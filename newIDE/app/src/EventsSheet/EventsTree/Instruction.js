@@ -1,6 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import capitalize from 'lodash/capitalize';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { mapFor } from '../../Utils/MapFor';
@@ -54,12 +55,6 @@ const styles = {
 };
 
 export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
-
-const capitalize = (str: string) => {
-  if (!str) return '';
-
-  return str[0].toUpperCase() + str.substr(1);
-};
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
   isCondition: boolean,

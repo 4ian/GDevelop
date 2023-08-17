@@ -16,6 +16,7 @@ export type AssetStorePageState = {|
   filtersState: FiltersState,
   scrollPosition?: ?number,
   displayAssets: boolean,
+  searchText?: string,
 |};
 
 export type NavigationState = {|
@@ -23,12 +24,22 @@ export type NavigationState = {|
   backToPreviousPage: () => AssetStorePageState,
   openHome: () => AssetStorePageState,
   clearHistory: () => void,
+  clearPreviousPageFromHistory: () => void,
   openSearchResultPage: () => void,
   openTagPage: string => void,
   openAssetCategoryPage: string => void,
-  openPackPage: (PublicAssetPack | PrivateAssetPack) => void,
-  openPrivateAssetPackInformationPage: PrivateAssetPackListingData => void,
-  openDetailPage: AssetShortHeader => void,
+  openPackPage: ({|
+    assetPack: PublicAssetPack | PrivateAssetPack,
+    previousSearchText: string,
+  |}) => void,
+  openPrivateAssetPackInformationPage: ({|
+    assetPack: PrivateAssetPackListingData,
+    previousSearchText: string,
+  |}) => void,
+  openDetailPage: ({|
+    assetShortHeader: AssetShortHeader,
+    previousSearchText: string,
+  |}) => void,
 |};
 
 const noFilter: FiltersState = {
@@ -118,6 +129,17 @@ export const useNavigation = (): NavigationState => {
           return { previousPages: [assetStoreHomePageState, currentPage] };
         });
       },
+      clearPreviousPageFromHistory: () => {
+        setHistory(previousHistory => {
+          if (previousHistory.previousPages.length <= 1) return previousHistory;
+
+          const newPreviousPages = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          return { previousPages: newPreviousPages };
+        });
+      },
       openSearchResultPage: () => {
         setHistory(previousHistory => {
           const currentPage =
@@ -178,16 +200,34 @@ export const useNavigation = (): NavigationState => {
           ],
         }));
       },
-      openPackPage: (assetPack: PublicAssetPack | PrivateAssetPack) => {
+      openPackPage: ({
+        assetPack,
+        previousSearchText,
+      }: {|
+        assetPack: PublicAssetPack | PrivateAssetPack,
+        previousSearchText: string,
+      |}) => {
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
             ];
+          const currentPageWithSearchText = {
+            ...currentPage,
+            searchText: previousSearchText,
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSearchText,
+          ];
           return {
             ...previousHistory,
             previousPages: [
-              ...previousHistory.previousPages,
+              ...previousPages,
               {
                 openedAssetShortHeader: null,
                 openedAssetCategory:
@@ -214,39 +254,85 @@ export const useNavigation = (): NavigationState => {
           };
         });
       },
-      openPrivateAssetPackInformationPage: (
-        assetPack: PrivateAssetPackListingData
-      ) => {
-        setHistory(previousHistory => ({
-          ...previousHistory,
-          previousPages: [
-            ...previousHistory.previousPages,
-            {
-              openedAssetShortHeader: null,
-              openedAssetCategory: null,
-              openedAssetPack: null,
-              openedPrivateAssetPackListingData: assetPack,
-              filtersState: noFilter,
-              displayAssets: false,
-            },
-          ],
-        }));
+      openPrivateAssetPackInformationPage: ({
+        assetPack,
+        previousSearchText,
+      }: {|
+        assetPack: PrivateAssetPackListingData,
+        previousSearchText: string,
+      |}) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSearchText = {
+            ...currentPage,
+            searchText: previousSearchText,
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSearchText,
+          ];
+          return {
+            ...previousHistory,
+            previousPages: [
+              ...previousPages,
+              {
+                openedAssetShortHeader: null,
+                openedAssetCategory: null,
+                openedAssetPack: null,
+                openedPrivateAssetPackListingData: assetPack,
+                filtersState: noFilter,
+                displayAssets: false,
+              },
+            ],
+          };
+        });
       },
-      openDetailPage: (assetShortHeader: AssetShortHeader) => {
-        setHistory(previousHistory => ({
-          ...previousHistory,
-          previousPages: [
-            ...previousHistory.previousPages,
-            {
-              openedAssetShortHeader: assetShortHeader,
-              openedAssetCategory: null,
-              openedAssetPack: null,
-              openedPrivateAssetPackListingData: null,
-              filtersState: noFilter,
-              displayAssets: false,
-            },
-          ],
-        }));
+      openDetailPage: ({
+        assetShortHeader,
+        previousSearchText,
+      }: {|
+        assetShortHeader: AssetShortHeader,
+        previousSearchText: string,
+      |}) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSearchText = {
+            ...currentPage,
+            searchText: previousSearchText,
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSearchText,
+          ];
+          return {
+            ...previousHistory,
+            previousPages: [
+              ...previousPages,
+              {
+                openedAssetShortHeader: assetShortHeader,
+                openedAssetCategory: null,
+                openedAssetPack: null,
+                openedPrivateAssetPackListingData: null,
+                filtersState: noFilter,
+                displayAssets: false,
+              },
+            ],
+          };
+        });
       },
     }),
     [previousPages]

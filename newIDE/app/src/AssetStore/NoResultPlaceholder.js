@@ -7,6 +7,7 @@ import RestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 
 type Props = {|
   onClear: () => void,
+  message?: React.Node,
 |};
 
 export const NoResultPlaceholder = (props: Props) => (
@@ -14,10 +15,12 @@ export const NoResultPlaceholder = (props: Props) => (
     <EmptyPlaceholder
       title={<Trans>No result</Trans>}
       description={
-        <Trans>
-          Try something else, browse the packs or create your object from
-          scratch!
-        </Trans>
+        props.message || (
+          <Trans>
+            Try something else, browse the packs or create your object from
+            scratch!
+          </Trans>
+        )
       }
       actionLabel={<Trans>Clear all filters</Trans>}
       actionButtonId="clear-filters-button"

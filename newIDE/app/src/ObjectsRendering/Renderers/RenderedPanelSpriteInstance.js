@@ -236,7 +236,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       return;
     }
 
-    console.log('Updating PanelSprite instance texture');
     function makeInsideTexture(rect) {
       if (rect.width < 0) rect.width = 0;
       if (rect.height < 0) rect.height = 0;

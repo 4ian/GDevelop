@@ -291,6 +291,5 @@ export const isTryingToSaveInForbiddenPath = (filePath: string): boolean => {
   const exePath = remote.app.getPath('exe');
   if (!exePath) return false; // This should not happen, but let's be safe.
   const gdevelopDirectory = path.dirname(exePath);
-  console.log(gdevelopDirectory, filePath);
   return filePath.startsWith(gdevelopDirectory);
 };

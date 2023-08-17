@@ -4,6 +4,7 @@ import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
   type PublicAssetPacks,
+  type PublicAssetPack,
   type Author,
   type License,
   type Environment,
@@ -23,6 +24,7 @@ import {
   ColorAssetStoreSearchFilter,
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
+  AssetPackTypeStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import {
   type NavigationState,
@@ -57,10 +59,15 @@ export type AssetFiltersState = {|
   setLicenseFilter: LicenseAssetStoreSearchFilter => void,
 |};
 
+export type AssetPackFiltersState = {|
+  typeFilter: AssetPackTypeStoreSearchFilter,
+  setTypeFilter: AssetPackTypeStoreSearchFilter => void,
+|};
+
 type AssetStoreState = {|
   filters: ?Filters,
   publicAssetPacks: ?PublicAssetPacks,
-  privateAssetPacks: ?Array<PrivateAssetPackListingData>,
+  privateAssetPackListingDatas: ?Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: ?{|
     starterPacks: Array<number>,
     privateAssetPacks: Array<number>,
@@ -69,12 +76,16 @@ type AssetStoreState = {|
   licenses: ?Array<License>,
   environment: Environment,
   setEnvironment: Environment => void,
-  searchResults: ?Array<AssetShortHeader>,
+  assetShortHeadersSearchResults: ?Array<AssetShortHeader>,
+  publicAssetPacksSearchResults: ?Array<PublicAssetPack>,
+  privateAssetPackListingDatasSearchResults: ?Array<PrivateAssetPackListingData>,
   fetchAssetsAndFilters: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
   assetFiltersState: AssetFiltersState,
+  assetPackFiltersState: AssetPackFiltersState,
+  clearAllFilters: () => void,
   navigationState: NavigationState,
   currentPage: AssetStorePageState,
   useSearchItem: (
@@ -89,13 +100,15 @@ type AssetStoreState = {|
 export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
   publicAssetPacks: null,
-  privateAssetPacks: null,
+  privateAssetPackListingDatas: null,
   assetPackRandomOrdering: null,
   authors: null,
   licenses: null,
   environment: 'live',
   setEnvironment: () => {},
-  searchResults: null,
+  assetShortHeadersSearchResults: null,
+  publicAssetPacksSearchResults: null,
+  privateAssetPackListingDatasSearchResults: null,
   fetchAssetsAndFilters: () => {},
   error: null,
   searchText: '',
@@ -114,11 +127,17 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     licenseFilter: new LicenseAssetStoreSearchFilter(),
     setLicenseFilter: filter => {},
   },
+  assetPackFiltersState: {
+    typeFilter: new AssetPackTypeStoreSearchFilter({}),
+    setTypeFilter: filter => {},
+  },
+  clearAllFilters: () => {},
   navigationState: {
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => assetStoreHomePageState,
     openHome: () => assetStoreHomePageState,
     clearHistory: () => {},
+    clearPreviousPageFromHistory: () => {},
     openSearchResultPage: () => {},
     openTagPage: tag => {},
     openAssetCategoryPage: category => {},
@@ -146,6 +165,13 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
     assetShortHeader.tags.join(', ')
   );
 };
+
+const getPublicAssetPackSearchTerms = (assetPack: PublicAssetPack) =>
+  assetPack.name + '\n' + assetPack.tag;
+
+const getPrivateAssetPackListingDataSearchTerms = (
+  privateAssetPack: PrivateAssetPackListingData
+) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
 const getAssetPackRandomOrdering = (length: number): Array<number> => {
   const array = new Array(length).fill(0).map((_, index) => index);
@@ -180,8 +206,8 @@ export const AssetStoreStateProvider = ({
     privateAssetPacks: Array<number>,
   |}>(null);
   const [
-    privateAssetPacks,
-    setPrivateAssetPacks,
+    privateAssetPackListingDatas,
+    setPrivateAssetPackListingDatas,
   ] = React.useState<?Array<PrivateAssetPackListingData>>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
@@ -235,7 +261,9 @@ export const AssetStoreStateProvider = ({
   );
   // When one of the filter change, we need to rebuild the array
   // for the search.
-  const searchFilters = React.useMemo<Array<SearchFilter<AssetShortHeader>>>(
+  const assetSearchFilters = React.useMemo<
+    Array<SearchFilter<AssetShortHeader>>
+  >(
     () => [
       animatedFilter,
       viewpointFilter,
@@ -254,6 +282,16 @@ export const AssetStoreStateProvider = ({
     ]
   );
 
+  const [
+    assetPackTypeFilter,
+    setAssetPackTypeFilter,
+  ] = React.useState<AssetPackTypeStoreSearchFilter>(
+    new AssetPackTypeStoreSearchFilter({ receivedAssetPacks })
+  );
+  const assetPackSearchFilters = React.useMemo<
+    Array<SearchFilter<PublicAssetPack | PrivateAssetPackListingData>>
+  >(() => [assetPackTypeFilter], [assetPackTypeFilter]);
+
   const fetchAssetsAndFilters = React.useCallback(
     () => {
       (async () => {
@@ -267,9 +305,11 @@ export const AssetStoreStateProvider = ({
           } = await listAllPublicAssets({ environment });
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
-          const privateAssetPacks = await listListedPrivateAssetPacks({
-            onlyAppStorePrivateAssetPacks,
-          });
+          const privateAssetPackListingDatas = await listListedPrivateAssetPacks(
+            {
+              onlyAppStorePrivateAssetPacks,
+            }
+          );
 
           console.info(
             `Loaded ${
@@ -281,7 +321,7 @@ export const AssetStoreStateProvider = ({
           setFilters(publicFilters);
           setAuthors(authors);
           setLicenses(licenses);
-          setPrivateAssetPacks(privateAssetPacks);
+          setPrivateAssetPackListingDatas(privateAssetPackListingDatas);
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -330,7 +370,7 @@ export const AssetStoreStateProvider = ({
       if (
         publicAssetPacks &&
         receivedAssetPacks &&
-        privateAssetPacks &&
+        privateAssetPackListingDatas &&
         initialPackUserFriendlySlug
       ) {
         initialPackOpened.current = true;
@@ -343,7 +383,10 @@ export const AssetStoreStateProvider = ({
         });
 
         if (assetPack) {
-          navigationState.openPackPage(assetPack);
+          navigationState.openPackPage({
+            assetPack,
+            previousSearchText: searchText,
+          });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);
           return;
@@ -351,12 +394,15 @@ export const AssetStoreStateProvider = ({
 
         // Otherwise, try to open the information page of a pack not yet bought.
         const privateAssetPack = getPrivateAssetPackListingData({
-          privateAssetPacks,
+          privateAssetPackListingDatas,
           userFriendlySlug: initialPackUserFriendlySlug,
         });
 
         if (privateAssetPack) {
-          navigationState.openPrivateAssetPackInformationPage(privateAssetPack);
+          navigationState.openPrivateAssetPackInformationPage({
+            assetPack: privateAssetPack,
+            previousSearchText: searchText,
+          });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);
           return;
@@ -371,10 +417,11 @@ export const AssetStoreStateProvider = ({
     [
       publicAssetPacks,
       receivedAssetPacks,
-      privateAssetPacks,
+      privateAssetPackListingDatas,
       navigationState,
       showAlert,
       initialPackUserFriendlySlug,
+      searchText,
     ]
   );
 
@@ -387,13 +434,49 @@ export const AssetStoreStateProvider = ({
     [fetchAssetsAndFilters]
   );
 
+  const publicAssetPacksByTag = React.useMemo(
+    () => {
+      if (!publicAssetPacks) {
+        return null;
+      }
+      const publicAssetPacksByTag = {};
+      publicAssetPacks.starterPacks.forEach(assetPack => {
+        const tag = assetPack.tag;
+        if (publicAssetPacksByTag[tag]) {
+          console.warn(`Multiple public asset packs with the same tag: ${tag}`);
+        }
+        publicAssetPacksByTag[tag] = assetPack;
+      });
+      return publicAssetPacksByTag;
+    },
+    [publicAssetPacks]
+  );
+
+  const privateAssetPackListingDatasById = React.useMemo(
+    () => {
+      if (!privateAssetPackListingDatas) {
+        return null;
+      }
+      const privateAssetPackListingDatasById = {};
+      privateAssetPackListingDatas.forEach(privateAssetPackListingData => {
+        const id = privateAssetPackListingData.id;
+        if (privateAssetPackListingDatasById[id]) {
+          console.warn(`Multiple private asset packs with the same id: ${id}`);
+        }
+        privateAssetPackListingDatasById[id] = privateAssetPackListingData;
+      });
+      return privateAssetPackListingDatasById;
+    },
+    [privateAssetPackListingDatas]
+  );
+
   // Randomize asset packs when number of asset packs and private asset packs change
   const assetPackCount =
     publicAssetPacks && publicAssetPacks.starterPacks
       ? publicAssetPacks.starterPacks.length
       : undefined;
-  const privateAssetPackCount = privateAssetPacks
-    ? privateAssetPacks.length
+  const privateAssetPackCount = privateAssetPackListingDatas
+    ? privateAssetPackListingDatas.length
     : undefined;
   React.useEffect(
     () => {
@@ -410,22 +493,102 @@ export const AssetStoreStateProvider = ({
 
   const currentPage = navigationState.getCurrentPage();
   const { chosenCategory, chosenFilters } = currentPage.filtersState;
-  const searchResults: ?Array<AssetShortHeader> = useSearchItem(
+  const assetShortHeadersSearchResults: ?Array<AssetShortHeader> = useSearchItem(
     assetShortHeadersById,
     getAssetShortHeaderSearchTerms,
     searchText,
     chosenCategory,
     chosenFilters,
-    searchFilters
+    assetSearchFilters
+  );
+
+  const publicAssetPacksSearchResults: ?Array<PublicAssetPack> = useSearchItem(
+    publicAssetPacksByTag,
+    getPublicAssetPackSearchTerms,
+    searchText,
+    chosenCategory,
+    null,
+    // $FlowFixMe - this filter works for both public and private packs
+    assetPackSearchFilters
+  );
+
+  const privateAssetPackListingDatasSearchResults: ?Array<PrivateAssetPackListingData> = useSearchItem(
+    privateAssetPackListingDatasById,
+    getPrivateAssetPackListingDataSearchTerms,
+    searchText,
+    chosenCategory,
+    null,
+    // $FlowFixMe - this filter works for both public and private packs
+    assetPackSearchFilters
+  );
+
+  const assetFiltersState: AssetFiltersState = React.useMemo(
+    () => ({
+      animatedFilter,
+      setAnimatedFilter,
+      viewpointFilter,
+      setViewpointFilter,
+      dimensionFilter,
+      setDimensionFilter,
+      objectTypeFilter,
+      setObjectTypeFilter,
+      colorFilter,
+      setColorFilter,
+      licenseFilter,
+      setLicenseFilter,
+    }),
+    [
+      animatedFilter,
+      setAnimatedFilter,
+      viewpointFilter,
+      setViewpointFilter,
+      dimensionFilter,
+      setDimensionFilter,
+      objectTypeFilter,
+      setObjectTypeFilter,
+      colorFilter,
+      setColorFilter,
+      licenseFilter,
+      setLicenseFilter,
+    ]
+  );
+
+  const assetPackFiltersState: AssetPackFiltersState = React.useMemo(
+    () => ({
+      typeFilter: assetPackTypeFilter,
+      setTypeFilter: setAssetPackTypeFilter,
+    }),
+    [assetPackTypeFilter, setAssetPackTypeFilter]
+  );
+
+  const clearAllFilters = React.useCallback(
+    () => {
+      assetFiltersState.setAnimatedFilter(new AnimatedAssetStoreSearchFilter());
+      assetFiltersState.setViewpointFilter(new TagAssetStoreSearchFilter());
+      assetFiltersState.setDimensionFilter(
+        new DimensionAssetStoreSearchFilter()
+      );
+      assetFiltersState.setObjectTypeFilter(
+        new ObjectTypeAssetStoreSearchFilter()
+      );
+      assetFiltersState.setColorFilter(new ColorAssetStoreSearchFilter());
+      assetFiltersState.setLicenseFilter(new LicenseAssetStoreSearchFilter());
+      assetPackFiltersState.setTypeFilter(
+        new AssetPackTypeStoreSearchFilter({})
+      );
+    },
+    [assetFiltersState, assetPackFiltersState]
   );
 
   const assetStoreState = React.useMemo(
     () => ({
-      searchResults,
+      assetShortHeadersSearchResults,
+      publicAssetPacksSearchResults,
+      privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,
       publicAssetPacks,
-      privateAssetPacks,
+      privateAssetPackListingDatas,
       assetPackRandomOrdering,
       authors,
       licenses,
@@ -436,20 +599,9 @@ export const AssetStoreStateProvider = ({
       currentPage,
       searchText,
       setSearchText,
-      assetFiltersState: {
-        animatedFilter,
-        setAnimatedFilter,
-        viewpointFilter,
-        setViewpointFilter,
-        dimensionFilter,
-        setDimensionFilter,
-        objectTypeFilter,
-        setObjectTypeFilter,
-        colorFilter,
-        setColorFilter,
-        licenseFilter,
-        setLicenseFilter,
-      },
+      assetFiltersState,
+      assetPackFiltersState,
+      clearAllFilters,
       useSearchItem: (
         searchText,
         chosenCategory,
@@ -467,11 +619,13 @@ export const AssetStoreStateProvider = ({
       setInitialPackUserFriendlySlug,
     }),
     [
-      searchResults,
+      assetShortHeadersSearchResults,
+      publicAssetPacksSearchResults,
+      privateAssetPackListingDatasSearchResults,
       fetchAssetsAndFilters,
       filters,
       publicAssetPacks,
-      privateAssetPacks,
+      privateAssetPackListingDatas,
       assetPackRandomOrdering,
       authors,
       licenses,
@@ -481,13 +635,9 @@ export const AssetStoreStateProvider = ({
       navigationState,
       currentPage,
       searchText,
-      animatedFilter,
-      viewpointFilter,
-      dimensionFilter,
-      objectTypeFilter,
-      colorFilter,
-      licenseFilter,
-      setLicenseFilter,
+      assetFiltersState,
+      assetPackFiltersState,
+      clearAllFilters,
       assetShortHeadersById,
       setInitialPackUserFriendlySlug,
     ]

@@ -16,6 +16,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
 
 using namespace std;
@@ -1260,6 +1261,11 @@ gd::String EventsCodeGenerator::GenerateArgumentsList(
   }
 
   return argumentsStr;
+}
+
+gd::ObjectsContainersList EventsCodeGenerator::GetObjectsContainersList() const {
+  // Build a container here to avoid refactoring this entire class, but this should be done at some point.
+  return gd::ObjectsContainersList::MakeNewObjectsContainersListForContainers(globalObjectsAndGroups, objectsAndGroups);
 }
 
 EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,

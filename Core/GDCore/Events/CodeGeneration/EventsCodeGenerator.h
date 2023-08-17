@@ -19,6 +19,7 @@ class Expression;
 class Project;
 class Layout;
 class ObjectsContainer;
+class ObjectsContainersList;
 class ExternalEvents;
 class ParameterMetadata;
 class ObjectMetadata;
@@ -328,6 +329,7 @@ class GD_CORE_API EventsCodeGenerator {
 
   /**
    * \brief Get the global objects/groups used for code generation.
+   * @deprecated Use `GetObjectsContainersList()`.
    */
   const gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
     return globalObjectsAndGroups;
@@ -335,10 +337,13 @@ class GD_CORE_API EventsCodeGenerator {
 
   /**
    * \brief Get the objects/groups used for code generation.
+   * @deprecated Use `GetObjectsContainersList()`.
    */
   const gd::ObjectsContainer& GetObjectsAndGroups() const {
     return objectsAndGroups;
   }
+
+  gd::ObjectsContainersList GetObjectsContainersList() const;
 
   /**
    * \brief Return true if the code generation is done for a given project and
@@ -557,6 +562,15 @@ class GD_CORE_API EventsCodeGenerator {
     }
 
     return "getVariableForObject(" + objectName + ", " + variableName + ")";
+  }
+
+  /**
+   * \brief Generate the code to get object variables.
+   */
+  virtual gd::String GenerateGetObjectVariables(
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& objectName) {
+    return "getVariablesForObject(" + objectName + ")";
   }
 
   /**

@@ -457,7 +457,7 @@ class GD_CORE_API ExpressionCompletionFinder
           node.location.GetEndPosition(),
           objectName));
     } else {
-      // Object function or behavior name
+      // Object function, behavior name, variable, object variable.
       if (IsCaretOn(node.identifierNameLocation)) {
         // TODO: add completions for variable
         completions.push_back(ExpressionCompletionDescription::ForObject(

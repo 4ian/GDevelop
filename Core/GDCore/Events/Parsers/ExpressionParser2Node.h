@@ -239,9 +239,10 @@ struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public Expres
 };
 
 /**
- * \brief A variable with bracket accessor or at least 2 "dot" accessors.
+ * \brief A variable, or object variable, with bracket accessor or at least 2 "dot" accessors.
  *
- * Example: MyVariable[MyChildren] or MyVariable.MyChildren.MyGranChildren.
+ * Example: `MyVariable["MyChildren"]` or `MyVariable.MyChildren.MyGrandChildren`.
+ * Example: `MyObject["MyVariable"]` or `MyObject.MyVariable.MyChildren`.
  *
  * Other cases like "MyVariable" or "MyVariable.MyChildren" are IdentifierNode
  * to allow handling ambiguities.

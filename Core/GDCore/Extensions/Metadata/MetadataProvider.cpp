@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/String.h"
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
 
@@ -391,20 +392,19 @@ MetadataProvider::GetBehaviorAnyExpressionMetadata(const gd::Platform& platform,
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
-    const gd::Platform& platform, 
-    const gd::ObjectsContainer &globalObjectsContainer,
-    const gd::ObjectsContainer &objectsContainer,
+    const gd::Platform& platform,
+    const gd::ObjectsContainersList &objectsContainersList,
     FunctionCallNode& node) {
 
   if (!node.behaviorName.empty()) {
-    gd::String behaviorType = 
-        GetTypeOfBehavior(globalObjectsContainer, objectsContainer, node.behaviorName);
+    gd::String behaviorType =
+        objectsContainersList.GetTypeOfBehavior(node.behaviorName);
     return MetadataProvider::GetBehaviorAnyExpressionMetadata(
             platform, behaviorType, node.functionName);
   }
   else if (!node.objectName.empty()) {
-    gd::String objectType = 
-        GetTypeOfObject(globalObjectsContainer, objectsContainer, node.objectName);
+    gd::String objectType =
+        objectsContainersList.GetTypeOfObject(node.objectName);
     return MetadataProvider::GetObjectAnyExpressionMetadata(
                   platform, objectType, node.functionName);
   }
@@ -412,10 +412,9 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
   return MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName);
 }
 
-  const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
-    const gd::Platform& platform, 
-    const gd::ObjectsContainer &globalObjectsContainer,
-    const gd::ObjectsContainer &objectsContainer,
+const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
+    const gd::Platform& platform,
+    const gd::ObjectsContainersList &objectsContainersList,
     FunctionCallNode& functionCall,
     ExpressionNode& parameter) {
       int parameterIndex = -1;
@@ -429,17 +428,15 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
         return nullptr;
       }
       return MetadataProvider::GetFunctionCallParameterMetadata(
-          platform, 
-          globalObjectsContainer,
-          objectsContainer,
+          platform,
+          objectsContainersList,
           functionCall,
           parameterIndex);
 }
 
-  const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
-    const gd::Platform& platform, 
-    const gd::ObjectsContainer &globalObjectsContainer,
-    const gd::ObjectsContainer &objectsContainer,
+const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
+    const gd::Platform& platform,
+    const gd::ObjectsContainersList &objectsContainersList,
     FunctionCallNode& functionCall,
     int parameterIndex) {
       // Search the parameter metadata index skipping invisible ones.
@@ -448,7 +445,7 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
           ExpressionParser2::WrittenParametersFirstIndex(
               functionCall.objectName, functionCall.behaviorName);
       const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
-          platform, globalObjectsContainer, objectsContainer, functionCall);
+          platform, objectsContainersList, functionCall);
 
       if (IsBadExpressionMetadata(metadata)) {
         return nullptr;

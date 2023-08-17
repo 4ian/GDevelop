@@ -7,8 +7,8 @@
 
 #include <algorithm>
 #include <memory>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Expression.h"
@@ -19,7 +19,9 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/VariablesContainersList.h"
 #include "GDCore/Tools/Localization.h"
@@ -62,22 +64,11 @@ size_t GetMaximumParametersNumber(
 
 }  // namespace
 
-std::optional<ExpressionValidator::Type> ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
+std::optional<ExpressionValidator::Type>
+ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
     const gd::IdentifierNode& identifier) {
-
-  if (hasObject with node.name in the codeGenerator containers) {
-  } else {
-
-
-  if (!variablesContainersList.Has(identifier.identifierName))
-    return {}; // The identifier does not even reference a declared variable.
-
-  // The identifier referes to a variable, check its type (or the child variable type, if any).
-  const gd::Variable& variable =
-      variablesContainersList.Get(identifier.identifierName);
-
   auto validateVariableTypeForExpression =
-      [](const gd::Variable& variable) {
+      [](gd::Variable::Type type) {
         const auto& type = variable.GetType();
 
         // Number or string variables can be used in expressions.
@@ -109,77 +100,104 @@ std::optional<ExpressionValidator::Type> ExpressionValidator::ValidateMaybeObjec
         }
       }
 
-  if (identifier.childIdentifierName.empty()) {
-    // Just the root variable is accessed, check it can be used in an expression.
-    return validateVariableTypeForExpression(variable);
-  }
-  else {
-    // A child variable is accessed, check it can be used in an expression.
-    if (!variable.HasChild(identifier.childIdentifierName)) {
-      RaiseTypeError(_("No child variable with this name found."),
-                         identifier.childIdentifierLocation);
+  const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
 
-      return Type::Unknown;
+  // Try first to identify an object variable ("MyObject.MyVariable"). If there is no childIdentifierName
+  // (i.e: no "MyVariable", it's just a plain identifier in a single word), this won't find anything.
+  auto objectOrGroupVariableType =
+      projectScopedContainers.GetObjectsContainersList()
+        .HasObjectWithVariableNamed(identifier.identifierName, identifier.childIdentifierName);
+  if (objectOrGroupVariableType) {
+    return validateVariableTypeForExpression(*objectOrGroupVariableType);
+  } else {
+    // Try to identify a declared variable with the name (and maybe the child
+    // variable).
+
+    if (!variablesContainersList.Has(identifier.identifierName))
+      return {};  // The identifier does not even reference a declared variable.
+
+    // The identifier refers to a variable, check its type (or the child
+    // variable type, if any).
+    const gd::Variable& variable =
+        variablesContainersList.Get(identifier.identifierName);
+
+    if (identifier.childIdentifierName.empty()) {
+      // Just the root variable is accessed, check it can be used in an
+      // expression.
+      return validateVariableTypeForExpression(variable.GetType());
+    } else {
+      // A child variable is accessed, check it can be used in an expression.
+      if (!variable.HasChild(identifier.childIdentifierName)) {
+        RaiseTypeError(_("No child variable with this name found."),
+                       identifier.childIdentifierLocation);
+
+        return Type::Unknown;
+      }
+
+      const gd::Variable& childVariable =
+          variable.GetChild(identifier.childIdentifierName);
+      return validateVariableTypeForExpression(childVariable.GetType());
     }
-
-    const gd::Variable& childVariable =
-        variable.GetChild(identifier.childIdentifierName);
-    return validateVariableTypeForExpression(childVariable);
-  }
-
   }
 }
 
 ExpressionValidator::Type ExpressionValidator::ValidateVariable(
     const gd::VariableNode& variableNode) {
-  if (!variablesContainersList.Has(variableNode.name)) {
-      RaiseTypeError(_("No child variable with this name found."),
-                         identifier.childIdentifierLocation);
+  const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
+
+  // Try first to identify an object.
+  if (projectScopedContainers.GetObjectsContainersList().HasObjectOrGroupNamed(variableNode.name)) {
+    // Object found. We can't validate the variable type though.
+    return;
+  } else if (variablesContainersList.Has(variableNode.name)) {
+    // We found the variable, check its type (or the child variable
+    // type, if any).
+    const gd::Variable& variable = variablesContainersList.Get(variableNode.name);
+
+    // Numbers or strings are always fine.
+    if (type == Variable::Number)
       return;
+    else if (type == Variable::String)
+      return;
+
+    // Any other type won't work alone in an expression.
+    if (type == Variable::Boolean) {
+      RaiseTypeError(_("This boolean variable can't be used here."),
+                    identifier.identifierNameLocation);
+      return;
+    } else if (type == Variable::Structure) {
+      // TODO: check if we can know the type of the final child.
+      return;
+    } else if (type == Variable::Array) {
+      // TODO: check if we can know the type of the final child.
+      return;
+    } else {
+      // Should not happen.
+      RaiseTypeError(_("Unexpected variable type"),
+                    identifier.identifierNameLocation);
+      return;
+    }
   }
 
-  // The identifier referes to a variable, check its type (or the child variable type, if any).
-  const gd::Variable& variable =
-      variablesContainersList.Get(variableNode.name);
-
-  // Numbers or strings are always fine.
-  if (type == Variable::Number) return;
-  else if (type == Variable::String) return;
-
-  // Any other type won't work alone in an expression.
-  if (type == Variable::Boolean) {
-    RaiseTypeError(_("This boolean variable can't be used here."),
-                  identifier.identifierNameLocation);
+    RaiseTypeError(_("No variable or object with this name found."),
+                  variableNode.location);
     return;
-  } else if (type == Variable::Structure) {
-    // TODO: check if we can know the type of the final child.
-    return;
-  } else if (type == Variable::Array) {
-    // TODO: check if we can know the type of the final child.
-    return;
-  } else {
-    // Should not happen.
-    RaiseTypeError(_("Unexpected variable type"),
-                  identifier.identifierNameLocation);
-    return;
-  }
 }
 
 ExpressionValidator::Type ExpressionValidator::ValidateFunction(
     const gd::FunctionCallNode& function) {
   ReportAnyError(function);
 
+  auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+
   gd::String objectType =
       function.objectName.empty()
           ? ""
-          : GetTypeOfObject(
-                globalObjectsContainer, objectsContainer, function.objectName);
+          : objectsContainersList.GetTypeOfObject(function.objectName);
 
   gd::String behaviorType = function.behaviorName.empty()
                                 ? ""
-                                : GetTypeOfBehavior(globalObjectsContainer,
-                                                    objectsContainer,
-                                                    function.behaviorName);
+                                : objectsContainersList.GetTypeOfBehavior(function.behaviorName);
 
   const gd::ExpressionMetadata& metadata =
       function.behaviorName.empty()
@@ -194,10 +212,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
   Type returnType = StringToType(metadata.GetReturnType());
 
   if (!function.objectName.empty() &&
-      !globalObjectsContainer.HasObjectNamed(function.objectName) &&
-      !globalObjectsContainer.GetObjectGroups().Has(function.objectName) &&
-      !objectsContainer.HasObjectNamed(function.objectName) &&
-      !objectsContainer.GetObjectGroups().Has(function.objectName)) {
+      !objectsContainersList.HasObjectOrGroupNamed(function.objectName)) {
     RaiseTypeError(_("This object doesn't exist."),
                    function.objectNameLocation,
                    /*isFatal=*/false);
@@ -205,9 +220,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
   }
 
   if (!function.behaviorName.empty() &&
-      !gd::HasBehaviorInObjectOrGroup(globalObjectsContainer,
-                                      objectsContainer,
-                                      function.objectName,
+      !objectsContainersList.HasBehaviorInObjectOrGroup(function.objectName,
                                       function.behaviorName)) {
     RaiseTypeError(_("This behavior is not attached to this object."),
                    function.behaviorNameLocation,

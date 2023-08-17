@@ -23,6 +23,7 @@ class Platform;
 class ParameterMetadata;
 class ExpressionMetadata;
 class VariablesContainersList;
+class ProjectScopedContainers;
 }  // namespace gd
 
 namespace gd {
@@ -36,15 +37,10 @@ namespace gd {
 class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
  public:
   ExpressionValidator(const gd::Platform &platform_,
-                      // TODO: use EventsScope
-                      const gd::ObjectsContainer &globalObjectsContainer_,
-                      const gd::ObjectsContainer &objectsContainer_,
-                      const gd::VariablesContainersList &variablesContainersList_,
+                      const gd::ProjectScopedContainers & projectScopedContainers_,
                       const gd::String &rootType_)
       : platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
-        variablesContainersList(variablesContainersList_),
+        projectScopedContainers(projectScopedContainers_),
         parentType(StringToType(gd::ParameterMetadata::GetExpressionValueType(rootType_))),
         childType(Type::Unknown) {};
   virtual ~ExpressionValidator(){};
@@ -54,13 +50,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
    * any error including non-fatal ones.
    */
   static bool HasNoErrors(const gd::Platform &platform,
-                      // TODO: use EventsScope
-                      const gd::ObjectsContainer &globalObjectsContainer,
-                      const gd::ObjectsContainer &objectsContainer,
-                      const gd::VariablesContainersList &variablesContainersList_,
+                      const gd::ProjectScopedContainers & projectScopedContainers,
                       const gd::String &rootType,
                       gd::ExpressionNode& node) {
-    gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, variablesContainersList_, rootType);
+    gd::ExpressionValidator validator(platform, projectScopedContainers, rootType);
     node.Visit(validator);
     return validator.GetAllErrors().empty();
   }
@@ -355,9 +348,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   Type childType;
   Type parentType;
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
-  const gd::VariablesContainersList &variablesContainersList;
+  const gd::ProjectScopedContainers &projectScopedContainers;
 };
 
 }  // namespace gd

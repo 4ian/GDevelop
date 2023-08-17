@@ -479,6 +479,7 @@ gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContain
 /**
  * \brief Get a type from a behavior name
  * @return Type of the behavior.
+ * @deprecated - Use GetTypeOfBehaviorInObjectOrGroup instead.
  */
 gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
                                          const ObjectsContainer& layout,

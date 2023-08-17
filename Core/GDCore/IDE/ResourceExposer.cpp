@@ -24,6 +24,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 
 namespace gd {
 
@@ -71,6 +72,43 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
   auto& loadingScreen = project.GetLoadingScreen();
   if (loadingScreen.GetBackgroundImageResourceName() != "")
     worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
+}
+
+void ResourceExposer::ExposeLayoutResources(
+    gd::Project &project, gd::Layout &layout,
+    gd::ArbitraryResourceWorker &worker) {
+
+  // Expose object configuration resources
+  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
+  gd::ProjectBrowserHelper::ExposeLayoutObjects(layout, objectWorker);
+
+  // Expose layer effect resources
+  for (std::size_t layerIndex = 0; layerIndex < layout.GetLayersCount();
+       layerIndex++) {
+    auto &layer = layout.GetLayer(layerIndex);
+
+    auto &effects = layer.GetEffects();
+    for (size_t effectIndex = 0; effectIndex < effects.GetEffectsCount();
+         effectIndex++) {
+      auto &effect = effects.GetEffect(effectIndex);
+      gd::ResourceExposer::ExposeEffectResources(project.GetCurrentPlatform(),
+                                                 effect, worker);
+    }
+  }
+
+  // Expose event resources
+  auto eventWorker = gd::GetResourceWorkerOnEvents(project, worker);
+  gd::ProjectBrowserHelper::ExposeLayoutEventsAndDependencies(project, layout,
+                                                              eventWorker);
+
+  // Exposed extension event resources
+  // Note that using resources in extensions is very unlikely and probably not
+  // worth the effort of something smart.
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(project, eventsFunctionsExtension, eventWorker);
+  }
 }
 
 void ResourceExposer::ExposeEffectResources(

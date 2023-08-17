@@ -60,14 +60,47 @@ public:
    * \brief Call the specified worker on all events of a layout and
    * its external events.
    */
-  static void ExposeLayoutEvents(gd::Project &project, gd::Layout &layout,
+  static void ExposeLayoutEventsAndExternalEvents(gd::Project &project, gd::Layout &layout,
                                  gd::ArbitraryEventsWorker &worker);
   /**
    * \brief Call the specified worker on all events of a layout and
    * its external events.
    */
-  static void ExposeLayoutEvents(gd::Project &project, gd::Layout &layout,
+  static void ExposeLayoutEventsAndExternalEvents(gd::Project &project, gd::Layout &layout,
                                  gd::ArbitraryEventsWorkerWithContext &worker);
+
+  /**
+   * \brief Call the specified worker on all events of a layout and
+   * its dependencies according to EventLink (external events or other layout
+   * events).
+   */
+  static void
+  ExposeLayoutEventsAndDependencies(gd::Project &project, gd::Layout &layout,
+                                    gd::ArbitraryEventsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
+   * extension
+   *
+   * This should be the preferred way to traverse all the events of an events
+   * based extension.
+   */
+  static void ExposeEventsFunctionsExtensionEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::ArbitraryEventsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
+   * extension
+   *
+   * This should be the preferred way to traverse all the events of an events
+   * based extension.
+   */
+  static void ExposeEventsFunctionsExtensionEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
    * \brief Call the specified worker on all events of the event-based
@@ -101,6 +134,18 @@ public:
   static void
   ExposeEventsBasedObjectEvents(gd::Project &project,
                                 const gd::EventsBasedObject &eventsBasedObject,
+                                gd::ArbitraryEventsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
+   * behavior.
+   *
+   * This should be the preferred way to traverse all the events of an
+   * event-based behavior.
+   */
+  static void
+  ExposeEventsBasedObjectEvents(gd::Project &project,
+                                const gd::EventsBasedObject &eventsBasedObject,
                                 gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
@@ -111,6 +156,14 @@ public:
    */
   static void ExposeProjectObjects(gd::Project &project,
                                    gd::ArbitraryObjectsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all ObjectContainers of the layout.
+   *
+   * This should be the preferred way to traverse all the objects of a layout.
+   */
+  static void ExposeLayoutObjects(gd::Layout &layout,
+                                  gd::ArbitraryObjectsWorker &worker);
 
   /**
    * \brief Call the specified worker on all FunctionsContainers of the project

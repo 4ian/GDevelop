@@ -10,6 +10,7 @@ class Platform;
 class Project;
 class ArbitraryResourceWorker;
 class Effect;
+class Layout;
 } // namespace gd
 
 namespace gd {
@@ -29,6 +30,9 @@ public:
    * \see ArbitraryResourceWorker
    */
   static void ExposeWholeProjectResources(gd::Project &project,
+                                          gd::ArbitraryResourceWorker &worker);
+
+  static void ExposeLayoutResources(gd::Project &project, gd::Layout &layout,
                                           gd::ArbitraryResourceWorker &worker);
 
   static void ExposeEffectResources(gd::Platform &platform, gd::Effect &effect,

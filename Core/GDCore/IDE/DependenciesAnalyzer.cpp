@@ -51,8 +51,8 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events) {
           // Circular dependency!
           return false;
         }
-        bool isDependencyAdded = externalEventsDependencies.insert(linked).second;
-        if (isDependencyAdded) {
+        bool wasDependencyJustAdded = externalEventsDependencies.insert(linked).second;
+        if (wasDependencyJustAdded) {
           parentExternalEvents.push_back(linked);
           if (!Analyze(project.GetExternalEvents(linked).GetEvents()))
             return false;
@@ -64,8 +64,8 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events) {
           // Circular dependency!
           return false;
         }
-        bool isDependencyAdded = scenesDependencies.insert(linked).second;
-        if (isDependencyAdded) {
+        bool wasDependencyJustAdded = scenesDependencies.insert(linked).second;
+        if (wasDependencyJustAdded) {
           parentScenes.push_back(linked);
           if (!Analyze(project.GetLayout(linked).GetEvents()))
             return false;

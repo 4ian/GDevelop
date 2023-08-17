@@ -132,7 +132,7 @@ namespace gdjs {
           new PIXI_SPINE.TextureAtlas(
             xhr.response,
             (path, textureCb) => {
-              const atlasImagePath = resourceName.substring(0, resourceName.lastIndexOf('/') + 1) + path;
+              const atlasImagePath = resourceName.match(/(^.*[\\\/]|^[^\\\/].*)/i)![0] + path;
               textureCb(this._imageManager.getPIXITexture(atlasImagePath).baseTexture)
             },
             (atlas) => {

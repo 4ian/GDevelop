@@ -230,7 +230,8 @@ namespace gdjs {
       );
       this._textManager = new gdjs.TextManager(
         this._data.resources.resources,
-        this._resourcesLoader
+        this._resourcesLoader,
+        this._imageManager
       )
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         this._data.resources.resources,

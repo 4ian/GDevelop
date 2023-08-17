@@ -19,7 +19,7 @@ namespace gdjs {
     private _scale: number;
     private _timeScale: number;
     private _animations: SpineAnimation[];
-    private _currentAnimationIndex!: number;
+    private _currentAnimationIndex = 0;
     private _renderer: gdjs.SpineRuntimeObjectPixiRenderer;
 
     readonly jsonResourceName: string;
@@ -74,11 +74,14 @@ namespace gdjs {
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+      let animationIndex = this._currentAnimationIndex;
       for (const extraData of initialInstanceData.numberProperties || []) {
         if (extraData.name === 'animation') {
-          this.setAnimationIndex(extraData.value);
+          animationIndex = extraData.value;
         }
       }
+      this.setAnimationIndex(animationIndex);
+
       if (initialInstanceData.customSize) {
         // prioritize custom size
         this.setScale(1);

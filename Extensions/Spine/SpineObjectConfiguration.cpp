@@ -96,11 +96,11 @@ SpineObjectConfiguration::GetProperties() const {
 }
 
 bool SpineObjectConfiguration::UpdateInitialInstanceProperty(
-    gd::InitialInstance &instance, const gd::String &propertyName,
-    const gd::String &newValue, gd::Project &project, gd::Layout &layout) {
+  gd::InitialInstance &instance, const gd::String &propertyName,
+  const gd::String &newValue, gd::Project &project, gd::Layout &layout
+) {
   if (propertyName == "animation") {
-    instance.SetRawDoubleProperty(
-        "animation", std::max(0, newValue.empty() ? 0 : newValue.To<int>()));
+    instance.SetRawDoubleProperty("animation", std::max(0, newValue.empty() ? 0 : newValue.To<int>()));
   }
 
   return true;
@@ -110,10 +110,9 @@ std::map<gd::String, gd::PropertyDescriptor>
 SpineObjectConfiguration::GetInitialInstanceProperties(const gd::InitialInstance &instance, gd::Project &project, gd::Layout &layout) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties["animation"] =
-      gd::PropertyDescriptor(
-          gd::String::From(instance.GetRawDoubleProperty("animation")))
-          .SetLabel(_("Animation"))
-          .SetType("number");
+      gd::PropertyDescriptor(gd::String::From(instance.GetRawDoubleProperty("animation")))
+        .SetLabel(_("Animation"))
+        .SetType("number");
   
   return properties;
 }
@@ -141,8 +140,7 @@ void SpineObjectConfiguration::DoUnserializeFrom(gd::Project &project, const gd:
   }
 }
 
-void SpineObjectConfiguration::DoSerializeTo(
-    gd::SerializerElement &element) const {
+void SpineObjectConfiguration::DoSerializeTo(gd::SerializerElement &element) const {
   auto &content = element.AddChild("content");
   content.SetAttribute("scale", scale);
   content.SetAttribute("opacity", opacity);

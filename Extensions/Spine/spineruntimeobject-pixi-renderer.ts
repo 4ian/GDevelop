@@ -2,17 +2,13 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
   import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
 
-  type SpineCb<T = any> = (s: PIXI_SPINE.Spine) => T;
-
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
    */
   export class SpineRuntimeObjectPixiRenderer {
     _object: gdjs.SpineRuntimeObject;
     _pixiObject: PIXI.Container;
-    _spine?: PIXI_SPINE.Spine;
-    _spinePromise!: Promise<PIXI_SPINE.Spine>;
-    private _isUpdatable = true;
+    _spine!: PIXI_SPINE.Spine;
     private _isAnimationCompelete = true;
 
     get isAnimationCompelete() {
@@ -20,12 +16,11 @@ namespace gdjs {
     }
 
     get isUpdatable() {
-      return this._isUpdatable;
+      return this._spine.autoUpdate;
     }
 
     set isUpdatable(isUpdatable: boolean) {
-      this._isUpdatable = isUpdatable;
-      this.applySpineAction(spine => spine.autoUpdate = this._isUpdatable);
+      this._spine.autoUpdate = isUpdatable
     }
 
     /**
@@ -62,7 +57,7 @@ namespace gdjs {
     }
 
     updateTimeScale() {
-      this.applySpineAction(spine => spine.state.timeScale = this._object.getTimeScale());
+      this._spine.state.timeScale = this._object.getTimeScale();
     }
 
     updateScale(): void {
@@ -96,78 +91,45 @@ namespace gdjs {
     }
 
     setWidth(width: float): void {
-      this.applySpineAction(spine => {
-        spine.width = width;
-        this.updateBounds(spine);
-      })
+      this._spine.width = width;
+      this.updateBounds(this._spine);
     }
 
     setHeight(height: float): void {
-      this.applySpineAction(spine => {
-        spine.height = height;
-        this.updateBounds(spine);
-      });
+      this._spine.height = height;
+      this.updateBounds(this._spine);
     }
 
     setSize(width: float, height: float): void {
-      this.applySpineAction(spine => {
-        spine.width = width;
-        spine.height = height;
-        this.updateBounds(spine);
-      });
+      this._spine.width = width;
+      this._spine.height = height;
+      this.updateBounds(this._spine);
     }
 
     setAnimation(animation: string, loop: boolean) {
-      this.applySpineAction(s => {
-        this._isAnimationCompelete = false;
-        s.state.addListener({ complete: () => this._isAnimationCompelete = true });
-        s.state.setAnimation(0, animation, loop);
-        this.updateBounds(s);
-      });
-    }
-
-    private applySpineAction(action: SpineCb) {
-      if (this._spine) {
-        action(this._spine);
-      } else {
-        this._spinePromise.then(action);
-      }
+      this._isAnimationCompelete = false;
+      this._spine.state.addListener({ complete: () => this._isAnimationCompelete = true });
+      this._spine.state.setAnimation(0, animation, loop);
+      this._spine.update(0);
+      this.updateBounds(this._spine);
     }
 
     private constructSpine() {
       const game = this.instanceContainer.getGame();
       const spineJson = game.getJsonManager().getLoadedJson(this._object.jsonResourceName)!;
-      const atlasText = game.getTextManager().get(this._object.atlasResourceName)!;
-      const atlasImage = game.getImageManager().getPIXITexture(this._object.imageResourceName)!;
+      const atlas = game.getTextManager().getAtlasTexture(this._object.atlasResourceName)!;
 
-      this._spinePromise = this.getSpineSkeleton(spineJson, atlasText, atlasImage)
-        .then(skeleton => {
-          this._spine = new PIXI_SPINE.Spine(skeleton);
-          this._pixiObject.addChild(this._spine);
-          this.updateBounds(this._spine);
-
-          return this._spine;
-        });
+      const resourceMoc = {};
+      const spineParser = new PIXI_SPINE.SpineParser();
+      spineParser.parseData(resourceMoc as any, spineParser.createJsonParser(), atlas, spineJson);
+      this._spine = new PIXI_SPINE.Spine((resourceMoc as unknown as { spineData: PIXI_SPINE.ISkeletonData }).spineData);
+      this._pixiObject.addChild(this._spine);
+      this.updateBounds(this._spine);
     }
 
     private updateBounds(s: PIXI_SPINE.Spine) {
       const localBounds = s.getLocalBounds(undefined, true);
       s.position.set(-localBounds.x * s.scale.x, -localBounds.y * s.scale.y);
-    }
-
-    private getSpineSkeleton(spineJson: Object, atlasText: string, atlasImage: PIXI.Texture) {
-      return new Promise<PIXI_SPINE.ISkeletonData>((resolve) => {
-        new PIXI_SPINE.TextureAtlas(
-          atlasText,
-          (_, textureCb) => textureCb(atlasImage.baseTexture),
-          (atlas) => {
-            const resourceMoc = {};
-            const spineParser = new PIXI_SPINE.SpineParser();
-            spineParser.parseData(resourceMoc as any, spineParser.createJsonParser(), atlas, spineJson);
-            
-            resolve((resourceMoc as unknown as { spineData: PIXI_SPINE.ISkeletonData }).spineData);
-          });
-      });
     }
   }
   export const SpineRuntimeObjectRenderer = SpineRuntimeObjectPixiRenderer;

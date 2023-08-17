@@ -5,6 +5,7 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Text Manager');
+  import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
   type TextManagerOnProgressCallback = (
     loadedCount: integer,
     totalCount: integer
@@ -33,6 +34,7 @@ namespace gdjs {
     _resources: ResourceData[];
 
     _loadedTexts: { [key: string]: string } = {};
+    _loadedTextureAtlases: { [key: string]: PIXI_SPINE.TextureAtlas } = {};
     _callbacks: { [key: string]: Array<TextManagerRequestCallback> } = {};
 
     /**
@@ -41,7 +43,8 @@ namespace gdjs {
      */
     constructor(
       resources: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader
+      resourcesLoader: RuntimeGameResourcesLoader,
+      private _imageManager: ImageManager
     ) {
       this._resources = resources;
       this._resourcesLoader = resourcesLoader;
@@ -125,7 +128,17 @@ namespace gdjs {
           this.callCallback(resourceName, `HTTP error: ${xhr.status} (${xhr.statusText })`, null);
         } else {
           this._loadedTexts[resourceName] = xhr.response;
-          this.callCallback(resourceName, null, xhr.response);
+
+          new PIXI_SPINE.TextureAtlas(
+            xhr.response,
+            (path, textureCb) => {
+              const atlasImagePath = resourceName.substring(0, resourceName.lastIndexOf('/') + 1) + path;
+              textureCb(this._imageManager.getPIXITexture(atlasImagePath).baseTexture)
+            },
+            (atlas) => {
+              this._loadedTextureAtlases[resourceName] = atlas;
+              this.callCallback(resourceName, null, xhr.response);
+            });
         }
       };
       xhr.onerror = () => this.callCallback(resourceName, 'Network error', null);
@@ -162,8 +175,12 @@ namespace gdjs {
      * @param resourceName The name of the text resource.
      * @returns the content of the text resource, if loaded. `null` otherwise.
      */
-    get(resourceName: string): string | null {
+    getText(resourceName: string): string | null {
       return this._loadedTexts[resourceName] || null;
+    }
+
+    getAtlasTexture(resourceName: string): PIXI_SPINE.TextureAtlas | null {
+      return this._loadedTextureAtlases[resourceName] || null;
     }
   }
 }

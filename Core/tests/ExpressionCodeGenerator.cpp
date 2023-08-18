@@ -269,7 +269,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
           parser.ParseExpression("MySpriteObject.GetObjectStringWith3Param("
                                  "MySpriteObject.GetObjectNumber() / 2.3, "
                                  "MySpriteObject.GetObjectStringWith1Param("
-                                 "MyExtension::GetNumber()), test)");
+                                 "MyExtension::GetNumber()), UnknownObject.Unknown)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("string",
                                                           "",
                                                           codeGenerator,
@@ -281,8 +281,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "MySpriteObject.getObjectStringWith3Param(MySpriteObject."
               "getObjectNumber() ?? 0 / 2.3, "
               "MySpriteObject.getObjectStringWith1Param(getNumber()) ?? \"\", "
-              "/* Error during generation, unrecognized identifier type: "
-              "unknown with value test */ \"test\") ?? \"\"");
+              "0) ?? \"\"");
     }
     SECTION("missing parameter") {
       {
@@ -392,9 +391,9 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "123) ?? \"\"");
     }
   }
-  SECTION("Function name") {
+  SECTION("Object variable with non existing object") {
     auto node =
-        parser.ParseExpression("MySpriteObject.GetObjectNumber");
+        parser.ParseExpression("MyNonExistingSpriteObject.MyVariable");
     gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                         "",
                                                         codeGenerator,
@@ -403,6 +402,42 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     REQUIRE(node);
     node->Visit(expressionCodeGenerator);
     REQUIRE(expressionCodeGenerator.GetOutput() == "0");
+  }
+  SECTION("Object variables (1 level)") {
+    auto node =
+        parser.ParseExpression("MySpriteObject.MyVariable");
+    gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                        "",
+                                                        codeGenerator,
+                                                        context);
+
+    REQUIRE(node);
+    node->Visit(expressionCodeGenerator);
+    REQUIRE(expressionCodeGenerator.GetOutput() == "getVariableForObject(MySpriteObject, MyVariable).getAsNumber()");
+  }
+  SECTION("Object variables (2 levels)") {
+    auto node =
+        parser.ParseExpression("MySpriteObject.MyVariable.MyChildVariable");
+    gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                        "",
+                                                        codeGenerator,
+                                                        context);
+
+    REQUIRE(node);
+    node->Visit(expressionCodeGenerator);
+    REQUIRE(expressionCodeGenerator.GetOutput() == "getVariablesForObject(MySpriteObject).getChild(\"MyVariable\").getChild(\"MyChildVariable\").getAsNumber()");
+  }
+  SECTION("Object variables (2 levels with bracket accessor)") {
+    auto node =
+        parser.ParseExpression("MySpriteObject.MyVariable[\"MyChildVariable\"]");
+    gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                        "",
+                                                        codeGenerator,
+                                                        context);
+
+    REQUIRE(node);
+    node->Visit(expressionCodeGenerator);
+    REQUIRE(expressionCodeGenerator.GetOutput() == "getVariablesForObject(MySpriteObject).getChild(\"MyVariable\").getChild(\"MyChildVariable\").getAsNumber()");
   }
   SECTION("Invalid variables") {
     SECTION("empty variable") {
@@ -459,7 +494,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "\"world\" ]", "")
               == "getLayoutVariable(myVariable).getChild(\"hello\" + \"world\")");
     }
-    SECTION("object variable") {
+    SECTION("object variable (legacy)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "objectvar", "myVariable", "MySpriteObject")
               == "getVariableForObject(MySpriteObject, myVariable)");

@@ -60,6 +60,9 @@ class GD_CORE_API VariableFinderExpressionNodeWorker
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
+    // We don't check variables or object variables here, because object variables only work
+    // if the variable is already declared.
+
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
@@ -70,7 +73,10 @@ class GD_CORE_API VariableFinderExpressionNodeWorker
     node.expression->Visit(*this);
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitIdentifierNode(IdentifierNode& node) override {
+    // We don't check object variables here, because object variables only work
+    // if the variable is already declared.
+  }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     bool considerFunction = objectName.empty() || node.objectName == objectName;

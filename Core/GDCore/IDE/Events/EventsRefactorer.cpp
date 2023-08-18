@@ -81,6 +81,19 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+    auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
+
+    if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // Nothing to do (this can't reference an object)
+    } else {
+      if (node.name == objectName) {
+        // This is an object variable.
+        hasDoneRenaming = true;
+        node.name = objectNewName;
+      }
+    }
+
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
@@ -97,6 +110,14 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
         node.identifierName == objectName) {
       hasDoneRenaming = true;
       node.identifierName = objectNewName;
+    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // Nothing to do (this can't reference an object)
+    } else {
+      if (node.identifierName == objectName) {
+        // This is an object variable.
+        hasDoneRenaming = true;
+        node.identifierName = objectNewName;
+      }
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
@@ -137,12 +158,12 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   ExpressionObjectFinder(const gd::Platform &platform_,
                          const gd::ProjectScopedContainers &projectScopedContainers_,
                          const gd::String &rootType_,
-                         const gd::String& objectName_)
+                         const gd::String& searchedObjectName_)
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         rootType(rootType_),
         hasObject(false),
-        objectName(objectName_){};
+        searchedObjectName(searchedObjectName_){};
   virtual ~ExpressionObjectFinder(){};
 
   static bool CheckIfHasObject(const gd::Platform &platform,
@@ -176,6 +197,18 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+    auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
+
+    if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // Nothing to do (this can't reference an object)
+    } else {
+      if (node.name == searchedObjectName) {
+        // This is an object variable.
+        hasObject = true;
+      }
+    }
+
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
@@ -189,17 +222,24 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers.GetObjectsContainersList(), rootType, node);
     if (gd::ParameterMetadata::IsObject(type) &&
-        node.identifierName == objectName) {
+        node.identifierName == searchedObjectName) {
       hasObject = true;
+    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // Nothing to do (this can't reference an object)
+    } else {
+      if (node.identifierName == searchedObjectName) {
+        // This is an object variable.
+        hasObject = true;
+      }
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    if (node.objectName == objectName) {
+    if (node.objectName == searchedObjectName) {
       hasObject = true;
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    if (node.objectName == objectName) {
+    if (node.objectName == searchedObjectName) {
       hasObject = true;
     }
     for (auto& parameter : node.parameters) {
@@ -210,7 +250,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
 
  private:
   bool hasObject;
-  const gd::String& objectName;
+  const gd::String& searchedObjectName;
 
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;

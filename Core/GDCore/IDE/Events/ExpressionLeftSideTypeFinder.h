@@ -99,6 +99,7 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     type = "unknown";
+    // TODO: add support for object variable.
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
     type = "unknown";

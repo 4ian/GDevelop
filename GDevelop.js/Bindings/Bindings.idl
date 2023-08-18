@@ -295,6 +295,15 @@ interface VariablesContainersList {
   [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
 };
 
+interface ObjectsContainerList {
+  [Value] ObjectsContainerList STATIC_MakeNewObjectsContainerListForProjectAndLayout(
+        [Const, Ref] Project project,
+        [Const, Ref] Layout layout);
+  [Value] ObjectsContainerList STATIC_MakeNewObjectsContainersListForContainers(
+        [Const, Ref] ObjectsContainerList globalObjectsContainer,
+        [Const, Ref] ObjectsContainerList objectsContainer);
+};
+
 interface ObjectGroup {
     void ObjectGroup();
 
@@ -2533,7 +2542,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainersList objectsContainersList, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
@@ -2879,7 +2888,7 @@ interface EventsContext {
 };
 
 interface EventsContextAnalyzer {
-    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer);
+    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] ObjectsContainersList objectsContainerList);
     [Const, Ref] EventsContext GetEventsContext();
 
     //Inherited from ArbitraryEventsWorker

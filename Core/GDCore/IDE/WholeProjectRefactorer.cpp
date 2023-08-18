@@ -46,6 +46,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Log.h"
 
@@ -1296,15 +1297,15 @@ void WholeProjectRefactorer::DoRenameObject(
   projectBrowser.ExposeFunctions(project, objectParameterRenamer);
 }
 
-// TODO: use EventsScope
 void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
     gd::Project &project, gd::Layout &layout, const gd::String &objectName,
     bool isObjectGroup, bool removeEventsAndGroups) {
+  auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+
   // Remove object in the current layout
   if (removeEventsAndGroups) {
-    // TODO: use EventsScope
     gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(),
-                                               project, layout,
+                                               projectScopedContainers,
                                                layout.GetEvents(), objectName);
   }
   if (!isObjectGroup) { // Object groups can't have instances or be in other
@@ -1323,9 +1324,9 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
     for (auto &externalEventsName :
          GetAssociatedExternalEvents(project, layout.GetName())) {
       auto &externalEvents = project.GetExternalEvents(externalEventsName);
-      // TODO: use EventsScope
+
       gd::EventsRefactorer::RemoveObjectInEvents(
-          project.GetCurrentPlatform(), project, layout,
+          project.GetCurrentPlatform(), projectScopedContainers,
           externalEvents.GetEvents(), objectName);
     }
   }
@@ -1347,9 +1348,12 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
     const gd::String &newName, bool isObjectGroup) {
   if (oldName == newName || newName.empty() || oldName.empty())
     return;
+
+  auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+
   // Rename object in the current layout
   gd::EventsRefactorer::RenameObjectInEvents(
-      project.GetCurrentPlatform(), project, layout, layout.GetEvents(),
+      project.GetCurrentPlatform(), projectScopedContainers, layout.GetEvents(),
       oldName, newName);
 
   if (!isObjectGroup) { // Object groups can't have instances or be in other
@@ -1365,7 +1369,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
        GetAssociatedExternalEvents(project, layout.GetName())) {
     auto &externalEvents = project.GetExternalEvents(externalEventsName);
     gd::EventsRefactorer::RenameObjectInEvents(
-        project.GetCurrentPlatform(), project, layout,
+        project.GetCurrentPlatform(), projectScopedContainers,
         externalEvents.GetEvents(), oldName, newName);
   }
 
@@ -1517,10 +1521,11 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::String &objectName,
     bool isObjectGroup, bool removeEventsAndGroups) {
-  // Remove object in the current layout
+  auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainer, objectsContainer);
+
   if (removeEventsAndGroups) {
     gd::EventsRefactorer::RemoveObjectInEvents(
-        project.GetCurrentPlatform(), globalObjectsContainer, objectsContainer,
+        project.GetCurrentPlatform(), projectScopedContainers,
         eventsFunction.GetEvents(), objectName);
   }
   if (!isObjectGroup) { // Object groups can't be in other groups
@@ -1552,9 +1557,10 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
-  // Rename object in the current layout
+  auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainer, objectsContainer);
+
   gd::EventsRefactorer::RenameObjectInEvents(
-      project.GetCurrentPlatform(), globalObjectsContainer, objectsContainer,
+      project.GetCurrentPlatform(), projectScopedContainers,
       eventsFunction.GetEvents(), oldName, newName);
 
   if (!isObjectGroup) { // Object groups can't be in other groups

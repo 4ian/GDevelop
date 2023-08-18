@@ -53,6 +53,7 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   auto projectScopedContainers = codeGenerator.HasProjectAndLayout() ?
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(codeGenerator.GetProject(), codeGenerator.GetLayout()) :
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups());
+  std::cout << "projectScopedContainers ad:" << &projectScopedContainers << std::endl;
 
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     projectScopedContainers,
@@ -127,11 +128,10 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
     output += codeGenerator.GenerateGetVariable(
         node.name, scope, context, objectName);
     if (node.child) node.child->Visit(*this);
-  } else if (gd::ParameterMetadata::IsExpression("number", type) || gd::ParameterMetadata::IsExpression("string", type)) {
+  } else {
     // The node represents a variable or an object variable in an expression waiting for its *value* to be returned.
 
-    if (gd::ObjectsContainersList::MakeNewObjectsContainersListForContainers(codeGenerator.GetGlobalObjectsAndGroups(),
-      codeGenerator.GetObjectsAndGroups()).HasObjectOrGroupNamed(node.name)) {
+    if (codeGenerator.GetObjectsContainersList().HasObjectOrGroupNamed(node.name)) {
       // Generate the code to access the object variables.
       output += codeGenerator.GenerateGetObjectVariables(context, node.name);
       if (node.child) node.child->Visit(*this);
@@ -157,9 +157,6 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
       // one, nor an object variable. It's invalid.
       output += GenerateDefaultValue(type);
     }
-  } else {
-    // We're unsure why the variable is used here, this is invalid.
-    output += GenerateDefaultValue(type);
   }
 }
 
@@ -204,17 +201,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       if (!node.childIdentifierName.empty()) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
-  } else if (gd::ParameterMetadata::IsExpression("number", type) || gd::ParameterMetadata::IsExpression("string", type)) {
+  } else {
     // The node represents a variable or an object.
-
-    // Try first to identify an object variable ("MyObject.MyVariable"). If there is no childIdentifierName
-    // (i.e: no "MyVariable", it's just a plain identifier in a single word), this won't find anything.
-    auto objectOrGroupVariableType =
-        gd::ObjectsContainersList::MakeNewObjectsContainersListForContainers(
-            codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups())
-            .HasObjectWithVariableNamed(node.identifierName,
-                                        node.childIdentifierName);
-    if (objectOrGroupVariableType) {
+    if (codeGenerator.GetObjectsContainersList().HasObjectOrGroupNamed(node.identifierName)) {
       // Generate the code to access the object variable.
       gd::String variableAccessorCode = codeGenerator.GenerateGetVariable(
         node.childIdentifierName, gd::EventsCodeGenerator::OBJECT_VARIABLE, context, node.identifierName);
@@ -245,9 +234,6 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       // one, nor an object variable. It's invalid.
       output += GenerateDefaultValue(type);
     }
-  } else {
-    // We're unsure what the identifier is used for here - it's probably not valid.
-    output += GenerateDefaultValue(type);
   }
 }
 

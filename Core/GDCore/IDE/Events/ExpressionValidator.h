@@ -8,7 +8,6 @@
 
 #include <memory>
 #include <vector>
-#include <optional>
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Tools/MakeUnique.h"
@@ -224,9 +223,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     ReportAnyError(node);
     if (parentType == Type::String) {
-      auto variableType = ValidateMaybeObjectVariableOrVariable(node);
-
-      if (!variableType) {
+      if (!ValidateMaybeObjectVariableOrVariable(node)) {
         // The identifier is not a variable, so either the variable is not properly declared
         // or it's a text without quotes.
         RaiseTypeError(_("You must wrap your text inside double quotes "
@@ -235,18 +232,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
     }
     else if (parentType == Type::Number) {
-      auto variableType = ValidateMaybeObjectVariableOrVariable(node);
-
-      if (!variableType) {
+      if (!ValidateMaybeObjectVariableOrVariable(node)) {
         // The identifier is not a variable, so the variable is not properly declared.
         RaiseTypeError(
             _("You must enter a number."), node.location);
       }
     }
     else if (parentType == Type::NumberOrString) {
-      auto variableType = ValidateMaybeObjectVariableOrVariable(node);
-
-      if (!variableType) {
+      if (!ValidateMaybeObjectVariableOrVariable(node)) {
         // The identifier is not a variable, so either the variable is not properly declared
         // or it's a text without quotes.
         RaiseTypeError(
@@ -292,7 +285,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
  private:
   enum Type {Unknown = 0, Number, String, NumberOrString, Variable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
-  std::optional<Type> ValidateMaybeObjectVariableOrVariable(const gd::IdentifierNode& identifier);
+  bool ValidateMaybeObjectVariableOrVariable(const gd::IdentifierNode& identifier);
   void ValidateVariable(const gd::VariableNode& variable);
 
   void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {

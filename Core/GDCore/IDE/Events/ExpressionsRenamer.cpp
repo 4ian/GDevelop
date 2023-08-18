@@ -23,7 +23,7 @@
 namespace gd {
 
 /**
- * \brief Go through the nodes and change the given object name to a new one.
+ * \brief Go through the nodes and change the given function name to a new name.
  *
  * \see gd::ExpressionParser2
  */
@@ -71,7 +71,9 @@ class GD_CORE_API ExpressionFunctionRenamer
     node.expression->Visit(*this);
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitIdentifierNode(IdentifierNode& node) override {
+    // Nothing to do as this is either a variable or an object variable.
+  }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     if (!node.behaviorFunctionName.empty()) {
       // Behavior function name

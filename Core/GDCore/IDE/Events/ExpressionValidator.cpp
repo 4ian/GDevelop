@@ -7,7 +7,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <optional>
 #include <vector>
 
 #include "GDCore/CommonTools.h"
@@ -64,57 +63,57 @@ size_t GetMaximumParametersNumber(
 
 }  // namespace
 
-std::optional<ExpressionValidator::Type>
-ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
+bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
     const gd::IdentifierNode& identifier) {
   auto validateVariableTypeForExpression =
-      [](gd::Variable::Type type) {
-        const auto& type = variable.GetType();
-
+      [this, &identifier](gd::Variable::Type type) {
         // Number or string variables can be used in expressions.
-        if (type == Variable::Number)
-          return Type::Number;
-        else if (type == Variable::String)
-          return Type::String;
+        if (type == Variable::Number || type == Variable::String)
+          return;
 
         // Any other type won't work alone in an expression.
         if (type == Variable::Boolean) {
           RaiseTypeError(_("This boolean variable can't be used here."),
                          identifier.identifierNameLocation);
-          return Type::Unknown;
+
         } else if (type == Variable::Structure) {
           RaiseTypeError(_("You need to specify the name of the child variable "
                            "to access."),
                          identifier.identifierNameLocation);
-          return Type::Unknown;
+
         } else if (type == Variable::Array) {
           RaiseTypeError(_("You need to specify the name of the child variable "
                            "to access."),
                          identifier.identifierNameLocation);
-          return Type::Unknown;
+
         } else {
           // Should not happen.
           RaiseTypeError(_("Unexpected variable type"),
                          identifier.identifierNameLocation);
-          return Type::Unknown;
+
         }
-      }
+      };
 
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
+  const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
 
-  // Try first to identify an object variable ("MyObject.MyVariable"). If there is no childIdentifierName
-  // (i.e: no "MyVariable", it's just a plain identifier in a single word), this won't find anything.
-  auto objectOrGroupVariableType =
-      projectScopedContainers.GetObjectsContainersList()
-        .HasObjectWithVariableNamed(identifier.identifierName, identifier.childIdentifierName);
-  if (objectOrGroupVariableType) {
-    return validateVariableTypeForExpression(*objectOrGroupVariableType);
+  if (objectsContainersList.HasObjectOrGroupNamed(identifier.identifierName)) {
+    // This is an object variable.
+
+    if (!objectsContainersList.HasObjectOrGroupWithVariableNamed(identifier.identifierName, identifier.childIdentifierName)) {
+      RaiseTypeError(_("This variable does not exist on this object or group."),
+                      identifier.childIdentifierNameLocation);
+      return true; // We should have found a variable.
+    }
+
+    const auto& variable = objectsContainersList.GetObjectOrGroupVariable(identifier.identifierName, identifier.childIdentifierName);
+    return true; // We found a variable.
   } else {
     // Try to identify a declared variable with the name (and maybe the child
     // variable).
 
     if (!variablesContainersList.Has(identifier.identifierName))
-      return {};  // The identifier does not even reference a declared variable.
+      return false;  // The identifier does not even reference a declared variable.
 
     // The identifier refers to a variable, check its type (or the child
     // variable type, if any).
@@ -124,24 +123,26 @@ ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
     if (identifier.childIdentifierName.empty()) {
       // Just the root variable is accessed, check it can be used in an
       // expression.
-      return validateVariableTypeForExpression(variable.GetType());
+      validateVariableTypeForExpression(variable.GetType());
+
+      return true; // We found a variable.
     } else {
       // A child variable is accessed, check it can be used in an expression.
       if (!variable.HasChild(identifier.childIdentifierName)) {
         RaiseTypeError(_("No child variable with this name found."),
-                       identifier.childIdentifierLocation);
+                       identifier.childIdentifierNameLocation);
 
-        return Type::Unknown;
+        return true; // We should have found a variable.
       }
 
       const gd::Variable& childVariable =
           variable.GetChild(identifier.childIdentifierName);
-      return validateVariableTypeForExpression(childVariable.GetType());
+      return true; // We found a variable.
     }
   }
 }
 
-ExpressionValidator::Type ExpressionValidator::ValidateVariable(
+void ExpressionValidator::ValidateVariable(
     const gd::VariableNode& variableNode) {
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
 
@@ -153,6 +154,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateVariable(
     // We found the variable, check its type (or the child variable
     // type, if any).
     const gd::Variable& variable = variablesContainersList.Get(variableNode.name);
+    const auto& type = variable.GetType();
 
     // Numbers or strings are always fine.
     if (type == Variable::Number)
@@ -162,8 +164,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateVariable(
 
     // Any other type won't work alone in an expression.
     if (type == Variable::Boolean) {
-      RaiseTypeError(_("This boolean variable can't be used here."),
-                    identifier.identifierNameLocation);
+      RaiseTypeError(_("This boolean variable can't be used here."), variableNode.location);
       return;
     } else if (type == Variable::Structure) {
       // TODO: check if we can know the type of the final child.
@@ -173,8 +174,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateVariable(
       return;
     } else {
       // Should not happen.
-      RaiseTypeError(_("Unexpected variable type"),
-                    identifier.identifierNameLocation);
+      RaiseTypeError(_("Unexpected variable type"), variableNode.location);
       return;
     }
   }

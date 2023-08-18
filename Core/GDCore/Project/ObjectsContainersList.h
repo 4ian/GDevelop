@@ -1,5 +1,4 @@
 #pragma once
-#include <optional>
 #include <vector>
 
 #include "Variable.h"
@@ -17,6 +16,8 @@ namespace gd {
 /**
  * \brief A list of objects containers, useful for accessing objects in a
  * scoped way, along with methods to access them.
+ *
+ * TODO: add comments for each method, as there is a bit of logic in them.
  *
  * \see gd::Object
  * \see gd::ObjectsContainer
@@ -37,7 +38,11 @@ class GD_CORE_API ObjectsContainersList {
       const gd::ObjectsContainer& objectsContainer);
 
   bool HasObjectOrGroupNamed(const gd::String& name) const;
-  std::optional<Variable::Type> HasObjectWithVariableNamed(
+
+  bool HasObjectOrGroupWithVariableNamed(const gd::String& objectOrGroupName,
+                                  const gd::String& variableName) const;
+
+  const gd::Variable& GetObjectOrGroupVariable(
       const gd::String& objectOrGroupName,
       const gd::String& variableName) const;
 
@@ -64,14 +69,20 @@ class GD_CORE_API ObjectsContainersList {
    */
   gd::String GetTypeOfBehavior(const gd::String& behaviorName) const;
 
+  std::vector<gd::String> ExpandObjectName(
+      const gd::String& objectOrGroupName) const;
+
  private:
-  ObjectsContainersList();
+  ObjectsContainersList() {};
+
+  bool HasObjectNamed(const gd::String& name) const;
 
   void Add(const gd::ObjectsContainer& objectsContainer) {
     objectsContainers.push_back(&objectsContainer);
   };
 
   std::vector<const gd::ObjectsContainer*> objectsContainers;
+  static gd::Variable badVariable;
 };
 
 }  // namespace gd

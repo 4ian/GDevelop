@@ -99,6 +99,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     VisitParent(node);
+    // TODO: add support for identifying objects.
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
     VisitParent(node);

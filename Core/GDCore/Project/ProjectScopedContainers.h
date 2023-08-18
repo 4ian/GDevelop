@@ -52,8 +52,8 @@ class ProjectScopedContainers {
   };
 
  private:
-  const gd::ObjectsContainersList &objectsContainersList;
-  const gd::VariablesContainersList &variablesContainersList;
+  gd::ObjectsContainersList objectsContainersList;
+  gd::VariablesContainersList variablesContainersList;
 };
 
 }  // namespace gd

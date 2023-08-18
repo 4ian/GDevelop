@@ -42,7 +42,7 @@ class GD_CORE_API VariablesContainersList {
   const Variable& Get(const gd::String& name) const;
 
  private:
-  VariablesContainersList();
+  VariablesContainersList() {};
 
   void Add(const gd::VariablesContainer& variablesContainer) {
     variablesContainers.push_back(&variablesContainer);

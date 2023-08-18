@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <functional>
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Serialization.h"

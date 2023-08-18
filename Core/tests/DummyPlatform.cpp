@@ -345,7 +345,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("expression", _("Number parameter"))
       .AddParameter("string", _("String parameter"))
-      .AddParameter("", _("Identifier parameter"))
+      .AddParameter("expression", _("Identifier parameter"))
       .SetFunctionName("getObjectStringWith3Param");
   object
       .AddStrExpression("GetObjectStringWith2ObjectParam",

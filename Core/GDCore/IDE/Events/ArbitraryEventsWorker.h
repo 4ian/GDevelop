@@ -10,6 +10,7 @@
 #include <vector>
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventVisitor.h"
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/String.h"
 namespace gd {
 class Instruction;
@@ -62,9 +63,9 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
 
   /**
    * Called to do some work on a link event.
-   * 
+   *
    * Note that DoVisitEvent is also called with this event.
-   * 
+   *
    * \return true if the event must be deleted from the events list, false
    * otherwise (default).
    */
@@ -129,6 +130,13 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
     return *currentObjectsContainer;
   };
 
+  gd::ObjectsContainersList GetObjectsContainersList() {
+    return gd::ObjectsContainersList::MakeNewObjectsContainersListForContainers(
+      *currentGlobalObjectsContainer,
+      *currentObjectsContainer
+    );
+  }
+
  private:
   const gd::ObjectsContainer* currentGlobalObjectsContainer;
   const gd::ObjectsContainer* currentObjectsContainer;
@@ -175,7 +183,7 @@ protected:
 
   /**
    * Called to do some work on a link event.
-   * 
+   *
    * Note that DoVisitEvent is also called with this event.
    */
   virtual void DoVisitLinkEvent(const gd::LinkEvent& linkEvent) {};

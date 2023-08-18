@@ -15,6 +15,7 @@ namespace gd {
 class BaseEvent;
 class Platform;
 class ObjectsContainer;
+class ObjectsContainersList;
 class Project;
 class Layout;
 class EventsList;
@@ -29,8 +30,8 @@ namespace gd {
  */
 class GD_CORE_API EventsContext {
  public:
-  EventsContext(gd::ObjectsContainer& project_, gd::ObjectsContainer& layout_)
-      : project(project_), layout(layout_){};
+  EventsContext(gd::ObjectsContainersList& objectsContainersList_)
+      : objectsContainersList(objectsContainersList_) {};
   virtual ~EventsContext(){};
 
   void AddObjectName(const gd::String& objectOrGroupName);
@@ -64,8 +65,7 @@ class GD_CORE_API EventsContext {
   std::set<gd::String> referencedObjectOrGroupNames;
   std::set<gd::String> objectNames;
   std::map<gd::String, std::set<gd::String>> objectOrGroupBehaviorNames;
-  gd::ObjectsContainer& project;
-  gd::ObjectsContainer& layout;
+  gd::ObjectsContainersList& objectsContainersList;
 };
 
 /**
@@ -76,12 +76,10 @@ class GD_CORE_API EventsContext {
 class GD_CORE_API EventsContextAnalyzer : public ArbitraryEventsWorker {
  public:
   EventsContextAnalyzer(const gd::Platform& platform_,
-                        gd::ObjectsContainer& project_,
-                        gd::ObjectsContainer& layout_)
+                        gd::ObjectsContainersList& objectsContainersList_)
       : platform(platform_),
-        project(project_),
-        layout(layout_),
-        context(project, layout){};
+        objectsContainersList(objectsContainersList_),
+        context(objectsContainersList){};
   virtual ~EventsContextAnalyzer(){};
 
   /**
@@ -90,8 +88,7 @@ class GD_CORE_API EventsContextAnalyzer : public ArbitraryEventsWorker {
   const EventsContext& GetEventsContext() { return context; }
 
   static void AnalyzeParameter(const gd::Platform& platform,
-                               const gd::ObjectsContainer& project,
-                               const gd::ObjectsContainer& layout,
+                               const gd::ObjectsContainersList& objectsContainersList,
                                const gd::ParameterMetadata& metadata,
                                const gd::Expression& parameter,
                                EventsContext& context,
@@ -102,8 +99,7 @@ class GD_CORE_API EventsContextAnalyzer : public ArbitraryEventsWorker {
                                   bool isCondition);
 
   const gd::Platform& platform;
-  gd::ObjectsContainer& project;
-  gd::ObjectsContainer& layout;
+  gd::ObjectsContainersList& objectsContainersList;
   EventsContext context;
 };
 

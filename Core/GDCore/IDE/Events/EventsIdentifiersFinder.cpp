@@ -70,7 +70,9 @@ class GD_CORE_API IdentifierFinderExpressionNodeWorker
     node.expression->Visit(*this);
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitIdentifierNode(IdentifierNode& node) override {
+    // TODO: add support for object variables.
+  }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     bool considerFunction = objectName.empty() || node.objectName == objectName;
@@ -86,7 +88,7 @@ class GD_CORE_API IdentifierFinderExpressionNodeWorker
     if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
       return;
     }
-    
+
     size_t parameterIndex = 0;
     for (size_t metadataIndex = (isObjectFunction ? 1 : 0); metadataIndex < metadata.parameters.size()
       && parameterIndex < node.parameters.size(); ++metadataIndex) {

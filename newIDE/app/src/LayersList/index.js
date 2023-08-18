@@ -16,6 +16,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Add from '../UI/CustomSvgIcons/Add';
+import { addDefaultLightToLayer } from '../ProjectCreation/CreateProjectDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -225,6 +226,9 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         layersContainer.hasLayerNamed(name)
       );
       layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+      const newLayer = layersContainer.getLayer(name);
+      addDefaultLightToLayer(newLayer);
+
       onLayerModified();
       props.onCreateLayer();
     };

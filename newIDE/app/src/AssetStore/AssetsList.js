@@ -212,25 +212,26 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         !hasAssetFiltersApplied,
       [assetPackFiltersState, hasAssetFiltersApplied, openedAssetPack]
     );
-    const noResultComponent =
-      noResultsPlaceHolder || hasOnlySelectedOwnedAssetPacks ? (
-        <NoResultPlaceholder
-          message={<Trans>You don't own any pack yet!</Trans>}
-          onClear={clearAllFilters}
-        />
-      ) : hasAssetPackFiltersApplied && hasAssetFiltersApplied ? (
-        <NoResultPlaceholder
-          message={
-            <Trans>
-              Cannot filter on both asset packs and assets at the same time. Try
-              clearing one of the filters!
-            </Trans>
-          }
-          onClear={clearAllFilters}
-        />
-      ) : (
-        <NoResultPlaceholder onClear={clearAllFilters} />
-      );
+    const noResultComponent = noResultsPlaceHolder ? (
+      noResultsPlaceHolder
+    ) : hasOnlySelectedOwnedAssetPacks ? (
+      <NoResultPlaceholder
+        message={<Trans>You don't own any pack yet!</Trans>}
+        onClear={clearAllFilters}
+      />
+    ) : hasAssetPackFiltersApplied && hasAssetFiltersApplied ? (
+      <NoResultPlaceholder
+        message={
+          <Trans>
+            Cannot filter on both asset packs and assets at the same time. Try
+            clearing one of the filters!
+          </Trans>
+        }
+        onClear={clearAllFilters}
+      />
+    ) : (
+      <NoResultPlaceholder onClear={clearAllFilters} />
+    );
 
     const [selectedFolders, setSelectedFolders] = React.useState<Array<string>>(
       []

@@ -53,7 +53,6 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   auto projectScopedContainers = codeGenerator.HasProjectAndLayout() ?
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(codeGenerator.GetProject(), codeGenerator.GetLayout()) :
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups());
-  std::cout << "projectScopedContainers ad:" << &projectScopedContainers << std::endl;
 
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     projectScopedContainers,

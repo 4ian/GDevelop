@@ -36,7 +36,7 @@ export const setupFunctionFromEvents = ({
   // Analyze events...
   const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
     gd.JsPlatform.get(),
-    gd.ObjectsContainerList.makeNewObjectsContainersListForContainers(
+    gd.ObjectsContainersList.makeNewObjectsContainersListForContainers(
       globalObjectsContainer,
       objectsContainer
     )

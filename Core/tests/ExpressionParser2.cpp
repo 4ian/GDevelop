@@ -21,6 +21,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
+  layout1.GetVariables().InsertNew("MySceneVariable", 0);
+  layout1.GetVariables().InsertNew("MySceneVariable2", 1);
 
   // Create an instance of BuiltinObject.
   // This is not possible in practice.
@@ -30,7 +32,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup", 0);
   myGroup.AddObject(myObject.GetName());
 
-  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
+  auto &mySpriteObject = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
+  mySpriteObject.GetVariables().InsertNew("MyVariable", 0);
+  mySpriteObject.GetVariables().InsertNew("MyVariable2", 1);
   layout1.InsertNewObject(project,
                           "MyExtension::FakeObjectWithDefaultBehavior",
                           "FakeObjectWithDefaultBehavior",
@@ -1171,6 +1175,117 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(numberNode.number == "1");
       REQUIRE(textNode.text == "2");
       REQUIRE(identifierNode.identifierName == "😄");
+    }
+  }
+
+  SECTION("Valid scene variables (1 level)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable + MySceneVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid scene variables (2 levels)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable.MyChild + MySceneVariable2.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid object variables (1 level)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable + MySpriteObject.MyVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid object variables (2 levels)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable.MyChild + MySpriteObject.MyVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable[\"MyChild\"] + MySpriteObject.MyVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid object variables (non existing object)") {
+    {
+      auto node =
+          parser.ParseExpression("MyNonExistingSpriteObject.MyVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      // TODO: can we do a better message?
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\").");
+    }
+  }
+
+  SECTION("Invalid object variables (non existing variable)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyNonExistingVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "This variable does not exist on this object or group.");
     }
   }
 

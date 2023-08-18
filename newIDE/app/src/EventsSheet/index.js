@@ -1451,8 +1451,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const { globalObjectsContainer, objectsContainer } = this.props;
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer
+      gd.ObjectsContainersList.makeNewObjectsContainersListForContainers(
+        globalObjectsContainer,
+        objectsContainer
+      )
     );
 
     const eventsList = new gd.EventsList();

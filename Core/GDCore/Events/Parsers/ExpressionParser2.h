@@ -317,7 +317,7 @@ class GD_CORE_API ExpressionParser2 {
       auto dotLocation = SkipChar();
       SkipAllWhitespaces();
 
-      auto identifierAndLocation = ReadIdentifierName();
+      auto identifierAndLocation = ReadIdentifierName(/*allowDeprecatedSpacesInName=*/ false);
       auto child =
           gd::make_unique<VariableAccessorNode>(identifierAndLocation.name);
       child->child = VariableAccessorOrVariableBracketAccessor();
@@ -362,7 +362,7 @@ class GD_CORE_API ExpressionParser2 {
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,
       const ExpressionParserLocation &parentIdentifierDotLocation) {
-    auto childIdentifierAndLocation = ReadIdentifierName();
+    auto childIdentifierAndLocation = ReadIdentifierName(/*allowDeprecatedSpacesInName=*/ false);
     const gd::String &childIdentifierName = childIdentifierAndLocation.name;
     const auto &childIdentifierNameLocation =
         childIdentifierAndLocation.location;
@@ -420,12 +420,6 @@ class GD_CORE_API ExpressionParser2 {
 
     auto node = gd::make_unique<IdentifierNode>(
         parentIdentifier, childIdentifierName);
-    if (!CheckIfChar(IsParameterSeparator) && !CheckIfChar(IsClosingParenthesis) && !IsEndReached()) {
-      node->diagnostic = RaiseSyntaxError(
-          _("An opening parenthesis (for an object expression), a double colon "
-            "(:: for a behavior expression), a dot or an opening bracket (for "
-            "a child variable) were expected."));
-    }
     node->location = ExpressionParserLocation(
         parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());
     node->identifierNameLocation = parentIdentifierLocation;
@@ -625,13 +619,13 @@ class GD_CORE_API ExpressionParser2 {
     ExpressionParserLocation location;
   };
 
-  IdentifierAndLocation ReadIdentifierName() {
+  IdentifierAndLocation ReadIdentifierName(bool allowDeprecatedSpacesInName = true) {
     gd::String name;
     size_t startPosition = currentPosition;
     while (currentPosition < expression.size() &&
            (CheckIfChar(IsAllowedInIdentifier)
             // Allow whitespace in identifier name for compatibility
-            || expression[currentPosition] == ' ')) {
+            || (allowDeprecatedSpacesInName && expression[currentPosition] == ' '))) {
       name += expression[currentPosition];
       currentPosition++;
     }

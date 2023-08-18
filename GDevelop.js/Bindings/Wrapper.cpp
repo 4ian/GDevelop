@@ -75,6 +75,7 @@
 #include <GDCore/Project/ObjectConfiguration.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
+#include <GDCore/Project/ProjectScopedContainers.h>
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
@@ -543,8 +544,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RemoveAllUseless RemoveAllUseless
 #define STATIC_MakeNewVariablesContainersListForProjectAndLayout MakeNewVariablesContainersListForProjectAndLayout
 #define STATIC_MakeNewEmptyVariablesContainersList MakeNewEmptyVariablesContainersList
-#define STATIC_MakeNewObjectsContainerListForProjectAndLayout MakeNewObjectsContainerListForProjectAndLayout
+#define STATIC_MakeNewObjectsContainersListForProjectAndLayout MakeNewObjectsContainersListForProjectAndLayout
 #define STATIC_MakeNewObjectsContainersListForContainers MakeNewObjectsContainersListForContainers
+#define STATIC_MakeNewProjectScopedContainersForProjectAndLayout MakeNewProjectScopedContainersForProjectAndLayout
+#define STATIC_MakeNewProjectScopedContainersFor MakeNewProjectScopedContainersFor
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata

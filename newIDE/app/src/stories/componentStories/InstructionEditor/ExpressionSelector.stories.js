@@ -7,6 +7,7 @@ import muiDecorator from '../../ThemeDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import paperDecorator from '../../PaperDecorator';
 import ExpressionSelector from '../../../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
+import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 export default {
   title: 'InstructionEditor/ExpressionSelector',

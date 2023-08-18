@@ -47,10 +47,7 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
-import {
-  makeVariablesContainersListFromEventsScope,
-  type EventsScope,
-} from '../../../InstructionOrExpression/EventsScope';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -138,10 +135,15 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
-    // TODO: use EventsScope
-    globalObjectsContainer,
-    objectsContainer,
-    makeVariablesContainersListFromEventsScope(scope),
+    scope.layout
+      ? gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+          scope.project,
+          scope.layout
+        )
+      : gd.ProjectScopedContainers.makeNewProjectScopedContainersFor(
+          globalObjectsContainer,
+          objectsContainer
+        ),
     expressionType
   );
   expressionNode.visit(expressionValidator);
@@ -306,8 +308,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
     const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      gd.ObjectsContainersList.makeNewObjectsContainersListForContainers(
+        globalObjectsContainer,
+        objectsContainer
+      ),
       expressionType,
       currentNode
     );
@@ -477,8 +481,10 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      gd.ObjectsContainersList.makeNewObjectsContainersListForContainers(
+        globalObjectsContainer,
+        objectsContainer
+      ),
       expressionType,
       expressionNode,
       cursorPosition - 1

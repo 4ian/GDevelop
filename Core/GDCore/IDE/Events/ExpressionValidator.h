@@ -188,14 +188,18 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     if (node.child) {
       node.child->Visit(*this);
     }
-    childType = Type::Variable;
     if (parentType == Type::String) {
+      childType = Type::String;
       ValidateVariable(node);
     } else if (parentType == Type::Number) {
+      childType = Type::Number;
       ValidateVariable(node);
     } else if (parentType == Type::NumberOrString) {
+      childType = Type::NumberOrString;
       ValidateVariable(node);
-    } else if (parentType != Type::Variable) {
+    } else if (parentType == Type::Variable) {
+      childType = Type::Variable;
+    } else {
       RaiseTypeError(_("You entered a variable, but this type was expected:") +
                          " " + TypeToString(parentType),
                      node.location);

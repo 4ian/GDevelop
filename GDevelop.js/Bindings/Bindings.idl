@@ -295,15 +295,6 @@ interface VariablesContainersList {
   [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
 };
 
-interface ObjectsContainerList {
-  [Value] ObjectsContainerList STATIC_MakeNewObjectsContainerListForProjectAndLayout(
-        [Const, Ref] Project project,
-        [Const, Ref] Layout layout);
-  [Value] ObjectsContainerList STATIC_MakeNewObjectsContainersListForContainers(
-        [Const, Ref] ObjectsContainerList globalObjectsContainer,
-        [Const, Ref] ObjectsContainerList objectsContainer);
-};
-
 interface ObjectGroup {
     void ObjectGroup();
 
@@ -561,6 +552,24 @@ interface Project {
     unsigned long GetObjectsCount();
 
     [Ref] ObjectGroupsContainer GetObjectGroups();
+};
+
+interface ObjectsContainersList {
+  [Value] ObjectsContainersList STATIC_MakeNewObjectsContainersListForProjectAndLayout(
+        [Const, Ref] Project project,
+        [Const, Ref] Layout layout);
+  [Value] ObjectsContainersList STATIC_MakeNewObjectsContainersListForContainers(
+        [Const, Ref] ObjectsContainer globalObjectsContainer,
+        [Const, Ref] ObjectsContainer objectsContainer);
+};
+
+interface ProjectScopedContainers {
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForProjectAndLayout(
+        [Const, Ref] Project project,
+        [Const, Ref] Layout layout);
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
+        [Const, Ref] ObjectsContainer globalObjectsContainer,
+        [Const, Ref] ObjectsContainer objectsContainer);
 };
 
 interface ExtensionProperties {
@@ -2246,8 +2255,8 @@ interface VectorEventsSearchResult {
 };
 
 interface EventsRefactorer {
-    void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
-    void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString name);
+    void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ProjectScopedContainers projectScopedContainers, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
+    void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ProjectScopedContainers projectScopedContainers, [Ref] EventsList events, [Const] DOMString name);
     [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
@@ -2504,9 +2513,7 @@ interface ExpressionParser2NodeWorker {
 interface ExpressionValidator {
     void ExpressionValidator(
         [Const, Ref] Platform platform,
-        [Const, Ref] ObjectsContainer globalObjectsContainer,
-        [Const, Ref] ObjectsContainer objectsContainer,
-        [Const, Ref] VariablesContainersList variablesContainersList,
+        [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetAllErrors();
@@ -2554,7 +2561,7 @@ interface ExpressionNodeLocationFinder {
 };
 
 interface ExpressionTypeFinder {
-    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node);
+    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainersList objectsContainersList, [Const] DOMString rootType, [Ref] ExpressionNode node);
 };
 
 interface ExpressionNode {

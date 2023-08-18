@@ -41,8 +41,9 @@ class GD_CORE_API VariablesContainersList {
    */
   const Variable& Get(const gd::String& name) const;
 
- private:
+  /** Do not use - should be private but accessible to let Emscripten create a temporary. */
   VariablesContainersList() {};
+ private:
 
   void Add(const gd::VariablesContainer& variablesContainer) {
     variablesContainers.push_back(&variablesContainer);

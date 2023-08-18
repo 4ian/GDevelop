@@ -3477,10 +3477,7 @@ describe('libGD.js', function () {
 
       const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
-        // TODO: use EventsScope
-        project,
-        layout,
-        gd.VariablesContainersList.makeNewVariablesContainersListForProjectAndLayout(project, layout)
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(project, layout),
         type);
       expressionNode.visit(expressionValidator);
       if (expectedError2) {
@@ -3671,8 +3668,9 @@ describe('libGD.js', function () {
       const completionDescriptions =
         gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
           gd.JsPlatform.get(),
-          project,
-          layout,
+          gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+            project, layout
+          ),
           type,
           expressionNode,
           // We're looking for completion for the character just before the caret.
@@ -3734,12 +3732,19 @@ describe('libGD.js', function () {
       });
     });
     it('completes an expression with a partial object function', function () {
-      expect.assertions(8);
+      expect.assertions(12);
       testCompletions(
         'number',
         '1 + MyObject.Func| ',
         (completionDescription, index) => {
           if (index == 0) {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Variable
+            );
+            expect(completionDescription.getType()).toBe('number');
+            expect(completionDescription.getPrefix()).toBe('Func');
+            expect(completionDescription.getObjectName()).toBe('MyObject');
+          } else if (index == 1) {
             expect(completionDescription.getCompletionKind()).toBe(
               gd.ExpressionCompletionDescription.Behavior
             );

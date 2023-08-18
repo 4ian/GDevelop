@@ -72,8 +72,9 @@ class GD_CORE_API ObjectsContainersList {
   std::vector<gd::String> ExpandObjectName(
       const gd::String& objectOrGroupName) const;
 
- private:
+  /** Do not use - should be private but accessible to let Emscripten create a temporary. */
   ObjectsContainersList() {};
+ private:
 
   bool HasObjectNamed(const gd::String& name) const;
 

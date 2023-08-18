@@ -51,6 +51,8 @@ class ProjectScopedContainers {
     return variablesContainersList;
   };
 
+  /** Do not use - should be private but accessible to let Emscripten create a temporary. */
+  ProjectScopedContainers(){};
  private:
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;

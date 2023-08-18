@@ -23,6 +23,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.GetVariables().InsertNew("MySceneVariable", 0);
   layout1.GetVariables().InsertNew("MySceneVariable2", 1);
+  layout1.GetVariables().InsertNew("MySceneStructureVariable", 2).GetChild("MyChild");
+  layout1.GetVariables().InsertNew("MySceneStructureVariable2", 2).GetChild("MyChild");
 
   // Create an instance of BuiltinObject.
   // This is not possible in practice.
@@ -1200,7 +1202,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Valid scene variables (2 levels)") {
     {
       auto node =
-          parser.ParseExpression("MySceneVariable.MyChild");
+          parser.ParseExpression("MySceneStructureVariable.MyChild");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
@@ -1208,11 +1210,37 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
     {
       auto node =
-          parser.ParseExpression("MySceneVariable.MyChild + MySceneVariable2.MyChild");
+          parser.ParseExpression("MySceneStructureVariable.MyChild + MySceneStructureVariable2.MyChild");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid scene variables (1 level, variable does not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MyNonExistingSceneVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\").");
+    }
+  }
+
+  SECTION("Invalid scene variables (2 levels, child does not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable.MyNonExistingChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No child variable with this name found.");
     }
   }
 

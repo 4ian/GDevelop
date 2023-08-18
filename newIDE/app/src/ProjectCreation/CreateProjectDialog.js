@@ -88,7 +88,6 @@ const addDefaultLightToProject = (project: gdProject): void => {
 
 export const createNewEmptyProject = (): NewProjectSource => {
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
-  addDefaultLightToProject(project);
 
   sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
   return {

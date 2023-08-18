@@ -482,7 +482,18 @@ export default class LayerRenderer {
     threeScene.scale.y = -1;
 
     this._threeGroup = new THREE.Group();
+    this._threeGroup.rotation.order = 'ZYX';
     threeScene.add(this._threeGroup);
+
+    const light = new THREE.HemisphereLight();
+    light.color = new THREE.Color(1, 1, 1);
+    light.groundColor = new THREE.Color(0.25, 0.25, 0.25);
+    light.position.set(0, 0, 1);
+    const lightGroup = new THREE.Group();
+    lightGroup.rotation.order = 'ZYX';
+    lightGroup.rotation.x = Math.PI / 4;
+    lightGroup.add(light);
+    threeScene.add(lightGroup);
 
     const threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
     threeCamera.rotation.order = 'ZYX';

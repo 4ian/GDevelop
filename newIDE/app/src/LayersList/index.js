@@ -16,6 +16,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Add from '../UI/CustomSvgIcons/Add';
+import { addDefaultLightToLayer } from '../ProjectCreation/CreateProjectDialog';
+import { getEffects2DCount, getEffects3DCount } from '../EffectsList';
 
 const gd: libGDevelop = global.gd;
 
@@ -38,6 +40,15 @@ type LayersListBodyProps = {|
   width: number,
 |};
 
+const getEffectsCount = (platform: gdPlatform, layer: gdLayer) => {
+  const effectsContainer = layer.getEffects();
+  return layer.getRenderingType() === '2d'
+    ? getEffects2DCount(platform, effectsContainer)
+    : layer.getRenderingType() === '3d'
+    ? getEffects3DCount(platform, effectsContainer)
+    : effectsContainer.getEffectsCount();
+};
+
 const LayersListBody = (props: LayersListBodyProps) => {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -57,24 +68,30 @@ const LayersListBody = (props: LayersListBodyProps) => {
     unsavedChanges,
   } = props;
 
-  const onLayerModified = () => {
-    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-    forceUpdate();
-  };
+  const onLayerModified = React.useCallback(
+    () => {
+      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
-  const onDropLayer = (targetIndex: number) => {
-    const { current: draggedLayerIndex } = draggedLayerIndexRef;
-    if (draggedLayerIndex === null) return;
+  const onDropLayer = React.useCallback(
+    (targetIndex: number) => {
+      const { current: draggedLayerIndex } = draggedLayerIndexRef;
+      if (draggedLayerIndex === null) return;
 
-    if (targetIndex !== draggedLayerIndex) {
-      layersContainer.moveLayer(
-        draggedLayerIndex,
-        targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
-      );
-      onLayerModified();
-    }
-    draggedLayerIndexRef.current = null;
-  };
+      if (targetIndex !== draggedLayerIndex) {
+        layersContainer.moveLayer(
+          draggedLayerIndex,
+          targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
+        );
+        onLayerModified();
+      }
+      draggedLayerIndexRef.current = null;
+    },
+    [layersContainer, onLayerModified]
+  );
 
   const layersCount = layersContainer.getLayersCount();
   const containerLayersList = mapReverseFor(0, layersCount, i => {
@@ -89,7 +106,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
         isSelected={props.selectedLayer === layerName}
         onSelect={() => props.onSelectLayer(layerName)}
         nameError={nameErrors[layerName]}
-        effectsCount={layer.getEffects().getEffectsCount()}
+        effectsCount={getEffectsCount(project.getCurrentPlatform(), layer)}
         onEditEffects={() => onEditEffects(layer)}
         onEdit={() => onEdit(layer)}
         onBeginDrag={() => {
@@ -225,6 +242,9 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         layersContainer.hasLayerNamed(name)
       );
       layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+      const newLayer = layersContainer.getLayer(name);
+      addDefaultLightToLayer(newLayer);
+
       onLayerModified();
       props.onCreateLayer();
     };

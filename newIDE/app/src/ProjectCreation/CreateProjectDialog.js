@@ -57,6 +57,35 @@ const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
   };
 };
 
+export const addDefaultLightToLayer = (layer: gdLayer): void => {
+  const light = layer.getEffects().insertNewEffect('3D Light', 0);
+  light.setEffectType('Scene3D::HemisphereLight');
+  light.setStringParameter('skyColor', '255;255;255');
+  light.setStringParameter('groundColor', '64;64;64');
+  light.setDoubleParameter('intensity', 1);
+  light.setStringParameter('top', 'Y-');
+  light.setDoubleParameter('elevation', 45);
+  light.setDoubleParameter('rotation', 0);
+};
+
+export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
+  for (let layerIndex = 0; layerIndex < layout.getLayersCount(); layerIndex++) {
+    const layer = layout.getLayerAt(layerIndex);
+    addDefaultLightToLayer(layer);
+  }
+};
+
+const addDefaultLightToProject = (project: gdProject): void => {
+  for (
+    let layoutIndex = 0;
+    layoutIndex < project.getLayoutsCount();
+    layoutIndex++
+  ) {
+    const layout = project.getLayoutAt(layoutIndex);
+    addDefaultLightToAllLayers(layout);
+  }
+};
+
 export const createNewEmptyProject = (): NewProjectSource => {
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
 
@@ -75,7 +104,11 @@ export const createNewProjectWithDefaultLogin = (): NewProjectSource => {
     exampleUrl: url,
     exampleSlug: 'login-template',
   });
-  return getNewProjectSourceFromUrl(url);
+  const newProjectSource = getNewProjectSourceFromUrl(url);
+  if (newProjectSource.project) {
+    addDefaultLightToProject(newProjectSource.project);
+  }
+  return newProjectSource;
 };
 
 export const createNewProjectFromAIGeneratedProject = (

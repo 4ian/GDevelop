@@ -173,6 +173,7 @@ import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
 import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProjectDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1838,7 +1839,10 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       if (currentProject.getLayoutsCount() === 0) {
-        currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+        const layoutName = i18n._(t`Untitled scene`);
+        currentProject.insertNewLayout(layoutName, 0);
+        const layout = currentProject.getLayout(layoutName);
+        addDefaultLightToAllLayers(layout);
       }
       openLayout(
         currentProject.getLayoutAt(0).getName(),

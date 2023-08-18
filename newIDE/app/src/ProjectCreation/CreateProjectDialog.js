@@ -65,7 +65,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   light.setDoubleParameter('intensity', 1);
   light.setStringParameter('top', 'Y-');
   light.setDoubleParameter('elevation', 45);
-  light.setDoubleParameter('rotation', 90);
+  light.setDoubleParameter('rotation', 0);
 };
 
 export const addDefaultLightToAllLayers = (layout: gdLayout): void => {

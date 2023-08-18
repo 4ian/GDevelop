@@ -177,7 +177,7 @@ namespace gdjs {
 
     getAnimationName(): string {
       return this.isAnimationIndex(this._currentAnimationIndex) ?
-        '' : this._animations[this._currentAnimationIndex].name;
+        this._animations[this._currentAnimationIndex].name : '';
     }
 
     getAnimationIndex(animationName: string) {

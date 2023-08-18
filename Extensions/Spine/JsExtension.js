@@ -138,7 +138,7 @@ module.exports = {
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .markAsSimple()
         .setFunctionName('setAnimationIndex')
-        .setGetter('getAnimationIndex');
+        .setGetter('getCurrentAnimationIndex');
 
       object
         .addExpressionAndConditionAndAction(

@@ -5,8 +5,6 @@ import { type InstancesEditorSettings } from './InstancesEditorSettings';
 import { type InstanceMeasurer } from './InstancesRenderer';
 import getObjectByName from '../Utils/GetObjectByName';
 
-
-
 export type ResizeGrabbingLocation =
   | 'TopLeft'
   | 'BottomLeft'

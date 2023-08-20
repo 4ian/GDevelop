@@ -122,15 +122,17 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
     },
     {
       kind: 'Behavior',
-      completion: 'PlatformerObject',
+      completion: 'PlatformBehavior::PlatformerObjectBehavior',
       addNamespaceSeparator: true,
       isExact: false,
+      behaviorType: '',
     },
     {
       kind: 'Behavior',
       completion: 'Physics2',
       addNamespaceSeparator: true,
       isExact: false,
+      behaviorType: 'Physics2::Physics2Behavior',
     },
     {
       kind: 'Expression',

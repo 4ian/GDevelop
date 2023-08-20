@@ -89,7 +89,10 @@ export const Default = () => (
       render={(value, onChange) => (
         <LeaderboardIdField
           project={testProject.project}
-          scope={{ project: testProject.project, layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -107,7 +110,10 @@ export const InitialValidLeaderboard = () => (
       render={(value, onChange) => (
         <LeaderboardIdField
           project={testProject.project}
-          scope={{ project: testProject.project, layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -125,7 +131,10 @@ export const InitialInvalidLeaderboard = () => (
       render={(value, onChange) => (
         <LeaderboardIdField
           project={testProject.project}
-          scope={{ project: testProject.project, layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}

@@ -5,7 +5,10 @@ import {
   filterObjectsList,
   filterGroupsList,
 } from '../ObjectsList/EnumerateObjects';
-import { enumerateVariables } from '../EventsSheet/ParameterFields/EnumerateVariables';
+import {
+  enumerateVariables,
+  type EnumeratedVariable,
+} from '../EventsSheet/ParameterFields/EnumerateVariables';
 import flatten from 'lodash/flatten';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 import {
@@ -23,6 +26,10 @@ import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMet
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
+import {
+  filterStringListWithPrefix,
+  filterListWithPrefix,
+} from '../Utils/ListFiltering';
 
 const gd: libGDevelop = global.gd;
 
@@ -52,6 +59,7 @@ export type ExpressionAutocompletion =
   | {|
       ...BaseExpressionAutocompletion,
       kind: 'Variable',
+      variableType: Variable_Type,
     |}
   | {|
       ...BaseExpressionAutocompletion,
@@ -61,7 +69,7 @@ export type ExpressionAutocompletion =
   | {|
       ...BaseExpressionAutocompletion,
       kind: 'Behavior',
-      behaviorType?: string,
+      behaviorType: string,
     |}
   | {|
       ...BaseExpressionAutocompletion,
@@ -75,19 +83,6 @@ type ExpressionAutocompletionContext = {|
   objectsContainer: gdObjectsContainer,
   scope: EventsScope,
 |};
-
-const filterStringList = (
-  list: Array<string>,
-  searchText: string
-): Array<string> => {
-  if (!searchText) return list;
-
-  const lowercaseSearchText = searchText.toLowerCase();
-
-  return list.filter((text: string) => {
-    return text.toLowerCase().indexOf(lowercaseSearchText) !== -1;
-  });
-};
 
 const getAutocompletionsForExpressions = (
   expressionMetadatas: Array<EnumeratedExpressionMetadata>,
@@ -424,7 +419,10 @@ const getAutocompletionsForText = function(
   }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
-  const filteredTextList = filterStringList(autocompletionTexts, prefix).sort();
+  const filteredTextList = filterStringListWithPrefix(
+    autocompletionTexts,
+    prefix
+  ).sort();
 
   const isLastParameter = completionDescription.isLastParameter();
   return filteredTextList.map(text => ({
@@ -443,48 +441,67 @@ const getAutocompletionsForVariable = function(
   const prefix: string = completionDescription.getPrefix();
   const type: string = completionDescription.getType();
   const objectName: string = completionDescription.getObjectName();
-  const { project, scope } = expressionAutocompletionContext;
-  const layout = scope.layout;
+  const { project, layout } = expressionAutocompletionContext.scope;
 
-  let variablesContainer: gdVariablesContainer;
-  if (type === 'globalvar') {
-    if (!project) {
-      // No variable completion
-      return [];
+  let declaredVariables: Array<EnumeratedVariable>;
+  if (gd.ParameterMetadata.isExpression('variable', type)) {
+    let variablesContainer: gdVariablesContainer;
+    if (type === 'globalvar') {
+      if (!project) {
+        // No variable completion
+        return [];
+      }
+      variablesContainer = project.getVariables();
+    } else if (type === 'scenevar') {
+      if (!layout) {
+        // No variable completion
+        return [];
+      }
+      variablesContainer = layout.getVariables();
+    } else if (type === 'objectvar') {
+      const object = getObjectByName(project, layout, objectName);
+      if (!object) {
+        // No variable completion for unknown objet
+        return [];
+      }
+      variablesContainer = object.getVariables();
     }
-    variablesContainer = project.getVariables();
-  } else if (type === 'scenevar') {
-    if (!layout) {
-      // No variable completion
-      return [];
+
+    declaredVariables = enumerateVariables(variablesContainer);
+  } else {
+    // We complete variables that are used "as is" in an expression.
+
+    if (objectName) {
+      const object = getObjectByName(project, layout, objectName);
+      if (!object) return [];
+
+      declaredVariables = enumerateVariables(object.getVariables());
+    } else {
+      declaredVariables = [
+        ...enumerateVariables(project.getVariables()),
+        ...(layout ? enumerateVariables(layout.getVariables()) : []),
+      ];
     }
-    variablesContainer = layout.getVariables();
-  } else if (type === 'objectvar') {
-    const object = getObjectByName(project, layout, objectName);
-    if (!object) {
-      // No variable completion for unknown objet
-      return [];
-    }
-    variablesContainer = object.getVariables();
   }
 
-  const definedVariableNames = enumerateVariables(variablesContainer)
-    .map(({ name, isValidName }) =>
-      isValidName
-        ? name
-        : // Hide invalid variable names - they would not
-          // be parsed correctly anyway.
-          null
-    )
-    .filter(Boolean);
+  // Hide invalid variable names - they would not
+  // be parsed correctly anyway.
+  const declaredAndValidVariables = declaredVariables.filter(
+    enumeratedVariable => !!enumeratedVariable.isValidName
+  );
 
-  const filteredVariablesList = filterStringList(definedVariableNames, prefix);
+  const filteredVariablesList = filterListWithPrefix(
+    declaredAndValidVariables,
+    prefix,
+    ({ name }) => name
+  );
 
-  return filteredVariablesList.map(variableName => ({
+  return filteredVariablesList.map(enumeratedVariable => ({
     kind: 'Variable',
-    completion: variableName,
+    completion: enumeratedVariable.name,
     replacementStartPosition: completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),
+    variableType: enumeratedVariable.type,
   }));
 };
 

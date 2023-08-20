@@ -3714,9 +3714,15 @@ describe('libGD.js', function () {
     });
 
     it('completes an expression with an operator and a prefix', function () {
-      expect.assertions(6);
+      expect.assertions(9);
       testCompletions('number', '1 + My| ', (completionDescription, index) => {
         if (index === 0) {
+          expect(completionDescription.getCompletionKind()).toBe(
+            gd.ExpressionCompletionDescription.Variable
+          );
+          expect(completionDescription.getType()).toBe('number');
+          expect(completionDescription.getPrefix()).toBe('My');
+        } else if (index === 1) {
           expect(completionDescription.getCompletionKind()).toBe(
             gd.ExpressionCompletionDescription.Object
           );
@@ -3779,12 +3785,18 @@ describe('libGD.js', function () {
       );
     });
     it('completes an expression parameters', function () {
-      expect.assertions(6);
+      expect.assertions(9);
       testCompletions(
         'number',
         '1 + MySpriteObject.PointX(a| ',
         (completionDescription, index) => {
           if (index === 0) {
+            expect(completionDescription.getCompletionKind()).toBe(
+              gd.ExpressionCompletionDescription.Variable
+            );
+            expect(completionDescription.getType()).toBe('string');
+            expect(completionDescription.getPrefix()).toBe('a');
+          } else if (index === 1) {
             expect(completionDescription.getCompletionKind()).toBe(
               gd.ExpressionCompletionDescription.Object
             );

@@ -44,7 +44,10 @@ export const EmptyNoScope = () => (
     <FixedHeightFlexContainer height={500}>
       <EventsSheet
         project={testProject.project}
-        scope={{ project: testProject.project, layout: testProject.emptyLayout }}
+        scope={{
+          project: testProject.project,
+          layout: testProject.emptyLayout,
+        }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.emptyLayout}
         events={testProject.emptyLayout.getEvents()}

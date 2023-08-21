@@ -223,7 +223,7 @@ export const enumerateObjectsAndGroups = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectType: ?string = undefined,
-  behaviorTypes?: Array<string> = []
+  requiredBehaviorTypes?: Array<string> = []
 ) => {
   const filterObject = (object: gdObject): boolean => {
     return (
@@ -234,14 +234,14 @@ export const enumerateObjectsAndGroups = (
           object.getName(),
           false
         ) === objectType) &&
-      behaviorTypes.every(
-        behaviorType =>
+      requiredBehaviorTypes.every(
+        requiredBehaviorType =>
           gd
             .getBehaviorNamesInObjectOrGroup(
               globalObjectsContainer,
               objectsContainer,
               object.getName(),
-              behaviorType,
+              requiredBehaviorType,
               false
             )
             .size() > 0
@@ -257,7 +257,7 @@ export const enumerateObjectsAndGroups = (
           group.getName(),
           true
         ) === objectType) &&
-      behaviorTypes.every(
+      requiredBehaviorTypes.every(
         behaviorType =>
           gd
             .getBehaviorNamesInObjectOrGroup(

@@ -101,10 +101,12 @@ declare class gdProject extends gdObjectsContainer {
   getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;
   getResourcesManager(): gdResourcesManager;
-  exposeResources(worker: gdArbitraryResourceWorker): void;
-  static validateName(name: string): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
+  static isUsageOfUnicodeIdentifierNamesAllowed(): boolean;
+  static allowUsageOfUnicodeIdentifierNames(enable: boolean): void;
+  static isNameSafe(name: string): boolean;
+  static getSafeName(name: string): string;
   getTypeOfBehavior(layout: gdLayout, name: string, searchInGroups: boolean): string;
   getTypeOfObject(layout: gdLayout, name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(layout: gdLayout, name: string, searchInGroups: boolean): gdVectorString;

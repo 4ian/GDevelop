@@ -21,6 +21,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetCategory("Game mechanic")
+      .SetTags("screen")
       .SetExtensionHelpPath("/behaviors/destroyoutside");
 
   gd::BehaviorMetadata& aut =

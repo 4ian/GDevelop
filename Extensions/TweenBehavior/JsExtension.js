@@ -74,6 +74,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setCategory('Visual effect')
+      .setTags("tween, interpolation, smooth")
       .setExtensionHelpPath('/behaviors/tween');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Tweening'))
@@ -708,7 +709,7 @@ module.exports = {
         _(
           'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
         ),
-        _('Scale'),
+        _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
@@ -742,7 +743,7 @@ module.exports = {
         _(
           'Tween the X-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
-        _('Scale'),
+        _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
@@ -775,7 +776,7 @@ module.exports = {
         _(
           'Tween the Y-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
-        _('Scale'),
+        _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
@@ -839,7 +840,7 @@ module.exports = {
         _(
           'Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
-        _('Opacity'),
+        _('Visibility'),
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )

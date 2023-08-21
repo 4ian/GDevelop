@@ -17,6 +17,7 @@ import {
   allObjectSpritesHaveSameCollisionMaskAs,
   allObjectSpritesHaveSamePointsAs,
   getCurrentElements,
+  getTotalSpritesCount,
 } from './Utils/SpriteObjectHelper';
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
@@ -41,6 +42,7 @@ import Add from '../../../UI/CustomSvgIcons/Add';
 import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../UI/Menu/ContextMenu';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -238,6 +240,7 @@ const SpritesList = ({
   }>({});
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
+  const { showConfirmation } = useAlertDialog();
 
   const updateSelectionIndexesAfterMoveUp = React.useCallback(
     (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
@@ -528,13 +531,37 @@ const SpritesList = ({
   );
 
   const deleteSprites = React.useCallback(
-    () => {
+    async () => {
       const sprites = selectedSprites.current;
       const firstSpritePtr = spriteConfiguration
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0).ptr;
-      const isFirstSpriteDeleted = !!sprites[firstSpritePtr];
+      const isObjectFirstSpriteDeleted = !!sprites[firstSpritePtr];
+
+      const totalSpritesCount = getTotalSpritesCount(spriteConfiguration);
+      const isDeletingLastSprites =
+        Object.keys(sprites).length === totalSpritesCount;
+      const oneOfSpritesInCurrentDirection =
+        direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+
+      const isUsingCustomCollisionMask =
+        !spriteConfiguration.adaptCollisionMaskAutomatically() &&
+        oneOfSpritesInCurrentDirection &&
+        !oneOfSpritesInCurrentDirection.isFullImageCollisionMask();
+      const shouldWarnBecauseLosingCustomCollisionMask =
+        isDeletingLastSprites && isUsingCustomCollisionMask;
+
+      if (shouldWarnBecauseLosingCustomCollisionMask) {
+        const deleteAnswer = await showConfirmation({
+          title: t`Remove the sprite`,
+          message: t`You are about to remove the last sprite of this object, which has a custom collision mask. The custom collision mask will be lost. Are you sure you want to continue?`,
+          confirmButtonLabel: t`Remove`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!deleteAnswer) return;
+      }
+
       mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
         const animation = spriteConfiguration.getAnimation(index);
         deleteSpritesFromAnimation(animation, sprites);
@@ -544,9 +571,22 @@ const SpritesList = ({
       selectedSprites.current = {};
       forceUpdate();
       if (onSpriteUpdated) onSpriteUpdated();
-      if (isFirstSpriteDeleted && onFirstSpriteUpdated) onFirstSpriteUpdated();
+      if (isObjectFirstSpriteDeleted && onFirstSpriteUpdated)
+        onFirstSpriteUpdated();
+      if (shouldWarnBecauseLosingCustomCollisionMask) {
+        // The user has deleted the last custom collision mask, so revert to automatic
+        // collision mask adaptation.
+        spriteConfiguration.setAdaptCollisionMaskAutomatically(true);
+      }
     },
-    [onSpriteUpdated, onFirstSpriteUpdated, spriteConfiguration, forceUpdate]
+    [
+      onSpriteUpdated,
+      onFirstSpriteUpdated,
+      spriteConfiguration,
+      forceUpdate,
+      showConfirmation,
+      direction,
+    ]
   );
 
   const duplicateSprites = React.useCallback(

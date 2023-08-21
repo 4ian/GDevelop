@@ -34,6 +34,10 @@ import DropIndicator from '../../../UI/SortableVirtualizedItemList/DropIndicator
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { getMatchingCollisionMask } from './CollisionMasksEditor/CollisionMaskHelper';
+import {
+  getCurrentElements,
+  getTotalSpritesCount,
+} from './Utils/SpriteObjectHelper';
 
 const gd: libGDevelop = global.gd;
 
@@ -287,9 +291,31 @@ export default function SpriteEditor({
 
   const removeAnimation = React.useCallback(
     async (index: number, i18n: I18nType) => {
+      const totalSpritesCount = getTotalSpritesCount(spriteConfiguration);
+      const isDeletingLastSprites =
+        spriteConfiguration
+          .getAnimation(index)
+          .getDirection(0)
+          .getSpritesCount() === totalSpritesCount;
+      const firstSpriteInAnimationDeleted = getCurrentElements(
+        spriteConfiguration,
+        index,
+        0,
+        0
+      ).sprite;
+      const isUsingCustomCollisionMask =
+        !spriteConfiguration.adaptCollisionMaskAutomatically() &&
+        firstSpriteInAnimationDeleted &&
+        !firstSpriteInAnimationDeleted.isFullImageCollisionMask();
+      const shouldWarnBecauseLosingCustomCollisionMask =
+        isDeletingLastSprites && isUsingCustomCollisionMask;
+
+      const message = shouldWarnBecauseLosingCustomCollisionMask
+        ? t`Are you sure you want to remove this animation? You will lose the custom collision mask you have set for this object.`
+        : t`Are you sure you want to remove this animation?`;
       const deleteAnswer = await showConfirmation({
         title: t`Remove the animation`,
-        message: t`Are you sure you want to remove this animation?`,
+        message,
         confirmButtonLabel: t`Remove`,
         dismissButtonLabel: t`Cancel`,
       });
@@ -307,6 +333,11 @@ export default function SpriteEditor({
         // If the first animation is removed and the collision mask is
         // automatically adapted, then recompute it.
         onCreateMatchingSpriteCollisionMask();
+      }
+      if (shouldWarnBecauseLosingCustomCollisionMask) {
+        // The user has deleted the last custom collision mask, so revert to automatic
+        // collision mask adaptation.
+        spriteConfiguration.setAdaptCollisionMaskAutomatically(true);
       }
       if (onObjectUpdated) onObjectUpdated();
     },

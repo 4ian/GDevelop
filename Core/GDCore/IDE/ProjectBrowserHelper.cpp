@@ -197,7 +197,7 @@ void ProjectBrowserHelper::ExposeProjectObjects(
   // Global objects
   worker.Launch(project);
 
-  // Layers objects
+  // Layout objects
   for (size_t i = 0; i < project.GetLayoutsCount(); i++) {
     worker.Launch(project.GetLayout(i));
   }

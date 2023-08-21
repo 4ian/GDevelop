@@ -12,6 +12,7 @@ export type EnumeratedBehaviorMetadata = {|
   description: string,
   previewIconUrl: string,
   category: string,
+  tags: Array<string>,
 |};
 
 export const enumerateBehaviorsMetadata = (
@@ -48,6 +49,7 @@ export const enumerateBehaviorsMetadata = (
           previewIconUrl: behaviorMetadata.getIconFilename(),
           objectType: behaviorMetadata.getObjectType(),
           category: extension.getCategory(),
+          tags: extension.getTags().toJSArray(),
         }));
     })
   );

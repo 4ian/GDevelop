@@ -212,6 +212,7 @@ export type PreferencesValues = {|
   newProjectsDefaultFolder: string,
   newProjectsDefaultStorageProviderName: string,
   useShortcutToClosePreviewWindow: boolean,
+  allowUsageOfUnicodeIdentifierNames: boolean,
 |};
 
 /**
@@ -289,6 +290,7 @@ export type Preferences = {|
   |}) => ?InAppTutorialUserProgress,
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
   setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
+  setAllowUsageOfUnicodeIdentifierNames: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -333,6 +335,7 @@ export const initialPreferences = {
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
+    allowUsageOfUnicodeIdentifierNames: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -389,6 +392,7 @@ export const initialPreferences = {
   setNewProjectsDefaultFolder: () => {},
   setNewProjectsDefaultStorageProviderName: () => {},
   setUseShortcutToClosePreviewWindow: () => {},
+  setAllowUsageOfUnicodeIdentifierNames: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

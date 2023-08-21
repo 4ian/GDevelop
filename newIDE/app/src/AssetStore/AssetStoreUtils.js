@@ -82,19 +82,19 @@ export const getAssetPackFromUserFriendlySlug = ({
 };
 
 export const getPrivateAssetPackListingData = ({
-  privateAssetPacks,
+  privateAssetPackListingDatas,
   userFriendlySlug,
 }: {|
-  privateAssetPacks: Array<PrivateAssetPackListingData>,
+  privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   userFriendlySlug: string,
 |}): ?PrivateAssetPackListingData => {
   const privateAssetPackId = getIdFromPrivateAssetPackUserFriendlySlug(
     userFriendlySlug
   );
-  const privateAssetPack = privateAssetPacks.find(
+  const privateAssetPackListingData = privateAssetPackListingDatas.find(
     privateAssetPack => privateAssetPackId === privateAssetPack.id
   );
-  if (privateAssetPack) return privateAssetPack;
+  if (privateAssetPackListingData) return privateAssetPackListingData;
 
   return null;
 };

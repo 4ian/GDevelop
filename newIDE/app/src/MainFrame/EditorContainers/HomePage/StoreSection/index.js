@@ -25,7 +25,7 @@ const StoreSection = ({
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const { searchResults, navigationState } = React.useContext(
+  const { assetShortHeadersSearchResults, navigationState } = React.useContext(
     AssetStoreContext
   );
   const {
@@ -36,7 +36,7 @@ const StoreSection = ({
   const assetShortHeadersToInstall = openedAssetShortHeader
     ? [openedAssetShortHeader]
     : openedAssetPack
-    ? searchResults
+    ? assetShortHeadersSearchResults
     : [];
 
   const existingAssetStoreIds = React.useMemo(

@@ -48,6 +48,27 @@ export const getCurrentElements = (
   };
 };
 
+export const getTotalSpritesCount = (objectConfiguration: gdSpriteObject) => {
+  let totalSpritesCount = 0;
+  for (
+    let animationIndex = 0;
+    animationIndex < objectConfiguration.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = objectConfiguration.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      totalSpritesCount += direction.getSpritesCount();
+    }
+  }
+
+  return totalSpritesCount;
+};
+
 /**
  * Return all the point names
  */

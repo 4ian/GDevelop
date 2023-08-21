@@ -111,9 +111,7 @@ export default function NewBehaviorDialog({
           allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
             behavior.behaviorMetadata
           ),
-          // PlatformExtension don't have tags so the information from EventsFunctionsExtension is lost.
-          // TODO (tags): Add tags to PlatformExtension, handle them in MetadataDeclarationHelper and enumerateBehaviorsMetadata.
-          tags: [],
+          tags: behavior.tags,
         }));
     },
     [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]

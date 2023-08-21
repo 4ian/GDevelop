@@ -157,6 +157,7 @@ declare class libGDevelop {
   UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
   VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
   ProjectBrowserHelper: Class<gdProjectBrowserHelper>;
+  ResourceExposer: Class<gdResourceExposer>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;

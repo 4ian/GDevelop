@@ -515,10 +515,14 @@ interface Project {
 
     [Ref] VariablesContainer GetVariables();
     [Ref] ResourcesManager GetResourcesManager();
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-    boolean STATIC_ValidateName([Const] DOMString name);
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+
+    boolean STATIC_IsUsageOfUnicodeIdentifierNamesAllowed();
+    void STATIC_AllowUsageOfUnicodeIdentifierNames(boolean enable);
+    boolean STATIC_IsNameSafe([Const] DOMString name);
+    [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
 
     [Const, Value] DOMString FREE_GetTypeOfBehavior([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Const, Value] DOMString FREE_GetTypeOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
@@ -1124,6 +1128,7 @@ interface InitialInstancesContainer {
     boolean SomeInstancesAreOnLayer([Const] DOMString layer);
     void RenameInstancesOfObject([Const] DOMString oldName, [Const] DOMString newName);
     void RemoveInstance([Const, Ref] InitialInstance inst);
+    unsigned long GetLayerInstancesCount([Const] DOMString layerName);
 
     [Ref] InitialInstance InsertNewInitialInstance();
     [Ref] InitialInstance InsertInitialInstance([Const, Ref] InitialInstance inst);
@@ -1290,7 +1295,7 @@ interface AbstractFunctionMetadata {
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] AbstractFunctionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] AbstractFunctionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
-    
+
     [Ref] AbstractFunctionMetadata SetHidden();
     [Ref] AbstractFunctionMetadata SetPrivate();
 
@@ -1350,7 +1355,7 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata MarkAsComplex();
 
     [Ref] InstructionMetadata GetCodeExtraInformation();
-    
+
     [Ref] InstructionMetadata SetFunctionName([Const] DOMString functionName_);
     [Ref] InstructionMetadata SetAsyncFunctionName([Const] DOMString functionName_);
     [Const, Ref] DOMString GetFunctionName();
@@ -1408,7 +1413,7 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
-    
+
     [Ref] ExpressionMetadata SetFunctionName([Const] DOMString functionName);
     [Const, Ref] DOMString GetFunctionName();
     [Ref] ExpressionMetadata SetStatic();
@@ -1790,6 +1795,9 @@ interface PlatformExtension {
     [Ref] PlatformExtension SetCategory([Const] DOMString category);
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
+
+    [Const, Ref] VectorString GetTags();
+    [Ref] PlatformExtension SetTags([Const] DOMString csvTags);
 
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(
                                         [Const] DOMString type,
@@ -2242,6 +2250,10 @@ interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
 };
 
+interface ResourceExposer {
+    void STATIC_ExposeWholeProjectResources([Ref] Project project, [Ref] ArbitraryResourceWorker worker);
+};
+
 interface WholeProjectRefactorer {
     void STATIC_RenameEventsFunctionsExtension(
       [Ref] Project project,
@@ -2376,6 +2388,9 @@ interface WholeProjectRefactorer {
     [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);
     [Value] VectorString STATIC_GetBehaviorsWithType([Const, Ref] gdObject obj, [Const] DOMString type);
     boolean STATIC_FixInvalidRequiredBehaviorProperties([Ref] Project project);
+    void STATIC_RemoveLayer([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
+    void STATIC_MergeLayers([Ref] Project project, [Ref] Layout layout, [Const] DOMString originLayerName, [Const] DOMString targetLayerName);
+    unsigned long STATIC_GetLayoutAndExternalLayoutLayerInstancesCount([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
 };
 
 interface PropertyFunctionGenerator {
@@ -3388,7 +3403,7 @@ interface JsCodeEvent {
 [Prefix="gdjs::"]
 interface MetadataDeclarationHelper {
     void MetadataDeclarationHelper();
-    
+
     void STATIC_DeclareExtension(
         [Ref] PlatformExtension extension,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
@@ -3413,9 +3428,24 @@ interface MetadataDeclarationHelper {
         [Const, Ref] EventsBasedObject eventsBasedObject,
         [Ref] MapStringString objectMethodMangledNames);
 
+    [Const, Value] DOMString STATIC_GetExtensionCodeNamespacePrefix(
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
+
     [Const, Value] DOMString STATIC_GetFreeFunctionCodeName(
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsFunction eventsFunction);
+
+    [Const, Value] DOMString STATIC_GetFreeFunctionCodeNamespace(
+        [Const, Ref] EventsFunction eventsFunction,
+        [Const] DOMString codeNamespacePrefix);
+
+    [Const, Value] DOMString STATIC_GetBehaviorFunctionCodeNamespace(
+        [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+        [Const] DOMString codeNamespacePrefix);
+
+    [Const, Value] DOMString STATIC_GetObjectFunctionCodeNamespace(
+        [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString codeNamespacePrefix);
 
     boolean STATIC_IsBehaviorLifecycleEventsFunction([Const] DOMString functionName);
     boolean STATIC_IsObjectLifecycleEventsFunction([Const] DOMString functionName);

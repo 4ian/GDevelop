@@ -45,16 +45,16 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
-  it('can create metadata for free actions with an underscore', () => {
+  it('can create metadata for free actions with an underscore and unicode characters', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();
 
     const eventExtension = project.insertNewEventsFunctionsExtension(
-      'MyExtension',
+      'My🧩Extension',
       0
     );
     const eventFunction = eventExtension.insertNewEventsFunction(
-      'My_Function',
+      'My_📝Function',
       0
     );
     eventFunction.setFunctionType(gd.EventsFunction.Action);
@@ -68,10 +68,10 @@ describe('MetadataDeclarationHelper', () => {
     );
     metadataDeclarationHelper.delete();
 
-    expect(extension.getAllActions().has('My_Function')).toBe(true);
-    const action = extension.getAllActions().get('My_Function');
+    expect(extension.getAllActions().has('My_📝Function')).toBe(true);
+    const action = extension.getAllActions().get('My_📝Function');
     expect(action.getFunctionName()).toBe(
-      'gdjs.evtsExt__MyExtension__My_Function.func'
+      'gdjs.evtsExt__My_129513Extension__My__128221Function.func'
     );
 
     extension.delete();

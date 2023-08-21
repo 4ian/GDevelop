@@ -41,7 +41,7 @@ type Props = {|
 
   // Object renaming:
   onRename: string => void,
-  canRenameObject: string => boolean,
+  getValidatedObjectOrGroupName: string => string,
 
   // Passed down to object editors:
   project: gdProject,
@@ -219,10 +219,10 @@ const InnerDialog = (props: InnerDialogProps) => {
                 onChange={newObjectName => {
                   if (newObjectName === objectName) return;
 
-                  if (props.canRenameObject(newObjectName)) {
-                    setObjectName(newObjectName);
-                    notifyOfChange();
-                  }
+                  setObjectName(
+                    props.getValidatedObjectOrGroupName(newObjectName)
+                  );
+                  notifyOfChange();
                 }}
                 autoFocus="desktop"
               />

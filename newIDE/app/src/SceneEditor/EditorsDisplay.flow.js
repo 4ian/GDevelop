@@ -70,19 +70,14 @@ export type SceneEditorsDisplayProps = {|
     newName: string,
     done: (boolean) => void
   ) => void,
-  canRenameObjectGroup: (
+  getValidatedObjectOrGroupName: (
     newName: string,
     global: boolean,
     i18n: I18nType
-  ) => boolean,
+  ) => string,
   canObjectOrGroupBeGlobal: (
     i18n: I18nType,
     objectOrGroupName: string
-  ) => boolean,
-  canObjectOrGroupUseNewName: (
-    newName: string,
-    global: boolean,
-    i18n: I18nType
   ) => boolean,
 
   updateBehaviorsSharedData: () => void,

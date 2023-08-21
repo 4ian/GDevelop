@@ -22,6 +22,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Movement")
+      .SetTags("pathfinding, obstacle, collision")
       .SetExtensionHelpPath("/behaviors/pathfinding");
   extension.AddInstructionOrExpressionGroupMetadata(_("Pathfinding behavior"))
       .SetIcon("CppPlatform/Extensions/AStaricon16.png");

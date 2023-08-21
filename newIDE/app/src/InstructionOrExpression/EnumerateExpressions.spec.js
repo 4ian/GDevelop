@@ -138,7 +138,7 @@ describe('EnumerateExpressions', () => {
         },
       },
       'Movement using forces': {
-        'X coordinate of the sum of forces': {
+        ForceX: {
           displayedName: 'X coordinate of the sum of forces',
           fullGroupName: 'Movement using forces',
           name: 'ForceX',
@@ -218,7 +218,7 @@ describe('EnumerateExpressions', () => {
       allExpressionsTree['General'];
     expect(generalTreeNode).toMatchObject({
       'Timers and time': {
-        'Current time': {
+        Time: {
           displayedName: 'Current time',
           fullGroupName: 'General/Timers and time',
           iconFilename: 'res/actions/time.png',
@@ -259,7 +259,7 @@ describe('EnumerateExpressions', () => {
     // $FlowFixMe
     expect(generalTreeNode['Sprite']).toMatchObject({
       Position: {
-        'X position of a point': {
+        PointX: {
           displayedName: 'X position of a point',
           fullGroupName: 'General/Sprite/Position',
           iconFilename: 'res/actions/position_black.png',
@@ -281,7 +281,7 @@ describe('EnumerateExpressions', () => {
     // $FlowFixMe
     expect(movementTreeNode['Platform behavior']).toMatchObject({
       Options: {
-        'Maximum horizontal speed': {
+        MaxSpeed: {
           displayedName: 'Maximum horizontal speed',
           fullGroupName: 'Movement/Platform behavior/Options',
           iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',

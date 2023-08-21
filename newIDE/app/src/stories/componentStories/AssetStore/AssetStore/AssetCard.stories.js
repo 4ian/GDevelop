@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -14,9 +13,5 @@ export default {
 };
 
 export const Default = () => (
-  <AssetCard
-    size={128}
-    onOpenDetails={action('onOpenDetails')}
-    assetShortHeader={fakeAssetShortHeader1}
-  />
+  <AssetCard size={128} assetShortHeader={fakeAssetShortHeader1} />
 );

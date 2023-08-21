@@ -41,6 +41,7 @@ import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 import PublicProfileDialog from '../Profile/PublicProfileDialog';
+import { capitalize } from 'lodash';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -74,9 +75,6 @@ const styles = {
     padding: 6,
   },
 };
-
-const makeFirstLetterUppercase = (str: string) =>
-  str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {|
   onTagSelection: (tag: string) => void,
@@ -298,7 +296,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
             <Column>
               <LineStackLayout alignItems="baseline" noMargin>
                 <Text size="block-title" displayInlineAsSpan>
-                  {assetShortHeader.name}
+                  {capitalize(assetShortHeader.name)}
                 </Text>
                 {!areAuthorsLoading && (
                   <LineStackLayout noMargin>
@@ -350,7 +348,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                       <Chip
                         size="small"
                         style={styles.chip}
-                        label={makeFirstLetterUppercase(tag)}
+                        label={capitalize(tag)}
                         onClick={() => {
                           onTagSelection(tag);
                         }}
@@ -468,7 +466,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                               value={animation.name}
                               label={
                                 !isAnimationNameEmpty
-                                  ? makeFirstLetterUppercase(animation.name)
+                                  ? capitalize(animation.name)
                                   : t`Default` // Display default for animations with no name.
                               }
                               shouldNotTranslate={!isAnimationNameEmpty}

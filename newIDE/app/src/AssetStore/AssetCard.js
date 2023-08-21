@@ -11,6 +11,7 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { capitalize } from 'lodash';
 
 const paddingSize = 10;
 const styles = {
@@ -99,7 +100,7 @@ export const AssetCard = ({ id, assetShortHeader, size }: Props) => {
         }}
       >
         <Text noMargin style={styles.title} color="inherit">
-          {assetShortHeader.name}
+          {capitalize(assetShortHeader.name)}
         </Text>
         {assetShortHeader.shortDescription && (
           <Text noMargin style={styles.title} size="body2" color="inherit">

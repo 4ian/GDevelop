@@ -238,12 +238,10 @@ module.exports = {
         this._pixiContainer.addChild(this._pixiObject);
 
         this.loadSpine();
-        this.update();
       }
 
-      // use smth better. can I create texture of default spine stage ?
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'JsPlatform/Extensions/3d_box.svg';
+        return 'CppPlatform/Extensions/spriteicon.png';
       }
 
       loadSpine() {
@@ -253,7 +251,7 @@ module.exports = {
 
         this._pixiResourcesLoader
           .getSpineData(this._project, jsonResourceName, imageResourceName, atlasResourceName)
-          .then((spineData) => {;
+          .then((spineData) => {
             this._spine = new PIXI.Spine(spineData);
             this._pixiObject.addChild(this._spine);
             this.update();
@@ -261,10 +259,8 @@ module.exports = {
       }
 
       update() {
-        // instance settings
         this._pixiObject.position.set(this._instance.getX(), this._instance.getY());
 
-        // object settings
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
         const width = this.getWidth();
@@ -295,7 +291,6 @@ module.exports = {
           return;
         }
 
-        // should I do that ? maybe just { return; } ?
         if (!Number.isInteger(index) || index < 0) {
           index = 0;
         } else if (configuration.getAnimationsCount() <= index) {

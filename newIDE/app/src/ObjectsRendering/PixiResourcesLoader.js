@@ -356,6 +356,14 @@ export default class PixiResourcesLoader {
     return loadingPromise;
   }
 
+  /**
+   * Return the Pixi spine data to the specified resource names.
+   * @param project The project
+   * @param spineName The name of the spine json resource
+   * @param atlasImageName The name of the atlas image resource
+   * @param atlasTextName The name of the atlas text resource
+   * @returns The requested material.
+   */
   static async getSpineData(
     project: gdProject,
     spineName: string,
@@ -381,11 +389,10 @@ export default class PixiResourcesLoader {
  
     // https://github.com/pixijs/spine/blob/master/examples/preload_atlas_text.md
     if (!atlasPromises[atlasTextName]) {
-      atlasPromises[atlasTextName] = new Promise(resolve => {
+      atlasPromises[atlasTextName] = new Promise(resolve =>
         loader
           .add(atlasTextName, ResourcesLoader.getResourceFullUrl(project, atlasTextName, { isResourceForPixi: true }), { xhrType: 'text' })
-          .load((_, atlasData) =>  resolve(atlasData[atlasTextName].data))
-      });
+          .load((_, atlasData) =>  resolve(atlasData[atlasTextName].data)));
     }
 
     if (!spineDataPromises[spineName]) {

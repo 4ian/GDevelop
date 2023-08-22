@@ -57,13 +57,12 @@ namespace gdjs {
       oldObjectData: SpineObjectData,
       newObjectData: SpineObjectData
     ): boolean {
-      super.updateFromObjectData
+      super.updateFromObjectData(oldObjectData, newObjectData);
+
       if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
         this.setOpacity(newObjectData.content.opacity);
       }
       if (oldObjectData.content.scale !== newObjectData.content.scale) {
-        // should I prioritize custom size here ?
-        // is there a same cb if instance properties have been changed ?
         this.setScale(newObjectData.content.scale);
       }
       if (oldObjectData.content.timeScale !== newObjectData.content.timeScale) {
@@ -83,7 +82,6 @@ namespace gdjs {
       this.setAnimationIndex(animationIndex);
 
       if (initialInstanceData.customSize) {
-        // prioritize custom size
         this.setScale(1);
         this._renderer.setSize(initialInstanceData.width, initialInstanceData.height);
         this.invalidateHitboxes();

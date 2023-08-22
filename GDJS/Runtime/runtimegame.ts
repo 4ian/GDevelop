@@ -140,7 +140,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
-    _textManager: TextManager;
+    _atlasManager: AtlasManager;
     _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
@@ -228,7 +228,7 @@ namespace gdjs {
         this._data.resources.resources,
         this._resourcesLoader
       );
-      this._textManager = new gdjs.TextManager(
+      this._atlasManager = new gdjs.AtlasManager(
         this._data.resources.resources,
         this._resourcesLoader,
         this._imageManager
@@ -326,7 +326,7 @@ namespace gdjs {
         this._soundManager,
         this._fontManager,
         this._jsonManager,
-        this._textManager,
+        this._atlasManager,
         this._bitmapFontManager,
         this._model3DManager,
       ].forEach((manager) => manager.setResources(resources));
@@ -408,8 +408,8 @@ namespace gdjs {
      * resources.
      * @return The text manager for the game
      */
-    getTextManager(): gdjs.TextManager {
-      return this._textManager;
+    getAtlasManager(): gdjs.AtlasManager {
+      return this._atlasManager;
     }
 
     /**
@@ -779,7 +779,7 @@ namespace gdjs {
                           }
                         },
                         function (model3DTotalCount) {
-                          that._textManager.preload(
+                          that._atlasManager.preload(
                             function (count, total) {
                               const percent = Math.floor(
                                 ((texturesTotalCount +

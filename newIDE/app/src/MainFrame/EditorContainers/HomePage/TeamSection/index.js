@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import Text from '../../../../UI/Text';
+import List from '@material-ui/core/List';
 import { Line, Column } from '../../../../UI/Grid';
 
 import {
@@ -17,7 +17,14 @@ import {
   type TeamMembership,
   type User,
 } from '../../../../Utils/GDevelopServices/User';
+import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
 import TeamContext from '../../../../Profile/Team/TeamContext';
+import TeamGroupNameField from './TeamGroupNameField';
+import TeamMemberRow from './TeamMemberRow';
+
+const sortMembersByNameOrEmail = (a: User, b: User) => {
+  return (a.username || a.email).localeCompare(b.username || b.email);
+};
 
 type GroupWithMembers = {| group: TeamGroup, members: User[] |};
 
@@ -73,12 +80,44 @@ const groupMembersByGroupId = ({
 
 const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   ({ project, onOpenRecentFile, storageProviders }, ref) => {
-    const { groups, members, memberships } = React.useContext(TeamContext);
+    const {
+      groups,
+      members,
+      memberships,
+      onChangeGroupName,
+      onListUserProjects,
+    } = React.useContext(TeamContext);
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
     }));
+
+    const [selectedUser, setSelectedUser] = React.useState<?User>(null);
+    const [
+      selectedUserProjects,
+      setSelectedUserProjects,
+    ] = React.useState<?Array<CloudProjectWithUserAccessInfo>>(null);
+    const [
+      isLoadingUserProjects,
+      setIsLoadingUserProjects,
+    ] = React.useState<boolean>(false);
+
+    const listUserProjects = React.useCallback(
+      async (user: User) => {
+        setIsLoadingUserProjects(true);
+        try {
+          setSelectedUser(user);
+          const userProjects = await onListUserProjects(user);
+          setSelectedUserProjects(userProjects);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoadingUserProjects(false);
+        }
+      },
+      [onListUserProjects]
+    );
 
     const membersByGroupId = groupMembersByGroupId({
       groups,
@@ -114,11 +153,22 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             <Line>
               <Column noMargin expand>
                 {membersNotInAGroup && (
-                  <ul>
-                    {membersNotInAGroup.members.map(member => (
-                      <li>{member.username || member.email}</li>
-                    ))}
-                  </ul>
+                  <List>
+                    {membersNotInAGroup.members
+                      .sort(sortMembersByNameOrEmail)
+                      .map(member => (
+                        <TeamMemberRow
+                          member={member}
+                          onListUserProjects={() => listUserProjects(member)}
+                          disabled={isLoadingUserProjects}
+                          isLoading={
+                            isLoadingUserProjects &&
+                            !!selectedUser &&
+                            member.id === selectedUser.id
+                          }
+                        />
+                      ))}
+                  </List>
                 )}
               </Column>
             </Line>
@@ -126,13 +176,24 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
               groupsAndMembers.map(({ group, members }) => (
                 <Line>
                   <Column noMargin expand>
-                    <Text>{group.name}</Text>
-
-                    <ul>
-                      {members.map(member => (
-                        <li>{member.username || member.email}</li>
+                    <TeamGroupNameField
+                      group={group}
+                      onFinishEditingGroupName={onChangeGroupName}
+                    />
+                    <List>
+                      {members.sort(sortMembersByNameOrEmail).map(member => (
+                        <TeamMemberRow
+                          member={member}
+                          onListUserProjects={() => listUserProjects(member)}
+                          disabled={isLoadingUserProjects}
+                          isLoading={
+                            isLoadingUserProjects &&
+                            !!selectedUser &&
+                            member.id === selectedUser.id
+                          }
+                        />
                       ))}
-                    </ul>
+                    </List>
                   </Column>
                 </Line>
               ))}

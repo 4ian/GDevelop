@@ -91,8 +91,20 @@ const TeamProvider = ({ children }: Props) => {
     [team, getAuthorizationHeader, profile]
   );
 
+  const onChangeGroupName = async () => {};
+  const onListUserProjects = async () => ([]);
+
   return (
-    <TeamContext.Provider value={{ team, groups, members, memberships }}>
+    <TeamContext.Provider
+      value={{
+        team,
+        groups,
+        members,
+        memberships,
+        onChangeGroupName,
+        onListUserProjects,
+      }}
+    >
       {children}
     </TeamContext.Provider>
   );

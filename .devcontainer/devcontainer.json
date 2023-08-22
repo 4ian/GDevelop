@@ -1,8 +1,5 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {
-    "ghcr.io/devcontainers-community/features/cmake:2": {}
-  },
   "onCreateCommand": "cd newIDE/app && npm install && cd ../electron-app && npm install",
   "forwardPorts": [3000],
   "customizations": {

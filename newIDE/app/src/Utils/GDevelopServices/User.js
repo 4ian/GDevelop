@@ -14,6 +14,7 @@ import YouTube from '../../UI/CustomSvgIcons/YouTube';
 import { GDevelopUserApi } from './ApiConfigs';
 
 import { type Badge } from './Badge';
+import { type Profile } from './Authentication';
 
 export type CommunityLinkType =
   | 'personalWebsiteLink'
@@ -57,6 +58,17 @@ export type UsernameAvailability = {|
   isAvailable: boolean,
 |};
 
+export type User = Profile;
+
+export type Team = {| id: string, createdAt: number, seats: number |};
+export type TeamGroup = {| id: string, name: string |};
+export type TeamMembership = {|
+  userId: string,
+  teamId: string,
+  createdAt: number,
+  groups: ?Array<string>,
+|};
+
 export const searchCreatorPublicProfilesByUsername = (
   searchString: string
 ): Promise<Array<UserPublicProfile>> => {
@@ -74,6 +86,63 @@ export const getUserBadges = (id: string): Promise<Array<Badge>> => {
   return axios
     .get(`${GDevelopUserApi.baseUrl}/user/${id}/badge`)
     .then(response => response.data);
+};
+
+export const listUserTeams = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<Team>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(`${GDevelopUserApi.baseUrl}/team`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, role: 'admin' },
+  });
+  return response.data;
+};
+
+export const listTeamMembers = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string
+): Promise<Array<User>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(`${GDevelopUserApi.baseUrl}/user`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, teamId },
+  });
+  return response.data;
+};
+
+export const listTeamMemberships = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string
+): Promise<Array<TeamMembership>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/team-membership`,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId, teamId },
+    }
+  );
+  return response.data;
+};
+
+export const listTeamGroups = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string
+): Promise<Array<TeamGroup>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/team/${teamId}/group`,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
 };
 
 export const getUserPublicProfilesByIds = (

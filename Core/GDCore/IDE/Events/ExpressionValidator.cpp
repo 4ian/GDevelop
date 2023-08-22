@@ -142,15 +142,12 @@ bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
   }
 }
 
-void ExpressionValidator::ValidateVariable(
+void ExpressionValidator::ValidateNonObjectVariable(
     const gd::VariableNode& variableNode) {
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
 
   // Try first to identify an object.
-  if (projectScopedContainers.GetObjectsContainersList().HasObjectOrGroupNamed(variableNode.name)) {
-    // Object found. We can't validate the variable type though.
-    return;
-  } else if (variablesContainersList.Has(variableNode.name)) {
+  if (variablesContainersList.Has(variableNode.name)) {
     // We found the variable, check its type (or the child variable
     // type, if any).
     const gd::Variable& variable = variablesContainersList.Get(variableNode.name);
@@ -179,9 +176,9 @@ void ExpressionValidator::ValidateVariable(
     }
   }
 
-    RaiseTypeError(_("No variable or object with this name found."),
-                  variableNode.location);
-    return;
+  RaiseTypeError(_("No variable or object with this name found."),
+                variableNode.location);
+  return;
 }
 
 ExpressionValidator::Type ExpressionValidator::ValidateFunction(

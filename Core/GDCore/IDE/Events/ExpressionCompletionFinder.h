@@ -409,6 +409,7 @@ class GD_CORE_API ExpressionCompletionFinder
   }
   void OnVisitVariableNode(VariableNode& node) override {
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
+
     auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
         platform,
         objectsContainersList,
@@ -422,6 +423,8 @@ class GD_CORE_API ExpressionCompletionFinder
         node.location.GetStartPosition(),
         node.location.GetEndPosition(),
         objectName));
+
+
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     // No completions

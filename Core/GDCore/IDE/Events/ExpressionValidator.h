@@ -13,6 +13,8 @@
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/Project/VariablesContainersList.h"
 
 namespace gd {
 class Expression;
@@ -41,7 +43,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         parentType(StringToType(gd::ParameterMetadata::GetExpressionValueType(rootType_))),
-        childType(Type::Unknown) {};
+        childType(Type::Unknown),
+        forbidsUsageOfBracketsBecauseParentIsObject(false) {};
   virtual ~ExpressionValidator(){};
 
   /**
@@ -185,28 +188,50 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitVariableNode(VariableNode& node) override {
     ReportAnyError(node);
-    if (node.child) {
-      node.child->Visit(*this);
-    }
-    if (parentType == Type::String) {
-      childType = Type::String;
-      ValidateVariable(node);
-    } else if (parentType == Type::Number) {
-      childType = Type::Number;
-      ValidateVariable(node);
-    } else if (parentType == Type::NumberOrString) {
-      childType = Type::NumberOrString;
-      ValidateVariable(node);
-    } else if (parentType == Type::Variable) {
+
+    if (parentType == Type::Variable) {
       childType = Type::Variable;
+
+      if (node.child) {
+        node.child->Visit(*this);
+      }
+    } else if (parentType == Type::String || parentType == Type::Number || parentType == Type::NumberOrString) {
+      // The node represents a variable or an object variable in an expression waiting for its *value* to be returned.
+      childType = parentType;
+
+      if (projectScopedContainers.GetObjectsContainersList().HasObjectOrGroupNamed(node.name)) {
+        // Object found. We dont't validate the variable type though.
+
+        // While understood by the parser, it's forbidden to use the bracket notation just after
+        // an object name (`MyObject["MyVariable"]`).
+        forbidsUsageOfBracketsBecauseParentIsObject = true;
+      } else {
+        ValidateNonObjectVariable(node);
+        forbidsUsageOfBracketsBecauseParentIsObject = false;
+      }
+
+      if (node.child) {
+        node.child->Visit(*this);
+      }
+
+      forbidsUsageOfBracketsBecauseParentIsObject = false;
     } else {
       RaiseTypeError(_("You entered a variable, but this type was expected:") +
                          " " + TypeToString(parentType),
                      node.location);
+
+      if (node.child) {
+        node.child->Visit(*this);
+      }
     }
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     ReportAnyError(node);
+
+    // In the case we accessed an object variable (`MyObject.MyVariable`),
+    // brackets can now be used (`MyObject.MyVariable["MyChildVariable"]` is now valid).
+    forbidsUsageOfBracketsBecauseParentIsObject = false;
+
     if (node.child) {
       node.child->Visit(*this);
     }
@@ -214,6 +239,15 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
+
+    if (forbidsUsageOfBracketsBecauseParentIsObject) {
+      RaiseError("brackets_not_allowed_for_objects",
+                 _("You can't use the brackets to access an object variable. "
+                   "Use a dot followed by the variable name, like this: "
+                   "`MyObject.MyVariable`."),
+                 node.location);
+    }
+    forbidsUsageOfBracketsBecauseParentIsObject = false;
 
     Type currentParentType = parentType;
     parentType = Type::NumberOrString;
@@ -290,7 +324,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   enum Type {Unknown = 0, Number, String, NumberOrString, Variable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
   bool ValidateMaybeObjectVariableOrVariable(const gd::IdentifierNode& identifier);
-  void ValidateVariable(const gd::VariableNode& variable);
+  void ValidateNonObjectVariable(const gd::VariableNode& variable);
 
   void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {
     if (node.diagnostic && node.diagnostic->IsError()) {
@@ -342,8 +376,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   std::vector<ExpressionParserDiagnostic*> fatalErrors;
   std::vector<ExpressionParserDiagnostic*> allErrors;
   std::vector<std::unique_ptr<ExpressionParserDiagnostic>> supplementalErrors;
-  Type childType;
-  Type parentType;
+  Type childType; ///< The type "discovered" down the tree and passed up.
+  Type parentType; ///< The type "required" by the top of the tree.
+  bool forbidsUsageOfBracketsBecauseParentIsObject;
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;
 };

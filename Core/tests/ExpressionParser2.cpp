@@ -1218,6 +1218,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid scene variables (2 levels with bracket accessor)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyChild\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyChild\"] + MySceneStructureVariable2[\"MyChild\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
   SECTION("Invalid scene variables (1 level, variable does not exist)") {
     {
       auto node =
@@ -1290,7 +1309,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Invalid object variables (non existing object)") {
+  SECTION("Invalid object variables (1 level, non existing object)") {
     {
       auto node =
           parser.ParseExpression("MyNonExistingSpriteObject.MyVariable");
@@ -1301,6 +1320,39 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // TODO: can we do a better message?
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\").");
+    }
+  }
+
+  SECTION("Invalid object variables (2 levels, bracket accessor)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject[\"BracketNotationCantBeUsedHere\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject[\"BracketNotationCantBeUsedHere\"].Child");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject[\"BracketNotationCantBeUsedHere\"][\"Child\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
     }
   }
 

@@ -565,15 +565,6 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
-   * \brief Generate the code to get object variables.
-   */
-  virtual gd::String GenerateGetObjectVariables(
-      gd::EventsCodeGenerationContext& context,
-      const gd::String& objectName) {
-    return "getVariablesForObject(" + objectName + ")";
-  }
-
-  /**
    * \brief Generate the code to get the child of a variable.
    */
   virtual gd::String GenerateVariableAccessor(gd::String childName) {

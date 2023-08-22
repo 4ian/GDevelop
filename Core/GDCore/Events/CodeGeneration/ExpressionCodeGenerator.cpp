@@ -132,8 +132,13 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
 
     if (codeGenerator.GetObjectsContainersList().HasObjectOrGroupNamed(node.name)) {
       // Generate the code to access the object variables.
-      output += codeGenerator.GenerateGetObjectVariables(context, node.name);
+
+      // Defer generation of the access to the object and variable to the child,
+      // once we know the name of the variable.
+      objectNameToUseForVariableAccessor = node.name;
       if (node.child) node.child->Visit(*this);
+      objectNameToUseForVariableAccessor = "";
+
       output += codeGenerator.GenerateVariableValueAs(type, ""); // TODO: Hacky as we pass an empty string because we don't have the full generation.
     } else if (codeGenerator.HasProjectAndLayout()) {
       // This could be adapted in the future if more scopes are supported.
@@ -161,12 +166,29 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
 
 void ExpressionCodeGenerator::OnVisitVariableAccessorNode(
     VariableAccessorNode& node) {
-  output += codeGenerator.GenerateVariableAccessor(node.name);
+    if (!objectNameToUseForVariableAccessor.empty()) {
+      // Use the name of the object passed by the parent, as we need both to access an object variable.
+      output += codeGenerator.GenerateGetVariable(node.name,
+          gd::EventsCodeGenerator::OBJECT_VARIABLE, context, objectNameToUseForVariableAccessor);
+
+      // We have accessed an object variable, from now we can continue accessing the child variables
+      // (including using the bracket notation).
+      objectNameToUseForVariableAccessor = "";
+    } else {
+        output += codeGenerator.GenerateVariableAccessor(node.name);
+    }
   if (node.child) node.child->Visit(*this);
 }
 
 void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
     VariableBracketAccessorNode& node) {
+  if (!objectNameToUseForVariableAccessor.empty()) {
+    // Bracket notation can't be used to directly access a variable of an object (`MyObject["MyVariable"]`).
+    // This would be rejected by the ExpressionValidator.
+    output += codeGenerator.GenerateBadVariable();
+    return;
+  }
+
   ExpressionCodeGenerator generator("string", "", codeGenerator, context);
   node.expression->Visit(generator);
   output +=

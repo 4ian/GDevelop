@@ -1,33 +1,33 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../ThemeDecorator';
-import { HomePage } from '../../MainFrame/EditorContainers/HomePage';
+import muiDecorator from '../../ThemeDecorator';
+import { HomePage } from '../../../MainFrame/EditorContainers/HomePage';
 import GDevelopJsInitializerDecorator, {
   testProject,
-} from '../GDevelopJsInitializerDecorator';
-import { ExampleStoreStateProvider } from '../../AssetStore/ExampleStore/ExampleStoreContext';
-import { TutorialStateProvider } from '../../Tutorial/TutorialContext';
+} from '../../GDevelopJsInitializerDecorator';
+import { ExampleStoreStateProvider } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
+import { TutorialStateProvider } from '../../../Tutorial/TutorialContext';
 import PreferencesContext, {
   initialPreferences,
   type InAppTutorialUserProgress,
-} from '../../MainFrame/Preferences/PreferencesContext';
-import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
-import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
+} from '../../../MainFrame/Preferences/PreferencesContext';
+import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
-} from '../../Profile/AuthenticatedUserContext';
-import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
+} from '../../../Profile/AuthenticatedUserContext';
+import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import {
   fakeSilverAuthenticatedUser,
   fakeAuthenticatedUserLoggingIn,
   indieUserProfile,
-} from '../../fixtures/GDevelopServicesTestData';
-import { GDevelopAssetApi } from '../../Utils/GDevelopServices/ApiConfigs';
+} from '../../../fixtures/GDevelopServicesTestData';
+import { GDevelopAssetApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 import withMock from 'storybook-addon-mock';
-import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
-import fakeResourceManagementProps from '../FakeResourceManagement';
+import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 const apiDataServerSideError = {
   mockData: [

@@ -200,19 +200,20 @@ const browserResourceSources: Array<ResourceSource> = [
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     console.log('Choose from asset store Browser');
     return {
-    name: `resource-store-${kind}`,
-    displayName: t`Choose from asset store`,
-    displayTab: 'standalone',
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ResourceStoreChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`resource-store-${kind}`}
-      />
-    ),
-  }}),
+      name: `resource-store-${kind}`,
+      displayName: t`Choose from asset store`,
+      displayTab: 'standalone',
+      kind,
+      renderComponent: (props: ResourceSourceComponentProps) => (
+        <ResourceStoreChooser
+          createNewResource={createNewResource}
+          onChooseResources={props.onChooseResources}
+          options={props.options}
+          key={`resource-store-${kind}`}
+        />
+      ),
+    };
+  }),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `url-chooser-${kind}`,
     displayName: t`Use a public URL`,

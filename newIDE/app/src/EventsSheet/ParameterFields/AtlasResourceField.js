@@ -39,9 +39,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         fullWidth
         initialResourceName={props.value}
         onChange={props.onChange}
-        floatingLabelText={
-          <Trans>Choose the atlas file (.atlas) to use</Trans>
-        }
+        floatingLabelText={<Trans>Choose the atlas file (.atlas) to use</Trans>}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
         ref={field}

@@ -232,19 +232,20 @@ const localResourceSources: Array<ResourceSource> = [
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     console.log('Choose from asset store Local');
     return {
-    name: `resource-store-${kind}`,
-    displayName: t`Choose from asset store`,
-    displayTab: 'standalone',
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ResourceStoreChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`resource-store-${kind}`}
-      />
-    ),
-  }}),
+      name: `resource-store-${kind}`,
+      displayName: t`Choose from asset store`,
+      displayTab: 'standalone',
+      kind,
+      renderComponent: (props: ResourceSourceComponentProps) => (
+        <ResourceStoreChooser
+          createNewResource={createNewResource}
+          onChooseResources={props.onChooseResources}
+          options={props.options}
+          key={`resource-store-${kind}`}
+        />
+      ),
+    };
+  }),
 ];
 
 export default localResourceSources;

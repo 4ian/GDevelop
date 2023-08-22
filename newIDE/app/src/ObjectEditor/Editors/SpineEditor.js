@@ -26,7 +26,11 @@ import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import { PropertyResourceSelector, PropertyField, styles } from './Model3DEditor';
+import {
+  PropertyResourceSelector,
+  PropertyField,
+  styles,
+} from './Model3DEditor';
 import { ISkeletonData } from 'pixi-spine';
 
 const gd: libGDevelop = global.gd;
@@ -74,7 +78,7 @@ const SpineEditor = ({
   const forceUpdate = useForceUpdate();
 
   const spineConfiguration = gd.asSpineConfiguration(objectConfiguration);
-  console.log('SpineEditod, ', spineConfiguration, objectConfiguration)
+  console.log('SpineEditod, ', spineConfiguration, objectConfiguration);
   const properties = objectConfiguration.getProperties();
 
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
@@ -83,16 +87,27 @@ const SpineEditor = ({
 
   const [skeleton, setSkeleton] = React.useState<?ISkeletonData>(null);
   const getSkeleton = React.useCallback(
-    (jsonResourceName: string, imageResourceName: string, atlasResourceName: string) => {
-      if ([jsonResourceName, imageResourceName, atlasResourceName].some(resName => !resName)) {
+    (
+      jsonResourceName: string,
+      imageResourceName: string,
+      atlasResourceName: string
+    ) => {
+      if (
+        [jsonResourceName, imageResourceName, atlasResourceName].some(
+          resName => !resName
+        )
+      ) {
         return;
       }
 
-      PixiResourcesLoader.getSpineData(project, jsonResourceName, imageResourceName, atlasResourceName).then(
-        newSkeleton => {
-          setSkeleton(newSkeleton);
-        }
-      );
+      PixiResourcesLoader.getSpineData(
+        project,
+        jsonResourceName,
+        imageResourceName,
+        atlasResourceName
+      ).then(newSkeleton => {
+        setSkeleton(newSkeleton);
+      });
     },
     [project]
   );

@@ -183,7 +183,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       async (source: ResourceSource) => {
         try {
           if (!source) {
-            console.log('source is undef')
+            console.log('source is undef');
             return;
           }
 

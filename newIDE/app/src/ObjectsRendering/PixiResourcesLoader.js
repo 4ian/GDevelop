@@ -375,16 +375,25 @@ export default class PixiResourcesLoader {
         return Promise.reject(`Unknown ${resKind} file ${resName}.`);
       }
       if (resourceManager.getResource(resName).getKind() !== resKind) {
-        return Promise.reject(`The resource called ${resName} is not of appropriate file type ${resKind}.`);
+        return Promise.reject(
+          `The resource called ${resName} is not of appropriate file type ${resKind}.`
+        );
       }
     }
- 
+
     // https://github.com/pixijs/spine/blob/master/examples/preload_atlas_text.md
     if (!atlasPromises[atlasTextName]) {
       atlasPromises[atlasTextName] = new Promise(resolve =>
         loader
-          .add(atlasTextName, ResourcesLoader.getResourceFullUrl(project, atlasTextName, { isResourceForPixi: true }), { xhrType: 'text' })
-          .load((_, atlasData) =>  resolve(atlasData[atlasTextName].data)));
+          .add(
+            atlasTextName,
+            ResourcesLoader.getResourceFullUrl(project, atlasTextName, {
+              isResourceForPixi: true,
+            }),
+            { xhrType: 'text' }
+          )
+          .load((_, atlasData) => resolve(atlasData[atlasTextName].data))
+      );
     }
 
     if (!spineDataPromises[spineName]) {
@@ -396,9 +405,15 @@ export default class PixiResourcesLoader {
           };
 
           loader
-            .add(spineName, ResourcesLoader.getResourceFullUrl(project, spineName, { isResourceForPixi: true }), { metadata })
+            .add(
+              spineName,
+              ResourcesLoader.getResourceFullUrl(project, spineName, {
+                isResourceForPixi: true,
+              }),
+              { metadata }
+            )
             .load((_, jsonData) => resolve(jsonData[spineName].spineData));
-        })
+        });
       });
     }
 
@@ -586,5 +601,4 @@ export default class PixiResourcesLoader {
       })
       .then(response => response.data);
   }
-
 }

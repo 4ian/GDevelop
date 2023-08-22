@@ -14,6 +14,7 @@ export type TeamState = {|
   members: ?Array<User>,
   memberships: ?Array<TeamMembership>,
   onChangeGroupName: (group: TeamGroup, newName: string) => Promise<void>,
+  onChangeUserGroup: (user: User, group: TeamGroup) => Promise<void>,
   onListUserProjects: (
     user: User
   ) => Promise<Array<CloudProjectWithUserAccessInfo>>,
@@ -24,8 +25,9 @@ export const initialTeamState = {
   groups: null,
   members: null,
   memberships: null,
-  onChangeGroupName: async (group: TeamGroup, newName: string) => {},
-  onListUserProjects: async (user: User) => [],
+  onChangeGroupName: async () => {},
+  onChangeUserGroup: async () => {},
+  onListUserProjects: async () => [],
 };
 
 const TeamContext = React.createContext<TeamState>(initialTeamState);

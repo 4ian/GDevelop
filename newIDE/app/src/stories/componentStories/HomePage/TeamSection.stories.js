@@ -4,6 +4,7 @@ import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
+import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import {
   type Team,
   type TeamGroup,
@@ -78,7 +79,13 @@ const members: Array<User> = [
     username: 'Bayonetta',
   },
 ];
-const memberships: Array<TeamMembership> = [
+
+const initialGroups = [
+  { id: 'group1', name: 'Edelweiss' },
+  { id: 'group2', name: 'Red square' },
+];
+
+const initialMemberships: Array<TeamMembership> = [
   {
     userId: 'user1',
     teamId: 'teamId',
@@ -130,12 +137,12 @@ const MockTeamProvider = ({
   loading: boolean,
 |}) => {
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
-  const [groups, setGroups] = React.useState<Array<TeamGroup>>([
-    { id: 'group1', name: 'Edelweiss' },
-    { id: 'group2', name: 'Red square' },
-  ]);
+  const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
+    initialMemberships
+  );
+  const [groups, setGroups] = React.useState<Array<TeamGroup>>(initialGroups);
 
-  const onListUserProjects = async (
+  const listUserProjects = async (
     user: User
   ): Promise<CloudProjectWithUserAccessInfo[]> => {
     await delay(1000);
@@ -177,23 +184,43 @@ const MockTeamProvider = ({
     setGroups(newGroups);
   };
 
+  const changeUserGroup = async (user: User, group: TeamGroup) => {
+    const membershipToChangeIndex = memberships.findIndex(
+      membership => membership.userId === user.id
+    );
+    if (
+      membershipToChangeIndex === -1 ||
+      (memberships[membershipToChangeIndex].groups &&
+        memberships[membershipToChangeIndex].groups[0] === group.id)
+    ) {
+      return;
+    }
+    await delay(1000);
+    const newMemberships = [...memberships];
+    newMemberships[membershipToChangeIndex].groups = [group.id];
+    setMemberships(newMemberships);
+  };
+
   return (
-    <AuthenticatedUserContext.Provider
-      value={fakeAuthenticatedUserWithEducationPlan}
-    >
-      <TeamContext.Provider
-        value={{
-          team: loading ? null : team,
-          members: loading ? null : members,
-          groups: loading ? null : groups,
-          memberships: loading ? null : memberships,
-          onChangeGroupName: changeGroupName,
-          onListUserProjects,
-        }}
+    <DragAndDropContextProvider>
+      <AuthenticatedUserContext.Provider
+        value={fakeAuthenticatedUserWithEducationPlan}
       >
-        {children}
-      </TeamContext.Provider>
-    </AuthenticatedUserContext.Provider>
+        <TeamContext.Provider
+          value={{
+            team: loading ? null : team,
+            members: loading ? null : members,
+            groups: loading ? null : groups,
+            memberships: loading ? null : memberships,
+            onChangeGroupName: changeGroupName,
+            onChangeUserGroup: changeUserGroup,
+            onListUserProjects: listUserProjects,
+          }}
+        >
+          {children}
+        </TeamContext.Provider>
+      </AuthenticatedUserContext.Provider>
+    </DragAndDropContextProvider>
   );
 };
 

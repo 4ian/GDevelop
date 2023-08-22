@@ -21,10 +21,14 @@ import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopS
 import TeamContext from '../../../../Profile/Team/TeamContext';
 import TeamGroupNameField from './TeamGroupNameField';
 import TeamMemberRow from './TeamMemberRow';
+import { makeDropTarget } from '../../../../UI/DragAndDrop/DropTarget';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
 };
+
+const DropTarget = makeDropTarget('team-groups');
 
 type GroupWithMembers = {| group: TeamGroup, members: User[] |};
 
@@ -75,6 +79,11 @@ const groupMembersByGroupId = ({
       membersByGroupId[group.id] = { group, members: [member] };
     }
   });
+  groups.forEach(group => {
+    if (!(group.id in membersByGroupId)) {
+      membersByGroupId[group.id] = { group, members: [] };
+    }
+  });
   return membersByGroupId;
 };
 
@@ -85,14 +94,17 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       members,
       memberships,
       onChangeGroupName,
+      onChangeUserGroup,
       onListUserProjects,
     } = React.useContext(TeamContext);
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
     }));
 
+    const draggedUserRef = React.useRef<?User>(null);
     const [selectedUser, setSelectedUser] = React.useState<?User>(null);
     const [
       selectedUserProjects,
@@ -102,6 +114,10 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       isLoadingUserProjects,
       setIsLoadingUserProjects,
     ] = React.useState<boolean>(false);
+
+    const setDraggedUser = React.useCallback((user: User) => {
+      draggedUserRef.current = user;
+    }, []);
 
     const listUserProjects = React.useCallback(
       async (user: User) => {
@@ -150,17 +166,19 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       <>
         <SectionContainer title={<Trans>Team</Trans>}>
           <SectionRow>
-            <Line>
-              <Column noMargin expand>
-                {membersNotInAGroup && (
+            {membersNotInAGroup && (
+              <Line>
+                <Column noMargin expand>
                   <List>
                     {membersNotInAGroup.members
                       .sort(sortMembersByNameOrEmail)
                       .map(member => (
                         <TeamMemberRow
+                          key={member.id}
                           member={member}
                           onListUserProjects={() => listUserProjects(member)}
                           disabled={isLoadingUserProjects}
+                          onDrag={setDraggedUser}
                           isLoading={
                             isLoadingUserProjects &&
                             !!selectedUser &&
@@ -169,33 +187,69 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                         />
                       ))}
                   </List>
-                )}
-              </Column>
-            </Line>
+                </Column>
+              </Line>
+            )}
             {groupsAndMembers.length > 0 &&
               groupsAndMembers.map(({ group, members }) => (
-                <Line>
-                  <Column noMargin expand>
-                    <TeamGroupNameField
-                      group={group}
-                      onFinishEditingGroupName={onChangeGroupName}
-                    />
-                    <List>
-                      {members.sort(sortMembersByNameOrEmail).map(member => (
-                        <TeamMemberRow
-                          member={member}
-                          onListUserProjects={() => listUserProjects(member)}
-                          disabled={isLoadingUserProjects}
-                          isLoading={
-                            isLoadingUserProjects &&
-                            !!selectedUser &&
-                            member.id === selectedUser.id
-                          }
-                        />
-                      ))}
-                    </List>
-                  </Column>
-                </Line>
+                <DropTarget
+                  canDrop={() => true}
+                  drop={() => {
+                    if (!draggedUserRef.current) return;
+                    onChangeUserGroup(draggedUserRef.current, group);
+                    draggedUserRef.current = null;
+                  }}
+                  key={group.id}
+                >
+                  {({ connectDropTarget, isOver }) =>
+                    connectDropTarget(
+                      <div
+                        style={
+                          isOver
+                            ? {
+                                backgroundColor:
+                                  gdevelopTheme.paper.backgroundColor.light,
+                                outline: `2px dashed ${
+                                  gdevelopTheme.dropIndicator.canDrop
+                                }`,
+                              }
+                            : undefined
+                        }
+                      >
+                        <Line noMargin>
+                          <Column noMargin expand>
+                            <Column>
+                              <TeamGroupNameField
+                                group={group}
+                                onFinishEditingGroupName={onChangeGroupName}
+                              />
+                            </Column>
+                            <List>
+                              {members
+                                .sort(sortMembersByNameOrEmail)
+                                .map(member => (
+                                  <TeamMemberRow
+                                    key={member.id}
+                                    member={member}
+                                    onListUserProjects={() =>
+                                      listUserProjects(member)
+                                    }
+                                    onDrag={setDraggedUser}
+                                    disabled={isLoadingUserProjects}
+                                    isLoading={
+                                      isLoadingUserProjects &&
+                                      !!selectedUser &&
+                                      member.id === selectedUser.id
+                                    }
+                                  />
+                                ))}
+                            </List>
+                          </Column>
+                        </Line>
+                      </div>
+                    )
+                  }
+                </DropTarget>
               ))}
           </SectionRow>
         </SectionContainer>

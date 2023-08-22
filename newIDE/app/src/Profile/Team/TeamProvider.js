@@ -92,7 +92,8 @@ const TeamProvider = ({ children }: Props) => {
   );
 
   const onChangeGroupName = async () => {};
-  const onListUserProjects = async () => ([]);
+  const onChangeUserGroup = async () => {};
+  const onListUserProjects = async () => [];
 
   return (
     <TeamContext.Provider
@@ -102,6 +103,7 @@ const TeamProvider = ({ children }: Props) => {
         members,
         memberships,
         onChangeGroupName,
+        onChangeUserGroup,
         onListUserProjects,
       }}
     >

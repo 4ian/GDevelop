@@ -161,14 +161,14 @@ export const createNewInstructionForEventsFunction = (
  * Validate that a function name is valid.
  */
 export const validateEventsFunctionName = (functionName: string) => {
-  return gd.Project.validateName(functionName);
+  return gd.Project.isNameSafe(functionName);
 };
 
 /**
  * Validate that an events functions extension name is valid.
  */
 export const validateExtensionName = (extensionName: string) => {
-  return gd.Project.validateName(extensionName);
+  return gd.Project.isNameSafe(extensionName);
 };
 
 /**

@@ -179,8 +179,9 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetAngle")
       .SetGetter("GetAngle");
 
+  // Deprecated
   obj.AddAction("Image",
-                _("Image name"),
+                _("Image name (deprecated)"),
                 _("Change the image of a Panel Sprite."),
                 _("Set image _PARAM1_ on _PARAM0_"),
                 _("Image"),
@@ -188,6 +189,19 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/imageicon.png")
       .AddParameter("object", _("Object"), "PanelSprite")
       .AddParameter("string", _("Image name"))
+      .AddCodeOnlyParameter("currentScene", "0")
+      .SetHidden()
+      .SetFunctionName("ChangeAndReloadImage");
+
+  obj.AddAction("SetImageFromResource",
+                _("Image name"),
+                _("Change the image of a Panel Sprite."),
+                _("Set image _PARAM1_ on _PARAM0_"),
+                _("Image"),
+                "res/imageicon24.png",
+                "res/imageicon.png")
+      .AddParameter("object", _("Object"), "PanelSprite")
+      .AddParameter("imageResource", _("Image file (or image resource name)"))
       .AddCodeOnlyParameter("currentScene", "0")
       .SetFunctionName("ChangeAndReloadImage");
 }

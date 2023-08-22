@@ -55,7 +55,12 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
   },
-  tableContainer: { flex: 1, overflowX: 'auto', overflowY: 'hidden' },
+  tableContainer: {
+    flex: 1,
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
+  },
 };
 
 const compareStrings = (x: string, y: string, direction: number): number => {

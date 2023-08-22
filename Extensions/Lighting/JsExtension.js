@@ -33,7 +33,8 @@ module.exports = {
       'Harsimran Virk',
       'MIT'
     )
-    .setCategory('Visual effect');
+    .setCategory('Visual effect')
+    .setTags("light");
 
     const lightObstacleBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior

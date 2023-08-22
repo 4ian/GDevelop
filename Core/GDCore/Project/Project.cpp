@@ -15,13 +15,12 @@
 #include <vector>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Parsers/GrammarTerminals.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -48,6 +47,11 @@ using namespace std;
 #undef CreateEvent
 
 namespace gd {
+
+// By default, disallow unicode in identifiers, but this can be set to true
+// by the IDE. In the future, this will be set to true by default, keeping backward compatibility.
+// We keep it disabled by default to progressively ask users to test it in real projects.
+bool Project::allowUsageOfUnicodeIdentifierNames = false;
 
 Project::Project()
     : name(_("Project")),
@@ -630,8 +634,10 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
-  SetAntialiasingMode(propElement.GetStringAttribute("antialiasingMode", "MSAA"));
-  SetAntialisingEnabledOnMobile(propElement.GetBoolAttribute("antialisingEnabledOnMobile", false));
+  SetAntialiasingMode(
+      propElement.GetStringAttribute("antialiasingMode", "MSAA"));
+  SetAntialisingEnabledOnMobile(
+      propElement.GetBoolAttribute("antialisingEnabledOnMobile", false));
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
@@ -887,7 +893,8 @@ void Project::SerializeTo(SerializerElement& element) const {
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   propElement.SetAttribute("antialiasingMode", antialiasingMode);
-  propElement.SetAttribute("antialisingEnabledOnMobile", isAntialisingEnabledOnMobile);
+  propElement.SetAttribute("antialisingEnabledOnMobile",
+                           isAntialisingEnabledOnMobile);
   propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
@@ -993,58 +1000,57 @@ void Project::SerializeTo(SerializerElement& element) const {
         externalSourceFilesElement.AddChild("sourceFile"));
 }
 
-bool Project::ValidateName(const gd::String& name) {
+void Project::AllowUsageOfUnicodeIdentifierNames(bool enable) {
+  allowUsageOfUnicodeIdentifierNames = enable;
+}
+
+bool Project::IsNameSafe(const gd::String& name) {
   if (name.empty()) return false;
 
   if (isdigit(name[0])) return false;
 
-  gd::String allowedCharacters =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-  return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
+  if (!allowUsageOfUnicodeIdentifierNames) {
+    gd::String legacyAllowedCharacters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    return !(name.find_first_not_of(legacyAllowedCharacters) != gd::String::npos);
+  } else {
+    for (auto character : name) {
+      if (!GrammarTerminals::IsAllowedInIdentifier(character)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
-void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::ProjectBrowserHelper::ExposeProjectEvents for a method that
-  // traverse the whole project (this time for events) and ExposeProjectEffects
-  // (this time for effects). Ideally, this method could be moved outside of
-  // gd::Project.
+gd::String Project::GetSafeName(const gd::String& name) {
+  if (name.empty()) return "Unnamed";
 
-  gd::ResourcesManager* resourcesManager = &GetResourcesManager();
+  gd::String newName = name;
 
-  // Add project resources
-  worker.ExposeResources(resourcesManager);
-  platformSpecificAssets.ExposeResources(worker);
+  if (isdigit(name[0])) newName = "_" + newName;
 
-  // Add layouts resources
-  for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
-    for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j) {  // Add objects resources
-      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
-    }
+  gd::String legacyAllowedCharacters =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
-    LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
-  }
-  // Add external events resources
-  for (std::size_t s = 0; s < GetExternalEventsCount(); s++) {
-    LaunchResourceWorkerOnEvents(
-        *this, GetExternalEvents(s).GetEvents(), worker);
-  }
-  // Add events functions extensions resources
-  for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
-    auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
+  for (size_t i = 0;i < newName.size();++i) {
+    // Note that iterating on the characters is not super efficient (O(n^2), which
+    // could be avoided with an iterator), but this function is not critical for performance
+    // (only used to generate a name when a user creates a new entity or rename one).
+    auto character = newName[i];
+    bool isAllowed =
+        allowUsageOfUnicodeIdentifierNames
+            ? GrammarTerminals::IsAllowedInIdentifier(character)
+            : legacyAllowedCharacters.find(character) != gd::String::npos;
+
+    // Replace all unallowed letters by an underscore.
+    if (!isAllowed) {
+      newName.replace(i, 1, '_');
     }
   }
 
-  // Add global objects resources
-  for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).GetConfiguration().ExposeResources(worker);
-  }
-
-  // Add loading screen background image if present
-  if (loadingScreen.GetBackgroundImageResourceName() != "")
-    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
+  return newName;
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {

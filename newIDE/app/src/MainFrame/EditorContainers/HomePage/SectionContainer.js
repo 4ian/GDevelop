@@ -35,6 +35,7 @@ const styles = {
   scrollContainer: {
     flex: 1,
     overflowY: 'scroll', // Force a scrollbar to prevent layout shifts.
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 

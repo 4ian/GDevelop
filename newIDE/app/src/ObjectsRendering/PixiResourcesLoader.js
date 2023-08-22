@@ -82,7 +82,7 @@ const load3DModel = (
     gltfLoader.load(
       url,
       gltf => {
-        traverseToSetBasicMaterialFromMeshes(gltf.scene);
+        traverseToRemoveMetalnessFromMeshes(gltf.scene);
         resolve(gltf);
       },
       undefined,
@@ -126,37 +126,29 @@ const applyThreeTextureSettings = (
   }
 };
 
-const convertToBasicMaterial = (
-  material: THREE.Material
-): THREE.MeshBasicMaterial => {
-  const basicMaterial = new THREE.MeshBasicMaterial();
-  if (material.color) {
-    basicMaterial.color = material.color;
+const removeMetalness = (material: THREE.Material): void => {
+  if (material.metalness) {
+    material.metalness = 0;
   }
-  if (material.map) {
-    basicMaterial.map = material.map;
-  }
-  return basicMaterial;
 };
 
-const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
+const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>): void => {
   const mesh = (node: THREE.Mesh);
   if (!mesh.material) {
     return;
   }
-
   if (Array.isArray(mesh.material)) {
     for (let index = 0; index < mesh.material.length; index++) {
-      mesh.material[index] = convertToBasicMaterial(mesh.material[index]);
+      removeMetalness(mesh.material[index]);
     }
   } else {
-    mesh.material = convertToBasicMaterial(mesh.material);
+    removeMetalness(mesh.material);
   }
 };
 
-const traverseToSetBasicMaterialFromMeshes = (
+const traverseToRemoveMetalnessFromMeshes = (
   node: THREE.Object3D<THREE.Event>
-) => node.traverse(setBasicMaterialTo);
+) => node.traverse(removeMetalnessFromMesh);
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of

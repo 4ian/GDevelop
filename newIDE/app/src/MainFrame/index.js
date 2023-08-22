@@ -70,7 +70,6 @@ import {
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
 } from './UpdaterTools';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -173,6 +172,8 @@ import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvide
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
 import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProjectDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1193,20 +1194,12 @@ const MainFrame = (props: Props) => {
 
     if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasLayoutNamed(newName)) {
-      showWarningBox(i18n._(t`Another scene with this name already exists.`), {
-        delayToNextTick: true,
-      });
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasLayoutNamed(tentativeNewName);
+      }
+    );
 
     const layout = currentProject.getLayout(oldName);
     const shouldChangeProjectFirstLayout =
@@ -1215,13 +1208,17 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      layout.setName(newName);
-      gd.WholeProjectRefactorer.renameLayout(currentProject, oldName, newName);
+      layout.setName(uniqueNewName);
+      gd.WholeProjectRefactorer.renameLayout(
+        currentProject,
+        oldName,
+        uniqueNewName
+      );
       if (inAppTutorialOrchestratorRef.current) {
-        inAppTutorialOrchestratorRef.current.changeData(oldName, newName);
+        inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
       }
       if (shouldChangeProjectFirstLayout)
-        currentProject.setFirstLayout(newName);
+        currentProject.setFirstLayout(uniqueNewName);
       _onProjectItemModified();
     });
   };
@@ -1234,32 +1231,23 @@ const MainFrame = (props: Props) => {
     if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasExternalLayoutNamed(newName)) {
-      showWarningBox(
-        i18n._(t`Another external layout with this name already exists.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasExternalLayoutNamed(tentativeNewName);
+      }
+    );
 
     const externalLayout = currentProject.getExternalLayout(oldName);
     setState(state => ({
       ...state,
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
     })).then(state => {
-      externalLayout.setName(newName);
+      externalLayout.setName(uniqueNewName);
       gd.WholeProjectRefactorer.renameExternalLayout(
         currentProject,
         oldName,
-        newName
+        uniqueNewName
       );
       _onProjectItemModified();
     });
@@ -1273,32 +1261,23 @@ const MainFrame = (props: Props) => {
     if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasExternalEventsNamed(newName)) {
-      showWarningBox(
-        i18n._(t`Other external events with this name already exist.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasExternalEventsNamed(tentativeNewName);
+      }
+    );
 
     const externalEvents = currentProject.getExternalEvents(oldName);
     setState(state => ({
       ...state,
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
     })).then(state => {
-      externalEvents.setName(newName);
+      externalEvents.setName(uniqueNewName);
       gd.WholeProjectRefactorer.renameExternalEvents(
         currentProject,
         oldName,
-        newName
+        uniqueNewName
       );
       _onProjectItemModified();
     });
@@ -1306,7 +1285,6 @@ const MainFrame = (props: Props) => {
 
   const renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = state;
-    const { i18n } = props;
     if (!currentProject) return;
 
     if (
@@ -1315,33 +1293,12 @@ const MainFrame = (props: Props) => {
     )
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (isExtensionNameTaken(newName, currentProject)) {
-      showWarningBox(
-        i18n._(
-          t`Another extension with this name already exists (or you used a reserved extension name). Please choose another name.`
-        ),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (!gd.Project.validateName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        ),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName => {
+        return isExtensionNameTaken(tentativeNewName, currentProject);
+      }
+    );
 
     const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
       oldName
@@ -1353,9 +1310,9 @@ const MainFrame = (props: Props) => {
       currentProject,
       eventsFunctionsExtension,
       oldName,
-      newName
+      safeAndUniqueNewName
     );
-    eventsFunctionsExtension.setName(newName);
+    eventsFunctionsExtension.setName(safeAndUniqueNewName);
     eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
       currentProject,
       oldName
@@ -1882,7 +1839,10 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       if (currentProject.getLayoutsCount() === 0) {
-        currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+        const layoutName = i18n._(t`Untitled scene`);
+        currentProject.insertNewLayout(layoutName, 0);
+        const layout = currentProject.getLayout(layoutName);
+        addDefaultLightToAllLayers(layout);
       }
       openLayout(
         currentProject.getLayoutAt(0).getName(),

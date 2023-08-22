@@ -37,7 +37,7 @@ export const Default = () => (
         selectedObjectTags={[]}
         onChangeSelectedObjectTags={selectedObjectTags => {}}
         getAllObjectTags={() => []}
-        canRenameObject={() => true}
+        getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
         onRenameObjectStart={() => {}}
         onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
@@ -68,7 +68,7 @@ export const WithSerializedObjectView = () => (
           selectedObjectTags={[]}
           onChangeSelectedObjectTags={selectedObjectTags => {}}
           getAllObjectTags={() => []}
-          canRenameObject={() => true}
+          getValidatedObjectOrGroupName={newName => newName}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
           onRenameObjectStart={() => {}}
           onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
@@ -104,7 +104,7 @@ export const WithTags = () => (
           'Looooooooooong Tag 3',
           'Unselected Tag 4',
         ]}
-        canRenameObject={() => true}
+        getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
         onRenameObjectStart={() => {}}
         onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}

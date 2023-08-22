@@ -34,6 +34,10 @@ void MetadataDeclarationHelper::DeclareExtension(
       .SetExtensionHelpPath(eventsFunctionsExtension.GetHelpPath())
       .SetIconUrl(eventsFunctionsExtension.GetIconUrl());
 
+  for(auto tag : eventsFunctionsExtension.GetTags()) {
+    extension.AddTag(tag);
+  }
+
   if (!fullName.empty()) {
     extension.AddInstructionOrExpressionGroupMetadata(fullName).SetIcon(
         eventsFunctionsExtension.GetIconUrl());
@@ -1348,7 +1352,7 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
 }
 
 gd::String MetadataDeclarationHelper::GetExtensionCodeNamespacePrefix(
-    const gd::EventsFunctionsExtension eventsFunctionsExtension) {
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
   return "gdjs.evtsExt__" + EventsCodeNameMangler::GetMangledName(
                                 eventsFunctionsExtension.GetName());
 }

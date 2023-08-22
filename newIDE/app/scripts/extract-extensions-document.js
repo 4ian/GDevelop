@@ -472,7 +472,7 @@ You can also [create](/gdevelop5/extensions/create) directly in your project new
 Read more about this:
 
 * [Create your own extensions](/gdevelop5/extensions/create)
-* [Share extensions with the community](/gdevelop5/extensions/share)
+* [Share extensions with the community](/gdevelop5/extensions/share-extension)
 * [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)
 
 `;

@@ -32,6 +32,7 @@ const styles = {
   listbox: {
     maxHeight: 250,
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 

@@ -12,6 +12,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/IDE/ResourceExposer.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
     bool preserveDirectoryStructure) {
   // Check if there are some resources with absolute filenames
   gd::ResourcesAbsolutePathChecker absolutePathChecker(fs);
-  originalProject.ExposeResources(absolutePathChecker);
+  gd::ResourceExposer::ExposeWholeProjectResources(originalProject, absolutePathChecker);
 
   auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
   std::cout << "Copying all resources from " << projectDirectory << " to "
@@ -41,10 +42,10 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
       preserveAbsoluteFilenames);
 
   if (updateOriginalProject) {
-    originalProject.ExposeResources(resourcesMergingHelper);
+    gd::ResourceExposer::ExposeWholeProjectResources(originalProject, resourcesMergingHelper);
   } else {
     std::shared_ptr<gd::Project> project(new gd::Project(originalProject));
-    project->ExposeResources(resourcesMergingHelper);
+    gd::ResourceExposer::ExposeWholeProjectResources(*project, resourcesMergingHelper);
   }
 
   // Copy resources

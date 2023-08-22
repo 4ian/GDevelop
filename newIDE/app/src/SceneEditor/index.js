@@ -24,7 +24,6 @@ import Window from '../Utils/Window';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
@@ -62,6 +61,7 @@ import { mapFor } from '../Utils/MapFor';
 import MosaicEditorsDisplay from './MosaicEditorsDisplay';
 import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
 import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 const gd: libGDevelop = global.gd;
 
@@ -825,74 +825,57 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
-  _canObjectOrGroupUseNewName = (
+  _getValidatedObjectOrGroupName = (
     newName: string,
     global: boolean,
     i18n: I18nType
   ) => {
     const { project, layout } = this.props;
 
-    if (
-      layout.hasObjectNamed(newName) ||
-      project.hasObjectNamed(newName) ||
-      layout.getObjectGroups().has(newName) ||
-      project.getObjectGroups().has(newName)
-    ) {
-      showWarningBox(
-        i18n._(t`Another object or group with this name already exists.`),
-        {
-          delayToNextTick: true,
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName => {
+        if (
+          layout.hasObjectNamed(tentativeNewName) ||
+          project.hasObjectNamed(tentativeNewName) ||
+          layout.getObjectGroups().has(tentativeNewName) ||
+          project.getObjectGroups().has(tentativeNewName)
+        ) {
+          return true;
         }
-      );
-      return false;
-    }
-    if (!gd.Project.validateName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        ),
-        { delayToNextTick: true }
-      );
-      return false;
-    }
 
-    if (global) {
-      // If object or group is global, also check for other layouts' objects and groups names.
-      const { layout, project } = this.props;
-      const layoutName = layout.getName();
-      const layoutsWithObjectOrGroupWithSameName: Array<string> = mapFor(
-        0,
-        project.getLayoutsCount(),
-        i => {
-          const otherLayout = project.getLayoutAt(i);
-          const otherLayoutName = otherLayout.getName();
-          if (layoutName !== otherLayoutName) {
-            if (otherLayout.hasObjectNamed(newName)) {
-              return otherLayoutName;
+        if (global) {
+          // If object or group is global, also check for other layouts' objects and groups names.
+          const layoutName = layout.getName();
+          const layoutsWithObjectOrGroupWithSameName: Array<string> = mapFor(
+            0,
+            project.getLayoutsCount(),
+            i => {
+              const otherLayout = project.getLayoutAt(i);
+              const otherLayoutName = otherLayout.getName();
+              if (layoutName !== otherLayoutName) {
+                if (otherLayout.hasObjectNamed(tentativeNewName)) {
+                  return otherLayoutName;
+                }
+                const groupContainer = otherLayout.getObjectGroups();
+                if (groupContainer.has(tentativeNewName)) {
+                  return otherLayoutName;
+                }
+              }
+              return null;
             }
-            const groupContainer = otherLayout.getObjectGroups();
-            if (groupContainer.has(newName)) {
-              return otherLayoutName;
-            }
+          ).filter(Boolean);
+
+          if (layoutsWithObjectOrGroupWithSameName.length > 0) {
+            return true;
           }
-          return null;
         }
-      ).filter(Boolean);
 
-      if (layoutsWithObjectOrGroupWithSameName.length > 0) {
-        return Window.showConfirmDialog(
-          i18n._(
-            t`Renaming the global object/group "${newName}" would conflict with the following scenes that have a group or an object with that name:${'\n\n - ' +
-              layoutsWithObjectOrGroupWithSameName.join('\n\n - ') +
-              '\n\n'}Continue only if you know what you're doing.`
-          ),
-          'warning'
-        );
+        return false;
       }
-      return true;
-    }
+    );
 
-    return true;
+    return safeAndUniqueNewName;
   };
 
   _onRenameEditedObject = (newName: string) => {
@@ -911,7 +894,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    // newName is supposed to have been already validated
+    // newName is supposed to have been already validated.
 
     // Avoid triggering renaming refactoring if name has not really changed
     if (object.getName() !== newName) {
@@ -1552,11 +1535,12 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onExportObject={this.openObjectExporterDialog}
                 onDeleteObject={this._onDeleteObject}
-                canObjectOrGroupUseNewName={this._canObjectOrGroupUseNewName}
+                getValidatedObjectOrGroupName={
+                  this._getValidatedObjectOrGroupName
+                }
                 onEditObjectGroup={this.editGroup}
                 onDeleteObjectGroup={this._onDeleteGroup}
                 onRenameObjectGroup={this._onRenameGroup}
-                canRenameObjectGroup={this._canObjectOrGroupUseNewName}
                 canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
                 updateBehaviorsSharedData={this.updateBehaviorsSharedData}
                 onEditObject={this.props.onEditObject || this.editObject}
@@ -1647,8 +1631,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                           }
                           this.editObject(null);
                         }}
-                        canRenameObject={newName =>
-                          this._canObjectOrGroupUseNewName(
+                        getValidatedObjectOrGroupName={newName =>
+                          this._getValidatedObjectOrGroupName(
                             newName,
                             editedObjectWithContext.global,
                             i18n

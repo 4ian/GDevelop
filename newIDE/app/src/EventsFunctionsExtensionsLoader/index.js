@@ -1,7 +1,6 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { mapVector, mapFor } from '../Utils/MapFor';
-import { caseSensitiveSlug } from '../Utils/CaseSensitiveSlug';
 
 const gd: libGDevelop = global.gd;
 
@@ -32,55 +31,9 @@ type OptionsForGeneration = {
 };
 
 type CodeGenerationContext = {|
-  codeNamespacePrefix: string,
+  codeNamespacePrefix: string, // TODO: could this reworked to avoid this entirely?
   extensionIncludeFiles: Array<string>,
 |};
-
-const mangleName = (name: string) => {
-  return caseSensitiveSlug(name, '_', []);
-};
-
-const getExtensionCodeNamespacePrefix = (
-  eventsFunctionsExtension: gdEventsFunctionsExtension
-) => {
-  return 'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
-};
-
-/** Generate the namespace for a free function. */
-const getFreeFunctionCodeNamespace = (
-  eventsFunction: gdEventsFunction,
-  codeNamespacePrefix: string
-) => {
-  return codeNamespacePrefix + '__' + mangleName(eventsFunction.getName());
-};
-
-export const getFreeFunctionCodeName = (
-  eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsFunction: gdEventsFunction
-) => {
-  return (
-    getFreeFunctionCodeNamespace(
-      eventsFunction,
-      getExtensionCodeNamespacePrefix(eventsFunctionsExtension)
-    ) + '.func'
-  );
-};
-
-/** Generate the namespace for a behavior function. */
-const getBehaviorFunctionCodeNamespace = (
-  eventsBasedBehavior: gdEventsBasedBehavior,
-  codeNamespacePrefix: string
-) => {
-  return codeNamespacePrefix + '__' + mangleName(eventsBasedBehavior.getName());
-};
-
-/** Generate the namespace for an object function. */
-const getObjectFunctionCodeNamespace = (
-  eventsBasedObject: gdEventsBasedObject,
-  codeNamespacePrefix: string
-) => {
-  return codeNamespacePrefix + '__' + mangleName(eventsBasedObject.getName());
-};
 
 /**
  * Load all events functions of a project in extensions
@@ -160,18 +113,15 @@ const loadProjectEventsFunctionsExtension = (
 const getExtensionIncludeFiles = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
-  options: Options,
-  codeNamespacePrefix: string
+  options: Options
 ): Array<string> => {
   return mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
     const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
 
-    const codeNamespace = getFreeFunctionCodeNamespace(
-      eventsFunction,
-      codeNamespacePrefix
+    const functionName = gd.MetadataDeclarationHelper.getFreeFunctionCodeName(
+      eventsFunctionsExtension,
+      eventsFunction
     );
-    // TODO Use getFreeFunctionCodeName.
-    const functionName = codeNamespace + '.func';
 
     return options.eventsFunctionCodeWriter.getIncludeFileFor(functionName);
   }).filter(Boolean);
@@ -191,14 +141,14 @@ const generateEventsFunctionExtension = (
     eventsFunctionsExtension
   );
 
-  const codeNamespacePrefix =
-    'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
+  const codeNamespacePrefix = gd.MetadataDeclarationHelper.getExtensionCodeNamespacePrefix(
+    eventsFunctionsExtension
+  );
 
   const extensionIncludeFiles = getExtensionIncludeFiles(
     project,
     eventsFunctionsExtension,
-    options,
-    codeNamespacePrefix
+    options
   );
   const codeGenerationContext = {
     codeNamespacePrefix,
@@ -276,14 +226,14 @@ const generateEventsFunctionExtensionMetadata = (
     eventsFunctionsExtension
   );
 
-  const codeNamespacePrefix =
-    'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
+  const codeNamespacePrefix = gd.MetadataDeclarationHelper.getExtensionCodeNamespacePrefix(
+    eventsFunctionsExtension
+  );
 
   const extensionIncludeFiles = getExtensionIncludeFiles(
     project,
     eventsFunctionsExtension,
-    options,
-    codeNamespacePrefix
+    options
   );
   const codeGenerationContext = {
     codeNamespacePrefix,
@@ -369,7 +319,7 @@ const generateFreeFunction = (
     const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
       project
     );
-    const codeNamespace = getFreeFunctionCodeNamespace(
+    const codeNamespace = gd.MetadataDeclarationHelper.getFreeFunctionCodeNamespace(
       eventsFunction,
       codeGenerationContext.codeNamespacePrefix
     );
@@ -398,8 +348,10 @@ const generateFreeFunction = (
     eventsFunctionsExtensionCodeGenerator.delete();
     metadataDeclarationHelper.delete();
 
-    // TODO Implement an helper function for free function names.
-    const functionName = codeNamespace + '.func';
+    const functionName = gd.MetadataDeclarationHelper.getFreeFunctionCodeName(
+      eventsFunctionsExtension,
+      eventsFunction
+    );
     return options.eventsFunctionCodeWriter
       .writeFunctionCode(functionName, code)
       .then(() => {});
@@ -476,7 +428,7 @@ function generateBehavior(
 
     // Generate code for the behavior and its methods
     if (!options.skipCodeGeneration) {
-      const codeNamespace = getBehaviorFunctionCodeNamespace(
+      const codeNamespace = gd.MetadataDeclarationHelper.getBehaviorFunctionCodeNamespace(
         eventsBasedBehavior,
         codeGenerationContext.codeNamespacePrefix
       );
@@ -538,7 +490,7 @@ function generateBehaviorMetadata(
     behaviorMethodMangledNames
   );
 
-  const codeNamespace = getBehaviorFunctionCodeNamespace(
+  const codeNamespace = gd.MetadataDeclarationHelper.getBehaviorFunctionCodeNamespace(
     eventsBasedBehavior,
     codeGenerationContext.codeNamespacePrefix
   );
@@ -578,7 +530,7 @@ function generateObject(
 
     // Generate code for the object and its methods
     if (!options.skipCodeGeneration) {
-      const codeNamespace = getObjectFunctionCodeNamespace(
+      const codeNamespace = gd.MetadataDeclarationHelper.getObjectFunctionCodeNamespace(
         eventsBasedObject,
         codeGenerationContext.codeNamespacePrefix
       );
@@ -640,7 +592,7 @@ function generateObjectMetadata(
     objectMethodMangledNames
   );
 
-  const codeNamespace = getObjectFunctionCodeNamespace(
+  const codeNamespace = gd.MetadataDeclarationHelper.getObjectFunctionCodeNamespace(
     eventsBasedObject,
     codeGenerationContext.codeNamespacePrefix
   );

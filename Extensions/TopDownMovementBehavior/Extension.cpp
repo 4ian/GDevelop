@@ -21,6 +21,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Movement")
+      .SetTags("top-down")
       .SetExtensionHelpPath("/behaviors/topdown");
   extension.AddInstructionOrExpressionGroupMetadata(_("Top-down movement"))
       .SetIcon("CppPlatform/Extensions/topdownmovementicon16.png");

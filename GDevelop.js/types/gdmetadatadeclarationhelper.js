@@ -5,7 +5,11 @@ declare class gdMetadataDeclarationHelper {
   generateFreeFunctionMetadata(project: gdProject, extension: gdPlatformExtension, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsFunction: gdEventsFunction): gdAbstractFunctionMetadata;
   static generateBehaviorMetadata(project: gdProject, extension: gdPlatformExtension, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, behaviorMethodMangledNames: gdMapStringString): gdBehaviorMetadata;
   static generateObjectMetadata(project: gdProject, extension: gdPlatformExtension, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, objectMethodMangledNames: gdMapStringString): gdObjectMetadata;
+  static getExtensionCodeNamespacePrefix(eventsFunctionsExtension: gdEventsFunctionsExtension): string;
   static getFreeFunctionCodeName(eventsFunctionsExtension: gdEventsFunctionsExtension, eventsFunction: gdEventsFunction): string;
+  static getFreeFunctionCodeNamespace(eventsFunction: gdEventsFunction, codeNamespacePrefix: string): string;
+  static getBehaviorFunctionCodeNamespace(eventsBasedBehavior: gdEventsBasedBehavior, codeNamespacePrefix: string): string;
+  static getObjectFunctionCodeNamespace(eventsBasedObject: gdEventsBasedObject, codeNamespacePrefix: string): string;
   static isBehaviorLifecycleEventsFunction(functionName: string): boolean;
   static isObjectLifecycleEventsFunction(functionName: string): boolean;
   static isExtensionLifecycleEventsFunction(functionName: string): boolean;

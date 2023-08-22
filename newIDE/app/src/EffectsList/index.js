@@ -341,6 +341,44 @@ const getEnumeratedEffectMetadata = (
   );
 };
 
+export const getEffects2DCount = (
+  platform: gdPlatform,
+  effectsContainer: gdEffectsContainer
+) => {
+  const effectCount = effectsContainer.getEffectsCount();
+  let effect2DCount = 0;
+  for (let i = 0; i < effectCount; i++) {
+    const effect: gdEffect = effectsContainer.getEffectAt(i);
+    const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+      platform,
+      effect.getEffectType()
+    );
+    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor3D()) {
+      effect2DCount++;
+    }
+  }
+  return effect2DCount;
+};
+
+export const getEffects3DCount = (
+  platform: gdPlatform,
+  effectsContainer: gdEffectsContainer
+) => {
+  const effectCount = effectsContainer.getEffectsCount();
+  let effect3DCount = 0;
+  for (let i = 0; i < effectCount; i++) {
+    const effect: gdEffect = effectsContainer.getEffectAt(i);
+    const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+      platform,
+      effect.getEffectType()
+    );
+    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor2D()) {
+      effect3DCount++;
+    }
+  }
+  return effect3DCount;
+};
+
 /**
  * Display a list of effects and allow to add/remove/edit them.
  *
@@ -657,28 +695,21 @@ export default function EffectsList(props: Props) {
   const duplicatedUniqueEffectMetadata = getDuplicatedUniqueEffectMetadata();
 
   // Count the number of effects to hide titles of empty sections.
-  let effect2DCount = 0;
-  let effect3DCount = 0;
-  for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
-    const effect: gdEffect = effectsContainer.getEffectAt(i);
-    const effectMetadata = getEnumeratedEffectMetadata(
-      allEffectMetadata,
-      effect.getEffectType()
-    );
-
-    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor2D) {
-      effect3DCount++;
-    }
-    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor3D) {
-      effect2DCount++;
-    }
-  }
+  const platform = project.getCurrentPlatform();
+  const effects2DCount = getEffects2DCount(platform, effectsContainer);
+  const effects3DCount = getEffects3DCount(platform, effectsContainer);
+  const visibleEffectsCount =
+    props.layerRenderingType === '2d'
+      ? effects2DCount
+      : props.layerRenderingType === '3d'
+      ? effects3DCount
+      : effectsContainer.getEffectsCount();
 
   return (
     <I18n>
       {({ i18n }) => (
         <Column noMargin expand useFullHeight>
-          {effectsContainer.getEffectsCount() !== 0 ? (
+          {visibleEffectsCount !== 0 ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
                 {duplicatedUniqueEffectMetadata && (
@@ -711,7 +742,7 @@ export default function EffectsList(props: Props) {
                     </Column>
                   </Line>
                 )}
-                {props.layerRenderingType !== '2d' && effect3DCount > 0 && (
+                {props.layerRenderingType !== '2d' && effects3DCount > 0 && (
                   <Column noMargin expand>
                     {props.layerRenderingType !== '3d' && (
                       <Column noMargin>
@@ -802,7 +833,7 @@ export default function EffectsList(props: Props) {
                     </Line>
                   </Column>
                 )}
-                {props.layerRenderingType !== '3d' && effect2DCount > 0 && (
+                {props.layerRenderingType !== '3d' && effects2DCount > 0 && (
                   <Column noMargin expand>
                     {props.layerRenderingType !== '2d' && (
                       <Column noMargin>

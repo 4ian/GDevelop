@@ -8,7 +8,6 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import SearchBar from '../UI/SearchBar';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import {
@@ -154,26 +153,18 @@ export default class EventsBasedBehaviorsList extends React.Component<
   };
 
   _rename = (eventsBasedBehavior: gdEventsBasedBehavior, newName: string) => {
-    const { eventsBasedBehaviorsList } = this.props;
     this.setState({
       renamedEventsBasedBehavior: null,
     });
 
     if (eventsBasedBehavior.getName() === newName) return;
 
-    if (eventsBasedBehaviorsList.has(newName)) {
-      showWarningBox('Another behavior with this name already exists.', {
-        delayToNextTick: true,
-      });
-      return;
-    }
-
     this.props.onRenameEventsBasedBehavior(
       eventsBasedBehavior,
       newName,
       doRename => {
         if (!doRename) return;
-        eventsBasedBehavior.setName(newName);
+
         this._onEventsBasedBehaviorModified();
         this.props.onEventsBasedBehaviorRenamed(eventsBasedBehavior);
       }

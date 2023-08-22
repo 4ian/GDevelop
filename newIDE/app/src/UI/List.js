@@ -351,6 +351,7 @@ type ListProps = {|
   style?: {|
     overflowY?: 'scroll',
     flex?: 1,
+    scrollbarWidth?: 'thin',
     padding?: number,
   |},
   useGap?: boolean,

@@ -129,7 +129,7 @@ export default function NewObjectDialog({
   ]);
 
   const {
-    searchResults,
+    assetShortHeadersSearchResults,
     navigationState,
     environment,
     setEnvironment,
@@ -319,7 +319,10 @@ export default function NewObjectDialog({
         primary
         label={<Trans>Add all assets to my scene</Trans>}
         onClick={() => setIsAssetPackDialogInstallOpen(true)}
-        disabled={!searchResults || searchResults.length === 0}
+        disabled={
+          !assetShortHeadersSearchResults ||
+          assetShortHeadersSearchResults.length === 0
+        }
       />
     ) : openedAssetShortHeader ? (
       <RaisedButton
@@ -458,22 +461,24 @@ export default function NewObjectDialog({
               />
             )}
           </Dialog>
-          {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-            <AssetPackInstallDialog
-              assetPack={openedAssetPack}
-              assetShortHeaders={searchResults}
-              addedAssetIds={existingAssetStoreIds}
-              onClose={() => setIsAssetPackDialogInstallOpen(false)}
-              onAssetsAdded={() => {
-                setIsAssetPackDialogInstallOpen(false);
-              }}
-              project={project}
-              objectsContainer={objectsContainer}
-              onObjectsAddedFromAssets={onObjectsAddedFromAssets}
-              canInstallPrivateAsset={canInstallPrivateAsset}
-              resourceManagementProps={resourceManagementProps}
-            />
-          )}
+          {isAssetPackDialogInstallOpen &&
+            assetShortHeadersSearchResults &&
+            openedAssetPack && (
+              <AssetPackInstallDialog
+                assetPack={openedAssetPack}
+                assetShortHeaders={assetShortHeadersSearchResults}
+                addedAssetIds={existingAssetStoreIds}
+                onClose={() => setIsAssetPackDialogInstallOpen(false)}
+                onAssetsAdded={() => {
+                  setIsAssetPackDialogInstallOpen(false);
+                }}
+                project={project}
+                objectsContainer={objectsContainer}
+                onObjectsAddedFromAssets={onObjectsAddedFromAssets}
+                canInstallPrivateAsset={canInstallPrivateAsset}
+                resourceManagementProps={resourceManagementProps}
+              />
+            )}
         </>
       )}
     </I18n>

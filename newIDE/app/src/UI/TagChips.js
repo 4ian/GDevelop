@@ -8,6 +8,7 @@ const styles = {
     display: 'flex',
     flexWrap: 'wrap',
     overflowX: 'auto',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     marginTop: 4,
   },
   chip: {

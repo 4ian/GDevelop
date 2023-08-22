@@ -13,6 +13,7 @@
 
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/String.h"
+#include "GDCore/IDE/ResourceExposer.h"
 
 namespace gd {
 
@@ -23,7 +24,7 @@ namespace gd {
  * Usage example:
 \code
 gd::ResourcesInUseHelper resourcesInUse;
-project.ExposeResources(resourcesInUse);
+gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesInUse);
 
 //Get a set with the name of all images in the project:
 std::set<gd::String> & usedImages = resourcesInUse.GetAllImages();

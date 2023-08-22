@@ -21,7 +21,10 @@ type Props<SearchItem> = {|
 
 const styles = {
   container: { flex: 1 },
-  grid: { overflowX: 'hidden' },
+  grid: {
+    overflowX: 'hidden',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
+  },
 };
 
 const ESTIMATED_ROW_HEIGHT = 90;

@@ -6,6 +6,9 @@ namespace gdjs {
         target: EffectsTarget,
         effectData: EffectData
       ): gdjs.PixiFiltersTools.Filter {
+        if (typeof THREE === 'undefined') {
+          return new gdjs.PixiFiltersTools.EmptyFilter();
+        }
         return new (class implements gdjs.PixiFiltersTools.Filter {
           light: THREE.AmbientLight;
           _isEnabled: boolean;

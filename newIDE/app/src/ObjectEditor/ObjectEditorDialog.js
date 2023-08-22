@@ -184,7 +184,9 @@ const InnerDialog = (props: InnerDialogProps) => {
               label: <Trans>Variables</Trans>,
               value: 'variables',
             },
-            objectMetadata.hasDefaultBehavior('EffectCapacity::EffectBehavior')
+            objectMetadata.hasDefaultBehavior(
+              'EffectCapability::EffectBehavior'
+            )
               ? {
                   label: <Trans>Effects</Trans>,
                   value: 'effects',

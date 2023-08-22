@@ -62,7 +62,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsBasedObject(
       project,
       eventsBasedObject,
-      // TODO: use EventsScope
       globalObjectsContainer,
       // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
       eventsBasedObject,

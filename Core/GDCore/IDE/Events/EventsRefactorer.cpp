@@ -550,7 +550,6 @@ bool EventsRefactorer::RemoveObjectInConditions(
   return somethingModified;
 }
 
-// TODO: use EventsScope
 void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
                                             gd::ProjectScopedContainers& projectScopedContainers,
                                             gd::EventsList& events,

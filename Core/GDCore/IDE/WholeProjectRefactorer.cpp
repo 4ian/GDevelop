@@ -1500,7 +1500,6 @@ void WholeProjectRefactorer::RenameObjectEffect(gd::Project &project,
                                                projectElementRenamer);
 }
 
-// TODO: use EventsScope
 void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsBasedObject(
     gd::Project &project, gd::EventsBasedObject &eventsBasedObject,
     gd::ObjectsContainer &globalObjectsContainer,
@@ -1515,7 +1514,6 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsBasedObject(
   }
 }
 
-// TODO: use EventsScope
 void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
     gd::Project &project, gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &globalObjectsContainer,
@@ -1589,7 +1587,6 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
   }
 }
 
-// TODO: use EventsScope
 void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
     gd::Project &project, const gd::String &objectName, bool isObjectGroup,
     bool removeEventsAndGroups) {
@@ -1606,8 +1603,7 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
     if (layout.HasObjectNamed(objectName))
       continue;
 
-    // TODO: use EventsScope
-    ObjectOrGroupRemovedInLayout(project, layout, objectName, isObjectGroup,
+        ObjectOrGroupRemovedInLayout(project, layout, objectName, isObjectGroup,
                                  removeEventsAndGroups);
   }
 }

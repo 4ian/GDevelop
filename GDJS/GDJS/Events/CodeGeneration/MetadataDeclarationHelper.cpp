@@ -204,7 +204,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .MarkAsAdvanced()
       .SetHidden()
       .SetFunctionName("setScale")
-      .SetGetter("getScale");
+      .SetGetter("getScaleMean");
 
   // Deprecated
   objectMetadata
@@ -218,7 +218,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .MarkAsAdvanced()
       .SetHidden()
       .SetFunctionName("setScale")
-      .SetGetter("getScale");
+      .SetGetter("getScaleMean");
 
   // Deprecated
   objectMetadata

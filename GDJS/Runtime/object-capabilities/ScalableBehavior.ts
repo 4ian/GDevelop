@@ -10,21 +10,21 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScale(newScale: number): void;
+    setScale(newScale: float): void;
 
     /**
      * Change the scale on X axis of the object (changing its width).
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleX(newScale: number): void;
+    setScaleX(newScale: float): void;
 
     /**
      * Change the scale on Y axis of the object (changing its height).
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleY(newScale: number): void;
+    setScaleY(newScale: float): void;
 
     /**
      * Get the scale of the object (or the geometric mean of the X and Y scale
@@ -33,7 +33,7 @@ namespace gdjs {
      * @return the scale of the object (or the geometric mean of the X and
      * Y scale in case they are different).
      */
-    getScale(): number;
+    getScale(): float;
 
     /**
      * Get the scale of the object on Y axis.

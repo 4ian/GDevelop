@@ -492,7 +492,7 @@ namespace gdjs {
      *
      * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
-    getScale(): number {
+    getScale(): float {
       const scaleX = this.getScaleX();
       const scaleY = this.getScaleY();
       return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);

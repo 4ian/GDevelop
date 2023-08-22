@@ -249,10 +249,14 @@ namespace gdjs {
     // Implement support for get/set scale:
 
     /**
-     * Get scale of the tiled sprite object.
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): float {
-      return (this.getScaleX() + this.getScaleY()) / 2.0;
+      const scaleX = Math.abs(this.getScaleX());
+      const scaleY = Math.abs(this.getScaleY());
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**

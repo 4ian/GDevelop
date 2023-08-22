@@ -1271,7 +1271,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScale(newScale: number): void {
+    setScale(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1292,7 +1292,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleX(newScale: number): void {
+    setScaleX(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1309,7 +1309,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleY(newScale: number): void {
+    setScaleY(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1322,12 +1322,24 @@ namespace gdjs {
     }
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
      */
-    getScale(): number {
+    getScaleMean(): float {
       return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): float {
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**

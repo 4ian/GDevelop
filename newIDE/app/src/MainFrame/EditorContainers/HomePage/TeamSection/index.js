@@ -1,82 +1,25 @@
 // @flow
 import * as React from 'react';
-import { Trans, t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import { Trans } from '@lingui/macro';
 
 import Text from '../../../../UI/Text';
-import TextButton from '../../../../UI/TextButton';
-import RaisedButton from '../../../../UI/RaisedButton';
-import { Line, Column, Spacer, marginsSize } from '../../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import {
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../../UI/Layout';
+import { Line, Column } from '../../../../UI/Grid';
 
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
 } from '../../../../ProjectsStorage';
-import PreferencesContext from '../../../Preferences/PreferencesContext';
-import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import SectionContainer, { SectionRow } from '../SectionContainer';
-import ContextMenu, {
-  type ContextMenuInterface,
-} from '../../../../UI/Menu/ContextMenu';
 import CircularProgress from '../../../../UI/CircularProgress';
-import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
-import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
-import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
-import optionalRequire from '../../../../Utils/OptionalRequire';
-import { showErrorBox } from '../../../../UI/Messages/MessageBox';
-import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
-import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
-import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Add from '../../../../UI/CustomSvgIcons/Add';
-import ImageTileRow from '../../../../UI/ImageTileRow';
-import { prepareExamples } from '../../../../AssetStore/ExampleStore';
-import Skeleton from '@material-ui/lab/Skeleton';
-import BackgroundText from '../../../../UI/BackgroundText';
-import Paper from '../../../../UI/Paper';
-import PlaceholderError from '../../../../UI/PlaceholderError';
-import AlertMessage from '../../../../UI/AlertMessage';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import IconButton from '../../../../UI/IconButton';
-import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
-import RouterContext from '../../../RouterContext';
-import { useLongTouch } from '../../../../Utils/UseLongTouch';
 import {
-  listTeamGroups,
-  listUserTeams,
-  type Team,
   type TeamGroup,
   type TeamMembership,
   type User,
 } from '../../../../Utils/GDevelopServices/User';
 import TeamContext from '../../../../Profile/Team/TeamContext';
-const electron = optionalRequire('electron');
-const path = optionalRequire('path');
 
-const styles = {
-  listItem: {
-    padding: 0,
-    marginTop: 2,
-    marginBottom: 2,
-    borderRadius: 8,
-    overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
-  },
-  projectSkeleton: { borderRadius: 6 },
-  noProjectsContainer: { padding: 10 },
-};
+type GroupWithMembers = {| group: TeamGroup, members: User[] |};
 
 type Props = {|
   project: ?gdProject,
@@ -88,7 +31,7 @@ export type TeamSectionInterface = {|
   forceUpdate: () => void,
 |};
 
-const groupMembersByGroupName = ({
+const groupMembersByGroupId = ({
   groups,
   members,
   memberships,
@@ -96,9 +39,9 @@ const groupMembersByGroupName = ({
   groups: ?(TeamGroup[]),
   members: ?(User[]),
   memberships: ?(TeamMembership[]),
-}): ?{ [groupName: string]: User } => {
+}): ?{ [groupId: string]: GroupWithMembers } => {
   if (!(groups && members && memberships)) return null;
-  const membersByGroupName = {};
+  const membersByGroupId = {};
   members.forEach(member => {
     const membership = memberships.find(
       membership => membership.userId === member.id
@@ -106,32 +49,63 @@ const groupMembersByGroupName = ({
     if (!membership) return;
     const memberGroups = membership.groups;
     if (!memberGroups) {
-      membersByGroupName['NONE'] = [...(membersByGroupName['NONE'] || []), member];
+      const itemWithoutGroup = membersByGroupId['NONE'];
+      membersByGroupId['NONE'] = {
+        members: [
+          ...((itemWithoutGroup && itemWithoutGroup.members) || []),
+          member,
+        ],
+        group: { id: 'none', name: 'none' },
+      };
       return;
     }
     const group = groups.find(group => group.id === memberGroups[0]);
     if (!group) return;
-    membersByGroupName[group.name] = [
-      ...(membersByGroupName[group.name] || []),
-      member,
-    ];
+    const item = membersByGroupId[group.id];
+    if (item) {
+      item.members = [...item.members, member];
+    } else {
+      membersByGroupId[group.id] = { group, members: [member] };
+    }
   });
-  return membersByGroupName;
+  return membersByGroupId;
 };
 
 const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   ({ project, onOpenRecentFile, storageProviders }, ref) => {
-    const { team, groups, members, memberships } = React.useContext(
-      TeamContext
-    );
+    const { groups, members, memberships } = React.useContext(TeamContext);
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
     }));
 
-    const membersByGroupName = groupMembersByGroupName({ groups, members, memberships });
-    console.log(membersByGroupName);
+    const membersByGroupId = groupMembersByGroupId({
+      groups,
+      members,
+      memberships,
+    });
+    if (!membersByGroupId) {
+      return (
+        <>
+          <SectionContainer title={<Trans>Team</Trans>}>
+            <SectionRow>
+              <Line>
+                <Column noMargin expand alignItems="center">
+                  <CircularProgress />
+                </Column>
+              </Line>
+            </SectionRow>
+          </SectionContainer>
+        </>
+      );
+    }
+
+    const membersNotInAGroup = membersByGroupId['NONE'];
+    const groupsAndMembers = Object.keys(membersByGroupId)
+      .map(id => (id === 'NONE' ? null : membersByGroupId[id]))
+      .filter(Boolean)
+      .sort((a, b) => a.group.name.localeCompare(b.group.name));
 
     return (
       <>
@@ -139,9 +113,29 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           <SectionRow>
             <Line>
               <Column noMargin expand>
-                Salut
+                {membersNotInAGroup && (
+                  <ul>
+                    {membersNotInAGroup.members.map(member => (
+                      <li>{member.username || member.email}</li>
+                    ))}
+                  </ul>
+                )}
               </Column>
             </Line>
+            {groupsAndMembers.length > 0 &&
+              groupsAndMembers.map(({ group, members }) => (
+                <Line>
+                  <Column noMargin expand>
+                    <Text>{group.name}</Text>
+
+                    <ul>
+                      {members.map(member => (
+                        <li>{member.username || member.email}</li>
+                      ))}
+                    </ul>
+                  </Column>
+                </Line>
+              ))}
           </SectionRow>
         </SectionContainer>
       </>

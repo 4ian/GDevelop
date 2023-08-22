@@ -66,7 +66,7 @@ export type TeamMembership = {|
   userId: string,
   teamId: string,
   createdAt: number,
-  groups: ?Array<string>,
+  groups?: ?Array<string>,
 |};
 
 export const searchCreatorPublicProfilesByUsername = (

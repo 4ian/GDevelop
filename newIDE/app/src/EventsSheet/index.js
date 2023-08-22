@@ -12,7 +12,8 @@ import EventTextDialog, {
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
+import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { serializeToJSObject } from '../Utils/Serializer';
@@ -143,6 +144,7 @@ type ComponentProps = {|
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
   leaderboardsManager: ?LeaderboardState,
+  shortcutMap: ShortcutMap,
 |};
 
 type State = {|
@@ -571,9 +573,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             label: i18n._(t`Invert Condition`),
             click: () => this._invertSelectedConditions(),
             accelerator: getShortcutDisplayName(
-              this.props.preferences.values.userShortcutMap[
-                'TOGGLE_CONDITION_INVERTED'
-              ] || 'KeyJ'
+              this.props.shortcutMap['TOGGLE_CONDITION_INVERTED']
             ),
           }
         : null,
@@ -766,9 +766,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       click: () => this.toggleDisabled(),
       enabled: this._selectionCanToggleDisabled(),
       accelerator: getShortcutDisplayName(
-        this.props.preferences.values.userShortcutMap[
-          'TOGGLE_EVENT_DISABLED'
-        ] || 'KeyD'
+        this.props.shortcutMap['TOGGLE_EVENT_DISABLED'] || 'KeyD'
       ),
     },
     { type: 'separator' },
@@ -780,15 +778,32 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           click: () => {
             this.addNewEvent('BuiltinCommonInstructions::Standard');
           },
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_STANDARD_EVENT']
+          ),
         },
         {
           label: i18n._(t`Add Sub Event`),
           click: () => this.addSubEvent(),
           enabled: this._selectionCanHaveSubEvents(),
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_SUBEVENT']
+          ),
+        },
+        {
+          label: i18n._(t`Add Comment`),
+          click: () => {
+            this.addNewEvent('BuiltinCommonInstructions::Comment');
+          },
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_COMMENT_EVENT']
+          ),
         },
         ...this.state.allEventsMetadata
           .filter(
-            metadata => metadata.type !== 'BuiltinCommonInstructions::Standard'
+            metadata =>
+              metadata.type !== 'BuiltinCommonInstructions::Standard' &&
+              metadata.type !== 'BuiltinCommonInstructions::Comment'
           )
           .map(metadata => ({
             label: i18n._(t`Add ${metadata.fullName}`),
@@ -1948,6 +1963,7 @@ const EventsSheet = (props, ref) => {
   const preferences = React.useContext(PreferencesContext);
   const { tutorials } = React.useContext(TutorialContext);
   const leaderboardsManager = React.useContext(LeaderboardContext);
+  const shortcutMap = useShortcutMap();
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
@@ -1955,6 +1971,7 @@ const EventsSheet = (props, ref) => {
       preferences={preferences}
       tutorials={tutorials}
       leaderboardsManager={leaderboardsManager}
+      shortcutMap={shortcutMap}
       {...props}
     />
   );

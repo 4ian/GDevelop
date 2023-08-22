@@ -120,7 +120,7 @@ const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
           title={
             i18n._(tooltip) +
             (acceleratorString
-              ? ' ' + adaptAcceleratorString(acceleratorString)
+              ? ' (' + adaptAcceleratorString(acceleratorString) + ')'
               : '')
           }
           placement="bottom"

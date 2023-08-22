@@ -21,6 +21,7 @@ ResizableExtension::ResizableExtension() {
 
   actions["ResizableCapability::ResizableBehavior::SetWidth"]
       .SetFunctionName("setWidth")
+      .SetGetter("getWidth")
       .SetIncludeFile("object-capabilities/ResizableBehavior.js");
   conditions["ResizableCapability::ResizableBehavior::Width"]
       .SetFunctionName("getWidth")
@@ -28,6 +29,7 @@ ResizableExtension::ResizableExtension() {
 
   actions["ResizableCapability::ResizableBehavior::SetHeight"]
       .SetFunctionName("setHeight")
+      .SetGetter("getHeight")
       .SetIncludeFile("object-capabilities/ResizableBehavior.js");
   conditions["ResizableCapability::ResizableBehavior::Height"]
       .SetFunctionName("getHeight")

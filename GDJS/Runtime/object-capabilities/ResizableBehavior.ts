@@ -26,6 +26,18 @@ namespace gdjs {
      * @param newHeight The new height of the object, in pixels.
      */
     setSize(newWidth: float, newHeight: float): void;
+
+    /**
+     * Return the width of the object.
+     * @return The width of the object
+     */
+    getWidth(): float;
+
+    /**
+     * Return the width of the object.
+     * @return The height of the object
+     */
+    getHeight(): float;
   }
 
   /**
@@ -68,6 +80,14 @@ namespace gdjs {
 
     setSize(newWidth: float, newHeight: float): void {
       this.object.setSize(newWidth, newHeight);
+    }
+
+    getWidth(): float {
+      return this.object.getWidth();
+    }
+
+    getHeight(): float {
+      return this.object.getHeight();
     }
   }
 

@@ -29,7 +29,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { PropertyResourceSelector, PropertyField, styles } from './Model3DEditor';
 import { ISkeletonData } from 'pixi-spine';
 
-const { gd }: libGDevelop = global;
+const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'spine-animations-list'

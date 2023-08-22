@@ -204,7 +204,7 @@ module.exports = {
   registerInstanceRenderers: function (
     objectsRenderingService /*: ObjectsRenderingService */
   ) {
-    const { PIXI, RenderedInstance } = objectsRenderingService;
+    const { PIXI, RenderedInstance, gd } = objectsRenderingService;
 
     class RenderedSpineInstance extends RenderedInstance {
       _spine;
@@ -299,9 +299,9 @@ module.exports = {
 
         this._animationIndex = index;
         const animation = configuration.getAnimation(index);
-        const name = animation.getName?.();
-        const source = animation.getSource?.();
-        const shouldLoop = animation.shouldLoop?.();
+        const name = animation.getName();
+        const source = animation.getSource();
+        const shouldLoop = animation.shouldLoop();
 
         // reset scale to track new animation range
         // if custome size is set it will be reinitialized in update method

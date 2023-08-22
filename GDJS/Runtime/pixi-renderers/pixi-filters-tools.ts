@@ -227,5 +227,24 @@ namespace gdjs {
         );
       }
     }
+
+    export class EmptyFilter {
+      isEnabled(target: EffectsTarget): boolean {
+        return false;
+      }
+      setEnabled(target: EffectsTarget, enabled: boolean): boolean {
+        return false;
+      }
+      applyEffect(target: EffectsTarget): boolean {
+        return false;
+      }
+      removeEffect(target: EffectsTarget): boolean {
+        return false;
+      }
+      updatePreRender(target: gdjs.EffectsTarget): any {}
+      updateDoubleParameter(parameterName: string, value: number): void {}
+      updateStringParameter(parameterName: string, value: string): void {}
+      updateBooleanParameter(parameterName: string, value: boolean): void {}
+    }
   }
 }

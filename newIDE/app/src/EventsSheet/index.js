@@ -762,7 +762,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       accelerator: 'Delete',
     },
     {
-      label: i18n._(t`Toggle disabled`),
+      label: i18n._(t`Toggle Disabled`),
       click: () => this.toggleDisabled(),
       enabled: this._selectionCanToggleDisabled(),
       accelerator: getShortcutDisplayName(
@@ -791,7 +791,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             metadata => metadata.type !== 'BuiltinCommonInstructions::Standard'
           )
           .map(metadata => ({
-            label: metadata.fullName,
+            label: i18n._(t`Add ${metadata.fullName}`),
             click: () => {
               this.addNewEvent(metadata.type);
             },
@@ -835,11 +835,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         },
         { type: 'separator' },
         {
-          label: i18n._(t`Collapse all`),
+          label: i18n._(t`Collapse All`),
           click: this.collapseAll,
         },
         {
-          label: i18n._(t`Expand all to level`),
+          label: i18n._(t`Expand All to Level`),
           submenu: [
             {
               label: i18n._(t`All`),

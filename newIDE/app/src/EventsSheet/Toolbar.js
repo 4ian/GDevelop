@@ -142,6 +142,7 @@ const Toolbar = ({
           onClick={onRemove}
           disabled={!canRemove}
           tooltip={t`Delete the selected event(s)`}
+          acceleratorString={'Delete'}
         >
           <TrashIcon />
         </IconButton>
@@ -152,6 +153,7 @@ const Toolbar = ({
           onClick={undo}
           disabled={!canUndo}
           tooltip={t`Undo the last changes`}
+          acceleratorString={'CmdOrCtrl+Z'}
         >
           <UndoIcon />
         </IconButton>
@@ -162,6 +164,7 @@ const Toolbar = ({
           onClick={redo}
           disabled={!canRedo}
           tooltip={t`Redo the last changes`}
+          acceleratorString={'CmdOrCtrl+Shift+Z'}
         >
           <RedoIcon />
         </IconButton>

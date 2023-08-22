@@ -12,7 +12,8 @@ import EventTextDialog, {
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
+import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { serializeToJSObject } from '../Utils/Serializer';
@@ -143,6 +144,7 @@ type ComponentProps = {|
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
   leaderboardsManager: ?LeaderboardState,
+  shortcutMap: ShortcutMap,
 |};
 
 type State = {|
@@ -543,58 +545,45 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _buildInstructionContextMenu = (i18n: I18nType) => [
-    {
-      label: i18n._(t`Copy`),
-      click: () => this.copySelection(),
-      accelerator: 'CmdOrCtrl+C',
-    },
-    {
-      label: i18n._(t`Cut`),
-      click: () => this.cutSelection(),
-      accelerator: 'CmdOrCtrl+X',
-    },
-    {
-      label: i18n._(t`Paste`),
-      click: () => this.pasteInstructions(),
-      enabled: hasClipboardConditions() || hasClipboardActions(),
-      accelerator: 'CmdOrCtrl+V',
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Delete`),
-      click: () => this.deleteSelection(),
-      accelerator: 'Delete',
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Undo`),
-      click: this.undo,
-      enabled: canUndo(this.state.eventsHistory),
-      accelerator: 'CmdOrCtrl+Z',
-    },
-    {
-      label: i18n._(t`Redo`),
-      click: this.redo,
-      enabled: canRedo(this.state.eventsHistory),
-      accelerator: 'CmdOrCtrl+Shift+Z',
-    },
-    {
-      label: i18n._(t`Invert Condition`),
-      click: () => this._invertSelectedConditions(),
-      visible: hasSelectedAtLeastOneCondition(this.state.selection),
-      accelerator: getShortcutDisplayName(
-        this.props.preferences.values.userShortcutMap[
-          'TOGGLE_CONDITION_INVERTED'
-        ] || 'KeyJ'
-      ),
-    },
-    {
-      label: i18n._(t`Toggle Wait the Action to End`),
-      click: () => this._toggleAwaitingActions(),
-      visible: this._hasSelectedOptionallyAsyncActions(),
-    },
-  ];
+  _buildInstructionContextMenu = (i18n: I18nType) =>
+    [
+      {
+        label: i18n._(t`Copy`),
+        click: () => this.copySelection(),
+        accelerator: 'CmdOrCtrl+C',
+      },
+      {
+        label: i18n._(t`Cut`),
+        click: () => this.cutSelection(),
+        accelerator: 'CmdOrCtrl+X',
+      },
+      {
+        label: i18n._(t`Paste`),
+        click: () => this.pasteInstructions(),
+        enabled: hasClipboardConditions() || hasClipboardActions(),
+        accelerator: 'CmdOrCtrl+V',
+      },
+      {
+        label: i18n._(t`Delete`),
+        click: () => this.deleteSelection(),
+        accelerator: 'Delete',
+      },
+      hasSelectedAtLeastOneCondition(this.state.selection)
+        ? {
+            label: i18n._(t`Invert Condition`),
+            click: () => this._invertSelectedConditions(),
+            accelerator: getShortcutDisplayName(
+              this.props.shortcutMap['TOGGLE_CONDITION_INVERTED']
+            ),
+          }
+        : null,
+      this._hasSelectedOptionallyAsyncActions()
+        ? {
+            label: i18n._(t`Toggle Wait the Action to End`),
+            click: () => this._toggleAwaitingActions(),
+          }
+        : null,
+    ].filter(Boolean);
 
   openAddInstructionContextMenu = (
     eventContext: EventContext,
@@ -773,99 +762,114 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       accelerator: 'Delete',
     },
     {
-      label: i18n._(t`Toggle disabled`),
+      label: i18n._(t`Toggle Disabled`),
       click: () => this.toggleDisabled(),
       enabled: this._selectionCanToggleDisabled(),
       accelerator: getShortcutDisplayName(
-        this.props.preferences.values.userShortcutMap[
-          'TOGGLE_EVENT_DISABLED'
-        ] || 'KeyD'
+        this.props.shortcutMap['TOGGLE_EVENT_DISABLED'] || 'KeyD'
       ),
     },
     { type: 'separator' },
     {
-      label: i18n._(t`Add New Event Below`),
-      click: () => {
-        this.addNewEvent('BuiltinCommonInstructions::Standard');
-      },
-    },
-    {
-      label: i18n._(t`Add Sub Event`),
-      click: () => this.addSubEvent(),
-      enabled: this._selectionCanHaveSubEvents(),
-    },
-    {
-      label: i18n._(t`Add Other`),
-      submenu: this.state.allEventsMetadata.map(metadata => {
-        return {
-          label: metadata.fullName,
-          click: () => {
-            this.addNewEvent(metadata.type);
-          },
-        };
-      }),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Undo`),
-      click: this.undo,
-      enabled: canUndo(this.state.eventsHistory),
-      accelerator: 'CmdOrCtrl+Z',
-    },
-    {
-      label: i18n._(t`Redo`),
-      click: this.redo,
-      enabled: canRedo(this.state.eventsHistory),
-      accelerator: 'CmdOrCtrl+Shift+Z',
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Collapse all`),
-      click: this.collapseAll,
-    },
-    {
-      label: i18n._(t`Expand all to level`),
+      label: i18n._(t`Add`),
       submenu: [
         {
-          label: i18n._(t`All`),
-          click: () => this.expandToLevel(-1),
+          label: i18n._(t`Add New Event Below`),
+          click: () => {
+            this.addNewEvent('BuiltinCommonInstructions::Standard');
+          },
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_STANDARD_EVENT']
+          ),
         },
-        { type: 'separator' },
-        ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
-          return {
-            label: i18n._(t`Level ${index + 1}`),
-            click: () => this.expandToLevel(index),
-          };
-        }),
+        {
+          label: i18n._(t`Add Sub Event`),
+          click: () => this.addSubEvent(),
+          enabled: this._selectionCanHaveSubEvents(),
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_SUBEVENT']
+          ),
+        },
+        {
+          label: i18n._(t`Add Comment`),
+          click: () => {
+            this.addNewEvent('BuiltinCommonInstructions::Comment');
+          },
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_COMMENT_EVENT']
+          ),
+        },
+        ...this.state.allEventsMetadata
+          .filter(
+            metadata =>
+              metadata.type !== 'BuiltinCommonInstructions::Standard' &&
+              metadata.type !== 'BuiltinCommonInstructions::Comment'
+          )
+          .map(metadata => ({
+            label: i18n._(t`Add ${metadata.fullName}`),
+            click: () => {
+              this.addNewEvent(metadata.type);
+            },
+          })),
+      ],
+    },
+    {
+      label: i18n._(t`Replace`),
+      submenu: [
+        {
+          label: i18n._(t`Extract Events to a Function`),
+          click: () => this.extractEventsToFunction(),
+        },
+        {
+          label: i18n._(t`Move Events into a Group`),
+          click: () => this.moveEventsIntoNewGroup(),
+        },
+        {
+          label: i18n._(t`Analyze Objects Used in this Event`),
+          click: this._openEventsContextAnalyzer,
+        },
       ],
     },
     { type: 'separator' },
     {
-      label: i18n._(t`Extract Events to a Function`),
-      click: () => this.extractEventsToFunction(),
-    },
-    {
-      label: i18n._(t`Move Events into a Group`),
-      click: () => this.moveEventsIntoNewGroup(),
-    },
-    {
-      label: i18n._(t`Analyze Objects Used in this Event`),
-      click: this._openEventsContextAnalyzer,
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Zoom In`),
-      click: () => this.onZoomEvent('IN')(),
-      accelerator: 'CmdOrCtrl+=',
-      enabled:
-        this.props.preferences.values.eventsSheetZoomLevel < zoomLevel.max,
-    },
-    {
-      label: i18n._(t`Zoom Out`),
-      click: () => this.onZoomEvent('OUT')(),
-      accelerator: 'CmdOrCtrl+-',
-      enabled:
-        this.props.preferences.values.eventsSheetZoomLevel > zoomLevel.min,
+      label: i18n._(t`Events Sheet`),
+      submenu: [
+        {
+          label: i18n._(t`Zoom In`),
+          click: () => this.onZoomEvent('IN')(),
+          accelerator: 'CmdOrCtrl+=',
+          enabled:
+            this.props.preferences.values.eventsSheetZoomLevel < zoomLevel.max,
+        },
+        {
+          label: i18n._(t`Zoom Out`),
+          click: () => this.onZoomEvent('OUT')(),
+          accelerator: 'CmdOrCtrl+-',
+          enabled:
+            this.props.preferences.values.eventsSheetZoomLevel > zoomLevel.min,
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Collapse All`),
+          click: this.collapseAll,
+        },
+        {
+          label: i18n._(t`Expand All to Level`),
+          submenu: [
+            {
+              label: i18n._(t`All`),
+              click: () => this.expandToLevel(-1),
+            },
+            { type: 'separator' },
+            ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
+              return {
+                label: i18n._(t`Level ${index + 1}`),
+                click: () => this.expandToLevel(index),
+              };
+            }),
+          ],
+        },
+      ],
     },
   ];
 
@@ -1959,6 +1963,7 @@ const EventsSheet = (props, ref) => {
   const preferences = React.useContext(PreferencesContext);
   const { tutorials } = React.useContext(TutorialContext);
   const leaderboardsManager = React.useContext(LeaderboardContext);
+  const shortcutMap = useShortcutMap();
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
@@ -1966,6 +1971,7 @@ const EventsSheet = (props, ref) => {
       preferences={preferences}
       tutorials={tutorials}
       leaderboardsManager={leaderboardsManager}
+      shortcutMap={shortcutMap}
       {...props}
     />
   );

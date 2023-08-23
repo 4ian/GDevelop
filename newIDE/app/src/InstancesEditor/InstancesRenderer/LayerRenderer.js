@@ -218,6 +218,17 @@ export default class LayerRenderer {
     );
   };
 
+  getUnrotatedInstanceZMin = (instance: gdInitialInstance) => {
+    return (
+      instance.getZ() -
+      // 3D objects Z position is always the "Z min":
+      // (this.renderedInstances[instance.ptr]
+      //   ? this.renderedInstances[instance.ptr].getOriginZ()
+      //   : 0)
+      0
+    );
+  };
+
   getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
     const renderedInstance = this.renderedInstances[instance.ptr];
     const hasCustomSize = instance.hasCustomSize();
@@ -248,50 +259,13 @@ export default class LayerRenderer {
     const size = this.getUnrotatedInstanceSize(instance);
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
+    const zMin = this.getUnrotatedInstanceZMin(instance);
     const right = left + size[0];
     const bottom = top + size[1];
-    // TODO (3D): add support for zMin/zMax/depth.
-    bounds.set({ left, top, right, bottom });
+    const zMax = zMin + size[2];
+
+    bounds.set({ left, top, right, bottom, zMin, zMax });
     return bounds;
-  }
-
-  _getInstanceRotatedRectangle(instance: gdInitialInstance): Polygon {
-    const size = this.getUnrotatedInstanceSize(instance);
-    const left = this.getUnrotatedInstanceLeft(instance);
-    const top = this.getUnrotatedInstanceTop(instance);
-    const right = left + size[0];
-    const bottom = top + size[1];
-
-    const rectangle = this._temporaryRectanglePath;
-
-    rectangle[0][0] = left;
-    rectangle[0][1] = top;
-
-    rectangle[1][0] = left;
-    rectangle[1][1] = bottom;
-
-    rectangle[2][0] = right;
-    rectangle[2][1] = bottom;
-
-    rectangle[3][0] = right;
-    rectangle[3][1] = top;
-
-    let centerX = undefined;
-    let centerY = undefined;
-
-    if (this.renderedInstances[instance.ptr]) {
-      centerX = left + this.renderedInstances[instance.ptr].getCenterX();
-      centerY = top + this.renderedInstances[instance.ptr].getCenterY();
-    }
-
-    if (centerX === undefined || centerY === undefined) {
-      centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
-      centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
-    }
-
-    const angle = (instance.getAngle() * Math.PI) / 180;
-    rotatePolygon(rectangle, centerX, centerY, angle);
-    return rectangle;
   }
 
   getInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
@@ -300,8 +274,48 @@ export default class LayerRenderer {
       return this.getUnrotatedInstanceAABB(instance, bounds);
     }
 
-    const rotatedRectangle = this._getInstanceRotatedRectangle(instance);
+    const size = this.getUnrotatedInstanceSize(instance);
 
+    // Compute the rotated rectangle of the instance, so we can then
+    // compute the new, unrotated AABB out of it.
+    const rotatedRectangle = this._temporaryRectanglePath;
+    {
+      const unrotatedLeft = this.getUnrotatedInstanceLeft(instance);
+      const unrotatedTop = this.getUnrotatedInstanceTop(instance);
+      const unrotatedRight = unrotatedLeft + size[0];
+      const unrotatedBottom = unrotatedTop + size[1];
+
+      rotatedRectangle[0][0] = unrotatedLeft;
+      rotatedRectangle[0][1] = unrotatedTop;
+
+      rotatedRectangle[1][0] = unrotatedLeft;
+      rotatedRectangle[1][1] = unrotatedBottom;
+
+      rotatedRectangle[2][0] = unrotatedRight;
+      rotatedRectangle[2][1] = unrotatedBottom;
+
+      rotatedRectangle[3][0] = unrotatedRight;
+      rotatedRectangle[3][1] = unrotatedTop;
+
+      let centerX = undefined;
+      let centerY = undefined;
+
+      if (this.renderedInstances[instance.ptr]) {
+        centerX =
+          unrotatedLeft + this.renderedInstances[instance.ptr].getCenterX();
+        centerY =
+          unrotatedTop + this.renderedInstances[instance.ptr].getCenterY();
+      }
+
+      if (centerX === undefined || centerY === undefined) {
+        centerX = (rotatedRectangle[0][0] + rotatedRectangle[2][0]) / 2;
+        centerY = (rotatedRectangle[0][1] + rotatedRectangle[2][1]) / 2;
+      }
+
+      rotatePolygon(rotatedRectangle, centerX, centerY, angle);
+    }
+
+    // Compute the new, unrotated AABB from the rotated rectangle of the instance.
     let left = Number.MAX_VALUE;
     let right = -Number.MAX_VALUE;
     let top = Number.MAX_VALUE;
@@ -312,8 +326,13 @@ export default class LayerRenderer {
       top = Math.min(top, rotatedRectangle[i][1]);
       bottom = Math.max(bottom, rotatedRectangle[i][1]);
     }
-    // TODO (3D): add support for zMin/zMax/depth.
-    bounds.set({ left, top, right, bottom });
+
+    // Add the 3D coordinates, for which rotation is not considered
+    // (but could be if we have a full 3D editor one day).
+    const zMin = this.getUnrotatedInstanceZMin(instance);
+    const zMax = zMin + size[2];
+
+    bounds.set({ left, top, right, bottom, zMin, zMax });
     return bounds;
   }
 

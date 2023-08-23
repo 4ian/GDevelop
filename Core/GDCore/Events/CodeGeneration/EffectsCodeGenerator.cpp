@@ -46,7 +46,10 @@ void EffectsCodeGenerator::GenerateEffectsIncludeFiles(
   // TODO Add unit tests on this function.
   
   // TODO Merge with UsedExtensionsFinder.
-  // Beware that default lights must not include Three.js.
+  // Default lights rely on the fact that UsedExtensionsFinder doesn't find
+  // extension usages for effects. This has the happy side effect of not
+  // including Three.js when no 3D object are in the scenes.
+  // We need to make something explicit to avoid future bugs.
 
   // See also gd::Project::ExposeResources for a method that traverse the whole
   // project (this time for resources) and

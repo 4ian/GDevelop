@@ -38,7 +38,6 @@ private:
 
   void AddEffectIncludeFiles(const gd::Effect& effect);
 
-  // Object Visitor
   void DoVisitObject(gd::Object &object) override;
 
   const gd::Platform &platform;

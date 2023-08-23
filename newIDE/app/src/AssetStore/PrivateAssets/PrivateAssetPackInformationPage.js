@@ -8,7 +8,6 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
-import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -581,7 +580,6 @@ const PrivateAssetPackInformationPage = ({
                       >
                         {packsIncludedInBundleTiles}
                       </GridList>
-                      <Grid />
                     </Line>
                   </>
                 )}
@@ -602,7 +600,6 @@ const PrivateAssetPackInformationPage = ({
                         >
                           {otherPacksFromTheSameAuthorTiles}
                         </GridList>
-                        <Grid />
                       </Line>
                     </>
                   )}

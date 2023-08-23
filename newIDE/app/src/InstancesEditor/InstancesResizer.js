@@ -107,7 +107,7 @@ export default class InstancesResizer {
     ));
   }
 
-  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance): {} {
+  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
     const initialPosition = this._instancePositions[instance.ptr];
     if (initialPosition) return initialPosition;
 

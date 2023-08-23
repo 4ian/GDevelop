@@ -40,7 +40,8 @@ const ResourceSelectorWithThumbnail = ({
   id,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const itemsAlignment = windowWidth === 'small' ? 'center' : 'flex-end';
+  const isMobileScreen = windowWidth === 'small';
+  const itemsAlignment = isMobileScreen ? 'center' : 'flex-end';
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);
 
   const resourcesSelector = (

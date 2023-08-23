@@ -99,10 +99,38 @@ describe('libGD.js', function () {
       expect(project.hasExternalLayoutNamed('My layout')).toBe(false);
     });
 
-    it('should validate object names', function () {
-      expect(gd.Project.validateName('ThisNameIs_Ok_123')).toBe(true);
-      expect(gd.Project.validateName('ThisName IsNot_Ok_123')).toBe(false);
-      expect(gd.Project.validateName('ThisNameIsNot_Ok!')).toBe(false);
+    it('should validate object names (legacy)', function () {
+      gd.Project.allowUsageOfUnicodeIdentifierNames(false);
+      expect(gd.Project.isNameSafe('ThisNameIs_Ok_123')).toBe(true);
+      expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);
+      expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
+      expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
+      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe('ThisNameIs_Ok_123');
+      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe('ThisName_IsNot_Ok_123');
+      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe('ThisNameIsNot_Ok_');
+      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe('_1ThisNameIsNot_Ok_123');
+      expect(gd.Project.getSafeName('官话 name')).toBe('___name');
+      expect(gd.Project.getSafeName('')).toBe('Unnamed');
+      expect(gd.Project.getSafeName('9')).toBe('_9');
+    });
+
+    it('should validate object names (unicode)', function () {
+      gd.Project.allowUsageOfUnicodeIdentifierNames(true);
+      expect(gd.Project.isNameSafe('ThisNameIs_Ok_123')).toBe(true);
+      expect(gd.Project.isNameSafe('ThisNameIs_👍_123')).toBe(true);
+      expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);
+      expect(gd.Project.isNameSafe('ThisName()IsNot_Ok_123')).toBe(false);
+      expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
+      expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
+      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe('ThisNameIs_Ok_123');
+      expect(gd.Project.getSafeName('ThisNameIs_👍_123')).toBe('ThisNameIs_👍_123');
+      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe('ThisName_IsNot_Ok_123');
+      expect(gd.Project.getSafeName('ThisName()IsNot_Ok_123')).toBe('ThisName__IsNot_Ok_123');
+      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe('ThisNameIsNot_Ok_');
+      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe('_1ThisNameIsNot_Ok_123');
+      expect(gd.Project.getSafeName('官话 name')).toBe('官话_name');
+      expect(gd.Project.getSafeName('')).toBe('Unnamed');
+      expect(gd.Project.getSafeName('9')).toBe('_9');
     });
 
     it('should have a list of extensions', function () {
@@ -1370,7 +1398,7 @@ describe('libGD.js', function () {
       );
 
       const worker = new gd.ResourcesInUseHelper();
-      project.exposeResources(worker);
+      gd.ResourceExposer.exposeWholeProjectResources(project, worker);
       expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(
         1
       );
@@ -1381,7 +1409,7 @@ describe('libGD.js', function () {
       gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
 
       const newWorker = new gd.ResourcesInUseHelper();
-      project.exposeResources(newWorker);
+      gd.ResourceExposer.exposeWholeProjectResources(project, newWorker);
       expect(
         newWorker.getAllImages().toNewVectorString().toJSArray().length
       ).toBe(1);
@@ -1414,7 +1442,7 @@ describe('libGD.js', function () {
         },
       });
 
-      project.exposeResources(worker);
+      gd.ResourceExposer.exposeWholeProjectResources(project, worker);
       project.delete();
     });
   });
@@ -3123,7 +3151,7 @@ describe('libGD.js', function () {
       // Check that ResourcesMergingHelper can update the filenames
       const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
-      project.exposeResources(resourcesMergingHelper);
+      gd.ResourceExposer.exposeWholeProjectResources(project, resourcesMergingHelper);
 
       const oldAndNewFilenames =
         resourcesMergingHelper.getAllResourcesOldAndNewFilename();

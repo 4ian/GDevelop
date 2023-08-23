@@ -26,6 +26,7 @@ export const PublicAsset = () => {
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
+        onPrivateAssetPackSelection={() => {}}
       />
     </AssetStoreStateProvider>
   );
@@ -51,6 +52,7 @@ export const PrivateAsset = () => (
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
+        onPrivateAssetPackSelection={() => {}}
       />
     </AssetStoreStateProvider>
   </PublicProfileProvider>
@@ -105,6 +107,7 @@ export const AssetWithMultipleAuthors = () => (
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
+        onPrivateAssetPackSelection={() => {}}
       />
     </AssetStoreStateProvider>
   </PublicProfileProvider>

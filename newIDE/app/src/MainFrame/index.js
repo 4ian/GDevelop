@@ -70,7 +70,6 @@ import {
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
 } from './UpdaterTools';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -172,6 +171,9 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
+import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProjectDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -760,7 +762,6 @@ const MainFrame = (props: Props) => {
               ...fileMetadata,
               name: project.getName(),
               gameId: project.getProjectUuid(),
-              lastModifiedDate: Date.now(),
             },
             storageProviderName: storageProvider.internalName,
           });
@@ -858,7 +859,7 @@ const MainFrame = (props: Props) => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
-        hasAutoSave,
+        getAutoSaveCreationDate,
         onGetAutoSave,
         onOpen,
         getOpenErrorMessage,
@@ -874,16 +875,21 @@ const MainFrame = (props: Props) => {
       }
 
       const checkForAutosave = async (): Promise<FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return fileMetadata;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, true);
-        if (!canOpenAutosave) return fileMetadata;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          true
+        );
+        if (!autoSaveCreationDate) return fileMetadata;
 
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
-          message: t`GDevelop automatically saved a newer version of this project. This new version might differ from the one that you manually saved. Which version would you like to open?`,
+          message: t`GDevelop automatically saved a newer version of this project on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}. This new version might differ from the one that you manually saved. Which version would you like to open?`,
           dismissButtonLabel: t`My manual save`,
           confirmButtonLabel: t`GDevelop auto-save`,
         });
@@ -893,16 +899,21 @@ const MainFrame = (props: Props) => {
       };
 
       const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return null;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, false);
-        if (!canOpenAutosave) return null;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          false
+        );
+        if (!autoSaveCreationDate) return null;
 
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
-          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
+          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}). Would you like to try to load it instead?`,
           confirmButtonLabel: t`Load autosave`,
         });
         if (!answer) return null;
@@ -1183,20 +1194,12 @@ const MainFrame = (props: Props) => {
 
     if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasLayoutNamed(newName)) {
-      showWarningBox(i18n._(t`Another scene with this name already exists.`), {
-        delayToNextTick: true,
-      });
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasLayoutNamed(tentativeNewName);
+      }
+    );
 
     const layout = currentProject.getLayout(oldName);
     const shouldChangeProjectFirstLayout =
@@ -1205,13 +1208,17 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      layout.setName(newName);
-      gd.WholeProjectRefactorer.renameLayout(currentProject, oldName, newName);
+      layout.setName(uniqueNewName);
+      gd.WholeProjectRefactorer.renameLayout(
+        currentProject,
+        oldName,
+        uniqueNewName
+      );
       if (inAppTutorialOrchestratorRef.current) {
-        inAppTutorialOrchestratorRef.current.changeData(oldName, newName);
+        inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
       }
       if (shouldChangeProjectFirstLayout)
-        currentProject.setFirstLayout(newName);
+        currentProject.setFirstLayout(uniqueNewName);
       _onProjectItemModified();
     });
   };
@@ -1224,32 +1231,23 @@ const MainFrame = (props: Props) => {
     if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasExternalLayoutNamed(newName)) {
-      showWarningBox(
-        i18n._(t`Another external layout with this name already exists.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasExternalLayoutNamed(tentativeNewName);
+      }
+    );
 
     const externalLayout = currentProject.getExternalLayout(oldName);
     setState(state => ({
       ...state,
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
     })).then(state => {
-      externalLayout.setName(newName);
+      externalLayout.setName(uniqueNewName);
       gd.WholeProjectRefactorer.renameExternalLayout(
         currentProject,
         oldName,
-        newName
+        uniqueNewName
       );
       _onProjectItemModified();
     });
@@ -1263,32 +1261,23 @@ const MainFrame = (props: Props) => {
     if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasExternalEventsNamed(newName)) {
-      showWarningBox(
-        i18n._(t`Other external events with this name already exist.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasExternalEventsNamed(tentativeNewName);
+      }
+    );
 
     const externalEvents = currentProject.getExternalEvents(oldName);
     setState(state => ({
       ...state,
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
     })).then(state => {
-      externalEvents.setName(newName);
+      externalEvents.setName(uniqueNewName);
       gd.WholeProjectRefactorer.renameExternalEvents(
         currentProject,
         oldName,
-        newName
+        uniqueNewName
       );
       _onProjectItemModified();
     });
@@ -1296,7 +1285,6 @@ const MainFrame = (props: Props) => {
 
   const renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = state;
-    const { i18n } = props;
     if (!currentProject) return;
 
     if (
@@ -1305,33 +1293,12 @@ const MainFrame = (props: Props) => {
     )
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (isExtensionNameTaken(newName, currentProject)) {
-      showWarningBox(
-        i18n._(
-          t`Another extension with this name already exists (or you used a reserved extension name). Please choose another name.`
-        ),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (!gd.Project.validateName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        ),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName => {
+        return isExtensionNameTaken(tentativeNewName, currentProject);
+      }
+    );
 
     const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
       oldName
@@ -1343,9 +1310,9 @@ const MainFrame = (props: Props) => {
       currentProject,
       eventsFunctionsExtension,
       oldName,
-      newName
+      safeAndUniqueNewName
     );
-    eventsFunctionsExtension.setName(newName);
+    eventsFunctionsExtension.setName(safeAndUniqueNewName);
     eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
       currentProject,
       oldName
@@ -1872,7 +1839,10 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       if (currentProject.getLayoutsCount() === 0) {
-        currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+        const layoutName = i18n._(t`Untitled scene`);
+        currentProject.insertNewLayout(layoutName, 0);
+        const layout = currentProject.getLayout(layoutName);
+        addDefaultLightToAllLayers(layout);
       }
       openLayout(
         currentProject.getLayoutAt(0).getName(),
@@ -2089,6 +2059,18 @@ const MainFrame = (props: Props) => {
           if (!saveAsLocation) {
             return; // Save as was cancelled.
           }
+
+          if (
+            newStorageProvider.internalName === 'LocalFile' &&
+            saveAsLocation.fileIdentifier &&
+            isTryingToSaveInForbiddenPath(saveAsLocation.fileIdentifier)
+          ) {
+            await showAlert({
+              title: t`Choose another location`,
+              message: t`You are trying to save the project in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location.`,
+            });
+            return;
+          }
           newSaveAsLocation = saveAsLocation;
         }
 
@@ -2196,6 +2178,7 @@ const MainFrame = (props: Props) => {
       ensureResourcesAreMoved,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      showAlert,
     ]
   );
 
@@ -2267,6 +2250,17 @@ const MainFrame = (props: Props) => {
         // may have changed (if the user opened another project). So we read and
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
+
+        if (
+          storageProviderInternalName === 'LocalFile' &&
+          isTryingToSaveInForbiddenPath(currentFileMetadata.fileIdentifier)
+        ) {
+          await showAlert({
+            title: t`Choose another location`,
+            message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+          });
+          // We don't block the save, as the user may want to save it anyway.
+        }
 
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
@@ -2350,6 +2344,7 @@ const MainFrame = (props: Props) => {
       currentlyRunningInAppTutorial,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
+      showAlert,
     ]
   );
 

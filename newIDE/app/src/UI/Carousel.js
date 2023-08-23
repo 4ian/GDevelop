@@ -45,11 +45,13 @@ const referenceSizesByWindowSize = {
     small: 120,
     medium: 130,
     large: 140,
+    xlarge: 150,
   },
   arrowWidth: {
     small: 24,
     medium: 30,
     large: 36,
+    xlarge: 42,
   },
 };
 

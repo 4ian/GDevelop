@@ -48,6 +48,27 @@ export const getCurrentElements = (
   };
 };
 
+export const getTotalSpritesCount = (objectConfiguration: gdSpriteObject) => {
+  let totalSpritesCount = 0;
+  for (
+    let animationIndex = 0;
+    animationIndex < objectConfiguration.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = objectConfiguration.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      totalSpritesCount += direction.getSpritesCount();
+    }
+  }
+
+  return totalSpritesCount;
+};
+
 /**
  * Return all the point names
  */
@@ -168,7 +189,7 @@ export const allDirectionSpritesHaveSamePointsAs = (
   );
 };
 
-export const allSpritesHaveSamePointsAs = (
+export const allAnimationSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
@@ -176,6 +197,18 @@ export const allSpritesHaveSamePointsAs = (
     mapFor(0, animation.getDirectionsCount(), i => {
       const direction = animation.getDirection(i);
       return allDirectionSpritesHaveSamePointsAs(originalSprite, direction);
+    })
+  );
+};
+
+export const allObjectSpritesHaveSamePointsAs = (
+  originalSprite: gdSprite,
+  spriteObject: gdSpriteObject
+) => {
+  return every(
+    mapFor(0, spriteObject.getAnimationsCount(), i => {
+      const animation = spriteObject.getAnimation(i);
+      return allAnimationSpritesHaveSamePointsAs(originalSprite, animation);
     })
   );
 };
@@ -260,7 +293,7 @@ export const allDirectionSpritesHaveSameCollisionMasksAs = (
   );
 };
 
-export const allSpritesHaveSameCollisionMasksAs = (
+export const allAnimationSpritesHaveSameCollisionMasksAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
@@ -273,6 +306,28 @@ export const allSpritesHaveSameCollisionMasksAs = (
       );
     })
   );
+};
+
+export const allObjectSpritesHaveSameCollisionMaskAs = (
+  originalSprite: gdSprite,
+  spriteObject: gdSpriteObject
+) => {
+  return every(
+    mapFor(0, spriteObject.getAnimationsCount(), i => {
+      const animation = spriteObject.getAnimation(i);
+      return allAnimationSpritesHaveSameCollisionMasksAs(
+        originalSprite,
+        animation
+      );
+    })
+  );
+};
+
+export const isFirstSpriteUsingFullImageCollisionMask = (
+  spriteObject: gdSpriteObject
+) => {
+  const firstSprite = getCurrentElements(spriteObject, 0, 0, 0).sprite;
+  return firstSprite ? firstSprite.isFullImageCollisionMask() : false;
 };
 
 export const deleteSpritesFromAnimation = (

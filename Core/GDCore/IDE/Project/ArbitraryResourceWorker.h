@@ -4,13 +4,14 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef ARBITRARYRESOURCEWORKER_H
-#define ARBITRARYRESOURCEWORKER_H
+#pragma once
 
 #include <map>
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
+#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
 namespace gd {
 class BaseEvent;
 }
@@ -52,6 +53,11 @@ class GD_CORE_API ArbitraryResourceWorker {
    * can make reference to them.
    */
   void ExposeResources(gd::ResourcesManager *resourcesManager);
+
+  /**
+   * \brief Expose a resource from a given type.
+   */
+  void ExposeResourceWithType(const gd::String& resourceType, gd::String& resourceName);
 
   /**
    * \brief Expose an image, which is always a reference to a "image" resource.
@@ -132,18 +138,47 @@ class GD_CORE_API ArbitraryResourceWorker {
 };
 
 /**
- * Tool function iterating over each event and calling
- * Expose(Actions/Conditions)Resources for each actions and conditions with the
- * ArbitraryResourceWorker passed as argument.
- *
- * \see gd::ArbitraryResourceWorker
- * \ingroup IDE
+ * Launch the specified resource worker on every resource referenced in the
+ * events.
  */
-void GD_CORE_API
-LaunchResourceWorkerOnEvents(const gd::Project &project,
-                             gd::EventsList &events,
-                             gd::ArbitraryResourceWorker &worker);
+class ResourceWorkerInEventsWorker : public gd::ArbitraryEventsWorker {
+public:
+  ResourceWorkerInEventsWorker(const gd::Project &project_,
+                               gd::ArbitraryResourceWorker &worker_)
+      : project(project_), worker(worker_){};
+  virtual ~ResourceWorkerInEventsWorker(){};
+
+private:
+  bool DoVisitInstruction(gd::Instruction &instruction,
+                          bool isCondition) override;
+
+  const gd::Project &project;
+  gd::ArbitraryResourceWorker &worker;
+};
+
+ResourceWorkerInEventsWorker GD_CORE_API GetResourceWorkerOnEvents(
+    const gd::Project &project, gd::ArbitraryResourceWorker &worker);
+
+/**
+ * Launch the specified resource worker on every resource referenced in the
+ * objects.
+ */
+class GD_CORE_API ResourceWorkerInObjectsWorker
+    : public gd::ArbitraryObjectsWorker {
+public:
+  ResourceWorkerInObjectsWorker(const gd::Project &project_, gd::ArbitraryResourceWorker &worker_)
+      : project(project_), worker(worker_){};
+  ~ResourceWorkerInObjectsWorker() {}
+
+private:
+  void DoVisitObject(gd::Object &object) override;
+  void DoVisitBehavior(gd::Behavior &behavior) override;
+
+  const gd::Project &project;
+  gd::ArbitraryResourceWorker &worker;
+};
+
+gd::ResourceWorkerInObjectsWorker GD_CORE_API
+GetResourceWorkerOnObjects(const gd::Project &project, gd::ArbitraryResourceWorker &worker);
 
 }  // namespace gd
-
-#endif  // ARBITRARYRESOURCEWORKER_H

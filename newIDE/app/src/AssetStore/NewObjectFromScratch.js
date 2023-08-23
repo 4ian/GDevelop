@@ -14,14 +14,13 @@ import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import { AssetStoreContext } from './AssetStoreContext';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
-import { AssetCard } from './AssetCard';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import TextButton from '../UI/TextButton';
 import { t, Trans } from '@lingui/macro';
 import LoaderModal from '../UI/LoaderModal';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
+import AssetsList from './AssetsList';
 
 const ObjectListItem = ({
   enumeratedObjectMetadata,
@@ -69,9 +68,7 @@ export const CustomObjectPackResults = ({
   onBack,
   isAssetBeingInstalled,
 }: CustomObjectPackResultsProps) => {
-  const { useSearchItem, error, fetchAssetsAndFilters } = React.useContext(
-    AssetStoreContext
-  );
+  const { useSearchItem, error } = React.useContext(AssetStoreContext);
   // Memoizing the parameters of the search as it seems to trigger infinite rendering if not.
   const chosenCategory: ChosenCategory = React.useMemo(
     () => ({
@@ -104,22 +101,13 @@ export const CustomObjectPackResults = ({
             disabled={isAssetBeingInstalled}
           />
         </Line>
-        <BoxSearchResults
-          baseSize={128}
-          onRetry={fetchAssetsAndFilters}
+        <AssetsList
+          assetShortHeaders={selectedAssetPackSearchResults}
           error={error}
-          searchItems={selectedAssetPackSearchResults}
-          spacing={8}
-          renderSearchItem={(assetShortHeader, size) => (
-            <AssetCard
-              size={size}
-              onOpenDetails={() => {
-                if (isAssetBeingInstalled) return;
-                onAssetSelect(assetShortHeader);
-              }}
-              assetShortHeader={assetShortHeader}
-            />
-          )}
+          onOpenDetails={assetShortHeader => {
+            if (isAssetBeingInstalled) return;
+            onAssetSelect(assetShortHeader);
+          }}
         />
       </Column>
       <LoaderModal show={isAssetBeingInstalled} />

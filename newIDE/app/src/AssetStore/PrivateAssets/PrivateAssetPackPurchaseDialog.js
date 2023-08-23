@@ -53,16 +53,26 @@ const PasswordPromptDialog = (props: {
       />,
     ]}
   >
-    <TextField
-      fullWidth
-      autoFocus="desktopAndMobileDevices"
-      value={props.passwordValue}
-      floatingLabelText={<Trans>Password</Trans>}
-      type="password"
-      onChange={(e, value) => {
-        props.setPasswordValue(value);
+    <form
+      onSubmit={event => {
+        // Prevent browser to navigate on form submission.
+        event.preventDefault();
+        props.onApply();
       }}
-    />
+      autocomplete="off"
+      name="asset-store-password"
+    >
+      <TextField
+        fullWidth
+        autoFocus="desktopAndMobileDevices"
+        value={props.passwordValue}
+        floatingLabelText={<Trans>Password</Trans>}
+        type="password"
+        onChange={(e, value) => {
+          props.setPasswordValue(value);
+        }}
+      />
+    </form>
   </Dialog>
 );
 

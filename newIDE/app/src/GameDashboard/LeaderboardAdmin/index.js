@@ -48,7 +48,7 @@ import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
-  type LeaderboardDisplayData,
+  type LeaderboardEntry,
   shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
@@ -210,6 +210,7 @@ export const LeaderboardAdmin = ({
 }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
@@ -429,14 +430,19 @@ export const LeaderboardAdmin = ({
 
   const onDeleteLeaderboard = async (i18n: I18nType) => {
     if (!currentLeaderboard) return;
-    const answer = await showDeleteConfirmation({
-      title: t`Delete leaderboard ${currentLeaderboard.name}`,
-      message: t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`,
+    // Extract word translation to ensure it is not wrongly translated in the sentence.
+    const translatedConfirmText = i18n._(t`delete`);
+
+    const deleteAnswer = await showDeleteConfirmation({
+      title: t`Do you really want to permanently delete the leaderboard ${
+        currentLeaderboard.name
+      }?`,
+      message: t`You’re about to permanently delete this leaderboard and all of its entries. This can't be undone.`,
+      fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
+      confirmText: translatedConfirmText,
       confirmButtonLabel: t`Delete Leaderboard`,
-      confirmText: currentLeaderboard.name,
-      fieldMessage: t`Type the name of the leaderboard:`,
     });
-    if (!answer) return;
+    if (!deleteAnswer) return;
 
     setIsLoading(true);
     setApiError(null);
@@ -458,10 +464,7 @@ export const LeaderboardAdmin = ({
     }
   };
 
-  const onDeleteEntry = async (
-    i18n: I18nType,
-    entry: LeaderboardDisplayData
-  ) => {
+  const onDeleteEntry = async (i18n: I18nType, entry: LeaderboardEntry) => {
     if (!currentLeaderboard) return;
     const answer = await showConfirmation({
       title: t`Delete score ${entry.score} from ${entry.playerName}`,
@@ -1186,7 +1189,7 @@ export const LeaderboardAdmin = ({
               <div
                 style={{
                   ...styles.rightColumn,
-                  paddingLeft: windowWidth === 'small' ? 0 : 20,
+                  paddingLeft: isMobileScreen ? 0 : 20,
                 }}
               >
                 <Line alignItems="center" justifyContent="flex-end">

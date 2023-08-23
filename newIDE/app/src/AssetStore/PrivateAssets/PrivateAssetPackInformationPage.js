@@ -8,7 +8,6 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
-import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -17,7 +16,7 @@ import {
   LineStackLayout,
   ColumnStackLayout,
 } from '../../UI/Layout';
-import { Column, Line } from '../../UI/Grid';
+import { Column, LargeSpacer, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -27,25 +26,44 @@ import Link from '../../UI/Link';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import Cross from '../../UI/CustomSvgIcons/Cross';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
-import { PrivateAssetPackTile } from '../AssetsHome';
 import {
   purchaseAppStoreProduct,
   shouldUseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
 import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import {
+  PrivateAssetPackTile,
+  PromoBundleAssetPackCard,
+} from '../AssetPackTiles';
+import { AssetStoreContext } from '../AssetStoreContext';
 
-const sameCreatorPackCountForSmallWindow = 2;
-const sameCreatorPackCountForMediumWindow = 3;
-const sameCreatorPackCount = 4;
-const cellSpacing = 2;
+const cellSpacing = 8;
+
+const getPackColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+      return 4;
+    case 'xlarge':
+      return 5;
+    default:
+      return 3;
+  }
+};
 
 const sortedContentType = [
   'sprite',
@@ -72,6 +90,9 @@ const contentTypeToMessageDescriptor = {
 const styles = {
   disabledText: { opacity: 0.6 },
   scrollview: { overflowX: 'hidden' },
+  grid: {
+    margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
+  },
 };
 
 type Props = {|
@@ -90,6 +111,7 @@ const PrivateAssetPackInformationPage = ({
   onAssetPackOpen,
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
+  const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
@@ -107,12 +129,154 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
 
   const isAlreadyReceived =
     !!receivedAssetPacks &&
     !!receivedAssetPacks.find(
       assetPack => assetPack.id === privateAssetPackListingData.id
     );
+
+  const packsIncludedInBundleTiles = React.useMemo(
+    () => {
+      if (!assetPack || !privateAssetPackListingDatas) return null;
+
+      const includedPackIds =
+        privateAssetPackListingData.includedListableProductIds;
+      if (!includedPackIds) return null;
+
+      return includedPackIds.map(includedPackId => {
+        const includedAssetPackListingData = privateAssetPackListingDatas.find(
+          privatePackListingData => privatePackListingData.id === includedPackId
+        );
+        if (!includedAssetPackListingData) {
+          console.warn(`Included pack ${includedPackId} not found`);
+          return null;
+        }
+
+        const isPackOwned =
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(
+            pack => pack.id === includedAssetPackListingData.id
+          );
+        return (
+          <PrivateAssetPackTile
+            assetPackListingData={includedAssetPackListingData}
+            key={includedAssetPackListingData.id}
+            onSelect={() => onAssetPackOpen(includedAssetPackListingData)}
+            owned={isPackOwned}
+          />
+        );
+      });
+    },
+    [
+      assetPack,
+      privateAssetPackListingDatas,
+      receivedAssetPacks,
+      onAssetPackOpen,
+      privateAssetPackListingData,
+    ]
+  );
+
+  const bundlesContainingPackTiles = React.useMemo(
+    () => {
+      if (!assetPack || !privateAssetPackListingDatas) return null;
+
+      const bundlesContainingPack = privateAssetPackListingDatas.filter(
+        privatePackListingData =>
+          privatePackListingData.includedListableProductIds &&
+          privatePackListingData.includedListableProductIds.includes(
+            assetPack.id
+          )
+      );
+
+      if (!bundlesContainingPack.length) return null;
+
+      const ownedBundlesContainingPack = bundlesContainingPack.filter(
+        bundleContainingPack =>
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(pack => pack.id === bundleContainingPack.id)
+      );
+      const notOwnedBundlesContainingPack = bundlesContainingPack.filter(
+        bundleContainingPack =>
+          !ownedBundlesContainingPack.find(
+            ownedBundleContainingPack =>
+              ownedBundleContainingPack.id === bundleContainingPack.id
+          )
+      );
+
+      const allTiles = ownedBundlesContainingPack
+        .map(bundleContainingPack => {
+          return (
+            <PromoBundleAssetPackCard
+              assetPackListingData={bundleContainingPack}
+              onSelect={() => onAssetPackOpen(bundleContainingPack)}
+              owned
+            />
+          );
+        })
+        .concat(
+          notOwnedBundlesContainingPack.map(bundleContainingPack => {
+            return (
+              <PromoBundleAssetPackCard
+                assetPackListingData={bundleContainingPack}
+                onSelect={() => onAssetPackOpen(bundleContainingPack)}
+                owned={false}
+              />
+            );
+          })
+        );
+
+      return allTiles;
+    },
+    [
+      assetPack,
+      privateAssetPackListingDatas,
+      receivedAssetPacks,
+      onAssetPackOpen,
+    ]
+  );
+
+  const otherPacksFromTheSameAuthorTiles = React.useMemo(
+    () => {
+      if (
+        !privateAssetPacksFromSameCreatorListingData ||
+        // Only display packs if there are at least 2. If there is only one,
+        // it means it's the same as the one currently opened.
+        privateAssetPacksFromSameCreatorListingData.length < 2
+      )
+        return null;
+
+      return (
+        privateAssetPacksFromSameCreatorListingData
+          // Do not display the pack currently opened.
+          .filter(
+            assetPackFromSameCreator => assetPackFromSameCreator.id !== id
+          )
+          .map(assetPackFromSameCreator => {
+            const isPackOwned =
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackFromSameCreator.id
+              );
+            return (
+              <PrivateAssetPackTile
+                assetPackListingData={assetPackFromSameCreator}
+                key={assetPackFromSameCreator.id}
+                onSelect={() => onAssetPackOpen(assetPackFromSameCreator)}
+                owned={isPackOwned}
+              />
+            );
+          })
+      );
+    },
+    [
+      id,
+      privateAssetPacksFromSameCreatorListingData,
+      onAssetPackOpen,
+      receivedAssetPacks,
+    ]
+  );
 
   React.useEffect(
     () => {
@@ -220,19 +384,29 @@ const PrivateAssetPackInformationPage = ({
   };
 
   const mediaItems = assetPack
-    ? assetPack.previewImageUrls
-        .map(url => ({
+    ? [
+        {
           kind: 'image',
-          url,
-        }))
-        .concat(
-          assetPack.previewSoundUrls
-            ? assetPack.previewSoundUrls.map(url => ({
-                kind: 'audio',
-                url,
-              }))
-            : []
-        )
+          url:
+            (shouldUseAppStoreProduct() &&
+              privateAssetPackListingData.appStoreThumbnailUrls &&
+              privateAssetPackListingData.appStoreThumbnailUrls[0]) ||
+            privateAssetPackListingData.thumbnailUrls[0],
+        },
+        ...assetPack.previewImageUrls
+          .map(url => ({
+            kind: 'image',
+            url,
+          }))
+          .concat(
+            assetPack.previewSoundUrls
+              ? assetPack.previewSoundUrls.map(url => ({
+                  kind: 'audio',
+                  url,
+                }))
+              : []
+          ),
+      ]
     : [];
 
   return (
@@ -282,7 +456,7 @@ const PrivateAssetPackInformationPage = ({
                     )}
                     <Paper
                       variant="outlined"
-                      style={{ padding: windowWidth === 'small' ? 20 : 30 }}
+                      style={{ padding: isMobileScreen ? 20 : 30 }}
                       background="medium"
                     >
                       <Column noMargin>
@@ -382,43 +556,55 @@ const PrivateAssetPackInformationPage = ({
                     </Paper>
                   </ColumnStackLayout>
                 </ResponsiveLineStackLayout>
-                {privateAssetPacksFromSameCreatorListingData &&
-                // Only display packs if there are at least 2. If there is only one,
-                // it means it's the same as the one currently opened.
-                privateAssetPacksFromSameCreatorListingData.length >= 2 ? (
+                {bundlesContainingPackTiles &&
+                bundlesContainingPackTiles.length ? (
+                  <>
+                    <ColumnStackLayout noMargin>
+                      <LargeSpacer />
+                      {bundlesContainingPackTiles}
+                      <LargeSpacer />
+                    </ColumnStackLayout>
+                  </>
+                ) : null}
+                {packsIncludedInBundleTiles && (
                   <>
                     <Line>
                       <Text size="block-title">
-                        <Trans>From the same author</Trans>
+                        <Trans>Included in this bundle</Trans>
                       </Text>
                     </Line>
                     <Line>
                       <GridList
-                        cols={
-                          windowWidth === 'small'
-                            ? sameCreatorPackCountForSmallWindow
-                            : windowWidth === 'medium'
-                            ? sameCreatorPackCountForMediumWindow
-                            : sameCreatorPackCount
-                        }
+                        cols={getPackColumns(windowWidth)}
                         cellHeight="auto"
-                        spacing={cellSpacing}
+                        spacing={cellSpacing / 2}
+                        style={styles.grid}
                       >
-                        {privateAssetPacksFromSameCreatorListingData.map(
-                          pack => (
-                            <PrivateAssetPackTile
-                              assetPackListingData={pack}
-                              key={pack.id}
-                              onSelect={() => onAssetPackOpen(pack)}
-                              owned={false}
-                            />
-                          )
-                        )}
+                        {packsIncludedInBundleTiles}
                       </GridList>
-                      <Grid />
                     </Line>
                   </>
-                ) : null}
+                )}
+                {otherPacksFromTheSameAuthorTiles &&
+                  otherPacksFromTheSameAuthorTiles.length > 0 && (
+                    <>
+                      <Line>
+                        <Text size="block-title">
+                          <Trans>From the same author</Trans>
+                        </Text>
+                      </Line>
+                      <Line>
+                        <GridList
+                          cols={getPackColumns(windowWidth)}
+                          cellHeight="auto"
+                          spacing={cellSpacing / 2}
+                          style={styles.grid}
+                        >
+                          {otherPacksFromTheSameAuthorTiles}
+                        </GridList>
+                      </Line>
+                    </>
+                  )}
               </ScrollView>
             </Column>
           ) : null}

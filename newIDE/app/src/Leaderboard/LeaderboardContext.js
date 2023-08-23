@@ -3,7 +3,7 @@ import * as React from 'react';
 import {
   type Leaderboard,
   type LeaderboardSortOption,
-  type LeaderboardDisplayData,
+  type LeaderboardEntry,
   type LeaderboardUpdatePayload,
 } from '../Utils/GDevelopServices/Play';
 
@@ -12,7 +12,7 @@ export type LeaderboardState = {|
   currentLeaderboard: ?Leaderboard,
   displayOnlyBestEntry: boolean,
   browsing: {|
-    entries: ?Array<LeaderboardDisplayData>,
+    entries: ?Array<LeaderboardEntry>,
     goToNextPage: ?() => Promise<void>,
     goToPreviousPage: ?() => Promise<void>,
     goToFirstPage: ?() => Promise<void>,

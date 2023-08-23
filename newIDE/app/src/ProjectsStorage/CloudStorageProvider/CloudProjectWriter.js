@@ -17,6 +17,10 @@ import {
   createZipWithSingleTextFile,
   unzipFirstEntryOfBlob,
 } from '../../Utils/Zip.js/Utils';
+import {
+  CLOUD_PROJECT_AUTOSAVE_CACHE_KEY,
+  isCacheApiAvailable,
+} from './CloudProjectOpener';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -85,9 +89,12 @@ export const generateOnSaveProject = (
       // Do not throw, as this is not a blocking error.
     }
   }
-  const newFileMetadata = {
+  const newFileMetadata: FileMetadata = {
     ...fileMetadata,
     gameId: project.getProjectUuid(),
+    // lastModifiedDate is not set since it will be set by backend services
+    // and then frontend will use it to transform the list of cloud project
+    // items into a list of FileMetadata.
   };
   const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,
@@ -274,3 +281,25 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
 
   return null;
 };
+
+export const generateOnAutoSaveProject = (
+  authenticatedUser: AuthenticatedUser
+) =>
+  isCacheApiAvailable
+    ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
+        const { profile } = authenticatedUser;
+        if (!profile) return;
+        const cloudProjectId = fileMetadata.fileIdentifier;
+        const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
+        const cacheKey = `${profile.id}/${cloudProjectId}`;
+        cache.put(
+          cacheKey,
+          new Response(
+            JSON.stringify({
+              project: serializeToJSON(project),
+              createdAt: Date.now(),
+            })
+          )
+        );
+      }
+    : undefined;

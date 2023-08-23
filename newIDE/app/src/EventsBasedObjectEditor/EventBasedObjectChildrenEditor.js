@@ -7,12 +7,12 @@ import * as React from 'react';
 import { Line } from '../UI/Grid';
 import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Window from '../Utils/Window';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,31 +72,26 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     done(true);
   };
 
-  _canObjectOrGroupUseNewName = (newName: string, i18n: I18nType) => {
+  _getValidatedObjectOrGroupName = (newName: string, i18n: I18nType) => {
     const { eventsBasedObject } = this.props;
 
-    if (
-      eventsBasedObject.hasObjectNamed(newName) ||
-      eventsBasedObject.getObjectGroups().has(newName)
-    ) {
-      showWarningBox(
-        i18n._(t`Another object or group with this name already exists.`),
-        {
-          delayToNextTick: true,
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName => {
+        if (
+          eventsBasedObject.hasObjectNamed(tentativeNewName) ||
+          eventsBasedObject.getObjectGroups().has(tentativeNewName) ||
+          // TODO EBO Use a constant instead a hard coded value "Object".
+          tentativeNewName === 'Object'
+        ) {
+          return true;
         }
-      );
-      return false;
-    } else if (!gd.Project.validateName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        ),
-        { delayToNextTick: true }
-      );
-      return false;
-    }
 
-    return true;
+        return false;
+      }
+    );
+
+    return safeAndUniqueNewName;
   };
 
   _onRenameObjectStart = (objectWithContext: ?ObjectWithContext) => {
@@ -130,19 +125,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     done: boolean => void,
     i18n: I18nType
   ) => {
-    // TODO EBO Use a constant instead a hard coded value "Object".
-    if (newName === 'Object') {
-      showWarningBox(
-        i18n._(
-          t`"Object" is a reserved name, used for the parent object in the events (actions, conditions, expressions...). Please choose another name.`
-        ),
-        {
-          delayToNextTick: true,
-        }
-      );
-      return;
-    }
-
     const { object } = objectWithContext;
     const { project, globalObjectsContainer, eventsBasedObject } = this.props;
 
@@ -253,8 +235,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Don't allow export as there is no assets.
                 onExportObject={() => {}}
                 onDeleteObject={this._onDeleteObject(i18n)}
-                canRenameObject={newName =>
-                  this._canObjectOrGroupUseNewName(newName, i18n)
+                getValidatedObjectOrGroupName={newName =>
+                  this._getValidatedObjectOrGroupName(newName, i18n)
                 }
                 // Nothing special to do.
                 onObjectCreated={() => {}}
@@ -318,8 +300,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onCancel={() => {
                   this.editObject(null);
                 }}
-                canRenameObject={newName =>
-                  this._canObjectOrGroupUseNewName(newName, i18n)
+                getValidatedObjectOrGroupName={newName =>
+                  this._getValidatedObjectOrGroupName(newName, i18n)
                 }
                 onRename={newName => {
                   this._onRenameEditedObject(newName, i18n);

@@ -87,49 +87,7 @@ export type LeaderboardEntry = {|
   playerName: string,
   createdAt: string,
   score: number,
-  deletedAt?: string,
-  outdatedAt?: string,
 |};
-
-export type LeaderboardDisplayData = {|
-  +id: string,
-  +playerName: string,
-  +createdAt: string,
-  +score: number,
-|};
-
-export type LeaderboardExtremePlayerScore = {|
-  leaderboardId: string,
-  playerId?: string,
-  playerName: string,
-  relatedEntryCreatedAt: string,
-  score: number,
-  relatedEntryId: string,
-|};
-
-export const extractEntryDisplayData = ({
-  playerName,
-  id,
-  score,
-  createdAt,
-}: LeaderboardEntry): LeaderboardDisplayData => ({
-  id,
-  createdAt,
-  playerName,
-  score,
-});
-
-export const extractExtremeScoreDisplayData = ({
-  playerName,
-  relatedEntryId,
-  score,
-  relatedEntryCreatedAt,
-}: LeaderboardExtremePlayerScore): LeaderboardDisplayData => ({
-  id: relatedEntryId,
-  createdAt: relatedEntryCreatedAt,
-  playerName,
-  score,
-});
 
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
@@ -176,7 +134,7 @@ export const listLeaderboardEntries = async (
   leaderboardId: string,
   options: {| pageSize: number, onlyBestEntry: boolean, forceUri: ?string |}
 ): Promise<{|
-  entries: LeaderboardEntry[] | LeaderboardExtremePlayerScore[],
+  entries: LeaderboardEntry[],
   nextPageUri: ?string,
 |}> => {
   const uri =

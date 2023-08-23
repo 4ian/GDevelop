@@ -13,6 +13,16 @@ import {
   isProductAuthorizedResourceUrl,
 } from './Shop';
 
+export type License = {|
+  name: string,
+  website: string,
+|};
+
+export type Author = {|
+  name: string,
+  website: string,
+|};
+
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,
   defaultValue: string,
@@ -75,6 +85,8 @@ export type PublicAssetPack = {|
   externalWebLink?: ?string,
   userFriendlyPrice?: ?string,
   categories: Array<string>,
+  authors: Array<Author>,
+  licenses: Array<License>,
 |};
 
 export type PublicAssetPacks = {|
@@ -122,16 +134,6 @@ export type Resource = {|
 export type AllResources = {|
   resources: Array<Resource>,
   filters: Filters,
-|};
-
-export type License = {|
-  name: string,
-  website: string,
-|};
-
-export type Author = {|
-  name: string,
-  website: string,
 |};
 
 export type Environment = 'staging' | 'live';

@@ -21,7 +21,7 @@ import Checkbox from '../UI/Checkbox';
 
 import TimerIcon from '@material-ui/icons/Timer';
 
-import InfoIcon from '../UI/CustomSvgIcons/Info';
+import InfoIcon from '../UI/CustomSvgIcons/SquaredInfo';
 import WarningIcon from '../UI/CustomSvgIcons/Warning';
 import ErrorIcon from '../UI/CustomSvgIcons/Error';
 import FilterIcon from '../UI/CustomSvgIcons/Filter';
@@ -93,6 +93,7 @@ const styles = {
     overflowX: 'hidden',
     // Always show the vertical scrollbar to avoid rendering issues:
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
   tag: { marginRight: 2 },
   consoleTextArea: {

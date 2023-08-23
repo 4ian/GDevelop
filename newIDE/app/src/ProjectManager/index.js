@@ -53,6 +53,7 @@ import { ShortcutsReminder } from './ShortcutsReminder';
 import Paper from '../UI/Paper';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProjectDialog';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -78,6 +79,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     marginTop: 16,
     padding: '0 16px 16px 16px',
     position: 'relative',
@@ -302,9 +304,9 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasLayoutNamed(name)
     );
     const newLayout = project.insertNewLayout(newName, index + 1);
-
     newLayout.setName(newName);
     newLayout.updateBehaviorsSharedData(project);
+    addDefaultLightToAllLayers(newLayout);
 
     this._onProjectItemModified();
 

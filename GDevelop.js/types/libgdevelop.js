@@ -7,6 +7,7 @@ declare class libGDevelop {
   getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
+  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
@@ -154,6 +155,7 @@ declare class libGDevelop {
   UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
   VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
   ProjectBrowserHelper: Class<gdProjectBrowserHelper>;
+  ResourceExposer: Class<gdResourceExposer>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;

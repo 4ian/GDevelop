@@ -16,6 +16,7 @@ import UndoIcon from '../UI/CustomSvgIcons/Undo';
 import RedoIcon from '../UI/CustomSvgIcons/Redo';
 import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
+import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -60,6 +61,8 @@ const Toolbar = ({
   onOpenSettings,
   settingsIcon,
 }: Props) => {
+  const shortcutMap = useShortcutMap();
+
   return (
     <>
       <ToolbarCommands
@@ -89,6 +92,9 @@ const Toolbar = ({
           onClick={onAddStandardEvent}
           id="toolbar-add-event-button"
           tooltip={t`Add a new empty event`}
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['ADD_STANDARD_EVENT']
+          )}
         >
           <AddEventIcon />
         </IconButton>
@@ -100,6 +106,9 @@ const Toolbar = ({
           disabled={!canAddSubEvent}
           id="toolbar-add-sub-event-button"
           tooltip={t`Add a sub-event to the selected event`}
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['ADD_SUBEVENT']
+          )}
         >
           <AddSubEventIcon />
         </IconButton>
@@ -110,6 +119,9 @@ const Toolbar = ({
           onClick={onAddCommentEvent}
           id="toolbar-add-comment-button"
           tooltip={t`Add a comment`}
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['ADD_COMMENT_EVENT']
+          )}
         >
           <AddCommentIcon />
         </IconButton>
@@ -119,6 +131,9 @@ const Toolbar = ({
               size="small"
               color="default"
               tooltip={t`Choose and add an event`}
+              acceleratorString={getShortcutDisplayName(
+                shortcutMap['CHOOSE_AND_ADD_EVENT']
+              )}
             >
               <CircledAddIcon />
             </IconButton>
@@ -142,6 +157,7 @@ const Toolbar = ({
           onClick={onRemove}
           disabled={!canRemove}
           tooltip={t`Delete the selected event(s)`}
+          acceleratorString={'Delete'}
         >
           <TrashIcon />
         </IconButton>
@@ -152,6 +168,7 @@ const Toolbar = ({
           onClick={undo}
           disabled={!canUndo}
           tooltip={t`Undo the last changes`}
+          acceleratorString={'CmdOrCtrl+Z'}
         >
           <UndoIcon />
         </IconButton>
@@ -162,6 +179,7 @@ const Toolbar = ({
           onClick={redo}
           disabled={!canRedo}
           tooltip={t`Redo the last changes`}
+          acceleratorString={'CmdOrCtrl+Shift+Z'}
         >
           <RedoIcon />
         </IconButton>

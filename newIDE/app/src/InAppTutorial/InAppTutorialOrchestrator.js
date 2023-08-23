@@ -64,7 +64,7 @@ const interpolateText = (
       if (objectName && project && project.getLayoutsCount() > 0) {
         const layout = project.getLayoutAt(0);
         replacement = getInstanceCountInLayoutForObject(
-          layout,
+          layout.getInitialInstances(),
           objectName
         ).toString();
       }
@@ -810,7 +810,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         } else {
           // Otherwise, we check if there is the expected number of instances.
           const instancesCount = getInstanceCountInLayoutForObject(
-            layout,
+            layout.getInitialInstances(),
             objectName
           );
           if (instancesCount >= count) goToNextStep();

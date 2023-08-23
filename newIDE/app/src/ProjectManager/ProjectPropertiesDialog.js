@@ -717,7 +717,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                   helperMarkdownText={i18n._(
-                    t`Note that this option will only have an effect when saving your project on your computer's filesystem from the desktop app.`
+                    t`Note that this option will only have an effect when saving your project on your computer's filesystem from the desktop app. Read about [using Git or GitHub with projects in multiple files](https://wiki.gdevelop.io/gdevelop5/tutorials/using-github-desktop/).`
                   )}
                 >
                   <SelectOption

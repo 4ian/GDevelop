@@ -39,6 +39,7 @@ export default function ExtensionsSearchDialog({
   onCreateNew,
 }: Props) {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -115,7 +116,7 @@ export default function ExtensionsSearchDialog({
                 leftIcon={<Download />}
                 key="import"
                 label={
-                  windowWidth === 'small' ? (
+                  isMobileScreen ? (
                     <Trans>Import</Trans>
                   ) : (
                     <Trans>Import extension</Trans>
@@ -132,7 +133,7 @@ export default function ExtensionsSearchDialog({
                 key="create-new"
                 onClick={onCreateNew}
                 label={
-                  windowWidth === 'small' ? (
+                  isMobileScreen ? (
                     <Trans>Create</Trans>
                   ) : (
                     <Trans>Create a new extension</Trans>

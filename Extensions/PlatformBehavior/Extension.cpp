@@ -27,6 +27,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Movement")
+      .SetTags("platformer, platform, character, jump, obstacle, collision")
       .SetExtensionHelpPath("/behaviors/platformer");
   extension.AddInstructionOrExpressionGroupMetadata(_("Platform behavior"))
       .SetIcon("CppPlatform/Extensions/platformerobjecticon.png");

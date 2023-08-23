@@ -1132,6 +1132,22 @@ export const fakePrivateAssetShortHeader1: AssetShortHeader = {
   dominantColors: [255],
 };
 
+export const fakePrivateAsset1: Asset = {
+  ...fakePrivateAssetShortHeader1,
+  description: 'A very nice Dino.',
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  dominantColors: [255],
+  objectAssets: [
+    {
+      object: {},
+      resources: [],
+      requiredExtensions: [],
+    },
+  ],
+};
+
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
   authorIds: [],
@@ -1537,6 +1553,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/platformer.png',
       assetsCount: 16,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Space Shooter',
@@ -1545,6 +1563,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
       assetsCount: 140,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Tanks',
@@ -1553,6 +1573,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/tank pack.png',
       assetsCount: 32,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Pixel Adventure',
@@ -1561,6 +1583,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel adventure pack.png',
       assetsCount: 80,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Fake Paid External',
@@ -1569,6 +1593,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pirate bomb pack.png',
       assetsCount: 48,
+      authors: [],
+      licenses: [],
       externalWebLink: 'https://example.com',
       userFriendlyPrice: '$4.99',
     },
@@ -1579,6 +1605,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel effects pack.png',
       assetsCount: 20,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Emotes',
@@ -1586,6 +1614,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       categories: [],
       thumbnailUrl: 'https://resources.gdevelop-app.com/assets/Packs/emote.png',
       assetsCount: 176,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Dinosaurus Characters',
@@ -1594,6 +1624,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/24x24 dino characters.png',
       assetsCount: 5,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Fake Paid Spinning Items',
@@ -1602,6 +1634,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art spinning items.png',
       assetsCount: 30,
+      authors: [],
+      licenses: [],
       userFriendlyPrice: '$4.99',
     },
     {
@@ -1611,6 +1645,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art rpg items.png',
       assetsCount: 64,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'RPG Items',
@@ -1619,6 +1655,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 rpg item pack.png',
       assetsCount: 144,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Fantasy Icons',
@@ -1627,6 +1665,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/32x32 fantasy icons pack v2.png',
       assetsCount: 285,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'On-Screen Controls',
@@ -1635,6 +1675,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/on-screen controls.png',
       assetsCount: 287,
+      authors: [],
+      licenses: [],
     },
   ],
 };

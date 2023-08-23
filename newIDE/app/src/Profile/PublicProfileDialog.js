@@ -23,8 +23,8 @@ type Props = {|
 const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
   const [profile, setProfile] = React.useState<?UserPublicProfile>(null);
   const [
-    assetPacksListingData,
-    setAssetPacksListingData,
+    assetPacksListingDatas,
+    setAssetPacksListingDatas,
   ] = React.useState<?(PrivateAssetPackListingData[])>(null);
   const [error, setError] = React.useState<?Error>(null);
 
@@ -45,14 +45,14 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
   const fetchUserPacks = React.useCallback(
     async () => {
       if (!userId) return;
-      setAssetPacksListingData(null);
+      setAssetPacksListingDatas(null);
       try {
         // Will return an empty array if the user is not a seller.
         const packs = await listSellerProducts({
           sellerId: userId,
           productType: 'asset-pack',
         });
-        setAssetPacksListingData(packs);
+        setAssetPacksListingDatas(packs);
       } catch (error) {
         setError(error);
       }
@@ -73,11 +73,14 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
     fetchProfile();
   };
 
+  const dialogSize =
+    assetPacksListingDatas && assetPacksListingDatas.length > 4 ? 'md' : 'sm';
+
   return (
     <Dialog
       title={null} // Specific case where the title is handled by the content.
-      open={true}
-      maxWidth="sm"
+      open
+      maxWidth={dialogSize}
       actions={[
         <FlatButton
           key="close"
@@ -92,7 +95,7 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
         profile={profile}
         error={error}
         onRetry={onRetry}
-        assetPacksListingData={assetPacksListingData}
+        assetPacksListingDatas={assetPacksListingDatas}
         onAssetPackOpen={onAssetPackOpen}
       />
     </Dialog>

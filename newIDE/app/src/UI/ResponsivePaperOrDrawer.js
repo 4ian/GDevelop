@@ -11,6 +11,7 @@ const styles = {
   },
   drawerPaper: {
     display: 'flex',
+    maxWidth: '80%', // Ensure it can always be closed on small screens.
   },
 };
 
@@ -35,7 +36,8 @@ export const ResponsivePaperOrDrawer = ({
   children: React.Node,
 |}) => {
   const windowWidth = useResponsiveWindowWidth();
-  if (windowWidth !== 'small') {
+  const isMobileScreen = windowWidth === 'small';
+  if (!isMobileScreen) {
     if (!open) return null;
     return (
       <Paper style={styles.paper} background="medium">

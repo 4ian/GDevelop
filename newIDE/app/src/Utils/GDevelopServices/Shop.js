@@ -28,6 +28,10 @@ export type PrivateAssetPackListingData = {|
 
   /** The id of the product on the app stores - if any. */
   appStoreProductId: string | null,
+
+  includedListableProductIds?: string[],
+  /** The thumbnails to use when on the app store - otherwise, use thumbnailUrls as usual. */
+  appStoreThumbnailUrls?: string[] | null,
 |};
 
 type Purchase = {|

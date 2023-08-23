@@ -41,7 +41,7 @@ type Props = {|
 
   // Object renaming:
   onRename: string => void,
-  canRenameObject: string => boolean,
+  getValidatedObjectOrGroupName: string => string,
 
   // Passed down to object editors:
   project: gdProject,
@@ -85,13 +85,12 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancel: props.onCancel,
   });
 
-  const objectMetadata = React.useMemo(
-    () =>
-      gd.MetadataProvider.getObjectMetadata(
-        props.project.getCurrentPlatform(),
-        props.object.getType()
-      ),
-    [props.project, props.object]
+  // Don't use a memo for this because metadata from custom objects are built
+  // from event-based object when extensions are refreshed after an extension
+  // installation.
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    props.project.getCurrentPlatform(),
+    props.object.getType()
   );
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
@@ -220,10 +219,10 @@ const InnerDialog = (props: InnerDialogProps) => {
                 onChange={newObjectName => {
                   if (newObjectName === objectName) return;
 
-                  if (props.canRenameObject(newObjectName)) {
-                    setObjectName(newObjectName);
-                    notifyOfChange();
-                  }
+                  setObjectName(
+                    props.getValidatedObjectOrGroupName(newObjectName)
+                  );
+                  notifyOfChange();
                 }}
                 autoFocus="desktop"
               />

@@ -286,6 +286,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       project={project}
                       objectsContainer={layout}
                       layout={layout}
+                      initialInstances={initialInstances}
                       onSelectAllInstancesOfObjectInLayout={
                         props.onSelectAllInstancesOfObjectInLayout
                       }
@@ -297,8 +298,12 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onDeleteObject={(objectWithContext, cb) =>
                         props.onDeleteObject(i18n, objectWithContext, cb)
                       }
-                      canRenameObject={(newName, global) =>
-                        props.canObjectOrGroupUseNewName(newName, global, i18n)
+                      getValidatedObjectOrGroupName={(newName, global) =>
+                        props.getValidatedObjectOrGroupName(
+                          newName,
+                          global,
+                          i18n
+                        )
                       }
                       onObjectCreated={props.onObjectCreated}
                       onObjectSelected={props.onObjectSelected}
@@ -353,8 +358,12 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onEditGroup={props.onEditObjectGroup}
                       onDeleteGroup={props.onDeleteObjectGroup}
                       onRenameGroup={props.onRenameObjectGroup}
-                      canRenameGroup={(newName, global) =>
-                        props.canRenameObjectGroup(newName, global, i18n)
+                      getValidatedObjectOrGroupName={(newName, global) =>
+                        props.getValidatedObjectOrGroupName(
+                          newName,
+                          global,
+                          i18n
+                        )
                       }
                       beforeSetAsGlobalGroup={groupName =>
                         props.canObjectOrGroupBeGlobal(i18n, groupName)

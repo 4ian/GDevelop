@@ -62,7 +62,7 @@ describe('EnumerateInstructions', () => {
     expect(tree).toMatchObject({
       Advanced: {
         'Events and control flow': {
-          'Trigger once while true': {
+          'BuiltinCommonInstructions::Once': {
             displayedName: 'Trigger once while true',
             fullGroupName: 'Advanced/Events and control flow',
             type: 'BuiltinCommonInstructions::Once',
@@ -71,7 +71,7 @@ describe('EnumerateInstructions', () => {
       },
       Audio: {
         'Sounds and music': {
-          'Global volume': {
+          GlobalVolume: {
             displayedName: 'Global volume',
             fullGroupName: 'Audio/Sounds and music',
             type: 'GlobalVolume',

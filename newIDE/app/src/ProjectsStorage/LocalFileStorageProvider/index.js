@@ -5,7 +5,7 @@ import { type StorageProvider } from '../index';
 import {
   onOpenWithPicker,
   onOpen,
-  hasAutoSave,
+  getAutoSaveCreationDate,
   onGetAutoSave,
 } from './LocalProjectOpener';
 import {
@@ -51,7 +51,7 @@ export default ({
   createOperations: () => ({
     onOpenWithPicker,
     onOpen,
-    hasAutoSave,
+    getAutoSaveCreationDate,
     onSaveProject,
     onChooseSaveProjectAsLocation,
     onSaveProjectAs,

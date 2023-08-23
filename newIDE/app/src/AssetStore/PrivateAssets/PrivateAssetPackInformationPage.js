@@ -387,7 +387,11 @@ const PrivateAssetPackInformationPage = ({
     ? [
         {
           kind: 'image',
-          url: privateAssetPackListingData.thumbnailUrls[0],
+          url:
+            (shouldUseAppStoreProduct() &&
+              privateAssetPackListingData.appStoreThumbnailUrls &&
+              privateAssetPackListingData.appStoreThumbnailUrls[0]) ||
+            privateAssetPackListingData.thumbnailUrls[0],
         },
         ...assetPack.previewImageUrls
           .map(url => ({

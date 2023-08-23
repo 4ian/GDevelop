@@ -89,9 +89,9 @@ module.exports = {
           'number',
           'ScaleZ',
           _('Scale on Z axis'),
-          _("the depth's scale of an object"),
-          _("the depth's scale"),
-          _('Size'),
+          _("the scale on Z axis of an object (default scale is 1)"),
+          _("the scale on Z axis scale"),
+          _('Scale'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
@@ -111,7 +111,7 @@ module.exports = {
           'FlipZ',
           _('Flip the object on Z'),
           _('Flip the object on Z axis'),
-          _('Flip on Z axis _PARAM0_: _PARAM1_'),
+          _('Flip on Z axis _PARAM0_: _PARAM2_'),
           _('Effects'),
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
@@ -175,7 +175,7 @@ module.exports = {
           _(
             "Turn the object around X axis. This axis doesn't move with the object rotation."
           ),
-          _('Turn _PARAM0_ from _PARAM1_° around X axis'),
+          _('Turn _PARAM0_ from _PARAM2_° around X axis'),
           _('Angle'),
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
@@ -193,7 +193,7 @@ module.exports = {
           _(
             "Turn the object around Y axis. This axis doesn't move with the object rotation."
           ),
-          _('Turn _PARAM0_ from _PARAM1_° around Y axis'),
+          _('Turn _PARAM0_ from _PARAM2_° around Y axis'),
           _('Angle'),
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
@@ -211,7 +211,7 @@ module.exports = {
           _(
             "Turn the object around Z axis. This axis doesn't move with the object rotation."
           ),
-          _('Turn _PARAM0_ from _PARAM1_° around Z axis'),
+          _('Turn _PARAM0_ from _PARAM2_° around Z axis'),
           _('Angle'),
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'

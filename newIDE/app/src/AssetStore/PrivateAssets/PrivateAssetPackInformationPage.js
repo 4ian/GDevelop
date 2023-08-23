@@ -8,7 +8,6 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
-import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -93,8 +92,6 @@ const styles = {
   scrollview: { overflowX: 'hidden' },
   grid: {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
-    // Remove the scroll capability of the grid, the scroll view handles it.
-    overflow: 'unset',
   },
 };
 
@@ -390,7 +387,11 @@ const PrivateAssetPackInformationPage = ({
     ? [
         {
           kind: 'image',
-          url: privateAssetPackListingData.thumbnailUrls[0],
+          url:
+            (shouldUseAppStoreProduct() &&
+              privateAssetPackListingData.appStoreThumbnailUrls &&
+              privateAssetPackListingData.appStoreThumbnailUrls[0]) ||
+            privateAssetPackListingData.thumbnailUrls[0],
         },
         ...assetPack.previewImageUrls
           .map(url => ({
@@ -581,7 +582,6 @@ const PrivateAssetPackInformationPage = ({
                       >
                         {packsIncludedInBundleTiles}
                       </GridList>
-                      <Grid />
                     </Line>
                   </>
                 )}
@@ -602,7 +602,6 @@ const PrivateAssetPackInformationPage = ({
                         >
                           {otherPacksFromTheSameAuthorTiles}
                         </GridList>
-                        <Grid />
                       </Line>
                     </>
                   )}

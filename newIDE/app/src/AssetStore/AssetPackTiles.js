@@ -49,7 +49,6 @@ const styles = {
   },
   paper: {
     margin: 4,
-    minWidth: 180,
   },
   packTitle: {
     ...textEllipsisStyle,

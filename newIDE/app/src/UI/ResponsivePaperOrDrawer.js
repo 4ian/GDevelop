@@ -11,6 +11,7 @@ const styles = {
   },
   drawerPaper: {
     display: 'flex',
+    maxWidth: '80%', // Ensure it can always be closed on small screens.
   },
 };
 

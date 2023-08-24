@@ -299,7 +299,7 @@ const NewProjectSetupDialog = ({
         await onCreateFromExample(
           selectedExampleShortHeader,
           {
-            // We only pass down the project name as this is the only cusomizable field for an example.
+            // We only pass down the project name as this is the only customizable field for an example.
             projectName,
             storageProvider,
             saveAsLocation,

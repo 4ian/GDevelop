@@ -16,21 +16,6 @@ export type ItemResult<Item> = {|
   error?: Error,
 |};
 
-export const sanitizeUrlWithEncodedPath = (url: string) => {
-  // Split the URL into protocol and the rest of the URL
-  const protocolIndex = url.indexOf('://');
-  const protocol = url.substring(0, protocolIndex + 3);
-  const restOfUrl = url.substring(protocolIndex + 3);
-
-  // Encode only the rest of the URL
-  const encodedRestOfUrl = restOfUrl
-    .split('/')
-    .map(part => encodeURIComponent(part))
-    .join('/');
-
-  return protocol + encodedRestOfUrl;
-};
-
 export const downloadUrlsToLocalFiles = async <
   Item: { url: string, filePath: string }
 >({
@@ -50,7 +35,7 @@ export const downloadUrlsToLocalFiles = async <
 
       try {
         await retryIfFailed({ times: 2 }, async () => {
-          const encodedUrl = sanitizeUrlWithEncodedPath(url);
+          const encodedUrl = new URL(url).href; // Encode the URL to support special characters in file names.
           await ipcRenderer.invoke('local-file-download', encodedUrl, filePath);
         });
 

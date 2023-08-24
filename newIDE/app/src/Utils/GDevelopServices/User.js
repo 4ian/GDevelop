@@ -145,6 +145,44 @@ export const listTeamGroups = async (
   return response.data;
 };
 
+export const updateGroup = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string,
+  groupId: string,
+  attributes: {| name: string |}
+): Promise<Array<TeamGroup>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.patch(
+    `${GDevelopUserApi.baseUrl}/team/${teamId}/group/${groupId}`,
+    attributes,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
+export const updateUserGroup = async (
+  getAuthorizationHeader: () => Promise<string>,
+  adminUserId: string,
+  teamId: string,
+  groupId: string,
+  userId: string
+): Promise<Array<TeamGroup>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopUserApi.baseUrl}/team/${teamId}/action/update-members`,
+    [groupId, userId],
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId: adminUserId },
+    }
+  );
+  return response.data;
+};
+
 export const getUserPublicProfilesByIds = (
   ids: Array<string>
 ): Promise<UserPublicProfileByIds> => {

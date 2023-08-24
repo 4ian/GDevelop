@@ -7,12 +7,15 @@ import {
   listTeamMembers,
   listTeamMemberships,
   listUserTeams,
+  updateGroup,
   type Team,
   type TeamGroup,
   type TeamMembership,
   type User,
+  updateUserGroup,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
 
 type Props = {| children: React.Node |};
 
@@ -91,9 +94,70 @@ const TeamProvider = ({ children }: Props) => {
     [team, getAuthorizationHeader, profile]
   );
 
-  const onChangeGroupName = async () => {};
-  const onChangeUserGroup = async () => {};
-  const onListUserProjects = async () => [];
+  const onChangeGroupName = React.useCallback(
+    async (group: TeamGroup, newName: string) => {
+      if (!team || !profile || !groups) return;
+      const updatedGroup = await updateGroup(
+        getAuthorizationHeader,
+        profile.id,
+        team.id,
+        group.id,
+        { name: newName }
+      );
+      const updatedGroupIndex = groups.findIndex(
+        group_ => group_.id === group.id
+      );
+      if (updatedGroupIndex !== -1) {
+        setGroups(groups =>
+          groups ? groups.with(updatedGroupIndex, updatedGroup) : null
+        );
+      }
+    },
+    [team, getAuthorizationHeader, profile, groups]
+  );
+
+  const onChangeUserGroup = React.useCallback(
+    async (user: User, group: TeamGroup) => {
+      if (!team || !profile || !memberships) return;
+      try {
+        await updateUserGroup(
+          getAuthorizationHeader,
+          profile.id,
+          team.id,
+          group.id,
+          user.id
+        );
+        const membershipIndex = memberships.findIndex(
+          membership => membership.userId === user.id
+        );
+        if (membershipIndex !== -1) {
+          setMemberships(memberships =>
+            memberships
+              ? memberships.with(membershipIndex, {
+                  ...memberships[membershipIndex],
+                  groups: [group.id],
+                })
+              : null
+          );
+        }
+      } catch (error) {
+        console.error('An error occurred while update user group:', error);
+      }
+    },
+    [team, getAuthorizationHeader, profile, memberships]
+  );
+
+  const onListUserProjects = React.useCallback(
+    async (user: User) => {
+      if (!profile) return [];
+      return listOtherUserCloudProjects(
+        getAuthorizationHeader,
+        profile.id,
+        user.id
+      );
+    },
+    [getAuthorizationHeader, profile]
+  );
 
   return (
     <TeamContext.Provider

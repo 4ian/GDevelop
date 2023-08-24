@@ -1369,6 +1369,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Invalid object (object entered without any variable)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "An object variable or expression should be entered.");
+    }
+  }
+
   SECTION("Valid function calls ('number|string' type)") {
     {
       auto node =

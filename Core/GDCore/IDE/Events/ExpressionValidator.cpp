@@ -100,9 +100,15 @@ bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
   if (objectsContainersList.HasObjectOrGroupNamed(identifier.identifierName)) {
     // This is an object variable.
 
+    if (identifier.childIdentifierName.empty()) {
+      RaiseTypeError(_("An object variable or expression should be entered."),
+                      identifier.identifierNameLocation);
+      return true; // We should have found a variable.
+    }
+
     if (!objectsContainersList.HasObjectOrGroupWithVariableNamed(identifier.identifierName, identifier.childIdentifierName)) {
       RaiseTypeError(_("This variable does not exist on this object or group."),
-                      identifier.childIdentifierNameLocation);
+                      identifier.identifierNameLocation);
       return true; // We should have found a variable.
     }
 

@@ -152,7 +152,12 @@ export type StorageProvider = {|
   disabled?: boolean,
   renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
   getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
-  onRenderNewProjectSaveAsLocationChooser?: (props: {|
+  getProjectLocation?: ({|
+    projectName: string,
+    saveAsLocation: ?SaveAsLocation,
+    newProjectsDefaultFolder?: string,
+  |}) => SaveAsLocation,
+  renderNewProjectSaveAsLocationChooser?: (props: {|
     projectName: string,
     saveAsLocation: ?SaveAsLocation,
     setSaveAsLocation: (?SaveAsLocation) => void,

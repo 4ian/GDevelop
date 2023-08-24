@@ -44,8 +44,10 @@ export default class BrowserEventsFunctionsExtensionWriter {
     }
   };
 
-  static chooseCustomObjectFile = (objectName?: string): Promise<?string> => {
-    return Promise.resolve(objectName);
+  static chooseCustomObjectFile = async (
+    objectName?: string
+  ): Promise<?string> => {
+    return objectName;
   };
 
   static writeCustomObject = (

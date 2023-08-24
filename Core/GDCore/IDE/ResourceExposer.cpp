@@ -37,6 +37,7 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
 
   // Expose any project resources as files.
   worker.ExposeResources(resourcesManager);
+
   project.GetPlatformSpecificAssets().ExposeResources(worker);
 
   // Expose event resources
@@ -72,6 +73,21 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
   auto& loadingScreen = project.GetLoadingScreen();
   if (loadingScreen.GetBackgroundImageResourceName() != "")
     worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
+}
+
+void ResourceExposer::ExposeProjectResources(gd::Project& project, gd::ArbitraryResourceWorker& worker) {
+
+  project.GetPlatformSpecificAssets().ExposeResources(worker);
+
+  // Expose global objects configuration resources
+  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
+  objectWorker.Launch(project);
+
+  // Expose loading screen background image if present
+  auto& loadingScreen = project.GetLoadingScreen();
+  if (loadingScreen.GetBackgroundImageResourceName() != "") {
+    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
+  }
 }
 
 void ResourceExposer::ExposeLayoutResources(
@@ -126,11 +142,13 @@ void ResourceExposer::ExposeEffectResources(
       auto &resourceType = propertyDescriptor.GetExtraInfo()[0];
 
       const gd::String &resourceName = effect.GetStringParameter(propertyName);
-      gd::String potentiallyUpdatedResourceName = resourceName;
-      worker.ExposeResourceWithType(resourceType,
-                                    potentiallyUpdatedResourceName);
-      if (potentiallyUpdatedResourceName != resourceName) {
-        effect.SetStringParameter(propertyName, potentiallyUpdatedResourceName);
+      if (!resourceName.empty()) {
+        gd::String potentiallyUpdatedResourceName = resourceName;
+        worker.ExposeResourceWithType(resourceType,
+                                      potentiallyUpdatedResourceName);
+        if (potentiallyUpdatedResourceName != resourceName) {
+          effect.SetStringParameter(propertyName, potentiallyUpdatedResourceName);
+        }
       }
     }
   }

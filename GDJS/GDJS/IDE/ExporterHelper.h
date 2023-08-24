@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef EXPORTER_HELPER_H
-#define EXPORTER_HELPER_H
+#pragma once
+
 #include <map>
 #include <set>
 #include <string>
@@ -266,7 +266,7 @@ class ExporterHelper {
    */
   static gd::String ExportProjectData(
       gd::AbstractFileSystem &fs,
-      const gd::Project &project,
+      gd::Project &project,
       gd::String filename,
       const gd::SerializerElement &runtimeGameOptions);
 
@@ -474,7 +474,10 @@ class ExporterHelper {
       gdjsRoot;  ///< The root directory of GDJS, used to copy runtime files.
   gd::String codeOutputDir;  ///< The directory where JS code is outputted. Will
                              ///< be then copied to the final output directory.
+
+private:
+  static void DeclareUsedResources(gd::SerializerElement &rootElement,
+                                   gd::Project &project);
 };
 
 }  // namespace gdjs
-#endif  // EXPORTER_HELPER_H

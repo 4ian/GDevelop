@@ -42,6 +42,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
+#include "GDJS/IDE/UsedResourcesDeclarer.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
@@ -259,7 +260,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs,
-    const gd::Project &project,
+    gd::Project &project,
     gd::String filename,
     const gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
@@ -267,6 +268,7 @@ gd::String ExporterHelper::ExportProjectData(
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
+  DeclareUsedResources(rootElement, project);
   gd::String output =
       "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
       "gdjs.runtimeGameOptions = " +
@@ -275,6 +277,19 @@ gd::String ExporterHelper::ExportProjectData(
   if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
 
   return "";
+}
+
+void ExporterHelper::DeclareUsedResources(gd::SerializerElement &rootElement,
+                                    gd::Project &project) {
+  gd::UsedResourcesDeclarer::DeclareProjectUsedResources(rootElement, project);
+  
+  for (std::size_t layoutIndex = 0; layoutIndex < project.GetLayoutsCount();
+       layoutIndex++) {
+    auto &layout = project.GetLayout(layoutIndex);
+
+    auto& layoutElement = rootElement.GetChild("layouts").GetChild(layoutIndex);
+    gd::UsedResourcesDeclarer::DeclareLayoutUsedResources(layoutElement, project, layout);
+  }
 }
 
 bool ExporterHelper::ExportPixiIndexFile(

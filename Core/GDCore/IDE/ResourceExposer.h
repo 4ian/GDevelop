@@ -32,6 +32,13 @@ public:
   static void ExposeWholeProjectResources(gd::Project &project,
                                           gd::ArbitraryResourceWorker &worker);
 
+  /**
+   * @brief Expose only the resource used globally on a project.
+   * It doesn't include resources used in layout.
+   */
+  static void ExposeProjectResources(gd::Project &project,
+                                     gd::ArbitraryResourceWorker &worker);
+
   static void ExposeLayoutResources(gd::Project &project, gd::Layout &layout,
                                           gd::ArbitraryResourceWorker &worker);
 

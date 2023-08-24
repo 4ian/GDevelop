@@ -20,6 +20,7 @@ import {
 import { sanitizeFilename } from '../../Utils/Filename';
 import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 import axios from 'axios';
+import { sanitizeUrlWithEncodedPath } from '../../Utils/LocalFileDownloader';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
@@ -142,9 +143,10 @@ export const moveUrlResourcesToLocalFiles = async ({
         try {
           await retryIfFailed({ times: 2 }, async () => {
             await fs.ensureDir(baseAssetsPath);
+            const encodedUrl = sanitizeUrlWithEncodedPath(url);
             await ipcRenderer.invoke(
               'local-file-download',
-              url,
+              encodedUrl,
               downloadedFilePath
             );
             resource.setFile(

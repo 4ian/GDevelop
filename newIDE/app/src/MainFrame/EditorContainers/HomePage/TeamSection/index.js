@@ -23,6 +23,11 @@ import TeamGroupNameField from './TeamGroupNameField';
 import TeamMemberRow from './TeamMemberRow';
 import { makeDropTarget } from '../../../../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import {
+  ProjectFileListItem,
+  transformCloudProjectsIntoFileMetadataWithStorageProviderName,
+} from '../BuildSection';
+import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
@@ -99,6 +104,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
+    const windowWidth = useResponsiveWindowWidth();
+    const isMobile = windowWidth === 'small';
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
@@ -156,6 +163,43 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       );
     }
 
+    if (selectedUser && selectedUserProjects) {
+      const fileMetadataAndStorageProviderNames = transformCloudProjectsIntoFileMetadataWithStorageProviderName(
+        selectedUserProjects
+      );
+      return (
+        <SectionContainer
+          title={
+            <Trans>
+              {selectedUser.username || selectedUser.email}'s projects
+            </Trans>
+          }
+          backAction={() => {
+            setSelectedUser(null);
+            setSelectedUserProjects(null);
+          }}
+        >
+          <SectionRow>
+            <Line>
+              <Column noMargin expand>
+                <List>
+                  {fileMetadataAndStorageProviderNames.map(file => (
+                    <ProjectFileListItem
+                      file={file}
+                      onOpenRecentFile={onOpenRecentFile}
+                      storageProviders={storageProviders}
+                      isWindowWidthMediumOrLarger={!isMobile}
+                      hideDeleteContextMenuAction={true}
+                    />
+                  ))}
+                </List>
+              </Column>
+            </Line>
+          </SectionRow>
+        </SectionContainer>
+      );
+    }
+
     const membersNotInAGroup = membersByGroupId['NONE'];
     const groupsAndMembers = Object.keys(membersByGroupId)
       .map(id => (id === 'NONE' ? null : membersByGroupId[id]))
@@ -163,97 +207,95 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       .sort((a, b) => a.group.name.localeCompare(b.group.name));
 
     return (
-      <>
-        <SectionContainer title={<Trans>Team</Trans>}>
-          <SectionRow>
-            {membersNotInAGroup && (
-              <Line>
-                <Column noMargin expand>
-                  <List>
-                    {membersNotInAGroup.members
-                      .sort(sortMembersByNameOrEmail)
-                      .map(member => (
-                        <TeamMemberRow
-                          key={member.id}
-                          member={member}
-                          onListUserProjects={() => listUserProjects(member)}
-                          disabled={isLoadingUserProjects}
-                          onDrag={setDraggedUser}
-                          isLoading={
-                            isLoadingUserProjects &&
-                            !!selectedUser &&
-                            member.id === selectedUser.id
-                          }
-                        />
-                      ))}
-                  </List>
-                </Column>
-              </Line>
-            )}
-            {groupsAndMembers.length > 0 &&
-              groupsAndMembers.map(({ group, members }) => (
-                <DropTarget
-                  canDrop={() => true}
-                  drop={() => {
-                    if (!draggedUserRef.current) return;
-                    onChangeUserGroup(draggedUserRef.current, group);
-                    draggedUserRef.current = null;
-                  }}
-                  key={group.id}
-                >
-                  {({ connectDropTarget, isOver }) =>
-                    connectDropTarget(
-                      <div
-                        style={
-                          isOver
-                            ? {
-                                backgroundColor:
-                                  gdevelopTheme.paper.backgroundColor.light,
-                                outline: `2px dashed ${
-                                  gdevelopTheme.dropIndicator.canDrop
-                                }`,
-                              }
-                            : undefined
+      <SectionContainer title={<Trans>Team</Trans>}>
+        <SectionRow>
+          {membersNotInAGroup && (
+            <Line>
+              <Column noMargin expand>
+                <List>
+                  {membersNotInAGroup.members
+                    .sort(sortMembersByNameOrEmail)
+                    .map(member => (
+                      <TeamMemberRow
+                        key={member.id}
+                        member={member}
+                        onListUserProjects={() => listUserProjects(member)}
+                        disabled={isLoadingUserProjects}
+                        onDrag={setDraggedUser}
+                        isLoading={
+                          isLoadingUserProjects &&
+                          !!selectedUser &&
+                          member.id === selectedUser.id
                         }
-                      >
-                        <Line noMargin>
-                          <Column noMargin expand>
-                            <Column>
-                              <TeamGroupNameField
-                                group={group}
-                                onFinishEditingGroupName={onChangeGroupName}
-                              />
-                            </Column>
-                            <List>
-                              {members
-                                .sort(sortMembersByNameOrEmail)
-                                .map(member => (
-                                  <TeamMemberRow
-                                    key={member.id}
-                                    member={member}
-                                    onListUserProjects={() =>
-                                      listUserProjects(member)
-                                    }
-                                    onDrag={setDraggedUser}
-                                    disabled={isLoadingUserProjects}
-                                    isLoading={
-                                      isLoadingUserProjects &&
-                                      !!selectedUser &&
-                                      member.id === selectedUser.id
-                                    }
-                                  />
-                                ))}
-                            </List>
+                      />
+                    ))}
+                </List>
+              </Column>
+            </Line>
+          )}
+          {groupsAndMembers.length > 0 &&
+            groupsAndMembers.map(({ group, members }) => (
+              <DropTarget
+                canDrop={() => true}
+                drop={() => {
+                  if (!draggedUserRef.current) return;
+                  onChangeUserGroup(draggedUserRef.current, group);
+                  draggedUserRef.current = null;
+                }}
+                key={group.id}
+              >
+                {({ connectDropTarget, isOver }) =>
+                  connectDropTarget(
+                    <div
+                      style={
+                        isOver
+                          ? {
+                              backgroundColor:
+                                gdevelopTheme.paper.backgroundColor.light,
+                              outline: `2px dashed ${
+                                gdevelopTheme.dropIndicator.canDrop
+                              }`,
+                            }
+                          : undefined
+                      }
+                    >
+                      <Line noMargin>
+                        <Column noMargin expand>
+                          <Column>
+                            <TeamGroupNameField
+                              group={group}
+                              onFinishEditingGroupName={onChangeGroupName}
+                            />
                           </Column>
-                        </Line>
-                      </div>
-                    )
-                  }
-                </DropTarget>
-              ))}
-          </SectionRow>
-        </SectionContainer>
-      </>
+                          <List>
+                            {members
+                              .sort(sortMembersByNameOrEmail)
+                              .map(member => (
+                                <TeamMemberRow
+                                  key={member.id}
+                                  member={member}
+                                  onListUserProjects={() =>
+                                    listUserProjects(member)
+                                  }
+                                  onDrag={setDraggedUser}
+                                  disabled={isLoadingUserProjects}
+                                  isLoading={
+                                    isLoadingUserProjects &&
+                                    !!selectedUser &&
+                                    member.id === selectedUser.id
+                                  }
+                                />
+                              ))}
+                          </List>
+                        </Column>
+                      </Line>
+                    </div>
+                  )
+                }
+              </DropTarget>
+            ))}
+        </SectionRow>
+      </SectionContainer>
     );
   }
 );

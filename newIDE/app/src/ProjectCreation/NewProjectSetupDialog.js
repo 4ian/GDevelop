@@ -139,9 +139,6 @@ const NewProjectSetupDialog = ({
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
     : '';
-  const [saveAsLocation, setSaveAsLocation] = React.useState<?SaveAsLocation>(
-    null
-  );
   const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
     () => {
       const localFileStorageProvider = storageProviders.find(
@@ -176,6 +173,15 @@ const NewProjectSetupDialog = ({
 
       return emptyStorageProvider;
     }
+  );
+  const [saveAsLocation, setSaveAsLocation] = React.useState<?SaveAsLocation>(
+    storageProvider.getProjectLocation
+      ? storageProvider.getProjectLocation({
+          projectName,
+          saveAsLocation: null,
+          newProjectsDefaultFolder,
+        })
+      : null
   );
 
   const generationCurrentUsage = authenticatedUser.limits
@@ -268,10 +274,20 @@ const NewProjectSetupDialog = ({
         );
         return;
       }
+
+      // Make sure that the path is up to date with the project name.
+      const projectLocation = storageProvider.getProjectLocation
+        ? storageProvider.getProjectLocation({
+            projectName,
+            saveAsLocation,
+            newProjectsDefaultFolder,
+          })
+        : saveAsLocation;
+
       const projectSetup = {
         projectName,
         storageProvider,
-        saveAsLocation,
+        saveAsLocation: projectLocation,
         height: selectedHeight,
         width: selectedWidth,
         orientation: selectedOrientation,
@@ -298,19 +314,20 @@ const NewProjectSetupDialog = ({
       }
     },
     [
+      generationPrompt,
       isOpeningProject,
       needUserAuthenticationForStorage,
       projectName,
       storageProvider,
       saveAsLocation,
+      newProjectsDefaultFolder,
       selectedHeight,
       selectedWidth,
       selectedOrientation,
       optimizeForPixelArt,
       allowPlayersToLogIn,
-      generateProject,
-      generationPrompt,
       selectedExampleShortHeader,
+      generateProject,
       onCreateFromExample,
       onCreateWithLogin,
       onCreateEmptyProject,
@@ -416,7 +433,7 @@ const NewProjectSetupDialog = ({
                 // or the "DownloadFile" storage provider, which is not a persistent storage).
                 .filter(
                   storageProvider =>
-                    !!storageProvider.onRenderNewProjectSaveAsLocationChooser
+                    !!storageProvider.renderNewProjectSaveAsLocationChooser
                 )
                 .map(storageProvider => (
                   <SelectOption
@@ -452,8 +469,8 @@ const NewProjectSetupDialog = ({
               </Paper>
             )}
             {!needUserAuthenticationForStorage &&
-              storageProvider.onRenderNewProjectSaveAsLocationChooser &&
-              storageProvider.onRenderNewProjectSaveAsLocationChooser({
+              storageProvider.renderNewProjectSaveAsLocationChooser &&
+              storageProvider.renderNewProjectSaveAsLocationChooser({
                 projectName,
                 saveAsLocation,
                 setSaveAsLocation,

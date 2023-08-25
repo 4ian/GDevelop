@@ -103,6 +103,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
   };
 
   const resourcesToFetchAndUpload = getResourcesToFetchAndUpload(project);
+  if (resourcesToFetchAndUpload.length === 0) return result;
 
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResourcesToUpload: Array<

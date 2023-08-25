@@ -13,24 +13,47 @@ describe('EnumerateInstructions', () => {
     const instructions = enumerateAllInstructions(true);
 
     // Test for the proper presence of a few conditions
-    expect(instructions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          displayedName: 'Animation finished',
-          fullGroupName: 'General/Sprite/Animations and images',
-          type: 'AnimationEnded2',
-        }),
-        expect.objectContaining({
-          displayedName: 'Trigger once while true',
-          fullGroupName: 'Advanced/Events and control flow',
-          type: 'BuiltinCommonInstructions::Once',
-        }),
-        expect.objectContaining({
-          displayedName: 'The cursor/touch is on an object',
-          fullGroupName: 'General/Objects/Mouse and touch',
-          type: 'SourisSurObjet',
-        }),
-      ])
+    expect(
+      instructions.find(
+        instruction =>
+          instruction.type ===
+          'AnimatableCapability::AnimatableBehavior::HasAnimationEnded'
+      )
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'Animation finished',
+        fullGroupName: 'General/Animatable capability/Animations and images',
+        type: 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded',
+      })
+    );
+    expect(
+      instructions.find(instruction => instruction.type === 'Sprite')
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'Current frame',
+        fullGroupName: 'General/Sprite/Animations and images',
+        type: 'Sprite',
+      })
+    );
+    expect(
+      instructions.find(
+        instruction => instruction.type === 'BuiltinCommonInstructions::Once'
+      )
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'Trigger once while true',
+        fullGroupName: 'Advanced/Events and control flow',
+        type: 'BuiltinCommonInstructions::Once',
+      })
+    );
+    expect(
+      instructions.find(instruction => instruction.type === 'SourisSurObjet')
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'The cursor/touch is on an object',
+        fullGroupName: 'General/Objects/Mouse and touch',
+        type: 'SourisSurObjet',
+      })
     );
   });
 
@@ -106,7 +129,8 @@ describe('EnumerateInstructions', () => {
     expect(getObjectParameterIndex(triggerOnce.metadata)).toBe(-1);
 
     const spriteAnimationEnded = conditions.filter(
-      ({ type }) => type === 'AnimationEnded2'
+      ({ type }) =>
+        type === 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded'
     )[0];
     expect(spriteAnimationEnded).not.toBeUndefined();
     expect(getObjectParameterIndex(spriteAnimationEnded.metadata)).toBe(0);
@@ -129,58 +153,11 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Animation finished',
-          type: 'AnimationEnded2',
+          type: 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded',
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',
           type: 'SourisSurObjet',
-        }),
-      ])
-    );
-  });
-
-  it('can enumerate instructions for an object (with an unsupported capability)', () => {
-    makeTestExtensions(gd);
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    const layout = project.insertNewLayout('Scene', 0);
-    layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
-    layout.insertNewObject(
-      project,
-      'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
-      'MyFakeObjectWithUnsupportedCapability',
-      0
-    );
-
-    // Test the sprite can have effects related condition.
-    const spriteInstructions = enumerateObjectAndBehaviorsInstructions(
-      true,
-      project,
-      layout,
-      'MySpriteObject'
-    );
-    expect(spriteInstructions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          displayedName: 'Effect is enabled',
-          fullGroupName: 'Effects',
-          type: 'IsEffectEnabled',
-        }),
-      ])
-    );
-
-    // Test an object not supporting effects don't have this condition.
-    const withUnsupportedCapabilityInstructions = enumerateObjectAndBehaviorsInstructions(
-      true,
-      project,
-      layout,
-      'MyFakeObjectWithUnsupportedCapability'
-    );
-    expect(withUnsupportedCapabilityInstructions).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          displayedName: 'Effect is enabled',
-          fullGroupName: 'Effects',
-          type: 'IsEffectEnabled',
         }),
       ])
     );

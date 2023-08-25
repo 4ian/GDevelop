@@ -21,6 +21,7 @@ import {
   TRIVIAL_FIRST_BEHAVIOR,
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
+import { mapVector } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -60,6 +61,33 @@ export default function NewBehaviorDialog({
     []
   );
 
+  const getAllRequiredBehaviorTypes = React.useCallback(
+    (
+      behaviorMetadata: gdBehaviorMetadata,
+      allRequiredBehaviorTypes: Array<string> = []
+    ): Array<string> => {
+      mapVector(
+        behaviorMetadata.getRequiredBehaviorTypes(),
+        requiredBehaviorType => {
+          if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
+            return;
+          }
+          allRequiredBehaviorTypes.push(requiredBehaviorType);
+          const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            project.getCurrentPlatform(),
+            requiredBehaviorType
+          );
+          getAllRequiredBehaviorTypes(
+            requiredBehaviorMetadata,
+            allRequiredBehaviorTypes
+          );
+        }
+      );
+      return allRequiredBehaviorTypes;
+    },
+    [project]
+  );
+
   const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
     () => {
       const platform = project.getCurrentPlatform();
@@ -71,17 +99,22 @@ export default function NewBehaviorDialog({
               eventsFunctionsExtension
             )
           : [];
-      return behaviorMetadataList.map(behavior => ({
-        type: behavior.type,
-        fullName: behavior.fullName,
-        description: behavior.description,
-        previewIconUrl: behavior.previewIconUrl,
-        objectType: behavior.objectType,
-        category: behavior.category,
-        tags: behavior.tags,
-      }));
+      return behaviorMetadataList
+        .filter(behavior => !behavior.behaviorMetadata.isHidden())
+        .map(behavior => ({
+          type: behavior.type,
+          fullName: behavior.fullName,
+          description: behavior.description,
+          previewIconUrl: behavior.previewIconUrl,
+          objectType: behavior.objectType,
+          category: behavior.category,
+          allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
+            behavior.behaviorMetadata
+          ),
+          tags: behavior.tags,
+        }));
     },
-    [project, eventsFunctionsExtension]
+    [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
   );
 
   const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(

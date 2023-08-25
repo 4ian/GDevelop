@@ -13,6 +13,7 @@ type EnumeratedProperty = {|
   isHidden: boolean,
 |};
 
+// TODO Remove this function as it seems to be a dead code.
 /**
  * Transform a gdNamedPropertyDescriptorsList into a JS object.
  * **Don't use this** unless you explicitly need to deal with JS objects.

@@ -153,7 +153,7 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject implements EffectsTarget {
+  export class RuntimeObject implements EffectsTarget, gdjs.EffectHandler {
     name: string;
     type: string;
     x: float = 0;
@@ -236,7 +236,6 @@ namespace gdjs {
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
         this.updateAllEffectParameters(objectData.effects[i]);
       }
-
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
         const autoData = objectData.behaviors[i];

@@ -217,12 +217,15 @@ const BehaviorsEditor = (props: Props) => {
         BEHAVIORS_CLIPBOARD_KIND,
         mapVector(object.getAllBehaviorNames(), behaviorName => {
           const behavior = object.getBehavior(behaviorName);
+          if (behavior.isDefaultBehavior()) {
+            return null;
+          }
           return {
             name: behaviorName,
             type: behavior.getTypeName(),
             serializedBehavior: serializeToJSObject(behavior),
           };
-        })
+        }).filter(Boolean)
       );
       forceUpdate();
     },
@@ -404,6 +407,10 @@ const BehaviorsEditor = (props: Props) => {
             {allBehaviorNames.map((behaviorName, index) => {
               const behavior = object.getBehavior(behaviorName);
               const behaviorTypeName = behavior.getTypeName();
+
+              if (behavior.isDefaultBehavior()) {
+                return null;
+              }
 
               const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                 gd.JsPlatform.get(),

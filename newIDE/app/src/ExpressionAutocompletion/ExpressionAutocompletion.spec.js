@@ -242,16 +242,10 @@ describe('ExpressionAutocompletion', () => {
       expect(autocompletions).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            completion: 'Animation',
+            completion: 'AnimationFrameCount',
             addParenthesis: true,
             isExact: false,
             shouldConvertToString: true,
-          }),
-          expect.objectContaining({
-            completion: 'AnimationName',
-            addParenthesis: true,
-            isExact: false,
-            shouldConvertToString: false,
           }),
         ])
       );
@@ -286,6 +280,16 @@ describe('ExpressionAutocompletion', () => {
         expect.arrayContaining([
           expect.objectContaining({
             completion: 'PlatformerObject::JumpSpeed',
+            addParenthesis: true,
+            isExact: false,
+            shouldConvertToString: true,
+          }),
+        ])
+      );
+      expect(autocompletions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            completion: 'Animation::SpeedScale',
             addParenthesis: true,
             isExact: false,
             shouldConvertToString: true,

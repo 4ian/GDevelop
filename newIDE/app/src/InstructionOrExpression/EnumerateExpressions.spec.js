@@ -67,8 +67,9 @@ describe('EnumerateExpressions', () => {
     expect(filterExpressions(spriteObjectExpressions, 'PointX')).toHaveLength(
       1
     );
+    expect(filterExpressions(spriteObjectExpressions, 'Layer')).toHaveLength(1);
     expect(
-      filterExpressions(spriteObjectExpressions, 'AnimationName')
+      filterExpressions(spriteObjectExpressions, 'AnimationFrameCount')
     ).toHaveLength(1);
 
     const objectExpressions = enumerateObjectExpressions('string', '');

@@ -288,7 +288,14 @@ namespace gdjs {
   /**
    * The SpriteRuntimeObject represents an object that can display images.
    */
-  export class SpriteRuntimeObject extends gdjs.RuntimeObject {
+  export class SpriteRuntimeObject
+    extends gdjs.RuntimeObject
+    implements
+      gdjs.Resizable,
+      gdjs.Scalable,
+      gdjs.Flippable,
+      gdjs.Animatable,
+      gdjs.OpacityHandler {
     _currentAnimation: number = 0;
     _currentDirection: number = 0;
     _currentFrame: number = 0;
@@ -416,7 +423,7 @@ namespace gdjs {
       //Make sure to delete already existing animations which are not used anymore.
       this._updateAnimationFrame();
       if (!this._animationFrame) {
-        this.setAnimation(0);
+        this.setAnimationIndex(0);
       }
       this.invalidateHitboxes();
       return true;
@@ -435,7 +442,7 @@ namespace gdjs {
         ) {
           const extraData = initialInstanceData.numberProperties[i];
           if (extraData.name === 'animation') {
-            this.setAnimation(extraData.value);
+            this.setAnimationIndex(extraData.value);
           }
         }
       }
@@ -614,8 +621,13 @@ namespace gdjs {
     /**
      * Change the animation being played.
      * @param newAnimation The index of the new animation to be played
+     * @deprecated Use `setAnimationIndex` instead
      */
     setAnimation(newAnimation: number): void {
+      this.setAnimationIndex(newAnimation);
+    }
+
+    setAnimationIndex(newAnimation: number): void {
       newAnimation = newAnimation | 0;
       if (
         newAnimation < this._animations.length &&
@@ -633,17 +645,14 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the animation being played.
-     * @param newAnimationName The name of the new animation to be played
-     */
     setAnimationName(newAnimationName: string): void {
       if (!newAnimationName) {
         return;
       }
       for (let i = 0; i < this._animations.length; ++i) {
         if (this._animations[i].name === newAnimationName) {
-          return this.setAnimation(i);
+          this.setAnimationIndex(i);
+          return;
         }
       }
     }
@@ -651,15 +660,16 @@ namespace gdjs {
     /**
      * Get the index of the animation being played.
      * @return The index of the new animation being played
+     * @deprecated Use `getAnimationIndex` instead
      */
     getAnimation(): number {
+      return this.getAnimationIndex();
+    }
+
+    getAnimationIndex(): number {
       return this._currentAnimation;
     }
 
-    /**
-     * Get the name of the animation being played.
-     * @return The name of the new animation being played
-     */
     getAnimationName(): string {
       if (this._currentAnimation >= this._animations.length) {
         return '';
@@ -667,7 +677,7 @@ namespace gdjs {
       return this._animations[this._currentAnimation].name;
     }
 
-    isCurrentAnimationName(name): boolean {
+    isCurrentAnimationName(name: string): boolean {
       return this.getAnimationName() === name;
     }
 
@@ -768,10 +778,10 @@ namespace gdjs {
     /**
      * @deprecated
      * Return true if animation has ended.
-     * Prefer using hasAnimationEnded2. This method returns true as soon as
+     * Prefer using `hasAnimationEnded2`. This method returns true as soon as
      * the animation enters the last frame, not at the end of the last frame.
      */
-    hasAnimationEnded(): boolean {
+    hasAnimationEndedLegacy(): boolean {
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=
@@ -794,8 +804,14 @@ namespace gdjs {
      * - it's not configured as a loop;
      * - the current frame is the last frame;
      * - the last frame has been displayed long enough.
+     *
+     * @deprecated Use `hasAnimationEnded` instead.
      */
     hasAnimationEnded2(): boolean {
+      return this.hasAnimationEnded();
+    }
+
+    hasAnimationEnded(): boolean {
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=
@@ -815,15 +831,29 @@ namespace gdjs {
       );
     }
 
-    animationPaused() {
+    /**
+     * @deprecated Use `isAnimationPaused` instead.
+     */
+    animationPaused(): boolean {
+      return this.isAnimationPaused();
+    }
+
+    isAnimationPaused(): boolean {
       return this._animationPaused;
     }
 
-    pauseAnimation() {
+    pauseAnimation(): void {
       this._animationPaused = true;
     }
 
-    playAnimation() {
+    /**
+     * @deprecated Use `resumeAnimation` instead.
+     */
+    playAnimation(): void {
+      this.resumeAnimation();
+    }
+
+    resumeAnimation(): void {
       this._animationPaused = false;
     }
 
@@ -831,7 +861,7 @@ namespace gdjs {
       return this._animationSpeedScale;
     }
 
-    setAnimationSpeedScale(ratio): void {
+    setAnimationSpeedScale(ratio: float): void {
       this._animationSpeedScale = ratio;
     }
 
@@ -1115,10 +1145,6 @@ namespace gdjs {
       return this._blendMode;
     }
 
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -1130,10 +1156,6 @@ namespace gdjs {
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
     getOpacity(): number {
       return this.opacity;
     }
@@ -1219,11 +1241,6 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param newWidth The new width of the object, in pixels.
-     */
     setWidth(newWidth: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
@@ -1234,11 +1251,6 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param newHeight The new height of the object, in pixels.
-     */
     setHeight(newHeight: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
@@ -1249,12 +1261,6 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the size of the object.
-     *
-     * @param newWidth The new width of the object, in pixels.
-     * @param newHeight The new height of the object, in pixels.
-     */
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
@@ -1265,7 +1271,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScale(newScale: number): void {
+    setScale(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1286,7 +1292,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleX(newScale: number): void {
+    setScaleX(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1303,7 +1309,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleY(newScale: number): void {
+    setScaleY(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1316,12 +1322,24 @@ namespace gdjs {
     }
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
      */
-    getScale(): number {
+    getScaleMean(): float {
       return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): float {
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**

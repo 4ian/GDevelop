@@ -275,6 +275,10 @@ class GD_CORE_API MetadataProvider {
     return &metadata == &badBehaviorMetadata;
   }
 
+  static bool IsBadObjectMetadata(const gd::ObjectMetadata& metadata) {
+    return &metadata == &badObjectInfo;
+  }
+
   virtual ~MetadataProvider();
 
  private:

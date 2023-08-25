@@ -40,6 +40,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Rotate to always face the camera (only the front face of the cube should be enabled).',
       objectType: 'Scene3D::Cube3DObject',
+      allRequiredBehaviorTypes: [],
       type: null,
     },
     {
@@ -60,6 +61,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Provides an action to make the object bounce from another object it just touched. Add a permanent force to the object and, when in collision with another one, use the action to make it bounce realistically.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -91,6 +93,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       extensionName: 'FireBullet',
       description: 'Fire bullets, manage ammo, reloading, and overheating.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -127,6 +130,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
     },
     {
@@ -146,6 +150,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       extensionName: 'Gamepads',
       description: 'Control a platformer character with a gamepad.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -174,6 +179,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       extensionName: 'Gamepads',
       description: 'Control a top-down character with a gamepad.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -206,6 +212,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Manage health (life) points including a protective shield and armor.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -241,6 +248,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       extensionName: 'SmoothCamera',
       description: 'Smoothly scroll to follow an object.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -270,6 +278,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Smoothly scroll to follow a character and stabilize the camera when jumping.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -304,6 +313,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Control a platformer character with a multitouch controller.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -344,6 +354,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       extensionName: 'SpriteMultitouchJoystick',
       description: 'Control a top-down character with a multitouch controller.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -383,6 +394,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -419,6 +431,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Set the depth (Z-order) of the instance to the value of its Y position in the scene, creating an illusion of depth. The origin point of the object is used to determine the Z-order.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [],
     },
@@ -443,6 +456,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Create and manage revolute joints between two objects.\nAlso known as a hinge joint because the objects act like they are connected with a hinge that pivots.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -482,6 +496,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Create and manage weld joints between two objects.\nAlso known as a static joint because the objects stay glued in the same relative position to each other.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -521,6 +536,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Create and manage distance joints between two objects. \nActs like a spring because the objects try to stay the same distance apart.',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {
@@ -560,6 +576,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description:
         'Create and manage rope joints between two objects. \nObjects can get closer, but they cannot exceed the starting distance from each other.\n',
       objectType: '',
+      allRequiredBehaviorTypes: [],
       type: null,
       authors: [
         {

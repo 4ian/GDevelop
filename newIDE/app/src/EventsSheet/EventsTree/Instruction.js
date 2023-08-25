@@ -42,6 +42,8 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
+import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
 
 const gd: libGDevelop = global.gd;
 
@@ -61,6 +63,7 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
 }>(reactDndInstructionType);
 
 type Props = {|
+  platform: gdPlatform,
   instruction: gdInstruction,
   isCondition: boolean,
   onClick: Function,
@@ -190,6 +193,7 @@ const InstructionMissing = (props: {|
 
 const Instruction = (props: Props) => {
   const {
+    platform,
     instruction,
     isCondition,
     onClick,
@@ -303,7 +307,17 @@ const Instruction = (props: Props) => {
                     objectsContainer,
                     objectOrGroupName,
                     /*searchInGroups=*/ true
-                  ) === parameterMetadata.getExtraInfo());
+                  ) === parameterMetadata.getExtraInfo()) &&
+                checkHasRequiredCapability({
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectName: objectOrGroupName,
+                  requiredBehaviorTypes: getRequiredBehaviorTypes(
+                    platform,
+                    metadata,
+                    parameterIndex
+                  ),
+                });
             } else if (
               gd.ParameterMetadata.isExpression('resource', parameterType)
             ) {
@@ -557,6 +571,7 @@ const Instruction = (props: Props) => {
                 {instructionDragSourceDropTargetElement}
                 {metadata.canHaveSubInstructions() && (
                   <InstructionsList
+                    platform={props.platform}
                     style={
                       {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
                     }

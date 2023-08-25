@@ -46,6 +46,7 @@ describe('setupInstructionParameters', () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';
+    const behaviorName = 'Animation';
     layout.insertNewObject(project, 'Sprite', objectName, 0);
 
     // Simulate that we select an instruction for the object
@@ -56,7 +57,9 @@ describe('setupInstructionParameters', () => {
       objectName
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
-      enumeratedInstruction => enumeratedInstruction.type === 'SetAnimationName'
+      enumeratedInstruction =>
+        enumeratedInstruction.type ===
+        'AnimatableCapability::AnimatableBehavior::SetName'
     );
 
     if (!setAnimationNameInstruction) {
@@ -73,9 +76,13 @@ describe('setupInstructionParameters', () => {
     );
 
     // Check that parameters were created and the object name set
-    expect(instruction.getParametersCount()).toBe(2);
+    expect(instruction.getParametersCount()).toBe(4);
     expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
-    expect(instruction.getParameter(1).getPlainString()).toBe('');
+    expect(instruction.getParameter(1).getPlainString()).toBe(behaviorName);
+    // Operator
+    expect(instruction.getParameter(2).getPlainString()).toBe('');
+    // Operand
+    expect(instruction.getParameter(3).getPlainString()).toBe('');
   });
 
   it('sets the proper parameters for a behavior', () => {

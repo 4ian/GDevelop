@@ -336,16 +336,6 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return instanceProperties;
     };
 
-    const object = extension
-      .addObject(
-        'FakeObjectWithUnsupportedCapability',
-        'FakeObjectWithUnsupportedCapability',
-        'This is FakeObjectWithUnsupportedCapability',
-        '',
-        fakeObject
-      )
-      .addUnsupportedBaseObjectCapability('effect');
-
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

@@ -270,11 +270,6 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
     const ObjectMetadata& objInfo = MetadataProvider::GetObjectMetadata(
         codeGenerator.GetPlatform(), objectType);
 
-    if (objInfo.IsUnsupportedBaseObjectCapability(
-            expressionMetadata.GetRequiredBaseObjectCapability())) {
-      // Do nothing, skipping objects not supporting the capability required by
-      // this expression.
-    } else {
       codeGenerator.AddIncludeFiles(objInfo.includeFiles);
       functionOutput = codeGenerator.GenerateObjectFunctionCall(
           realObjects[i],
@@ -283,7 +278,6 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
           parametersCode,
           functionOutput,
           context);
-    }
   }
 
   return functionOutput;

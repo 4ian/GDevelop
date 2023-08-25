@@ -142,9 +142,10 @@ export const moveUrlResourcesToLocalFiles = async ({
         try {
           await retryIfFailed({ times: 2 }, async () => {
             await fs.ensureDir(baseAssetsPath);
+            const encodedUrl = new URL(url).href; // Encode the URL to support special characters in file names.
             await ipcRenderer.invoke(
               'local-file-download',
-              url,
+              encodedUrl,
               downloadedFilePath
             );
             resource.setFile(

@@ -32,7 +32,7 @@ import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAss
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { Column, LargeSpacer, Line } from '../UI/Grid';
 import Text from '../UI/Text';
-import { LineStackLayout } from '../UI/Layout';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -563,9 +563,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         ) : null}
         {openedAssetPack && (
           <Column>
-            <LineStackLayout>
+            <ResponsiveLineStackLayout>
               {packMainImageUrl && (
-                <>
+                <Line>
                   <CorsAwareImage
                     key={openedAssetPack.name}
                     style={styles.previewImage}
@@ -579,7 +579,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                     alt={`Preview image of asset pack ${openedAssetPack.name}`}
                   />
                   <LargeSpacer />
-                </>
+                </Line>
               )}
               <Column noMargin alignItems="flex-start" expand>
                 <Text size="bold-title">{openedAssetPack.name}</Text>
@@ -633,7 +633,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                   </Text>
                 )}
               </Column>
-            </LineStackLayout>
+            </ResponsiveLineStackLayout>
           </Column>
         )}
         {openedAssetPack &&

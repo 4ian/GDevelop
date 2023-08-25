@@ -116,6 +116,9 @@ export default class InstancesRenderer {
           bounds.top = instance.getY();
           bounds.right = instance.getX();
           bounds.bottom = instance.getY();
+          bounds.zMin = 0;
+          bounds.zMax = 0;
+
           return bounds;
         }
 
@@ -129,8 +132,9 @@ export default class InstancesRenderer {
           bounds.top = instance.getY();
           bounds.right = instance.getX();
           bounds.bottom = instance.getY();
+          bounds.zMin = 0;
+          bounds.zMax = 0;
 
-          // TODO (3D): add support for zMin/zMax/depth.
           return bounds;
         }
 

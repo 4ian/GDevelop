@@ -263,10 +263,25 @@ export const generateOnSaveProjectAs = (
   }
 };
 
-export const onRenderNewProjectSaveAsLocationChooser = ({
+export const getProjectLocation = ({
+  projectName,
+  saveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  newProjectsDefaultFolder?: string,
+|}): SaveAsLocation => {
+  return {
+    name: projectName,
+  };
+};
+
+export const renderNewProjectSaveAsLocationChooser = ({
   projectName,
   saveAsLocation,
   setSaveAsLocation,
+  newProjectsDefaultFolder,
 }: {|
   projectName: string,
   saveAsLocation: ?SaveAsLocation,
@@ -274,11 +289,14 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
   newProjectsDefaultFolder?: string,
 |}) => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
-    setSaveAsLocation({
-      name: projectName,
-    });
+    setSaveAsLocation(
+      getProjectLocation({
+        projectName,
+        saveAsLocation,
+        newProjectsDefaultFolder,
+      })
+    );
   }
-
   return null;
 };
 

@@ -75,7 +75,13 @@ export const setupInstructionParameters = (
       });
 
     if (
+      // Don't auto-select a behavior in the case of allowedBehaviorType being not specified
+      // which in practice is only the case where the user really needs to select a behavior
+      // (like the action to enable/disable a behavior).
+      // So making a choice there automatically would not make sense unless there is only one.
       behaviorNames.length === 1 ||
+      // In any other case, a specific behavior type is requested, so it makes sense to
+      // automatically select it (and it might not be shown in the events sheet).
       (allowedBehaviorType && behaviorNames.length > 0)
     ) {
       const currentParameterValue = instruction

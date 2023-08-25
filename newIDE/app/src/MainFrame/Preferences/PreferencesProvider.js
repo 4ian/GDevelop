@@ -17,6 +17,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import {
   getBrowserLanguageOrLocale,
   setLanguageInDOM,
@@ -168,6 +169,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAllowUsageOfUnicodeIdentifierNames: this._setAllowUsageOfUnicodeIdentifierNames.bind(
       this
     ),
+    getEditorStateForProject: this._getEditorStateForProject.bind(this),
+    setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
 
   componentDidMount() {
@@ -831,12 +834,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _setAllowUsageOfUnicodeIdentifierNames(enable: boolean) {
     const gd: libGDevelop = global.gd;
     gd.Project.allowUsageOfUnicodeIdentifierNames(enable);
-
     this.setState(
       state => ({
         values: {
           ...state.values,
           allowUsageOfUnicodeIdentifierNames: enable,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getEditorStateForProject(projectId: string) {
+    return this.state.values.editorStateByProject[projectId];
+  }
+
+  _setEditorStateForProject(
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          editorStateByProject: {
+            ...state.values.editorStateByProject,
+            [projectId]: editorState,
+          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

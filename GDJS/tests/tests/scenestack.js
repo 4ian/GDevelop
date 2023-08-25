@@ -19,6 +19,7 @@ describe('gdjs.SceneStack', function () {
         stopSoundsOnStartup: false,
         title: '',
         variables: [],
+        usedResources: [],
       },
       {
         r: 0,
@@ -33,6 +34,7 @@ describe('gdjs.SceneStack', function () {
         stopSoundsOnStartup: false,
         title: '',
         variables: [],
+        usedResources: [],
       },
     ],
   });

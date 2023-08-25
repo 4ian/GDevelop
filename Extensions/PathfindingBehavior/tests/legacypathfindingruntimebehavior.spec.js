@@ -39,6 +39,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
         behaviorsSharedData: [],
         objects: [],
         instances: [],
+        usedResources: [],
       });
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / 60) * 1000;

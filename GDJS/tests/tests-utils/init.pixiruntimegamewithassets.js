@@ -76,6 +76,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
         },
       ],
     },
+    usedResources: [],
     // Used in CustomRuntimeObjects.js
     eventsFunctionsExtensions: [
       {

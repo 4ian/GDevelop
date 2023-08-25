@@ -41,6 +41,11 @@ class GD_CORE_API VariablesContainersList {
    */
   const Variable& Get(const gd::String& name) const;
 
+  /**
+   * \brief Return true if the specified variable container is present.
+   */
+  bool HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const;
+
   /** Do not use - should be private but accessible to let Emscripten create a temporary. */
   VariablesContainersList() {};
  private:

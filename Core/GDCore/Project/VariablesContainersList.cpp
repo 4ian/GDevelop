@@ -43,4 +43,13 @@ const Variable& VariablesContainersList::Get(const gd::String& name) const {
   return badVariable;
 }
 
+bool VariablesContainersList::HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    if (*it == &variablesContainer) return true;
+  }
+
+  return false;
+}
+
 }  // namespace gd

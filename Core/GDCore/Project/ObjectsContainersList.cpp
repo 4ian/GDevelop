@@ -6,6 +6,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 
@@ -62,6 +63,24 @@ bool ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
       const auto& variables =
           (*it)->GetObject(objectOrGroupName).GetVariables();
       return variables.Has(variableName);
+    }
+    if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
+      // TODO: much like behaviors or object types, handle variables that are
+      // common between objects in a group (and maybe we should require the
+      // group to declare them?)
+    }
+  }
+
+  return false;
+}
+
+bool ObjectsContainersList::HasVariablesContainer(
+  const gd::String& objectOrGroupName, const gd::VariablesContainer& variablesContainer) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectOrGroupName)) {
+      return &variablesContainer ==
+        &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
       // TODO: much like behaviors or object types, handle variables that are

@@ -14,6 +14,7 @@
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
+#include "GDCore/IDE/Events/EventsVariableRenamer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
@@ -131,6 +132,16 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
         .SetExtraInfo(gd::PlatformExtension::GetObjectFullType(
             eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()));
   }
+}
+
+void WholeProjectRefactorer::RenameVariable(
+    gd::Project& project,
+    const gd::VariablesContainer& variablesContainer,
+    const gd::String& oldName,
+    const gd::String& newName) {
+  const gd::Platform &platform = project.GetCurrentPlatform();
+  gd::EventsVariableRenamer eventsVariableRenamer(platform, variablesContainer, oldName, newName);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, eventsVariableRenamer);
 }
 
 void WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(

@@ -8,6 +8,7 @@ class String;
 class Project;
 class Layout;
 class ObjectsContainer;
+class VariablesContainer;
 class Object;
 }  // namespace gd
 
@@ -41,6 +42,9 @@ class GD_CORE_API ObjectsContainersList {
 
   bool HasObjectOrGroupWithVariableNamed(const gd::String& objectOrGroupName,
                                   const gd::String& variableName) const;
+
+  bool HasVariablesContainer(const gd::String& objectOrGroupName,
+                                const gd::VariablesContainer& variablesContainer) const;
 
   const gd::Variable& GetObjectOrGroupVariable(
       const gd::String& objectOrGroupName,

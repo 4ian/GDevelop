@@ -201,6 +201,11 @@ const MockTeamProvider = ({
     setMemberships(newMemberships);
   };
 
+  const deleteGroup = async (group: TeamGroup) => {
+    await delay(1000);
+    setGroups(groups => groups.filter(group_ => group_.id !== group.id));
+  };
+
   return (
     <DragAndDropContextProvider>
       <AuthenticatedUserContext.Provider
@@ -215,6 +220,7 @@ const MockTeamProvider = ({
             onChangeGroupName: changeGroupName,
             onChangeUserGroup: changeUserGroup,
             onListUserProjects: listUserProjects,
+            onDeleteGroup: deleteGroup,
           }}
         >
           {children}

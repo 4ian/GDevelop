@@ -164,6 +164,23 @@ export const updateGroup = async (
   return response.data;
 };
 
+export const deleteGroup = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string,
+  groupId: string,
+): Promise<Array<TeamGroup>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.delete(
+    `${GDevelopUserApi.baseUrl}/team/${teamId}/group/${groupId}`,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
 export const updateUserGroup = async (
   getAuthorizationHeader: () => Promise<string>,
   adminUserId: string,

@@ -13,6 +13,7 @@ import {
   type TeamMembership,
   type User,
   updateUserGroup,
+  deleteGroup,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
@@ -159,6 +160,17 @@ const TeamProvider = ({ children }: Props) => {
     [getAuthorizationHeader, profile]
   );
 
+  const onDeleteGroup = React.useCallback(
+    async (group: TeamGroup) => {
+      if (!profile || !team) return;
+      await deleteGroup(getAuthorizationHeader, profile.id, team.id, group.id);
+      setGroups(groups =>
+        groups ? groups.filter(group_ => group_.id !== group.id) : null
+      );
+    },
+    [team, getAuthorizationHeader, profile]
+  );
+
   return (
     <TeamContext.Provider
       value={{
@@ -169,6 +181,7 @@ const TeamProvider = ({ children }: Props) => {
         onChangeGroupName,
         onChangeUserGroup,
         onListUserProjects,
+        onDeleteGroup,
       }}
     >
       {children}

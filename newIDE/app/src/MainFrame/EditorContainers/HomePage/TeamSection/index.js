@@ -101,6 +101,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onChangeGroupName,
       onChangeUserGroup,
       onListUserProjects,
+      onDeleteGroup,
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
@@ -265,6 +266,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                             <TeamGroupNameField
                               group={group}
                               onFinishEditingGroupName={onChangeGroupName}
+                              allowDelete={members.length === 0}
+                              onDeleteGroup={onDeleteGroup}
                             />
                           </Column>
                           <List>

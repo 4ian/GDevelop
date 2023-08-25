@@ -8,12 +8,14 @@ import IconButton from '../../../../UI/IconButton';
 import EditIcon from '../../../../UI/CustomSvgIcons/Edit';
 import CheckIcon from '../../../../UI/CustomSvgIcons/Check';
 import CrossIcon from '../../../../UI/CustomSvgIcons/Cross';
+import TrashIcon from '../../../../UI/CustomSvgIcons/Trash';
 import {
   shouldActivate,
   shouldCloseOrCancel,
 } from '../../../../UI/KeyboardShortcuts/InteractionKeys';
 import TextField from '../../../../UI/TextField';
 import { Trans } from '@lingui/macro';
+import CircularProgress from '../../../../UI/CircularProgress';
 
 type Props = {|
   group: TeamGroup,
@@ -21,10 +23,18 @@ type Props = {|
     group: TeamGroup,
     newName: string
   ) => Promise<void>,
+  allowDelete: boolean,
+  onDeleteGroup: (group: TeamGroup) => Promise<void>,
 |};
 
-const TeamGroupNameField = ({ group, onFinishEditingGroupName }: Props) => {
+const TeamGroupNameField = ({
+  group,
+  onFinishEditingGroupName,
+  allowDelete,
+  onDeleteGroup,
+}: Props) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
   const [newGroupName, setNewGroupName] = React.useState<string>(group.name);
@@ -79,6 +89,20 @@ const TeamGroupNameField = ({ group, onFinishEditingGroupName }: Props) => {
     [group]
   );
 
+  const onClickDeleteGroup = React.useCallback(async () => {
+    setIsDeleting(true);
+    try {
+      await onDeleteGroup(group);
+    } catch (error) {
+      console.error(
+        `An error occurred when deleting the group ${group.id}`,
+        error
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [group, onDeleteGroup]);
+
   return (
     <Line noMargin>
       {isEditingName ? (
@@ -127,6 +151,11 @@ const TeamGroupNameField = ({ group, onFinishEditingGroupName }: Props) => {
           <IconButton onClick={onStartEditingGroupName}>
             <EditIcon fontSize="small" />
           </IconButton>
+          {allowDelete && (
+            <IconButton onClick={onClickDeleteGroup}>
+              {isDeleting ? <CircularProgress size={10} /> : <TrashIcon fontSize="small" /> }
+            </IconButton>
+          )}
         </Line>
       )}
     </Line>

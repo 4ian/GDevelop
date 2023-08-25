@@ -10,7 +10,7 @@
 #include <vector>
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventVisitor.h"
-#include "GDCore/Project/ObjectsContainersList.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 namespace gd {
 class Instruction;
@@ -100,8 +100,7 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
     : public ArbitraryEventsWorker {
  public:
   ArbitraryEventsWorkerWithContext()
-      : currentGlobalObjectsContainer(nullptr),
-        currentObjectsContainer(nullptr){};
+      : projectScopedContainers(nullptr){};
   virtual ~ArbitraryEventsWorkerWithContext();
 
   /**
@@ -109,37 +108,27 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(gd::EventsList& events,
-              const gd::ObjectsContainer& globalObjectsContainer_,
-              const gd::ObjectsContainer& objectsContainer_) {
-    currentGlobalObjectsContainer = &globalObjectsContainer_;
-    currentObjectsContainer = &objectsContainer_;
+              const gd::ProjectScopedContainers& projectScopedContainers_) {
+    projectScopedContainers = &projectScopedContainers_;
     ArbitraryEventsWorker::Launch(events);
   };
 
   void Launch(gd::EventsList& events) = delete;
 
  protected:
-  const gd::ObjectsContainer& GetGlobalObjectsContainer() {
+  const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *currentGlobalObjectsContainer;
+    return *projectScopedContainers;
   };
-  const gd::ObjectsContainer& GetObjectsContainer() {
+  const gd::ObjectsContainersList& GetObjectsContainersList() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *currentObjectsContainer;
+    return projectScopedContainers->GetObjectsContainersList();
   };
-
-  gd::ObjectsContainersList GetObjectsContainersList() {
-    return gd::ObjectsContainersList::MakeNewObjectsContainersListForContainers(
-      *currentGlobalObjectsContainer,
-      *currentObjectsContainer
-    );
-  }
 
  private:
-  const gd::ObjectsContainer* currentGlobalObjectsContainer;
-  const gd::ObjectsContainer* currentObjectsContainer;
+  const gd::ProjectScopedContainers* projectScopedContainers;
 };
 
 /**
@@ -215,8 +204,7 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
     : public ReadOnlyArbitraryEventsWorker {
  public:
   ReadOnlyArbitraryEventsWorkerWithContext()
-      : currentGlobalObjectsContainer(nullptr),
-        currentObjectsContainer(nullptr){};
+      : projectScopedContainers(nullptr){};
   virtual ~ReadOnlyArbitraryEventsWorkerWithContext();
 
   /**
@@ -224,30 +212,22 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(const gd::EventsList& events,
-              const gd::ObjectsContainer& globalObjectsContainer_,
-              const gd::ObjectsContainer& objectsContainer_) {
-    currentGlobalObjectsContainer = &globalObjectsContainer_;
-    currentObjectsContainer = &objectsContainer_;
+              const gd::ProjectScopedContainers& projectScopedContainers_) {
+    projectScopedContainers = &projectScopedContainers_;
     ReadOnlyArbitraryEventsWorker::Launch(events);
   };
 
   void Launch(gd::EventsList& events) = delete;
 
  protected:
-  const gd::ObjectsContainer& GetGlobalObjectsContainer() {
+  const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *currentGlobalObjectsContainer;
-  };
-  const gd::ObjectsContainer& GetObjectsContainer() {
-    // Pointers are guaranteed to be not nullptr after
-    // Launch was called.
-    return *currentObjectsContainer;
+    return *projectScopedContainers;
   };
 
  private:
-  const gd::ObjectsContainer* currentGlobalObjectsContainer;
-  const gd::ObjectsContainer* currentObjectsContainer;
+  const gd::ProjectScopedContainers* projectScopedContainers;
 };
 
 }  // namespace gd

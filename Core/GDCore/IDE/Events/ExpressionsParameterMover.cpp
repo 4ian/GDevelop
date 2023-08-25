@@ -31,16 +31,14 @@ namespace gd {
 class GD_CORE_API ExpressionParameterMover
     : public ExpressionParser2NodeWorker {
  public:
-  ExpressionParameterMover(const gd::ObjectsContainer& globalObjectsContainer_,
-                           const gd::ObjectsContainer& objectsContainer_,
+  ExpressionParameterMover(const gd::ProjectScopedContainers& projectScopedContainers_,
                            const gd::String& behaviorType_,
                            const gd::String& objectType_,
                            const gd::String& functionName_,
                            std::size_t oldIndex_,
                            std::size_t newIndex_)
       : hasDoneMoving(false),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        projectScopedContainers(projectScopedContainers_),
         behaviorType(behaviorType_),
         objectType(objectType_),
         functionName(functionName_),
@@ -98,16 +96,16 @@ class GD_CORE_API ExpressionParameterMover
         // This refactor only applies on events object functions
         // and events object functions doesn't exist yet.
         // This is a dead code.
-        const gd::String& thisObjectType = gd::GetTypeOfObject(
-            globalObjectsContainer, objectsContainer, node.objectName);
+        const gd::String& thisObjectType = projectScopedContainers
+            .GetObjectsContainersList().GetTypeOfObject(node.objectName);
         if (thisObjectType == objectType) {
           moveParameter(node.parameters, 1);
           hasDoneMoving = true;
         }
       } else if (!behaviorType.empty() && !node.behaviorName.empty()) {
         // Move parameter of a behavior function
-        const gd::String& thisBehaviorType = gd::GetTypeOfBehavior(
-            globalObjectsContainer, objectsContainer, node.behaviorName);
+        const gd::String& thisBehaviorType = projectScopedContainers
+            .GetObjectsContainersList().GetTypeOfBehavior(node.behaviorName);
         if (thisBehaviorType == behaviorType) {
           moveParameter(node.parameters, 2);
           hasDoneMoving = true;
@@ -126,8 +124,7 @@ class GD_CORE_API ExpressionParameterMover
 
  private:
   bool hasDoneMoving;
-  const gd::ObjectsContainer& globalObjectsContainer;
-  const gd::ObjectsContainer& objectsContainer;
+  const gd::ProjectScopedContainers& projectScopedContainers;
   const gd::String& behaviorType;  // The behavior type of the function which
                                    // must have a parameter moved (optional).
   const gd::String& objectType;    // The object type of the function which
@@ -155,8 +152,7 @@ bool ExpressionsParameterMover::DoVisitInstruction(gd::Instruction& instruction,
 
     auto node = expression.GetRootNode();
     if (node) {
-      ExpressionParameterMover mover(GetGlobalObjectsContainer(),
-                                     GetObjectsContainer(),
+      ExpressionParameterMover mover(GetProjectScopedContainers(),
                                      behaviorType,
                                      objectType,
                                      functionName,

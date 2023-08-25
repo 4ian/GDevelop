@@ -17,6 +17,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
 
@@ -34,14 +35,12 @@ class GD_CORE_API VariableFinderExpressionNodeWorker
  public:
   VariableFinderExpressionNodeWorker(std::set<gd::String>& results_,
                               const gd::Platform &platform_,
-                              const gd::ObjectsContainer &globalObjectsContainer_,
-                              const gd::ObjectsContainer &objectsContainer_,
+                              const gd::ProjectScopedContainers &projectScopedContainers_,
                               const gd::String& parameterType_,
                               const gd::String& objectName_ = "")
       : results(results_),
         platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        projectScopedContainers(projectScopedContainers_),
         parameterType(parameterType_),
         objectName(objectName_){};
   virtual ~VariableFinderExpressionNodeWorker(){};
@@ -85,7 +84,7 @@ class GD_CORE_API VariableFinderExpressionNodeWorker
     const gd::ExpressionMetadata &metadata = isObjectFunction ?
             MetadataProvider::GetObjectAnyExpressionMetadata(
                 platform,
-                GetTypeOfObject(globalObjectsContainer, objectsContainer, objectName),
+                projectScopedContainers.GetObjectsContainersList().GetTypeOfObject(objectName),
                 node.functionName):
             MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName);
 
@@ -116,8 +115,7 @@ class GD_CORE_API VariableFinderExpressionNodeWorker
 
  private:
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ProjectScopedContainers &projectScopedContainers;
 
   std::set<gd::String>& results;  ///< Reference to the std::set where argument
                                   ///< values must be stored.
@@ -169,8 +167,7 @@ class GD_CORE_API VariableFinderEventWorker
           VariableFinderExpressionNodeWorker searcher(
               results,
               platform,
-              GetGlobalObjectsContainer(),
-              GetObjectsContainer(),
+              GetProjectScopedContainers(),
               parameterType,
               objectName);
           node->Visit(searcher);
@@ -258,7 +255,8 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
                                         platform,
                                         parameterType,
                                         objectName);
-  eventWorker.Launch(layout.GetEvents(), project, layout);
+  eventWorker.Launch(layout.GetEvents(),
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout));
 
   DependenciesAnalyzer dependenciesAnalyzer = DependenciesAnalyzer(project, layout);
   dependenciesAnalyzer.Analyze();
@@ -269,7 +267,8 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
                                           platform,
                                           parameterType,
                                           objectName);
-    eventWorker.Launch(externalEvents.GetEvents(), project, layout);
+    eventWorker.Launch(externalEvents.GetEvents(),
+        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout));
   }
   for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
     const gd::Layout& dependencyLayout = project.GetLayout(sceneName);
@@ -278,7 +277,8 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
                                           platform,
                                           parameterType,
                                           objectName);
-    eventWorker.Launch(dependencyLayout.GetEvents(), project, dependencyLayout);
+    eventWorker.Launch(dependencyLayout.GetEvents(),
+        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, dependencyLayout));
   }
 }
 

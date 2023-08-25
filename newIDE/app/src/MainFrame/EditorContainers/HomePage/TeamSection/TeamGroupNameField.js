@@ -10,7 +10,7 @@ import CheckIcon from '../../../../UI/CustomSvgIcons/Check';
 import CrossIcon from '../../../../UI/CustomSvgIcons/Cross';
 import TrashIcon from '../../../../UI/CustomSvgIcons/Trash';
 import {
-  shouldActivate,
+  shouldValidate,
   shouldCloseOrCancel,
 } from '../../../../UI/KeyboardShortcuts/InteractionKeys';
 import TextField from '../../../../UI/TextField';
@@ -54,17 +54,18 @@ const TeamGroupNameField = ({
 
   const onFinishEditingName = React.useCallback(
     async () => {
-      if (!newGroupName) {
+      const cleanedNewGroupName = newGroupName.trim();
+      if (!cleanedNewGroupName) {
         setErrorText(<Trans>Group name cannot be empty.</Trans>);
         return;
       }
-      if (newGroupName === group.name) {
+      if (cleanedNewGroupName === group.name) {
         setIsEditingName(false);
         return;
       }
       setIsLoading(true);
       try {
-        await onFinishEditingGroupName(group, newGroupName);
+        await onFinishEditingGroupName(group, cleanedNewGroupName);
         setIsEditingName(false);
       } catch (error) {
         console.error(error);
@@ -89,19 +90,22 @@ const TeamGroupNameField = ({
     [group]
   );
 
-  const onClickDeleteGroup = React.useCallback(async () => {
-    setIsDeleting(true);
-    try {
-      await onDeleteGroup(group);
-    } catch (error) {
-      console.error(
-        `An error occurred when deleting the group ${group.id}`,
-        error
-      );
-    } finally {
-      setIsDeleting(false);
-    }
-  }, [group, onDeleteGroup]);
+  const onClickDeleteGroup = React.useCallback(
+    async () => {
+      setIsDeleting(true);
+      try {
+        await onDeleteGroup(group);
+      } catch (error) {
+        console.error(
+          `An error occurred when deleting the group ${group.id}`,
+          error
+        );
+      } finally {
+        setIsDeleting(false);
+      }
+    },
+    [group, onDeleteGroup]
+  );
 
   return (
     <Line noMargin>
@@ -118,7 +122,7 @@ const TeamGroupNameField = ({
           errorText={errorText}
           autoFocus="desktopAndMobileDevices"
           onKeyUp={event => {
-            if (shouldActivate(event)) {
+            if (shouldValidate(event)) {
               onFinishEditingName();
             } else if (shouldCloseOrCancel(event)) {
               event.stopPropagation();
@@ -153,7 +157,11 @@ const TeamGroupNameField = ({
           </IconButton>
           {allowDelete && (
             <IconButton onClick={onClickDeleteGroup}>
-              {isDeleting ? <CircularProgress size={10} /> : <TrashIcon fontSize="small" /> }
+              {isDeleting ? (
+                <CircularProgress size={10} />
+              ) : (
+                <TrashIcon fontSize="small" />
+              )}
             </IconButton>
           )}
         </Line>

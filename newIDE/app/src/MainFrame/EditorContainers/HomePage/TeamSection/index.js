@@ -29,6 +29,8 @@ import {
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from '../BuildSection';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import EmptyMessage from '../../../../UI/EmptyMessage';
+import AlertMessage from '../../../../UI/AlertMessage';
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
@@ -185,17 +187,33 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           <SectionRow>
             <Line>
               <Column noMargin expand>
-                <List>
-                  {fileMetadataAndStorageProviderNames.map(file => (
-                    <ProjectFileListItem
-                      file={file}
-                      onOpenRecentFile={onOpenRecentFile}
-                      storageProviders={storageProviders}
-                      isWindowWidthMediumOrLarger={!isMobile}
-                      hideDeleteContextMenuAction={true}
-                    />
-                  ))}
-                </List>
+                {fileMetadataAndStorageProviderNames.length === 0 ? (
+                  <>
+                    <EmptyMessage>
+                      <Trans>This user does not have projects yet.</Trans>
+                    </EmptyMessage>
+                    <AlertMessage kind="info">
+                      <Trans>
+                        Here are displayed their cloud projects only, they might
+                        need to save their local projects as cloud projects for
+                        you to see them.
+                      </Trans>
+                    </AlertMessage>
+                  </>
+                ) : (
+                  <List>
+                    {fileMetadataAndStorageProviderNames.map(file => (
+                      <ProjectFileListItem
+                        file={file}
+                        key={file.fileMetadata.fileIdentifier}
+                        onOpenRecentFile={onOpenRecentFile}
+                        storageProviders={storageProviders}
+                        isWindowWidthMediumOrLarger={!isMobile}
+                        hideDeleteContextMenuAction={true}
+                      />
+                    ))}
+                  </List>
+                )}
               </Column>
             </Line>
           </SectionRow>

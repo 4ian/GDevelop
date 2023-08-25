@@ -6,7 +6,7 @@ import IconButton from '../../../../UI/IconButton';
 import CheckIcon from '../../../../UI/CustomSvgIcons/Check';
 import CrossIcon from '../../../../UI/CustomSvgIcons/Cross';
 import {
-  shouldActivate,
+  shouldValidate,
   shouldCloseOrCancel,
 } from '../../../../UI/KeyboardShortcuts/InteractionKeys';
 import TextField from '../../../../UI/TextField';
@@ -23,14 +23,16 @@ const NewTeamGroupNameField = ({ onValidateGroupName }: Props) => {
 
   const onFinishEditingName = React.useCallback(
     async () => {
-      if (!groupName) {
+      const cleanedGroupName = groupName.trim();
+      if (!cleanedGroupName) {
         setErrorText(<Trans>Group name cannot be empty.</Trans>);
         return;
       }
       setIsLoading(true);
       try {
-        await onValidateGroupName({ name: groupName });
+        await onValidateGroupName({ name: cleanedGroupName });
         setGroupName('');
+        setErrorText(null);
       } catch (error) {
         console.error(error);
         setErrorText(
@@ -47,6 +49,7 @@ const NewTeamGroupNameField = ({ onValidateGroupName }: Props) => {
 
   const onCancelEditingName = React.useCallback(() => {
     setGroupName('');
+    setErrorText(null);
   }, []);
 
   return (
@@ -63,7 +66,7 @@ const NewTeamGroupNameField = ({ onValidateGroupName }: Props) => {
         translatableHintText={t`New group name`}
         errorText={errorText}
         onKeyUp={event => {
-          if (shouldActivate(event)) {
+          if (shouldValidate(event)) {
             onFinishEditingName();
           } else if (shouldCloseOrCancel(event)) {
             event.stopPropagation();

@@ -78,10 +78,7 @@ const TeamMemberRow = ({
             canDrop={() => false}
             beginDrag={() => {
               onDrag(member);
-              return {
-                name: member.id,
-                thumbnail: <Text>{member.username || member.email}</Text>,
-              };
+              return {};
             }}
             drop={() => {}}
           >

@@ -209,7 +209,7 @@ export const updateUserGroup = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.post(
     `${GDevelopUserApi.baseUrl}/team/${teamId}/action/update-members`,
-    [groupId, userId],
+    [{ groupId, userId }],
     {
       headers: { Authorization: authorizationHeader },
       params: { userId: adminUserId },

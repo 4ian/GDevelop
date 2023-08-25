@@ -6,6 +6,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import { isWebGLSupported } from '../../Utils/WebGL';
@@ -213,6 +214,7 @@ export type PreferencesValues = {|
   newProjectsDefaultStorageProviderName: string,
   useShortcutToClosePreviewWindow: boolean,
   allowUsageOfUnicodeIdentifierNames: boolean,
+  editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
 |};
 
 /**
@@ -291,6 +293,13 @@ export type Preferences = {|
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
   setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
   setAllowUsageOfUnicodeIdentifierNames: (enabled: boolean) => void,
+  getEditorStateForProject: (
+    projectId: string
+  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  setEditorStateForProject: (
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -336,6 +345,7 @@ export const initialPreferences = {
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
     allowUsageOfUnicodeIdentifierNames: false,
+    editorStateByProject: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -393,6 +403,8 @@ export const initialPreferences = {
   setNewProjectsDefaultStorageProviderName: () => {},
   setUseShortcutToClosePreviewWindow: () => {},
   setAllowUsageOfUnicodeIdentifierNames: () => {},
+  getEditorStateForProject: projectId => {},
+  setEditorStateForProject: (projectId, editorState) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

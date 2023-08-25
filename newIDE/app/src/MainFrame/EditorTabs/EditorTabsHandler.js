@@ -46,9 +46,69 @@ export type EditorTab = {|
   closable: boolean,
 |};
 
-export type EditorTabsState = {
+export type EditorTabsState = {|
   editors: Array<EditorTab>,
   currentTab: number,
+|};
+
+export type EditorKind =
+  | 'layout'
+  | 'layout events'
+  | 'external layout'
+  | 'external events'
+  | 'events functions extension'
+  | 'debugger'
+  | 'resources'
+  | 'start page';
+
+type EditorTabMetadata = {|
+  /** The name of the layout/external layout/external events/extension. */
+  projectItemName: ?string,
+  /** The editor kind. */
+  editorKind: EditorKind,
+|};
+
+export type EditorTabsPersistedState = {|
+  editors: Array<EditorTabMetadata>,
+  currentTab: number,
+|};
+
+export type EditorOpeningOptions = {|
+  label?: string,
+  icon?: React.Node,
+  projectItemName: ?string,
+  tabOptions?: TabOptions,
+  renderEditorContainer: (
+    props: RenderEditorContainerPropsWithRef
+  ) => React.Node,
+  key: string,
+  extraEditorProps?: EditorContainerExtraProps,
+  dontFocusTab?: boolean,
+  closable?: boolean,
+|};
+
+export const getEditorTabMetadata = (
+  editorTab: EditorTab
+): EditorTabMetadata => {
+  return {
+    projectItemName: editorTab.projectItemName,
+    editorKind:
+      editorTab.editorRef instanceof SceneEditorContainer
+        ? 'layout'
+        : editorTab.editorRef instanceof ExternalEventsEditorContainer
+        ? 'external events'
+        : editorTab.editorRef instanceof ExternalLayoutEditorContainer
+        ? 'external layout'
+        : editorTab.editorRef instanceof ResourcesEditorContainer
+        ? 'resources'
+        : editorTab.editorRef instanceof EventsEditorContainer
+        ? 'layout events'
+        : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
+        ? 'events functions extension'
+        : editorTab.editorRef instanceof DebuggerEditorContainer
+        ? 'debugger'
+        : 'start page',
+  };
 };
 
 export const getEditorTabsInitialState = (): EditorTabsState => {
@@ -70,19 +130,7 @@ export const openEditorTab = (
     extraEditorProps,
     dontFocusTab,
     closable,
-  }: {|
-    label?: string,
-    icon?: React.Node,
-    projectItemName: ?string,
-    tabOptions?: TabOptions,
-    renderEditorContainer: (
-      props: RenderEditorContainerPropsWithRef
-    ) => React.Node,
-    key: string,
-    extraEditorProps?: EditorContainerExtraProps,
-    dontFocusTab?: boolean,
-    closable?: boolean,
-  |}
+  }: EditorOpeningOptions
 ): EditorTabsState => {
   const existingEditorId = findIndex(
     state.editors,
@@ -122,6 +170,10 @@ export const changeCurrentTab = (
     ...state,
     currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
   };
+};
+
+export const isStartPageTabPresent = (state: EditorTabsState): boolean => {
+  return state.editors.some(editor => editor.key === 'start page');
 };
 
 export const closeTabsExceptIf = (

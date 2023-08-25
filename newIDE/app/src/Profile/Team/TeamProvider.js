@@ -22,7 +22,7 @@ import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project
 type Props = {| children: React.Node |};
 
 const TeamProvider = ({ children }: Props) => {
-  const { profile, getAuthorizationHeader } = React.useContext(
+  const { profile, getAuthorizationHeader, authenticated } = React.useContext(
     AuthenticatedUserContext
   );
   const [groups, setGroups] = React.useState<?(TeamGroup[])>(null);
@@ -30,6 +30,18 @@ const TeamProvider = ({ children }: Props) => {
   const [members, setMembers] = React.useState<?(User[])>(null);
   const [memberships, setMemberships] = React.useState<?(TeamMembership[])>(
     null
+  );
+
+  React.useEffect(
+    () => {
+      if (!authenticated) {
+        setTeam(null);
+        setGroups(null);
+        setMembers(null);
+        setMemberships(null);
+      }
+    },
+    [authenticated]
   );
 
   React.useEffect(

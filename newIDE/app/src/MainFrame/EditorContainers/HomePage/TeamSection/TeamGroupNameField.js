@@ -95,12 +95,13 @@ const TeamGroupNameField = ({
       setIsDeleting(true);
       try {
         await onDeleteGroup(group);
+        // No need to set back isDeleting flag to false since the component should
+        // be unmounted by the time the API call is done.
       } catch (error) {
         console.error(
           `An error occurred when deleting the group ${group.id}`,
           error
         );
-      } finally {
         setIsDeleting(false);
       }
     },

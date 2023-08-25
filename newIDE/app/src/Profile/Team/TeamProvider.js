@@ -121,15 +121,21 @@ const TeamProvider = ({ children }: Props) => {
     async (user: User, group: TeamGroup) => {
       if (!team || !profile || !memberships) return;
       try {
+        const membershipIndex = memberships.findIndex(
+          membership => membership.userId === user.id
+        );
+        if (
+          memberships[membershipIndex].groups &&
+          memberships[membershipIndex].groups[0] === group.id
+        ) {
+          return;
+        }
         await updateUserGroup(
           getAuthorizationHeader,
           profile.id,
           team.id,
           group.id,
           user.id
-        );
-        const membershipIndex = memberships.findIndex(
-          membership => membership.userId === user.id
         );
         if (membershipIndex !== -1) {
           setMemberships(memberships =>

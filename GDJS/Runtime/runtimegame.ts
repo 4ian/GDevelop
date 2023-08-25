@@ -211,29 +211,31 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
       this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
+
+      const resources = this._data.resources.resources;
       this._imageManager = new gdjs.ImageManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._soundManager = new gdjs.SoundManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._fontManager = new gdjs.FontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._jsonManager = new gdjs.JsonManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader,
         this._imageManager
       );
       this._model3DManager = new gdjs.Model3DManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._effectsManager = new gdjs.EffectsManager();

@@ -598,6 +598,15 @@ namespace gdjs {
   > => {
     return Promise.all(asynchronouslyLoadingLibraryPromises);
   };
+
+  export function* mapIterable<S, T>(
+    iterator: Iterable<S>,
+    mapping: (source: S) => T
+  ): Iterable<T> {
+    for (let i of iterator) {
+      yield mapping(i);
+    }
+  }
 }
 
 // Make sure console.warn and console.error are available.

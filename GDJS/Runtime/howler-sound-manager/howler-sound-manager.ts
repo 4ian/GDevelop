@@ -366,7 +366,7 @@ namespace gdjs {
   export class HowlerSoundManager {
     _loadedMusics: Record<string, Howl> = {};
     _loadedSounds: Record<string, Howl> = {};
-    _resources: ResourceData[];
+    _resources: Map<string, ResourceData>;
     _availableResources: Record<string, ResourceData> = {};
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
@@ -385,10 +385,11 @@ namespace gdjs {
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
-      resources: ResourceData[],
+      resourceDataArray: ResourceData[],
       resourcesLoader: RuntimeGameResourcesLoader
     ) {
-      this._resources = resources;
+      this._resources = new Map<string, ResourceData>();
+      this.setResources(resourceDataArray);
       this._resourcesLoader = resourcesLoader;
 
       const that = this;
@@ -441,8 +442,13 @@ namespace gdjs {
      *
      * @param resources The resources data of the game.
      */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
+    setResources(resourceDataArray: ResourceData[]): void {
+      this._resources.clear();
+      for (const resourceData of resourceDataArray) {
+        if (resourceData.kind === 'audio') {
+          this._resources.set(resourceData.name, resourceData);
+        }
+      }
     }
 
     /**
@@ -778,15 +784,12 @@ namespace gdjs {
       onComplete: (totalCount: integer) => void,
       resources?: ResourceData[]
     ) {
-      resources = resources || this._resources;
-
       // Construct the list of files to be loaded.
       // For one loaded file, it can have one or more resources
       // that use it.
       const files = {};
-      for (let i = 0, len = resources.length; i < len; ++i) {
-        let res = resources[i];
-        if (res.file && res.kind === 'audio') {
+      for (const res of resources || this._resources.values()) {
+        if (res.file) {
           if (!!this._availableResources[res.name]) {
             continue;
           }

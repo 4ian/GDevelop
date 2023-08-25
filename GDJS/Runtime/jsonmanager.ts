@@ -27,7 +27,7 @@ namespace gdjs {
    */
   export class JsonManager {
     _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: ResourceData[];
+    _resources: Map<string, ResourceData>;
 
     _loadedJsons: { [key: string]: Object } = {};
     _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
@@ -37,10 +37,11 @@ namespace gdjs {
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
-      resources: ResourceData[],
+      resourceDataArray: ResourceData[],
       resourcesLoader: RuntimeGameResourcesLoader
     ) {
-      this._resources = resources;
+      this._resources = new Map<string, ResourceData>();
+      this.setResources(resourceDataArray);
       this._resourcesLoader = resourcesLoader;
     }
 
@@ -49,8 +50,17 @@ namespace gdjs {
      *
      * @param resources The resources data of the game.
      */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
+    setResources(resourceDataArray: ResourceData[]): void {
+      this._resources.clear();
+      for (const resourceData of resourceDataArray) {
+        if (
+          resourceData.kind === 'json' ||
+          resourceData.kind === 'tilemap' ||
+          resourceData.kind === 'tileset'
+        ) {
+          this._resources.set(resourceData.name, resourceData);
+        }
+      }
     }
 
     /**
@@ -77,14 +87,9 @@ namespace gdjs {
       onComplete: JsonManagerOnCompleteCallback
     ): void {
       const resources = this._resources;
-      const jsonResources = resources.filter(function (resource) {
-        return (
-          (resource.kind === 'json' ||
-            resource.kind === 'tilemap' ||
-            resource.kind === 'tileset') &&
-          !resource.disablePreload
-        );
-      });
+      const jsonResources = [...resources.values()].filter(
+        (resource) => !resource.disablePreload
+      );
       if (jsonResources.length === 0) {
         return onComplete(jsonResources.length);
       }
@@ -101,8 +106,8 @@ namespace gdjs {
           onProgress(loaded, jsonResources.length);
         }
       };
-      for (let i = 0; i < jsonResources.length; ++i) {
-        this.loadJson(jsonResources[i].name, onLoad);
+      for (const jsonResource of jsonResources) {
+        this.loadJson(jsonResource.name, onLoad);
       }
     }
 
@@ -115,14 +120,7 @@ namespace gdjs {
      * @param callback The callback function called when json is loaded (or an error occurred).
      */
     loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
-      const resource = this._resources.find(function (resource) {
-        return (
-          (resource.kind === 'json' ||
-            resource.kind === 'tilemap' ||
-            resource.kind === 'tileset') &&
-          resource.name === resourceName
-        );
-      });
+      const resource = this._resources.get(resourceName);
       if (!resource) {
         callback(
           new Error(

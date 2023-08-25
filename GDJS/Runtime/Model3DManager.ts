@@ -18,7 +18,7 @@ namespace gdjs {
     private _loadedThreeModels = new Map<String, THREE_ADDONS.GLTF>();
 
     _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: ResourceData[];
+    _resources: Map<string, ResourceData>;
 
     _loader: THREE_ADDONS.GLTFLoader | null = null;
     _dracoLoader: THREE_ADDONS.DRACOLoader | null = null;
@@ -31,10 +31,11 @@ namespace gdjs {
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
-      resources: ResourceData[],
+      resourceDataArray: ResourceData[],
       resourcesLoader: RuntimeGameResourcesLoader
     ) {
-      this._resources = resources;
+      this._resources = new Map<string, ResourceData>();
+      this.setResources(resourceDataArray);
       this._resourcesLoader = resourcesLoader;
 
       if (typeof THREE !== 'undefined') {
@@ -73,8 +74,13 @@ namespace gdjs {
      *
      * @param resources The resources data of the game.
      */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
+    setResources(resourceDataArray: ResourceData[]): void {
+      this._resources.clear();
+      for (const resourceData of resourceDataArray) {
+        if (resourceData.kind === 'model3D') {
+          this._resources.set(resourceData.name, resourceData);
+        }
+      }
     }
 
     /**
@@ -87,17 +93,14 @@ namespace gdjs {
      * @param onComplete The function called when all file are loaded.
      */
     async loadModels(onProgress: OnProgressCallback): Promise<integer> {
-      const model3DResources = this._resources.filter(function (resource) {
-        return resource.kind === 'model3D';
-      });
       const loader = this._loader;
-      if (model3DResources.length === 0 || !loader) {
+      if (this._resources.size === 0 || !loader) {
         return 0;
       }
 
       let loadedCount = 0;
       await Promise.all(
-        model3DResources.map(async (resource) => {
+        mapIterable(this._resources.values(), async (resource) => {
           const url = this._resourcesLoader.getFullUrl(resource.file);
           loader.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
             url
@@ -117,7 +120,7 @@ namespace gdjs {
             );
           }
           loadedCount++;
-          onProgress(loadedCount, model3DResources.length);
+          onProgress(loadedCount, this._resources.size);
         })
       );
       return loadedCount;

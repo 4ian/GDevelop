@@ -164,6 +164,24 @@ export const updateGroup = async (
   return response.data;
 };
 
+export const createGroup = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string,
+  attributes: {| name: string |}
+): Promise<TeamGroup> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopUserApi.baseUrl}/team/${teamId}/group`,
+    attributes,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
 export const deleteGroup = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,

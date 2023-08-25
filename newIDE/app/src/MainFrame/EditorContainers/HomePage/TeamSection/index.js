@@ -20,6 +20,7 @@ import {
 import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
 import TeamContext from '../../../../Profile/Team/TeamContext';
 import TeamGroupNameField from './TeamGroupNameField';
+import NewTeamGroupNameField from './NewTeamGroupNameField';
 import TeamMemberRow from './TeamMemberRow';
 import { makeDropTarget } from '../../../../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
@@ -102,6 +103,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onChangeUserGroup,
       onListUserProjects,
       onDeleteGroup,
+      onCreateGroup,
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
@@ -297,6 +299,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 }
               </DropTarget>
             ))}
+          <NewTeamGroupNameField onValidateGroupName={onCreateGroup} />
         </SectionRow>
       </SectionContainer>
     );

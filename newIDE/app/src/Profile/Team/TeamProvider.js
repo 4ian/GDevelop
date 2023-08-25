@@ -14,6 +14,7 @@ import {
   type User,
   updateUserGroup,
   deleteGroup,
+  createGroup,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
@@ -175,6 +176,20 @@ const TeamProvider = ({ children }: Props) => {
     [team, getAuthorizationHeader, profile]
   );
 
+  const onCreateGroup = React.useCallback(
+    async (attributes: {| name: string |}) => {
+      if (!profile || !team) return;
+      const newGroup = await createGroup(
+        getAuthorizationHeader,
+        profile.id,
+        team.id,
+        attributes
+      );
+      setGroups(groups ? [...groups, newGroup] : null);
+    },
+    [team, getAuthorizationHeader, profile, groups]
+  );
+
   return (
     <TeamContext.Provider
       value={{
@@ -186,6 +201,7 @@ const TeamProvider = ({ children }: Props) => {
         onChangeUserGroup,
         onListUserProjects,
         onDeleteGroup,
+        onCreateGroup,
       }}
     >
       {children}

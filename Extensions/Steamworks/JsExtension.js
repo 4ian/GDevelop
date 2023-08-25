@@ -61,7 +61,7 @@ module.exports = {
       .setExportName('steamworks.js')
       // Note: Updating steamworks.js here only updates it for the game builds,
       // also update newIDE/electron-app/app/package.json to update it for previews as well!
-      .setVersion('0.2.0');
+      .setVersion('0.3.1');
 
     extension
       .addAction(

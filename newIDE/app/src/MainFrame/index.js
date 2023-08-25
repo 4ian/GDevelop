@@ -2355,6 +2355,8 @@ const MainFrame = (props: Props) => {
         return saveProjectAs();
       }
 
+      if (!!currentFileMetadata.ownerId) return;
+
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
         return;
@@ -3034,7 +3036,11 @@ const MainFrame = (props: Props) => {
               : null
           )
         }
-        canSave={!!state.currentProject && !isSavingProject}
+        canSave={
+          !!state.currentProject &&
+          !isSavingProject &&
+          (!currentFileMetadata || !currentFileMetadata.ownerId)
+        }
         onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}

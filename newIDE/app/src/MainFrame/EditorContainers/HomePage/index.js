@@ -272,6 +272,16 @@ export const HomePage = React.memo<Props>(
         showGetStartedSection ? 'get-started' : 'build'
       );
 
+      // If the user logs out and is on the team view section, go back to the build section.
+      React.useEffect(
+        () => {
+          if (activeTab === 'team-view' && !authenticated) {
+            setActiveTab('build');
+          }
+        },
+        [authenticated, activeTab]
+      );
+
       return (
         <I18n>
           {({ i18n }) => (

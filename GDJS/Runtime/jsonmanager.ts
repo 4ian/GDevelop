@@ -60,9 +60,19 @@ namespace gdjs {
      * as JSON files can have been modified without the editor knowing).
      *
      * @param onProgress The function called after each json is loaded.
-     * @param onComplete The function called when all jsons are loaded.
      */
     preloadJsons(
+      onProgress: (loadedCount: integer, totalCount: integer) => void
+    ): Promise<integer> {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.preloadJsonsWithCallback(onProgress, (totalCount: integer) => {
+          resolve(totalCount);
+        });
+      });
+    }
+
+    private preloadJsonsWithCallback(
       onProgress: JsonManagerOnProgressCallback,
       onComplete: JsonManagerOnCompleteCallback
     ): void {

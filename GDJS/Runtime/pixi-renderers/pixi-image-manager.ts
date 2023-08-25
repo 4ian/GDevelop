@@ -311,9 +311,8 @@ namespace gdjs {
      * @param onComplete Callback called when loading is done.
      */
     loadTextures(
-      onProgress: (loadingCount: integer, totalCount: integer) => void,
-      onComplete: (totalCount: integer) => void
-    ) {
+      onProgress: (loadingCount: integer, totalCount: integer) => void
+    ): Promise<integer> {
       const resources = this._resources;
 
       // Construct the list of files to be loaded.
@@ -335,7 +334,7 @@ namespace gdjs {
       const totalCount = Object.keys(resourceFiles).length;
       if (totalCount === 0) {
         // Nothing to load.
-        return onComplete(totalCount);
+        return Promise.resolve(0);
       }
 
       const loader = PIXI.Loader.shared;
@@ -356,30 +355,32 @@ namespace gdjs {
           });
         }
       }
-      loader.load((loader, loadedPixiResources) => {
-        loader.onProgress.detach(progressCallbackId);
+      return new Promise((resolve, reject) => {
+        loader.load((loader, loadedPixiResources) => {
+          loader.onProgress.detach(progressCallbackId);
 
-        // Store the loaded textures so that they are ready to use.
-        for (const file in loadedPixiResources) {
-          if (loadedPixiResources.hasOwnProperty(file)) {
-            if (!resourceFiles.hasOwnProperty(file)) {
-              continue;
-            }
-
-            resourceFiles[file].forEach((resource) => {
-              const loadedTexture = loadedPixiResources[file].texture;
-              if (!loadedTexture) {
-                const error = loadedPixiResources[file].error;
-                logFileLoadingError(file, error);
-                return;
+          // Store the loaded textures so that they are ready to use.
+          for (const file in loadedPixiResources) {
+            if (loadedPixiResources.hasOwnProperty(file)) {
+              if (!resourceFiles.hasOwnProperty(file)) {
+                continue;
               }
 
-              this._loadedTextures.put(resource.name, loadedTexture);
-              applyTextureSettings(loadedTexture, resource);
-            });
+              resourceFiles[file].forEach((resource) => {
+                const loadedTexture = loadedPixiResources[file].texture;
+                if (!loadedTexture) {
+                  const error = loadedPixiResources[file].error;
+                  logFileLoadingError(file, error);
+                  return;
+                }
+
+                this._loadedTextures.put(resource.name, loadedTexture);
+                applyTextureSettings(loadedTexture, resource);
+              });
+            }
           }
-        }
-        onComplete(totalCount);
+          resolve(totalCount);
+        });
       });
     }
   }

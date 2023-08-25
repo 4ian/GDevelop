@@ -182,9 +182,19 @@ namespace gdjs {
      * Load the specified resources, so that fonts are loaded and can then be
      * used by using the font family returned by getFontFamily.
      * @param onProgress Callback called each time a new file is loaded.
-     * @param onComplete Callback called when loading is done.
      */
     loadFonts(
+      onProgress: (loadedCount: integer, totalCount: integer) => void
+    ): Promise<integer> {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.loadFontsWithCallback(onProgress, (totalCount: integer) => {
+          resolve(totalCount);
+        });
+      });
+    }
+
+    private loadFontsWithCallback(
       onProgress: (loadingCount: integer, totalCount: integer) => void,
       onComplete: (totalCount: integer) => void
     ) {

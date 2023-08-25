@@ -759,6 +759,22 @@ namespace gdjs {
 
     preloadAudio(
       onProgress: (loadedCount: integer, totalCount: integer) => void,
+      resources?: ResourceData[]
+    ): Promise<integer> {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.preloadAudioWithCallback(
+          onProgress,
+          (totalCount: integer) => {
+            resolve(totalCount);
+          },
+          resources
+        );
+      });
+    }
+
+    private preloadAudioWithCallback(
+      onProgress: (loadedCount: integer, totalCount: integer) => void,
       onComplete: (totalCount: integer) => void,
       resources?: ResourceData[]
     ) {

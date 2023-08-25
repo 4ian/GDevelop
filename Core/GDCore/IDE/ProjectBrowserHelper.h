@@ -80,7 +80,7 @@ public:
 
   /**
    * \brief Call the specified worker on all events of the event-based
-   * extension
+   * extension.
    *
    * This should be the preferred way to traverse all the events of an events
    * based extension.
@@ -92,7 +92,7 @@ public:
 
   /**
    * \brief Call the specified worker on all events of the event-based
-   * extension
+   * extension.
    *
    * This should be the preferred way to traverse all the events of an events
    * based extension.
@@ -104,7 +104,7 @@ public:
 
   /**
    * \brief Call the specified worker on all events of the event-based
-   * behavior
+   * behavior.
    *
    * This should be the preferred way to traverse all the events of an events
    * based behavior.
@@ -126,10 +126,10 @@ public:
 
   /**
    * \brief Call the specified worker on all events of the event-based
-   * behavior.
+   * object.
    *
    * This should be the preferred way to traverse all the events of an
-   * event-based behavior.
+   * event-based object.
    */
   static void
   ExposeEventsBasedObjectEvents(gd::Project &project,
@@ -138,10 +138,10 @@ public:
 
   /**
    * \brief Call the specified worker on all events of the event-based
-   * behavior.
+   * object.
    *
    * This should be the preferred way to traverse all the events of an
-   * event-based behavior.
+   * event-based object.
    */
   static void
   ExposeEventsBasedObjectEvents(gd::Project &project,

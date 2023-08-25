@@ -135,7 +135,8 @@ const useStylesForListItemIcon = makeStyles({
 });
 
 export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
-  cloudProjects: Array<CloudProjectWithUserAccessInfo>
+  cloudProjects: Array<CloudProjectWithUserAccessInfo>,
+  ownerId?: string
 ): Array<FileMetadataAndStorageProviderName> => {
   return cloudProjects
     .map(cloudProject => {
@@ -149,6 +150,9 @@ export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
           gameId: cloudProject.gameId,
         },
       };
+      if (ownerId) {
+        file.fileMetadata.ownerId = ownerId;
+      }
       return file;
     })
     .filter(Boolean);

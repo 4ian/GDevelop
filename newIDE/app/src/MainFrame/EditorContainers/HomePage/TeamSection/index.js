@@ -170,7 +170,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
 
     if (selectedUser && selectedUserProjects) {
       const fileMetadataAndStorageProviderNames = transformCloudProjectsIntoFileMetadataWithStorageProviderName(
-        selectedUserProjects
+        selectedUserProjects,
+        selectedUser.id
       );
       return (
         <SectionContainer

@@ -109,9 +109,9 @@ const TeamProvider = ({ children }: Props) => {
         group_ => group_.id === group.id
       );
       if (updatedGroupIndex !== -1) {
-        setGroups(groups =>
-          groups ? groups.with(updatedGroupIndex, updatedGroup) : null
-        );
+        const newGroups = [...groups];
+        newGroups[updatedGroupIndex] = updatedGroup;
+        setGroups(newGroups);
       }
     },
     [team, getAuthorizationHeader, profile, groups]
@@ -138,14 +138,12 @@ const TeamProvider = ({ children }: Props) => {
           user.id
         );
         if (membershipIndex !== -1) {
-          setMemberships(memberships =>
-            memberships
-              ? memberships.with(membershipIndex, {
-                  ...memberships[membershipIndex],
-                  groups: [group.id],
-                })
-              : null
-          );
+          const newMemberships = [...memberships];
+          newMemberships[membershipIndex] = {
+            ...memberships[membershipIndex],
+            groups: [group.id],
+          };
+          setMemberships(newMemberships);
         }
       } catch (error) {
         console.error('An error occurred while update user group:', error);

@@ -151,7 +151,7 @@ export const updateGroup = async (
   teamId: string,
   groupId: string,
   attributes: {| name: string |}
-): Promise<Array<TeamGroup>> => {
+): Promise<TeamGroup> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.patch(
     `${GDevelopUserApi.baseUrl}/team/${teamId}/group/${groupId}`,
@@ -168,7 +168,7 @@ export const deleteGroup = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   teamId: string,
-  groupId: string,
+  groupId: string
 ): Promise<Array<TeamGroup>> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.delete(

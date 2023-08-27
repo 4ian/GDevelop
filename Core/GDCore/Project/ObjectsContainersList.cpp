@@ -12,8 +12,6 @@
 
 namespace gd {
 
-gd::Variable ObjectsContainersList::badVariable;
-
 ObjectsContainersList
 ObjectsContainersList::MakeNewObjectsContainersListForProjectAndLayout(
     const gd::Project& project, const gd::Layout& layout) {
@@ -65,9 +63,7 @@ bool ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
       return variables.Has(variableName);
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // TODO: much like behaviors or object types, handle variables that are
-      // common between objects in a group (and maybe we should require the
-      // group to declare them?)
+      // TODO: allow object groups to have variables?
     }
   }
 
@@ -83,36 +79,26 @@ bool ObjectsContainersList::HasVariablesContainer(
         &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // TODO: much like behaviors or object types, handle variables that are
-      // common between objects in a group (and maybe we should require the
-      // group to declare them?)
+      // TODO: allow object groups to have variables?
     }
   }
 
   return false;
 }
 
-const gd::Variable& ObjectsContainersList::GetObjectOrGroupVariable(
-  const gd::String& objectOrGroupName, const gd::String& variableName) const {
+const gd::VariablesContainer* ObjectsContainersList::GetObjectOrGroupVariablesContainer(
+  const gd::String& objectOrGroupName) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
-      const auto& variables =
-          (*it)->GetObject(objectOrGroupName).GetVariables();
-      if (variables.Has(variableName)) {
-        return variables.Get(variableName);
-      }
-
-      return badVariable;
+      return &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // TODO: much like behaviors or object types, handle variables that are
-      // common between objects in a group (and maybe we should require the
-      // group to declare them?)
+      // TODO: allow object groups to have variables?
     }
   }
 
-  return badVariable;
+  return nullptr;
 }
 
 std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String& objectOrGroupName) const {

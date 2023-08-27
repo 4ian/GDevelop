@@ -27,11 +27,11 @@ namespace gd {
 class GD_CORE_API EventsVariableRenamer : public ArbitraryEventsWorkerWithContext {
  public:
   EventsVariableRenamer(const gd::Platform &platform_,
-    const gd::VariablesContainer &variablesContainer_,
+    const gd::VariablesContainer &variablesContainerWithVariableToReplace_,
     const gd::String& oldVariableName_,
     const gd::String& newVariableName_) :
     platform(platform_),
-    variablesContainer(variablesContainer_),
+    variablesContainerWithVariableToReplace(variablesContainerWithVariableToReplace_),
     oldVariableName(oldVariableName_),
     newVariableName(newVariableName_)
   {};
@@ -43,7 +43,7 @@ class GD_CORE_API EventsVariableRenamer : public ArbitraryEventsWorkerWithContex
   // TODO: handle renaming of variables in events like "For each child variable".
 
   const gd::Platform &platform;
-  const gd::VariablesContainer &variablesContainer;
+  const gd::VariablesContainer &variablesContainerWithVariableToReplace;
   gd::String objectName;
   gd::String oldVariableName;
   gd::String newVariableName;

@@ -46,6 +46,24 @@ class GD_CORE_API VariablesContainersList {
    */
   bool HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const;
 
+  /**
+   * Get the variables container at the top of the scope (so the most "global" one).
+   * \brief Avoid using apart when a scope must be forced.
+   */
+  const VariablesContainer* GetTopMostVariablesContainer() const {
+    if (variablesContainers.empty()) return nullptr;
+    return variablesContainers.front();
+  };
+
+  /**
+   * Get the variables container at the top of the scope (so the most "local" one).
+   * \brief Avoid using apart when a scope must be forced.
+   */
+  const VariablesContainer* GetBottomMostVariablesContainer() const {
+    if (variablesContainers.empty()) return nullptr;
+    return variablesContainers.back();
+  }
+
   /** Do not use - should be private but accessible to let Emscripten create a temporary. */
   VariablesContainersList() {};
  private:

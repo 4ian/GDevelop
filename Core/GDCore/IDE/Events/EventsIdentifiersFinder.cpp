@@ -68,9 +68,7 @@ class GD_CORE_API IdentifierFinderExpressionNodeWorker
     node.expression->Visit(*this);
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitIdentifierNode(IdentifierNode& node) override {
-    // TODO: add support for object variables.
-  }
+  void OnVisitIdentifierNode(IdentifierNode& node) override {}
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     bool considerFunction = objectName.empty() || node.objectName == objectName;

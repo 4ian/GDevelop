@@ -112,7 +112,6 @@ bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
       return true; // We should have found a variable.
     }
 
-    const auto& variable = objectsContainersList.GetObjectOrGroupVariable(identifier.identifierName, identifier.childIdentifierName);
     return true; // We found a variable.
   } else {
     // Try to identify a declared variable with the name (and maybe the child

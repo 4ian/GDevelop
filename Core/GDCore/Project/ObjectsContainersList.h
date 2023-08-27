@@ -46,9 +46,8 @@ class GD_CORE_API ObjectsContainersList {
   bool HasVariablesContainer(const gd::String& objectOrGroupName,
                                 const gd::VariablesContainer& variablesContainer) const;
 
-  const gd::Variable& GetObjectOrGroupVariable(
-      const gd::String& objectOrGroupName,
-      const gd::String& variableName) const;
+  const gd::VariablesContainer* GetObjectOrGroupVariablesContainer(
+      const gd::String& objectOrGroupName) const;
 
   /**
    * \brief Get a type from an object/group name.
@@ -87,7 +86,6 @@ class GD_CORE_API ObjectsContainersList {
   };
 
   std::vector<const gd::ObjectsContainer*> objectsContainers;
-  static gd::Variable badVariable;
 };
 
 }  // namespace gd

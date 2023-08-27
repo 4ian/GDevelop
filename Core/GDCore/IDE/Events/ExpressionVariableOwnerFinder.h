@@ -32,6 +32,10 @@ namespace gd {
  * \brief Find the object name that should be used as a context of the
  * expression or sub-expression that a given node represents.
  *
+ * This is needed because of the legacy convention where a "objectvar"
+ * parameter represents a variable of the object represented by the previous "object"
+ * parameter.
+ *
  * \see gd::ExpressionParser2
  */
 class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWorker {

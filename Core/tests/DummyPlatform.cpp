@@ -243,6 +243,20 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("soundfile", "Parameter 3 (an audio resource)")
       .SetFunctionName("doSomethingWithResources");
 
+  extension
+      ->AddAction("DoSomethingWithLegacyPreScopedVariables",
+                  "Do something with variables",
+                  "This does something with variables",
+                  "Do something with variables please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("scenevar", "Scene variable")
+      .AddParameter("globalvar", "Global variable")
+      .AddParameter("object", "Some object")
+      .AddParameter("objectvar", "Some variable of the object")
+      .SetFunctionName("doSomethingWithVariables");
+
   extension->AddExpression("GetNumber", "Get me a number", "", "", "")
       .SetFunctionName("getNumber");
   extension

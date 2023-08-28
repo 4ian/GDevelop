@@ -27,7 +27,7 @@ namespace gdjs {
     _invalidModel: THREE_ADDONS.GLTF;
 
     /**
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
@@ -72,7 +72,7 @@ namespace gdjs {
     /**
      * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
      *
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      */
     setResources(resourceDataArray: ResourceData[]): void {
       this._resources.clear();
@@ -100,7 +100,7 @@ namespace gdjs {
 
       let loadedCount = 0;
       await Promise.all(
-        mapIterable(this._resources.values(), async (resource) => {
+        gdjs.mapIterable(this._resources.values(), async (resource) => {
           const url = this._resourcesLoader.getFullUrl(resource.file);
           loader.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
             url
@@ -124,6 +124,34 @@ namespace gdjs {
         })
       );
       return loadedCount;
+    }
+
+    getAllResourcesPromises(): Iterable<Promise<void>> {
+      const loader = this._loader;
+      if (this._resources.size === 0 || !loader) {
+        return gdjs.emptyIterable;
+      }
+
+      return gdjs.mapIterable(this._resources.values(), async (resource) => {
+        const url = this._resourcesLoader.getFullUrl(resource.file);
+        loader.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
+          url
+        );
+        try {
+          const gltf: THREE_ADDONS.GLTF = await loader.loadAsync(
+            url,
+            (event) => {}
+          );
+          this._loadedThreeModels.set(resource.name, gltf);
+        } catch (error) {
+          logger.error(
+            "Can't fetch the 3D model file " +
+              resource.file +
+              ', error: ' +
+              error
+          );
+        }
+      });
     }
 
     /**

@@ -5,11 +5,6 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('JSON Manager');
-  type JsonManagerOnProgressCallback = (
-    loadedCount: integer,
-    totalCount: integer
-  ) => void;
-  type JsonManagerOnCompleteCallback = (totalCount: integer) => void;
 
   /** The callback called when a json that was requested is loaded (or an error occurred). */
   export type JsonManagerRequestCallback = (
@@ -33,7 +28,7 @@ namespace gdjs {
     _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
 
     /**
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
@@ -48,7 +43,7 @@ namespace gdjs {
     /**
      * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
      *
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      */
     setResources(resourceDataArray: ResourceData[]): void {
       this._resources.clear();
@@ -71,44 +66,41 @@ namespace gdjs {
      *
      * @param onProgress The function called after each json is loaded.
      */
-    preloadJsons(
+    async preloadJsons(
       onProgress: (loadedCount: integer, totalCount: integer) => void
     ): Promise<integer> {
-      const that = this;
-      return new Promise((resolve, reject) => {
-        that.preloadJsonsWithCallback(onProgress, (totalCount: integer) => {
-          resolve(totalCount);
-        });
-      });
+      const preloadedResources = [
+        ...gdjs.filterIterable(
+          this._resources.values(),
+          (resource) => !resource.disablePreload
+        ),
+      ];
+
+      let loadedCount = 0;
+      await Promise.all(
+        gdjs.mapIterable(preloadedResources, async (resource) => {
+          try {
+            this.loadJsonAsync(resource.name);
+          } catch (error) {
+            logger.error('Error while preloading a json resource:' + error);
+          }
+          loadedCount++;
+          onProgress(loadedCount, this._resources.size);
+        })
+      );
+      return loadedCount;
     }
 
-    private preloadJsonsWithCallback(
-      onProgress: JsonManagerOnProgressCallback,
-      onComplete: JsonManagerOnCompleteCallback
-    ): void {
-      const resources = this._resources;
-      const jsonResources = [...resources.values()].filter(
-        (resource) => !resource.disablePreload
-      );
-      if (jsonResources.length === 0) {
-        return onComplete(jsonResources.length);
-      }
-      let loaded = 0;
-
-      const onLoad: JsonManagerRequestCallback = function (error) {
-        if (error) {
-          logger.error('Error while preloading a json resource:' + error);
-        }
-        loaded++;
-        if (loaded === jsonResources.length) {
-          onComplete(jsonResources.length);
-        } else {
-          onProgress(loaded, jsonResources.length);
-        }
-      };
-      for (const jsonResource of jsonResources) {
-        this.loadJson(jsonResource.name, onLoad);
-      }
+    loadJsonAsync(resourceName: string): Promise<Object | null> {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.loadJson(resourceName, (error, content) => {
+          if (error) {
+            reject(error.message);
+          }
+          resolve(content);
+        });
+      });
     }
 
     /**

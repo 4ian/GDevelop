@@ -124,7 +124,7 @@ namespace gdjs {
      * @param fontFamily The font
      * @returns The font family to be used for this font resource.
      */
-    private _loadFont(fontFamily: string, src): Promise<void> {
+    private _loadFont(fontFamily: string, src: string): Promise<void> {
       const descriptors = {};
       const srcWithUrl = 'url(' + encodeURI(src) + ')';
 
@@ -189,28 +189,14 @@ namespace gdjs {
      * used by using the font family returned by getFontFamily.
      * @param onProgress Callback called each time a new file is loaded.
      */
-    loadFonts(
+    async loadFonts(
       onProgress: (loadedCount: integer, totalCount: integer) => void
     ): Promise<integer> {
-      const that = this;
-      return new Promise((resolve, reject) => {
-        that.loadFontsWithCallback(onProgress, (totalCount: integer) => {
-          resolve(totalCount);
-        });
-      });
-    }
-
-    private loadFontsWithCallback(
-      onProgress: (loadingCount: integer, totalCount: integer) => void,
-      onComplete: (totalCount: integer) => void
-    ) {
-      const resources = this._resources;
-
       // Construct the list of files to be loaded.
       // For one loaded file, it can have one or more resources
       // that use it.
       const filesResources: { [key: string]: ResourceData[] } = {};
-      for (const res of resources.values()) {
+      for (const res of this._resources.values()) {
         if (res.file) {
           if (!!this._loadedFonts[res.name]) {
             continue;
@@ -222,35 +208,17 @@ namespace gdjs {
       }
       const totalCount = Object.keys(filesResources).length;
       if (totalCount === 0) {
-        return onComplete(
-          // Nothing to load.
-          totalCount
-        );
+        return 0;
       }
-      let loadingCount = 0;
 
-      const onFontLoaded = (
-        fontFamily: string,
-        fontResources: ResourceData[]
-      ) => {
-        fontResources.forEach((resource) => {
-          this._loadedFontFamily[resource.name] = fontFamily;
-          this._loadedFonts[resource.name] = resource;
-        });
-        loadingCount++;
-        onProgress(loadingCount, totalCount);
-        if (loadingCount === totalCount) {
-          onComplete(totalCount);
-        }
-      };
-      Object.keys(filesResources).forEach((file) => {
-        const fontFamily = this._getFontFamilyFromFilename(file);
-        const fontResources = filesResources[file];
-        this._loadFont(fontFamily, file).then(
-          () => {
-            onFontLoaded(fontFamily, fontResources);
-          },
-          (error) => {
+      let loadingCount = 0;
+      await Promise.all(
+        Object.keys(filesResources).map(async (file) => {
+          const fontFamily = this._getFontFamilyFromFilename(file);
+          const fontResources = filesResources[file];
+          try {
+            await this._loadFont(fontFamily, file);
+          } catch (error) {
             logger.error(
               'Error loading font resource "' +
                 fontResources[0].name +
@@ -259,10 +227,16 @@ namespace gdjs {
                 '): ' +
                 (error.message || 'Unknown error')
             );
-            onFontLoaded(fontFamily, fontResources);
           }
-        );
-      });
+          fontResources.forEach((resource) => {
+            this._loadedFontFamily[resource.name] = fontFamily;
+            this._loadedFonts[resource.name] = resource;
+          });
+          loadingCount++;
+          onProgress(loadingCount, totalCount);
+        })
+      );
+      return totalCount;
     }
   }
 

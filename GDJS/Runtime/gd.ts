@@ -600,13 +600,28 @@ namespace gdjs {
   };
 
   export function* mapIterable<S, T>(
-    iterator: Iterable<S>,
+    iterable: Iterable<S>,
     mapping: (source: S) => T
   ): Iterable<T> {
-    for (let i of iterator) {
-      yield mapping(i);
+    for (const element of iterable) {
+      yield mapping(element);
     }
   }
+
+  export function* filterIterable<T>(
+    iterable: Iterable<T>,
+    predicate: (value: T) => unknown,
+    thisArg?: any
+  ): Iterable<T> {
+    for (const element of iterable) {
+      if (predicate(element)) {
+        yield element;
+      }
+    }
+  }
+
+  function* createEmptyIterable<T>(): Iterable<T> {}
+  export const emptyIterable = createEmptyIterable<any>();
 }
 
 // Make sure console.warn and console.error are available.

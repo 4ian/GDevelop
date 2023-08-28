@@ -41,7 +41,7 @@ namespace gdjs {
    * It installs the "BitmapFont" with PixiJS to be used with PIXI.BitmapText.
    */
   export class PixiBitmapFontManager {
-    private _resources: ResourceData[];
+    _resources: Map<string, ResourceData>;
     private _imageManager: gdjs.PixiImageManager;
 
     /** Pixi.BitmapFont used, indexed by their BitmapFont name. */
@@ -61,16 +61,17 @@ namespace gdjs {
     _resourcesLoader: RuntimeGameResourcesLoader;
 
     /**
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      * @param resourcesLoader The resources loader of the game.
      * @param imageManager The image manager to be used to get textures used by fonts.
      */
     constructor(
-      resources: ResourceData[],
+      resourceDataArray: ResourceData[],
       resourcesLoader: RuntimeGameResourcesLoader,
       imageManager: gdjs.PixiImageManager
     ) {
-      this._resources = resources;
+      this._resources = new Map<string, ResourceData>();
+      this.setResources(resourceDataArray);
       this._imageManager = imageManager;
       this._resourcesLoader = resourcesLoader;
     }
@@ -111,10 +112,15 @@ namespace gdjs {
 
     /**
      * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
+    setResources(resourceDataArray: ResourceData[]): void {
+      this._resources.clear();
+      for (const resourceData of resourceDataArray) {
+        if (resourceData.kind === 'bitmapFont') {
+          this._resources.set(resourceData.name, resourceData);
+        }
+      }
     }
 
     /**
@@ -256,16 +262,16 @@ namespace gdjs {
     async loadBitmapFontData(
       onProgress: (count: integer, total: integer) => void
     ): Promise<integer> {
-      const bitmapFontResources = this._resources.filter(
-        (resource) => resource.kind === 'bitmapFont' && !resource.disablePreload
-      );
-      if (bitmapFontResources.length === 0) {
-        return 0;
-      }
+      const preloadedResources = [
+        ...gdjs.filterIterable(
+          this._resources.values(),
+          (resource) => !resource.disablePreload
+        ),
+      ];
 
       let loadedCount = 0;
       await Promise.all(
-        bitmapFontResources.map(async (bitmapFontResource) => {
+        gdjs.mapIterable(preloadedResources, async (bitmapFontResource) => {
           try {
             const response = await fetch(
               this._resourcesLoader.getFullUrl(bitmapFontResource.file),
@@ -291,7 +297,7 @@ namespace gdjs {
             );
           }
           loadedCount++;
-          onProgress(loadedCount, bitmapFontResources.length);
+          onProgress(loadedCount, preloadedResources.length);
         })
       );
       return loadedCount;

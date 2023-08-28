@@ -38,6 +38,8 @@ type Props = {|
   onToggleSearchPanel: () => void,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
+  moveEventsIntoNewGroup: () => void,
+  canMoveEventsIntoNewGroup: boolean,
 |};
 
 const Toolbar = ({
@@ -60,6 +62,8 @@ const Toolbar = ({
   onToggleSearchPanel,
   onOpenSettings,
   settingsIcon,
+  moveEventsIntoNewGroup,
+  canMoveEventsIntoNewGroup,
 }: Props) => {
   const shortcutMap = useShortcutMap();
 
@@ -84,6 +88,8 @@ const Toolbar = ({
         canRedo={canRedo}
         onToggleSearchPanel={onToggleSearchPanel}
         onOpenSettings={onOpenSettings}
+        moveEventsIntoNewGroup={moveEventsIntoNewGroup}
+        canMoveEventsIntoNewGroup={canMoveEventsIntoNewGroup}
       />
       <ToolbarGroup lastChild>
         <IconButton

@@ -25,6 +25,8 @@ type Props = {|
   canRedo: boolean,
   onToggleSearchPanel: () => void,
   onOpenSettings?: ?() => void,
+  moveEventsIntoNewGroup: () => void,
+  canMoveEventsIntoNewGroup: boolean,
 |};
 
 const ToolbarCommands = (props: Props) => {
@@ -61,6 +63,10 @@ const ToolbarCommands = (props: Props) => {
         })),
       [props.allEventsMetadata, onAddEvent]
     ),
+  });
+
+  useCommand('MOVE_EVENTS_IN_NEW_GROUP', props.canMoveEventsIntoNewGroup, {
+    handler: props.moveEventsIntoNewGroup,
   });
 
   useCommand('DELETE_SELECTION', props.canRemove, {

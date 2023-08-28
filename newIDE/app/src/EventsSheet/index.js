@@ -343,6 +343,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onOpenSettings={this.props.onOpenSettings}
         settingsIcon={this.props.settingsIcon}
         onToggleSearchPanel={this._toggleSearchPanel}
+        canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
+        moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
       />
     );
   }
@@ -823,6 +825,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         {
           label: i18n._(t`Move Events into a Group`),
           click: () => this.moveEventsIntoNewGroup(),
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['MOVE_EVENTS_IN_NEW_GROUP']
+          ),
         },
         {
           label: i18n._(t`Analyze Objects Used in this Event`),

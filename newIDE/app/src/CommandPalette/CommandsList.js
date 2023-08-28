@@ -56,6 +56,7 @@ export type CommandName =
   | 'TOGGLE_EVENT_DISABLED'
   | 'TOGGLE_CONDITION_INVERTED'
   | 'CHOOSE_AND_ADD_EVENT'
+  | 'MOVE_EVENTS_IN_NEW_GROUP'
   | 'EVENTS_EDITOR_UNDO'
   | 'EVENTS_EDITOR_REDO'
   | 'DELETE_SELECTION'
@@ -297,6 +298,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   CHOOSE_AND_ADD_EVENT: {
     area: 'EVENTS',
     displayText: t`Choose and add an event...`,
+  },
+  MOVE_EVENTS_IN_NEW_GROUP: {
+    area: 'EVENTS',
+    displayText: t`Move events into a new group`,
   },
   EVENTS_EDITOR_UNDO: {
     area: 'EVENTS',

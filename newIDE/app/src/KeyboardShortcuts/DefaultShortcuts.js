@@ -55,6 +55,7 @@ const defaultShortcuts: ShortcutMap = {
   TOGGLE_EVENT_DISABLED: 'KeyD',
   TOGGLE_CONDITION_INVERTED: 'KeyJ',
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',
+  MOVE_EVENTS_IN_NEW_GROUP: 'CmdOrCtrl+KeyG',
   OPEN_EXTENSION_SETTINGS: '',
 };
 

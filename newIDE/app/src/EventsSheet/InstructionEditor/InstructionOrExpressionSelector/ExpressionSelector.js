@@ -10,7 +10,7 @@ import {
   type EnumeratedExpressionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
   expressionType: string,

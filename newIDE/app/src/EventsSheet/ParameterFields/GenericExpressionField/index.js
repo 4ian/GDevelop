@@ -47,7 +47,7 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
-import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 const styles = {

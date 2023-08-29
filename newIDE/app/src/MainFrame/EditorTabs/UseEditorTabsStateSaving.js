@@ -112,10 +112,10 @@ const useEditorTabsStateSaving = ({
   );
 
   const openEditorTabsFromPersistedState = React.useCallback(
-    (project: gdProject) => {
+    (project: gdProject): number => {
       const projectId = project.getProjectUuid();
       const editorState = getEditorStateForProject(projectId);
-      if (!editorState) return;
+      if (!editorState) return 0;
       let shouldOpenSavedCurrentTab = true;
 
       const editorsOpeningOptions = editorState.editorTabs.editors
@@ -167,6 +167,7 @@ const useEditorTabsStateSaving = ({
           : 0
       );
       setEditorTabs(newEditorTabs);
+      return editorsOpeningOptions.length;
     },
     [
       getEditorOpeningOptions,

@@ -1983,10 +1983,19 @@ const MainFrame = (props: Props) => {
                 currentProject &&
                 hasAPreviousSaveForEditorTabsState(currentProject)
               ) {
-                openEditorTabsFromPersistedState(currentProject);
-                setIsLoadingProject(false);
-                setLoaderModalProgress(null, null);
-                openProjectManager(false);
+                const openedEditorsCount = openEditorTabsFromPersistedState(
+                  currentProject
+                );
+                if (openedEditorsCount === 0) {
+                  openSceneOrProjectManager({
+                    currentProject: currentProject,
+                    editorTabs: state.editorTabs,
+                  });
+                } else {
+                  setIsLoadingProject(false);
+                  setLoaderModalProgress(null, null);
+                  openProjectManager(false);
+                }
               } else {
                 openSceneOrProjectManager({
                   currentProject: currentProject,
@@ -2064,10 +2073,19 @@ const MainFrame = (props: Props) => {
               currentProject &&
               hasAPreviousSaveForEditorTabsState(currentProject)
             ) {
-              openEditorTabsFromPersistedState(currentProject);
-              setIsLoadingProject(false);
-              setLoaderModalProgress(null, null);
-              openProjectManager(false);
+              const openedEditorsCount = openEditorTabsFromPersistedState(
+                currentProject
+              );
+              if (openedEditorsCount === 0) {
+                openSceneOrProjectManager({
+                  currentProject: currentProject,
+                  editorTabs: state.editorTabs,
+                });
+              } else {
+                setIsLoadingProject(false);
+                setLoaderModalProgress(null, null);
+                openProjectManager(false);
+              }
             } else {
               openSceneOrProjectManager({
                 currentProject: currentProject,

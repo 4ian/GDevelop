@@ -1986,9 +1986,16 @@ const MainFrame = (props: Props) => {
                 const openedEditorsCount = openEditorTabsFromPersistedState(
                   currentProject
                 );
-                setIsLoadingProject(false);
-                setLoaderModalProgress(null, null);
-                openProjectManager(openedEditorsCount === 0);
+                if (openedEditorsCount === 0) {
+                  openSceneOrProjectManager({
+                    currentProject: currentProject,
+                    editorTabs: state.editorTabs,
+                  });
+                } else {
+                  setIsLoadingProject(false);
+                  setLoaderModalProgress(null, null);
+                  openProjectManager(false);
+                }
               } else {
                 openSceneOrProjectManager({
                   currentProject: currentProject,
@@ -2069,9 +2076,16 @@ const MainFrame = (props: Props) => {
               const openedEditorsCount = openEditorTabsFromPersistedState(
                 currentProject
               );
-              setIsLoadingProject(false);
-              setLoaderModalProgress(null, null);
-              openProjectManager(openedEditorsCount === 0);
+              if (openedEditorsCount === 0) {
+                openSceneOrProjectManager({
+                  currentProject: currentProject,
+                  editorTabs: state.editorTabs,
+                });
+              } else {
+                setIsLoadingProject(false);
+                setLoaderModalProgress(null, null);
+                openProjectManager(false);
+              }
             } else {
               openSceneOrProjectManager({
                 currentProject: currentProject,

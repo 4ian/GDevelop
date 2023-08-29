@@ -155,10 +155,8 @@ const useEditorTabsStateSaving = ({
         );
       }
 
-      let openedEditorsCount = 0;
       for (const editorOpeningOption of editorsOpeningOptions) {
         newEditorTabs = openEditorTab(newEditorTabs, editorOpeningOption);
-        openedEditorsCount++;
       }
       newEditorTabs = changeCurrentTab(
         newEditorTabs,
@@ -169,7 +167,7 @@ const useEditorTabsStateSaving = ({
           : 0
       );
       setEditorTabs(newEditorTabs);
-      return openedEditorsCount;
+      return editorsOpeningOptions.length;
     },
     [
       getEditorOpeningOptions,

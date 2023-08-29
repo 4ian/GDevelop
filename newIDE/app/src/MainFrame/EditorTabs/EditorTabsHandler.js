@@ -157,7 +157,10 @@ export const openEditorTab = (
 
   return {
     ...state,
-    editors: [...state.editors, editorTab],
+    editors:
+      key === 'start page'
+        ? [editorTab, ...state.editors]
+        : [...state.editors, editorTab],
     currentTab: dontFocusTab ? state.currentTab : state.editors.length,
   };
 };

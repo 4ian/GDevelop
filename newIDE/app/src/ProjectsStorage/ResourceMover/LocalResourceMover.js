@@ -60,6 +60,7 @@ export const moveAllLocalResourcesToCloudResources = async ({
     return allResourceNames
       .map(
         (resourceName: string): ?gdResource => {
+          console.log('resource name', resourceName);
           const resource = resourcesManager.getResource(resourceName);
           const resourceFile = resource.getFile();
 
@@ -75,6 +76,7 @@ export const moveAllLocalResourcesToCloudResources = async ({
               });
               return null;
             } else {
+              console.log('nothing to do for ', resourceFile);
               // Public URL resource: nothing to do.
               return null;
             }
@@ -194,14 +196,15 @@ const movers: {
     };
   },
   // When saving a Cloud project locally, all resources are downloaded (including
-  // the ones on GDevelop Cloud).
+  // the ones on GDevelop Cloud or private game templates).
   [`${CloudStorageProvider.internalName}=>${
     LocalFileStorageProvider.internalName
-  }`]: ({ project, newFileMetadata, onProgress }) =>
+  }`]: ({ project, newFileMetadata, onProgress, authenticatedUser }) =>
     moveUrlResourcesToLocalFiles({
       project,
       fileMetadata: newFileMetadata,
       onProgress,
+      authenticatedUser,
     }),
   // On the desktop app, try to download all URLs into local files, put
   // next to the project file (in a "assets" directory). This is helpful
@@ -209,11 +212,12 @@ const movers: {
   // for resources).
   [`${UrlStorageProvider.internalName}=>${
     LocalFileStorageProvider.internalName
-  }`]: ({ project, newFileMetadata, onProgress }) =>
+  }`]: ({ project, newFileMetadata, onProgress, authenticatedUser }) =>
     moveUrlResourcesToLocalFiles({
       project,
       fileMetadata: newFileMetadata,
       onProgress,
+      authenticatedUser,
     }),
 
   // Moving to GDevelop "Cloud" storage:

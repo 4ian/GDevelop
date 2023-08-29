@@ -14,6 +14,7 @@ import {
   fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects,
   fakeNotAuthenticatedUser,
   geometryMonsterExampleShortHeader,
+  fakePrivateGameTemplateListingData,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -37,7 +38,11 @@ export const OpenAndNotAuthenticated = () => {
       onCreateFromExample={() => action('create from example')()}
       onCreateWithLogin={() => action('create with login')()}
       onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
       selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
     />
   );
 };
@@ -57,7 +62,11 @@ export const OpenAndAuthenticated = () => {
       onCreateFromExample={() => action('create from example')()}
       onCreateWithLogin={() => action('create with login')()}
       onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
       selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
     />
   );
 };
@@ -78,7 +87,11 @@ export const Opening = () => {
       onCreateFromExample={() => action('create from example')()}
       onCreateWithLogin={() => action('create with login')()}
       onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
       selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
     />
   );
 };
@@ -100,7 +113,11 @@ export const LimitsReached = () => {
       onCreateFromExample={() => action('create from example')()}
       onCreateWithLogin={() => action('create with login')()}
       onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
       selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
     />
   );
 };
@@ -121,6 +138,36 @@ export const FromExample = () => {
       onCreateWithLogin={() => action('create with login')()}
       onCreateFromAIGeneration={() => action('create from AI generation')()}
       selectedExampleShortHeader={geometryMonsterExampleShortHeader}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedPrivateGameTemplateListingData={null}
+    />
+  );
+};
+
+export const FromPrivateGameTemplate = () => {
+  return (
+    <NewProjectSetupDialog
+      authenticatedUser={fakeSilverAuthenticatedUser}
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedPrivateGameTemplateListingData={
+        fakePrivateGameTemplateListingData
+      }
     />
   );
 };

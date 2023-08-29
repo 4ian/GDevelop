@@ -40,12 +40,9 @@ import {
   purchaseAppStoreProduct,
   shouldUseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
-import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
+import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import {
-  PrivateAssetPackTile,
-  PromoBundleAssetPackCard,
-} from '../AssetPackTiles';
+import { PrivateAssetPackTile, PromoBundleAssetPackCard } from '../ShopTiles';
 import { AssetStoreContext } from '../AssetStoreContext';
 
 const cellSpacing = 8;
@@ -364,7 +361,10 @@ const PrivateAssetPackInformationPage = ({
     ) : (
       <Trans>
         Buy for{' '}
-        {formatPrivateAssetPackPrice({ i18n, privateAssetPackListingData })}
+        {formatProductPrice({
+          i18n,
+          productListingData: privateAssetPackListingData,
+        })}
       </Trans>
     );
 
@@ -467,9 +467,9 @@ const PrivateAssetPackInformationPage = ({
                           alignItems="center"
                         >
                           <Text noMargin size="block-title">
-                            {formatPrivateAssetPackPrice({
+                            {formatProductPrice({
                               i18n,
-                              privateAssetPackListingData,
+                              productListingData: privateAssetPackListingData,
                             })}
                           </Text>
                           {getBuyButton(i18n)}

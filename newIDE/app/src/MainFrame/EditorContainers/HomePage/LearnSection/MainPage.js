@@ -12,7 +12,6 @@ import {
   type TutorialCategory,
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -82,7 +81,7 @@ const styles = {
 
 type Props = {|
   onStartTutorial: () => void,
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
@@ -92,7 +91,7 @@ type Props = {|
 
 const MainPage = ({
   onStartTutorial,
-  onCreateProject,
+  onOpenExampleStore,
   onTabChange,
   onOpenHelpFinder,
   onSelectCategory,
@@ -133,7 +132,7 @@ const MainPage = ({
     {
       title: <Trans>Examples</Trans>,
       description: <Trans>Have look at existing games from the inside</Trans>,
-      action: onCreateProject,
+      action: onOpenExampleStore,
     },
     {
       title: <Trans>Community</Trans>,

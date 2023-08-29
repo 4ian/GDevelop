@@ -225,14 +225,14 @@ export const AssetStoreFilterPanel = () => {
     assetFiltersState,
     assetPackFiltersState,
     clearAllFilters,
-    navigationState,
+    shopNavigationState,
   } = React.useContext(AssetStoreContext);
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const onChoiceChange = React.useCallback(
     () => {
-      navigationState.openSearchResultPage();
+      shopNavigationState.openSearchResultPage();
     },
-    [navigationState]
+    [shopNavigationState]
   );
   return (
     <Column noMargin>

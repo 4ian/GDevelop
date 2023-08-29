@@ -10,7 +10,7 @@ import {
 } from '../Utils/GDevelopServices/User';
 import {
   type PrivateAssetPackListingData,
-  listSellerProducts,
+  listSellerAssetPacks,
 } from '../Utils/GDevelopServices/Shop';
 import ProfileDetails from './ProfileDetails';
 
@@ -48,9 +48,8 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
       setAssetPacksListingDatas(null);
       try {
         // Will return an empty array if the user is not a seller.
-        const packs = await listSellerProducts({
+        const packs = await listSellerAssetPacks({
           sellerId: userId,
-          productType: 'asset-pack',
         });
         setAssetPacksListingDatas(packs);
       } catch (error) {

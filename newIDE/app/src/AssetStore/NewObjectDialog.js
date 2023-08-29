@@ -130,14 +130,14 @@ export default function NewObjectDialog({
 
   const {
     assetShortHeadersSearchResults,
-    navigationState,
+    shopNavigationState,
     environment,
     setEnvironment,
   } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
-  } = navigationState.getCurrentPage();
+  } = shopNavigationState.getCurrentPage();
   const [
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
@@ -441,7 +441,9 @@ export default function NewObjectDialog({
               />
             }
           >
-            {currentTab === 'asset-store' && <AssetStore ref={assetStore} />}
+            {currentTab === 'asset-store' && (
+              <AssetStore ref={assetStore} hideGameTemplates />
+            )}
             {currentTab === 'new-object' && (
               <NewObjectFromScratch
                 onCreateNewObject={onCreateNewObject}

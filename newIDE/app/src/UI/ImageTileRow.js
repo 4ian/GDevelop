@@ -17,6 +17,7 @@ type ImageTileRowProps = {|
   showAllIcon: React.Node,
   getLimitFromWidth: (width: WidthType) => number,
   getColumnsFromWidth: (width: WidthType) => number,
+  seeAllLabel?: React.Node,
 |};
 
 const ImageTileRow = ({
@@ -28,6 +29,7 @@ const ImageTileRow = ({
   showAllIcon,
   getLimitFromWidth,
   getColumnsFromWidth,
+  seeAllLabel,
 }: ImageTileRowProps) => {
   return (
     <>
@@ -43,7 +45,7 @@ const ImageTileRow = ({
         <Column noMargin>
           <FlatButton
             onClick={onShowAll}
-            label={<Trans>Show all</Trans>}
+            label={seeAllLabel || <Trans>Show all</Trans>}
             rightIcon={showAllIcon}
           />
         </Column>

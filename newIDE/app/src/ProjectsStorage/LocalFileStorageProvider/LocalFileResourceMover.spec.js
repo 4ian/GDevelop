@@ -3,6 +3,7 @@ import axios from 'axios';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { moveUrlResourcesToLocalFiles } from './LocalFileResourceMover';
 import { makeTestProject } from '../../fixtures/TestProject';
+import { fakeSilverAuthenticatedUser } from '../../fixtures/GDevelopServicesTestData';
 import path from 'path';
 const gd: libGDevelop = global.gd;
 
@@ -124,6 +125,7 @@ const makeMoveAllProjectResourcesOptions = (project: gdProject) => ({
   project,
   onProgress: jest.fn(),
   fileMetadata: { fileIdentifier: 'fake-file' },
+  authenticatedUser: fakeSilverAuthenticatedUser,
 });
 
 describe('LocalResourceMover', () => {

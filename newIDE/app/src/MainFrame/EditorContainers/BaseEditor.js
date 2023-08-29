@@ -10,6 +10,7 @@ import {
   type FileMetadata,
 } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -77,7 +78,12 @@ export type RenderEditorContainerProps = {|
   onCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
+  onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
+  onOpenExampleStoreWithPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
+  onOpenPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   selectInAppTutorial: (tutorialId: string) => void,

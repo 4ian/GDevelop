@@ -47,7 +47,7 @@ import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Exam
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import ImageTileRow from '../../../../UI/ImageTileRow';
-import { prepareExamples } from '../../../../AssetStore/ExampleStore';
+import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
@@ -58,6 +58,9 @@ import IconButton from '../../../../UI/IconButton';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import RouterContext from '../../../RouterContext';
 import { useLongTouch } from '../../../../Utils/UseLongTouch';
+import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
+import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -101,7 +104,10 @@ type Props = {|
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
   onShowAllExamples: () => void,
-  onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
+  onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
+  onSelectPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -420,14 +426,18 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onChooseProject,
       onOpenNewProjectSetupDialog,
       onShowAllExamples,
-      onSelectExample,
+      onSelectExampleShortHeader,
+      onSelectPrivateGameTemplateListingData,
       onOpenRecentFile,
       storageProviders,
     },
     ref
   ) => {
     const { getRecentProjectFiles } = React.useContext(PreferencesContext);
-    const { allExamples } = React.useContext(ExampleStoreContext);
+    const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+    const { privateGameTemplateListingDatas } = React.useContext(
+      PrivateGameTemplateStoreContext
+    );
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
@@ -480,6 +490,41 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     });
 
     const skeletonLineHeight = getProjectLineHeight(windowWidth);
+    const imageTileRowItems = [
+      ...(privateGameTemplateListingDatas
+        ? privateGameTemplateListingDatas.map(
+            privateGameTemplateListingData => {
+              const isTemplateOwned =
+                !!authenticatedUser.receivedGameTemplates &&
+                !!authenticatedUser.receivedGameTemplates.find(
+                  receivedGameTemplate =>
+                    receivedGameTemplate.id ===
+                    privateGameTemplateListingData.id
+                );
+              return {
+                onClick: () =>
+                  onSelectPrivateGameTemplateListingData(
+                    privateGameTemplateListingData
+                  ),
+                imageUrl: privateGameTemplateListingData.thumbnailUrls[0],
+                overlayText: (
+                  <ProductPriceTag
+                    productListingData={privateGameTemplateListingData}
+                    owned={isTemplateOwned}
+                  />
+                ),
+                overlayTextPosition: 'topLeft',
+              };
+            }
+          )
+        : []),
+      ...(exampleShortHeaders
+        ? prepareExampleShortHeaders(exampleShortHeaders).map(example => ({
+            onClick: () => onSelectExampleShortHeader(example),
+            imageUrl: example.previewImageUrls[0],
+          }))
+        : []),
+    ];
 
     return (
       <>
@@ -506,20 +551,16 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         >
           <SectionRow>
             <ImageTileRow
-              isLoading={!allExamples}
-              items={
-                allExamples
-                  ? prepareExamples(allExamples).map(example => ({
-                      onClick: () => onSelectExample(example),
-                      imageUrl: example.previewImageUrls[0],
-                    }))
-                  : []
+              isLoading={
+                !exampleShortHeaders || !privateGameTemplateListingDatas
               }
+              items={imageTileRowItems}
               title={<Trans>Recommended templates</Trans>}
               onShowAll={onShowAllExamples}
               showAllIcon={<Add fontSize="small" />}
               getColumnsFromWidth={getTemplatesGridSizeFromWidth}
               getLimitFromWidth={getTemplatesGridSizeFromWidth}
+              seeAllLabel={<Trans>Browse all templates</Trans>}
             />
           </SectionRow>
           <SectionRow>

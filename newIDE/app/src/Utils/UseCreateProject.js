@@ -6,11 +6,12 @@ import {
   createNewEmptyProject,
   createNewProjectFromAIGeneratedProject,
   createNewProjectFromExampleShortHeader,
+  createNewProjectFromPrivateGameTemplate,
   createNewProjectFromTutorialTemplate,
   createNewProjectWithDefaultLogin,
-  type NewProjectSetup,
   type NewProjectSource,
-} from '../ProjectCreation/CreateProjectDialog';
+} from '../ProjectCreation/CreateProject';
+import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import { type State } from '../MainFrame';
 import {
   type StorageProvider,
@@ -29,6 +30,11 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type EditorTabsState } from '../MainFrame/EditorTabs/EditorTabsHandler';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import {
+  getAuthorizationTokenForPrivateGameTemplates,
+  type PrivateGameTemplateListingData,
+} from './GDevelopServices/Shop';
+import { createPrivateGameTemplateUrl } from './GDevelopServices/Asset';
 
 type Props = {|
   beforeCreatingProject: () => void,
@@ -66,6 +72,7 @@ const useCreateProject = ({
   onProjectSaved,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const preferences = React.useContext(PreferencesContext);
   const { ensureResourcesAreMoved } = useResourceMover({ resourceMover });
@@ -175,6 +182,7 @@ const useCreateProject = ({
                 console.log('Start saving as the new project...');
               },
               onMoveResources: async ({ newFileMetadata }) => {
+                console.log('Start moving resources to the new project...');
                 if (
                   !sourceStorageProvider ||
                   !sourceStorageProviderOperations ||
@@ -201,10 +209,6 @@ const useCreateProject = ({
           );
 
           if (wasSaved) {
-            // setState(state => ({
-            //   ...state,
-            //   currentFileMetadata: fileMetadata,
-            // }));
             onProjectSaved(fileMetadata);
             unsavedChanges.sealUnsavedChanges();
             if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
@@ -279,22 +283,57 @@ const useCreateProject = ({
     [beforeCreatingProject, createProject]
   );
 
+  const createProjectFromPrivateGameTemplate = React.useCallback(
+    async (
+      privateGameTemplateListingData: PrivateGameTemplateListingData,
+      newProjectSetup: NewProjectSetup
+    ) => {
+      beforeCreatingProject();
+      if (!profile) {
+        throw new Error(
+          'Unable to create the project with the game template because no profile was found.'
+        );
+      }
+
+      const token = await getAuthorizationTokenForPrivateGameTemplates(
+        authenticatedUser.getAuthorizationHeader,
+        {
+          userId: profile.id,
+        }
+      );
+
+      const privateGameTemplateUrl = await createPrivateGameTemplateUrl(
+        privateGameTemplateListingData,
+        token
+      );
+
+      const newProjectSource = await createNewProjectFromPrivateGameTemplate(
+        privateGameTemplateUrl,
+        privateGameTemplateListingData.id
+      );
+      await createProject(newProjectSource, newProjectSetup); // TODO: when creating project, enrich all resourceUrls with token.
+    },
+    [beforeCreatingProject, createProject, profile, authenticatedUser]
+  );
+
   const createProjectFromInAppTutorial = React.useCallback(
     async (tutorialId: string, newProjectSetup: NewProjectSetup) => {
       beforeCreatingProject();
       const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
         tutorialId
       );
-      const templateUrl =
-        selectedInAppTutorialShortHeader &&
-        selectedInAppTutorialShortHeader.initialTemplateUrl;
+      if (!selectedInAppTutorialShortHeader) {
+        throw new Error(`No in app tutorial found for id "${tutorialId}"`);
+      }
+      const templateUrl = selectedInAppTutorialShortHeader.initialTemplateUrl;
       if (!templateUrl) {
         throw new Error(
           `No initial template URL for the in-app tutorial "${tutorialId}"`
         );
       }
       const newProjectSource = await createNewProjectFromTutorialTemplate(
-        templateUrl
+        templateUrl,
+        selectedInAppTutorialShortHeader.id
       );
       await createProject(newProjectSource, newProjectSetup);
     },
@@ -324,6 +363,7 @@ const useCreateProject = ({
   return {
     createEmptyProject,
     createProjectFromExample,
+    createProjectFromPrivateGameTemplate,
     createProjectFromInAppTutorial,
     createProjectWithLogin,
     createProjectFromAIGeneration,

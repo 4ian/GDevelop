@@ -13,11 +13,11 @@ type StripePrice = {|
   stripePriceId: string,
 |};
 
-export type PrivateAssetPackListingData = {|
+type ProductListingData = {|
   id: string,
   sellerId: string,
-  productType: 'ASSET_PACK',
-  listing: 'ASSET_PACK',
+  productType: 'ASSET_PACK' | 'GAME_TEMPLATE',
+  listing: 'ASSET_PACK' | 'GAME_TEMPLATE',
   name: string,
   description: string,
   categories: Array<string>,
@@ -32,6 +32,18 @@ export type PrivateAssetPackListingData = {|
   includedListableProductIds?: string[],
   /** The thumbnails to use when on the app store - otherwise, use thumbnailUrls as usual. */
   appStoreThumbnailUrls?: string[] | null,
+|};
+
+export type PrivateAssetPackListingData = {|
+  ...ProductListingData,
+  productType: 'ASSET_PACK',
+  listing: 'ASSET_PACK',
+|};
+
+export type PrivateGameTemplateListingData = {|
+  ...ProductListingData,
+  productType: 'GAME_TEMPLATE',
+  listing: 'GAME_TEMPLATE',
 |};
 
 type Purchase = {|
@@ -58,16 +70,40 @@ export const listListedPrivateAssetPacks = async ({
   return response.data;
 };
 
-export const listSellerProducts = async ({
+export const listListedPrivateGameTemplates = async ({
+  onlyAppStorePrivateGameTemplates,
+}: {|
+  onlyAppStorePrivateGameTemplates?: ?boolean,
+|}): Promise<Array<PrivateGameTemplateListingData>> => {
+  const response = await client.get('/game-template', {
+    params: {
+      withAppStoreProductId: !!onlyAppStorePrivateGameTemplates,
+    },
+  });
+  return response.data;
+};
+
+export const listSellerAssetPacks = async ({
   sellerId,
-  productType,
 }: {|
   sellerId: string,
-  productType: 'asset-pack',
 |}): Promise<Array<PrivateAssetPackListingData>> => {
   const response = await client.get(`/user/${sellerId}/product`, {
     params: {
-      productType,
+      productType: 'asset-pack',
+    },
+  });
+  return response.data;
+};
+
+export const listSellerGameTemplates = async ({
+  sellerId,
+}: {|
+  sellerId: string,
+|}): Promise<Array<PrivateGameTemplateListingData>> => {
+  const response = await client.get(`/user/${sellerId}/product`, {
+    params: {
+      productType: 'game-template',
     },
   });
   return response.data;
@@ -81,7 +117,7 @@ export const listUserPurchases = async (
     role,
   }: {|
     userId: string,
-    productType: 'asset-pack',
+    productType: 'asset-pack' | 'game-template',
     role: 'receiver' | 'buyer',
   |}
 ): Promise<Array<Purchase>> => {
@@ -119,18 +155,48 @@ export const getAuthorizationTokenForPrivateAssets = async (
   return response.data;
 };
 
+export const getAuthorizationTokenForPrivateGameTemplates = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<string> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    '/game-template/action/authorize',
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
 export const createProductAuthorizedUrl = (
   url: string,
   token: string
 ): string => {
   return url.indexOf('?') !== -1
-    ? `${url}&token=${token}`
+    ? `${url}&token=${encodeURIComponent(token)}`
     : `${url}?token=${encodeURIComponent(token)}`;
 };
 
-export const isProductAuthorizedResourceUrl = (url: string): boolean =>
+export const isPrivateAssetResourceAuthorizedUrl = (url: string): boolean =>
   url.startsWith('https://private-assets.gdevelop.io/') ||
   url.startsWith('https://private-assets-dev.gdevelop.io/');
+
+export const isPrivateGameTemplateResourceAuthorizedUrl = (
+  url: string
+): boolean =>
+  url.startsWith('https://private-game-templates.gdevelop.io/') ||
+  url.startsWith('https://private-game-templates-dev.gdevelop.io/');
+
+export const isProductAuthorizedResourceUrl = (url: string): boolean =>
+  isPrivateAssetResourceAuthorizedUrl(url) ||
+  isPrivateGameTemplateResourceAuthorizedUrl(url);
 
 export const extractFilenameWithExtensionFromProductAuthorizedUrl = (
   url: string

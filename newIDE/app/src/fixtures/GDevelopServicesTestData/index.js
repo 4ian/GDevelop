@@ -28,6 +28,7 @@ import {
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
 import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -505,6 +506,7 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
       content: {},
     },
   ],
+  receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
   onLogin: () => {},
@@ -1555,6 +1557,22 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   ],
   gdevelopVersion: '',
   codeSizeLevel: 'small',
+};
+
+export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData = {
+  name: 'Fake private game template',
+  description: 'This is a fake private game template',
+  id: 'fake-id',
+  sellerId: 'fake-seller-id',
+  productType: 'GAME_TEMPLATE',
+  listing: 'GAME_TEMPLATE',
+  categories: ['adventure'],
+  updatedAt: '2020-01-01',
+  createdAt: '2020-01-01',
+  thumbnailUrls: [],
+  prices: [],
+  appStoreProductId: null,
+  includedListableProductIds: [],
 };
 
 export const fakeAssetPacks: PublicAssetPacks = {

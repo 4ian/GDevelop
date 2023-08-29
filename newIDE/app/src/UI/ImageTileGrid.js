@@ -34,8 +34,6 @@ const styles = {
   },
   overlay: {
     position: 'absolute',
-    right: 8,
-    bottom: 8,
     background: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 4,
     padding: '2px 6px',
@@ -89,13 +87,40 @@ const useStylesForTileHover = makeStyles(theme =>
   })
 );
 
-const ImageOverlay = ({ content }: {| content: React.Node |}) => (
-  <div style={styles.overlay}>
-    <Typography variant="body1" style={styles.overlayText}>
-      {content}
-    </Typography>
-  </div>
-);
+type OverlayTextPosition =
+  | 'topLeft'
+  | 'topRight'
+  | 'bottomLeft'
+  | 'bottomRight';
+
+const ImageOverlay = ({
+  content,
+  position,
+}: {|
+  content: React.Node,
+  position: OverlayTextPosition,
+|}) => {
+  const positionStyles = {
+    top: position === 'topLeft' || position === 'topRight' ? 8 : undefined,
+    bottom:
+      position === 'bottomLeft' || position === 'bottomRight' ? 8 : undefined,
+    left: position === 'topLeft' || position === 'bottomLeft' ? 8 : undefined,
+    right:
+      position === 'topRight' || position === 'bottomRight' ? 8 : undefined,
+  };
+  return (
+    <div
+      style={{
+        ...styles.overlay,
+        ...positionStyles,
+      }}
+    >
+      <Typography variant="body1" style={styles.overlayText}>
+        {content}
+      </Typography>
+    </div>
+  );
+};
 
 export type ImageTileComponent = {|
   onClick: () => void,
@@ -103,6 +128,7 @@ export type ImageTileComponent = {|
   title?: string,
   description?: string,
   overlayText?: string | React.Node,
+  overlayTextPosition?: OverlayTextPosition,
 |};
 
 type ImageTileGridProps = {|
@@ -198,7 +224,10 @@ const ImageTileGrid = ({
                           onLoad={() => setImageLoaded(item.imageUrl)}
                         />
                         {item.overlayText && (
-                          <ImageOverlay content={item.overlayText} />
+                          <ImageOverlay
+                            content={item.overlayText}
+                            position={item.overlayTextPosition || 'bottomRight'}
+                          />
                         )}
                       </div>
                       {item.title && (

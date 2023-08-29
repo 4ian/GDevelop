@@ -24,6 +24,7 @@ const ensureNoCloudProjectResources = async ({
   allResourceNames.forEach((resourceName: string) => {
     const resource = resourcesManager.getResource(resourceName);
     const resourceFile = resource.getFile();
+    console.log('resource name', resourceName);
 
     if (isURL(resourceFile)) {
       if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {

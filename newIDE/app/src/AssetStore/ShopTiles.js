@@ -6,7 +6,10 @@ import {
   type PublicAssetPack,
   type AssetShortHeader,
 } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 import GridListTile from '@material-ui/core/GridListTile';
 import createStyles from '@material-ui/core/styles/createStyles';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -17,10 +20,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import {
-  PrivateAssetPackPriceTag,
-  formatPrivateAssetPackPrice,
-} from './PrivateAssets/PrivateAssetPackPriceTag';
+import ProductPriceTag, { formatProductPrice } from './ProductPriceTag';
 import { AssetCard } from './AssetCard';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
@@ -245,8 +245,8 @@ export const PrivateAssetPackTile = ({
           alt={`Preview image of asset pack ${assetPackListingData.name}`}
         />
         <div style={styles.priceTagContainer}>
-          <PrivateAssetPackPriceTag
-            privateAssetPackListingData={assetPackListingData}
+          <ProductPriceTag
+            productListingData={assetPackListingData}
             withOverlay
             owned={owned}
           />
@@ -308,9 +308,9 @@ export const PromoBundleAssetPackCard = ({
                   {!owned ? (
                     <Trans>
                       This pack is included in this bundle for{' '}
-                      {formatPrivateAssetPackPrice({
+                      {formatProductPrice({
                         i18n,
-                        privateAssetPackListingData: assetPackListingData,
+                        productListingData: assetPackListingData,
                       })}
                       !
                     </Trans>
@@ -387,6 +387,62 @@ export const CategoryTile = ({
           <Line justifyContent="center" noMargin>
             <Text style={styles.packTitle} size="sub-title">
               {title}
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  );
+};
+
+export const PrivateGameTemplateTile = ({
+  privateGameTemplateListingData,
+  onSelect,
+  style,
+  owned,
+}: {|
+  privateGameTemplateListingData: PrivateGameTemplateListingData,
+  onSelect: () => void,
+  /** Props needed so that GridList component can adjust tile size */
+  style?: any,
+  owned: boolean,
+|}) => {
+  const classesForGridListItem = useStylesForGridListItem();
+  return (
+    <GridListTile
+      classes={classesForGridListItem}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onSelect();
+        }
+      }}
+      style={style}
+      onClick={onSelect}
+    >
+      <Paper elevation={2} style={styles.paper} background="light">
+        <CorsAwareImage
+          key={privateGameTemplateListingData.name}
+          style={styles.previewImage}
+          src={privateGameTemplateListingData.thumbnailUrls[0]}
+          alt={`Preview image of game template ${
+            privateGameTemplateListingData.name
+          }`}
+        />
+        <div style={styles.priceTagContainer}>
+          <ProductPriceTag
+            productListingData={privateGameTemplateListingData}
+            withOverlay
+            owned={owned}
+          />
+        </div>
+        <Column>
+          <Line justifyContent="space-between" noMargin>
+            <Text style={styles.packTitle} size="body2">
+              {privateGameTemplateListingData.name}
+            </Text>
+            <Text style={styles.packTitle} color="primary" size="body2">
+              {privateGameTemplateListingData.description}
             </Text>
           </Line>
         </Column>

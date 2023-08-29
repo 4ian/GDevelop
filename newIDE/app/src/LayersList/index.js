@@ -16,7 +16,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Add from '../UI/CustomSvgIcons/Add';
-import { addDefaultLightToLayer } from '../ProjectCreation/CreateProjectDialog';
+import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
 import { getEffects2DCount, getEffects3DCount } from '../EffectsList';
 
 const gd: libGDevelop = global.gd;

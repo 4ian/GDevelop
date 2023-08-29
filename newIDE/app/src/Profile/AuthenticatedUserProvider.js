@@ -44,6 +44,7 @@ import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvide
 import {
   listReceivedAssetShortHeaders,
   listReceivedAssetPacks,
+  listReceivedGameTemplates,
 } from '../Utils/GDevelopServices/Asset';
 import AdditionalUserInfoDialog, {
   shouldAskForAdditionalUserInfo,
@@ -197,7 +198,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           await this._reloadFirebaseProfile();
         },
         onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
-        onPurchaseSuccessful: this._fetchUserAssets,
+        onPurchaseSuccessful: this._fetchUserPurchases,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
           sendEmailAutomatically,
@@ -407,6 +408,20 @@ export default class AuthenticatedUserProvider extends React.Component<
         );
       }
     );
+    listReceivedGameTemplates(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedGameTemplates =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedGameTemplates,
+          },
+        })),
+      error => {
+        console.error('Error while loading received game templates:', error);
+      }
+    );
     this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
@@ -493,7 +508,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _fetchUserAssets = async () => {
+  _fetchUserAssetPacks = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
     if (!firebaseUser) return;
@@ -515,6 +530,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading received asset packs:', error);
     }
+  };
+
+  _fetchUserAssetShortHedaers = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
 
     try {
       const receivedAssetShortHeaders = await listReceivedAssetShortHeaders(
@@ -533,6 +554,38 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading received asset short headers:', error);
     }
+  };
+
+  _fetchUserGameTemplates = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const receivedGameTemplates = await listReceivedGameTemplates(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedGameTemplates,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received game templates:', error);
+    }
+  };
+
+  _fetchUserPurchases = async () => {
+    await Promise.all([
+      this._fetchUserAssetPacks(),
+      this._fetchUserAssetShortHedaers(),
+      this._fetchUserGameTemplates(),
+    ]);
   };
 
   _fetchUserCloudProjects = async () => {

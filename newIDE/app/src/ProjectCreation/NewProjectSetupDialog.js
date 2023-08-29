@@ -9,7 +9,6 @@ import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
-import { type NewProjectSetup } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
@@ -52,10 +51,23 @@ import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
+import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
+
+export type NewProjectSetup = {|
+  storageProvider: StorageProvider,
+  saveAsLocation: ?SaveAsLocation,
+  projectName?: string,
+  height?: number,
+  width?: number,
+  orientation?: 'landscape' | 'portrait' | 'default',
+  optimizeForPixelArt?: boolean,
+  allowPlayersToLogIn?: boolean,
+  templateSlug?: string,
+|};
 
 type Props = {|
   isOpeningProject?: boolean,
@@ -66,12 +78,18 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
+  onCreateProjectFromPrivateGameTemplate: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
   onCreateWithLogin: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateFromAIGeneration: (
     generatedProject: GeneratedProject,
     newProjectSetup: NewProjectSetup
   ) => Promise<void>,
   selectedExampleShortHeader: ?ExampleShortHeader,
+  selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
   storageProviders: Array<StorageProvider>,
   authenticatedUser: AuthenticatedUser,
 |};
@@ -81,15 +99,19 @@ const NewProjectSetupDialog = ({
   onClose,
   onCreateEmptyProject,
   onCreateFromExample,
+  onCreateProjectFromPrivateGameTemplate,
   onCreateWithLogin,
   onCreateFromAIGeneration,
   selectedExampleShortHeader,
+  selectedPrivateGameTemplateListingData,
   storageProviders,
   authenticatedUser,
 }: Props): React.Node => {
   const generateProjectName = () =>
     selectedExampleShortHeader
       ? `${generateName()} (${selectedExampleShortHeader.name})`
+      : selectedPrivateGameTemplateListingData
+      ? `${generateName()} (${selectedPrivateGameTemplateListingData.name})`
       : generateName();
 
   const { getAuthorizationHeader, profile } = React.useContext(
@@ -306,6 +328,17 @@ const NewProjectSetupDialog = ({
           },
           i18n
         );
+      } else if (selectedPrivateGameTemplateListingData) {
+        await onCreateProjectFromPrivateGameTemplate(
+          selectedPrivateGameTemplateListingData,
+          {
+            // We only pass down the project name as this is the only cusomizable field for a template.
+            projectName,
+            storageProvider,
+            saveAsLocation,
+          },
+          i18n
+        );
       } else if (allowPlayersToLogIn) {
         await onCreateWithLogin(projectSetup);
         return;
@@ -328,7 +361,9 @@ const NewProjectSetupDialog = ({
       allowPlayersToLogIn,
       selectedExampleShortHeader,
       generateProject,
+      selectedPrivateGameTemplateListingData,
       onCreateFromExample,
+      onCreateProjectFromPrivateGameTemplate,
       onCreateWithLogin,
       onCreateEmptyProject,
     ]
@@ -343,6 +378,9 @@ const NewProjectSetupDialog = ({
   );
 
   const isLoading = isGeneratingProject || isOpeningProject;
+
+  const isStartingProjectFromScratch =
+    !selectedExampleShortHeader && !selectedPrivateGameTemplateListingData;
 
   return (
     <I18n>
@@ -378,7 +416,7 @@ const NewProjectSetupDialog = ({
           onApply={() => onValidate(i18n)}
         >
           <ColumnStackLayout noMargin>
-            {!selectedExampleShortHeader && (
+            {isStartingProjectFromScratch && (
               <ResolutionOptions
                 onClick={key => setResolutionOption(key)}
                 selectedOption={resolutionOption}
@@ -476,7 +514,7 @@ const NewProjectSetupDialog = ({
                 setSaveAsLocation,
                 newProjectsDefaultFolder,
               })}
-            {!selectedExampleShortHeader && (
+            {isStartingProjectFromScratch && (
               <ColumnStackLayout noMargin expand>
                 <DismissableAlertMessage
                   kind="info"

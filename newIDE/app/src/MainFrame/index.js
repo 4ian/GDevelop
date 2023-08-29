@@ -1983,10 +1983,12 @@ const MainFrame = (props: Props) => {
                 currentProject &&
                 hasAPreviousSaveForEditorTabsState(currentProject)
               ) {
-                openEditorTabsFromPersistedState(currentProject);
+                const openedEditorsCount = openEditorTabsFromPersistedState(
+                  currentProject
+                );
                 setIsLoadingProject(false);
                 setLoaderModalProgress(null, null);
-                openProjectManager(false);
+                openProjectManager(openedEditorsCount === 0);
               } else {
                 openSceneOrProjectManager({
                   currentProject: currentProject,
@@ -2064,10 +2066,12 @@ const MainFrame = (props: Props) => {
               currentProject &&
               hasAPreviousSaveForEditorTabsState(currentProject)
             ) {
-              openEditorTabsFromPersistedState(currentProject);
+              const openedEditorsCount = openEditorTabsFromPersistedState(
+                currentProject
+              );
               setIsLoadingProject(false);
               setLoaderModalProgress(null, null);
-              openProjectManager(false);
+              openProjectManager(openedEditorsCount === 0);
             } else {
               openSceneOrProjectManager({
                 currentProject: currentProject,

@@ -158,6 +158,7 @@ export const openEditorTab = (
   return {
     ...state,
     editors:
+      // Make sure the home page is always the first tab.
       key === 'start page'
         ? [editorTab, ...state.editors]
         : [...state.editors, editorTab],

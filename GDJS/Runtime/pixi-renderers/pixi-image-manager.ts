@@ -309,9 +309,27 @@ namespace gdjs {
      * used by calling `getPIXITexture`.
      * @param onProgress Callback called each time a new file is loaded.
      */
-    loadTextures(
+    async loadTextures(
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<integer> {
+      // let loadedCount = 0;
+      // await Promise.all(gdjs.mapIterable(this._resources.values(), async resource => {
+      //   try {
+      //     PIXI_ASSETS.Assets.setPreferences({
+      //       preferWorkers: false,
+      //       preferCreateImageBitmap: false,
+      //       crossOrigin: '',
+      //     });
+      //     await PIXI_ASSETS.Assets.load("test.png");
+      //   }
+      //   catch (error) {
+      //     logFileLoadingError(resource.file, error);
+      //   }
+      //   loadedCount++;
+      //   onProgress(loadedCount, this._resources.size);
+      // }));
+      // return loadedCount;
+
       // Construct the list of files to be loaded.
       // For one loaded file, it can have one or more resources
       // that use it.

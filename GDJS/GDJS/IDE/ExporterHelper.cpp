@@ -691,6 +691,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
+    InsertUnique(includesFiles, "pixi-renderers/pixi-assets.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");

@@ -16,15 +16,15 @@ export const Default = () => (
   <ExampleStoreStateProvider>
     <ExampleStoreDialog
       open
-      onClose={action('onClose')}
-      initialExampleShortHeader={null}
-      initialPrivateGameTemplateListingData={null}
       isProjectOpening={false}
-      onChooseExampleShortHeader={action('onChooseExampleShortHeader')}
-      onChoosePrivateGameTemplateListingData={action(
-        'onChoosePrivateGameTemplateListingData'
+      onClose={action('onClose')}
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
+      onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
+      onSelectPrivateGameTemplateListingData={action(
+        'onSelectPrivateGameTemplateListingData'
       )}
-      onChooseEmptyProject={action('onChooseEmptyProject')}
+      onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
     />
   </ExampleStoreStateProvider>
 );

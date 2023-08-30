@@ -247,7 +247,6 @@ const isCurrentProjectFresh = (
   currentProject.ptr === currentProjectRef.current.ptr;
 
 export type State = {|
-  exampleStoreDialogOpen: boolean,
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
   editorTabs: EditorTabsState,
@@ -259,8 +258,6 @@ export type State = {|
   saveToStorageProviderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
-  initialExampleShortHeader: ?ExampleShortHeader,
-  initialPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
 |};
 
 const initialPreviewState: PreviewState = {
@@ -313,7 +310,6 @@ const MainFrame = (props: Props) => {
     ((State => State) | State) => Promise<State>,
   ] = useStateWithCallback(
     ({
-      exampleStoreDialogOpen: false,
       currentProject: null,
       currentFileMetadata: null,
       editorTabs: getEditorTabsInitialState(),
@@ -325,8 +321,6 @@ const MainFrame = (props: Props) => {
       saveToStorageProviderDialogOpen: false,
       eventsFunctionsExtensionsError: null,
       gdjsDevelopmentWatcherEnabled: false,
-      initialExampleShortHeader: null,
-      initialPrivateGameTemplateListingData: null,
     }: State)
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
@@ -375,6 +369,10 @@ const MainFrame = (props: Props) => {
   const [
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    exampleStoreDialogOpen,
+    setExampleStoreDialogOpen,
   ] = React.useState<boolean>(false);
   const [
     selectedExampleShortHeader,
@@ -886,8 +884,8 @@ const MainFrame = (props: Props) => {
         ...state,
         currentProject: project,
         currentFileMetadata: fileMetadata,
-        exampleStoreDialogOpen: false,
       }));
+      setExampleStoreDialogOpen(false);
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -1881,44 +1879,27 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const openExampleStoreDialog = React.useCallback(
-    () => {
-      setState(state => ({
-        ...state,
-        exampleStoreDialogOpen: true,
-      }));
-    },
-    [setState]
-  );
   const openExampleStoreDialogWithExampleShortHeader = React.useCallback(
     (exampleShortHeader: ExampleShortHeader) => {
-      setState(state => ({
-        ...state,
-        initialExampleShortHeader: exampleShortHeader,
-        exampleStoreDialogOpen: true,
-      }));
+      setSelectedExampleShortHeader(exampleShortHeader);
+      setExampleStoreDialogOpen(true);
     },
-    [setState]
+    []
   );
   const openExampleStoreDialogWithPrivateGameTemplateListingData = React.useCallback(
     (privateGameTemplateListingData: PrivateGameTemplateListingData) => {
-      setState(state => ({
-        ...state,
-        initialPrivateGameTemplateListingData: privateGameTemplateListingData,
-        exampleStoreDialogOpen: true,
-      }));
+      setSelectedPrivateGameTemplateListingData(privateGameTemplateListingData);
+      setExampleStoreDialogOpen(true);
     },
-    [setState]
+    []
   );
   const closeExampleStoreDialog = React.useCallback(
-    () =>
-      setState(state => ({
-        ...state,
-        exampleStoreDialogOpen: false,
-        initialExampleShortHeader: null,
-        initialPrivateGameTemplateListingData: null,
-      })),
-    [setState]
+    () => {
+      setExampleStoreDialogOpen(false);
+      setSelectedExampleShortHeader(null);
+      setSelectedPrivateGameTemplateListingData(null);
+    },
+    [setExampleStoreDialogOpen]
   );
 
   const openOpenFromStorageProviderDialog = React.useCallback(
@@ -2916,7 +2897,7 @@ const MainFrame = (props: Props) => {
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
     onExportProject: () => openExportDialog(true),
-    onCreateProject: openExampleStoreDialog,
+    onCreateProject: () => setExampleStoreDialogOpen(true),
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
@@ -3131,7 +3112,7 @@ const MainFrame = (props: Props) => {
                     },
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onOpenExampleStore: openExampleStoreDialog,
+                    onOpenExampleStore: () => setExampleStoreDialogOpen(true),
                     onOpenExampleStoreWithExampleShortHeader: openExampleStoreDialogWithExampleShortHeader,
                     onOpenExampleStoreWithPrivateGameTemplateListingData: openExampleStoreDialogWithPrivateGameTemplateListingData,
                     onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
@@ -3215,28 +3196,25 @@ const MainFrame = (props: Props) => {
           project: state.currentProject,
           onSaveProject: saveProject,
         })}
-      {state.exampleStoreDialogOpen && (
+      {exampleStoreDialogOpen && (
         <ExampleStoreDialog
           open
-          onClose={() => {
-            closeExampleStoreDialog();
-          }}
-          initialExampleShortHeader={state.initialExampleShortHeader}
-          initialPrivateGameTemplateListingData={
-            state.initialPrivateGameTemplateListingData
-          }
+          onClose={closeExampleStoreDialog}
           isProjectOpening={isProjectOpening}
-          onChooseExampleShortHeader={exampleShortHeader => {
+          selectedExampleShortHeader={selectedExampleShortHeader}
+          selectedPrivateGameTemplateListingData={
+            selectedPrivateGameTemplateListingData
+          }
+          onSelectExampleShortHeader={exampleShortHeader => {
+            console.log('selecting example short header', exampleShortHeader);
             setSelectedExampleShortHeader(exampleShortHeader);
-            setNewProjectSetupDialogOpen(true);
           }}
-          onChoosePrivateGameTemplateListingData={privateGameTemplateListingData => {
+          onSelectPrivateGameTemplateListingData={privateGameTemplateListingData => {
             setSelectedPrivateGameTemplateListingData(
               privateGameTemplateListingData
             );
-            setNewProjectSetupDialogOpen(true);
           }}
-          onChooseEmptyProject={() => {
+          onOpenNewProjectSetupDialog={() => {
             setNewProjectSetupDialogOpen(true);
           }}
         />

@@ -56,32 +56,28 @@ const getItemUniqueId = (
 
 type Props = {|
   isOpening: boolean,
-  onOpenExampleShortHeader: ExampleShortHeader => void,
-  onOpenPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
+  onOpenNewProjectSetupDialog: () => void,
   focusOnMount?: boolean,
-  initialExampleShortHeader: ?ExampleShortHeader,
-  initialPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  selectedExampleShortHeader: ?ExampleShortHeader,
+  onSelectExampleShortHeader: (?ExampleShortHeader) => void,
+  selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  onSelectPrivateGameTemplateListingData: (
+    ?PrivateGameTemplateListingData
+  ) => void,
 |};
 
 export const ExampleStore = ({
   isOpening,
-  onOpenExampleShortHeader,
-  onOpenPrivateGameTemplateListingData,
+  onOpenNewProjectSetupDialog,
   focusOnMount,
-  initialExampleShortHeader,
-  initialPrivateGameTemplateListingData,
+  // The example store is "controlled", because the selected items are
+  // needed in the mainframe, to open the NewProjectSetupDialog.
+  selectedExampleShortHeader,
+  onSelectExampleShortHeader,
+  selectedPrivateGameTemplateListingData,
+  onSelectPrivateGameTemplateListingData,
 }: Props) => {
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
-  const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(initialExampleShortHeader);
-  const [
-    selectedPrivateGameTemplateListingData,
-    setSelectedPrivateGameTemplateListingData,
-  ] = React.useState<?PrivateGameTemplateListingData>(
-    initialPrivateGameTemplateListingData
-  );
   const [
     purchasingGameTemplateListingData,
     setPurchasingGameTemplateListingData,
@@ -258,11 +254,9 @@ export const ExampleStore = ({
                         matches={getExampleShortHeaderMatches(item)}
                         onChoose={() => {
                           sendExampleDetailsOpened(item.slug);
-                          setSelectedExampleShortHeader(item);
+                          onSelectExampleShortHeader(item);
                         }}
-                        onOpen={() => {
-                          onOpenExampleShortHeader(item);
-                        }}
+                        onOpen={onOpenNewProjectSetupDialog}
                       />
                     );
                   }
@@ -280,7 +274,7 @@ export const ExampleStore = ({
                         privateGameTemplateListingData={item}
                         matches={getPrivateAssetPackListingDataMatches(item)}
                         onChoose={() => {
-                          setSelectedPrivateGameTemplateListingData(item);
+                          onSelectPrivateGameTemplateListingData(item);
                         }}
                         owned={isTemplateOwned}
                       />
@@ -297,10 +291,8 @@ export const ExampleStore = ({
         <ExampleDialog
           isOpening={isOpening}
           exampleShortHeader={selectedExampleShortHeader}
-          onOpen={() => {
-            onOpenExampleShortHeader(selectedExampleShortHeader);
-          }}
-          onClose={() => setSelectedExampleShortHeader(null)}
+          onOpen={onOpenNewProjectSetupDialog}
+          onClose={() => onSelectExampleShortHeader(null)}
         />
       )}
       {!!selectedPrivateGameTemplateListingData && (
@@ -309,17 +301,13 @@ export const ExampleStore = ({
             selectedPrivateGameTemplateListingData
           }
           isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
-          onGameTemplateOpen={() => {
-            onOpenPrivateGameTemplateListingData(
-              selectedPrivateGameTemplateListingData
-            );
-          }}
+          onGameTemplateOpen={onOpenNewProjectSetupDialog}
           onOpenPurchaseDialog={() => {
             setPurchasingGameTemplateListingData(
               selectedPrivateGameTemplateListingData
             );
           }}
-          onClose={() => setSelectedPrivateGameTemplateListingData(null)}
+          onClose={() => onSelectPrivateGameTemplateListingData(null)}
         />
       )}
       {!!purchasingGameTemplateListingData && (

@@ -11,24 +11,24 @@ import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopService
 export type ExampleStoreDialogProps = {|
   open: boolean,
   onClose: () => void,
-  initialExampleShortHeader: ?ExampleShortHeader,
-  initialPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
-  onChooseExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
-  onChoosePrivateGameTemplateListingData: (
+  selectedExampleShortHeader: ?ExampleShortHeader,
+  selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
+  onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: ?PrivateGameTemplateListingData
   ) => void,
-  onChooseEmptyProject: () => void,
+  onOpenNewProjectSetupDialog: () => void,
   isProjectOpening: boolean,
 |};
 
 const ExampleStoreDialog = ({
   open,
   onClose,
-  initialExampleShortHeader,
-  initialPrivateGameTemplateListingData,
-  onChooseExampleShortHeader,
-  onChoosePrivateGameTemplateListingData,
-  onChooseEmptyProject,
+  selectedExampleShortHeader,
+  selectedPrivateGameTemplateListingData,
+  onSelectExampleShortHeader,
+  onSelectPrivateGameTemplateListingData,
+  onOpenNewProjectSetupDialog,
   isProjectOpening,
 }: ExampleStoreDialogProps) => {
   const actions = React.useMemo(
@@ -44,10 +44,10 @@ const ExampleStoreDialog = ({
         id="create-blank-project-button"
         label={<Trans>Create a blank project</Trans>}
         primary
-        onClick={onChooseEmptyProject}
+        onClick={onOpenNewProjectSetupDialog}
       />,
     ],
-    [onClose, onChooseEmptyProject]
+    [onClose, onOpenNewProjectSetupDialog]
   );
 
   if (!open) return null;
@@ -59,7 +59,7 @@ const ExampleStoreDialog = ({
           title={<Trans>Create a new project</Trans>}
           actions={actions}
           onRequestClose={onClose}
-          onApply={onChooseEmptyProject}
+          onApply={onOpenNewProjectSetupDialog}
           open={open}
           fullHeight
           flexColumnBody
@@ -67,13 +67,14 @@ const ExampleStoreDialog = ({
           <ExampleStore
             focusOnMount
             isOpening={isProjectOpening}
-            onOpenExampleShortHeader={onChooseExampleShortHeader}
-            onOpenPrivateGameTemplateListingData={
-              onChoosePrivateGameTemplateListingData
+            onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+            onSelectExampleShortHeader={onSelectExampleShortHeader}
+            onSelectPrivateGameTemplateListingData={
+              onSelectPrivateGameTemplateListingData
             }
-            initialExampleShortHeader={initialExampleShortHeader}
-            initialPrivateGameTemplateListingData={
-              initialPrivateGameTemplateListingData
+            selectedExampleShortHeader={selectedExampleShortHeader}
+            selectedPrivateGameTemplateListingData={
+              selectedPrivateGameTemplateListingData
             }
           />
         </Dialog>

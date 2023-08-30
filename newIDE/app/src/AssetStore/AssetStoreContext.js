@@ -521,8 +521,6 @@ export const AssetStoreStateProvider = ({
     assetPackSearchFilters
   );
 
-  console.log('chosenCategory', chosenCategory);
-
   const privateAssetPackListingDatasSearchResults: ?Array<PrivateAssetPackListingData> = useSearchItem(
     privateAssetPackListingDatasById,
     getPrivateAssetPackListingDataSearchTerms,

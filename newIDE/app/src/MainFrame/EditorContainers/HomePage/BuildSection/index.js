@@ -61,6 +61,7 @@ import { useLongTouch } from '../../../../Utils/UseLongTouch';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
 import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -557,7 +558,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               items={imageTileRowItems}
               title={<Trans>Recommended templates</Trans>}
               onShowAll={onShowAllExamples}
-              showAllIcon={<Add fontSize="small" />}
+              showAllIcon={<ChevronArrowRight fontSize="small" />}
               getColumnsFromWidth={getTemplatesGridSizeFromWidth}
               getLimitFromWidth={getTemplatesGridSizeFromWidth}
               seeAllLabel={<Trans>Browse all templates</Trans>}
@@ -580,7 +581,13 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                   <RaisedButton
                     primary
                     fullWidth={!canOpen}
-                    label={<Trans>Create a project</Trans>}
+                    label={
+                      isMobile ? (
+                        <Trans>Create</Trans>
+                      ) : (
+                        <Trans>Create a project</Trans>
+                      )
+                    }
                     onClick={() =>
                       onOpenNewProjectSetupDialog(/*exampleShortHeader=*/ null)
                     }
@@ -595,7 +602,13 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                       <Spacer />
                       <TextButton
                         primary
-                        label={<Trans>Open a project</Trans>}
+                        label={
+                          isMobile ? (
+                            <Trans>Open</Trans>
+                          ) : (
+                            <Trans>Open a project</Trans>
+                          )
+                        }
                         onClick={onChooseProject}
                       />
                     </>

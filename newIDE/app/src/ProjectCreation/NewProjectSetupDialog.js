@@ -382,6 +382,12 @@ const NewProjectSetupDialog = ({
   const isStartingProjectFromScratch =
     !selectedExampleShortHeader && !selectedPrivateGameTemplateListingData;
 
+  // On the local app, prefer to always have something saved so that the user is not blocked
+  // On the web-app, allow to create a project without saving it, unless a private game template is selected
+  // (as it requires to save the project to the cloud to be able to use it).
+  const shouldAllowCreatingProjectWithoutSaving =
+    !electron && !selectedPrivateGameTemplateListingData;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -481,10 +487,7 @@ const NewProjectSetupDialog = ({
                     disabled={storageProvider.disabled}
                   />
                 ))}
-              {!electron && (
-                // Only show the ability to start a project without saving on the web-app.
-                // On the local app, prefer to always have something saved so that the user is not blocked
-                // when they want to add their own resources or use external editors.
+              {shouldAllowCreatingProjectWithoutSaving && (
                 <SelectOption
                   value={emptyStorageProvider.internalName}
                   label={t`Don't save this project now`}

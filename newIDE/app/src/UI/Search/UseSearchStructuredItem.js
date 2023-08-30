@@ -134,7 +134,6 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
   const startTime = performance.now();
   const filteredSearchResults = searchResults
     .filter(({ item }) => {
-      console.log('chosenItemCategory', chosenItemCategory);
       if (!chosenItemCategory) return true; // No category chosen, return all items.
       if (!item.category) return false; // Item has no category, it cannot be in the chosen category.
       return item.category === chosenItemCategory;
@@ -147,7 +146,6 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
         // skip checking if the item has it.
         chosenCategory.node.isTagContainerOnly ||
         (item.tags && item.tags.some(tag => tag === chosenCategory.node.name));
-      console.log('hasChosenCategoryTag', hasChosenCategoryTag, chosenCategory);
       if (!hasChosenCategoryTag) return false; // Item is not in the selected category
       for (const parentNode of chosenCategory.parentNodes) {
         if (parentNode.isTagContainerOnly) {

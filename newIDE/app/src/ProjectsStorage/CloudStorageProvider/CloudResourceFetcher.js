@@ -57,7 +57,6 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
     return allResourceNames
       .map(
         (resourceName: string): ?ResourceToFetchAndUpload => {
-          console.log('resource name', resourceName);
           const resource = resourcesManager.getResource(resourceName);
           const resourceFile = resource.getFile();
 

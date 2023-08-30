@@ -209,6 +209,7 @@ const PrivateAssetPackInformationPage = ({
               assetPackListingData={bundleContainingPack}
               onSelect={() => onAssetPackOpen(bundleContainingPack)}
               owned
+              key={bundleContainingPack.id}
             />
           );
         })
@@ -219,6 +220,7 @@ const PrivateAssetPackInformationPage = ({
                 assetPackListingData={bundleContainingPack}
                 onSelect={() => onAssetPackOpen(bundleContainingPack)}
                 owned={false}
+                key={bundleContainingPack.id}
               />
             );
           })

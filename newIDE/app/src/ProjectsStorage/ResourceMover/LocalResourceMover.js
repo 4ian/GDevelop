@@ -11,7 +11,7 @@ import CloudStorageProvider from '../CloudStorageProvider';
 import LocalFileSystem from '../../Export/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
-import { moveAllCloudProjectResourcesToCloudProject } from '../CloudStorageProvider/CloudResourceMover';
+import { moveUrlResourcesToCloudProject } from '../CloudStorageProvider/CloudResourceMover';
 import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
 import {
   getCredentialsForCloudProject,
@@ -24,12 +24,6 @@ import { isURL, isBlobURL } from '../../ResourcesList/ResourceUtils';
 const path = optionalRequire('path');
 
 const gd: libGDevelop = global.gd;
-
-const moveNothing = async () => {
-  return {
-    erroredResources: [],
-  };
-};
 
 type ResourceAndFile = {|
   resource: gdResource,
@@ -60,7 +54,6 @@ export const moveAllLocalResourcesToCloudResources = async ({
     return allResourceNames
       .map(
         (resourceName: string): ?gdResource => {
-          console.log('resource name', resourceName);
           const resource = resourcesManager.getResource(resourceName);
           const resourceFile = resource.getFile();
 
@@ -76,7 +69,6 @@ export const moveAllLocalResourcesToCloudResources = async ({
               });
               return null;
             } else {
-              console.log('nothing to do for ', resourceFile);
               // Public URL resource: nothing to do.
               return null;
             }
@@ -210,6 +202,8 @@ const movers: {
   // next to the project file (in a "assets" directory). This is helpful
   // to continue working on a game started on the web-app (using public URLs
   // for resources).
+  // This is also helpful to download private game templates resources so that
+  // the game can be opened offline.
   [`${UrlStorageProvider.internalName}=>${
     LocalFileStorageProvider.internalName
   }`]: ({ project, newFileMetadata, onProgress, authenticatedUser }) =>
@@ -230,13 +224,13 @@ const movers: {
   // (unless they are public URLs).
   [`${CloudStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
-  }`]: moveAllCloudProjectResourcesToCloudProject,
+  }`]: moveUrlResourcesToCloudProject,
   // Nothing to move around when going from a project on a public URL
   // to a cloud project (we could offer an option one day though to download
   // and upload the URL resources on GDevelop Cloud).
   [`${UrlStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
-  }`]: moveNothing,
+  }`]: moveUrlResourcesToCloudProject,
 };
 
 const LocalResourceMover = {

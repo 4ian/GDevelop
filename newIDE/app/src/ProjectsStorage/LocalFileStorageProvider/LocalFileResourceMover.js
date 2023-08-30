@@ -69,6 +69,7 @@ const downloadBlobToLocalFile = async (
   );
 };
 
+// This mover can be used for both public URLs and Cloud project resources.
 export const moveUrlResourcesToLocalFiles = async ({
   project,
   fileMetadata,
@@ -110,9 +111,6 @@ export const moveUrlResourcesToLocalFiles = async ({
   const baseAssetsPath = path.join(projectPath, 'assets');
   const downloadedFilePaths = new Set<string>();
   const erroredResources = [];
-
-  console.log('allResourceNames', allResourceNames);
-  console.log('projectPath', projectPath);
 
   let fetchedResourcesCount = 0;
 
@@ -181,7 +179,6 @@ export const moveUrlResourcesToLocalFiles = async ({
               );
             }
             const encodedUrl = resourceUrl.href; // Encode the URL to support special characters in file names.
-            console.log('Downloading', encodedUrl, 'to', downloadedFilePath);
             await ipcRenderer.invoke(
               'local-file-download',
               encodedUrl,
@@ -196,11 +193,8 @@ export const moveUrlResourcesToLocalFiles = async ({
         }
       }
 
-      console.log('calling onProgress');
       onProgress(fetchedResourcesCount++, resourceToFetchNames.length);
     });
-
-  console.log('finished, returning', erroredResources);
 
   return {
     erroredResources,

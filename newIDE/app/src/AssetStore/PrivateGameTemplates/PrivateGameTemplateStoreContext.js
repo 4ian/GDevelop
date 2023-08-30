@@ -230,11 +230,6 @@ export const PrivateGameTemplateStoreStateProvider = ({
     currentPage.filtersState.chosenFilters
   );
 
-  console.log(
-    'privateGameTemplateListingDatasSearchResultsForShop',
-    privateGameTemplateListingDatasSearchResultsForShop
-  );
-
   const PrivateGameTemplateStoreState = React.useMemo(
     () => ({
       privateGameTemplateListingDatas,

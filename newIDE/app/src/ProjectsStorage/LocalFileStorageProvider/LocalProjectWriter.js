@@ -194,8 +194,6 @@ export const onSaveProjectAs = async (
   if (!filePath)
     throw new Error('A file path was not chosen before saving as.');
 
-  console.log('calling on start saving');
-
   options.onStartSaving();
   // Ensure we always pick the latest name and gameId.
   const newFileMetadata = {
@@ -205,18 +203,12 @@ export const onSaveProjectAs = async (
     lastModifiedDate: Date.now(),
   };
 
-  console.log('calling onMoveResources');
-
   // Move (copy or download, etc...) the resources first.
   await options.onMoveResources({ newFileMetadata });
-
-  console.log('calling setProjectFile');
 
   // Save the project when resources have been copied.
   const projectPath = path.dirname(filePath);
   project.setProjectFile(filePath);
-
-  console.log('calling writeProjectFiles');
 
   await writeProjectFiles(project, filePath, projectPath);
   return {

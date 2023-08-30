@@ -31,6 +31,9 @@ import {
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import AlertMessage from '../../../../UI/AlertMessage';
+import Text from '../../../../UI/Text';
+import FlatButton from '../../../../UI/FlatButton';
+import Add from '../../../../UI/CustomSvgIcons/Add';
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
@@ -125,6 +128,10 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     const [
       isLoadingUserProjects,
       setIsLoadingUserProjects,
+    ] = React.useState<boolean>(false);
+    const [
+      showNewGroupNameField,
+      setShowNewGroupNameField,
     ] = React.useState<boolean>(false);
 
     const setDraggedUser = React.useCallback((user: User) => {
@@ -229,11 +236,14 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       .sort((a, b) => a.group.name.localeCompare(b.group.name));
 
     return (
-      <SectionContainer title={<Trans>Team</Trans>}>
+      <SectionContainer title={<Trans>Classrooms</Trans>}>
         <SectionRow>
           {membersNotInAGroup && (
             <Line>
               <Column noMargin expand>
+                <Text size="section-title" noMargin>
+                  <Trans>Unassigned members</Trans>
+                </Text>
                 <List>
                   {membersNotInAGroup.members
                     .sort(sortMembersByNameOrEmail)
@@ -253,6 +263,25 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                     ))}
                 </List>
               </Column>
+            </Line>
+          )}
+          <Line justifyContent="space-between" alignItems="center">
+            <Text size="section-title" noMargin>
+              <Trans>Rooms</Trans>
+            </Text>
+            <FlatButton
+              primary
+              label={<Trans>Create a new room</Trans>}
+              leftIcon={<Add fontSize="small" />}
+              onClick={() => setShowNewGroupNameField(true)}
+            />
+          </Line>
+          {showNewGroupNameField && (
+            <Line>
+              <NewTeamGroupNameField
+                onValidateGroupName={onCreateGroup}
+                onDismiss={() => setShowNewGroupNameField(false)}
+              />
             </Line>
           )}
           {groupsAndMembers.length > 0 &&
@@ -283,7 +312,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                     >
                       <Line noMargin>
                         <Column noMargin expand>
-                          <Column>
+                          <Column noMargin>
                             <TeamGroupNameField
                               group={group}
                               onFinishEditingGroupName={onChangeGroupName}
@@ -318,7 +347,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 }
               </DropTarget>
             ))}
-          <NewTeamGroupNameField onValidateGroupName={onCreateGroup} />
         </SectionRow>
       </SectionContainer>
     );

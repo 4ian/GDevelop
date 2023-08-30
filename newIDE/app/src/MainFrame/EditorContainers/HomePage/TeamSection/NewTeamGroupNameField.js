@@ -14,9 +14,10 @@ import { Trans, t } from '@lingui/macro';
 
 type Props = {|
   onValidateGroupName: ({| name: string |}) => Promise<void>,
+  onDismiss: () => void,
 |};
 
-const NewTeamGroupNameField = ({ onValidateGroupName }: Props) => {
+const NewTeamGroupNameField = ({ onValidateGroupName, onDismiss }: Props) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const [groupName, setGroupName] = React.useState<string>('');
@@ -33,6 +34,7 @@ const NewTeamGroupNameField = ({ onValidateGroupName }: Props) => {
         await onValidateGroupName({ name: cleanedGroupName });
         setGroupName('');
         setErrorText(null);
+        onDismiss();
       } catch (error) {
         console.error(error);
         setErrorText(
@@ -44,13 +46,17 @@ const NewTeamGroupNameField = ({ onValidateGroupName }: Props) => {
         setIsLoading(false);
       }
     },
-    [onValidateGroupName, groupName]
+    [onValidateGroupName, groupName, onDismiss]
   );
 
-  const onCancelEditingName = React.useCallback(() => {
-    setGroupName('');
-    setErrorText(null);
-  }, []);
+  const onCancelEditingName = React.useCallback(
+    () => {
+      setGroupName('');
+      setErrorText(null);
+      onDismiss();
+    },
+    [onDismiss]
+  );
 
   return (
     <Line noMargin>
@@ -63,6 +69,7 @@ const NewTeamGroupNameField = ({ onValidateGroupName }: Props) => {
         onChange={(e, newName) => {
           setGroupName(newName);
         }}
+        autoFocus="desktopAndMobileDevices"
         translatableHintText={t`New group name`}
         errorText={errorText}
         onKeyUp={event => {

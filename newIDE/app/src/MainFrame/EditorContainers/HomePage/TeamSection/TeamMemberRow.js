@@ -25,10 +25,11 @@ import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../../UI/Menu/ContextMenu';
+import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 
 const styles = {
   listItem: {
-    padding: '6px 10px',
+    padding: '4px 0',
     borderRadius: 8,
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
@@ -130,7 +131,9 @@ const TeamMemberRow = ({
                         </ListItemSecondaryAction>
                       ) : (
                         <FlatButton
+                          primary
                           disabled={disabled}
+                          rightIcon={<ChevronArrowRight fontSize="small" />}
                           label={<Trans>See projects</Trans>}
                           onClick={() => onListUserProjects(member)}
                         />

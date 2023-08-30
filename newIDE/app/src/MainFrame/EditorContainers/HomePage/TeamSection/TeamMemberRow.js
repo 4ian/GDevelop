@@ -8,11 +8,9 @@ import { type User } from '../../../../Utils/GDevelopServices/User';
 
 import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import {
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../../UI/Layout';
+import { LineStackLayout } from '../../../../UI/Layout';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import Text from '../../../../UI/Text';
 import DragHandle from '../../../../UI/DragHandle';
@@ -100,36 +98,55 @@ const TeamMemberRow = ({
                       )}
                       {connectDragPreview(
                         <div>
-                          <ResponsiveLineStackLayout
-                            noMargin
-                            alignItems="center"
-                          >
-                            {member.username && (
-                              <Text allowSelection noMargin>
-                                {member.username}
+                          {isMobile ? (
+                            <ListItemText
+                              disableTypography
+                              primary={
+                                <Text allowSelection noMargin>
+                                  {member.username || member.email}
+                                </Text>
+                              }
+                              secondary={
+                                member.username ? (
+                                  <Text
+                                    allowSelection
+                                    noMargin
+                                    color="secondary"
+                                  >
+                                    {member.email}
+                                  </Text>
+                                ) : null
+                              }
+                            />
+                          ) : (
+                            <LineStackLayout noMargin alignItems="center">
+                              {member.username && (
+                                <Text allowSelection noMargin>
+                                  {member.username}
+                                </Text>
+                              )}
+                              <Text allowSelection noMargin color="secondary">
+                                {member.email}
                               </Text>
-                            )}
-                            <Text allowSelection noMargin color="secondary">
-                              {member.email}
-                            </Text>
-                          </ResponsiveLineStackLayout>
+                            </LineStackLayout>
+                          )}
                         </div>
                       )}
                     </LineStackLayout>
 
-                    <LeftLoader isLoading={isLoading}>
-                      {isMobile ? (
-                        <ListItemSecondaryAction>
-                          <IconButton
-                            size="small"
-                            edge="end"
-                            aria-label="menu"
-                            onClick={openContextMenu}
-                          >
-                            <ThreeDotsMenu />
-                          </IconButton>
-                        </ListItemSecondaryAction>
-                      ) : (
+                    {isMobile ? (
+                      <ListItemSecondaryAction>
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          aria-label="menu"
+                          onClick={openContextMenu}
+                        >
+                          <ThreeDotsMenu />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    ) : (
+                      <LeftLoader isLoading={isLoading}>
                         <FlatButton
                           primary
                           disabled={disabled}
@@ -137,8 +154,8 @@ const TeamMemberRow = ({
                           label={<Trans>See projects</Trans>}
                           onClick={() => onListUserProjects(member)}
                         />
-                      )}
-                    </LeftLoader>
+                      </LeftLoader>
+                    )}
                   </LineStackLayout>
                 </ListItem>
               );

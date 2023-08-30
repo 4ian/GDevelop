@@ -187,15 +187,14 @@ export default class PixiResourcesLoader {
               isResourceForPixi: true,
             }
           );
-
-          // TODO Preferences are important for Cloud and 3D.
-
-          // PIXI_ASSETS.Assets.setPreferences({
-          //   preferWorkers: false,
-          //   preferCreateImageBitmap: false,
-          //   crossOrigin: '',
-          // });
-          const loadedTexture = await Assets.load(url);
+          PIXI.Assets.setPreferences({
+            preferWorkers: false,
+            preferCreateImageBitmap: false,
+            crossOrigin: checkIfCredentialsRequired(url)
+              ? 'use-credentials'
+              : 'anonymous',
+          });
+          const loadedTexture = await PIXI.Assets.load(url);
           loadedTextures[resourceName] = loadedTexture;
           // TODO What if 2 assets share the same file with different settings?
           applyPixiTextureSettings(loadedTexture, resource);

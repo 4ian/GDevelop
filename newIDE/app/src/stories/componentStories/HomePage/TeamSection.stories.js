@@ -132,15 +132,25 @@ const initialMemberships: Array<TeamMembership> = [
 const MockTeamProvider = ({
   children,
   loading,
+  noGroups,
 }: {|
   children: React.Node,
   loading: boolean,
+  noGroups?: boolean,
 |}) => {
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
-    initialMemberships
+    noGroups
+      ? initialMemberships.map(membership => ({
+          userId: membership.userId,
+          teamId: membership.teamId,
+          createdAt: membership.createdAt,
+        }))
+      : initialMemberships
   );
-  const [groups, setGroups] = React.useState<Array<TeamGroup>>(initialGroups);
+  const [groups, setGroups] = React.useState<Array<TeamGroup>>(
+    noGroups ? [] : initialGroups
+  );
 
   const listUserProjects = async (
     user: User
@@ -239,6 +249,18 @@ const MockTeamProvider = ({
 
 export const Default = () => (
   <MockTeamProvider loading={false}>
+    <FixedHeightFlexContainer height={600}>
+      <TeamSection
+        project={testProject.project}
+        onOpenRecentFile={action('onOpenRecentFile')}
+        storageProviders={[CloudStorageProvider]}
+      />
+    </FixedHeightFlexContainer>
+  </MockTeamProvider>
+);
+
+export const WithNoGroupsYet = () => (
+  <MockTeamProvider loading={false} noGroups>
     <FixedHeightFlexContainer height={600}>
       <TeamSection
         project={testProject.project}

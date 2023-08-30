@@ -284,7 +284,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
               />
             </Line>
           )}
-          {groupsAndMembers.length > 0 &&
+          {groupsAndMembers.length > 0 ? (
             groupsAndMembers.map(({ group, members }) => (
               <DropTarget
                 canDrop={() => true}
@@ -346,7 +346,12 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                   )
                 }
               </DropTarget>
-            ))}
+            ))
+          ) : !showNewGroupNameField ? (
+            <EmptyMessage>
+              <Trans>Create a room and drag and drop members in it.</Trans>
+            </EmptyMessage>
+          ) : null}
         </SectionRow>
       </SectionContainer>
     );

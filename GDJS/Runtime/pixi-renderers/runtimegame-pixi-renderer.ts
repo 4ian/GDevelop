@@ -108,7 +108,7 @@ namespace gdjs {
           antialias: false,
         }) as PIXI.Renderer;
 
-        gameCanvas = this._pixiRenderer.view;
+        gameCanvas = this._pixiRenderer.view as HTMLCanvasElement;
       }
 
       // Add the renderer view element to the DOM

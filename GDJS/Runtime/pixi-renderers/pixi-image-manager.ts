@@ -314,26 +314,29 @@ namespace gdjs {
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<integer> {
       let loadedCount = 0;
-      await Promise.all(gdjs.mapIterable(this._resources.values(), async resource => {
-        try {
-          // TODO Preferences are important for Cloud and 3D.
-
-          // PIXI_ASSETS.Assets.setPreferences({
-          //   preferWorkers: false,
-          //   preferCreateImageBitmap: false,
-          //   crossOrigin: '',
-          // });
-          const loadedTexture = await PIXI_ASSETS.Assets.load(resource.file);
-          this._loadedTextures.put(resource.name, loadedTexture);
-          // TODO What if 2 assets share the same file with different settings?
-          applyTextureSettings(loadedTexture, resource);
-        }
-        catch (error) {
-          logFileLoadingError(resource.file, error);
-        }
-        loadedCount++;
-        onProgress(loadedCount, this._resources.size);
-      }));
+      await Promise.all(
+        gdjs.mapIterable(this._resources.values(), async (resource) => {
+          try {
+            PIXI.Assets.setPreferences({
+              preferWorkers: false,
+              preferCreateImageBitmap: false,
+              crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
+                resource.file
+              )
+                ? 'use-credentials'
+                : 'anonymous',
+            });
+            const loadedTexture = await PIXI.Assets.load(resource.file);
+            this._loadedTextures.put(resource.name, loadedTexture);
+            // TODO What if 2 assets share the same file with different settings?
+            applyTextureSettings(loadedTexture, resource);
+          } catch (error) {
+            logFileLoadingError(resource.file, error);
+          }
+          loadedCount++;
+          onProgress(loadedCount, this._resources.size);
+        })
+      );
       return loadedCount;
     }
   }

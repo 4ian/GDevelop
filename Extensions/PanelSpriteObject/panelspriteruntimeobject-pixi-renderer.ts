@@ -373,7 +373,7 @@ namespace gdjs {
     }
 
     getColor() {
-      const rgb = PIXI.utils.hex2rgb(this._centerSprite.tint);
+      const rgb = new PIXI.Color(this._centerSprite.tint).toRgbArray();
       return (
         Math.floor(rgb[0] * 255) +
         ';' +

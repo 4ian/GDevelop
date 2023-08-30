@@ -80,7 +80,7 @@ namespace gdjs {
       await Promise.all(
         gdjs.mapIterable(preloadedResources, async (resource) => {
           try {
-            this.loadJsonAsync(resource.name);
+            await this.loadJsonAsync(resource.name);
           } catch (error) {
             logger.error('Error while preloading a json resource:' + error);
           }

@@ -43,12 +43,17 @@ export default class WindowBorder {
 
     this.pixiRectangle.clear();
     this.pixiRectangle.beginFill(0x000000);
+    const backgroundRed = this.layout.getBackgroundColorRed();
+    const backgroundBlue = this.layout.getBackgroundColorBlue();
+    const backgroundGreen = this.layout.getBackgroundColorGreen();
+    const isDark =
+      Math.max(backgroundRed, backgroundBlue, backgroundGreen) < 128;
     this.pixiRectangle.lineStyle(
       1,
       rgbToHexNumber(
-        128 + (this.layout.getBackgroundColorRed() % 256),
-        128 + (this.layout.getBackgroundColorBlue() % 256),
-        128 + (this.layout.getBackgroundColorGreen() % 256)
+        ((isDark ? 255 : 0) + backgroundRed) / 2,
+        ((isDark ? 255 : 0) + backgroundBlue) / 2,
+        ((isDark ? 255 : 0) + backgroundGreen) / 2
       ),
       1
     );

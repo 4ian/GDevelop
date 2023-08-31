@@ -204,8 +204,17 @@ namespace gdjs {
 
     /**
      * Contains the behaviors of the object.
+     *
+     * It doesn't includes capabilities behaviors because they don't need their
+     * life-cycle functions to be called. This avoids decorative Sprite
+     * instances to use CPU.
      */
     protected _behaviors: gdjs.RuntimeBehavior[] = [];
+    /**
+     * Contains the behaviors of the object by name.
+     *
+     * It includes capabilities behaviors.
+     */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;
 
@@ -240,8 +249,11 @@ namespace gdjs {
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
         const autoData = objectData.behaviors[i];
         const Ctor = gdjs.getBehaviorConstructor(autoData.type);
-        this._behaviors.push(new Ctor(instanceContainer, autoData, this));
-        this._behaviorsTable.put(autoData.name, this._behaviors[i]);
+        const behavior = new Ctor(instanceContainer, autoData, this);
+        if (behavior.usesLifecycleFunction()) {
+          this._behaviors.push(behavior);
+        }
+        this._behaviorsTable.put(autoData.name, behavior);
       }
       this._timers = new Hashtable();
     }
@@ -310,19 +322,28 @@ namespace gdjs {
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
-      let i = 0;
-      for (const len = objectData.behaviors.length; i < len; ++i) {
-        const behaviorData = objectData.behaviors[i];
+      const behaviorsDataCount = objectData.behaviors.length;
+      let behaviorsUsingLifecycleFunctionCount = 0;
+      for (
+        let behaviorDataIndex = 0;
+        behaviorDataIndex < behaviorsDataCount;
+        ++behaviorDataIndex
+      ) {
+        const behaviorData = objectData.behaviors[behaviorDataIndex];
         const Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
-        if (i < this._behaviors.length) {
-          // TODO: Add support for behavior recycling with a `reinitialize` method.
-          this._behaviors[i] = new Ctor(runtimeScene, behaviorData, this);
-        } else {
-          this._behaviors.push(new Ctor(runtimeScene, behaviorData, this));
+        // TODO: Add support for behavior recycling with a `reinitialize` method.
+        const behavior = new Ctor(runtimeScene, behaviorData, this);
+        if (behavior.usesLifecycleFunction()) {
+          if (behaviorsUsingLifecycleFunctionCount < this._behaviors.length) {
+            this._behaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
+          } else {
+            this._behaviors.push(behavior);
+          }
+          behaviorsUsingLifecycleFunctionCount++;
         }
-        this._behaviorsTable.put(behaviorData.name, this._behaviors[i]);
+        this._behaviorsTable.put(behaviorData.name, behavior);
       }
-      this._behaviors.length = i;
+      this._behaviors.length = behaviorsUsingLifecycleFunctionCount;
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
@@ -1830,7 +1851,9 @@ namespace gdjs {
         behaviorData,
         this
       );
-      this._behaviors.push(newRuntimeBehavior);
+      if (newRuntimeBehavior.usesLifecycleFunction()) {
+        this._behaviors.push(newRuntimeBehavior);
+      }
       this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
       return true;
     }

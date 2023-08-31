@@ -196,6 +196,16 @@ namespace gdjs {
      * of events.
      */
     onObjectHotReloaded(): void {}
+
+    /**
+     * Capabilities behaviors set it to false because they don't need their
+     * life-cycle functions to be called. This avoids decorative Sprite
+     * instances to use CPU.
+     * @returns
+     */
+    usesLifecycleFunction(): boolean {
+      return true;
+    }
   }
   gdjs.registerBehavior('', gdjs.RuntimeBehavior);
 }

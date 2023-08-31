@@ -57,6 +57,10 @@ namespace gdjs {
       this.object = owner;
     }
 
+    usesLifecycleFunction(): boolean {
+      return false;
+    }
+
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       // Nothing to update.
       return true;

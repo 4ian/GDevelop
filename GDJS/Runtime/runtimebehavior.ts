@@ -198,9 +198,12 @@ namespace gdjs {
     onObjectHotReloaded(): void {}
 
     /**
-     * Capabilities behaviors set it to false because they don't need their
-     * life-cycle functions to be called. This avoids decorative Sprite
-     * instances to use CPU.
+     * Should return `false` if the behavior does not need any lifecycle function to
+     * be called.
+     * Default, hidden, "capability" behaviors set it to `false`. 
+     * This avoids useless calls to empty lifecycle functions, which would waste CPU
+     * time (and have a sizeable impact for example when lots of static instances
+     * are living in the scene).
      * @returns
      */
     usesLifecycleFunction(): boolean {

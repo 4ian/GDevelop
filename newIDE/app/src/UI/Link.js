@@ -8,7 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 type Props = {|
   children: React.Node,
   href: string,
-  onClick: () => void,
+  onClick: () => void | Promise<void>,
   disabled?: boolean,
 |};
 

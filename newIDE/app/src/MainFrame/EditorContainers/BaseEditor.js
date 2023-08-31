@@ -101,7 +101,7 @@ export type RenderEditorContainerProps = {|
   canInstallPrivateAsset: () => boolean,
 
   // Project creation
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
 
   // Project save
   onSave: () => Promise<void>,

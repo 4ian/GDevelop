@@ -90,7 +90,7 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
 
   // Project save
   onSave: () => Promise<void>,
@@ -294,15 +294,11 @@ export const HomePage = React.memo<Props>(
                     onChooseProject={onChooseProject}
                     onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
                     onShowAllExamples={onOpenExampleStore}
-                    onSelectExampleShortHeader={exampleShortHeader =>
-                      onOpenExampleStoreWithExampleShortHeader(
-                        exampleShortHeader
-                      )
+                    onSelectExampleShortHeader={
+                      onOpenExampleStoreWithExampleShortHeader
                     }
-                    onSelectPrivateGameTemplateListingData={privateGameTemplateListingData =>
-                      onOpenExampleStoreWithPrivateGameTemplateListingData(
-                        privateGameTemplateListingData
-                      )
+                    onSelectPrivateGameTemplateListingData={
+                      onOpenExampleStoreWithPrivateGameTemplateListingData
                     }
                     onOpenRecentFile={onOpenRecentFile}
                     storageProviders={storageProviders}

@@ -70,8 +70,8 @@ export const ExampleStore = ({
   isOpening,
   onOpenNewProjectSetupDialog,
   focusOnMount,
-  // The example store is "controlled", because the selected items are
-  // needed in the mainframe, to open the NewProjectSetupDialog.
+  // The example store is "controlled" by the parent. Useful as selected items are
+  // needed in MainFrame, to display them in NewProjectSetupDialog.
   selectedExampleShortHeader,
   onSelectExampleShortHeader,
   selectedPrivateGameTemplateListingData,
@@ -245,7 +245,7 @@ export const ExampleStore = ({
                 getSearchItemUniqueId={getItemUniqueId}
                 renderSearchItem={(item, onHeightComputed) => {
                   if (item.authorIds) {
-                    // This is an exampleShortHeader.
+                    // This is an ExampleShortHeader.
                     return (
                       <ExampleListItem
                         isOpening={isOpening}
@@ -261,7 +261,7 @@ export const ExampleStore = ({
                     );
                   }
                   if (item.listing) {
-                    // This is a privateGameTemplateListingData.
+                    // This is a PrivateGameTemplateListingData.
                     const isTemplateOwned =
                       !!receivedGameTemplates &&
                       !!receivedGameTemplates.find(

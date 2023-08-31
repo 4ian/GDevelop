@@ -12,7 +12,7 @@ import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContex
 import withMock from 'storybook-addon-mock';
 import { GDevelopUserApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import PublicProfileProvider from '../../../../Profile/PublicProfileProvider';
-import { useNavigation } from '../../../../AssetStore/AssetStoreNavigator';
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore/AssetDetails',
@@ -21,7 +21,7 @@ export default {
 };
 
 const Wrapper = ({ children }: { children: React.Node }) => {
-  const navigationState = useNavigation();
+  const navigationState = useShopNavigation();
   return (
     <PublicProfileProvider>
       <AssetStoreStateProvider shopNavigationState={navigationState}>

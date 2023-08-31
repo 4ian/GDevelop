@@ -401,7 +401,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     const selectPrivateGameTemplate = React.useCallback(
       (privateGameTemplateListingData: PrivateGameTemplateListingData) => {
-        // The user has not received the pack, open the page to buy it.
         sendGameTemplateInformationOpened({
           gameTemplateName: privateGameTemplateListingData.name,
           gameTemplateId: privateGameTemplateListingData.id,

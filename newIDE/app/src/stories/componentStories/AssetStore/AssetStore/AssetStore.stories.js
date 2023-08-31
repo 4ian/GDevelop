@@ -12,7 +12,7 @@ import {
   fakeSilverAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import { useNavigation } from '../../../../AssetStore/AssetStoreNavigator';
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore',
@@ -43,7 +43,7 @@ const apiDataFakePacks = {
 };
 
 const Wrapper = ({ children }: { children: React.Node }) => {
-  const navigationState = useNavigation();
+  const navigationState = useShopNavigation();
   return (
     <FixedHeightFlexContainer height={500}>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>

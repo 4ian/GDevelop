@@ -3105,9 +3105,7 @@ const MainFrame = (props: Props) => {
                     canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                    onOpenNewProjectSetupDialog: exampleShortHeader => {
-                      // TO UPDATE
-                      setSelectedExampleShortHeader(exampleShortHeader);
+                    onOpenNewProjectSetupDialog: () => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProjectManager: () => openProjectManager(true),
@@ -3205,15 +3203,10 @@ const MainFrame = (props: Props) => {
           selectedPrivateGameTemplateListingData={
             selectedPrivateGameTemplateListingData
           }
-          onSelectExampleShortHeader={exampleShortHeader => {
-            console.log('selecting example short header', exampleShortHeader);
-            setSelectedExampleShortHeader(exampleShortHeader);
-          }}
-          onSelectPrivateGameTemplateListingData={privateGameTemplateListingData => {
-            setSelectedPrivateGameTemplateListingData(
-              privateGameTemplateListingData
-            );
-          }}
+          onSelectExampleShortHeader={setSelectedExampleShortHeader}
+          onSelectPrivateGameTemplateListingData={
+            setSelectedPrivateGameTemplateListingData
+          }
           onOpenNewProjectSetupDialog={() => {
             setNewProjectSetupDialogOpen(true);
           }}

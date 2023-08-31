@@ -532,7 +532,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _fetchUserAssetShortHedaers = async () => {
+  _fetchUserAssetShortHeaders = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
     if (!firebaseUser) return;
@@ -583,7 +583,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _fetchUserPurchases = async () => {
     await Promise.all([
       this._fetchUserAssetPacks(),
-      this._fetchUserAssetShortHedaers(),
+      this._fetchUserAssetShortHeaders(),
       this._fetchUserGameTemplates(),
     ]);
   };

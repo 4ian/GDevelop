@@ -2,6 +2,8 @@
 import axios from 'axios';
 import path from 'path-browserify';
 import { GDevelopShopApi } from './ApiConfigs';
+import { isURL } from '../../ResourcesList/ResourceUtils';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -240,4 +242,34 @@ export const getStripeCheckoutUrl = async (
   if (!response.data.sessionUrl)
     throw new Error('Could not find the session url.');
   return response.data.sessionUrl;
+};
+
+// Helper to fetch a token for private game templates if needed, when moving or fetching resources.
+export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
+  authenticatedUser,
+  allResourcePaths,
+}: {|
+  authenticatedUser: AuthenticatedUser,
+  allResourcePaths: Array<string>,
+|}): Promise<?string> => {
+  const isFetchingGameTemplateAuthorizedResources = allResourcePaths.some(
+    resourcePath =>
+      isURL(resourcePath) &&
+      isPrivateGameTemplateResourceAuthorizedUrl(resourcePath)
+  );
+
+  if (isFetchingGameTemplateAuthorizedResources) {
+    const userId = authenticatedUser.profile && authenticatedUser.profile.id;
+    if (!userId) {
+      throw new Error(
+        'Can not fetch resources from a private game template without being authenticated.'
+      );
+    }
+    const tokenForPrivateGameTemplateAuthorization = await getAuthorizationTokenForPrivateGameTemplates(
+      authenticatedUser.getAuthorizationHeader,
+      { userId }
+    );
+    return tokenForPrivateGameTemplateAuthorization;
+  }
+  return null;
 };

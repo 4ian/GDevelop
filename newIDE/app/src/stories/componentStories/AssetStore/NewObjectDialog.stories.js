@@ -9,7 +9,7 @@ import NewObjectDialog from '../../../AssetStore/NewObjectDialog';
 import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
-import { useNavigation } from '../../../AssetStore/AssetStoreNavigator';
+import { useShopNavigation } from '../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/NewObjectDialog',
@@ -18,7 +18,7 @@ export default {
 };
 
 export const Default = () => {
-  const navigationState = useNavigation();
+  const navigationState = useShopNavigation();
   return (
     <AssetStoreStateProvider shopNavigationState={navigationState}>
       <I18n>

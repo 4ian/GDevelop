@@ -102,7 +102,6 @@ const styles = {
     display: 'flex',
   },
   titleContainer: {
-    paddingBottom: dialogTitlePadding,
     textAlign: 'left',
     // Ensure the title can break on any character, to ensure it's visible on mobile. Especially useful for long emails.
     overflowWrap: 'anywhere',
@@ -365,28 +364,27 @@ const Dialog = ({
         />
       )}
       <div style={dialogContainerStyle}>
-        {title && (
-          <div style={styles.titleContainer}>
-            <Line
-              noMargin
-              justifyContent="space-between"
-              alignItems="flex-start"
-            >
-              <Text noMargin size="section-title">
-                {title}
-              </Text>
-              {onRequestClose && !cannotBeDismissed && (
-                <IconButton
-                  onClick={onRequestClose}
-                  size="small"
-                  disabled={cannotBeDismissed}
-                >
-                  <Cross />
-                </IconButton>
-              )}
-            </Line>
-          </div>
-        )}
+        <div
+          style={{
+            ...styles.titleContainer,
+            paddingBottom: title ? dialogTitlePadding : 0, // Keep the title container if there is no title, for the close button to be visible, but don't add padding.
+          }}
+        >
+          <Line noMargin justifyContent="space-between" alignItems="flex-start">
+            <Text noMargin size="section-title">
+              {title}
+            </Text>
+            {onRequestClose && !cannotBeDismissed && (
+              <IconButton
+                onClick={onRequestClose}
+                size="small"
+                disabled={cannotBeDismissed}
+              >
+                <Cross />
+              </IconButton>
+            )}
+          </Line>
+        </div>
         {fixedContent && (
           <div style={styles.fixedContentContainer}>{fixedContent}</div>
         )}

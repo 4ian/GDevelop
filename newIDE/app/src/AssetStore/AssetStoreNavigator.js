@@ -103,7 +103,7 @@ type AssetStorePageHistory = {|
   previousPages: Array<AssetStorePageState>,
 |};
 
-export const useNavigation = (): NavigationState => {
+export const useShopNavigation = (): NavigationState => {
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],
   });

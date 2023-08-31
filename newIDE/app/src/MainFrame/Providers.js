@@ -35,7 +35,7 @@ import { SubscriptionSuggestionProvider } from '../Profile/Subscription/Subscrip
 import { RouterContextProvider } from './RouterContext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
-import { useNavigation } from '../AssetStore/AssetStoreNavigator';
+import { useShopNavigation } from '../AssetStore/AssetStoreNavigator';
 
 type Props = {|
   authentication: Authentication,
@@ -62,7 +62,7 @@ const Providers = ({
   eventsFunctionsExtensionOpener,
   onlyAppStoreShopItems,
 }: Props) => {
-  const shopNavigationState = useNavigation();
+  const shopNavigationState = useShopNavigation();
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>

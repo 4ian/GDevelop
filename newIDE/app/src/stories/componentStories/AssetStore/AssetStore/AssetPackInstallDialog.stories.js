@@ -21,7 +21,7 @@ import LocalEventsFunctionsExtensionWriter from '../../../../EventsFunctionsExte
 import LocalEventsFunctionsExtensionOpener from '../../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 import EventsFunctionsExtensionsContext from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import fakeResourceManagementProps from '../../../FakeResourceManagement';
-const { useNavigation } = require('../../../../AssetStore/AssetStoreNavigator');
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
@@ -92,7 +92,7 @@ const fakeEventsFunctionsExtensionsContext = {
 };
 
 const Wrapper = ({ children }: { children: React.Node }) => {
-  const navigationState = useNavigation();
+  const navigationState = useShopNavigation();
   return (
     <EventsFunctionsExtensionsContext.Provider
       value={fakeEventsFunctionsExtensionsContext}
@@ -185,7 +185,7 @@ LayoutPublicAssetSomeAlreadyInstalled.parameters = {
 };
 
 export const LayoutPrivateAssetInstallSuccess = () => {
-  const navigationState = useNavigation();
+  const navigationState = useShopNavigation();
 
   return (
     <PrivateAssetsAuthorizationContext.Provider
@@ -220,7 +220,7 @@ export const LayoutPrivateAssetInstallSuccess = () => {
 };
 
 export const LayoutPrivateAssetInstallFailure = () => {
-  const navigationState = useNavigation();
+  const navigationState = useShopNavigation();
 
   return (
     <PrivateAssetsAuthorizationContext.Provider

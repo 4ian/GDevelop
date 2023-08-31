@@ -437,12 +437,9 @@ export const PrivateGameTemplateTile = ({
           />
         </div>
         <Column>
-          <Line justifyContent="space-between" noMargin>
+          <Line justifyContent="flex-start" noMargin>
             <Text style={styles.packTitle} size="body2">
               {privateGameTemplateListingData.name}
-            </Text>
-            <Text style={styles.packTitle} color="primary" size="body2">
-              {privateGameTemplateListingData.description}
             </Text>
           </Line>
         </Column>

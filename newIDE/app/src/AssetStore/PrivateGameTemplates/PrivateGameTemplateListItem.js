@@ -135,7 +135,7 @@ const PrivateGameTemplateListItem = ({
                     color="secondary"
                     size="small"
                     style={styles.chip}
-                    label={<Trans>Premium</Trans>}
+                    label={<Trans>Ready-made</Trans>}
                     key="premium"
                   />
                   {privateGameTemplateListingData.categories.map(category => (

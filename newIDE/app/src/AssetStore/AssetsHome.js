@@ -62,47 +62,47 @@ export const shopCategories = {
   'full-game-pack': {
     title: <Trans>Full Game Packs</Trans>,
     imageAlt: 'Full game asset packs category',
-    imageSource: 'res/asset-categories/Full_game_pack.jpeg',
+    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
   },
   'game-template': {
     title: <Trans>Game Templates</Trans>,
     imageAlt: 'Premium game templates category',
-    imageSource: 'res/asset-categories/Full_game_pack.jpeg',
+    imageSource: 'res/shop-categories/Game_Templates.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,
     imageAlt: 'Characters asset packs category',
-    imageSource: 'res/asset-categories/Characters.jpeg',
+    imageSource: 'res/shop-categories/Characters.jpeg',
   },
   props: {
     title: <Trans>Props</Trans>,
     imageAlt: 'Props asset packs category',
-    imageSource: 'res/asset-categories/Props.jpeg',
+    imageSource: 'res/shop-categories/Props.jpeg',
   },
   background: {
     title: <Trans>Backgrounds</Trans>,
     imageAlt: 'Backgrounds asset packs category',
-    imageSource: 'res/asset-categories/Backgrounds.jpeg',
+    imageSource: 'res/shop-categories/Backgrounds.jpeg',
   },
   'visual-effect': {
     title: <Trans>Visual Effects</Trans>,
     imageAlt: 'Visual effects asset packs category',
-    imageSource: 'res/asset-categories/Visual_Effects.jpeg',
+    imageSource: 'res/shop-categories/Visual_Effects.jpeg',
   },
   interface: {
     title: <Trans>UI/Interface</Trans>,
     imageAlt: 'User Interface asset packs category',
-    imageSource: 'res/asset-categories/Interface.jpeg',
+    imageSource: 'res/shop-categories/Interface.jpeg',
   },
   prefab: {
     title: <Trans>Prefabs (Ready-to-use Objects)</Trans>,
     imageAlt: 'Prefabs asset packs category',
-    imageSource: 'res/asset-categories/Prefabs.jpeg',
+    imageSource: 'res/shop-categories/Prefabs.jpeg',
   },
   sounds: {
     title: <Trans>Sounds and musics</Trans>,
     imageAlt: 'Sounds and musics asset packs category',
-    imageSource: 'res/asset-categories/Sounds.jpeg',
+    imageSource: 'res/shop-categories/Sounds.jpeg',
   },
 };
 

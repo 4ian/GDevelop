@@ -245,7 +245,7 @@ const NewProjectSetupDialog = ({
   const isStartingProjectFromScratch =
     !selectedExampleShortHeader && !selectedPrivateGameTemplateListingData;
 
-  // On the local app, prefer to always have something saved so that the user is not blocked
+  // On the local app, prefer to always have something saved so that the user is not blocked.
   // On the web-app, allow to create a project without saving it, unless a private game template is selected
   // (as it requires to save the project to the cloud to be able to use it).
   const shouldAllowCreatingProjectWithoutSaving =

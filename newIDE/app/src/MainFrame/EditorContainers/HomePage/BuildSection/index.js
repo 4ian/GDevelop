@@ -103,7 +103,7 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
   onShowAllExamples: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   onSelectPrivateGameTemplateListingData: (
@@ -588,9 +588,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         <Trans>Create a project</Trans>
                       )
                     }
-                    onClick={() =>
-                      onOpenNewProjectSetupDialog(/*exampleShortHeader=*/ null)
-                    }
+                    onClick={onOpenNewProjectSetupDialog}
                     icon={<Add fontSize="small" />}
                     id="home-create-project-button"
                   />

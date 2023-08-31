@@ -20,7 +20,7 @@ import {
 import { isBlobURL, isURL } from '../../ResourcesList/ResourceUtils';
 import {
   extractFilenameWithExtensionFromProductAuthorizedUrl,
-  getAuthorizationTokenForPrivateGameTemplates,
+  fetchTokenForPrivateGameTemplateAuthorizationIfNeeded,
   isPrivateGameTemplateResourceAuthorizedUrl,
 } from '../../Utils/GDevelopServices/Shop';
 
@@ -59,30 +59,15 @@ export const moveUrlResourcesToCloudProject = async ({
     const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
     const resourceToFetchAndUpload: Array<ResourceToFetchAndUpload> = [];
 
-    let tokenForPrivateGameTemplateAuthorization = null;
-    let isFetchingGameTemplateAuthorizedResources = false;
-    for (const resourceName of allResourceNames) {
-      const resource = resourcesManager.getResource(resourceName);
-      const resourcePath = resource.getFile();
-      if (
-        isURL(resourcePath) &&
-        isPrivateGameTemplateResourceAuthorizedUrl(resourcePath)
-      ) {
-        isFetchingGameTemplateAuthorizedResources = true;
+    const tokenForPrivateGameTemplateAuthorization = await fetchTokenForPrivateGameTemplateAuthorizationIfNeeded(
+      {
+        authenticatedUser,
+        allResourcePaths: allResourceNames.map(resourceName => {
+          const resource = resourcesManager.getResource(resourceName);
+          return resource.getFile();
+        }),
       }
-    }
-    if (isFetchingGameTemplateAuthorizedResources) {
-      const userId = authenticatedUser.profile && authenticatedUser.profile.id;
-      if (!userId) {
-        throw new Error(
-          'Can not fetch resources from a private game template without being authenticated.'
-        );
-      }
-      tokenForPrivateGameTemplateAuthorization = await getAuthorizationTokenForPrivateGameTemplates(
-        authenticatedUser.getAuthorizationHeader,
-        { userId }
-      );
-    }
+    );
 
     await PromisePool.withConcurrency(50)
       .for(allResourceNames)

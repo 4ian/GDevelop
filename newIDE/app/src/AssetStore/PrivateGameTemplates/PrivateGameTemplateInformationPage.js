@@ -38,6 +38,7 @@ import {
 } from '../../Utils/AppStorePurchases';
 import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { capitalize } from 'lodash';
 
 const styles = {
   disabledText: { opacity: 0.6 },
@@ -271,6 +272,13 @@ const PrivateGameTemplateInformationPage = ({
                           )}
                           {getBuyButton(i18n)}
                         </Line>
+                        <Text size="body2" displayInlineAsSpan>
+                          <Trans>Ready-made</Trans>,{' '}
+                          <Trans>Game template</Trans>,{' '}
+                          {privateGameTemplateListingData.categories
+                            .map(category => capitalize(category))
+                            .join(', ')}
+                        </Text>
                         <Text size="body2" displayInlineAsSpan>
                           <MarkdownText
                             source={gameTemplate.longDescription}

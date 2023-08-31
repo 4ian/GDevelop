@@ -311,7 +311,7 @@ const useCreateProject = ({
         privateGameTemplateUrl,
         privateGameTemplateListingData.id
       );
-      await createProject(newProjectSource, newProjectSetup); // TODO: when creating project, enrich all resourceUrls with token.
+      await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject, profile, authenticatedUser]
   );

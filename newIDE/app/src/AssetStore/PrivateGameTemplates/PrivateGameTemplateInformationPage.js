@@ -32,10 +32,7 @@ import { MarkdownText } from '../../UI/MarkdownText';
 import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
-import {
-  purchaseAppStoreProduct,
-  shouldUseAppStoreProduct,
-} from '../../Utils/AppStorePurchases';
+import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { capitalize } from 'lodash';
@@ -53,6 +50,7 @@ type Props = {|
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
+  simulateAppStoreProduct?: boolean,
 |};
 
 const PrivateGameTemplateInformationPage = ({
@@ -60,9 +58,12 @@ const PrivateGameTemplateInformationPage = ({
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
   onGameTemplateOpen,
+  simulateAppStoreProduct,
 }: Props) => {
   const { id, name, sellerId } = privateGameTemplateListingData;
-  const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
+  const { receivedGameTemplates, authenticated } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [gameTemplate, setGameTemplate] = React.useState<?PrivateGameTemplate>(
     null
   );
@@ -75,13 +76,12 @@ const PrivateGameTemplateInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
-  const [
-    appStoreProductBeingBought,
-    setAppStoreProductBeingBought,
-  ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+
+  const shouldUseOrSimulateAppStoreProduct =
+    shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
   const isAlreadyReceived =
     !!receivedGameTemplates &&
@@ -137,18 +137,7 @@ const PrivateGameTemplateInformationPage = ({
           gameTemplateTag: gameTemplate.tag,
         });
 
-        if (shouldUseAppStoreProduct()) {
-          try {
-            setAppStoreProductBeingBought(true);
-            await purchaseAppStoreProduct(
-              privateGameTemplateListingData.appStoreProductId
-            );
-          } finally {
-            setAppStoreProductBeingBought(false);
-          }
-        } else {
-          onOpenPurchaseDialog();
-        }
+        onOpenPurchaseDialog();
       } catch (e) {
         console.warn('Unable to send event', e);
       }
@@ -169,7 +158,7 @@ const PrivateGameTemplateInformationPage = ({
       <Trans>Loading...</Trans>
     ) : isAlreadyReceived ? (
       <Trans>Open template</Trans>
-    ) : isPurchaseDialogOpen || appStoreProductBeingBought ? (
+    ) : isPurchaseDialogOpen ? (
       <Trans>Processing...</Trans>
     ) : (
       <Trans>
@@ -181,18 +170,28 @@ const PrivateGameTemplateInformationPage = ({
       </Trans>
     );
 
-    const disabled =
-      !gameTemplate || isPurchaseDialogOpen || appStoreProductBeingBought;
+    const disabled = !gameTemplate || isPurchaseDialogOpen;
 
     return (
-      <RaisedButton
-        key="buy-game-template"
-        primary
-        label={label}
-        onClick={onClickBuy}
-        disabled={disabled}
-        id="buy-game-template"
-      />
+      <Column noMargin alignItems="flex-end">
+        <RaisedButton
+          key="buy-game-template"
+          primary
+          label={label}
+          onClick={onClickBuy}
+          disabled={disabled}
+          id="buy-game-template"
+        />
+        {shouldUseOrSimulateAppStoreProduct &&
+          !isAlreadyReceived &&
+          !authenticated && (
+            <Text size="body-small">
+              <Link onClick={onClickBuy} disabled={disabled} href="">
+                <Trans>Restore a previous purchase</Trans>
+              </Link>
+            </Text>
+          )}
+      </Column>
     );
   };
 
@@ -201,7 +200,7 @@ const PrivateGameTemplateInformationPage = ({
         {
           kind: 'image',
           url:
-            (shouldUseAppStoreProduct() &&
+            (shouldUseOrSimulateAppStoreProduct &&
               privateGameTemplateListingData.appStoreThumbnailUrls &&
               privateGameTemplateListingData.appStoreThumbnailUrls[0]) ||
             privateGameTemplateListingData.thumbnailUrls[0],

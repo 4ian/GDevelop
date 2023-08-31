@@ -36,7 +36,7 @@ const NewTeamGroupNameField = ({ onValidateGroupName, onDismiss }: Props) => {
         setErrorText(null);
         onDismiss();
       } catch (error) {
-        console.error(error);
+        console.error('An error occurred when renaming the group:', error);
         setErrorText(
           <Trans>
             An error occurred while creating the group. Please try again later.

@@ -1,8 +1,30 @@
 /*!
- * @pixi/filter-color-replace - v3.1.1
- * Compiled Wed, 08 Apr 2020 11:09:37 UTC
+ * @pixi/filter-color-replace - v5.1.1
+ * Compiled Thu, 31 Aug 2023 09:18:38 UTC
  *
  * @pixi/filter-color-replace is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
- */
-var __filters=function(o,r,n){"use strict";var e="attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}",i="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec3 originalColor;\nuniform vec3 newColor;\nuniform float epsilon;\nvoid main(void) {\n    vec4 currentColor = texture2D(uSampler, vTextureCoord);\n    vec3 colorDiff = originalColor - (currentColor.rgb / max(currentColor.a, 0.0000000001));\n    float colorDistance = length(colorDiff);\n    float doReplace = step(colorDistance, epsilon);\n    gl_FragColor = vec4(mix(currentColor.rgb, (newColor + colorDiff) * currentColor.a, doReplace), currentColor.a);\n}\n",t=function(o){function r(r,n,t){void 0===r&&(r=16711680),void 0===n&&(n=0),void 0===t&&(t=.4),o.call(this,e,i),this.uniforms.originalColor=new Float32Array(3),this.uniforms.newColor=new Float32Array(3),this.originalColor=r,this.newColor=n,this.epsilon=t}o&&(r.__proto__=o),r.prototype=Object.create(o&&o.prototype),r.prototype.constructor=r;var t={originalColor:{configurable:!0},newColor:{configurable:!0},epsilon:{configurable:!0}};return t.originalColor.set=function(o){var r=this.uniforms.originalColor;"number"==typeof o?(n.hex2rgb(o,r),this._originalColor=o):(r[0]=o[0],r[1]=o[1],r[2]=o[2],this._originalColor=n.rgb2hex(r))},t.originalColor.get=function(){return this._originalColor},t.newColor.set=function(o){var r=this.uniforms.newColor;"number"==typeof o?(n.hex2rgb(o,r),this._newColor=o):(r[0]=o[0],r[1]=o[1],r[2]=o[2],this._newColor=n.rgb2hex(r))},t.newColor.get=function(){return this._newColor},t.epsilon.set=function(o){this.uniforms.epsilon=o},t.epsilon.get=function(){return this.uniforms.epsilon},Object.defineProperties(r.prototype,t),r}(r.Filter);return o.ColorReplaceFilter=t,o}({},PIXI,PIXI.utils);Object.assign(PIXI.filters,__filters);
+ */var __filters=function(n,e){"use strict";var i=`attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
+
+uniform mat3 projectionMatrix;
+
+varying vec2 vTextureCoord;
+
+void main(void)
+{
+    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+    vTextureCoord = aTextureCoord;
+}`,t=`varying vec2 vTextureCoord;
+uniform sampler2D uSampler;
+uniform vec3 originalColor;
+uniform vec3 newColor;
+uniform float epsilon;
+void main(void) {
+    vec4 currentColor = texture2D(uSampler, vTextureCoord);
+    vec3 colorDiff = originalColor - (currentColor.rgb / max(currentColor.a, 0.0000000001));
+    float colorDistance = length(colorDiff);
+    float doReplace = step(colorDistance, epsilon);
+    gl_FragColor = vec4(mix(currentColor.rgb, (newColor + colorDiff) * currentColor.a, doReplace), currentColor.a);
+}
+`;class l extends e.Filter{constructor(r=16711680,o=0,s=.4){super(i,t),this._originalColor=16711680,this._newColor=0,this.uniforms.originalColor=new Float32Array(3),this.uniforms.newColor=new Float32Array(3),this.originalColor=r,this.newColor=o,this.epsilon=s}set originalColor(r){const o=this.uniforms.originalColor;typeof r=="number"?(e.utils.hex2rgb(r,o),this._originalColor=r):(o[0]=r[0],o[1]=r[1],o[2]=r[2],this._originalColor=e.utils.rgb2hex(o))}get originalColor(){return this._originalColor}set newColor(r){const o=this.uniforms.newColor;typeof r=="number"?(e.utils.hex2rgb(r,o),this._newColor=r):(o[0]=r[0],o[1]=r[1],o[2]=r[2],this._newColor=e.utils.rgb2hex(o))}get newColor(){return this._newColor}set epsilon(r){this.uniforms.epsilon=r}get epsilon(){return this.uniforms.epsilon}}return n.ColorReplaceFilter=l,Object.defineProperty(n,"__esModule",{value:!0}),n}({},PIXI);Object.assign(PIXI.filters,__filters);

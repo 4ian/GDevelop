@@ -1,8 +1,51 @@
 /*!
- * @pixi/filter-bulge-pinch - v3.1.1
- * Compiled Wed, 08 Apr 2020 11:09:37 UTC
+ * @pixi/filter-bulge-pinch - v5.1.1
+ * Compiled Thu, 31 Aug 2023 09:18:38 UTC
  *
  * @pixi/filter-bulge-pinch is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
- */
-var __filters=function(e,r){"use strict";var n="attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}",t="uniform float radius;\nuniform float strength;\nuniform vec2 center;\nuniform sampler2D uSampler;\nvarying vec2 vTextureCoord;\n\nuniform vec4 filterArea;\nuniform vec4 filterClamp;\nuniform vec2 dimensions;\n\nvoid main()\n{\n    vec2 coord = vTextureCoord * filterArea.xy;\n    coord -= center * dimensions.xy;\n    float distance = length(coord);\n    if (distance < radius) {\n        float percent = distance / radius;\n        if (strength > 0.0) {\n            coord *= mix(1.0, smoothstep(0.0, radius / distance, percent), strength * 0.75);\n        } else {\n            coord *= mix(1.0, pow(percent, 1.0 + strength * 0.75) * radius / distance, 1.0 - percent);\n        }\n    }\n    coord += center * dimensions.xy;\n    coord /= filterArea.xy;\n    vec2 clampedCoord = clamp(coord, filterClamp.xy, filterClamp.zw);\n    vec4 color = texture2D(uSampler, clampedCoord);\n    if (coord != clampedCoord) {\n        color *= max(0.0, 1.0 - length(coord - clampedCoord));\n    }\n\n    gl_FragColor = color;\n}\n",o=function(e){function r(r){if(e.call(this,n,t),"object"!=typeof r){var o=arguments[0],i=arguments[1],s=arguments[2];r={},void 0!==o&&(r.center=o),void 0!==i&&(r.radius=i),void 0!==s&&(r.strength=s)}this.uniforms.dimensions=new Float32Array(2),Object.assign(this,{center:[.5,.5],radius:100,strength:1},r)}e&&(r.__proto__=e),r.prototype=Object.create(e&&e.prototype),r.prototype.constructor=r;var o={radius:{configurable:!0},strength:{configurable:!0},center:{configurable:!0}};return r.prototype.apply=function(e,r,n,t){this.uniforms.dimensions[0]=r.filterFrame.width,this.uniforms.dimensions[1]=r.filterFrame.height,e.applyFilter(this,r,n,t)},o.radius.get=function(){return this.uniforms.radius},o.radius.set=function(e){this.uniforms.radius=e},o.strength.get=function(){return this.uniforms.strength},o.strength.set=function(e){this.uniforms.strength=e},o.center.get=function(){return this.uniforms.center},o.center.set=function(e){this.uniforms.center=e},Object.defineProperties(r.prototype,o),r}(r.Filter);return e.BulgePinchFilter=o,e}({},PIXI);Object.assign(PIXI.filters,__filters);
+ */var __filters=function(r,o){"use strict";var s=`attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
+
+uniform mat3 projectionMatrix;
+
+varying vec2 vTextureCoord;
+
+void main(void)
+{
+    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+    vTextureCoord = aTextureCoord;
+}`,a=`uniform float radius;
+uniform float strength;
+uniform vec2 center;
+uniform sampler2D uSampler;
+varying vec2 vTextureCoord;
+
+uniform vec4 filterArea;
+uniform vec4 filterClamp;
+uniform vec2 dimensions;
+
+void main()
+{
+    vec2 coord = vTextureCoord * filterArea.xy;
+    coord -= center * dimensions.xy;
+    float distance = length(coord);
+    if (distance < radius) {
+        float percent = distance / radius;
+        if (strength > 0.0) {
+            coord *= mix(1.0, smoothstep(0.0, radius / distance, percent), strength * 0.75);
+        } else {
+            coord *= mix(1.0, pow(percent, 1.0 + strength * 0.75) * radius / distance, 1.0 - percent);
+        }
+    }
+    coord += center * dimensions.xy;
+    coord /= filterArea.xy;
+    vec2 clampedCoord = clamp(coord, filterClamp.xy, filterClamp.zw);
+    vec4 color = texture2D(uSampler, clampedCoord);
+    if (coord != clampedCoord) {
+        color *= max(0.0, 1.0 - length(coord - clampedCoord));
+    }
+
+    gl_FragColor = color;
+}
+`;const n=class extends o.Filter{constructor(e){super(s,a),this.uniforms.dimensions=new Float32Array(2),Object.assign(this,n.defaults,e)}apply(e,i,c,d){const{width:u,height:l}=i.filterFrame;this.uniforms.dimensions[0]=u,this.uniforms.dimensions[1]=l,e.applyFilter(this,i,c,d)}get radius(){return this.uniforms.radius}set radius(e){this.uniforms.radius=e}get strength(){return this.uniforms.strength}set strength(e){this.uniforms.strength=e}get center(){return this.uniforms.center}set center(e){this.uniforms.center=e}};let t=n;return t.defaults={center:[.5,.5],radius:100,strength:1},r.BulgePinchFilter=t,Object.defineProperty(r,"__esModule",{value:!0}),r}({},PIXI);Object.assign(PIXI.filters,__filters);

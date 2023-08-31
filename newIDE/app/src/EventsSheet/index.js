@@ -1317,7 +1317,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    this._eventSearcher.reset();
+    if (this._eventSearcher) this._eventSearcher.reset();
 
     const { _eventsTree: eventsTree } = this;
     if (!eventsTree) return;
@@ -1372,7 +1372,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    this._eventSearcher.reset();
+    if (this._eventSearcher) this._eventSearcher.reset();
 
     const { _eventsTree: eventsTree } = this;
     if (!eventsTree) return;

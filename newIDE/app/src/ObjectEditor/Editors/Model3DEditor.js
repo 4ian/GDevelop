@@ -254,7 +254,6 @@ const Model3DEditor = ({
   const forceUpdate = useForceUpdate();
 
   const model3DConfiguration = gd.asModel3DConfiguration(objectConfiguration);
-  console.log('Model3DEditod, ', model3DConfiguration, objectConfiguration);
   const properties = objectConfiguration.getProperties();
 
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(

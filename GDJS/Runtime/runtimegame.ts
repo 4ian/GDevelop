@@ -404,9 +404,9 @@ namespace gdjs {
     }
 
     /**
-     * Get the text manager of the game, used to load text from game
+     * Get the atlas manager of the game, used to load atlases from game
      * resources.
-     * @return The text manager for the game
+     * @return The atlas manager for the game
      */
     getAtlasManager(): gdjs.AtlasManager {
       return this._atlasManager;
@@ -796,7 +796,7 @@ namespace gdjs {
                                 progressCallback(percent);
                               }
                             },
-                            function (textsTotalCount) {
+                            function (atlasesTotalCount) {
                               that._bitmapFontManager
                                 .loadBitmapFontData((count) => {
                                   var percent = Math.floor(
@@ -805,7 +805,7 @@ namespace gdjs {
                                       fontTotalCount +
                                       jsonTotalCount +
                                       model3DTotalCount +
-                                      textsTotalCount +
+                                      atlasesTotalCount +
                                       count) /
                                       allAssetsTotal) *
                                       100

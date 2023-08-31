@@ -78,7 +78,6 @@ const SpineEditor = ({
   const forceUpdate = useForceUpdate();
 
   const spineConfiguration = gd.asSpineConfiguration(objectConfiguration);
-  console.log('SpineEditod, ', spineConfiguration, objectConfiguration);
   const properties = objectConfiguration.getProperties();
 
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
@@ -286,7 +285,6 @@ const SpineEditor = ({
       }
 
       animation.setName(newName);
-      // TODO EBO Refactor event-based object events when an animation is renamed.
       if (layout && object) {
         gd.WholeProjectRefactorer.renameObjectAnimation(
           project,

@@ -1,22 +1,16 @@
 namespace gdjs {
   import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
 
+  function assert(value: any, message?: string): asserts value {
+    if (!value) {
+      throw new Error(message);
+    }
+  }
+
   export class SpineRuntimeObjectPixiRenderer {
     _object: gdjs.SpineRuntimeObject;
     _spine!: PIXI_SPINE.Spine;
-    private _isAnimationCompelete = true;
-
-    get isAnimationCompelete() {
-      return this._isAnimationCompelete;
-    }
-
-    get isUpdatable() {
-      return this._spine.autoUpdate;
-    }
-
-    set isUpdatable(isUpdatable: boolean) {
-      this._spine.autoUpdate = isUpdatable
-    }
+    private _isAnimationComplete = true;
 
     /**
      * @param runtimeObject The object to render
@@ -41,15 +35,15 @@ namespace gdjs {
         .addRendererObject(this._spine, runtimeObject.getZOrder());
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI_SPINE.Spine {
       return this._spine;
     }
 
-    onDestroy() {
+    onDestroy(): void {
       this._spine.destroy();
     }
 
-    updateTimeScale() {
+    updateTimeScale(): void {
       this._spine.state.timeScale = this._object.getTimeScale();
     }
 
@@ -94,29 +88,64 @@ namespace gdjs {
       this.updateBounds();
     }
 
-    setAnimation(animation: string, loop: boolean) {
-      this._isAnimationCompelete = false;
-      this._spine.state.addListener({ complete: () => this._isAnimationCompelete = true });
+    setAnimation(animation: string, loop: boolean): void {
+      this._isAnimationComplete = false;
+      this._spine.state.addListener({
+        complete: () => (this._isAnimationComplete = true),
+      });
       this._spine.state.setAnimation(0, animation, loop);
       this._spine.update(0);
       this.updateBounds();
     }
 
-    private constructSpine() {
+    isAnimationCompelete(): boolean {
+      return this._isAnimationComplete;
+    }
+
+    isUpdatable(): boolean {
+      return this._spine.autoUpdate;
+    }
+
+    setIsUpdatable(isUpdatable: boolean): void {
+      this._spine.autoUpdate = isUpdatable;
+    }
+
+    private constructSpine(): void {
       const game = this.instanceContainer.getGame();
-      const spineJson = game.getJsonManager().getLoadedJson(this._object.jsonResourceName)!;
-      const atlas = game.getAtlasManager().getAtlasTexture(this._object.atlasResourceName)!;
+      const spineJson = game
+        .getJsonManager()
+        .getLoadedJson(this._object.jsonResourceName);
+      assert(
+        spineJson,
+        `Unavailable ${this._object.jsonResourceName} spine json!`
+      );
+      const atlas = game
+        .getAtlasManager()
+        .getAtlasTexture(this._object.atlasResourceName);
+      assert(
+        atlas,
+        `Unavailable ${this._object.atlasResourceName} spine atlas!`
+      );
 
       const resourceMoc = {};
       const spineParser = new PIXI_SPINE.SpineParser();
-      spineParser.parseData(resourceMoc as any, spineParser.createJsonParser(), atlas, spineJson);
-      this._spine = new PIXI_SPINE.Spine((resourceMoc as unknown as { spineData: PIXI_SPINE.ISkeletonData }).spineData);
+      spineParser.parseData(
+        resourceMoc as any,
+        spineParser.createJsonParser(),
+        atlas,
+        spineJson
+      );
+      this._spine = new PIXI_SPINE.Spine(
+        ((resourceMoc as unknown) as {
+          spineData: PIXI_SPINE.ISkeletonData;
+        }).spineData
+      );
     }
 
-    private updateBounds() {
+    private updateBounds(): void {
       this._spine.position.x = this._object.x;
       this._spine.position.y = this._object.y;
-      
+
       const localBounds = this._spine.getLocalBounds(undefined, true);
 
       this._spine.position.x -= localBounds.x * this._spine.scale.x;

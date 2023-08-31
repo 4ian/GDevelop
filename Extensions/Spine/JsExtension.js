@@ -31,7 +31,7 @@ module.exports = {
         'SpineObject',
         _('Spine'),
         _('Displays a Spine animation.'),
-        'Aurélien Vivet',
+        'Vladyslav Pohorielov',
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/objects/spine')
@@ -271,8 +271,8 @@ module.exports = {
         this._rect.lineStyle(0, 0xFFFFFF);
         this._rect.drawRect(0, 0, width, height);
 
-        if (this._spine) {
-          const s = this._spine;
+        const s = this._spine;
+        if (s) {
           s.width = width;
           s.height = height;
           s.alpha = this.properties.get('opacity').getValue() / 255;
@@ -283,9 +283,11 @@ module.exports = {
         this._pixiObject.calculateBounds();
       }
 
+      /**
+       * @param {number} animation index
+       */
       setAnimation(index) {
-        const s = this._spine;
-        const {configuration} = this;
+        const {configuration, _spine:s} = this;
 
         if (!s || configuration.hasNoAnimations() || index === this._animationIndex) {
           return;
@@ -304,7 +306,7 @@ module.exports = {
         const shouldLoop = animation.shouldLoop();
 
         // reset scale to track new animation range
-        // if custome size is set it will be reinitialized in update method
+        // if custom size is set it will be reinitialized in update method
         s.scale.set(1, 1);
         s.state.setAnimation(0, source, shouldLoop);
         s.state.tracks[0].trackTime = 0;
@@ -314,14 +316,20 @@ module.exports = {
         this._initialHeight = s.height;
       }
 
+      /**
+       * @returns {number} default width
+       */
       getDefaultWidth() {
-        const scale = +this.properties.get('scale').getValue() || 1;
+        const scale = Number(this.properties.get('scale').getValue()) || 1;
 
         return typeof this._initialWidth === 'number' ? this._initialWidth * scale : 256;
       }
 
+      /**
+       * @returns {number} default height
+       */
       getDefaultHeight() {
-        const scale = +this.properties.get('scale').getValue() || 1;
+        const scale = Number(this.properties.get('scale').getValue()) || 1;
 
         return typeof this._initialHeight === 'number' ? this._initialHeight * scale : 256;
       }

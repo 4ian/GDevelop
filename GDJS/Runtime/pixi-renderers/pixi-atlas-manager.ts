@@ -6,7 +6,7 @@
 namespace gdjs {
   import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
 
-  const logger = new gdjs.Logger('Text Manager');
+  const logger = new gdjs.Logger('Atlas Manager');
   type AtlasManagerOnProgressCallback = (
     loadedCount: integer,
     totalCount: integer
@@ -20,7 +20,8 @@ namespace gdjs {
   ) => void;
 
   const atlasKinds: ReadonlyArray<string> = ['atlas'];
-  const isTextResource = (resource: ResourceData) => atlasKinds.includes(resource.kind);
+  const isTextResource = (resource: ResourceData) =>
+    atlasKinds.includes(resource.kind);
 
   /**
    * AtlasManager loads text files (using `XMLHttpRequest`), using the "atlas" resources
@@ -33,7 +34,6 @@ namespace gdjs {
   export class AtlasManager {
     _resourcesLoader: RuntimeGameResourcesLoader;
     _resources: ResourceData[];
-
     _loadedAtlases: { [key: string]: string } = {};
     _loadedTextureAtlases: { [key: string]: PIXI_SPINE.TextureAtlas } = {};
     _callbacks: { [key: string]: Array<AtlasManagerRequestCallback> } = {};
@@ -73,8 +73,12 @@ namespace gdjs {
       onProgress: AtlasManagerOnProgressCallback,
       onComplete: AtlasManagerOnCompleteCallback
     ): void {
-      const textResources = this._resources.filter((resource) => isTextResource(resource) && !resource.disablePreload);
-      if (!textResources.length) { return onComplete(0); }
+      const textResources = this._resources.filter(
+        (resource) => isTextResource(resource) && !resource.disablePreload
+      );
+      if (!textResources.length) {
+        return onComplete(0);
+      }
       let loaded = 0;
 
       const onLoad: AtlasManagerRequestCallback = (error) => {
@@ -101,9 +105,16 @@ namespace gdjs {
      * @param callback The callback function called when json is loaded (or an error occurred).
      */
     load(resourceName: string, callback: AtlasManagerRequestCallback): void {
-      const resource = this._resources.find((resource) => isTextResource(resource) && resource.name === resourceName);
+      const resource = this._resources.find(
+        (resource) => isTextResource(resource) && resource.name === resourceName
+      );
       if (!resource) {
-        return callback(new Error(`Can't find resource with name: "${resourceName}" (or is not a text resource).`), null);
+        return callback(
+          new Error(
+            `Can't find resource with name: "${resourceName}" (or is not a text resource).`
+          ),
+          null
+        );
       }
 
       // Don't fetch again an object that is already in memory
@@ -121,38 +132,73 @@ namespace gdjs {
       this._callbacks[resourceName] = [callback];
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'text';
-      xhr.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(resource.file);
+      xhr.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
+        resource.file
+      );
       xhr.open('GET', this._resourcesLoader.getFullUrl(resource.file));
       xhr.onload = () => {
         if (xhr.status !== 200) {
-          this.callCallback(resourceName, `HTTP error: ${xhr.status} (${xhr.statusText })`, null);
+          this.callCallback(
+            resourceName,
+            `HTTP error: ${xhr.status} (${xhr.statusText})`,
+            null
+          );
         } else {
           this._loadedAtlases[resourceName] = xhr.response;
 
           new PIXI_SPINE.TextureAtlas(
             xhr.response,
             (path, textureCb) => {
-              const atlasImagePath = resourceName.match(/(^.*[\\\/]|^[^\\\/].*)/i)![0] + path;
-              textureCb(this._imageManager.getPIXITexture(atlasImagePath).baseTexture)
+              const resourceDirectory = /(^.*[\\\/]|^[^\\\/].*)/i;
+              const atlasImagePath =
+                resourceName.match(resourceDirectory)![0] + path;
+              textureCb(
+                this._imageManager.getPIXITexture(atlasImagePath).baseTexture
+              );
             },
             (atlas) => {
               this._loadedTextureAtlases[resourceName] = atlas;
               this.callCallback(resourceName, null, xhr.response);
-            });
+            }
+          );
         }
       };
-      xhr.onerror = () => this.callCallback(resourceName, 'Network error', null);
-      xhr.onabort = () => this.callCallback(resourceName, 'Request aborted', null);
+      xhr.onerror = () =>
+        this.callCallback(resourceName, 'Network error', null);
+      xhr.onabort = () =>
+        this.callCallback(resourceName, 'Request aborted', null);
       xhr.send();
     }
 
-    protected callCallback(resourceName: string, errorMessage: string, text: null): void
-    protected callCallback(resourceName: string, errorMessage: null, text: string): void
-    protected callCallback(resourceName: string, errorMessage: string | null, text: string | null): void {
-      if (!this._callbacks[resourceName]) { return; }
-  
+    protected callCallback(
+      resourceName: string,
+      errorMessage: string,
+      text: null
+    ): void;
+    protected callCallback(
+      resourceName: string,
+      errorMessage: null,
+      text: string
+    ): void;
+    protected callCallback(
+      resourceName: string,
+      errorMessage: string | null,
+      text: string | null
+    ): void {
+      if (!this._callbacks[resourceName]) {
+        return;
+      }
+
       for (const callback of this._callbacks[resourceName]) {
-        const error = typeof errorMessage === 'string' ? new Error(errorMessage) : null;
+        const error =
+          typeof errorMessage === 'string' ? new Error(errorMessage) : null;
+
+        if (!text) {
+          throw new Error(
+            `Unavailable text for ${resourceName} atlas resource!`
+          );
+        }
+
         callback(error, text);
       }
 
@@ -165,7 +211,7 @@ namespace gdjs {
      * @returns true if the content of the text resource is loaded. false otherwise.
      */
     isLoaded(resourceName: string): boolean {
-      return typeof this._loadedAtlases[resourceName] === 'string';
+      return resourceName in this._loadedAtlases;
     }
 
     /**
@@ -175,7 +221,9 @@ namespace gdjs {
      * @returns the content of the text resource, if loaded. `null` otherwise.
      */
     getText(resourceName: string): string | null {
-      return this.isLoaded(resourceName) ? this._loadedAtlases[resourceName] : null;
+      return this.isLoaded(resourceName)
+        ? this._loadedAtlases[resourceName]
+        : null;
     }
 
     /**

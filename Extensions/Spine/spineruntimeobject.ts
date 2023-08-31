@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
+
   type SpineAnimation = { name: string; source: string; loop: boolean };
 
   export type SpineObjectDataType = {
@@ -43,13 +45,16 @@ namespace gdjs {
       this.jsonResourceName = objectData.content.jsonResourceName;
       this.atlasResourceName = objectData.content.atlasResourceName;
       this.imageResourceName = objectData.content.imageResourceName;
-      this._renderer = new gdjs.SpineRuntimeObjectRenderer(this, instanceContainer);
+      this._renderer = new gdjs.SpineRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI_SPINE.Spine {
       return this._renderer.getRendererObject();
     }
 
@@ -72,7 +77,9 @@ namespace gdjs {
       return true;
     }
 
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ): void {
       let animationIndex = this._currentAnimationIndex;
       for (const extraData of initialInstanceData.numberProperties || []) {
         if (extraData.name === 'animation') {
@@ -83,7 +90,10 @@ namespace gdjs {
 
       if (initialInstanceData.customSize) {
         this.setScale(1);
-        this._renderer.setSize(initialInstanceData.width, initialInstanceData.height);
+        this._renderer.setSize(
+          initialInstanceData.width,
+          initialInstanceData.height
+        );
         this.invalidateHitboxes();
       }
     }
@@ -128,10 +138,7 @@ namespace gdjs {
     }
 
     setOpacity(opacity: float): void {
-      this._opacity =
-        opacity < 0 ? 0 :
-        opacity > 255 ? 255 :
-        opacity;
+      this._opacity = PixiFiltersTools.clampValue(opacity, 0, 255);
       this._renderer.updateOpacity();
     }
 
@@ -157,15 +164,17 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    setAnimationIndex(animationIndex: number) {
-      if (!this.isAnimationIndex(animationIndex)) { return; }
+    setAnimationIndex(animationIndex: number): void {
+      if (!this.isAnimationIndex(animationIndex)) {
+        return;
+      }
 
       const animation = this._animations[animationIndex];
       this._currentAnimationIndex = animationIndex;
       this._renderer.setAnimation(animation.source, animation.loop);
     }
 
-    setAnimationName(animationName: string) {
+    setAnimationName(animationName: string): void {
       this.setAnimationIndex(this.getAnimationIndex(animationName));
     }
 
@@ -174,24 +183,27 @@ namespace gdjs {
     }
 
     getAnimationName(): string {
-      return this.isAnimationIndex(this._currentAnimationIndex) ?
-        this._animations[this._currentAnimationIndex].name : '';
+      return this.isAnimationIndex(this._currentAnimationIndex)
+        ? this._animations[this._currentAnimationIndex].name
+        : '';
     }
 
-    getAnimationIndex(animationName: string) {
-      return this._animations.findIndex(animation => animation.name === animationName);
+    getAnimationIndex(animationName: string): number {
+      return this._animations.findIndex(
+        (animation) => animation.name === animationName
+      );
     }
 
-    isAnimationIndex(animationIndex: number) {
+    isAnimationIndex(animationIndex: number): boolean {
       return (
-        Number.isInteger(animationIndex)
-        && animationIndex >= 0
-        && animationIndex < this._animations.length
+        Number.isInteger(animationIndex) &&
+        animationIndex >= 0 &&
+        animationIndex < this._animations.length
       );
     }
 
     isAnimationComplete(): boolean {
-      return this._renderer.isAnimationCompelete;
+      return this._renderer.isAnimationCompelete();
     }
 
     isCurrentAnimationName(name: string): boolean {
@@ -199,17 +211,13 @@ namespace gdjs {
     }
 
     setIsUpdatable(isUpdatable: boolean): void {
-      this._renderer.isUpdatable = isUpdatable;
+      this._renderer.setIsUpdatable(isUpdatable);
     }
 
     isUpdatable(): boolean {
-      return this._renderer.isUpdatable;
+      return this._renderer.isUpdatable();
     }
   }
 
-  gdjs.registerObject(
-    'SpineObject::SpineObject',
-    // @ts-ignore
-    gdjs.SpineRuntimeObject
-  );
+  gdjs.registerObject('SpineObject::SpineObject', gdjs.SpineRuntimeObject);
 }

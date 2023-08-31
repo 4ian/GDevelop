@@ -12,7 +12,6 @@ import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 import { ISkeleton } from 'pixi-spine';
 const gd: libGDevelop = global.gd;
 
-// PIXI_SPINE.SpineParser.registerLoaderPlugin();
 PIXI.Loader.registerPlugin(PIXI_SPINE.SpineParser);
 
 type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
@@ -361,7 +360,7 @@ export default class PixiResourcesLoader {
     spineName: string,
     atlasImageName: string,
     atlasTextName: string
-  ): Promise<any> {
+  ): Promise<PIXI_SPINE.ISkeleton> {
     const loader = PIXI.Loader.shared;
     const resourceManager = project.getResourcesManager();
     const resourcesData = [

@@ -232,7 +232,7 @@ namespace gdjs {
         this._data.resources.resources,
         this._resourcesLoader,
         this._imageManager
-      )
+      );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         this._data.resources.resources,
         this._resourcesLoader,
@@ -811,7 +811,8 @@ namespace gdjs {
                                       100
                                   );
                                   loadingScreen.setPercent(percent);
-                                  if (progressCallback) progressCallback(percent);
+                                  if (progressCallback)
+                                    progressCallback(percent);
                                 })
                                 .then(() => loadingScreen.unload())
                                 .then(() =>
@@ -821,7 +822,7 @@ namespace gdjs {
                                   callback();
                                 });
                             }
-                          )
+                          );
                         }
                       );
                     }

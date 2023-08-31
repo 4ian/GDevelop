@@ -119,7 +119,7 @@ namespace gdjs {
               // Render the background color.
               pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
               pixiRenderer.backgroundAlpha = 1;
-              pixiRenderer.clear();
+              if (this._runtimeScene.getClearCanvas()) pixiRenderer.clear();
 
               isFirstRender = false;
             }
@@ -192,7 +192,7 @@ namespace gdjs {
                   this._runtimeScene.getBackgroundColor()
                 );
                 threeRenderer.resetState();
-                threeRenderer.clear();
+                if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
                 threeScene.background = new THREE.Color(
                   this._runtimeScene.getBackgroundColor()
                 );

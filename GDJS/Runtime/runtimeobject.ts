@@ -203,17 +203,18 @@ namespace gdjs {
     _averageForce: gdjs.Force;
 
     /**
-     * Contains the behaviors of the object.
+     * Contains the behaviors of the object, except those not having lifecycle functions.
      *
-     * It doesn't includes capabilities behaviors because they don't need their
-     * life-cycle functions to be called. This avoids decorative Sprite
-     * instances to use CPU.
+     * This means default, hidden, "capability" behaviors are not included in this array.
+     * This avoids wasting time iterating on them when we know their lifecycle functions
+     * are never used.
      */
     protected _behaviors: gdjs.RuntimeBehavior[] = [];
     /**
      * Contains the behaviors of the object by name.
      *
-     * It includes capabilities behaviors.
+     * This includes the default, hidden, "capability" behaviors (those to handle opacity,
+     * effects, scale, size...).
      */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;

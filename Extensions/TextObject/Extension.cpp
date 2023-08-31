@@ -257,7 +257,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Opacity (0-255)")))
       .SetFunctionName("SetOpacity")
-      .SetGetter("GetOpacity");
+      .SetGetter("GetOpacity")
+      .SetHidden();
 
   // Deprecated
   obj.AddCondition("Opacity",
@@ -274,7 +275,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Opacity to compare to (0-255)")))
-      .SetFunctionName("GetOpacity");
+      .SetFunctionName("GetOpacity")
+      .SetHidden();
 
   obj.AddAction("SetSmooth",
                 _("Smoothing"),
@@ -539,7 +541,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Opacity"),
                     "res/actions/opacity.png")
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetOpacity");
+      .SetFunctionName("GetOpacity")
+      .SetHidden();
 
   obj.AddExpression("Angle",
                     _("Angle"),

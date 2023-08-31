@@ -176,6 +176,7 @@ module.exports = {
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
       .setCategoryFullName(_('Text'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior');
 

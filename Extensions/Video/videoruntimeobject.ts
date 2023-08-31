@@ -24,7 +24,9 @@ namespace gdjs {
    * video will have the same state for this video (paused/playing, current time,
    * volume, etc...).
    */
-  export class VideoRuntimeObject extends gdjs.RuntimeObject {
+  export class VideoRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.OpacityHandler {
     _opacity: float;
     _loop: boolean;
     _volume: float;

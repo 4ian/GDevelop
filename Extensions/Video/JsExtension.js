@@ -136,7 +136,9 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
-      .setCategoryFullName(_('User interface'));
+      .setCategoryFullName(_('User interface'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
+      .addDefaultBehavior("OpacityCapability::OpacityBehavior");
 
     object
       .addAction(
@@ -425,8 +427,10 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
+    // Deprecated
     object
       .addCondition(
         'GetOpacity',
@@ -445,8 +449,10 @@ module.exports = {
         )
       )
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .setFunctionName('getOpacity')
+      .setHidden();
 
+    // Deprecated
     object
       .addExpression(
         'Opacity',
@@ -457,7 +463,8 @@ module.exports = {
       )
       .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .setFunctionName('getOpacity')
+      .setHidden();
 
     object
       .addAction(

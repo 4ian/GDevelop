@@ -530,6 +530,8 @@ namespace gdjs {
     
     /**
      * Set whether the canvas should be cleared before this scene rendering.
+     * This is experimental: if possible, try to avoid relying on this and use
+     * custom objects to build complex scenes.
      */
     setClearCanvas(shouldClearCanvas: boolean): void {
       this._clearCanvas = shouldClearCanvas;

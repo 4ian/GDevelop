@@ -43,6 +43,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
 
+  // Deprecated
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Panel Sprite, between 0 (fully "
@@ -56,8 +57,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardRelationalOperatorParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Opacity to compare to (0-255)")));
+              _("Opacity to compare to (0-255)")))
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction(
          "SetOpacity",
          _("Change Panel Sprite opacity"),
@@ -72,14 +75,17 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Opacity (0-255)")));
+              _("Opacity (0-255)")))
+      .SetHidden();
 
+  // Deprecated
   obj.AddExpression("Opacity",
                     _("Opacity"),
                     _("Opacity"),
                     _("Visibility"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Panel Sprite"), "PanelSprite");
+      .AddParameter("object", _("Panel Sprite"), "PanelSprite")
+      .SetHidden();
 
   obj.AddAction(
          "SetColor",

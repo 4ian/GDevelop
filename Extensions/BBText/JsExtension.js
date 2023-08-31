@@ -175,6 +175,7 @@ module.exports = {
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
       .setCategoryFullName(_('Text'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior("OpacityCapability::OpacityBehavior");
 
     /**

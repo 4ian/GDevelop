@@ -26,62 +26,62 @@ export declare class CanvasTileRenderer {
 }
 
 /**
-* A tilemap composite that lazily builds tilesets layered into multiple tilemaps.
-*
-* The composite tileset is the concatenatation of the individual tilesets used in the tilemaps. You can
-* preinitialized it by passing a list of tile textures to the constructor. Otherwise, the composite tilemap
-* is lazily built as you add more tiles with newer tile textures. A new tilemap is created once the last
-* tilemap has reached its limit (as set by {@link CompositeTilemap.texturesPerTilemap texturesPerTilemap}).
-*
-* @example
-* import { Application } from '@pixi/app';
-* import { CompositeTilemap } from '@pixi/tilemap';
-* import { Loader } from '@pixi/loaders';
-*
-* // Setup view & stage.
-* const app = new Application();
-*
-* document.body.appendChild(app.renderer.view);
-* app.stage.interactive = true;
-*
-* // Global reference to the tilemap.
-* let globalTilemap: CompositeTilemap;
-*
-* // Load the tileset spritesheet!
-* Loader.shared.load('atlas.json');
-*
-* // Initialize the tilemap scene when the assets load.
-* Loader.shared.load(function onTilesetLoaded()
-* {
-*      const tilemap = new CompositeTilemap();
-*
-*      // Setup the game level with grass and dungeons!
-*      for (let x = 0; x < 10; x++)
-*      {
-*          for (let y = 0; y < 10; y++)
-*          {
-*              tilemap.tile(
-*                  x % 2 === 0 && (x === y || x + y === 10) ? 'dungeon.png' : 'grass.png',
-*                  x * 100,
-*                  y * 100,
-*              );
-*          }
-*      }
-*
-*      globalTilemap = app.stage.addChild(tilemap);
-* });
-*
-* // Show a bomb at a random location whenever the user clicks!
-* app.stage.on('click', function onClick()
-* {
-*      if (!globalTilemap) return;
-*
-*      const x = Math.floor(Math.random() * 10);
-*      const y = Math.floor(Math.random() * 10);
-*
-*      globalTilemap.tile('bomb.png', x * 100, y * 100);
-* });
-*/
+ * A tilemap composite that lazily builds tilesets layered into multiple tilemaps.
+ *
+ * The composite tileset is the concatenatation of the individual tilesets used in the tilemaps. You can
+ * preinitialized it by passing a list of tile textures to the constructor. Otherwise, the composite tilemap
+ * is lazily built as you add more tiles with newer tile textures. A new tilemap is created once the last
+ * tilemap has reached its limit (as set by {@link CompositeTilemap.texturesPerTilemap texturesPerTilemap}).
+ *
+ * @example
+ * import { Application } from '@pixi/app';
+ * import { CompositeTilemap } from '@pixi/tilemap';
+ * import { Loader } from '@pixi/loaders';
+ *
+ * // Setup view & stage.
+ * const app = new Application();
+ *
+ * document.body.appendChild(app.renderer.view);
+ * app.stage.interactive = true;
+ *
+ * // Global reference to the tilemap.
+ * let globalTilemap: CompositeTilemap;
+ *
+ * // Load the tileset spritesheet!
+ * Loader.shared.load('atlas.json');
+ *
+ * // Initialize the tilemap scene when the assets load.
+ * Loader.shared.load(function onTilesetLoaded()
+ * {
+ *      const tilemap = new CompositeTilemap();
+ *
+ *      // Setup the game level with grass and dungeons!
+ *      for (let x = 0; x < 10; x++)
+ *      {
+ *          for (let y = 0; y < 10; y++)
+ *          {
+ *              tilemap.tile(
+ *                  x % 2 === 0 && (x === y || x + y === 10) ? 'dungeon.png' : 'grass.png',
+ *                  x * 100,
+ *                  y * 100,
+ *              );
+ *          }
+ *      }
+ *
+ *      globalTilemap = app.stage.addChild(tilemap);
+ * });
+ *
+ * // Show a bomb at a random location whenever the user clicks!
+ * app.stage.on('click', function onClick()
+ * {
+ *      if (!globalTilemap) return;
+ *
+ *      const x = Math.floor(Math.random() * 10);
+ *      const y = Math.floor(Math.random() * 10);
+ *
+ *      globalTilemap.tile('bomb.png', x * 100, y * 100);
+ * });
+ */
 declare class CompositeTilemap extends PIXI.Container {
   /** The hard limit on the number of tile textures used in each tilemap. */
   readonly texturesPerTilemap: number;
@@ -150,7 +150,11 @@ declare class CompositeTilemap extends PIXI.Container {
    * @param [options.alpha=1] - Tile alpha
    * @return This tilemap, good for chaining.
    */
-  tile(tileTexture: PIXI.Texture | string | number, x: number, y: number, options?: {
+  tile(
+    tileTexture: PIXI.Texture | string | number,
+    x: number,
+    y: number,
+    options?: {
       u?: number;
       v?: number;
       tileWidth?: number;
@@ -162,7 +166,8 @@ declare class CompositeTilemap extends PIXI.Container {
       animCountY?: number;
       animDivisor?: number;
       alpha?: number;
-  }): this;
+    }
+  ): this;
   renderCanvas(renderer: any): void;
   render(renderer: PIXI.Renderer): void;
   /* Excluded from this release type: isModified */
@@ -171,12 +176,35 @@ declare class CompositeTilemap extends PIXI.Container {
    * @deprecated Since @pixi/tilemap 3.
    * @see CompositeTilemap.tile
    */
-  addFrame(texture: PIXI.Texture | string | number, x: number, y: number, animX?: number, animY?: number, animWidth?: number, animHeight?: number, animDivisor?: number, alpha?: number): this;
+  addFrame(
+    texture: PIXI.Texture | string | number,
+    x: number,
+    y: number,
+    animX?: number,
+    animY?: number,
+    animWidth?: number,
+    animHeight?: number,
+    animDivisor?: number,
+    alpha?: number
+  ): this;
   /**
    * @deprecated @pixi/tilemap 3
    * @see CompositeTilemap.tile
    */
-  addRect(textureIndex: number, u: number, v: number, x: number, y: number, tileWidth: number, tileHeight: number, animX?: number, animY?: number, rotate?: number, animWidth?: number, animHeight?: number): this;
+  addRect(
+    textureIndex: number,
+    u: number,
+    v: number,
+    x: number,
+    y: number,
+    tileWidth: number,
+    tileHeight: number,
+    animX?: number,
+    animY?: number,
+    rotate?: number,
+    animWidth?: number,
+    animHeight?: number
+  ): this;
   /**
    * Alias for {@link CompositeTilemap.tileset tileset}.
    *
@@ -190,8 +218,8 @@ declare class CompositeTilemap extends PIXI.Container {
    */
   get texPerChild(): number;
 }
-export { CompositeTilemap as CompositeRectTileLayer }
-export { CompositeTilemap }
+export { CompositeTilemap as CompositeRectTileLayer };
+export { CompositeTilemap };
 
 export declare const Constant: {
   /** The default number of textures per tilemap in a tilemap composite. */
@@ -233,15 +261,15 @@ export declare const pixi_tilemap: {
   CompositeRectTileLayer: typeof CompositeTilemap;
   CompositeTilemap: typeof CompositeTilemap;
   Constant: {
-      TEXTURES_PER_TILEMAP: number;
-      TEXTILE_DIMEN: number;
-      TEXTILE_UNITS: number;
-      TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
-      use32bitIndex: boolean;
-      DO_CLEAR: boolean;
-      maxTextures: number;
-      boundSize: number;
-      boundCountPerBuffer: number;
+    TEXTURES_PER_TILEMAP: number;
+    TEXTILE_DIMEN: number;
+    TEXTILE_UNITS: number;
+    TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
+    use32bitIndex: boolean;
+    DO_CLEAR: boolean;
+    maxTextures: number;
+    boundSize: number;
+    boundCountPerBuffer: number;
   };
   TextileResource: typeof TextileResource;
   MultiTextureResource: typeof TextileResource;
@@ -257,11 +285,11 @@ export declare const pixi_tilemap: {
 export declare const POINT_STRUCT_SIZE: number;
 
 /**
-* These are additional @pixi/tilemap options.
-*
-* This settings should not be changed after the renderer has initialized; otherwise, the behavior
-* is undefined.
-*/
+ * These are additional @pixi/tilemap options.
+ *
+ * This settings should not be changed after the renderer has initialized; otherwise, the behavior
+ * is undefined.
+ */
 export declare const settings: {
   /** The default number of textures per tilemap in a tilemap composite. */
   TEXTURES_PER_TILEMAP: number;
@@ -300,15 +328,15 @@ export declare interface TextileOptions {
 }
 
 /**
-* This texture tiling resource can be used to upload multiple base-textures together.
-*
-* This resource combines multiple base-textures into a "textile". They're laid out in
-* a dual column format, placed in row-order order. The size of each tile is predefined,
-* and defaults to {@link settings.TEXTILE_DIMEN}. This means that each input base-texture
-* must is smaller than that along both its width and height.
-*
-* @see settings.TEXTILE_UNITS
-*/
+ * This texture tiling resource can be used to upload multiple base-textures together.
+ *
+ * This resource combines multiple base-textures into a "textile". They're laid out in
+ * a dual column format, placed in row-order order. The size of each tile is predefined,
+ * and defaults to {@link settings.TEXTILE_DIMEN}. This means that each input base-texture
+ * must is smaller than that along both its width and height.
+ *
+ * @see settings.TEXTILE_UNITS
+ */
 export declare class TextileResource extends PIXI.Resource {
   /** The base-texture that contains all the texture tiles. */
   baseTexture: PIXI.BaseTexture;
@@ -332,38 +360,42 @@ export declare class TextileResource extends PIXI.Resource {
   /** @override */
   bind(baseTexture: PIXI.BaseTexture): void;
   /** @override */
-  upload(renderer: PIXI.Renderer, texture: PIXI.BaseTexture, glTexture: PIXI.GLTexture): boolean;
+  upload(
+    renderer: PIXI.Renderer,
+    texture: PIXI.BaseTexture,
+    glTexture: PIXI.GLTexture
+  ): boolean;
 }
 
 /**
-* A rectangular tilemap implementation that renders a predefined set of tile textures.
-*
-* The {@link Tilemap.tileset tileset} of a tilemap defines the list of base-textures that can be painted in the
-* tilemap. A texture is identified using its base-texture's index into the this list, i.e. changing the base-texture
-* at a given index in the tileset modifies the paint of all tiles pointing to that index.
-*
-* The size of the tileset is limited by the texture units supported by the client device. The minimum supported
-* value is 8, as defined by the WebGL 1 specification. `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS`) can be used
-* to extract this limit. {@link CompositeTilemap} can be used to get around this limit by layering multiple tilemap
-* instances.
-*
-* @example
-* import { Tilemap } from '@pixi/tilemap';
-* import { Loader } from '@pixi/loaders';
-*
-* // Add the spritesheet into your loader!
-* Loader.shared.add('atlas', 'assets/atlas.json');
-*
-* // Make the tilemap once the tileset assets are available.
-* Loader.shared.load(function onTilesetLoaded()
-* {
-*      // The base-texture is shared between all the tile textures.
-*      const tilemap = new Tilemap([Texture.from('grass.png').baseTexture])
-*          .tile('grass.png', 0, 0)
-*          .tile('grass.png', 100, 100)
-*          .tile('brick_wall.png', 0, 100);
-* });
-*/
+ * A rectangular tilemap implementation that renders a predefined set of tile textures.
+ *
+ * The {@link Tilemap.tileset tileset} of a tilemap defines the list of base-textures that can be painted in the
+ * tilemap. A texture is identified using its base-texture's index into the this list, i.e. changing the base-texture
+ * at a given index in the tileset modifies the paint of all tiles pointing to that index.
+ *
+ * The size of the tileset is limited by the texture units supported by the client device. The minimum supported
+ * value is 8, as defined by the WebGL 1 specification. `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS`) can be used
+ * to extract this limit. {@link CompositeTilemap} can be used to get around this limit by layering multiple tilemap
+ * instances.
+ *
+ * @example
+ * import { Tilemap } from '@pixi/tilemap';
+ * import { Loader } from '@pixi/loaders';
+ *
+ * // Add the spritesheet into your loader!
+ * Loader.shared.add('atlas', 'assets/atlas.json');
+ *
+ * // Make the tilemap once the tileset assets are available.
+ * Loader.shared.load(function onTilesetLoaded()
+ * {
+ *      // The base-texture is shared between all the tile textures.
+ *      const tilemap = new Tilemap([Texture.from('grass.png').baseTexture])
+ *          .tile('grass.png', 0, 0)
+ *          .tile('grass.png', 100, 100)
+ *          .tile('brick_wall.png', 0, 100);
+ * });
+ */
 declare class Tilemap extends PIXI.Container {
   shadowColor: Float32Array;
   _globalMat: PIXI.Matrix;
@@ -441,7 +473,11 @@ declare class Tilemap extends PIXI.Container {
    * @param [options.alpha=1] - Tile alpha
    * @return This tilemap, good for chaining.
    */
-  tile(tileTexture: number | string | PIXI.Texture | PIXI.BaseTexture, x: number, y: number, options?: {
+  tile(
+    tileTexture: number | string | PIXI.Texture | PIXI.BaseTexture,
+    x: number,
+    y: number,
+    options?: {
       u?: number;
       v?: number;
       tileWidth?: number;
@@ -453,7 +489,8 @@ declare class Tilemap extends PIXI.Container {
       animCountY?: number;
       animDivisor?: number;
       alpha?: number;
-  }): this;
+    }
+  ): this;
   /** Changes the rotation of the last tile. */
   tileRotate(rotate: number): void;
   /** Changes the `animX`, `animCountX` of the last tile. */
@@ -486,16 +523,37 @@ declare class Tilemap extends PIXI.Container {
    *
    * @deprecated Since @pixi/tilemap 3.
    */
-  addFrame(texture: PIXI.Texture | string | number, x: number, y: number, animX: number, animY: number): boolean;
+  addFrame(
+    texture: PIXI.Texture | string | number,
+    x: number,
+    y: number,
+    animX: number,
+    animY: number
+  ): boolean;
   /**
    * Deprecated signature for {@link Tilemap.tile tile}.
    *
    * @deprecated Since @pixi/tilemap 3.
    */
-  addRect(textureIndex: number, u: number, v: number, x: number, y: number, tileWidth: number, tileHeight: number, animX?: number, animY?: number, rotate?: number, animCountX?: number, animCountY?: number, animDivisor?: number, alpha?: number): this;
+  addRect(
+    textureIndex: number,
+    u: number,
+    v: number,
+    x: number,
+    y: number,
+    tileWidth: number,
+    tileHeight: number,
+    animX?: number,
+    animY?: number,
+    rotate?: number,
+    animCountX?: number,
+    animCountY?: number,
+    animDivisor?: number,
+    alpha?: number
+  ): this;
 }
-export { Tilemap as RectTileLayer }
-export { Tilemap }
+export { Tilemap as RectTileLayer };
+export { Tilemap };
 
 export declare class TilemapGeometry extends PIXI.Geometry {
   vertSize: number;
@@ -512,8 +570,8 @@ export declare class TilemapShader extends PIXI.Shader {
 }
 
 /**
-* Rendering helper pipeline for tilemaps. This plugin is registered automatically.
-*/
+ * Rendering helper pipeline for tilemaps. This plugin is registered automatically.
+ */
 export declare class TileRenderer extends PIXI.ObjectRenderer {
   /** The managing renderer */
   readonly renderer: PIXI.Renderer;
@@ -539,7 +597,10 @@ export declare class TileRenderer extends PIXI.ObjectRenderer {
    * @param renderer - The renderer to which the textures are to be bound.
    * @param textures - The tile textures being bound.
    */
-  bindTileTextures(renderer: PIXI.Renderer, textures: Array<PIXI.BaseTexture>): void;
+  bindTileTextures(
+    renderer: PIXI.Renderer,
+    textures: Array<PIXI.BaseTexture>
+  ): void;
   start(): void;
   /* Excluded from this release type: createVb */
   /** @return The {@link TilemapShader} shader that this rendering pipeline is using. */

@@ -143,9 +143,10 @@ export const HomePage = React.memo<Props>(
       const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
-      const { fetchGameTemplates } = React.useContext(
-        PrivateGameTemplateStoreContext
-      );
+      const {
+        fetchGameTemplates,
+        shop: { setInitialGameTemplateUserFriendlySlug },
+      } = React.useContext(PrivateGameTemplateStoreContext);
       const {
         values: { showGetStartedSection },
         setShowGetStartedSection,
@@ -233,17 +234,36 @@ export const HomePage = React.memo<Props>(
         AssetStoreContext
       );
 
-      // Open the asset store and a pack if asked to do so.
+      // Open the store and a pack or game template if asked to do so.
       React.useEffect(
         () => {
-          if (routeArguments['initial-dialog'] === 'asset-store') {
+          if (
+            routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
+            routeArguments['initial-dialog'] === 'store' // New way of opening the store
+          ) {
             setActiveTab('shop');
-            setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            if (routeArguments['asset-pack']) {
+              setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            }
+            if (routeArguments['game-template']) {
+              setInitialGameTemplateUserFriendlySlug(
+                routeArguments['game-template']
+              );
+            }
             // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments(['initial-dialog', 'asset-pack']);
+            removeRouteArguments([
+              'initial-dialog',
+              'asset-pack',
+              'game-template',
+            ]);
           }
         },
-        [routeArguments, removeRouteArguments, setInitialPackUserFriendlySlug]
+        [
+          routeArguments,
+          removeRouteArguments,
+          setInitialPackUserFriendlySlug,
+          setInitialGameTemplateUserFriendlySlug,
+        ]
       );
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(

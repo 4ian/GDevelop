@@ -36,7 +36,7 @@ import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   getAssetPackFromUserFriendlySlug,
-  getPrivateAssetPackListingData,
+  getPrivateAssetPackListingDataFromUserFriendlySlug,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
@@ -402,10 +402,12 @@ export const AssetStoreStateProvider = ({
         }
 
         // Otherwise, try to open the information page of a pack not yet bought.
-        const privateAssetPackListingData = getPrivateAssetPackListingData({
-          privateAssetPackListingDatas,
-          userFriendlySlug: initialPackUserFriendlySlug,
-        });
+        const privateAssetPackListingData = getPrivateAssetPackListingDataFromUserFriendlySlug(
+          {
+            privateAssetPackListingDatas,
+            userFriendlySlug: initialPackUserFriendlySlug,
+          }
+        );
 
         if (privateAssetPackListingData) {
           shopNavigationState.openPrivateAssetPackInformationPage({

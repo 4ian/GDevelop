@@ -13,6 +13,9 @@ import {
 } from '../../Utils/GDevelopServices/Shop';
 import { capitalize } from 'lodash';
 import { type NavigationState } from '../AssetStoreNavigator';
+import { getPrivateGameTemplateListingDataFromUserFriendlySlug } from '../AssetStoreUtils';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { t } from '@lingui/macro';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for game templates.
@@ -37,6 +40,7 @@ type PrivateGameTemplateStoreState = {|
     searchText: string,
     setSearchText: string => void,
     filtersState: FiltersState,
+    setInitialGameTemplateUserFriendlySlug: string => void,
   },
   exampleStore: {
     privateGameTemplateListingDatasSearchResults: ?Array<{|
@@ -66,6 +70,9 @@ export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTe
         chosenCategory: null,
         setChosenCategory: () => {},
       },
+      setInitialGameTemplateUserFriendlySlug: (
+        initialGameTemplateUserFriendlySlug: string
+      ) => {},
     },
     exampleStore: {
       privateGameTemplateListingDatasSearchResults: null,
@@ -102,8 +109,14 @@ export const PrivateGameTemplateStoreStateProvider = ({
     privateGameTemplateListingDatas,
     setPrivateGameTemplateListingDatas,
   ] = React.useState<?Array<PrivateGameTemplateListingData>>(null);
+  const [
+    initialGameTemplateUserFriendlySlug,
+    setInitialGameTemplateUserFriendlySlug,
+  ] = React.useState<?string>(null);
+  const initialGameTemplateOpened = React.useRef<boolean>(false);
 
   const isLoading = React.useRef<boolean>(false);
+  const { showAlert } = useAlertDialog();
 
   const [shopSearchText, setShopSearchText] = React.useState(defaultSearchText);
   const [exampleStoreSearchText, setExampleStoreSearchText] = React.useState(
@@ -168,6 +181,59 @@ export const PrivateGameTemplateStoreStateProvider = ({
       isLoading,
       onlyAppStorePrivateGameTemplates,
       privateGameTemplateListingDatas,
+    ]
+  );
+
+  // When the asset packs (public and received private packs) are loaded,
+  // open the asset pack with the slug that was asked to be initially loaded.
+  React.useEffect(
+    () => {
+      if (
+        !initialGameTemplateUserFriendlySlug ||
+        initialGameTemplateOpened.current
+      ) {
+        // If there is no initial pack or
+        // if the pack was already opened, don't re-open it again even
+        // if the effect run again.
+        return;
+      }
+
+      if (
+        privateGameTemplateListingDatas &&
+        initialGameTemplateUserFriendlySlug
+      ) {
+        initialGameTemplateOpened.current = true;
+
+        // Open the information page of a the game template.
+        const privateGameTemplateListingData = getPrivateGameTemplateListingDataFromUserFriendlySlug(
+          {
+            privateGameTemplateListingDatas,
+            userFriendlySlug: initialGameTemplateUserFriendlySlug,
+          }
+        );
+
+        if (privateGameTemplateListingData) {
+          shopNavigationState.openPrivateGameTemplateInformationPage({
+            privateGameTemplateListingData,
+            previousSearchText: shopSearchText,
+          });
+          initialGameTemplateOpened.current = false; // Allow to open the pack again if the effect run again.
+          setInitialGameTemplateUserFriendlySlug(null);
+          return;
+        }
+
+        showAlert({
+          title: t`Game template not found`,
+          message: t`The link to the game template you've followed seems outdated. Why not take a look at the other templates in the store?`,
+        });
+      }
+    },
+    [
+      privateGameTemplateListingDatas,
+      shopNavigationState,
+      showAlert,
+      initialGameTemplateUserFriendlySlug,
+      shopSearchText,
     ]
   );
 
@@ -241,6 +307,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         searchText: shopSearchText,
         setSearchText: setShopSearchText,
         filtersState: currentPage.filtersState,
+        setInitialGameTemplateUserFriendlySlug,
       },
       exampleStore: {
         privateGameTemplateListingDatasSearchResults: privateGameTemplateListingDatasSearchResultsForExampleStore,

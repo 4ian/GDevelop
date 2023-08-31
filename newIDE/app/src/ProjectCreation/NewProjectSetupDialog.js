@@ -255,7 +255,8 @@ const NewProjectSetupDialog = ({
     isLoading ||
     needUserAuthenticationForStorage ||
     hasTooManyCloudProjects ||
-    hasNotSelectedAStorageProvider;
+    (hasNotSelectedAStorageProvider &&
+      !shouldAllowCreatingProjectWithoutSaving);
 
   const generateProject = React.useCallback(
     async () => {

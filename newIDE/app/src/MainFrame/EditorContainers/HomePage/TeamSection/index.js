@@ -24,16 +24,11 @@ import NewTeamGroupNameField from './NewTeamGroupNameField';
 import TeamMemberRow from './TeamMemberRow';
 import { makeDropTarget } from '../../../../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import {
-  ProjectFileListItem,
-  transformCloudProjectsIntoFileMetadataWithStorageProviderName,
-} from '../BuildSection';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import EmptyMessage from '../../../../UI/EmptyMessage';
-import AlertMessage from '../../../../UI/AlertMessage';
 import Text from '../../../../UI/Text';
 import FlatButton from '../../../../UI/FlatButton';
 import Add from '../../../../UI/CustomSvgIcons/Add';
+import TeamMemberProjectsView from './TeamMemberProjectsView';
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
@@ -112,8 +107,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobile = windowWidth === 'small';
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
@@ -176,56 +169,17 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     }
 
     if (selectedUser && selectedUserProjects) {
-      const fileMetadataAndStorageProviderNames = transformCloudProjectsIntoFileMetadataWithStorageProviderName(
-        selectedUserProjects,
-        selectedUser.id
-      );
       return (
-        <SectionContainer
-          title={
-            <Trans>
-              {selectedUser.username || selectedUser.email}'s projects
-            </Trans>
-          }
-          backAction={() => {
+        <TeamMemberProjectsView
+          user={selectedUser}
+          projects={selectedUserProjects}
+          storageProviders={storageProviders}
+          onOpenRecentFile={onOpenRecentFile}
+          onClickBack={() => {
             setSelectedUser(null);
             setSelectedUserProjects(null);
           }}
-        >
-          <SectionRow>
-            <Line>
-              <Column noMargin expand>
-                {fileMetadataAndStorageProviderNames.length === 0 ? (
-                  <>
-                    <EmptyMessage>
-                      <Trans>This user does not have projects yet.</Trans>
-                    </EmptyMessage>
-                    <AlertMessage kind="info">
-                      <Trans>
-                        Here are displayed their cloud projects only, they might
-                        need to save their local projects as cloud projects for
-                        you to see them.
-                      </Trans>
-                    </AlertMessage>
-                  </>
-                ) : (
-                  <List>
-                    {fileMetadataAndStorageProviderNames.map(file => (
-                      <ProjectFileListItem
-                        file={file}
-                        key={file.fileMetadata.fileIdentifier}
-                        onOpenRecentFile={onOpenRecentFile}
-                        storageProviders={storageProviders}
-                        isWindowWidthMediumOrLarger={!isMobile}
-                        hideDeleteContextMenuAction={true}
-                      />
-                    ))}
-                  </List>
-                )}
-              </Column>
-            </Line>
-          </SectionRow>
-        </SectionContainer>
+        />
       );
     }
 

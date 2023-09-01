@@ -16,6 +16,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../../UI/IconButton';
 
+const gd: libGDevelop = global.gd;
+
 const styles = {
   button: { width: '100%' },
   container: {
@@ -35,6 +37,7 @@ type Props = {|
   onChoose: () => void,
   onShowDetails: () => void,
   onHeightComputed: number => void,
+  platform: gdPlatform,
 |};
 
 export const BehaviorListItem = ({
@@ -46,12 +49,23 @@ export const BehaviorListItem = ({
   onChoose,
   onShowDetails,
   onHeightComputed,
+  platform,
 }: Props) => {
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);
   // An empty object type means the base object, i.e: any object.
-  const isObjectIncompatible =
-    behaviorShortHeader.objectType &&
-    objectType !== behaviorShortHeader.objectType;
+  const isObjectCompatible =
+    (!behaviorShortHeader.objectType ||
+      objectType === behaviorShortHeader.objectType) &&
+    behaviorShortHeader.allRequiredBehaviorTypes.every(requiredBehaviorType => {
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        platform,
+        requiredBehaviorType
+      );
+      return (
+        !behaviorMetadata.isHidden() ||
+        objectBehaviorsTypes.includes(requiredBehaviorType)
+      );
+    });
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -75,7 +89,7 @@ export const BehaviorListItem = ({
     );
   };
 
-  const isEnabled = !alreadyAdded && !isObjectIncompatible;
+  const isEnabled = !alreadyAdded && isObjectCompatible;
 
   const chooseBehavior = React.useCallback(
     () => {
@@ -88,7 +102,7 @@ export const BehaviorListItem = ({
 
   const hasChip =
     alreadyAdded ||
-    isObjectIncompatible ||
+    !isObjectCompatible ||
     behaviorShortHeader.tier === 'community' ||
     (behaviorShortHeader.isDeprecated || false);
   const hasInfoButton = behaviorShortHeader.authors || false;
@@ -134,7 +148,7 @@ export const BehaviorListItem = ({
                   variant="outlined"
                 />
               )}
-              {isObjectIncompatible && (
+              {!isObjectCompatible && (
                 <Chip
                   size="small"
                   label={<Trans>Incompatible with the object</Trans>}

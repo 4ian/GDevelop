@@ -34,8 +34,7 @@ BehaviorMetadata::BehaviorMetadata(
       className(className_),
       iconFilename(icon24x24),
       instance(instance_),
-      sharedDatasInstance(sharedDatasInstance_),
-      isEventBased(false) {
+      sharedDatasInstance(sharedDatasInstance_) {
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   SetDefaultName(gd::String(defaultName_));
@@ -51,29 +50,6 @@ BehaviorMetadata::BehaviorMetadata(
   if (instance) instance->SetTypeName(nameWithNamespace);
   if (sharedDatasInstance) sharedDatasInstance->SetTypeName(nameWithNamespace);
 }
-
-BehaviorMetadata::BehaviorMetadata(
-    const gd::String& extensionNamespace,
-    const gd::String& nameWithNamespace,
-    const gd::String& fullname_,
-    const gd::String& defaultName_,
-    const gd::String& description_,
-    const gd::String& group_,
-    const gd::String& icon24x24_): BehaviorMetadata(
-        extensionNamespace,
-        nameWithNamespace,
-        fullname_,
-        defaultName_,
-        description_,
-        group_,
-        icon24x24_,
-        // Class name is the name, actually unused
-        defaultName_,
-        // It is only used to get the name for GetName.
-        gd::make_unique<gd::Behavior>("", nameWithNamespace),
-        nullptr){
-  isEventBased = true;
-};
 
 gd::InstructionMetadata& BehaviorMetadata::AddCondition(
     const gd::String& name,
@@ -420,10 +396,6 @@ const gd::String& BehaviorMetadata::GetName() const {
 }
 
 gd::Behavior& BehaviorMetadata::Get() const {
-  if (isEventBased) {
-    gd::LogFatalError("Error: Event-based behaviors don't have blueprint. "
-                      "This method should not never be called.");
-  }
   if (!instance) {
     gd::LogFatalError(
         "Trying to get a behavior from a BehaviorMetadata that has no "
@@ -434,11 +406,20 @@ gd::Behavior& BehaviorMetadata::Get() const {
 }
 
 gd::BehaviorsSharedData* BehaviorMetadata::GetSharedDataInstance() const { 
-  if (isEventBased) {
-    gd::LogFatalError("Error: Event-based behaviors don't have blueprint. "
-                      "This method should not never be called.");
-  }
   return sharedDatasInstance.get();
+}
+
+const std::vector<gd::String>& BehaviorMetadata::GetRequiredBehaviorTypes() const {
+  requiredBehaviors.clear();
+  for (auto& property : Get().GetProperties()) {
+    const String& propertyName = property.first;
+    const gd::PropertyDescriptor& propertyDescriptor = property.second;
+
+    if (propertyDescriptor.GetType() == "Behavior") {
+      requiredBehaviors.push_back(propertyDescriptor.GetExtraInfo()[0]);
+    }
+  }
+  return requiredBehaviors;
 }
 
 }  // namespace gd

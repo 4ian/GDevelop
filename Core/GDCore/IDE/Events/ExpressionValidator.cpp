@@ -104,14 +104,6 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   !metadata.GetRequiredBaseObjectCapability().empty()) {
     const gd::ObjectMetadata &objectMetadata =
         MetadataProvider::GetObjectMetadata(platform, objectType);
-
-    if (objectMetadata.IsUnsupportedBaseObjectCapability(
-            metadata.GetRequiredBaseObjectCapability())) {
-      RaiseTypeError(
-          _("This expression exists, but it can't be used on this object."),
-          function.objectNameLocation);
-      return returnType;
-    }
   }
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {

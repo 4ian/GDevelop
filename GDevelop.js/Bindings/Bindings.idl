@@ -527,7 +527,9 @@ interface Project {
     [Const, Value] DOMString FREE_GetTypeOfBehavior([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Const, Value] DOMString FREE_GetTypeOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Value] VectorString FREE_GetBehaviorsOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
+    boolean FREE_IsDefaultBehavior([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
     [Const, Value] DOMString FREE_GetTypeOfBehaviorInObjectOrGroup([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
+    [Value] VectorString FREE_GetBehaviorNamesInObjectOrGroup([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorType, boolean searchInGroups);
 
     //Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
@@ -570,6 +572,8 @@ interface Behavior {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+
+    boolean IsDefaultBehavior();
 };
 
 [JSImplementation=Behavior]
@@ -1346,9 +1350,6 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 
-    [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
-    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
-
     [Ref] InstructionMetadata MarkAsSimple();
     [Ref] InstructionMetadata MarkAsAdvanced();
     [Ref] InstructionMetadata MarkAsComplex();
@@ -1410,9 +1411,6 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
-
-    [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
-    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
 
@@ -1639,9 +1637,9 @@ interface ObjectMetadata {
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
 
-    [Const, Ref] SetString GetUnsupportedBaseObjectCapabilities();
-    [Ref] ObjectMetadata AddUnsupportedBaseObjectCapability([Const] DOMString capability);
-    boolean IsUnsupportedBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] SetString GetDefaultBehaviors();
+    boolean HasDefaultBehavior([Const] DOMString behaviorType);
+    [Ref] ObjectMetadata AddDefaultBehavior([Const] DOMString behaviorType);
 
     [Ref] ObjectMetadata SetHidden();
     boolean IsHidden();
@@ -1744,9 +1742,13 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
     [Const, Ref] DOMString GetObjectType();
+    [Const, Ref] VectorString GetRequiredBehaviorTypes();
 
     boolean IsPrivate();
     [Ref] BehaviorMetadata SetPrivate();
+
+    boolean IsHidden();
+    [Ref] BehaviorMetadata SetHidden();
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();

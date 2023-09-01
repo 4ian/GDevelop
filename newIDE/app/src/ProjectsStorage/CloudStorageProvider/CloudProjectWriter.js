@@ -17,10 +17,8 @@ import {
   createZipWithSingleTextFile,
   unzipFirstEntryOfBlob,
 } from '../../Utils/Zip.js/Utils';
-import {
-  CLOUD_PROJECT_AUTOSAVE_CACHE_KEY,
-  isCacheApiAvailable,
-} from './CloudProjectOpener';
+import ProjectCache from '../../Utils/ProjectCache';
+import { getProjectCache } from './CloudProjectOpener';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -263,10 +261,25 @@ export const generateOnSaveProjectAs = (
   }
 };
 
-export const onRenderNewProjectSaveAsLocationChooser = ({
+export const getProjectLocation = ({
+  projectName,
+  saveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  newProjectsDefaultFolder?: string,
+|}): SaveAsLocation => {
+  return {
+    name: projectName,
+  };
+};
+
+export const renderNewProjectSaveAsLocationChooser = ({
   projectName,
   saveAsLocation,
   setSaveAsLocation,
+  newProjectsDefaultFolder,
 }: {|
   projectName: string,
   saveAsLocation: ?SaveAsLocation,
@@ -274,32 +287,32 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
   newProjectsDefaultFolder?: string,
 |}) => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
-    setSaveAsLocation({
-      name: projectName,
-    });
+    setSaveAsLocation(
+      getProjectLocation({
+        projectName,
+        saveAsLocation,
+        newProjectsDefaultFolder,
+      })
+    );
   }
-
   return null;
 };
 
 export const generateOnAutoSaveProject = (
   authenticatedUser: AuthenticatedUser
 ) =>
-  isCacheApiAvailable
+  ProjectCache.isAvailable()
     ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
         const { profile } = authenticatedUser;
         if (!profile) return;
         const cloudProjectId = fileMetadata.fileIdentifier;
-        const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
-        const cacheKey = `${profile.id}/${cloudProjectId}`;
-        cache.put(
-          cacheKey,
-          new Response(
-            JSON.stringify({
-              project: serializeToJSON(project),
-              createdAt: Date.now(),
-            })
-          )
+        const projectCache = getProjectCache();
+        projectCache.put(
+          {
+            userId: profile.id,
+            cloudProjectId,
+          },
+          project
         );
       }
     : undefined;

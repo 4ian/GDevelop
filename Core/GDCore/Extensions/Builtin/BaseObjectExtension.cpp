@@ -29,8 +29,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/force24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
       .SetIcon("res/conditions/var24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Timers"))
+      .SetIcon("res/actions/timer24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Visibility"))
+      .SetIcon("res/actions/visibilite24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Position"))
       .SetIcon("res/actions/position24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Angle"))
+      .SetIcon("res/actions/direction24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
+      .SetIcon("res/actions/scale24_black.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -1101,6 +1109,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"));
 
+  // Deprecated
   obj.AddExpression("Largeur",
                     _("Width"),
                     _("Width of the object"),
@@ -1116,6 +1125,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"));
 
+  // Deprecated
   obj.AddExpression("Hauteur",
                     _("Height"),
                     _("Height of the object"),
@@ -1201,7 +1211,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddExpression("ObjectTimerElapsedTime",
                     _("Object timer value"),
                     _("Value of an object timer"),
-                    _("Object timers"),
+                    _("Timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer");
@@ -1251,6 +1261,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target X position"))
       .AddParameter("expression", _("Target Y position"));
 
+  // Deprecated
   obj.AddAction("EnableEffect",
                 _("Enable an object effect"),
                 _("Enable an effect on the object"),
@@ -1262,8 +1273,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetEffectDoubleParameter",
                 _("Effect parameter (number)"),
                 _("Change the value of a parameter of an effect.") + "\n" +
@@ -1278,8 +1290,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("expression", _("New value"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetEffectStringParameter",
                 _("Effect parameter (string)"),
                 _("Change the value (string) of a parameter of an effect.") +
@@ -1295,8 +1308,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("string", _("New value"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetEffectBooleanParameter",
                 _("Effect parameter (enable or disable)"),
                 _("Enable or disable a parameter of an effect.") + "\n" +
@@ -1311,8 +1325,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition("IsEffectEnabled",
                    _("Effect is enabled"),
                    _("Check if the effect on an object is enabled."),
@@ -1323,7 +1338,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
   obj.AddAction("SetIncludedInParentCollisionMask",
                 _("Include in parent collision mask"),

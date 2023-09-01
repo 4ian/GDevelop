@@ -283,11 +283,13 @@ module.exports = {
         textInputObject
       )
       .setCategoryFullName(_('User interface'))
-      .addUnsupportedBaseObjectCapability('effect')
+      // Effects are unsupported because the object is not rendered with PIXI.
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
-      );
+      )
+      .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     // Properties expressions/conditions/actions:
     object
@@ -525,6 +527,8 @@ module.exports = {
       .setGetter('isDisabled');
 
     // Other expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -543,7 +547,8 @@ module.exports = {
         )
       )
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
     object
       .addScopedCondition(

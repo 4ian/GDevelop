@@ -268,6 +268,7 @@ export const BehaviorStore = ({
                   setSelectedBehaviorShortHeader(behaviorShortHeader);
                 }
               }}
+              platform={project.getCurrentPlatform()}
             />
           )}
         />

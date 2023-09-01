@@ -8,7 +8,8 @@ import {
   generateOnChooseSaveProjectAsLocation,
   generateOnSaveProjectAs,
   getWriteErrorMessage,
-  onRenderNewProjectSaveAsLocationChooser,
+  renderNewProjectSaveAsLocationChooser,
+  getProjectLocation,
   generateOnAutoSaveProject,
 } from './CloudProjectWriter';
 import {
@@ -52,7 +53,8 @@ export default ({
       fileIdentifier,
     };
   },
-  onRenderNewProjectSaveAsLocationChooser: onRenderNewProjectSaveAsLocationChooser,
+  getProjectLocation: getProjectLocation,
+  renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
     onOpen: generateOnOpen(authenticatedUser),
     onEnsureCanAccessResources: generateOnEnsureCanAccessResources(

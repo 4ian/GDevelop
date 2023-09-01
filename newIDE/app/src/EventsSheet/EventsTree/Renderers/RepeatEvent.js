@@ -137,6 +137,7 @@ export default class RepeatEvent extends React.Component<
           windowWidth={this.props.windowWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={repeatEvent.getConditions()}
               style={style}
               className={className}
@@ -166,6 +167,7 @@ export default class RepeatEvent extends React.Component<
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={repeatEvent.getActions()}
               style={
                 {

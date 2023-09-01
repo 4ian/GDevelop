@@ -116,7 +116,13 @@ const BehaviorsEditor = (props: Props) => {
     onUpdateBehaviorsSharedData,
     openBehaviorEvents,
   } = props;
-  const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
+  // As for now, any default behavior is hidden,
+  // it avoids to get behavior metadata to check the "hidden" flag.
+  const allVisibleBehaviors = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(behaviorName => object.getBehavior(behaviorName))
+    .filter(behavior => !behavior.isDefaultBehavior());
   const forceUpdate = useForceUpdate();
 
   const { values } = React.useContext(PreferencesContext);
@@ -217,12 +223,15 @@ const BehaviorsEditor = (props: Props) => {
         BEHAVIORS_CLIPBOARD_KIND,
         mapVector(object.getAllBehaviorNames(), behaviorName => {
           const behavior = object.getBehavior(behaviorName);
+          if (behavior.isDefaultBehavior()) {
+            return null;
+          }
           return {
             name: behaviorName,
             type: behavior.getTypeName(),
             serializedBehavior: serializeToJSObject(behavior),
           };
-        })
+        }).filter(Boolean)
       );
       forceUpdate();
     },
@@ -375,7 +384,7 @@ const BehaviorsEditor = (props: Props) => {
 
   return (
     <Column noMargin expand useFullHeight noOverflowParent>
-      {allBehaviorNames.length === 0 ? (
+      {allVisibleBehaviors.length === 0 ? (
         <Column noMargin expand justifyContent="center">
           <EmptyPlaceholder
             title={<Trans>Add your first behavior</Trans>}
@@ -401,9 +410,13 @@ const BehaviorsEditor = (props: Props) => {
       ) : (
         <React.Fragment>
           <ScrollView ref={scrollView}>
-            {allBehaviorNames.map((behaviorName, index) => {
-              const behavior = object.getBehavior(behaviorName);
+            {allVisibleBehaviors.map((behavior, index) => {
+              const behaviorName = behavior.getName();
               const behaviorTypeName = behavior.getTypeName();
+
+              if (behavior.isDefaultBehavior()) {
+                return null;
+              }
 
               const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                 gd.JsPlatform.get(),

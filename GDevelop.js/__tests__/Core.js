@@ -148,7 +148,15 @@ describe('libGD.js', function () {
           .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
-      ).toEqual(['Sprite']);
+      ).toEqual([
+        'AnimatableCapability',
+        'EffectCapability',
+        'FlippableCapability',
+        'OpacityCapability',
+        'ResizableCapability',
+        'ScalableCapability',
+        'Sprite',
+      ]);
     });
 
     it('handles events functions extensions', function () {
@@ -1819,6 +1827,8 @@ describe('libGD.js', function () {
       expect(object.getBehavior('Draggable')).toBe(behavior);
     });
 
+    const spriteDefaultBehaviorCount = 6;
+
     it('can have its behaviors retrieved with gd.getBehaviorsOfObject', function () {
       let behaviors = gd.getBehaviorsOfObject(
         project,
@@ -1826,8 +1836,8 @@ describe('libGD.js', function () {
         'TheObject',
         true
       );
-      expect(behaviors.size()).toBe(1);
-      expect(behaviors.get(0)).toBe('Draggable');
+      expect(behaviors.size()).toBe(1 + spriteDefaultBehaviorCount);
+      expect(behaviors.get(1)).toBe('Draggable');
     });
 
     it('can be un/serialized (basic)', function () {
@@ -1840,8 +1850,8 @@ describe('libGD.js', function () {
 
       //Check that behaviors were persisted and restored
       let behaviors = object2.getAllBehaviorNames();
-      expect(behaviors.size()).toBe(1);
-      expect(behaviors.at(0)).toBe('Draggable');
+      expect(behaviors.size()).toBe(1 + spriteDefaultBehaviorCount);
+      expect(behaviors.at(1)).toBe('Draggable');
     });
 
     it('can be un/serialized (with behavior content)', function () {
@@ -1857,8 +1867,8 @@ describe('libGD.js', function () {
 
       //Check that behaviors were persisted and restored
       let behaviors = object2.getAllBehaviorNames();
-      expect(behaviors.size()).toBe(1);
-      expect(behaviors.at(0)).toBe('Draggable');
+      expect(behaviors.size()).toBe(1 + spriteDefaultBehaviorCount);
+      expect(behaviors.at(1)).toBe('Draggable');
 
       const behaviorContent2 = object2.getBehavior('Draggable');
       expect(behaviorContent2.getProperties()

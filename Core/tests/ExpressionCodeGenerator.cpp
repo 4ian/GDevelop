@@ -24,13 +24,13 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   layout1.InsertNewObject(
       project, "MyExtension::Sprite", "MyOtherSpriteObject", 1);
   layout1.InsertNewObject(project,
-                          "MyExtension::FakeObjectWithUnsupportedCapability",
-                          "MyFakeObjectWithUnsupportedCapability",
+                          "MyExtension::FakeObjectWithDefaultBehavior",
+                          "FakeObjectWithDefaultBehavior",
                           2);
   auto &group = layout1.GetObjectGroups().InsertNew("AllObjects");
   group.AddObject("MySpriteObject");
   group.AddObject("MyOtherSpriteObject");
-  group.AddObject("MyFakeObjectWithUnsupportedCapability");
+  group.AddObject("FakeObjectWithDefaultBehavior");
 
   gd::ExpressionParser2 parser;
 
@@ -342,7 +342,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     SECTION("supported capability") {
       // Capability is supported, so the expression is valid.
       auto node = parser.ParseExpression(
-          "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
+          "FakeObjectWithDefaultBehavior.Effect::GetSomethingRequiringEffectCapability(123)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("string",
                                                           "",
                                                           codeGenerator,
@@ -352,12 +352,12 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       node->Visit(expressionCodeGenerator);
       REQUIRE(
           expressionCodeGenerator.GetOutput() ==
-          "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
+          "FakeObjectWithDefaultBehavior::Effect.getSomethingRequiringEffectCapability(123) ?? \"\"");
     }
     SECTION("unsupported capability") {
       // Capability is not supported, so the expression is not even valid.
       auto node =
-          parser.ParseExpression("MyFakeObjectWithUnsupportedCapability."
+          parser.ParseExpression("MySpriteObject::Effect."
                                  "GetSomethingRequiringEffectCapability(123)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("string",
                                                           "",
@@ -366,14 +366,16 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "\"\"");
+      REQUIRE(
+        expressionCodeGenerator.GetOutput() ==
+        "/* Error during generation, function not found: GetSomethingRequiringEffectCapability */ \"\"");
     }
     SECTION("group with partial support") {
       // We use a group, capability is supported only by one object of the
       // group. The expression itself is valid, but code generation should skip
       // the objects with unsupported capability.
       auto node = parser.ParseExpression(
-          "AllObjects.GetSomethingRequiringEffectCapability(123)");
+          "AllObjects.Effect::GetSomethingRequiringEffectCapability(123)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("string",
                                                           "",
                                                           codeGenerator,
@@ -381,10 +383,13 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(
-          expressionCodeGenerator.GetOutput() ==
-          "MyOtherSpriteObject.getSomethingRequiringEffectCapability(123) ?? "
-          "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "FakeObjectWithDefaultBehavior::Effect."
+              "getSomethingRequiringEffectCapability(123) ?? "
+              "MyOtherSpriteObject::Effect."
+              "getSomethingRequiringEffectCapability(123) ?? "
+              "MySpriteObject::Effect.getSomethingRequiringEffectCapability("
+              "123) ?? \"\"");
     }
   }
   SECTION("Function name") {

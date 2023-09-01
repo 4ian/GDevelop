@@ -273,25 +273,6 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
   return behaviorsInfo[nameWithNamespace];
 }
 
-gd::BehaviorMetadata& PlatformExtension::AddEventsBasedBehavior(
-    const gd::String& name,
-    const gd::String& fullname,
-    const gd::String& description,
-    const gd::String& group,
-    const gd::String& icon24x24) {
-  gd::String nameWithNamespace = GetNameSpace() + name;
-  behaviorsInfo[nameWithNamespace] = BehaviorMetadata(GetNameSpace(),
-                                                      nameWithNamespace,
-                                                      fullname,
-                                                      // Default name is the name
-                                                      name,
-                                                      description,
-                                                      group,
-                                                      icon24x24)
-                                         .SetHelpPath(GetHelpPath());
-  return behaviorsInfo[nameWithNamespace];
-}
-
 gd::EffectMetadata& PlatformExtension::AddEffect(const gd::String& name) {
   gd::String nameWithNamespace = GetNameSpace() + name;
   effectsMetadata[nameWithNamespace] = EffectMetadata(nameWithNamespace);

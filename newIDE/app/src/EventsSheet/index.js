@@ -343,6 +343,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onOpenSettings={this.props.onOpenSettings}
         settingsIcon={this.props.settingsIcon}
         onToggleSearchPanel={this._toggleSearchPanel}
+        canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
+        moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
       />
     );
   }
@@ -823,6 +825,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         {
           label: i18n._(t`Move Events into a Group`),
           click: () => this.moveEventsIntoNewGroup(),
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['MOVE_EVENTS_IN_NEW_GROUP']
+          ),
         },
         {
           label: i18n._(t`Analyze Objects Used in this Event`),
@@ -1312,6 +1317,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
+    if (this._eventSearcher) this._eventSearcher.reset();
+
     const { _eventsTree: eventsTree } = this;
     if (!eventsTree) return;
     eventsTree.forceEventsUpdate(() => {
@@ -1321,8 +1328,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       } = newEventsHistory.futureActions[
         newEventsHistory.futureActions.length - 1
       ];
-      // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
-      eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
 
       let newSelection: SelectionState = getInitialSelection();
       // If it is a DELETE or EDIT, then the element will be present, so we can select them.
@@ -1335,12 +1340,25 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         );
         newSelection = selectEventsAfterHistoryChange(eventContexts);
       }
+
       this.setState(
         {
           selection: newSelection,
           eventsHistory: newEventsHistory,
         },
-        () => this.updateToolbar()
+        () => {
+          // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
+          eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
+          // Hack: because of the virtualization and the undo/redo, we lose the heights of events
+          // (at least some, because they are different objects in memory).
+          // While they are recomputed when rendered, scroll again to be sure we don't end
+          // up at the very beginning (if everything was recomputed from 0) or at
+          // an offset too large.
+          setTimeout(() => {
+            eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
+          }, 70);
+          this.updateToolbar();
+        }
       );
     });
   };
@@ -1354,6 +1372,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
+    if (this._eventSearcher) this._eventSearcher.reset();
+
     const { _eventsTree: eventsTree } = this;
     if (!eventsTree) return;
     eventsTree.forceEventsUpdate(() => {
@@ -1363,8 +1383,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       } = newEventsHistory.previousActions[
         newEventsHistory.previousActions.length - 1
       ];
-      // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
-      eventsTree.scrollToRow(positions.positionAfterAction);
+
       // If it is a ADD or EDIT, then the element will be present, so we can select them.
       // If it is a DELETE, then they will not be present, so we can't select them.
       let newSelection: SelectionState = getInitialSelection();
@@ -1382,7 +1401,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           selection: newSelection,
           eventsHistory: newEventsHistory,
         },
-        () => this.updateToolbar()
+        () => {
+          // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
+          eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
+          // Hack: because of the virtualization and the undo/redo, we lose the heights of events
+          // (at least some, because they are different objects in memory).
+          // While they are recomputed when rendered, scroll again to be sure we don't end
+          // up at the very beginning (if everything was recomputed from 0) or at
+          // an offset too large.
+          setTimeout(() => {
+            eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
+          }, 70);
+          this.updateToolbar();
+        }
       );
     });
   };
@@ -1406,6 +1437,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           zoomLevel.max
         )
       );
+
+      // Force a new rendering - not strictly necessary but otherwise a user input
+      // is needed for events to occupy their proper new height.
+      setTimeout(() => {
+        const { _eventsTree: eventsTree } = this;
+        if (eventsTree) eventsTree.forceEventsUpdate();
+      });
     };
   };
 

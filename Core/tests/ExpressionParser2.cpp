@@ -21,7 +21,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
 
-  auto &myObject = layout1.InsertNewObject(project, "BuiltinObject", "MyObject", 0);
+  // Create an instance of BuiltinObject.
+  // This is not possible in practice.
+  auto &myObject = layout1.InsertNewObject(project, "", "MyObject", 0);
   myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
   auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup", 0);
@@ -29,8 +31,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
   layout1.InsertNewObject(project,
-                          "MyExtension::FakeObjectWithUnsupportedCapability",
-                          "MyFakeObjectWithUnsupportedCapability",
+                          "MyExtension::FakeObjectWithDefaultBehavior",
+                          "FakeObjectWithDefaultBehavior",
                           2);
 
   gd::ExpressionParser2 parser;
@@ -1984,29 +1986,29 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION(
-      "Valid function call with an object expression requiring a capability") {
+      "Valid function call with a default behavior") {
     auto node = parser.ParseExpression(
-        "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
+        "FakeObjectWithDefaultBehavior.Effect::GetSomethingRequiringEffectCapability(123)");
     REQUIRE(node != nullptr);
 
     gd::ExpressionValidator validator(platform, project, layout1, "string");
     node->Visit(validator);
-    REQUIRE(validator.GetFatalErrors().size() == 0);
+    REQUIRE(validator.GetAllErrors().size() == 0);
   }
 
   SECTION(
-      "Invalid function call with an object expression requiring a "
-      "capability") {
+      "Invalid function call with an object that doesn't have a default behavior") {
     auto node =
-        parser.ParseExpression("MyFakeObjectWithUnsupportedCapability."
+        parser.ParseExpression("MySpriteObject.Effect::"
                                "GetSomethingRequiringEffectCapability(123)");
     REQUIRE(node != nullptr);
 
     gd::ExpressionValidator validator(platform, project, layout1, "string");
     node->Visit(validator);
-    REQUIRE(validator.GetFatalErrors().size() == 1);
-    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-            "This expression exists, but it can't be used on this object.");
+    REQUIRE(validator.GetFatalErrors().size() == 0);
+    REQUIRE(validator.GetAllErrors().size() == 1);
+    REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "This behavior is not attached to this object.");
   }
 
   SECTION("Fuzzy/random tests") {

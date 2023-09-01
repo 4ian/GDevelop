@@ -346,7 +346,10 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
                   </IconButton>
                 </InputAdornment>
               ) : props.endAdornment ? (
-                <InputAdornment position="end">
+                <InputAdornment
+                  position="end"
+                  style={props.multiline ? { marginTop: -17 } : undefined}
+                >
                   {props.endAdornment}
                 </InputAdornment>
               ) : (

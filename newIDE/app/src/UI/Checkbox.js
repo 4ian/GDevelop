@@ -43,7 +43,7 @@ type Props = {|
 |};
 
 /**
- * A text field based on Material-UI text field.
+ * A checkbox based on Material-UI checkbox.
  */
 const Checkbox = (props: Props) => {
   const { onCheck } = props;

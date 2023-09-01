@@ -134,7 +134,6 @@ void Object::UnserializeFrom(gd::Project& project,
 
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
-  behaviors.clear();
 
   if (element.HasChild("effects")) {
     const SerializerElement& effectsElement = element.GetChild("effects");
@@ -210,6 +209,11 @@ void Object::SerializeTo(SerializerElement& element) const {
   std::vector<gd::String> allBehaviors = GetAllBehaviorNames();
   for (std::size_t i = 0; i < allBehaviors.size(); ++i) {
     const gd::Behavior& behavior = GetBehavior(allBehaviors[i]);
+    // Default behaviors are added at the object creation according to metadata.
+    // They don't need to be serialized.
+    if (behavior.IsDefaultBehavior()) {
+      continue;
+    }
     SerializerElement& behaviorElement = behaviorsElement.AddChild("behavior");
 
     behavior.SerializeTo(behaviorElement);

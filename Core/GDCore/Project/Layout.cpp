@@ -507,6 +507,81 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
   return type;
 }
 
+void GD_CORE_API FilterBehaviorNamesFromObject(
+    const gd::Object &object, const gd::String &behaviorType,
+    std::vector<gd::String> &behaviorNames) {
+  for (size_t i = 0; i < behaviorNames.size(); i++) {
+    auto &behaviorName = behaviorNames[i];
+    if (!object.HasBehaviorNamed(behaviorName) ||
+        object.GetBehavior(behaviorName).GetTypeName() != behaviorType) {
+      behaviorNames.erase(behaviorNames.begin() + i);
+    }
+  }
+}
+
+std::vector<gd::String> GD_CORE_API GetBehaviorNamesInObjectOrGroup(
+    const gd::ObjectsContainer &project, const gd::ObjectsContainer &layout,
+    const gd::String &objectOrGroupName, const gd::String &behaviorType,
+    bool searchInGroups) {
+  // Search in objects
+  if (layout.HasObjectNamed(objectOrGroupName)) {
+    auto &object = layout.GetObject(objectOrGroupName);
+    auto behaviorNames = object.GetAllBehaviorNames();
+    FilterBehaviorNamesFromObject(object, behaviorType, behaviorNames);
+    return behaviorNames;
+  }
+  if (project.HasObjectNamed(objectOrGroupName)) {
+    auto &object = project.GetObject(objectOrGroupName);
+    auto behaviorNames = object.GetAllBehaviorNames();
+    FilterBehaviorNamesFromObject(object, behaviorType, behaviorNames);
+    return behaviorNames;
+  }
+
+  if (!searchInGroups) {
+    std::vector<gd::String> behaviorNames;
+    return behaviorNames;
+  }
+
+  // Search in groups
+  const gd::ObjectsContainer *container;
+  if (layout.GetObjectGroups().Has(objectOrGroupName)) {
+    container = &layout;
+  } else if (project.GetObjectGroups().Has(objectOrGroupName)) {
+    container = &project;
+  } else {
+    std::vector<gd::String> behaviorNames;
+    return behaviorNames;
+  }
+  const vector<gd::String> &groupsObjects =
+      container->GetObjectGroups().Get(objectOrGroupName).GetAllObjectsNames();
+  // Empty groups don't contain any behavior.
+  if (groupsObjects.empty()) {
+    std::vector<gd::String> behaviorNames;
+    return behaviorNames;
+  }
+
+  auto behaviorNames = GetBehaviorNamesInObjectOrGroup(
+      project, layout, groupsObjects[0], behaviorType, false);
+  for (size_t i = 1; i < groupsObjects.size(); i++) {
+    auto &objectName = groupsObjects[i];
+
+    if (layout.HasObjectNamed(objectName)) {
+      auto &object = layout.GetObject(objectName);
+      FilterBehaviorNamesFromObject(object, behaviorType, behaviorNames);
+      return behaviorNames;
+    }
+    if (project.HasObjectNamed(objectName)) {
+      auto &object = project.GetObject(objectName);
+      FilterBehaviorNamesFromObject(object, behaviorType, behaviorNames);
+      return behaviorNames;
+    }
+    if (behaviorNames.size() == 0) {
+      return behaviorNames;
+    }
+  }
+  return behaviorNames;
+}
+
 bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
                                             const gd::ObjectsContainer &layout,
                                             const gd::String &objectOrGroupName,
@@ -518,6 +593,10 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
   }
   if (project.HasObjectNamed(objectOrGroupName)) {
     return project.GetObject(objectOrGroupName).HasBehaviorNamed(behaviorName);
+  }
+
+  if (!searchInGroups) {
+    return false;
   }
 
   // Search in groups
@@ -545,6 +624,52 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
   return true;
 }
 
+bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+                                         const gd::ObjectsContainer& layout,
+                                         gd::String objectOrGroupName,
+                                         gd::String behaviorName,
+                                         bool searchInGroups) {
+  // Search in objects
+  if (layout.HasObjectNamed(objectOrGroupName)) {
+    auto &object = layout.GetObject(objectOrGroupName);
+    return object.HasBehaviorNamed(behaviorName) &&
+           object.GetBehavior(behaviorName).IsDefaultBehavior();
+  }
+  if (project.HasObjectNamed(objectOrGroupName)) {
+    auto &object = project.GetObject(objectOrGroupName);
+    return object.HasBehaviorNamed(behaviorName) &&
+           object.GetBehavior(behaviorName).IsDefaultBehavior();
+  }
+
+  if (!searchInGroups) {
+    return false;
+  }
+
+  // Search in groups
+  const gd::ObjectsContainer *container;
+  if (layout.GetObjectGroups().Has(objectOrGroupName)) {
+    container = &layout;
+  } else if (project.GetObjectGroups().Has(objectOrGroupName)) {
+    container = &project;
+  } else {
+    return false;
+  }
+  const vector<gd::String> &groupsObjects =
+      container->GetObjectGroups().Get(objectOrGroupName).GetAllObjectsNames();
+  // Empty groups don't contain any behavior.
+  if (groupsObjects.empty()) {
+    return false;
+  }
+  // Check that all objects have the same type.
+  for (auto &&object : groupsObjects) {
+    if (!IsDefaultBehavior(project, layout, object, behaviorName,
+                                    false)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer& project,
                                          const gd::ObjectsContainer& layout,
                                          const gd::String& objectOrGroupName,
@@ -560,6 +685,10 @@ gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContain
     auto &object = project.GetObject(objectOrGroupName);
     return object.HasBehaviorNamed(behaviorName) ?
            object.GetBehavior(behaviorName).GetTypeName() : "";
+  }
+
+  if (!searchInGroups) {
+    return "";
   }
 
   // Search in groups

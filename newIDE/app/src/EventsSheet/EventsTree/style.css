@@ -64,6 +64,13 @@
     border-radius: 0;
     padding: 0;
     flex: 1;
+
+    /*
+     * Align the renderered event to the top, so that it does not move
+     * if the container is too large and resized down (for exemple, when deleting
+     * an action or a condition.
+     */
+    align-items: flex-start;
 }
 
 .gd-events-sheet .rst__rowWrapper {

@@ -29,6 +29,9 @@ import Text from '../../../../UI/Text';
 import FlatButton from '../../../../UI/FlatButton';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import TeamMemberProjectsView from './TeamMemberProjectsView';
+import { IconButton } from '@material-ui/core';
+import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
+import { LineStackLayout } from '../../../../UI/Layout';
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
@@ -104,6 +107,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onListUserProjects,
       onDeleteGroup,
       onCreateGroup,
+      onRefreshMembers,
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
@@ -195,9 +199,14 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           {membersNotInAGroup && (
             <Line>
               <Column noMargin expand>
-                <Text size="section-title" noMargin>
-                  <Trans>Unassigned members</Trans>
-                </Text>
+                <LineStackLayout noMargin alignItems="center">
+                  <Text size="section-title" noMargin>
+                    <Trans>Unassigned members</Trans>
+                  </Text>
+                  <IconButton onClick={onRefreshMembers} size="small">
+                    <Refresh fontSize="small" />
+                  </IconButton>
+                </LineStackLayout>
                 <List>
                   {membersNotInAGroup.members
                     .sort(sortMembersByNameOrEmail)
@@ -220,9 +229,14 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             </Line>
           )}
           <Line justifyContent="space-between" alignItems="center">
-            <Text size="section-title" noMargin>
-              <Trans>Rooms</Trans>
-            </Text>
+            <LineStackLayout noMargin alignItems="center">
+              <Text size="section-title" noMargin>
+                <Trans>Rooms</Trans>
+              </Text>
+              <IconButton onClick={onRefreshMembers} size="small">
+                <Refresh fontSize="small" />
+              </IconButton>
+            </LineStackLayout>
             <FlatButton
               primary
               label={<Trans>Create a new room</Trans>}

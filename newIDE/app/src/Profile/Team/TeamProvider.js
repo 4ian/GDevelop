@@ -74,38 +74,46 @@ const TeamProvider = ({ children }: Props) => {
     [team, getAuthorizationHeader, profile]
   );
 
-  React.useEffect(
-    () => {
-      const fetchMembers = async () => {
-        if (!team || !profile) return;
+  const fetchMembers = React.useCallback(
+    async () => {
+      if (!team || !profile) return;
 
-        const teamMembers = await listTeamMembers(
-          getAuthorizationHeader,
-          profile.id,
-          team.id
-        );
-        setMembers(teamMembers);
-      };
-      fetchMembers();
+      const teamMembers = await listTeamMembers(
+        getAuthorizationHeader,
+        profile.id,
+        team.id
+      );
+      setMembers(teamMembers);
     },
     [team, getAuthorizationHeader, profile]
   );
 
   React.useEffect(
     () => {
-      const fetchMemberships = async () => {
-        if (!team || !profile) return;
+      fetchMembers();
+    },
+    [fetchMembers]
+  );
 
-        const teamMemberships = await listTeamMemberships(
-          getAuthorizationHeader,
-          profile.id,
-          team.id
-        );
-        setMemberships(teamMemberships);
-      };
-      fetchMemberships();
+  const fetchMemberships = React.useCallback(
+    async () => {
+      if (!team || !profile) return;
+
+      const teamMemberships = await listTeamMemberships(
+        getAuthorizationHeader,
+        profile.id,
+        team.id
+      );
+      setMemberships(teamMemberships);
     },
     [team, getAuthorizationHeader, profile]
+  );
+
+  React.useEffect(
+    () => {
+      fetchMemberships();
+    },
+    [fetchMemberships]
   );
 
   const onChangeGroupName = React.useCallback(
@@ -202,6 +210,13 @@ const TeamProvider = ({ children }: Props) => {
     [team, getAuthorizationHeader, profile, groups]
   );
 
+  const onRefreshMembers = React.useCallback(
+    async () => {
+      await Promise.all([fetchMembers(), fetchMemberships()]);
+    },
+    [fetchMembers, fetchMemberships]
+  );
+
   return (
     <TeamContext.Provider
       value={{
@@ -214,6 +229,7 @@ const TeamProvider = ({ children }: Props) => {
         onListUserProjects,
         onDeleteGroup,
         onCreateGroup,
+        onRefreshMembers,
       }}
     >
       {children}

@@ -22,6 +22,7 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { fakeAuthenticatedUserWithEducationPlan } from '../../../fixtures/GDevelopServicesTestData';
 import { delay } from '../../../Utils/Delay';
 import random from 'lodash/random';
+import sample from 'lodash/sample';
 
 export default {
   title: 'HomePage/TeamSection',
@@ -35,7 +36,7 @@ const team: Team = {
   seats: 8,
 };
 
-const members: Array<User> = [
+const initialMembers: Array<User> = [
   // $FlowIgnore - the whole user object is not needed for this component
   {
     id: 'user1',
@@ -139,6 +140,7 @@ const MockTeamProvider = ({
   noGroups?: boolean,
 |}) => {
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
+  const [members, setMembers] = React.useState<?(User[])>(initialMembers);
   const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
     noGroups
       ? initialMemberships.map(membership => ({
@@ -222,6 +224,24 @@ const MockTeamProvider = ({
     setGroups([...groups, newGroup]);
   };
 
+  const refreshMembers = async () => {
+    await delay(800);
+    setMembers(members => {
+      if (!members) return members;
+      const chosenMemberIndex = Math.floor(Math.random() * members.length);
+      const newMembers = [...members];
+      newMembers[chosenMemberIndex] = {
+        ...newMembers[chosenMemberIndex],
+        username:
+          Math.random() > 0.5
+            ? null
+            : sample(['donatello', 'rafaelo', 'leonardo', 'michelangelo']) +
+              random(0, 1000, false),
+      };
+      return newMembers;
+    });
+  };
+
   return (
     <DragAndDropContextProvider>
       <AuthenticatedUserContext.Provider
@@ -238,6 +258,7 @@ const MockTeamProvider = ({
             onListUserProjects: listUserProjects,
             onDeleteGroup: deleteGroup,
             onCreateGroup: createGroup,
+            onRefreshMembers: refreshMembers,
           }}
         >
           {children}

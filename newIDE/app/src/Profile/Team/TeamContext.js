@@ -20,6 +20,7 @@ export type TeamState = {|
   ) => Promise<Array<CloudProjectWithUserAccessInfo>>,
   onDeleteGroup: (group: TeamGroup) => Promise<void>,
   onCreateGroup: (attributes: {| name: string |}) => Promise<void>,
+  onRefreshMembers: () => Promise<void>,
 |};
 
 export const initialTeamState = {
@@ -32,6 +33,7 @@ export const initialTeamState = {
   onListUserProjects: async () => [],
   onDeleteGroup: async () => {},
   onCreateGroup: async () => {},
+  onRefreshMembers: async () => {},
 };
 
 const TeamContext = React.createContext<TeamState>(initialTeamState);

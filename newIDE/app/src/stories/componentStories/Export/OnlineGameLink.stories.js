@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import withMock from 'storybook-addon-mock';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
@@ -18,7 +17,7 @@ import { GDevelopGameApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 export default {
   title: 'Export/OnlineGameLink',
   component: OnlineGameLink,
-  decorators: [paperDecorator, muiDecorator, withMock],
+  decorators: [paperDecorator, muiDecorator],
   parameters: {
     mockData: [
       {

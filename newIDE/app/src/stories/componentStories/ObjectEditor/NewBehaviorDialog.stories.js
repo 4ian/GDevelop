@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import withMock from 'storybook-addon-mock';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -61,7 +60,6 @@ export const DefaultForSpriteObject = () => (
     />
   </BehaviorStoreStateProvider>
 );
-DefaultForSpriteObject.decorators = [withMock];
 DefaultForSpriteObject.parameters = apiDataFakeBehaviors;
 
 export const WithCommunityExtensions = () => {
@@ -94,7 +92,6 @@ export const WithCommunityExtensions = () => {
     </PreferencesContext.Provider>
   );
 };
-WithCommunityExtensions.decorators = [withMock];
 WithCommunityExtensions.parameters = apiDataFakeBehaviors;
 
 export const WithServerSideErrors = () => (
@@ -114,5 +111,4 @@ export const WithServerSideErrors = () => (
     </BehaviorStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-WithServerSideErrors.decorators = [withMock];
 WithServerSideErrors.parameters = apiDataServerSideError;

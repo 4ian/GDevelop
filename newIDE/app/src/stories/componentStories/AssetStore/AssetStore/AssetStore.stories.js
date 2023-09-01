@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -60,7 +59,6 @@ export const Default = () => (
     <AssetStore />
   </Wrapper>
 );
-Default.decorators = [withMock];
 Default.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
@@ -68,5 +66,4 @@ export const LoadingError = () => (
     <AssetStore />
   </Wrapper>
 );
-LoadingError.decorators = [withMock];
 LoadingError.parameters = apiDataServerSideError;

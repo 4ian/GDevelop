@@ -7,7 +7,6 @@ import paperDecorator from '../../PaperDecorator';
 import ProjectGeneratingDialog from '../../../ProjectCreation/ProjectGeneratingDialog';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import { GDevelopGenerationApi } from '../../../Utils/GDevelopServices/ApiConfigs';
-import withMock from 'storybook-addon-mock';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
 
@@ -42,7 +41,6 @@ export const Errored = () => {
     </AuthenticatedUserContext.Provider>
   );
 };
-Errored.decorators = [withMock];
 Errored.parameters = {
   mockData: [
     {

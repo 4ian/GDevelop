@@ -68,6 +68,7 @@ const generatedEventsCodeToJSFunction = (code, gdjs, runtimeScene) => {
 
   return (...args) => func(gdjs, runtimeScene, args);
 };
+
 function generateCompiledEventsForEventsBasedBehavior(
   gd,
   project,
@@ -249,10 +250,10 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
 
 /**
  * Helper to create compiled events from serialized events, creating a project and the events function.
- * @param {*} gd 
- * @param {gdSerializerElement} eventsSerializerElement 
- * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean}?} configuration 
- * @returns 
+ * @param {*} gd
+ * @param {gdSerializerElement} eventsSerializerElement
+ * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean}?} configuration
+ * @returns
  */
 function generateCompiledEventsFromSerializedEvents(
   gd,
@@ -262,18 +263,17 @@ function generateCompiledEventsFromSerializedEvents(
   const project = new gd.ProjectHelper.createNewGDJSProject();
   const eventsFunction = new gd.EventsFunction();
   eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
-  
+
   if (configuration) {
-    const {
-      parameterTypes,
-      groups
-      } = configuration;
+    const { parameterTypes, groups } = configuration;
     if (groups) {
       for (const groupName in groups) {
         if (Object.hasOwnProperty.call(groups, groupName)) {
           const objectsNames = groups[groupName];
 
-          const group = eventsFunction.getObjectGroups().insertNew(groupName, 0);
+          const group = eventsFunction
+            .getObjectGroups()
+            .insertNew(groupName, 0);
           for (const objectName of objectsNames) {
             group.addObject(objectName);
           }
@@ -285,7 +285,7 @@ function generateCompiledEventsFromSerializedEvents(
       for (const parameterName in parameterTypes) {
         if (Object.hasOwnProperty.call(parameterTypes, parameterName)) {
           const parameterType = parameterTypes[parameterName];
-          
+
           const parameter = new gd.ParameterMetadata();
           parameter.setType(parameterType);
           parameter.setName(parameterName);
@@ -294,7 +294,7 @@ function generateCompiledEventsFromSerializedEvents(
         }
       }
     }
-}
+  }
 
   const runCompiledEvents = generateCompiledEventsForEventsFunction(
     gd,
@@ -309,8 +309,37 @@ function generateCompiledEventsFromSerializedEvents(
   return runCompiledEvents;
 }
 
+/**
+ * Generate a function to run the compiled events of a layout.
+ */
+function generateCompiledEventsForLayout(gd, project, layout) {
+  const includeFiles = new gd.SetString();
+  const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+
+  const code = layoutCodeGenerator.generateLayoutCompleteCode(
+    layout,
+    includeFiles,
+    true
+  );
+
+  layoutCodeGenerator.delete();
+  includeFiles.delete();
+
+  // Create a function running the generated code.
+  const compiledFunction = new Function(
+    'gdjs',
+    'runtimeScene',
+    `const Hashtable = gdjs.Hashtable;
+     ${code}
+     return gdjs['${layout.getName()}Code'].func(runtimeScene);`
+  );
+
+  return compiledFunction;
+}
+
 module.exports = {
   generateCompiledEventsForEventsFunction,
   generateCompiledEventsFromSerializedEvents,
   generateCompiledEventsForSerializedEventsBasedExtension,
+  generateCompiledEventsForLayout,
 };

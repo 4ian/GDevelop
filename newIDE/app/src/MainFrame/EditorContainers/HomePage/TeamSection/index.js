@@ -130,6 +130,9 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       showNewGroupNameField,
       setShowNewGroupNameField,
     ] = React.useState<boolean>(false);
+    const [isLoadingMembers, setIsLoadingMembers] = React.useState<boolean>(
+      false
+    );
 
     const setDraggedUser = React.useCallback((user: User) => {
       draggedUserRef.current = user;
@@ -149,6 +152,23 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         }
       },
       [onListUserProjects]
+    );
+
+    const onRefreshTeamMembers = React.useCallback(
+      async () => {
+        setIsLoadingMembers(true);
+        try {
+          await onRefreshMembers();
+        } catch (error) {
+          console.error(
+            'An error occurred when refreshing team members:',
+            error
+          );
+        } finally {
+          setIsLoadingMembers(false);
+        }
+      },
+      [onRefreshMembers]
     );
 
     const membersByGroupId = groupMembersByGroupId({
@@ -195,6 +215,20 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       .filter(Boolean)
       .sort((a, b) => a.group.name.localeCompare(b.group.name));
 
+    const refreshMembersButton = (
+      <IconButton
+        disabled={isLoadingMembers}
+        onClick={onRefreshTeamMembers}
+        size="small"
+      >
+        {isLoadingMembers ? (
+          <CircularProgress size={15} />
+        ) : (
+          <Refresh fontSize="small" />
+        )}
+      </IconButton>
+    );
+
     return (
       <SectionContainer title={<Trans>Classrooms</Trans>}>
         <SectionRow>
@@ -205,9 +239,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                   <Text size="section-title" noMargin>
                     <Trans>Unassigned members</Trans>
                   </Text>
-                  <IconButton onClick={onRefreshMembers} size="small">
-                    <Refresh fontSize="small" />
-                  </IconButton>
+                  {refreshMembersButton}
                 </LineStackLayout>
                 <List>
                   {membersNotInAGroup.members
@@ -235,9 +267,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
               <Text size="section-title" noMargin>
                 <Trans>Rooms</Trans>
               </Text>
-              <IconButton onClick={onRefreshMembers} size="small">
-                <Refresh fontSize="small" />
-              </IconButton>
+              {refreshMembersButton}
             </LineStackLayout>
             <FlatButton
               primary

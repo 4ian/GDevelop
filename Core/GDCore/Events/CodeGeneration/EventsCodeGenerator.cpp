@@ -963,6 +963,8 @@ void EventsCodeGenerator::DeleteUselessEvents(gd::EventsList& events) {
  */
 void EventsCodeGenerator::PreprocessEventList(gd::EventsList& listEvent) {
   for (std::size_t i = 0; i < listEvent.GetEventsCount(); ++i) {
+    if (listEvent[i].IsDisabled()) continue;
+
     listEvent[i].Preprocess(*this, listEvent, i);
     if (i <
         listEvent.GetEventsCount()) {  // Be sure that that there is still an

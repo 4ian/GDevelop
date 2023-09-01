@@ -14,7 +14,7 @@ using namespace std;
 namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
-    gd::PlatformExtension& extension) {
+    gd::PlatformExtension &extension) {
   extension
       .SetExtensionInformation("ResizableCapability",
                                _("Resizable capability"),
@@ -22,84 +22,86 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
-      .SetIcon("res/actions/scale24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
+      "res/actions/scale24_black.png");
 
-  gd::BehaviorMetadata& aut = extension.AddBehavior(
-      "ResizableBehavior",
-      _("Resizable capability"),
-      "Resizable",
-      _("Change the object dimensions."),
-      "",
-      "res/actions/scale24_black.png",
-      "ResizableBehavior",
-      std::make_shared<gd::Behavior>(),
-      std::make_shared<gd::BehaviorsSharedData>())
-    .SetHidden();
+  gd::BehaviorMetadata &aut =
+      extension
+          .AddBehavior("ResizableBehavior",
+                       _("Resizable capability"),
+                       "Resizable",
+                       _("Change the object dimensions."),
+                       "",
+                       "res/actions/scale24_black.png",
+                       "ResizableBehavior",
+                       std::make_shared<gd::Behavior>(),
+                       std::make_shared<gd::BehaviorsSharedData>())
+          .SetHidden();
 
   aut.AddScopedAction("SetWidth",
-                _("Width"),
-                _("Change the width of the object."),
-                _("the width"),
-                _("Size"),
-                "res/actions/scaleWidth24_black.png",
-                "res/actions/scaleWidth_black.png")
+                      _("Width"),
+                      _("Change the width of the object."),
+                      _("the width"),
+                      _("Size"),
+                      "res/actions/scaleWidth24_black.png",
+                      "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
-      .UseStandardOperatorParameters("number",
-                                     ParameterOptions::MakeNewOptions().SetDescription(
-                                        _("Width")))
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(_("Width")))
       .MarkAsAdvanced();
 
   aut.AddScopedCondition("Width",
-                   _("Width"),
-                   _("Compare the width of the object."),
-                   _("the width"),
-                   _("Size"),
-                   "res/conditions/scaleWidth24_black.png",
-                   "res/conditions/scaleWidth_black.png")
+                         _("Width"),
+                         _("Compare the width of the object."),
+                         _("the width"),
+                         _("Size"),
+                         "res/conditions/scaleWidth24_black.png",
+                         "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions().SetDescription(
-                        _("Width")))
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(_("Width")))
       .MarkAsAdvanced();
 
   aut.AddScopedAction("SetHeight",
-                _("Height"),
-                _("Change the height of the object."),
-                _("the height"),
-                _("Size"),
-                "res/actions/scaleHeight24_black.png",
-                "res/actions/scaleHeight_black.png")
+                      _("Height"),
+                      _("Change the height of the object."),
+                      _("the height"),
+                      _("Size"),
+                      "res/actions/scaleHeight24_black.png",
+                      "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
-      .UseStandardOperatorParameters("number",
-                                     ParameterOptions::MakeNewOptions().SetDescription(
-                                        _("Height")))
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(_("Height")))
       .MarkAsAdvanced();
 
   aut.AddScopedCondition("Height",
-                   _("Height"),
-                   _("Compare the height of the object."),
-                   _("the height"),
-                   _("Size"),
-                   "res/conditions/scaleHeight24_black.png",
-                   "res/conditions/scaleHeight_black.png")
+                         _("Height"),
+                         _("Compare the height of the object."),
+                         _("the height"),
+                         _("Size"),
+                         "res/conditions/scaleHeight24_black.png",
+                         "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions().SetDescription(
-                        _("Height")))
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(_("Height")))
       .MarkAsAdvanced();
 
-  aut.AddScopedAction("SetSize",
-                _("Size"),
-                _("Change the size of an object."),
-                _("Change the size of _PARAM0_: set to _PARAM1_ x _PARAM2_"),
-                _("Size"),
-                "res/actions/scale24_black.png",
-                "res/actions/scale_black.png")
+  aut.AddScopedAction(
+         "SetSize",
+         _("Size"),
+         _("Change the size of an object."),
+         _("Change the size of _PARAM0_: set to _PARAM2_ x _PARAM3_"),
+         _("Size"),
+         "res/actions/scale24_black.png",
+         "res/actions/scale_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .AddParameter("expression", _("Width"))

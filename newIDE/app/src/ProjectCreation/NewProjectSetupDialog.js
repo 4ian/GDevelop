@@ -302,7 +302,7 @@ const NewProjectSetupDialog = ({
             // We only pass down the project name as this is the only customizable field for an example.
             projectName,
             storageProvider,
-            saveAsLocation,
+            saveAsLocation: projectLocation,
           },
           i18n
         );

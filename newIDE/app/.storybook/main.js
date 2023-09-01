@@ -2,7 +2,11 @@ module.exports = {
   framework: {
     name: '@storybook/react-webpack5',
   },
-  stories: ['../src/stories/index.js', '../src/stories/**/*.stories.js'],
+  features: {
+    storyStoreV7: false,
+  },
+  stories: ['../src/stories/**/*.stories.js'],
+  staticDirs: ['../public'],
   addons: [
     {
       name: '@storybook/addon-essentials',
@@ -13,16 +17,18 @@ module.exports = {
     'storybook-addon-mock',
     '@storybook/preset-create-react-app',
   ],
-  webpackFinal: async (config, { configType }) => {
-    config.resolve = {
+  webpackFinal: async config => {
+    return {
+      ...config,
+      resolve: {
         ...config.resolve,
         fallback: {
-            ...(config.resolve || {}).fallback,
-            fs: false,
-            stream: false,
-            os: false,
+          ...(config.resolve || {}).fallback,
+          fs: false,
+          stream: false,
+          os: false,
         },
-    }
-    return config
+      },
+    };
   },
 };

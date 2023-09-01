@@ -12,6 +12,7 @@
     "@storybook/addon-essentials": "^7.4.0",
     "@storybook/preset-create-react-app": "^7.4.0",
     "@storybook/react-webpack5": "^7.4.0",
+    "@storybook/react": "^7.4.0",
 
     "webpack": "5.88.2",
     "@babel/preset-env": "^7.22.14",
@@ -111,8 +112,8 @@
     "test": "react-scripts test --env=node",
     "flow": "flow",
     "check-script-types": "cd scripts && tsc",
-    "storybook": "storybook dev -p 9009 -s public",
-    "build-storybook": "storybook build -s public -o build-storybook",
+    "storybook": "storybook dev -p 9009",
+    "build-storybook": "storybook build -o build-storybook",
     "analyze-test-coverage": "react-scripts test --env=node --coverage",
     "analyze-flow-coverage": "flow-coverage-report",
     "analyze-source-map": "source-map-explorer build/static/js/*.js",

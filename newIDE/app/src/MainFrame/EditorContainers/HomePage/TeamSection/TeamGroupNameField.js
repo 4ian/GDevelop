@@ -127,7 +127,6 @@ const TeamGroupNameField = ({
               onFinishEditingName();
             } else if (shouldCloseOrCancel(event)) {
               event.stopPropagation();
-              event.preventDefault();
               onCancelEditingName();
             }
           }}

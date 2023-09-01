@@ -77,7 +77,6 @@ const NewTeamGroupNameField = ({ onValidateGroupName, onDismiss }: Props) => {
             onFinishEditingName();
           } else if (shouldCloseOrCancel(event)) {
             event.stopPropagation();
-            event.preventDefault();
             onCancelEditingName();
           }
         }}

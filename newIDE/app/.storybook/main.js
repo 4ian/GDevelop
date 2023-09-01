@@ -13,4 +13,16 @@ module.exports = {
     },
     'storybook-addon-mock/register',
   ],
+  webpackFinal: async (config, { configType }) => {
+    config.resolve = {
+        ...config.resolve,
+        fallback: {
+            ...(config.resolve || {}).fallback,
+            fs: false,
+            stream: false,
+            os: false,
+        },
+    }
+    return config
+  },
 };

@@ -5,6 +5,8 @@
   "license": "MIT",
   "homepage": ".",
   "devDependencies": {
+    "@babel/preset-env": "^7.22.14",
+    "@babel/preset-react": "^7.22.5",
     "@lingui/cli": "^2.7.3",
     "@lingui/macro": "^2.7.3",
     "storybook": "7.4.0",

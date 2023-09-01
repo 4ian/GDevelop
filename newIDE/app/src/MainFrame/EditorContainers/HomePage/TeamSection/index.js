@@ -48,15 +48,15 @@ export type TeamSectionInterface = {|
   forceUpdate: () => void,
 |};
 
-const groupMembersByGroupId = ({
+export const groupMembersByGroupId = ({
   groups,
   members,
   memberships,
-}: {
+}: {|
   groups: ?(TeamGroup[]),
   members: ?(User[]),
   memberships: ?(TeamMembership[]),
-}): ?{ [groupId: string]: GroupWithMembers } => {
+|}): ?{ [groupId: string]: GroupWithMembers } => {
   if (!(groups && members && memberships)) return null;
   const membersByGroupId = {};
   members.forEach(member => {

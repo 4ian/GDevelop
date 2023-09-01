@@ -1,7 +1,6 @@
 module.exports = {
   framework: {
     name: '@storybook/react-webpack5',
-    options: { fastRefresh: true },
   },
   stories: ['../src/stories/index.js', '../src/stories/**/*.stories.js'],
   addons: [
@@ -11,7 +10,8 @@ module.exports = {
         docs: false,
       },
     },
-    'storybook-addon-mock/register',
+    'storybook-addon-mock',
+    '@storybook/preset-create-react-app',
   ],
   webpackFinal: async (config, { configType }) => {
     config.resolve = {

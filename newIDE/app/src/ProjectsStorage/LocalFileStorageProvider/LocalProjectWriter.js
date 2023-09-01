@@ -287,17 +287,21 @@ export const renderNewProjectSaveAsLocationChooser = ({
     <LocalFolderPicker
       fullWidth
       value={path.dirname(projectLocation.fileIdentifier)}
-      onChange={newOutputPath =>
+      onChange={newOutputPath => {
+        const newOutputFileIdentifier = path.join(
+          newOutputPath,
+          path.basename(projectLocation.fileIdentifier)
+        );
         setSaveAsLocation(
           getProjectLocation({
             projectName,
             saveAsLocation: {
-              fileIdentifier: newOutputPath,
+              fileIdentifier: newOutputFileIdentifier,
             },
             newProjectsDefaultFolder,
           })
-        )
-      }
+        );
+      }}
       type="create-game"
     />
   );

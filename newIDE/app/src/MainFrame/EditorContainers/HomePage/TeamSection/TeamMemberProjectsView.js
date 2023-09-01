@@ -16,13 +16,18 @@ import { type FileMetadataAndStorageProviderName } from '../../../../ProjectsSto
 import { type StorageProvider } from '../../../../ProjectsStorage';
 import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
 import { type User } from '../../../../Utils/GDevelopServices/User';
+import IconButton from '../../../../UI/IconButton';
+import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
+import CircularProgress from '../../../../UI/CircularProgress';
 
 type Props = {|
   user: User,
   onClickBack: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   storageProviders: Array<StorageProvider>,
-  projects: Array<CloudProjectWithUserAccessInfo>
+  projects: Array<CloudProjectWithUserAccessInfo>,
+  onRefreshProjects: (user: User) => Promise<void>,
+  isLoadingProjects: boolean,
 |};
 
 const TeamMemberProjectsView = ({
@@ -31,6 +36,8 @@ const TeamMemberProjectsView = ({
   onOpenRecentFile,
   storageProviders,
   projects,
+  onRefreshProjects,
+  isLoadingProjects,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
@@ -42,6 +49,14 @@ const TeamMemberProjectsView = ({
   return (
     <SectionContainer
       title={<Trans>{user.username || user.email}'s projects</Trans>}
+      titleAdornment={
+        <IconButton
+          onClick={() => onRefreshProjects(user)}
+          disabled={isLoadingProjects}
+        >
+          {isLoadingProjects ? <CircularProgress size={20} /> : <Refresh />}
+        </IconButton>
+      }
       backAction={onClickBack}
     >
       <SectionRow>

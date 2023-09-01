@@ -183,6 +183,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             setSelectedUser(null);
             setSelectedUserProjects(null);
           }}
+          onRefreshProjects={listUserProjects}
+          isLoadingProjects={isLoadingUserProjects}
         />
       );
     }

@@ -7,6 +7,7 @@ import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
 import Paper from '../../../UI/Paper';
+import { LineStackLayout } from '../../../UI/Layout';
 
 export const SECTION_PADDING = 30;
 
@@ -47,6 +48,7 @@ const styles = {
 type Props = {|
   children: React.Node,
   title: React.Node,
+  titleAdornment?: React.Node,
   subtitleText?: React.Node,
   renderSubtitle?: () => React.Node,
   backAction?: () => void,
@@ -58,6 +60,7 @@ type Props = {|
 const SectionContainer = ({
   children,
   title,
+  titleAdornment,
   subtitleText,
   renderSubtitle,
   backAction,
@@ -97,11 +100,12 @@ const SectionContainer = ({
                   />
                 </Line>
               )}
-              <Line noMargin>
+              <LineStackLayout noMargin alignItems="center">
                 <Text size="bold-title" noMargin>
                   {title}
                 </Text>
-              </Line>
+                {titleAdornment}
+              </LineStackLayout>
               {subtitleText && (
                 <Line noMargin>
                   <Text noMargin>{subtitleText}</Text>

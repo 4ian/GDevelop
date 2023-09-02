@@ -12,6 +12,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/Tools/UUID/UUID.h"
 
 namespace gd {
 
@@ -162,6 +163,9 @@ void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
 }
 
 void VariablesContainer::SerializeTo(SerializerElement& element) const {
+  if (!persistentUuid.empty())
+    element.SetStringAttribute("persistentUuid", persistentUuid);
+
   element.ConsiderAsArrayOf("variable");
   for (std::size_t j = 0; j < variables.size(); j++) {
     SerializerElement& variableElement = element.AddChild("variable");
@@ -171,6 +175,8 @@ void VariablesContainer::SerializeTo(SerializerElement& element) const {
 }
 
 void VariablesContainer::UnserializeFrom(const SerializerElement& element) {
+  persistentUuid = element.GetStringAttribute("persistentUuid");
+
   Clear();
   element.ConsiderAsArrayOf("variable", "Variable");
   for (std::size_t j = 0; j < element.GetChildrenCount(); j++) {
@@ -181,6 +187,24 @@ void VariablesContainer::UnserializeFrom(const SerializerElement& element) {
     Insert(
         variableElement.GetStringAttribute("name", "", "Name"), variable, -1);
   }
+}
+
+VariablesContainer& VariablesContainer::ResetPersistentUuid() {
+  persistentUuid = UUID::MakeUuid4();
+  for(auto& variable: variables) {
+    variable.second->ResetPersistentUuid();
+  }
+
+  return *this;
+}
+
+VariablesContainer& VariablesContainer::ClearPersistentUuid() {
+  persistentUuid = "";
+  for(auto& variable: variables) {
+    variable.second->ClearPersistentUuid();
+  }
+
+  return *this;
 }
 
 VariablesContainer::VariablesContainer(const VariablesContainer& other) {
@@ -195,6 +219,7 @@ VariablesContainer& VariablesContainer::operator=(
 }
 
 void VariablesContainer::Init(const gd::VariablesContainer& other) {
+  persistentUuid = other.persistentUuid;
   variables.clear();
   for (auto& it : other.variables) {
     variables.push_back(

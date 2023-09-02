@@ -12,6 +12,8 @@ import { Column, Line } from '../UI/Grid';
 import VariablesList from './VariablesList';
 import HelpButton from '../UI/HelpButton';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   onCancel: () => void,
   onApply: () => void,
@@ -20,9 +22,13 @@ type Props = {|
   title: React.Node,
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
+
+  project: gdProject,
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+
+  // TODO: Deprecate/remove this?
   onComputeAllVariableNames: () => Array<string>,
   helpPagePath: ?string,
   id?: string,
@@ -36,6 +42,7 @@ const VariablesEditorDialog = ({
   title,
   emptyPlaceholderTitle,
   emptyPlaceholderDescription,
+  project,
   variablesContainer,
   inheritedVariablesContainer,
   hotReloadPreviewButtonProps,
@@ -46,12 +53,43 @@ const VariablesEditorDialog = ({
   const {
     onCancelChanges,
     notifyOfChange,
+    getOriginalContentSerializedElement,
   } = useSerializableObjectCancelableEditor({
     serializableObject: variablesContainer,
     onCancel,
+    resetPersistentUuid: true,
   });
+  const removeReferencesToRemovedVariables = true;
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-variables'
+  );
+
+  const onRefactorAndApply = React.useCallback(
+    () => {
+      if (inheritedVariablesContainer) {
+        // No refactoring to do - this is a variable container of an instance
+        // (or something else that overrides variables from another container),
+        // which does not have an impact on the rest of the project.
+      } else {
+        gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+          project,
+          getOriginalContentSerializedElement(),
+          variablesContainer,
+          removeReferencesToRemovedVariables,
+        );
+      }
+
+      variablesContainer.clearPersistentUuid();
+      onApply();
+    },
+    [
+      onApply,
+      project,
+      getOriginalContentSerializedElement,
+      variablesContainer,
+      inheritedVariablesContainer,
+      removeReferencesToRemovedVariables,
+    ]
   );
 
   return (
@@ -66,7 +104,7 @@ const VariablesEditorDialog = ({
         <DialogPrimaryButton
           label={<Trans>Apply</Trans>}
           primary
-          onClick={onApply}
+          onClick={onRefactorAndApply}
           key="Apply"
           id="apply-button"
         />,
@@ -91,7 +129,7 @@ const VariablesEditorDialog = ({
         ) : null,
       ]}
       onRequestClose={onCancelChanges}
-      onApply={onApply}
+      onApply={onRefactorAndApply}
       open={open}
       flexBody
       fullHeight

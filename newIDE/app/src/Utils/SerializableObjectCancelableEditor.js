@@ -9,6 +9,7 @@ type Props = {|
   serializableObject: gdSerializable,
   useProjectToUnserialize?: ?gdProject,
   onCancel: () => void | Promise<void>,
+  resetPersistentUuid?: boolean,
 |};
 
 const changesBeforeShowingWarning = 1;
@@ -22,8 +23,9 @@ export const useSerializableObjectCancelableEditor = ({
   serializableObject,
   useProjectToUnserialize,
   onCancel,
+  resetPersistentUuid,
 }: Props) => {
-  const serializedElementRef = React.useRef(null);
+  const serializedElementRef = React.useRef<gdSerializerElement | null>(null);
   const numberOfChangesRef = React.useRef(0);
   const { showConfirmation } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
@@ -38,6 +40,8 @@ export const useSerializableObjectCancelableEditor = ({
         serializedElementRef.current = null;
       }
 
+      if (resetPersistentUuid) serializableObject.resetPersistentUuid();
+
       serializedElementRef.current = new gd.SerializerElement();
       serializableObject.serializeTo(serializedElementRef.current);
 
@@ -48,8 +52,16 @@ export const useSerializableObjectCancelableEditor = ({
         }
       };
     },
-    [serializableObject]
+    [serializableObject, resetPersistentUuid]
   );
+
+  const getOriginalContentSerializedElement = React.useCallback(() => {
+    if (!serializedElementRef.current) {
+      throw new Error("serializedElementRef should always be non null.");
+    }
+
+    return serializedElementRef.current;
+  }, []);
 
   const notifyOfChange = React.useCallback(() => {
     numberOfChangesRef.current++;
@@ -98,6 +110,8 @@ export const useSerializableObjectCancelableEditor = ({
         );
       }
 
+      if (resetPersistentUuid) serializableObject.clearPersistentUuid();
+
       onCancel();
     },
     [
@@ -106,8 +120,9 @@ export const useSerializableObjectCancelableEditor = ({
       onCancel,
       showConfirmation,
       backdropClickBehavior,
+      resetPersistentUuid,
     ]
   );
 
-  return { onCancelChanges, notifyOfChange, hasUnsavedChanges };
+  return { onCancelChanges, notifyOfChange, hasUnsavedChanges, getOriginalContentSerializedElement };
 };

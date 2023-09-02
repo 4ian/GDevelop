@@ -64,6 +64,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         />
         {editorOpen && layout && (
           <VariablesEditorDialog
+            project={project}
             title={<Trans>{layout.getName()} variables</Trans>}
             open
             variablesContainer={layout.getVariables()}

@@ -77,7 +77,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-unused-private-field
 
 		# Make as much warnings considered as errors as possible (only one for now).
-		-Werror=return-stack-address)
+		-Werror=return-stack-address
+		-Werror=return-type)
 endif()
 
 # Define common directories:

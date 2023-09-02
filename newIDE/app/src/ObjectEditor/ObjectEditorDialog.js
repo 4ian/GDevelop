@@ -79,11 +79,14 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancelChanges,
     notifyOfChange,
     hasUnsavedChanges,
+    getOriginalContentSerializedElement,
   } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
+    resetPersistentUuid: true,
   });
+  const removeReferencesToRemovedVariables = true;
 
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
@@ -98,6 +101,15 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   const onApply = () => {
     props.onApply();
+
+    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+      props.project,
+      getOriginalContentSerializedElement().getChild("variables"),
+      props.object.getVariables(),
+      removeReferencesToRemovedVariables,
+    );
+    props.object.clearPersistentUuid();
+
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will
     // override the name.

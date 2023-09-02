@@ -5,6 +5,8 @@
  */
 #include "WholeProjectRefactorer.h"
 
+#include <unordered_map>
+
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
@@ -14,8 +16,8 @@
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
-#include "GDCore/IDE/Events/EventsVariableRenamer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
+#include "GDCore/IDE/Events/EventsVariableReplacer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/InstructionsParameterMover.h"
@@ -48,6 +50,7 @@
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Log.h"
 
@@ -134,14 +137,66 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
   }
 }
 
-void WholeProjectRefactorer::RenameVariable(
-    gd::Project& project,
-    const gd::VariablesContainer& variablesContainer,
-    const gd::String& oldName,
-    const gd::String& newName) {
-  const gd::Platform &platform = project.GetCurrentPlatform();
-  gd::EventsVariableRenamer eventsVariableRenamer(platform, variablesContainer, oldName, newName);
-  gd::ProjectBrowserHelper::ExposeProjectEvents(project, eventsVariableRenamer);
+void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+    gd::Project &project,
+    const gd::SerializerElement &oldSerializedVariablesContainer,
+    const gd::VariablesContainer &newVariablesContainer,
+    bool removeReferencesToRemovedVariables) {
+  gd::VariablesContainer oldVariablesContainer;
+  oldVariablesContainer.UnserializeFrom(oldSerializedVariablesContainer);
+
+  if (oldVariablesContainer.GetPersistentUuid() !=
+      newVariablesContainer.GetPersistentUuid()) {
+    gd::LogWarning(
+        _("Called ApplyRefactoringForVariablesContainer on variables container "
+          "that are different - they can't be compared."));
+    return;
+  }
+
+  std::unordered_map<gd::String, gd::String> removedUuidAndNames;
+  std::unordered_map<gd::String, gd::String> oldToNewVariableNames;
+  for (std::size_t i = 0; i < oldVariablesContainer.Count(); ++i) {
+    const auto &variable = oldVariablesContainer.Get(i);
+    const auto &variableName = oldVariablesContainer.GetNameAt(i);
+
+    // All variables are candidate to be removed.
+    removedUuidAndNames[variable.GetPersistentUuid()] = variableName;
+  }
+  for (std::size_t i = 0; i < newVariablesContainer.Count(); ++i) {
+    const auto &variable = newVariablesContainer.Get(i);
+    const auto &variableName = newVariablesContainer.GetNameAt(i);
+
+    auto existingOldVariableUuidAndName =
+        removedUuidAndNames.find(variable.GetPersistentUuid());
+    if (existingOldVariableUuidAndName == removedUuidAndNames.end()) {
+      // This is a new variable.
+    } else {
+      const gd::String &oldName = existingOldVariableUuidAndName->second;
+
+      if (oldName != variableName) {
+        // This is a renamed variable.
+        oldToNewVariableNames[oldName] = variableName;
+      }
+
+      // Renamed or not, this is not a removed variable.
+      removedUuidAndNames.erase(variable.GetPersistentUuid());
+    }
+  }
+
+  std::unordered_set<gd::String> removedVariableNames;
+  if (removeReferencesToRemovedVariables) {
+    for (const auto &removedUuidAndName : removedUuidAndNames) {
+      removedVariableNames.insert(removedUuidAndName.second);
+    }
+  }
+
+  gd::EventsVariableReplacer eventsVariableReplacer(
+      project.GetCurrentPlatform(),
+      newVariablesContainer,
+      oldToNewVariableNames,
+      removedVariableNames);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project,
+                                                eventsVariableReplacer);
 }
 
 void WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(

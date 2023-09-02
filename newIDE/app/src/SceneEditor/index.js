@@ -1697,6 +1697,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               {!!this.state.variablesEditedInstance &&
                 !!variablesEditedAssociatedObject && (
                   <VariablesEditorDialog
+                    project={project}
                     open
                     variablesContainer={this.state.variablesEditedInstance.getVariables()}
                     inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}

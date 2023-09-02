@@ -54,6 +54,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         />
         {editorOpen && project && (
           <VariablesEditorDialog
+            project={project}
             title={<Trans>Global Variables</Trans>}
             open={editorOpen}
             variablesContainer={project.getVariables()}

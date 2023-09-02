@@ -1156,6 +1156,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             </List>
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog
+                project={project}
                 title={<Trans>Global Variables</Trans>}
                 open
                 variablesContainer={project.getVariables()}

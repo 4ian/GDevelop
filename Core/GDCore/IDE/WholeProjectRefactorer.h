@@ -31,6 +31,7 @@ class Behavior;
 class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
 class ProjectBrowser;
+class SerializerElement;
 }  // namespace gd
 
 namespace gd {
@@ -46,18 +47,10 @@ namespace gd {
 class GD_CORE_API WholeProjectRefactorer {
  public:
 
-  /**
-   * \brief Refactor the project **before** a variable is renamed.
-   *
-   * \warning Do the renaming of the specified variable after calling this.
-   * This is because the variable is expected to have its old name for the
-   * refactoring.
-   */
-  static void RenameVariable(
-      gd::Project& project,
-      const gd::VariablesContainer& variablesContainer,
-      const gd::String& oldName,
-      const gd::String& newName);
+  static void ApplyRefactoringForVariablesContainer(gd::Project& project,
+    const gd::SerializerElement& oldSerializedVariablesContainer,
+    const gd::VariablesContainer& newVariablesContainer,
+    bool removeReferencesToRemovedVariables);
 
   /**
    * \brief Refactor the project **before** an events function extension is

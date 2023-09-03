@@ -78,7 +78,13 @@ export const quicklyAnalyzeVariableName = (
   const squareBracketPosition = name.indexOf('[');
   const nameToCheck =
     dotPosition !== -1 || squareBracketPosition !== -1
-      ? name.substring(0, Math.min(dotPosition, squareBracketPosition))
+      ? name.substring(
+          0,
+          Math.min(
+            dotPosition === -1 ? name.length : dotPosition,
+            squareBracketPosition === -1 ? name.length : squareBracketPosition
+          )
+        )
       : name;
 
   if (variablesContainer && !variablesContainer.has(nameToCheck))

@@ -35,10 +35,10 @@ namespace gd {
  *
  * \see gd::ExpressionParser2
  */
-class GD_CORE_API ExpressionVariableReplaer
+class GD_CORE_API ExpressionVariableReplacer
     : public ExpressionParser2NodeWorker {
  public:
-  ExpressionVariableReplaer(
+  ExpressionVariableReplacer(
       const gd::Platform& platform_,
       const gd::ProjectScopedContainers& projectScopedContainers_,
       const gd::VariablesContainer& targetVariablesContainer_,
@@ -49,11 +49,10 @@ class GD_CORE_API ExpressionVariableReplaer
         platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         forcedInitialVariablesContainer(nullptr),
-        targetVariablesContainer(
-            targetVariablesContainer_),
+        targetVariablesContainer(targetVariablesContainer_),
         oldToNewVariableNames(oldToNewVariableNames_),
         removedVariableNames(removedVariableNames_){};
-  virtual ~ExpressionVariableReplaer(){};
+  virtual ~ExpressionVariableReplacer(){};
 
   void SetForcedInitialVariablesContainer(
       const gd::VariablesContainer* forcedInitialVariablesContainer_) {
@@ -84,8 +83,8 @@ class GD_CORE_API ExpressionVariableReplaer
     // will be accessed.
 
     if (forcedInitialVariablesContainer) {
-      // A scope was forced. Honor it: it means this node represents a variable of the forced
-      // variables container.
+      // A scope was forced. Honor it: it means this node represents a variable
+      // of the forced variables container.
       if (forcedInitialVariablesContainer == &targetVariablesContainer) {
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       }
@@ -98,9 +97,10 @@ class GD_CORE_API ExpressionVariableReplaer
       if (node.child) node.child->Visit(*this);
       objectNameToUseForVariableAccessor = "";
     } else {
-      if (projectScopedContainers.GetVariablesContainersList().HasVariablesContainer(targetVariablesContainer)) {
-        // The node represents a variable, that can come from the target (because the target is in the scope),
-        // replace or remove it:
+      if (projectScopedContainers.GetVariablesContainersList()
+              .HasVariablesContainer(targetVariablesContainer)) {
+        // The node represents a variable, that can come from the target
+        // (because the target is in the scope), replace or remove it:
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       }
 
@@ -112,10 +112,9 @@ class GD_CORE_API ExpressionVariableReplaer
         projectScopedContainers.GetObjectsContainersList();
     if (!objectNameToUseForVariableAccessor.empty()) {
       if (objectsContainersList.HasVariablesContainer(
-        objectNameToUseForVariableAccessor,
-        targetVariablesContainer)) {
-        // The node represents an object variable, and this object variables are the target.
-        // Do the replacement or removals:
+              objectNameToUseForVariableAccessor, targetVariablesContainer)) {
+        // The node represents an object variable, and this object variables are
+        // the target. Do the replacement or removals:
         RenameOrRemoveVariableOfTargetVariableContainer(node.name);
       }
     }
@@ -139,24 +138,25 @@ class GD_CORE_API ExpressionVariableReplaer
     // here).
 
     if (forcedInitialVariablesContainer) {
-      // A scope was forced. Honor it: it means this node represents a variable of the forced
-      // variables container.
+      // A scope was forced. Honor it: it means this node represents a variable
+      // of the forced variables container.
       if (forcedInitialVariablesContainer == &targetVariablesContainer) {
         RenameOrRemoveVariableOfTargetVariableContainer(node.identifierName);
       }
     } else if (objectsContainersList.HasObjectOrGroupNamed(
                    node.identifierName)) {
       if (objectsContainersList.HasVariablesContainer(
-                node.identifierName, targetVariablesContainer)) {
-        // The node represents an object variable, and this object variables are the target.
-        // Do the replacement or removals:
-        RenameOrRemoveVariableOfTargetVariableContainer(node.childIdentifierName);
+              node.identifierName, targetVariablesContainer)) {
+        // The node represents an object variable, and this object variables are
+        // the target. Do the replacement or removals:
+        RenameOrRemoveVariableOfTargetVariableContainer(
+            node.childIdentifierName);
       }
     } else {
       if (projectScopedContainers.GetVariablesContainersList()
               .HasVariablesContainer(targetVariablesContainer)) {
-        // The node represents a variable, that can come from the target (because the target is in the scope),
-        // replace or remove it:
+        // The node represents a variable, that can come from the target
+        // (because the target is in the scope), replace or remove it:
         RenameOrRemoveVariableOfTargetVariableContainer(node.identifierName);
       }
     }
@@ -217,7 +217,8 @@ class GD_CORE_API ExpressionVariableReplaer
   bool hasDoneRenaming;
   bool removedVariableUsed;
 
-  bool RenameOrRemoveVariableOfTargetVariableContainer(gd::String& variableName) {
+  bool RenameOrRemoveVariableOfTargetVariableContainer(
+      gd::String& variableName) {
     if (oldToNewVariableNames.count(variableName) >= 1) {
       variableName = oldToNewVariableNames.find(variableName)->second;
       hasDoneRenaming = true;
@@ -227,7 +228,7 @@ class GD_CORE_API ExpressionVariableReplaer
       return true;
     }
 
-    return false; // Nothing was changed or done.
+    return false;  // Nothing was changed or done.
   }
 
   // Scope:
@@ -243,8 +244,30 @@ class GD_CORE_API ExpressionVariableReplaer
   gd::String objectNameToUseForVariableAccessor;
 };
 
+const gd::VariablesContainer*
+EventsVariableReplacer::FindForcedVariablesContainerIfAny(
+    const gd::String& type, const gd::String& lastObjectName) {
+  // Handle legacy pre-scoped variable parameters: in this case, we
+  // force the "scope" at which starts the evalution of variables.
+  if (type == "objectvar") {
+    return GetProjectScopedContainers()
+        .GetObjectsContainersList()
+        .GetObjectOrGroupVariablesContainer(lastObjectName);
+  } else if (type == "globalvar") {
+    return GetProjectScopedContainers()
+        .GetVariablesContainersList()
+        .GetTopMostVariablesContainer();
+  } else if (type == "scenevar") {
+    return GetProjectScopedContainers()
+        .GetVariablesContainersList()
+        .GetBottomMostVariablesContainer();
+  }
+
+  return nullptr;
+}
+
 bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
-                                               bool isCondition) {
+                                                bool isCondition) {
   const auto& metadata = isCondition
                              ? gd::MetadataProvider::GetConditionMetadata(
                                    platform, instruction.GetType())
@@ -266,35 +289,15 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
             !gd::ParameterMetadata::IsExpression("string", type))
           return;  // Not an expression that can contain variables.
 
-        // Handle legacy pre-scoped variable parameters: in this case, we
-        // force the "scope" at which starts the evalution of variables.
-        const gd::VariablesContainer* forcedInitialVariablesContainer = nullptr;
-        if (type == "objectvar") {
-          forcedInitialVariablesContainer =
-              GetProjectScopedContainers()
-                  .GetObjectsContainersList()
-                  .GetObjectOrGroupVariablesContainer(lastObjectName);
-        } else if (type == "globalvar") {
-          forcedInitialVariablesContainer = GetProjectScopedContainers()
-                                                .GetVariablesContainersList()
-                                                .GetTopMostVariablesContainer();
-        } else if (type == "scenevar") {
-          forcedInitialVariablesContainer =
-              GetProjectScopedContainers()
-                  .GetVariablesContainersList()
-                  .GetBottomMostVariablesContainer();
-        }
-
         auto node = parameterValue.GetRootNode();
         if (node) {
-          ExpressionVariableReplaer renamer(
-              platform,
-              GetProjectScopedContainers(),
-              targetVariablesContainer,
-              oldToNewVariableNames,
-              removedVariableNames);
+          ExpressionVariableReplacer renamer(platform,
+                                             GetProjectScopedContainers(),
+                                             targetVariablesContainer,
+                                             oldToNewVariableNames,
+                                             removedVariableNames);
           renamer.SetForcedInitialVariablesContainer(
-              forcedInitialVariablesContainer);
+              FindForcedVariablesContainerIfAny(type, lastObjectName));
           node->Visit(renamer);
 
           if (renamer.IsRemovedVariableUsed()) {
@@ -307,6 +310,36 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
       });
 
   return shouldDeleteInstruction;
+}
+
+bool EventsVariableReplacer::DoVisitEventExpression(
+    gd::Expression& expression, const gd::ParameterMetadata& metadata) {
+  const gd::String& type = metadata.GetType();
+
+  if (!gd::ParameterMetadata::IsExpression("variable", type) &&
+      !gd::ParameterMetadata::IsExpression("number", type) &&
+      !gd::ParameterMetadata::IsExpression("string", type))
+    return false;  // Not an expression that can contain variables.
+
+  auto node = expression.GetRootNode();
+  if (node) {
+    ExpressionVariableReplacer renamer(platform,
+                                       GetProjectScopedContainers(),
+                                       targetVariablesContainer,
+                                       oldToNewVariableNames,
+                                       removedVariableNames);
+    renamer.SetForcedInitialVariablesContainer(
+        FindForcedVariablesContainerIfAny(type, ""));
+    node->Visit(renamer);
+
+    if (renamer.IsRemovedVariableUsed()) {
+      return true;
+    } else if (renamer.HasDoneRenaming()) {
+      expression = ExpressionParser2NodePrinter::PrintNode(*node);
+    }
+  }
+
+  return false;
 }
 
 EventsVariableReplacer::~EventsVariableReplacer() {}

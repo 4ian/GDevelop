@@ -10,7 +10,9 @@
 #include <stdexcept>
 
 #include "DummyPlatform.h"
+#include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
+#include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -29,7 +31,8 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "catch.hpp"
 
-TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[common]") {
+TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
+          "[common]") {
   SECTION("Variable renamed (project, layout, object)") {
     gd::Project project;
     gd::Platform platform;
@@ -38,6 +41,13 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[com
     gd::StandardEvent &event =
         dynamic_cast<gd::StandardEvent &>(layout1.GetEvents().InsertNewEvent(
             project, "BuiltinCommonInstructions::Standard"));
+    gd::ForEachChildVariableEvent &forEachChildVariableEvent =
+        dynamic_cast<gd::ForEachChildVariableEvent &>(
+            layout1.GetEvents().InsertNewEvent(
+                project, "BuiltinCommonInstructions::ForEachChildVariable"));
+    gd::RepeatEvent &repeatEvent =
+        dynamic_cast<gd::RepeatEvent &>(layout1.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Repeat"));
 
     // Declare global variables.
     project.GetVariables().InsertNew("MyGlobalVariable", 0).SetValue(123);
@@ -161,6 +171,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[com
       action.SetParameter(3, gd::Expression("MyObjectVariable"));
       event.GetActions().Insert(action);
     }
+
+    forEachChildVariableEvent.SetIterableVariableName("MySceneStructureVariable");
+    repeatEvent.SetRepeatExpression("1 + MySceneVariable + Object1.MyObjectVariable + Object2.MyObjectVariable");
     // clang-format on
 
     // Do a copy of layout1 to ensure other scene is unchanged after the
@@ -189,7 +202,10 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[com
     project.GetVariables().Rename("SharedVariableName",
                                   "RenamedGlobalVariableFromASharedName");
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, originalSerializedProjectVariables, project.GetVariables(), false);
+        project,
+        originalSerializedProjectVariables,
+        project.GetVariables(),
+        false);
 
     layout1.GetVariables().Rename("MySceneVariable", "MyRenamedSceneVariable");
     layout1.GetVariables().Rename("MySceneStructureVariable",
@@ -197,14 +213,20 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[com
     layout1.GetVariables().Rename("SharedVariableName",
                                   "RenamedSceneVariableFromASharedName");
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, originalSerializedLayoutVariables, layout1.GetVariables(), false);
+        project,
+        originalSerializedLayoutVariables,
+        layout1.GetVariables(),
+        false);
 
     object1.GetVariables().Rename("MyObjectVariable",
                                   "MyRenamedObjectVariable");
     object1.GetVariables().Rename("MyObjectStructureVariable",
                                   "MyRenamedObjectStructureVariable");
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, originalSerializedObject1Variables, object1.GetVariables(), false);
+        project,
+        originalSerializedObject1Variables,
+        object1.GetVariables(),
+        false);
 
     // Check the first layout is updated.
     // clang-format off
@@ -287,6 +309,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[com
       REQUIRE(event.GetActions()[3].GetParameter(3).GetPlainString() ==
               "MyObjectVariable");
     }
+
+    REQUIRE(forEachChildVariableEvent.GetIterableVariableName() == "MyRenamedSceneStructureVariable");
+    REQUIRE(repeatEvent.GetRepeatExpression() == "1 + MyRenamedSceneVariable + Object1.MyRenamedObjectVariable + Object2.MyObjectVariable");
     // clang-format on
 
     // Check the other layout is untouched.
@@ -348,7 +373,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[com
         .GetChild("MyChild")
         .SetValue(123);
 
-    auto makeTestAction = [](const gd::String& expression) {
+    auto makeTestAction = [](const gd::String &expression) {
       gd::Instruction action;
       action.SetType("MyExtension::DoSomething");
       action.SetParametersCount(1);
@@ -464,18 +489,27 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer", "[com
     project.GetVariables().Remove("MyGlobalStructureVariable");
     project.GetVariables().Remove("SharedVariableName");
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, originalSerializedProjectVariables, project.GetVariables(), true);
+        project,
+        originalSerializedProjectVariables,
+        project.GetVariables(),
+        true);
 
     layout1.GetVariables().Remove("MySceneVariable");
     layout1.GetVariables().Remove("MySceneStructureVariable");
     layout1.GetVariables().Remove("SharedVariableName");
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, originalSerializedLayoutVariables, layout1.GetVariables(), true);
+        project,
+        originalSerializedLayoutVariables,
+        layout1.GetVariables(),
+        true);
 
     object1.GetVariables().Remove("MyObjectVariable");
     object1.GetVariables().Remove("MyObjectStructureVariable");
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, originalSerializedObject1Variables, object1.GetVariables(), true);
+        project,
+        originalSerializedObject1Variables,
+        object1.GetVariables(),
+        true);
 
     // Check the first layout is updated.
     {

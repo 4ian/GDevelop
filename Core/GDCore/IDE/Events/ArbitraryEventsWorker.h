@@ -18,6 +18,8 @@ class BaseEvent;
 class LinkEvent;
 class EventsList;
 class ObjectsContainer;
+class Expression;
+class ParameterMetadata;
 }  // namespace gd
 
 namespace gd {
@@ -48,6 +50,7 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
   void VisitInstructionList(gd::InstructionsList& instructions,
                             bool areConditions);
   bool VisitInstruction(gd::Instruction& instruction, bool isCondition);
+  bool VisitEventExpression(gd::Expression& expression, const gd::ParameterMetadata& metadata);
 
   /**
    * Called to do some work on an event list.
@@ -86,6 +89,16 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
                                   bool isCondition) {
     return false;
   };
+
+  /**
+   * Called to do some work on an expression of an event.
+   * \return true if the event must be deleted from the list, false
+   * otherwise (default).
+   */
+  virtual bool DoVisitEventExpression(gd::Expression& expression,
+                                      const gd::ParameterMetadata& metadata) {
+    return false;
+  }
 };
 
 /**
@@ -159,6 +172,7 @@ protected:
   void VisitInstructionList(const gd::InstructionsList& instructions,
                             bool areConditions);
   void VisitInstruction(const gd::Instruction& instruction, bool isCondition);
+  void VisitEventExpression(const gd::Expression& expression, const gd::ParameterMetadata& metadata);
 
   /**
    * Called to do some work on an event list.
@@ -188,6 +202,13 @@ protected:
    */
   virtual void DoVisitInstruction(const gd::Instruction& instruction,
                                   bool isCondition) {};
+
+  /**
+   * Called to do some work on an expression of an event.
+   */
+  virtual void DoVisitEventExpression(const gd::Expression& expression,
+                                      const gd::ParameterMetadata& metadata) {
+  }
 
   bool shouldStopIteration;
 };

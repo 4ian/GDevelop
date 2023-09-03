@@ -44,8 +44,11 @@ class GD_CORE_API EventsVariableReplacer
  private:
   bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override;
-  // TODO: handle renaming of variables in events like "For each child
-  // variable".
+  bool DoVisitEventExpression(gd::Expression &expression,
+                              const gd::ParameterMetadata &metadata) override;
+
+  const gd::VariablesContainer *FindForcedVariablesContainerIfAny(
+      const gd::String &type, const gd::String &lastObjectName);
 
   const gd::Platform &platform;
   const gd::VariablesContainer &targetVariablesContainer;

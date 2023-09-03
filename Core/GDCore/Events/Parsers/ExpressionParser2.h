@@ -357,7 +357,6 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
-  // TODO: rename the type to IdentifierOrFunctionCallOr[Object]VariableOrEmptyNode?
   ObjectFunctionOrBehaviorFunctionOrVariable(
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,

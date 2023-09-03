@@ -1246,7 +1246,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\").");
+              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
     }
   }
 
@@ -1317,9 +1317,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
-      // TODO: can we do a better message?
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\").");
+              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
     }
   }
 
@@ -1904,8 +1903,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-            "You must enter a number or a text, wrapped inside double quotes "
-            "(example: \"Hello world\").");
+            "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
     }
     SECTION("no closing bracket") {
       auto node = parser.ParseExpression("myVariable[\"myChild\"");

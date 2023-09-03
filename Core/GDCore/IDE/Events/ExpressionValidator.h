@@ -281,8 +281,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         // The identifier is not a variable, so either the variable is not properly declared
         // or it's a text without quotes.
         RaiseTypeError(
-            _("You must enter a number or a text, wrapped inside double quotes "
-              "(example: \"Hello world\")."),
+            _("You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name."),
             node.location);
       }
     }

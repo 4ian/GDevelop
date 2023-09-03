@@ -18,8 +18,6 @@ namespace gd {
  * \brief A list of objects containers, useful for accessing objects in a
  * scoped way, along with methods to access them.
  *
- * TODO: add comments for each method, as there is a bit of logic in them.
- *
  * \see gd::Object
  * \see gd::ObjectsContainer
  * \see gd::Project
@@ -38,14 +36,27 @@ class GD_CORE_API ObjectsContainersList {
       const gd::ObjectsContainer& globalObjectsContainer,
       const gd::ObjectsContainer& objectsContainer);
 
+  /**
+   * \brief Check if the specified object or group exists.
+   */
   bool HasObjectOrGroupNamed(const gd::String& name) const;
 
+  /**
+   * \brief Check if the specified object or group has the specified variable in its
+   * declared variables.
+   */
   bool HasObjectOrGroupWithVariableNamed(const gd::String& objectOrGroupName,
                                   const gd::String& variableName) const;
 
+  /**
+   * \brief Check if the specified object or group has the specified variables container.
+   */
   bool HasVariablesContainer(const gd::String& objectOrGroupName,
                                 const gd::VariablesContainer& variablesContainer) const;
 
+  /**
+   * \brief Return the container of the variables for the specified object or group of objects.
+   */
   const gd::VariablesContainer* GetObjectOrGroupVariablesContainer(
       const gd::String& objectOrGroupName) const;
 
@@ -72,13 +83,17 @@ class GD_CORE_API ObjectsContainersList {
    */
   gd::String GetTypeOfBehavior(const gd::String& behaviorName) const;
 
+  /**
+   * \brief Return a list containing all objects refered to by the group.
+   * If an object name is passed, then only this object name is returned.
+   */
   std::vector<gd::String> ExpandObjectName(
       const gd::String& objectOrGroupName) const;
 
   /** Do not use - should be private but accessible to let Emscripten create a temporary. */
   ObjectsContainersList() {};
- private:
 
+ private:
   bool HasObjectNamed(const gd::String& name) const;
 
   void Add(const gd::ObjectsContainer& objectsContainer) {

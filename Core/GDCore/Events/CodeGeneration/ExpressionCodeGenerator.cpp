@@ -139,7 +139,7 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
       if (node.child) node.child->Visit(*this);
       objectNameToUseForVariableAccessor = "";
 
-      output += codeGenerator.GenerateVariableValueAs(type, ""); // TODO: Hacky as we pass an empty string because we don't have the full generation.
+      output += codeGenerator.GenerateVariableValueAs(type);
     } else if (codeGenerator.HasProjectAndLayout()) {
       // This could be adapted in the future if more scopes are supported.
       EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
@@ -155,7 +155,7 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
 
       output += codeGenerator.GenerateGetVariable(node.name, scope, context, "");
       if (node.child) node.child->Visit(*this);
-      output += codeGenerator.GenerateVariableValueAs(type, ""); // TODO: Hacky as we pass an empty string because we don't have the full generation.
+      output += codeGenerator.GenerateVariableValueAs(type);
     } else {
       // The identifier does not represents a variable (or a child variable), or not at least an existing
       // one, nor an object variable. It's invalid.
@@ -226,9 +226,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
     // The node represents a variable or an object.
     if (codeGenerator.GetObjectsContainersList().HasObjectOrGroupNamed(node.identifierName)) {
       // Generate the code to access the object variable.
-      gd::String variableAccessorCode = codeGenerator.GenerateGetVariable(
+      output += codeGenerator.GenerateGetVariable(
         node.childIdentifierName, gd::EventsCodeGenerator::OBJECT_VARIABLE, context, node.identifierName);
-      output += codeGenerator.GenerateVariableValueAs(type, variableAccessorCode);
+      output += codeGenerator.GenerateVariableValueAs(type);
     } else if (codeGenerator.HasProjectAndLayout()) {
       // This might be a "scene" or "global" variable (and if not, that's an error).
 
@@ -244,12 +244,11 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         return;
       }
 
-      gd::String variableAccessorCode = codeGenerator.GenerateGetVariable(
-        node.identifierName, scope, context, "");
+      output += codeGenerator.GenerateGetVariable(node.identifierName, scope, context, "");
       if (!node.childIdentifierName.empty()) {
-        variableAccessorCode += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
+        output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
-      output += codeGenerator.GenerateVariableValueAs(type, variableAccessorCode);
+      output += codeGenerator.GenerateVariableValueAs(type);
     } else {
       // The identifier does not represents a variable (or a child variable), or not at least an existing
       // one, nor an object variable. It's invalid.

@@ -571,8 +571,8 @@ class GD_CORE_API EventsCodeGenerator {
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
   };
 
-  virtual gd::String GenerateVariableValueAs(const gd::String& type, const gd::String& variableCode) {
-    return variableCode + (type == "string" ? ".getAsString()" : ".getAsNumber()");
+  virtual gd::String GenerateVariableValueAs(const gd::String& type) {
+    return type == "string" ? ".getAsString()" : ".getAsNumber()";
   }
 
   /**

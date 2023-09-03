@@ -28,7 +28,10 @@ type Props = {|
   inheritedVariablesContainer?: gdVariablesContainer,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 
-  // TODO: Deprecate/remove this?
+  /**
+   * Deprecated - will be removed once we don't want to display completions
+   * for variables not declared but still used in events.
+   */
   onComputeAllVariableNames: () => Array<string>,
   helpPagePath: ?string,
   id?: string,

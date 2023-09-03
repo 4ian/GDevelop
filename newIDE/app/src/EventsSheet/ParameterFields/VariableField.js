@@ -29,7 +29,7 @@ type Props = {
   onOpenDialog: ?() => void,
 };
 
-type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3;
+type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4;
 
 export type VariableFieldInterface = {|
   ...ParameterFieldInterface,
@@ -41,17 +41,23 @@ export const VariableNameQuickAnalyzeResults = {
   WRONG_QUOTE: 1,
   WRONG_SPACE: 2,
   WRONG_EXPRESSION: 3,
+  UNDECLARED_VARIABLE: 4,
 };
 
-// TODO As parsed node tree are cached, this may no longer be needed.
+// TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
+// (of type: "variable" or the legacy: "scenevar", "globalvar" or "objectvar"). This will
+// ensure we 100% validate and can autocomplete what is entered (and we can have also a simpler
+// selector that offers the variables in the scope).
 export const quicklyAnalyzeVariableName = (
-  name: string
+  name: string,
+  variablesContainer?: ?gdVariablesContainer
 ): VariableNameQuickAnalyzeResult => {
   for (let i = 0; i < name.length; ++i) {
     const character = name[i];
+
     if (character === '[') {
       // This probably starts an expression, so stop the analysis.
-      return VariableNameQuickAnalyzeResults.OK;
+      break;
     } else if (character === ' ') {
       return VariableNameQuickAnalyzeResults.WRONG_SPACE;
     } else if (character === '"') {
@@ -66,6 +72,17 @@ export const quicklyAnalyzeVariableName = (
       return VariableNameQuickAnalyzeResults.WRONG_EXPRESSION;
     }
   }
+
+  // Check at least the name of the root variable, it's the best we can do.
+  const dotPosition = name.indexOf('.');
+  const squareBracketPosition = name.indexOf('[');
+  const nameToCheck =
+    dotPosition !== -1 || squareBracketPosition !== -1
+      ? name.substring(0, Math.min(dotPosition, squareBracketPosition))
+      : name;
+
+  if (variablesContainer && !variablesContainer.has(nameToCheck))
+    return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
 
   return VariableNameQuickAnalyzeResults.OK;
 };
@@ -134,7 +151,10 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       ? parameterMetadata.getDescription()
       : undefined;
 
-    const quicklyAnalysisResult = quicklyAnalyzeVariableName(value);
+    const quicklyAnalysisResult = quicklyAnalyzeVariableName(
+      value,
+      variablesContainer
+    );
 
     const errorText =
       quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
@@ -154,6 +174,11 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           The variable name looks like you're building an expression or a
           formula. You can only use this for structure or arrays. For example:
           Score[3].
+        </Trans>
+      ) : quicklyAnalysisResult ===
+        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
+        <Trans>
+          This variable is not declared. Add it first to the list of variables.
         </Trans>
       ) : null;
 

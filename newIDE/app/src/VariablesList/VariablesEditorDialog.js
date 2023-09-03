@@ -57,7 +57,7 @@ const VariablesEditorDialog = ({
   } = useSerializableObjectCancelableEditor({
     serializableObject: variablesContainer,
     onCancel,
-    resetPersistentUuid: true,
+    resetThenClearPersistentUuid: true,
   });
   const removeReferencesToRemovedVariables = true;
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
@@ -75,7 +75,7 @@ const VariablesEditorDialog = ({
           project,
           getOriginalContentSerializedElement(),
           variablesContainer,
-          removeReferencesToRemovedVariables,
+          removeReferencesToRemovedVariables
         );
       }
 

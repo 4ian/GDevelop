@@ -71,7 +71,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainer={variablesContainer}
-          onComputeAllVariableNames={onComputeAllVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -89,7 +88,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
         />
-        {editorOpen && variablesContainer && (
+        {editorOpen && variablesContainer && project && (
           <VariablesEditorDialog
             project={project}
             title={<Trans>Object Variables</Trans>}

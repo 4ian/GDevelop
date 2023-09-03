@@ -39,7 +39,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainer={project ? project.getVariables() : null}
-          onComputeAllVariableNames={onComputeAllVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

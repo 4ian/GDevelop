@@ -84,7 +84,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
-    resetPersistentUuid: true,
+    resetThenClearPersistentUuid: true,
   });
   const removeReferencesToRemovedVariables = true;
 
@@ -104,9 +104,9 @@ const InnerDialog = (props: InnerDialogProps) => {
 
     gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
       props.project,
-      getOriginalContentSerializedElement().getChild("variables"),
+      getOriginalContentSerializedElement().getChild('variables'),
       props.object.getVariables(),
-      removeReferencesToRemovedVariables,
+      removeReferencesToRemovedVariables
     );
     props.object.clearPersistentUuid();
 

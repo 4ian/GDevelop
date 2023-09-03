@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import {
@@ -20,14 +21,11 @@ import SemiControlledAutoComplete, {
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import uniq from 'lodash/uniq';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 type Props = {
   ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
-  onComputeAllVariableNames: () => Array<string>,
   onOpenDialog: ?() => void,
 };
 
@@ -75,7 +73,6 @@ export const quicklyAnalyzeVariableName = (
 export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
-      onComputeAllVariableNames,
       variablesContainer,
       value,
       onChange,
@@ -88,7 +85,6 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
-    const preferences = React.useContext(PreferencesContext);
     const [
       autocompletionVariableNames,
       setAutocompletionVariableNames,
@@ -107,18 +103,14 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 null
           )
           .filter(Boolean);
-        const newAutocompletionVariableNames = preferences.values
-          .useUndefinedVariablesInAutocompletion
-          ? uniq([...definedVariableNames, ...onComputeAllVariableNames()])
-          : definedVariableNames;
         setAutocompletionVariableNames(
-          newAutocompletionVariableNames.map(name => ({
+          definedVariableNames.map(name => ({
             text: name,
             value: name,
           }))
         );
       },
-      [variablesContainer, onComputeAllVariableNames, preferences]
+      [variablesContainer]
     );
 
     const focus: FieldFocusFunction = options => {
@@ -182,7 +174,17 @@ export default React.forwardRef<Props, VariableFieldInterface>(
             onChange={onChange}
             onRequestClose={onRequestClose}
             onApply={onApply}
-            dataSource={autocompletionVariableNames}
+            dataSource={[
+              ...autocompletionVariableNames,
+              onOpenDialog
+                ? {
+                    translatableValue: t`Add or edit variables...`,
+                    text: '',
+                    value: '',
+                    onClick: onOpenDialog,
+                  }
+                : null,
+            ].filter(Boolean)}
             openOnFocus={!isInline}
             ref={field}
             id={id}

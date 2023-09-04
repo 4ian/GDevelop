@@ -8,6 +8,7 @@ import {
   noSubscription,
   silverSubscriptionWithExpiredRedemptionCode,
   silverSubscriptionWithRedemptionCode,
+  silverSubscriptionButCancelAtPeriodEnd,
   subscriptionForGoldUser,
   subscriptionForStartupUser,
   subscriptionForIndieUser,
@@ -101,6 +102,16 @@ export const WithEducationSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
       subscription={subscriptionForEducationPlan}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithSilverSubscriptionButCancelAtPeriodEnd = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={silverSubscriptionButCancelAtPeriodEnd}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />

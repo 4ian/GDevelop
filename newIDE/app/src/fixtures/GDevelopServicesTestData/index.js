@@ -255,6 +255,14 @@ export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {
   redemptionCodeValidUntil: Date.now() - 1000,
 };
 
+export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  cancelAtPeriodEnd: true,
+};
+
 export const noSubscription: Subscription = {
   planId: null,
   createdAt: 1515084011000,
@@ -531,6 +539,11 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
 export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
+  limits: limitsForSilverUser,
+};
+export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionButCancelAtPeriodEnd,
   limits: limitsForSilverUser,
 };
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {

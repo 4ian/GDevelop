@@ -181,6 +181,9 @@ import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 
+import optionalRequire from '../Utils/OptionalRequire';
+import path from 'path-browserify';
+const fileWatcher = optionalRequire('chokidar');
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -759,6 +762,43 @@ const MainFrame = (props: Props) => {
       updateToolbar();
     },
     [updateToolbar]
+  );
+
+  const informEditorsResourceExternallyChanged = React.useCallback(
+    () => {
+      state.editorTabs.editors.forEach(editor => {
+        console.log(editor);
+        if (
+          editor.editorRef &&
+          editor.editorRef.editor &&
+          editor.editorRef.editor.onResourceExternallyChanged
+        ) {
+          editor.editorRef.editor.onResourceExternallyChanged();
+        }
+      });
+    },
+    [state.editorTabs]
+  );
+
+  React.useEffect(
+    () => {
+      if (fileWatcher && currentFileMetadata && path) {
+        const folderPath = path.dirname(currentFileMetadata.fileIdentifier);
+        const gameFile = path.basename(currentFileMetadata.fileIdentifier);
+        console.log(gameFile);
+        const watcher = fileWatcher
+          .watch(folderPath, {
+            ignored: [`**/.DS_Store`, gameFile],
+          })
+          .on('change', event => {
+            console.log(event);
+            console.log('CHANGE');
+            informEditorsResourceExternallyChanged();
+          });
+        return () => watcher.unwatch(folderPath);
+      }
+    },
+    [currentFileMetadata, informEditorsResourceExternallyChanged]
   );
 
   const _languageDidChange = () => {

@@ -109,7 +109,7 @@
     "flow": "flow",
     "check-script-types": "cd scripts && tsc",
     "storybook": "storybook dev -p 9009",
-    "build-storybook": "storybook build -o storybook build",
+    "build-storybook": "storybook build -o build-storybook",
     "analyze-test-coverage": "react-scripts test --env=node --coverage",
     "analyze-flow-coverage": "flow-coverage-report",
     "analyze-source-map": "source-map-explorer build/static/js/*.js",

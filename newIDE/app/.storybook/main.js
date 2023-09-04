@@ -29,6 +29,10 @@ module.exports = {
           os: false,
         },
       },
+      // node: {
+      //   ...config.node,
+      //   global: true
+      // }
     };
   },
 };

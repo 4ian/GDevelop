@@ -34,7 +34,7 @@ const styles = {
     marginBottom: 0,
     flex: 1,
     minHeight: 0,
-    width: '100%'
+    width: '100%',
   },
   mobileContainer: {
     display: 'flex',

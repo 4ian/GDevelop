@@ -34,7 +34,7 @@ export const styles = {
     marginBottom: 'env(safe-area-inset-bottom)',
   },
   button: { padding: 6 },
-  buttonLabel: { padding: '0 6px' }
+  buttonLabel: { padding: '0 6px' },
 };
 
 type Props = {|
@@ -126,9 +126,7 @@ const HomePageMenuBar = ({
                 style={styles.button}
                 onClick={onClick}
               >
-                <span style={styles.buttonLabel}>
-                  {getIcon('secondary')}
-                </span>
+                <span style={styles.buttonLabel}>{getIcon('secondary')}</span>
               </IconButton>
             ))}
           </ToolbarGroup>

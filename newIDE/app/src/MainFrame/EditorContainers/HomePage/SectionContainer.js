@@ -11,12 +11,12 @@ import Paper from '../../../UI/Paper';
 export const SECTION_PADDING = 30;
 
 const styles = {
-  mobileScrollContainer: {
+  mobileContainer: {
     paddingTop: 10,
     paddingLeft: 5,
     paddingRight: 5,
   },
-  desktopScrollContainer: {
+  desktopContainer: {
     paddingTop: SECTION_PADDING,
     paddingLeft: SECTION_PADDING,
     paddingRight: SECTION_PADDING,
@@ -32,10 +32,15 @@ const styles = {
     flexDirection: 'column',
     paddingBottom: SECTION_PADDING,
   },
-  scrollContainer: {
+  container: {
     flex: 1,
+  },
+  scrollContainer: {
     overflowY: 'scroll', // Force a scrollbar to prevent layout shifts.
     scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
+  },
+  noScrollContainer: {
+    overflowY: 'hidden',
   },
 };
 
@@ -47,6 +52,7 @@ type Props = {|
   backAction?: () => void,
   flexBody?: boolean,
   renderFooter?: () => React.Node,
+  noScroll?: boolean,
 |};
 
 const SectionContainer = ({
@@ -57,23 +63,28 @@ const SectionContainer = ({
   backAction,
   flexBody,
   renderFooter,
+  noScroll,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+  const containerStyle: {|
+    paddingTop: number,
+    paddingLeft: number,
+    paddingRight: number,
+  |} = isMobileScreen ? styles.mobileContainer : styles.desktopContainer;
+  const scrollStyle: {| overflowY: string, scrollbarWidth?: string |} = noScroll
+    ? styles.noScrollContainer
+    : styles.scrollContainer;
+  const paperStyle = {
+    ...styles.container,
+    display: flexBody ? 'flex' : 'block',
+    ...containerStyle,
+    ...scrollStyle,
+  };
 
   return (
     <Column useFullHeight noMargin expand>
-      <Paper
-        style={{
-          ...styles.scrollContainer,
-          display: flexBody ? 'flex' : 'block',
-          ...(isMobileScreen
-            ? styles.mobileScrollContainer
-            : styles.desktopScrollContainer),
-        }}
-        square
-        background="dark"
-      >
+      <Paper style={paperStyle} square background="dark">
         <Column noOverflowParent expand>
           {title && (
             <SectionRow>

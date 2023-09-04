@@ -22,6 +22,8 @@ export type Subscription = {|
   paypalSubscriptionId?: string,
   paypalPayerId?: string,
 
+  cancelAtPeriodEnd?: boolean,
+
   purchaselyPlan?: string,
 
   redemptionCode?: string | null,
@@ -335,6 +337,13 @@ export const canSeamlesslyChangeSubscription = (
     !!subscription.stripeSubscriptionId &&
     !planId.startsWith('gdevelop_education')
   );
+};
+
+export const canCancelAtEndOfPeriod = (subscription: Subscription) => {
+  // If the subscription is on Stripe, it can be set as cancelled and only removed at the
+  // end of the period alreayd paid.
+  // Otherwise (Paypal), it will be cancelled immediately.
+  return !!subscription.stripeSubscriptionId;
 };
 
 export const hasMobileAppStoreSubscriptionPlan = (

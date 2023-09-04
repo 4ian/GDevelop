@@ -10,6 +10,7 @@ import AuthenticatedUserContext, {
 import {
   fakeAuthenticatedUserLoggingIn,
   fakeSilverAuthenticatedUser,
+  fakeSilverButCancelAtPeriodEndAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
   fakeNotAuthenticatedUser,
   fakeAuthenticatedUserWithValidSilverRedemptionCode,
@@ -63,6 +64,12 @@ export const WithNoSubscription = () => (
 
 export const WithSilverSubscription = () => (
   <SubscriptionDialogWrapper authenticatedUser={fakeSilverAuthenticatedUser} />
+);
+
+export const WithSilverButCancelAtPeriodEndSubscription = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeSilverButCancelAtPeriodEndAuthenticatedUser}
+  />
 );
 
 export const WithGoldSubscription = () => (

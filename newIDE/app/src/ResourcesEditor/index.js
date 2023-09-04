@@ -207,7 +207,6 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   onResourceExternallyChanged = () => {
     if (this._propertiesEditor) {
-      console.log("SALUT")
       this._propertiesEditor.forceUpdate();
     }
   };

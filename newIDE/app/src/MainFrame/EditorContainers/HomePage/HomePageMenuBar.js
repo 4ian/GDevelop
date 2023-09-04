@@ -11,6 +11,7 @@ import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import Paper from '../../../UI/Paper';
 import { homePageMenuTabs, type HomeTab } from './HomePageMenu';
+import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
 
 export const styles = {
   desktopMenu: {
@@ -26,9 +27,14 @@ export const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  mobileContainer: {
+    width: '100%',
+  },
   bottomButtonsContainer: {
     marginBottom: 'env(safe-area-inset-bottom)',
   },
+  button: { padding: 6 },
+  buttonLabel: { padding: '0 6px' }
 };
 
 type Props = {|
@@ -49,7 +55,7 @@ const HomePageMenuBar = ({
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
   const isMobileOrSmallScreen = isMobile || windowWidth === 'medium';
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
+  const theme = React.useContext(GDevelopThemeContext);
 
   const buttons: {
     label: React.Node,
@@ -71,11 +77,71 @@ const HomePageMenuBar = ({
     },
   ];
 
+  if (isMobile) {
+    return (
+      <Paper
+        background="medium"
+        square
+        style={{
+          ...styles.mobileContainer,
+          borderTop: `1px solid ${theme.home.separator.color}`,
+        }}
+      >
+        <Toolbar>
+          <ToolbarGroup>
+            {homePageMenuTabs.map(({ label, tab, getIcon, id }) => {
+              const isActive = activeTab === tab;
+              return (
+                <IconButton
+                  color="default"
+                  key={id}
+                  disableRipple
+                  disableFocusRipple
+                  style={styles.button}
+                  onClick={() => {
+                    setActiveTab(tab);
+                  }}
+                  selected={isActive}
+                >
+                  <span style={styles.buttonLabel}>
+                    {getIcon(isActive ? 'inherit' : 'secondary')}
+                  </span>
+                </IconButton>
+              );
+            })}
+            <span
+              style={{
+                width: 1,
+                backgroundColor: theme.home.separator.color,
+                height: '70%',
+                margin: '0 3px',
+              }}
+            />
+            {buttons.map(({ label, onClick, getIcon, id }) => (
+              <IconButton
+                color="default"
+                key={id}
+                disableRipple
+                disableFocusRipple
+                style={styles.button}
+                onClick={onClick}
+              >
+                <span style={styles.buttonLabel}>
+                  {getIcon('secondary')}
+                </span>
+              </IconButton>
+            ))}
+          </ToolbarGroup>
+        </Toolbar>
+      </Paper>
+    );
+  }
+
   return (
     <Paper
       style={{
         ...(isMobileOrSmallScreen ? styles.mobileMenu : styles.desktopMenu),
-        borderRight: `1px solid ${GDevelopTheme.home.separator.color}`,
+        borderRight: `1px solid ${theme.home.separator.color}`,
       }}
       square
       background="dark"

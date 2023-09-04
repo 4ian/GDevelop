@@ -2,37 +2,22 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../../UI/Grid';
-import { Drawer } from '@material-ui/core';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Drawer from '@material-ui/core/Drawer';
 import IconButton from '../../../UI/IconButton';
-import DoubleChevronArrowRight from '../../../UI/CustomSvgIcons/DoubleChevronArrowRight';
 import VerticalTabButton from '../../../UI/VerticalTabButton';
 import DoubleChevronArrowLeft from '../../../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import PickAxeIcon from '../../../UI/CustomSvgIcons/PickAxe';
 import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
 import WebIcon from '../../../UI/CustomSvgIcons/Web';
-import Sun from '../../../UI/CustomSvgIcons/Sun';
-import Store from '../../../UI/CustomSvgIcons/Store';
+import SunIcon from '../../../UI/CustomSvgIcons/Sun';
+import StoreIcon from '../../../UI/CustomSvgIcons/Store';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
-import Paper from '../../../UI/Paper';
+import HomePageMenuBar from './HomePageMenuBar';
 
 export const styles = {
-  desktopMenu: {
-    paddingTop: 40,
-    paddingBottom: 10,
-    minWidth: 230,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  mobileMenu: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    display: 'flex',
-    flexDirection: 'column',
-  },
   drawerContent: {
     height: '100%',
     width: 250,
@@ -45,7 +30,7 @@ export const styles = {
     flex: 1,
     marginTop: 'env(safe-area-inset-top)',
   },
-  bottomButtonsContainer: {
+  drawerBottomButtonsContainer: {
     marginBottom: 'env(safe-area-inset-bottom)',
   },
 };
@@ -58,7 +43,7 @@ export type HomeTab =
   | 'community'
   | 'shop';
 
-const tabs: {
+export const homePageMenuTabs: {
   label: React.Node,
   tab: HomeTab,
   getIcon: (color: string) => React.Node,
@@ -68,7 +53,7 @@ const tabs: {
     label: <Trans>Get Started</Trans>,
     tab: 'get-started',
     id: 'home-get-started-tab',
-    getIcon: color => <Sun fontSize="small" color={color} />,
+    getIcon: color => <SunIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Build</Trans>,
@@ -80,7 +65,7 @@ const tabs: {
     label: <Trans>Shop</Trans>,
     tab: 'shop',
     id: 'home-shop-tab',
-    getIcon: color => <Store fontSize="small" color={color} />,
+    getIcon: color => <StoreIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Learn</Trans>,
@@ -114,9 +99,6 @@ export const HomePageMenu = ({
   onOpenPreferences,
   onOpenAbout,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileOrSmallScreen =
-    windowWidth === 'small' || windowWidth === 'medium';
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   const [
     isHomePageMenuDrawerOpen,
@@ -145,52 +127,13 @@ export const HomePageMenu = ({
 
   return (
     <>
-      <Paper
-        style={{
-          ...(isMobileOrSmallScreen ? styles.mobileMenu : styles.desktopMenu),
-          borderRight: `1px solid ${GDevelopTheme.home.separator.color}`,
-        }}
-        square
-        background="dark"
-      >
-        <Column expand>
-          {isMobileOrSmallScreen && (
-            <IconButton
-              onClick={() => setIsHomePageMenuDrawerOpen(true)}
-              size="small"
-            >
-              <DoubleChevronArrowRight />
-            </IconButton>
-          )}
-          {tabs.map(({ label, tab, getIcon, id }) => (
-            <VerticalTabButton
-              key={id}
-              label={label}
-              onClick={() => setActiveTab(tab)}
-              getIcon={getIcon}
-              isActive={activeTab === tab}
-              hideLabel={isMobileOrSmallScreen}
-              id={id}
-            />
-          ))}
-        </Column>
-
-        <div style={styles.bottomButtonsContainer}>
-          <Column>
-            {buttons.map(({ label, getIcon, onClick, id }) => (
-              <VerticalTabButton
-                key={id}
-                label={label}
-                onClick={onClick}
-                getIcon={getIcon}
-                isActive={false}
-                hideLabel={isMobileOrSmallScreen}
-                id={id}
-              />
-            ))}
-          </Column>
-        </div>
-      </Paper>
+      <HomePageMenuBar
+        activeTab={activeTab}
+        onOpenAbout={onOpenAbout}
+        onOpenHomePageMenuDrawer={() => setIsHomePageMenuDrawerOpen(true)}
+        onOpenPreferences={onOpenPreferences}
+        setActiveTab={setActiveTab}
+      />
       <Drawer
         open={isHomePageMenuDrawerOpen}
         PaperProps={{
@@ -221,7 +164,7 @@ export const HomePageMenu = ({
                     <DoubleChevronArrowLeft />
                   </IconButton>
                 </Line>
-                {tabs.map(({ label, tab, getIcon }, index) => (
+                {homePageMenuTabs.map(({ label, tab, getIcon }, index) => (
                   <VerticalTabButton
                     key={index}
                     label={label}
@@ -235,7 +178,7 @@ export const HomePageMenu = ({
                 ))}
               </Column>
             </div>
-            <div style={styles.bottomButtonsContainer}>
+            <div style={styles.drawerBottomButtonsContainer}>
               <Column noMargin>
                 {buttons.map(({ label, getIcon, onClick, id }) => (
                   <VerticalTabButton

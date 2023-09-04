@@ -45,6 +45,26 @@ const styles = {
   },
 };
 
+const licensingItems = [
+  <Trans>Personal projects</Trans>,
+  <Trans>Professional projects</Trans>,
+  <Trans>Asset modification</Trans>,
+  <Trans>Publish any number of games</Trans>,
+];
+
+const whatYouGetItems = [
+  <Trans>Game built by a GDevelop expert</Trans>,
+  <Trans>Ready to publish on mobile, web or desktop</Trans>,
+  <Trans>Leaderboard already integrated</Trans>,
+  <Trans>Easy to modify</Trans>,
+  <Trans>Features and extensions reviewed by GDevelop</Trans>,
+];
+
+const howToUseItems = [
+  <Trans>Directly accessible from your account once purchased</Trans>,
+  <Trans>Modify and publish it like a traditional GDevelop game</Trans>,
+];
+
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   onOpenPurchaseDialog: () => void,
@@ -289,24 +309,18 @@ const PrivateGameTemplateInformationPage = ({
                             <Text size="sub-title">
                               <Trans>Licensing</Trans>
                             </Text>
-                            <LineStackLayout noMargin alignItems="center">
-                              <Mark fontSize="small" />
-                              <Text displayInlineAsSpan noMargin>
-                                <Trans>Personal projects</Trans>
-                              </Text>
-                            </LineStackLayout>
-                            <LineStackLayout noMargin alignItems="center">
-                              <Mark fontSize="small" />
-                              <Text displayInlineAsSpan noMargin>
-                                <Trans>Professional projects</Trans>
-                              </Text>
-                            </LineStackLayout>
-                            <LineStackLayout noMargin alignItems="center">
-                              <Mark fontSize="small" />
-                              <Text displayInlineAsSpan noMargin>
-                                <Trans>Asset modification</Trans>
-                              </Text>
-                            </LineStackLayout>
+                            {licensingItems.map((item, index) => (
+                              <LineStackLayout
+                                noMargin
+                                alignItems="center"
+                                key={index}
+                              >
+                                <Mark fontSize="small" />
+                                <Text displayInlineAsSpan noMargin>
+                                  {item}
+                                </Text>
+                              </LineStackLayout>
+                            ))}
                             <LineStackLayout noMargin alignItems="center">
                               <Cross
                                 fontSize="small"
@@ -334,6 +348,36 @@ const PrivateGameTemplateInformationPage = ({
                                 </Link>
                               </Text>
                             </Line>
+                            <Text size="sub-title">
+                              <Trans>What you get</Trans>
+                            </Text>
+                            {whatYouGetItems.map((item, index) => (
+                              <LineStackLayout
+                                noMargin
+                                alignItems="center"
+                                key={index}
+                              >
+                                <Mark fontSize="small" />
+                                <Text displayInlineAsSpan noMargin>
+                                  {item}
+                                </Text>
+                              </LineStackLayout>
+                            ))}
+                            <Text size="sub-title">
+                              <Trans>How to use</Trans>
+                            </Text>
+                            {howToUseItems.map((item, index) => (
+                              <LineStackLayout
+                                noMargin
+                                alignItems="center"
+                                key={index}
+                              >
+                                <Mark fontSize="small" />
+                                <Text displayInlineAsSpan noMargin>
+                                  {item}
+                                </Text>
+                              </LineStackLayout>
+                            ))}
                           </Column>
                         </ResponsiveLineStackLayout>
                       </Column>

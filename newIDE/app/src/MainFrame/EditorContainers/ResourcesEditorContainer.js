@@ -42,7 +42,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   render() {
-    const { project, extraEditorProps } = this.props;
+    const { project } = this.props;
     if (!project) return null;
 
     return (
@@ -52,7 +52,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
         onRenameResource={this.props.onRenameResource}
         resourceManagementProps={this.props.resourceManagementProps}
         ref={editor => (this.editor = editor)}
-        fileMetadata={extraEditorProps ? extraEditorProps.fileMetadata : null}
+        fileMetadata={this.props.fileMetadata}
         project={project}
       />
     );

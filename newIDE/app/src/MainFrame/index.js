@@ -3047,13 +3047,6 @@ const MainFrame = (props: Props) => {
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
 
-          const extraEditorProps = editorTab.withFileMetadata
-            ? {
-                ...(editorTab.extraEditorProps || undefined),
-                fileMetadata: currentFileMetadata,
-              }
-            : editorTab.extraEditorProps;
-
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
@@ -3063,8 +3056,9 @@ const MainFrame = (props: Props) => {
                 >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
-                    extraEditorProps,
+                    extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
+                    fileMetadata: currentFileMetadata,
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),

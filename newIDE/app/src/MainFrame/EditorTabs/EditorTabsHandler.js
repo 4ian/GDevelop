@@ -42,8 +42,6 @@ export type EditorTab = {|
   key: string,
   /** Extra props to pass to editors. */
   extraEditorProps: ?EditorContainerExtraProps,
-  /** To indicate if the editor needs the most up-to-date fileMetadata in its extra props. */
-  withFileMetadata?: boolean,
   /** If set to false, the tab can't be closed. */
   closable: boolean,
 |};
@@ -155,7 +153,6 @@ export const openEditorTab = (
     extraEditorProps,
     editorRef: null,
     closable: typeof closable === 'undefined' ? true : !!closable,
-    withFileMetadata: key === 'resources',
   };
 
   return {

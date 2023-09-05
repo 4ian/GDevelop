@@ -681,7 +681,7 @@ namespace gdjs {
     /**
      * Load all assets, displaying progress in renderer.
      */
-    loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
+    loadAllAssets(callback: () => void, progressCallback?: (progress: float) => void) {
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
         this._imageManager,

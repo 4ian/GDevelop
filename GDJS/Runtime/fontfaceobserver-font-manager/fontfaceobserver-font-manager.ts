@@ -184,7 +184,10 @@ namespace gdjs {
      * @param onProgress Callback called each time a new file is loaded.
      * @param onComplete Callback called when loading is done.
      */
-    loadFonts(onProgress, onComplete) {
+    loadFonts(
+      onProgress: (loadingCount: integer, totalCount: integer) => void,
+      onComplete: (totalCount: integer) => void
+    ) {
       const resources = this._resources;
 
       // Construct the list of files to be loaded.

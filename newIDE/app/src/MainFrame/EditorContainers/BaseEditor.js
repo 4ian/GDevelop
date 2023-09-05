@@ -19,15 +19,13 @@ export type EditorContainerExtraProps = {|
   // Homepage
   storageProviders?: Array<StorageProvider>,
   initialTab?: ?string,
-
-  // Resources editor
-  fileMetadata?: ?FileMetadata,
 |};
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
   projectItemName: ?string,
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   setToolbar: (?React.Node) => void,
 
   // Some optional extra props to pass to the rendered editor

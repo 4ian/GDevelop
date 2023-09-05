@@ -616,9 +616,7 @@ const MainFrame = (props: Props) => {
         kind === 'start page' ? <HomeIcon titleAccess="Home" /> : undefined;
       const closable = kind !== 'start page';
       const extraEditorProps =
-        kind === 'resources'
-          ? { fileMetadata: currentFileMetadata }
-          : kind === 'start page'
+        kind === 'start page'
           ? { storageProviders: props.storageProviders }
           : undefined;
       return {
@@ -633,7 +631,7 @@ const MainFrame = (props: Props) => {
         dontFocusTab,
       };
     },
-    [i18n, currentFileMetadata, props.storageProviders]
+    [i18n, props.storageProviders]
   );
 
   const setEditorTabs = React.useCallback(
@@ -3048,6 +3046,7 @@ const MainFrame = (props: Props) => {
       >
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
@@ -3059,6 +3058,7 @@ const MainFrame = (props: Props) => {
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
+                    fileMetadata: currentFileMetadata,
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),

@@ -477,7 +477,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const skeletonLineHeight = getProjectLineHeight(windowWidth);
 
     // Show a premium game template every 3 examples.
-    const allItems = React.useMemo(
+    const examplesAndTemplatesToDisplay = React.useMemo(
       () => {
         const allItems = [];
         const privateGameTemplateItems = [
@@ -537,7 +537,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           }
         }
 
-        return allItems;
+        return allItems.slice(0, 12); // Only show 12 items.
       },
       [
         authenticatedUser.receivedGameTemplates,
@@ -577,9 +577,10 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               displayItemTitles={false}
               browseAllLabel={<Trans>Browse all templates</Trans>}
               onBrowseAllClick={onShowAllExamples}
-              items={allItems}
+              items={examplesAndTemplatesToDisplay}
               browseAllIcon={<ChevronArrowRight fontSize="small" />}
               roundedImages
+              hideArrows
             />
           </SectionRow>
           <SectionRow>

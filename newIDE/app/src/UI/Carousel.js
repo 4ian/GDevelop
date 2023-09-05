@@ -52,6 +52,7 @@ type Props<ThumbnailType> = {|
   displayItemTitles?: boolean,
   error?: React.Node,
   roundedImages?: boolean,
+  hideArrows?: boolean,
 |};
 
 const referenceSizesByWindowSize = {
@@ -191,6 +192,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
   error,
   displayItemTitles = true,
   roundedImages = false,
+  hideArrows = false,
 }: Props<ThumbnailType>) => {
   const [
     shouldDisplayLeftArrow,
@@ -199,7 +201,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
   const [
     shouldDisplayRightArrow,
     setShouldDisplayRightArrow,
-  ] = React.useState<boolean>(true);
+  ] = React.useState<boolean>(!hideArrows);
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
   const classesForGridList = useStylesForGridList();
@@ -379,6 +381,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
     (): void => {
       const scrollViewElement = scrollView.current;
       if (!scrollViewElement) return;
+      if (!!hideArrows) return;
 
       const isScrollAtStart = scrollViewElement.scrollLeft === 0;
       const isScrollAtEnd =
@@ -393,7 +396,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
       if (shouldToggleRightArrowVisibility)
         setShouldDisplayRightArrow(!shouldDisplayRightArrow);
     },
-    [shouldDisplayLeftArrow, shouldDisplayRightArrow]
+    [shouldDisplayLeftArrow, shouldDisplayRightArrow, hideArrows]
   );
 
   const handleScrollEnd = React.useCallback(
@@ -499,7 +502,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
         </div>
         <div
           style={{
-            width: `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
+            width: !!hideArrows
+              ? '100%'
+              : `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
           }}
         >
           {error ? (

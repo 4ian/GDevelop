@@ -206,7 +206,6 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   onResourceExternallyChanged = () => {
-    this.resourcesLoader.burstAllUrlsCache()
     if (this._propertiesEditor) {
       this._propertiesEditor.forceUpdate();
     }

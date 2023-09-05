@@ -766,8 +766,8 @@ const MainFrame = (props: Props) => {
 
   const informEditorsResourceExternallyChanged = React.useCallback(
     () => {
+      ResourcesLoader.burstAllUrlsCache()
       state.editorTabs.editors.forEach(editor => {
-        console.log(editor);
         if (
           editor.editorRef &&
           editor.editorRef.editor &&
@@ -785,7 +785,6 @@ const MainFrame = (props: Props) => {
       if (fileWatcher && currentFileMetadata && path) {
         const folderPath = path.dirname(currentFileMetadata.fileIdentifier);
         const gameFile = path.basename(currentFileMetadata.fileIdentifier);
-        console.log(gameFile);
         const watcher = fileWatcher
           .watch(folderPath, {
             ignored: [`**/.DS_Store`, gameFile],

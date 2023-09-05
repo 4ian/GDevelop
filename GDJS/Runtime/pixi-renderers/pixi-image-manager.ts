@@ -36,25 +36,19 @@ namespace gdjs {
   };
 
   const findResourceWithNameAndKind = (
-    resources: ResourceData[],
+    resources: Map<string, ResourceData>,
     resourceName: string,
     kind: ResourceKind
   ): ResourceData | null => {
-    for (let i = 0, len = resources.length; i < len; ++i) {
-      const res = resources[i];
-      if (res.name === resourceName && res.kind === kind) {
-        return res;
-      }
-    }
-
-    return null;
+    const resource = resources.get(resourceName);
+    return resource && resource.kind === kind ? resource : null;
   };
 
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
    */
   export class PixiImageManager {
-    _resources: ResourceData[];
+    _resources: Map<string, ResourceData>;
 
     /**
      * The invalid texture is a 8x8 PNG file filled with magenta (#ff00ff), to be
@@ -80,10 +74,11 @@ namespace gdjs {
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
-      resources: ResourceData[],
+      resourceDataArray: ResourceData[],
       resourcesLoader: RuntimeGameResourcesLoader
     ) {
-      this._resources = resources;
+      this._resources = new Map<string, ResourceData>();
+      this.setResources(resourceDataArray);
       this._resourcesLoader = resourcesLoader;
       this._invalidTexture = PIXI.Texture.from(
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQoU2P8z/D/PwMewDgyFAAApMMX8Zi0uXAAAAAASUVORK5CYIIA'
@@ -98,8 +93,13 @@ namespace gdjs {
      *
      * @param resources The resources data of the game.
      */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
+    setResources(resourceDataArray: ResourceData[]): void {
+      this._resources.clear();
+      for (const resourceData of resourceDataArray) {
+        if (resourceData.kind === 'image') {
+          this._resources.set(resourceData.name, resourceData);
+        }
+      }
     }
 
     /**
@@ -308,18 +308,16 @@ namespace gdjs {
      * Load the specified resources, so that textures are loaded and can then be
      * used by calling `getPIXITexture`.
      * @param onProgress Callback called each time a new file is loaded.
-     * @param onComplete Callback called when loading is done.
      */
-    loadTextures(onProgress, onComplete) {
-      const resources = this._resources;
-
+    loadTextures(
+      onProgress: (loadingCount: integer, totalCount: integer) => void
+    ): Promise<integer> {
       // Construct the list of files to be loaded.
       // For one loaded file, it can have one or more resources
       // that use it.
       const resourceFiles: Record<string, ResourceData[]> = {};
-      for (let i = 0, len = resources.length; i < len; ++i) {
-        const res = resources[i];
-        if (res.file && res.kind === 'image') {
+      for (const res of this._resources.values()) {
+        if (res.file) {
           if (this._loadedTextures.containsKey(res.name)) {
             // This resource is already loaded.
             continue;
@@ -332,7 +330,7 @@ namespace gdjs {
       const totalCount = Object.keys(resourceFiles).length;
       if (totalCount === 0) {
         // Nothing to load.
-        return onComplete(totalCount);
+        return Promise.resolve(0);
       }
 
       const loader = PIXI.Loader.shared;
@@ -353,30 +351,32 @@ namespace gdjs {
           });
         }
       }
-      loader.load((loader, loadedPixiResources) => {
-        loader.onProgress.detach(progressCallbackId);
+      return new Promise((resolve, reject) => {
+        loader.load((loader, loadedPixiResources) => {
+          loader.onProgress.detach(progressCallbackId);
 
-        // Store the loaded textures so that they are ready to use.
-        for (const file in loadedPixiResources) {
-          if (loadedPixiResources.hasOwnProperty(file)) {
-            if (!resourceFiles.hasOwnProperty(file)) {
-              continue;
-            }
-
-            resourceFiles[file].forEach((resource) => {
-              const loadedTexture = loadedPixiResources[file].texture;
-              if (!loadedTexture) {
-                const error = loadedPixiResources[file].error;
-                logFileLoadingError(file, error);
-                return;
+          // Store the loaded textures so that they are ready to use.
+          for (const file in loadedPixiResources) {
+            if (loadedPixiResources.hasOwnProperty(file)) {
+              if (!resourceFiles.hasOwnProperty(file)) {
+                continue;
               }
 
-              this._loadedTextures.put(resource.name, loadedTexture);
-              applyTextureSettings(loadedTexture, resource);
-            });
+              resourceFiles[file].forEach((resource) => {
+                const loadedTexture = loadedPixiResources[file].texture;
+                if (!loadedTexture) {
+                  const error = loadedPixiResources[file].error;
+                  logFileLoadingError(file, error);
+                  return;
+                }
+
+                this._loadedTextures.put(resource.name, loadedTexture);
+                applyTextureSettings(loadedTexture, resource);
+              });
+            }
           }
-        }
-        onComplete(totalCount);
+          resolve(totalCount);
+        });
       });
     }
   }

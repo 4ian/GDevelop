@@ -100,7 +100,7 @@ namespace gdjs {
 
       let loadedCount = 0;
       await Promise.all(
-        gdjs.mapIterable(this._resources.values(), async (resource) => {
+        [...this._resources.values()].map(async (resource) => {
           const url = this._resourcesLoader.getFullUrl(resource.file);
           loader.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
             url
@@ -124,34 +124,6 @@ namespace gdjs {
         })
       );
       return loadedCount;
-    }
-
-    getAllResourcesPromises(): Iterable<Promise<void>> {
-      const loader = this._loader;
-      if (this._resources.size === 0 || !loader) {
-        return gdjs.emptyIterable;
-      }
-
-      return gdjs.mapIterable(this._resources.values(), async (resource) => {
-        const url = this._resourcesLoader.getFullUrl(resource.file);
-        loader.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
-          url
-        );
-        try {
-          const gltf: THREE_ADDONS.GLTF = await loader.loadAsync(
-            url,
-            (event) => {}
-          );
-          this._loadedThreeModels.set(resource.name, gltf);
-        } catch (error) {
-          logger.error(
-            "Can't fetch the 3D model file " +
-              resource.file +
-              ', error: ' +
-              error
-          );
-        }
-      });
     }
 
     /**

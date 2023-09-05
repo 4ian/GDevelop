@@ -308,7 +308,6 @@ namespace gdjs {
      * Load the specified resources, so that textures are loaded and can then be
      * used by calling `getPIXITexture`.
      * @param onProgress Callback called each time a new file is loaded.
-     * @param onComplete Callback called when loading is done.
      */
     loadTextures(
       onProgress: (loadingCount: integer, totalCount: integer) => void

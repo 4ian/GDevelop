@@ -598,30 +598,6 @@ namespace gdjs {
   > => {
     return Promise.all(asynchronouslyLoadingLibraryPromises);
   };
-
-  export function* mapIterable<S, T>(
-    iterable: Iterable<S>,
-    mapping: (source: S) => T
-  ): Iterable<T> {
-    for (const element of iterable) {
-      yield mapping(element);
-    }
-  }
-
-  export function* filterIterable<T>(
-    iterable: Iterable<T>,
-    predicate: (value: T) => unknown,
-    thisArg?: any
-  ): Iterable<T> {
-    for (const element of iterable) {
-      if (predicate(element)) {
-        yield element;
-      }
-    }
-  }
-
-  function* createEmptyIterable<T>(): Iterable<T> {}
-  export const emptyIterable = createEmptyIterable<any>();
 }
 
 // Make sure console.warn and console.error are available.

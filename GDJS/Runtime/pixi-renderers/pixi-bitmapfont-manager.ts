@@ -262,16 +262,13 @@ namespace gdjs {
     async loadBitmapFontData(
       onProgress: (count: integer, total: integer) => void
     ): Promise<integer> {
-      const preloadedResources = [
-        ...gdjs.filterIterable(
-          this._resources.values(),
-          (resource) => !resource.disablePreload
-        ),
-      ];
+      const preloadedResources = [...this._resources.values()].filter(
+        (resource) => !resource.disablePreload
+      );
 
       let loadedCount = 0;
       await Promise.all(
-        gdjs.mapIterable(preloadedResources, async (bitmapFontResource) => {
+        preloadedResources.map(async (bitmapFontResource) => {
           try {
             const response = await fetch(
               this._resourcesLoader.getFullUrl(bitmapFontResource.file),

@@ -6,9 +6,7 @@ import * as React from 'react';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
-import ResourcePreview, {
-  type ResourcePreviewInterface,
-} from '../../ResourcesList/ResourcePreview';
+import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
@@ -65,19 +63,7 @@ const ResourcePropertiesEditor = React.forwardRef<
     },
     ref
   ) => {
-    const _forceUpdate = useForceUpdate();
-    const resourcePreviewRef = React.useRef<?ResourcePreviewInterface>(null);
-
-    const forceUpdate = React.useCallback(
-      () => {
-        _forceUpdate();
-        if (resourcePreviewRef.current) {
-          resourcePreviewRef.current.forceUpdate();
-        }
-      },
-      [_forceUpdate]
-    );
-
+    const forceUpdate = useForceUpdate();
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
     const chooseResourcePath = React.useCallback(
@@ -185,7 +171,6 @@ const ResourcePropertiesEditor = React.forwardRef<
 
       return (
         <ResourcePreview
-          ref={resourcePreviewRef}
           resourceName={resources[0].getName()}
           resourcesLoader={resourcesLoader}
           project={project}

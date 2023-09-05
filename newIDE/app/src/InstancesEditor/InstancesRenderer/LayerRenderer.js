@@ -161,10 +161,10 @@ export default class LayerRenderer {
       const isVisible = this._isInstanceVisible(instance);
       if (pixiObject) {
         pixiObject.visible = isVisible;
-        pixiObject.interactive = !(
-          this.layer.isLocked() ||
-          (instance.isLocked() && instance.isSealed())
-        );
+        pixiObject.eventMode =
+          this.layer.isLocked() || (instance.isLocked() && instance.isSealed())
+            ? 'auto'
+            : 'static';
       }
       if (isVisible) renderedInstance.update();
 
@@ -360,7 +360,7 @@ export default class LayerRenderer {
         this._threeGroup
       );
 
-      renderedInstance._pixiObject.interactive = true;
+      renderedInstance._pixiObject.eventMode = 'static';
       gesture.panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
       renderedInstance._pixiObject.on('click', event => {

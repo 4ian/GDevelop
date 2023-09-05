@@ -141,7 +141,7 @@ export default class SelectedInstances {
     onEnd: () => void,
     cursor: string
   ) {
-    objectButton.interactive = true;
+    objectButton.eventMode = 'static';
     objectButton.buttonMode = true;
     objectButton.cursor = cursor;
     gesture.panable(objectButton);

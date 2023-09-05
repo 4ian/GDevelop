@@ -36,7 +36,7 @@ export const makeDoubleClickable = (pixiDisplayObject: PIXI.DisplayObject) => {
     lastClickGlobalY = y;
   };
 
-  pixiDisplayObject.interactive = true;
+  pixiDisplayObject.eventMode = 'static';
   pixiDisplayObject.on('click', handleTap);
   pixiDisplayObject.on('touchend', handleTap);
 };

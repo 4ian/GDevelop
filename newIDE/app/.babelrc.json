@@ -8,8 +8,7 @@
           "chrome": 100,
           "safari": 15,
           "firefox": 91
-        },
-        "loose": false
+        }
       }
     ],
     "@babel/preset-react",

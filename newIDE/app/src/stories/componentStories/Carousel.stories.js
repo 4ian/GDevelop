@@ -7,6 +7,7 @@ import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import Carousel from '../../UI/Carousel';
+import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 
 export default {
   title: 'Carousel',
@@ -20,16 +21,11 @@ export const LoadingWithoutTitleSkeleton = () => (
     items={null}
     displayItemTitles={false}
     browseAllLabel={<Trans>Browse all</Trans>}
+    browseAllIcon={<ChevronArrowRight fontSize="small" />}
   />
 );
 export const Tutorials = () => {
-  type YoutubeThumbnail = {|
-    id: string,
-    title: string,
-    thumbnailUrl: string,
-    link: string,
-  |};
-  const items: YoutubeThumbnail[] = [
+  const items = [
     {
       id: 'tutorial1',
       title: 'Tutorial 1',
@@ -65,6 +61,7 @@ export const Tutorials = () => {
     <Carousel
       title={<Trans>Learn game making</Trans>}
       browseAllLabel={<Trans>Browse all</Trans>}
+      browseAllIcon={<ChevronArrowRight fontSize="small" />}
       items={items}
       displayItemTitles={false}
       browseAllLink="https://www.youtube.com/c/GDevelopApp/videos"
@@ -77,22 +74,19 @@ export const LoadingWithTitleSkeleton = () => (
     title={<Trans>Showcase</Trans>}
     items={null}
     browseAllLabel={<Trans>Browse all</Trans>}
+    browseAllIcon={<ChevronArrowRight fontSize="small" />}
   />
 );
-export const Showcases = () => {
-  type ShowcaseThumbnail = {|
-    id: string,
-    title: string,
-    thumbnailUrl: string,
-    onClick: () => void,
-  |};
-  const items: ShowcaseThumbnail[] = [
+export const RoundedImagesWithOverlay = () => {
+  const items = [
     {
       id: 'lil-bub-s-hello-earth',
       title: "Lil BUB's HELLO EARTH",
       onClick: () => action('Clicked on lil-bub-s-hello-earth'),
       thumbnailUrl:
         'https://resources.gdevelop-app.com/games-showcase/images/bub-animated-logo.gif',
+      overlayText: 'New',
+      overlayTextPosition: 'topLeft',
     },
     {
       id: 'vai-juliette',
@@ -106,6 +100,8 @@ export const Showcases = () => {
       title: 'Alanna The Princess Of Puzzles',
       onClick: () => action('Clicked on alanna-the-princess-of-puzzles'),
       thumbnailUrl: 'https://i.ytimg.com/vi/PguDpz7TC7g/hqdefault.jpg',
+      overlayText: 'New',
+      overlayTextPosition: 'topLeft',
     },
     {
       id: 'miko-adventures-puffball',
@@ -113,6 +109,8 @@ export const Showcases = () => {
       onClick: () => action('Clicked on miko-adventures-puffball'),
       thumbnailUrl:
         'https://resources.gdevelop-app.com/games-showcase/images/miko-adventures-puffball/Miko_adventures_puffball_header_logo.png',
+      overlayText: 'Old',
+      overlayTextPosition: 'topLeft',
     },
     {
       id: 'swamp',
@@ -170,6 +168,8 @@ export const Showcases = () => {
       items={items}
       browseAllLabel={<Trans>Browse all</Trans>}
       onBrowseAllClick={() => action('Browse all button clicked')}
+      browseAllIcon={<ChevronArrowRight fontSize="small" />}
+      roundedImages
     />
   );
 };
@@ -180,5 +180,6 @@ export const WithError = () => (
     items={null}
     browseAllLabel={<Trans>Browse all</Trans>}
     error={<Trans>Unexpected error</Trans>}
+    browseAllIcon={<ChevronArrowRight fontSize="small" />}
   />
 );

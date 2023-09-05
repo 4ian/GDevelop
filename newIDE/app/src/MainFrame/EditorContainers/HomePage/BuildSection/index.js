@@ -18,7 +18,7 @@ import {
   LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
-
+import Carousel from '../../../../UI/Carousel';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -46,7 +46,6 @@ import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '../../../../UI/CustomSvgIcons/Add';
-import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
@@ -75,21 +74,6 @@ const styles = {
   },
   projectSkeleton: { borderRadius: 6 },
   noProjectsContainer: { padding: 10 },
-};
-
-const getTemplatesGridSizeFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 2;
-    case 'medium':
-      return 4;
-    case 'large':
-      return 6;
-    case 'xlarge':
-      return 7;
-    default:
-      return 4;
-  }
 };
 
 const getProjectLineHeight = (width: WidthType) => {
@@ -491,41 +475,78 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     });
 
     const skeletonLineHeight = getProjectLineHeight(windowWidth);
-    const imageTileRowItems = [
-      ...(privateGameTemplateListingDatas
-        ? privateGameTemplateListingDatas.map(
-            privateGameTemplateListingData => {
-              const isTemplateOwned =
-                !!authenticatedUser.receivedGameTemplates &&
-                !!authenticatedUser.receivedGameTemplates.find(
-                  receivedGameTemplate =>
-                    receivedGameTemplate.id ===
-                    privateGameTemplateListingData.id
-                );
-              return {
-                onClick: () =>
-                  onSelectPrivateGameTemplateListingData(
-                    privateGameTemplateListingData
-                  ),
-                imageUrl: privateGameTemplateListingData.thumbnailUrls[0],
-                overlayText: (
-                  <ProductPriceTag
-                    productListingData={privateGameTemplateListingData}
-                    owned={isTemplateOwned}
-                  />
-                ),
-                overlayTextPosition: 'topLeft',
-              };
-            }
-          )
-        : []),
-      ...(exampleShortHeaders
-        ? prepareExampleShortHeaders(exampleShortHeaders).map(example => ({
-            onClick: () => onSelectExampleShortHeader(example),
-            imageUrl: example.previewImageUrls[0],
-          }))
-        : []),
-    ];
+
+    // Show a premium game template every 3 examples.
+    const allItems = React.useMemo(
+      () => {
+        const allItems = [];
+        const privateGameTemplateItems = [
+          ...(privateGameTemplateListingDatas
+            ? privateGameTemplateListingDatas.map(
+                privateGameTemplateListingData => {
+                  const isTemplateOwned =
+                    !!authenticatedUser.receivedGameTemplates &&
+                    !!authenticatedUser.receivedGameTemplates.find(
+                      receivedGameTemplate =>
+                        receivedGameTemplate.id ===
+                        privateGameTemplateListingData.id
+                    );
+                  return {
+                    id: privateGameTemplateListingData.id,
+                    title: privateGameTemplateListingData.name,
+                    thumbnailUrl:
+                      privateGameTemplateListingData.thumbnailUrls[0],
+                    onClick: () =>
+                      onSelectPrivateGameTemplateListingData(
+                        privateGameTemplateListingData
+                      ),
+                    overlayText: (
+                      <ProductPriceTag
+                        productListingData={privateGameTemplateListingData}
+                        owned={isTemplateOwned}
+                      />
+                    ),
+                    overlayTextPosition: 'topLeft',
+                  };
+                }
+              )
+            : []),
+        ];
+
+        const exampleShortHeaderItems = [
+          ...(exampleShortHeaders
+            ? prepareExampleShortHeaders(exampleShortHeaders)
+                .map(example => ({
+                  id: example.id,
+                  title: example.name,
+                  onClick: () => onSelectExampleShortHeader(example),
+                  thumbnailUrl: example.previewImageUrls[0],
+                }))
+                .filter(exampleShortHeader => !!exampleShortHeader.thumbnailUrl)
+            : []),
+        ];
+
+        for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
+          allItems.push(exampleShortHeaderItems[i]);
+          if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
+            const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+            if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
+              allItems.push(
+                privateGameTemplateItems[nextPrivateGameTemplateIndex]
+              );
+          }
+        }
+
+        return allItems;
+      },
+      [
+        authenticatedUser.receivedGameTemplates,
+        exampleShortHeaders,
+        onSelectExampleShortHeader,
+        onSelectPrivateGameTemplateListingData,
+        privateGameTemplateListingDatas,
+      ]
+    );
 
     return (
       <>
@@ -551,17 +572,14 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           }
         >
           <SectionRow>
-            <ImageTileRow
-              isLoading={
-                !exampleShortHeaders || !privateGameTemplateListingDatas
-              }
-              items={imageTileRowItems}
+            <Carousel
               title={<Trans>Recommended templates</Trans>}
-              onShowAll={onShowAllExamples}
-              showAllIcon={<ChevronArrowRight fontSize="small" />}
-              getColumnsFromWidth={getTemplatesGridSizeFromWidth}
-              getLimitFromWidth={getTemplatesGridSizeFromWidth}
-              seeAllLabel={<Trans>Browse all templates</Trans>}
+              displayItemTitles={false}
+              browseAllLabel={<Trans>Browse all templates</Trans>}
+              onBrowseAllClick={onShowAllExamples}
+              items={allItems}
+              browseAllIcon={<ChevronArrowRight fontSize="small" />}
+              roundedImages
             />
           </SectionRow>
           <SectionRow>

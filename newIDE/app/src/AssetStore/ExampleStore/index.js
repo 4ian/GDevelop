@@ -182,20 +182,24 @@ export const ExampleStore = ({
   )[] = React.useMemo(
     () => {
       const searchItems = [];
-      if (privateGameTemplateListingDatasSearchResults) {
-        searchItems.push(
-          ...privateGameTemplateListingDatasSearchResults.map(
-            ({ item }) => item
-          )
-        );
+      const privateGameTemplateItems = privateGameTemplateListingDatasSearchResults
+        ? privateGameTemplateListingDatasSearchResults.map(({ item }) => item)
+        : [];
+      const exampleShortHeaderItems = exampleShortHeadersSearchResults
+        ? exampleShortHeadersSearchResults.map(({ item }) => item)
+        : [];
+
+      for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
+        searchItems.push(exampleShortHeaderItems[i]);
+        if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
+          const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+          if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
+            searchItems.push(
+              privateGameTemplateItems[nextPrivateGameTemplateIndex]
+            );
+        }
       }
-      if (exampleShortHeadersSearchResults) {
-        searchItems.push(
-          ...prepareExampleShortHeaders(
-            exampleShortHeadersSearchResults.map(({ item }) => item)
-          )
-        );
-      }
+
       return searchItems;
     },
     [

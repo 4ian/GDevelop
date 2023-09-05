@@ -60,6 +60,7 @@ const StoreSection = ({
     <SectionContainer
       title={null /* Give the asset store the full space to display */}
       flexBody
+      noScroll
     >
       <AssetStore />
       <Line justifyContent="flex-end">

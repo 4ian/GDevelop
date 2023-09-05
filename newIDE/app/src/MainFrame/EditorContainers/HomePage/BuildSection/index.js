@@ -485,21 +485,23 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       <>
         <SectionContainer
           title={<Trans>My projects</Trans>}
-          renderFooter={() =>
-            limits && hasTooManyCloudProjects ? (
-              <Line>
-                <Column expand>
-                  <MaxProjectCountAlertMessage
-                    limits={limits}
-                    onUpgrade={() =>
-                      openSubscriptionDialog({
-                        reason: 'Cloud Project limit reached',
-                      })
-                    }
-                  />
-                </Column>
-              </Line>
-            ) : null
+          renderFooter={
+            limits && hasTooManyCloudProjects
+              ? () => (
+                  <Line>
+                    <Column expand>
+                      <MaxProjectCountAlertMessage
+                        limits={limits}
+                        onUpgrade={() =>
+                          openSubscriptionDialog({
+                            reason: 'Cloud Project limit reached',
+                          })
+                        }
+                      />
+                    </Column>
+                  </Line>
+                )
+              : undefined
           }
         >
           <SectionRow>

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -25,6 +24,36 @@ import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/Announcemen
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import RouterContext from '../../RouterContext';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    marginTop: 0,
+    marginBottom: 0,
+    flex: 1,
+    minHeight: 0,
+    width: '100%',
+  },
+  mobileContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    width: '100%',
+  },
+  scrollableContainer: {
+    display: 'flex',
+    marginLeft: 0,
+    marginRight: 0,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    flex: 1,
+    height: '100%',
+    minWidth: 0,
+    overflowY: 'auto',
+  },
+};
 
 type Props = {|
   project: ?gdProject,
@@ -107,6 +136,8 @@ export const HomePage = React.memo<Props>(
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
       const buildSectionRef = React.useRef<?BuildSectionInterface>(null);
+      const windowWidth = useResponsiveWindowWidth();
+      const isMobile = windowWidth === 'small';
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
@@ -206,72 +237,66 @@ export const HomePage = React.memo<Props>(
       return (
         <I18n>
           {({ i18n }) => (
-            <>
-              <Column expand noMargin noOverflowParent>
-                <Line expand noMargin useFullHeight>
-                  <HomePageMenu
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    onOpenPreferences={onOpenPreferences}
-                    onOpenAbout={onOpenAbout}
+            <div style={isMobile ? styles.mobileContainer : styles.container}>
+              <div style={styles.scrollableContainer}>
+                {activeTab !== 'community' && !!announcements && (
+                  <AnnouncementsFeed canClose level="urgent" addMargins />
+                )}
+                {activeTab === 'get-started' && (
+                  <GetStartedSection
+                    onTabChange={setActiveTab}
+                    onCreateProject={() =>
+                      onCreateProject(/*exampleShortHeader=*/ null)
+                    }
+                    selectInAppTutorial={selectInAppTutorial}
+                    showGetStartedSection={showGetStartedSection}
+                    setShowGetStartedSection={setShowGetStartedSection}
                   />
-                  <Column noMargin expand noOverflowParent>
-                    {activeTab !== 'community' && !!announcements && (
-                      <AnnouncementsFeed canClose level="urgent" addMargins />
-                    )}
-                    {activeTab === 'get-started' && (
-                      <GetStartedSection
-                        onTabChange={setActiveTab}
-                        onCreateProject={() =>
-                          onCreateProject(/*exampleShortHeader=*/ null)
-                        }
-                        selectInAppTutorial={selectInAppTutorial}
-                        showGetStartedSection={showGetStartedSection}
-                        setShowGetStartedSection={setShowGetStartedSection}
-                      />
-                    )}
-                    {activeTab === 'build' && (
-                      <BuildSection
-                        ref={buildSectionRef}
-                        project={project}
-                        canOpen={canOpen}
-                        onChooseProject={onChooseProject}
-                        onOpenNewProjectSetupDialog={
-                          onOpenNewProjectSetupDialog
-                        }
-                        onShowAllExamples={() =>
-                          onCreateProject(/*exampleShortHeader=*/ null)
-                        }
-                        onSelectExample={exampleShortHeader =>
-                          onCreateProject(exampleShortHeader)
-                        }
-                        onOpenRecentFile={onOpenRecentFile}
-                        storageProviders={storageProviders}
-                      />
-                    )}
-                    {activeTab === 'learn' && (
-                      <LearnSection
-                        onCreateProject={() =>
-                          onCreateProject(/*exampleShortHeader=*/ null)
-                        }
-                        onTabChange={setActiveTab}
-                        onOpenHelpFinder={onOpenHelpFinder}
-                        selectInAppTutorial={selectInAppTutorial}
-                      />
-                    )}
-                    {activeTab === 'play' && <PlaySection />}
-                    {activeTab === 'community' && <CommunitySection />}
-                    {activeTab === 'shop' && (
-                      <StoreSection
-                        project={project}
-                        resourceManagementProps={resourceManagementProps}
-                        canInstallPrivateAsset={canInstallPrivateAsset}
-                      />
-                    )}
-                  </Column>
-                </Line>
-              </Column>
-            </>
+                )}
+                {activeTab === 'build' && (
+                  <BuildSection
+                    ref={buildSectionRef}
+                    project={project}
+                    canOpen={canOpen}
+                    onChooseProject={onChooseProject}
+                    onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+                    onShowAllExamples={() =>
+                      onCreateProject(/*exampleShortHeader=*/ null)
+                    }
+                    onSelectExample={exampleShortHeader =>
+                      onCreateProject(exampleShortHeader)
+                    }
+                    onOpenRecentFile={onOpenRecentFile}
+                    storageProviders={storageProviders}
+                  />
+                )}
+                {activeTab === 'learn' && (
+                  <LearnSection
+                    onCreateProject={() =>
+                      onCreateProject(/*exampleShortHeader=*/ null)
+                    }
+                    onTabChange={setActiveTab}
+                    onOpenHelpFinder={onOpenHelpFinder}
+                    selectInAppTutorial={selectInAppTutorial}
+                  />
+                )}
+                {activeTab === 'play' && <PlaySection />}
+                {activeTab === 'community' && <CommunitySection />}
+                {activeTab === 'shop' && (
+                  <StoreSection
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                    canInstallPrivateAsset={canInstallPrivateAsset}
+                  />
+                )}
+              </div>
+              <HomePageMenu
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onOpenPreferences={onOpenPreferences}
+                onOpenAbout={onOpenAbout}
+              />
+            </div>
           )}
         </I18n>
       );

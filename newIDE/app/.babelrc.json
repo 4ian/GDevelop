@@ -9,7 +9,7 @@
           "safari": 15,
           "firefox": 91
         },
-        "loose": true
+        "loose": false
       }
     ],
     "@babel/preset-react",

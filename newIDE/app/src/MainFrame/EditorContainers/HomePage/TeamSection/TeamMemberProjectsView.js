@@ -69,7 +69,9 @@ const TeamMemberProjectsView = ({
         <FlatButton
           primary
           disabled={isLoadingProjects}
-          label={<Trans>Refresh dashboard</Trans>}
+          label={
+            isMobile ? <Trans>Refresh</Trans> : <Trans>Refresh dashboard</Trans>
+          }
           onClick={() => onRefreshProjects(user)}
           leftIcon={<Refresh fontSize="small" />}
         />

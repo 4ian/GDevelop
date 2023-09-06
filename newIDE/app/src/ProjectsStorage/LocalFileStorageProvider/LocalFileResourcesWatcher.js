@@ -2,6 +2,7 @@
 import path from 'path-browserify';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '..';
+import debounce from 'lodash/debounce';
 
 const fileWatcher = optionalRequire('chokidar');
 
@@ -14,9 +15,19 @@ export const setupResourcesWatcher =
           .watch(folderPath, {
             ignored: [`**/.DS_Store`, gameFile],
           })
-          .on('change', event => {
-            callback();
-          });
+          .on(
+            'change',
+            // TODO: Is it safe to let it like that since the OS could for some reason
+            // do never-ending operations on the folder or its children, making the debounce
+            // never ending.
+            debounce(
+              path => {
+                callback();
+              },
+              200,
+              { leading: false, trailing: true }
+            )
+          );
         return () => watcher.unwatch(folderPath);
       }
     : undefined;

@@ -19,8 +19,8 @@ import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopS
 import { type User } from '../../../../Utils/GDevelopServices/User';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import FlatButton from '../../../../UI/FlatButton';
-import { Skeleton } from '@material-ui/lab';
-import { ListItem } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
+import ListItem from '@material-ui/core/ListItem';
 
 const styles = {
   listItem: {

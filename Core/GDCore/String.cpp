@@ -255,7 +255,6 @@ String &String::RemoveConsecutiveOccurrences(iterator i1,
                                              iterator i2,
                                              const char c) {
     iterator end = i2;
-    std::cout << this->ToUTF8() << std::endl;
     for (iterator current_index = i1.base(); current_index < end.base();
          current_index++) {
       if (*current_index == c) {

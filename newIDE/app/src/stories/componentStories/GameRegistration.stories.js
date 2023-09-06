@@ -13,7 +13,6 @@ import {
   fakeNotAuthenticatedUser,
 } from '../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import withMock from 'storybook-addon-mock';
 import { GDevelopGameApi } from '../../Utils/GDevelopServices/ApiConfigs';
 
 export default {
@@ -45,7 +44,6 @@ export const NotAuthorized = () => (
     />
   </AuthenticatedUserContext.Provider>
 );
-NotAuthorized.decorators = [withMock];
 NotAuthorized.parameters = {
   mockData: [
     {
@@ -66,7 +64,6 @@ export const GameNotExisting = () => (
     />
   </AuthenticatedUserContext.Provider>
 );
-GameNotExisting.decorators = [withMock];
 GameNotExisting.parameters = {
   mockData: [
     {
@@ -87,7 +84,6 @@ export const ErrorLoadingGame = () => (
     />
   </AuthenticatedUserContext.Provider>
 );
-ErrorLoadingGame.decorators = [withMock];
 ErrorLoadingGame.parameters = {
   mockData: [
     {
@@ -109,7 +105,6 @@ export const RegisteredWithGameStatsEmail = () => (
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithGameStatsEmail.decorators = [withMock];
 RegisteredWithGameStatsEmail.parameters = {
   mockData: [
     {
@@ -133,7 +128,6 @@ export const RegisteredWithLoader = () => (
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithLoader.decorators = [withMock];
 RegisteredWithLoader.parameters = {
   mockData: [
     {
@@ -158,7 +152,6 @@ export const RegisteredWithoutLoader = () => (
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithoutLoader.decorators = [withMock];
 RegisteredWithoutLoader.parameters = {
   mockData: [
     {

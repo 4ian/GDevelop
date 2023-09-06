@@ -25,7 +25,6 @@ import {
   indieUserProfile,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { GDevelopAssetApi } from '../../../Utils/GDevelopServices/ApiConfigs';
-import withMock from 'storybook-addon-mock';
 import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
@@ -287,5 +286,4 @@ export const NetworkError = () => (
     user={fakeSilverAuthenticatedUser}
   />
 );
-NetworkError.decorators = [withMock];
 NetworkError.parameters = apiDataServerSideError;

@@ -6,7 +6,7 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from './GDevelopJsInitializerDecorator';
 
-import { storiesOf, addDecorator } from '@storybook/react';
+import { storiesOf } from '@storybook/react';
 import { action, configureActions } from '@storybook/addon-actions';
 
 import { I18n } from '@lingui/react';
@@ -140,8 +140,6 @@ configureActions({
   depth: 2,
   limit: 20,
 });
-
-addDecorator(GDevelopJsInitializerDecorator);
 
 // No i18n in this file
 

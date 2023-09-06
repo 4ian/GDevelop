@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -120,7 +119,6 @@ export const LayoutPublicAssetInstallSuccess = () => (
     />
   </Wrapper>
 );
-LayoutPublicAssetInstallSuccess.decorators = [withMock];
 LayoutPublicAssetInstallSuccess.parameters = {
   mockData: mockApiDataForPublicAssets,
 };
@@ -141,7 +139,6 @@ export const LayoutPublicAssetInstallFailure = () => (
     />
   </Wrapper>
 );
-LayoutPublicAssetInstallFailure.decorators = [withMock];
 LayoutPublicAssetInstallFailure.parameters = {
   mockData: mockFailedApiDataForPublicAsset1,
 };
@@ -179,7 +176,6 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => (
     />
   </Wrapper>
 );
-LayoutPublicAssetSomeAlreadyInstalled.decorators = [withMock];
 LayoutPublicAssetSomeAlreadyInstalled.parameters = {
   mockData: mockApiDataForPublicAssets,
 };
@@ -307,7 +303,6 @@ export const NoObjectsContainerPublicAssetInstallSuccess = () => (
     />
   </Wrapper>
 );
-NoObjectsContainerPublicAssetInstallSuccess.decorators = [withMock];
 NoObjectsContainerPublicAssetInstallSuccess.parameters = {
   mockData: mockApiDataForPublicAssets,
 };

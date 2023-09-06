@@ -9,7 +9,6 @@ import {
   fakeAssetWithCustomObject,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
-import withMock from 'storybook-addon-mock';
 import { GDevelopUserApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import PublicProfileProvider from '../../../../Profile/PublicProfileProvider';
 import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
@@ -43,7 +42,6 @@ export const PublicAsset = () => {
     </Wrapper>
   );
 };
-PublicAsset.decorators = [withMock];
 PublicAsset.parameters = {
   mockData: [
     {
@@ -67,7 +65,6 @@ export const PrivateAsset = () => (
     />
   </Wrapper>
 );
-PrivateAsset.decorators = [withMock];
 PrivateAsset.parameters = {
   mockData: [
     {
@@ -120,7 +117,6 @@ export const AssetWithMultipleAuthors = () => (
     />
   </Wrapper>
 );
-PrivateAsset.decorators = [withMock];
 PrivateAsset.parameters = {
   mockData: [
     {

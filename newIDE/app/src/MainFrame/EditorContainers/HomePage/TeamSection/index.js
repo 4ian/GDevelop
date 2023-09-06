@@ -41,6 +41,7 @@ const styles = {
   list: { padding: 0 },
   lobbyContainer: { padding: PADDING },
   roomsContainer: { paddingRight: PADDING },
+  titleAdornmentContainer: { paddingRight: PADDING },
 };
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
@@ -261,19 +262,21 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       <SectionContainer
         title={<Trans>Classrooms</Trans>}
         titleAdornment={
-          <FlatButton
-            primary
-            disabled={isLoadingMembers}
-            label={
-              isMobile ? (
-                <Trans>Refresh</Trans>
-              ) : (
-                <Trans>Refresh dashboard</Trans>
-              )
-            }
-            onClick={onRefreshTeamMembers}
-            leftIcon={<Refresh fontSize="small" />}
-          />
+          <div style={styles.titleAdornmentContainer}>
+            <FlatButton
+              primary
+              disabled={isLoadingMembers}
+              label={
+                isMobile ? (
+                  <Trans>Refresh</Trans>
+                ) : (
+                  <Trans>Refresh dashboard</Trans>
+                )
+              }
+              onClick={onRefreshTeamMembers}
+              leftIcon={<Refresh fontSize="small" />}
+            />
+          </div>
         }
       >
         <SectionRow>

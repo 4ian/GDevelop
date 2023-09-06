@@ -22,7 +22,7 @@ type Props = {|
   autoFocus?: 'desktop' | 'desktopAndMobileDevices',
   maxLength?: number,
   margin?: 'none' | 'dense',
-  translatableHintText?: MessageDescriptor
+  translatableHintText?: MessageDescriptor,
 |};
 
 const AsyncSemiControlledTextField = ({

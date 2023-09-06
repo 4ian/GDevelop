@@ -23,6 +23,7 @@ import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../../UI/Menu/ContextMenu';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   listItem: {
@@ -36,14 +37,21 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{}>('team-groups');
 
 type Props = {|
   member: User,
+  isTemporary: boolean,
   onListUserProjects: User => Promise<void>,
   onDrag: (user: User) => void,
 |};
 
-const TeamMemberRow = ({ member, onListUserProjects, onDrag }: Props) => {
+const TeamMemberRow = ({
+  isTemporary,
+  member,
+  onListUserProjects,
+  onDrag,
+}: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const buildContextMenu = (i18n: I18nType): Array<MenuItemTemplate> => {
     return [
@@ -74,7 +82,14 @@ const TeamMemberRow = ({ member, onListUserProjects, onDrag }: Props) => {
           >
             {({ connectDragSource, connectDragPreview }) => {
               return (
-                <ListItem style={styles.listItem}>
+                <ListItem
+                  style={{
+                    ...styles.listItem,
+                    backgroundColor: isTemporary
+                      ? gdevelopTheme.paper.backgroundColor.light
+                      : undefined,
+                  }}
+                >
                   <LineStackLayout
                     noMargin
                     alignItems="center"

@@ -15,7 +15,6 @@
     "@babel/preset-flow"
   ],
   "plugins": [
-    "babel-plugin-macros", 
-    "@babel/plugin-transform-private-property-in-object"
+    "babel-plugin-macros"
   ]
 }

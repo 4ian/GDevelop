@@ -180,11 +180,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
-
-import optionalRequire from '../Utils/OptionalRequire';
-import path from 'path-browserify';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
-const fileWatcher = optionalRequire('chokidar');
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -768,7 +764,8 @@ const MainFrame = (props: Props) => {
   const informEditorsResourceExternallyChanged = React.useCallback(
     () => {
       ResourcesLoader.burstAllUrlsCache();
-      if (state.currentProject) PixiResourcesLoader.burstCache(state.currentProject);
+      if (state.currentProject)
+        PixiResourcesLoader.burstCache(state.currentProject);
       state.editorTabs.editors.forEach(editor => {
         if (
           editor.editorRef &&
@@ -784,22 +781,20 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(
     () => {
-      if (fileWatcher && currentFileMetadata && path) {
-        const folderPath = path.dirname(currentFileMetadata.fileIdentifier);
-        const gameFile = path.basename(currentFileMetadata.fileIdentifier);
-        const watcher = fileWatcher
-          .watch(folderPath, {
-            ignored: [`**/.DS_Store`, gameFile],
-          })
-          .on('change', event => {
-            console.log(event);
-            console.log('CHANGE');
-            informEditorsResourceExternallyChanged();
-          });
-        return () => watcher.unwatch(folderPath);
+      const storageProvider = getStorageProvider();
+      if (currentFileMetadata && storageProvider.setupResourcesWatcher) {
+        const unsubscribe = storageProvider.setupResourcesWatcher(
+          currentFileMetadata,
+          informEditorsResourceExternallyChanged
+        );
+        return unsubscribe;
       }
     },
-    [currentFileMetadata, informEditorsResourceExternallyChanged]
+    [
+      currentFileMetadata,
+      informEditorsResourceExternallyChanged,
+      getStorageProvider,
+    ]
   );
 
   const _languageDidChange = () => {

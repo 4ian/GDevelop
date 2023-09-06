@@ -20,19 +20,4 @@ module.exports = {
     'storybook-addon-mock',
     '@storybook/preset-create-react-app',
   ],
-
-  webpackFinal: async config => {
-    return {
-      ...config,
-      resolve: {
-        ...config.resolve,
-        fallback: {
-          ...(config.resolve || {}).fallback,
-          fs: false,
-          stream: false,
-          os: false,
-        },
-      },
-    };
-  },
 };

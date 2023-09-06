@@ -4,22 +4,10 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 namespace gdjs {
-
-  enum Behaviors {
-    alpha,
-    moveAcceleration,
-    scale,
-    color,
-    rotation,
-    blendMode,
-    textureSingle,
-    spawnShape,
-  }
   export class ParticleEmitterObjectPixiRenderer {
     renderer: any;
     emitter: PIXI.particles.Emitter;
     started: boolean = false;
-    _configuration: PIXI.particles.EmitterConfigV3;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -79,8 +67,7 @@ namespace gdjs {
       //@ts-expect-error Pixi has wrong type definitions for this method
       texture = pixiRenderer.generateTexture(graphics);
 
-      this._configuration = {
-        behaviors: [],
+      const configuration = {
         ease: undefined,
         emit: undefined,
         lifetime: {
@@ -100,112 +87,124 @@ namespace gdjs {
         ),
         pos: { x: 0, y: 0 },
         addAtBack: false,
-      };
-      this._configuration.behaviors.length = 8;
-
-      this._configuration.behaviors[Behaviors.alpha] = {
-        type: "alpha",
-        config: {
-          alpha: {
-            isStepped: false,
-            list: [
-              {time: 0, value: objectData.particleAlpha1 / 255.0},
-              {time: 1, value: objectData.particleAlpha2 / 255.0}
-            ]
-          }
-        }
-      };
-
-      this._configuration.behaviors[Behaviors.moveAcceleration] = {
-        type: "moveAcceleration",
-        config: {
-          accel: { x: objectData.particleGravityX, y: objectData.particleGravityY },
-          minStart: objectData.emitterForceMax,
-          maxStart: objectData.emitterForceMax,
-          rotate: true,
-        }
-      };
-
-      let size1 = objectData.particleSize1 / 100;
-      let size2 = objectData.particleSize2 / 100;
-      const sizeRandom1 = objectData.particleSizeRandomness1 / 100;
-      const sizeRandom2 = objectData.particleSizeRandomness2 / 100;
-      this._configuration.behaviors[Behaviors.scale] = {
-        type: "scale",
-        config: {
-          scale: {
-            isStepped: false,
-            list: [
-              {time: 0, value: size1 * (1 + sizeRandom1) },
-              {time: 1, value: size2 * (1 + sizeRandom2) }
-            ]
-          }
-        }
-      };
-
-      this._configuration.behaviors[Behaviors.color] = {
-        type: "color",
-        config: {
-          color: {
-            isStepped: false,
-            list: [
-              {time: 0, value: gdjs.rgbToHex(objectData.particleRed1,
-                objectData.particleGreen1,
-                objectData.particleBlue1)},
-              {time: 1, value: gdjs.rgbToHex(objectData.particleRed2,
-                objectData.particleGreen2,
-                objectData.particleBlue2)}
-            ]
-          }
-        }
-      };
-
-      this._configuration.behaviors[Behaviors.rotation] = {
-        type: "rotation",
-        config: {
-          accel: 0,
-          // Angle of the spray cone
-          minStart: -objectData.emitterAngleB / 2.0,
-          maxStart: objectData.emitterAngleB / 2.0,
-          // Rotation speed of the particles
-          maxSpeed: objectData.particleAngle2,
-          minSpeed: objectData.particleAngle1,
-        }
-      };
-
-      this._configuration.behaviors[Behaviors.blendMode] = {
-        type: "blendMode",
-        config: {
-          blendMode: objectData.additive ? 'ADD' : 'NORMAL',
-        }
-      };
-
-      this._configuration.behaviors[Behaviors.textureSingle] = {
-        type: "textureSingle",
-        config: {
-          texture: texture,
-        }
-      };
-
-      this._configuration.behaviors[Behaviors.spawnShape] = {
-        type: "spawnShape",
-        config: {
-          type: "torus",
-          data: {
-            affectRotation: false,
-            innerRadius: 0,
-            radius: objectData.zoneRadius,
-            x: 0,
-            y: 0,
+        behaviors: [
+          {
+            type: 'alpha',
+            config: {
+              alpha: {
+                isStepped: false,
+                list: [
+                  { time: 0, value: objectData.particleAlpha1 / 255.0 },
+                  { time: 1, value: objectData.particleAlpha2 / 255.0 },
+                ],
+              },
+            },
           },
-        }
+          {
+            type: 'moveAcceleration',
+            config: {
+              accel: {
+                x: objectData.particleGravityX,
+                y: objectData.particleGravityY,
+              },
+              minStart: objectData.emitterForceMax,
+              maxStart: objectData.emitterForceMax,
+              rotate: true,
+            },
+          },
+          {
+            type: 'scale',
+            config: {
+              scale: {
+                isStepped: false,
+                list: [
+                  {
+                    time: 0,
+                    value:
+                      (objectData.particleSize1 / 100) *
+                      (1 + objectData.particleSizeRandomness1 / 100),
+                  },
+                  {
+                    time: 1,
+                    value:
+                      (objectData.particleSize2 / 100) *
+                      (1 + objectData.particleSizeRandomness2 / 100),
+                  },
+                ],
+              },
+            },
+          },
+          {
+            type: 'color',
+            config: {
+              color: {
+                isStepped: false,
+                list: [
+                  {
+                    time: 0,
+                    value: gdjs.rgbToHex(
+                      objectData.particleRed1,
+                      objectData.particleGreen1,
+                      objectData.particleBlue1
+                    ),
+                  },
+                  {
+                    time: 1,
+                    value: gdjs.rgbToHex(
+                      objectData.particleRed2,
+                      objectData.particleGreen2,
+                      objectData.particleBlue2
+                    ),
+                  },
+                ],
+              },
+            },
+          },
+          {
+            type: 'rotation',
+            config: {
+              accel: 0,
+              // Angle of the spray cone
+              minStart: -objectData.emitterAngleB / 2.0,
+              maxStart: objectData.emitterAngleB / 2.0,
+              // Rotation speed of the particles
+              maxSpeed: objectData.particleAngle2,
+              minSpeed: objectData.particleAngle1,
+            },
+          },
+          {
+            type: 'blendMode',
+            config: {
+              blendMode: objectData.additive ? 'ADD' : 'NORMAL',
+            },
+          },
+          {
+            type: 'textureSingle',
+            config: {
+              texture: texture,
+            },
+          },
+          {
+            type: 'spawnShape',
+            config: {
+              type: 'torus',
+              data: {
+                affectRotation: false,
+                innerRadius: 0,
+                radius: objectData.zoneRadius,
+                x: 0,
+                y: 0,
+              },
+            },
+          },
+        ],
       };
 
       this.renderer = new PIXI.Container();
       // The embedded particle emitter is supposed to be the last minor version
       // of the version 5 of the particle emitter object
       // See source https://github.com/pixijs/particle-emitter/blob/v5.0.8/src/Emitter.ts
-      this.emitter = new PIXI.particles.Emitter(this.renderer, this._configuration);
+      this.emitter = new PIXI.particles.Emitter(this.renderer, configuration);
       this.start();
       const layer = instanceContainer.getLayer(runtimeObject.getLayer());
       if (layer) {
@@ -232,23 +231,26 @@ namespace gdjs {
     }
 
     setAngle(angle1: float, angle2: float): void {
-      const config = this._configuration.behaviors[Behaviors.rotation].config;
-      config.minStart = angle1;
-      config.maxStart = angle2;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('rotation');
+      behavior.minStart = angle1;
+      behavior.maxStart = angle2;
     }
 
     setForce(min: float, max: float): void {
-      const config = this._configuration.behaviors[Behaviors.moveAcceleration].config;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('moveAcceleration');
       // If max force is zero, PIXI seems to not be able to compute correctly
       // the angle of the emitter, resulting in it staying at 0° or 180°.
       // See https://github.com/4ian/GDevelop/issues/4312.
-      config.max = max || 0.000001;
-      config.min = min;
+      behavior.maxStart = max || 0.000001;
+      behavior.minStart = min;
     }
 
     setZoneRadius(radius: float): void {
-      const config = this._configuration.behaviors[Behaviors.spawnShape].config;
-      config.data.radius = radius;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('spawnShape');
+      behavior.shape.radius = radius;
     }
 
     setLifeTime(min: float, max: float): void {
@@ -257,9 +259,10 @@ namespace gdjs {
     }
 
     setGravity(x: float, y: float): void {
-      const config = this._configuration.behaviors[Behaviors.moveAcceleration].config;
-      config.accel.x = x;
-      config.accel.y = y;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('moveAcceleration');
+      behavior.accel.x = x;
+      behavior.accel.y = y;
     }
 
     setColor(
@@ -270,21 +273,42 @@ namespace gdjs {
       g2: number,
       b2: number
     ): void {
-      const config = this._configuration.behaviors[Behaviors.color].config;
-      config.color.list[0].value = gdjs.rgbToHex(r1, g1, b1);
-      config.color.list[1].value = gdjs.rgbToHex(r2, g2, b2);
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('color');
+
+      const startColor = behavior.list.first.value;
+      startColor.r = r1;
+      startColor.g = g1;
+      startColor.b = b1;
+
+      behavior.list.first.next = behavior.list.first.next || {
+        time: 1,
+        value: {},
+      };
+      const endColor = behavior.list.first.next.value;
+      endColor.r = r2;
+      endColor.g = g2;
+      endColor.b = b2;
     }
 
     setSize(size1: float, size2: float): void {
-      const config = this._configuration.behaviors[Behaviors.scale].config;
-      config.scale.list[0].value = size1 / 100.0;
-      config.scale.list[1].value = size2 / 100.0;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('scale');
+
+      behavior.list.value = size1 / 100.0;
+
+      behavior.list.next = behavior.list.next || {
+        time: 1,
+        value: {},
+      };
+      behavior.list.next.value = size2 / 100.0;
     }
 
     setParticleRotationSpeed(min: float, max: float): void {
-      const config = this._configuration.behaviors[Behaviors.rotation].config;
-      config.minSpeed = min;
-      config.maxSpeed = max;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('rotation');
+      behavior.minSpeed = min;
+      behavior.maxSpeed = max;
     }
 
     setMaxParticlesCount(count: float): void {
@@ -292,16 +316,22 @@ namespace gdjs {
     }
 
     setAdditiveRendering(enabled: boolean): void {
-      const config = this._configuration.behaviors[Behaviors.blendMode].config;
-      config.blendMode = enabled
-        ? PIXI.BLEND_MODES.ADD
-        : PIXI.BLEND_MODES.NORMAL;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('blendMode');
+      behavior.blendMode = enabled ? 'ADD' : 'NORMAL';
     }
 
     setAlpha(alpha1: number, alpha2: number): void {
-      const config = this._configuration.behaviors[Behaviors.alpha].config;
-      config.alpha.list[0].value = alpha1;
-      config.alpha.list[1].value = alpha2;
+      // Access private members of the behavior to apply changes right away.
+      const behavior: any = this.emitter.getBehavior('alpha');
+
+      behavior.list.value = alpha1;
+
+      behavior.list.next = behavior.list.next || {
+        time: 1,
+        value: {},
+      };
+      behavior.list.next.value = alpha2;
     }
 
     setFlow(flow: number, tank: number): void {
@@ -348,8 +378,9 @@ namespace gdjs {
         .getImageManager()
         .getPIXITexture(texture);
       if (pixiTexture.valid && pixiTexture !== invalidPixiTexture) {
-        const config = this._configuration.behaviors[0].config;
-        config.texture = pixiTexture;
+        // Access private members of the behavior to apply changes right away.
+        const behavior: any = this.emitter.getBehavior('textureSingle');
+        behavior.texture = pixiTexture;
       }
     }
 
@@ -366,20 +397,6 @@ namespace gdjs {
     }
 
     recreate(): void {
-      const configuration = this._configuration;
-      const emitter = this.emitter;
-      configuration.lifetime.min = emitter.minLifetime;
-      configuration.lifetime.max = emitter.maxLifetime;
-      configuration.frequency = emitter.frequency;
-      configuration.spawnChance = emitter.spawnChance;
-      configuration.particlesPerWave = emitter.particlesPerWave;
-      configuration.maxParticles = emitter.particlesPerWave;
-      configuration.pos.x = emitter.spawnPos.x,
-      configuration.pos.y = emitter.spawnPos.y,
-      configuration.addAtBack = emitter.addAtBack;
-      configuration.ease = emitter.customEase,
-
-      this.emitter.init(this._configuration);
       this.emitter.cleanup();
     }
 

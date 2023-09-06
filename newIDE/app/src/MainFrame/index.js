@@ -1136,13 +1136,13 @@ const MainFrame = (props: Props) => {
     },
     loadFromProject,
     openFromFileMetadata,
-    resourceMover,
     onProjectSaved: fileMetadata => {
       setState(state => ({
         ...state,
         currentFileMetadata: fileMetadata,
       }));
     },
+    ensureResourcesAreMoved,
   });
 
   const closeApp = React.useCallback((): void => {

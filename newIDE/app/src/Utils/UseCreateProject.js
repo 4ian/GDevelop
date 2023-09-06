@@ -21,10 +21,7 @@ import {
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { registerGame } from './GDevelopServices/Game';
-import {
-  useResourceMover,
-  type ResourceMover,
-} from '../ProjectsStorage/ResourceMover';
+import { type MoveAllProjectResourcesOptionsWithoutProgress } from '../ProjectsStorage/ResourceMover';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -53,8 +50,10 @@ type Props = {|
     fileMetadata: ?FileMetadata
   ) => Promise<State>,
   openFromFileMetadata: (fileMetadata: FileMetadata) => Promise<?State>,
-  resourceMover: ResourceMover,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
+  ensureResourcesAreMoved: (
+    options: MoveAllProjectResourcesOptionsWithoutProgress
+  ) => Promise<void>,
 |};
 
 /**
@@ -68,14 +67,13 @@ const useCreateProject = ({
   getStorageProviderOperations,
   loadFromProject,
   openFromFileMetadata,
-  resourceMover,
   onProjectSaved,
+  ensureResourcesAreMoved,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const preferences = React.useContext(PreferencesContext);
-  const { ensureResourcesAreMoved } = useResourceMover({ resourceMover });
   const { showAlert } = useAlertDialog();
   const { getInAppTutorialShortHeader } = React.useContext(
     InAppTutorialContext

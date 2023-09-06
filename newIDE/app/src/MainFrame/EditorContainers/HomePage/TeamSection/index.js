@@ -330,85 +330,87 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 />
               </Line>
             )}
-            {groupsAndMembers.length > 0 ? (
-              groupsAndMembers.map(({ group, members }) => {
-                const membersToDisplay =
-                  !!movingUsers && movingUsers.groupId === group.id
-                    ? [...members, ...movingUsers.users]
-                    : members;
-                return (
-                  <DropTarget
-                    canDrop={() => true}
-                    drop={() => {
-                      const droppedUser = draggedUserRef.current;
-                      if (!droppedUser) return;
-                      setMovingUsers({
-                        groupId: group.id,
-                        users: [droppedUser],
-                      });
-                      changeUserGroup(droppedUser, group);
-                      draggedUserRef.current = null;
-                    }}
-                    key={group.id}
-                  >
-                    {({ connectDropTarget, isOver }) =>
-                      connectDropTarget(
-                        <div
-                          style={
-                            isOver
-                              ? {
-                                  backgroundColor:
-                                    gdevelopTheme.paper.backgroundColor.light,
-                                  outline: `2px dashed ${
-                                    gdevelopTheme.dropIndicator.canDrop
-                                  }`,
-                                }
-                              : undefined
-                          }
-                        >
-                          <Line noMargin>
-                            <Column noMargin expand>
-                              <Column noMargin>
-                                <TeamGroupNameField
-                                  group={group}
-                                  onFinishEditingGroupName={onChangeGroupName}
-                                  allowDelete={membersToDisplay.length === 0}
-                                  onDeleteGroup={onDeleteGroup}
-                                />
+            <ColumnStackLayout noMargin>
+              {groupsAndMembers.length > 0 ? (
+                groupsAndMembers.map(({ group, members }) => {
+                  const membersToDisplay =
+                    !!movingUsers && movingUsers.groupId === group.id
+                      ? [...members, ...movingUsers.users]
+                      : members;
+                  return (
+                    <DropTarget
+                      canDrop={() => true}
+                      drop={() => {
+                        const droppedUser = draggedUserRef.current;
+                        if (!droppedUser) return;
+                        setMovingUsers({
+                          groupId: group.id,
+                          users: [droppedUser],
+                        });
+                        changeUserGroup(droppedUser, group);
+                        draggedUserRef.current = null;
+                      }}
+                      key={group.id}
+                    >
+                      {({ connectDropTarget, isOver }) =>
+                        connectDropTarget(
+                          <div
+                            style={
+                              isOver
+                                ? {
+                                    backgroundColor:
+                                      gdevelopTheme.paper.backgroundColor.light,
+                                    outline: `2px dashed ${
+                                      gdevelopTheme.dropIndicator.canDrop
+                                    }`,
+                                  }
+                                : undefined
+                            }
+                          >
+                            <Line noMargin>
+                              <Column noMargin expand>
+                                <Column noMargin>
+                                  <TeamGroupNameField
+                                    group={group}
+                                    onFinishEditingGroupName={onChangeGroupName}
+                                    allowDelete={membersToDisplay.length === 0}
+                                    onDeleteGroup={onDeleteGroup}
+                                  />
+                                </Column>
+                                <List style={styles.list}>
+                                  {membersToDisplay
+                                    .sort(sortMembersByNameOrEmail)
+                                    .map(member => (
+                                      <TeamMemberRow
+                                        isTemporary={
+                                          !!movingUsers &&
+                                          movingUsers.users.some(
+                                            user => user.id === member.id
+                                          )
+                                        }
+                                        key={member.id}
+                                        member={member}
+                                        onListUserProjects={() =>
+                                          listUserProjects(member)
+                                        }
+                                        onDrag={setDraggedUser}
+                                      />
+                                    ))}
+                                </List>
                               </Column>
-                              <List style={styles.list}>
-                                {membersToDisplay
-                                  .sort(sortMembersByNameOrEmail)
-                                  .map(member => (
-                                    <TeamMemberRow
-                                      isTemporary={
-                                        !!movingUsers &&
-                                        movingUsers.users.some(
-                                          user => user.id === member.id
-                                        )
-                                      }
-                                      key={member.id}
-                                      member={member}
-                                      onListUserProjects={() =>
-                                        listUserProjects(member)
-                                      }
-                                      onDrag={setDraggedUser}
-                                    />
-                                  ))}
-                              </List>
-                            </Column>
-                          </Line>
-                        </div>
-                      )
-                    }
-                  </DropTarget>
-                );
-              })
-            ) : !showNewGroupNameField ? (
-              <EmptyMessage>
-                <Trans>Create a room and drag and drop members in it.</Trans>
-              </EmptyMessage>
-            ) : null}
+                            </Line>
+                          </div>
+                        )
+                      }
+                    </DropTarget>
+                  );
+                })
+              ) : !showNewGroupNameField ? (
+                <EmptyMessage>
+                  <Trans>Create a room and drag and drop members in it.</Trans>
+                </EmptyMessage>
+              ) : null}
+            </ColumnStackLayout>
           </div>
         </SectionRow>
       </SectionContainer>

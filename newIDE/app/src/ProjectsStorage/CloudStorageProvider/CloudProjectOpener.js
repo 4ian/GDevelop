@@ -4,6 +4,7 @@ import { t } from '@lingui/macro';
 import {
   getCloudProject,
   getCredentialsForCloudProject,
+  getOtherUserCloudProject,
   getProjectFileAsZipBlob,
 } from '../../Utils/GDevelopServices/Project';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
@@ -69,7 +70,16 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   }
 
   onProgress && onProgress((1 / 4) * 100, t`Calibrating sensors`);
-  const cloudProject = await getCloudProject(authenticatedUser, cloudProjectId);
+  let cloudProject;
+  if (fileMetadata.ownerId) {
+    cloudProject = await getOtherUserCloudProject(
+      authenticatedUser,
+      cloudProjectId,
+      fileMetadata.ownerId
+    );
+  } else {
+    cloudProject = await getCloudProject(authenticatedUser, cloudProjectId);
+  }
   if (!cloudProject) throw new Error("Cloud project couldn't be fetched.");
 
   onProgress && onProgress((2 / 4) * 100, t`Starting engine`);

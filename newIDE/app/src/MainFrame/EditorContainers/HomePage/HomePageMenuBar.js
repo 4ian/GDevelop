@@ -10,8 +10,9 @@ import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import Paper from '../../../UI/Paper';
-import { homePageMenuTabs, type HomeTab } from './HomePageMenu';
+import { homePageMenuTabs, teamViewTab, type HomeTab } from './HomePageMenu';
 import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export const styles = {
   desktopMenu: {
@@ -56,6 +57,15 @@ const HomePageMenuBar = ({
   const isMobile = windowWidth === 'small';
   const isMobileOrSmallScreen = isMobile || windowWidth === 'medium';
   const theme = React.useContext(GDevelopThemeContext);
+  const { profile } = React.useContext(AuthenticatedUserContext);
+  const displayTeamViewTab = profile && profile.isTeacher;
+  const tabsToDisplay = displayTeamViewTab
+    ? [
+        ...homePageMenuTabs.slice(0, 2),
+        teamViewTab,
+        ...homePageMenuTabs.slice(2),
+      ]
+    : homePageMenuTabs;
 
   const buttons: {
     label: React.Node,
@@ -89,7 +99,7 @@ const HomePageMenuBar = ({
       >
         <Toolbar>
           <ToolbarGroup>
-            {homePageMenuTabs.map(({ label, tab, getIcon, id }) => {
+            {tabsToDisplay.map(({ label, tab, getIcon, id }) => {
               const isActive = activeTab === tab;
               return (
                 <IconButton
@@ -150,7 +160,7 @@ const HomePageMenuBar = ({
             <DoubleChevronArrowRight />
           </IconButton>
         )}
-        {homePageMenuTabs.map(({ label, tab, getIcon, id }) => (
+        {tabsToDisplay.map(({ label, tab, getIcon, id }) => (
           <VerticalTabButton
             key={id}
             label={label}

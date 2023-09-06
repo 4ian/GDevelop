@@ -18,6 +18,8 @@ export type FileMetadata = {|
   lastModifiedDate?: number,
   name?: string,
   gameId?: string,
+  /** The user id of the user owning the project if not the authenticated user. */
+  ownerId?: string,
 |};
 
 /**

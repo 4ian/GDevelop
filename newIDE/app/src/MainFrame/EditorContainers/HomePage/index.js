@@ -24,6 +24,8 @@ import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/Announcemen
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import RouterContext from '../../RouterContext';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
+import TeamSection from './TeamSection';
+import TeamProvider from '../../../Profile/Team/TeamProvider';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
@@ -270,68 +272,87 @@ export const HomePage = React.memo<Props>(
         showGetStartedSection ? 'get-started' : 'build'
       );
 
+      // If the user logs out and is on the team view section, go back to the build section.
+      React.useEffect(
+        () => {
+          if (activeTab === 'team-view' && !authenticated) {
+            setActiveTab('build');
+          }
+        },
+        [authenticated, activeTab]
+      );
+
       return (
         <I18n>
           {({ i18n }) => (
-            <div style={isMobile ? styles.mobileContainer : styles.container}>
-              <div style={styles.scrollableContainer}>
-                {activeTab !== 'community' && !!announcements && (
-                  <AnnouncementsFeed canClose level="urgent" addMargins />
-                )}
-                {activeTab === 'get-started' && (
-                  <GetStartedSection
-                    onTabChange={setActiveTab}
-                    selectInAppTutorial={selectInAppTutorial}
-                    showGetStartedSection={showGetStartedSection}
-                    setShowGetStartedSection={setShowGetStartedSection}
-                  />
-                )}
-                {activeTab === 'build' && (
-                  <BuildSection
-                    ref={buildSectionRef}
-                    project={project}
-                    canOpen={canOpen}
-                    onChooseProject={onChooseProject}
-                    onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
-                    onShowAllExamples={onOpenExampleStore}
-                    onSelectExampleShortHeader={
-                      onOpenExampleStoreWithExampleShortHeader
-                    }
-                    onSelectPrivateGameTemplateListingData={
-                      onOpenExampleStoreWithPrivateGameTemplateListingData
-                    }
-                    onOpenRecentFile={onOpenRecentFile}
-                    storageProviders={storageProviders}
-                  />
-                )}
-                {activeTab === 'learn' && (
-                  <LearnSection
-                    onOpenExampleStore={onOpenExampleStore}
-                    onTabChange={setActiveTab}
-                    onOpenHelpFinder={onOpenHelpFinder}
-                    selectInAppTutorial={selectInAppTutorial}
-                  />
-                )}
-                {activeTab === 'play' && <PlaySection />}
-                {activeTab === 'community' && <CommunitySection />}
-                {activeTab === 'shop' && (
-                  <StoreSection
-                    project={project}
-                    resourceManagementProps={resourceManagementProps}
-                    canInstallPrivateAsset={canInstallPrivateAsset}
-                    onOpenPrivateGameTemplateListingData={
-                      onOpenPrivateGameTemplateListingData
-                    }
-                  />
-                )}
+            <TeamProvider>
+              <div style={isMobile ? styles.mobileContainer : styles.container}>
+                <div style={styles.scrollableContainer}>
+                  {activeTab !== 'community' && !!announcements && (
+                    <AnnouncementsFeed canClose level="urgent" addMargins />
+                  )}
+                  {activeTab === 'get-started' && (
+                    <GetStartedSection
+                      onTabChange={setActiveTab}
+                      selectInAppTutorial={selectInAppTutorial}
+                      showGetStartedSection={showGetStartedSection}
+                      setShowGetStartedSection={setShowGetStartedSection}
+                    />
+                  )}
+                  {activeTab === 'build' && (
+                    <BuildSection
+                      ref={buildSectionRef}
+                      project={project}
+                      canOpen={canOpen}
+                      onChooseProject={onChooseProject}
+                      onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+                      onShowAllExamples={onOpenExampleStore}
+                      onSelectExampleShortHeader={
+                        onOpenExampleStoreWithExampleShortHeader
+                      }
+                      onSelectPrivateGameTemplateListingData={
+                        onOpenExampleStoreWithPrivateGameTemplateListingData
+                      }
+                      onOpenRecentFile={onOpenRecentFile}
+                      storageProviders={storageProviders}
+                    />
+                  )}
+                  {activeTab === 'learn' && (
+                    <LearnSection
+                      onOpenExampleStore={onOpenExampleStore}
+                      onTabChange={setActiveTab}
+                      onOpenHelpFinder={onOpenHelpFinder}
+                      selectInAppTutorial={selectInAppTutorial}
+                    />
+                  )}
+                  {activeTab === 'play' && <PlaySection />}
+                  {activeTab === 'community' && <CommunitySection />}
+                  {activeTab === 'shop' && (
+                    <StoreSection
+                      project={project}
+                      resourceManagementProps={resourceManagementProps}
+                      canInstallPrivateAsset={canInstallPrivateAsset}
+                      onOpenPrivateGameTemplateListingData={
+                        onOpenPrivateGameTemplateListingData
+                      }
+                    />
+                  )}
+                  {activeTab === 'team-view' && (
+                    <TeamSection
+                      project={project}
+                      onOpenRecentFile={onOpenRecentFile}
+                      storageProviders={storageProviders}
+                    />
+                  )}
+                </div>
+                <HomePageMenu
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  onOpenPreferences={onOpenPreferences}
+                  onOpenAbout={onOpenAbout}
+                />
               </div>
-              <HomePageMenu
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                onOpenPreferences={onOpenPreferences}
-                onOpenAbout={onOpenAbout}
-              />
-            </div>
+            </TeamProvider>
           )}
         </I18n>
       );

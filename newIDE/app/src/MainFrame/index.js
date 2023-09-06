@@ -2354,6 +2354,8 @@ const MainFrame = (props: Props) => {
       if (!currentFileMetadata) {
         return saveProjectAs();
       }
+      const isProjectOwnedBySomeoneElse = !!currentFileMetadata.ownerId;
+      if (isProjectOwnedBySomeoneElse) return;
 
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
@@ -2908,6 +2910,13 @@ const MainFrame = (props: Props) => {
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
+  const isProjectOwnedBySomeoneElse =
+    !!currentFileMetadata && !!currentFileMetadata.ownerId;
+  const canSave =
+    !!state.currentProject &&
+    !isSavingProject &&
+    (!currentFileMetadata || !isProjectOwnedBySomeoneElse);
+
   return (
     <div
       className={
@@ -3034,7 +3043,7 @@ const MainFrame = (props: Props) => {
               : null
           )
         }
-        canSave={!!state.currentProject && !isSavingProject}
+        canSave={canSave}
         onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
@@ -3095,7 +3104,7 @@ const MainFrame = (props: Props) => {
                     },
                     resourceManagementProps,
                     onSave: saveProject,
-                    canSave: !!state.currentProject && !isSavingProject,
+                    canSave,
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     unsavedChanges: unsavedChanges,

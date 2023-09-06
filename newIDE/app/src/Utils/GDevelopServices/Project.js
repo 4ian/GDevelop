@@ -348,6 +348,19 @@ export const listUserCloudProjects = async (
   return response.data;
 };
 
+export const listOtherUserCloudProjects = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  otherUserId: string
+): Promise<Array<CloudProjectWithUserAccessInfo>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`user/${otherUserId}/project`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
 export const getCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
@@ -363,6 +376,28 @@ export const getCloudProject = async (
     },
     params: { userId },
   });
+  return response.data;
+};
+
+export const getOtherUserCloudProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  otherUserId: string
+): Promise<?CloudProject> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(
+    `/user/${otherUserId}/project/${cloudProjectId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
   return response.data;
 };
 

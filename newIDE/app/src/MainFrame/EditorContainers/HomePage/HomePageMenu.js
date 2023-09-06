@@ -10,12 +10,14 @@ import PickAxeIcon from '../../../UI/CustomSvgIcons/PickAxe';
 import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
 import WebIcon from '../../../UI/CustomSvgIcons/Web';
+import BookLeafIcon from '../../../UI/CustomSvgIcons/BookLeaf';
 import SunIcon from '../../../UI/CustomSvgIcons/Sun';
 import StoreIcon from '../../../UI/CustomSvgIcons/Store';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import HomePageMenuBar from './HomePageMenuBar';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export const styles = {
   drawerContent: {
@@ -41,7 +43,8 @@ export type HomeTab =
   | 'learn'
   | 'play'
   | 'community'
-  | 'shop';
+  | 'shop'
+  | 'team-view';
 
 export const homePageMenuTabs: {
   label: React.Node,
@@ -86,6 +89,14 @@ export const homePageMenuTabs: {
     getIcon: color => <WebIcon fontSize="small" color={color} />,
   },
 ];
+
+export const teamViewTab = {
+  label: <Trans>Classrooms</Trans>,
+  tab: 'team-view',
+  id: 'team-view-tab',
+  getIcon: (color: string) => <BookLeafIcon fontSize="small" color={color} />,
+};
+
 type Props = {|
   setActiveTab: HomeTab => void,
   activeTab: HomeTab,
@@ -99,11 +110,21 @@ export const HomePageMenu = ({
   onOpenPreferences,
   onOpenAbout,
 }: Props) => {
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { profile } = React.useContext(AuthenticatedUserContext);
+  const displayTeamViewTab = profile && profile.isTeacher;
   const [
     isHomePageMenuDrawerOpen,
     setIsHomePageMenuDrawerOpen,
   ] = React.useState(false);
+
+  const tabsToDisplay = displayTeamViewTab
+    ? [
+        ...homePageMenuTabs.slice(0, 2),
+        teamViewTab,
+        ...homePageMenuTabs.slice(2),
+      ]
+    : homePageMenuTabs;
 
   const buttons: {
     label: React.Node,
@@ -139,7 +160,7 @@ export const HomePageMenu = ({
         PaperProps={{
           style: {
             ...styles.drawerContent,
-            backgroundColor: GDevelopTheme.home.header.backgroundColor,
+            backgroundColor: gdevelopTheme.home.header.backgroundColor,
           },
           className: 'safe-area-aware-left-container',
         }}
@@ -164,7 +185,7 @@ export const HomePageMenu = ({
                     <DoubleChevronArrowLeft />
                   </IconButton>
                 </Line>
-                {homePageMenuTabs.map(({ label, tab, getIcon }, index) => (
+                {tabsToDisplay.map(({ label, tab, getIcon }, index) => (
                   <VerticalTabButton
                     key={index}
                     label={label}

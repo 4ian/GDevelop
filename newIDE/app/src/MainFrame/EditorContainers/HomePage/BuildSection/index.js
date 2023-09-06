@@ -32,7 +32,10 @@ import ContextMenu, {
 import CircularProgress from '../../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
-import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
+import {
+  deleteCloudProject,
+  type CloudProjectWithUserAccessInfo,
+} from '../../../../Utils/GDevelopServices/Project';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
@@ -76,7 +79,7 @@ const styles = {
   noProjectsContainer: { padding: 10 },
 };
 
-const getProjectLineHeight = (width: WidthType) => {
+export const getProjectLineHeight = (width: WidthType) => {
   const lineHeight = width === 'small' ? 52 : 36;
 
   return lineHeight - 2 * marginsSize;
@@ -131,17 +134,45 @@ const useStylesForListItemIcon = makeStyles({
   },
 });
 
-const ProjectFileListItem = ({
-  file,
-  storageProviders,
-  onOpenRecentFile,
-  isWindowWidthMediumOrLarger,
-}: {|
+export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
+  cloudProjects: Array<CloudProjectWithUserAccessInfo>,
+  ownerId?: string
+): Array<FileMetadataAndStorageProviderName> => {
+  return cloudProjects
+    .map(cloudProject => {
+      if (cloudProject.deletedAt) return null;
+      const file: FileMetadataAndStorageProviderName = {
+        storageProviderName: 'Cloud',
+        fileMetadata: {
+          fileIdentifier: cloudProject.id,
+          lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
+          name: cloudProject.name,
+          gameId: cloudProject.gameId,
+        },
+      };
+      if (ownerId) {
+        file.fileMetadata.ownerId = ownerId;
+      }
+      return file;
+    })
+    .filter(Boolean);
+};
+
+type ProjectFileListItemProps = {|
   file: FileMetadataAndStorageProviderName,
   storageProviders: Array<StorageProvider>,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   isWindowWidthMediumOrLarger: boolean,
-|}) => {
+  hideDeleteContextMenuAction?: boolean,
+|};
+
+export const ProjectFileListItem = ({
+  file,
+  storageProviders,
+  onOpenRecentFile,
+  isWindowWidthMediumOrLarger,
+  hideDeleteContextMenuAction,
+}: ProjectFileListItemProps) => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const iconClasses = useStylesForListItemIcon();
   const { showDeleteConfirmation } = useAlertDialog();
@@ -207,12 +238,14 @@ const ProjectFileListItem = ({
       { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
     ];
     if (file.storageProviderName === 'Cloud') {
-      actions = actions.concat([
-        {
-          label: i18n._(t`Delete`),
-          click: () => onDeleteCloudProject(i18n, file),
-        },
-      ]);
+      if (!hideDeleteContextMenuAction) {
+        actions = actions.concat([
+          {
+            label: i18n._(t`Delete`),
+            click: () => onDeleteCloudProject(i18n, file),
+          },
+        ]);
+      }
     } else if (file.storageProviderName === 'LocalFile') {
       actions = actions.concat([
         {
@@ -447,21 +480,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
 
     if (cloudProjects) {
       projectFiles = projectFiles.concat(
-        cloudProjects
-          .map(cloudProject => {
-            if (cloudProject.deletedAt) return null;
-            const file: FileMetadataAndStorageProviderName = {
-              storageProviderName: 'Cloud',
-              fileMetadata: {
-                fileIdentifier: cloudProject.id,
-                lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
-                name: cloudProject.name,
-                gameId: cloudProject.gameId,
-              },
-            };
-            return file;
-          })
-          .filter(Boolean)
+        transformCloudProjectsIntoFileMetadataWithStorageProviderName(
+          cloudProjects
+        )
       );
     }
     const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
@@ -645,7 +666,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             <Line>
               <Column noMargin expand>
                 {!isMobile && (
-                  <LineStackLayout justifyContent="space-between">
+                  <Line justifyContent="space-between">
                     <Column expand>
                       <Text color="secondary">
                         <Trans>File name</Trans>
@@ -661,7 +682,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         <Trans>Last edited</Trans>
                       </Text>
                     </Column>
-                  </LineStackLayout>
+                  </Line>
                 )}
                 <List>
                   {authenticatedUser.loginState === 'loggingIn' &&

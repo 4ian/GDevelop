@@ -119,7 +119,11 @@ export const HomePageMenu = ({
   ] = React.useState(false);
 
   const tabsToDisplay = displayTeamViewTab
-    ? [...homePageMenuTabs, teamViewTab]
+    ? [
+        ...homePageMenuTabs.slice(0, 2),
+        teamViewTab,
+        ...homePageMenuTabs.slice(2),
+      ]
     : homePageMenuTabs;
 
   const buttons: {

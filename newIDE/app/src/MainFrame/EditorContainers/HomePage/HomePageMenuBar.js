@@ -60,7 +60,11 @@ const HomePageMenuBar = ({
   const { profile } = React.useContext(AuthenticatedUserContext);
   const displayTeamViewTab = profile && profile.isTeacher;
   const tabsToDisplay = displayTeamViewTab
-    ? [...homePageMenuTabs, teamViewTab]
+    ? [
+        ...homePageMenuTabs.slice(0, 2),
+        teamViewTab,
+        ...homePageMenuTabs.slice(2),
+      ]
     : homePageMenuTabs;
 
   const buttons: {

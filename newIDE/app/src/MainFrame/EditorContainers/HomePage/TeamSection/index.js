@@ -32,6 +32,7 @@ import TeamMemberProjectsView from './TeamMemberProjectsView';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Paper from '../../../../UI/Paper';
+import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const PADDING = 16;
 
@@ -119,6 +120,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
+    const windowWidth = useResponsiveWindowWidth();
+    const isMobile = windowWidth === 'small';
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
@@ -230,7 +233,13 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           <FlatButton
             primary
             disabled={isLoadingMembers}
-            label={<Trans>Refresh dashboard</Trans>}
+            label={
+              isMobile ? (
+                <Trans>Refresh</Trans>
+              ) : (
+                <Trans>Refresh dashboard</Trans>
+              )
+            }
             onClick={onRefreshTeamMembers}
             leftIcon={<Refresh fontSize="small" />}
           />
@@ -271,7 +280,13 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
               </LineStackLayout>
               <FlatButton
                 primary
-                label={<Trans>Create a new room</Trans>}
+                label={
+                  isMobile ? (
+                    <Trans>Create</Trans>
+                  ) : (
+                    <Trans>Create a new room</Trans>
+                  )
+                }
                 leftIcon={<Add fontSize="small" />}
                 onClick={() => setShowNewGroupNameField(true)}
               />

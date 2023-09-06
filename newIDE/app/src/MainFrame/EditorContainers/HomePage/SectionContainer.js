@@ -12,6 +12,7 @@ import { LineStackLayout } from '../../../UI/Layout';
 export const SECTION_PADDING = 30;
 
 const styles = {
+  title: { overflowWrap: 'anywhere', textWrap: 'wrap' },
   mobileContainer: {
     paddingTop: 10,
     paddingLeft: 5,
@@ -100,11 +101,15 @@ const SectionContainer = ({
                   />
                 </Line>
               )}
-              <LineStackLayout noMargin alignItems="center" justifyContent="space-between">
-                <Text size="bold-title" noMargin>
+              <LineStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Text size="bold-title" noMargin style={styles.title}>
                   {title}
                 </Text>
-                {titleAdornment}
+                {titleAdornment && <Column noMargin>{titleAdornment}</Column>}
               </LineStackLayout>
               {subtitleText && (
                 <Line noMargin>

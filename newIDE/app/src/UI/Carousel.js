@@ -59,8 +59,8 @@ const referenceSizesByWindowSize = {
   imageHeight: {
     small: 80,
     medium: 130,
-    large: 140,
-    xlarge: 150,
+    large: 150,
+    xlarge: 170,
   },
   arrowWidth: {
     small: 20,
@@ -491,15 +491,17 @@ const Carousel = <ThumbnailType: Thumbnail>({
       </Line>
 
       <Line noMargin>
-        <div
-          style={{
-            ...styles.arrowContainer,
-            width: arrowWidth,
-          }}
-          onClick={onClickArrow('left')}
-        >
-          {shouldDisplayLeftArrow && areItemsSet && <ArrowLeft />}
-        </div>
+        {!hideArrows && (
+          <div
+            style={{
+              ...styles.arrowContainer,
+              width: arrowWidth,
+            }}
+            onClick={onClickArrow('left')}
+          >
+            {shouldDisplayLeftArrow && areItemsSet && <ArrowLeft />}
+          </div>
+        )}
         <div
           style={{
             width: !!hideArrows
@@ -558,16 +560,18 @@ const Carousel = <ThumbnailType: Thumbnail>({
             </GridList>
           )}
         </div>
-        <div
-          style={{
-            ...styles.arrowContainer,
-            width: arrowWidth,
-            marginLeft: rightArrowMargin,
-          }}
-          onClick={onClickArrow('right')}
-        >
-          {shouldDisplayRightArrow && areItemsSet && <ArrowRight />}
-        </div>
+        {!hideArrows && (
+          <div
+            style={{
+              ...styles.arrowContainer,
+              width: arrowWidth,
+              marginLeft: rightArrowMargin,
+            }}
+            onClick={onClickArrow('right')}
+          >
+            {shouldDisplayRightArrow && areItemsSet && <ArrowRight />}
+          </div>
+        )}
       </Line>
     </Column>
   );

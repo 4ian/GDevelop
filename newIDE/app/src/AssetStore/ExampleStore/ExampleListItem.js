@@ -148,7 +148,7 @@ const ExampleListItem = ({
             <FlatButtonWithSplitMenu
               label={<Trans>Open</Trans>}
               disabled={isOpening || !isCompatible}
-              onClick={() => onOpen()}
+              onClick={onOpen}
               buildMenuTemplate={i18n => [
                 {
                   label: i18n._(t`Open details`),

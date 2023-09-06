@@ -10,6 +10,7 @@ import EditIcon from '../../../../UI/CustomSvgIcons/Edit';
 import TrashIcon from '../../../../UI/CustomSvgIcons/Trash';
 import CircularProgress from '../../../../UI/CircularProgress';
 import AsyncSemiControlledTextField from '../../../../UI/AsyncSemiControlledTextField';
+import { LineStackLayout } from '../../../../UI/Layout';
 
 type Props = {|
   group: TeamGroup,
@@ -74,13 +75,13 @@ const TeamGroupNameField = ({
           emptyErrorText={<Trans>Group name cannot be empty.</Trans>}
         />
       ) : (
-        <Line noMargin alignItems="center">
+        <LineStackLayout noMargin alignItems="center">
           <Text size="block-title">{group.name}</Text>
-          <IconButton onClick={onStartEditingGroupName}>
+          <IconButton onClick={onStartEditingGroupName} size="small">
             <EditIcon fontSize="small" />
           </IconButton>
           {allowDelete && (
-            <IconButton onClick={onClickDeleteGroup}>
+            <IconButton onClick={onClickDeleteGroup} size="small">
               {isDeleting ? (
                 <CircularProgress size={10} />
               ) : (
@@ -88,7 +89,7 @@ const TeamGroupNameField = ({
               )}
             </IconButton>
           )}
-        </Line>
+        </LineStackLayout>
       )}
     </Line>
   );

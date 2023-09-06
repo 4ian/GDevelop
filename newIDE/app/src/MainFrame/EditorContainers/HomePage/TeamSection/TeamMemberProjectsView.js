@@ -69,9 +69,9 @@ const TeamMemberProjectsView = ({
                 </EmptyMessage>
                 <AlertMessage kind="info">
                   <Trans>
-                    Here are displayed their cloud projects only, they might
-                    need to save their local projects as cloud projects for you
-                    to see them.
+                    Only cloud projects can be displayed here. If the user has
+                    created local projects, they need to be saved as cloud
+                    projects to be visible.
                   </Trans>
                 </AlertMessage>
               </>

@@ -10,7 +10,7 @@ import PickAxeIcon from '../../../UI/CustomSvgIcons/PickAxe';
 import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
 import WebIcon from '../../../UI/CustomSvgIcons/Web';
-import UsersIcon from '../../../UI/CustomSvgIcons/Users';
+import BookLeafIcon from '../../../UI/CustomSvgIcons/BookLeaf';
 import SunIcon from '../../../UI/CustomSvgIcons/Sun';
 import StoreIcon from '../../../UI/CustomSvgIcons/Store';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
@@ -94,7 +94,7 @@ export const teamViewTab = {
   label: <Trans>Classrooms</Trans>,
   tab: 'team-view',
   id: 'team-view-tab',
-  getIcon: (color: string) => <UsersIcon fontSize="small" color={color} />,
+  getIcon: (color: string) => <BookLeafIcon fontSize="small" color={color} />,
 };
 
 type Props = {|

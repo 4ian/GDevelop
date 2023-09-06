@@ -140,6 +140,7 @@ const MockTeamProvider = ({
   noGroups?: boolean,
 |}) => {
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
+  const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);
   const [members, setMembers] = React.useState<?(User[])>(initialMembers);
   const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
     noGroups
@@ -186,7 +187,7 @@ const MockTeamProvider = ({
     setNameChangeTryCount(nameChangeTryCount + 1);
     if (nameChangeTryCount % 3 === 1) {
       await delay(1000);
-      throw new Error('Group name error change');
+      throw new Error('Group name change error');
     }
     const newGroups = [...groups];
     const foundGroupIndex = groups.findIndex(_group => _group.id === group.id);
@@ -197,6 +198,11 @@ const MockTeamProvider = ({
   };
 
   const changeUserGroup = async (user: User, group: TeamGroup) => {
+    setUserChangeTryCount(userChangeTryCount + 1);
+    if (userChangeTryCount % 3 === 1) {
+      await delay(1000);
+      throw new Error('User group change error');
+    }
     const membershipToChangeIndex = memberships.findIndex(
       membership => membership.userId === user.id
     );

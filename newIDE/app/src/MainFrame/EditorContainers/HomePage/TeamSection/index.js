@@ -187,8 +187,18 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     );
     const changeUserGroup = React.useCallback(
       async (user: User, group: TeamGroup) => {
-        await onChangeUserGroup(user, group);
-        setMovingUsers(null);
+        try {
+          await onChangeUserGroup(user, group);
+        } catch (error) {
+          console.error(
+            `An error occurred when changing user ${user.email} to group ${
+              group.name
+            }: `,
+            error
+          );
+        } finally {
+          setMovingUsers(null);
+        }
       },
       [onChangeUserGroup]
     );

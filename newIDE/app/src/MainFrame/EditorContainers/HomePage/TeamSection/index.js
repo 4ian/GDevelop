@@ -30,9 +30,10 @@ import FlatButton from '../../../../UI/FlatButton';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import TeamMemberProjectsView from './TeamMemberProjectsView';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
-import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
+import { ColumnStackLayout } from '../../../../UI/Layout';
 import Paper from '../../../../UI/Paper';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import RaisedButton from '../../../../UI/RaisedButton';
 
 const PADDING = 16;
 
@@ -280,11 +281,9 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             <Paper background="medium" style={styles.lobbyContainer}>
               <Line noMargin>
                 <ColumnStackLayout noMargin expand>
-                  <LineStackLayout noMargin alignItems="center">
-                    <Text size="section-title" noMargin>
-                      <Trans>Lobby</Trans>
-                    </Text>
-                  </LineStackLayout>
+                  <Text size="section-title" noMargin>
+                    <Trans>Lobby</Trans>
+                  </Text>
                   <List style={styles.list}>
                     {membersNotInAGroupToDisplay.members
                       .sort(sortMembersByNameOrEmail)
@@ -304,12 +303,10 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           )}
           <div style={styles.roomsContainer}>
             <Line justifyContent="space-between" alignItems="center">
-              <LineStackLayout noMargin alignItems="center">
-                <Text size="section-title" noMargin>
-                  <Trans>Rooms</Trans>
-                </Text>
-              </LineStackLayout>
-              <FlatButton
+              <Text size="section-title" noMargin>
+                <Trans>Rooms</Trans>
+              </Text>
+              <RaisedButton
                 primary
                 label={
                   isMobile ? (
@@ -318,7 +315,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                     <Trans>Create a new room</Trans>
                   )
                 }
-                leftIcon={<Add fontSize="small" />}
+                icon={<Add fontSize="small" />}
                 onClick={() => setShowNewGroupNameField(true)}
               />
             </Line>

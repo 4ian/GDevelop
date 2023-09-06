@@ -36,6 +36,7 @@ import {
   type ShowAlertFunction,
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
+import { setupResourcesWatcher } from './LocalFileResourcesWatcher';
 
 /**
  * Use the Electron APIs to provide access to the native
@@ -55,6 +56,7 @@ export default ({
   },
   getProjectLocation: getProjectLocation,
   renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,
+  setupResourcesWatcher,
   createOperations: () => ({
     onOpenWithPicker,
     onOpen,

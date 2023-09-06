@@ -30,30 +30,30 @@ type Props = {|
 
 const transitionDuration = { enter: 0, exit: 150 };
 
-const LoaderModal = (props: Props) => {
-  const isInfinite = props.progress === null || props.progress === undefined;
+const LoaderModal = ({ progress, message, show }: Props) => {
+  const isInfinite = progress === null || progress === undefined;
   return (
     <I18n>
       {({ i18n }) => (
-        <Dialog open={props.show} transitionDuration={transitionDuration}>
+        <Dialog open={show} transitionDuration={transitionDuration}>
           <DialogContent style={styles.dialogContent}>
             <div
               style={{
-                width: props.message ? dialogWithMessageWidth : undefined,
+                width: message ? dialogWithMessageWidth : undefined,
               }}
             >
               <Column noMargin alignItems="center" expand>
                 <CircularProgress
                   size={loaderSize}
                   disableShrink={isInfinite}
-                  value={isInfinite ? undefined : props.progress}
+                  value={isInfinite ? undefined : progress}
                   variant={isInfinite ? 'indeterminate' : 'determinate'}
                 />
-                {props.message && (
+                {message && (
                   <>
                     <Spacer />
                     <Text noMargin align="center">
-                      {i18n._(props.message)}
+                      {i18n._(message)}
                     </Text>
                   </>
                 )}

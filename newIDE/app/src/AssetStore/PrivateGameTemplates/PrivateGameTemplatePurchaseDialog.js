@@ -3,7 +3,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import {
   listUserPurchases,
-  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
 } from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -34,7 +34,7 @@ const PasswordPromptDialog = (props: {
   <Dialog
     open
     maxWidth="xs"
-    title={<Trans>Asset store password</Trans>}
+    title={<Trans>Store password</Trans>}
     onApply={props.onApply}
     onRequestClose={props.onClose}
     actions={[
@@ -58,7 +58,7 @@ const PasswordPromptDialog = (props: {
         props.onApply();
       }}
       autoComplete="off"
-      name="asset-store-password"
+      name="store-password"
     >
       <TextField
         fullWidth
@@ -75,13 +75,13 @@ const PasswordPromptDialog = (props: {
 );
 
 type Props = {|
-  privateAssetPackListingData: PrivateAssetPackListingData,
+  privateGameTemplateListingData: PrivateGameTemplateListingData,
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
 |};
 
-const PrivateAssetPackPurchaseDialog = ({
-  privateAssetPackListingData,
+const PrivateGameTemplatePurchaseDialog = ({
+  privateGameTemplateListingData,
   onClose,
   simulateAppStoreProduct,
 }: Props) => {
@@ -90,14 +90,14 @@ const PrivateAssetPackPurchaseDialog = ({
     getAuthorizationHeader,
     onLogin,
     onCreateAccount,
-    receivedAssetPacks,
+    receivedGameTemplates,
     onPurchaseSuccessful,
   } = React.useContext(AuthenticatedUserContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
     isCheckingPurchasesAfterLogin,
     setIsCheckingPurchasesAfterLogin,
-  ] = React.useState(!receivedAssetPacks);
+  ] = React.useState(!receivedGameTemplates);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
   const [
     displayPasswordPrompt,
@@ -118,7 +118,7 @@ const PrivateAssetPackPurchaseDialog = ({
       try {
         setIsPurchasing(true);
         await purchaseAppStoreProduct(
-          privateAssetPackListingData.appStoreProductId
+          privateGameTemplateListingData.appStoreProductId
         );
       } finally {
         setIsPurchasing(false);
@@ -130,8 +130,8 @@ const PrivateAssetPackPurchaseDialog = ({
     try {
       setIsPurchasing(true);
       const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
-        productId: privateAssetPackListingData.id,
-        priceName: privateAssetPackListingData.prices[0].name,
+        productId: privateGameTemplateListingData.id,
+        priceName: privateGameTemplateListingData.prices[0].name,
         userId: profile.id,
         customerEmail: profile.email,
         ...(password ? { password } : undefined),
@@ -161,7 +161,7 @@ const PrivateAssetPackPurchaseDialog = ({
   };
 
   const onWillPurchase = () => {
-    // Password is required in dev environment only so that one cannot freely purchase asset packs.
+    // Password is required in dev environment only so that one cannot freely purchase game templates.
     if (Window.isDev()) setDisplayPasswordPrompt(true);
     else onStartPurchase();
   };
@@ -172,31 +172,31 @@ const PrivateAssetPackPurchaseDialog = ({
       try {
         const userPurchases = await listUserPurchases(getAuthorizationHeader, {
           userId: profile.id,
-          productType: 'asset-pack',
+          productType: 'game-template',
           role: 'receiver',
         });
         if (
           userPurchases.find(
             userPurchase =>
-              userPurchase.productId === privateAssetPackListingData.id
+              userPurchase.productId === privateGameTemplateListingData.id
           )
         ) {
-          // We found the purchase, the user has bought the asset pack.
-          // We do not close the dialog yet, as we need to trigger a refresh of the asset store.
+          // We found the purchase, the user has bought the game template.
+          // We do not close the dialog yet, as we need to trigger a refresh of the purchases.
           await onPurchaseSuccessful();
         }
       } catch (error) {
         console.error('Unable to get the user purchases', error);
         await showAlert({
           title: t`An error happened`,
-          message: t`An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the store to see your asset pack!`,
+          message: t`An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the store to see your game template!`,
         });
       }
     },
     [
       profile,
       getAuthorizationHeader,
-      privateAssetPackListingData,
+      privateGameTemplateListingData,
       onPurchaseSuccessful,
       showAlert,
     ]
@@ -209,13 +209,13 @@ const PrivateAssetPackPurchaseDialog = ({
     isPurchasing ? 3900 : null
   );
 
-  // Listen to the received asset pack, to know when a user has just logged in and the received asset packs have been loaded.
-  // In this case, start a timeout to remove the loader and give some time for the asset store to refresh.
+  // Listen to the received game template, to know when a user has just logged in and the received game templates have been loaded.
+  // In this case, start a timeout to remove the loader and give some time for the store to refresh.
   React.useEffect(
     () => {
       let timeoutId;
       (async () => {
-        if (receivedAssetPacks) {
+        if (receivedGameTemplates) {
           timeoutId = setTimeout(
             () => setIsCheckingPurchasesAfterLogin(false),
             3000
@@ -226,19 +226,19 @@ const PrivateAssetPackPurchaseDialog = ({
         clearTimeout(timeoutId);
       };
     },
-    [receivedAssetPacks]
+    [receivedGameTemplates]
   );
 
-  // If the user has received this particular pack, either:
+  // If the user has received this particular template, either:
   // - they just logged in, and already have it, so we close the dialog.
   // - they just bought it, we display the success message.
   React.useEffect(
     () => {
-      if (receivedAssetPacks) {
-        const receivedAssetPack = receivedAssetPacks.find(
-          pack => pack.id === privateAssetPackListingData.id
+      if (receivedGameTemplates) {
+        const receivedGameTemplate = receivedGameTemplates.find(
+          gameTemplate => gameTemplate.id === privateGameTemplateListingData.id
         );
-        if (receivedAssetPack) {
+        if (receivedGameTemplate) {
           if (isPurchasing) {
             setIsPurchasing(false);
             setPurchaseSuccessful(true);
@@ -249,8 +249,8 @@ const PrivateAssetPackPurchaseDialog = ({
       }
     },
     [
-      receivedAssetPacks,
-      privateAssetPackListingData,
+      receivedGameTemplates,
+      privateGameTemplateListingData,
       isPurchasing,
       onClose,
       isCheckingPurchasesAfterLogin,
@@ -267,9 +267,9 @@ const PrivateAssetPackPurchaseDialog = ({
             onCreateAccount={onCreateAccount}
             message={
               <Trans>
-                Asset packs will be linked to your user account and available
-                for all your projects. Log-in or sign-up to purchase this pack
-                (or restore your existing purchase).
+                Game templates will be linked to your user account and available
+                for all your projects. Log-in or sign-up to purchase this game
+                template. (or restore your existing purchase).
               </Trans>
             }
             justifyContent="center"
@@ -283,8 +283,7 @@ const PrivateAssetPackPurchaseDialog = ({
           <Line justifyContent="center" alignItems="center">
             <Text>
               <Trans>
-                You can now go back to the asset store to use the assets in your
-                games.
+                You can now go back to the store to use your new game template.
               </Trans>
             </Text>
           </Line>
@@ -321,8 +320,8 @@ const PrivateAssetPackPurchaseDialog = ({
             <Line justifyContent="center">
               <BackgroundText>
                 <Trans>
-                  Once you're done, come back to GDevelop and the assets will be
-                  added to your account automatically.
+                  Once you're done, come back to GDevelop and the game template
+                  will be added to your account automatically.
                 </Trans>
               </BackgroundText>
             </Line>
@@ -341,8 +340,8 @@ const PrivateAssetPackPurchaseDialog = ({
     : {
         subtitle: (
           <Trans>
-            The asset pack {privateAssetPackListingData.name} will be linked to
-            your account {profile.email}.
+            The game template {privateGameTemplateListingData.name} will be
+            linked to your account {profile.email}.
           </Trans>
         ),
         content: shouldUseOrSimulateAppStoreProduct ? null : (
@@ -380,7 +379,7 @@ const PrivateAssetPackPurchaseDialog = ({
   return (
     <>
       <Dialog
-        title={<Trans>{privateAssetPackListingData.name}</Trans>}
+        title={<Trans>{privateGameTemplateListingData.name}</Trans>}
         maxWidth="sm"
         open
         onRequestClose={onClose}
@@ -407,4 +406,4 @@ const PrivateAssetPackPurchaseDialog = ({
   );
 };
 
-export default PrivateAssetPackPurchaseDialog;
+export default PrivateGameTemplatePurchaseDialog;

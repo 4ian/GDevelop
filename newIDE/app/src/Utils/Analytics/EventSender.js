@@ -224,9 +224,9 @@ export const sendInAppTutorialStarted = (metadata: {|
 };
 
 export const sendAssetPackOpened = (options: {|
+  assetPackId: string | null,
   assetPackName: string,
   assetPackTag: string | null,
-  assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
   source: 'store-home' | 'author-profile' | 'new-object',
 |}) => {
@@ -248,6 +248,30 @@ export const sendAssetPackInformationOpened = (options: {|
   assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
   recordEvent('asset_pack_information_opened', options);
+};
+
+export const sendGameTemplateOpened = (options: {|
+  gameTemplateId: string | null,
+  gameTemplateName: string,
+  gameTemplateTag: string | null,
+  source: 'store-home' | 'examples-list',
+|}) => {
+  recordEvent('game_template_opened', options);
+};
+
+export const sendGameTemplateBuyClicked = (options: {|
+  gameTemplateId: string,
+  gameTemplateName: string,
+  gameTemplateTag: string,
+|}) => {
+  recordEvent('game_template_buy_clicked', options);
+};
+
+export const sendGameTemplateInformationOpened = (options: {|
+  gameTemplateId: string,
+  gameTemplateName: string,
+|}) => {
+  recordEvent('game_template_information_opened', options);
 };
 
 export const sendHelpSearch = (searchText: string) => {

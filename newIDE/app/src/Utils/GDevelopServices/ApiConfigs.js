@@ -113,6 +113,12 @@ export const GDevelopPrivateAssetsStorage = {
     : 'https://private-assets.gdevelop.io',
 };
 
+export const GDevelopPrivateGameTemplatesStorage = {
+  baseUrl: isDev
+    ? 'https://private-game-templates-dev.gdevelop.io'
+    : 'https://private-game-templates.gdevelop.io',
+};
+
 export const GDevelopPublicAssetResourcesStorageBaseUrl =
   'https://asset-resources.gdevelop.io';
 export const GDevelopPublicAssetResourcesStorageStagingBaseUrl =

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import {
   useResponsiveWindowWidth,
   type WidthType,
@@ -82,7 +81,6 @@ const styles = {
 };
 
 type Props = {|
-  onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
   showGetStartedSection: boolean,
@@ -90,7 +88,6 @@ type Props = {|
 |};
 
 const GetStartedSection = ({
-  onCreateProject,
   onTabChange,
   selectInAppTutorial,
   showGetStartedSection,

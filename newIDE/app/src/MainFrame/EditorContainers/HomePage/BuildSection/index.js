@@ -18,7 +18,7 @@ import {
   LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
-
+import Carousel from '../../../../UI/Carousel';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -46,8 +46,7 @@ import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '../../../../UI/CustomSvgIcons/Add';
-import ImageTileRow from '../../../../UI/ImageTileRow';
-import { prepareExamples } from '../../../../AssetStore/ExampleStore';
+import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
@@ -58,6 +57,10 @@ import IconButton from '../../../../UI/IconButton';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import RouterContext from '../../../RouterContext';
 import { useLongTouch } from '../../../../Utils/UseLongTouch';
+import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
+import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -73,21 +76,6 @@ const styles = {
   noProjectsContainer: { padding: 10 },
 };
 
-const getTemplatesGridSizeFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 2;
-    case 'medium':
-      return 4;
-    case 'large':
-      return 6;
-    case 'xlarge':
-      return 7;
-    default:
-      return 4;
-  }
-};
-
 const getProjectLineHeight = (width: WidthType) => {
   const lineHeight = width === 'small' ? 52 : 36;
 
@@ -99,9 +87,12 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
   onShowAllExamples: () => void,
-  onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
+  onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
+  onSelectPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -420,14 +411,18 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onChooseProject,
       onOpenNewProjectSetupDialog,
       onShowAllExamples,
-      onSelectExample,
+      onSelectExampleShortHeader,
+      onSelectPrivateGameTemplateListingData,
       onOpenRecentFile,
       storageProviders,
     },
     ref
   ) => {
     const { getRecentProjectFiles } = React.useContext(PreferencesContext);
-    const { allExamples } = React.useContext(ExampleStoreContext);
+    const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+    const { privateGameTemplateListingDatas } = React.useContext(
+      PrivateGameTemplateStoreContext
+    );
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
@@ -481,6 +476,78 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
 
     const skeletonLineHeight = getProjectLineHeight(windowWidth);
 
+    // Show a premium game template every 3 examples.
+    const examplesAndTemplatesToDisplay = React.useMemo(
+      () => {
+        const allItems = [];
+        const privateGameTemplateItems = [
+          ...(privateGameTemplateListingDatas
+            ? privateGameTemplateListingDatas.map(
+                privateGameTemplateListingData => {
+                  const isTemplateOwned =
+                    !!authenticatedUser.receivedGameTemplates &&
+                    !!authenticatedUser.receivedGameTemplates.find(
+                      receivedGameTemplate =>
+                        receivedGameTemplate.id ===
+                        privateGameTemplateListingData.id
+                    );
+                  return {
+                    id: privateGameTemplateListingData.id,
+                    title: privateGameTemplateListingData.name,
+                    thumbnailUrl:
+                      privateGameTemplateListingData.thumbnailUrls[0],
+                    onClick: () =>
+                      onSelectPrivateGameTemplateListingData(
+                        privateGameTemplateListingData
+                      ),
+                    overlayText: (
+                      <ProductPriceTag
+                        productListingData={privateGameTemplateListingData}
+                        owned={isTemplateOwned}
+                      />
+                    ),
+                    overlayTextPosition: 'topLeft',
+                  };
+                }
+              )
+            : []),
+        ];
+
+        const exampleShortHeaderItems = [
+          ...(exampleShortHeaders
+            ? prepareExampleShortHeaders(exampleShortHeaders)
+                .map(example => ({
+                  id: example.id,
+                  title: example.name,
+                  onClick: () => onSelectExampleShortHeader(example),
+                  thumbnailUrl: example.previewImageUrls[0],
+                }))
+                .filter(exampleShortHeader => !!exampleShortHeader.thumbnailUrl)
+            : []),
+        ];
+
+        for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
+          allItems.push(exampleShortHeaderItems[i]);
+          if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
+            const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+            if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
+              allItems.push(
+                privateGameTemplateItems[nextPrivateGameTemplateIndex]
+              );
+          }
+        }
+
+        return allItems.slice(0, 12); // Only show 12 items.
+      },
+      [
+        authenticatedUser.receivedGameTemplates,
+        exampleShortHeaders,
+        onSelectExampleShortHeader,
+        onSelectPrivateGameTemplateListingData,
+        privateGameTemplateListingDatas,
+      ]
+    );
+
     return (
       <>
         <SectionContainer
@@ -505,21 +572,15 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           }
         >
           <SectionRow>
-            <ImageTileRow
-              isLoading={!allExamples}
-              items={
-                allExamples
-                  ? prepareExamples(allExamples).map(example => ({
-                      onClick: () => onSelectExample(example),
-                      imageUrl: example.previewImageUrls[0],
-                    }))
-                  : []
-              }
-              title={<Trans>Recommended templates</Trans>}
-              onShowAll={onShowAllExamples}
-              showAllIcon={<Add fontSize="small" />}
-              getColumnsFromWidth={getTemplatesGridSizeFromWidth}
-              getLimitFromWidth={getTemplatesGridSizeFromWidth}
+            <Carousel
+              title={<Trans>Game templates</Trans>}
+              displayItemTitles={false}
+              browseAllLabel={<Trans>Browse all templates</Trans>}
+              onBrowseAllClick={onShowAllExamples}
+              items={examplesAndTemplatesToDisplay}
+              browseAllIcon={<ChevronArrowRight fontSize="small" />}
+              roundedImages
+              hideArrows
             />
           </SectionRow>
           <SectionRow>
@@ -539,10 +600,14 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                   <RaisedButton
                     primary
                     fullWidth={!canOpen}
-                    label={<Trans>Create a project</Trans>}
-                    onClick={() =>
-                      onOpenNewProjectSetupDialog(/*exampleShortHeader=*/ null)
+                    label={
+                      isMobile ? (
+                        <Trans>Create</Trans>
+                      ) : (
+                        <Trans>Create a project</Trans>
+                      )
                     }
+                    onClick={onOpenNewProjectSetupDialog}
                     icon={<Add fontSize="small" />}
                     id="home-create-project-button"
                   />
@@ -554,7 +619,13 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                       <Spacer />
                       <TextButton
                         primary
-                        label={<Trans>Open a project</Trans>}
+                        label={
+                          isMobile ? (
+                            <Trans>Open</Trans>
+                          ) : (
+                            <Trans>Open a project</Trans>
+                          )
+                        }
                         onClick={onChooseProject}
                       />
                     </>

@@ -10,7 +10,10 @@ import {
   type License,
   isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import GridList from '@material-ui/core/GridList';
 import {
@@ -26,8 +29,9 @@ import {
   AssetCardTile,
   AssetFolderTile,
   PrivateAssetPackTile,
+  PrivateGameTemplateTile,
   PublicAssetPackTile,
-} from './AssetPackTiles';
+} from './ShopTiles';
 import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAssetPackAudioFilesDownloadButton';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { Column, LargeSpacer, Line } from '../UI/Grid';
@@ -42,6 +46,7 @@ import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Window from '../Utils/Window';
 import Breadcrumbs from '../UI/Breadcrumbs';
 import { getFolderTagsFromAssetShortHeaders } from './TagsHelper';
+import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 const ASSETS_DISPLAY_LIMIT = 100;
 
@@ -59,7 +64,7 @@ const getAssetSize = (windowWidth: WidthType) => {
   }
 };
 
-const getAssetPacksColumns = (windowWidth: WidthType) => {
+const getShopItemsColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
     case 'small':
       return 1;
@@ -116,14 +121,18 @@ export type AssetsListInterface = {|
 type Props = {|
   assetShortHeaders: ?Array<AssetShortHeader>,
   privateAssetPackListingDatas?: ?Array<PrivateAssetPackListingData>,
+  privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
   publicAssetPacks?: ?Array<PublicAssetPack>,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
   noResultsPlaceHolder?: React.Node,
   error?: ?Error,
   onPrivateAssetPackSelection?: (
-    assetPack: PrivateAssetPackListingData
+    privateAssetPackListingData: PrivateAssetPackListingData
   ) => void,
   onPublicAssetPackSelection?: (assetPack: PublicAssetPack) => void,
+  onPrivateGameTemplateSelection?: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   noScroll?: boolean,
 |};
 
@@ -134,25 +143,33 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       onOpenDetails,
       noResultsPlaceHolder,
       privateAssetPackListingDatas,
+      privateGameTemplateListingDatas,
       publicAssetPacks,
       onPrivateAssetPackSelection,
       onPublicAssetPackSelection,
+      onPrivateGameTemplateSelection,
       noScroll,
     }: Props,
     ref
   ) => {
     const {
-      error,
+      error: assetStoreError,
       fetchAssetsAndFilters,
-      clearAllFilters,
-      navigationState,
+      clearAllFilters: clearAllAssetFilters,
+      shopNavigationState,
       licenses,
       authors,
       assetFiltersState,
       assetPackFiltersState,
       privateAssetPackListingDatas: allPrivateAssetPackListingDatas,
     } = React.useContext(AssetStoreContext);
-    const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+    const {
+      error: gameTemplateStoreError,
+      fetchGameTemplates,
+    } = React.useContext(PrivateGameTemplateStoreContext);
+    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
+      AuthenticatedUserContext
+    );
     const [
       authorPublicProfile,
       setAuthorPublicProfile,
@@ -165,7 +182,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       isNavigatingInsideFolder,
       setIsNavigatingInsideFolder,
     ] = React.useState<boolean>(false);
-    const currentPage = navigationState.getCurrentPage();
+    const currentPage = shopNavigationState.getCurrentPage();
     const { openedAssetPack, filtersState } = currentPage;
     const chosenCategory = filtersState.chosenCategory;
     const windowWidth = useResponsiveWindowWidth();
@@ -184,6 +201,16 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         scrollViewElement.scrollToPosition(y);
       },
     }));
+
+    const fetchAssetsAndGameTemplates = React.useCallback(
+      () => {
+        fetchAssetsAndFilters();
+        fetchGameTemplates();
+      },
+      [fetchAssetsAndFilters, fetchGameTemplates]
+    );
+
+    const shopError = assetStoreError || gameTemplateStoreError;
 
     const hasAssetPackFiltersApplied = React.useMemo(
       // When a pack is opened, the asset pack filters are not hidden, but not relevant either.
@@ -217,7 +244,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     ) : hasOnlySelectedOwnedAssetPacks ? (
       <NoResultPlaceholder
         message={<Trans>You don't own any pack yet!</Trans>}
-        onClear={clearAllFilters}
+        onClear={clearAllAssetFilters}
       />
     ) : hasAssetPackFiltersApplied && hasAssetFiltersApplied ? (
       <NoResultPlaceholder
@@ -227,10 +254,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             clearing one of the filters!
           </Trans>
         }
-        onClear={clearAllFilters}
+        onClear={clearAllAssetFilters}
       />
     ) : (
-      <NoResultPlaceholder onClear={clearAllFilters} />
+      <NoResultPlaceholder onClear={clearAllAssetFilters} />
     );
 
     const [selectedFolders, setSelectedFolders] = React.useState<Array<string>>(
@@ -461,6 +488,43 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       ]
     );
 
+    const gameTemplateTiles = React.useMemo(
+      () => {
+        if (
+          !privateGameTemplateListingDatas ||
+          !onPrivateGameTemplateSelection ||
+          hasAssetFiltersApplied || // Don't show private game templates if filtering on assets.
+          hasAssetPackFiltersApplied // Don't show private game templates if filtering on asset packs.
+        )
+          return [];
+
+        return privateGameTemplateListingDatas.map(
+          (privateGameTemplateListingData, index) => (
+            <PrivateGameTemplateTile
+              privateGameTemplateListingData={privateGameTemplateListingData}
+              onSelect={() => {
+                onPrivateGameTemplateSelection(privateGameTemplateListingData);
+              }}
+              owned={
+                !!receivedGameTemplates &&
+                !!receivedGameTemplates.find(
+                  pack => pack.id === privateGameTemplateListingData.id
+                )
+              }
+              key={privateGameTemplateListingData.id}
+            />
+          )
+        );
+      },
+      [
+        privateGameTemplateListingDatas,
+        onPrivateGameTemplateSelection,
+        receivedGameTemplates,
+        hasAssetFiltersApplied,
+        hasAssetPackFiltersApplied,
+      ]
+    );
+
     const packMainImageUrl = openedAssetPack
       ? openedAssetPack.thumbnailUrl
         ? openedAssetPack.thumbnailUrl
@@ -524,20 +588,34 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           ...(noScroll ? { overflow: 'hidden' } : {}),
         }}
       >
-        {!assetTiles && !error && <PlaceholderLoader />}
-        {!assetTiles && error && (
-          <PlaceholderError onRetry={fetchAssetsAndFilters}>
+        {!assetTiles && !shopError && <PlaceholderLoader />}
+        {!assetTiles && shopError && (
+          <PlaceholderError onRetry={fetchAssetsAndGameTemplates}>
             <Trans>
               Can't load the results. Verify your internet connection or retry
               later.
             </Trans>
           </PlaceholderError>
         )}
+        {!openedAssetPack && gameTemplateTiles.length ? (
+          <Line expand>
+            <Column noMargin expand>
+              <GridList
+                cols={getShopItemsColumns(windowWidth)}
+                style={styles.grid}
+                cellHeight="auto"
+                spacing={cellSpacing / 2}
+              >
+                {gameTemplateTiles}
+              </GridList>
+            </Column>
+          </Line>
+        ) : null}
         {!openedAssetPack && allBundlePackTiles.length ? (
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getAssetPacksColumns(windowWidth)}
+                cols={getShopItemsColumns(windowWidth)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -551,7 +629,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getAssetPacksColumns(windowWidth)}
+                cols={getShopItemsColumns(windowWidth)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -696,6 +774,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           !assetTiles.length &&
           !allBundlePackTiles.length &&
           !allStandAlonePackTiles.length &&
+          !gameTemplateTiles.length &&
           noResultComponent}
         {onPrivateAssetPackSelection &&
           openAuthorPublicProfileDialog &&

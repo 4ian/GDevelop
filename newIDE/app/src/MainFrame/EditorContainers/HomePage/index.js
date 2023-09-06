@@ -25,6 +25,8 @@ import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSou
 import RouterContext from '../../RouterContext';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
+import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 const styles = {
   container: {
@@ -69,7 +71,14 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: (ExampleShortHeader | null) => void,
+  onOpenExampleStore: () => void,
+  onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
+  onOpenExampleStoreWithPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
+  onOpenPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
@@ -81,7 +90,7 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
 
   // Project save
   onSave: () => Promise<void>,
@@ -106,7 +115,10 @@ export const HomePage = React.memo<Props>(
         onChooseProject,
         onOpenRecentFile,
         onOpenNewProjectSetupDialog,
-        onCreateProject,
+        onOpenExampleStore,
+        onOpenExampleStoreWithExampleShortHeader,
+        onOpenExampleStoreWithPrivateGameTemplateListingData,
+        onOpenPrivateGameTemplateListingData,
         onOpenProjectManager,
         onOpenHelpFinder,
         onOpenLanguageDialog,
@@ -132,6 +144,10 @@ export const HomePage = React.memo<Props>(
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
+        fetchGameTemplates,
+        shop: { setInitialGameTemplateUserFriendlySlug },
+      } = React.useContext(PrivateGameTemplateStoreContext);
+      const {
         values: { showGetStartedSection },
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
@@ -143,9 +159,10 @@ export const HomePage = React.memo<Props>(
       React.useEffect(
         () => {
           fetchExamplesAndFilters();
+          fetchGameTemplates();
           fetchTutorials();
         },
-        [fetchExamplesAndFilters, fetchTutorials]
+        [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -217,17 +234,36 @@ export const HomePage = React.memo<Props>(
         AssetStoreContext
       );
 
-      // Open the asset store and a pack if asked to do so.
+      // Open the store and a pack or game template if asked to do so.
       React.useEffect(
         () => {
-          if (routeArguments['initial-dialog'] === 'asset-store') {
+          if (
+            routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
+            routeArguments['initial-dialog'] === 'store' // New way of opening the store
+          ) {
             setActiveTab('shop');
-            setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            if (routeArguments['asset-pack']) {
+              setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            }
+            if (routeArguments['game-template']) {
+              setInitialGameTemplateUserFriendlySlug(
+                routeArguments['game-template']
+              );
+            }
             // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments(['initial-dialog', 'asset-pack']);
+            removeRouteArguments([
+              'initial-dialog',
+              'asset-pack',
+              'game-template',
+            ]);
           }
         },
-        [routeArguments, removeRouteArguments, setInitialPackUserFriendlySlug]
+        [
+          routeArguments,
+          removeRouteArguments,
+          setInitialPackUserFriendlySlug,
+          setInitialGameTemplateUserFriendlySlug,
+        ]
       );
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(
@@ -245,9 +281,6 @@ export const HomePage = React.memo<Props>(
                 {activeTab === 'get-started' && (
                   <GetStartedSection
                     onTabChange={setActiveTab}
-                    onCreateProject={() =>
-                      onCreateProject(/*exampleShortHeader=*/ null)
-                    }
                     selectInAppTutorial={selectInAppTutorial}
                     showGetStartedSection={showGetStartedSection}
                     setShowGetStartedSection={setShowGetStartedSection}
@@ -260,11 +293,12 @@ export const HomePage = React.memo<Props>(
                     canOpen={canOpen}
                     onChooseProject={onChooseProject}
                     onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
-                    onShowAllExamples={() =>
-                      onCreateProject(/*exampleShortHeader=*/ null)
+                    onShowAllExamples={onOpenExampleStore}
+                    onSelectExampleShortHeader={
+                      onOpenExampleStoreWithExampleShortHeader
                     }
-                    onSelectExample={exampleShortHeader =>
-                      onCreateProject(exampleShortHeader)
+                    onSelectPrivateGameTemplateListingData={
+                      onOpenExampleStoreWithPrivateGameTemplateListingData
                     }
                     onOpenRecentFile={onOpenRecentFile}
                     storageProviders={storageProviders}
@@ -272,9 +306,7 @@ export const HomePage = React.memo<Props>(
                 )}
                 {activeTab === 'learn' && (
                   <LearnSection
-                    onCreateProject={() =>
-                      onCreateProject(/*exampleShortHeader=*/ null)
-                    }
+                    onOpenExampleStore={onOpenExampleStore}
                     onTabChange={setActiveTab}
                     onOpenHelpFinder={onOpenHelpFinder}
                     selectInAppTutorial={selectInAppTutorial}
@@ -287,6 +319,9 @@ export const HomePage = React.memo<Props>(
                     project={project}
                     resourceManagementProps={resourceManagementProps}
                     canInstallPrivateAsset={canInstallPrivateAsset}
+                    onOpenPrivateGameTemplateListingData={
+                      onOpenPrivateGameTemplateListingData
+                    }
                   />
                 )}
               </div>
@@ -319,7 +354,16 @@ export const renderHomePageContainer = (
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
-    onCreateProject={props.onCreateProject}
+    onOpenExampleStore={props.onOpenExampleStore}
+    onOpenExampleStoreWithExampleShortHeader={
+      props.onOpenExampleStoreWithExampleShortHeader
+    }
+    onOpenExampleStoreWithPrivateGameTemplateListingData={
+      props.onOpenExampleStoreWithPrivateGameTemplateListingData
+    }
+    onOpenPrivateGameTemplateListingData={
+      props.onOpenPrivateGameTemplateListingData
+    }
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}

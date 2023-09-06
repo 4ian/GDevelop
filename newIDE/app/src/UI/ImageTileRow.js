@@ -6,7 +6,10 @@ import { LineStackLayout } from './Layout';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
 import ImageTileGrid, { type ImageTileComponent } from './ImageTileGrid';
-import { type WidthType } from './Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from './Reponsive/ResponsiveWindowMeasurer';
 
 type ImageTileRowProps = {|
   title: React.Node,
@@ -17,6 +20,7 @@ type ImageTileRowProps = {|
   showAllIcon: React.Node,
   getLimitFromWidth: (width: WidthType) => number,
   getColumnsFromWidth: (width: WidthType) => number,
+  seeAllLabel?: React.Node,
 |};
 
 const ImageTileRow = ({
@@ -28,7 +32,10 @@ const ImageTileRow = ({
   showAllIcon,
   getLimitFromWidth,
   getColumnsFromWidth,
+  seeAllLabel,
 }: ImageTileRowProps) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   return (
     <>
       <LineStackLayout
@@ -43,7 +50,13 @@ const ImageTileRow = ({
         <Column noMargin>
           <FlatButton
             onClick={onShowAll}
-            label={<Trans>Show all</Trans>}
+            label={
+              isMobileScreen ? (
+                <Trans>Browse</Trans> // Short label on mobile.
+              ) : (
+                seeAllLabel || <Trans>See all</Trans>
+              )
+            }
             rightIcon={showAllIcon}
           />
         </Column>

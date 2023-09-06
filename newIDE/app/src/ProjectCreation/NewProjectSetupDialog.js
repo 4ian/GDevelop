@@ -9,7 +9,6 @@ import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
-import { type NewProjectSetup } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
@@ -52,10 +51,23 @@ import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
+import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
+
+export type NewProjectSetup = {|
+  storageProvider: StorageProvider,
+  saveAsLocation: ?SaveAsLocation,
+  projectName?: string,
+  height?: number,
+  width?: number,
+  orientation?: 'landscape' | 'portrait' | 'default',
+  optimizeForPixelArt?: boolean,
+  allowPlayersToLogIn?: boolean,
+  templateSlug?: string,
+|};
 
 type Props = {|
   isOpeningProject?: boolean,
@@ -66,12 +78,18 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
+  onCreateProjectFromPrivateGameTemplate: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType
+  ) => Promise<void>,
   onCreateWithLogin: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateFromAIGeneration: (
     generatedProject: GeneratedProject,
     newProjectSetup: NewProjectSetup
   ) => Promise<void>,
   selectedExampleShortHeader: ?ExampleShortHeader,
+  selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
   storageProviders: Array<StorageProvider>,
   authenticatedUser: AuthenticatedUser,
 |};
@@ -81,15 +99,19 @@ const NewProjectSetupDialog = ({
   onClose,
   onCreateEmptyProject,
   onCreateFromExample,
+  onCreateProjectFromPrivateGameTemplate,
   onCreateWithLogin,
   onCreateFromAIGeneration,
   selectedExampleShortHeader,
+  selectedPrivateGameTemplateListingData,
   storageProviders,
   authenticatedUser,
 }: Props): React.Node => {
   const generateProjectName = () =>
     selectedExampleShortHeader
       ? `${generateName()} (${selectedExampleShortHeader.name})`
+      : selectedPrivateGameTemplateListingData
+      ? `${generateName()} (${selectedPrivateGameTemplateListingData.name})`
       : generateName();
 
   const { getAuthorizationHeader, profile } = React.useContext(
@@ -147,6 +169,10 @@ const NewProjectSetupDialog = ({
       const cloudStorageProvider = storageProviders.find(
         ({ internalName }) => internalName === 'Cloud'
       );
+      const preferredStorageProvider = storageProviders.find(
+        ({ internalName }) =>
+          internalName === values.newProjectsDefaultStorageProviderName
+      );
 
       // If in a tutorial, choose either the local file storage provider or none.
       // This is to avoid a new user to be messing with account creation.
@@ -155,13 +181,18 @@ const NewProjectSetupDialog = ({
         return emptyStorageProvider;
       }
 
+      // If a private game template is selected, suggest the preferred storage if available,
+      // or default to local or cloud.
+      if (!!selectedPrivateGameTemplateListingData) {
+        if (preferredStorageProvider) return preferredStorageProvider;
+        if (localFileStorageProvider) return localFileStorageProvider;
+        if (cloudStorageProvider) return cloudStorageProvider;
+        return emptyStorageProvider;
+      }
+
       // Try to use the storage provider stored in user preferences.
       if (values.newProjectsDefaultStorageProviderName === 'Empty')
         return emptyStorageProvider;
-      const preferredStorageProvider = storageProviders.find(
-        ({ internalName }) =>
-          internalName === values.newProjectsDefaultStorageProviderName
-      );
       if (preferredStorageProvider) return preferredStorageProvider;
 
       // If preferred storage provider not found, push Cloud storage provider if user authenticated.
@@ -196,6 +227,8 @@ const NewProjectSetupDialog = ({
   const hasTooManyCloudProjects =
     storageProvider.internalName === 'Cloud' &&
     checkIfHasTooManyCloudProjects(authenticatedUser);
+  const hasNotSelectedAStorageProvider =
+    storageProvider.internalName === 'Empty';
 
   const selectedWidth =
     resolutionOptions[resolutionOption].width ||
@@ -207,10 +240,28 @@ const NewProjectSetupDialog = ({
     defaultCustomHeight;
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
+  const isLoading = isGeneratingProject || isOpeningProject;
+
+  const isStartingProjectFromScratch =
+    !selectedExampleShortHeader && !selectedPrivateGameTemplateListingData;
+
+  // On the local app, prefer to always have something saved so that the user is not blocked.
+  // On the web-app, allow to create a project without saving it, unless a private game template is selected
+  // (as it requires to save the project to the cloud to be able to use it).
+  const shouldAllowCreatingProjectWithoutSaving =
+    !electron && !selectedPrivateGameTemplateListingData;
+
+  const shouldNotAllowCreatingProject =
+    isLoading ||
+    needUserAuthenticationForStorage ||
+    hasTooManyCloudProjects ||
+    (hasNotSelectedAStorageProvider &&
+      !shouldAllowCreatingProjectWithoutSaving);
+
   const generateProject = React.useCallback(
     async () => {
-      if (isOpeningProject) return;
-      if (needUserAuthenticationForStorage || !profile) return;
+      if (shouldNotAllowCreatingProject) return;
+      if (!profile) return;
 
       setIsGeneratingProject(true);
       try {
@@ -244,8 +295,7 @@ const NewProjectSetupDialog = ({
       }
     },
     [
-      isOpeningProject,
-      needUserAuthenticationForStorage,
+      shouldNotAllowCreatingProject,
       getAuthorizationHeader,
       generationPrompt,
       profile,
@@ -264,8 +314,7 @@ const NewProjectSetupDialog = ({
         return;
       }
 
-      if (isOpeningProject) return;
-      if (needUserAuthenticationForStorage) return;
+      if (shouldNotAllowCreatingProject) return;
 
       setProjectNameError(null);
       if (!projectName) {
@@ -306,6 +355,17 @@ const NewProjectSetupDialog = ({
           },
           i18n
         );
+      } else if (selectedPrivateGameTemplateListingData) {
+        await onCreateProjectFromPrivateGameTemplate(
+          selectedPrivateGameTemplateListingData,
+          {
+            // We only pass down the project name as this is the only cusomizable field for a template.
+            projectName,
+            storageProvider,
+            saveAsLocation,
+          },
+          i18n
+        );
       } else if (allowPlayersToLogIn) {
         await onCreateWithLogin(projectSetup);
         return;
@@ -315,8 +375,7 @@ const NewProjectSetupDialog = ({
     },
     [
       generationPrompt,
-      isOpeningProject,
-      needUserAuthenticationForStorage,
+      shouldNotAllowCreatingProject,
       projectName,
       storageProvider,
       saveAsLocation,
@@ -328,7 +387,9 @@ const NewProjectSetupDialog = ({
       allowPlayersToLogIn,
       selectedExampleShortHeader,
       generateProject,
+      selectedPrivateGameTemplateListingData,
       onCreateFromExample,
+      onCreateProjectFromPrivateGameTemplate,
       onCreateWithLogin,
       onCreateEmptyProject,
     ]
@@ -341,8 +402,6 @@ const NewProjectSetupDialog = ({
     },
     [setProjectName, projectNameError]
   );
-
-  const isLoading = isGeneratingProject || isOpeningProject;
 
   return (
     <I18n>
@@ -362,11 +421,7 @@ const NewProjectSetupDialog = ({
             <LeftLoader isLoading={isLoading} key="create">
               <DialogPrimaryButton
                 primary
-                disabled={
-                  isLoading ||
-                  needUserAuthenticationForStorage ||
-                  hasTooManyCloudProjects
-                }
+                disabled={shouldNotAllowCreatingProject}
                 label={<Trans>Create project</Trans>}
                 onClick={() => onValidate(i18n)}
                 id="create-project-button"
@@ -378,7 +433,7 @@ const NewProjectSetupDialog = ({
           onApply={() => onValidate(i18n)}
         >
           <ColumnStackLayout noMargin>
-            {!selectedExampleShortHeader && (
+            {isStartingProjectFromScratch && (
               <ResolutionOptions
                 onClick={key => setResolutionOption(key)}
                 selectedOption={resolutionOption}
@@ -443,10 +498,7 @@ const NewProjectSetupDialog = ({
                     disabled={storageProvider.disabled}
                   />
                 ))}
-              {!electron && (
-                // Only show the ability to start a project without saving on the web-app.
-                // On the local app, prefer to always have something saved so that the user is not blocked
-                // when they want to add their own resources or use external editors.
+              {shouldAllowCreatingProjectWithoutSaving && (
                 <SelectOption
                   value={emptyStorageProvider.internalName}
                   label={t`Don't save this project now`}
@@ -476,7 +528,7 @@ const NewProjectSetupDialog = ({
                 setSaveAsLocation,
                 newProjectsDefaultFolder,
               })}
-            {!selectedExampleShortHeader && (
+            {isStartingProjectFromScratch && (
               <ColumnStackLayout noMargin expand>
                 <DismissableAlertMessage
                   kind="info"

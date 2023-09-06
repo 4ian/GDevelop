@@ -3,28 +3,33 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import PriceTag from '../../UI/PriceTag';
-import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
+import PriceTag from '../UI/PriceTag';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 import {
   shouldUseAppStoreProduct,
   getAppStoreProduct,
-} from '../../Utils/AppStorePurchases';
+} from '../Utils/AppStorePurchases';
 
 type FormatProps = {|
-  privateAssetPackListingData: PrivateAssetPackListingData,
+  productListingData:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData,
   i18n: I18nType,
 |};
 
-export const formatPrivateAssetPackPrice = ({
+export const formatProductPrice = ({
   i18n,
-  privateAssetPackListingData,
+  productListingData,
 }: FormatProps): string => {
   const appStoreProduct = shouldUseAppStoreProduct()
-    ? getAppStoreProduct(privateAssetPackListingData.appStoreProductId)
+    ? getAppStoreProduct(productListingData.appStoreProductId)
     : null;
   if (appStoreProduct) return appStoreProduct.price;
 
-  const stripePrice = privateAssetPackListingData.prices[0];
+  const stripePrice = productListingData.prices[0];
   if (!stripePrice) return '';
 
   return `€ ${i18n
@@ -35,8 +40,10 @@ export const formatPrivateAssetPackPrice = ({
     .replace(/\D00$/, '')}`;
 };
 
-type PrivateAssetPackPriceTagProps = {|
-  privateAssetPackListingData: PrivateAssetPackListingData,
+type ProductPriceTagProps = {|
+  productListingData:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData,
   /**
    * To be used when the component is over an element for which
    * we don't control the background (e.g. an image).
@@ -45,18 +52,18 @@ type PrivateAssetPackPriceTagProps = {|
   owned?: boolean,
 |};
 
-export const PrivateAssetPackPriceTag = ({
-  privateAssetPackListingData,
+const ProductPriceTag = ({
+  productListingData,
   withOverlay,
   owned,
-}: PrivateAssetPackPriceTagProps) => {
+}: ProductPriceTagProps) => {
   return (
     <I18n>
       {({ i18n }) => {
         const label = owned ? (
           <Trans>✅ Owned</Trans>
         ) : (
-          formatPrivateAssetPackPrice({ i18n, privateAssetPackListingData })
+          formatProductPrice({ i18n, productListingData })
         );
 
         return <PriceTag withOverlay={withOverlay} label={label} />;
@@ -64,3 +71,5 @@ export const PrivateAssetPackPriceTag = ({
     </I18n>
   );
 };
+
+export default ProductPriceTag;

@@ -46,7 +46,6 @@ export const NotLoggedIn = () => {
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
         onClose={() => action('close')()}
-        onSuccessfulPurchase={() => action('purchase')()}
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -58,7 +57,6 @@ export const LoggedIn = () => {
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
         onClose={() => action('close')()}
-        onSuccessfulPurchase={() => action('purchase')()}
       />
     </AuthenticatedUserContext.Provider>
   );

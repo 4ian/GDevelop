@@ -184,16 +184,16 @@ export const PrivateGameTemplateStoreStateProvider = ({
     ]
   );
 
-  // When the asset packs (public and received private packs) are loaded,
-  // open the asset pack with the slug that was asked to be initially loaded.
+  // When the game templates are loaded,
+  // open the game template with the slug that was asked to be initially loaded.
   React.useEffect(
     () => {
       if (
         !initialGameTemplateUserFriendlySlug ||
         initialGameTemplateOpened.current
       ) {
-        // If there is no initial pack or
-        // if the pack was already opened, don't re-open it again even
+        // If there is no initial game template or
+        // if the game template was already opened, don't re-open it again even
         // if the effect run again.
         return;
       }
@@ -217,7 +217,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
             privateGameTemplateListingData,
             previousSearchText: shopSearchText,
           });
-          initialGameTemplateOpened.current = false; // Allow to open the pack again if the effect run again.
+          initialGameTemplateOpened.current = false; // Allow to open the game template again if the effect run again.
           setInitialGameTemplateUserFriendlySlug(null);
           return;
         }

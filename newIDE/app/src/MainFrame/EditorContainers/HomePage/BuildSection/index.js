@@ -573,7 +573,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         >
           <SectionRow>
             <Carousel
-              title={<Trans>Recommended templates</Trans>}
+              title={<Trans>Game templates</Trans>}
               displayItemTitles={false}
               browseAllLabel={<Trans>Browse all templates</Trans>}
               onBrowseAllClick={onShowAllExamples}

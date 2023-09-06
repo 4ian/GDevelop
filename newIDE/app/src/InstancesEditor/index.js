@@ -382,6 +382,10 @@ export default class InstancesEditor extends Component<Props> {
     this._mountEditorComponents(this.props);
   };
 
+  // refreshInstancesEditorCache = () => {
+
+  // }
+
   _mountEditorComponents(props: Props) {
     //Remove and delete any existing editor component
     if (this.highlightedInstance) {

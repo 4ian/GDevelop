@@ -183,6 +183,7 @@ import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/S
 
 import optionalRequire from '../Utils/OptionalRequire';
 import path from 'path-browserify';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 const fileWatcher = optionalRequire('chokidar');
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -766,7 +767,8 @@ const MainFrame = (props: Props) => {
 
   const informEditorsResourceExternallyChanged = React.useCallback(
     () => {
-      ResourcesLoader.burstAllUrlsCache()
+      ResourcesLoader.burstAllUrlsCache();
+      if (state.currentProject) PixiResourcesLoader.burstCache(state.currentProject);
       state.editorTabs.editors.forEach(editor => {
         if (
           editor.editorRef &&
@@ -777,7 +779,7 @@ const MainFrame = (props: Props) => {
         }
       });
     },
-    [state.editorTabs]
+    [state.editorTabs, state.currentProject]
   );
 
   React.useEffect(

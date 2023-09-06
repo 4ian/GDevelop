@@ -100,7 +100,7 @@ const SectionContainer = ({
                   />
                 </Line>
               )}
-              <LineStackLayout noMargin alignItems="center">
+              <LineStackLayout noMargin alignItems="center" justifyContent="space-between">
                 <Text size="bold-title" noMargin>
                   {title}
                 </Text>

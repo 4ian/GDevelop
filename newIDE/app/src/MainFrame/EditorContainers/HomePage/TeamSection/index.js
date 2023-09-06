@@ -29,7 +29,6 @@ import Text from '../../../../UI/Text';
 import FlatButton from '../../../../UI/FlatButton';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import TeamMemberProjectsView from './TeamMemberProjectsView';
-import { IconButton } from '@material-ui/core';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Paper from '../../../../UI/Paper';
@@ -201,7 +200,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       );
     }
 
-    if (selectedUser && selectedUserProjects) {
+    if (selectedUser) {
       return (
         <TeamMemberProjectsView
           user={selectedUser}
@@ -224,22 +223,19 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       .filter(Boolean)
       .sort((a, b) => a.group.name.localeCompare(b.group.name));
 
-    const refreshMembersButton = (
-      <IconButton
-        disabled={isLoadingMembers}
-        onClick={onRefreshTeamMembers}
-        size="small"
-      >
-        {isLoadingMembers ? (
-          <CircularProgress size={15} />
-        ) : (
-          <Refresh fontSize="small" />
-        )}
-      </IconButton>
-    );
-
     return (
-      <SectionContainer title={<Trans>Classrooms</Trans>}>
+      <SectionContainer
+        title={<Trans>Classrooms</Trans>}
+        titleAdornment={
+          <FlatButton
+            primary
+            disabled={isLoadingMembers}
+            label={<Trans>Refresh dashboard</Trans>}
+            onClick={onRefreshTeamMembers}
+            leftIcon={<Refresh fontSize="small" />}
+          />
+        }
+      >
         <SectionRow>
           {membersNotInAGroup && (
             <Paper background="medium" style={styles.lobbyContainer}>
@@ -249,7 +245,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                     <Text size="section-title" noMargin>
                       <Trans>Lobby</Trans>
                     </Text>
-                    {refreshMembersButton}
                   </LineStackLayout>
                   <List style={styles.list}>
                     {membersNotInAGroup.members
@@ -259,13 +254,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                           key={member.id}
                           member={member}
                           onListUserProjects={() => listUserProjects(member)}
-                          disabled={isLoadingUserProjects}
                           onDrag={setDraggedUser}
-                          isLoading={
-                            isLoadingUserProjects &&
-                            !!selectedUser &&
-                            member.id === selectedUser.id
-                          }
                         />
                       ))}
                   </List>
@@ -279,7 +268,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 <Text size="section-title" noMargin>
                   <Trans>Rooms</Trans>
                 </Text>
-                {refreshMembersButton}
               </LineStackLayout>
               <FlatButton
                 primary
@@ -343,12 +331,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                                       listUserProjects(member)
                                     }
                                     onDrag={setDraggedUser}
-                                    disabled={isLoadingUserProjects}
-                                    isLoading={
-                                      isLoadingUserProjects &&
-                                      !!selectedUser &&
-                                      member.id === selectedUser.id
-                                    }
                                   />
                                 ))}
                             </List>

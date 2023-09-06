@@ -16,7 +16,6 @@ import Text from '../../../../UI/Text';
 import DragHandle from '../../../../UI/DragHandle';
 import FlatButton from '../../../../UI/FlatButton';
 import { Trans, t } from '@lingui/macro';
-import LeftLoader from '../../../../UI/LeftLoader';
 import { makeDragSourceAndDropTarget } from '../../../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
@@ -38,18 +37,10 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{}>('team-groups');
 type Props = {|
   member: User,
   onListUserProjects: User => Promise<void>,
-  disabled: boolean,
-  isLoading: boolean,
   onDrag: (user: User) => void,
 |};
 
-const TeamMemberRow = ({
-  member,
-  onListUserProjects,
-  disabled,
-  isLoading,
-  onDrag,
-}: Props) => {
+const TeamMemberRow = ({ member, onListUserProjects, onDrag }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
@@ -146,15 +137,12 @@ const TeamMemberRow = ({
                         </IconButton>
                       </ListItemSecondaryAction>
                     ) : (
-                      <LeftLoader isLoading={isLoading}>
-                        <FlatButton
-                          primary
-                          disabled={disabled}
-                          rightIcon={<ChevronArrowRight fontSize="small" />}
-                          label={<Trans>See projects</Trans>}
-                          onClick={() => onListUserProjects(member)}
-                        />
-                      </LeftLoader>
+                      <FlatButton
+                        primary
+                        rightIcon={<ChevronArrowRight fontSize="small" />}
+                        label={<Trans>See projects</Trans>}
+                        onClick={() => onListUserProjects(member)}
+                      />
                     )}
                   </LineStackLayout>
                 </ListItem>

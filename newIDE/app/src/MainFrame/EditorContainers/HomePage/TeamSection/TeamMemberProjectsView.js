@@ -9,6 +9,7 @@ import AlertMessage from '../../../../UI/AlertMessage';
 import { List } from '../../../../UI/List';
 import {
   ProjectFileListItem,
+  getProjectLineHeight,
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from '../BuildSection';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -16,16 +17,28 @@ import { type FileMetadataAndStorageProviderName } from '../../../../ProjectsSto
 import { type StorageProvider } from '../../../../ProjectsStorage';
 import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
 import { type User } from '../../../../Utils/GDevelopServices/User';
-import IconButton from '../../../../UI/IconButton';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
-import CircularProgress from '../../../../UI/CircularProgress';
+import FlatButton from '../../../../UI/FlatButton';
+import { Skeleton } from '@material-ui/lab';
+import { ListItem } from '@material-ui/core';
+
+const styles = {
+  listItem: {
+    padding: 0,
+    marginTop: 2,
+    marginBottom: 2,
+    borderRadius: 8,
+    overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
+  },
+  skeleton: { borderRadius: 6 },
+};
 
 type Props = {|
   user: User,
   onClickBack: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   storageProviders: Array<StorageProvider>,
-  projects: Array<CloudProjectWithUserAccessInfo>,
+  projects: ?Array<CloudProjectWithUserAccessInfo>,
   onRefreshProjects: (user: User) => Promise<void>,
   isLoadingProjects: boolean,
 |};
@@ -41,28 +54,49 @@ const TeamMemberProjectsView = ({
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
+  const skeletonLineHeight = getProjectLineHeight(windowWidth);
 
-  const fileMetadataAndStorageProviderNames = transformCloudProjectsIntoFileMetadataWithStorageProviderName(
-    projects,
-    user.id
-  );
+  const fileMetadataAndStorageProviderNames = projects
+    ? transformCloudProjectsIntoFileMetadataWithStorageProviderName(
+        projects,
+        user.id
+      )
+    : null;
   return (
     <SectionContainer
       title={<Trans>{user.username || user.email}'s projects</Trans>}
       titleAdornment={
-        <IconButton
-          onClick={() => onRefreshProjects(user)}
+        <FlatButton
+          primary
           disabled={isLoadingProjects}
-        >
-          {isLoadingProjects ? <CircularProgress size={20} /> : <Refresh />}
-        </IconButton>
+          label={<Trans>Refresh dashboard</Trans>}
+          onClick={() => onRefreshProjects(user)}
+          leftIcon={<Refresh fontSize="small" />}
+        />
       }
       backAction={onClickBack}
     >
       <SectionRow>
         <Line>
           <Column noMargin expand>
-            {fileMetadataAndStorageProviderNames.length === 0 ? (
+            {!fileMetadataAndStorageProviderNames ? (
+              <List>
+                {new Array(5).fill(0).map((_, index) => (
+                  <ListItem style={styles.listItem} key={`skeleton-${index}`}>
+                    <Line expand>
+                      <Column expand>
+                        <Skeleton
+                          variant="rect"
+                          height={skeletonLineHeight}
+                          width={'100%'}
+                          style={styles.skeleton}
+                        />
+                      </Column>
+                    </Line>
+                  </ListItem>
+                ))}
+              </List>
+            ) : fileMetadataAndStorageProviderNames.length === 0 ? (
               <>
                 <EmptyMessage>
                   <Trans>This user does not have projects yet.</Trans>

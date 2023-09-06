@@ -79,7 +79,7 @@ const styles = {
   noProjectsContainer: { padding: 10 },
 };
 
-const getProjectLineHeight = (width: WidthType) => {
+export const getProjectLineHeight = (width: WidthType) => {
   const lineHeight = width === 'small' ? 52 : 36;
 
   return lineHeight - 2 * marginsSize;

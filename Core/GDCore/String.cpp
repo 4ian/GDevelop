@@ -260,10 +260,8 @@ String &String::RemoveConsecutiveOccurrences(iterator i1,
       if (*current_index == c) {
         iterator current_subindex = current_index;
         current_subindex++;
-        if (*current_subindex == c) {
-          while (current_subindex < end.base() && *current_subindex == c) {
-            current_subindex++;
-          }
+        while (current_subindex < end.base() && *current_subindex == c) {
+          current_subindex++;
         }
         difference_type difference_to_replace =
             std::distance(current_index, current_subindex);

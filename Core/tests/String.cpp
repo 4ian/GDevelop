@@ -26,6 +26,9 @@ TEST_CASE("String", "[common]") {
     str = "ccccccccc";
     REQUIRE(str.RemoveConsecutiveOccurrences(str.begin(), str.end(), 'c') ==
             "c");
+    str = "c";
+    REQUIRE(str.RemoveConsecutiveOccurrences(str.begin(), str.end(), 'c') ==
+            "c");
     str = "";
     REQUIRE(str.RemoveConsecutiveOccurrences(str.begin(), str.end(), ' ') ==
             "");

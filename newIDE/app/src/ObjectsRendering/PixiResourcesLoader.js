@@ -9,10 +9,11 @@ import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 const gd: libGDevelop = global.gd;
+const loader = PIXI.Loader.shared;
 
 const loadedBitmapFonts = {};
 const loadedFontFamilies = {};
-const loadedTextures = {};
+let loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
@@ -150,6 +151,27 @@ const traverseToRemoveMetalnessFromMeshes = (
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
+  static burstCache(project: gdProject) {
+    console.log('HAHAHAHAH');
+    console.log(PIXI);
+    console.log(PIXI.utils);
+    console.log(loader);
+    console.log(loadedTextures);
+    const keys = Object.keys(PIXI.utils.BaseTextureCache).filter(
+      name => !name.startsWith('pixiid')
+    );
+    for (const key of Object.keys(PIXI.utils.BaseTextureCache)) {
+      console.log(key);
+      PIXI.utils.BaseTextureCache[key].destroy();
+      delete PIXI.utils.BaseTextureCache[key];
+    }
+    // PixiResourcesLoader.loadTextures(
+    //   project,
+    //   resourceNames,
+    //   () => {},
+    //   () => {}
+    // );
+  }
   /**
    * (Re)load the PIXI texture represented by the given resources.
    */

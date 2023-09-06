@@ -210,6 +210,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) {
       this.editorDisplay.forceUpdateObjectsList()
     }
+    // console.log("SALUT")
+    // const { layout } = this.props;
+    // const objectsCount = layout.getObjectsCount();
+    // for (let index = 0; index < objectsCount; index++) {
+    //   console.log(index)
+    //   this.reloadResourcesFor(layout.getObjectAt(index));
+    // }
   }
 
   updateToolbar = () => {

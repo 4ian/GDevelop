@@ -1,21 +1,15 @@
 // @flow
 
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import { type TeamGroup } from '../../../../Utils/GDevelopServices/User';
 import { Line } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import IconButton from '../../../../UI/IconButton';
 import EditIcon from '../../../../UI/CustomSvgIcons/Edit';
-import CheckIcon from '../../../../UI/CustomSvgIcons/Check';
-import CrossIcon from '../../../../UI/CustomSvgIcons/Cross';
 import TrashIcon from '../../../../UI/CustomSvgIcons/Trash';
-import {
-  shouldValidate,
-  shouldCloseOrCancel,
-} from '../../../../UI/KeyboardShortcuts/InteractionKeys';
-import TextField from '../../../../UI/TextField';
-import { Trans } from '@lingui/macro';
 import CircularProgress from '../../../../UI/CircularProgress';
+import AsyncSemiControlledTextField from '../../../../UI/AsyncSemiControlledTextField';
 
 type Props = {|
   group: TeamGroup,
@@ -33,62 +27,12 @@ const TeamGroupNameField = ({
   allowDelete,
   onDeleteGroup,
 }: Props) => {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
-  const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
-  const [newGroupName, setNewGroupName] = React.useState<string>(group.name);
 
   const onStartEditingGroupName = React.useCallback(() => {
     setIsEditingName(true);
   }, []);
-
-  React.useEffect(
-    () => {
-      if (!isEditingName) {
-        setErrorText(null);
-      }
-    },
-    [isEditingName]
-  );
-
-  const onFinishEditingName = React.useCallback(
-    async () => {
-      const cleanedNewGroupName = newGroupName.trim();
-      if (!cleanedNewGroupName) {
-        setErrorText(<Trans>Group name cannot be empty.</Trans>);
-        return;
-      }
-      if (cleanedNewGroupName === group.name) {
-        setIsEditingName(false);
-        return;
-      }
-      setIsLoading(true);
-      try {
-        await onFinishEditingGroupName(group, cleanedNewGroupName);
-        setIsEditingName(false);
-      } catch (error) {
-        console.error(error);
-        setErrorText(
-          <Trans>
-            An error occurred while renaming the group name. Please try again
-            later.
-          </Trans>
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [onFinishEditingGroupName, group, newGroupName]
-  );
-
-  const onCancelEditingName = React.useCallback(
-    () => {
-      setNewGroupName(group.name);
-      setIsEditingName(false);
-    },
-    [group]
-  );
 
   const onClickDeleteGroup = React.useCallback(
     async () => {
@@ -111,43 +55,23 @@ const TeamGroupNameField = ({
   return (
     <Line noMargin>
       {isEditingName ? (
-        <TextField
-          type="text"
-          maxLength={50}
-          value={newGroupName}
-          disabled={isLoading}
+        <AsyncSemiControlledTextField
           margin="dense"
-          onChange={(e, newName) => {
-            setNewGroupName(newName);
-          }}
-          errorText={errorText}
+          maxLength={50}
           autoFocus="desktopAndMobileDevices"
-          onKeyUp={event => {
-            if (shouldValidate(event)) {
-              onFinishEditingName();
-            } else if (shouldCloseOrCancel(event)) {
-              event.stopPropagation();
-              onCancelEditingName();
-            }
+          value={group.name}
+          callback={async newGroupName => {
+            await onFinishEditingGroupName(group, newGroupName);
+            setIsEditingName(false);
           }}
-          endAdornment={
-            <>
-              <IconButton
-                edge="end"
-                onClick={onCancelEditingName}
-                disabled={isLoading}
-              >
-                <CrossIcon />
-              </IconButton>
-              <IconButton
-                edge="end"
-                onClick={onFinishEditingName}
-                disabled={isLoading}
-              >
-                <CheckIcon />
-              </IconButton>
-            </>
+          callbackErrorText={
+            <Trans>
+              An error occurred while renaming the group name. Please try again
+              later.
+            </Trans>
           }
+          onCancel={() => setIsEditingName(false)}
+          emptyErrorText={<Trans>Group name cannot be empty.</Trans>}
         />
       ) : (
         <Line noMargin alignItems="center">

@@ -5,7 +5,6 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('PIXI Image manager');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   const logFileLoadingError = (file: string, error: Error | undefined) => {
     logger.error(
@@ -315,7 +314,7 @@ namespace gdjs {
     ): Promise<integer> {
       let loadedCount = 0;
       await Promise.all(
-        gdjs.mapIterable(this._resources.values(), async (resource) => {
+        [...this._resources.values()].map(async (resource) => {
           try {
             PIXI.Assets.setPreferences({
               preferWorkers: false,

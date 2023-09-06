@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   class PanelSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.PanelSpriteRuntimeObject;
     /**

@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class TextRuntimeObjectPixiRenderer {
     _object: gdjs.TextRuntimeObject;
     _fontManager: any;

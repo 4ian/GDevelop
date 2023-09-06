@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Displacement',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -11,7 +10,7 @@ namespace gdjs {
           .getPIXITexture(effectData.stringParameters.displacementMapTexture);
         displacementMapTexture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
         const displacementSprite = new PIXI.Sprite(displacementMapTexture);
-        const displacementFilter = new PIXI.filters.DisplacementFilter(
+        const displacementFilter = new PIXI.DisplacementFilter(
           displacementSprite
         );
         return displacementFilter;

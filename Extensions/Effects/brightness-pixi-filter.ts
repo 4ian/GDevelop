@@ -1,10 +1,9 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Brightness',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target, effectData) {
-        const brightness = new PIXI.filters.ColorMatrixFilter();
+        const brightness = new PIXI.ColorMatrixFilter();
         brightness.brightness(1, false);
         return brightness;
       }

@@ -1,5 +1,5 @@
-import PIXI = GlobalPIXIModule.PIXI;
-
+declare namespace PIXI {
+  namespace tilemap {
 /**
  * The renderer plugin for canvas. It isn't registered by default.
  *
@@ -12,7 +12,7 @@ import PIXI = GlobalPIXIModule.PIXI;
  * CanvasTileRenderer.registerExtension();
  * ```
  */
-export declare class CanvasTileRenderer {
+export class CanvasTileRenderer {
   /** The renderer */
   renderer: PIXI.IRenderer;
   /** The global tile animation state */
@@ -82,7 +82,7 @@ export declare class CanvasTileRenderer {
  *      globalTilemap.tile('bomb.png', x * 100, y * 100);
  * });
  */
-declare class CompositeTilemap extends PIXI.Container {
+class CompositeTilemap extends PIXI.Container {
   /** The hard limit on the number of tile textures used in each tilemap. */
   readonly texturesPerTilemap: number;
   /**
@@ -221,7 +221,7 @@ declare class CompositeTilemap extends PIXI.Container {
 export { CompositeTilemap as CompositeRectTileLayer };
 export { CompositeTilemap };
 
-export declare const Constant: {
+export const Constant: {
   /** The default number of textures per tilemap in a tilemap composite. */
   TEXTURES_PER_TILEMAP: number;
   /**
@@ -256,7 +256,7 @@ export declare const Constant: {
 
 /* Excluded from this release type: generateFragmentSrc */
 
-export declare const pixi_tilemap: {
+export const pixi_tilemap: {
   CanvasTileRenderer: typeof CanvasTileRenderer;
   CompositeRectTileLayer: typeof CompositeTilemap;
   CompositeTilemap: typeof CompositeTilemap;
@@ -282,7 +282,7 @@ export declare const pixi_tilemap: {
   TileRenderer: typeof TileRenderer;
 };
 
-export declare const POINT_STRUCT_SIZE: number;
+export const POINT_STRUCT_SIZE: number;
 
 /**
  * These are additional @pixi/tilemap options.
@@ -290,7 +290,7 @@ export declare const POINT_STRUCT_SIZE: number;
  * This settings should not be changed after the renderer has initialized; otherwise, the behavior
  * is undefined.
  */
-export declare const settings: {
+export const settings: {
   /** The default number of textures per tilemap in a tilemap composite. */
   TEXTURES_PER_TILEMAP: number;
   /**
@@ -321,7 +321,7 @@ export declare const settings: {
   boundCountPerBuffer: number;
 };
 
-export declare interface TextileOptions {
+export interface TextileOptions {
   TEXTILE_DIMEN: number;
   TEXTILE_UNITS: number;
   DO_CLEAR?: boolean;
@@ -337,7 +337,7 @@ export declare interface TextileOptions {
  *
  * @see settings.TEXTILE_UNITS
  */
-export declare class TextileResource extends PIXI.Resource {
+export class TextileResource extends PIXI.Resource {
   /** The base-texture that contains all the texture tiles. */
   baseTexture: PIXI.BaseTexture;
   private readonly doClear;
@@ -396,7 +396,7 @@ export declare class TextileResource extends PIXI.Resource {
  *          .tile('brick_wall.png', 0, 100);
  * });
  */
-declare class Tilemap extends PIXI.Container {
+class Tilemap extends PIXI.Container {
   shadowColor: Float32Array;
   _globalMat: PIXI.Matrix;
   /**
@@ -555,7 +555,7 @@ declare class Tilemap extends PIXI.Container {
 export { Tilemap as RectTileLayer };
 export { Tilemap };
 
-export declare class TilemapGeometry extends PIXI.Geometry {
+export class TilemapGeometry extends PIXI.Geometry {
   vertSize: number;
   vertPerQuad: number;
   stride: number;
@@ -564,7 +564,7 @@ export declare class TilemapGeometry extends PIXI.Geometry {
   buf: any;
 }
 
-export declare class TilemapShader extends PIXI.Shader {
+export class TilemapShader extends PIXI.Shader {
   maxTextures: number;
   constructor(maxTextures: number);
 }
@@ -572,7 +572,7 @@ export declare class TilemapShader extends PIXI.Shader {
 /**
  * Rendering helper pipeline for tilemaps. This plugin is registered automatically.
  */
-export declare class TileRenderer extends PIXI.ObjectRenderer {
+export class TileRenderer extends PIXI.ObjectRenderer {
   /** The managing renderer */
   readonly renderer: PIXI.Renderer;
   /** The tile animation frame */
@@ -609,4 +609,6 @@ export declare class TileRenderer extends PIXI.ObjectRenderer {
   checkIndexBuffer(size: number, _vb?: TilemapGeometry): void;
   /** Makes textile resources and initializes {@link TileRenderer.textiles}. */
   private makeTextiles;
+}
+}
 }

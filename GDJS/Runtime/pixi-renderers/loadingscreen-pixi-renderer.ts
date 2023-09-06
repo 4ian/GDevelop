@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   enum LoadingScreenState {
     NOT_STARTED,
     STARTED,

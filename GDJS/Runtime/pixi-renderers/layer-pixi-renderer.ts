@@ -5,8 +5,6 @@
  */
 
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   const logger = new gdjs.Logger('LayerPixiRenderer');
 
   /**

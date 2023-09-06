@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class AdvancedBloomFilter extends PIXI.Filter {
     constructor(options?: AdvancedBloomOptions);
     constructor(threshold?: number);

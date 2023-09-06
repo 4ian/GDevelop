@@ -1,10 +1,9 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'BlackAndWhite',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target, effectData) {
-        const colorMatrix = new PIXI.filters.ColorMatrixFilter();
+        const colorMatrix = new PIXI.ColorMatrixFilter();
         colorMatrix.blackAndWhite(false);
         return colorMatrix;
       }

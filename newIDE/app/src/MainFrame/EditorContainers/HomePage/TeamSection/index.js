@@ -31,7 +31,16 @@ import Add from '../../../../UI/CustomSvgIcons/Add';
 import TeamMemberProjectsView from './TeamMemberProjectsView';
 import { IconButton } from '@material-ui/core';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
-import { LineStackLayout } from '../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
+import Paper from '../../../../UI/Paper';
+
+const PADDING = 16;
+
+const styles = {
+  list: { padding: 0 },
+  lobbyContainer: { padding: PADDING },
+  roomsContainer: { paddingRight: PADDING },
+};
 
 const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
@@ -233,125 +242,129 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       <SectionContainer title={<Trans>Classrooms</Trans>}>
         <SectionRow>
           {membersNotInAGroup && (
-            <Line>
-              <Column noMargin expand>
-                <LineStackLayout noMargin alignItems="center">
-                  <Text size="section-title" noMargin>
-                    <Trans>Unassigned members</Trans>
-                  </Text>
-                  {refreshMembersButton}
-                </LineStackLayout>
-                <List>
-                  {membersNotInAGroup.members
-                    .sort(sortMembersByNameOrEmail)
-                    .map(member => (
-                      <TeamMemberRow
-                        key={member.id}
-                        member={member}
-                        onListUserProjects={() => listUserProjects(member)}
-                        disabled={isLoadingUserProjects}
-                        onDrag={setDraggedUser}
-                        isLoading={
-                          isLoadingUserProjects &&
-                          !!selectedUser &&
-                          member.id === selectedUser.id
-                        }
-                      />
-                    ))}
-                </List>
-              </Column>
-            </Line>
+            <Paper background="medium" style={styles.lobbyContainer}>
+              <Line noMargin>
+                <ColumnStackLayout noMargin expand>
+                  <LineStackLayout noMargin alignItems="center">
+                    <Text size="section-title" noMargin>
+                      <Trans>Lobby</Trans>
+                    </Text>
+                    {refreshMembersButton}
+                  </LineStackLayout>
+                  <List style={styles.list}>
+                    {membersNotInAGroup.members
+                      .sort(sortMembersByNameOrEmail)
+                      .map(member => (
+                        <TeamMemberRow
+                          key={member.id}
+                          member={member}
+                          onListUserProjects={() => listUserProjects(member)}
+                          disabled={isLoadingUserProjects}
+                          onDrag={setDraggedUser}
+                          isLoading={
+                            isLoadingUserProjects &&
+                            !!selectedUser &&
+                            member.id === selectedUser.id
+                          }
+                        />
+                      ))}
+                  </List>
+                </ColumnStackLayout>
+              </Line>
+            </Paper>
           )}
-          <Line justifyContent="space-between" alignItems="center">
-            <LineStackLayout noMargin alignItems="center">
-              <Text size="section-title" noMargin>
-                <Trans>Rooms</Trans>
-              </Text>
-              {refreshMembersButton}
-            </LineStackLayout>
-            <FlatButton
-              primary
-              label={<Trans>Create a new room</Trans>}
-              leftIcon={<Add fontSize="small" />}
-              onClick={() => setShowNewGroupNameField(true)}
-            />
-          </Line>
-          {showNewGroupNameField && (
-            <Line>
-              <NewTeamGroupNameField
-                onValidateGroupName={onCreateGroup}
-                onDismiss={() => setShowNewGroupNameField(false)}
+          <div style={styles.roomsContainer}>
+            <Line justifyContent="space-between" alignItems="center">
+              <LineStackLayout noMargin alignItems="center">
+                <Text size="section-title" noMargin>
+                  <Trans>Rooms</Trans>
+                </Text>
+                {refreshMembersButton}
+              </LineStackLayout>
+              <FlatButton
+                primary
+                label={<Trans>Create a new room</Trans>}
+                leftIcon={<Add fontSize="small" />}
+                onClick={() => setShowNewGroupNameField(true)}
               />
             </Line>
-          )}
-          {groupsAndMembers.length > 0 ? (
-            groupsAndMembers.map(({ group, members }) => (
-              <DropTarget
-                canDrop={() => true}
-                drop={() => {
-                  if (!draggedUserRef.current) return;
-                  onChangeUserGroup(draggedUserRef.current, group);
-                  draggedUserRef.current = null;
-                }}
-                key={group.id}
-              >
-                {({ connectDropTarget, isOver }) =>
-                  connectDropTarget(
-                    <div
-                      style={
-                        isOver
-                          ? {
-                              backgroundColor:
-                                gdevelopTheme.paper.backgroundColor.light,
-                              outline: `2px dashed ${
-                                gdevelopTheme.dropIndicator.canDrop
-                              }`,
-                            }
-                          : undefined
-                      }
-                    >
-                      <Line noMargin>
-                        <Column noMargin expand>
-                          <Column noMargin>
-                            <TeamGroupNameField
-                              group={group}
-                              onFinishEditingGroupName={onChangeGroupName}
-                              allowDelete={members.length === 0}
-                              onDeleteGroup={onDeleteGroup}
-                            />
+            {showNewGroupNameField && (
+              <Line>
+                <NewTeamGroupNameField
+                  onValidateGroupName={onCreateGroup}
+                  onDismiss={() => setShowNewGroupNameField(false)}
+                />
+              </Line>
+            )}
+            {groupsAndMembers.length > 0 ? (
+              groupsAndMembers.map(({ group, members }) => (
+                <DropTarget
+                  canDrop={() => true}
+                  drop={() => {
+                    if (!draggedUserRef.current) return;
+                    onChangeUserGroup(draggedUserRef.current, group);
+                    draggedUserRef.current = null;
+                  }}
+                  key={group.id}
+                >
+                  {({ connectDropTarget, isOver }) =>
+                    connectDropTarget(
+                      <div
+                        style={
+                          isOver
+                            ? {
+                                backgroundColor:
+                                  gdevelopTheme.paper.backgroundColor.light,
+                                outline: `2px dashed ${
+                                  gdevelopTheme.dropIndicator.canDrop
+                                }`,
+                              }
+                            : undefined
+                        }
+                      >
+                        <Line noMargin>
+                          <Column noMargin expand>
+                            <Column noMargin>
+                              <TeamGroupNameField
+                                group={group}
+                                onFinishEditingGroupName={onChangeGroupName}
+                                allowDelete={members.length === 0}
+                                onDeleteGroup={onDeleteGroup}
+                              />
+                            </Column>
+                            <List style={styles.list}>
+                              {members
+                                .sort(sortMembersByNameOrEmail)
+                                .map(member => (
+                                  <TeamMemberRow
+                                    key={member.id}
+                                    member={member}
+                                    onListUserProjects={() =>
+                                      listUserProjects(member)
+                                    }
+                                    onDrag={setDraggedUser}
+                                    disabled={isLoadingUserProjects}
+                                    isLoading={
+                                      isLoadingUserProjects &&
+                                      !!selectedUser &&
+                                      member.id === selectedUser.id
+                                    }
+                                  />
+                                ))}
+                            </List>
                           </Column>
-                          <List>
-                            {members
-                              .sort(sortMembersByNameOrEmail)
-                              .map(member => (
-                                <TeamMemberRow
-                                  key={member.id}
-                                  member={member}
-                                  onListUserProjects={() =>
-                                    listUserProjects(member)
-                                  }
-                                  onDrag={setDraggedUser}
-                                  disabled={isLoadingUserProjects}
-                                  isLoading={
-                                    isLoadingUserProjects &&
-                                    !!selectedUser &&
-                                    member.id === selectedUser.id
-                                  }
-                                />
-                              ))}
-                          </List>
-                        </Column>
-                      </Line>
-                    </div>
-                  )
-                }
-              </DropTarget>
-            ))
-          ) : !showNewGroupNameField ? (
-            <EmptyMessage>
-              <Trans>Create a room and drag and drop members in it.</Trans>
-            </EmptyMessage>
-          ) : null}
+                        </Line>
+                      </div>
+                    )
+                  }
+                </DropTarget>
+              ))
+            ) : !showNewGroupNameField ? (
+              <EmptyMessage>
+                <Trans>Create a room and drag and drop members in it.</Trans>
+              </EmptyMessage>
+            ) : null}
+          </div>
         </SectionRow>
       </SectionContainer>
     );

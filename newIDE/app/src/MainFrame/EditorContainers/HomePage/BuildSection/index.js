@@ -666,7 +666,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             <Line>
               <Column noMargin expand>
                 {!isMobile && (
-                  <LineStackLayout justifyContent="space-between">
+                  <Line justifyContent="space-between">
                     <Column expand>
                       <Text color="secondary">
                         <Trans>File name</Trans>
@@ -682,7 +682,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         <Trans>Last edited</Trans>
                       </Text>
                     </Column>
-                  </LineStackLayout>
+                  </Line>
                 )}
                 <List>
                   {authenticatedUser.loginState === 'loggingIn' &&

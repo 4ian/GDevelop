@@ -21,6 +21,7 @@ import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import FlatButton from '../../../../UI/FlatButton';
 import Skeleton from '@material-ui/lab/Skeleton';
 import ListItem from '@material-ui/core/ListItem';
+import Text from '../../../../UI/Text';
 
 const styles = {
   listItem: {
@@ -79,6 +80,25 @@ const TeamMemberProjectsView = ({
       backAction={onClickBack}
     >
       <SectionRow>
+        {!isMobile && (
+          <Line justifyContent="space-between">
+            <Column expand>
+              <Text color="secondary">
+                <Trans>File name</Trans>
+              </Text>
+            </Column>
+            <Column expand>
+              <Text color="secondary">
+                <Trans>Location</Trans>
+              </Text>
+            </Column>
+            <Column expand>
+              <Text color="secondary">
+                <Trans>Last edited</Trans>
+              </Text>
+            </Column>
+          </Line>
+        )}
         <Line>
           <Column noMargin expand>
             {!fileMetadataAndStorageProviderNames ? (

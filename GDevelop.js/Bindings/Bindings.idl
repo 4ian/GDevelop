@@ -573,6 +573,9 @@ interface Behavior {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 
+    boolean IsFolded();
+    void SetFolded(boolean folded);
+
     boolean IsDefaultBehavior();
 };
 

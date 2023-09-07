@@ -24,7 +24,9 @@ type Props = {|
 
 export type ScrollViewInterface = {|
   getScrollPosition: () => number,
-  scrollTo: (target: ?React$Component<any, any>) => void,
+  scrollTo: (
+    target: ?React$Component<any, any> | ?React.ElementRef<any>
+  ) => void,
   scrollToPosition: (number: number) => void,
   scrollToBottom: () => void,
 |};

@@ -81,10 +81,15 @@ export const moveUrlResourcesToLocalFiles = async ({
   // Get all resources to download.
   const resourcesManager = project.getResourcesManager();
   const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
+  const resourcesToFetchNames = allResourceNames.filter(resourceName => {
+    const resource = resourcesManager.getResource(resourceName);
+    const resourceFile = resource.getFile();
+    return isURL(resourceFile);
+  });
   const tokenForPrivateGameTemplateAuthorization = await fetchTokenForPrivateGameTemplateAuthorizationIfNeeded(
     {
       authenticatedUser,
-      allResourcePaths: allResourceNames.map(resourceName => {
+      allResourcePaths: resourcesToFetchNames.map(resourceName => {
         const resource = resourcesManager.getResource(resourceName);
         return resource.getFile();
       }),
@@ -99,7 +104,7 @@ export const moveUrlResourcesToLocalFiles = async ({
   let fetchedResourcesCount = 0;
 
   await PromisePool.withConcurrency(50)
-    .for(allResourceNames)
+    .for(resourcesToFetchNames) // It's important not to loop on allResourceNames, as calling the onProgress can be costly on the UI.
     .process(async resourceName => {
       const resource = resourcesManager.getResource(resourceName);
 
@@ -183,7 +188,7 @@ export const moveUrlResourcesToLocalFiles = async ({
         }
       }
 
-      onProgress(fetchedResourcesCount++, allResourceNames.length);
+      onProgress(fetchedResourcesCount++, resourcesToFetchNames.length);
     });
 
   return {

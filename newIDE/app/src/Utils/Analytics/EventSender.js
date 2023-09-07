@@ -250,15 +250,6 @@ export const sendAssetPackInformationOpened = (options: {|
   recordEvent('asset_pack_information_opened', options);
 };
 
-export const sendGameTemplateOpened = (options: {|
-  gameTemplateId: string | null,
-  gameTemplateName: string,
-  gameTemplateTag: string | null,
-  source: 'store-home' | 'examples-list',
-|}) => {
-  recordEvent('game_template_opened', options);
-};
-
 export const sendGameTemplateBuyClicked = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
@@ -270,6 +261,7 @@ export const sendGameTemplateBuyClicked = (options: {|
 export const sendGameTemplateInformationOpened = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
+  source: 'store' | 'examples-list' | 'homepage' | 'web-link',
 |}) => {
   recordEvent('game_template_information_opened', options);
 };

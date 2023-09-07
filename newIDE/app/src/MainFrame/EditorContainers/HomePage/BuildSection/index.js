@@ -64,6 +64,7 @@ import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopS
 import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
 import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
+import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -517,10 +518,16 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                     title: privateGameTemplateListingData.name,
                     thumbnailUrl:
                       privateGameTemplateListingData.thumbnailUrls[0],
-                    onClick: () =>
+                    onClick: () => {
+                      sendGameTemplateInformationOpened({
+                        gameTemplateName: privateGameTemplateListingData.name,
+                        gameTemplateId: privateGameTemplateListingData.id,
+                        source: 'homepage',
+                      });
                       onSelectPrivateGameTemplateListingData(
                         privateGameTemplateListingData
-                      ),
+                      );
+                    },
                     overlayText: (
                       <ProductPriceTag
                         productListingData={privateGameTemplateListingData}

@@ -9,7 +9,10 @@ import ExampleListItem from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
+import {
+  sendExampleDetailsOpened,
+  sendGameTemplateInformationOpened,
+} from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
@@ -279,6 +282,11 @@ export const ExampleStore = ({
                         matches={getPrivateAssetPackListingDataMatches(item)}
                         onChoose={() => {
                           onSelectPrivateGameTemplateListingData(item);
+                          sendGameTemplateInformationOpened({
+                            gameTemplateName: item.name,
+                            gameTemplateId: item.id,
+                            source: 'examples-list',
+                          });
                         }}
                         owned={isTemplateOwned}
                       />

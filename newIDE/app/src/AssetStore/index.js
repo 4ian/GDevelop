@@ -404,6 +404,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         sendGameTemplateInformationOpened({
           gameTemplateName: privateGameTemplateListingData.name,
           gameTemplateId: privateGameTemplateListingData.id,
+          source: 'store',
         });
         saveScrollPosition();
         const previousSearchText = searchText;

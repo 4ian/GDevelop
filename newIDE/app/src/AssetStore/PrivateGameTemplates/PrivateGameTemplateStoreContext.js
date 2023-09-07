@@ -16,6 +16,7 @@ import { type NavigationState } from '../AssetStoreNavigator';
 import { getPrivateGameTemplateListingDataFromUserFriendlySlug } from '../AssetStoreUtils';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
+import { sendGameTemplateInformationOpened } from '../../Utils/Analytics/EventSender';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for game templates.
@@ -213,6 +214,11 @@ export const PrivateGameTemplateStoreStateProvider = ({
         );
 
         if (privateGameTemplateListingData) {
+          sendGameTemplateInformationOpened({
+            gameTemplateName: privateGameTemplateListingData.name,
+            gameTemplateId: privateGameTemplateListingData.id,
+            source: 'web-link',
+          });
           shopNavigationState.openPrivateGameTemplateInformationPage({
             privateGameTemplateListingData,
             previousSearchText: shopSearchText,

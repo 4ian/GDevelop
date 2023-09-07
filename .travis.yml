@@ -39,7 +39,7 @@ install:
   - cd ..
 # Install Emscripten (for GDevelop.js)
   - git clone https://github.com/juj/emsdk.git
-  - cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+  - cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 # Install GDevelop.js dependencies
   - cd GDevelop.js && npm install && cd ..
 # Build GDevelop.js

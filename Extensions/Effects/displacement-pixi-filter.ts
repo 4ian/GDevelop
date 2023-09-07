@@ -17,8 +17,7 @@ namespace gdjs {
       }
       updatePreRender(filter, target) {}
       updateDoubleParameter(filter, parameterName, value) {
-        // @ts-ignore - unsure why PIXI.filters is not recognised.
-        const displacementFilter = (filter as unknown) as PIXI.filters.DisplacementFilter;
+        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
         if (parameterName === 'scaleX') {
           displacementFilter.scale.x = value;
         }

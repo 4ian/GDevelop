@@ -28,9 +28,9 @@ install:
 
       cd emsdk
 
-      emsdk install 1.39.6
+      emsdk install 3.1.21
 
-      CMD /C "emsdk activate 1.39.6 && cd .. && npm run build"
+      CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
 
       cd ..\..
 

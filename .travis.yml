@@ -30,7 +30,7 @@ before_install:
 
 install:
 # Ensure we use a recent version of Node.js (and npm).
-  - nvm install v16 && nvm use v16
+  - nvm install v18 && nvm use v18
 #Compile the tests only for GDCore
   - mkdir .build-tests
   - cd .build-tests
@@ -39,7 +39,7 @@ install:
   - cd ..
 # Install Emscripten (for GDevelop.js)
   - git clone https://github.com/juj/emsdk.git
-  - cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+  - cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 # Install GDevelop.js dependencies
   - cd GDevelop.js && npm install && cd ..
 # Build GDevelop.js

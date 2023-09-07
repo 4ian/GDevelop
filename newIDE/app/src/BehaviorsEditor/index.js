@@ -72,6 +72,7 @@ type BehaviorConfigurationEditorProps = {|
   onChangeBehaviorName: (behavior: gdBehavior, newName: string) => void,
   onRemoveBehavior: (behaviorName: string) => void,
   copyBehavior: (behaviorName: string) => void,
+  canPasteBehaviors: boolean,
   pasteBehaviors: () => Promise<void>,
   openExtension: (behaviorType: string) => void,
 |};
@@ -90,6 +91,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       onChangeBehaviorName,
       onRemoveBehavior,
       copyBehavior,
+      canPasteBehaviors,
       pasteBehaviors,
       openExtension,
     },
@@ -166,13 +168,8 @@ const BehaviorConfigurationEditor = React.forwardRef<
     );
     const iconUrl = behaviorMetadata.getIconFilename();
 
-    const isClipboardContainingBehaviors = Clipboard.has(
-      BEHAVIORS_CLIPBOARD_KIND
-    );
-
     return (
       <Accordion
-        key={behaviorName}
         expanded={expanded}
         onChange={(_, newExpanded) => {
           setExpanded(newExpanded);
@@ -206,7 +203,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
                 {
                   label: i18n._(t`Paste`),
                   click: pasteBehaviors,
-                  enabled: isClipboardContainingBehaviors,
+                  enabled: canPasteBehaviors,
                 },
                 ...(project.hasEventsBasedBehavior(behaviorTypeName)
                   ? [
@@ -641,6 +638,7 @@ const BehaviorsEditor = (props: Props) => {
                   onBehaviorsUpdated={onBehaviorsUpdated}
                   onChangeBehaviorName={onChangeBehaviorName}
                   openExtension={openExtension}
+                  canPasteBehaviors={isClipboardContainingBehaviors}
                   pasteBehaviors={pasteBehaviors}
                   resourceManagementProps={props.resourceManagementProps}
                 />

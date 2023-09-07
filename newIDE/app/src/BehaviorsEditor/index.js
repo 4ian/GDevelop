@@ -98,22 +98,15 @@ const BehaviorConfigurationEditor = React.forwardRef<
     ref
   ) => {
     const { values } = React.useContext(PreferencesContext);
-    const [expanded, setExpanded] = React.useState<boolean>(
-      !behavior.isFolded()
-    );
+    const forceUpdate = useForceUpdate();
     const behaviorName = behavior.getName();
     const behaviorTypeName = behavior.getTypeName();
-
-    React.useEffect(
-      () => {
-        behavior.setFolded(!expanded);
-      },
-      [expanded, behavior]
-    );
 
     if (behavior.isDefaultBehavior()) {
       return null;
     }
+
+    const expanded = !behavior.isFolded();
 
     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
       gd.JsPlatform.get(),
@@ -172,7 +165,8 @@ const BehaviorConfigurationEditor = React.forwardRef<
       <Accordion
         expanded={expanded}
         onChange={(_, newExpanded) => {
-          setExpanded(newExpanded);
+          behavior.setFolded(!newExpanded);
+          forceUpdate();
         }}
         id={`behavior-parameters-${behaviorName}`}
         ref={ref}

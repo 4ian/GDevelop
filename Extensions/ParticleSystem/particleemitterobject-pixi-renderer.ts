@@ -5,7 +5,7 @@ This project is released under the MIT License.
 */
 namespace gdjs {
   export class ParticleEmitterObjectPixiRenderer {
-    renderer: any;
+    renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
     started: boolean = false;
 

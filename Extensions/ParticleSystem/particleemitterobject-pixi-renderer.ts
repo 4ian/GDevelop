@@ -4,6 +4,16 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 namespace gdjs {
+  const setBoundsValues = (list: any, startValue: float, endValue: float) => {
+    const first = list.first;
+    first.value = startValue;
+    first.next = first.next || {
+      time: 1,
+      value: 0,
+    };
+    first.next.value = endValue;
+  };
+
   export class ParticleEmitterObjectPixiRenderer {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
@@ -38,11 +48,11 @@ namespace gdjs {
         );
       } else if (objectData.textureParticleName) {
         const sprite = new PIXI.Sprite(
-          (instanceContainer
-            .getGame()
-            .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-            objectData.textureParticleName
-          )
+          (
+            instanceContainer
+              .getGame()
+              .getImageManager() as gdjs.PixiImageManager
+          ).getPIXITexture(objectData.textureParticleName)
         );
         sprite.width = objectData.rendererParam1;
         sprite.height = objectData.rendererParam2;
@@ -275,17 +285,18 @@ namespace gdjs {
     ): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('color');
+      const first = behavior.list.first;
 
-      const startColor = behavior.list.first.value;
+      const startColor = first.value;
       startColor.r = r1;
       startColor.g = g1;
       startColor.b = b1;
 
-      behavior.list.first.next = behavior.list.first.next || {
+      first.next = first.next || {
         time: 1,
         value: {},
       };
-      const endColor = behavior.list.first.next.value;
+      const endColor = first.next.value;
       endColor.r = r2;
       endColor.g = g2;
       endColor.b = b2;
@@ -294,14 +305,7 @@ namespace gdjs {
     setSize(size1: float, size2: float): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('scale');
-
-      behavior.list.value = size1 / 100.0;
-
-      behavior.list.next = behavior.list.next || {
-        time: 1,
-        value: {},
-      };
-      behavior.list.next.value = size2 / 100.0;
+      setBoundsValues(behavior.list, size1 / 100.0, size2 / 100.0);
     }
 
     setParticleRotationSpeed(min: float, max: float): void {
@@ -324,22 +328,13 @@ namespace gdjs {
     setAlpha(alpha1: number, alpha2: number): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('alpha');
-
-      behavior.list.value = alpha1;
-
-      behavior.list.next = behavior.list.next || {
-        time: 1,
-        value: {},
-      };
-      behavior.list.next.value = alpha2;
+      setBoundsValues(behavior.list, alpha1, alpha2);
     }
 
     setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
-      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
-        flow,
-        tank
-      );
+      this.emitter.emitterLifetime =
+        ParticleEmitterObjectPixiRenderer.computeLifetime(flow, tank);
     }
 
     resetEmission(flow: number, tank: number): void {
@@ -416,6 +411,7 @@ namespace gdjs {
   }
 
   // @ts-ignore - Register the class to let the engine use it.
-  export const ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
+  export const ParticleEmitterObjectRenderer =
+    ParticleEmitterObjectPixiRenderer;
   export type ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
 }

@@ -167,6 +167,7 @@ void Object::UnserializeFrom(gd::Project& project,
       gd::String name = behaviorElement.GetStringAttribute("name");
 
       auto behavior = gd::Object::AddNewBehavior(project, type, name);
+      behavior->SetFolded(behaviorElement.GetBoolAttribute("folded", false));
       // Compatibility with GD <= 4.0.98
       // If there is only one child called "content" (in addition to "type" and
       // "name"), it's the content of a JavaScript behavior. Move the content
@@ -219,6 +220,7 @@ void Object::SerializeTo(SerializerElement& element) const {
     behavior.SerializeTo(behaviorElement);
     behaviorElement.RemoveChild("type");  // The content can contain type or
                                           // name properties, remove them.
+    if (behavior.IsFolded()) behaviorElement.SetAttribute("folded", true);
     behaviorElement.RemoveChild("name");
     behaviorElement.SetAttribute("type", behavior.GetTypeName());
     behaviorElement.SetAttribute("name", behavior.GetName());

@@ -43,7 +43,7 @@ const styles = {
 };
 
 // Those names are used internally by GDevelop.
-const PROTECTED_PROPERTY_NAMES = ['name', 'type', 'folded'];
+const PROTECTED_PROPERTY_NAMES = ['name', 'type'];
 
 const getValidatedPropertyName = (
   i18n: I18nType,

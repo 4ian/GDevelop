@@ -16,7 +16,6 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
 
-      // Load (or reset) the text
       this._pixiObject = new MultiStyleText(runtimeObject._text, {
         default: {
           fontFamily: instanceContainer

@@ -737,8 +737,9 @@ module.exports = {
     RenderedBitmapTextInstance.prototype.onRemovedFromScene = function () {
       RenderedInstance.prototype.onRemovedFromScene.call(this);
 
+      const fontName = this._pixiObject.fontName;
       this._pixiObject.destroy();
-      releaseBitmapFont(this._pixiObject.fontName);
+      releaseBitmapFont(fontName);
     };
 
     /**

@@ -30,7 +30,7 @@ before_install:
 
 install:
 # Ensure we use a recent version of Node.js (and npm).
-  - nvm install v18 && nvm use v18
+  - nvm install v16 && nvm use v16
 #Compile the tests only for GDCore
   - mkdir .build-tests
   - cd .build-tests

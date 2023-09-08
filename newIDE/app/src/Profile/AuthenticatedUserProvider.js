@@ -443,18 +443,21 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     }
 
-    this.setState(({ authenticatedUser }) => ({
-      authenticatedUser: {
-        ...authenticatedUser,
-        profile: userProfile,
-        loginState: 'done',
-      },
-    }));
-
-    // We call this function every time the user is fetched, as it will
-    // automatically prevent the event to be sent if the user attributes haven't changed.
-    identifyUserForAnalytics(this.state.authenticatedUser);
-    this._notifyUserAboutEmailVerificationAndAdditionalInfo();
+    this.setState(
+      ({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          profile: userProfile,
+          loginState: 'done',
+        },
+      }),
+      () => {
+        // We call this function every time the user is fetched, as it will
+        // automatically prevent the event to be sent if the user attributes haven't changed.
+        identifyUserForAnalytics(this.state.authenticatedUser);
+        this._notifyUserAboutEmailVerificationAndAdditionalInfo();
+      }
+    );
   };
 
   _fetchUserSubscriptionLimitsAndUsages = async () => {

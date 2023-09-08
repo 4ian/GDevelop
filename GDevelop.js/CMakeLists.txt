@@ -13,7 +13,7 @@ endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
 add_compile_options(-O3 -flto) # Optimizations during compilation
-add_compile_options(-fwasm-exceptions) # Enable exceptions
+# add_compile_options(-fwasm-exceptions) # Enable exceptions
 if(NOT DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS)
 	add_compile_options(-flto) # The compiler needs to know if there will be link time optimisations
 endif()

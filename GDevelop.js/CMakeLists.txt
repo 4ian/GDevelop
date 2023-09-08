@@ -86,8 +86,8 @@ target_link_libraries(GD "-s \"EXPORTED_FUNCTIONS=['_free']\"")
 
 # Linker debugging options
 #
-target_link_libraries(GD "-s DEMANGLE_SUPPORT=1") # Demangle stack traces
-target_link_libraries(GD "-s ASSERTIONS=1") # Basic runtime memory allocation checks (necessary for wasm exceptions stack traces)
+# target_link_libraries(GD "-s DEMANGLE_SUPPORT=1") # Demangle stack traces
+# target_link_libraries(GD "-s ASSERTIONS=1") # Basic runtime memory allocation checks (necessary for wasm exceptions stack traces)
 # target_link_libraries(GD "-s ASSERTIONS=2 -s SAFE_HEAP=1") # Uncomment to do runtime checks for memory allocations and access errors
 # target_link_libraries(GD "-fsanitize=address") # Uncomment to auto-detect occurences of memory bugs (memory leak, use after free, overflows, ...) - also enable compiling above!
 # target_link_libraries(GD "-fsanitize=undefined") # Uncomment to auto-detect occurences of undefined behavior - also enable compiling above!

@@ -60,8 +60,6 @@ class GD_CORE_API EventsContext {
   }
 
  private:
-  std::vector<gd::String> ExpandObjectsName(const gd::String& objectOrGroupName);
-
   std::set<gd::String> referencedObjectOrGroupNames;
   std::set<gd::String> objectNames;
   std::map<gd::String, std::set<gd::String>> objectOrGroupBehaviorNames;

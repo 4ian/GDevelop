@@ -13,6 +13,7 @@
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 namespace gd {
 class EventsList;
 class Expression;
@@ -58,8 +59,7 @@ class GD_CORE_API EventsCodeGenerator {
    * objects/groups and platform
    */
   EventsCodeGenerator(const gd::Platform& platform,
-                      const gd::ObjectsContainer& globalObjectsAndGroups_,
-                      const gd::ObjectsContainer& objectsAndGroups_);
+                      const gd::ProjectScopedContainers& projectScopedContainers_);
   virtual ~EventsCodeGenerator(){};
 
   /**
@@ -327,23 +327,13 @@ class GD_CORE_API EventsCodeGenerator {
    */
   bool ErrorOccurred() const { return errorOccurred; };
 
-  /**
-   * \brief Get the global objects/groups used for code generation.
-   * @deprecated Use `GetObjectsContainersList()`.
-   */
-  const gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
-    return globalObjectsAndGroups;
-  }
+  const gd::ObjectsContainersList& GetObjectsContainersList() const {
+    return projectScopedContainers.GetObjectsContainersList();
+  };
 
-  /**
-   * \brief Get the objects/groups used for code generation.
-   * @deprecated Use `GetObjectsContainersList()`.
-   */
-  const gd::ObjectsContainer& GetObjectsAndGroups() const {
-    return objectsAndGroups;
+  const gd::ProjectScopedContainers& GetProjectScopedContainers() const {
+    return projectScopedContainers;
   }
-
-  gd::ObjectsContainersList GetObjectsContainersList() const;
 
   /**
    * \brief Return true if the code generation is done for a given project and
@@ -367,22 +357,6 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Get the platform the code is being generated for.
    */
   const gd::Platform& GetPlatform() const { return platform; }
-
-  /**
-   * \brief Convert a group name to the full list of objects contained in the
-   * group.
-   *
-   * Get a list containing the "real" objects name when the events refers to \a
-   * objectName :<br> If \a objectName is really an object, the list will only
-   * contains \a objectName unchanged.<br> If \a objectName is a group, the list
-   * will contains all the objects of the group.<br> If \a objectName is the
-   * "current" object in the context ( i.e: The object being used for launching
-   * an action... ), none of the two rules below apply, and the list will only
-   * contains the context "current" object name.
-   */
-  std::vector<gd::String> ExpandObjectsName(
-      const gd::String& objectName,
-      const EventsCodeGenerationContext& context) const;
 
   /**
    * \brief Get the maximum depth of custom conditions reached during code
@@ -786,8 +760,7 @@ class GD_CORE_API EventsCodeGenerator {
 
   const gd::Platform& platform;  ///< The platform being used.
 
-  const gd::ObjectsContainer& globalObjectsAndGroups;
-  const gd::ObjectsContainer& objectsAndGroups;
+  gd::ProjectScopedContainers projectScopedContainers;
 
   bool hasProjectAndLayout;  ///< true only if project and layout are valid
                              ///< references. If false, they should not be used.

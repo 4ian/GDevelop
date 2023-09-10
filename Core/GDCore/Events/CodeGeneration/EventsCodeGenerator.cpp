@@ -296,16 +296,10 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
 
-      if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
-              objectInParameter)) {
+      if (!GetObjectsContainersList().HasObjectOrGroupNamed(objectInParameter)) {
         return "/* Unknown object - skipped. */";
       } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                     GetObjectsAndGroups(),
-                                     objectInParameter) !=
+                GetObjectsContainersList().GetTypeOfObject(objectInParameter) !=
                      instrInfos.parameters[pNb].GetExtraInfo()) {
         return "/* Mismatched object type - skipped. */";
       }
@@ -316,11 +310,10 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     gd::String objectName = condition.GetParameter(0).GetPlainString();
     if (!objectName.empty() && !instrInfos.parameters.empty()) {
       std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
+          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Set up the context
-        gd::String objectType = gd::GetTypeOfObject(
-            GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), realObjects[i]);
+        gd::String objectType = GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
         const ObjectMetadata& objInfo =
             MetadataProvider::GetObjectMetadata(platform, objectType);
 
@@ -344,13 +337,10 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
     gd::String objectName = condition.GetParameter(0).GetPlainString();
-    gd::String behaviorType =
-        gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
-                              GetObjectsAndGroups(),
-                              condition.GetParameter(1).GetPlainString());
+    gd::String behaviorType = GetObjectsContainersList().GetTypeOfBehavior(condition.GetParameter(1).GetPlainString());
     if (instrInfos.parameters.size() >= 2) {
       std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
+          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         const BehaviorMetadata& autoInfo =
@@ -480,16 +470,10 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
-      if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
-              objectInParameter)) {
+      if (!GetObjectsContainersList().HasObjectOrGroupNamed(objectInParameter)) {
         return "/* Unknown object - skipped. */";
       } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                     GetObjectsAndGroups(),
-                                     objectInParameter) !=
+                 GetObjectsContainersList().GetTypeOfObject(objectInParameter) !=
                      instrInfos.parameters[pNb].GetExtraInfo()) {
         return "/* Mismatched object type - skipped. */";
       }
@@ -502,11 +486,10 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
     if (!instrInfos.parameters.empty()) {
       std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
+          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
-        gd::String objectType = gd::GetTypeOfObject(
-            GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), realObjects[i]);
+        gd::String objectType = GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
         const ObjectMetadata& objInfo =
             MetadataProvider::GetObjectMetadata(platform, objectType);
 
@@ -530,14 +513,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
     gd::String objectName = action.GetParameter(0).GetPlainString();
-    gd::String behaviorType =
-        gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
-                              GetObjectsAndGroups(),
-                              action.GetParameter(1).GetPlainString());
+    gd::String behaviorType = GetObjectsContainersList().GetTypeOfBehavior(action.GetParameter(1).GetPlainString());
 
     if (instrInfos.parameters.size() >= 2) {
       std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
+          GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         const BehaviorMetadata& autoInfo =
@@ -913,41 +893,6 @@ gd::String EventsCodeGenerator::ConvertToStringExplicit(
   return "\"" + ConvertToString(plainString) + "\"";
 }
 
-std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(
-    const gd::String& objectName,
-    const EventsCodeGenerationContext& context) const {
-  // Note: this logic is duplicated in EventsContextAnalyzer::ExpandObjectsName
-  std::vector<gd::String> realObjects;
-  if (globalObjectsAndGroups.GetObjectGroups().Has(objectName))
-    realObjects = globalObjectsAndGroups.GetObjectGroups()
-                      .Get(objectName)
-                      .GetAllObjectsNames();
-  else if (objectsAndGroups.GetObjectGroups().Has(objectName))
-    realObjects =
-        objectsAndGroups.GetObjectGroups().Get(objectName).GetAllObjectsNames();
-  else
-    realObjects.push_back(objectName);
-
-  // If current object is present, use it and only it.
-  if (find(realObjects.begin(),
-           realObjects.end(),
-           context.GetCurrentObject()) != realObjects.end()) {
-    realObjects.clear();
-    realObjects.push_back(context.GetCurrentObject());
-  }
-
-  // Ensure that all returned objects actually exists.
-  for (std::size_t i = 0; i < realObjects.size();) {
-    if (!objectsAndGroups.HasObjectNamed(realObjects[i]) &&
-        !globalObjectsAndGroups.HasObjectNamed(realObjects[i]))
-      realObjects.erase(realObjects.begin() + i);
-    else
-      ++i;
-  }
-
-  return realObjects;
-}
-
 void EventsCodeGenerator::DeleteUselessEvents(gd::EventsList& events) {
   for (std::size_t eId = events.size() - 1; eId < events.size(); --eId) {
     if (events[eId].CanHaveSubEvents())  // Process sub events, if any
@@ -1263,17 +1208,11 @@ gd::String EventsCodeGenerator::GenerateArgumentsList(
   return argumentsStr;
 }
 
-gd::ObjectsContainersList EventsCodeGenerator::GetObjectsContainersList() const {
-  // Build a container here to avoid refactoring this entire class, but this should be done at some point.
-  return gd::ObjectsContainersList::MakeNewObjectsContainersListForContainers(globalObjectsAndGroups, objectsAndGroups);
-}
-
 EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
                                          const gd::Layout& layout,
                                          const gd::Platform& platform_)
     : platform(platform_),
-      globalObjectsAndGroups(project_),
-      objectsAndGroups(layout),
+      projectScopedContainers(gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project_, layout)),
       hasProjectAndLayout(true),
       project(&project_),
       scene(&layout),
@@ -1285,11 +1224,9 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
 
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::Platform& platform_,
-    const gd::ObjectsContainer& globalObjectsAndGroups_,
-    const gd::ObjectsContainer& objectsAndGroups_)
+    const gd::ProjectScopedContainers& projectScopedContainers_)
     : platform(platform_),
-      globalObjectsAndGroups(globalObjectsAndGroups_),
-      objectsAndGroups(objectsAndGroups_),
+      projectScopedContainers(projectScopedContainers_),
       hasProjectAndLayout(false),
       project(nullptr),
       scene(nullptr),

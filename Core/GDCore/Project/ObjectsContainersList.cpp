@@ -101,7 +101,7 @@ const gd::VariablesContainer* ObjectsContainersList::GetObjectOrGroupVariablesCo
   return nullptr;
 }
 
-std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String& objectOrGroupName) const {
+std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String& objectOrGroupName, const gd::String& onlyObjectToSelectIfPresent) const {
   std::vector<gd::String> realObjects;
 
   // Check progressively each object container to find the object or the group with the specified name.
@@ -119,6 +119,14 @@ std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String
       break;
     }
   }
+  
+  // If the "current object" is present, use it and only it.
+  if (!onlyObjectToSelectIfPresent.empty() && find(realObjects.begin(),
+           realObjects.end(),
+           onlyObjectToSelectIfPresent) != realObjects.end()) {
+    realObjects.clear();
+    realObjects.push_back(onlyObjectToSelectIfPresent);
+  }
 
   // Ensure that all returned objects actually exists (i.e: if some groups have
   // names refering to non existing objects, don't return them).
@@ -130,6 +138,15 @@ std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String
   }
 
   return realObjects;
+}
+
+void ObjectsContainersList::ForEachObject(std::function<void(const gd::Object& object)> fn) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();++it) {
+    const auto& objectsContainer = **it;
+    for (const auto& object: objectsContainer.GetObjects()) {
+      fn(*object);
+    }
+  }
 }
 
 gd::String ObjectsContainersList::GetTypeOfObject(
@@ -171,6 +188,17 @@ gd::String ObjectsContainersList::GetTypeOfBehavior(
   }
   return gd::GetTypeOfBehavior(
       *objectsContainers[0], *objectsContainers[1], behaviorName, true);
+}
+
+std::vector<gd::String> ObjectsContainersList::GetBehaviorsOfObject(const gd::String& objectName, bool searchInGroups) const {
+  if (objectsContainers.size() != 2) {
+    // TODO: rework forwarded methods so they can work with any number of containers.
+    gd::LogFatalError(
+        "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
+        "not being exactly 2. This is a logical error and will crash.");
+  }
+
+  return gd::GetBehaviorsOfObject(*objectsContainers[0], *objectsContainers[1], objectName, searchInGroups);
 }
 
 }  // namespace gd

@@ -23,6 +23,7 @@ class BehaviorMetadata;
 class InstructionMetadata;
 class ExpressionCodeGenerationInformation;
 class EventsCodeGenerationContext;
+class ProjectScopedContainers;
 }  // namespace gd
 
 namespace gdjs {
@@ -415,10 +416,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   EventsCodeGenerator(const gd::Project& project, const gd::Layout& layout);
 
   /**
-   * \brief Construct a code generator for the specified objects and groups.
+   * \brief Construct a code generator for the specified containers.
    */
-  EventsCodeGenerator(gd::ObjectsContainer& globalObjectsAndGroups,
-                      const gd::ObjectsContainer& objectsAndGroups);
+  EventsCodeGenerator(const gd::ProjectScopedContainers& projectScopedContainers);
   virtual ~EventsCodeGenerator();
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,

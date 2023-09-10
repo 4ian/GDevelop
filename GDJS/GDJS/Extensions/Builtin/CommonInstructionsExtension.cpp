@@ -656,8 +656,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String outputCode;
         gd::ForEachEvent& event = dynamic_cast<gd::ForEachEvent&>(event_);
 
-        std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(
-            event.GetObjectToPick(), parentContext);
+        std::vector<gd::String> realObjects = codeGenerator.GetObjectsContainersList().ExpandObjectName(
+            event.GetObjectToPick(), parentContext.GetCurrentObject());
 
         if (realObjects.empty()) return gd::String("");
         for (unsigned int i = 0; i < realObjects.size(); ++i)
@@ -855,8 +855,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Generate the code to call the function
         gd::String callingCode;
         if (!event.GetParameterObjects().empty()) {
-          std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(
-              event.GetParameterObjects(), parentContext);
+          std::vector<gd::String> realObjects = codeGenerator.GetObjectsContainersList().ExpandObjectName(
+              event.GetParameterObjects(), parentContext.GetCurrentObject());
 
           callingCode += "var objects = [];\n";
           for (unsigned int i = 0; i < realObjects.size(); ++i) {

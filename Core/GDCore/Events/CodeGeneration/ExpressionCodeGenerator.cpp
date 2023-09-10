@@ -50,12 +50,8 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     return generator.GenerateDefaultValue(rootType);
   }
 
-  auto projectScopedContainers = codeGenerator.HasProjectAndLayout() ?
-    gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(codeGenerator.GetProject(), codeGenerator.GetLayout()) :
-    gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups());
-
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
-                                    projectScopedContainers,
+                                    codeGenerator.GetProjectScopedContainers(),
                                     rootType);
   node->Visit(validator);
   if (!validator.GetFatalErrors().empty()) {
@@ -316,11 +312,6 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
     const gd::String& objectName,
     const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
     const ExpressionMetadata& expressionMetadata) {
-  const gd::ObjectsContainer& globalObjectsAndGroups =
-      codeGenerator.GetGlobalObjectsAndGroups();
-  const gd::ObjectsContainer& objectsAndGroups =
-      codeGenerator.GetObjectsAndGroups();
-
   codeGenerator.AddIncludeFiles(
       expressionMetadata.GetIncludeFiles());
 
@@ -341,12 +332,11 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
 
   // Get object(s) concerned by function call
   std::vector<gd::String> realObjects =
-      codeGenerator.ExpandObjectsName(objectName, context);
+      codeGenerator.GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
   for (std::size_t i = 0; i < realObjects.size(); ++i) {
     context.ObjectsListNeeded(realObjects[i]);
 
-    gd::String objectType = gd::GetTypeOfObject(
-        globalObjectsAndGroups, objectsAndGroups, realObjects[i]);
+    gd::String objectType = codeGenerator.GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
     const ObjectMetadata& objInfo = MetadataProvider::GetObjectMetadata(
         codeGenerator.GetPlatform(), objectType);
 
@@ -368,11 +358,6 @@ gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
     const gd::String& behaviorName,
     const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
     const ExpressionMetadata& expressionMetadata) {
-  const gd::ObjectsContainer& globalObjectsAndGroups =
-      codeGenerator.GetGlobalObjectsAndGroups();
-  const gd::ObjectsContainer& objectsAndGroups =
-      codeGenerator.GetObjectsAndGroups();
-
   codeGenerator.AddIncludeFiles(
       expressionMetadata.GetIncludeFiles());
 
@@ -391,12 +376,11 @@ gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
 
   // Get object(s) concerned by function call
   std::vector<gd::String> realObjects =
-      codeGenerator.ExpandObjectsName(objectName, context);
+      codeGenerator.GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
 
   gd::String functionOutput = GenerateDefaultValue(type);
 
-  gd::String behaviorType = gd::GetTypeOfBehavior(
-      globalObjectsAndGroups, objectsAndGroups, behaviorName);
+  gd::String behaviorType = codeGenerator.GetObjectsContainersList().GetTypeOfBehavior(behaviorName);
   const BehaviorMetadata& autoInfo = MetadataProvider::GetBehaviorMetadata(
       codeGenerator.GetPlatform(), behaviorType);
 

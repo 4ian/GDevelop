@@ -742,7 +742,7 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
 vector<gd::String> GD_CORE_API
 GetBehaviorsOfObject(const gd::ObjectsContainer& project,
                      const gd::ObjectsContainer& layout,
-                     gd::String name,
+                     const gd::String& name,
                      bool searchInGroups) {
   bool behaviorsAlreadyInserted = false;
   vector<gd::String> behaviors;

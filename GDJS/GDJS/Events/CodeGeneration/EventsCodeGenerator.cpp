@@ -125,7 +125,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       globalObjectsAndGroups,
       objectsAndGroups);
 
-  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
+  EventsCodeGenerator codeGenerator(gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups));
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -166,7 +166,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       globalObjectsAndGroups,
       objectsAndGroups);
 
-  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
+  EventsCodeGenerator codeGenerator(gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups));
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -234,7 +234,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       globalObjectsAndGroups,
       objectsAndGroups);
 
-  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
+  EventsCodeGenerator codeGenerator(gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups));
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -625,11 +625,7 @@ EventsCodeGenerator::GenerateAllObjectsDeclarationsAndResets(
         }
       };
 
-  for (std::size_t i = 0; i < globalObjectsAndGroups.GetObjectsCount(); ++i)
-    generateDeclarations(globalObjectsAndGroups.GetObject(i));
-
-  for (std::size_t i = 0; i < objectsAndGroups.GetObjectsCount(); ++i)
-    generateDeclarations(objectsAndGroups.GetObject(i));
+  GetObjectsContainersList().ForEachObject(generateDeclarations);
 
   return std::make_pair(globalObjectLists, globalObjectListsReset);
 }
@@ -787,8 +783,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors = gd::GetBehaviorsOfObject(
-      globalObjectsAndGroups, objectsAndGroups, objectName);
+  vector<gd::String> behaviors = GetObjectsContainersList().GetBehaviorsOfObject(objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Error: bad behavior \"" << behaviorName
@@ -914,8 +909,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   }
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors = gd::GetBehaviorsOfObject(
-      globalObjectsAndGroups, objectsAndGroups, objectName);
+  vector<gd::String> behaviors = GetObjectsContainersList().GetBehaviorsOfObject(objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Error: bad behavior \"" << behaviorName
@@ -1186,14 +1180,14 @@ gd::String EventsCodeGenerator::GenerateObject(
   gd::String output;
   if (type == "objectList") {
     std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
+        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
     for (auto& objectName : realObjects) context.ObjectsListNeeded(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
     output = objectsMapName;
   } else if (type == "objectListOrEmptyIfJustDeclared") {
     std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
+        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
     for (auto& objectName : realObjects)
       context.ObjectsListNeededOrEmptyIfJustDeclared(objectName);
 
@@ -1201,7 +1195,7 @@ gd::String EventsCodeGenerator::GenerateObject(
     output = objectsMapName;
   } else if (type == "objectListOrEmptyWithoutPicking") {
     std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
+        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
 
     // Find the objects not yet declared, and handle them separately so they are
     // passed as empty object lists.
@@ -1221,7 +1215,7 @@ gd::String EventsCodeGenerator::GenerateObject(
     output = objectsMapName;
   } else if (type == "objectPtr") {
     std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
+        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
 
     if (find(realObjects.begin(),
              realObjects.end(),
@@ -1265,7 +1259,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     }
   } else {
     std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
+        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
 
     output = "gdjs.VariablesContainer.badVariablesContainer";
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
@@ -1352,11 +1346,8 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project,
                                          const gd::Layout& layout)
     : gd::EventsCodeGenerator(project, layout, JsPlatform::Get()) {}
 
-EventsCodeGenerator::EventsCodeGenerator(
-    gd::ObjectsContainer& globalObjectsAndGroups,
-    const gd::ObjectsContainer& objectsAndGroups)
-    : gd::EventsCodeGenerator(
-          JsPlatform::Get(), globalObjectsAndGroups, objectsAndGroups) {}
+EventsCodeGenerator::EventsCodeGenerator(const gd::ProjectScopedContainers& projectScopedContainers)
+    : gd::EventsCodeGenerator(JsPlatform::Get(), projectScopedContainers) {}
 
 EventsCodeGenerator::~EventsCodeGenerator() {}
 

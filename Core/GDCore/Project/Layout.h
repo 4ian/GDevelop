@@ -498,7 +498,7 @@ gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
 std::vector<gd::String> GD_CORE_API
 GetBehaviorsOfObject(const ObjectsContainer& game,
                      const ObjectsContainer& layout,
-                     gd::String objectName,
+                     const gd::String& objectName,
                      bool searchInGroups = true);
 
 }  // namespace gd

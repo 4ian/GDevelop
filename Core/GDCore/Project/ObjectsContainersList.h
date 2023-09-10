@@ -42,20 +42,23 @@ class GD_CORE_API ObjectsContainersList {
   bool HasObjectOrGroupNamed(const gd::String& name) const;
 
   /**
-   * \brief Check if the specified object or group has the specified variable in its
-   * declared variables.
+   * \brief Check if the specified object or group has the specified variable in
+   * its declared variables.
    */
   bool HasObjectOrGroupWithVariableNamed(const gd::String& objectOrGroupName,
-                                  const gd::String& variableName) const;
+                                         const gd::String& variableName) const;
 
   /**
-   * \brief Check if the specified object or group has the specified variables container.
+   * \brief Check if the specified object or group has the specified variables
+   * container.
    */
-  bool HasVariablesContainer(const gd::String& objectOrGroupName,
-                                const gd::VariablesContainer& variablesContainer) const;
+  bool HasVariablesContainer(
+      const gd::String& objectOrGroupName,
+      const gd::VariablesContainer& variablesContainer) const;
 
   /**
-   * \brief Return the container of the variables for the specified object or group of objects.
+   * \brief Return the container of the variables for the specified object or
+   * group of objects.
    */
   const gd::VariablesContainer* GetObjectOrGroupVariablesContainer(
       const gd::String& objectOrGroupName) const;
@@ -84,14 +87,34 @@ class GD_CORE_API ObjectsContainersList {
   gd::String GetTypeOfBehavior(const gd::String& behaviorName) const;
 
   /**
+   * \brief Get behaviors of an object/group
+   * \note The behaviors of a group are the behaviors which are found in common
+   * when looking all the objects of the group.
+   *
+   * @return Vector containing names of behaviors
+   */
+  std::vector<gd::String> 
+  GetBehaviorsOfObject(const gd::String& objectName,
+                       bool searchInGroups = true) const;
+
+  /**
    * \brief Return a list containing all objects refered to by the group.
    * If an object name is passed, then only this object name is returned.
+   *
+   * If \a onlyObjectToSelectIfPresent is set and present in the group(s),
+   * only this object will be returned. This is useful for considering this
+   * object as the "currently selected" object, when generating a condition or
+   * an action.
    */
   std::vector<gd::String> ExpandObjectName(
-      const gd::String& objectOrGroupName) const;
+      const gd::String& objectOrGroupName,
+      const gd::String& onlyObjectToSelectIfPresent = "") const;
 
-  /** Do not use - should be private but accessible to let Emscripten create a temporary. */
-  ObjectsContainersList() {};
+  void ForEachObject(std::function<void(const gd::Object& object)> fn) const;
+
+  /** Do not use - should be private but accessible to let Emscripten create a
+   * temporary. */
+  ObjectsContainersList(){};
 
  private:
   bool HasObjectNamed(const gd::String& name) const;

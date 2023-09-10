@@ -1664,9 +1664,9 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.NamedPropertyDescriptorsList', function () {
+  describe('gd.PropertiesContainer', function () {
     it('can be used to store named properties', function () {
-      const list = new gd.NamedPropertyDescriptorsList();
+      const list = new gd.PropertiesContainer();
 
       const property1 = list.insertNew('Property1', 0);
       expect(list.has('Property1')).toBe(true);

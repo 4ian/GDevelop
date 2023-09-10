@@ -47,7 +47,10 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
-import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
+import {
+  type EventsScope,
+  getProjectScopedContainersFromScope,
+} from '../../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -135,15 +138,11 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
-    scope.layout
-      ? gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
-          scope.project,
-          scope.layout
-        )
-      : gd.ProjectScopedContainers.makeNewProjectScopedContainersFor(
-          globalObjectsContainer,
-          objectsContainer
-        ),
+    getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    ),
     expressionType
   );
   expressionNode.visit(expressionValidator);

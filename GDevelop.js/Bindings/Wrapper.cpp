@@ -76,6 +76,8 @@
 #include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/ProjectScopedContainers.h>
+#include <GDCore/Project/PropertiesContainer.h>
+#include <GDCore/Project/PropertiesContainersList.h>
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
@@ -442,8 +444,6 @@ typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::EventsBasedObject>
     EventsBasedObjectsList;
-typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor>
-    NamedPropertyDescriptorsList;
 typedef ExpressionCompletionDescription::CompletionKind
     ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription>

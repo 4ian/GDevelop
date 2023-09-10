@@ -38,7 +38,10 @@ import {
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import {
+  type EventsScope,
+  getProjectScopedContainersFromScope,
+} from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
@@ -283,15 +286,11 @@ const Instruction = (props: Props) => {
                 .getRootNode();
               const expressionValidator = new gd.ExpressionValidator(
                 gd.JsPlatform.get(),
-                scope.layout
-                  ? gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
-                      scope.project,
-                      scope.layout
-                    )
-                  : gd.ProjectScopedContainers.makeNewProjectScopedContainersFor(
-                      globalObjectsContainer,
-                      objectsContainer
-                    ),
+                getProjectScopedContainersFromScope(
+                  scope,
+                  globalObjectsContainer,
+                  objectsContainer
+                ),
                 parameterType
               );
               expressionNode.visit(expressionValidator);

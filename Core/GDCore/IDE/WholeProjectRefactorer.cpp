@@ -1622,6 +1622,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
     gd::ObjectsContainer &objectsContainer, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
   auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainer, objectsContainer);
+  // TODO: add AddPropertiesContainer
 
   gd::EventsRefactorer::RenameObjectInEvents(
       project.GetCurrentPlatform(), projectScopedContainers,

@@ -574,6 +574,9 @@ interface ProjectScopedContainers {
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
         [Const, Ref] ObjectsContainer globalObjectsContainer,
         [Const, Ref] ObjectsContainer objectsContainer);
+     
+  [Ref] ProjectScopedContainers AddPropertiesContainer(
+        [Const, Ref] PropertiesContainer propertiesContainer);
 };
 
 interface ExtensionProperties {
@@ -2647,7 +2650,7 @@ interface EventsFunctionsContainer {
 
 interface AbstractEventsBasedEntity {
     [Ref] EventsFunctionsContainer GetEventsFunctions();
-    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
+    [Ref] PropertiesContainer GetPropertyDescriptors();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -2667,7 +2670,7 @@ interface EventsBasedBehavior {
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
     boolean IsPrivate();
 
-    [Ref] NamedPropertyDescriptorsList GetSharedPropertyDescriptors();
+    [Ref] PropertiesContainer GetSharedPropertyDescriptors();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
@@ -2744,8 +2747,8 @@ interface EventsBasedObjectsList {
     [Ref] EventsBasedObject at(unsigned long index);
 };
 
-interface NamedPropertyDescriptorsList {
-    void NamedPropertyDescriptorsList();
+interface PropertiesContainer {
+    void PropertiesContainer();
 
     [Ref] NamedPropertyDescriptor InsertNew([Const] DOMString name, unsigned long pos);
     [Ref] NamedPropertyDescriptor Insert([Const, Ref] NamedPropertyDescriptor item, unsigned long pos);

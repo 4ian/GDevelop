@@ -16,6 +16,7 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
@@ -179,6 +180,8 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
         objectsAndGroups);
     auto projectScopedContainers =
       gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
+    projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetSharedPropertyDescriptors());
+    projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetPropertyDescriptors());
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }
@@ -196,6 +199,7 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
         objectsAndGroups);
     auto projectScopedContainers =
       gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
+    projectScopedContainers.AddPropertiesContainer(eventsBasedObject.GetPropertyDescriptors());
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }

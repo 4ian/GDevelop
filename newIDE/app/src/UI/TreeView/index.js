@@ -8,7 +8,9 @@ import { FixedSizeList as List, areEqual } from 'react-window';
 import { AutoSizer } from 'react-virtualized';
 import memoizeOne from 'memoize-one';
 
-const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view');
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
+  vibrate: 100,
+});
 
 type Node = {| name: string, id: string, children?: Node[] |};
 type FlattenedNode = {|

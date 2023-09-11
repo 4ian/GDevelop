@@ -182,36 +182,45 @@ const TreeView = <Item>({
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
 
-  const flattenOpened = (treeData): FlattenedNode[] => {
-    const result = [];
-    for (let item of items) {
-      flattenNode(item, 1, result);
-    }
-    return result;
+  const flattenOpened = (treeData, searchText: ?string): FlattenedNode[] => {
+    return items.map(item => flattenNode(item, 1, searchText)).flat();
   };
 
-  const flattenNode = (item: Item, depth: number, result: FlattenedNode[]) => {
+  const flattenNode = (
+    item: Item,
+    depth: number,
+    searchText: ?string
+  ): FlattenedNode[] => {
     const id = getItemId(item);
     const name = getItemName(item);
     const children = getItemChildren(item);
-    const thumbnailSrc = getItemThumbnail(item);
     const collapsed = !openedNodeIds.includes(id);
-    const selected = selectedNodeIds.includes(id);
-    result.push({
-      id,
-      name,
-      hasChildren: !!children && children.length > 0,
-      depth,
-      collapsed,
-      selected,
-      thumbnailSrc,
-    });
-
-    if (!collapsed && children) {
-      for (let child of children) {
-        flattenNode(child, depth + 1, result);
-      }
+    let flattenedChildren = [];
+    if (children && (!collapsed || !!searchText)) {
+      flattenedChildren = children
+        .map(child => flattenNode(child, depth + 1, searchText))
+        .flat();
     }
+    if (
+      !searchText ||
+      (name.toLowerCase().includes(searchText) || flattenedChildren.length > 0)
+    ) {
+      const thumbnailSrc = getItemThumbnail(item);
+      const selected = selectedNodeIds.includes(id);
+      return [
+        {
+          id,
+          name,
+          hasChildren: !!children && children.length > 0,
+          depth,
+          collapsed,
+          selected,
+          thumbnailSrc,
+        },
+        ...flattenedChildren,
+      ];
+    }
+    return [];
   };
 
   const onOpen = (node: FlattenedNode) => {
@@ -236,13 +245,10 @@ const TreeView = <Item>({
     }
   };
 
-  let flattenedData = flattenOpened(items);
-  if (searchText) {
-    const searchTextLowerCase = searchText.toLowerCase();
-    flattenedData = flattenedData.filter(node =>
-      node.name.toLowerCase().includes(searchTextLowerCase)
-    );
-  }
+  let flattenedData = flattenOpened(
+    items,
+    searchText ? searchText.toLowerCase() : null
+  );
 
   const styling = {
     selectedBackgroundColor: theme.listItem.selectedBackgroundColor,

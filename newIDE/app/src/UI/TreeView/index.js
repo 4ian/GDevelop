@@ -7,6 +7,10 @@ import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import { AutoSizer } from 'react-virtualized';
 import memoizeOne from 'memoize-one';
+import IconButton from '../IconButton';
+import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
+import ArrowHeadTop from '../CustomSvgIcons/ArrowHeadTop';
+import Folder from '../CustomSvgIcons/Folder';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
@@ -37,6 +41,7 @@ const Row = React.memo(props => {
     },
     [onSelect, node]
   );
+
   return (
     <div style={style}>
       <DragSourceAndDropTarget
@@ -79,13 +84,22 @@ const Row = React.memo(props => {
                         }}
                       >
                         {node.hasChildren && (
-                          <button
-                            type="button"
-                            onClick={e => onOpen(e, node)}
-                            tabIndex={-1}
-                          >
-                            {true ? '-' : '+'}
-                          </button>
+                          <>
+                            <IconButton
+                              size="small"
+                              onClick={e => onOpen(e, node)}
+                            >
+                              {node.collapsed ? (
+                                <ArrowHeadBottom fontSize="small" />
+                              ) : (
+                                <ArrowHeadTop fontSize="small" />
+                              )}
+                            </IconButton>
+                            <Folder
+                              fontSize="small"
+                              style={{ marginRight: 4 }}
+                            />
+                          </>
                         )}
                         <Text>{node.name}</Text>
                       </div>

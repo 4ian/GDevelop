@@ -34,6 +34,8 @@ const Row = React.memo(props => {
   const { flattenedData, onOpen, onSelect, styling } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
+  const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
+  const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
 
   const onClick = React.useCallback(
     event => {
@@ -41,6 +43,26 @@ const Row = React.memo(props => {
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
     },
     [onSelect, node]
+  );
+
+  React.useEffect(
+    () => {
+      if (
+        isStayingOver &&
+        !openWhenOverTimeoutId.current &&
+        node.hasChildren &&
+        node.collapsed
+      ) {
+        openWhenOverTimeoutId.current = setTimeout(() => {
+          onOpen(node);
+        }, 500);
+        return () => {
+          clearTimeout(openWhenOverTimeoutId.current);
+          openWhenOverTimeoutId.current = null;
+        };
+      }
+    },
+    [isStayingOver, onOpen, node]
   );
 
   return (
@@ -62,58 +84,64 @@ const Row = React.memo(props => {
           connectDragPreview,
           isOver,
           canDrop,
-        }) => (
-          <div style={{ paddingLeft: left, display: 'flex' }}>
-            {connectDropTarget(
-              <div
-                onClick={onClick}
-                tabIndex={0}
-                style={{
-                  display: 'flex',
-                  flex: 1,
-                  borderRadius: 6,
-                  backgroundColor: node.selected
-                    ? styling.selectedBackgroundColor
-                    : undefined,
-                }}
-              >
-                {connectDragPreview(
-                  <div style={{ flex: 1 }}>
-                    {isOver && <DropIndicator canDrop={canDrop} />}
-                    {connectDragSource(
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        {node.hasChildren && (
-                          <>
-                            <IconButton
-                              size="small"
-                              onClick={e => onOpen(e, node)}
-                            >
-                              {node.collapsed ? (
-                                <ArrowHeadBottom fontSize="small" />
-                              ) : (
-                                <ArrowHeadTop fontSize="small" />
-                              )}
-                            </IconButton>
-                            <Folder
-                              fontSize="small"
-                              style={{ marginRight: 4 }}
-                            />
-                          </>
-                        )}
-                        <Text>{node.name}</Text>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        }) => {
+          setIsStayingOver(isOver);
+          return (
+            <div style={{ paddingLeft: left, display: 'flex' }}>
+              {connectDropTarget(
+                <div
+                  onClick={onClick}
+                  tabIndex={0}
+                  style={{
+                    display: 'flex',
+                    flex: 1,
+                    borderRadius: 6,
+                    backgroundColor: node.selected
+                      ? styling.selectedBackgroundColor
+                      : undefined,
+                  }}
+                >
+                  {connectDragPreview(
+                    <div style={{ flex: 1 }}>
+                      {isOver && <DropIndicator canDrop={canDrop} />}
+                      {connectDragSource(
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {node.hasChildren && (
+                            <>
+                              <IconButton
+                                size="small"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  onOpen(node);
+                                }}
+                              >
+                                {node.collapsed ? (
+                                  <ArrowHeadBottom fontSize="small" />
+                                ) : (
+                                  <ArrowHeadTop fontSize="small" />
+                                )}
+                              </IconButton>
+                              <Folder
+                                fontSize="small"
+                                style={{ marginRight: 4 }}
+                              />
+                            </>
+                          )}
+                          <Text>{node.name}</Text>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        }}
       </DragSourceAndDropTarget>
     </div>
   );
@@ -159,8 +187,7 @@ const SpeedTree = ({ nodes, searchText }: Props) => {
     }
   };
 
-  const onOpen = (e, node) => {
-    e.stopPropagation();
+  const onOpen = (node: FlattenedNode) => {
     node.collapsed
       ? setOpenedNodeIds([...openedNodeIds, node.id])
       : setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
@@ -189,7 +216,6 @@ const SpeedTree = ({ nodes, searchText }: Props) => {
       node.name.toLowerCase().includes(searchTextLowerCase)
     );
   }
-  console.log(flattenedData);
 
   const styling = {
     selectedBackgroundColor: theme.listItem.selectedBackgroundColor,

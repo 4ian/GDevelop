@@ -443,8 +443,12 @@ export const Default = () => {
                   <TreeView
                     height={height}
                     width={width}
-                    nodes={nodes}
+                    items={nodes}
                     searchText={searchText}
+                    getItemId={node => node.id}
+                    getItemName={node => node.name}
+                    // $FlowIgnore
+                    getItemChildren={node => node.children}
                   />
                 </Column>
               </Line>

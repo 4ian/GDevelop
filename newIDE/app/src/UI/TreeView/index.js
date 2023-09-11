@@ -151,28 +151,41 @@ const getItemData = memoizeOne((flattenedData, onOpen, onSelect, styling) => ({
   styling,
 }));
 
-type Props = {|
+type Props<Item> = {|
   height: number,
   width: number,
-  nodes: Node[],
+  items: Item[],
+  getItemName: Item => string,
+  getItemId: Item => string,
+  getItemChildren: Item => ?(Item[]),
   searchText?: string,
 |};
 
-const TreeView = ({ height, width, nodes, searchText }: Props) => {
+const TreeView = <Item>({
+  height,
+  width,
+  items,
+  searchText,
+  getItemName,
+  getItemId,
+  getItemChildren,
+}: Props<Item>) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
 
   const flattenOpened = (treeData): FlattenedNode[] => {
     const result = [];
-    for (let node of nodes) {
-      flattenNode(node, 1, result);
+    for (let item of items) {
+      flattenNode(item, 1, result);
     }
     return result;
   };
 
-  const flattenNode = (node, depth, result) => {
-    const { id, name, children } = node;
+  const flattenNode = (item: Item, depth: number, result: FlattenedNode[]) => {
+    const id = getItemId(item);
+    const name = getItemName(item);
+    const children = getItemChildren(item);
     const collapsed = !openedNodeIds.includes(id);
     const selected = selectedNodeIds.includes(id);
     result.push({
@@ -213,7 +226,7 @@ const TreeView = ({ height, width, nodes, searchText }: Props) => {
     }
   };
 
-  let flattenedData = flattenOpened(nodes);
+  let flattenedData = flattenOpened(items);
   if (searchText) {
     const searchTextLowerCase = searchText.toLowerCase();
     flattenedData = flattenedData.filter(node =>

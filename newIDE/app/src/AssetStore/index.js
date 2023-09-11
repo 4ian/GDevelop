@@ -710,6 +710,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onPrivateAssetPackSelection={selectPrivateAssetPack}
               onPublicAssetPackSelection={selectPublicAssetPack}
               onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+              currentPage={shopNavigationState.getCurrentPage()}
             />
           ) : openedAssetShortHeader ? (
             <AssetDetails

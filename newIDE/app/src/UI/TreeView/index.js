@@ -25,6 +25,7 @@ type FlattenedNode = {|
   depth: number,
   collapsed: boolean,
   selected: boolean,
+  disableCollapse: boolean,
   thumbnailSrc?: ?string,
 |};
 
@@ -118,6 +119,7 @@ const Row = React.memo(props => {
                                   e.stopPropagation();
                                   onOpen(node);
                                 }}
+                                disabled={node.disableCollapse}
                               >
                                 {node.collapsed ? (
                                   <ArrowHeadBottom fontSize="small" />
@@ -179,31 +181,56 @@ const TreeView = <Item>({
   getItemThumbnail,
 }: Props<Item>) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
+  const [
+    openedDuringSearchNodeIds,
+    setOpenedDuringSearchNodeIds,
+  ] = React.useState<string[]>([]);
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
 
   const flattenOpened = (treeData, searchText: ?string): FlattenedNode[] => {
-    return items.map(item => flattenNode(item, 1, searchText)).flat();
+    return items.map(item => flattenNode(item, 1, searchText, false)).flat();
   };
 
   const flattenNode = (
     item: Item,
     depth: number,
-    searchText: ?string
+    searchText: ?string,
+    forceOpen: boolean
   ): FlattenedNode[] => {
     const id = getItemId(item);
     const name = getItemName(item);
     const children = getItemChildren(item);
     const collapsed = !openedNodeIds.includes(id);
+    const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
     let flattenedChildren = [];
-    if (children && (!collapsed || !!searchText)) {
+    /*
+     * Compute children nodes flattening if:
+     * - node has children;
+     * and if either one of these conditions are true:
+     * - the node is opened (not collapsed)
+     * - the user is searching and they opened the node during the search
+     */
+    if (children && (!collapsed || (!!searchText && openedDuringSearch))) {
       flattenedChildren = children
-        .map(child => flattenNode(child, depth + 1, searchText))
+        .map(child =>
+          flattenNode(child, depth + 1, searchText, openedDuringSearch)
+        )
         .flat();
     }
+
+    /*
+     * Append node to result if either:
+     * - the user is not searching
+     * - the node is force-opened (if user opened the node during the search)
+     * - the node name matches the search
+     * - the node contains children that should be displayed
+     */
     if (
       !searchText ||
-      (name.toLowerCase().includes(searchText) || flattenedChildren.length > 0)
+      forceOpen ||
+      name.toLowerCase().includes(searchText) ||
+      flattenedChildren.length > 0
     ) {
       const thumbnailSrc = getItemThumbnail(item);
       const selected = selectedNodeIds.includes(id);
@@ -213,9 +240,23 @@ const TreeView = <Item>({
           name,
           hasChildren: !!children && children.length > 0,
           depth,
-          collapsed,
+          /*
+           * If the user is searching, the node should be opened if either:
+           * - it has children that should be displayed
+           * - the user opened it
+           */
+          collapsed: !!searchText
+            ? flattenedChildren.length === 0 || !openedDuringSearch
+            : collapsed,
           selected,
           thumbnailSrc,
+          /*
+           * Disable opening of the node if:
+           * - the user is searching
+           * - the node has children to be displayed but it's not because the user opened it
+           */
+          disableCollapse:
+            !!searchText && flattenedChildren.length > 0 && !openedDuringSearch,
         },
         ...flattenedChildren,
       ];
@@ -224,9 +265,17 @@ const TreeView = <Item>({
   };
 
   const onOpen = (node: FlattenedNode) => {
-    node.collapsed
-      ? setOpenedNodeIds([...openedNodeIds, node.id])
-      : setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
+    if (!!searchText) {
+      node.collapsed
+        ? setOpenedDuringSearchNodeIds([...openedDuringSearchNodeIds, node.id])
+        : setOpenedDuringSearchNodeIds(
+            openedDuringSearchNodeIds.filter(id => id !== node.id)
+          );
+    } else {
+      node.collapsed
+        ? setOpenedNodeIds([...openedNodeIds, node.id])
+        : setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
+    }
   };
 
   const onSelect = ({
@@ -255,6 +304,17 @@ const TreeView = <Item>({
   };
 
   const itemData = getItemData(flattenedData, onOpen, onSelect, styling);
+
+  // Reset opened nodes during search when user stops searching
+  // or when the search text changes.
+  React.useEffect(
+    () => {
+      if (!searchText || searchText.length > 0) {
+        setOpenedDuringSearchNodeIds([]);
+      }
+    },
+    [searchText]
+  );
 
   return (
     <List

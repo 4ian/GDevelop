@@ -69,26 +69,25 @@ const Row = React.memo(props => {
                 {connectDragPreview(
                   <div style={{ flex: 1 }}>
                     {isOver && <DropIndicator canDrop={canDrop} />}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      {connectDragSource(
-                        <span style={{ padding: 5 }}>||</span>
-                      )}
-                      {node.hasChildren && (
-                        <button
-                          type="button"
-                          onClick={e => onOpen(e, node)}
-                          tabIndex={-1}
-                        >
-                          {true ? '-' : '+'}
-                        </button>
-                      )}
-                      <Text>{node.name}</Text>
-                    </div>
+                    {connectDragSource(
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {node.hasChildren && (
+                          <button
+                            type="button"
+                            onClick={e => onOpen(e, node)}
+                            tabIndex={-1}
+                          >
+                            {true ? '-' : '+'}
+                          </button>
+                        )}
+                        <Text>{node.name}</Text>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

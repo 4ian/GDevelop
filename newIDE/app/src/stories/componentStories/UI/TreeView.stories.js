@@ -5,6 +5,7 @@ import muiDecorator from '../../ThemeDecorator';
 import { getPaperDecorator } from '../../PaperDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
+import { AutoSizer } from 'react-virtualized';
 
 import TreeView from '../../../UI/TreeView';
 import { Column, Line } from '../../../UI/Grid';
@@ -425,23 +426,32 @@ export const Default = () => {
   const [searchText, setSearchText] = React.useState<string>('');
   return (
     <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={400}>
-        <Column noMargin expand>
-          <TextField
-            type="text"
-            value={searchText}
-            onChange={(e, text) => {
-              setSearchText(text);
-            }}
-            hintText={'Filter'}
-          />
-          <Line expand>
-            <Column expand>
-              <TreeView nodes={nodes} searchText={searchText} />
-            </Column>
-          </Line>
-        </Column>
-      </FixedHeightFlexContainer>
+      <Column noMargin expand>
+        <TextField
+          type="text"
+          value={searchText}
+          onChange={(e, text) => {
+            setSearchText(text);
+          }}
+          hintText={'Filter'}
+        />
+        <FixedHeightFlexContainer height={400}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <Line expand>
+                <Column expand>
+                  <TreeView
+                    height={height}
+                    width={width}
+                    nodes={nodes}
+                    searchText={searchText}
+                  />
+                </Column>
+              </Line>
+            )}
+          </AutoSizer>
+        </FixedHeightFlexContainer>
+      </Column>
     </DragAndDropContextProvider>
   );
 };

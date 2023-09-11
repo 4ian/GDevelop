@@ -6,46 +6,32 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Font manager');
 
+  const resourceKinds: Array<ResourceKind> = ['font'];
+
   /**
    * FontFaceObserverFontManager loads fonts (using `FontFace` or `fontfaceobserver` library)
    * from the game resources (see `loadFonts`), and allow to access to
    * the font families of the loaded fonts during the game (see `getFontFamily`).
    */
-  export class FontFaceObserverFontManager {
-    _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: Map<string, ResourceData>;
+  export class FontFaceObserverFontManager implements gdjs.ResourceManager {
+    _resourceLoader: gdjs.ResourceLoader;
     // Associate font resource names to the loaded font family
     _loadedFontFamily: { [key: string]: string } = {};
     // Associate font resource names to the resources, for faster access
     _loadedFonts: { [key: string]: ResourceData } = {};
+    // Cache the result of transforming a filename to a font family - useful to avoid duplicates.
     _filenameToFontFamily: { [key: string]: string } = {};
 
     /**
      * @param resources The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
      */
-    constructor(
-      resourceDataArray: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader
-    ) {
-      this._resources = new Map<string, ResourceData>();
-      this.setResources(resourceDataArray);
-      this._resourcesLoader = resourcesLoader;
+    constructor(resourceLoader: gdjs.ResourceLoader) {
+      this._resourceLoader = resourceLoader;
     }
 
-    // Cache the result of transforming a filename to a font family - useful to avoid duplicates.
-    /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     *
-     * @param resources The resources data of the game.
-     */
-    setResources(resourceDataArray: ResourceData[]): void {
-      this._resources.clear();
-      for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'font') {
-          this._resources.set(resourceData.name, resourceData);
-        }
-      }
+    getResourceKinds(): ResourceKind[] {
+      return resourceKinds;
     }
 
     /**
@@ -131,8 +117,8 @@ namespace gdjs {
       // @ts-ignore
       if (typeof FontFace !== 'undefined') {
         // Load the given font using CSS Font Loading API.
-        return fetch(this._resourcesLoader.getFullUrl(src), {
-          credentials: this._resourcesLoader.checkIfCredentialsRequired(src)
+        return fetch(this._resourceLoader.getFullUrl(src), {
+          credentials: this._resourceLoader.checkIfCredentialsRequired(src)
             ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
               // i.e: its gdevelop.io cookie, to be passed.
               'include'
@@ -189,54 +175,35 @@ namespace gdjs {
      * used by using the font family returned by getFontFamily.
      * @param onProgress Callback called each time a new file is loaded.
      */
-    async loadFonts(
-      onProgress: (loadedCount: integer, totalCount: integer) => void
-    ): Promise<integer> {
-      // Construct the list of files to be loaded.
-      // For one loaded file, it can have one or more resources
-      // that use it.
-      const filesResources: { [key: string]: ResourceData[] } = {};
-      for (const res of this._resources.values()) {
-        if (res.file) {
-          if (!!this._loadedFonts[res.name]) {
-            continue;
-          }
-          filesResources[res.file] = filesResources[res.file]
-            ? filesResources[res.file].concat(res)
-            : [res];
-        }
-      }
-      const totalCount = Object.keys(filesResources).length;
-      if (totalCount === 0) {
-        return 0;
+    async loadResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn('Unable to find font for resource "' + resourceName + '".');
+        return;
       }
 
-      let loadingCount = 0;
-      await Promise.all(
-        Object.keys(filesResources).map(async (file) => {
-          const fontFamily = this._getFontFamilyFromFilename(file);
-          const fontResources = filesResources[file];
-          try {
-            await this._loadFont(fontFamily, file);
-          } catch (error) {
-            logger.error(
-              'Error loading font resource "' +
-                fontResources[0].name +
-                '" (file: ' +
-                file +
-                '): ' +
-                (error.message || 'Unknown error')
-            );
-          }
-          fontResources.forEach((resource) => {
-            this._loadedFontFamily[resource.name] = fontFamily;
-            this._loadedFonts[resource.name] = resource;
-          });
-          loadingCount++;
-          onProgress(loadingCount, totalCount);
-        })
-      );
-      return totalCount;
+      const file = resource.file;
+      if (file) {
+        if (this._loadedFonts[resource.name]) {
+          return;
+        }
+      }
+
+      const fontFamily = this._getFontFamilyFromFilename(file);
+      try {
+        await this._loadFont(fontFamily, file);
+      } catch (error) {
+        logger.error(
+          'Error loading font resource "' +
+            resource.name +
+            '" (file: ' +
+            file +
+            '): ' +
+            (error.message || 'Unknown error')
+        );
+      }
+      this._loadedFontFamily[resource.name] = fontFamily;
+      this._loadedFonts[resource.name] = resource;
     }
   }
 

@@ -34,21 +34,12 @@ namespace gdjs {
     }
   };
 
-  const findResourceWithNameAndKind = (
-    resources: Map<string, ResourceData>,
-    resourceName: string,
-    kind: ResourceKind
-  ): ResourceData | null => {
-    const resource = resources.get(resourceName);
-    return resource && resource.kind === kind ? resource : null;
-  };
+  const resourceKinds: Array<ResourceKind> = ['image', 'video'];
 
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
    */
-  export class PixiImageManager {
-    _resources: Map<string, ResourceData>;
-
+  export class PixiImageManager implements gdjs.ResourceManager {
     /**
      * The invalid texture is a 8x8 PNG file filled with magenta (#ff00ff), to be
      * easily spotted if rendered on screen.
@@ -66,19 +57,14 @@ namespace gdjs {
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
     private _loadedThreeMaterials: Hashtable<THREE.Material>;
 
-    private _resourcesLoader: RuntimeGameResourcesLoader;
+    private _resourceLoader: gdjs.ResourceLoader;
 
     /**
      * @param resources The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
      */
-    constructor(
-      resourceDataArray: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader
-    ) {
-      this._resources = new Map<string, ResourceData>();
-      this.setResources(resourceDataArray);
-      this._resourcesLoader = resourcesLoader;
+    constructor(resourceLoader: gdjs.ResourceLoader) {
+      this._resourceLoader = resourceLoader;
       this._invalidTexture = PIXI.Texture.from(
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQoU2P8z/D/PwMewDgyFAAApMMX8Zi0uXAAAAAASUVORK5CYIIA'
       );
@@ -87,18 +73,8 @@ namespace gdjs {
       this._loadedThreeMaterials = new Hashtable();
     }
 
-    /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     *
-     * @param resources The resources data of the game.
-     */
-    setResources(resourceDataArray: ResourceData[]): void {
-      this._resources.clear();
-      for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'image' || resourceData.kind === 'video') {
-          this._resources.set(resourceData.name, resourceData);
-        }
-      }
+    getResourceKinds(): ResourceKind[] {
+      return resourceKinds;
     }
 
     /**
@@ -162,13 +138,13 @@ namespace gdjs {
 
       logger.log('Loading texture for resource "' + resourceName + '"...');
       const file = resource.file;
-      const url = this._resourcesLoader.getFullUrl(file);
+      const url = this._resourceLoader.getFullUrl(file);
       const texture = PIXI.Texture.from(url, {
         resourceOptions: {
           // Note that using `false`
           // to not having `crossorigin` at all would NOT work because the browser would taint the
           // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+          crossorigin: this._resourceLoader.checkIfCredentialsRequired(file)
             ? 'use-credentials'
             : 'anonymous',
         },
@@ -203,7 +179,7 @@ namespace gdjs {
       // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
       // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
       const pixiTexture = this.getPIXITexture(resourceName);
-      const pixiRenderer = this._resourcesLoader._runtimeGame
+      const pixiRenderer = this._resourceLoader._runtimeGame
         .getRenderer()
         .getPIXIRenderer();
       if (!pixiRenderer) throw new Error('No PIXI renderer was found.');
@@ -224,11 +200,7 @@ namespace gdjs {
       threeTexture.colorSpace = THREE.SRGBColorSpace;
       threeTexture.needsUpdate = true;
 
-      const resource = findResourceWithNameAndKind(
-        this._resources,
-        resourceName,
-        'image'
-      );
+      const resource = this._getImageResource(resourceName);
 
       applyThreeTextureSettings(threeTexture, resource);
       this._loadedThreeTextures.put(resourceName, threeTexture);
@@ -284,6 +256,13 @@ namespace gdjs {
       return this._invalidTexture;
     }
 
+    private _getImageResource = (resourceName: string): ResourceData | null => {
+      const resource = this._resourceLoader.getResource(resourceName);
+      return resource && this.getResourceKinds().includes(resource.kind)
+        ? resource
+        : null;
+    };
+
     /**
      * Return a PIXI texture which can be used as a placeholder when no
      * suitable texture can be found.
@@ -295,84 +274,85 @@ namespace gdjs {
     /**
      * Load the specified resources, so that textures are loaded and can then be
      * used by calling `getPIXITexture`.
+     */
+    async loadResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return;
+      }
+      this._loadTexture(resource);
+    }
+
+    /**
+     * Load the specified resources, so that textures are loaded and can then be
+     * used by calling `getPIXITexture`.
      * @param onProgress Callback called each time a new file is loaded.
      */
-    async loadTextures(
-      onProgress: (loadingCount: integer, totalCount: integer) => void
-    ): Promise<integer> {
-      let loadedCount = 0;
-      await Promise.all(
-        [...this._resources.values()].map(async (resource) => {
-          try {
-            if (resource.kind === 'video') {
-              // For videos, we want to preload them so they are available as soon as we want to use them.
-              // We cannot use Pixi.assets.load() as it does not allow passing options (autoplay) to the resource loader.
-              // Pixi.Texture.from() does not return a promise, so we need to ensure we look at the 'loaded' event of the baseTexture,
-              // to continue, otherwise if we try to play the video too soon (at the beginning of scene for instance),
-              // it will fail.
-              await new Promise<void>((resolve, reject) => {
-                const texture = PIXI.Texture.from(
-                  this._resourcesLoader.getFullUrl(resource.file),
-                  {
-                    resourceOptions: {
-                      crossorigin: this._resourcesLoader.checkIfCredentialsRequired(
-                        resource.file
-                      )
-                        ? 'use-credentials'
-                        : 'anonymous',
-                      autoPlay: false,
-                    },
-                  }
-                ).on('error', (error) => {
-                  reject(error);
-                });
+    async _loadTexture(resource: ResourceData): Promise<void> {
+      try {
+        if (resource.kind === 'video') {
+          // For videos, we want to preload them so they are available as soon as we want to use them.
+          // We cannot use Pixi.assets.load() as it does not allow passing options (autoplay) to the resource loader.
+          // Pixi.Texture.from() does not return a promise, so we need to ensure we look at the 'loaded' event of the baseTexture,
+          // to continue, otherwise if we try to play the video too soon (at the beginning of scene for instance),
+          // it will fail.
+          await new Promise<void>((resolve, reject) => {
+            const texture = PIXI.Texture.from(
+              this._resourceLoader.getFullUrl(resource.file),
+              {
+                resourceOptions: {
+                  crossorigin: this._resourceLoader.checkIfCredentialsRequired(
+                    resource.file
+                  )
+                    ? 'use-credentials'
+                    : 'anonymous',
+                  autoPlay: false,
+                },
+              }
+            ).on('error', (error) => {
+              reject(error);
+            });
 
-                const baseTexture = texture.baseTexture;
+            const baseTexture = texture.baseTexture;
 
-                baseTexture
-                  .on('loaded', () => {
-                    this._loadedTextures.put(resource.name, texture);
-                    applyTextureSettings(texture, resource);
-                    resolve();
-                  })
-                  .on('error', (error) => {
-                    reject(error);
-                  });
-              });
-            } else {
-              // If the file has no extension, PIXI.assets.load cannot find
-              // an adequate load parser and does not load the file although
-              // we would like to force it to load (we are confident it's an image).
-              // TODO: When PIXI v8+ is used, PIXI.Assets.load can be used because
-              // loadParser can be forced in PIXI.Assets.load
-              // (see https://github.com/pixijs/pixijs/blob/71ed56c569ebc6b53da19e3c49258a0a84892101/packages/assets/src/loader/Loader.ts#L68)
-              const loadedTexture = PIXI.Texture.from(
-                this._resourcesLoader.getFullUrl(resource.file),
-                {
-                  resourceOptions: {
-                    autoLoad: false,
-                    crossorigin: this._resourcesLoader.checkIfCredentialsRequired(
-                      resource.file
-                    )
-                      ? 'use-credentials'
-                      : 'anonymous',
-                  },
-                }
-              );
-              await loadedTexture.baseTexture.resource.load();
-
-              this._loadedTextures.put(resource.name, loadedTexture);
-              // TODO What if 2 assets share the same file with different settings?
-              applyTextureSettings(loadedTexture, resource);
+            baseTexture.on('loaded', () => {
+              this._loadedTextures.put(resource.name, texture);
+              applyTextureSettings(texture, resource);
+              resolve();
+            });
+          });
+        } else {
+          // If the file has no extension, PIXI.assets.load cannot find
+          // an adequate load parser and does not load the file although
+          // we would like to force it to load (we are confident it's an image).
+          // TODO: When PIXI v8+ is used, PIXI.Assets.load can be used because
+          // loadParser can be forced in PIXI.Assets.load
+          // (see https://github.com/pixijs/pixijs/blob/71ed56c569ebc6b53da19e3c49258a0a84892101/packages/assets/src/loader/Loader.ts#L68)
+          const loadedTexture = PIXI.Texture.from(
+            this._resourceLoader.getFullUrl(resource.file),
+            {
+              resourceOptions: {
+                autoLoad: false,
+                crossorigin: this._resourceLoader.checkIfCredentialsRequired(
+                  resource.file
+                )
+                  ? 'use-credentials'
+                  : 'anonymous',
+              },
             }
-          } catch (error) {
-            logFileLoadingError(resource.file, error);
-          }
-          loadedCount++;
-          onProgress(loadedCount, this._resources.size);
-        })
-      );
-      return loadedCount;
+          );
+          await loadedTexture.baseTexture.resource.load();
+
+          this._loadedTextures.put(resource.name, loadedTexture);
+          // TODO What if 2 assets share the same file with different settings?
+          applyTextureSettings(loadedTexture, resource);
+        }
+      } catch (error) {
+        logFileLoadingError(resource.file, error);
+      }
     }
   }
 

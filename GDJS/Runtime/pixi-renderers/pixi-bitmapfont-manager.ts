@@ -33,13 +33,14 @@ namespace gdjs {
     return PIXI.BitmapFont.available[bitmapFontInstallKey];
   };
 
+  const resourceKinds: Array<ResourceKind> = ['bitmapFont'];
+
   /**
    * PixiBitmapFontManager loads fnt/xml files (using `fetch`), from the "bitmapFont" resources of the game.
    *
    * It installs the "BitmapFont" with PixiJS to be used with PIXI.BitmapText.
    */
-  export class PixiBitmapFontManager {
-    _resources: Map<string, ResourceData>;
+  export class PixiBitmapFontManager implements gdjs.ResourceManager {
     private _imageManager: gdjs.PixiImageManager;
 
     /** Pixi.BitmapFont used, indexed by their BitmapFont name. */
@@ -56,22 +57,23 @@ namespace gdjs {
 
     private _defaultSlugFontName: string | null = null;
 
-    _resourcesLoader: RuntimeGameResourcesLoader;
+    _resourceLoader: gdjs.ResourceLoader;
 
     /**
      * @param resourceDataArray The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
      * @param imageManager The image manager to be used to get textures used by fonts.
      */
     constructor(
-      resourceDataArray: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader,
+      resourceLoader: gdjs.ResourceLoader,
       imageManager: gdjs.PixiImageManager
     ) {
-      this._resources = new Map<string, ResourceData>();
-      this.setResources(resourceDataArray);
       this._imageManager = imageManager;
-      this._resourcesLoader = resourcesLoader;
+      this._resourceLoader = resourceLoader;
+    }
+
+    getResourceKinds(): ResourceKind[] {
+      return resourceKinds;
     }
 
     /**
@@ -106,19 +108,6 @@ namespace gdjs {
       // Define the default name used for the default bitmap font.
       this._defaultSlugFontName = defaultBitmapFont.font;
       return defaultBitmapFont;
-    }
-
-    /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     * @param resourceDataArray The resources data of the game.
-     */
-    setResources(resourceDataArray: ResourceData[]): void {
-      this._resources.clear();
-      for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'bitmapFont') {
-          this._resources.set(resourceData.name, resourceData);
-        }
-      }
     }
 
     /**
@@ -257,45 +246,42 @@ namespace gdjs {
      * Load the "bitmapFont" resources of the game, so that they are ready
      * to be used when `obtainBitmapFont` is called.
      */
-    async loadBitmapFontData(
-      onProgress: (count: integer, total: integer) => void
-    ): Promise<integer> {
-      const preloadedResources = [...this._resources.values()].filter(
-        (resource) => !resource.disablePreload
-      );
+    async loadResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find bitmap font for resource "' + resourceName + '".'
+        );
+        return;
+      }
+      if (!resource.disablePreload) {
+        return;
+      }
 
-      let loadedCount = 0;
-      await Promise.all(
-        preloadedResources.map(async (bitmapFontResource) => {
-          try {
-            const response = await fetch(
-              this._resourcesLoader.getFullUrl(bitmapFontResource.file),
-              {
-                credentials: this._resourcesLoader.checkIfCredentialsRequired(
-                  bitmapFontResource.file
-                )
-                  ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-                    // i.e: its gdevelop.io cookie, to be passed.
-                    'include'
-                  : // For other resources, use "same-origin" as done by default by fetch.
-                    'same-origin',
-              }
-            );
-            const fontData = await response.text();
-            this._loadedFontsData[bitmapFontResource.name] = fontData;
-          } catch (error) {
-            logger.error(
-              "Can't fetch the bitmap font file " +
-                bitmapFontResource.file +
-                ', error: ' +
-                error
-            );
+      try {
+        const response = await fetch(
+          this._resourceLoader.getFullUrl(resource.file),
+          {
+            credentials: this._resourceLoader.checkIfCredentialsRequired(
+              resource.file
+            )
+              ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+                // i.e: its gdevelop.io cookie, to be passed.
+                'include'
+              : // For other resources, use "same-origin" as done by default by fetch.
+                'same-origin',
           }
-          loadedCount++;
-          onProgress(loadedCount, preloadedResources.length);
-        })
-      );
-      return loadedCount;
+        );
+        const fontData = await response.text();
+        this._loadedFontsData[resource.name] = fontData;
+      } catch (error) {
+        logger.error(
+          "Can't fetch the bitmap font file " +
+            resource.file +
+            ', error: ' +
+            error
+        );
+      }
     }
   }
 

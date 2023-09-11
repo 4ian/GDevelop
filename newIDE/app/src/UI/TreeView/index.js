@@ -11,6 +11,7 @@ import IconButton from '../IconButton';
 import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
 import ArrowHeadTop from '../CustomSvgIcons/ArrowHeadTop';
 import Folder from '../CustomSvgIcons/Folder';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
@@ -30,7 +31,7 @@ type Props = {| nodes: Node[], searchText?: string |};
 
 const Row = React.memo(props => {
   const { data, index, style } = props;
-  const { flattenedData, onOpen, onSelect } = data;
+  const { flattenedData, onOpen, onSelect, styling } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
 
@@ -70,7 +71,10 @@ const Row = React.memo(props => {
                 style={{
                   display: 'flex',
                   flex: 1,
-                  background: node.selected ? 'red' : undefined,
+                  borderRadius: 6,
+                  backgroundColor: node.selected
+                    ? styling.selectedBackgroundColor
+                    : undefined,
                 }}
               >
                 {connectDragPreview(
@@ -115,15 +119,17 @@ const Row = React.memo(props => {
   );
 }, areEqual);
 
-const getItemData = memoizeOne((flattenedData, onOpen, onSelect) => ({
+const getItemData = memoizeOne((flattenedData, onOpen, onSelect, styling) => ({
   onOpen,
   onSelect,
   flattenedData,
+  styling,
 }));
 
 const SpeedTree = ({ nodes, searchText }: Props) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
+  const theme = React.useContext(GDevelopThemeContext);
 
   const flattenOpened = (treeData): FlattenedNode[] => {
     const result = [];
@@ -185,7 +191,11 @@ const SpeedTree = ({ nodes, searchText }: Props) => {
   }
   console.log(flattenedData);
 
-  const itemData = getItemData(flattenedData, onOpen, onSelect);
+  const styling = {
+    selectedBackgroundColor: theme.listItem.selectedBackgroundColor,
+  };
+
+  const itemData = getItemData(flattenedData, onOpen, onSelect, styling);
 
   return (
     <AutoSizer>

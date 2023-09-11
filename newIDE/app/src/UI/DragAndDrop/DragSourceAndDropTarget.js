@@ -11,6 +11,7 @@ import {
   type ConnectDropTarget,
   type ConnectDragPreview,
 } from 'react-dnd';
+import { hapticFeedback } from '../../Utils/Haptic';
 
 type Props<DraggedItemType> = {|
   children: ({|
@@ -61,13 +62,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
       return true;
     },
     beginDrag(props: InnerDragSourceAndDropTargetProps<DraggedItemType>) {
-      if (
-        options &&
-        options.vibrate &&
-        window.navigator &&
-        window.navigator.vibrate
-      ) {
-        window.navigator.vibrate(options.vibrate);
+      if (hapticFeedback && options && options.vibrate) {
+        hapticFeedback({ durationInMs: options.vibrate });
       }
       return props.beginDrag();
     },

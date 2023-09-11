@@ -47,6 +47,7 @@ import Window from '../Utils/Window';
 import Breadcrumbs from '../UI/Breadcrumbs';
 import { getFolderTagsFromAssetShortHeaders } from './TagsHelper';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { type AssetStorePageState } from './AssetStoreNavigator';
 
 const ASSETS_DISPLAY_LIMIT = 100;
 
@@ -134,6 +135,11 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   noScroll?: boolean,
+  // This component can either display the list of assets, packs, and game templates using the asset store navigator,
+  // then currentPage is the current page of the navigator.
+  // Or it can display arbitrary content, like the list of assets in a pack, or similar assets,
+  // then currentPage is null.
+  currentPage?: AssetStorePageState,
 |};
 
 const AssetsList = React.forwardRef<Props, AssetsListInterface>(
@@ -149,6 +155,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       onPublicAssetPackSelection,
       onPrivateGameTemplateSelection,
       noScroll,
+      currentPage,
     }: Props,
     ref
   ) => {
@@ -156,7 +163,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       error: assetStoreError,
       fetchAssetsAndFilters,
       clearAllFilters: clearAllAssetFilters,
-      shopNavigationState,
       licenses,
       authors,
       assetFiltersState,
@@ -182,9 +188,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       isNavigatingInsideFolder,
       setIsNavigatingInsideFolder,
     ] = React.useState<boolean>(false);
-    const currentPage = shopNavigationState.getCurrentPage();
-    const { openedAssetPack, filtersState } = currentPage;
-    const chosenCategory = filtersState.chosenCategory;
+    const openedAssetPack = currentPage ? currentPage.openedAssetPack : null;
+    const chosenCategory = currentPage
+      ? currentPage.filtersState.chosenCategory
+      : null;
     const windowWidth = useResponsiveWindowWidth();
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({

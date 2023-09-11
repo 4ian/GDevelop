@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <vector>
 
 #include "PropertiesContainer.h"
@@ -44,9 +45,26 @@ class GD_CORE_API PropertiesContainersList {
   bool Has(const gd::String& name) const;
 
   /**
-   * \brief Return a reference to the property called \a name.
+   * \brief Return a reference to the property called \a name, and the
+   * properties container holding it.
    */
-  const NamedPropertyDescriptor& Get(const gd::String& name) const;
+  std::pair<std::reference_wrapper<const gd::PropertiesContainer>,
+            std::reference_wrapper<const NamedPropertyDescriptor>>
+  Get(const gd::String& name) const;
+
+  /**
+   * \brief Return true if the specified properties container is present.
+   */
+  bool HasPropertiesContainer(const gd::PropertiesContainer& propertiesContainer) const;
+
+  /**
+   * Get the properties container at the bottom of the scope (so the most
+   * "local" one).
+   */
+  const PropertiesContainer* GetBottomMostPropertiesContainer() const {
+    if (propertiesContainers.empty()) return nullptr;
+    return propertiesContainers.back();
+  }
 
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
@@ -55,6 +73,7 @@ class GD_CORE_API PropertiesContainersList {
  private:
   std::vector<const gd::PropertiesContainer*> propertiesContainers;
   static NamedPropertyDescriptor badNamedPropertyDescriptor;
+  static PropertiesContainer badPropertiesContainer;
 };
 
 }  // namespace gd

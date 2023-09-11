@@ -28,6 +28,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
 
 using namespace std;
@@ -1350,6 +1351,55 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
 
   return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
          ConvertToStringExplicit(section) + "); }";
+}
+
+gd::String EventsCodeGenerator::GeneratePropertyGetter(
+    const gd::PropertiesContainer& propertiesContainer,
+    const gd::NamedPropertyDescriptor& property,
+    const gd::String& type,
+    gd::EventsCodeGenerationContext& context) {
+  bool isLocalProperty =
+      projectScopedContainers.GetPropertiesContainersList()
+          .GetBottomMostPropertiesContainer() == &propertiesContainer;
+
+  gd::String propertyHolderCode =
+      propertiesContainer.GetOwner() == gd::EventsFunctionsContainer::Behavior
+          ? "eventsFunctionContext.getObjects(\"Object\")[0].getBehavior(" +
+                GenerateGetBehaviorNameCode("Behavior") + ")"
+          : (propertiesContainer.GetOwner() == gd::EventsFunctionsContainer::Object
+                 ? "eventsFunctionContext.getObjects(\"Object\")[0]"
+                 : "eventsFunctionContext.getProperties()");
+  gd::String propertyGetterCode =
+      propertyHolderCode + "." +
+      (isLocalProperty
+           ? BehaviorCodeGenerator::GetBehaviorPropertyGetterName(
+                 property.GetName())
+           : BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterName(
+                 property.GetName())) +
+      "()";
+
+  if (type == "string") {
+    if (property.GetType() == "Number") {
+      return "(\"\" + " + propertyGetterCode + ")";
+    } else if (property.GetType() == "Boolean") {
+      return "(" + propertyGetterCode + " ? \"true\" : \"false\")";
+    } else {
+      // Assume type is String or equivalent.
+      return "(Number(" + propertyGetterCode + ") || 0)";
+    }
+  } else if (type == "number") {
+    if (property.GetType() == "Number") {
+      return propertyGetterCode;
+    } else if (property.GetType() == "Boolean") {
+      return "(" + propertyGetterCode + " ? 1 : 0)";
+    } else {
+      // Assume type is String or equivalent.
+      return "(Number(" + propertyGetterCode + ") || 0)";
+    }
+  } else {
+    gd::LogError("Unrecognized expression type for using a property: " + type);
+    return "0 /* Unrecognized type */";
+  }
 }
 
 EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project,

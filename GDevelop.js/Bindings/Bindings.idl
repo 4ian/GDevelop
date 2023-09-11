@@ -574,7 +574,7 @@ interface ProjectScopedContainers {
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
         [Const, Ref] ObjectsContainer globalObjectsContainer,
         [Const, Ref] ObjectsContainer objectsContainer);
-     
+
   [Ref] ProjectScopedContainers AddPropertiesContainer(
         [Const, Ref] PropertiesContainer propertiesContainer);
 };
@@ -2540,7 +2540,8 @@ enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Behavior",
   "ExpressionCompletionDescription::Expression",
   "ExpressionCompletionDescription::Variable",
-  "ExpressionCompletionDescription::Text"
+  "ExpressionCompletionDescription::Text",
+  "ExpressionCompletionDescription::Property"
 };
 
 interface ExpressionCompletionDescription {
@@ -2562,7 +2563,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainersList objectsContainersList, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ProjectScopedContainers projectScopedContainers, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
@@ -2634,6 +2635,12 @@ interface EventsFunction {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+enum EventsFunctionsContainer_FunctionOwner {
+    "EventsFunctionsContainer::Extension",
+    "EventsFunctionsContainer::Behavior",
+    "EventsFunctionsContainer::Object"
 };
 
 interface EventsFunctionsContainer {
@@ -2748,7 +2755,7 @@ interface EventsBasedObjectsList {
 };
 
 interface PropertiesContainer {
-    void PropertiesContainer();
+    void PropertiesContainer(EventsFunctionsContainer_FunctionOwner owner);
 
     [Ref] NamedPropertyDescriptor InsertNew([Const] DOMString name, unsigned long pos);
     [Ref] NamedPropertyDescriptor Insert([Const, Ref] NamedPropertyDescriptor item, unsigned long pos);

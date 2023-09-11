@@ -17,6 +17,7 @@
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 
 namespace gd {
 class Expression;
@@ -39,7 +40,7 @@ struct GD_CORE_API ExpressionCompletionDescription {
   /**
    * The different kind of completions that can be described.
    */
-  enum CompletionKind { Object, Behavior, Expression, Variable, Text };
+  enum CompletionKind { Object, Behavior, Expression, Variable, Text, Property };
 
   /**
    * \brief Create a completion for an object with the given prefix
@@ -88,6 +89,21 @@ struct GD_CORE_API ExpressionCompletionDescription {
                                            replacementStartPosition_,
                                            replacementEndPosition_,
                                            objectName_);
+  }
+
+  /**
+   * \brief Create a completion for a property with the given prefix
+   */
+  static ExpressionCompletionDescription ForProperty(
+      const gd::String& type_,
+      const gd::String& prefix_,
+      size_t replacementStartPosition_,
+      size_t replacementEndPosition_) {
+    return ExpressionCompletionDescription(Property,
+                                           type_,
+                                           prefix_,
+                                           replacementStartPosition_,
+                                           replacementEndPosition_);
   }
 
   /**
@@ -293,7 +309,7 @@ class GD_CORE_API ExpressionCompletionFinder
    */
   static std::vector<ExpressionCompletionDescription>
   GetCompletionDescriptionsFor(const gd::Platform &platform,
-                               const gd::ObjectsContainersList &objectsContainersList,
+                               const gd::ProjectScopedContainers &projectScopedContainers,
                                const gd::String &rootType,
                                gd::ExpressionNode& node,
                                size_t searchedPosition) {
@@ -308,7 +324,7 @@ class GD_CORE_API ExpressionCompletionFinder
 
     gd::ExpressionNode* maybeParentNodeAtLocation = finder.GetParentNode();
     gd::ExpressionCompletionFinder autocompletionProvider(
-        platform, objectsContainersList, rootType,
+        platform, projectScopedContainers, rootType,
         searchedPosition, maybeParentNodeAtLocation);
     nodeAtLocation->Visit(autocompletionProvider);
     return autocompletionProvider.GetCompletionDescriptions();
@@ -326,6 +342,7 @@ class GD_CORE_API ExpressionCompletionFinder
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type, "", searchedPosition + 1, searchedPosition + 1));
@@ -336,6 +353,7 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type, "", searchedPosition + 1, searchedPosition + 1));
@@ -368,6 +386,7 @@ class GD_CORE_API ExpressionCompletionFinder
       size_t metadataParameterIndex =
           ExpressionParser2::WrittenParametersFirstIndex(
               functionCall->objectName, functionCall->behaviorName);
+      const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
       const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
           platform, objectsContainersList, *functionCall);
 
@@ -408,6 +427,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitVariableNode(VariableNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
 
     auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
@@ -434,6 +454,7 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
     if (gd::ParameterMetadata::IsObject(type)) {
       // Only show completions of objects if an object is required
@@ -459,6 +480,11 @@ class GD_CORE_API ExpressionCompletionFinder
     } else {
       // Object function, behavior name, variable, object variable.
       if (IsCaretOn(node.identifierNameLocation)) {
+        completions.push_back(ExpressionCompletionDescription::ForProperty(
+            type,
+            node.identifierName,
+            node.identifierNameLocation.GetStartPosition(),
+            node.identifierNameLocation.GetEndPosition()));
         completions.push_back(ExpressionCompletionDescription::ForVariable(
             type,
             node.identifierName,
@@ -502,6 +528,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
     if (!node.behaviorFunctionName.empty() ||
         node.behaviorNameNamespaceSeparatorLocation.IsValid()) {
@@ -555,6 +582,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
     bool isCaretOnParenthesis = IsCaretOn(node.openingParenthesisLocation) ||
                                 IsCaretOn(node.closingParenthesisLocation);
@@ -625,6 +653,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
+    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type,
@@ -649,12 +678,12 @@ class GD_CORE_API ExpressionCompletionFinder
   }
 
   ExpressionCompletionFinder(const gd::Platform &platform_,
-                             const gd::ObjectsContainersList &objectsContainersList_,
+                             const gd::ProjectScopedContainers &projectScopedContainers_,
                              const gd::String &rootType_,
                              size_t searchedPosition_,
                              gd::ExpressionNode* maybeParentNodeAtLocation_)
       : platform(platform_),
-        objectsContainersList(objectsContainersList_),
+        projectScopedContainers(projectScopedContainers_),
         rootType(rootType_),
         searchedPosition(searchedPosition_),
         maybeParentNodeAtLocation(maybeParentNodeAtLocation_){};
@@ -664,7 +693,7 @@ class GD_CORE_API ExpressionCompletionFinder
   gd::ExpressionNode* maybeParentNodeAtLocation;
 
   const gd::Platform &platform;
-  const gd::ObjectsContainersList &objectsContainersList;
+  const gd::ProjectScopedContainers &projectScopedContainers;
   const gd::String rootType;
 };
 

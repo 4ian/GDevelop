@@ -63,7 +63,7 @@ size_t GetMaximumParametersNumber(
 
 }  // namespace
 
-bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
+bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     const gd::IdentifierNode& identifier) {
   auto validateVariableTypeForExpression =
       [this, &identifier](gd::Variable::Type type) {
@@ -96,6 +96,7 @@ bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
 
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
   const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+  const auto& propertiesContainersList = projectScopedContainers.GetPropertiesContainersList();
 
   if (objectsContainersList.HasObjectOrGroupNamed(identifier.identifierName)) {
     // This is an object variable.
@@ -113,15 +114,10 @@ bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
     }
 
     return true; // We found a variable.
-  } else {
+  } else if (variablesContainersList.Has(identifier.identifierName)) {
     // Try to identify a declared variable with the name (and maybe the child
     // variable).
 
-    if (!variablesContainersList.Has(identifier.identifierName))
-      return false;  // The identifier does not even reference a declared variable.
-
-    // The identifier refers to a variable, check its type (or the child
-    // variable type, if any).
     const gd::Variable& variable =
         variablesContainersList.Get(identifier.identifierName);
 
@@ -135,7 +131,7 @@ bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
       // A child variable is accessed, check it can be used in an expression.
       if (!variable.HasChild(identifier.childIdentifierName)) {
         RaiseTypeError(_("No child variable with this name found."),
-                       identifier.childIdentifierNameLocation);
+                      identifier.childIdentifierNameLocation);
 
         return true; // We should have found a variable.
       }
@@ -144,6 +140,17 @@ bool ExpressionValidator::ValidateMaybeObjectVariableOrVariable(
           variable.GetChild(identifier.childIdentifierName);
       return true; // We found a variable.
     }
+  } else if (propertiesContainersList.Has(identifier.identifierName)) {
+    if (!identifier.childIdentifierName.empty()) {
+      RaiseTypeError(_("You can't access a child variable of a propert - just write the property name."),
+          identifier.childIdentifierNameLocation);
+      return true; // We found a property, even if the child is not allowed.
+    }
+
+    return true; // We found a property.
+  } else {
+    // This is neither a variable nor a property.
+    return false;
   }
 }
 

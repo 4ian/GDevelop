@@ -396,6 +396,42 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "123) ?? \"\"");
     }
   }
+  SECTION("Properties (1 level)") {
+    gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+    auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+    propertiesContainer.InsertNew("MyProperty");
+    propertiesContainer.InsertNew("MyProperty2");
+
+    gd::EventsCodeGenerator codeGeneratorWithProperties(platform, projectScopedContainersWithProperties);
+
+    {
+      auto node =
+        parser.ParseExpression("MyProperty + 1");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGeneratorWithProperties,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getPropertyMyProperty() + 1");
+    }
+    {
+      auto node =
+        parser.ParseExpression("MyProperty + MyProperty2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGeneratorWithProperties,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getPropertyMyProperty() + getPropertyMyProperty2()");
+    }
+  }
   SECTION("Scene variables (1 level)") {
     {
       auto node =

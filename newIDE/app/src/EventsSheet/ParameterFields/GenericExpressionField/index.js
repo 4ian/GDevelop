@@ -480,7 +480,8 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      gd.ObjectsContainersList.makeNewObjectsContainersListForContainers(
+      getProjectScopedContainersFromScope(
+        scope,
         globalObjectsContainer,
         objectsContainer
       ),

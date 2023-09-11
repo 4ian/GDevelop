@@ -14,6 +14,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "catch.hpp"
 
 TEST_CASE("ExpressionParser2", "[common][events]") {
@@ -1378,6 +1379,65 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "An object variable or expression should be entered.");
+    }
+  }
+
+  SECTION("Valid property") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid property (non existing name)") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+    }
+  }
+
+  SECTION("Invalid property (unsupported child syntax)") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty2.child");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You can't access a child variable of a propert - just write the property name.");
     }
   }
 

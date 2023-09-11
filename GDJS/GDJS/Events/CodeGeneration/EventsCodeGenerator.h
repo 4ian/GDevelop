@@ -314,6 +314,11 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
     return "gdjs.VariablesContainer.badVariable";
   }
 
+  virtual gd::String GeneratePropertyGetter(const gd::PropertiesContainer& propertiesContainer,
+                                            const gd::NamedPropertyDescriptor& property,
+                                            const gd::String& type,
+                                            gd::EventsCodeGenerationContext& context);
+
   virtual gd::String GenerateBadObject() { return "null"; }
 
   virtual gd::String GenerateObject(const gd::String& objectName,

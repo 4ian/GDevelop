@@ -56,7 +56,7 @@ class GD_CORE_API VariablesContainersList {
   };
 
   /**
-   * Get the variables container at the top of the scope (so the most "local" one).
+   * Get the variables container at the bottom of the scope (so the most "local" one).
    * \brief Avoid using apart when a scope must be forced.
    */
   const VariablesContainer* GetBottomMostVariablesContainer() const {

@@ -577,6 +577,11 @@ class GD_CORE_API EventsCodeGenerator {
     return "fakeObjectListOf_" + objectName;
   }
 
+  virtual gd::String GeneratePropertyGetter(const gd::PropertiesContainer& propertiesContainer,
+                                            const gd::NamedPropertyDescriptor& property,
+                                            const gd::String& type,
+                                            gd::EventsCodeGenerationContext& context);
+
   /**
    * \brief Generate the code to reference an object which is
    * in an empty/null state.

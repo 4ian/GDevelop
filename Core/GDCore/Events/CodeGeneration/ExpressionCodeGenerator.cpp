@@ -219,25 +219,26 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
   } else {
+    const auto& variablesContainersList = codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
+    const auto& propertiesContainersList = codeGenerator.GetProjectScopedContainers().GetPropertiesContainersList();
+
     // The node represents a variable or an object.
     if (codeGenerator.GetObjectsContainersList().HasObjectOrGroupNamed(node.identifierName)) {
       // Generate the code to access the object variable.
       output += codeGenerator.GenerateGetVariable(
         node.childIdentifierName, gd::EventsCodeGenerator::OBJECT_VARIABLE, context, node.identifierName);
       output += codeGenerator.GenerateVariableValueAs(type);
-    } else if (codeGenerator.HasProjectAndLayout()) {
-      // This might be a "scene" or "global" variable (and if not, that's an error).
-
-      // This could be adapted in the future if more scopes are supported.
-      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      if (codeGenerator.GetLayout().GetVariables().Has(node.identifierName)) {
-        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      } else if (codeGenerator.GetProject().GetVariables().Has(node.identifierName)) {
-        scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
-      } else {
-        // The node represents a non existing variable, so it's invalid.
+    } else if (variablesContainersList.Has(node.identifierName)) {
+      if (!codeGenerator.HasProjectAndLayout()) {
+        gd::LogWarning("Tried to generate access to a variable without a project/scene - the code generator only works for global and scene variables for now.");
         output += GenerateDefaultValue(type);
         return;
+      }
+
+      // This could be adapted in the future if more scopes are supported at runtime.
+      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
+      if (variablesContainersList.GetTopMostVariablesContainer()->Has(node.identifierName)) {
+        scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
       }
 
       output += codeGenerator.GenerateGetVariable(node.identifierName, scope, context, "");
@@ -245,6 +246,11 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
       output += codeGenerator.GenerateVariableValueAs(type);
+    } else if (propertiesContainersList.Has(node.identifierName)) {
+      const auto& propertiesContainerAndProperty = propertiesContainersList.Get(node.identifierName);
+
+      output += codeGenerator.GeneratePropertyGetter(
+        propertiesContainerAndProperty.first, propertiesContainerAndProperty.second, type, context);
     } else {
       // The identifier does not represents a variable (or a child variable), or not at least an existing
       // one, nor an object variable. It's invalid.

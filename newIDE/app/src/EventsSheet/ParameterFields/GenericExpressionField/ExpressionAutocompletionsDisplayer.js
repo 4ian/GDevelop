@@ -32,6 +32,17 @@ const autocompletionIconSizeStyle = {
   maxHeight: 16,
 };
 
+const getTypeToIcon = (type: string) => {
+  // Reuse variable icons for property types.
+  if (type === 'number') {
+    return getVariableTypeToIcon()[gd.Variable.Number];
+  } else if (type === 'boolean') {
+    return getVariableTypeToIcon()[gd.Variable.Boolean];
+  } else {
+    return getVariableTypeToIcon()[gd.Variable.String];
+  }
+};
+
 const AutocompletionIcon = React.memo(({ src }) => {
   const {
     palette: { type: paletteType },
@@ -292,6 +303,10 @@ export default function ExpressionAutocompletionsDisplayer({
                           expressionAutocompletion.variableType ||
                             gd.Variable.Number
                         ]
+                      : expressionAutocompletion.kind === 'Property'
+                      ? getTypeToIcon(
+                          expressionAutocompletion.propertyType.toLowerCase()
+                        )
                       : null;
                   const icon = IconComponent ? (
                     <IconComponent style={autocompletionIconSizeStyle} />

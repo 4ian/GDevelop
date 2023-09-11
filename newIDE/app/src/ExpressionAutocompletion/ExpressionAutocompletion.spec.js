@@ -67,7 +67,7 @@ describe('ExpressionAutocompletion', () => {
       const expressionNode = parser.parseExpression('My').get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -104,7 +104,7 @@ describe('ExpressionAutocompletion', () => {
       const expressionNode2 = parser.parseExpression('MySpriteObjectW').get();
       const completionDescriptions2 = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -141,7 +141,7 @@ describe('ExpressionAutocompletion', () => {
       const expressionNode = parser.parseExpression('To').get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -196,7 +196,7 @@ describe('ExpressionAutocompletion', () => {
       const expressionNode = parser.parseExpression('MouseX("Ba').get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -231,7 +231,7 @@ describe('ExpressionAutocompletion', () => {
       const expressionNode = parser.parseExpression('MySpriteObject.Ani').get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -270,7 +270,7 @@ describe('ExpressionAutocompletion', () => {
         .get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -319,7 +319,7 @@ describe('ExpressionAutocompletion', () => {
         .get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -356,7 +356,7 @@ describe('ExpressionAutocompletion', () => {
         .get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -394,7 +394,7 @@ describe('ExpressionAutocompletion', () => {
         .get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),
@@ -437,7 +437,7 @@ describe('ExpressionAutocompletion', () => {
         .get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
-        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
           testLayout
         ),

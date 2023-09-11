@@ -1,11 +1,14 @@
 #include "PropertiesContainersList.h"
-#include "PropertiesContainer.h"
 
+#include <functional>
 #include <vector>
+
+#include "PropertiesContainer.h"
 
 namespace gd {
 
 NamedPropertyDescriptor PropertiesContainersList::badNamedPropertyDescriptor;
+PropertiesContainer PropertiesContainersList::badPropertiesContainer(gd::EventsFunctionsContainer::FunctionOwner::Extension);
 
 PropertiesContainersList
 PropertiesContainersList::MakeNewPropertiesContainersListFor(
@@ -22,7 +25,8 @@ PropertiesContainersList::MakeNewEmptyPropertiesContainersList() {
 }
 
 bool PropertiesContainersList::Has(const gd::String& name) const {
-  for (auto it = propertiesContainers.rbegin(); it != propertiesContainers.rend();
+  for (auto it = propertiesContainers.rbegin();
+       it != propertiesContainers.rend();
        ++it) {
     if ((*it)->Has(name)) return true;
   }
@@ -30,13 +34,25 @@ bool PropertiesContainersList::Has(const gd::String& name) const {
   return false;
 }
 
-const NamedPropertyDescriptor& PropertiesContainersList::Get(const gd::String& name) const {
-  for (auto it = propertiesContainers.rbegin(); it != propertiesContainers.rend();
+std::pair<std::reference_wrapper<const gd::PropertiesContainer>,
+          std::reference_wrapper<const NamedPropertyDescriptor>>
+PropertiesContainersList::Get(const gd::String& name) const {
+  for (auto it = propertiesContainers.rbegin();
+       it != propertiesContainers.rend();
        ++it) {
-    if ((*it)->Has(name)) return (*it)->Get(name);
+    if ((*it)->Has(name)) return {**it, (*it)->Get(name)};
   }
 
-  return badNamedPropertyDescriptor;
+  return {badPropertiesContainer, badNamedPropertyDescriptor};
+}
+
+bool PropertiesContainersList::HasPropertiesContainer(const gd::PropertiesContainer& propertiesContainer) const {
+  for (auto it = propertiesContainers.rbegin(); it != propertiesContainers.rend();
+       ++it) {
+    if (*it == &propertiesContainer) return true;
+  }
+
+  return false;
 }
 
 }  // namespace gd

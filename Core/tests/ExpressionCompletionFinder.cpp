@@ -11,7 +11,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCore/Project/ObjectsContainersList.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Project.h"
 #include "catch.hpp"
 
@@ -22,8 +22,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   auto& layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
 
-  gd::ObjectsContainersList objectsContainersList = gd::ObjectsContainersList::
-      MakeNewObjectsContainersListForProjectAndLayout(project, layout1);
+  gd::ProjectScopedContainers projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
 
   gd::ExpressionParser2 parser;
 
@@ -33,7 +33,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     auto node = parser.ParseExpression(expression);
     REQUIRE(node != nullptr);
     return gd::ExpressionCompletionFinder::GetCompletionDescriptionsFor(
-        platform, objectsContainersList, type, *node, location);
+        platform, projectScopedContainers, type, *node, location);
   };
 
   const std::vector<gd::ExpressionCompletionDescription>
@@ -42,6 +42,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   SECTION("Identifier") {
     SECTION("Object or expression completions when type is string") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForProperty("string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForVariable("string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForObject("string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForExpression(
@@ -52,6 +53,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
     SECTION("Object or expression completions when type is number") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForProperty("number", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForVariable("number", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForObject("number", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForExpression(
@@ -62,6 +64,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
     SECTION("Object or expression completions when type is number|string") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForProperty(
+              "number|string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForVariable(
               "number|string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForObject(
@@ -77,6 +81,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
     SECTION("Object or expression completions in a variable name") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForProperty("string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForVariable("string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForObject("string", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForExpression(
@@ -96,6 +101,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
     SECTION("Object or expression completions in a variable index") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForProperty("number", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForVariable("number", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForObject("number", "My", 0, 2),
           gd::ExpressionCompletionDescription::ForExpression(
@@ -176,6 +182,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedEmptyCompletions);
 
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForProperty("unknown", "a", 9, 10),
           gd::ExpressionCompletionDescription::ForVariable("unknown", "a", 9, 10),
           gd::ExpressionCompletionDescription::ForObject("unknown", "a", 9, 10),
           gd::ExpressionCompletionDescription::ForExpression(
@@ -221,6 +228,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     SECTION("Test with string type") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForProperty(
+                  "string", "MyObject", 0, 8),
               gd::ExpressionCompletionDescription::ForVariable(
                   "string", "MyObject", 0, 8),
               gd::ExpressionCompletionDescription::ForObject(
@@ -249,6 +258,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     SECTION("Test with 'number|string' type") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
+              gd::ExpressionCompletionDescription::ForProperty(
+                  "number|string", "MyObject", 0, 8),
               gd::ExpressionCompletionDescription::ForVariable(
                   "number|string", "MyObject", 0, 8),
               gd::ExpressionCompletionDescription::ForObject(

@@ -415,13 +415,13 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorSharedPropertyAction) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the layout using "MyProperty" action
+    // Create an event in the layout using "MySharedProperty" action
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
       instruction.SetType(
           "MyEventsExtension::MyEventsBasedBehavior::" +
-          gd::EventsBasedBehavior::GetSharedPropertyActionName("MyProperty"));
+          gd::EventsBasedBehavior::GetSharedPropertyActionName("MySharedProperty"));
       event.GetActions().Insert(instruction);
       eventList.InsertEvent(event);
     }
@@ -429,13 +429,13 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorSharedPropertyCondition) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the layout using "MyProperty" condition
+    // Create an event in the layout using "MySharedProperty" condition
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
       instruction.SetType(
           "MyEventsExtension::MyEventsBasedBehavior::" +
-          gd::EventsBasedBehavior::GetSharedPropertyConditionName("MyProperty"));
+          gd::EventsBasedBehavior::GetSharedPropertyConditionName("MySharedProperty"));
       event.GetConditions().Insert(instruction);
       eventList.InsertEvent(event);
     }
@@ -443,7 +443,7 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorSharedPropertyExpression) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the layout using "MyProperty" expression
+    // Create an event in the layout using "MySharedProperty" expression
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
@@ -452,7 +452,7 @@ const void SetupEvents(gd::EventsList &eventList) {
       instruction.SetParameter(
           0, gd::Expression("ObjectWithMyBehavior.MyBehavior::" +
                             gd::EventsBasedBehavior::GetSharedPropertyExpressionName(
-                                "MyProperty") +
+                                "MySharedProperty") +
                             "()"));
       event.GetActions().Insert(instruction);
       eventList.InsertEvent(event);
@@ -929,11 +929,15 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         .SetFunctionType(gd::EventsFunction::ActionWithOperator)
         .SetGetterName("MyBehaviorEventsFunctionExpressionAndCondition");
 
-    // Add property
+    // Add a property:
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("MyProperty", 0)
         .SetType("Number");
-    // The same name is used for the shared property to ensure there is no name
+    // Add a shared property:
+    eventsBasedBehavior.GetSharedPropertyDescriptors()
+        .InsertNew("MySharedProperty", 0)
+        .SetType("Number");
+    // The same name is used for another shared property to ensure there is no name
     // collision.
     eventsBasedBehavior.GetSharedPropertyDescriptors()
         .InsertNew("MyProperty", 0)
@@ -1742,7 +1746,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     eventsList->GetEvent(BehaviorActionWithOperator)) ==
           "MyRenamedExtension::MyEventsBasedBehavior::"
           "MyBehaviorEventsFunctionActionWithOperator");
-      
+
       // Check if events-based behaviors properties have been renamed in
       // instructions
       REQUIRE(GetEventFirstActionType(
@@ -1752,7 +1756,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyRenamedExtension::MyEventsBasedBehavior::"
-              "SetSharedPropertyMyProperty");
+              "SetSharedPropertyMySharedProperty");
 
       // Check events-based behavior methods have *not* been renamed in
       // expressions
@@ -2114,7 +2118,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyEventsExtension::MyRenamedEventsBasedBehavior::"
-              "SetSharedPropertyMyProperty");
+              "SetSharedPropertyMySharedProperty");
 
       // Check events-based behavior methods have *not* been renamed in
       // expressions
@@ -2729,16 +2733,16 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SetSharedPropertyMyProperty");
+              "SetSharedPropertyMySharedProperty");
 
       REQUIRE(GetEventFirstConditionType(
                   eventsList->GetEvent(BehaviorSharedPropertyCondition)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SharedPropertyMyProperty");
+              "SharedPropertyMySharedProperty");
 
       REQUIRE(GetEventFirstActionFirstParameterString(
                   eventsList->GetEvent(BehaviorSharedPropertyExpression)) ==
-              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMyProperty()");
+              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMySharedProperty()");
     }
   }
 
@@ -2751,6 +2755,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
 
     gd::WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
+        project, eventsExtension, eventsBasedBehavior, "MySharedProperty",
+        "MyRenamedSharedProperty");
+
+    // Also wrongly try to rename a property that is not a shared property.
+    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
         project, eventsExtension, eventsBasedBehavior, "MyProperty",
         "MyRenamedProperty");
 
@@ -2760,16 +2769,16 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SetSharedPropertyMyRenamedProperty");
+              "SetSharedPropertyMyRenamedSharedProperty");
 
       REQUIRE(GetEventFirstConditionType(
                   eventsList->GetEvent(BehaviorSharedPropertyCondition)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SharedPropertyMyRenamedProperty");
+              "SharedPropertyMyRenamedSharedProperty");
 
       REQUIRE(GetEventFirstActionFirstParameterString(
                   eventsList->GetEvent(BehaviorSharedPropertyExpression)) ==
-              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMyRenamedProperty()");
+              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMyRenamedSharedProperty()");
 
       // Ensure that the property was NOT renamed.
       REQUIRE(GetEventFirstActionType(

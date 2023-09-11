@@ -63,6 +63,11 @@ export type ExpressionAutocompletion =
     |}
   | {|
       ...BaseExpressionAutocompletion,
+      kind: 'Property',
+      propertyType: string,
+    |}
+  | {|
+      ...BaseExpressionAutocompletion,
       object?: gdObject,
       kind: 'Object',
     |}
@@ -505,6 +510,54 @@ const getAutocompletionsForVariable = function(
   }));
 };
 
+const getAutocompletionsForProperty = function(
+  expressionAutocompletionContext: ExpressionAutocompletionContext,
+  completionDescription: gdExpressionCompletionDescription
+): Array<ExpressionAutocompletion> {
+  const prefix: string = completionDescription.getPrefix();
+  const {
+    eventsBasedBehavior,
+    eventsBasedObject,
+  } = expressionAutocompletionContext.scope;
+
+  const enumerateExpressionAutocompletionForProperties = (
+    properties: gdPropertiesContainer
+  ): Array<ExpressionAutocompletion> =>
+    mapFor(0, properties.getCount(), i => {
+      const property = properties.getAt(i);
+
+      return {
+        kind: 'Property',
+        completion: property.getName(),
+        replacementStartPosition: completionDescription.getReplacementStartPosition(),
+        replacementEndPosition: completionDescription.getReplacementEndPosition(),
+        propertyType: property.getType(),
+      };
+    });
+
+  return filterListWithPrefix(
+    [
+      ...(eventsBasedBehavior
+        ? enumerateExpressionAutocompletionForProperties(
+            eventsBasedBehavior.getPropertyDescriptors()
+          )
+        : []),
+      ...(eventsBasedBehavior
+        ? enumerateExpressionAutocompletionForProperties(
+            eventsBasedBehavior.getSharedPropertyDescriptors()
+          )
+        : []),
+      ...(eventsBasedObject
+        ? enumerateExpressionAutocompletionForProperties(
+            eventsBasedObject.getPropertyDescriptors()
+          )
+        : []),
+    ],
+    prefix,
+    ({ completion }) => completion
+  );
+};
+
 const getAutocompletionsForBehavior = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
@@ -598,6 +651,13 @@ export const getAutocompletionsFromDescriptions = (
         completionKind === gd.ExpressionCompletionDescription.Variable
       ) {
         return getAutocompletionsForVariable(
+          expressionAutocompletionContext,
+          completionDescription
+        );
+      } else if (
+        completionKind === gd.ExpressionCompletionDescription.Property
+      ) {
+        return getAutocompletionsForProperty(
           expressionAutocompletionContext,
           completionDescription
         );

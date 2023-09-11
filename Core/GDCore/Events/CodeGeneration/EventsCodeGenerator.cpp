@@ -1208,6 +1208,13 @@ gd::String EventsCodeGenerator::GenerateArgumentsList(
   return argumentsStr;
 }
 
+gd::String EventsCodeGenerator::GeneratePropertyGetter(const gd::PropertiesContainer& propertiesContainer,
+                                                       const gd::NamedPropertyDescriptor& property,
+                                                       const gd::String& type,
+                                                       gd::EventsCodeGenerationContext& context) {
+  return "getProperty" + property.GetName() + "()";
+}
+
 EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
                                          const gd::Layout& layout,
                                          const gd::Platform& platform_)

@@ -10,6 +10,7 @@ import { AutoSizer } from 'react-virtualized';
 import TreeView from '../../../UI/TreeView';
 import { Column, Line } from '../../../UI/Grid';
 import TextField from '../../../UI/TextField';
+import sample from 'lodash/sample';
 
 export default {
   title: 'UI Building Blocks/TreeView',
@@ -447,6 +448,14 @@ export const Default = () => {
                     searchText={searchText}
                     getItemId={node => node.id}
                     getItemName={node => node.name}
+                    getItemThumbnail={node =>
+                      node.children ? null : sample([
+                        'res/unknown32.png',
+                        'res/view24.png',
+                        'res/bug24.png',
+                        'res/save_all24.png',
+                      ])
+                    }
                     // $FlowIgnore
                     getItemChildren={node => node.children}
                   />

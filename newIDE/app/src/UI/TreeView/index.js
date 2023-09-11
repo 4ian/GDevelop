@@ -11,6 +11,7 @@ import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
 import ArrowHeadTop from '../CustomSvgIcons/ArrowHeadTop';
 import Folder from '../CustomSvgIcons/Folder';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import ListIcon from '../ListIcon';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
@@ -24,6 +25,7 @@ type FlattenedNode = {|
   depth: number,
   collapsed: boolean,
   selected: boolean,
+  thumbnailSrc?: ?string,
 |};
 
 const Row = React.memo(props => {
@@ -108,7 +110,7 @@ const Row = React.memo(props => {
                             alignItems: 'center',
                           }}
                         >
-                          {node.hasChildren && (
+                          {node.hasChildren ? (
                             <>
                               <IconButton
                                 size="small"
@@ -128,7 +130,11 @@ const Row = React.memo(props => {
                                 style={{ marginRight: 4 }}
                               />
                             </>
-                          )}
+                          ) : node.thumbnailSrc ? (
+                            <div style={{ marginRight: 6 }}>
+                              <ListIcon iconSize={16} src={node.thumbnailSrc} />
+                            </div>
+                          ) : null}
                           <Text>{node.name}</Text>
                         </div>
                       )}
@@ -158,6 +164,7 @@ type Props<Item> = {|
   getItemName: Item => string,
   getItemId: Item => string,
   getItemChildren: Item => ?(Item[]),
+  getItemThumbnail: Item => ?string,
   searchText?: string,
 |};
 
@@ -169,6 +176,7 @@ const TreeView = <Item>({
   getItemName,
   getItemId,
   getItemChildren,
+  getItemThumbnail,
 }: Props<Item>) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
@@ -186,6 +194,7 @@ const TreeView = <Item>({
     const id = getItemId(item);
     const name = getItemName(item);
     const children = getItemChildren(item);
+    const thumbnailSrc = getItemThumbnail(item);
     const collapsed = !openedNodeIds.includes(id);
     const selected = selectedNodeIds.includes(id);
     result.push({
@@ -195,6 +204,7 @@ const TreeView = <Item>({
       depth,
       collapsed,
       selected,
+      thumbnailSrc,
     });
 
     if (!collapsed && children) {

@@ -154,7 +154,7 @@ const getItemData = memoizeOne((flattenedData, onOpen, onSelect, styling) => ({
   styling,
 }));
 
-const SpeedTree = ({ nodes, searchText }: Props) => {
+const TreeView = ({ nodes, searchText }: Props) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
@@ -241,4 +241,4 @@ const SpeedTree = ({ nodes, searchText }: Props) => {
   );
 };
 
-export default SpeedTree;
+export default TreeView;

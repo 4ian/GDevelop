@@ -5,7 +5,6 @@ import Text from '../Text';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import { AutoSizer } from 'react-virtualized';
 import memoizeOne from 'memoize-one';
 import IconButton from '../IconButton';
 import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
@@ -26,8 +25,6 @@ type FlattenedNode = {|
   collapsed: boolean,
   selected: boolean,
 |};
-
-type Props = {| nodes: Node[], searchText?: string |};
 
 const Row = React.memo(props => {
   const { data, index, style } = props;
@@ -154,7 +151,14 @@ const getItemData = memoizeOne((flattenedData, onOpen, onSelect, styling) => ({
   styling,
 }));
 
-const TreeView = ({ nodes, searchText }: Props) => {
+type Props = {|
+  height: number,
+  width: number,
+  nodes: Node[],
+  searchText?: string,
+|};
+
+const TreeView = ({ height, width, nodes, searchText }: Props) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
@@ -224,20 +228,16 @@ const TreeView = ({ nodes, searchText }: Props) => {
   const itemData = getItemData(flattenedData, onOpen, onSelect, styling);
 
   return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <List
-          height={height}
-          itemCount={flattenedData.length}
-          itemSize={32}
-          width={width}
-          itemKey={index => flattenedData[index].id}
-          itemData={itemData}
-        >
-          {Row}
-        </List>
-      )}
-    </AutoSizer>
+    <List
+      height={height}
+      itemCount={flattenedData.length}
+      itemSize={32}
+      width={width}
+      itemKey={index => flattenedData[index].id}
+      itemData={itemData}
+    >
+      {Row}
+    </List>
   );
 };
 

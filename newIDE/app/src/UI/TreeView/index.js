@@ -149,24 +149,21 @@ const Row = React.memo(<Item>(props: RowProps<Item>) => {
         }) => {
           setIsStayingOver(isOver);
           return (
-            <div style={{ paddingLeft: left }} className="indented-row">
+            <div
+              style={{ paddingLeft: left }}
+              className="full-height-flex-container"
+            >
               {connectDropTarget(
                 <div
                   onClick={onClick}
                   tabIndex={0}
-                  className={'row-content' + (node.selected ? ' selected' : '')}
+                  className={'row-container' + (node.selected ? ' selected' : '')}
                 >
                   {connectDragPreview(
-                    <div style={{ flex: 1, height: '100%' }}>
+                    <div className="full-space-container">
                       {isOver && <DropIndicator canDrop={canDrop} />}
                       {connectDragSource(
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            height: '100%',
-                          }}
-                        >
+                        <div className="row-content">
                           {node.hasChildren ? (
                             <>
                               <IconButton

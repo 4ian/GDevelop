@@ -69,6 +69,7 @@ const SemiControlledRowInput = ({
       onChange={e => {
         setValue(e.currentTarget.value);
       }}
+      onClick={e => e.stopPropagation()}
       onBlur={() => {
         onEndRenaming(value);
       }}
@@ -217,6 +218,7 @@ const Row = React.memo(<Item>(props: RowProps<Item>) => {
                                 className="item-name"
                                 onClick={e => {
                                   if (!e.metaKey && !e.shiftKey) {
+                                    e.stopPropagation();
                                     onStartRenaming(node.id);
                                   }
                                 }}
@@ -415,8 +417,10 @@ const TreeView = <Item>({
     exclusive?: boolean,
   |}) => {
     if (node.selected) {
-      if (exclusive) setSelectedNodeIds([]);
-      else setSelectedNodeIds(selectedNodeIds.filter(id => id !== node.id));
+      if (exclusive) {
+        if (selectedNodeIds.length === 1) return;
+        setSelectedNodeIds([node.id]);
+      } else setSelectedNodeIds(selectedNodeIds.filter(id => id !== node.id));
     } else {
       if (exclusive) setSelectedNodeIds([node.id]);
       else setSelectedNodeIds([...selectedNodeIds, node.id]);

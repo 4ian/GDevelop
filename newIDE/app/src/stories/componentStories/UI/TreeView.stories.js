@@ -449,15 +449,18 @@ export const Default = () => {
                     getItemId={node => node.id}
                     getItemName={node => node.name}
                     getItemThumbnail={node =>
-                      node.children ? null : sample([
-                        'res/unknown32.png',
-                        'res/view24.png',
-                        'res/bug24.png',
-                        'res/save_all24.png',
-                      ])
+                      node.children
+                        ? null
+                        : sample([
+                            'res/unknown32.png',
+                            'res/view24.png',
+                            'res/bug24.png',
+                            'res/save_all24.png',
+                          ])
                     }
                     // $FlowIgnore
                     getItemChildren={node => node.children}
+                    buildMenuTemplate={() => [{ label: 'salut' }]}
                   />
                 </Column>
               </Line>

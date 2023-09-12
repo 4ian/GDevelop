@@ -17,6 +17,8 @@ import {
   shouldCloseOrCancel,
   shouldValidate,
 } from '../KeyboardShortcuts/InteractionKeys';
+import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
+import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
@@ -40,6 +42,12 @@ type ItemData<Item> = {|
   flattenedData: FlattenedNode<Item>[],
   onStartRenaming: (nodeId: string) => void,
   onEndRenaming: (nodeId: string, newName: string) => void,
+  onContextMenu: ({|
+    item: Item,
+    index: number,
+    x: number,
+    y: number,
+  |}) => void,
   renamedItemId: ?string,
 |};
 
@@ -93,6 +101,7 @@ const Row = React.memo(<Item>(props: RowProps<Item>) => {
     onStartRenaming,
     onEndRenaming,
     renamedItemId,
+    onContextMenu,
   } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
@@ -157,58 +166,80 @@ const Row = React.memo(<Item>(props: RowProps<Item>) => {
                 <div
                   onClick={onClick}
                   tabIndex={0}
-                  className={'row-container' + (node.selected ? ' selected' : '')}
+                  className={
+                    'row-container' + (node.selected ? ' selected' : '')
+                  }
                 >
                   {connectDragPreview(
                     <div className="full-space-container">
                       {isOver && <DropIndicator canDrop={canDrop} />}
                       {connectDragSource(
                         <div className="row-content">
-                          {node.hasChildren ? (
-                            <>
-                              <IconButton
-                                size="small"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  onOpen(node);
-                                }}
-                                disabled={node.disableCollapse}
-                              >
-                                {node.collapsed ? (
-                                  <ArrowHeadBottom fontSize="small" />
-                                ) : (
-                                  <ArrowHeadTop fontSize="small" />
-                                )}
-                              </IconButton>
-                              <Folder
-                                fontSize="small"
-                                style={{ marginRight: 4 }}
-                              />
-                            </>
-                          ) : node.thumbnailSrc ? (
-                            <div style={{ marginRight: 6 }}>
-                              <ListIcon iconSize={16} src={node.thumbnailSrc} />
-                            </div>
-                          ) : null}
-                          {renamedItemId === node.id ? (
-                            <SemiControlledRowInput
-                              initialValue={node.name}
-                              onEndRenaming={value =>
-                                onEndRenaming(node.id, value)
-                              }
-                            />
-                          ) : (
-                            <span
-                              className="item-name"
-                              onClick={e => {
-                                if (!e.metaKey && !e.shiftKey) {
-                                  onStartRenaming(node.id);
+                          <div className="row-content-side">
+                            {node.hasChildren ? (
+                              <>
+                                <IconButton
+                                  size="small"
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    onOpen(node);
+                                  }}
+                                  disabled={node.disableCollapse}
+                                >
+                                  {node.collapsed ? (
+                                    <ArrowHeadBottom fontSize="small" />
+                                  ) : (
+                                    <ArrowHeadTop fontSize="small" />
+                                  )}
+                                </IconButton>
+                                <Folder
+                                  fontSize="small"
+                                  style={{ marginRight: 4 }}
+                                />
+                              </>
+                            ) : node.thumbnailSrc ? (
+                              <div style={{ marginRight: 6 }}>
+                                <ListIcon
+                                  iconSize={16}
+                                  src={node.thumbnailSrc}
+                                />
+                              </div>
+                            ) : null}
+                            {renamedItemId === node.id ? (
+                              <SemiControlledRowInput
+                                initialValue={node.name}
+                                onEndRenaming={value =>
+                                  onEndRenaming(node.id, value)
                                 }
+                              />
+                            ) : (
+                              <span
+                                className="item-name"
+                                onClick={e => {
+                                  if (!e.metaKey && !e.shiftKey) {
+                                    onStartRenaming(node.id);
+                                  }
+                                }}
+                              >
+                                {node.name}
+                              </span>
+                            )}
+                          </div>
+                          <div className="row-content-side">
+                            <IconButton
+                              size="small"
+                              onClick={e => {
+                                onContextMenu({
+                                  item: node.item,
+                                  index,
+                                  x: e.clientX,
+                                  y: e.clientY,
+                                });
                               }}
                             >
-                              {node.name}
-                            </span>
-                          )}
+                              <ThreeDotsMenu />
+                            </IconButton>{' '}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -230,7 +261,8 @@ const getItemData = memoizeOne(
     onSelect: ({| node: FlattenedNode<T>, exclusive?: boolean |}) => void,
     onStartRenaming: (nodeId: string) => void,
     onEndRenaming: (nodeId: string, newName: string) => void,
-    renamedItemId: ?string
+    renamedItemId: ?string,
+    onContextMenu: ({| item: T, index: number, x: number, y: number |}) => void
   ): ItemData<T> => ({
     onOpen,
     onSelect,
@@ -238,6 +270,7 @@ const getItemData = memoizeOne(
     onStartRenaming,
     onEndRenaming,
     renamedItemId,
+    onContextMenu,
   })
 );
 
@@ -249,6 +282,7 @@ type Props<Item> = {|
   getItemId: Item => string,
   getItemChildren: Item => ?(Item[]),
   getItemThumbnail: Item => ?string,
+  buildMenuTemplate: (Item, index: number) => any,
   searchText?: string,
 |};
 
@@ -261,9 +295,17 @@ const TreeView = <Item>({
   getItemId,
   getItemChildren,
   getItemThumbnail,
+  buildMenuTemplate,
 }: Props<Item>) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
+  const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
+  const [contextMenuItemInfo, setContextMenuItemInfo] = React.useState<?{|
+    item: Item,
+    index: number,
+    x: number,
+    y: number,
+  |}>(null);
   const [
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
@@ -397,7 +439,8 @@ const TreeView = <Item>({
     onSelect,
     setRenamedItemId,
     onEndRenaming,
-    renamedItemId
+    renamedItemId,
+    setContextMenuItemInfo
   );
 
   // Reset opened nodes during search when user stops searching
@@ -411,21 +454,39 @@ const TreeView = <Item>({
     [searchText]
   );
 
+  React.useEffect(
+    () => {
+      if (contextMenuRef.current && contextMenuItemInfo) {
+        const { x, y, item, index } = contextMenuItemInfo;
+        contextMenuRef.current.open(x, y, { item, index });
+      }
+    },
+    [contextMenuItemInfo]
+  );
+
   return (
-    <FixedSizeList
-      height={height}
-      itemCount={flattenedData.length}
-      itemSize={32}
-      width={width}
-      itemKey={index => flattenedData[index].id}
-      // Flow does not seem to accept the generic used in FixedSizeList
-      // can itself use a generic.
-      // $FlowFixMe
-      itemData={itemData}
-      className={`${treeView} ${theme.treeViewRootClassName}`}
-    >
-      {Row}
-    </FixedSizeList>
+    <>
+      <FixedSizeList
+        height={height}
+        itemCount={flattenedData.length}
+        itemSize={32}
+        width={width}
+        itemKey={index => flattenedData[index].id}
+        // Flow does not seem to accept the generic used in FixedSizeList
+        // can itself use a generic.
+        // $FlowFixMe
+        itemData={itemData}
+        className={`${treeView} ${theme.treeViewRootClassName}`}
+      >
+        {Row}
+      </FixedSizeList>
+      <ContextMenu
+        ref={contextMenuRef}
+        buildMenuTemplate={(i18n, options) =>
+          buildMenuTemplate(options.item, options.index)
+        }
+      />
+    </>
   );
 };
 

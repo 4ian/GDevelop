@@ -1,14 +1,23 @@
-.tree-view .indented-row {
+.tree-view .full-height-flex-container {
   display: flex;
   height: 100%;
 }
-
+.tree-view .full-space-container {
+  flex: 1;
+  height: 100%;
+}
 .tree-view .row-content {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.tree-view .row-container {
   display: flex;
   flex: 1;
   border-radius: 6px;
 }
-.tree-view .row-content.selected {
+.tree-view .row-container.selected {
   background-color: var(--table-row-selected-background-color);
 }
 

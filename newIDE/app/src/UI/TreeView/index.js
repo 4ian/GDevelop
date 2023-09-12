@@ -12,6 +12,8 @@ import ArrowHeadTop from '../CustomSvgIcons/ArrowHeadTop';
 import Folder from '../CustomSvgIcons/Folder';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import ListIcon from '../ListIcon';
+import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
+import './TreeView.css';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
@@ -31,7 +33,7 @@ type FlattenedNode = {|
 
 const Row = React.memo(props => {
   const { data, index, style } = props;
-  const { flattenedData, onOpen, onSelect, styling } = data;
+  const { flattenedData, onOpen, onSelect } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
@@ -87,19 +89,12 @@ const Row = React.memo(props => {
         }) => {
           setIsStayingOver(isOver);
           return (
-            <div style={{ paddingLeft: left, display: 'flex' }}>
+            <div style={{ paddingLeft: left }} className="indented-row">
               {connectDropTarget(
                 <div
                   onClick={onClick}
                   tabIndex={0}
-                  style={{
-                    display: 'flex',
-                    flex: 1,
-                    borderRadius: 6,
-                    backgroundColor: node.selected
-                      ? styling.selectedBackgroundColor
-                      : undefined,
-                  }}
+                  className={'row-content' + (node.selected ? ' selected' : '')}
                 >
                   {connectDragPreview(
                     <div style={{ flex: 1 }}>
@@ -152,11 +147,10 @@ const Row = React.memo(props => {
   );
 }, areEqual);
 
-const getItemData = memoizeOne((flattenedData, onOpen, onSelect, styling) => ({
+const getItemData = memoizeOne((flattenedData, onOpen, onSelect) => ({
   onOpen,
   onSelect,
   flattenedData,
-  styling,
 }));
 
 type Props<Item> = {|
@@ -299,11 +293,7 @@ const TreeView = <Item>({
     searchText ? searchText.toLowerCase() : null
   );
 
-  const styling = {
-    selectedBackgroundColor: theme.listItem.selectedBackgroundColor,
-  };
-
-  const itemData = getItemData(flattenedData, onOpen, onSelect, styling);
+  const itemData = getItemData(flattenedData, onOpen, onSelect);
 
   // Reset opened nodes during search when user stops searching
   // or when the search text changes.
@@ -324,6 +314,7 @@ const TreeView = <Item>({
       width={width}
       itemKey={index => flattenedData[index].id}
       itemData={itemData}
+      className={`${treeView} ${theme.treeViewRootClassName}`}
     >
       {Row}
     </List>

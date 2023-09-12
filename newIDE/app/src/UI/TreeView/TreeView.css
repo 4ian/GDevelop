@@ -1,5 +1,6 @@
 .tree-view .indented-row {
   display: flex;
+  height: 100%;
 }
 
 .tree-view .row-content {
@@ -9,4 +10,27 @@
 }
 .tree-view .row-content.selected {
   background-color: var(--table-row-selected-background-color);
+}
+
+.tree-view .item-name,
+.tree-view .item-name-input {
+  font-family: var(--gdevelop-modern-font-family) !important;
+  font-size: 14px;
+}
+.tree-view .item-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tree-view .item-name-input {
+  outline: none;
+  border: none;
+  padding: 0;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  color: inherit;
 }

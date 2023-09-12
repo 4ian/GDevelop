@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import Text from '../Text';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
 import { FixedSizeList, areEqual } from 'react-window';
@@ -14,6 +13,10 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import ListIcon from '../ListIcon';
 import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
 import './TreeView.css';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../KeyboardShortcuts/InteractionKeys';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
@@ -35,7 +38,43 @@ type ItemData<Item> = {|
   onOpen: (FlattenedNode<Item>) => void,
   onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
   flattenedData: FlattenedNode<Item>[],
+  onStartRenaming: (nodeId: string) => void,
+  onEndRenaming: (nodeId: string, newName: string) => void,
+  renamedItemId: ?string,
 |};
+
+const SemiControlledRowInput = ({
+  initialValue,
+  onEndRenaming,
+}: {
+  initialValue: string,
+  onEndRenaming: (newName: string) => void,
+}) => {
+  const [value, setValue] = React.useState<string>(initialValue);
+
+  return (
+    <input
+      autoFocus
+      type="text"
+      className="item-name-input"
+      value={value}
+      onChange={e => {
+        setValue(e.currentTarget.value);
+      }}
+      onBlur={() => {
+        onEndRenaming(value);
+      }}
+      onKeyUp={e => {
+        if (shouldCloseOrCancel(e)) {
+          e.preventDefault();
+          onEndRenaming(initialValue);
+        } else if (shouldValidate(e)) {
+          onEndRenaming(value);
+        }
+      }}
+    />
+  );
+};
 
 type RowProps<Item> = {|
   index: number,
@@ -47,7 +86,14 @@ type RowProps<Item> = {|
 
 const Row = React.memo(<Item>(props: RowProps<Item>) => {
   const { data, index, style } = props;
-  const { flattenedData, onOpen, onSelect } = data;
+  const {
+    flattenedData,
+    onOpen,
+    onSelect,
+    onStartRenaming,
+    onEndRenaming,
+    renamedItemId,
+  } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
@@ -111,13 +157,14 @@ const Row = React.memo(<Item>(props: RowProps<Item>) => {
                   className={'row-content' + (node.selected ? ' selected' : '')}
                 >
                   {connectDragPreview(
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, height: '100%' }}>
                       {isOver && <DropIndicator canDrop={canDrop} />}
                       {connectDragSource(
                         <div
                           style={{
                             display: 'flex',
                             alignItems: 'center',
+                            height: '100%',
                           }}
                         >
                           {node.hasChildren ? (
@@ -146,7 +193,25 @@ const Row = React.memo(<Item>(props: RowProps<Item>) => {
                               <ListIcon iconSize={16} src={node.thumbnailSrc} />
                             </div>
                           ) : null}
-                          <Text>{node.name}</Text>
+                          {renamedItemId === node.id ? (
+                            <SemiControlledRowInput
+                              initialValue={node.name}
+                              onEndRenaming={value =>
+                                onEndRenaming(node.id, value)
+                              }
+                            />
+                          ) : (
+                            <span
+                              className="item-name"
+                              onClick={e => {
+                                if (!e.metaKey && !e.shiftKey) {
+                                  onStartRenaming(node.id);
+                                }
+                              }}
+                            >
+                              {node.name}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -165,11 +230,17 @@ const getItemData = memoizeOne(
   <T>(
     flattenedData: FlattenedNode<T>[],
     onOpen: (FlattenedNode<T>) => void,
-    onSelect: ({| node: FlattenedNode<T>, exclusive?: boolean |}) => void
+    onSelect: ({| node: FlattenedNode<T>, exclusive?: boolean |}) => void,
+    onStartRenaming: (nodeId: string) => void,
+    onEndRenaming: (nodeId: string, newName: string) => void,
+    renamedItemId: ?string
   ): ItemData<T> => ({
     onOpen,
     onSelect,
     flattenedData,
+    onStartRenaming,
+    onEndRenaming,
+    renamedItemId,
   })
 );
 
@@ -195,6 +266,7 @@ const TreeView = <Item>({
   getItemThumbnail,
 }: Props<Item>) => {
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
+  const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const [
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
@@ -312,6 +384,11 @@ const TreeView = <Item>({
     }
   };
 
+  const onEndRenaming = (nodeId: string, newName: string) => {
+    console.log(newName);
+    setRenamedItemId(null);
+  };
+
   let flattenedData = flattenOpened(
     items,
     searchText ? searchText.toLowerCase() : null
@@ -320,7 +397,10 @@ const TreeView = <Item>({
   const itemData: ItemData<Item> = getItemData<Item>(
     flattenedData,
     onOpen,
-    onSelect
+    onSelect,
+    setRenamedItemId,
+    onEndRenaming,
+    renamedItemId
   );
 
   // Reset opened nodes during search when user stops searching

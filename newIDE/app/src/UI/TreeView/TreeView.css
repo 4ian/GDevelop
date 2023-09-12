@@ -1,0 +1,12 @@
+.tree-view .indented-row {
+  display: flex;
+}
+
+.tree-view .row-content {
+  display: flex;
+  flex: 1;
+  border-radius: 6px;
+}
+.tree-view .row-content.selected {
+  background-color: var(--table-row-selected-background-color);
+}

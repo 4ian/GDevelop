@@ -6,7 +6,15 @@
   flex: 1;
   height: 100%;
 }
+
 .tree-view .row-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.tree-view .row-content-side {
   display: flex;
   align-items: center;
   height: 100%;

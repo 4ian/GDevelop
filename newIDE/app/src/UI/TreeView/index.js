@@ -4,7 +4,7 @@ import * as React from 'react';
 import Text from '../Text';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
-import { FixedSizeList as List, areEqual } from 'react-window';
+import { FixedSizeList, areEqual } from 'react-window';
 import memoizeOne from 'memoize-one';
 import IconButton from '../IconButton';
 import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
@@ -19,8 +19,7 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
 });
 
-type Node = {| name: string, id: string, children?: Node[] |};
-type FlattenedNode = {|
+type FlattenedNode<Item> = {|
   id: string,
   name: string,
   hasChildren: boolean,
@@ -29,9 +28,24 @@ type FlattenedNode = {|
   selected: boolean,
   disableCollapse: boolean,
   thumbnailSrc?: ?string,
+  item: Item,
 |};
 
-const Row = React.memo(props => {
+type ItemData<Item> = {|
+  onOpen: (FlattenedNode<Item>) => void,
+  onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
+  flattenedData: FlattenedNode<Item>[],
+|};
+
+type RowProps<Item> = {|
+  index: number,
+  style: any,
+  data: ItemData<Item>,
+  /** Used by react-window. */
+  isScrolling?: boolean,
+|};
+
+const Row = React.memo(<Item>(props: RowProps<Item>) => {
   const { data, index, style } = props;
   const { flattenedData, onOpen, onSelect } = data;
   const node = flattenedData[index];
@@ -147,11 +161,17 @@ const Row = React.memo(props => {
   );
 }, areEqual);
 
-const getItemData = memoizeOne((flattenedData, onOpen, onSelect) => ({
-  onOpen,
-  onSelect,
-  flattenedData,
-}));
+const getItemData = memoizeOne(
+  <T>(
+    flattenedData: FlattenedNode<T>[],
+    onOpen: (FlattenedNode<T>) => void,
+    onSelect: ({| node: FlattenedNode<T>, exclusive?: boolean |}) => void
+  ): ItemData<T> => ({
+    onOpen,
+    onSelect,
+    flattenedData,
+  })
+);
 
 type Props<Item> = {|
   height: number,
@@ -182,7 +202,10 @@ const TreeView = <Item>({
   const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
 
-  const flattenOpened = (treeData, searchText: ?string): FlattenedNode[] => {
+  const flattenOpened = (
+    treeData,
+    searchText: ?string
+  ): FlattenedNode<Item>[] => {
     return items.map(item => flattenNode(item, 1, searchText, false)).flat();
   };
 
@@ -191,7 +214,7 @@ const TreeView = <Item>({
     depth: number,
     searchText: ?string,
     forceOpen: boolean
-  ): FlattenedNode[] => {
+  ): FlattenedNode<Item>[] => {
     const id = getItemId(item);
     const name = getItemName(item);
     const children = getItemChildren(item);
@@ -234,6 +257,9 @@ const TreeView = <Item>({
           name,
           hasChildren: !!children && children.length > 0,
           depth,
+          selected,
+          thumbnailSrc,
+          item,
           /*
            * If the user is searching, the node should be opened if either:
            * - it has children that should be displayed
@@ -242,8 +268,6 @@ const TreeView = <Item>({
           collapsed: !!searchText
             ? flattenedChildren.length === 0 || !openedDuringSearch
             : collapsed,
-          selected,
-          thumbnailSrc,
           /*
            * Disable opening of the node if:
            * - the user is searching
@@ -258,7 +282,7 @@ const TreeView = <Item>({
     return [];
   };
 
-  const onOpen = (node: FlattenedNode) => {
+  const onOpen = (node: FlattenedNode<Item>) => {
     if (!!searchText) {
       node.collapsed
         ? setOpenedDuringSearchNodeIds([...openedDuringSearchNodeIds, node.id])
@@ -275,10 +299,10 @@ const TreeView = <Item>({
   const onSelect = ({
     node,
     exclusive,
-  }: {
-    node: FlattenedNode,
+  }: {|
+    node: FlattenedNode<Item>,
     exclusive?: boolean,
-  }) => {
+  |}) => {
     if (node.selected) {
       if (exclusive) setSelectedNodeIds([]);
       else setSelectedNodeIds(selectedNodeIds.filter(id => id !== node.id));
@@ -293,7 +317,11 @@ const TreeView = <Item>({
     searchText ? searchText.toLowerCase() : null
   );
 
-  const itemData = getItemData(flattenedData, onOpen, onSelect);
+  const itemData: ItemData<Item> = getItemData<Item>(
+    flattenedData,
+    onOpen,
+    onSelect
+  );
 
   // Reset opened nodes during search when user stops searching
   // or when the search text changes.
@@ -307,17 +335,20 @@ const TreeView = <Item>({
   );
 
   return (
-    <List
+    <FixedSizeList
       height={height}
       itemCount={flattenedData.length}
       itemSize={32}
       width={width}
       itemKey={index => flattenedData[index].id}
+      // Flow does not seem to accept the generic used in FixedSizeList
+      // can itself use a generic.
+      // $FlowFixMe
       itemData={itemData}
       className={`${treeView} ${theme.treeViewRootClassName}`}
     >
       {Row}
-    </List>
+    </FixedSizeList>
   );
 };
 

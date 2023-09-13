@@ -73,6 +73,8 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
     onEndRenaming,
     renamedItemId,
     onContextMenu,
+    canDrop,
+    onDrop,
   } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
@@ -111,13 +113,13 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
     <div style={style}>
       <DragSourceAndDropTarget
         beginDrag={() => {
-          console.log(`drag ${node.name}`);
+          if (!node.selected) onSelect({ node, exclusive: !node.selected });
           return {};
         }}
         canDrag={() => true}
-        canDrop={() => true}
+        canDrop={canDrop ? () => canDrop(node.item) : () => true}
         drop={() => {
-          console.log(`drop on ${node.name}`);
+          onDrop(node.item);
         }}
       >
         {({
@@ -146,7 +148,7 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                       {isOver && <DropIndicator canDrop={canDrop} />}
                       <div className="row-content">
                         {connectDragPreview(
-                          <div className="row-content-side">
+                          <div className="row-content-side row-content-side-left">
                             {node.hasChildren ? (
                               <>
                                 <IconButton

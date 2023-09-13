@@ -34,18 +34,27 @@ export type ItemData<Item> = {|
     y: number,
   |}) => void,
   renamedItemId: ?string,
+  canDrop?: ?(Item) => boolean,
+  onDrop: Item => void,
 |};
 
 const getItemData = memoizeOne(
-  <T>(
-    flattenedData: FlattenedNode<T>[],
-    onOpen: (FlattenedNode<T>) => void,
-    onSelect: ({| node: FlattenedNode<T>, exclusive?: boolean |}) => void,
+  <Item>(
+    flattenedData: FlattenedNode<Item>[],
+    onOpen: (FlattenedNode<Item>) => void,
+    onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
     onStartRenaming: (nodeId: string) => void,
     onEndRenaming: (nodeId: string, newName: string) => void,
     renamedItemId: ?string,
-    onContextMenu: ({| item: T, index: number, x: number, y: number |}) => void
-  ): ItemData<T> => ({
+    onContextMenu: ({|
+      item: Item,
+      index: number,
+      x: number,
+      y: number,
+    |}) => void,
+    canDrop?: ?(Item) => boolean,
+    onDrop: Item => void
+  ): ItemData<Item> => ({
     onOpen,
     onSelect,
     flattenedData,
@@ -53,6 +62,8 @@ const getItemData = memoizeOne(
     onEndRenaming,
     renamedItemId,
     onContextMenu,
+    canDrop,
+    onDrop,
   })
 );
 
@@ -69,6 +80,8 @@ type Props<Item> = {|
   selectedItems: Item[],
   onSelectItems: (Item[]) => void,
   multiSelect: boolean,
+  onMoveSelectionToItem: (destinationItem: Item) => void,
+  canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
 |};
 
 const TreeView = <Item>({
@@ -84,6 +97,8 @@ const TreeView = <Item>({
   selectedItems,
   onSelectItems,
   multiSelect,
+  onMoveSelectionToItem,
+  canMoveSelectionToItem,
 }: Props<Item>) => {
   const selectedNodeIds = selectedItems.map(item => getItemId(item));
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
@@ -239,7 +254,9 @@ const TreeView = <Item>({
     setRenamedItemId,
     onEndRenaming,
     renamedItemId,
-    setContextMenuOpeningOptions
+    setContextMenuOpeningOptions,
+    canMoveSelectionToItem,
+    onMoveSelectionToItem
   );
 
   // Reset opened nodes during search when user stops searching

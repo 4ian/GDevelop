@@ -11,6 +11,8 @@ import TreeView from '../../../UI/TreeView';
 import { Column, Line } from '../../../UI/Grid';
 import TextField from '../../../UI/TextField';
 import sample from 'lodash/sample';
+import Toggle from '../../../UI/Toggle';
+import Text from '../../../UI/Text';
 
 export default {
   title: 'UI Building Blocks/TreeView',
@@ -425,24 +427,38 @@ const nodes = [
 ];
 export const Default = () => {
   const [searchText, setSearchText] = React.useState<string>('');
+  const [multiSelect, setMultiSelect] = React.useState<boolean>(true);
   const [selectedItems, setSelectedItems] = React.useState<any[]>([]);
   return (
     <DragAndDropContextProvider>
       <Column noMargin expand>
-        <TextField
-          type="text"
-          value={searchText}
-          onChange={(e, text) => {
-            setSearchText(text);
-          }}
-          hintText={'Filter'}
-        />
+        <Line>
+          <Column expand>
+            <TextField
+              type="text"
+              value={searchText}
+              onChange={(e, text) => {
+                setSearchText(text);
+              }}
+              hintText={'Filter'}
+            />
+          </Column>
+          <Column>
+            <Toggle
+              label={<Text>Allow multi selection</Text>}
+              labelPosition="left"
+              toggled={multiSelect}
+              onToggle={() => setMultiSelect(!multiSelect)}
+            />
+          </Column>
+        </Line>
         <FixedHeightFlexContainer height={400}>
           <AutoSizer>
             {({ height, width }) => (
               <Line expand>
                 <Column expand>
                   <TreeView
+                    multiSelect={multiSelect}
                     height={height}
                     width={width}
                     items={nodes}

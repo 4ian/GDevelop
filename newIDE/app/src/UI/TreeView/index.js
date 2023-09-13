@@ -68,6 +68,7 @@ type Props<Item> = {|
   searchText?: string,
   selectedItems: Item[],
   onSelectItems: (Item[]) => void,
+  multiSelect: boolean,
 |};
 
 const TreeView = <Item>({
@@ -82,6 +83,7 @@ const TreeView = <Item>({
   buildMenuTemplate,
   selectedItems,
   onSelectItems,
+  multiSelect,
 }: Props<Item>) => {
   const selectedNodeIds = selectedItems.map(item => getItemId(item));
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
@@ -204,14 +206,19 @@ const TreeView = <Item>({
     node: FlattenedNode<Item>,
     exclusive?: boolean,
   |}) => {
-    if (node.selected) {
-      if (exclusive) {
-        if (selectedNodeIds.length === 1) return;
-        onSelectItems([node.item]);
-      } else onSelectItems(selectedItems.filter(item => item !== node.item));
+    if (multiSelect) {
+      if (node.selected) {
+        if (exclusive) {
+          if (selectedNodeIds.length === 1) return;
+          onSelectItems([node.item]);
+        } else onSelectItems(selectedItems.filter(item => item !== node.item));
+      } else {
+        if (exclusive) onSelectItems([node.item]);
+        else onSelectItems([...selectedItems, node.item]);
+      }
     } else {
-      if (exclusive) onSelectItems([node.item]);
-      else onSelectItems([...selectedItems, node.item]);
+      if (node.selected && selectedNodeIds.length === 1) return;
+      onSelectItems([node.item]);
     }
   };
 

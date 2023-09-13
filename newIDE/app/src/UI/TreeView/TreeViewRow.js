@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
 import { areEqual } from 'react-window';
 import IconButton from '../IconButton';
@@ -17,10 +16,6 @@ import {
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
-
-const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
-  vibrate: 100,
-});
 
 const SemiControlledRowInput = ({
   initialValue,
@@ -78,6 +73,7 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
     onDrop,
     onEditItem,
     hideMenuButton,
+    DragSourceAndDropTarget,
   } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;

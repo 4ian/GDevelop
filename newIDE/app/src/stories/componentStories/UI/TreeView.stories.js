@@ -487,6 +487,7 @@ export const Default = () => {
                     buildMenuTemplate={() => [{ label: 'salut' }]}
                     onMoveSelectionToItem={action('Drop selection on item')}
                     canMoveSelectionToItem={() => Math.random() > 0.2}
+                    reactDndType="demo"
                   />
                 </Column>
               </Line>

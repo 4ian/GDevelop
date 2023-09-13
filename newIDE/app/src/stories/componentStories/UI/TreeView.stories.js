@@ -425,6 +425,7 @@ const nodes = [
 ];
 export const Default = () => {
   const [searchText, setSearchText] = React.useState<string>('');
+  const [selectedItems, setSelectedItems] = React.useState<any[]>([]);
   return (
     <DragAndDropContextProvider>
       <Column noMargin expand>
@@ -448,6 +449,8 @@ export const Default = () => {
                     searchText={searchText}
                     getItemId={node => node.id}
                     getItemName={node => node.name}
+                    selectedItems={selectedItems}
+                    onSelectItems={setSelectedItems}
                     getItemThumbnail={node =>
                       node.children
                         ? null

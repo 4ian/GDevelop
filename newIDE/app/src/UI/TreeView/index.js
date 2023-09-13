@@ -9,6 +9,7 @@ import './TreeView.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
 import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
 import TreeViewRow from './TreeViewRow';
+import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 
 type FlattenedNode<Item> = {|
   id: string,
@@ -39,6 +40,7 @@ export type ItemData<Item> = {|
   onDrop: Item => void,
   onEditItem?: Item => void,
   hideMenuButton: boolean,
+  DragSourceAndDropTarget: any => React.Node,
 |};
 
 const getItemData = memoizeOne(
@@ -58,7 +60,8 @@ const getItemData = memoizeOne(
     canDrop?: ?(Item) => boolean,
     onDrop: Item => void,
     onEditItem?: Item => void,
-    hideMenuButton: boolean
+    hideMenuButton: boolean,
+    DragSourceAndDropTarget: any => React.Node
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -71,6 +74,7 @@ const getItemData = memoizeOne(
     onDrop,
     onEditItem,
     hideMenuButton,
+    DragSourceAndDropTarget,
   })
 );
 
@@ -91,6 +95,7 @@ type Props<Item> = {|
   onRenameItem: (Item, newName: string) => void,
   onMoveSelectionToItem: (destinationItem: Item) => void,
   canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
+  reactDndType: string,
 |};
 
 const TreeView = <Item>({
@@ -110,6 +115,7 @@ const TreeView = <Item>({
   onRenameItem,
   onMoveSelectionToItem,
   canMoveSelectionToItem,
+  reactDndType,
 }: Props<Item>) => {
   const selectedNodeIds = selectedItems.map(item => getItemId(item));
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
@@ -285,6 +291,14 @@ const TreeView = <Item>({
     [flattenOpened, items, searchText]
   );
 
+  const DragSourceAndDropTarget = React.useMemo(
+    () =>
+      makeDragSourceAndDropTarget(reactDndType, {
+        vibrate: 100,
+      }),
+    [reactDndType]
+  );
+
   const itemData: ItemData<Item> = getItemData<Item>(
     flattenedData,
     onOpen,
@@ -296,7 +310,8 @@ const TreeView = <Item>({
     canMoveSelectionToItem,
     onMoveSelectionToItem,
     onEditItem,
-    isMobileScreen
+    isMobileScreen,
+    DragSourceAndDropTarget
   );
 
   // Reset opened nodes during search when user stops searching

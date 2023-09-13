@@ -14,6 +14,9 @@ namespace gdjs {
     hash: number;
   };
 
+  const getGlobalResources = (projectData: ProjectData): Array<string> =>
+    projectData.usedResources.map((resource) => resource.name);
+
   /** Options given to the game at startup. */
   export type RuntimeGameOptions = {
     /** if true, force fullscreen. */
@@ -140,8 +143,12 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
 
-      const resources = this._data.resources.resources;
-      this._resourcesLoader = new gdjs.ResourceLoader(this, resources);
+      this._resourcesLoader = new gdjs.ResourceLoader(
+        this,
+        data.resources.resources,
+        getGlobalResources(data),
+        data.layouts
+      );
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
@@ -219,7 +226,11 @@ namespace gdjs {
      */
     setProjectData(projectData: ProjectData): void {
       this._data = projectData;
-      this._resourcesLoader.setResources(this._data.resources.resources);
+      this._resourcesLoader.setResources(
+        projectData.resources.resources,
+        getGlobalResources(projectData),
+        projectData.layouts
+      );
     }
 
     /**
@@ -585,39 +596,79 @@ namespace gdjs {
       callback: () => void,
       progressCallback?: (progress: float) => void
     ) {
-      this.loadAllAssetsAsync(progressCallback).then(callback);
+      this.loadFirstAssetsAsync(progressCallback).then(callback);
     }
 
     /**
      * Load all assets, displaying progress in renderer.
      */
-    loadAllAssetsAsync = async (
+    async loadFirstAssetsAsync(progressCallback?: (progress: float) => void) {
+      await this.loadAssetsWithLoadingScreen(async (onProgress) => {
+        if (false) {
+          this._resourcesLoader.loadAllResources(onProgress);
+        } else {
+          const firstSceneName = this._data.firstLayout;
+          await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
+            firstSceneName,
+            onProgress
+          );
+          this._resourcesLoader.loadAllLayoutInBackground(firstSceneName);
+        }
+      }, progressCallback);
+    }
+
+    /**
+     * Load all assets, displaying progress in renderer.
+     */
+    async loadLayoutAssetsAsync(
+      layoutName: string,
       progressCallback?: (progress: float) => void
-    ) => {
+    ) {
       try {
-        const loadingScreen = new gdjs.LoadingScreenRenderer(
-          this.getRenderer(),
-          this._resourcesLoader.getImageManager(),
-          this._data.properties.loadingScreen
-        );
-
-        const onProgress = (count: integer, total: integer) => {
-          const percent = Math.floor((100 * count) / total);
-          loadingScreen.setPercent(percent);
-          if (progressCallback) {
-            progressCallback(percent);
-          }
-        };
-        this._resourcesLoader.loadAllResources(onProgress);
-
-        await loadingScreen.unload();
-        await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+        if (false) {
+          return;
+        }
+        await this.loadAssetsWithLoadingScreen((onProgress) => {
+          this._resourcesLoader.loadLayoutResources(layoutName, onProgress);
+        }, progressCallback);
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 
         throw e;
       }
-    };
+    }
+
+    isLayoutAssetsLoaded(layoutName: string): boolean {
+      return this._resourcesLoader.isLayoutAssetsLoaded(layoutName);
+    }
+
+    /**
+     * Load all assets, displaying progress in renderer.
+     */
+    async loadAssetsWithLoadingScreen(
+      loadAssets: (
+        onProgress: (count: integer, total: integer) => void
+      ) => void,
+      progressCallback?: (progress: float) => void
+    ) {
+      const loadingScreen = new gdjs.LoadingScreenRenderer(
+        this.getRenderer(),
+        this._resourcesLoader.getImageManager(),
+        this._data.properties.loadingScreen
+      );
+
+      const onProgress = (count: integer, total: integer) => {
+        const percent = Math.floor((100 * count) / total);
+        loadingScreen.setPercent(percent);
+        if (progressCallback) {
+          progressCallback(percent);
+        }
+      };
+      loadAssets(onProgress);
+
+      await loadingScreen.unload();
+      await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+    }
 
     /**
      * Start the game loop, to be called once assets are loaded.

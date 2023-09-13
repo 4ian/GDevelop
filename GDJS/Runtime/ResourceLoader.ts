@@ -27,6 +27,48 @@ namespace gdjs {
     );
   };
 
+  class LayoutLoadingTask {
+    layoutName: string;
+    private onProgressCallbacks: Array<(count: number, total: number) => void>;
+    private onFinishCallbacks: Array<() => void>;
+    private isFinished = false;
+
+    constructor(layoutName: string) {
+      this.layoutName = layoutName;
+      this.onProgressCallbacks = new Array<
+        (count: number, total: number) => void
+      >();
+      this.onFinishCallbacks = new Array<() => void>();
+    }
+
+    registerCallback(
+      onFinish: () => void,
+      onProgress?: (count: number, total: number) => void
+    ) {
+      if (this.isFinished) {
+        onFinish();
+        return;
+      }
+      this.onFinishCallbacks.push(onFinish);
+      if (onProgress) {
+        this.onProgressCallbacks.push(onProgress);
+      }
+    }
+
+    onProgress(count: number, total: number) {
+      for (const onProgress of this.onProgressCallbacks) {
+        onProgress(count, total);
+      }
+    }
+
+    onFinish() {
+      this.isFinished = true;
+      for (const onFinish of this.onFinishCallbacks) {
+        onFinish();
+      }
+    }
+  }
+
   /**
    * Gives helper methods used when resources are loaded from an URL.
    */
@@ -36,6 +78,13 @@ namespace gdjs {
   export class ResourceLoader {
     _runtimeGame: RuntimeGame;
     private _resources: Map<string, ResourceData>;
+    private _globalResources: Array<string>;
+    private _layoutResources: Map<string, Array<string>>;
+    private _loadedLayoutNames: Set<string> = new Set<string>();
+    private _layoutToLoadQueue: Array<LayoutLoadingTask> = new Array<
+      LayoutLoadingTask
+    >();
+
     private _resourceManagersMap: Map<ResourceKind, ResourceManager>;
     private _imageManager: ImageManager;
     private _soundManager: SoundManager;
@@ -48,10 +97,17 @@ namespace gdjs {
      * @param resources The resources data of the game.
      * @param resourcesLoader The resources loader of the game.
      */
-    constructor(runtimeGame: RuntimeGame, resourceDataArray: ResourceData[]) {
+    constructor(
+      runtimeGame: RuntimeGame,
+      resourceDataArray: ResourceData[],
+      globalResources: Array<string>,
+      layoutDataArray: Array<LayoutData>
+    ) {
       this._runtimeGame = runtimeGame;
       this._resources = new Map<string, ResourceData>();
-      this.setResources(resourceDataArray);
+      this._globalResources = globalResources;
+      this._layoutResources = new Map<string, Array<string>>();
+      this.setResources(resourceDataArray, globalResources, layoutDataArray);
 
       this._imageManager = new gdjs.ImageManager(this);
       this._soundManager = new gdjs.SoundManager(this);
@@ -84,7 +140,26 @@ namespace gdjs {
      *
      * @param resources The resources data of the game.
      */
-    setResources(resourceDataArray: ResourceData[]): void {
+    setResources(
+      resourceDataArray: ResourceData[],
+      globalResources: Array<string>,
+      layoutDataArray: Array<LayoutData>
+    ): void {
+      this._globalResources = globalResources;
+
+      this._layoutResources.clear();
+      for (const layoutData of layoutDataArray) {
+        this._layoutResources.set(
+          layoutData.name,
+          layoutData.usedResources.map((resource) => resource.name)
+        );
+      }
+      this._layoutToLoadQueue.length = 0;
+      for (let index = layoutDataArray.length - 1; index >= 0; index--) {
+        const layoutData = layoutDataArray[index];
+        this._layoutToLoadQueue.push(new LayoutLoadingTask(layoutData.name));
+      }
+
       this._resources.clear();
       for (const resourceData of resourceDataArray) {
         this._resources.set(resourceData.name, resourceData);
@@ -93,7 +168,7 @@ namespace gdjs {
 
     async loadAllResources(
       onProgress: (loadingCount: integer, totalCount: integer) => void
-    ) {
+    ): Promise<void> {
       let loadedCount = 0;
       await Promise.all(
         [...this._resources.values()].map(async (resource) => {
@@ -102,7 +177,104 @@ namespace gdjs {
           onProgress(loadedCount, this._resources.size);
         })
       );
-      return loadedCount;
+    }
+
+    async loadGlobalAndFirstLayoutResources(
+      firstSceneName: string,
+      onProgress: (count: number, total: number) => void
+    ): Promise<void> {
+      const layoutResources = this._layoutResources.get(firstSceneName);
+      if (!layoutResources) {
+        logger.warn(
+          'Can\'t load resource for unknown layout: "' + firstSceneName + '".'
+        );
+        return;
+      }
+      let loadedCount = 0;
+      const resources = [...this._globalResources, ...layoutResources.values()];
+      await Promise.all(
+        resources.map(async (resource) => {
+          await this.loadResource(resource);
+          loadedCount++;
+          onProgress(loadedCount, resources.length);
+        })
+      );
+      this._loadedLayoutNames.add(firstSceneName);
+    }
+
+    async loadAllLayoutInBackground(firstSceneName: string): Promise<void> {
+      while (this._layoutToLoadQueue.length > 0) {
+        const task = this._layoutToLoadQueue.pop();
+        if (task === undefined) {
+          continue;
+        }
+        if (!this.isLayoutAssetsLoaded(task.layoutName)) {
+          await this._doLoadLayoutResources(task.layoutName, (count, total) =>
+            task.onProgress(count, total)
+          );
+          task.onFinish();
+        }
+      }
+    }
+
+    loadLayoutResources(
+      layoutName: string,
+      onProgress?: (count: number, total: number) => void
+    ): Promise<void> {
+      const task = this._prioritizeLayout(layoutName);
+      return new Promise((resolve, reject) => {
+        if (!task) {
+          resolve();
+          return;
+        }
+        task.registerCallback(() => {
+          resolve();
+        }, onProgress);
+      });
+    }
+
+    private _prioritizeLayout(layoutName: string): LayoutLoadingTask | null {
+      const taskIndex = this._layoutToLoadQueue.findIndex(
+        (task) => task.layoutName === layoutName
+      );
+      if (taskIndex < 0) {
+        return null;
+      }
+      const task = this._layoutToLoadQueue[taskIndex];
+      this._layoutToLoadQueue.splice(
+        this._layoutToLoadQueue.findIndex(
+          (task) => task.layoutName === layoutName
+        )
+      );
+      this._layoutToLoadQueue.push(task);
+      return task;
+    }
+
+    private async _doLoadLayoutResources(
+      layoutName: string,
+      onProgress?: (count: number, total: number) => void
+    ): Promise<void> {
+      console.log('------- Scene: ' + layoutName);
+      const layoutResources = this._layoutResources.get(layoutName);
+      if (!layoutResources) {
+        logger.warn(
+          'Can\'t load resource for unknown layout: "' + layoutName + '".'
+        );
+        return;
+      }
+      let loadedCount = 0;
+      await Promise.all(
+        [...layoutResources.values()].map(async (resource) => {
+          this.loadResource(resource);
+          loadedCount++;
+          onProgress && onProgress(loadedCount, this._resources.size);
+        })
+      );
+      this._loadedLayoutNames.add(layoutName);
+    }
+
+    isLayoutAssetsLoaded(layoutName: string): boolean {
+      return this._loadedLayoutNames.has(layoutName);
     }
 
     /**
@@ -130,7 +302,7 @@ namespace gdjs {
         );
         return;
       }
-      console.log("Load: " + resource.name);
+      console.log('Load: ' + resource.name);
       return resourceManager.loadResource(resource.name);
     }
 

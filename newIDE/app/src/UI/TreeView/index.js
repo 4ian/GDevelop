@@ -66,6 +66,8 @@ type Props<Item> = {|
   getItemThumbnail: Item => ?string,
   buildMenuTemplate: (Item, index: number) => any,
   searchText?: string,
+  selectedItems: Item[],
+  onSelectItems: (Item[]) => void,
 |};
 
 const TreeView = <Item>({
@@ -78,7 +80,10 @@ const TreeView = <Item>({
   getItemChildren,
   getItemThumbnail,
   buildMenuTemplate,
+  selectedItems,
+  onSelectItems,
 }: Props<Item>) => {
+  const selectedNodeIds = selectedItems.map(item => getItemId(item));
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
@@ -95,7 +100,6 @@ const TreeView = <Item>({
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
   ] = React.useState<string[]>([]);
-  const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
 
   const flattenOpened = (
@@ -203,11 +207,11 @@ const TreeView = <Item>({
     if (node.selected) {
       if (exclusive) {
         if (selectedNodeIds.length === 1) return;
-        setSelectedNodeIds([node.id]);
-      } else setSelectedNodeIds(selectedNodeIds.filter(id => id !== node.id));
+        onSelectItems([node.item]);
+      } else onSelectItems(selectedItems.filter(item => item !== node.item));
     } else {
-      if (exclusive) setSelectedNodeIds([node.id]);
-      else setSelectedNodeIds([...selectedNodeIds, node.id]);
+      if (exclusive) onSelectItems([node.item]);
+      else onSelectItems([...selectedItems, node.item]);
     }
   };
 

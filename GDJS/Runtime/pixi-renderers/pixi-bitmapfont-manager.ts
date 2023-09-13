@@ -254,7 +254,7 @@ namespace gdjs {
         );
         return;
       }
-      if (!resource.disablePreload) {
+      if (resource.disablePreload) {
         return;
       }
 

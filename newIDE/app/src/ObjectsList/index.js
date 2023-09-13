@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
+import { useTheme } from '@material-ui/core/styles';
 
 import React from 'react';
 import { AutoSizer } from 'react-virtualized';
@@ -35,6 +36,7 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import TreeView from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
@@ -48,12 +50,19 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
+import Text from '../UI/Text';
+import IconButton from '../UI/IconButton';
+import ArrowHeadBottom from '../UI/CustomSvgIcons/ArrowHeadBottom';
+import ArrowHeadTop from '../UI/CustomSvgIcons/ArrowHeadTop';
+import EmptyMessage from '../UI/EmptyMessage';
 
 const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
   },
 };
 
@@ -189,7 +198,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const sortableList = React.useRef<?SortableVirtualizedItemList<ObjectWithContext>>(
       null
     );
-
+    const theme = useTheme();
+    const [globalObjectsOpen, setGlobalObjectsOpen] = React.useState<boolean>(
+      true
+    );
+    const [sceneObjectsOpen, setSceneObjectsOpen] = React.useState<boolean>(
+      true
+    );
+    const [
+      objectListDividerYPosition,
+      setObjectListDividerYPosition,
+    ] = React.useState<number>(50);
+    const isDraggingDivider = React.useRef<boolean>(false);
+    const listContainerRef = React.useRef<?HTMLDivElement>(null);
     const forceUpdate = useForceUpdate();
 
     const forceUpdateList = React.useCallback(
@@ -832,6 +853,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
+    const changeDividerPosition = React.useCallback(
+      (event: MouseEvent) => {
+        if (listContainerRef.current) {
+          if (!globalObjectsOpen) setGlobalObjectsOpen(true);
+          const containerRectangle = listContainerRef.current.getBoundingClientRect();
+          const targetPercentage =
+            (100 * (event.clientY - containerRectangle.top)) /
+            containerRectangle.height;
+          if (targetPercentage < 3) {
+            setGlobalObjectsOpen(false);
+          } else {
+            setObjectListDividerYPosition(targetPercentage);
+          }
+        }
+      },
+      [globalObjectsOpen]
+    );
+
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
@@ -855,44 +894,188 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
         />
-        <div style={styles.listContainer} id="objects-list">
-          <AutoSizer>
-            {({ height, width }) => (
-              <I18n>
-                {({ i18n }) => (
-                  <SortableVirtualizedItemList
-                    key={listKey}
-                    ref={sortableList}
-                    fullList={displayedObjectWithContextsList}
-                    width={width}
-                    height={height}
-                    getItemName={getObjectWithContextName}
-                    getItemThumbnail={getObjectThumbnail}
-                    getItemId={(objectWithContext, index) =>
-                      `object-item-${index}`
-                    }
-                    getItemData={(objectWithContext, index) => ({
-                      objectName: objectWithContext.object.getName(),
-                      global: objectWithContext.global.toString(),
-                    })}
-                    isItemBold={isObjectWithContextGlobal}
-                    onEditItem={objectWithContext =>
-                      onEditObject(objectWithContext.object)
-                    }
-                    selectedItems={selectedObjects}
-                    onItemSelected={selectObject}
-                    renamedItem={displayedRenamedObjectWithContext}
-                    onRename={rename}
-                    buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                    onMoveSelectionToItem={moveSelectionTo}
-                    canMoveSelectionToItem={canMoveSelectionTo}
-                    scaleUpItemIconWhenSelected={screenType === 'touch'}
-                    reactDndType={objectWithContextReactDndType}
-                  />
-                )}
-              </I18n>
+        <div
+          style={styles.listContainer}
+          id="objects-list"
+          ref={listContainerRef}
+          onMouseUp={e => {
+            isDraggingDivider.current = false;
+          }}
+          onMouseLeave={() => {
+            isDraggingDivider.current = false;
+          }}
+          onMouseMove={event => {
+            if (isDraggingDivider.current) {
+              changeDividerPosition(event);
+            }
+          }}
+        >
+          <I18n>
+            {({ i18n }) => (
+              <>
+                <div
+                  style={{
+                    height: globalObjectsOpen
+                      ? `${objectListDividerYPosition}%`
+                      : 0,
+                    minHeight: 32,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Line noMargin alignItems="center">
+                    <IconButton
+                      size="small"
+                      onClick={() => setGlobalObjectsOpen(!globalObjectsOpen)}
+                    >
+                      {globalObjectsOpen ? (
+                        <ArrowHeadTop fontSize="small" />
+                      ) : (
+                        <ArrowHeadBottom fontSize="small" />
+                      )}
+                    </IconButton>
+                    <Text size="sub-title">
+                      <Trans>Global objects</Trans>
+                    </Text>
+                  </Line>
+                  {globalObjectsOpen &&
+                    (lists.projectObjectsList.length > 0 ? (
+                      <div style={{ flex: 1, paddingLeft: 16 }}>
+                        <AutoSizer>
+                          {({ height, width }) => (
+                            <TreeView
+                              key={listKey}
+                              ref={sortableList}
+                              items={lists.projectObjectsList}
+                              width={width}
+                              height={height}
+                              searchText={searchText}
+                              getItemName={getObjectWithContextName}
+                              getItemThumbnail={getObjectThumbnail}
+                              getItemChildren={() => []}
+                              multiSelect={false}
+                              getItemId={objectWithContext =>
+                                `object-item-${getObjectWithContextName(
+                                  objectWithContext
+                                )}`
+                              }
+                              // getItemData={(objectWithContext, index) => ({
+                              //   objectName: objectWithContext.object.getName(),
+                              //   global: objectWithContext.global.toString(),
+                              // })}
+                              // isItemBold={isObjectWithContextGlobal}
+                              onEditItem={objectWithContext =>
+                                onEditObject(objectWithContext.object)
+                              }
+                              selectedItems={selectedObjects}
+                              onSelectItems={items =>
+                                selectObject(items ? items[0] : null)
+                              }
+                              // renamedItem={displayedRenamedObjectWithContext}
+                              onRenameItem={rename}
+                              buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                              onMoveSelectionToItem={moveSelectionTo}
+                              canMoveSelectionToItem={canMoveSelectionTo}
+                              // scaleUpItemIconWhenSelected={screenType === 'touch'}
+                              reactDndType={objectWithContextReactDndType}
+                            />
+                          )}
+                        </AutoSizer>
+                      </div>
+                    ) : (
+                      <div>
+                        <EmptyMessage>
+                          <Trans>There are no global objects yet.</Trans>
+                        </EmptyMessage>
+                      </div>
+                    ))}
+                </div>
+                <div
+                  style={{
+                    borderTop: `2px solid ${theme.palette.divider}`,
+                    height: 4,
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    cursor: 'ns-resize',
+                  }}
+                  onMouseDown={e => {
+                    e.stopPropagation();
+                    isDraggingDivider.current = true;
+                  }}
+                />
+                <div
+                  style={{
+                    height: `${100 - objectListDividerYPosition}%`,
+                    minHeight: 32,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Line noMargin alignItems="center">
+                    <IconButton
+                      size="small"
+                      onClick={() => setSceneObjectsOpen(!sceneObjectsOpen)}
+                    >
+                      {sceneObjectsOpen ? (
+                        <ArrowHeadTop fontSize="small" />
+                      ) : (
+                        <ArrowHeadBottom fontSize="small" />
+                      )}
+                    </IconButton>
+                    <Text size="sub-title">
+                      <Trans>Scene objects</Trans>
+                    </Text>
+                  </Line>
+                  {sceneObjectsOpen && (
+                    <div style={{ flex: 1, paddingLeft: 16 }}>
+                      <AutoSizer>
+                        {({ height, width }) => {
+                          return (
+                            <TreeView
+                              key={listKey}
+                              ref={sortableList}
+                              items={lists.containerObjectsList}
+                              width={width}
+                              height={height}
+                              searchText={searchText}
+                              getItemName={getObjectWithContextName}
+                              getItemThumbnail={getObjectThumbnail}
+                              getItemChildren={() => []}
+                              multiSelect={false}
+                              getItemId={objectWithContext =>
+                                `object-item-${getObjectWithContextName(
+                                  objectWithContext
+                                )}`
+                              }
+                              // getItemData={(objectWithContext, index) => ({
+                              //   objectName: objectWithContext.object.getName(),
+                              //   global: objectWithContext.global.toString(),
+                              // })}
+                              // isItemBold={isObjectWithContextGlobal}
+                              onEditItem={objectWithContext =>
+                                onEditObject(objectWithContext.object)
+                              }
+                              selectedItems={selectedObjects}
+                              onSelectItems={items =>
+                                selectObject(items ? items[0] : null)
+                              }
+                              // renamedItem={displayedRenamedObjectWithContext}
+                              onRenameItem={rename}
+                              buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                              onMoveSelectionToItem={moveSelectionTo}
+                              canMoveSelectionToItem={canMoveSelectionTo}
+                              // scaleUpItemIconWhenSelected={screenType === 'touch'}
+                              reactDndType={objectWithContextReactDndType + 'e'}
+                            />
+                          );
+                        }}
+                      </AutoSizer>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
-          </AutoSizer>
+          </I18n>
         </div>
         <Line>
           <Column expand>

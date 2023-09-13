@@ -272,9 +272,9 @@ const TreeView = <Item>({
 
   const onEndRenaming = (item: Item, newName: string) => {
     const trimmedNewName = newName.trim();
+    setRenamedItemId(null);
     if (getItemName(item) === trimmedNewName) return;
     onRenameItem(item, trimmedNewName);
-    setRenamedItemId(null);
   };
 
   let flattenedData = React.useMemo(

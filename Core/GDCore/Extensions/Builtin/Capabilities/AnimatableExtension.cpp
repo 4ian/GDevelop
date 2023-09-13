@@ -59,7 +59,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
          "Name",
          _("Animation (by name)"),
          _("the animation played by the object using the name of the "
-           "animation."),
+           "animation"),
          _("the animation"),
          _("Animations and images"),
          "res/actions/animation24.png")
@@ -72,7 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
 
   aut.AddScopedAction("PauseAnimation",
                 _("Pause the animation"),
-                _("Pause the animation of the object"),
+                _("Pause the animation of the object."),
                 _("Pause the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
@@ -83,7 +83,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
 
   aut.AddScopedAction("PlayAnimation",
                 _("Resume the animation"),
-                _("Resume the animation of the object"),
+                _("Resume the animation of the object."),
                 _("Resume the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",

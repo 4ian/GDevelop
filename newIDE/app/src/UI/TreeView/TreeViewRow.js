@@ -204,7 +204,7 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                               <SemiControlledRowInput
                                 initialValue={node.name}
                                 onEndRenaming={value =>
-                                  onEndRenaming(node.id, value)
+                                  onEndRenaming(node.item, value)
                                 }
                               />
                             ) : (

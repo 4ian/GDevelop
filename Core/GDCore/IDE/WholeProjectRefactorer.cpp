@@ -1649,8 +1649,9 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
+  // In theory we should pass a ProjectScopedContainers to this function so it does not have to construct one.
+  // In practice, this is ok because we only deal with objects.
   auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainer, objectsContainer);
-  // TODO: add AddPropertiesContainer
 
   gd::EventsRefactorer::RenameObjectInEvents(
       project.GetCurrentPlatform(), projectScopedContainers,

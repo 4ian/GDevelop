@@ -67,30 +67,20 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     const gd::IdentifierNode& identifier) {
   auto validateVariableTypeForExpression =
       [this, &identifier](gd::Variable::Type type) {
-        // Number or string variables can be used in expressions.
-        if (type == Variable::Number || type == Variable::String)
-          return;
-
-        // Any other type won't work alone in an expression.
-        if (type == Variable::Boolean) {
-          RaiseTypeError(_("This boolean variable can't be used here."),
-                         identifier.identifierNameLocation);
-
-        } else if (type == Variable::Structure) {
+        // Collections type can't be used directly in expressions, a child
+        // must be accessed.
+        if (type == Variable::Structure) {
           RaiseTypeError(_("You need to specify the name of the child variable "
-                           "to access."),
+                           "to access. For example: `MyVariable.child`."),
                          identifier.identifierNameLocation);
-
         } else if (type == Variable::Array) {
           RaiseTypeError(_("You need to specify the name of the child variable "
-                           "to access."),
+                           "to access. For example: `MyVariable[0]`."),
                          identifier.identifierNameLocation);
 
         } else {
-          // Should not happen.
-          RaiseTypeError(_("Unexpected variable type"),
-                         identifier.identifierNameLocation);
-
+          // Number, string or boolean variables can be used in expressions.
+          return;
         }
       };
 
@@ -142,7 +132,7 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     }
   } else if (propertiesContainersList.Has(identifier.identifierName)) {
     if (!identifier.childIdentifierName.empty()) {
-      RaiseTypeError(_("You can't access a child variable of a propert - just write the property name."),
+      RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
           identifier.childIdentifierNameLocation);
       return true; // We found a property, even if the child is not allowed.
     }
@@ -152,45 +142,6 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     // This is neither a variable nor a property.
     return false;
   }
-}
-
-void ExpressionValidator::ValidateNonObjectVariable(
-    const gd::VariableNode& variableNode) {
-  const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
-
-  // Try first to identify an object.
-  if (variablesContainersList.Has(variableNode.name)) {
-    // We found the variable, check its type (or the child variable
-    // type, if any).
-    const gd::Variable& variable = variablesContainersList.Get(variableNode.name);
-    const auto& type = variable.GetType();
-
-    // Numbers or strings are always fine.
-    if (type == Variable::Number)
-      return;
-    else if (type == Variable::String)
-      return;
-
-    // Any other type won't work alone in an expression.
-    if (type == Variable::Boolean) {
-      RaiseTypeError(_("This boolean variable can't be used here."), variableNode.location);
-      return;
-    } else if (type == Variable::Structure) {
-      // TODO: check if we can know the type of the final child.
-      return;
-    } else if (type == Variable::Array) {
-      // TODO: check if we can know the type of the final child.
-      return;
-    } else {
-      // Should not happen.
-      RaiseTypeError(_("Unexpected variable type"), variableNode.location);
-      return;
-    }
-  }
-
-  RaiseTypeError(_("No variable or object with this name found."),
-                variableNode.location);
-  return;
 }
 
 ExpressionValidator::Type ExpressionValidator::ValidateFunction(

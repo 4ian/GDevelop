@@ -191,7 +191,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "No variable or object with this name found.");
+              "No object, variable or property with this name found.");
       REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
@@ -202,7 +202,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "No variable or object with this name found.");
+              "No object, variable or property with this name found.");
       REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
@@ -739,7 +739,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "No variable or object with this name found.");
+              "No object, variable or property with this name found.");
       REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
@@ -750,7 +750,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "No variable or object with this name found.");
+              "No object, variable or property with this name found.");
       REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
@@ -1421,7 +1421,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Invalid property (unsupported child syntax)") {
+  SECTION("Invalid property (unsupported child syntax, 1 level)") {
     {
       gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
 
@@ -1437,7 +1437,26 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
-      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You can't access a child variable of a propert - just write the property name.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a property is not possible - just write the property name.");
+    }
+  }
+  SECTION("Invalid property (unsupported child syntax, 2 levels)") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty2.child.grandChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a property is not possible - just write the property name.");
     }
   }
 

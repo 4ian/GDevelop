@@ -63,7 +63,7 @@ bool ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
       return variables.Has(variableName);
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // TODO: allow object groups to have variables?
+      // Could be adapted if objects groups have variables in the future.
     }
   }
 
@@ -79,7 +79,7 @@ bool ObjectsContainersList::HasVariablesContainer(
         &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // TODO: allow object groups to have variables?
+      // Could be adapted if objects groups have variables in the future.
     }
   }
 
@@ -94,7 +94,7 @@ const gd::VariablesContainer* ObjectsContainersList::GetObjectOrGroupVariablesCo
       return &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // TODO: allow object groups to have variables?
+      // Could be adapted if objects groups have variables in the future.
     }
   }
 
@@ -119,7 +119,7 @@ std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String
       break;
     }
   }
-  
+
   // If the "current object" is present, use it and only it.
   if (!onlyObjectToSelectIfPresent.empty() && find(realObjects.begin(),
            realObjects.end(),

@@ -16,6 +16,7 @@ import {
 } from '../KeyboardShortcuts/InteractionKeys';
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData } from '.';
+import { useLongTouch } from '../../Utils/UseLongTouch';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('tree-view', {
   vibrate: 100,
@@ -82,6 +83,19 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
   const left = (node.depth - 1) * 20;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      ({ clientX, clientY }) => {
+        onContextMenu({
+          index: index,
+          item: node.item,
+          x: clientX,
+          y: clientY,
+        });
+      },
+      [onContextMenu, index, node.item]
+    )
+  );
 
   const onClick = React.useCallback(
     event => {
@@ -153,6 +167,7 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                         onDoubleClick={
                           onEditItem ? () => onEditItem(node.item) : undefined
                         }
+                        {...longTouchForContextMenuProps}
                       >
                         {connectDragPreview(
                           <div className="row-content-side row-content-side-left">

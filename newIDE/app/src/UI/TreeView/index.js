@@ -36,6 +36,7 @@ export type ItemData<Item> = {|
   renamedItemId: ?string,
   canDrop?: ?(Item) => boolean,
   onDrop: Item => void,
+  onEditItem?: Item => void,
 |};
 
 const getItemData = memoizeOne(
@@ -53,7 +54,8 @@ const getItemData = memoizeOne(
       y: number,
     |}) => void,
     canDrop?: ?(Item) => boolean,
-    onDrop: Item => void
+    onDrop: Item => void,
+    onEditItem?: Item => void
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -64,6 +66,7 @@ const getItemData = memoizeOne(
     onContextMenu,
     canDrop,
     onDrop,
+    onEditItem,
   })
 );
 
@@ -75,6 +78,7 @@ type Props<Item> = {|
   getItemId: Item => string,
   getItemChildren: Item => ?(Item[]),
   getItemThumbnail: Item => ?string,
+  onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
   searchText?: string,
   selectedItems: Item[],
@@ -93,6 +97,7 @@ const TreeView = <Item>({
   getItemId,
   getItemChildren,
   getItemThumbnail,
+  onEditItem,
   buildMenuTemplate,
   selectedItems,
   onSelectItems,
@@ -256,7 +261,8 @@ const TreeView = <Item>({
     renamedItemId,
     setContextMenuOpeningOptions,
     canMoveSelectionToItem,
-    onMoveSelectionToItem
+    onMoveSelectionToItem,
+    onEditItem
   );
 
   // Reset opened nodes during search when user stops searching

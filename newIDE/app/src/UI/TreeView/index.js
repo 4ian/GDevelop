@@ -82,7 +82,10 @@ const TreeView = <Item>({
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
-  const [contextMenuItemInfo, setContextMenuItemInfo] = React.useState<?{|
+  const [
+    contextMenuOpeningOptions,
+    setContextMenuOpeningOptions,
+  ] = React.useState<?{|
     item: Item,
     index: number,
     x: number,
@@ -225,7 +228,7 @@ const TreeView = <Item>({
     setRenamedItemId,
     onEndRenaming,
     renamedItemId,
-    setContextMenuItemInfo
+    setContextMenuOpeningOptions
   );
 
   // Reset opened nodes during search when user stops searching
@@ -239,14 +242,15 @@ const TreeView = <Item>({
     [searchText]
   );
 
+  // Open context menu when the opening options change.
   React.useEffect(
     () => {
-      if (contextMenuRef.current && contextMenuItemInfo) {
-        const { x, y, item, index } = contextMenuItemInfo;
+      if (contextMenuRef.current && contextMenuOpeningOptions) {
+        const { x, y, item, index } = contextMenuOpeningOptions;
         contextMenuRef.current.open(x, y, { item, index });
       }
     },
-    [contextMenuItemInfo]
+    [contextMenuOpeningOptions]
   );
 
   return (

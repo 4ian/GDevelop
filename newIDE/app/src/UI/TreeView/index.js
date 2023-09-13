@@ -27,7 +27,7 @@ export type ItemData<Item> = {|
   onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
   flattenedData: FlattenedNode<Item>[],
   onStartRenaming: (nodeId: string) => void,
-  onEndRenaming: (nodeId: string, newName: string) => void,
+  onEndRenaming: (item: Item, newName: string) => void,
   onContextMenu: ({|
     item: Item,
     index: number,
@@ -47,7 +47,7 @@ const getItemData = memoizeOne(
     onOpen: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
     onStartRenaming: (nodeId: string) => void,
-    onEndRenaming: (nodeId: string, newName: string) => void,
+    onEndRenaming: (item: Item, newName: string) => void,
     renamedItemId: ?string,
     onContextMenu: ({|
       item: Item,
@@ -88,6 +88,7 @@ type Props<Item> = {|
   selectedItems: Item[],
   onSelectItems: (Item[]) => void,
   multiSelect: boolean,
+  onRenameItem: (Item, newName: string) => void,
   onMoveSelectionToItem: (destinationItem: Item) => void,
   canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
 |};
@@ -106,6 +107,7 @@ const TreeView = <Item>({
   selectedItems,
   onSelectItems,
   multiSelect,
+  onRenameItem,
   onMoveSelectionToItem,
   canMoveSelectionToItem,
 }: Props<Item>) => {
@@ -271,8 +273,10 @@ const TreeView = <Item>({
     [multiSelect, onSelectItems, selectedItems]
   );
 
-  const onEndRenaming = (nodeId: string, newName: string) => {
-    console.log(newName);
+  const onEndRenaming = (item: Item, newName: string) => {
+    const trimmedNewName = newName.trim();
+    if (getItemName(item) === trimmedNewName) return;
+    onRenameItem(item, trimmedNewName);
     setRenamedItemId(null);
   };
 

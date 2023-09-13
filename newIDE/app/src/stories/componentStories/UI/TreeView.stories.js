@@ -471,6 +471,7 @@ export const Default = () => {
                     onEditItem={action('Edit item')}
                     selectedItems={selectedItems}
                     onSelectItems={setSelectedItems}
+                    onRenameItem={action('Rename item')}
                     getItemThumbnail={node =>
                       node.children
                         ? null
@@ -484,7 +485,7 @@ export const Default = () => {
                     // $FlowIgnore
                     getItemChildren={node => node.children}
                     buildMenuTemplate={() => [{ label: 'salut' }]}
-                    onMoveSelectionToItem={action('Drop on item')}
+                    onMoveSelectionToItem={action('Drop selection on item')}
                     canMoveSelectionToItem={() => Math.random() > 0.2}
                   />
                 </Column>

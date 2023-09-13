@@ -22,7 +22,7 @@
 
 .tree-view .row-content-side.row-content-side-left {
   /* Used for a better dragging preview. */
-  padding-right: 6px;
+  padding: 0 6px;
 }
 
 .tree-view .row-container {
@@ -44,6 +44,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   user-select: none;
+  cursor: text;
 }
 
 .tree-view .item-name-input {

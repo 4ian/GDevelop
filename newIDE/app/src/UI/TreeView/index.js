@@ -119,9 +119,10 @@ const TreeView = <Item>({
      * - node has children;
      * and if either one of these conditions are true:
      * - the node is opened (not collapsed)
-     * - the user is searching and they opened the node during the search
+     * - the user is searching
+     * - the user opened the node during the search
      */
-    if (children && (!collapsed || (!!searchText && openedDuringSearch))) {
+    if (children && (!collapsed || !!searchText || openedDuringSearch)) {
       flattenedChildren = children
         .map(child =>
           flattenNode(child, depth + 1, searchText, openedDuringSearch)

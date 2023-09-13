@@ -127,7 +127,7 @@ const Row = React.memo(<Item>(props: RowProps<Item>) => {
       ) {
         openWhenOverTimeoutId.current = setTimeout(() => {
           onOpen(node);
-        }, 500);
+        }, 800);
         return () => {
           clearTimeout(openWhenOverTimeoutId.current);
           openWhenOverTimeoutId.current = null;

@@ -141,11 +141,11 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                     'row-container' + (node.selected ? ' selected' : '')
                   }
                 >
-                  {connectDragPreview(
+                  {connectDragSource(
                     <div className="full-space-container">
                       {isOver && <DropIndicator canDrop={canDrop} />}
-                      {connectDragSource(
-                        <div className="row-content">
+                      <div className="row-content">
+                        {connectDragPreview(
                           <div className="row-content-side">
                             {node.hasChildren ? (
                               <>
@@ -197,24 +197,24 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                               </span>
                             )}
                           </div>
-                          <div className="row-content-side">
-                            <IconButton
-                              size="small"
-                              onClick={e => {
-                                e.stopPropagation();
-                                onContextMenu({
-                                  item: node.item,
-                                  index,
-                                  x: e.clientX,
-                                  y: e.clientY,
-                                });
-                              }}
-                            >
-                              <ThreeDotsMenu />
-                            </IconButton>
-                          </div>
+                        )}
+                        <div className="row-content-side">
+                          <IconButton
+                            size="small"
+                            onClick={e => {
+                              e.stopPropagation();
+                              onContextMenu({
+                                item: node.item,
+                                index,
+                                x: e.clientX,
+                                y: e.clientY,
+                              });
+                            }}
+                          >
+                            <ThreeDotsMenu />
+                          </IconButton>
                         </div>
-                      )}
+                      </div>
                     </div>
                   )}
                 </div>

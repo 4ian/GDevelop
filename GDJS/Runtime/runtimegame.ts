@@ -628,8 +628,8 @@ namespace gdjs {
         if (false) {
           return;
         }
-        await this.loadAssetsWithLoadingScreen((onProgress) => {
-          this._resourcesLoader.loadLayoutResources(layoutName, onProgress);
+        await this.loadAssetsWithLoadingScreen(async (onProgress) => {
+          await this._resourcesLoader.loadLayoutResources(layoutName, onProgress);
         }, progressCallback);
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
@@ -648,7 +648,7 @@ namespace gdjs {
     async loadAssetsWithLoadingScreen(
       loadAssets: (
         onProgress: (count: integer, total: integer) => void
-      ) => void,
+      ) => Promise<void>,
       progressCallback?: (progress: float) => void
     ) {
       const loadingScreen = new gdjs.LoadingScreenRenderer(
@@ -664,7 +664,7 @@ namespace gdjs {
           progressCallback(percent);
         }
       };
-      loadAssets(onProgress);
+      await loadAssets(onProgress);
 
       await loadingScreen.unload();
       await gdjs.getAllAsynchronouslyLoadingLibraryPromise();

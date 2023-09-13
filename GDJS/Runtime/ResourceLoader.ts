@@ -199,6 +199,7 @@ namespace gdjs {
           onProgress(loadedCount, resources.length);
         })
       );
+      console.log('First layout is ready!');
       this._loadedLayoutNames.add(firstSceneName);
     }
 
@@ -287,7 +288,7 @@ namespace gdjs {
         logger.warn('Unable to find resource "' + resourceName + '".');
         return;
       }
-      return this._loadResource(resource);
+      return await this._loadResource(resource);
     }
 
     private async _loadResource(resource: ResourceData): Promise<void> {
@@ -303,7 +304,7 @@ namespace gdjs {
         return;
       }
       console.log('Load: ' + resource.name);
-      return resourceManager.loadResource(resource.name);
+      return await resourceManager.loadResource(resource.name);
     }
 
     getResource(resourceName: string): ResourceData | null {

@@ -466,6 +466,7 @@ export const Default = () => {
                     searchText={searchText}
                     getItemId={node => node.id}
                     getItemName={node => node.name}
+                    onEditItem={action('Edit item')}
                     selectedItems={selectedItems}
                     onSelectItems={setSelectedItems}
                     getItemThumbnail={node =>

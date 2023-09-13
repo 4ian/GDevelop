@@ -75,6 +75,7 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
     onContextMenu,
     canDrop,
     onDrop,
+    onEditItem,
   } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
@@ -146,7 +147,12 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                   {connectDragSource(
                     <div className="full-space-container">
                       {isOver && <DropIndicator canDrop={canDrop} />}
-                      <div className="row-content">
+                      <div
+                        className="row-content"
+                        onDoubleClick={
+                          onEditItem ? () => onEditItem(node.item) : undefined
+                        }
+                      >
                         {connectDragPreview(
                           <div className="row-content-side row-content-side-left">
                             {node.hasChildren ? (

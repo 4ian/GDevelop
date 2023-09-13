@@ -7,6 +7,7 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
 import './TreeView.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
+import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
 import TreeViewRow from './TreeViewRow';
 
 type FlattenedNode<Item> = {|
@@ -37,6 +38,7 @@ export type ItemData<Item> = {|
   canDrop?: ?(Item) => boolean,
   onDrop: Item => void,
   onEditItem?: Item => void,
+  hideMenuButton: boolean,
 |};
 
 const getItemData = memoizeOne(
@@ -55,7 +57,8 @@ const getItemData = memoizeOne(
     |}) => void,
     canDrop?: ?(Item) => boolean,
     onDrop: Item => void,
-    onEditItem?: Item => void
+    onEditItem?: Item => void,
+    hideMenuButton: boolean,
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -67,6 +70,7 @@ const getItemData = memoizeOne(
     canDrop,
     onDrop,
     onEditItem,
+    hideMenuButton,
   })
 );
 
@@ -123,6 +127,8 @@ const TreeView = <Item>({
     setOpenedDuringSearchNodeIds,
   ] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
 
   const flattenOpened = (
     treeData,
@@ -262,7 +268,8 @@ const TreeView = <Item>({
     setContextMenuOpeningOptions,
     canMoveSelectionToItem,
     onMoveSelectionToItem,
-    onEditItem
+    onEditItem,
+    isMobileScreen
   );
 
   // Reset opened nodes during search when user stops searching

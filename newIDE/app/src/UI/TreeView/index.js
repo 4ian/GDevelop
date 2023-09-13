@@ -122,15 +122,6 @@ const TreeView = <Item>({
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
   const [
-    contextMenuOpeningOptions,
-    setContextMenuOpeningOptions,
-  ] = React.useState<?{|
-    item: Item,
-    index: number,
-    x: number,
-    y: number,
-  |}>(null);
-  const [
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
   ] = React.useState<string[]>([]);
@@ -299,6 +290,25 @@ const TreeView = <Item>({
     [reactDndType]
   );
 
+  const openContextMenu = React.useCallback(
+    ({
+      x,
+      y,
+      item,
+      index,
+    }: {|
+      item: Item,
+      index: number,
+      x: number,
+      y: number,
+    |}) => {
+      if (contextMenuRef.current) {
+        contextMenuRef.current.open(x, y, { item, index });
+      }
+    },
+    []
+  );
+
   const itemData: ItemData<Item> = getItemData<Item>(
     flattenedData,
     onOpen,
@@ -306,7 +316,7 @@ const TreeView = <Item>({
     setRenamedItemId,
     onEndRenaming,
     renamedItemId,
-    setContextMenuOpeningOptions,
+    openContextMenu,
     canMoveSelectionToItem,
     onMoveSelectionToItem,
     onEditItem,
@@ -323,17 +333,6 @@ const TreeView = <Item>({
       }
     },
     [searchText]
-  );
-
-  // Open context menu when the opening options change.
-  React.useEffect(
-    () => {
-      if (contextMenuRef.current && contextMenuOpeningOptions) {
-        const { x, y, item, index } = contextMenuOpeningOptions;
-        contextMenuRef.current.open(x, y, { item, index });
-      }
-    },
-    [contextMenuOpeningOptions]
   );
 
   return (

@@ -58,7 +58,7 @@ const getItemData = memoizeOne(
     canDrop?: ?(Item) => boolean,
     onDrop: Item => void,
     onEditItem?: Item => void,
-    hideMenuButton: boolean,
+    hideMenuButton: boolean
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -129,133 +129,156 @@ const TreeView = <Item>({
   const theme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
-
-  const flattenOpened = (
-    treeData,
-    searchText: ?string
-  ): FlattenedNode<Item>[] => {
-    return items.map(item => flattenNode(item, 1, searchText, false)).flat();
-  };
-
-  const flattenNode = (
-    item: Item,
-    depth: number,
-    searchText: ?string,
-    forceOpen: boolean
-  ): FlattenedNode<Item>[] => {
-    const id = getItemId(item);
-    const name = getItemName(item);
-    const children = getItemChildren(item);
-    const collapsed = !openedNodeIds.includes(id);
-    const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
-    let flattenedChildren = [];
-    /*
-     * Compute children nodes flattening if:
-     * - node has children;
-     * and if either one of these conditions are true:
-     * - the node is opened (not collapsed)
-     * - the user is searching
-     * - the user opened the node during the search
-     */
-    if (children && (!collapsed || !!searchText || openedDuringSearch)) {
-      flattenedChildren = children
-        .map(child =>
-          flattenNode(child, depth + 1, searchText, openedDuringSearch)
-        )
-        .flat();
-    }
-
-    /*
-     * Append node to result if either:
-     * - the user is not searching
-     * - the node is force-opened (if user opened the node during the search)
-     * - the node name matches the search
-     * - the node contains children that should be displayed
-     */
-    if (
-      !searchText ||
-      forceOpen ||
-      name.toLowerCase().includes(searchText) ||
-      flattenedChildren.length > 0
-    ) {
-      const thumbnailSrc = getItemThumbnail(item);
-      const selected = selectedNodeIds.includes(id);
-      return [
-        {
-          id,
-          name,
-          hasChildren: !!children && children.length > 0,
-          depth,
-          selected,
-          thumbnailSrc,
-          item,
-          /*
-           * If the user is searching, the node should be opened if either:
-           * - it has children that should be displayed
-           * - the user opened it
-           */
-          collapsed: !!searchText
-            ? flattenedChildren.length === 0 || !openedDuringSearch
-            : collapsed,
-          /*
-           * Disable opening of the node if:
-           * - the user is searching
-           * - the node has children to be displayed but it's not because the user opened it
-           */
-          disableCollapse:
-            !!searchText && flattenedChildren.length > 0 && !openedDuringSearch,
-        },
-        ...flattenedChildren,
-      ];
-    }
-    return [];
-  };
-
-  const onOpen = (node: FlattenedNode<Item>) => {
-    if (!!searchText) {
-      node.collapsed
-        ? setOpenedDuringSearchNodeIds([...openedDuringSearchNodeIds, node.id])
-        : setOpenedDuringSearchNodeIds(
-            openedDuringSearchNodeIds.filter(id => id !== node.id)
-          );
-    } else {
-      node.collapsed
-        ? setOpenedNodeIds([...openedNodeIds, node.id])
-        : setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
-    }
-  };
-
-  const onSelect = ({
-    node,
-    exclusive,
-  }: {|
-    node: FlattenedNode<Item>,
-    exclusive?: boolean,
-  |}) => {
-    if (multiSelect) {
-      if (node.selected) {
-        if (exclusive) {
-          if (selectedNodeIds.length === 1) return;
-          onSelectItems([node.item]);
-        } else onSelectItems(selectedItems.filter(item => item !== node.item));
-      } else {
-        if (exclusive) onSelectItems([node.item]);
-        else onSelectItems([...selectedItems, node.item]);
+  const isSearching = !!searchText;
+  const flattenNode = React.useCallback(
+    (
+      item: Item,
+      depth: number,
+      searchText: ?string,
+      forceOpen: boolean
+    ): FlattenedNode<Item>[] => {
+      const id = getItemId(item);
+      const name = getItemName(item);
+      const children = getItemChildren(item);
+      const collapsed = !openedNodeIds.includes(id);
+      const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
+      let flattenedChildren = [];
+      /*
+       * Compute children nodes flattening if:
+       * - node has children;
+       * and if either one of these conditions are true:
+       * - the node is opened (not collapsed)
+       * - the user is searching
+       * - the user opened the node during the search
+       */
+      if (children && (!collapsed || !!searchText || openedDuringSearch)) {
+        flattenedChildren = children
+          .map(child =>
+            flattenNode(child, depth + 1, searchText, openedDuringSearch)
+          )
+          .flat();
       }
-    } else {
-      if (node.selected && selectedNodeIds.length === 1) return;
-      onSelectItems([node.item]);
-    }
-  };
+
+      /*
+       * Append node to result if either:
+       * - the user is not searching
+       * - the node is force-opened (if user opened the node during the search)
+       * - the node name matches the search
+       * - the node contains children that should be displayed
+       */
+      if (
+        !searchText ||
+        forceOpen ||
+        name.toLowerCase().includes(searchText) ||
+        flattenedChildren.length > 0
+      ) {
+        const thumbnailSrc = getItemThumbnail(item);
+        const selected = selectedNodeIds.includes(id);
+        return [
+          {
+            id,
+            name,
+            hasChildren: !!children && children.length > 0,
+            depth,
+            selected,
+            thumbnailSrc,
+            item,
+            /*
+             * If the user is searching, the node should be opened if either:
+             * - it has children that should be displayed
+             * - the user opened it
+             */
+            collapsed: !!searchText
+              ? flattenedChildren.length === 0 || !openedDuringSearch
+              : collapsed,
+            /*
+             * Disable opening of the node if:
+             * - the user is searching
+             * - the node has children to be displayed but it's not because the user opened it
+             */
+            disableCollapse:
+              !!searchText &&
+              flattenedChildren.length > 0 &&
+              !openedDuringSearch,
+          },
+          ...flattenedChildren,
+        ];
+      }
+      return [];
+    },
+    [
+      getItemChildren,
+      getItemId,
+      getItemName,
+      getItemThumbnail,
+      openedDuringSearchNodeIds,
+      openedNodeIds,
+      selectedNodeIds,
+    ]
+  );
+
+  const flattenOpened = React.useCallback(
+    (items: Item[], searchText: ?string): FlattenedNode<Item>[] => {
+      return items.map(item => flattenNode(item, 1, searchText, false)).flat();
+    },
+    [flattenNode]
+  );
+
+  const onOpen = React.useCallback(
+    (node: FlattenedNode<Item>) => {
+      if (isSearching) {
+        node.collapsed
+          ? setOpenedDuringSearchNodeIds([
+              ...openedDuringSearchNodeIds,
+              node.id,
+            ])
+          : setOpenedDuringSearchNodeIds(
+              openedDuringSearchNodeIds.filter(id => id !== node.id)
+            );
+      } else {
+        node.collapsed
+          ? setOpenedNodeIds([...openedNodeIds, node.id])
+          : setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
+      }
+    },
+    [openedDuringSearchNodeIds, openedNodeIds, isSearching]
+  );
+
+  const onSelect = React.useCallback(
+    ({
+      node,
+      exclusive,
+    }: {|
+      node: FlattenedNode<Item>,
+      exclusive?: boolean,
+    |}) => {
+      if (multiSelect) {
+        if (node.selected) {
+          if (exclusive) {
+            if (selectedItems.length === 1) return;
+            onSelectItems([node.item]);
+          } else
+            onSelectItems(selectedItems.filter(item => item !== node.item));
+        } else {
+          if (exclusive) onSelectItems([node.item]);
+          else onSelectItems([...selectedItems, node.item]);
+        }
+      } else {
+        if (node.selected && selectedItems.length === 1) return;
+        onSelectItems([node.item]);
+      }
+    },
+    [multiSelect, onSelectItems, selectedItems]
+  );
 
   const onEndRenaming = (nodeId: string, newName: string) => {
     console.log(newName);
     setRenamedItemId(null);
   };
 
-  let flattenedData = flattenOpened(
-    items,
-    searchText ? searchText.toLowerCase() : null
+  let flattenedData = React.useMemo(
+    () => flattenOpened(items, searchText ? searchText.toLowerCase() : null),
+    [flattenOpened, items, searchText]
   );
 
   const itemData: ItemData<Item> = getItemData<Item>(

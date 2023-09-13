@@ -14,6 +14,7 @@ import TextField from '../../../UI/TextField';
 import sample from 'lodash/sample';
 import Toggle from '../../../UI/Toggle';
 import Text from '../../../UI/Text';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 
 export default {
   title: 'UI Building Blocks/TreeView',
@@ -433,9 +434,10 @@ export const Default = () => {
   return (
     <DragAndDropContextProvider>
       <Column noMargin expand>
-        <Line>
-          <Column expand>
+        <ResponsiveLineStackLayout expand>
+          <Line expand noMargin>
             <TextField
+              fullWidth
               type="text"
               value={searchText}
               onChange={(e, text) => {
@@ -443,16 +445,16 @@ export const Default = () => {
               }}
               hintText={'Filter'}
             />
-          </Column>
-          <Column>
+          </Line>
+          <Line noMargin>
             <Toggle
               label={<Text>Allow multi selection</Text>}
-              labelPosition="left"
+              labelPosition="right"
               toggled={multiSelect}
               onToggle={() => setMultiSelect(!multiSelect)}
             />
-          </Column>
-        </Line>
+          </Line>
+        </ResponsiveLineStackLayout>
         <FixedHeightFlexContainer height={400}>
           <AutoSizer>
             {({ height, width }) => (

@@ -76,6 +76,7 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
     canDrop,
     onDrop,
     onEditItem,
+    hideMenuButton,
   } = data;
   const node = flattenedData[index];
   const left = (node.depth - 1) * 20;
@@ -206,22 +207,24 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                             )}
                           </div>
                         )}
-                        <div className="row-content-side">
-                          <IconButton
-                            size="small"
-                            onClick={e => {
-                              e.stopPropagation();
-                              onContextMenu({
-                                item: node.item,
-                                index,
-                                x: e.clientX,
-                                y: e.clientY,
-                              });
-                            }}
-                          >
-                            <ThreeDotsMenu />
-                          </IconButton>
-                        </div>
+                        {!hideMenuButton && (
+                          <div className="row-content-side">
+                            <IconButton
+                              size="small"
+                              onClick={e => {
+                                e.stopPropagation();
+                                onContextMenu({
+                                  item: node.item,
+                                  index,
+                                  x: e.clientX,
+                                  y: e.clientY,
+                                });
+                              }}
+                            >
+                              <ThreeDotsMenu />
+                            </IconButton>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
 import { getPaperDecorator } from '../../PaperDecorator';
@@ -480,6 +481,8 @@ export const Default = () => {
                     // $FlowIgnore
                     getItemChildren={node => node.children}
                     buildMenuTemplate={() => [{ label: 'salut' }]}
+                    onMoveSelectionToItem={action('Drop on item')}
+                    canMoveSelectionToItem={() => Math.random() > 0.2}
                   />
                 </Column>
               </Line>

@@ -65,7 +65,6 @@ const VariablesEditorDialog = ({
     onCancel,
     resetThenClearPersistentUuid: true,
   });
-  const removeReferencesToRemovedVariables = true;
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-variables'
   );
@@ -110,7 +109,7 @@ const VariablesEditorDialog = ({
       getOriginalContentSerializedElement,
       variablesContainer,
       inheritedVariablesContainer,
-      removeReferencesToRemovedVariables,
+      showConfirmation,
     ]
   );
 

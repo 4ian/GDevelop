@@ -239,6 +239,7 @@ namespace gdjs {
      * @param yPos The offset on Y axis
      * @param trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
      * to the same as the associated instance. Useful for hot-reloading when instances are changed.
+     * @returns A list of objects created.
      */
     createObjectsFrom(
       data: InstanceData[],
@@ -246,6 +247,7 @@ namespace gdjs {
       yPos: float,
       trackByPersistentUuid: boolean
     ) {
+      let newObjects = [];
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];
         const objectName = instanceData.name;
@@ -275,8 +277,10 @@ namespace gdjs {
             .getVariables()
             .initFrom(instanceData.initialVariables, true);
           newObject.extraInitializationFromInitialInstance(instanceData);
+          newObjects.push(newObject);
         }
       }
+      return newObjects;
     }
 
     /**

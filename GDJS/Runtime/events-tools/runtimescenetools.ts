@@ -287,7 +287,7 @@ namespace gdjs {
           .getGame()
           .getExternalLayoutData(externalLayout);
         if (externalLayoutData === null) {
-          return;
+          return [];
         }
 
         // trackByPersistentUuid is set to false as we don't want external layouts

@@ -11,6 +11,8 @@ import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer'
 import TreeViewRow from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 
+export type ItemBaseAttributes = { isRoot?: boolean };
+
 type FlattenedNode<Item> = {|
   id: string,
   name: string,
@@ -89,7 +91,7 @@ type Props<Item> = {|
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
   searchText?: string,
-  selectedItems: Item[],
+  selectedItems: $ReadOnlyArray<Item>,
   onSelectItems: (Item[]) => void,
   multiSelect: boolean,
   onRenameItem: (Item, newName: string) => void,
@@ -98,7 +100,7 @@ type Props<Item> = {|
   reactDndType: string,
 |};
 
-const TreeView = <Item>({
+const TreeView = <Item: ItemBaseAttributes>({
   height,
   width,
   items,

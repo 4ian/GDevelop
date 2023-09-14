@@ -14,7 +14,7 @@ import {
   shouldValidate,
 } from '../KeyboardShortcuts/InteractionKeys';
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
-import { type ItemData } from '.';
+import { type ItemData, type ItemBaseAttributes } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 
 const SemiControlledRowInput = ({
@@ -59,7 +59,7 @@ type Props<Item> = {|
   isScrolling?: boolean,
 |};
 
-const TreeViewRow = <Item>(props: Props<Item>) => {
+const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const { data, index, style } = props;
   const {
     flattenedData,
@@ -145,7 +145,9 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
           return (
             <div
               style={{ paddingLeft: left }}
-              className="full-height-flex-container"
+              className={`full-height-flex-container${
+                node.item.isRoot && index > 0 ? ' with-divider' : ''
+              }`}
             >
               {connectDropTarget(
                 <div
@@ -183,10 +185,12 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                                     <ArrowHeadTop fontSize="small" />
                                   )}
                                 </IconButton>
-                                <Folder
-                                  fontSize="small"
-                                  style={{ marginRight: 4 }}
-                                />
+                                {!node.item.isRoot && (
+                                  <Folder
+                                    fontSize="small"
+                                    style={{ marginRight: 4 }}
+                                  />
+                                )}
                               </>
                             ) : node.thumbnailSrc ? (
                               <div style={{ marginRight: 6 }}>
@@ -205,20 +209,26 @@ const TreeViewRow = <Item>(props: Props<Item>) => {
                               />
                             ) : (
                               <span
-                                className="item-name"
-                                onClick={e => {
-                                  if (!e.metaKey && !e.shiftKey) {
-                                    e.stopPropagation();
-                                    onStartRenaming(node.id);
-                                  }
-                                }}
+                                className={`item-name${
+                                  node.item.isRoot ? ' root-folder' : ''
+                                }`}
+                                onClick={
+                                  node.item.isRoot
+                                    ? null
+                                    : e => {
+                                        if (!e.metaKey && !e.shiftKey) {
+                                          e.stopPropagation();
+                                          onStartRenaming(node.id);
+                                        }
+                                      }
+                                }
                               >
                                 {node.name}
                               </span>
                             )}
                           </div>
                         )}
-                        {!hideMenuButton && (
+                        {!hideMenuButton && !node.item.isRoot && (
                           <div className="row-content-side">
                             <IconButton
                               size="small"

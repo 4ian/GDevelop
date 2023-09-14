@@ -2,6 +2,9 @@
   display: flex;
   height: 100%;
 }
+.tree-view .full-height-flex-container.with-divider {
+  border-top: 1px solid var(--theme-list-item-separator-color);
+}
 .tree-view .full-space-container {
   flex: 1;
   height: 100%;
@@ -44,7 +47,14 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   user-select: none;
+}
+.tree-view .item-name:not(.root-folder) {
   cursor: text;
+}
+
+.tree-view .item-name.root-folder {
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .tree-view .item-name-input {

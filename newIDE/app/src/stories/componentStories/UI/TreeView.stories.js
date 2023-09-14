@@ -22,251 +22,272 @@ export default {
   decorators: [getPaperDecorator('dark'), muiDecorator],
 };
 
-const nodes = [
+type Node = {|
+  name: string,
+  id: string,
+  isRoot?: boolean,
+  children?: Node[],
+|};
+
+const nodes: Node[] = [
   {
-    name: 'Root #1',
-    id: 'root-1',
+    name: 'Section 1',
+    id: 'section',
+    isRoot: true,
     children: [
       {
+        name: 'Root #1',
+        id: 'root-1',
         children: [
-          { id: 'child-2', name: 'Child #2' },
-          { id: 'child-3', name: 'Child #3' },
+          {
+            children: [
+              { id: 'child-2', name: 'Child #2' },
+              { id: 'child-3', name: 'Child #3' },
+            ],
+            id: 'child-4',
+            name: 'Child #4',
+          },
+          {
+            children: [{ id: 'child-5', name: 'Child #5' }],
+            id: 'child-6',
+            name: 'Child #6',
+          },
         ],
-        id: 'child-4',
-        name: 'Child #4',
       },
       {
-        children: [{ id: 'child-5', name: 'Child #5' }],
-        id: 'child-6',
-        name: 'Child #6',
+        name: 'Root #2',
+        id: 'root-2',
+        children: [
+          {
+            children: [
+              { id: 'child-7', name: 'Child #7' },
+              { id: 'child-8', name: 'Child #8' },
+            ],
+            id: 'child-9',
+            name: 'Child #9',
+          },
+          {
+            children: [{ id: 'child-10', name: 'Child #10' }],
+            id: 'child-11',
+            name: 'Child #11',
+          },
+        ],
+      },
+      {
+        name: 'Root #3',
+        id: 'root-3',
+        children: [
+          {
+            children: [
+              { id: 'child-12', name: 'Child #12' },
+              { id: 'child-13', name: 'Child #13' },
+            ],
+            id: 'child-14',
+            name: 'Child #14',
+          },
+          {
+            children: [{ id: 'child-15', name: 'Child #15' }],
+            id: 'child-16',
+            name: 'Child #16',
+          },
+        ],
+      },
+      {
+        name: 'Root #4',
+        id: 'root-4',
+        children: [
+          {
+            children: [
+              { id: 'child-17', name: 'Child #17' },
+              { id: 'child-18', name: 'Child #18' },
+            ],
+            id: 'child-19',
+            name: 'Child #19',
+          },
+          {
+            children: [{ id: 'child-20', name: 'Child #20' }],
+            id: 'child-21',
+            name: 'Child #21',
+          },
+        ],
+      },
+      {
+        name: 'Root #5',
+        id: 'root-5',
+        children: [
+          {
+            children: [
+              { id: 'child-22', name: 'Child #22' },
+              { id: 'child-23', name: 'Child #23' },
+            ],
+            id: 'child-24',
+            name: 'Child #24',
+          },
+          {
+            children: [{ id: 'child-25', name: 'Child #25' }],
+            id: 'child-26',
+            name: 'Child #26',
+          },
+        ],
       },
     ],
   },
   {
-    name: 'Root #2',
-    id: 'root-2',
+    name: 'Section 2',
+    id: 'section-2',
+    isRoot: true,
     children: [
       {
+        name: 'Root #6',
+        id: 'root-6',
         children: [
-          { id: 'child-7', name: 'Child #7' },
-          { id: 'child-8', name: 'Child #8' },
+          {
+            children: [
+              { id: 'child-27', name: 'Child #27' },
+              { id: 'child-28', name: 'Child #28' },
+            ],
+            id: 'child-29',
+            name: 'Child #29',
+          },
+          {
+            children: [{ id: 'child-30', name: 'Child #30' }],
+            id: 'child-31',
+            name: 'Child #31',
+          },
         ],
-        id: 'child-9',
-        name: 'Child #9',
       },
       {
-        children: [{ id: 'child-10', name: 'Child #10' }],
-        id: 'child-11',
-        name: 'Child #11',
-      },
-    ],
-  },
-  {
-    name: 'Root #3',
-    id: 'root-3',
-    children: [
-      {
+        name: 'Root #7',
+        id: 'root-7',
         children: [
-          { id: 'child-12', name: 'Child #12' },
-          { id: 'child-13', name: 'Child #13' },
+          {
+            children: [
+              { id: 'child-32', name: 'Child #32' },
+              { id: 'child-33', name: 'Child #33' },
+            ],
+            id: 'child-34',
+            name: 'Child #34',
+          },
+          {
+            children: [{ id: 'child-35', name: 'Child #35' }],
+            id: 'child-36',
+            name: 'Child #36',
+          },
         ],
-        id: 'child-14',
-        name: 'Child #14',
       },
       {
-        children: [{ id: 'child-15', name: 'Child #15' }],
-        id: 'child-16',
-        name: 'Child #16',
-      },
-    ],
-  },
-  {
-    name: 'Root #4',
-    id: 'root-4',
-    children: [
-      {
+        name: 'Root #8',
+        id: 'root-8',
         children: [
-          { id: 'child-17', name: 'Child #17' },
-          { id: 'child-18', name: 'Child #18' },
+          {
+            children: [
+              { id: 'child-37', name: 'Child #37' },
+              { id: 'child-38', name: 'Child #38' },
+            ],
+            id: 'child-39',
+            name: 'Child #39',
+          },
+          {
+            children: [{ id: 'child-40', name: 'Child #40' }],
+            id: 'child-41',
+            name: 'Child #41',
+          },
         ],
-        id: 'child-19',
-        name: 'Child #19',
       },
       {
-        children: [{ id: 'child-20', name: 'Child #20' }],
-        id: 'child-21',
-        name: 'Child #21',
-      },
-    ],
-  },
-  {
-    name: 'Root #5',
-    id: 'root-5',
-    children: [
-      {
+        name: 'Root #9',
+        id: 'root-9',
         children: [
-          { id: 'child-22', name: 'Child #22' },
-          { id: 'child-23', name: 'Child #23' },
+          {
+            children: [
+              { id: 'child-42', name: 'Child #42' },
+              { id: 'child-43', name: 'Child #43' },
+            ],
+            id: 'child-44',
+            name: 'Child #44',
+          },
+          {
+            children: [{ id: 'child-45', name: 'Child #45' }],
+            id: 'child-46',
+            name: 'Child #46',
+          },
         ],
-        id: 'child-24',
-        name: 'Child #24',
       },
       {
-        children: [{ id: 'child-25', name: 'Child #25' }],
-        id: 'child-26',
-        name: 'Child #26',
-      },
-    ],
-  },
-  {
-    name: 'Root #6',
-    id: 'root-6',
-    children: [
-      {
+        name: 'Root #10',
+        id: 'root-10',
         children: [
-          { id: 'child-27', name: 'Child #27' },
-          { id: 'child-28', name: 'Child #28' },
+          {
+            children: [
+              { id: 'child-47', name: 'Child #47' },
+              { id: 'child-48', name: 'Child #48' },
+            ],
+            id: 'child-49',
+            name: 'Child #49',
+          },
+          {
+            children: [{ id: 'child-50', name: 'Child #50' }],
+            id: 'child-51',
+            name: 'Child #51',
+          },
         ],
-        id: 'child-29',
-        name: 'Child #29',
       },
       {
-        children: [{ id: 'child-30', name: 'Child #30' }],
-        id: 'child-31',
-        name: 'Child #31',
-      },
-    ],
-  },
-  {
-    name: 'Root #7',
-    id: 'root-7',
-    children: [
-      {
+        name: 'Root #11',
+        id: 'root-11',
         children: [
-          { id: 'child-32', name: 'Child #32' },
-          { id: 'child-33', name: 'Child #33' },
+          {
+            children: [
+              { id: 'child-52', name: 'Child #52' },
+              { id: 'child-53', name: 'Child #53' },
+            ],
+            id: 'child-54',
+            name: 'Child #54',
+          },
+          {
+            children: [{ id: 'child-55', name: 'Child #55' }],
+            id: 'child-56',
+            name: 'Child #56',
+          },
         ],
-        id: 'child-34',
-        name: 'Child #34',
       },
       {
-        children: [{ id: 'child-35', name: 'Child #35' }],
-        id: 'child-36',
-        name: 'Child #36',
-      },
-    ],
-  },
-  {
-    name: 'Root #8',
-    id: 'root-8',
-    children: [
-      {
+        name: 'Root #12',
+        id: 'root-12',
         children: [
-          { id: 'child-37', name: 'Child #37' },
-          { id: 'child-38', name: 'Child #38' },
+          {
+            children: [
+              { id: 'child-57', name: 'Child #57' },
+              { id: 'child-58', name: 'Child #58' },
+            ],
+            id: 'child-59',
+            name: 'Child #59',
+          },
+          {
+            children: [{ id: 'child-60', name: 'Child #60' }],
+            id: 'child-61',
+            name: 'Child #61',
+          },
         ],
-        id: 'child-39',
-        name: 'Child #39',
       },
       {
-        children: [{ id: 'child-40', name: 'Child #40' }],
-        id: 'child-41',
-        name: 'Child #41',
-      },
-    ],
-  },
-  {
-    name: 'Root #9',
-    id: 'root-9',
-    children: [
-      {
+        name: 'Root #13',
+        id: 'root-13',
         children: [
-          { id: 'child-42', name: 'Child #42' },
-          { id: 'child-43', name: 'Child #43' },
+          {
+            children: [
+              { id: 'child-62', name: 'Child #62' },
+              { id: 'child-63', name: 'Child #63' },
+            ],
+            id: 'child-64',
+            name: 'Child #64',
+          },
+          {
+            children: [{ id: 'child-65', name: 'Child #65' }],
+            id: 'child-66',
+            name: 'Child #66',
+          },
         ],
-        id: 'child-44',
-        name: 'Child #44',
-      },
-      {
-        children: [{ id: 'child-45', name: 'Child #45' }],
-        id: 'child-46',
-        name: 'Child #46',
-      },
-    ],
-  },
-  {
-    name: 'Root #10',
-    id: 'root-10',
-    children: [
-      {
-        children: [
-          { id: 'child-47', name: 'Child #47' },
-          { id: 'child-48', name: 'Child #48' },
-        ],
-        id: 'child-49',
-        name: 'Child #49',
-      },
-      {
-        children: [{ id: 'child-50', name: 'Child #50' }],
-        id: 'child-51',
-        name: 'Child #51',
-      },
-    ],
-  },
-  {
-    name: 'Root #11',
-    id: 'root-11',
-    children: [
-      {
-        children: [
-          { id: 'child-52', name: 'Child #52' },
-          { id: 'child-53', name: 'Child #53' },
-        ],
-        id: 'child-54',
-        name: 'Child #54',
-      },
-      {
-        children: [{ id: 'child-55', name: 'Child #55' }],
-        id: 'child-56',
-        name: 'Child #56',
-      },
-    ],
-  },
-  {
-    name: 'Root #12',
-    id: 'root-12',
-    children: [
-      {
-        children: [
-          { id: 'child-57', name: 'Child #57' },
-          { id: 'child-58', name: 'Child #58' },
-        ],
-        id: 'child-59',
-        name: 'Child #59',
-      },
-      {
-        children: [{ id: 'child-60', name: 'Child #60' }],
-        id: 'child-61',
-        name: 'Child #61',
-      },
-    ],
-  },
-  {
-    name: 'Root #13',
-    id: 'root-13',
-    children: [
-      {
-        children: [
-          { id: 'child-62', name: 'Child #62' },
-          { id: 'child-63', name: 'Child #63' },
-        ],
-        id: 'child-64',
-        name: 'Child #64',
-      },
-      {
-        children: [{ id: 'child-65', name: 'Child #65' }],
-        id: 'child-66',
-        name: 'Child #66',
       },
     ],
   },
@@ -430,7 +451,10 @@ const nodes = [
 export const Default = () => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [multiSelect, setMultiSelect] = React.useState<boolean>(true);
-  const [selectedItems, setSelectedItems] = React.useState<any[]>([]);
+  const [selectedItems, setSelectedItems] = React.useState<Node[]>([]);
+  const onSelectItems = (items: Node[]) => {
+    setSelectedItems(items.filter(item => !item.isRoot));
+  };
   return (
     <DragAndDropContextProvider>
       <Column noMargin expand>
@@ -459,7 +483,7 @@ export const Default = () => {
           <AutoSizer>
             {({ height, width }) => (
               <Line expand>
-                <Column expand>
+                <Column expand noMargin>
                   <TreeView
                     multiSelect={multiSelect}
                     height={height}
@@ -470,7 +494,7 @@ export const Default = () => {
                     getItemName={node => node.name}
                     onEditItem={action('Edit item')}
                     selectedItems={selectedItems}
-                    onSelectItems={setSelectedItems}
+                    onSelectItems={onSelectItems}
                     onRenameItem={action('Rename item')}
                     getItemThumbnail={node =>
                       node.children

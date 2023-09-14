@@ -138,24 +138,24 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
   }
 }
 
-void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+VariablesChangeset WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
     gd::Project &project,
     const gd::SerializerElement &oldSerializedVariablesContainer,
-    const gd::VariablesContainer &newVariablesContainer,
-    bool removeReferencesToRemovedVariables) {
+    const gd::VariablesContainer &newVariablesContainer) {
+  gd::VariablesChangeset changeset;
+
   gd::VariablesContainer oldVariablesContainer;
   oldVariablesContainer.UnserializeFrom(oldSerializedVariablesContainer);
 
   if (oldVariablesContainer.GetPersistentUuid() !=
       newVariablesContainer.GetPersistentUuid()) {
     gd::LogWarning(
-        _("Called ApplyRefactoringForVariablesContainer on variables container "
+        _("Called ComputeChangesetForVariablesContainer on variables containers "
           "that are different - they can't be compared."));
-    return;
+    return changeset;
   }
 
   std::unordered_map<gd::String, gd::String> removedUuidAndNames;
-  std::unordered_map<gd::String, gd::String> oldToNewVariableNames;
   for (std::size_t i = 0; i < oldVariablesContainer.Count(); ++i) {
     const auto &variable = oldVariablesContainer.Get(i);
     const auto &variableName = oldVariablesContainer.GetNameAt(i);
@@ -176,7 +176,7 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
 
       if (oldName != variableName) {
         // This is a renamed variable.
-        oldToNewVariableNames[oldName] = variableName;
+        changeset.oldToNewVariableNames[oldName] = variableName;
       }
 
       // Renamed or not, this is not a removed variable.
@@ -184,18 +184,22 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
     }
   }
 
-  std::unordered_set<gd::String> removedVariableNames;
-  if (removeReferencesToRemovedVariables) {
-    for (const auto &removedUuidAndName : removedUuidAndNames) {
-      removedVariableNames.insert(removedUuidAndName.second);
-    }
+  for (const auto &removedUuidAndName : removedUuidAndNames) {
+    changeset.removedVariableNames.insert(removedUuidAndName.second);
   }
 
+  return changeset;
+}
+
+void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+    gd::Project &project,
+    const gd::VariablesContainer &newVariablesContainer,
+    const gd::VariablesChangeset& changeset) {
   gd::EventsVariableReplacer eventsVariableReplacer(
       project.GetCurrentPlatform(),
       newVariablesContainer,
-      oldToNewVariableNames,
-      removedVariableNames);
+      changeset.oldToNewVariableNames,
+      changeset.removedVariableNames);
   gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                 eventsVariableReplacer);
 }

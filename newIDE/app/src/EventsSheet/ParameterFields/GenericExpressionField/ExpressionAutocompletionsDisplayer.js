@@ -300,8 +300,7 @@ export default function ExpressionAutocompletionsDisplayer({
                   const IconComponent =
                     expressionAutocompletion.kind === 'Variable'
                       ? getVariableTypeToIcon()[
-                          expressionAutocompletion.variableType ||
-                            gd.Variable.Number
+                          expressionAutocompletion.variableType
                         ]
                       : expressionAutocompletion.kind === 'Property'
                       ? getTypeToIcon(

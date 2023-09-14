@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -11,6 +12,7 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import { Column, Line } from '../UI/Grid';
 import VariablesList from './VariablesList';
 import HelpButton from '../UI/HelpButton';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -53,6 +55,7 @@ const VariablesEditorDialog = ({
   helpPagePath,
   id,
 }: Props) => {
+  const { showConfirmation } = useAlertDialog();
   const {
     onCancelChanges,
     notifyOfChange,
@@ -68,17 +71,33 @@ const VariablesEditorDialog = ({
   );
 
   const onRefactorAndApply = React.useCallback(
-    () => {
+    async () => {
       if (inheritedVariablesContainer) {
         // No refactoring to do - this is a variable container of an instance
         // (or something else that overrides variables from another container),
         // which does not have an impact on the rest of the project.
       } else {
-        gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+        const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
           project,
           getOriginalContentSerializedElement(),
+          variablesContainer
+        );
+        if (changeset.hasRemovedVariables()) {
+          const shouldRemoveVariables = await showConfirmation({
+            title: t`Remove actions and conditions?`,
+            message: t`You've removed some variables. Do you want to also remove all the actions and conditions in events using them?`,
+            confirmButtonLabel: t`Don't remove anything else`,
+            dismissButtonLabel: t`Delete all references to these variables`,
+          });
+          if (shouldRemoveVariables) {
+            changeset.clearRemovedVariables();
+          }
+        }
+
+        gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+          project,
           variablesContainer,
-          removeReferencesToRemovedVariables
+          changeset
         );
       }
 

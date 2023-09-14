@@ -69,6 +69,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
+  const { showConfirmation } = useAlertDialog();
   const { openBehaviorEvents } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
@@ -86,7 +87,6 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancel: props.onCancel,
     resetThenClearPersistentUuid: true,
   });
-  const removeReferencesToRemovedVariables = true;
 
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
@@ -99,14 +99,30 @@ const InnerDialog = (props: InnerDialogProps) => {
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
 
-  const onApply = () => {
+  const onApply = async () => {
     props.onApply();
+
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      props.project,
+      getOriginalContentSerializedElement().getChild('variables'),
+      props.object.getVariables()
+    );
+    if (changeset.hasRemovedVariables()) {
+      const shouldRemoveVariables = await showConfirmation({
+        title: t`Remove actions and conditions?`,
+        message: t`You've removed some variables. Do you want to also remove all the actions and conditions in events using them?`,
+        confirmButtonLabel: t`Don't remove anything else`,
+        dismissButtonLabel: t`Delete all references to these variables`,
+      });
+      if (shouldRemoveVariables) {
+        changeset.clearRemovedVariables();
+      }
+    }
 
     gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
       props.project,
-      getOriginalContentSerializedElement().getChild('variables'),
       props.object.getVariables(),
-      removeReferencesToRemovedVariables
+      changeset
     );
     props.object.clearPersistentUuid();
 
@@ -128,8 +144,6 @@ const InnerDialog = (props: InnerDialogProps) => {
     },
     [currentTab]
   );
-
-  const { showConfirmation } = useAlertDialog();
 
   const askConfirmationAndOpenBehaviorEvents = React.useCallback(
     async (extensionName, behaviorName) => {

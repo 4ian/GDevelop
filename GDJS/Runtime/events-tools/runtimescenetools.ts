@@ -282,7 +282,7 @@ namespace gdjs {
         externalLayout: string,
         xPos: float,
         yPos: float
-      ) {
+      ): gdjs.RuntimeObject[] {
         const externalLayoutData = scene
           .getGame()
           .getExternalLayoutData(externalLayout);

@@ -246,7 +246,7 @@ namespace gdjs {
       xPos: float,
       yPos: float,
       trackByPersistentUuid: boolean
-    ) {
+    ): gdjs.RuntimeObject[] {
       let newObjects = [];
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];

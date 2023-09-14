@@ -213,8 +213,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     layout1.GetVariables().Rename("MySceneVariable", "MyRenamedSceneVariable");
     layout1.GetVariables().Rename("MySceneStructureVariable",
                                   "MyRenamedSceneStructureVariable");
-    layout1.GetVariables().Rename("SharedVariableName",
-                                  "RenamedSceneVariableFromASharedName");
     changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
         project,
         originalSerializedLayoutVariables,
@@ -281,7 +279,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
               "MyExtension::GetGlobalVariableAsNumber(RenamedGlobalVariableFromASharedName) + "
               "MyExtension::GetVariableAsNumber(MyRenamedSceneVariable) + "
               "MyExtension::GetVariableAsNumber(MySceneVariable2) + "
-              "MyExtension::GetVariableAsNumber(RenamedSceneVariableFromASharedName) + "
+              "MyExtension::GetVariableAsNumber(SharedVariableName) + "
               // "globalvar" and "scenevar" in a free function, with child
               // variables:
               "MyExtension::GetGlobalVariableAsNumber(MyRenamedGlobalStructureVariable.MyChild) + "
@@ -308,7 +306,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
       // Updated "scenevar" and "globalvar" parameters of an instruction:
       REQUIRE(event.GetActions()[3].GetParameter(0).GetPlainString() ==
-              "RenamedSceneVariableFromASharedName");
+              "SharedVariableName");
       REQUIRE(event.GetActions()[3].GetParameter(1).GetPlainString() ==
               "RenamedGlobalVariableFromASharedName");
 
@@ -508,7 +506,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     layout1.GetVariables().Remove("MySceneVariable");
     layout1.GetVariables().Remove("MySceneStructureVariable");
-    layout1.GetVariables().Remove("SharedVariableName");
     changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
         project,
         originalSerializedLayoutVariables,
@@ -531,7 +528,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     // Check the first layout is updated.
     {
-      REQUIRE(event.GetActions().GetCount() == 18);
+      REQUIRE(event.GetActions().GetCount() == 19);
 
       // clang-format off
       // All the actions using the removed variables are gone.
@@ -548,15 +545,16 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
       REQUIRE(event.GetActions()[10].GetParameter(0).GetPlainString() == "1 + Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild.GrandChild)");
       REQUIRE(event.GetActions()[11].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalVariable2)");
       REQUIRE(event.GetActions()[12].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneVariable2)");
-      REQUIRE(event.GetActions()[13].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild)");
-      REQUIRE(event.GetActions()[14].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild)");
-      REQUIRE(event.GetActions()[15].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild.GrandChild)");
-      REQUIRE(event.GetActions()[16].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild.GrandChild)");
+      REQUIRE(event.GetActions()[13].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(SharedVariableName)");
+      REQUIRE(event.GetActions()[14].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild)");
+      REQUIRE(event.GetActions()[15].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild)");
+      REQUIRE(event.GetActions()[16].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild.GrandChild)");
+      REQUIRE(event.GetActions()[17].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild.GrandChild)");
 
-      REQUIRE(event.GetActions()[17].GetParameter(0).GetPlainString() == "MySceneVariable2");
-      REQUIRE(event.GetActions()[17].GetParameter(1).GetPlainString() == "MyGlobalVariable2");
-      REQUIRE(event.GetActions()[17].GetParameter(2).GetPlainString() == "Object2");
-      REQUIRE(event.GetActions()[17].GetParameter(3).GetPlainString() == "MyObjectVariable");
+      REQUIRE(event.GetActions()[18].GetParameter(0).GetPlainString() == "MySceneVariable2");
+      REQUIRE(event.GetActions()[18].GetParameter(1).GetPlainString() == "MyGlobalVariable2");
+      REQUIRE(event.GetActions()[18].GetParameter(2).GetPlainString() == "Object2");
+      REQUIRE(event.GetActions()[18].GetParameter(3).GetPlainString() == "MyObjectVariable");
       // clang-format on
     }
 

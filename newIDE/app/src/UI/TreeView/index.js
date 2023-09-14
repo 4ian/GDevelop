@@ -11,6 +11,7 @@ import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer'
 import TreeViewRow from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 export type ItemBaseAttributes = { +isRoot?: boolean };
 
@@ -82,6 +83,11 @@ const getItemProps = memoizeOne(
   })
 );
 
+export type TreeViewInterface<Item> = {|
+  forceUpdateList: () => void,
+  scrollToItem: Item => void,
+|};
+
 type Props<Item> = {|
   height: number,
   width: number,
@@ -90,7 +96,7 @@ type Props<Item> = {|
   getItemId: Item => string,
   getItemChildren: Item => ?(Item[]),
   getItemThumbnail: Item => ?string,
-  getItemDataset?: (Item) => ?HTMLDataset,
+  getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
   searchText?: string,
@@ -103,36 +109,42 @@ type Props<Item> = {|
   reactDndType: string,
 |};
 
-const TreeView = <Item: ItemBaseAttributes>({
-  height,
-  width,
-  items,
-  searchText,
-  getItemName,
-  getItemId,
-  getItemChildren,
-  getItemThumbnail,
-  getItemDataset,
-  onEditItem,
-  buildMenuTemplate,
-  selectedItems,
-  onSelectItems,
-  multiSelect,
-  onRenameItem,
-  onMoveSelectionToItem,
-  canMoveSelectionToItem,
-  reactDndType,
-}: Props<Item>) => {
+const TreeView = <Item: ItemBaseAttributes>(
+  {
+    height,
+    width,
+    items,
+    searchText,
+    getItemName,
+    getItemId,
+    getItemChildren,
+    getItemThumbnail,
+    getItemDataset,
+    onEditItem,
+    buildMenuTemplate,
+    selectedItems,
+    onSelectItems,
+    multiSelect,
+    onRenameItem,
+    onMoveSelectionToItem,
+    canMoveSelectionToItem,
+    reactDndType,
+  }: Props<Item>,
+  ref: TreeViewInterface<Item>
+) => {
   const selectedNodeIds = selectedItems.map(item => getItemId(item));
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
+  const listRef = React.useRef<any>(null);
   const [
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
   ] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
+  const forceUpdate = useForceUpdate();
+
   const isMobileScreen = windowWidth === 'small';
   const isSearching = !!searchText;
   const flattenNode = React.useCallback(
@@ -291,6 +303,29 @@ const TreeView = <Item: ItemBaseAttributes>({
     [flattenOpened, items, searchText]
   );
 
+  const scrollToItem = React.useCallback(
+    (item: Item) => {
+      const list = listRef.current;
+      if (list) {
+        const itemId = getItemId(item);
+        const index = flattenedData.findIndex(node => node.id === itemId);
+        if (index >= 0) {
+          list.scrollToItem(index, 'smart');
+        }
+      }
+    },
+    [getItemId, flattenedData]
+  );
+
+  React.useImperativeHandle(
+    // $FlowFixMe
+    ref,
+    () => ({
+      forceUpdateList: forceUpdate,
+      scrollToItem,
+    })
+  );
+
   const DragSourceAndDropTarget = React.useMemo(
     () =>
       makeDragSourceAndDropTarget(reactDndType, {
@@ -356,6 +391,7 @@ const TreeView = <Item: ItemBaseAttributes>({
         // can itself use a generic.
         // $FlowFixMe
         itemData={itemData}
+        ref={listRef}
         className={`${treeView} ${theme.treeViewRootClassName}`}
       >
         {TreeViewRow}
@@ -370,4 +406,5 @@ const TreeView = <Item: ItemBaseAttributes>({
   );
 };
 
-export default TreeView;
+// $FlowFixMe
+export default React.forwardRef(TreeView);

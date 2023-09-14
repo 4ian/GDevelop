@@ -38,7 +38,6 @@ import {
 import TreeView from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -758,6 +757,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           : null,
       []
     );
+    const getObjectContextOrFolderData = React.useCallback(
+      (objectWithContextOrFolder: TreeViewItem) =>
+        objectWithContextOrFolder.isRoot
+          ? undefined
+          : {
+              objectName: objectWithContextOrFolder.object.getName(),
+              global: objectWithContextOrFolder.global.toString(),
+            },
+      []
+    );
 
     const eventsFunctionsExtensionsState = React.useContext(
       EventsFunctionsExtensionsContext
@@ -911,8 +920,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
-    const screenType = useScreenType();
-
     return (
       <Background maxWidth>
         <Line>
@@ -948,11 +955,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemChildren={getObjectWithContextOfFolderChildren}
                       multiSelect={false}
                       getItemId={getObjectContextOrFolderId}
-                      // getItemData={(objectWithContext, index) => ({
-                      //   objectName: objectWithContext.object.getName(),
-                      //   global: objectWithContext.global.toString(),
-                      // })}
-                      // isItemBold={isObjectWithContextGlobal}
+                      getItemDataset={getObjectContextOrFolderData}
                       onEditItem={editItem}
                       // $FlowFixMe
                       selectedItems={selectedObjects}
@@ -967,7 +970,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       buildMenuTemplate={renderObjectMenuTemplate(i18n)}
                       onMoveSelectionToItem={moveSelectionTo}
                       canMoveSelectionToItem={canMoveSelectionTo}
-                      // scaleUpItemIconWhenSelected={screenType === 'touch'}
                       reactDndType={objectWithContextReactDndType}
                     />
                   )}

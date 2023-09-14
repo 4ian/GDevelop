@@ -20,6 +20,8 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
+
+  // Add some variables and objects:
   layout1.GetVariables().InsertNew("MySceneVariable", 0);
   layout1.GetVariables().InsertNew("MySceneVariable2", 1);
   layout1.GetVariables().InsertNew("MySceneStructureVariable", 2).GetChild("MyChild");
@@ -32,6 +34,15 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
                           "MyExtension::FakeObjectWithDefaultBehavior",
                           "FakeObjectWithDefaultBehavior",
                           2);
+
+  // Also insert a variable having the same name as an object:
+  layout1.InsertNewObject(project, "MyExtension::Sprite", "ObjectWithNameReused", 3);
+  layout1.GetVariables().InsertNew("ObjectWithNameReused", 3).GetChild("MyChild");
+
+  // Also insert a global variable having the same name as a scene variable:
+  layout1.GetVariables().InsertNew("SceneVariableWithNameReused", 4);
+  project.GetVariables().InsertNew("SceneVariableWithNameReused", 0);
+
   auto &group = layout1.GetObjectGroups().InsertNew("AllObjects");
   group.AddObject("MySpriteObject");
   group.AddObject("MyOtherSpriteObject");
@@ -458,6 +469,20 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsNumber() + getLayoutVariable(MySceneVariable2).getAsNumber()");
     }
   }
+  SECTION("Scene variables (conflict with a global variable)") {
+    {
+      auto node =
+        parser.ParseExpression("SceneVariableWithNameReused + 1");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(SceneVariableWithNameReused).getAsNumber() + 1");
+    }
+  }
   SECTION("Scene variables (2 levels)") {
     {
       auto node =
@@ -546,6 +571,20 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "getVariableForObject(MySpriteObject, MyVariable).getAsNumber() + getVariableForObject(MySpriteObject, MyVariable2).getAsNumber()");
+    }
+  }
+  SECTION("Object variables (conflict with a scene variable)") {
+    {
+      auto node =
+        parser.ParseExpression("ObjectWithNameReused.MyVariable + 1");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getVariableForObject(ObjectWithNameReused, MyVariable).getAsNumber() + 1");
     }
   }
   SECTION("Object variables (1 level with bracket accessor) (invalid)") {

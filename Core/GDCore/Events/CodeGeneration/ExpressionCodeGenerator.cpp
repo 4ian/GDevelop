@@ -236,9 +236,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       }
 
       // This could be adapted in the future if more scopes are supported at runtime.
-      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      if (variablesContainersList.GetTopMostVariablesContainer()->Has(node.identifierName)) {
-        scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
+      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
+      if (variablesContainersList.GetBottomMostVariablesContainer()->Has(node.identifierName)) {
+        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
       }
 
       output += codeGenerator.GenerateGetVariable(node.identifierName, scope, context, "");

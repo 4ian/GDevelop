@@ -128,7 +128,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
           return {};
         }}
-        canDrag={() => true}
+        canDrag={() => !node.item.isRoot}
         canDrop={canDrop ? () => canDrop(node.item) : () => true}
         drop={() => {
           onDrop(node.item);
@@ -168,7 +168,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                         {...longTouchForContextMenuProps}
                       >
                         {connectDragPreview(
-                          <div className="row-content-side row-content-side-left">
+                          <div
+                            className={`row-content-side${
+                              node.item.isRoot ? '' : ' row-content-side-left'
+                            }`}
+                          >
                             {node.hasChildren ? (
                               <>
                                 <IconButton

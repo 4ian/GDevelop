@@ -3,9 +3,8 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
-import { useTheme } from '@material-ui/core/styles';
 
-import React from 'react';
+import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import Background from '../UI/Background';
@@ -50,11 +49,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
-import Text from '../UI/Text';
-import IconButton from '../UI/IconButton';
-import ArrowHeadBottom from '../UI/CustomSvgIcons/ArrowHeadBottom';
-import ArrowHeadTop from '../UI/CustomSvgIcons/ArrowHeadTop';
-import EmptyMessage from '../UI/EmptyMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -65,6 +59,15 @@ const styles = {
     flexDirection: 'column',
   },
 };
+
+type TopLevelFolder = {|
+  +label: string,
+  +children: Array<ObjectWithContext>,
+  +isRoot: true,
+  +id: string,
+|};
+
+type TreeViewItem = ObjectWithContext | TopLevelFolder;
 
 const objectTypeToDefaultName = {
   Sprite: 'NewSprite',
@@ -90,6 +93,18 @@ export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
 const getObjectWithContextName = (objectWithContext: ObjectWithContext) =>
   objectWithContext.object.getName();
+
+const getObjectWithContextOrFolderName = (
+  objectWithContextOrFolder: TreeViewItem
+) =>
+  objectWithContextOrFolder.isRoot
+    ? objectWithContextOrFolder.label
+    : objectWithContextOrFolder.object.getName();
+
+const getObjectContextOrFolderId = (objectWithContextOrFolder: TreeViewItem) =>
+  objectWithContextOrFolder.isRoot
+    ? objectWithContextOrFolder.id
+    : `object-item-${getObjectWithContextName(objectWithContextOrFolder)}`;
 
 const isObjectWithContextGlobal = (objectWithContext: ObjectWithContext) =>
   objectWithContext.global;
@@ -198,19 +213,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const sortableList = React.useRef<?SortableVirtualizedItemList<ObjectWithContext>>(
       null
     );
-    const theme = useTheme();
-    const [globalObjectsOpen, setGlobalObjectsOpen] = React.useState<boolean>(
-      true
-    );
-    const [sceneObjectsOpen, setSceneObjectsOpen] = React.useState<boolean>(
-      true
-    );
-    const [
-      objectListDividerYPosition,
-      setObjectListDividerYPosition,
-    ] = React.useState<number>(50);
-    const isDraggingDivider = React.useRef<boolean>(false);
-    const listContainerRef = React.useRef<?HTMLDivElement>(null);
     const forceUpdate = useForceUpdate();
 
     const forceUpdateList = React.useCallback(
@@ -484,18 +486,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const rename = React.useCallback(
-      (objectWithContext: ObjectWithContext, newName: string) => {
-        const { global } = objectWithContext;
+      (objectWithContextOrFolder: TreeViewItem, newName: string) => {
+        if (objectWithContextOrFolder.isRoot) return;
+        const { global } = objectWithContextOrFolder;
         onRenameObjectStart(null);
 
-        if (getObjectWithContextName(objectWithContext) === newName) return;
+        if (getObjectWithContextName(objectWithContextOrFolder) === newName)
+          return;
 
         const validatedNewName = getValidatedObjectOrGroupName(newName, global);
-        onRenameObjectFinish(objectWithContext, validatedNewName, doRename => {
-          if (!doRename) return;
+        onRenameObjectFinish(
+          objectWithContextOrFolder,
+          validatedNewName,
+          doRename => {
+            if (!doRename) return;
 
-          onObjectModified(false);
-        });
+            onObjectModified(false);
+          }
+        );
       },
       [
         getValidatedObjectOrGroupName,
@@ -503,6 +511,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectStart,
         onRenameObjectFinish,
       ]
+    );
+
+    const editItem = React.useCallback(
+      (objectWithContextOrFolder: TreeViewItem) => {
+        if (objectWithContextOrFolder.isRoot) return;
+        onEditObject(objectWithContextOrFolder.object);
+      },
+      [onEditObject]
     );
 
     const scrollToItem = (objectWithContext: ObjectWithContext) => {
@@ -519,16 +535,37 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectedTags: selectedObjectTags,
       }
     );
-    const selectedObjects = displayedObjectWithContextsList.filter(
+    const selectedObjects: $ReadOnlyArray<TreeViewItem> = displayedObjectWithContextsList.filter(
       objectWithContext =>
         selectedObjectNames.indexOf(objectWithContext.object.getName()) !== -1
     );
     const displayedRenamedObjectWithContext = displayedObjectWithContextsList.find(
       isSameObjectWithContext(renamedObjectWithContext)
     );
+    const getTreeViewData = React.useCallback(
+      (i18n: I18nType): Array<TreeViewItem> => {
+        const treeViewItems = [
+          {
+            label: i18n._(t`Global Objects`),
+            children: lists.projectObjectsList,
+            isRoot: true,
+            id: 'global-objects',
+          },
+          {
+            label: i18n._(t`Scene Objects`),
+            children: lists.containerObjectsList,
+            isRoot: true,
+            id: 'scene-objects',
+          },
+        ];
+        return treeViewItems;
+      },
+      [lists]
+    );
 
     const canMoveSelectionTo = React.useCallback(
-      (destinationObjectWithContext: ObjectWithContext) => {
+      (destinationObjectWithContextOrFolder: TreeViewItem) => {
+        if (destinationObjectWithContextOrFolder.isRoot) return false;
         // Check if at least one element in the selection can be moved.
         const selectedObjectsWithContext = displayedObjectWithContextsList.filter(
           objectWithContext =>
@@ -538,7 +575,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (
           selectedObjectsWithContext.every(
             selectedObject =>
-              selectedObject.global === destinationObjectWithContext.global
+              selectedObject.global ===
+              destinationObjectWithContextOrFolder.global
           )
         ) {
           return true;
@@ -552,9 +590,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           selectedObjectsWithContext.every(
             selectedObject => !selectedObject.global
           ) &&
-          destinationObjectWithContext.global &&
+          destinationObjectWithContextOrFolder.global &&
           displayedGlobalObjectsWithContext.indexOf(
-            destinationObjectWithContext
+            destinationObjectWithContextOrFolder
           ) === 0
         ) {
           return true;
@@ -565,7 +603,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const moveSelectionTo = React.useCallback(
-      (destinationObjectWithContext: ObjectWithContext) => {
+      (destinationObjectWithContextOrFolder: TreeViewItem) => {
+        if (destinationObjectWithContextOrFolder.isRoot) return;
         const displayedGlobalObjectsWithContext = displayedObjectWithContextsList.filter(
           objectWithContext => objectWithContext.global
         );
@@ -574,9 +613,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
 
         const isDestinationItemFirstItemOfGlobalDisplayedList =
-          destinationObjectWithContext.global &&
+          destinationObjectWithContextOrFolder.global &&
           displayedGlobalObjectsWithContext.indexOf(
-            destinationObjectWithContext
+            destinationObjectWithContextOrFolder
           ) === 0;
 
         const selectedObjectsWithContext = displayedObjectWithContextsList.filter(
@@ -590,9 +629,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           let toIndex: number;
           if (
             movedObjectWithContext.global ===
-            destinationObjectWithContext.global
+            destinationObjectWithContextOrFolder.global
           ) {
-            container = destinationObjectWithContext.global
+            container = destinationObjectWithContextOrFolder.global
               ? project
               : objectsContainer;
 
@@ -600,7 +639,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               movedObjectWithContext.object.getName()
             );
             toIndex = container.getObjectPosition(
-              destinationObjectWithContext.object.getName()
+              destinationObjectWithContextOrFolder.object.getName()
             );
           } else if (
             !movedObjectWithContext.global &&
@@ -701,10 +740,23 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectSelected]
     );
 
-    const getObjectThumbnail = React.useCallback(
-      (objectWithContext: ObjectWithContext) =>
-        getThumbnail(project, objectWithContext.object.getConfiguration()),
+    const getObjectWithContextOfFolderThumbnail = React.useCallback(
+      (objectWithContextOrFolder: TreeViewItem) =>
+        objectWithContextOrFolder.isRoot
+          ? null
+          : getThumbnail(
+              project,
+              objectWithContextOrFolder.object.getConfiguration()
+            ),
       [getThumbnail, project]
+    );
+
+    const getObjectWithContextOfFolderChildren = React.useCallback(
+      (objectWithContextOrFolder: TreeViewItem) =>
+        objectWithContextOrFolder.isRoot
+          ? objectWithContextOrFolder.children
+          : null,
+      []
     );
 
     const eventsFunctionsExtensionsState = React.useContext(
@@ -714,10 +766,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (
-        objectWithContext: ObjectWithContext,
+        objectWithContextOrFolder: TreeViewItem,
         index: number
       ) => {
-        const { object } = objectWithContext;
+        if (objectWithContextOrFolder.isRoot) return;
+        const { object } = objectWithContextOrFolder;
         const instanceCountOnScene = initialInstances
           ? getInstanceCountInLayoutForObject(
               initialInstances,
@@ -732,20 +785,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         return [
           {
             label: i18n._(t`Copy`),
-            click: () => copyObject(objectWithContext),
+            click: () => copyObject(objectWithContextOrFolder),
           },
           {
             label: i18n._(t`Cut`),
-            click: () => cutObject(i18n, objectWithContext),
+            click: () => cutObject(i18n, objectWithContextOrFolder),
           },
           {
-            label: getPasteLabel(i18n, objectWithContext.global),
+            label: getPasteLabel(i18n, objectWithContextOrFolder.global),
             enabled: Clipboard.has(CLIPBOARD_KIND),
-            click: () => paste(objectWithContext),
+            click: () => paste(objectWithContextOrFolder),
           },
           {
             label: i18n._(t`Duplicate`),
-            click: () => duplicateObject(objectWithContext),
+            click: () => duplicateObject(objectWithContextOrFolder),
           },
           { type: 'separator' },
           {
@@ -777,7 +830,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           { type: 'separator' },
           {
             label: i18n._(t`Rename`),
-            click: () => editName(objectWithContext),
+            click: () => editName(objectWithContextOrFolder),
             accelerator: getShortcutDisplayName(
               preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
                 defaultShortcuts.RENAME_SCENE_OBJECT
@@ -785,8 +838,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Set as global object`),
-            enabled: !isObjectWithContextGlobal(objectWithContext),
-            click: () => setAsGlobalObject(i18n, objectWithContext),
+            enabled: !isObjectWithContextGlobal(objectWithContextOrFolder),
+            click: () => setAsGlobalObject(i18n, objectWithContextOrFolder),
             visible: canSetAsGlobalObject !== false,
           },
           {
@@ -804,7 +857,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Delete`),
-            click: () => deleteObject(i18n, objectWithContext),
+            click: () => deleteObject(i18n, objectWithContextOrFolder),
           },
           { type: 'separator' },
           {
@@ -853,24 +906,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
-    const changeDividerPosition = React.useCallback(
-      (event: MouseEvent) => {
-        if (listContainerRef.current) {
-          if (!globalObjectsOpen) setGlobalObjectsOpen(true);
-          const containerRectangle = listContainerRef.current.getBoundingClientRect();
-          const targetPercentage =
-            (100 * (event.clientY - containerRectangle.top)) /
-            containerRectangle.height;
-          if (targetPercentage < 3) {
-            setGlobalObjectsOpen(false);
-          } else {
-            setObjectListDividerYPosition(targetPercentage);
-          }
-        }
-      },
-      [globalObjectsOpen]
-    );
-
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
@@ -894,186 +929,50 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
         />
-        <div
-          style={styles.listContainer}
-          id="objects-list"
-          ref={listContainerRef}
-          onMouseUp={e => {
-            isDraggingDivider.current = false;
-          }}
-          onMouseLeave={() => {
-            isDraggingDivider.current = false;
-          }}
-          onMouseMove={event => {
-            if (isDraggingDivider.current) {
-              changeDividerPosition(event);
-            }
-          }}
-        >
+        <div style={styles.listContainer} id="objects-list">
           <I18n>
             {({ i18n }) => (
-              <>
-                <div
-                  style={{
-                    height: globalObjectsOpen
-                      ? `${objectListDividerYPosition}%`
-                      : 0,
-                    minHeight: 32,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Line noMargin alignItems="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => setGlobalObjectsOpen(!globalObjectsOpen)}
-                    >
-                      {globalObjectsOpen ? (
-                        <ArrowHeadTop fontSize="small" />
-                      ) : (
-                        <ArrowHeadBottom fontSize="small" />
-                      )}
-                    </IconButton>
-                    <Text size="sub-title">
-                      <Trans>Global objects</Trans>
-                    </Text>
-                  </Line>
-                  {globalObjectsOpen &&
-                    (lists.projectObjectsList.length > 0 ? (
-                      <div style={{ flex: 1, paddingLeft: 16 }}>
-                        <AutoSizer>
-                          {({ height, width }) => (
-                            <TreeView
-                              key={listKey}
-                              ref={sortableList}
-                              items={lists.projectObjectsList}
-                              width={width}
-                              height={height}
-                              searchText={searchText}
-                              getItemName={getObjectWithContextName}
-                              getItemThumbnail={getObjectThumbnail}
-                              getItemChildren={() => []}
-                              multiSelect={false}
-                              getItemId={objectWithContext =>
-                                `object-item-${getObjectWithContextName(
-                                  objectWithContext
-                                )}`
-                              }
-                              // getItemData={(objectWithContext, index) => ({
-                              //   objectName: objectWithContext.object.getName(),
-                              //   global: objectWithContext.global.toString(),
-                              // })}
-                              // isItemBold={isObjectWithContextGlobal}
-                              onEditItem={objectWithContext =>
-                                onEditObject(objectWithContext.object)
-                              }
-                              selectedItems={selectedObjects}
-                              onSelectItems={items =>
-                                selectObject(items ? items[0] : null)
-                              }
-                              // renamedItem={displayedRenamedObjectWithContext}
-                              onRenameItem={rename}
-                              buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                              onMoveSelectionToItem={moveSelectionTo}
-                              canMoveSelectionToItem={canMoveSelectionTo}
-                              // scaleUpItemIconWhenSelected={screenType === 'touch'}
-                              reactDndType={objectWithContextReactDndType}
-                            />
-                          )}
-                        </AutoSizer>
-                      </div>
-                    ) : (
-                      <div>
-                        <EmptyMessage>
-                          <Trans>There are no global objects yet.</Trans>
-                        </EmptyMessage>
-                      </div>
-                    ))}
-                </div>
-                <div
-                  style={{
-                    borderTop: `2px solid ${theme.palette.divider}`,
-                    height: 4,
-                    width: '100%',
-                    boxSizing: 'border-box',
-                    cursor: 'ns-resize',
-                  }}
-                  onMouseDown={e => {
-                    e.stopPropagation();
-                    isDraggingDivider.current = true;
-                  }}
-                />
-                <div
-                  style={{
-                    height: `${100 - objectListDividerYPosition}%`,
-                    minHeight: 32,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Line noMargin alignItems="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => setSceneObjectsOpen(!sceneObjectsOpen)}
-                    >
-                      {sceneObjectsOpen ? (
-                        <ArrowHeadTop fontSize="small" />
-                      ) : (
-                        <ArrowHeadBottom fontSize="small" />
-                      )}
-                    </IconButton>
-                    <Text size="sub-title">
-                      <Trans>Scene objects</Trans>
-                    </Text>
-                  </Line>
-                  {sceneObjectsOpen && (
-                    <div style={{ flex: 1, paddingLeft: 16 }}>
-                      <AutoSizer>
-                        {({ height, width }) => {
-                          return (
-                            <TreeView
-                              key={listKey}
-                              ref={sortableList}
-                              items={lists.containerObjectsList}
-                              width={width}
-                              height={height}
-                              searchText={searchText}
-                              getItemName={getObjectWithContextName}
-                              getItemThumbnail={getObjectThumbnail}
-                              getItemChildren={() => []}
-                              multiSelect={false}
-                              getItemId={objectWithContext =>
-                                `object-item-${getObjectWithContextName(
-                                  objectWithContext
-                                )}`
-                              }
-                              // getItemData={(objectWithContext, index) => ({
-                              //   objectName: objectWithContext.object.getName(),
-                              //   global: objectWithContext.global.toString(),
-                              // })}
-                              // isItemBold={isObjectWithContextGlobal}
-                              onEditItem={objectWithContext =>
-                                onEditObject(objectWithContext.object)
-                              }
-                              selectedItems={selectedObjects}
-                              onSelectItems={items =>
-                                selectObject(items ? items[0] : null)
-                              }
-                              // renamedItem={displayedRenamedObjectWithContext}
-                              onRenameItem={rename}
-                              buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                              onMoveSelectionToItem={moveSelectionTo}
-                              canMoveSelectionToItem={canMoveSelectionTo}
-                              // scaleUpItemIconWhenSelected={screenType === 'touch'}
-                              reactDndType={objectWithContextReactDndType + 'e'}
-                            />
-                          );
-                        }}
-                      </AutoSizer>
-                    </div>
+              <div style={{ flex: 1 }}>
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <TreeView
+                      key={listKey}
+                      ref={sortableList}
+                      // $FlowFixMe
+                      items={getTreeViewData(i18n)}
+                      width={width}
+                      height={height}
+                      searchText={searchText}
+                      getItemName={getObjectWithContextOrFolderName}
+                      getItemThumbnail={getObjectWithContextOfFolderThumbnail}
+                      getItemChildren={getObjectWithContextOfFolderChildren}
+                      multiSelect={false}
+                      getItemId={getObjectContextOrFolderId}
+                      // getItemData={(objectWithContext, index) => ({
+                      //   objectName: objectWithContext.object.getName(),
+                      //   global: objectWithContext.global.toString(),
+                      // })}
+                      // isItemBold={isObjectWithContextGlobal}
+                      onEditItem={editItem}
+                      // $FlowFixMe
+                      selectedItems={selectedObjects}
+                      onSelectItems={items => {
+                        if (!items) selectObject(null);
+                        const itemToSelect = items[0];
+                        if ('isRoot' in itemToSelect) return;
+                        selectObject(itemToSelect || null);
+                      }}
+                      // renamedItem={displayedRenamedObjectWithContext}
+                      onRenameItem={rename}
+                      buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                      onMoveSelectionToItem={moveSelectionTo}
+                      canMoveSelectionToItem={canMoveSelectionTo}
+                      // scaleUpItemIconWhenSelected={screenType === 'touch'}
+                      reactDndType={objectWithContextReactDndType}
+                    />
                   )}
-                </div>
-              </>
+                </AutoSizer>
+              </div>
             )}
           </I18n>
         </div>

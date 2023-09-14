@@ -11,7 +11,7 @@ import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer'
 import TreeViewRow from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 
-export type ItemBaseAttributes = { isRoot?: boolean };
+export type ItemBaseAttributes = { +isRoot?: boolean };
 
 type FlattenedNode<Item> = {|
   id: string,

@@ -27,54 +27,51 @@ namespace gd {
  */
 class UsedResourcesDeclarer : private gd::ArbitraryResourceWorker {
 public:
-  static void DeclareLayoutUsedResources(gd::SerializerElement &layoutElement,
-                                         gd::Project &project,
+  static std::set<gd::String> GetLayoutUsedResources(gd::Project &project,
                                          gd::Layout &layout);
 
-  static void DeclareProjectUsedResources(gd::SerializerElement &layoutElement,
-                                          gd::Project &project);
+  static std::set<gd::String> GetProjectUsedResources(gd::Project &project);
 
   virtual ~UsedResourcesDeclarer(){};
 
 private:
-  UsedResourcesDeclarer(gd::SerializerElement &resourcesElement_)
-      : gd::ArbitraryResourceWorker(), resourcesElement(resourcesElement_){};
+  UsedResourcesDeclarer()
+      : gd::ArbitraryResourceWorker(){};
 
-  void DeclareLayoutResource(gd::String &resourceName);
+  void DeclareUsedResource(gd::String &resourceName);
 
   void ExposeFile(gd::String &resourceFileName) override{
       // Don't do anything: we're renaming resources, not the files they are
       // pointing to.
   };
   void ExposeImage(gd::String &imageResourceName) override {
-    DeclareLayoutResource(imageResourceName);
+    DeclareUsedResource(imageResourceName);
   };
   void ExposeAudio(gd::String &audioResourceName) override {
-    DeclareLayoutResource(audioResourceName);
+    DeclareUsedResource(audioResourceName);
   };
   void ExposeFont(gd::String &fontResourceName) override {
-    DeclareLayoutResource(fontResourceName);
+    DeclareUsedResource(fontResourceName);
   };
   void ExposeJson(gd::String &jsonResourceName) override {
-    DeclareLayoutResource(jsonResourceName);
+    DeclareUsedResource(jsonResourceName);
   };
   void ExposeTilemap(gd::String &tilemapResourceName) override {
-    DeclareLayoutResource(tilemapResourceName);
+    DeclareUsedResource(tilemapResourceName);
   };
   void ExposeTileset(gd::String &tilesetResourceName) override {
-    DeclareLayoutResource(tilesetResourceName);
+    DeclareUsedResource(tilesetResourceName);
   };
   void ExposeVideo(gd::String &videoResourceName) override {
-    DeclareLayoutResource(videoResourceName);
+    DeclareUsedResource(videoResourceName);
   };
   void ExposeBitmapFont(gd::String &bitmapFontName) override {
-    DeclareLayoutResource(bitmapFontName);
+    DeclareUsedResource(bitmapFontName);
   };
   void ExposeModel3D(gd::String &resourceName) override {
-    DeclareLayoutResource(resourceName);
+    DeclareUsedResource(resourceName);
   };
 
-  gd::SerializerElement &resourcesElement;
   std::set<gd::String> resourceNames;
 };
 

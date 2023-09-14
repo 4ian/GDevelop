@@ -27,6 +27,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/IDE/ExporterHelper.h"
+#include "GDJS/IDE/UsedResourcesDeclarer.h"
 
 #undef CopyFile  // Disable an annoying macro
 
@@ -129,14 +130,26 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       return false;
     }
 
+    auto projectUsedResources =
+        gd::UsedResourcesDeclarer::GetProjectUsedResources(exportedProject);
+    std::vector<std::set<gd::String>> layersUsedResources;
+    for (std::size_t layoutIndex = 0;
+         layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
+      auto &layout = exportedProject.GetLayout(layoutIndex);
+      layersUsedResources.push_back(
+          gd::UsedResourcesDeclarer::GetLayoutUsedResources(exportedProject,
+                                                            layout));
+    }
+
     // Strip the project (*after* generating events as the events may use
     // stripped things like objects groups...)...
     gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
-    helper.ExportProjectData(
-        fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
+    helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                             noRuntimeGameOptions, projectUsedResources,
+                             layersUsedResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     // Export a WebManifest with project metadata

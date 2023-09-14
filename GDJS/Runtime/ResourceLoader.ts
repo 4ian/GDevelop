@@ -119,7 +119,7 @@ namespace gdjs {
       );
       this._model3DManager = new gdjs.Model3DManager(this);
 
-      const resourceManagers = [
+      const resourceManagers: Array<ResourceManager> = [
         this._imageManager,
         this._soundManager,
         this._fontManager,

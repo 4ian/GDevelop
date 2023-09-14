@@ -12,34 +12,24 @@
 
 namespace gd {
 
-void UsedResourcesDeclarer::DeclareProjectUsedResources(
-    gd::SerializerElement &layoutElement, gd::Project &project) {
-  auto &resourcesElement = layoutElement.AddChild("usedResources");
-  resourcesElement.ConsiderAsArrayOf("resource");
-
-  gd::UsedResourcesDeclarer resourceWorker(resourcesElement);
+std::set<gd::String> UsedResourcesDeclarer::GetProjectUsedResources(gd::Project &project) {
+  gd::UsedResourcesDeclarer resourceWorker;
   gd::ResourceExposer::ExposeProjectResources(project, resourceWorker);
+  return resourceWorker.resourceNames;
 }
 
-void UsedResourcesDeclarer::DeclareLayoutUsedResources(
-    gd::SerializerElement &projectElement, gd::Project &project,
+std::set<gd::String> UsedResourcesDeclarer::GetLayoutUsedResources(gd::Project &project,
     gd::Layout &layout) {
-  auto &resourcesElement = projectElement.AddChild("usedResources");
-  resourcesElement.ConsiderAsArrayOf("resource");
-
-  gd::UsedResourcesDeclarer resourceWorker(resourcesElement);
+  gd::UsedResourcesDeclarer resourceWorker;
   gd::ResourceExposer::ExposeLayoutResources(project, layout, resourceWorker);
+  return resourceWorker.resourceNames;
 }
 
-void UsedResourcesDeclarer::DeclareLayoutResource(gd::String &resourceName) {
+void UsedResourcesDeclarer::DeclareUsedResource(gd::String &resourceName) {
   if (resourceName.empty()) {
     return;
   }
-  bool isNotYetAdded = resourceNames.insert(resourceName).second;
-  if (isNotYetAdded) {
-    SerializerElement &resourceElement = resourcesElement.AddChild("resource");
-    resourceElement.SetAttribute("name", resourceName);
-  }
+  resourceNames.insert(resourceName);
 }
 
 } // namespace gd

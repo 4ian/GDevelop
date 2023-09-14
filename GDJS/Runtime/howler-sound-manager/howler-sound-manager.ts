@@ -758,7 +758,7 @@ namespace gdjs {
         return;
       }
       if (resource.file) {
-        if (!!this._availableResources[resource.name]) {
+        if (this._availableResources[resource.name]) {
           return;
         }
 

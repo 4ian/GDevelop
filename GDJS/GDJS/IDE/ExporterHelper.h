@@ -264,11 +264,12 @@ class ExporterHelper {
    * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs,
-      gd::Project &project,
-      gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions);
+  static gd::String
+  ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
+                    gd::String filename,
+                    const gd::SerializerElement &runtimeGameOptions,
+                    std::set<gd::String> &projectUsedResources,
+                    std::vector<std::set<gd::String>> &layersUsedResources);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -476,8 +477,10 @@ class ExporterHelper {
                              ///< be then copied to the final output directory.
 
 private:
-  static void DeclareUsedResources(gd::SerializerElement &rootElement,
-                                   gd::Project &project);
+  static void SerializeUsedResources(
+      gd::SerializerElement &rootElement,
+      std::set<gd::String> &projectUsedResources,
+      std::vector<std::set<gd::String>> &layersUsedResources);
 };
 
 }  // namespace gdjs

@@ -188,6 +188,17 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     previousTime = LogTimeSpent("Events code export", previousTime);
   }
 
+  auto projectUsedResources =
+      gd::UsedResourcesDeclarer::GetProjectUsedResources(exportedProject);
+  std::vector<std::set<gd::String>> layersUsedResources;
+  for (std::size_t layoutIndex = 0;
+       layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
+    auto &layout = exportedProject.GetLayout(layoutIndex);
+    layersUsedResources.push_back(
+        gd::UsedResourcesDeclarer::GetLayoutUsedResources(exportedProject,
+                                                          layout));
+  }
+
   // Strip the project (*after* generating events as the events may use stripped
   // things (objects groups...))
   gd::ProjectStripper::StripProjectForExport(exportedProject);
@@ -235,8 +246,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   // Export the project
-  ExportProjectData(
-      fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
+  ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                    runtimeGameOptions, projectUsedResources,
+                    layersUsedResources);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   previousTime = LogTimeSpent("Project data export", previousTime);
@@ -262,13 +274,15 @@ gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs,
     gd::Project &project,
     gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions) {
+    const gd::SerializerElement &runtimeGameOptions,
+    std::set<gd::String> &projectUsedResources,
+    std::vector<std::set<gd::String>> &layersUsedResources) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
-  DeclareUsedResources(rootElement, project);
+  SerializeUsedResources(rootElement, projectUsedResources, layersUsedResources);
   gd::String output =
       "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
       "gdjs.runtimeGameOptions = " +
@@ -279,16 +293,33 @@ gd::String ExporterHelper::ExportProjectData(
   return "";
 }
 
-void ExporterHelper::DeclareUsedResources(gd::SerializerElement &rootElement,
-                                    gd::Project &project) {
-  gd::UsedResourcesDeclarer::DeclareProjectUsedResources(rootElement, project);
-  
-  for (std::size_t layoutIndex = 0; layoutIndex < project.GetLayoutsCount();
-       layoutIndex++) {
-    auto &layout = project.GetLayout(layoutIndex);
+void ExporterHelper::SerializeUsedResources(
+    gd::SerializerElement &rootElement,
+    std::set<gd::String> &projectUsedResources,
+    std::vector<std::set<gd::String>> &layersUsedResources) {
 
-    auto& layoutElement = rootElement.GetChild("layouts").GetChild(layoutIndex);
-    gd::UsedResourcesDeclarer::DeclareLayoutUsedResources(layoutElement, project, layout);
+  auto serializeUsedResources =
+      [](gd::SerializerElement &element,
+         std::set<gd::String> &usedResources) -> void {
+    auto &resourcesElement = element.AddChild("usedResources");
+    resourcesElement.ConsiderAsArrayOf("resource");
+    for (auto &resourceName : usedResources) {
+      auto &resourceElement = resourcesElement.AddChild("resource");
+      resourceElement.SetAttribute("name", resourceName);
+    }
+  };
+
+  serializeUsedResources(rootElement, projectUsedResources);
+
+  auto &layoutsElement = rootElement.GetChild("layouts");
+  std::size_t layoutCount =
+      std::min(layersUsedResources.size(), layoutsElement.GetChildrenCount());
+  for (std::size_t layoutIndex = 0; layoutIndex < layoutCount; layoutIndex++) {
+    // Both lists should have the same order.
+    auto &layoutElement = layoutsElement.GetChild(layoutIndex);
+    auto &layoutUsedResources = layersUsedResources[layoutIndex];
+
+    serializeUsedResources(layoutElement, layoutUsedResources);
   }
 }
 

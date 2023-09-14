@@ -262,13 +262,6 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
   return false;
 };
 
-void LaunchResourceWorkerOnEvents(const gd::Project& project,
-                                  gd::EventsList& events,
-                                  gd::ArbitraryResourceWorker& worker) {
-  gd::ResourceWorkerInEventsWorker eventsWorker(project, worker);
-  eventsWorker.Launch(events);
-}
-
 gd::ResourceWorkerInEventsWorker
 GetResourceWorkerOnEvents(const gd::Project &project,
                           gd::ArbitraryResourceWorker &worker) {

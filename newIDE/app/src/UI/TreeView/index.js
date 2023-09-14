@@ -10,6 +10,7 @@ import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
 import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
 import TreeViewRow from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
+import { type HTMLDataset } from '../../Utils/HTMLDataset';
 
 export type ItemBaseAttributes = { +isRoot?: boolean };
 
@@ -18,6 +19,7 @@ type FlattenedNode<Item> = {|
   name: string,
   hasChildren: boolean,
   depth: number,
+  dataset?: ?HTMLDataset,
   collapsed: boolean,
   selected: boolean,
   disableCollapse: boolean,
@@ -45,7 +47,7 @@ export type ItemData<Item> = {|
   DragSourceAndDropTarget: any => React.Node,
 |};
 
-const getItemData = memoizeOne(
+const getItemProps = memoizeOne(
   <Item>(
     flattenedData: FlattenedNode<Item>[],
     onOpen: (FlattenedNode<Item>) => void,
@@ -88,6 +90,7 @@ type Props<Item> = {|
   getItemId: Item => string,
   getItemChildren: Item => ?(Item[]),
   getItemThumbnail: Item => ?string,
+  getItemDataset?: (Item) => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
   searchText?: string,
@@ -109,6 +112,7 @@ const TreeView = <Item: ItemBaseAttributes>({
   getItemId,
   getItemChildren,
   getItemThumbnail,
+  getItemDataset,
   onEditItem,
   buildMenuTemplate,
   selectedItems,
@@ -141,6 +145,7 @@ const TreeView = <Item: ItemBaseAttributes>({
       const id = getItemId(item);
       const name = getItemName(item);
       const children = getItemChildren(item);
+      const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const collapsed = !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
       let flattenedChildren = [];
@@ -183,6 +188,7 @@ const TreeView = <Item: ItemBaseAttributes>({
             depth,
             selected,
             thumbnailSrc,
+            dataset,
             item,
             /*
              * If the user is searching, the node should be opened if either:
@@ -212,6 +218,7 @@ const TreeView = <Item: ItemBaseAttributes>({
       getItemId,
       getItemName,
       getItemThumbnail,
+      getItemDataset,
       openedDuringSearchNodeIds,
       openedNodeIds,
       selectedNodeIds,
@@ -311,7 +318,7 @@ const TreeView = <Item: ItemBaseAttributes>({
     []
   );
 
-  const itemData: ItemData<Item> = getItemData<Item>(
+  const itemData: ItemData<Item> = getItemProps<Item>(
     flattenedData,
     onOpen,
     onSelect,

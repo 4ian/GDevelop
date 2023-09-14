@@ -16,6 +16,7 @@ import {
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData, type ItemBaseAttributes } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { dataObjectToProps } from '../../Utils/HTMLDataset';
 
 const SemiControlledRowInput = ({
   initialValue,
@@ -156,6 +157,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   className={
                     'row-container' + (node.selected ? ' selected' : '')
                   }
+                  {...dataObjectToProps(node.dataset)}
                 >
                   {connectDragSource(
                     <div className="full-space-container">

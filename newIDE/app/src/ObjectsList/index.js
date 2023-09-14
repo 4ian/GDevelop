@@ -6,7 +6,6 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
-import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
@@ -35,7 +34,7 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
-import TreeView from '../UI/TreeView';
+import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
@@ -209,15 +208,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     ref
   ) => {
     const preferences = React.useContext(PreferencesContext);
-    const sortableList = React.useRef<?SortableVirtualizedItemList<ObjectWithContext>>(
-      null
-    );
+    const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
 
     const forceUpdateList = React.useCallback(
       () => {
         forceUpdate();
-        if (sortableList.current) sortableList.current.forceUpdateGrid();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
       [forceUpdate]
     );
@@ -227,7 +224,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     React.useImperativeHandle(ref, () => ({
       forceUpdateList: () => {
         forceUpdate();
-        if (sortableList.current) sortableList.current.forceUpdateGrid();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
       openNewObjectDialog: () => {
         setNewObjectDialogOpen(true);
@@ -458,7 +455,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (objectWithContext: ?ObjectWithContext) => {
         onRenameObjectStart(objectWithContext);
         // TODO Should it be called later?
-        if (sortableList.current) sortableList.current.forceUpdateGrid();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
       [onRenameObjectStart]
     );
@@ -521,8 +518,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const scrollToItem = (objectWithContext: ObjectWithContext) => {
-      if (sortableList.current) {
-        sortableList.current.scrollToItem(objectWithContext);
+      if (treeViewRef.current) {
+        treeViewRef.current.scrollToItem(objectWithContext);
       }
     };
 
@@ -541,6 +538,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const displayedRenamedObjectWithContext = displayedObjectWithContextsList.find(
       isSameObjectWithContext(renamedObjectWithContext)
     );
+    console.log(displayedRenamedObjectWithContext);
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
@@ -944,7 +942,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   {({ height, width }) => (
                     <TreeView
                       key={listKey}
-                      ref={sortableList}
+                      ref={treeViewRef}
                       // $FlowFixMe
                       items={getTreeViewData(i18n)}
                       width={width}

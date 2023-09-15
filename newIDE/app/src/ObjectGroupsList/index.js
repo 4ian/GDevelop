@@ -285,15 +285,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return true;
     }
 
-    if (
-      !this.state.selectedGroupWithContext.global &&
-      destinationItem.global &&
-      this.displayedGlobalObjectGroupsList.indexOf(destinationItem) === 0
-    ) {
-      // Allow drop on first element of global items to put local item at the end of its list
-      return true;
-    }
-
     return false;
   };
 
@@ -316,11 +307,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const areSelectedAndTargetItemsFromSameContext =
       selectedGroupWithContext.global === destinationItem.global;
 
-    const isDroppingLocalItemOnFirstGlobalItemOfDisplayedList =
-      !selectedGroupWithContext.global &&
-      destinationItem.global &&
-      globalObjectGroups.getPosition(destinationItem.group.getName()) === 0;
-
     if (areSelectedAndTargetItemsFromSameContext) {
       container = selectedGroupWithContext.global
         ? globalObjectGroups
@@ -330,18 +316,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         selectedGroupWithContext.group.getName()
       );
       toIndex = container.getPosition(destinationItem.group.getName());
-    } else if (isDroppingLocalItemOnFirstGlobalItemOfDisplayedList) {
-      container = objectGroups;
-      fromIndex = container.getPosition(
-        selectedGroupWithContext.group.getName()
-      );
-      toIndex = !this.state.searchText
-        ? container.count()
-        : container.getPosition(
-            this.displayedObjectGroupsList[
-              this.displayedObjectGroupsList.length - 1
-            ].group.getName()
-          ) + 1;
     } else {
       return;
     }

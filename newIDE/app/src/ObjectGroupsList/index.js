@@ -239,7 +239,11 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     });
   };
 
-  _setAsGlobalGroup = (i18n: I18nType, groupWithContext: GroupWithContext) => {
+  _setAsGlobalGroup = (
+    i18n: I18nType,
+    groupWithContext: GroupWithContext,
+    index?: number
+  ) => {
     const { group } = groupWithContext;
     const {
       globalObjectGroups,
@@ -271,7 +275,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     if (!answer) return;
 
     if (this.treeView) this.treeView.openItem(globalGroupsRootFolderId);
-    globalObjectGroups.insert(group, globalObjectGroups.count());
+    globalObjectGroups.insert(
+      group,
+      typeof index === 'number' ? index : globalObjectGroups.count()
+    );
     objectGroups.remove(groupName);
     this._onObjectGroupModified();
     // Scroll to the moved group.
@@ -293,7 +300,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     if (destinationItem.isRoot || destinationItem.isPlaceholder) return false;
     if (!this.state.selectedGroupWithContext) return false;
 
-    if (this.state.selectedGroupWithContext.global === destinationItem.global) {
+    if (
+      this.state.selectedGroupWithContext.global === destinationItem.global ||
+      (!this.state.selectedGroupWithContext.global && destinationItem.global)
+    ) {
       return true;
     }
 
@@ -306,7 +316,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     });
   };
 
-  _moveSelectionTo = (destinationItem: TreeViewItem) => {
+  _moveSelectionTo = (i18n: I18nType, destinationItem: TreeViewItem) => {
     if (destinationItem.isRoot || destinationItem.isPlaceholder) return false;
     const { selectedGroupWithContext } = this.state;
     if (!selectedGroupWithContext) return;
@@ -328,6 +338,9 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         selectedGroupWithContext.group.getName()
       );
       toIndex = container.getPosition(destinationItem.group.getName());
+    } else if (!selectedGroupWithContext.global && destinationItem.global) {
+      this._setAsGlobalGroup(i18n, selectedGroupWithContext);
+      return;
     } else {
       return;
     }
@@ -492,7 +505,9 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                       }}
                       onRenameItem={this._onRename}
                       buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
-                      onMoveSelectionToItem={this._moveSelectionTo}
+                      onMoveSelectionToItem={destinationItem =>
+                        this._moveSelectionTo(i18n, destinationItem)
+                      }
                       canMoveSelectionToItem={this._canMoveSelectionTo}
                       reactDndType={groupWithContextReactDndType}
                     />

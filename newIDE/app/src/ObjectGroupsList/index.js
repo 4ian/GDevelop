@@ -274,6 +274,13 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     globalObjectGroups.insert(group, globalObjectGroups.count());
     objectGroups.remove(groupName);
     this._onObjectGroupModified();
+    // Scroll to the moved group.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      this.scrollToItem(groupWithContext);
+    }, 100); // A few ms is enough for a new render to be done.
   };
 
   _onObjectGroupModified = () => {

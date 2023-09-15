@@ -150,6 +150,10 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (!editorMosaicRef.current) return false;
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
+  const renameObjectWithContext = React.useCallback(objectWithContext => {
+    if (objectsListRef.current)
+      objectsListRef.current.renameObjectWithContext(objectWithContext);
+  }, []);
 
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
@@ -163,6 +167,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView,
       isEditorVisible,
+      renameObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,
@@ -362,8 +367,6 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               onObjectCreated={props.onObjectCreated}
               onObjectSelected={props.onObjectSelected}
-              renamedObjectWithContext={props.renamedObjectWithContext}
-              onRenameObjectStart={props.onRenameObjectStart}
               onRenameObjectFinish={props.onRenameObjectFinish}
               onAddObjectInstance={props.onAddObjectInstance}
               onObjectPasted={props.updateBehaviorsSharedData}

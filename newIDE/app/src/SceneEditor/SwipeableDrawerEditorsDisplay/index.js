@@ -136,6 +136,10 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     },
     [selectedEditorId, drawerOpeningState]
   );
+  const renameObjectWithContext = React.useCallback(objectWithContext => {
+    if (objectsListRef.current)
+      objectsListRef.current.renameObjectWithContext(objectWithContext);
+  }, []);
 
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
@@ -150,6 +154,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView: halfOpenOrCloseDrawerOnEditor,
       isEditorVisible,
+      renameObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,
@@ -307,8 +312,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       }
                       onObjectCreated={props.onObjectCreated}
                       onObjectSelected={props.onObjectSelected}
-                      renamedObjectWithContext={props.renamedObjectWithContext}
-                      onRenameObjectStart={props.onRenameObjectStart}
                       onRenameObjectFinish={props.onRenameObjectFinish}
                       onAddObjectInstance={objectName =>
                         props.onAddObjectInstance(objectName, 'upperCenter')

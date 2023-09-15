@@ -308,7 +308,10 @@ const TreeView = <Item: ItemBaseAttributes>(
       const list = listRef.current;
       if (list) {
         const itemId = getItemId(item);
-        const index = flattenedData.findIndex(node => node.id === itemId);
+        // Browse flattenedData in reverse order since scrollToItem is mainly used
+        // to scroll to newly added object that is appended at the end of the list.
+        // $FlowFixMe - Method introduced in 2022.
+        const index = flattenedData.findLastIndex(node => node.id === itemId);
         if (index >= 0) {
           list.scrollToItem(index, 'smart');
         }

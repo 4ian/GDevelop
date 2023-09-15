@@ -54,14 +54,20 @@ const styles = {
   },
 };
 
-export type TopLevelFolder = {|
+export type RootFolder = {|
   +label: string,
   +children: Array<ObjectWithContext>,
   +isRoot: true,
   +id: string,
 |};
 
-type TreeViewItem = ObjectWithContext | TopLevelFolder;
+export type EmptyPlaceholder = {|
+  +label: string,
+  +isPlaceholder: true,
+  +id: string,
+|};
+
+type TreeViewItem = ObjectWithContext | RootFolder | EmptyPlaceholder;
 
 const objectTypeToDefaultName = {
   Sprite: 'NewSprite',
@@ -88,30 +94,22 @@ export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 const getObjectWithContextName = (objectWithContext: ObjectWithContext) =>
   objectWithContext.object.getName();
 
-const getObjectWithContextOrFolderName = (
-  objectWithContextOrFolder: TreeViewItem
-) =>
-  objectWithContextOrFolder.isRoot
-    ? objectWithContextOrFolder.label
-    : objectWithContextOrFolder.object.getName();
+const getTreeViewItemName = (item: TreeViewItem) =>
+  item.isRoot || item.isPlaceholder ? item.label : item.object.getName();
 
-const getObjectContextOrFolderId = (objectWithContextOrFolder: TreeViewItem) =>
-  objectWithContextOrFolder.isRoot
-    ? objectWithContextOrFolder.id
-    : `object-item-${getObjectWithContextName(objectWithContextOrFolder)}`;
+const getTreeViewItemId = (item: TreeViewItem) =>
+  item.isRoot || item.isPlaceholder
+    ? item.id
+    : `object-item-${getObjectWithContextName(item)}`;
 
-const getObjectWithContextOfFolderChildren = (
-  objectWithContextOrFolder: TreeViewItem
-) =>
-  objectWithContextOrFolder.isRoot ? objectWithContextOrFolder.children : null;
-const getObjectContextOrFolderData = (
-  objectWithContextOrFolder: TreeViewItem
-) =>
-  objectWithContextOrFolder.isRoot
+const getTreeViewItemChildren = (item: TreeViewItem) =>
+  item.isRoot ? item.children : null;
+const getTreeViewItemData = (item: TreeViewItem) =>
+  item.isRoot || item.isPlaceholder
     ? undefined
     : {
-        objectName: objectWithContextOrFolder.object.getName(),
-        global: objectWithContextOrFolder.global.toString(),
+        objectName: item.object.getName(),
+        global: item.global.toString(),
       };
 
 const isObjectWithContextGlobal = (objectWithContext: ObjectWithContext) =>
@@ -493,31 +491,26 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const rename = React.useCallback(
-      (objectWithContextOrFolder: TreeViewItem, newName: string) => {
-        if (objectWithContextOrFolder.isRoot) return;
-        const { global } = objectWithContextOrFolder;
+      (item: TreeViewItem, newName: string) => {
+        if (item.isRoot || item.isPlaceholder) return;
+        const { global } = item;
 
-        if (getObjectWithContextName(objectWithContextOrFolder) === newName)
-          return;
+        if (getObjectWithContextName(item) === newName) return;
 
         const validatedNewName = getValidatedObjectOrGroupName(newName, global);
-        onRenameObjectFinish(
-          objectWithContextOrFolder,
-          validatedNewName,
-          doRename => {
-            if (!doRename) return;
+        onRenameObjectFinish(item, validatedNewName, doRename => {
+          if (!doRename) return;
 
-            onObjectModified(false);
-          }
-        );
+          onObjectModified(false);
+        });
       },
       [getValidatedObjectOrGroupName, onObjectModified, onRenameObjectFinish]
     );
 
     const editItem = React.useCallback(
-      (objectWithContextOrFolder: TreeViewItem) => {
-        if (objectWithContextOrFolder.isRoot) return;
-        onEditObject(objectWithContextOrFolder.object);
+      (item: TreeViewItem) => {
+        if (item.isRoot || item.isPlaceholder) return;
+        onEditObject(item.object);
       },
       [onEditObject]
     );
@@ -545,25 +538,45 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const treeViewItems = [
           {
             label: i18n._(t`Global Objects`),
-            children: lists.projectObjectsList,
+            children:
+              lists.projectObjectsList.length > 0
+                ? lists.projectObjectsList
+                : [
+                    {
+                      label: i18n._(t`There is no global object yet.`),
+                      id: 'global-empty-placeholder',
+                      isPlaceholder: true,
+                    },
+                  ],
             isRoot: true,
             id: 'global-objects',
           },
           {
             label: i18n._(t`Scene Objects`),
-            children: lists.containerObjectsList,
+            children:
+              lists.containerObjectsList.length > 0
+                ? lists.containerObjectsList
+                : [
+                    {
+                      label: i18n._(t`Start by adding a new object.`),
+                      id: 'scene-empty-placeholder',
+                      isPlaceholder: true,
+                    },
+                  ],
             isRoot: true,
             id: 'scene-objects',
           },
         ];
+        // $FlowFixMe
         return treeViewItems;
       },
       [lists]
     );
 
     const canMoveSelectionTo = React.useCallback(
-      (destinationObjectWithContextOrFolder: TreeViewItem) => {
-        if (destinationObjectWithContextOrFolder.isRoot) return false;
+      (destinationItem: TreeViewItem) => {
+        if (destinationItem.isRoot || destinationItem.isPlaceholder)
+          return false;
         // Check if at least one element in the selection can be moved.
         const selectedObjectsWithContext = displayedObjectWithContextsList.filter(
           objectWithContext =>
@@ -572,9 +585,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         if (
           selectedObjectsWithContext.every(
-            selectedObject =>
-              selectedObject.global ===
-              destinationObjectWithContextOrFolder.global
+            selectedObject => selectedObject.global === destinationItem.global
           )
         ) {
           return true;
@@ -586,8 +597,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const moveSelectionTo = React.useCallback(
-      (destinationObjectWithContextOrFolder: TreeViewItem) => {
-        if (destinationObjectWithContextOrFolder.isRoot) return;
+      (destinationItem: TreeViewItem) => {
+        if (destinationItem.isRoot || destinationItem.isPlaceholder) return;
         const displayedGlobalObjectsWithContext = displayedObjectWithContextsList.filter(
           objectWithContext => objectWithContext.global
         );
@@ -596,10 +607,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
 
         const isDestinationItemFirstItemOfGlobalDisplayedList =
-          destinationObjectWithContextOrFolder.global &&
-          displayedGlobalObjectsWithContext.indexOf(
-            destinationObjectWithContextOrFolder
-          ) === 0;
+          destinationItem.global &&
+          displayedGlobalObjectsWithContext.indexOf(destinationItem) === 0;
 
         const selectedObjectsWithContext = displayedObjectWithContextsList.filter(
           objectWithContext =>
@@ -610,19 +619,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           let container: gdObjectsContainer;
           let fromIndex: number;
           let toIndex: number;
-          if (
-            movedObjectWithContext.global ===
-            destinationObjectWithContextOrFolder.global
-          ) {
-            container = destinationObjectWithContextOrFolder.global
-              ? project
-              : objectsContainer;
+          if (movedObjectWithContext.global === destinationItem.global) {
+            container = destinationItem.global ? project : objectsContainer;
 
             fromIndex = container.getObjectPosition(
               movedObjectWithContext.object.getName()
             );
             toIndex = container.getObjectPosition(
-              destinationObjectWithContextOrFolder.object.getName()
+              destinationItem.object.getName()
             );
           } else if (
             !movedObjectWithContext.global &&
@@ -723,14 +727,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectSelected]
     );
 
-    const getObjectWithContextOfFolderThumbnail = React.useCallback(
-      (objectWithContextOrFolder: TreeViewItem) =>
-        objectWithContextOrFolder.isRoot
+    const getTreeViewItemThumbnail = React.useCallback(
+      (item: TreeViewItem) =>
+        item.isRoot || item.isPlaceholder
           ? null
-          : getThumbnail(
-              project,
-              objectWithContextOrFolder.object.getConfiguration()
-            ),
+          : getThumbnail(project, item.object.getConfiguration()),
       [getThumbnail, project]
     );
 
@@ -740,12 +741,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
     const renderObjectMenuTemplate = React.useCallback(
-      (i18n: I18nType) => (
-        objectWithContextOrFolder: TreeViewItem,
-        index: number
-      ) => {
-        if (objectWithContextOrFolder.isRoot) return;
-        const { object } = objectWithContextOrFolder;
+      (i18n: I18nType) => (item: TreeViewItem, index: number) => {
+        if (item.isRoot || item.isPlaceholder) return;
+        const { object } = item;
         const instanceCountOnScene = initialInstances
           ? getInstanceCountInLayoutForObject(
               initialInstances,
@@ -760,20 +758,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         return [
           {
             label: i18n._(t`Copy`),
-            click: () => copyObject(objectWithContextOrFolder),
+            click: () => copyObject(item),
           },
           {
             label: i18n._(t`Cut`),
-            click: () => cutObject(i18n, objectWithContextOrFolder),
+            click: () => cutObject(i18n, item),
           },
           {
-            label: getPasteLabel(i18n, objectWithContextOrFolder.global),
+            label: getPasteLabel(i18n, item.global),
             enabled: Clipboard.has(CLIPBOARD_KIND),
-            click: () => paste(objectWithContextOrFolder),
+            click: () => paste(item),
           },
           {
             label: i18n._(t`Duplicate`),
-            click: () => duplicateObject(objectWithContextOrFolder),
+            click: () => duplicateObject(item),
           },
           { type: 'separator' },
           {
@@ -805,7 +803,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           { type: 'separator' },
           {
             label: i18n._(t`Rename`),
-            click: () => editName(objectWithContextOrFolder),
+            click: () => editName(item),
             accelerator: getShortcutDisplayName(
               preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
                 defaultShortcuts.RENAME_SCENE_OBJECT
@@ -813,8 +811,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Set as global object`),
-            enabled: !isObjectWithContextGlobal(objectWithContextOrFolder),
-            click: () => setAsGlobalObject(i18n, objectWithContextOrFolder),
+            enabled: !isObjectWithContextGlobal(item),
+            click: () => setAsGlobalObject(i18n, item),
             visible: canSetAsGlobalObject !== false,
           },
           {
@@ -832,7 +830,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Delete`),
-            click: () => deleteObject(i18n, objectWithContextOrFolder),
+            click: () => deleteObject(i18n, item),
           },
           { type: 'separator' },
           {
@@ -911,16 +909,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
-                      // $FlowFixMe
                       items={getTreeViewData(i18n)}
                       height={height}
                       searchText={searchText}
-                      getItemName={getObjectWithContextOrFolderName}
-                      getItemThumbnail={getObjectWithContextOfFolderThumbnail}
-                      getItemChildren={getObjectWithContextOfFolderChildren}
+                      getItemName={getTreeViewItemName}
+                      getItemThumbnail={getTreeViewItemThumbnail}
+                      getItemChildren={getTreeViewItemChildren}
                       multiSelect={false}
-                      getItemId={getObjectContextOrFolderId}
-                      getItemDataset={getObjectContextOrFolderData}
+                      getItemId={getTreeViewItemId}
+                      getItemDataset={getTreeViewItemData}
                       onEditItem={editItem}
                       // $FlowFixMe
                       selectedItems={selectedObjects}

@@ -282,17 +282,17 @@ namespace gdjs {
         externalLayout: string,
         xPos: float,
         yPos: float
-      ): gdjs.RuntimeObject[] {
+      ) {
         const externalLayoutData = scene
           .getGame()
           .getExternalLayoutData(externalLayout);
         if (externalLayoutData === null) {
-          return [];
+          return;
         }
 
         // trackByPersistentUuid is set to false as we don't want external layouts
         // instantiated at runtime to be hot-reloaded.
-        return scene.getScene().createObjectsFrom(
+        scene.getScene().createObjectsFrom(
           externalLayoutData.instances,
           xPos,
           yPos,

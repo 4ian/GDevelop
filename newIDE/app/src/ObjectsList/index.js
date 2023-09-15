@@ -45,6 +45,8 @@ import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
+const sceneObjectsRootFolderId = 'scene-objects';
+const globalObjectsRootFolderId = 'global-objects';
 
 const styles = {
   listContainer: {
@@ -272,6 +274,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           object,
           global: false, // A new object is always added to the scene (layout) by default.
         };
+
+        if (treeViewRef.current)
+          treeViewRef.current.openItem(sceneObjectsRootFolderId);
 
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
@@ -549,7 +554,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     },
                   ],
             isRoot: true,
-            id: 'global-objects',
+            id: globalObjectsRootFolderId,
           },
           {
             label: i18n._(t`Scene Objects`),
@@ -564,7 +569,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     },
                   ],
             isRoot: true,
-            id: 'scene-objects',
+            id: sceneObjectsRootFolderId,
           },
         ];
         // $FlowFixMe
@@ -662,6 +667,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           )
         );
         if (!answer) return;
+
+        if (treeViewRef.current)
+          treeViewRef.current.openItem(globalObjectsRootFolderId);
 
         // It's safe to call moveObjectToAnotherContainer because it does not invalidate the
         // references to the object in memory - so other editors like InstancesRenderer can

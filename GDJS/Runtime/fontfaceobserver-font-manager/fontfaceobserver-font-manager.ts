@@ -16,11 +16,7 @@ namespace gdjs {
   export class FontFaceObserverFontManager implements gdjs.ResourceManager {
     _resourceLoader: gdjs.ResourceLoader;
     // Associate font resource names to the loaded font family
-    _loadedFontFamily: { [key: string]: string } = {};
-    // Associate font resource names to the resources, for faster access
-    _loadedFonts: { [key: string]: ResourceData } = {};
-    // Cache the result of transforming a filename to a font family - useful to avoid duplicates.
-    _filenameToFontFamily: { [key: string]: string } = {};
+    _loadedFontFamily = new gdjs.ResourceCache<string>();
 
     /**
      * @param resources The resources data of the game.
@@ -44,10 +40,7 @@ namespace gdjs {
      * or "Arial" if not loaded.
      */
     getFontFamily(resourceName: string): string {
-      if (this._loadedFontFamily[resourceName]) {
-        return this._loadedFontFamily[resourceName];
-      }
-      return 'Arial';
+      return this._loadedFontFamily.getFromName(resourceName) || 'Arial';
     }
 
     /**
@@ -62,10 +55,8 @@ namespace gdjs {
      * @returns The file of the font resource.
      */
     getFontFile(resourceName: string): string {
-      if (this._loadedFonts[resourceName]) {
-        return this._loadedFonts[resourceName].file || '';
-      }
-      return resourceName;
+      const resource = this._resourceLoader.getResource(resourceName);
+      return resource ? resource.file || '' : resourceName;
     }
 
     /**
@@ -78,26 +69,28 @@ namespace gdjs {
      * @param filename The filename of the font.
      * @returns The font family to be used for this font resource.
      */
-    _getFontFamilyFromFilename(filename: string): string {
-      if (this._filenameToFontFamily[filename]) {
-        return this._filenameToFontFamily[filename];
+    _getFontFamilyFromFilename(resource: ResourceData): string {
+      const existingFontFamily = this._loadedFontFamily.get(resource);
+      if (existingFontFamily) {
+        return existingFontFamily;
       }
 
       // Replaces all non-alphanumeric characters with dashes to ensure no issues when
       // referring to this font family (see https://github.com/4ian/GDevelop/issues/1521).
       let baseSlugifiedName =
-        'gdjs_font_' + filename.toLowerCase().replace(/[^\w]/gi, '-');
+        'gdjs_font_' + resource.file.toLowerCase().replace(/[^\w]/gi, '-');
 
       // Ensure the generated font family is unique.
       const slugifiedName = baseSlugifiedName;
       let uniqueSuffix = 2;
-      while (!!this._filenameToFontFamily[baseSlugifiedName]) {
+      while (!!this._loadedFontFamily.getFromFile(baseSlugifiedName)) {
         baseSlugifiedName = baseSlugifiedName + '-' + uniqueSuffix;
         uniqueSuffix++;
       }
 
       // Cache the result to avoid collision with a similar slugified name for another filename.
-      return (this._filenameToFontFamily[filename] = slugifiedName);
+      this._loadedFontFamily.set(resource, slugifiedName);
+      return slugifiedName;
     }
 
     /**
@@ -182,14 +175,15 @@ namespace gdjs {
         return;
       }
 
+      if (this._loadedFontFamily[resource.name]) {
+        return;
+      }
       const file = resource.file;
-      if (file) {
-        if (this._loadedFonts[resource.name]) {
-          return;
-        }
+      if (!file) {
+        return;
       }
 
-      const fontFamily = this._getFontFamilyFromFilename(file);
+      const fontFamily = this._getFontFamilyFromFilename(resource);
       try {
         await this._loadFont(fontFamily, file);
       } catch (error) {
@@ -203,7 +197,6 @@ namespace gdjs {
         );
       }
       this._loadedFontFamily[resource.name] = fontFamily;
-      this._loadedFonts[resource.name] = resource;
     }
   }
 

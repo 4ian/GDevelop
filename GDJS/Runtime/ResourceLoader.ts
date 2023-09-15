@@ -199,7 +199,6 @@ namespace gdjs {
           onProgress(loadedCount, resources.length);
         })
       );
-      console.log('First layout is ready!');
       this._loadedLayoutNames.add(firstSceneName);
     }
 

@@ -53,7 +53,7 @@ namespace gdjs {
     private _pixiBitmapFontsToUninstall: string[] = [];
 
     /** Loaded fonts data, indexed by resource name. */
-    private _loadedFontsData: Record<string, any> = {};
+    private _loadedFontsData = new gdjs.ResourceCache<any>();
 
     private _defaultSlugFontName: string | null = null;
 
@@ -208,7 +208,9 @@ namespace gdjs {
       // The Bitmap Font is not loaded, load it in memory.
 
       // First get the font data:
-      const fontData = this._loadedFontsData[bitmapFontResourceName];
+      const fontData = this._loadedFontsData.getFromName(
+        bitmapFontResourceName
+      );
       if (!fontData) {
         logger.warn(
           'Could not find Bitmap Font for resource named "' +
@@ -254,7 +256,7 @@ namespace gdjs {
         );
         return;
       }
-      if (resource.disablePreload) {
+      if (this._loadedFontsData.get(resource)) {
         return;
       }
 
@@ -273,7 +275,7 @@ namespace gdjs {
           }
         );
         const fontData = await response.text();
-        this._loadedFontsData[resource.name] = fontData;
+        this._loadedFontsData.set(resource, fontData);
       } catch (error) {
         logger.error(
           "Can't fetch the bitmap font file " +

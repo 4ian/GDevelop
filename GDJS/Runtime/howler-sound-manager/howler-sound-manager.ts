@@ -366,8 +366,8 @@ namespace gdjs {
    * of all sounds being played.
    */
   export class HowlerSoundManager {
-    _loadedMusics: Record<string, Howl> = {};
-    _loadedSounds: Record<string, Howl> = {};
+    _loadedMusics = new gdjs.ResourceCache<Howl>();
+    _loadedSounds = new gdjs.ResourceCache<Howl>();
     _availableResources: Record<string, ResourceData> = {};
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
@@ -458,17 +458,19 @@ namespace gdjs {
      * file is associated to the given name, then the name will be considered as a
      * filename and will be returned.
      *
-     * @return The associated filename
+     * @return The associated resource
      */
-    private _getFileFromSoundName(soundName: string): string {
-      if (
-        this._availableResources.hasOwnProperty(soundName) &&
-        this._availableResources[soundName].file
-      ) {
-        return this._availableResources[soundName].file;
-      }
-      return soundName;
-    }
+    private _getAudioResource = (resourceName: string): ResourceData => {
+      const resource = this._resourceLoader.getResource(resourceName);
+      return resource && this.getResourceKinds().includes(resource.kind)
+        ? resource
+        : ({
+            file: resourceName,
+            kind: 'audio',
+            metadata: '',
+            name: resourceName,
+          } as ResourceData);
+    };
 
     /**
      * Store the sound in the specified array, put it at the first index that
@@ -510,18 +512,20 @@ namespace gdjs {
       loop: boolean,
       rate: float
     ): HowlerSound {
-      const soundFile = this._getFileFromSoundName(soundName);
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
+      const resource = this._getAudioResource(soundName);
 
-      if (!cacheContainer.hasOwnProperty(soundFile)) {
-        cacheContainer[soundFile] = new Howl(
+      let howl = cacheContainer.get(resource);
+      if (!howl) {
+        const fileName = resource ? resource.file : soundName;
+        howl = new Howl(
           Object.assign(
             {
-              src: [this._resourceLoader.getFullUrl(soundFile)],
+              src: [this._resourceLoader.getFullUrl(fileName)],
               html5: isMusic,
               xhr: {
                 withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                  soundFile
+                  fileName
                 ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
@@ -531,14 +535,10 @@ namespace gdjs {
             HowlParameters
           )
         );
+        cacheContainer.set(resource, howl);
       }
 
-      return new gdjs.HowlerSound(
-        cacheContainer[soundFile],
-        volume,
-        loop,
-        rate
-      );
+      return new gdjs.HowlerSound(howl, volume, loop, rate);
     }
 
     /**
@@ -547,27 +547,32 @@ namespace gdjs {
      * @param isMusic True if a music, false if a sound.
      */
     loadAudio(soundName: string, isMusic: boolean) {
-      const soundFile = this._getFileFromSoundName(soundName);
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
+      const resource = this._getAudioResource(soundName);
 
       // Do not reload if it is already loaded.
-      if (cacheContainer.hasOwnProperty(soundFile)) return;
+      if (cacheContainer.get(resource)) {
+        return;
+      }
 
-      cacheContainer[soundFile] = new Howl(
-        Object.assign(
-          {
-            src: [this._resourceLoader.getFullUrl(soundFile)],
-            html5: isMusic,
-            xhr: {
-              withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                soundFile
-              ),
+      cacheContainer.set(
+        resource,
+        new Howl(
+          Object.assign(
+            {
+              src: [this._resourceLoader.getFullUrl(resource.file)],
+              html5: isMusic,
+              xhr: {
+                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
+                  resource.file
+                ),
+              },
+              // Cache the sound with no volume. This avoids a bug where it plays at full volume
+              // for a split second before setting its correct volume.
+              volume: 0,
             },
-            // Cache the sound with no volume. This avoids a bug where it plays at full volume
-            // for a split second before setting its correct volume.
-            volume: 0,
-          },
-          HowlParameters
+            HowlParameters
+          )
         )
       );
     }
@@ -578,15 +583,17 @@ namespace gdjs {
      * @param isMusic True if a music, false if a sound.
      */
     unloadAudio(soundName: string, isMusic: boolean) {
-      const soundFile = this._getFileFromSoundName(soundName);
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
+      const resource = this._getAudioResource(soundName);
 
-      if (!cacheContainer[soundFile]) return;
+      const howl = cacheContainer.get(resource);
+      if (!howl) {
+        return;
+      }
 
       // Make sure any sound using the howl is deleted so
       // that the howl can be garbage collected
       // and no weird "zombies" using the unloaded howl can exist.
-      const howl = cacheContainer[soundFile];
       function clearContainer(howlerSoundContainer: HowlerSound[]) {
         for (let i in howlerSoundContainer) {
           if (
@@ -606,8 +613,8 @@ namespace gdjs {
       clearContainer(Object.values(this._sounds));
       clearContainer(this._pausedSounds);
 
-      cacheContainer[soundFile].unload();
-      delete cacheContainer[soundFile];
+      howl.unload();
+      cacheContainer.delete(resource);
     }
 
     /**
@@ -624,8 +631,8 @@ namespace gdjs {
       this._sounds = {};
       this._musics = {};
       this._pausedSounds.length = 0;
-      this._loadedMusics = {};
-      this._loadedSounds = {};
+      this._loadedMusics.clear();
+      this._loadedSounds.clear();
     }
 
     playSound(soundName: string, loop: boolean, volume: float, pitch: float) {

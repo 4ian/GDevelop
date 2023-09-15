@@ -49,7 +49,7 @@ namespace gdjs {
     /**
      * Map associating a resource name to the loaded PixiJS texture.
      */
-    private _loadedTextures: Hashtable<PIXI.Texture<PIXI.Resource>>;
+    private _loadedTextures = new gdjs.ResourceCache<PIXI.Texture>();
 
     /**
      * Map associating a resource name to the loaded Three.js texture.
@@ -68,7 +68,6 @@ namespace gdjs {
       this._invalidTexture = PIXI.Texture.from(
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQoU2P8z/D/PwMewDgyFAAApMMX8Zi0uXAAAAAASUVORK5CYIIA'
       );
-      this._loadedTextures = new Hashtable();
       this._loadedThreeTextures = new Hashtable();
       this._loadedThreeMaterials = new Hashtable();
     }
@@ -84,19 +83,28 @@ namespace gdjs {
      * @returns The requested texture, or a placeholder if not found.
      */
     getPIXITexture(resourceName: string): PIXI.Texture {
-      if (this._loadedTextures.containsKey(resourceName)) {
-        const texture = this._loadedTextures.get(resourceName);
-        if (texture.valid) {
-          return texture;
-        } else {
-          logger.error(
-            'Texture for ' +
-              resourceName +
-              ' is not valid anymore (or never was).'
-          );
-        }
+      const resource = this._getImageResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return this._invalidTexture;
       }
-      return this._invalidTexture;
+
+      const existingTexture = this._loadedTextures.get(resource);
+      if (!existingTexture) {
+        return this._invalidTexture;
+      }
+      if (!existingTexture.valid) {
+        logger.error(
+          'Texture for ' +
+            resourceName +
+            ' is not valid anymore (or never was).'
+        );
+        return this._invalidTexture;
+      }
+
+      return existingTexture;
     }
 
     /**
@@ -173,7 +181,9 @@ namespace gdjs {
      */
     getThreeTexture(resourceName: string): THREE.Texture {
       const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
-      if (loadedThreeTexture) return loadedThreeTexture;
+      if (loadedThreeTexture) {
+        return loadedThreeTexture;
+      }
 
       // Texture is not loaded, load it now from the PixiJS texture.
       // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
@@ -250,10 +260,22 @@ namespace gdjs {
      * @param resourceName The name of the resource to get.
      */
     getPIXIVideoTexture(resourceName: string) {
-      if (this._loadedTextures.containsKey(resourceName)) {
-        return this._loadedTextures.get(resourceName);
+      if (resourceName === '') {
+        return this._invalidTexture;
       }
-      return this._invalidTexture;
+      const resource = this._getImageResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find video texture for resource "' + resourceName + '".'
+        );
+        return this._invalidTexture;
+      }
+
+      const texture = this._loadedTextures.get(resource);
+      if (!texture) {
+        return this._invalidTexture;
+      }
+      return texture;
     }
 
     private _getImageResource = (resourceName: string): ResourceData | null => {
@@ -292,6 +314,9 @@ namespace gdjs {
      * @param onProgress Callback called each time a new file is loaded.
      */
     async _loadTexture(resource: ResourceData): Promise<void> {
+      if (this._loadedTextures.get(resource)) {
+        return;
+      }
       try {
         if (resource.kind === 'video') {
           // For videos, we want to preload them so they are available as soon as we want to use them.
@@ -319,7 +344,7 @@ namespace gdjs {
             const baseTexture = texture.baseTexture;
 
             baseTexture.on('loaded', () => {
-              this._loadedTextures.put(resource.name, texture);
+              this._loadedTextures.set(resource, texture);
               applyTextureSettings(texture, resource);
               resolve();
             });
@@ -346,7 +371,7 @@ namespace gdjs {
           );
           await loadedTexture.baseTexture.resource.load();
 
-          this._loadedTextures.put(resource.name, loadedTexture);
+          this._loadedTextures.set(resource, loadedTexture);
           console.log('Loaded: ' + resource.name);
           // TODO What if 2 assets share the same file with different settings?
           applyTextureSettings(loadedTexture, resource);

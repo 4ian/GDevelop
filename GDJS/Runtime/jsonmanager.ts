@@ -24,8 +24,8 @@ namespace gdjs {
   export class JsonManager implements gdjs.ResourceManager {
     _resourceLoader: ResourceLoader;
 
-    _loadedJsons: { [key: string]: Object } = {};
-    _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
+    _loadedJsons = new gdjs.ResourceCache<Object>();
+    _callbacks = new gdjs.ResourceCache<Array<JsonManagerRequestCallback>>();
 
     /**
      * @param resourceDataArray The resources data of the game.
@@ -107,20 +107,21 @@ namespace gdjs {
       }
 
       // Don't fetch again an object that is already in memory
-      if (this._loadedJsons[resourceName]) {
-        callback(null, this._loadedJsons[resourceName]);
+      if (this._loadedJsons.get(resource)) {
+        callback(null, this._loadedJsons.get(resource));
         return;
       }
       // Don't fetch again an object that is already being fetched.
       {
-        const callbacks = this._callbacks[resourceName];
+        const callbacks = this._callbacks.get(resource);
         if (callbacks) {
           callbacks.push(callback);
           return;
         } else {
-          this._callbacks[resourceName] = [callback];
+          this._callbacks.set(resource, [callback]);
         }
       }
+
       const that = this;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
@@ -129,7 +130,7 @@ namespace gdjs {
       );
       xhr.open('GET', this._resourceLoader.getFullUrl(resource.file));
       xhr.onload = function () {
-        const callbacks = that._callbacks[resourceName];
+        const callbacks = that._callbacks.get(resource);
         if (!callbacks) {
           return;
         }
@@ -142,36 +143,36 @@ namespace gdjs {
               null
             );
           }
-          delete that._callbacks[resourceName];
+          that._callbacks.delete(resource);
           return;
         }
 
         // Cache the result
-        that._loadedJsons[resourceName] = xhr.response;
+        that._loadedJsons.set(resource, xhr.response);
         for (const callback of callbacks) {
           callback(null, xhr.response);
         }
-        delete that._callbacks[resourceName];
+        that._callbacks.delete(resource);
       };
       xhr.onerror = function () {
-        const callbacks = that._callbacks[resourceName];
+        const callbacks = that._callbacks.get(resource);
         if (!callbacks) {
           return;
         }
         for (const callback of callbacks) {
           callback(new Error('Network error'), null);
         }
-        delete that._callbacks[resourceName];
+        that._callbacks.delete(resource);
       };
       xhr.onabort = function () {
-        const callbacks = that._callbacks[resourceName];
+        const callbacks = that._callbacks.get(resource);
         if (!callbacks) {
           return;
         }
         for (const callback of callbacks) {
           callback(new Error('Request aborted'), null);
         }
-        delete that._callbacks[resourceName];
+        that._callbacks.delete(resource);
       };
       xhr.send();
     }
@@ -182,7 +183,7 @@ namespace gdjs {
      * @returns true if the content of the json resource is loaded. false otherwise.
      */
     isJsonLoaded(resourceName: string): boolean {
-      return !!this._loadedJsons[resourceName];
+      return !!this._loadedJsons.getFromName(resourceName);
     }
 
     /**
@@ -193,7 +194,7 @@ namespace gdjs {
      * @returns the content of the json resource, if loaded. `null` otherwise.
      */
     getLoadedJson(resourceName: string): Object | null {
-      return this._loadedJsons[resourceName] || null;
+      return this._loadedJsons.getFromName(resourceName) || null;
     }
   }
 }

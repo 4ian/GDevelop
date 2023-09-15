@@ -16,7 +16,7 @@ namespace gdjs {
     /**
      * Map associating a resource name to the loaded Three.js model.
      */
-    private _loadedThreeModels = new Map<String, THREE_ADDONS.GLTF>();
+    private _loadedThreeModels = new gdjs.ResourceCache<THREE_ADDONS.GLTF>();
 
     _resourceLoader: gdjs.ResourceLoader;
 
@@ -82,6 +82,9 @@ namespace gdjs {
         );
         return;
       }
+      if (this._loadedThreeModels.get(resource)) {
+        return;
+      }
       const loader = this._loader;
       if (!loader) {
         return;
@@ -95,7 +98,7 @@ namespace gdjs {
           url,
           (event) => {}
         );
-        this._loadedThreeModels.set(resource.name, gltf);
+        this._loadedThreeModels.set(resource, gltf);
       } catch (error) {
         logger.error(
           "Can't fetch the 3D model file " + resource.file + ', error: ' + error
@@ -112,7 +115,9 @@ namespace gdjs {
      * @returns a 3D model if it exists.
      */
     getModel(resourceName: string): THREE_ADDONS.GLTF {
-      return this._loadedThreeModels.get(resourceName) || this._invalidModel;
+      return (
+        this._loadedThreeModels.getFromName(resourceName) || this._invalidModel
+      );
     }
   }
 }

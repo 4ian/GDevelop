@@ -91,7 +91,7 @@ export type TreeViewInterface<Item> = {|
 
 type Props<Item> = {|
   height: number,
-  width: number,
+  width?: number,
   items: Item[],
   getItemName: Item => string,
   getItemId: Item => string,
@@ -398,7 +398,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         height={height}
         itemCount={flattenedData.length}
         itemSize={32}
-        width={width}
+        width={typeof width === 'number' ? width : '100%'}
         itemKey={index => flattenedData[index].id}
         // Flow does not seem to accept the generic used in FixedSizeList
         // can itself use a generic.

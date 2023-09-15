@@ -235,7 +235,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                           </div>
                         )}
                         {!hideMenuButton && !node.item.isRoot && (
-                          <div className="row-content-side">
+                          <div className="row-content-side row-content-side-right">
                             <IconButton
                               size="small"
                               onClick={e => {

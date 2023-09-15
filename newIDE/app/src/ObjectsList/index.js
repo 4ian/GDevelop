@@ -566,21 +566,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return true;
         }
 
-        const displayedGlobalObjectsWithContext = displayedObjectWithContextsList.filter(
-          objectWithContext => objectWithContext.global
-        );
-
-        if (
-          selectedObjectsWithContext.every(
-            selectedObject => !selectedObject.global
-          ) &&
-          destinationObjectWithContextOrFolder.global &&
-          displayedGlobalObjectsWithContext.indexOf(
-            destinationObjectWithContextOrFolder
-          ) === 0
-        ) {
-          return true;
-        }
         return false;
       },
       [displayedObjectWithContextsList, selectedObjectNames]

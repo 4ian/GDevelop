@@ -910,14 +910,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           <I18n>
             {({ i18n }) => (
               <div style={{ flex: 1 }}>
-                <AutoSizer>
-                  {({ height, width }) => (
+                <AutoSizer style={{ width: '100%' }} disableWidth>
+                  {({ height }) => (
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
                       // $FlowFixMe
                       items={getTreeViewData(i18n)}
-                      width={width}
                       height={height}
                       searchText={searchText}
                       getItemName={getObjectWithContextOrFolderName}

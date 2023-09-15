@@ -8,6 +8,7 @@
 .tree-view .full-space-container {
   flex: 1;
   height: 100%;
+  width: 100%;
 }
 
 .tree-view .row-content {
@@ -15,23 +16,34 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 .tree-view .row-content-side {
   display: flex;
   align-items: center;
   height: 100%;
+  position: relative;
 }
 
 .tree-view .row-content-side.row-content-side-left {
   /* Used for a better dragging preview. */
   padding: 0 6px;
+  /* Necessary for item-name to be overflown. */
+  width: 80%;
+}
+.tree-view .row-content-side.row-content-side-right {
+  /* Used for a better dragging preview. */
+  position: absolute;
+  right: 0;
+  z-index: 1;
 }
 
 .tree-view .row-container {
   display: flex;
   flex: 1;
   border-radius: 6px;
+  width: 100%;
 }
 .tree-view .row-container.selected {
   background-color: var(--table-row-selected-background-color);

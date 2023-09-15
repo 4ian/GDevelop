@@ -134,7 +134,6 @@ type State = {|
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
 
-  renamedObjectWithContext: ?ObjectWithContext,
   selectedObjectsWithContext: Array<ObjectWithContext>,
   selectedLayer: string,
 |};
@@ -190,7 +189,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       selectedObjectTags: [],
 
-      renamedObjectWithContext: null,
       selectedObjectsWithContext: [],
       selectedLayer: BASE_LAYER_NAME,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
@@ -794,25 +792,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onRenameObjectStart = (objectWithContext: ?ObjectWithContext) => {
-    const selectedObjectsWithContext = [];
-    if (objectWithContext) {
-      selectedObjectsWithContext.push(objectWithContext);
-    }
-
-    this.setState(
-      {
-        renamedObjectWithContext: objectWithContext,
-        selectedObjectsWithContext,
-      },
-      () => {
-        this.updateToolbar();
-      }
-    );
-  };
-
   _startRenamingSelectedObject = () => {
-    this._onRenameObjectStart(this.state.selectedObjectsWithContext[0]);
+    const firstSelectedObject = this.state.selectedObjectsWithContext[0];
+    if (!firstSelectedObject) return;
+
+    if (this.editorDisplay)
+      this.editorDisplay.renameObjectWithContext(firstSelectedObject);
+    this.updateToolbar();
   };
 
   _onRenameLayer = (
@@ -1568,7 +1554,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 editInstanceVariables={this.editInstanceVariables}
                 editObjectByName={this.editObjectByName}
                 selectedObjectNames={selectedObjectNames}
-                renamedObjectWithContext={this.state.renamedObjectWithContext}
                 onRenameLayer={this._onRenameLayer}
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={(layer: string) =>
@@ -1585,7 +1570,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
                 updateBehaviorsSharedData={this.updateBehaviorsSharedData}
                 onEditObject={this.props.onEditObject || this.editObject}
-                onRenameObjectStart={this._onRenameObjectStart}
                 onRenameObjectFinish={this._onRenameObjectFinish}
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}

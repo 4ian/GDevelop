@@ -32,7 +32,6 @@ export type SceneEditorsDisplayProps = {|
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
   onEditObject: gdObject => void,
   selectedObjectNames: string[],
-  renamedObjectWithContext: ?ObjectWithContext,
   onSelectLayer: (layerName: string) => void,
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
@@ -54,7 +53,6 @@ export type SceneEditorsDisplayProps = {|
     objectName: string,
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
-  onRenameObjectStart: (?ObjectWithContext) => void,
   onRenameObjectFinish: (
     objectWithContext: ObjectWithContext,
     newName: string,
@@ -121,6 +119,7 @@ export type SceneEditorsDisplayInterface = {|
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
+  renameObjectWithContext: (ObjectWithContext) => void,
   viewControls: {|
     zoomBy: (factor: number) => void,
     setZoomFactor: (factor: number) => void,

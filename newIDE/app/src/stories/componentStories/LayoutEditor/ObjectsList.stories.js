@@ -39,10 +39,8 @@ export const Default = () => (
         getAllObjectTags={() => []}
         getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
-        onRenameObjectStart={() => {}}
         onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
         onObjectSelected={() => {}}
-        renamedObjectWithContext={null}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         canInstallPrivateAsset={() => false}
       />
@@ -70,10 +68,8 @@ export const WithSerializedObjectView = () => (
           getAllObjectTags={() => []}
           getValidatedObjectOrGroupName={newName => newName}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameObjectStart={() => {}}
           onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
           onObjectSelected={() => {}}
-          renamedObjectWithContext={null}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           canInstallPrivateAsset={() => false}
         />
@@ -106,10 +102,8 @@ export const WithTags = () => (
         ]}
         getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
-        onRenameObjectStart={() => {}}
         onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
         onObjectSelected={() => {}}
-        renamedObjectWithContext={null}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         canInstallPrivateAsset={() => false}
       />

@@ -86,6 +86,7 @@ const getItemProps = memoizeOne(
 export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
   scrollToItem: Item => void,
+  renameItem: Item => void,
 |};
 
 type Props<Item> = {|
@@ -294,6 +295,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   const onEndRenaming = (item: Item, newName: string) => {
     const trimmedNewName = newName.trim();
     setRenamedItemId(null);
+    if (!trimmedNewName) return;
     if (getItemName(item) === trimmedNewName) return;
     onRenameItem(item, trimmedNewName);
   };
@@ -320,12 +322,20 @@ const TreeView = <Item: ItemBaseAttributes>(
     [getItemId, flattenedData]
   );
 
+  const renameItem = React.useCallback(
+    (item: Item) => {
+      setRenamedItemId(getItemId(item));
+    },
+    [getItemId]
+  );
+
   React.useImperativeHandle(
     // $FlowFixMe
     ref,
     () => ({
       forceUpdateList: forceUpdate,
       scrollToItem,
+      renameItem,
     })
   );
 

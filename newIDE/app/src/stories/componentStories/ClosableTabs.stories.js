@@ -274,13 +274,11 @@ export const WithObjectsList = () => (
                   getAllObjectTags={() => []}
                   getValidatedObjectOrGroupName={newName => newName}
                   onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameObjectStart={() => {}}
                   onRenameObjectFinish={(objectWithContext, newName, cb) =>
                     cb(true)
                   }
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
-                  renamedObjectWithContext={null}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   canInstallPrivateAsset={() => false}
                 />

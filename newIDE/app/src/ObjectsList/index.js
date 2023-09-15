@@ -17,11 +17,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import {
-  enumerateObjects,
-  filterObjectsList,
-  isSameObjectWithContext,
-} from './EnumerateObjects';
+import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
@@ -124,6 +120,7 @@ export type ObjectsListInterface = {|
   forceUpdateList: () => void,
   openNewObjectDialog: () => void,
   closeNewObjectDialog: () => void,
+  renameObjectWithContext: ObjectWithContext => void,
 |};
 
 type Props = {|
@@ -137,8 +134,6 @@ type Props = {|
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
   ) => void,
-  renamedObjectWithContext: ?ObjectWithContext,
-  onRenameObjectStart: (?ObjectWithContext) => void,
   onRenameObjectFinish: (
     objectWithContext: ObjectWithContext,
     newName: string,
@@ -180,8 +175,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObject,
-      renamedObjectWithContext,
-      onRenameObjectStart,
       onRenameObjectFinish,
       selectedObjectNames,
       canInstallPrivateAsset,
@@ -231,6 +224,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       closeNewObjectDialog: () => {
         setNewObjectDialogOpen(false);
+      },
+      renameObjectWithContext: objectWithContext => {
+        if (treeViewRef.current)
+          treeViewRef.current.renameItem(objectWithContext);
       },
     }));
 
@@ -453,11 +450,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const editName = React.useCallback(
       (objectWithContext: ?ObjectWithContext) => {
-        onRenameObjectStart(objectWithContext);
-        // TODO Should it be called later?
-        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+        if (!objectWithContext) return;
+        if (treeViewRef.current)
+          treeViewRef.current.renameItem(objectWithContext);
       },
-      [onRenameObjectStart]
+      []
     );
 
     const duplicateObject = React.useCallback(
@@ -485,7 +482,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (objectWithContextOrFolder: TreeViewItem, newName: string) => {
         if (objectWithContextOrFolder.isRoot) return;
         const { global } = objectWithContextOrFolder;
-        onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContextOrFolder) === newName)
           return;
@@ -501,12 +497,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           }
         );
       },
-      [
-        getValidatedObjectOrGroupName,
-        onObjectModified,
-        onRenameObjectStart,
-        onRenameObjectFinish,
-      ]
+      [getValidatedObjectOrGroupName, onObjectModified, onRenameObjectFinish]
     );
 
     const editItem = React.useCallback(
@@ -535,10 +526,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       objectWithContext =>
         selectedObjectNames.indexOf(objectWithContext.object.getName()) !== -1
     );
-    const displayedRenamedObjectWithContext = displayedObjectWithContextsList.find(
-      isSameObjectWithContext(renamedObjectWithContext)
-    );
-    console.log(displayedRenamedObjectWithContext);
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [

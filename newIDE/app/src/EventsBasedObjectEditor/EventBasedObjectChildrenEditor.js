@@ -27,7 +27,6 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   selectedObjectsWithContext: ObjectWithContext[],
-  renamedObjectWithContext: ?ObjectWithContext,
 |};
 
 export default class EventBasedObjectChildrenEditor extends React.Component<
@@ -40,7 +39,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     editedObjectWithContext: null,
     editedObjectInitialTab: 'properties',
     selectedObjectsWithContext: [],
-    renamedObjectWithContext: null,
   };
 
   _onDeleteObject = (i18n: I18nType) => (
@@ -92,23 +90,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     );
 
     return safeAndUniqueNewName;
-  };
-
-  _onRenameObjectStart = (objectWithContext: ?ObjectWithContext) => {
-    const selectedObjectsWithContext = [];
-    if (objectWithContext) {
-      selectedObjectsWithContext.push(objectWithContext);
-    }
-
-    this.setState(
-      {
-        renamedObjectWithContext: objectWithContext,
-        selectedObjectsWithContext,
-      },
-      () => {
-        this.forceUpdateObjectsList();
-      }
-    );
   };
 
   _onRenameEditedObject = (newName: string, i18n: I18nType) => {
@@ -241,8 +222,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Nothing special to do.
                 onObjectCreated={() => {}}
                 onObjectSelected={this._onObjectSelected}
-                renamedObjectWithContext={this.state.renamedObjectWithContext}
-                onRenameObjectStart={this._onRenameObjectStart}
                 onRenameObjectFinish={(objectWithContext, newName, done) =>
                   this._onRenameObject(objectWithContext, newName, done, i18n)
                 }

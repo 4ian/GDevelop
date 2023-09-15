@@ -599,16 +599,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const moveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem) => {
         if (destinationItem.isRoot || destinationItem.isPlaceholder) return;
-        const displayedGlobalObjectsWithContext = displayedObjectWithContextsList.filter(
-          objectWithContext => objectWithContext.global
-        );
-        const displayedLocalObjectsWithContext = displayedObjectWithContextsList.filter(
-          objectWithContext => !objectWithContext.global
-        );
-
-        const isDestinationItemFirstItemOfGlobalDisplayedList =
-          destinationItem.global &&
-          displayedGlobalObjectsWithContext.indexOf(destinationItem) === 0;
 
         const selectedObjectsWithContext = displayedObjectWithContextsList.filter(
           objectWithContext =>
@@ -628,21 +618,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             toIndex = container.getObjectPosition(
               destinationItem.object.getName()
             );
-          } else if (
-            !movedObjectWithContext.global &&
-            isDestinationItemFirstItemOfGlobalDisplayedList
-          ) {
-            container = objectsContainer;
-            fromIndex = container.getObjectPosition(
-              movedObjectWithContext.object.getName()
-            );
-            toIndex = !searchText
-              ? container.getObjectsCount()
-              : container.getObjectPosition(
-                  displayedLocalObjectsWithContext[
-                    displayedLocalObjectsWithContext.length - 1
-                  ].object.getName()
-                ) + 1;
           } else {
             return;
           }
@@ -656,7 +631,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectModified,
         project,
-        searchText,
         selectedObjectNames,
       ]
     );

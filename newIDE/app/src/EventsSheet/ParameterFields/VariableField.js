@@ -184,7 +184,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       ) : quicklyAnalysisResult ===
         VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
         <Trans>
-          This variable is not declared. Add it first to the list of variables.
+          This variable is not declared. Use the variable editor to add it.
         </Trans>
       ) : null;
 

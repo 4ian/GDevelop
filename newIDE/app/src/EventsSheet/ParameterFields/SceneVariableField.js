@@ -80,6 +80,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             }
             helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
+            preventRefactoringToDeleteInstructions
           />
         )}
       </React.Fragment>

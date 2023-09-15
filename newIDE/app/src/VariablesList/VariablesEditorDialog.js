@@ -37,6 +37,12 @@ type Props = {|
   onComputeAllVariableNames: () => Array<string>,
   helpPagePath: ?string,
   id?: string,
+
+  /**
+   * If set to true, a deleted variable won't trigger a confirmation asking if the
+   * project must be refactored to delete any reference to it.
+   */
+  preventRefactoringToDeleteInstructions?: boolean,
 |};
 
 const VariablesEditorDialog = ({
@@ -53,6 +59,7 @@ const VariablesEditorDialog = ({
   hotReloadPreviewButtonProps,
   onComputeAllVariableNames,
   helpPagePath,
+  preventRefactoringToDeleteInstructions,
   id,
 }: Props) => {
   const { showConfirmation } = useAlertDialog();
@@ -81,6 +88,11 @@ const VariablesEditorDialog = ({
           getOriginalContentSerializedElement(),
           variablesContainer
         );
+        if (preventRefactoringToDeleteInstructions) {
+          // Clear the removed variables from the changeset, so they do not trigger
+          // deletion of actions/conditions or events using them.
+          changeset.clearRemovedVariables();
+        }
         if (changeset.hasRemovedVariables()) {
           const shouldRemoveVariables = await showConfirmation({
             title: t`Remove actions and conditions?`,
@@ -110,6 +122,7 @@ const VariablesEditorDialog = ({
       variablesContainer,
       inheritedVariablesContainer,
       showConfirmation,
+      preventRefactoringToDeleteInstructions,
     ]
   );
 

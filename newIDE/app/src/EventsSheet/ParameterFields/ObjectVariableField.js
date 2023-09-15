@@ -109,6 +109,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               setEditorOpen(false);
               if (field.current) field.current.updateAutocompletions();
             }}
+            preventRefactoringToDeleteInstructions
           />
         )}
       </React.Fragment>

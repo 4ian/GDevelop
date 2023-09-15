@@ -72,6 +72,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             }
             helpPagePath={'/all-features/variables/global-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
+            preventRefactoringToDeleteInstructions
           />
         )}
       </React.Fragment>

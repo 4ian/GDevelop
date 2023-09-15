@@ -17,7 +17,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
+import { enumerateObjects } from './EnumerateObjects';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
@@ -527,14 +527,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     };
 
     const lists = enumerateObjects(project, objectsContainer);
-    const displayedObjectWithContextsList = filterObjectsList(
-      lists.allObjectsList,
-      {
-        searchText,
-        selectedTags: selectedObjectTags,
-      }
-    );
-    const selectedObjects: $ReadOnlyArray<TreeViewItem> = displayedObjectWithContextsList.filter(
+    const selectedObjects: $ReadOnlyArray<TreeViewItem> = lists.allObjectsList.filter(
       objectWithContext =>
         selectedObjectNames.indexOf(objectWithContext.object.getName()) !== -1
     );
@@ -583,7 +576,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (destinationItem.isRoot || destinationItem.isPlaceholder)
           return false;
         // Check if at least one element in the selection can be moved.
-        const selectedObjectsWithContext = displayedObjectWithContextsList.filter(
+        const selectedObjectsWithContext = lists.allObjectsList.filter(
           objectWithContext =>
             selectedObjectNames.indexOf(objectWithContext.object.getName()) !==
             -1
@@ -598,14 +591,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         return false;
       },
-      [displayedObjectWithContextsList, selectedObjectNames]
+      [lists.allObjectsList, selectedObjectNames]
     );
 
     const moveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem) => {
         if (destinationItem.isRoot || destinationItem.isPlaceholder) return;
 
-        const selectedObjectsWithContext = displayedObjectWithContextsList.filter(
+        const selectedObjectsWithContext = lists.allObjectsList.filter(
           objectWithContext =>
             selectedObjectNames.indexOf(objectWithContext.object.getName()) !==
             -1
@@ -632,7 +625,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectModified(true);
       },
       [
-        displayedObjectWithContextsList,
+        lists.allObjectsList,
         objectsContainer,
         onObjectModified,
         project,

@@ -216,10 +216,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             ) : (
                               <span
                                 className={`item-name${
-                                  node.item.isRoot ? ' root-folder' : ''
+                                  node.item.isRoot
+                                    ? ' root-folder'
+                                    : node.item.isPlaceholder
+                                    ? ' placeholder'
+                                    : ''
                                 }`}
                                 onClick={
-                                  node.item.isRoot
+                                  node.item.isRoot || node.item.isPlaceholder
                                     ? null
                                     : e => {
                                         if (!e.metaKey && !e.shiftKey) {
@@ -234,24 +238,26 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             )}
                           </div>
                         )}
-                        {!hideMenuButton && !node.item.isRoot && (
-                          <div className="row-content-side row-content-side-right">
-                            <IconButton
-                              size="small"
-                              onClick={e => {
-                                e.stopPropagation();
-                                onContextMenu({
-                                  item: node.item,
-                                  index,
-                                  x: e.clientX,
-                                  y: e.clientY,
-                                });
-                              }}
-                            >
-                              <ThreeDotsMenu />
-                            </IconButton>
-                          </div>
-                        )}
+                        {!hideMenuButton &&
+                          !node.item.isRoot &&
+                          !node.item.isPlaceholder && (
+                            <div className="row-content-side row-content-side-right">
+                              <IconButton
+                                size="small"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  onContextMenu({
+                                    item: node.item,
+                                    index,
+                                    x: e.clientX,
+                                    y: e.clientY,
+                                  });
+                                }}
+                              >
+                                <ThreeDotsMenu />
+                              </IconButton>
+                            </div>
+                          )}
                       </div>
                     </div>
                   )}

@@ -13,7 +13,10 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
-export type ItemBaseAttributes = { +isRoot?: boolean };
+export type ItemBaseAttributes = {
+  +isRoot?: boolean,
+  +isPlaceholder?: boolean,
+};
 
 type FlattenedNode<Item> = {|
   id: string,

@@ -23,7 +23,7 @@ import {
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
-import { type TopLevelFolder } from '../ObjectsList';
+import { type RootFolder, type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
@@ -36,33 +36,26 @@ const styles = {
   },
 };
 
-type TreeViewItem = GroupWithContext | TopLevelFolder;
+type TreeViewItem = GroupWithContext | RootFolder | EmptyPlaceholder;
 
 const getGroupWithContextName = (groupWithContext: GroupWithContext): string =>
   groupWithContext.group.getName();
 
-const getGroupWithContextOrFolderName = (
-  groupWithContextOrFolder: TreeViewItem
-) =>
-  groupWithContextOrFolder.isRoot
-    ? groupWithContextOrFolder.label
-    : groupWithContextOrFolder.group.getName();
+const getTreeViewItemName = (item: TreeViewItem) =>
+  item.isRoot || item.isPlaceholder ? item.label : item.group.getName();
 
-const getGroupWithContextOfFolderChildren = (
-  groupWithContextOrFolder: TreeViewItem
-) =>
-  groupWithContextOrFolder.isRoot ? groupWithContextOrFolder.children : null;
+const getTreeViewItemChildren = (item: TreeViewItem) =>
+  item.isRoot ? item.children : null;
 
-const getGroupContextOrFolderId = (groupWithContextOrFolder: TreeViewItem) =>
-  groupWithContextOrFolder.isRoot
-    ? groupWithContextOrFolder.id
-    : `group-item-${getGroupWithContextName(groupWithContextOrFolder)}`;
+const getTreeViewItemId = (item: TreeViewItem) =>
+  item.isRoot || item.isPlaceholder
+    ? item.id
+    : `group-item-${getGroupWithContextName(item)}`;
 
 const isGroupWithContextGlobal = (groupWithContext: GroupWithContext) =>
   groupWithContext.global;
 
 type State = {|
-  renamedGroupWithContext: ?GroupWithContext,
   selectedGroupWithContext: ?GroupWithContext,
   searchText: string,
 |};
@@ -101,7 +94,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   displayedObjectGroupsList: GroupWithContextList = [];
   displayedGlobalObjectGroupsList: GroupWithContextList = [];
   state: State = {
-    renamedGroupWithContext: null,
     selectedGroupWithContext: null,
     searchText: '',
   };
@@ -115,8 +107,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     // call forceUpdate.
 
     if (
-      this.state.renamedGroupWithContext !==
-        nextState.renamedGroupWithContext ||
       this.state.selectedGroupWithContext !==
         nextState.selectedGroupWithContext ||
       this.state.searchText !== nextState.searchText
@@ -191,14 +181,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   };
 
   _onEditName = (groupWithContext: GroupWithContext) => {
-    this.setState(
-      {
-        renamedGroupWithContext: groupWithContext,
-      },
-      () => {
-        if (this.treeView) this.treeView.forceUpdateList();
-      }
-    );
+    if (this.treeView) this.treeView.renameItem(groupWithContext);
   };
 
   _onDuplicate = (groupWithContext: GroupWithContext): ?GroupWithContext => {
@@ -233,10 +216,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {
     const { group, global } = groupWithContext;
-
-    this.setState({
-      renamedGroupWithContext: null,
-    });
 
     if (group.getName() === newName) return;
 
@@ -298,20 +277,18 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
-  _canMoveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
+  _canMoveSelectionTo = (destinationItem: TreeViewItem) => {
+    if (destinationItem.isRoot || destinationItem.isPlaceholder) return false;
     if (!this.state.selectedGroupWithContext) return false;
 
-    if (
-      this.state.selectedGroupWithContext.global ===
-      targetGroupWithContext.global
-    ) {
+    if (this.state.selectedGroupWithContext.global === destinationItem.global) {
       return true;
     }
 
     if (
       !this.state.selectedGroupWithContext.global &&
-      targetGroupWithContext.global &&
-      this.displayedGlobalObjectGroupsList.indexOf(targetGroupWithContext) === 0
+      destinationItem.global &&
+      this.displayedGlobalObjectGroupsList.indexOf(destinationItem) === 0
     ) {
       // Allow drop on first element of global items to put local item at the end of its list
       return true;
@@ -326,7 +303,8 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     });
   };
 
-  _moveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
+  _moveSelectionTo = (destinationItem: TreeViewItem) => {
+    if (destinationItem.isRoot || destinationItem.isPlaceholder) return false;
     const { selectedGroupWithContext } = this.state;
     if (!selectedGroupWithContext) return;
 
@@ -336,13 +314,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     let toIndex: number;
 
     const areSelectedAndTargetItemsFromSameContext =
-      selectedGroupWithContext.global === targetGroupWithContext.global;
+      selectedGroupWithContext.global === destinationItem.global;
 
     const isDroppingLocalItemOnFirstGlobalItemOfDisplayedList =
       !selectedGroupWithContext.global &&
-      targetGroupWithContext.global &&
-      globalObjectGroups.getPosition(targetGroupWithContext.group.getName()) ===
-        0;
+      destinationItem.global &&
+      globalObjectGroups.getPosition(destinationItem.group.getName()) === 0;
 
     if (areSelectedAndTargetItemsFromSameContext) {
       container = selectedGroupWithContext.global
@@ -352,7 +329,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       fromIndex = container.getPosition(
         selectedGroupWithContext.group.getName()
       );
-      toIndex = container.getPosition(targetGroupWithContext.group.getName());
+      toIndex = container.getPosition(destinationItem.group.getName());
     } else if (isDroppingLocalItemOnFirstGlobalItemOfDisplayedList) {
       container = objectGroups;
       fromIndex = container.getPosition(
@@ -375,45 +352,48 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     if (this.treeView) this.treeView.forceUpdateList();
   };
 
-  _editItem = (groupWithContextOrFolder: TreeViewItem) => {
-    if (groupWithContextOrFolder.isRoot) return;
-    this.props.onEditGroup(groupWithContextOrFolder.group);
+  _editItem = (item: TreeViewItem) => {
+    if (item.isRoot || item.isPlaceholder) return;
+    this.props.onEditGroup(item.group);
   };
 
   _renderGroupMenuTemplate = (i18n: I18nType) => (
-    groupWithContext: GroupWithContext,
+    item: TreeViewItem,
     index: number
-  ) => [
-    {
-      label: i18n._(t`Duplicate`),
-      click: () => this._onDuplicate(groupWithContext),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Edit group`),
-      click: () => this.props.onEditGroup(groupWithContext.group),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Rename`),
-      click: () => this._onEditName(groupWithContext),
-    },
-    {
-      label: i18n._(t`Set as global group`),
-      enabled: !isGroupWithContextGlobal(groupWithContext),
-      click: () => this._setAsGlobalGroup(i18n, groupWithContext),
-      visible: this.props.canSetAsGlobalGroup !== false,
-    },
-    {
-      label: i18n._(t`Delete`),
-      click: () => this._onDelete(groupWithContext),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Add a new group...`),
-      click: this.addGroup,
-    },
-  ];
+  ) =>
+    item.isRoot || item.isPlaceholder
+      ? null
+      : [
+          {
+            label: i18n._(t`Duplicate`),
+            click: () => this._onDuplicate(item),
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Edit group`),
+            click: () => this.props.onEditGroup(item.group),
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Rename`),
+            click: () => this._onEditName(item),
+          },
+          {
+            label: i18n._(t`Set as global group`),
+            enabled: !isGroupWithContextGlobal(item),
+            click: () => this._setAsGlobalGroup(i18n, item),
+            visible: this.props.canSetAsGlobalGroup !== false,
+          },
+          {
+            label: i18n._(t`Delete`),
+            click: () => this._onDelete(item),
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Add a new group...`),
+            click: this.addGroup,
+          },
+        ];
 
   scrollToItem = (groupWithContext: GroupWithContext) => {
     if (this.treeView) {
@@ -433,13 +413,31 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const treeViewItems = [
       {
         label: i18n._(t`Global Groups`),
-        children: globalObjectGroupsList,
+        children:
+          globalObjectGroupsList.length > 0
+            ? globalObjectGroupsList
+            : [
+                {
+                  label: i18n._(t`There is no global group yet.`),
+                  id: 'global-empty-placeholder',
+                  isPlaceholder: true,
+                },
+              ],
         isRoot: true,
         id: 'global-groups',
       },
       {
         label: i18n._(t`Scene Groups`),
-        children: objectGroupsList,
+        children:
+          objectGroupsList.length > 0
+            ? objectGroupsList
+            : [
+                {
+                  label: i18n._(t`Start by adding a new group.`),
+                  id: 'scene-empty-placeholder',
+                  isPlaceholder: true,
+                },
+              ],
         isRoot: true,
         id: 'scene-groups',
       },
@@ -485,10 +483,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                       items={this._getTreeViewData(i18n)}
                       height={height}
                       searchText={searchText}
-                      getItemName={getGroupWithContextOrFolderName}
-                      getItemChildren={getGroupWithContextOfFolderChildren}
+                      getItemName={getTreeViewItemName}
+                      getItemChildren={getTreeViewItemChildren}
                       multiSelect={false}
-                      getItemId={getGroupContextOrFolderId}
+                      getItemId={getTreeViewItemId}
                       onEditItem={this._editItem}
                       // $FlowFixMe
                       selectedItems={
@@ -499,7 +497,11 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                       onSelectItems={items => {
                         if (!items) this._selectGroup(null);
                         const itemToSelect = items[0];
-                        if ('isRoot' in itemToSelect) return;
+                        if (
+                          'isRoot' in itemToSelect ||
+                          'isPlaceholder' in itemToSelect
+                        )
+                          return;
                         this._selectGroup(itemToSelect || null);
                       }}
                       onRenameItem={this._onRename}

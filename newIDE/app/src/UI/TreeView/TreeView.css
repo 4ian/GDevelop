@@ -60,8 +60,13 @@
   text-overflow: ellipsis;
   user-select: none;
 }
-.tree-view .item-name:not(.root-folder) {
+.tree-view .item-name:not(.root-folder):not(.placeholder) {
   cursor: text;
+}
+
+.tree-view .item-name.placeholder {
+  color: var(--theme-text-secondary-color);
+  font-size: 14px;
 }
 
 .tree-view .item-name.root-folder {

@@ -27,6 +27,8 @@ import { type RootFolder, type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
+const sceneGroupsRootFolderId = 'scene-groups';
+const globalGroupsRootFolderId = 'global-groups';
 
 const styles = {
   listContainer: {
@@ -142,6 +144,8 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       group: newObjectGroup,
       global: false, // A new group is not global by default.
     };
+
+    if (this.treeView) this.treeView.openItem(sceneGroupsRootFolderId);
 
     // Scroll to the new group.
     // Ideally, we'd wait for the list to be updated to scroll, but
@@ -266,6 +270,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
     if (!answer) return;
 
+    if (this.treeView) this.treeView.openItem(globalGroupsRootFolderId);
     globalObjectGroups.insert(group, globalObjectGroups.count());
     objectGroups.remove(groupName);
     this._onObjectGroupModified();
@@ -398,7 +403,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                 },
               ],
         isRoot: true,
-        id: 'global-groups',
+        id: globalGroupsRootFolderId,
       },
       {
         label: i18n._(t`Scene Groups`),
@@ -413,7 +418,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                 },
               ],
         isRoot: true,
-        id: 'scene-groups',
+        id: sceneGroupsRootFolderId,
       },
     ];
     // $FlowFixMe

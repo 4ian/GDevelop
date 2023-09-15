@@ -90,6 +90,7 @@ export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
   scrollToItem: Item => void,
   renameItem: Item => void,
+  openItem: string => void,
 |};
 
 type Props<Item> = {|
@@ -332,6 +333,14 @@ const TreeView = <Item: ItemBaseAttributes>(
     [getItemId]
   );
 
+  const openItem = React.useCallback(
+    (itemId: string) => {
+      if (!openedNodeIds.includes(itemId))
+        setOpenedNodeIds([...openedNodeIds, itemId]);
+    },
+    [openedNodeIds]
+  );
+
   React.useImperativeHandle(
     // $FlowFixMe
     ref,
@@ -339,6 +348,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       forceUpdateList: forceUpdate,
       scrollToItem,
       renameItem,
+      openItem,
     })
   );
 

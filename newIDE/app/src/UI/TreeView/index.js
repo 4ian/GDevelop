@@ -96,7 +96,7 @@ type Props<Item> = {|
   getItemName: Item => string,
   getItemId: Item => string,
   getItemChildren: Item => ?(Item[]),
-  getItemThumbnail: Item => ?string,
+  getItemThumbnail?: Item => ?string,
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
@@ -191,7 +191,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         name.toLowerCase().includes(searchText) ||
         flattenedChildren.length > 0
       ) {
-        const thumbnailSrc = getItemThumbnail(item);
+        const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
         const selected = selectedNodeIds.includes(id);
         return [
           {

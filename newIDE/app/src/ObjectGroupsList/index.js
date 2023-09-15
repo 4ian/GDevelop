@@ -9,12 +9,7 @@ import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
-import {
-  filterGroupsList,
-  enumerateGroups,
-  isSameGroupWithContext,
-} from '../ObjectsList/EnumerateObjects';
+import { enumerateGroups } from '../ObjectsList/EnumerateObjects';
 import {
   type GroupWithContextList,
   type GroupWithContext,
@@ -28,17 +23,41 @@ import {
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
+import { type TopLevelFolder } from '../ObjectsList';
+import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
 const styles = {
   listContainer: {
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
   },
 };
 
+type TreeViewItem = GroupWithContext | TopLevelFolder;
+
 const getGroupWithContextName = (groupWithContext: GroupWithContext): string =>
   groupWithContext.group.getName();
+
+const getGroupWithContextOrFolderName = (
+  groupWithContextOrFolder: TreeViewItem
+) =>
+  groupWithContextOrFolder.isRoot
+    ? groupWithContextOrFolder.label
+    : groupWithContextOrFolder.group.getName();
+
+const getGroupWithContextOfFolderChildren = (
+  groupWithContextOrFolder: TreeViewItem
+) =>
+  groupWithContextOrFolder.isRoot ? groupWithContextOrFolder.children : null;
+
+const getGroupContextOrFolderId = (groupWithContextOrFolder: TreeViewItem) =>
+  groupWithContextOrFolder.isRoot
+    ? groupWithContextOrFolder.id
+    : `group-item-${getGroupWithContextName(groupWithContextOrFolder)}`;
+
 const isGroupWithContextGlobal = (groupWithContext: GroupWithContext) =>
   groupWithContext.global;
 
@@ -78,7 +97,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     ) => cb(true),
   };
 
-  sortableList: ?SortableVirtualizedItemList<GroupWithContext>;
+  treeView: ?TreeViewInterface<TreeViewItem>;
   displayedObjectGroupsList: GroupWithContextList = [];
   displayedGlobalObjectGroupsList: GroupWithContextList = [];
   state: State = {
@@ -177,7 +196,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         renamedGroupWithContext: groupWithContext,
       },
       () => {
-        if (this.sortableList) this.sortableList.forceUpdateGrid();
+        if (this.treeView) this.treeView.forceUpdateList();
       }
     );
   };
@@ -353,7 +372,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     container.move(fromIndex, toIndex);
     this._onObjectGroupModified();
-    if (this.sortableList) this.sortableList.forceUpdateGrid();
+    if (this.treeView) this.treeView.forceUpdateList();
+  };
+
+  _editItem = (groupWithContextOrFolder: TreeViewItem) => {
+    if (groupWithContextOrFolder.isRoot) return;
+    this.props.onEditGroup(groupWithContextOrFolder.group);
   };
 
   _renderGroupMenuTemplate = (i18n: I18nType) => (
@@ -392,45 +416,46 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   ];
 
   scrollToItem = (groupWithContext: GroupWithContext) => {
-    if (this.sortableList) {
-      this.sortableList.scrollToItem(groupWithContext);
+    if (this.treeView) {
+      this.treeView.scrollToItem(groupWithContext);
     }
   };
 
-  render() {
+  _getTreeViewData = (i18n: I18nType): Array<TreeViewItem> => {
     const { globalObjectGroups, objectGroups } = this.props;
-    const { searchText } = this.state;
-
     const objectGroupsList: GroupWithContextList = enumerateGroups(
       objectGroups
     ).map(group => ({ group, global: false }));
     const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
       globalObjectGroups
     ).map(group => ({ group, global: true }));
-    this.displayedObjectGroupsList = filterGroupsList(objectGroupsList, {
-      searchText,
-    });
-    this.displayedGlobalObjectGroupsList = filterGroupsList(
-      globalObjectGroupsList,
+
+    const treeViewItems = [
       {
-        searchText,
-      }
-    );
-    const fullList = filterGroupsList(
-      [...objectGroupsList, ...globalObjectGroupsList],
-      { searchText }
-    );
+        label: i18n._(t`Global Groups`),
+        children: globalObjectGroupsList,
+        isRoot: true,
+        id: 'global-groups',
+      },
+      {
+        label: i18n._(t`Scene Groups`),
+        children: objectGroupsList,
+        isRoot: true,
+        id: 'scene-groups',
+      },
+    ];
+    // $FlowFixMe
+    return treeViewItems;
+  };
+
+  render() {
+    const { searchText, selectedGroupWithContext } = this.state;
+    const { globalObjectGroups, objectGroups } = this.props;
 
     // Force List component to be mounted again if globalObjectGroups or objectGroups
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = objectGroups.ptr + ';' + globalObjectGroups.ptr;
-
-    const renamedGroupWithContext = this.state.renamedGroupWithContext
-      ? fullList.find(
-          isSameGroupWithContext(this.state.renamedGroupWithContext)
-        )
-      : null;
 
     return (
       <Background>
@@ -449,41 +474,45 @@ export default class GroupsListContainer extends React.Component<Props, State> {
           </Column>
         </Line>
         <div style={styles.listContainer}>
-          <AutoSizer>
-            {({ height, width }) => (
-              <I18n>
-                {({ i18n }) => (
-                  <SortableVirtualizedItemList
-                    key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
-                    fullList={fullList}
-                    width={width}
-                    height={height}
-                    getItemName={getGroupWithContextName}
-                    getItemId={(groupWithContext, index) => {
-                      return 'group-item-' + index;
-                    }}
-                    isItemBold={isGroupWithContextGlobal}
-                    onEditItem={groupWithContext =>
-                      this.props.onEditGroup(groupWithContext.group)
-                    }
-                    selectedItems={
-                      this.state.selectedGroupWithContext
-                        ? [this.state.selectedGroupWithContext]
-                        : []
-                    }
-                    onItemSelected={this._selectGroup}
-                    renamedItem={renamedGroupWithContext}
-                    onRename={this._onRename}
-                    buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
-                    onMoveSelectionToItem={this._moveSelectionTo}
-                    canMoveSelectionToItem={this._canMoveSelectionTo}
-                    reactDndType={groupWithContextReactDndType}
-                  />
-                )}
-              </I18n>
+          <I18n>
+            {({ i18n }) => (
+              <div style={{ flex: 1 }}>
+                <AutoSizer style={{ width: '100%' }} disableWidth>
+                  {({ height }) => (
+                    <TreeView
+                      key={listKey}
+                      ref={treeView => (this.treeView = treeView)}
+                      items={this._getTreeViewData(i18n)}
+                      height={height}
+                      searchText={searchText}
+                      getItemName={getGroupWithContextOrFolderName}
+                      getItemChildren={getGroupWithContextOfFolderChildren}
+                      multiSelect={false}
+                      getItemId={getGroupContextOrFolderId}
+                      onEditItem={this._editItem}
+                      // $FlowFixMe
+                      selectedItems={
+                        selectedGroupWithContext
+                          ? [selectedGroupWithContext]
+                          : []
+                      }
+                      onSelectItems={items => {
+                        if (!items) this._selectGroup(null);
+                        const itemToSelect = items[0];
+                        if ('isRoot' in itemToSelect) return;
+                        this._selectGroup(itemToSelect || null);
+                      }}
+                      onRenameItem={this._onRename}
+                      buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
+                      onMoveSelectionToItem={this._moveSelectionTo}
+                      canMoveSelectionToItem={this._canMoveSelectionTo}
+                      reactDndType={groupWithContextReactDndType}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
             )}
-          </AutoSizer>
+          </I18n>
         </div>
         <Line>
           <Column expand>

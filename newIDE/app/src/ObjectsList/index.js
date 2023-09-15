@@ -47,6 +47,7 @@ import Add from '../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
+const globalObjectsEmptyPlaceholderId = 'global-empty-placeholder';
 
 const styles = {
   listContainer: {
@@ -542,7 +543,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 : [
                     {
                       label: i18n._(t`There is no global object yet.`),
-                      id: 'global-empty-placeholder',
+                      id: globalObjectsEmptyPlaceholderId,
                       isPlaceholder: true,
                     },
                   ],
@@ -573,14 +574,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem) => {
-        if (destinationItem.isRoot || destinationItem.isPlaceholder)
-          return false;
-        // Check if at least one element in the selection can be moved.
+        if (destinationItem.isRoot) return false;
         const selectedObjectsWithContext = lists.allObjectsList.filter(
           objectWithContext =>
             selectedObjectNames.indexOf(objectWithContext.object.getName()) !==
             -1
         );
+        if (destinationItem.isPlaceholder) {
+          if (
+            destinationItem.id === globalObjectsEmptyPlaceholderId &&
+            selectedObjectsWithContext.length === 1 &&
+            !selectedObjectsWithContext[0].global
+          ) {
+            // In that case, the user is drag n dropping a scene object on the
+            // empty placeholder of the global objects section.
+            return true;
+          }
+          return false;
+        }
+        // Check if at least one element in the selection can be moved.
         if (
           selectedObjectsWithContext.every(
             selectedObject => selectedObject.global === destinationItem.global
@@ -660,13 +672,26 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const moveSelectionTo = React.useCallback(
       (i18n: I18nType, destinationItem: TreeViewItem) => {
-        if (destinationItem.isRoot || destinationItem.isPlaceholder) return;
+        if (destinationItem.isRoot) return;
 
         const selectedObjectsWithContext = lists.allObjectsList.filter(
           objectWithContext =>
             selectedObjectNames.indexOf(objectWithContext.object.getName()) !==
             -1
         );
+
+        if (destinationItem.isPlaceholder) {
+          if (
+            destinationItem.id === globalObjectsEmptyPlaceholderId &&
+            selectedObjectsWithContext.length === 1 &&
+            !selectedObjectsWithContext[0].global
+          ) {
+            const selectedObjectWithContext = selectedObjectsWithContext[0];
+            setAsGlobalObject(i18n, selectedObjectWithContext, 0);
+            return;
+          }
+          return;
+        }
 
         if (selectedObjectsWithContext.length === 1) {
           const selectedObjectWithContext = selectedObjectsWithContext[0];

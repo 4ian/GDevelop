@@ -29,6 +29,7 @@ import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 const sceneGroupsRootFolderId = 'scene-groups';
 const globalGroupsRootFolderId = 'global-groups';
+const globalGroupsEmptyPlaceholderId = 'global-empty-placeholder';
 
 const styles = {
   listContainer: {
@@ -297,8 +298,19 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   };
 
   _canMoveSelectionTo = (destinationItem: TreeViewItem) => {
-    if (destinationItem.isRoot || destinationItem.isPlaceholder) return false;
+    if (destinationItem.isRoot) return false;
     if (!this.state.selectedGroupWithContext) return false;
+    if (destinationItem.isPlaceholder) {
+      if (
+        destinationItem.id === globalGroupsEmptyPlaceholderId &&
+        !this.state.selectedGroupWithContext.global
+      ) {
+        // In that case, the user is drag n dropping a scene group on the
+        // empty placeholder of the global groups section.
+        return true;
+      }
+      return false;
+    }
 
     if (
       this.state.selectedGroupWithContext.global === destinationItem.global ||
@@ -317,9 +329,19 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   };
 
   _moveSelectionTo = (i18n: I18nType, destinationItem: TreeViewItem) => {
-    if (destinationItem.isRoot || destinationItem.isPlaceholder) return false;
+    if (destinationItem.isRoot) return false;
     const { selectedGroupWithContext } = this.state;
     if (!selectedGroupWithContext) return;
+
+    if (destinationItem.isPlaceholder) {
+      if (
+        destinationItem.id === globalGroupsEmptyPlaceholderId &&
+        !selectedGroupWithContext.global
+      ) {
+        this._setAsGlobalGroup(i18n, selectedGroupWithContext, 0);
+      }
+      return;
+    }
 
     const { globalObjectGroups, objectGroups } = this.props;
     let container: gdObjectGroupsContainer;
@@ -339,7 +361,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       );
       toIndex = container.getPosition(destinationItem.group.getName());
     } else if (!selectedGroupWithContext.global && destinationItem.global) {
-      this._setAsGlobalGroup(i18n, selectedGroupWithContext);
+      const destinationIndex = globalObjectGroups.getPosition(
+        destinationItem.group.getName()
+      );
+      this._setAsGlobalGroup(i18n, selectedGroupWithContext, destinationIndex);
       return;
     } else {
       return;
@@ -418,7 +443,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
             : [
                 {
                   label: i18n._(t`There is no global group yet.`),
-                  id: 'global-empty-placeholder',
+                  id: globalGroupsEmptyPlaceholderId,
                   isPlaceholder: true,
                 },
               ],

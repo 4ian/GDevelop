@@ -587,6 +587,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           )
         ) {
           return true;
+        } else if (
+          selectedObjectsWithContext.length === 1 &&
+          selectedObjectsWithContext.every(
+            selectedObject => selectedObject.global === false
+          ) &&
+          destinationItem.global === true
+        ) {
+          return true;
         }
 
         return false;
@@ -594,47 +602,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [lists.allObjectsList, selectedObjectNames]
     );
 
-    const moveSelectionTo = React.useCallback(
-      (destinationItem: TreeViewItem) => {
-        if (destinationItem.isRoot || destinationItem.isPlaceholder) return;
-
-        const selectedObjectsWithContext = lists.allObjectsList.filter(
-          objectWithContext =>
-            selectedObjectNames.indexOf(objectWithContext.object.getName()) !==
-            -1
-        );
-        selectedObjectsWithContext.forEach(movedObjectWithContext => {
-          let container: gdObjectsContainer;
-          let fromIndex: number;
-          let toIndex: number;
-          if (movedObjectWithContext.global === destinationItem.global) {
-            container = destinationItem.global ? project : objectsContainer;
-
-            fromIndex = container.getObjectPosition(
-              movedObjectWithContext.object.getName()
-            );
-            toIndex = container.getObjectPosition(
-              destinationItem.object.getName()
-            );
-          } else {
-            return;
-          }
-          if (toIndex > fromIndex) toIndex -= 1;
-          container.moveObject(fromIndex, toIndex);
-        });
-        onObjectModified(true);
-      },
-      [
-        lists.allObjectsList,
-        objectsContainer,
-        onObjectModified,
-        project,
-        selectedObjectNames,
-      ]
-    );
-
     const setAsGlobalObject = React.useCallback(
-      (i18n: I18nType, objectWithContext: ObjectWithContext) => {
+      (
+        i18n: I18nType,
+        objectWithContext: ObjectWithContext,
+        index?: number
+      ) => {
         const { object } = objectWithContext;
 
         const objectName: string = object.getName();
@@ -670,7 +643,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer.moveObjectToAnotherContainer(
           objectName,
           project,
-          project.getObjectsCount()
+          typeof index === 'number' ? index : project.getObjectsCount()
         );
         onObjectModified(true);
 
@@ -683,6 +656,65 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }, 100); // A few ms is enough for a new render to be done.
       },
       [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
+    );
+
+    const moveSelectionTo = React.useCallback(
+      (i18n: I18nType, destinationItem: TreeViewItem) => {
+        if (destinationItem.isRoot || destinationItem.isPlaceholder) return;
+
+        const selectedObjectsWithContext = lists.allObjectsList.filter(
+          objectWithContext =>
+            selectedObjectNames.indexOf(objectWithContext.object.getName()) !==
+            -1
+        );
+
+        if (selectedObjectsWithContext.length === 1) {
+          const selectedObjectWithContext = selectedObjectsWithContext[0];
+          if (
+            selectedObjectWithContext.global === false &&
+            destinationItem.global === true
+          ) {
+            const destinationIndex = project.getObjectPosition(
+              destinationItem.object.getName()
+            );
+            setAsGlobalObject(
+              i18n,
+              selectedObjectWithContext,
+              destinationIndex
+            );
+            return;
+          }
+        }
+
+        selectedObjectsWithContext.forEach(movedObjectWithContext => {
+          let container: gdObjectsContainer;
+          let fromIndex: number;
+          let toIndex: number;
+          if (movedObjectWithContext.global === destinationItem.global) {
+            container = destinationItem.global ? project : objectsContainer;
+
+            fromIndex = container.getObjectPosition(
+              movedObjectWithContext.object.getName()
+            );
+            toIndex = container.getObjectPosition(
+              destinationItem.object.getName()
+            );
+          } else {
+            return;
+          }
+          if (toIndex > fromIndex) toIndex -= 1;
+          container.moveObject(fromIndex, toIndex);
+        });
+        onObjectModified(true);
+      },
+      [
+        lists.allObjectsList,
+        objectsContainer,
+        onObjectModified,
+        project,
+        selectedObjectNames,
+        setAsGlobalObject,
+      ]
     );
 
     const openEditTagDialog = React.useCallback(
@@ -912,7 +944,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       }}
                       onRenameItem={rename}
                       buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                      onMoveSelectionToItem={moveSelectionTo}
+                      onMoveSelectionToItem={destinationItem =>
+                        moveSelectionTo(i18n, destinationItem)
+                      }
                       canMoveSelectionToItem={canMoveSelectionTo}
                       reactDndType={objectWithContextReactDndType}
                     />

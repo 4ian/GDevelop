@@ -119,7 +119,7 @@ export type SceneEditorsDisplayInterface = {|
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
-  renameObjectWithContext: (ObjectWithContext) => void,
+  renameObjectWithContext: ObjectWithContext => void,
   viewControls: {|
     zoomBy: (factor: number) => void,
     setZoomFactor: (factor: number) => void,

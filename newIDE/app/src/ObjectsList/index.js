@@ -680,6 +680,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           project.getObjectsCount()
         );
         onObjectModified(true);
+
+        // Scroll to the moved object.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(objectWithContext);
+        }, 100); // A few ms is enough for a new render to be done.
       },
       [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
     );

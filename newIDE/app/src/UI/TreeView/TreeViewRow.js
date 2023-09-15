@@ -28,27 +28,29 @@ const SemiControlledRowInput = ({
   const [value, setValue] = React.useState<string>(initialValue);
 
   return (
-    <input
-      autoFocus
-      type="text"
-      className="item-name-input"
-      value={value}
-      onChange={e => {
-        setValue(e.currentTarget.value);
-      }}
-      onClick={e => e.stopPropagation()}
-      onBlur={() => {
-        onEndRenaming(value);
-      }}
-      onKeyUp={e => {
-        if (shouldCloseOrCancel(e)) {
-          e.preventDefault();
-          onEndRenaming(initialValue);
-        } else if (shouldValidate(e)) {
+    <div className="item-name-input-container">
+      <input
+        autoFocus
+        type="text"
+        className="item-name-input"
+        value={value}
+        onChange={e => {
+          setValue(e.currentTarget.value);
+        }}
+        onClick={e => e.stopPropagation()}
+        onBlur={() => {
           onEndRenaming(value);
-        }
-      }}
-    />
+        }}
+        onKeyUp={e => {
+          if (shouldCloseOrCancel(e)) {
+            e.preventDefault();
+            onEndRenaming(initialValue);
+          } else if (shouldValidate(e)) {
+            onEndRenaming(value);
+          }
+        }}
+      />
+    </div>
   );
 };
 

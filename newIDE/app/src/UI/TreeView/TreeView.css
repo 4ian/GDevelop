@@ -84,4 +84,21 @@
   -moz-box-shadow: none;
   box-shadow: none;
   color: inherit;
+  width: 100%;
+  max-width: 200px;
+}
+
+.tree-view .item-name-input-container:before {
+  bottom: -1px;
+  left: 0;
+  content: '\00a0';
+  width: 100%;
+  border-bottom: 1px solid var(--theme-text-default-color);
+  display: block;
+  position: absolute;
+  height: 1px;
+}
+
+.tree-view .item-name-input-container {
+  position: relative;
 }

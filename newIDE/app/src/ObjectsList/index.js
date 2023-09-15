@@ -54,7 +54,7 @@ const styles = {
   },
 };
 
-type TopLevelFolder = {|
+export type TopLevelFolder = {|
   +label: string,
   +children: Array<ObjectWithContext>,
   +isRoot: true,
@@ -99,6 +99,20 @@ const getObjectContextOrFolderId = (objectWithContextOrFolder: TreeViewItem) =>
   objectWithContextOrFolder.isRoot
     ? objectWithContextOrFolder.id
     : `object-item-${getObjectWithContextName(objectWithContextOrFolder)}`;
+
+const getObjectWithContextOfFolderChildren = (
+  objectWithContextOrFolder: TreeViewItem
+) =>
+  objectWithContextOrFolder.isRoot ? objectWithContextOrFolder.children : null;
+const getObjectContextOrFolderData = (
+  objectWithContextOrFolder: TreeViewItem
+) =>
+  objectWithContextOrFolder.isRoot
+    ? undefined
+    : {
+        objectName: objectWithContextOrFolder.object.getName(),
+        global: objectWithContextOrFolder.global.toString(),
+      };
 
 const isObjectWithContextGlobal = (objectWithContext: ObjectWithContext) =>
   objectWithContext.global;
@@ -720,24 +734,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [getThumbnail, project]
     );
 
-    const getObjectWithContextOfFolderChildren = React.useCallback(
-      (objectWithContextOrFolder: TreeViewItem) =>
-        objectWithContextOrFolder.isRoot
-          ? objectWithContextOrFolder.children
-          : null,
-      []
-    );
-    const getObjectContextOrFolderData = React.useCallback(
-      (objectWithContextOrFolder: TreeViewItem) =>
-        objectWithContextOrFolder.isRoot
-          ? undefined
-          : {
-              objectName: objectWithContextOrFolder.object.getName(),
-              global: objectWithContextOrFolder.global.toString(),
-            },
-      []
-    );
-
     const eventsFunctionsExtensionsState = React.useContext(
       EventsFunctionsExtensionsContext
     );
@@ -934,7 +930,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                         if ('isRoot' in itemToSelect) return;
                         selectObject(itemToSelect || null);
                       }}
-                      // renamedItem={displayedRenamedObjectWithContext}
                       onRenameItem={rename}
                       buildMenuTemplate={renderObjectMenuTemplate(i18n)}
                       onMoveSelectionToItem={moveSelectionTo}

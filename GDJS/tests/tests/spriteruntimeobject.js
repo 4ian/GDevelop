@@ -308,7 +308,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       expect(object.getAnimationFrame()).to.be(1);
     });
 
-    it('should stop when the animation is reached', () => {
+    it('should stop when the animation beginning is reached', () => {
       const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
       const stepDurationInMilliseconds = 1000 / 60;

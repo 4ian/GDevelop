@@ -10,7 +10,7 @@ namespace gdjs {
     'text area',
   ] as const;
 
-  type SupportedInputType = typeof supportedInputTypes[number];
+  type SupportedInputType = (typeof supportedInputTypes)[number];
 
   const parseInputType = (potentialInputType: string): SupportedInputType => {
     const lowercasedNewInputType = potentialInputType.toLowerCase();
@@ -50,7 +50,8 @@ namespace gdjs {
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.OpacityHandler {
+    implements gdjs.Resizable, gdjs.OpacityHandler
+  {
     private _string: string;
     private _placeholder: string;
     private opacity: float = 255;
@@ -92,10 +93,12 @@ namespace gdjs {
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
 
-      this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      if (gdjs.TextInputRuntimeObjectRenderer) {
+        this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -171,7 +174,7 @@ namespace gdjs {
     }
 
     updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
-      this._renderer.updatePreRender();
+      if (this._renderer) this._renderer.updatePreRender();
     }
 
     /**
@@ -192,21 +195,21 @@ namespace gdjs {
     }
 
     onScenePaused(runtimeScene: gdjs.RuntimeScene): void {
-      this._renderer.onScenePaused();
+      if (this._renderer) this._renderer.onScenePaused();
     }
 
     onSceneResumed(runtimeScene: gdjs.RuntimeScene): void {
-      this._renderer.onSceneResumed();
+      if (this._renderer) this._renderer.onSceneResumed();
     }
 
     onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       super.onDestroyFromScene(instanceContainer);
-      this._renderer.onDestroy();
+      if (this._renderer) this._renderer.onDestroy();
     }
 
     setOpacity(opacity: float): void {
       this.opacity = Math.max(0, Math.min(255, opacity));
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     getOpacity(): float {
@@ -256,7 +259,7 @@ namespace gdjs {
       if (newString === this._string) return;
 
       this._string = newString;
-      this._renderer.updateString();
+      if (this._renderer) this._renderer.updateString();
     }
 
     /**
@@ -279,7 +282,7 @@ namespace gdjs {
       if (this._fontResourceName === resourceName) return;
 
       this._fontResourceName = resourceName;
-      this._renderer.updateFont();
+      if (this._renderer) this._renderer.updateFont();
     }
 
     getFontSize() {
@@ -304,7 +307,7 @@ namespace gdjs {
       if (newPlaceholder === this._placeholder) return;
 
       this._placeholder = newPlaceholder;
-      this._renderer.updatePlaceholder();
+      if (this._renderer) this._renderer.updatePlaceholder();
     }
 
     /**
@@ -322,12 +325,12 @@ namespace gdjs {
       if (lowercasedNewInputType === this._inputType) return;
 
       this._inputType = parseInputType(lowercasedNewInputType);
-      this._renderer.updateInputType();
+      if (this._renderer) this._renderer.updateInputType();
     }
 
     setTextColor(newColor: string) {
       this._textColor = gdjs.rgbOrHexToRGBColor(newColor);
-      this._renderer.updateTextColor();
+      if (this._renderer) this._renderer.updateTextColor();
     }
 
     getTextColor(): string {
@@ -342,7 +345,7 @@ namespace gdjs {
 
     setFillColor(newColor: string) {
       this._fillColor = gdjs.rgbOrHexToRGBColor(newColor);
-      this._renderer.updateFillColorAndOpacity();
+      if (this._renderer) this._renderer.updateFillColorAndOpacity();
     }
 
     getFillColor(): string {
@@ -357,7 +360,7 @@ namespace gdjs {
 
     setFillOpacity(newOpacity: float) {
       this._fillOpacity = Math.max(0, Math.min(255, newOpacity));
-      this._renderer.updateFillColorAndOpacity();
+      if (this._renderer) this._renderer.updateFillColorAndOpacity();
     }
 
     getFillOpacity(): float {
@@ -366,7 +369,7 @@ namespace gdjs {
 
     setBorderColor(newColor: string) {
       this._borderColor = gdjs.rgbOrHexToRGBColor(newColor);
-      this._renderer.updateBorderColorAndOpacity();
+      if (this._renderer) this._renderer.updateBorderColorAndOpacity();
     }
 
     getBorderColor(): string {
@@ -385,7 +388,7 @@ namespace gdjs {
 
     setBorderOpacity(newOpacity: float) {
       this._borderOpacity = Math.max(0, Math.min(255, newOpacity));
-      this._renderer.updateBorderColorAndOpacity();
+      if (this._renderer) this._renderer.updateBorderColorAndOpacity();
     }
 
     getBorderOpacity(): float {
@@ -394,7 +397,7 @@ namespace gdjs {
 
     setBorderWidth(width: float) {
       this._borderWidth = Math.max(0, width);
-      this._renderer.updateBorderWidth();
+      if (this._renderer) this._renderer.updateBorderWidth();
     }
 
     getBorderWidth(): float {
@@ -403,7 +406,7 @@ namespace gdjs {
 
     setDisabled(value: boolean) {
       this._disabled = value;
-      this._renderer.updateDisabled();
+      if (this._renderer) this._renderer.updateDisabled();
     }
 
     isDisabled(): boolean {
@@ -412,7 +415,7 @@ namespace gdjs {
 
     setReadOnly(value: boolean) {
       this._readOnly = value;
-      this._renderer.updateReadOnly();
+      if (this._renderer) this._renderer.updateReadOnly();
     }
 
     isReadOnly(): boolean {
@@ -420,11 +423,11 @@ namespace gdjs {
     }
 
     isFocused(): boolean {
-      return this._renderer.isFocused();
+      return !!this._renderer?.isFocused();
     }
 
     focus(): void {
-      this._renderer.focus();
+      if (this._renderer) this._renderer.focus();
     }
   }
   gdjs.registerObject(

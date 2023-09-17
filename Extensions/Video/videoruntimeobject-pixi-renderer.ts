@@ -10,7 +10,7 @@ namespace gdjs {
     _object: gdjs.VideoRuntimeObject;
 
     // Load (or reset) the video
-    _pixiObject: any;
+    _pixiObject?: any;
     _textureWasValid: boolean = false;
 
     /**
@@ -22,11 +22,9 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
+      const imageManager = instanceContainer.getGame().getImageManager()!;
       this._pixiObject = new PIXI.Sprite(
-        instanceContainer
-          .getGame()
-          .getImageManager()
-          .getPIXIVideoTexture(this._object._videoResource)
+        imageManager.getPIXIVideoTexture(this._object._videoResource)
       );
       this._pixiObject._texture.baseTexture.resource.autoPlay = false;
 
@@ -38,7 +36,7 @@ namespace gdjs {
       // Will be set to true when video texture is loaded.
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
       // Set the anchor in the center, so that the object rotates around
@@ -83,7 +81,8 @@ namespace gdjs {
     }
 
     updateLoop(): void {
-      this._pixiObject._texture.baseTexture.resource.source.loop = this._object._loop;
+      this._pixiObject._texture.baseTexture.resource.source.loop =
+        this._object._loop;
     }
 
     updateVolume(): void {
@@ -328,6 +327,12 @@ namespace gdjs {
     }
   }
 
-  export const VideoRuntimeObjectRenderer = VideoRuntimeObjectPixiRenderer;
-  export type VideoRuntimeObjectRenderer = VideoRuntimeObjectPixiRenderer;
+  export type VideoRuntimeObjectRenderer =
+    | VideoRuntimeObjectPixiRenderer
+    | undefined;
+  type VideoRuntimeObjectRendererClass =
+    | typeof VideoRuntimeObjectPixiRenderer
+    | undefined;
+  export const VideoRuntimeObjectRenderer: VideoRuntimeObjectRendererClass =
+    VideoRuntimeObjectPixiRenderer;
 }

@@ -25,9 +25,8 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
+    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
+      null;
     let _cordovaAuthenticationMessageCallback:
       | ((event: MessageEvent) => void)
       | null = null;
@@ -104,7 +103,7 @@ namespace gdjs {
       runtimeScene: RuntimeScene
     ): 'electron' | 'cordova' | 'web' => {
       const runtimeGame = runtimeScene.getGame();
-      const electron = runtimeGame.getRenderer().getElectron();
+      const electron = runtimeGame.getRenderer()?.getElectron();
       if (electron) {
         return 'electron';
       }
@@ -229,7 +228,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -351,7 +350,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -431,7 +430,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -516,7 +515,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -541,7 +540,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -614,7 +613,7 @@ namespace gdjs {
               const electron = runtimeScene
                 .getGame()
                 .getRenderer()
-                .getElectron();
+                ?.getElectron();
               const openWindow = () => electron.shell.openExternal(targetUrl);
 
               openWindow();
@@ -758,7 +757,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -785,13 +784,10 @@ namespace gdjs {
       if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
       const platform = getPlatform(runtimeScene);
-      const {
-        rootContainer,
-        loaderContainer,
-        iframeContainer,
-      } = authComponents.computeAuthenticationContainer(
-        onAuthenticationContainerDismissed
-      );
+      const { rootContainer, loaderContainer, iframeContainer } =
+        authComponents.computeAuthenticationContainer(
+          onAuthenticationContainerDismissed
+        );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
       _authenticationIframeContainer = iframeContainer;
@@ -805,7 +801,10 @@ namespace gdjs {
       checkIfGameIsRegistered(runtimeScene.getGame(), _gameId)
         .then((isGameRegistered) => {
           if (_authenticationLoaderContainer) {
-            const electron = runtimeScene.getGame().getRenderer().getElectron();
+            const electron = runtimeScene
+              .getGame()
+              .getRenderer()
+              ?.getElectron();
             const wikiOpenAction = electron
               ? () =>
                   electron.shell.openExternal(
@@ -813,12 +812,13 @@ namespace gdjs {
                   )
               : null; // Only show a link if we're on electron.
 
-            _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
-              _authenticationLoaderContainer,
-              platform,
-              isGameRegistered,
-              wikiOpenAction
-            );
+            _authenticationTextContainer =
+              authComponents.addAuthenticationTextsToLoadingContainer(
+                _authenticationLoaderContainer,
+                platform,
+                isGameRegistered,
+                wikiOpenAction
+              );
           }
           if (isGameRegistered) {
             startAuthenticationWindowTimeout(runtimeScene);
@@ -869,7 +869,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         logger.info(
           "The div element covering the game couldn't be found, the authentication must be already closed."
@@ -920,7 +920,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         logger.info(
           "The div element covering the game couldn't be found, the authentication must be already closed."
@@ -936,7 +936,7 @@ namespace gdjs {
      * Focus on game canvas to allow user to interact with it.
      */
     const focusOnGame = function (runtimeScene: gdjs.RuntimeScene) {
-      const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
+      const gameCanvas = runtimeScene.getGame().getRenderer()?.getCanvas();
       if (gameCanvas) gameCanvas.focus();
     };
   }

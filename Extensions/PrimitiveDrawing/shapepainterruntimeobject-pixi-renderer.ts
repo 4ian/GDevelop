@@ -35,7 +35,7 @@ namespace gdjs {
       this._graphics = new PIXI.Graphics();
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._graphics, runtimeObject.getZOrder());
       this.updateAntialiasing();
     }
@@ -524,6 +524,12 @@ namespace gdjs {
     }
   }
 
-  export const ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
-  export type ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
+  export type ShapePainterRuntimeObjectRenderer =
+    | ShapePainterRuntimeObjectPixiRenderer
+    | undefined;
+  type ShapePainterRuntimeObjectRendererClass =
+    | typeof ShapePainterRuntimeObjectPixiRenderer
+    | undefined;
+  export const ShapePainterRuntimeObjectRenderer: ShapePainterRuntimeObjectRendererClass =
+    ShapePainterRuntimeObjectPixiRenderer;
 }

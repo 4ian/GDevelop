@@ -546,7 +546,7 @@ namespace gdjs {
         runtimeScene
           .getGame()
           .getRenderer()
-          .setWindowTitle(newLayoutData.title);
+          ?.setWindowTitle(newLayoutData.title);
       }
       this._hotReloadVariablesContainer(
         oldLayoutData.variables as Required<VariableData>[],

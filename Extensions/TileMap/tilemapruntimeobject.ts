@@ -139,7 +139,7 @@ namespace gdjs {
                 textureName
               );
               return (game
-                .getImageManager()
+                .getImageManager()!
                 .getPIXITexture(mappedName) as unknown) as PIXI.BaseTexture<
                 PIXI.Resource
               >;

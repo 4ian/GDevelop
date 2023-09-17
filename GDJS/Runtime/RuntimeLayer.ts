@@ -47,7 +47,7 @@ namespace gdjs {
     _clearColor: Array<integer>;
 
     _rendererEffects: Record<string, gdjs.PixiFiltersTools.Filter> = {};
-    _renderer: gdjs.LayerRenderer;
+    _renderer?: gdjs.LayerRenderer;
 
     /**
      * @param layerData The data used to initialize the layer
@@ -76,11 +76,13 @@ namespace gdjs {
         layerData.ambientLightColorB / 255,
         1.0,
       ];
-      this._renderer = new gdjs.LayerRenderer(
-        this,
-        instanceContainer.getRenderer(),
-        instanceContainer.getGame().getRenderer()
-      );
+      if (gdjs.LayerRenderer) {
+        this._renderer = new gdjs.LayerRenderer(
+          this,
+          instanceContainer.getRenderer()!,
+          instanceContainer.getGame().getRenderer()
+        );
+      }
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
         this.addEffect(layerData.effects[i]);
@@ -92,11 +94,11 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     get3DRendererObject() {
-      return this._renderer.getThreeScene();
+      return this._renderer?.getThreeScene();
     }
 
     getRenderingType(): RuntimeLayerRenderingType {
@@ -143,8 +145,10 @@ namespace gdjs {
       if (this._followBaseLayerCamera) {
         this.followBaseLayer();
       }
-      this._renderer.updatePreRender();
-      this._effectsManager.updatePreRender(this._rendererEffects, this);
+      if (this._renderer && this._effectsManager) {
+        this._renderer.updatePreRender();
+        this._effectsManager.updatePreRender(this._rendererEffects, this);
+      }
     }
 
     /**
@@ -211,7 +215,7 @@ namespace gdjs {
      */
     show(enable: boolean): void {
       this._hidden = !enable;
-      this._renderer.updateVisibility(enable);
+      this._renderer?.updateVisibility(enable);
     }
 
     /**
@@ -375,7 +379,7 @@ namespace gdjs {
      * @param effectData The data of the effect to add.
      */
     addEffect(effectData: EffectData): void {
-      this._effectsManager.addEffect(effectData, this._rendererEffects, this);
+      this._effectsManager?.addEffect(effectData, this._rendererEffects, this);
     }
 
     /**
@@ -383,7 +387,7 @@ namespace gdjs {
      * @param effectName The name of the effect.
      */
     removeEffect(effectName: string): void {
-      this._effectsManager.removeEffect(
+      this._effectsManager?.removeEffect(
         this._rendererEffects,
         this,
         effectName
@@ -401,7 +405,7 @@ namespace gdjs {
       parameterName: string,
       value: float
     ): void {
-      this._effectsManager.setEffectDoubleParameter(
+      this._effectsManager?.setEffectDoubleParameter(
         this._rendererEffects,
         name,
         parameterName,
@@ -420,7 +424,7 @@ namespace gdjs {
       parameterName: string,
       value: string
     ): void {
-      this._effectsManager.setEffectStringParameter(
+      this._effectsManager?.setEffectStringParameter(
         this._rendererEffects,
         name,
         parameterName,
@@ -439,7 +443,7 @@ namespace gdjs {
       parameterName: string,
       value: boolean
     ): void {
-      this._effectsManager.setEffectBooleanParameter(
+      this._effectsManager?.setEffectBooleanParameter(
         this._rendererEffects,
         name,
         parameterName,
@@ -453,7 +457,7 @@ namespace gdjs {
      * @param enable true to enable, false to disable
      */
     enableEffect(name: string, enable: boolean): void {
-      this._effectsManager.enableEffect(
+      this._effectsManager?.enableEffect(
         this._rendererEffects,
         this,
         name,
@@ -467,7 +471,7 @@ namespace gdjs {
      * @return true if the effect is enabled, false otherwise.
      */
     isEffectEnabled(name: string): boolean {
-      return this._effectsManager.isEffectEnabled(
+      return !!this._effectsManager?.isEffectEnabled(
         this._rendererEffects,
         this,
         name
@@ -480,7 +484,7 @@ namespace gdjs {
      * @return true if the effect exists, false otherwise.
      */
     hasEffect(name: string): boolean {
-      return this._effectsManager.hasEffect(this._rendererEffects, name);
+      return !!this._effectsManager?.hasEffect(this._rendererEffects, name);
     }
 
     /**
@@ -541,7 +545,7 @@ namespace gdjs {
       this._clearColor[0] = r / 255;
       this._clearColor[1] = g / 255;
       this._clearColor[2] = b / 255;
-      this._renderer.updateClearColor();
+      this._renderer?.updateClearColor();
     }
 
     /**

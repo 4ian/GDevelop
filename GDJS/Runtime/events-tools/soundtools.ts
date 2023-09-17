@@ -11,20 +11,25 @@ namespace gdjs {
       export const getGlobalVolume = function (
         runtimeScene: gdjs.RuntimeScene
       ): float {
-        return runtimeScene.getScene().getSoundManager().getGlobalVolume();
+        return (
+          runtimeScene.getScene().getSoundManager()?.getGlobalVolume() || 0
+        );
       };
 
       export const setGlobalVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         globalVolume: float
       ): void {
-        runtimeScene.getScene().getSoundManager().setGlobalVolume(globalVolume);
+        runtimeScene
+          .getScene()
+          .getSoundManager()
+          ?.setGlobalVolume(globalVolume);
       };
 
       export const unloadAllAudio = function (
         runtimeScene: gdjs.RuntimeScene
       ): void {
-        runtimeScene.getScene().getSoundManager().unloadAll();
+        runtimeScene.getScene().getSoundManager()?.unloadAll();
       };
 
       // Sounds:
@@ -38,7 +43,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .playSound(soundFile, loop, volume, pitch);
+          ?.playSound(soundFile, loop, volume, pitch);
       };
 
       export const playSoundOnChannel = function (
@@ -52,7 +57,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .playSoundOnChannel(soundFile, channel, loop, volume, pitch);
+          ?.playSoundOnChannel(soundFile, channel, loop, volume, pitch);
       };
 
       export const stopSoundOnChannel = function (
@@ -62,7 +67,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) sound.stop();
         else {
           logger.error(`Cannot stop non-existing sound on channel ${channel}.`);
@@ -76,7 +81,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) sound.pause();
         else {
           logger.error(
@@ -92,7 +97,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) {
           if (!sound.playing()) sound.play();
         } else {
@@ -109,7 +114,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         return sound ? sound.playing() : false;
       };
 
@@ -120,7 +125,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) return sound.paused();
         else {
           logger.error(
@@ -137,7 +142,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) return sound.stopped();
         else {
           logger.error(
@@ -154,7 +159,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) return sound.getVolume() * 100;
         else {
           logger.error(
@@ -172,7 +177,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) sound.setVolume(volume / 100);
         else {
           logger.error(
@@ -188,7 +193,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) return sound.getSeek();
         else {
           logger.error(
@@ -206,7 +211,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) sound.setSeek(playingOffset);
         else {
           logger.error(
@@ -222,7 +227,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) return sound.getRate();
         else {
           logger.error(
@@ -240,7 +245,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) sound.setRate(pitch);
         else {
           logger.error(
@@ -256,7 +261,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .loadAudio(soundFile, /* isMusic= */ false);
+          ?.loadAudio(soundFile, /* isMusic= */ false);
 
       export const unloadSound = (
         runtimeScene: gdjs.RuntimeScene,
@@ -265,7 +270,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .unloadAudio(soundFile, /* isMusic= */ false);
+          ?.unloadAudio(soundFile, /* isMusic= */ false);
 
       // Musics:
       export const playMusic = function (
@@ -278,7 +283,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .playMusic(soundFile, loop, volume, pitch);
+          ?.playMusic(soundFile, loop, volume, pitch);
       };
 
       export const playMusicOnChannel = function (
@@ -292,7 +297,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .playMusicOnChannel(soundFile, channel, loop, volume, pitch);
+          ?.playMusicOnChannel(soundFile, channel, loop, volume, pitch);
       };
 
       export const stopMusicOnChannel = function (
@@ -302,7 +307,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) music.stop();
         else {
           logger.error(
@@ -318,7 +323,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) music.pause();
         else {
           logger.error(
@@ -334,7 +339,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) {
           if (!music.playing()) music.play();
         } else {
@@ -351,7 +356,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         return music ? music.playing() : false;
       };
 
@@ -362,7 +367,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) return music.paused();
         else {
           logger.error(
@@ -379,7 +384,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) return music.stopped();
         else {
           logger.error(
@@ -396,7 +401,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) return music.getVolume() * 100;
         else {
           logger.error(
@@ -414,7 +419,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) music.setVolume(volume / 100);
         else {
           logger.error(
@@ -430,7 +435,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) return music.getSeek();
         else {
           logger.error(
@@ -448,7 +453,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) music.setSeek(playingOffset);
         else {
           logger.error(
@@ -464,7 +469,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) return music.getRate();
         else {
           logger.error(
@@ -482,7 +487,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) music.setRate(pitch);
         else {
           logger.error(
@@ -498,7 +503,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .loadAudio(soundFile, /* isMusic= */ true);
+          ?.loadAudio(soundFile, /* isMusic= */ true);
 
       export const unloadMusic = (
         runtimeScene: gdjs.RuntimeScene,
@@ -507,7 +512,7 @@ namespace gdjs {
         runtimeScene
           .getScene()
           .getSoundManager()
-          .unloadAudio(soundFile, /* isMusic= */ true);
+          ?.unloadAudio(soundFile, /* isMusic= */ true);
 
       export const fadeSoundVolume = (
         runtimeScene: gdjs.RuntimeScene,
@@ -518,7 +523,7 @@ namespace gdjs {
         const sound = runtimeScene
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) {
           sound.fade(sound.getVolume(), toVolume / 100, timeOfFade * 1000);
         } else {
@@ -536,7 +541,7 @@ namespace gdjs {
         const music = runtimeScene
           .getScene()
           .getSoundManager()
-          .getMusicOnChannel(channel);
+          ?.getMusicOnChannel(channel);
         if (music) {
           music.fade(music.getVolume(), toVolume / 100, timeOfFade * 1000);
         } else {

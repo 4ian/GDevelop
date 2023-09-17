@@ -19,7 +19,8 @@ namespace gdjs {
    */
   export class TiledSpriteRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.OpacityHandler {
+    implements gdjs.Resizable, gdjs.OpacityHandler
+  {
     _xOffset: float = 0;
     _yOffset: float = 0;
     opacity: float = 255;
@@ -28,6 +29,8 @@ namespace gdjs {
     // size of the texture being used (contrary to most objects).
     _width: float;
     _height: float;
+    _color: string = '255;255;255';
+    _baseDimensions: { height: number; width: number };
 
     _renderer: gdjs.TiledSpriteRuntimeObjectRenderer;
 
@@ -40,11 +43,16 @@ namespace gdjs {
       tiledSpriteObjectData: TiledSpriteObjectData
     ) {
       super(instanceContainer, tiledSpriteObjectData);
-      this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(
-        this,
-        instanceContainer,
-        tiledSpriteObjectData.texture
-      );
+      if (gdjs.TiledSpriteRuntimeObjectRenderer) {
+        this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(
+          this,
+          instanceContainer,
+          tiledSpriteObjectData.texture
+        );
+      }
+      this._baseDimensions = instanceContainer
+        .getGame()
+        .getResourceBaseDimensions(tiledSpriteObjectData.texture);
       this._width = 0;
       this._height = 0;
       this.setWidth(tiledSpriteObjectData.width);
@@ -68,7 +76,7 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
@@ -94,7 +102,7 @@ namespace gdjs {
      */
     setX(x: float): void {
       super.setX(x);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -103,7 +111,7 @@ namespace gdjs {
      */
     setY(y: float): void {
       super.setY(y);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -115,7 +123,11 @@ namespace gdjs {
       textureName: string,
       instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      this._renderer.setTexture(textureName, instanceContainer);
+      this._baseDimensions = instanceContainer
+        .getGame()
+        .getResourceBaseDimensions(textureName);
+      if (this._renderer)
+        this._renderer.setTexture(textureName, instanceContainer);
     }
 
     /**
@@ -124,7 +136,7 @@ namespace gdjs {
      */
     setAngle(angle: float): void {
       super.setAngle(angle);
-      this._renderer.updateAngle();
+      if (this._renderer) this._renderer.updateAngle();
     }
 
     /**
@@ -151,7 +163,7 @@ namespace gdjs {
       if (this._width === width) return;
 
       this._width = width;
-      this._renderer.setWidth(width);
+      if (this._renderer) this._renderer.setWidth(width);
       this.invalidateHitboxes();
     }
 
@@ -163,7 +175,7 @@ namespace gdjs {
       if (this._height === height) return;
 
       this._height = height;
-      this._renderer.setHeight(height);
+      if (this._renderer) this._renderer.setHeight(height);
       this.invalidateHitboxes();
     }
 
@@ -183,7 +195,7 @@ namespace gdjs {
      */
     setXOffset(xOffset: number): void {
       this._xOffset = xOffset;
-      this._renderer.updateXOffset();
+      if (this._renderer) this._renderer.updateXOffset();
     }
 
     /**
@@ -192,7 +204,7 @@ namespace gdjs {
      */
     setYOffset(yOffset: number): void {
       this._yOffset = yOffset;
-      this._renderer.updateYOffset();
+      if (this._renderer) this._renderer.updateYOffset();
     }
 
     /**
@@ -219,7 +231,7 @@ namespace gdjs {
         opacity = 255;
       }
       this.opacity = opacity;
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     getOpacity(): number {
@@ -232,7 +244,8 @@ namespace gdjs {
      * @param rgbColor The color, in RGB format ("128;200;255").
      */
     setColor(rgbColor: string): void {
-      this._renderer.setColor(rgbColor);
+      this._color = rgbColor;
+      if (this._renderer) this._renderer.setColor(rgbColor);
     }
 
     /**
@@ -241,7 +254,7 @@ namespace gdjs {
      * @returns The color, in RGB format ("128;200;255").
      */
     getColor(): string {
-      return this._renderer.getColor();
+      return this._color;
     }
 
     // Implement support for get/set scale:
@@ -261,14 +274,14 @@ namespace gdjs {
      * Get x-scale of the tiled sprite object.
      */
     getScaleX(): float {
-      return this._width / this._renderer.getTextureWidth();
+      return this._width / this._baseDimensions.width;
     }
 
     /**
      * Get y-scale of the tiled sprite object.
      */
     getScaleY(): float {
-      return this._height / this._renderer.getTextureHeight();
+      return this._height / this._baseDimensions.height;
     }
 
     /**
@@ -276,8 +289,8 @@ namespace gdjs {
      * @param newScale The new scale for the tiled sprite object.
      */
     setScale(newScale: float): void {
-      this.setWidth(this._renderer.getTextureWidth() * newScale);
-      this.setHeight(this._renderer.getTextureHeight() * newScale);
+      this.setWidth(this._baseDimensions.width * newScale);
+      this.setHeight(this._baseDimensions.height * newScale);
     }
 
     /**
@@ -285,7 +298,7 @@ namespace gdjs {
      * @param newScale The new x-scale for the tiled sprite object.
      */
     setScaleX(newScale: float): void {
-      this.setWidth(this._renderer.getTextureWidth() * newScale);
+      this.setWidth(this._baseDimensions.width * newScale);
     }
 
     /**
@@ -293,7 +306,7 @@ namespace gdjs {
      * @param newScale The new y-scale for the tiled sprite object.
      */
     setScaleY(newScale: float): void {
-      this.setHeight(this._renderer.getTextureHeight() * newScale);
+      this.setHeight(this._baseDimensions.height * newScale);
     }
   }
   gdjs.registerObject(

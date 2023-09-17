@@ -5,7 +5,7 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class RuntimeScenePixiRenderer
-    implements gdjs.RuntimeInstanceContainerPixiRenderer {
+    implements gdjs.RuntimeInstanceContainerRenderer {
     private _runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null;
     private _runtimeScene: gdjs.RuntimeScene;
     private _pixiContainer: PIXI.Container;
@@ -53,7 +53,7 @@ namespace gdjs {
         pixiRenderer.height / runtimeGame.getGameResolutionHeight();
 
       for (const runtimeLayer of this._runtimeScene._orderedLayers) {
-        runtimeLayer.getRenderer().onGameResolutionResized();
+        runtimeLayer.getRenderer()!.onGameResolutionResized();
       }
     }
 
@@ -98,7 +98,7 @@ namespace gdjs {
           const runtimeLayer = this._runtimeScene._orderedLayers[i];
           if (!runtimeLayer.isVisible()) continue;
 
-          const runtimeLayerRenderer = runtimeLayer.getRenderer();
+          const runtimeLayerRenderer = runtimeLayer.getRenderer()!;
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
           const layerHas3DObjectsToRender = runtimeLayerRenderer.has3DObjects();
           if (
@@ -217,7 +217,7 @@ namespace gdjs {
 
         const debugContainer = this._runtimeScene
           .getDebuggerRenderer()
-          .getRendererObject();
+          ?.getRendererObject();
 
         if (debugContainer) {
           threeRenderer.resetState();
@@ -241,7 +241,7 @@ namespace gdjs {
         for (const runtimeLayer of this._runtimeScene._orderedLayers) {
           if (runtimeLayer.isLightingLayer()) {
             // Render the lights on the render texture used then by the lighting Sprite.
-            const runtimeLayerRenderer = runtimeLayer.getRenderer();
+            const runtimeLayerRenderer = runtimeLayer.getRenderer()!;
             runtimeLayerRenderer.renderOnPixiRenderTexture(pixiRenderer);
           }
         }
@@ -325,7 +325,7 @@ namespace gdjs {
     }
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {
-      const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer();
+      const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer()!;
       let layerPixiObject:
         | PIXI.Container
         | PIXI.Sprite
@@ -346,6 +346,8 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export type RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
-  export const RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
+  export type RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer | undefined;
+  type RuntimeSceneRendererClass = typeof RuntimeScenePixiRenderer | undefined;
+  export const RuntimeSceneRenderer: RuntimeSceneRendererClass =
+    gdjs.RuntimeScenePixiRenderer;
 }

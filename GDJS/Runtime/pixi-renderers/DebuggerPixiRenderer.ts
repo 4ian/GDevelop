@@ -40,7 +40,7 @@ namespace gdjs {
       showCustomPoints: boolean
     ) {
       const pixiContainer = this._instanceContainer
-        .getRenderer()
+        .getRenderer()!
         .getRendererObject();
       if (!this._debugDraw || !this._debugDrawContainer) {
         this._debugDrawContainer = new PIXI.Container();
@@ -313,7 +313,7 @@ namespace gdjs {
           children: true,
         });
         const pixiContainer: PIXI.Container = this._instanceContainer
-          .getRenderer()
+          .getRenderer()!
           .getRendererObject();
         pixiContainer.removeChild(this._debugDrawContainer);
       }
@@ -324,6 +324,8 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export type DebuggerRenderer = gdjs.DebuggerPixiRenderer;
-  export const DebuggerRenderer = gdjs.DebuggerPixiRenderer;
+  export type DebuggerRenderer = gdjs.DebuggerPixiRenderer | undefined;
+  type DebuggerRendererClass = typeof DebuggerPixiRenderer | undefined;
+  export const DebuggerRenderer: DebuggerRendererClass =
+    gdjs.DebuggerPixiRenderer;
 }

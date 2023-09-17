@@ -20,7 +20,8 @@ namespace gdjs {
       textEntryObjectData: ObjectData
     ) {
       super(instanceContainer, textEntryObjectData);
-      this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this);
+      if (gdjs.TextEntryRuntimeObjectRenderer)
+        this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -33,7 +34,7 @@ namespace gdjs {
 
     onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       super.onDestroyFromScene(instanceContainer);
-      if (this._renderer.onDestroy) {
+      if (this._renderer?.onDestroy) {
         this._renderer.onDestroy();
       }
     }
@@ -50,7 +51,7 @@ namespace gdjs {
 
     setString(str: string): void {
       this._str = str;
-      this._renderer.updateString();
+      if (this._renderer) this._renderer.updateString();
     }
 
     isActivated(): boolean {
@@ -59,7 +60,7 @@ namespace gdjs {
 
     activate(enable: boolean) {
       this._activated = enable;
-      this._renderer.activate(this._activated);
+      if (this._renderer) this._renderer.activate(this._activated);
     }
   }
   gdjs.registerObject(

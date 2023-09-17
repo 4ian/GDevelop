@@ -40,11 +40,11 @@ namespace gdjs {
         );
       } else if (objectData.textureParticleName) {
         const sprite = new PIXI.Sprite(
-          (instanceContainer
-            .getGame()
-            .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-            objectData.textureParticleName
-          )
+          (
+            instanceContainer
+              .getGame()
+              .getImageManager() as gdjs.PixiImageManager
+          ).getPIXITexture(objectData.textureParticleName)
         );
         sprite.width = objectData.rendererParam1;
         sprite.height = objectData.rendererParam2;
@@ -64,7 +64,7 @@ namespace gdjs {
       // instead of at each object creation.
       const pixiRenderer = instanceContainer
         .getGame()
-        .getRenderer()
+        .getRenderer()!
         .getPIXIRenderer();
       //@ts-expect-error Pixi has wrong type definitions for this method
       texture = pixiRenderer.generateTexture(graphics);
@@ -173,7 +173,7 @@ namespace gdjs {
       const layer = instanceContainer.getLayer(runtimeObject.getLayer());
       if (layer) {
         layer
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(this.renderer, runtimeObject.getZOrder());
       }
     }
@@ -273,10 +273,8 @@ namespace gdjs {
 
     setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
-      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
-        flow,
-        tank
-      );
+      this.emitter.emitterLifetime =
+        ParticleEmitterObjectPixiRenderer.computeLifetime(flow, tank);
     }
 
     resetEmission(flow: number, tank: number): void {
@@ -293,11 +291,11 @@ namespace gdjs {
     ): boolean {
       const invalidPixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getInvalidPIXITexture();
       const pixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(texture);
       return pixiTexture.valid && pixiTexture !== invalidPixiTexture;
     }
@@ -308,11 +306,11 @@ namespace gdjs {
     ): void {
       const invalidPixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getInvalidPIXITexture();
       const pixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(texture);
       if (pixiTexture.valid && pixiTexture !== invalidPixiTexture) {
         this.emitter.particleImages[0] = pixiTexture;
@@ -351,6 +349,12 @@ namespace gdjs {
   }
 
   // @ts-ignore - Register the class to let the engine use it.
-  export const ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
-  export type ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
+  export type ParticleEmitterObjectRenderer =
+    | ParticleEmitterObjectPixiRenderer
+    | undefined;
+  type ParticleEmitterObjectRendererClass =
+    | typeof ParticleEmitterObjectPixiRenderer
+    | undefined;
+  export const ParticleEmitterObjectRenderer: ParticleEmitterObjectRendererClass =
+    ParticleEmitterObjectPixiRenderer;
 }

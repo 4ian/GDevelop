@@ -374,10 +374,8 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const {
-                closeSaving,
-                closeSavingWithError,
-              } = scoreSavingState.startSaving({ playerName, score });
+              const { closeSaving, closeSavingWithError } =
+                scoreSavingState.startSaving({ playerName, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -419,10 +417,8 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const {
-                closeSaving,
-                closeSavingWithError,
-              } = scoreSavingState.startSaving({ playerId, score });
+              const { closeSaving, closeSavingWithError } =
+                scoreSavingState.startSaving({ playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -610,7 +606,7 @@ namespace gdjs {
         const domElementContainer = runtimeScene
           .getGame()
           .getRenderer()
-          .getDomElementContainer();
+          ?.getDomElementContainer();
         if (!domElementContainer) {
           if (options.callOnErrorIfDomElementContainerMissing) {
             handleErrorDisplayingLeaderboard(
@@ -757,7 +753,7 @@ namespace gdjs {
             const domElementContainer = runtimeScene
               .getGame()
               .getRenderer()
-              .getDomElementContainer();
+              ?.getDomElementContainer();
             if (!domElementContainer) {
               handleErrorDisplayingLeaderboard(
                 runtimeScene,
@@ -768,9 +764,8 @@ namespace gdjs {
 
             resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-            _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-              targetUrl
-            );
+            _leaderboardViewIframe =
+              computeLeaderboardDisplayingIframe(targetUrl);
             if (typeof window !== 'undefined') {
               _leaderboardViewClosingCallback = (event: MessageEvent) => {
                 receiveMessageFromLeaderboardView(
@@ -825,7 +820,7 @@ namespace gdjs {
           const domElementContainer = runtimeScene
             .getGame()
             .getRenderer()
-            .getDomElementContainer();
+            ?.getDomElementContainer();
           if (!domElementContainer) {
             logger.info(
               "The div element covering the game couldn't be found, the leaderboard view must be already closed."
@@ -849,7 +844,7 @@ namespace gdjs {
           // but reset the flag indicating the view is loaded (if it was).
           _leaderboardViewIframeLoaded = false;
 
-          const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
+          const gameCanvas = runtimeScene.getGame().getRenderer()?.getCanvas();
           if (gameCanvas) gameCanvas.focus();
         }
       };

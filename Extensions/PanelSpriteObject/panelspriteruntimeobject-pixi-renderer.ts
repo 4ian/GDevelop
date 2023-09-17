@@ -25,11 +25,9 @@ namespace gdjs {
       tiled: boolean
     ) {
       this._object = runtimeObject;
-      const texture = (instanceContainer
-        .getGame()
-        .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-        textureName
-      );
+      const texture = (
+        instanceContainer.getGame().getImageManager() as gdjs.PixiImageManager
+      ).getPIXITexture(textureName);
       const StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
       this._spritesContainer = new PIXI.Container();
       this._wrapperContainer = new PIXI.Container();
@@ -64,7 +62,7 @@ namespace gdjs {
       this._wrapperContainer.addChild(this._spritesContainer);
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._wrapperContainer, runtimeObject.getZOrder());
     }
 
@@ -200,7 +198,7 @@ namespace gdjs {
       const obj = this._object;
       const texture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(textureName).baseTexture;
       this._textureWidth = texture.width;
       this._textureHeight = texture.height;
@@ -392,6 +390,12 @@ namespace gdjs {
     }
   }
 
-  export const PanelSpriteRuntimeObjectRenderer = PanelSpriteRuntimeObjectPixiRenderer;
-  export type PanelSpriteRuntimeObjectRenderer = PanelSpriteRuntimeObjectPixiRenderer;
+  export type PanelSpriteRuntimeObjectRenderer =
+    | PanelSpriteRuntimeObjectPixiRenderer
+    | undefined;
+  type PanelSpriteRuntimeObjectRendererClass =
+    | typeof PanelSpriteRuntimeObjectPixiRenderer
+    | undefined;
+  export const PanelSpriteRuntimeObjectRenderer: PanelSpriteRuntimeObjectRendererClass =
+    PanelSpriteRuntimeObjectPixiRenderer;
 }

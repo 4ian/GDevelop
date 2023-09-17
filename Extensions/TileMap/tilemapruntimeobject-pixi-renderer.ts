@@ -31,7 +31,7 @@ namespace gdjs {
 
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
       this.updateAngle();
       this.updateOpacity();
@@ -125,5 +125,6 @@ namespace gdjs {
   }
   export const TileMapRuntimeObjectRenderer =
     gdjs.TileMapRuntimeObjectPixiRenderer;
-  export type TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
+  export type TileMapRuntimeObjectRenderer =
+    gdjs.TileMapRuntimeObjectPixiRenderer;
 }

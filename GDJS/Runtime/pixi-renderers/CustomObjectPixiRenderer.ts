@@ -5,7 +5,7 @@ namespace gdjs {
    * The renderer for a {@link gdjs.CustomRuntimeObject} using Pixi.js.
    */
   export class CustomObjectPixiRenderer
-    implements gdjs.RuntimeInstanceContainerPixiRenderer {
+    implements gdjs.RuntimeInstanceContainerRenderer {
     _object: gdjs.CustomRuntimeObject;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
@@ -43,10 +43,10 @@ namespace gdjs {
       const layer = parent.getLayer('');
       if (layer) {
         layer
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(this._pixiContainer, object.getZOrder());
         if (this._threeGroup) {
-          layer.getRenderer().add3DRendererObject(this._threeGroup);
+          layer.getRenderer()!.add3DRendererObject(this._threeGroup);
         }
       }
     }
@@ -60,10 +60,10 @@ namespace gdjs {
       const layer = parent.getLayer('');
       if (layer) {
         layer
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(this._pixiContainer, object.getZOrder());
         if (this._threeGroup) {
-          layer.getRenderer().add3DRendererObject(this._threeGroup);
+          layer.getRenderer()!.add3DRendererObject(this._threeGroup);
         }
       }
     }
@@ -176,7 +176,7 @@ namespace gdjs {
     }
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {
-      const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer();
+      const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer()!;
       let layerPixiObject:
         | PIXI.Container
         | PIXI.Sprite
@@ -196,6 +196,8 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export type CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
-  export const CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
+  export type CustomObjectRenderer = gdjs.CustomObjectPixiRenderer | undefined;
+  type CustomObjectRendererClass = typeof CustomObjectPixiRenderer | undefined;
+  export const CustomObjectRenderer: CustomObjectRendererClass =
+    gdjs.CustomObjectPixiRenderer;
 }

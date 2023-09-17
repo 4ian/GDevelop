@@ -13,13 +13,13 @@ namespace gdjs {
       this._object = runtimeObject;
       const texture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(textureName);
       this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
 
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._tiledSprite, runtimeObject.getZOrder());
       this.updatePosition();
       this.updateAngle();
@@ -48,7 +48,7 @@ namespace gdjs {
     ): void {
       const texture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(textureName);
       this._tiledSprite.texture = texture;
       this.updatePosition();
@@ -129,6 +129,12 @@ namespace gdjs {
     }
   }
 
-  export const TiledSpriteRuntimeObjectRenderer = TiledSpriteRuntimeObjectPixiRenderer;
-  export type TiledSpriteRuntimeObjectRenderer = TiledSpriteRuntimeObjectPixiRenderer;
+  export type TiledSpriteRuntimeObjectRenderer =
+    | TiledSpriteRuntimeObjectPixiRenderer
+    | undefined;
+  type TiledSpriteRuntimeObjectRendererClass =
+    | typeof TiledSpriteRuntimeObjectPixiRenderer
+    | undefined;
+  export const TiledSpriteRuntimeObjectRenderer: TiledSpriteRuntimeObjectRendererClass =
+    TiledSpriteRuntimeObjectPixiRenderer;
 }

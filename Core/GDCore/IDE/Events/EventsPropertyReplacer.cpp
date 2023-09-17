@@ -69,33 +69,46 @@ class GD_CORE_API ExpressionPropertyReplacer
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
-    auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
-    auto& variablesContainersList =
-        projectScopedContainers.GetVariablesContainersList();
     auto& propertiesContainersList =
         projectScopedContainers.GetPropertiesContainersList();
 
     // The node represents a variable or an object name on which a variable
     // will be accessed, or a property with a child.
-    if (objectsContainersList.HasObjectOrGroupNamed(node.name)) {
-      // Do nothing, it's an object variable.
-      if (node.child) node.child->Visit(*this);
-    } else if (variablesContainersList.Has(node.name)) {
-      // Do nothing, it's a variable.
-      if (node.child) node.child->Visit(*this);
-    } else if (propertiesContainersList.Has(node.name)) {
-      // This is a property, check if it's coming from the target container with
-      // properties to replace.
-      if (propertiesContainersList.HasPropertiesContainer(
-              targetPropertiesContainer)) {
-        // The node represents a property, that can come from the target
-        // (because the target is in the scope), replace or remove it:
-        RenameOrRemovePropertyOfTargetPropertyContainer(node.name);
-      }
 
-      if (node.child) node.child->Visit(*this);
-    }
+    // Match the potential *new* name of the property, because refactorings are
+    // done after changes in the variables container.
+    projectScopedContainers.MatchIdentifierWithName<void>(
+      GetPotentialNewName(node.name),
+      [&]() {
+        // Do nothing, it's an object variable.
+        if (node.child) node.child->Visit(*this);
+      }, [&]() {
+        // Do nothing, it's a variable.
+        if (node.child) node.child->Visit(*this);
+      }, [&]() {
+        // This is a property, check if it's coming from the target container with
+        // properties to replace.
+        if (propertiesContainersList.HasPropertiesContainer(
+                targetPropertiesContainer)) {
+          // The node represents a property, that can come from the target
+          // (because the target is in the scope), replace or remove it:
+          RenameOrRemovePropertyOfTargetPropertyContainer(node.name);
+        }
+
+        if (node.child) node.child->Visit(*this);
+      }, [&]() {
+        // This is something else - potentially a deleted property.
+        // Check if it's coming from the target container with
+        // properties to replace.
+        if (propertiesContainersList.HasPropertiesContainer(
+                targetPropertiesContainer)) {
+          // The node represents a property, that can come from the target
+          // (because the target is in the scope), replace or remove it:
+          RenameOrRemovePropertyOfTargetPropertyContainer(node.name);
+        }
+
+        if (node.child) node.child->Visit(*this);
+      });
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     if (node.child) node.child->Visit(*this);
@@ -106,29 +119,37 @@ class GD_CORE_API ExpressionPropertyReplacer
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
-    auto& variablesContainersList =
-        projectScopedContainers.GetVariablesContainersList();
     auto& propertiesContainersList =
         projectScopedContainers.GetPropertiesContainersList();
 
-    // The node represents a variable, an object variable or a property in an
-    // expression.
-    if (objectsContainersList.HasObjectOrGroupNamed(node.identifierName)) {
-      // Do nothing, it's an object variable.
-    } else if (variablesContainersList.Has(node.identifierName)) {
-      // Do nothing, it's a variable.
-    } else if (propertiesContainersList.Has(node.identifierName)) {
-      // This is a property, check if it's coming from the target container with
-      // properties to replace.
-      if (propertiesContainersList.HasPropertiesContainer(
-              targetPropertiesContainer)) {
-        // The node represents a property, that can come from the target
-        // (because the target is in the scope), replace or remove it:
-        RenameOrRemovePropertyOfTargetPropertyContainer(node.identifierName);
-      }
-    }
+    // Match the potential *new* name of the property, because refactorings are
+    // done after changes in the variables container.
+    projectScopedContainers.MatchIdentifierWithName<void>(
+      GetPotentialNewName(node.identifierName),
+      [&]() {
+        // Do nothing, it's an object variable.
+      }, [&]() {
+        // Do nothing, it's a variable.
+      }, [&]() {
+        // This is a property, check if it's coming from the target container with
+        // properties to replace.
+        if (propertiesContainersList.HasPropertiesContainer(
+                targetPropertiesContainer)) {
+          // The node represents a property, that can come from the target
+          // (because the target is in the scope), replace or remove it:
+          RenameOrRemovePropertyOfTargetPropertyContainer(node.identifierName);
+        }
+      }, [&]() {
+        // This is something else - potentially a deleted property.
+        // Check if it's coming from the target container with
+        // properties to replace.
+        if (propertiesContainersList.HasPropertiesContainer(
+                targetPropertiesContainer)) {
+          // The node represents a property, that can come from the target
+          // (because the target is in the scope), replace or remove it:
+          RenameOrRemovePropertyOfTargetPropertyContainer(node.identifierName);
+        }
+      });
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
@@ -141,6 +162,12 @@ class GD_CORE_API ExpressionPropertyReplacer
  private:
   bool hasDoneRenaming;
   bool removedPropertyUsed;
+
+  const gd::String& GetPotentialNewName(const gd::String& oldName) {
+    return oldToNewPropertyNames.count(oldName) >= 1
+            ? oldToNewPropertyNames.find(oldName)->second
+            : oldName;
+  }
 
   bool RenameOrRemovePropertyOfTargetPropertyContainer(
       gd::String& propertyName) {

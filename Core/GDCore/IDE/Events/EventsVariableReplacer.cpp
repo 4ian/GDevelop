@@ -76,9 +76,6 @@ class GD_CORE_API ExpressionVariableReplacer
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
-    auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
-
     // The node represents a variable or an object name on which a variable
     // will be accessed.
 
@@ -90,22 +87,46 @@ class GD_CORE_API ExpressionVariableReplacer
       }
 
       if (node.child) node.child->Visit(*this);
-    } else if (objectsContainersList.HasObjectOrGroupNamed(node.name)) {
-      // This represents an object.
-      // Remember the object name.
-      objectNameToUseForVariableAccessor = node.name;
-      if (node.child) node.child->Visit(*this);
-      objectNameToUseForVariableAccessor = "";
-    } else {
-      if (projectScopedContainers.GetVariablesContainersList()
-              .HasVariablesContainer(targetVariablesContainer)) {
-        // The node represents a variable, that can come from the target
-        // (because the target is in the scope), replace or remove it:
-        RenameOrRemoveVariableOfTargetVariableContainer(node.name);
-      }
-
-      if (node.child) node.child->Visit(*this);
+      return;
     }
+
+    // Match the potential *new* name of the variable, because refactorings are
+    // done after changes in the variables container.
+    projectScopedContainers.MatchIdentifierWithName<void>(
+        GetPotentialNewName(node.name),
+        [&]() {
+          // This represents an object.
+          // Remember the object name.
+          objectNameToUseForVariableAccessor = node.name;
+          if (node.child) node.child->Visit(*this);
+          objectNameToUseForVariableAccessor = "";
+        },
+        [&]() {
+          // This is a variable.
+          if (projectScopedContainers.GetVariablesContainersList()
+                  .HasVariablesContainer(targetVariablesContainer)) {
+            // The node represents a variable, that can come from the target
+            // (because the target is in the scope), replace or remove it:
+            RenameOrRemoveVariableOfTargetVariableContainer(node.name);
+          }
+
+          if (node.child) node.child->Visit(*this);
+        },
+        [&]() {
+          // This is a property.
+          if (node.child) node.child->Visit(*this);
+        },
+        [&]() {
+          // This is something else - potentially a deleted variable.
+          if (projectScopedContainers.GetVariablesContainersList()
+                  .HasVariablesContainer(targetVariablesContainer)) {
+            // The node represents a variable, that can come from the target
+            // (because the target is in the scope), replace or remove it:
+            RenameOrRemoveVariableOfTargetVariableContainer(node.name);
+          }
+
+          if (node.child) node.child->Visit(*this);
+        });
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     auto& objectsContainersList =
@@ -143,23 +164,46 @@ class GD_CORE_API ExpressionVariableReplacer
       if (forcedInitialVariablesContainer == &targetVariablesContainer) {
         RenameOrRemoveVariableOfTargetVariableContainer(node.identifierName);
       }
-    } else if (objectsContainersList.HasObjectOrGroupNamed(
-                   node.identifierName)) {
-      if (objectsContainersList.HasVariablesContainer(
-              node.identifierName, targetVariablesContainer)) {
-        // The node represents an object variable, and this object variables are
-        // the target. Do the replacement or removals:
-        RenameOrRemoveVariableOfTargetVariableContainer(
-            node.childIdentifierName);
-      }
-    } else {
-      if (projectScopedContainers.GetVariablesContainersList()
-              .HasVariablesContainer(targetVariablesContainer)) {
-        // The node represents a variable, that can come from the target
-        // (because the target is in the scope), replace or remove it:
-        RenameOrRemoveVariableOfTargetVariableContainer(node.identifierName);
-      }
+      return;
     }
+
+    // Match the potential *new* name of the variable, because refactorings are
+    // done after changes in the variables container.
+    projectScopedContainers.MatchIdentifierWithName<void>(
+        GetPotentialNewName(node.identifierName),
+        [&]() {
+          // This represents an object.
+          if (objectsContainersList.HasVariablesContainer(
+                  node.identifierName, targetVariablesContainer)) {
+            // The node represents an object variable, and this object variables
+            // are the target. Do the replacement or removals:
+            RenameOrRemoveVariableOfTargetVariableContainer(
+                node.childIdentifierName);
+          }
+        },
+        [&]() {
+          // This is a variable.
+          if (projectScopedContainers.GetVariablesContainersList()
+                  .HasVariablesContainer(targetVariablesContainer)) {
+            // The node represents a variable, that can come from the target
+            // (because the target is in the scope), replace or remove it:
+            RenameOrRemoveVariableOfTargetVariableContainer(
+                node.identifierName);
+          }
+        },
+        [&]() {
+          // This is a property.
+        },
+        [&]() {
+          // This is something else - potentially a deleted variable.
+          if (projectScopedContainers.GetVariablesContainersList()
+                  .HasVariablesContainer(targetVariablesContainer)) {
+            // The node represents a variable, that can come from the target
+            // (because the target is in the scope), replace or remove it:
+            RenameOrRemoveVariableOfTargetVariableContainer(
+                node.identifierName);
+          }
+        });
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
@@ -216,6 +260,12 @@ class GD_CORE_API ExpressionVariableReplacer
  private:
   bool hasDoneRenaming;
   bool removedVariableUsed;
+
+  const gd::String& GetPotentialNewName(const gd::String& oldName) {
+    return oldToNewVariableNames.count(oldName) >= 1
+            ? oldToNewVariableNames.find(oldName)->second
+            : oldName;
+  }
 
   bool RenameOrRemoveVariableOfTargetVariableContainer(
       gd::String& variableName) {

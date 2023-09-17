@@ -126,7 +126,7 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   } else {
     // The node represents a variable or an object variable in an expression waiting for its *value* to be returned.
 
-    if (codeGenerator.GetObjectsContainersList().HasObjectOrGroupNamed(node.name)) {
+    codeGenerator.GetProjectScopedContainers().MatchIdentifierWithName<void>(node.name, [&](){
       // Generate the code to access the object variables.
 
       // Defer generation of the access to the object and variable to the child,
@@ -136,27 +136,30 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
       objectNameToUseForVariableAccessor = "";
 
       output += codeGenerator.GenerateVariableValueAs(type);
-    } else if (codeGenerator.HasProjectAndLayout()) {
-      // This could be adapted in the future if more scopes are supported.
-      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      if (codeGenerator.GetLayout().GetVariables().Has(node.name)) {
-        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      } else if (codeGenerator.GetProject().GetVariables().Has(node.name)) {
-        scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
-      } else {
-        // The node represents a non existing variable, so it's invalid.
+    }, [&]() {
+      if (!codeGenerator.HasProjectAndLayout()) {
+        gd::LogWarning("Tried to generate access to a variable without a project/scene - the code generator only works for global and scene variables for now.");
         output += GenerateDefaultValue(type);
         return;
+      }
+
+      // This could be adapted in the future if more scopes are supported.
+      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
+      if (codeGenerator.GetProjectScopedContainers().GetVariablesContainersList().GetBottomMostVariablesContainer()->Has(node.name)) {
+        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
       }
 
       output += codeGenerator.GenerateGetVariable(node.name, scope, context, "");
       if (node.child) node.child->Visit(*this);
       output += codeGenerator.GenerateVariableValueAs(type);
-    } else {
+    }, [&]() {
+      // Properties are not supported.
+      output += GenerateDefaultValue(type);
+    }, [&]() {
       // The identifier does not represents a variable (or a child variable), or not at least an existing
       // one, nor an object variable. It's invalid.
       output += GenerateDefaultValue(type);
-    }
+    });
   }
 }
 
@@ -223,12 +226,12 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
     const auto& propertiesContainersList = codeGenerator.GetProjectScopedContainers().GetPropertiesContainersList();
 
     // The node represents a variable or an object.
-    if (codeGenerator.GetObjectsContainersList().HasObjectOrGroupNamed(node.identifierName)) {
+    codeGenerator.GetProjectScopedContainers().MatchIdentifierWithName<void>(node.identifierName, [&]() {
       // Generate the code to access the object variable.
       output += codeGenerator.GenerateGetVariable(
         node.childIdentifierName, gd::EventsCodeGenerator::OBJECT_VARIABLE, context, node.identifierName);
       output += codeGenerator.GenerateVariableValueAs(type);
-    } else if (variablesContainersList.Has(node.identifierName)) {
+    }, [&]() {
       if (!codeGenerator.HasProjectAndLayout()) {
         gd::LogWarning("Tried to generate access to a variable without a project/scene - the code generator only works for global and scene variables for now.");
         output += GenerateDefaultValue(type);
@@ -246,16 +249,16 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
       output += codeGenerator.GenerateVariableValueAs(type);
-    } else if (propertiesContainersList.Has(node.identifierName)) {
+    }, [&]() {
       const auto& propertiesContainerAndProperty = propertiesContainersList.Get(node.identifierName);
 
       output += codeGenerator.GeneratePropertyGetter(
         propertiesContainerAndProperty.first, propertiesContainerAndProperty.second, type, context);
-    } else {
+    }, [&]() {
       // The identifier does not represents a variable (or a child variable), or not at least an existing
       // one, nor an object variable. It's invalid.
       output += GenerateDefaultValue(type);
-    }
+    });
   }
 }
 

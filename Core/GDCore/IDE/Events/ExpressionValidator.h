@@ -204,22 +204,25 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       const auto& propertiesContainerList = projectScopedContainers.GetPropertiesContainersList();
 
       forbidsUsageOfBracketsBecauseParentIsObject = false;
-      if (objectsContainersList.HasObjectOrGroupNamed(node.name)) {
-        // Object found. We dont't validate the variable type though.
+      projectScopedContainers.MatchIdentifierWithName<void>(node.name,
+        [&]() {
+          // This represents an object.
 
-        // While understood by the parser, it's forbidden to use the bracket notation just after
-        // an object name (`MyObject["MyVariable"]`).
-        forbidsUsageOfBracketsBecauseParentIsObject = true;
-      } else if (variablesContainersList.Has(node.name)) {
-        // Do nothing, using a variable is fine.
-      } else if (propertiesContainerList.Has(node.name)) {
-        // Being in this node implies that there is at least a child - which is not supported for properties.
-        RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
-            node.location);
-      } else {
-        RaiseTypeError(_("No object, variable or property with this name found."),
-            node.location);
-      }
+          // While understood by the parser, it's forbidden to use the bracket notation just after
+          // an object name (`MyObject["MyVariable"]`).
+          forbidsUsageOfBracketsBecauseParentIsObject = true;
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+          // Being in this node implies that there is at least a child - which is not supported for properties.
+          RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
+              node.location);
+        }, [&]() {
+          // This is something else.
+          RaiseTypeError(_("No object, variable or property with this name found."),
+              node.location);
+        });
 
       if (node.child) {
         node.child->Visit(*this);

@@ -1,7 +1,7 @@
 #pragma once
 #include "ObjectsContainersList.h"
-#include "VariablesContainersList.h"
 #include "PropertiesContainersList.h"
+#include "VariablesContainersList.h"
 
 namespace gd {
 class Project;
@@ -13,15 +13,25 @@ class PropertiesContainersList;
 
 namespace gd {
 
+/**
+ * \brief Holds references to variables, objects, properties and other
+ * containers.
+ *
+ * This is useful to access elements of a project from a specific location,
+ * honoring the scope of each element.
+ *
+ * For example, in an expression, when an identifier is written, this class is
+ * used to know what this identifier refers too.
+ */
 class ProjectScopedContainers {
  public:
   ProjectScopedContainers(
       const gd::ObjectsContainersList &objectsContainersList_,
       const gd::VariablesContainersList &variablesContainersList_,
-      const gd::PropertiesContainersList &namedPropertyDescriptorsContainersList_)
+      const gd::PropertiesContainersList &propertiesContainersList_)
       : objectsContainersList(objectsContainersList_),
         variablesContainersList(variablesContainersList_),
-        namedPropertyDescriptorsContainersList(namedPropertyDescriptorsContainersList_){};
+        propertiesContainersList(propertiesContainersList_){};
   virtual ~ProjectScopedContainers(){};
 
   static ProjectScopedContainers
@@ -49,13 +59,29 @@ class ProjectScopedContainers {
     return projectScopedContainers;
   }
 
-  ProjectScopedContainers& AddPropertiesContainer(
-    const gd::PropertiesContainer& container
-  ) {
-    namedPropertyDescriptorsContainersList.Add(container);
+  ProjectScopedContainers &AddPropertiesContainer(
+      const gd::PropertiesContainer &container) {
+    propertiesContainersList.Add(container);
 
     return *this;
   }
+
+  template <class ReturnType>
+  ReturnType MatchIdentifierWithName(
+      const gd::String &name,
+      std::function<ReturnType()> objectCallback,
+      std::function<ReturnType()> variableCallback,
+      std::function<ReturnType()> propertyCallback,
+      std::function<ReturnType()> notFoundCallback) const {
+    if (objectsContainersList.HasObjectOrGroupNamed(name))
+      return objectCallback();
+    else if (variablesContainersList.Has(name))
+      return variableCallback();
+    else if (propertiesContainersList.Has(name))
+      return propertyCallback();
+
+    return notFoundCallback();
+  };
 
   const gd::ObjectsContainersList &GetObjectsContainersList() const {
     return objectsContainersList;
@@ -66,15 +92,17 @@ class ProjectScopedContainers {
   };
 
   const gd::PropertiesContainersList &GetPropertiesContainersList() const {
-    return namedPropertyDescriptorsContainersList;
+    return propertiesContainersList;
   };
 
-  /** Do not use - should be private but accessible to let Emscripten create a temporary. */
+  /** Do not use - should be private but accessible to let Emscripten create a
+   * temporary. */
   ProjectScopedContainers(){};
+
  private:
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;
-  gd::PropertiesContainersList namedPropertyDescriptorsContainersList;
+  gd::PropertiesContainersList propertiesContainersList;
 };
 
 }  // namespace gd

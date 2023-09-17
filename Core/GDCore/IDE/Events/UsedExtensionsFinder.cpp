@@ -115,15 +115,22 @@ void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
   if (gd::ParameterMetadata::IsExpression("variable", type)) {
     // Nothing to do (this can't reference an object)
   } else {
-    if (GetObjectsContainersList().HasObjectOrGroupNamed(node.name)) {
-      // This is an object variable.
-      auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
-        project.GetCurrentPlatform(), node.name);
-      result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
-      for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
-        result.GetUsedIncludeFiles().insert(includeFile);
-      }
-    }
+    GetProjectScopedContainers().MatchIdentifierWithName<void>(node.name,
+      [&]() {
+        // This represents an object.
+        auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
+          project.GetCurrentPlatform(), node.name);
+        result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+        for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
+          result.GetUsedIncludeFiles().insert(includeFile);
+        }
+      }, [&]() {
+        // This is a variable.
+      }, [&]() {
+        // This is a property.
+      }, [&]() {
+        // This is something else.
+      });
   }
 
   if (node.child) node.child->Visit(*this);

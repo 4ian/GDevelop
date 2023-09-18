@@ -83,19 +83,19 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const left = node.depth * 20;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
-  const longTouchForContextMenuProps = useLongTouch(
-    React.useCallback(
-      ({ clientX, clientY }) => {
-        onContextMenu({
-          index: index,
-          item: node.item,
-          x: clientX,
-          y: clientY,
-        });
-      },
-      [onContextMenu, index, node.item]
-    )
+  const openContextMenu = React.useCallback(
+    ({ clientX, clientY }) => {
+      onContextMenu({
+        index: index,
+        item: node.item,
+        x: clientX,
+        y: clientY,
+      });
+    },
+    [onContextMenu, index, node.item]
   );
+
+  const longTouchForContextMenuProps = useLongTouch(openContextMenu);
 
   const onClick = React.useCallback(
     event => {
@@ -103,6 +103,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
     },
     [onSelect, node]
+  );
+
+  const selectAndOpenContextMenu = React.useCallback(
+    (event: MouseEvent) => {
+      onClick(event);
+      openContextMenu(event);
+    },
+    [onClick, openContextMenu]
   );
 
   React.useEffect(
@@ -173,6 +181,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                         onDoubleClick={
                           onEditItem ? () => onEditItem(node.item) : undefined
                         }
+                        onContextMenu={selectAndOpenContextMenu}
                         {...longTouchForContextMenuProps}
                       >
                         {connectDragPreview(

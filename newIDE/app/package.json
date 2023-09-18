@@ -84,7 +84,7 @@
     "react-sortable-tree": "2.6.2",
     "react-test-renderer": "16.14.0",
     "react-virtualized": "9.21.1",
-    "react-window": "^1.8.9",
+    "react-window": "1.8.9",
     "recharts": "^2.1.10",
     "remark-gfm": "^3.0.1",
     "remark-parse": "^10.0.2",

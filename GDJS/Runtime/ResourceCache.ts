@@ -10,16 +10,12 @@ namespace gdjs {
 
     constructor() {}
 
+    /**
+     * Gives a fast access to asset content when they were pre-loaded and
+     * on-the-fly loading is not allowed.
+     */
     getFromName(name: string): C | null {
       return this._nameToContent.get(name) || null;
-    }
-
-    /**
-     * Historically, some resource parameters can be filled with a file name
-     * instead of a resource name.
-     */
-    getFromFile(file: string): C | null {
-      return this._fileToContent.get(file) || null;
     }
 
     get(resource: ResourceData): C | null {
@@ -27,6 +23,7 @@ namespace gdjs {
       if (existingContent) {
         return existingContent;
       }
+      // When several assets use the same file, it avoids to download it again.
       existingContent = this._fileToContent.get(resource.file);
       if (existingContent) {
         this._nameToContent.set(resource.name, existingContent);

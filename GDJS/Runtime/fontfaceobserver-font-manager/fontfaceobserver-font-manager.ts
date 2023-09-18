@@ -17,6 +17,7 @@ namespace gdjs {
     _resourceLoader: gdjs.ResourceLoader;
     // Associate font resource names to the loaded font family
     _loadedFontFamily = new gdjs.ResourceCache<string>();
+    _loadedFontFamilySet = new Set<string>();
 
     /**
      * @param resources The resources data of the game.
@@ -70,11 +71,6 @@ namespace gdjs {
      * @returns The font family to be used for this font resource.
      */
     _getFontFamilyFromFilename(resource: ResourceData): string {
-      const existingFontFamily = this._loadedFontFamily.get(resource);
-      if (existingFontFamily) {
-        return existingFontFamily;
-      }
-
       // Replaces all non-alphanumeric characters with dashes to ensure no issues when
       // referring to this font family (see https://github.com/4ian/GDevelop/issues/1521).
       let baseSlugifiedName =
@@ -83,13 +79,10 @@ namespace gdjs {
       // Ensure the generated font family is unique.
       const slugifiedName = baseSlugifiedName;
       let uniqueSuffix = 2;
-      while (!!this._loadedFontFamily.getFromFile(baseSlugifiedName)) {
+      while (this._loadedFontFamilySet.has(baseSlugifiedName)) {
         baseSlugifiedName = baseSlugifiedName + '-' + uniqueSuffix;
         uniqueSuffix++;
       }
-
-      // Cache the result to avoid collision with a similar slugified name for another filename.
-      this._loadedFontFamily.set(resource, slugifiedName);
       return slugifiedName;
     }
 
@@ -175,7 +168,7 @@ namespace gdjs {
         return;
       }
 
-      if (this._loadedFontFamily[resource.name]) {
+      if (this._loadedFontFamily.get(resource)) {
         return;
       }
       const file = resource.file;
@@ -184,6 +177,9 @@ namespace gdjs {
       }
 
       const fontFamily = this._getFontFamilyFromFilename(resource);
+      // Cache the result to avoid collision with a similar slugified name for another filename.
+      this._loadedFontFamily.set(resource, fontFamily);
+      this._loadedFontFamilySet.add(fontFamily);
       try {
         await this._loadFont(fontFamily, file);
       } catch (error) {
@@ -196,7 +192,6 @@ namespace gdjs {
             (error.message || 'Unknown error')
         );
       }
-      this._loadedFontFamily[resource.name] = fontFamily;
     }
   }
 

@@ -116,6 +116,7 @@ type Props<Item> = {|
   onMoveSelectionToItem: (destinationItem: Item) => void,
   canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
   reactDndType: string,
+  forceAllOpened?: boolean,
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -139,6 +140,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     onMoveSelectionToItem,
     canMoveSelectionToItem,
     reactDndType,
+    forceAllOpened,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
@@ -166,18 +168,22 @@ const TreeView = <Item: ItemBaseAttributes>(
     ): FlattenedNode<Item>[] => {
       const id = getItemId(item);
       const children = getItemChildren(item);
-      const collapsed = !openedNodeIds.includes(id);
+      const collapsed = !forceAllOpened && !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
       let flattenedChildren = [];
       /*
        * Compute children nodes flattening if:
        * - node has children;
        * and if either one of these conditions are true:
+       * - the nodes are force-opened (props)
        * - the node is opened (not collapsed)
        * - the user is searching
        * - the user opened the node during the search
        */
-      if (children && (!collapsed || !!searchText || openedDuringSearch)) {
+      if (
+        children &&
+        (forceAllOpened || !collapsed || !!searchText || openedDuringSearch)
+      ) {
         flattenedChildren = children
           .map(child =>
             flattenNode(child, depth + 1, searchText, openedDuringSearch)
@@ -191,12 +197,14 @@ const TreeView = <Item: ItemBaseAttributes>(
       /*
        * Append node to result if either:
        * - the user is not searching
+       * - the nodes are force-opened (props)
        * - the node is force-opened (if user opened the node during the search)
        * - the node name matches the search
        * - the node contains children that should be displayed
        */
       if (
         !searchText ||
+        forceAllOpened ||
         forceOpen ||
         name.toLowerCase().includes(searchText) ||
         flattenedChildren.length > 0
@@ -245,6 +253,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       openedDuringSearchNodeIds,
       openedNodeIds,
       selectedNodeIds,
+      forceAllOpened,
     ]
   );
 
@@ -258,21 +267,24 @@ const TreeView = <Item: ItemBaseAttributes>(
   const onOpen = React.useCallback(
     (node: FlattenedNode<Item>) => {
       if (isSearching) {
-        node.collapsed
-          ? setOpenedDuringSearchNodeIds([
-              ...openedDuringSearchNodeIds,
-              node.id,
-            ])
-          : setOpenedDuringSearchNodeIds(
+        if (node.collapsed) {
+          setOpenedDuringSearchNodeIds([...openedDuringSearchNodeIds, node.id]);
+        } else {
+          if (!forceAllOpened)
+            setOpenedDuringSearchNodeIds(
               openedDuringSearchNodeIds.filter(id => id !== node.id)
             );
+        }
       } else {
-        node.collapsed
-          ? setOpenedNodeIds([...openedNodeIds, node.id])
-          : setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
+        if (node.collapsed) {
+          setOpenedNodeIds([...openedNodeIds, node.id]);
+        } else {
+          if (!forceAllOpened)
+            setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
+        }
       }
     },
-    [openedDuringSearchNodeIds, openedNodeIds, isSearching]
+    [openedDuringSearchNodeIds, openedNodeIds, isSearching, forceAllOpened]
   );
 
   const onSelect = React.useCallback(

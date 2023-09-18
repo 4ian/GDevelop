@@ -27,6 +27,14 @@ namespace gdjs {
     );
   };
 
+  /**
+   * A task of pre-loading resources used by a layout.
+   * 
+   * A Promise can't be used instead of this class because a Promise will start
+   * as soon as possible. It would flood the server with downloading requests
+   * and make impossible to finely tune in which order layouts are actually
+   * downloaded.
+   */
   class LayoutLoadingTask {
     layoutName: string;
     private onProgressCallbacks: Array<(count: number, total: number) => void>;
@@ -70,21 +78,37 @@ namespace gdjs {
   }
 
   /**
-   * Gives helper methods used when resources are loaded from an URL.
-   */
-  /**
-   * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
+   * Pre-load resources of any kind needed for a game or a layout.
    */
   export class ResourceLoader {
     _runtimeGame: RuntimeGame;
+    /**
+     * All the resource of a game by resource name.
+     */
     private _resources: Map<string, ResourceData>;
+    /**
+     * Resources needed for any layout. Typically, they are resources from
+     * global objects.
+     */
     private _globalResources: Array<string>;
+    /**
+     * Resources by layout names.
+     */
     private _layoutResources: Map<string, Array<string>>;
+    /**
+     * Keep track of which layout whose resources has already be pre-loaded.
+     */
     private _loadedLayoutNames: Set<string> = new Set<string>();
+    /**
+     * A queue of layouts whose resources are still to be pre-loaded.
+     */
     private _layoutToLoadQueue: Array<LayoutLoadingTask> = new Array<
       LayoutLoadingTask
     >();
-
+    /**
+     * The resource managers that actually download and remember downloaded
+     * content.
+     */
     private _resourceManagersMap: Map<ResourceKind, ResourceManager>;
     private _imageManager: ImageManager;
     private _soundManager: SoundManager;
@@ -94,8 +118,10 @@ namespace gdjs {
     private _bitmapFontManager: BitmapFontManager;
 
     /**
-     * @param resources The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param runtimeGame The game.
+     * @param resourceDataArray The resources data of the game.
+     * @param globalResources The resources needed for any layer.
+     * @param layoutDataArray The resources used by each layer.
      */
     constructor(
       runtimeGame: RuntimeGame,
@@ -136,9 +162,8 @@ namespace gdjs {
     }
 
     /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     *
-     * @param resources The resources data of the game.
+     * Update the resources data of the game. Useful for hot-reloading, should
+     * not be used otherwise.
      */
     setResources(
       resourceDataArray: ResourceData[],
@@ -179,6 +204,9 @@ namespace gdjs {
       );
     }
 
+    /**
+     * Pre-load the resources that are needed to launch the first layout.
+     */
     async loadGlobalAndFirstLayoutResources(
       firstSceneName: string,
       onProgress: (count: number, total: number) => void
@@ -202,6 +230,12 @@ namespace gdjs {
       this._loadedLayoutNames.add(firstSceneName);
     }
 
+    /**
+     * Pre-load each layout in order.
+     * 
+     * This is done in background to try to avoid loading screens when changing
+     * layouts.
+     */
     async loadAllLayoutInBackground(firstSceneName: string): Promise<void> {
       while (this._layoutToLoadQueue.length > 0) {
         const task = this._layoutToLoadQueue.pop();
@@ -217,6 +251,11 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Load a scene that is needed right away.
+     * 
+     * The renderer will show a loading screen while its done.
+     */
     loadLayoutResources(
       layoutName: string,
       onProgress?: (count: number, total: number) => void
@@ -233,6 +272,12 @@ namespace gdjs {
       });
     }
 
+    /**
+     * Put a given layout at the end of the queue.
+     * 
+     * When the layout that is currently pre-loading in background is done,
+     * this layout will be the next to be pre-loaded.
+     */
     private _prioritizeLayout(layoutName: string): LayoutLoadingTask | null {
       const taskIndex = this._layoutToLoadQueue.findIndex(
         (task) => task.layoutName === layoutName
@@ -278,8 +323,7 @@ namespace gdjs {
     }
 
     /**
-     * Load the specified resources, so that textures are loaded and can then be
-     * used by calling `getPIXITexture`.
+     * Load the specified resources.
      */
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resources.get(resourceName);
@@ -309,6 +353,8 @@ namespace gdjs {
     getResource(resourceName: string): ResourceData | null {
       return this._resources.get(resourceName) || null;
     }
+
+    // Helper methods used when resources are loaded from an URL.
 
     /**
      * Complete the given URL with any specific parameter required to access

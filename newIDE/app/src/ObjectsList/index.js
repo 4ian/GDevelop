@@ -692,7 +692,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const moveSelectionTo = React.useCallback(
-      (i18n: I18nType, destinationItem: TreeViewItem) => {
+      (
+        i18n: I18nType,
+        destinationItem: TreeViewItem,
+        where: 'after' | 'before'
+      ) => {
         if (destinationItem.isRoot) return;
 
         const selectedObjectsWithContext = lists.allObjectsList.filter(
@@ -749,6 +753,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             return;
           }
           if (toIndex > fromIndex) toIndex -= 1;
+          if (where === 'after') toIndex += 1;
           container.moveObject(fromIndex, toIndex);
         });
         onObjectModified(true);
@@ -992,8 +997,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       }}
                       onRenameItem={rename}
                       buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                      onMoveSelectionToItem={destinationItem =>
-                        moveSelectionTo(i18n, destinationItem)
+                      onMoveSelectionToItem={(destinationItem, where) =>
+                        moveSelectionTo(i18n, destinationItem, where)
                       }
                       canMoveSelectionToItem={canMoveSelectionTo}
                       reactDndType={objectWithContextReactDndType}

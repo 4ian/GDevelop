@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
+import memoizeOne from 'memoize-one';
 import { areEqual } from 'react-window';
 import IconButton from '../IconButton';
 import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
@@ -54,6 +55,10 @@ const SemiControlledRowInput = ({
   );
 };
 
+const memoized = memoizeOne((initialValue, getContainerYPosition) =>
+  getContainerYPosition()
+);
+
 type Props<Item> = {|
   index: number,
   style: any,
@@ -83,6 +88,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const left = node.depth * 20;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
+  const [whereToDrop, setWhereToDrop] = React.useState<'before' | 'after'>(
+    'before'
+  );
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const openContextMenu = React.useCallback(
     ({ clientX, clientY }) => {
       onContextMenu({
@@ -133,8 +142,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [isStayingOver, onOpen, node]
   );
 
+  const getContainerYPosition = React.useCallback(() => {
+    if (containerRef.current) {
+      return containerRef.current.getBoundingClientRect().top;
+    }
+  }, []);
+
   return (
-    <div style={style}>
+    <div style={style} ref={containerRef}>
       <DragSourceAndDropTarget
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
@@ -143,7 +158,19 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         canDrag={() => !node.item.isRoot}
         canDrop={canDrop ? () => canDrop(node.item) : () => true}
         drop={() => {
-          onDrop(node.item);
+          onDrop(node.item, whereToDrop);
+        }}
+        hover={monitor => {
+          const { y } = monitor.getClientOffset();
+          // Use a cached version of container position to avoid recomputing bounding rectangle.
+          // Doing this, the position is computed every second the user hovers the target.
+          const containerYPosition = memoized(
+            Math.floor(Date.now() / 1000),
+            getContainerYPosition
+          );
+          if (containerYPosition) {
+            setWhereToDrop(y - containerYPosition <= 16 ? 'before' : 'after');
+          }
         }}
       >
         {({
@@ -175,7 +202,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 >
                   {connectDragSource(
                     <div className="full-space-container">
-                      {isOver && <DropIndicator canDrop={canDrop} />}
+                      {isOver && whereToDrop === 'before' && (
+                        <DropIndicator canDrop={canDrop} />
+                      )}
                       <div
                         className="row-content"
                         onDoubleClick={
@@ -274,6 +303,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             </div>
                           )}
                       </div>
+                      {isOver && whereToDrop === 'after' && (
+                        <DropIndicator canDrop={canDrop} />
+                      )}
                     </div>
                   )}
                 </div>

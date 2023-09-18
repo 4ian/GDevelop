@@ -43,6 +43,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
+import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -218,6 +219,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     ref
   ) => {
     const preferences = React.useContext(PreferencesContext);
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
+    );
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
 
@@ -968,6 +972,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       ref={treeViewRef}
                       items={getTreeViewData(i18n)}
                       height={height}
+                      forceAllOpened={!!currentlyRunningInAppTutorial}
                       searchText={searchText}
                       getItemName={getTreeViewItemName}
                       getItemThumbnail={getTreeViewItemThumbnail}

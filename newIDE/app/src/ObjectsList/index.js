@@ -313,9 +313,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           object.setTags(getStringFromTags(selectedObjectTags));
           onObjectCreated(object);
         });
-        forceUpdateList();
+        if (treeViewRef.current)
+          treeViewRef.current.openItem(sceneObjectsRootFolderId);
+
+        const lastObjectWithContext = {
+          object: objects[objects.length - 1],
+          // Objects are added as scene objects.
+          global: false,
+        };
+
+        // Scroll to the new object.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(lastObjectWithContext);
+        }, 100); // A few ms is enough for a new render to be done.
       },
-      [forceUpdateList, onObjectCreated, selectedObjectTags]
+      [onObjectCreated, selectedObjectTags]
     );
 
     const onAddNewObject = React.useCallback(() => {

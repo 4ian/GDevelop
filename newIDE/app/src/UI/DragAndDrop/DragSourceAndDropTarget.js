@@ -27,6 +27,7 @@ type Props<DraggedItemType> = {|
   canDrop: (item: DraggedItemType) => boolean,
   drop: () => void,
   endDrag?: () => void,
+  hover?: (monitor: DropTargetMonitor) => void,
 |};
 
 type DragSourceProps = {|
@@ -93,6 +94,9 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         return; // Drop already handled by another target
       }
       props.drop();
+    },
+    hover(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
+      if (props.hover) props.hover(monitor);
     },
   };
 

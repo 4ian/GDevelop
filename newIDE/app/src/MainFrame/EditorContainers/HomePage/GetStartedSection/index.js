@@ -97,14 +97,12 @@ const GetStartedSection = ({
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,
     fetchInAppTutorials,
+    currentlyRunningInAppTutorial,
   } = React.useContext(InAppTutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
   const items: {
     key: string,
     title: React.Node,

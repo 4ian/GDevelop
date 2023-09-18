@@ -104,6 +104,8 @@ const getTreeViewItemId = (item: TreeViewItem) =>
   item.isRoot || item.isPlaceholder
     ? item.id
     : `object-item-${getObjectWithContextName(item)}`;
+const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
+  item.isRoot || item.isPlaceholder ? undefined : `object-item-${index}`;
 
 const getTreeViewItemChildren = (item: TreeViewItem) =>
   item.isRoot ? item.children : null;
@@ -957,6 +959,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemChildren={getTreeViewItemChildren}
                       multiSelect={false}
                       getItemId={getTreeViewItemId}
+                      getItemHtmlId={getTreeViewItemHtmlId}
                       getItemDataset={getTreeViewItemData}
                       onEditItem={editItem}
                       // $FlowFixMe

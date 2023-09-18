@@ -77,9 +77,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     onEditItem,
     hideMenuButton,
     DragSourceAndDropTarget,
+    getItemHtmlId,
   } = data;
   const node = flattenedData[index];
-  const left = (node.depth - 1) * 20;
+  const left = node.depth * 20;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
   const longTouchForContextMenuProps = useLongTouch(
@@ -154,6 +155,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             >
               {connectDropTarget(
                 <div
+                  id={
+                    getItemHtmlId ? getItemHtmlId(node.item, index) : undefined
+                  }
                   onClick={onClick}
                   tabIndex={0}
                   className={

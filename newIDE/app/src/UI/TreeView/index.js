@@ -49,6 +49,7 @@ export type ItemData<Item> = {|
   onEditItem?: Item => void,
   hideMenuButton: boolean,
   DragSourceAndDropTarget: any => React.Node,
+  getItemHtmlId?: (Item, index: number) => ?string,
 |};
 
 const getItemProps = memoizeOne(
@@ -69,7 +70,8 @@ const getItemProps = memoizeOne(
     onDrop: Item => void,
     onEditItem?: Item => void,
     hideMenuButton: boolean,
-    DragSourceAndDropTarget: any => React.Node
+    DragSourceAndDropTarget: any => React.Node,
+    getItemHtmlId?: (Item, index: number) => ?string
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -83,6 +85,7 @@ const getItemProps = memoizeOne(
     onEditItem,
     hideMenuButton,
     DragSourceAndDropTarget,
+    getItemHtmlId,
   })
 );
 
@@ -99,6 +102,7 @@ type Props<Item> = {|
   items: Item[],
   getItemName: Item => string,
   getItemId: Item => string,
+  getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
   getItemThumbnail?: Item => ?string,
   getItemDataset?: Item => ?HTMLDataset,
@@ -122,6 +126,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     searchText,
     getItemName,
     getItemId,
+    getItemHtmlId,
     getItemChildren,
     getItemThumbnail,
     getItemDataset,
@@ -160,9 +165,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       forceOpen: boolean
     ): FlattenedNode<Item>[] => {
       const id = getItemId(item);
-      const name = getItemName(item);
       const children = getItemChildren(item);
-      const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const collapsed = !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
       let flattenedChildren = [];
@@ -181,6 +184,9 @@ const TreeView = <Item: ItemBaseAttributes>(
           )
           .flat();
       }
+
+      const name = getItemName(item);
+      const dataset = getItemDataset ? getItemDataset(item) : undefined;
 
       /*
        * Append node to result if either:
@@ -244,7 +250,7 @@ const TreeView = <Item: ItemBaseAttributes>(
 
   const flattenOpened = React.useCallback(
     (items: Item[], searchText: ?string): FlattenedNode<Item>[] => {
-      return items.map(item => flattenNode(item, 1, searchText, false)).flat();
+      return items.map(item => flattenNode(item, 0, searchText, false)).flat();
     },
     [flattenNode]
   );
@@ -391,7 +397,8 @@ const TreeView = <Item: ItemBaseAttributes>(
     onMoveSelectionToItem,
     onEditItem,
     isMobileScreen,
-    DragSourceAndDropTarget
+    DragSourceAndDropTarget,
+    getItemHtmlId
   );
 
   // Reset opened nodes during search when user stops searching

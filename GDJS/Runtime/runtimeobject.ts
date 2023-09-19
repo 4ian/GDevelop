@@ -1243,7 +1243,7 @@ namespace gdjs {
     }
 
     /**
-     * Return the width of the object.
+     * Return the height of the object.
      * @return The height of the object
      */
     getHeight(): float {

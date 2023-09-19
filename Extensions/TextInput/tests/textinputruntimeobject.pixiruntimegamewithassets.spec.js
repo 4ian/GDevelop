@@ -65,13 +65,16 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
 
     // Make sure the renderer is created (to test the real DOM element creation/update)
     const gameContainer = document.createElement('div');
+    //@ts-ignore In this testing environement the renderer is always defined
     runtimeGame.getRenderer().createStandardCanvas(gameContainer);
 
     const object = makeTextInputRuntimeObject(runtimeScene);
     runtimeScene.addObject(object);
 
     // Check that the DOM element was created
+    // @ts-ignore In this testing environement the renderer is always defined
     const gameDomElementContainer = runtimeGame
+      //@ts-ignore In this testing environement the renderer is always defined
       .getRenderer()
       .getDomElementContainer();
     if (!gameDomElementContainer)

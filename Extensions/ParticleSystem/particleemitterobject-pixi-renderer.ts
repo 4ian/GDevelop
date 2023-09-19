@@ -328,7 +328,7 @@ namespace gdjs {
     setAlpha(alpha1: number, alpha2: number): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('alpha');
-      setBoundsValues(behavior.list, alpha1, alpha2);
+      setBoundsValues(behavior.list, alpha1 / 255.0, alpha2 / 255.0);
     }
 
     setFlow(flow: number, tank: number): void {

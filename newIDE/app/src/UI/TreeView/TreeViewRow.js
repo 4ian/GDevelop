@@ -83,7 +83,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     canDrop,
     onDrop,
     onEditItem,
-    hideMenuButton,
+    isMobileScreen,
     DragSourceAndDropTarget,
     getItemHtmlId,
   } = data;
@@ -272,7 +272,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                                     : ''
                                 }`}
                                 onClick={
-                                  node.item.isRoot || node.item.isPlaceholder
+                                  node.item.isRoot ||
+                                  node.item.isPlaceholder ||
+                                  isMobileScreen
                                     ? null
                                     : e => {
                                         if (!e.metaKey && !e.shiftKey) {
@@ -287,7 +289,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             )}
                           </div>
                         )}
-                        {!hideMenuButton &&
+                        {!isMobileScreen &&
                           !node.item.isRoot &&
                           !node.item.isPlaceholder && (
                             <div className="row-content-side row-content-side-right">

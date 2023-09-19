@@ -29,7 +29,7 @@ namespace gdjs {
 
   /**
    * A task of pre-loading resources used by a layout.
-   * 
+   *
    * A Promise can't be used instead of this class because a Promise will start
    * as soon as possible. It would flood the server with downloading requests
    * and make impossible to finely tune in which order layouts are actually
@@ -232,7 +232,7 @@ namespace gdjs {
 
     /**
      * Pre-load each layout in order.
-     * 
+     *
      * This is done in background to try to avoid loading screens when changing
      * layouts.
      */
@@ -253,7 +253,7 @@ namespace gdjs {
 
     /**
      * Load a scene that is needed right away.
-     * 
+     *
      * The renderer will show a loading screen while its done.
      */
     loadLayoutResources(
@@ -274,7 +274,7 @@ namespace gdjs {
 
     /**
      * Put a given layout at the end of the queue.
-     * 
+     *
      * When the layout that is currently pre-loading in background is done,
      * this layout will be the next to be pre-loaded.
      */

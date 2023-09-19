@@ -62,6 +62,7 @@ public:
    */
   static void ExposeLayoutEventsAndExternalEvents(gd::Project &project, gd::Layout &layout,
                                  gd::ArbitraryEventsWorker &worker);
+
   /**
    * \brief Call the specified worker on all events of a layout and
    * its external events.

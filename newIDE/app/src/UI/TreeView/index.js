@@ -35,7 +35,7 @@ export type ItemData<Item> = {|
   onOpen: (FlattenedNode<Item>) => void,
   onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
   flattenedData: FlattenedNode<Item>[],
-  onStartRenaming: (nodeId: string) => void,
+  onStartRenaming: (nodeId: ?string) => void,
   onEndRenaming: (item: Item, newName: string) => void,
   onContextMenu: ({|
     item: Item,
@@ -57,7 +57,7 @@ const getItemProps = memoizeOne(
     flattenedData: FlattenedNode<Item>[],
     onOpen: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
-    onStartRenaming: (nodeId: string) => void,
+    onStartRenaming: (nodeId: ?string) => void,
     onEndRenaming: (item: Item, newName: string) => void,
     renamedItemId: ?string,
     onContextMenu: ({|

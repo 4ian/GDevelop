@@ -29,9 +29,12 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       // Make sure the renderer is created (to test the real DOM element creation/update)
       const gameContainer = document.createElement('div');
+      // @ts-ignore In this testing environement the renderer is always defined
       runtimeGame.getRenderer().createStandardCanvas(gameContainer);
 
-      const watermark = runtimeGame._watermark;
+      const watermark = /** @type {Exclude<gdjs.RuntimeWatermark, undefined>} */ (
+        /** @type {unknown} */ (runtimeGame._watermark)
+      );
 
       expect(watermark._backgroundElement).to.be(null);
       expect(watermark._containerElement).to.be(null);
@@ -120,9 +123,12 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       // Make sure the renderer is created (to test the real DOM element creation/update)
       const gameContainer = document.createElement('div');
+      // @ts-ignore In this testing environement the renderer is always defined
       runtimeGame.getRenderer().createStandardCanvas(gameContainer);
 
-      const watermark = runtimeGame._watermark;
+      const watermark = /** @type {Exclude<gdjs.RuntimeWatermark, undefined>} */ (
+        /** @type {unknown} */ (runtimeGame._watermark)
+      );
 
       expect(watermark._backgroundElement).to.be(null);
       expect(watermark._containerElement).to.be(null);

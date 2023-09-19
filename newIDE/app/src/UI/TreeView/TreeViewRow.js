@@ -107,7 +107,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onContextMenu, index, node.item]
   );
 
-  const longTouchForContextMenuProps = useLongTouch(openContextMenu);
+  const longTouchForContextMenuProps = useLongTouch(openContextMenu, {
+    delay: 1000,
+  });
 
   const onClick = React.useCallback(
     event => {

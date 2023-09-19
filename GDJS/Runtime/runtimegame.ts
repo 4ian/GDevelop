@@ -794,6 +794,7 @@ namespace gdjs {
     static fallbackGameLoopStarter(
       requestFrameRun: (deltaTime: number) => boolean
     ) {
+      const yieldToRuntime = setImmediate ?? setTimeout;
       let oldTime = 0;
       const gameLoop = () => {
         const now = Date.now();
@@ -801,7 +802,7 @@ namespace gdjs {
         oldTime = now;
         if (requestFrameRun(dt)) {
           // As long as RuntimeGame does not request the game to stop, continue running the loop.
-          setImmediate(gameLoop);
+          yieldToRuntime(gameLoop);
         }
       };
       gameLoop();

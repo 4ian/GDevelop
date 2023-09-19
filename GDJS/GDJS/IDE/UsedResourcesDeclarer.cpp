@@ -12,20 +12,20 @@
 
 namespace gd {
 
-std::set<gd::String> UsedResourcesDeclarer::GetProjectUsedResources(gd::Project &project) {
-  gd::UsedResourcesDeclarer resourceWorker;
+std::set<gd::String> UsedResourcesFinder::FindProjectUsedResources(gd::Project &project) {
+  gd::UsedResourcesFinder resourceWorker;
   gd::ResourceExposer::ExposeProjectResources(project, resourceWorker);
   return resourceWorker.resourceNames;
 }
 
-std::set<gd::String> UsedResourcesDeclarer::GetLayoutUsedResources(gd::Project &project,
+std::set<gd::String> UsedResourcesFinder::FindLayoutUsedResources(gd::Project &project,
     gd::Layout &layout) {
-  gd::UsedResourcesDeclarer resourceWorker;
+  gd::UsedResourcesFinder resourceWorker;
   gd::ResourceExposer::ExposeLayoutResources(project, layout, resourceWorker);
   return resourceWorker.resourceNames;
 }
 
-void UsedResourcesDeclarer::DeclareUsedResource(gd::String &resourceName) {
+void UsedResourcesFinder::AddUsedResource(gd::String &resourceName) {
   if (resourceName.empty()) {
     return;
   }

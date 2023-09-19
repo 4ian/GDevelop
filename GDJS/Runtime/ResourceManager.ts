@@ -4,6 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * A resource managers that download and remember downloaded content for one
+   * kind of resource.
+   */
   export interface ResourceManager {
     /**
      * Load the specified resource.

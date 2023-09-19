@@ -189,13 +189,13 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   auto projectUsedResources =
-      gd::UsedResourcesDeclarer::GetProjectUsedResources(exportedProject);
+      gd::UsedResourcesFinder::FindProjectUsedResources(exportedProject);
   std::vector<std::set<gd::String>> layersUsedResources;
   for (std::size_t layoutIndex = 0;
        layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
     auto &layout = exportedProject.GetLayout(layoutIndex);
     layersUsedResources.push_back(
-        gd::UsedResourcesDeclarer::GetLayoutUsedResources(exportedProject,
+        gd::UsedResourcesFinder::FindLayoutUsedResources(exportedProject,
                                                           layout));
   }
 

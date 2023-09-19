@@ -328,7 +328,11 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     });
   };
 
-  _moveSelectionTo = (i18n: I18nType, destinationItem: TreeViewItem) => {
+  _moveSelectionTo = (
+    i18n: I18nType,
+    destinationItem: TreeViewItem,
+    where: 'after' | 'before'
+  ) => {
     if (destinationItem.isRoot) return false;
     const { selectedGroupWithContext } = this.state;
     if (!selectedGroupWithContext) return;
@@ -370,6 +374,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return;
     }
     if (toIndex > fromIndex) toIndex -= 1;
+    if (where === 'after') toIndex += 1;
 
     container.move(fromIndex, toIndex);
     this._onObjectGroupModified();
@@ -530,8 +535,8 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                       }}
                       onRenameItem={this._onRename}
                       buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
-                      onMoveSelectionToItem={destinationItem =>
-                        this._moveSelectionTo(i18n, destinationItem)
+                      onMoveSelectionToItem={(destinationItem, where) =>
+                        this._moveSelectionTo(i18n, destinationItem, where)
                       }
                       canMoveSelectionToItem={this._canMoveSelectionTo}
                       reactDndType={groupWithContextReactDndType}

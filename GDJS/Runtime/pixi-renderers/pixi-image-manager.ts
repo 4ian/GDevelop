@@ -182,7 +182,6 @@ namespace gdjs {
 
       // @ts-ignore - source does exist on resource.
       const image = pixiTexture.baseTexture.resource.source;
-      console.log(image);
       if (!(image instanceof HTMLImageElement)) {
         throw new Error(
           `Can't load texture for resource "${resourceName}" as it's not an image.`

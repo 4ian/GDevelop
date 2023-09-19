@@ -4671,4 +4671,20 @@ Array [
       ).toBe(true);
     });
   });
+
+  describe('gd.ObjectFolderOrObject (using gd.ObjectsContainer)', () => {
+    let project = null;
+    let layout = null;
+    beforeAll(() => {
+      project = gd.ProjectHelper.createNewGDJSProject();
+      layout = project.insertNewLayout('Scene', 0);
+    });
+
+    it('objects container has an root ObjectFolderOrObject', () => {
+      const rootFolder = layout.getRootFolder();
+      expect(rootFolder.isFolder()).toBe(true);
+      expect(rootFolder.isObjectExpired()).toBe(true);
+      expect(rootFolder.getFolderName()).toEqual('__ROOT');
+    });
+  });
 });

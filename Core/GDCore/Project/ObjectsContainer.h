@@ -9,6 +9,7 @@
 #include <vector>
 #include "GDCore/String.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
+#include "GDCore/Project/ObjectFolderOrObject.h"
 namespace gd {
 class Object;
 class Project;
@@ -153,6 +154,10 @@ class GD_CORE_API ObjectsContainer {
   }
   ///@}
 
+  gd::ObjectFolderOrObject& GetRootFolder() {
+      return *rootFolder;
+  }
+
   /** \name Saving and loading
    * Members functions related to saving and loading the objects of the class.
    */
@@ -190,6 +195,10 @@ class GD_CORE_API ObjectsContainer {
   std::vector<std::unique_ptr<gd::Object> >
       initialObjects;  ///< Objects contained.
   gd::ObjectGroupsContainer objectGroups;
+
+ private:
+  std::unique_ptr<gd::ObjectFolderOrObject> rootFolder;
+
 };
 
 }  // namespace gd

@@ -19,6 +19,8 @@ import { type ItemData, type ItemBaseAttributes } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 
+const stopPropagation = e => e.stopPropagation();
+
 const SemiControlledRowInput = ({
   initialValue,
   onEndRenaming,
@@ -38,7 +40,8 @@ const SemiControlledRowInput = ({
         onChange={e => {
           setValue(e.currentTarget.value);
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={stopPropagation}
+        onDoubleClick={stopPropagation}
         onBlur={() => {
           onEndRenaming(value);
         }}

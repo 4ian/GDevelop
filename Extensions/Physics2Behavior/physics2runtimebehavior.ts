@@ -169,7 +169,10 @@ namespace gdjs {
       // `frameTime` can take negative values.
       // It's better to be a bit early rather than skipping a frame and being
       // a lot more late.
-      let numberOfSteps = Math.round(this.frameTime / this.timeStep);
+      let numberOfSteps = Math.max(
+        0,
+        Math.round(this.frameTime / this.timeStep)
+      );
       this.frameTime -= numberOfSteps * this.timeStep;
       if (numberOfSteps > 5) {
         numberOfSteps = 5;

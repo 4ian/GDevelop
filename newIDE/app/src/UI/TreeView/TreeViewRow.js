@@ -114,9 +114,13 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const onClick = React.useCallback(
     event => {
       if (!node) return;
+      if (node.item.isRoot) {
+        onOpen(node);
+        return;
+      }
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
     },
-    [onSelect, node]
+    [onSelect, node, onOpen]
   );
 
   const selectAndOpenContextMenu = React.useCallback(

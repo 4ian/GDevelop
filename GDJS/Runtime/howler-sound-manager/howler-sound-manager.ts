@@ -871,6 +871,7 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export const SoundManager = HowlerSoundManager;
-  export type SoundManager = HowlerSoundManager;
+  export type SoundManager = HowlerSoundManager | undefined;
+  type SoundManagerClass = typeof HowlerSoundManager | undefined;
+  export const SoundManager: SoundManagerClass = HowlerSoundManager;
 }

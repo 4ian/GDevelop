@@ -64,7 +64,7 @@ namespace gdjs {
       // instead of at each object creation.
       const pixiRenderer = instanceContainer
         .getGame()
-        .getRenderer()
+        .getRenderer()!
         .getPIXIRenderer();
       //@ts-expect-error Pixi has wrong type definitions for this method
       texture = pixiRenderer.generateTexture(graphics);
@@ -173,7 +173,7 @@ namespace gdjs {
       const layer = instanceContainer.getLayer(runtimeObject.getLayer());
       if (layer) {
         layer
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(this.renderer, runtimeObject.getZOrder());
       }
     }
@@ -293,11 +293,11 @@ namespace gdjs {
     ): boolean {
       const invalidPixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getInvalidPIXITexture();
       const pixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(texture);
       return pixiTexture.valid && pixiTexture !== invalidPixiTexture;
     }
@@ -308,11 +308,11 @@ namespace gdjs {
     ): void {
       const invalidPixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getInvalidPIXITexture();
       const pixiTexture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(texture);
       if (pixiTexture.valid && pixiTexture !== invalidPixiTexture) {
         this.emitter.particleImages[0] = pixiTexture;
@@ -351,6 +351,11 @@ namespace gdjs {
   }
 
   // @ts-ignore - Register the class to let the engine use it.
-  export const ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
-  export type ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
+  export type ParticleEmitterObjectRenderer =
+    | ParticleEmitterObjectPixiRenderer
+    | undefined;
+  type ParticleEmitterObjectRendererClass =
+    | typeof ParticleEmitterObjectPixiRenderer
+    | undefined;
+  export const ParticleEmitterObjectRenderer: ParticleEmitterObjectRendererClass = ParticleEmitterObjectPixiRenderer;
 }

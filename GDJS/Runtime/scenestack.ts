@@ -40,7 +40,7 @@ namespace gdjs {
 
         //Something special was requested by the current scene.
         if (request === gdjs.SceneChangeRequest.STOP_GAME) {
-          this._runtimeGame.getRenderer().stopGame();
+          this._runtimeGame.getRenderer()?.stopGame();
           return true;
         } else if (request === gdjs.SceneChangeRequest.POP_SCENE) {
           this.pop();

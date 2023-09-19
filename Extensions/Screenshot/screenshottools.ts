@@ -13,7 +13,7 @@ namespace gdjs {
     ) {
       const fs = typeof require !== 'undefined' ? require('fs') : null;
       if (fs) {
-        const canvas = instanceContainer.getGame().getRenderer().getCanvas();
+        const canvas = instanceContainer.getGame().getRenderer()?.getCanvas();
         if (canvas) {
           const content = canvas
             .toDataURL('image/png')

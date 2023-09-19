@@ -25,9 +25,11 @@ namespace gdjs {
       tiled: boolean
     ) {
       this._object = runtimeObject;
-      const texture = (
-        instanceContainer.getGame().getImageManager() as gdjs.PixiImageManager
-      ).getPIXITexture(textureName);
+      const texture = (instanceContainer
+        .getGame()
+        .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
+        textureName
+      );
       const StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
       this._spritesContainer = new PIXI.Container();
       this._wrapperContainer = new PIXI.Container();
@@ -396,6 +398,5 @@ namespace gdjs {
   type PanelSpriteRuntimeObjectRendererClass =
     | typeof PanelSpriteRuntimeObjectPixiRenderer
     | undefined;
-  export const PanelSpriteRuntimeObjectRenderer: PanelSpriteRuntimeObjectRendererClass =
-    PanelSpriteRuntimeObjectPixiRenderer;
+  export const PanelSpriteRuntimeObjectRenderer: PanelSpriteRuntimeObjectRendererClass = PanelSpriteRuntimeObjectPixiRenderer;
 }

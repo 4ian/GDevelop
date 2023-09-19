@@ -40,11 +40,11 @@ namespace gdjs {
         );
       } else if (objectData.textureParticleName) {
         const sprite = new PIXI.Sprite(
-          (
-            instanceContainer
-              .getGame()
-              .getImageManager() as gdjs.PixiImageManager
-          ).getPIXITexture(objectData.textureParticleName)
+          (instanceContainer
+            .getGame()
+            .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
+            objectData.textureParticleName
+          )
         );
         sprite.width = objectData.rendererParam1;
         sprite.height = objectData.rendererParam2;
@@ -273,8 +273,10 @@ namespace gdjs {
 
     setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
-      this.emitter.emitterLifetime =
-        ParticleEmitterObjectPixiRenderer.computeLifetime(flow, tank);
+      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
+        flow,
+        tank
+      );
     }
 
     resetEmission(flow: number, tank: number): void {
@@ -355,6 +357,5 @@ namespace gdjs {
   type ParticleEmitterObjectRendererClass =
     | typeof ParticleEmitterObjectPixiRenderer
     | undefined;
-  export const ParticleEmitterObjectRenderer: ParticleEmitterObjectRendererClass =
-    ParticleEmitterObjectPixiRenderer;
+  export const ParticleEmitterObjectRenderer: ParticleEmitterObjectRendererClass = ParticleEmitterObjectPixiRenderer;
 }

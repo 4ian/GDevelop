@@ -59,6 +59,5 @@ namespace gdjs {
   type RuntimeObject3DRendererClass =
     | typeof RuntimeObject3DThreeRenderer
     | undefined;
-  export const RuntimeObject3DRenderer: RuntimeObject3DRendererClass =
-    RuntimeObject3DThreeRenderer;
+  export const RuntimeObject3DRenderer: RuntimeObject3DRendererClass = RuntimeObject3DThreeRenderer;
 }

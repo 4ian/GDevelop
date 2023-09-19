@@ -81,8 +81,7 @@ namespace gdjs {
     }
 
     updateLoop(): void {
-      this._pixiObject._texture.baseTexture.resource.source.loop =
-        this._object._loop;
+      this._pixiObject._texture.baseTexture.resource.source.loop = this._object._loop;
     }
 
     updateVolume(): void {
@@ -333,6 +332,5 @@ namespace gdjs {
   type VideoRuntimeObjectRendererClass =
     | typeof VideoRuntimeObjectPixiRenderer
     | undefined;
-  export const VideoRuntimeObjectRenderer: VideoRuntimeObjectRendererClass =
-    VideoRuntimeObjectPixiRenderer;
+  export const VideoRuntimeObjectRenderer: VideoRuntimeObjectRendererClass = VideoRuntimeObjectPixiRenderer;
 }

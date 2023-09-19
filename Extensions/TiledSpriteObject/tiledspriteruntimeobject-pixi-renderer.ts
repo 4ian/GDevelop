@@ -135,6 +135,5 @@ namespace gdjs {
   type TiledSpriteRuntimeObjectRendererClass =
     | typeof TiledSpriteRuntimeObjectPixiRenderer
     | undefined;
-  export const TiledSpriteRuntimeObjectRenderer: TiledSpriteRuntimeObjectRendererClass =
-    TiledSpriteRuntimeObjectPixiRenderer;
+  export const TiledSpriteRuntimeObjectRenderer: TiledSpriteRuntimeObjectRendererClass = TiledSpriteRuntimeObjectPixiRenderer;
 }

@@ -356,6 +356,5 @@ namespace gdjs {
   type Model3DRuntimeObjectRendererClass =
     | typeof Model3DRuntimeObjectThreeRenderer
     | undefined;
-  export const Model3DRuntimeObjectRenderer: Model3DRuntimeObjectRendererClass =
-    Model3DRuntimeObjectThreeRenderer;
+  export const Model3DRuntimeObjectRenderer: Model3DRuntimeObjectRendererClass = Model3DRuntimeObjectThreeRenderer;
 }

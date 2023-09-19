@@ -374,8 +374,10 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerName, score });
+              const {
+                closeSaving,
+                closeSavingWithError,
+              } = scoreSavingState.startSaving({ playerName, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -417,8 +419,10 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerId, score });
+              const {
+                closeSaving,
+                closeSavingWithError,
+              } = scoreSavingState.startSaving({ playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -764,8 +768,9 @@ namespace gdjs {
 
             resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-            _leaderboardViewIframe =
-              computeLeaderboardDisplayingIframe(targetUrl);
+            _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
+              targetUrl
+            );
             if (typeof window !== 'undefined') {
               _leaderboardViewClosingCallback = (event: MessageEvent) => {
                 receiveMessageFromLeaderboardView(

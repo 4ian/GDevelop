@@ -138,6 +138,5 @@ namespace gdjs {
   type BBTextRuntimeObjectRendererClass =
     | typeof BBTextRuntimeObjectPixiRenderer
     | undefined;
-  export const BBTextRuntimeObjectRenderer: BBTextRuntimeObjectRendererClass =
-    BBTextRuntimeObjectPixiRenderer;
+  export const BBTextRuntimeObjectRenderer: BBTextRuntimeObjectRendererClass = BBTextRuntimeObjectPixiRenderer;
 }

@@ -304,6 +304,5 @@ namespace gdjs {
   type TextInputRuntimeObjectRendererClass =
     | typeof TextInputRuntimeObjectPixiRenderer
     | undefined;
-  export const TextInputRuntimeObjectRenderer: TextInputRuntimeObjectRendererClass =
-    TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer: TextInputRuntimeObjectRendererClass = TextInputRuntimeObjectPixiRenderer;
 }

@@ -182,6 +182,5 @@ namespace gdjs {
   type BitmapTextRuntimeObjectRendererClass =
     | typeof BitmapTextRuntimeObjectPixiRenderer
     | undefined;
-  export const BitmapTextRuntimeObjectRenderer: BitmapTextRuntimeObjectRendererClass =
-    BitmapTextRuntimeObjectPixiRenderer;
+  export const BitmapTextRuntimeObjectRenderer: BitmapTextRuntimeObjectRendererClass = BitmapTextRuntimeObjectPixiRenderer;
 }

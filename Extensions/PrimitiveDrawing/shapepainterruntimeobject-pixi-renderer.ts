@@ -530,6 +530,5 @@ namespace gdjs {
   type ShapePainterRuntimeObjectRendererClass =
     | typeof ShapePainterRuntimeObjectPixiRenderer
     | undefined;
-  export const ShapePainterRuntimeObjectRenderer: ShapePainterRuntimeObjectRendererClass =
-    ShapePainterRuntimeObjectPixiRenderer;
+  export const ShapePainterRuntimeObjectRenderer: ShapePainterRuntimeObjectRendererClass = ShapePainterRuntimeObjectPixiRenderer;
 }

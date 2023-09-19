@@ -1268,7 +1268,7 @@ namespace gdjs {
       ) {
         return;
       }
-      this.setScaleX(newHeight / this._animationFrame.dimensions.height);
+      this.setScaleY(newHeight / this._animationFrame.dimensions.height);
     }
 
     setSize(newWidth: float, newHeight: float): void {

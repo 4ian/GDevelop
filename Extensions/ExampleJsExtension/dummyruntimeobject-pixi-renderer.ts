@@ -88,6 +88,5 @@ namespace gdjs {
   type DummyRuntimeObjectRendererClass =
     | typeof DummyRuntimeObjectPixiRenderer
     | undefined;
-  export const DummyRuntimeObjectRenderer: DummyRuntimeObjectRendererClass =
-    DummyRuntimeObjectPixiRenderer;
+  export const DummyRuntimeObjectRenderer: DummyRuntimeObjectRendererClass = DummyRuntimeObjectPixiRenderer;
 }

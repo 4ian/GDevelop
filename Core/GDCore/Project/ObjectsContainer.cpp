@@ -9,12 +9,15 @@
 
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectFolderOrObject.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {
 
-ObjectsContainer::ObjectsContainer() {}
+ObjectsContainer::ObjectsContainer() {
+  rootFolder = gd::make_unique<gd::ObjectFolderOrObject>("__ROOT");
+}
 
 ObjectsContainer::~ObjectsContainer() {}
 

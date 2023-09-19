@@ -396,6 +396,14 @@ interface Watermark {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface ObjectFolderOrObject {
+    void ObjectFolderOrObject();
+    boolean IsFolder();
+    boolean IsObjectExpired();
+    [Ref] gdObject GetObject();
+    [Const, Ref] DOMString GetFolderName();
+};
+
 interface ObjectsContainer {
     void ObjectsContainer();
 
@@ -410,7 +418,7 @@ interface ObjectsContainer {
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
     void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
-
+    [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
@@ -554,7 +562,7 @@ interface Project {
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
     void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
-
+    [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
@@ -800,7 +808,7 @@ interface Layout {
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
     void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
-
+    [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 

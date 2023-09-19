@@ -124,6 +124,7 @@ declare class gdProject extends gdObjectsContainer {
   moveObject(oldIndex: number, newIndex: number): void;
   moveObjectToAnotherContainer(name: string, newObjectsContainer: gdObjectsContainer, newPosition: number): void;
   getObjectsCount(): number;
+  getRootFolder(): gdObjectFolderOrObject;
   getObjectGroups(): gdObjectGroupsContainer;
   delete(): void;
   ptr: number;

@@ -47,7 +47,7 @@ export type ItemData<Item> = {|
   canDrop?: ?(Item) => boolean,
   onDrop: (Item, where: 'before' | 'after') => void,
   onEditItem?: Item => void,
-  hideMenuButton: boolean,
+  isMobileScreen: boolean,
   DragSourceAndDropTarget: any => React.Node,
   getItemHtmlId?: (Item, index: number) => ?string,
 |};
@@ -69,7 +69,7 @@ const getItemProps = memoizeOne(
     canDrop?: ?(Item) => boolean,
     onDrop: (Item, where: 'before' | 'after') => void,
     onEditItem?: Item => void,
-    hideMenuButton: boolean,
+    isMobileScreen: boolean,
     DragSourceAndDropTarget: any => React.Node,
     getItemHtmlId?: (Item, index: number) => ?string
   ): ItemData<Item> => ({
@@ -83,7 +83,7 @@ const getItemProps = memoizeOne(
     canDrop,
     onDrop,
     onEditItem,
-    hideMenuButton,
+    isMobileScreen,
     DragSourceAndDropTarget,
     getItemHtmlId,
   })

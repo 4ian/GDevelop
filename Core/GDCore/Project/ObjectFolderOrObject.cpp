@@ -38,4 +38,13 @@ void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject) {
   children.push_back(std::move(objectFolderOrObject));
 }
 
+ObjectFolderOrObject& ObjectFolderOrObject::InsertNewFolder(
+    const gd::String newFolderName, std::size_t position) {
+  auto newFolderPtr = gd::make_unique<ObjectFolderOrObject>(newFolderName);
+  gd::ObjectFolderOrObject& newFolder = *(*(children.insert(
+      position < children.size() ? children.begin() + position : children.end(),
+      std::move(newFolderPtr))));
+  return newFolder;
+};
+
 }  // namespace gd

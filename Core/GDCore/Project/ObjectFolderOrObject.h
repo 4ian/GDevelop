@@ -30,6 +30,8 @@ class GD_CORE_API ObjectFolderOrObject {
   bool HasObjectNamed(const gd::String& name);
 
   void InsertObject(gd::Object* insertedObject);
+  ObjectFolderOrObject& InsertNewFolder(const gd::String newFolderName,
+                                        std::size_t position);
 
  private:
   gd::Object* object;  // Vide si folderName est pas vide.

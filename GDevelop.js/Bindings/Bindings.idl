@@ -402,6 +402,7 @@ interface ObjectFolderOrObject {
     [Ref] gdObject GetObject();
     [Const, Ref] DOMString GetFolderName();
     boolean HasObjectNamed([Const] DOMString name);
+    [Ref] ObjectFolderOrObject InsertNewFolder([Const] DOMString name, unsigned long newPosition);
 };
 
 interface ObjectsContainer {

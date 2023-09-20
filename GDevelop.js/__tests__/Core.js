@@ -4543,6 +4543,13 @@ Array [
     let layout = null;
     beforeAll(() => {
       project = gd.ProjectHelper.createNewGDJSProject();
+    });
+
+    afterEach(() => {
+      project.removeLayout('Scene');
+    });
+
+    beforeEach(() => {
       layout = project.insertNewLayout('Scene', 0);
     });
 
@@ -4569,6 +4576,34 @@ Array [
       subFolder.renameFolder('Players');
       expect(subFolder.getFolderName()).toEqual('Players');
       expect(subFolder.getParent()).toBe(rootFolder);
+    });
+
+    test('an ObjectFolderOrObject can be serialized', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        1
+      );
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
+
+      const element = new gd.SerializerElement();
+      layout.serializeTo(element);
+
+      project.removeLayout('Scene');
+
+      const layout2 = project.insertNewLayout('Scene2', 0);
+      layout2.unserializeFrom(project, element);
+
+      expect(layout2.hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getRootFolder();
+      expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
     });
   });
 });

@@ -12,11 +12,15 @@ using namespace std;
 
 namespace gd {
 
-ObjectFolderOrObject::ObjectFolderOrObject() {}
-ObjectFolderOrObject::ObjectFolderOrObject(gd::String folderName_)
-    : folderName(folderName_) {}
-ObjectFolderOrObject::ObjectFolderOrObject(gd::Object* object_)
-    : object(object_) {}
+ObjectFolderOrObject ObjectFolderOrObject::badObjectFolderOrObject;
+
+ObjectFolderOrObject::ObjectFolderOrObject() : folderName("__NULL") {}
+ObjectFolderOrObject::ObjectFolderOrObject(gd::String folderName_,
+                                           ObjectFolderOrObject* parent_)
+    : folderName(folderName_), parent(parent_) {}
+ObjectFolderOrObject::ObjectFolderOrObject(gd::Object* object_,
+                                           ObjectFolderOrObject* parent_)
+    : object(object_), parent(parent_) {}
 ObjectFolderOrObject::~ObjectFolderOrObject() {}
 
 bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
@@ -34,13 +38,14 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
 
 void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject) {
   auto objectFolderOrObject =
-      gd::make_unique<ObjectFolderOrObject>(insertedObject);
+      gd::make_unique<ObjectFolderOrObject>(insertedObject, this);
   children.push_back(std::move(objectFolderOrObject));
 }
 
 ObjectFolderOrObject& ObjectFolderOrObject::InsertNewFolder(
     const gd::String newFolderName, std::size_t position) {
-  auto newFolderPtr = gd::make_unique<ObjectFolderOrObject>(newFolderName);
+  auto newFolderPtr =
+      gd::make_unique<ObjectFolderOrObject>(newFolderName, this);
   gd::ObjectFolderOrObject& newFolder = *(*(children.insert(
       position < children.size() ? children.begin() + position : children.end(),
       std::move(newFolderPtr))));

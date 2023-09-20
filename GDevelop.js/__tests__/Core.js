@@ -4684,6 +4684,8 @@ Array [
       const rootFolder = layout.getRootFolder();
       expect(rootFolder.isFolder()).toBe(true);
       expect(rootFolder.getFolderName()).toEqual('__ROOT');
+      expect(rootFolder.getParent().isFolder()).toBe(true);
+      expect(rootFolder.getParent().getFolderName()).toEqual('__NULL');
     });
 
     test('an object added to the object container is added to the root ObjectFolderOrObject', () => {
@@ -4700,6 +4702,7 @@ Array [
       expect(subFolder.getFolderName()).toEqual('Enemies');
       subFolder.renameFolder('Players');
       expect(subFolder.getFolderName()).toEqual('Players');
+      expect(subFolder.getParent()).toBe(rootFolder);
     });
   });
 });

@@ -399,9 +399,9 @@ interface Watermark {
 interface ObjectFolderOrObject {
     void ObjectFolderOrObject();
     boolean IsFolder();
-    boolean IsObjectExpired();
     [Ref] gdObject GetObject();
     [Const, Ref] DOMString GetFolderName();
+    boolean HasObjectNamed([Const] DOMString name);
 };
 
 interface ObjectsContainer {

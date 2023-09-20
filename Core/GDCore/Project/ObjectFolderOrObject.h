@@ -20,17 +20,19 @@ class GD_CORE_API ObjectFolderOrObject {
  public:
   ObjectFolderOrObject();
   ObjectFolderOrObject(gd::String folderName_);
+  ObjectFolderOrObject(gd::Object* object_);
   virtual ~ObjectFolderOrObject();
 
-  bool IsObjectExpired() { return object.expired(); }
-  gd::Object& GetObject() { return *object.lock(); }
+  gd::Object& GetObject() { return *object; }
 
-  // Si je suis un dossier:
-  bool IsFolder() { return !folderName.empty(); }
-  gd::String GetFolderName() { return folderName; }
+  bool IsFolder() const { return !folderName.empty(); }
+  gd::String GetFolderName() const { return folderName; }
+  bool HasObjectNamed(const gd::String& name);
+
+  void InsertObject(gd::Object* insertedObject);
 
  private:
-  std::weak_ptr<gd::Object> object;  // Vide si folderName est pas vide.
+  gd::Object* object;  // Vide si folderName est pas vide.
 
   // ou:
 
@@ -39,6 +41,7 @@ class GD_CORE_API ObjectFolderOrObject {
   gd::ObjectFolderOrObject*
       parent;  // nullptr if root folder, sinon pointeur vers le parent.
 };
+
 }  // namespace gd
 
 #endif  // GDCORE_OBJECTFOLDEROROBJECT_H

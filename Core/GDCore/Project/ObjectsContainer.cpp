@@ -87,6 +87,8 @@ gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
                                        : initialObjects.end(),
       project.CreateObject(objectType, name))));
 
+  rootFolder->InsertObject(&newlyCreatedObject);
+
   return newlyCreatedObject;
 }
 

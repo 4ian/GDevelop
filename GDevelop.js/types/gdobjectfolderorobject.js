@@ -2,9 +2,9 @@
 declare class gdObjectFolderOrObject {
   constructor(): void;
   isFolder(): boolean;
-  isObjectExpired(): boolean;
   getObject(): gdObject;
   getFolderName(): string;
+  hasObjectNamed(name: string): boolean;
   delete(): void;
   ptr: number;
 };

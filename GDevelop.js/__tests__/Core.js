@@ -4546,11 +4546,16 @@ Array [
       layout = project.insertNewLayout('Scene', 0);
     });
 
-    it('objects container has an root ObjectFolderOrObject', () => {
+    test('objects container has a root ObjectFolderOrObject', () => {
       const rootFolder = layout.getRootFolder();
       expect(rootFolder.isFolder()).toBe(true);
-      expect(rootFolder.isObjectExpired()).toBe(true);
       expect(rootFolder.getFolderName()).toEqual('__ROOT');
+    });
+
+    test('an object added to the object container is added to the root ObjectFolderOrObject', () => {
+      let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const rootFolder = layout.getRootFolder();
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
     });
   });
 });

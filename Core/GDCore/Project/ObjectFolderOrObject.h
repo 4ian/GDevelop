@@ -35,6 +35,8 @@ class GD_CORE_API ObjectFolderOrObject {
 
   void RemoveRecursivelyObjectNamed(const gd::String& name);
 
+  void RenameFolder(const gd::String& name) { folderName = name; }
+
  private:
   gd::Object* object;  // Vide si folderName est pas vide.
 

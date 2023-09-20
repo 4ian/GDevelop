@@ -102,16 +102,6 @@ gd::Object& ObjectsContainer::InsertObject(const gd::Object& object,
   return newlyCreatedObject;
 }
 
-void ObjectsContainer::SwapObjects(std::size_t firstObjectIndex,
-                                   std::size_t secondObjectIndex) {
-  if (firstObjectIndex >= initialObjects.size() ||
-      secondObjectIndex >= initialObjects.size())
-    return;
-
-  std::iter_swap(initialObjects.begin() + firstObjectIndex,
-                 initialObjects.begin() + secondObjectIndex);
-}
-
 void ObjectsContainer::MoveObject(std::size_t oldIndex, std::size_t newIndex) {
   if (oldIndex >= initialObjects.size() || newIndex >= initialObjects.size())
     return;

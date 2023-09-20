@@ -126,11 +126,6 @@ class GD_CORE_API ObjectsContainer {
   void MoveObject(std::size_t oldIndex, std::size_t newIndex);
 
   /**
-   * \brief Swap the position of the specified objects.
-   */
-  void SwapObjects(std::size_t firstObjectIndex, std::size_t secondObjectIndex);
-
-  /**
    * Move the specified object to another container, removing it from the current one
    * and adding it to the new one at the specified position.
    *

@@ -20,7 +20,6 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   getObjectAt(pos: number): gdObject;
   getObjectPosition(name: string): number;
   removeObject(name: string): void;
-  swapObjects(first: number, second: number): void;
   moveObject(oldIndex: number, newIndex: number): void;
   moveObjectToAnotherContainer(name: string, newObjectsContainer: gdObjectsContainer, newPosition: number): void;
   getObjectsCount(): number;

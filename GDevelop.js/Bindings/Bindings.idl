@@ -417,7 +417,6 @@ interface ObjectsContainer {
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
     void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
@@ -559,7 +558,6 @@ interface Project {
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
     void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
@@ -805,7 +803,6 @@ interface Layout {
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
     void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();
@@ -2765,7 +2762,6 @@ interface EventsBasedObject {
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
     void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
     unsigned long GetObjectsCount();

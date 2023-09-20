@@ -8,6 +8,9 @@
 #include <memory>
 
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Serialization/SerializerElement.h"
+
 using namespace std;
 
 namespace gd {
@@ -67,6 +70,50 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
   }
   for (auto& it : children) {
     it.get()->RemoveRecursivelyObjectNamed(name);
+  }
+};
+
+void ObjectFolderOrObject::SerializeTo(SerializerElement& element) const {
+  if (IsFolder()) {
+    element.SetAttribute("folderName", GetFolderName());
+    if (children.size() > 0) {
+      SerializerElement& childrenElement = element.AddChild("children");
+      childrenElement.ConsiderAsArrayOf("objectFolderOrObjet");
+      for (std::size_t j = 0; j < children.size(); j++) {
+        children[j]->SerializeTo(
+            childrenElement.AddChild("objectFolderOrObjet"));
+      }
+    }
+  } else {
+    element.SetAttribute("objectName", GetObject().GetName());
+  }
+}
+
+void ObjectFolderOrObject::UnserializeFrom(
+    gd::Project& project,
+    const SerializerElement& element,
+    gd::ObjectsContainer& objectsContainer) {
+  children.clear();
+  if (element.HasAttribute("folderName")) {
+    object = nullptr;
+    folderName = element.GetStringAttribute("folderName", "");
+
+    if (element.HasChild("children")) {
+      SerializerElement& childrenElements = element.GetChild("children");
+      childrenElements.ConsiderAsArrayOf("objectFolderOrObjet");
+
+      for (std::size_t i = 0; i < childrenElements.GetChildrenCount(); ++i) {
+        std::unique_ptr<ObjectFolderOrObject> childObjectFolderOrObject =
+            make_unique<ObjectFolderOrObject>();
+        childObjectFolderOrObject->UnserializeFrom(
+            project, childrenElements.GetChild(i), objectsContainer);
+        children.push_back(std::move(childObjectFolderOrObject));
+      }
+    }
+  } else {
+    folderName = "";
+    object =
+        &objectsContainer.GetObject(element.GetStringAttribute("objectName"));
   }
 };
 

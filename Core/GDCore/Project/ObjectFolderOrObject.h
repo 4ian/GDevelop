@@ -8,10 +8,14 @@
 #include <memory>
 #include <vector>
 
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
+
 namespace gd {
+class Project;
 class Object;
 class SerializerElement;
+class ObjectsContainer;
 }  // namespace gd
 
 namespace gd {
@@ -25,7 +29,7 @@ class GD_CORE_API ObjectFolderOrObject {
                        ObjectFolderOrObject* parent_ = nullptr);
   virtual ~ObjectFolderOrObject();
 
-  gd::Object& GetObject() { return *object; }
+  gd::Object& GetObject() const { return *object; }
 
   bool IsFolder() const { return !folderName.empty(); }
   gd::String GetFolderName() const { return folderName; }
@@ -45,6 +49,23 @@ class GD_CORE_API ObjectFolderOrObject {
   void RemoveRecursivelyObjectNamed(const gd::String& name);
 
   void RenameFolder(const gd::String& name) { folderName = name; }
+
+  /** \name Saving and loading
+   * Members functions related to saving and loading the objects of the class.
+   */
+  ///@{
+  /**
+   * \brief Serialize the object folder or object.
+   */
+  void SerializeTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserialize the object folder or object.
+   */
+  void UnserializeFrom(gd::Project& project,
+                       const SerializerElement& element,
+                       ObjectsContainer& objectsContainer);
+  ///@}
 
  private:
   gd::Object* object;  // Vide si folderName est pas vide.

@@ -14,7 +14,7 @@ namespace gd {
 class Object;
 class Project;
 class SerializerElement;
-}
+}  // namespace gd
 #undef GetObject  // Disable an annoying macro
 
 namespace gd {
@@ -158,14 +158,24 @@ class GD_CORE_API ObjectsContainer {
    */
   ///@{
   /**
-   * \brief Serialize instances container.
+   * \brief Serialize the objects container.
    */
   void SerializeObjectsTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserialize the instances container.
+   * \brief Unserialize the objects container.
    */
   void UnserializeObjectsFrom(gd::Project& project,
+                              const SerializerElement& element);
+  /**
+   * \brief Serialize folder structure.
+   */
+  void SerializeFoldersTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserialize folder structure.
+   */
+  void UnserializeFoldersFrom(gd::Project& project,
                               const SerializerElement& element);
   ///@}
 
@@ -193,7 +203,6 @@ class GD_CORE_API ObjectsContainer {
 
  private:
   std::unique_ptr<gd::ObjectFolderOrObject> rootFolder;
-
 };
 
 }  // namespace gd

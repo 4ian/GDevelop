@@ -27,6 +27,14 @@ void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {
     initialObjects[j]->SerializeTo(element.AddChild("object"));
   }
 }
+void ObjectsContainer::SerializeFoldersTo(SerializerElement& element) const {
+  rootFolder->SerializeTo(element);
+}
+
+void ObjectsContainer::UnserializeFoldersFrom(
+    gd::Project& project, const SerializerElement& element) {
+  rootFolder->UnserializeFrom(project, element, *this);
+}
 
 void ObjectsContainer::UnserializeObjectsFrom(
     gd::Project& project, const SerializerElement& element) {

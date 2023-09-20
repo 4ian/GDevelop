@@ -128,6 +128,8 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
               [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; });
   if (objectIt == initialObjects.end()) return;
 
+  rootFolder->RemoveRecursivelyObjectNamed(name);
+
   initialObjects.erase(objectIt);
 }
 

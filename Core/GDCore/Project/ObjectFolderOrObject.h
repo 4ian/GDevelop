@@ -19,8 +19,10 @@ namespace gd {
 class GD_CORE_API ObjectFolderOrObject {
  public:
   ObjectFolderOrObject();
-  ObjectFolderOrObject(gd::String folderName_);
-  ObjectFolderOrObject(gd::Object* object_);
+  ObjectFolderOrObject(gd::String folderName_,
+                       ObjectFolderOrObject* parent_ = nullptr);
+  ObjectFolderOrObject(gd::Object* object_,
+                       ObjectFolderOrObject* parent_ = nullptr);
   virtual ~ObjectFolderOrObject();
 
   gd::Object& GetObject() { return *object; }
@@ -28,6 +30,13 @@ class GD_CORE_API ObjectFolderOrObject {
   bool IsFolder() const { return !folderName.empty(); }
   gd::String GetFolderName() const { return folderName; }
   bool HasObjectNamed(const gd::String& name);
+
+  ObjectFolderOrObject& GetParent() {
+    if (parent == nullptr) {
+      return badObjectFolderOrObject;
+    }
+    return *parent;
+  };
 
   void InsertObject(gd::Object* insertedObject);
   ObjectFolderOrObject& InsertNewFolder(const gd::String newFolderName,
@@ -46,6 +55,8 @@ class GD_CORE_API ObjectFolderOrObject {
   std::vector<std::unique_ptr<ObjectFolderOrObject>> children;
   gd::ObjectFolderOrObject*
       parent;  // nullptr if root folder, sinon pointeur vers le parent.
+
+  static gd::ObjectFolderOrObject badObjectFolderOrObject;
 };
 
 }  // namespace gd

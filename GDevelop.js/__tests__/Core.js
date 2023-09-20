@@ -4698,6 +4698,8 @@ Array [
       const rootFolder = layout.getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Enemies', 1);
       expect(subFolder.getFolderName()).toEqual('Enemies');
+      subFolder.renameFolder('Players');
+      expect(subFolder.getFolderName()).toEqual('Players');
     });
   });
 });

@@ -81,6 +81,34 @@ namespace gdjs {
       ): boolean => {
         return instanceContainer.getGame().isPreview();
       };
+
+      /**
+       * Check if the game is running as a preview, launched from an editor,
+       * for an external layout.
+       * @param instanceContainer The current container.
+       * @returns true if the game is running as a preview for an external layout.
+       */
+      export const isPreviewingAnExternalLayout = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean => {
+        const game = instanceContainer.getGame();
+        return game.isPreview() && !!game.getPreviewedExternalLayoutName();
+      };
+
+      /**
+       * If the game is running as a preview, launched from an editor,
+       * this returns the name of the external layout being previewed - if any.
+       * Otherwise, returns an empty string.
+       *
+       * @param instanceContainer The current container.
+       * @returns the name of the previewed external layout.
+       */
+      export const getPreviewedExternalLayoutName = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): string => {
+        const game = instanceContainer.getGame();
+        return game.getPreviewedExternalLayoutName();
+      };
     }
   }
 }

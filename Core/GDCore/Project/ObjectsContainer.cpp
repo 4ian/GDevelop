@@ -128,6 +128,8 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
               bind2nd(ObjectHasName(), name));
   if (objectIt == initialObjects.end()) return;
 
+  rootFolder->RemoveRecursivelyObjectNamed(name);
+
   initialObjects.erase(objectIt);
 }
 

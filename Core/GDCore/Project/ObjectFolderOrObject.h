@@ -33,6 +33,8 @@ class GD_CORE_API ObjectFolderOrObject {
   ObjectFolderOrObject& InsertNewFolder(const gd::String newFolderName,
                                         std::size_t position);
 
+  void RemoveRecursivelyObjectNamed(const gd::String& name);
+
  private:
   gd::Object* object;  // Vide si folderName est pas vide.
 

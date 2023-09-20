@@ -4556,7 +4556,12 @@ Array [
       let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
       const rootFolder = layout.getRootFolder();
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
-      rootFolder.insertNewFolder('Enemies', 1);
+      layout.removeObject('MyObject');
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(false);
+    });
+
+    test('a folder can be added to the root folder', () => {
+      const rootFolder = layout.getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Enemies', 1);
       expect(subFolder.getFolderName()).toEqual('Enemies');
     });

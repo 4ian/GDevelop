@@ -10,6 +10,7 @@ class Layout;
 class ObjectsContainer;
 class VariablesContainer;
 class Object;
+class ObjectConfiguration;
 }  // namespace gd
 
 namespace gd {
@@ -80,11 +81,18 @@ class GD_CORE_API ObjectsContainersList {
                                   const gd::String& behaviorName) const;
 
   /**
+    * \brief Get the type of a behavior if an object or all objects of a group has it.
+    */
+  gd::String GetTypeOfBehaviorInObjectOrGroup(const gd::String &objectOrGroupName,
+                                              const gd::String &behaviorName,
+                                              bool searchInGroups = true) const;
+
+  /**
    * \brief Get a type from a behavior name
    * @return Type of the behavior.
    * @deprecated - Use GetTypeOfBehaviorInObjectOrGroup instead.
    */
-  gd::String GetTypeOfBehavior(const gd::String& behaviorName) const;
+  gd::String GetTypeOfBehavior(const gd::String& behaviorName, bool searchInGroups = true) const;
 
   /**
    * \brief Get behaviors of an object/group
@@ -93,7 +101,7 @@ class GD_CORE_API ObjectsContainersList {
    *
    * @return Vector containing names of behaviors
    */
-  std::vector<gd::String> 
+  std::vector<gd::String>
   GetBehaviorsOfObject(const gd::String& objectName,
                        bool searchInGroups = true) const;
 
@@ -111,6 +119,11 @@ class GD_CORE_API ObjectsContainersList {
       const gd::String& onlyObjectToSelectIfPresent = "") const;
 
   void ForEachObject(std::function<void(const gd::Object& object)> fn) const;
+
+  /**
+   * \brief Call the callback for each object or group name starting with the prefix passed in parameter.
+   */
+  void ForEachNameWithPrefix(const gd::String& prefix, std::function<void(const gd::String& name, const gd::ObjectConfiguration* objectConfiguration)> fn) const;
 
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */

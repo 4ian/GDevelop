@@ -282,10 +282,10 @@ export default function ExpressionAutocompletionsDisplayer({
                       ? expressionAutocompletion.enumeratedExpressionMetadata
                           .iconFilename
                       : expressionAutocompletion.kind === 'Object'
-                      ? project && expressionAutocompletion.object
+                      ? project && expressionAutocompletion.objectConfiguration
                         ? ObjectsRenderingService.getThumbnail(
                             project,
-                            expressionAutocompletion.object.getConfiguration()
+                            expressionAutocompletion.objectConfiguration
                           )
                         : 'res/types/object.png'
                       : expressionAutocompletion.kind === 'Behavior'

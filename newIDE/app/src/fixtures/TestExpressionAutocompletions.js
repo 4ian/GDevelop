@@ -105,18 +105,21 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
     {
       kind: 'Object',
       completion: 'SomeObject',
+      objectConfiguration: null,
       addDot: true,
       isExact: false,
     },
     {
       kind: 'Object',
       completion: 'SomeOtherObject',
+      objectConfiguration: null,
       addDot: true,
       isExact: false,
     },
     {
       kind: 'Object',
       completion: 'SomeOtherObjectWithALoooooooooooongLoooooooooooongName',
+      objectConfiguration: null,
       addDot: true,
       isExact: false,
     },

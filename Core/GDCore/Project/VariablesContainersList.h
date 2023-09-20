@@ -64,6 +64,11 @@ class GD_CORE_API VariablesContainersList {
     return variablesContainers.back();
   }
 
+  /**
+   * \brief Call the callback for each variable having a name starting with the specified prefix.
+   */
+  void ForEachVariableWithPrefix(const gd::String& prefix, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
+
   /** Do not use - should be private but accessible to let Emscripten create a temporary. */
   VariablesContainersList() {};
  private:

@@ -10,21 +10,15 @@ namespace gd {
 const gd::ParameterMetadata
     ExpressionCompletionDescription::badParameterMetadata;
 
+const gd::ObjectConfiguration
+    ExpressionCompletionDescription::badObjectConfiguration;
+
 /**
  * \brief Turn an ExpressionCompletionDescription to a string.
  */
 std::ostream& operator<<(std::ostream& os,
                          ExpressionCompletionDescription const& value) {
-  os << "{ " << value.GetCompletionKind() << ", " << value.GetType() << ", "
-     << value.GetPrefix() << ", " << value.GetObjectName() << ", "
-     << value.GetBehaviorName() << ", "
-     << (value.IsExact() ? "exact" : "non-exact") << ", "
-     << (value.IsLastParameter() ? "last parameter" : "not last parameter")
-     << ", "
-     << (value.HasParameterMetadata()
-             ? gd::String::From(&value.GetParameterMetadata())
-             : "no parameter metadata")
-     << " }";
+  os << value.ToString();
   return os;
 }
 

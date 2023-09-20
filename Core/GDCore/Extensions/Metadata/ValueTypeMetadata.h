@@ -137,7 +137,16 @@ class GD_CORE_API ValueTypeMetadata {
    * parameter (which accepts any variable coming from an object or from containers in the scope).
    */
   bool IsLegacyPreScopedVariable() const {
-    return name == "scenevar" || name == "globalvar" || name == "objectvar";
+    return gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(name);
+  }
+
+  /**
+   * \brief Return true if the type is a variable but from a specific scope
+   * (scene, project or object). In new code, prefer to use the more generic "variable"
+   * parameter (which accepts any variable coming from an object or from containers in the scope).
+   */
+  static bool IsTypeLegacyPreScopedVariable(const gd::String &type) {
+    return type == "scenevar" || type == "globalvar" || type == "objectvar";
   }
 
   /**

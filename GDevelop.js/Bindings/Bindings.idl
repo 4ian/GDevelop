@@ -565,6 +565,11 @@ interface ObjectsContainersList {
   [Value] ObjectsContainersList STATIC_MakeNewObjectsContainersListForContainers(
         [Const, Ref] ObjectsContainer globalObjectsContainer,
         [Const, Ref] ObjectsContainer objectsContainer);
+
+  [Const, Value] DOMString GetTypeOfObject([Const] DOMString objectName);
+  [Const, Value] DOMString GetTypeOfBehavior([Const] DOMString name, boolean searchInGroups);
+  [Value] VectorString GetBehaviorsOfObject([Const] DOMString name, boolean searchInGroups);
+  [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
 };
 
 interface ProjectScopedContainers {
@@ -577,6 +582,9 @@ interface ProjectScopedContainers {
 
   [Ref] ProjectScopedContainers AddPropertiesContainer(
         [Const, Ref] PropertiesContainer propertiesContainer);
+
+  [Const, Ref] ObjectsContainersList GetObjectsContainersList();
+  [Const, Ref] VariablesContainersList GetVariablesContainersList();
 };
 
 interface ExtensionProperties {
@@ -2544,17 +2552,19 @@ interface ExpressionValidator {
 
 enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Object",
-  "ExpressionCompletionDescription::Behavior",
-  "ExpressionCompletionDescription::Expression",
+  "ExpressionCompletionDescription::BehaviorWithPrefix",
+  "ExpressionCompletionDescription::ExpressionWithPrefix",
   "ExpressionCompletionDescription::Variable",
-  "ExpressionCompletionDescription::Text",
+  "ExpressionCompletionDescription::TextWithPrefix",
   "ExpressionCompletionDescription::Property"
 };
 
 interface ExpressionCompletionDescription {
   ExpressionCompletionDescription_CompletionKind GetCompletionKind();
   [Const, Ref] DOMString GetType();
+  Variable_Type GetVariableType();
   [Const, Ref] DOMString GetPrefix();
+  [Const, Ref] DOMString GetCompletion();
   [Const, Ref] DOMString GetObjectName();
   [Const, Ref] DOMString GetBehaviorName();
   boolean IsExact();
@@ -2562,6 +2572,10 @@ interface ExpressionCompletionDescription {
   unsigned long GetReplacementStartPosition();
   unsigned long GetReplacementEndPosition();
   [Const, Ref] ParameterMetadata GetParameterMetadata();
+  boolean HasObjectConfiguration();
+  [Const, Ref] ObjectConfiguration GetObjectConfiguration();
+
+  [Const, Value] DOMString ToString();
 };
 
 interface VectorExpressionCompletionDescription {

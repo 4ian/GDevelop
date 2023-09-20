@@ -1,6 +1,5 @@
 // @flow
-
-export const filterListWithPrefix = <T>(
+const filterListWithPrefix = <T>(
   list: Array<T>,
   searchText: string,
   getStringForItem: T => string

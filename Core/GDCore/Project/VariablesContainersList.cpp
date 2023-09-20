@@ -52,4 +52,13 @@ bool VariablesContainersList::HasVariablesContainer(const gd::VariablesContainer
   return false;
 }
 
+void VariablesContainersList::ForEachVariableWithPrefix(
+    const gd::String& prefix,
+    std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    (*it)->ForEachVariableWithPrefix(prefix, fn);
+  }
+}
+
 }  // namespace gd

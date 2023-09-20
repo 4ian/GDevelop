@@ -72,13 +72,13 @@ const getObjectsAndGroupsDataSource = ({
   requiredBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
-  const list = enumerateObjectsAndGroups(
+  const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
     globalObjectsContainer,
     objectsContainer,
     allowedObjectType || undefined,
     requiredBehaviorTypes || []
   );
-  const objects = list.allObjectsList.map(({ object }) => {
+  const objects = allObjectsList.map(({ object }) => {
     return {
       text: object.getName(),
       value: object.getName(),
@@ -97,7 +97,7 @@ const getObjectsAndGroupsDataSource = ({
   });
   const groups = noGroups
     ? []
-    : list.allGroupsList.map(({ group }) => {
+    : allGroupsList.map(({ group }) => {
         return {
           text: group.getName(),
           value: group.getName(),

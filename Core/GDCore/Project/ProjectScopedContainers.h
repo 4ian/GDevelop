@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include "ObjectsContainersList.h"
 #include "PropertiesContainersList.h"
 #include "VariablesContainersList.h"
@@ -9,6 +10,7 @@ class ObjectsContainer;
 class ObjectsContainersList;
 class VariablesContainersList;
 class PropertiesContainersList;
+class NamedPropertyDescriptor;
 }  // namespace gd
 
 namespace gd {
@@ -81,6 +83,33 @@ class ProjectScopedContainers {
       return propertyCallback();
 
     return notFoundCallback();
+  };
+
+  void ForEachIdentifierWithPrefix(
+      const gd::String &prefix,
+      std::function<void(const gd::String& name, const ObjectConfiguration* objectConfiguration)> objectCallback,
+      std::function<void(const gd::String& name, const gd::Variable& variable)> variableCallback,
+      std::function<void(const gd::NamedPropertyDescriptor& property)> propertyCallback) const {
+    std::set<gd::String> namesAlreadySeen;
+
+    objectsContainersList.ForEachNameWithPrefix(prefix, [&](const gd::String& name, const ObjectConfiguration* objectConfiguration) {
+      if (namesAlreadySeen.count(name) == 0) {
+        namesAlreadySeen.insert(name);
+        objectCallback(name, objectConfiguration);
+      }
+    });
+    variablesContainersList.ForEachVariableWithPrefix(prefix, [&](const gd::String& name, const gd::Variable& variable) {
+      if (namesAlreadySeen.count(name) == 0) {
+        namesAlreadySeen.insert(name);
+        variableCallback(name, variable);
+      }
+    });
+    propertiesContainersList.ForEachPropertyWithPrefix(prefix, [&](const gd::NamedPropertyDescriptor& property) {
+      if (namesAlreadySeen.count(property.GetName()) == 0) {
+        namesAlreadySeen.insert(property.GetName());
+        propertyCallback(property);
+      }
+    });
   };
 
   const gd::ObjectsContainersList &GetObjectsContainersList() const {

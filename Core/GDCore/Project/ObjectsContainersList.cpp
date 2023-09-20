@@ -2,13 +2,13 @@
 
 #include <vector>
 
-#include "GDCore/Tools/Log.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
-#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
 
@@ -42,19 +42,17 @@ bool ObjectsContainersList::HasObjectOrGroupNamed(
   return false;
 }
 
-bool ObjectsContainersList::HasObjectNamed(
-    const gd::String& name) const {
+bool ObjectsContainersList::HasObjectNamed(const gd::String& name) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
-    if ((*it)->HasObjectNamed(name))
-      return true;
+    if ((*it)->HasObjectNamed(name)) return true;
   }
 
   return false;
 }
 
 bool ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
-  const gd::String& objectOrGroupName, const gd::String& variableName) const {
+    const gd::String& objectOrGroupName, const gd::String& variableName) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
@@ -71,12 +69,13 @@ bool ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
 }
 
 bool ObjectsContainersList::HasVariablesContainer(
-  const gd::String& objectOrGroupName, const gd::VariablesContainer& variablesContainer) const {
+    const gd::String& objectOrGroupName,
+    const gd::VariablesContainer& variablesContainer) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
       return &variablesContainer ==
-        &(*it)->GetObject(objectOrGroupName).GetVariables();
+             &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
       // Could be adapted if objects groups have variables in the future.
@@ -86,8 +85,9 @@ bool ObjectsContainersList::HasVariablesContainer(
   return false;
 }
 
-const gd::VariablesContainer* ObjectsContainersList::GetObjectOrGroupVariablesContainer(
-  const gd::String& objectOrGroupName) const {
+const gd::VariablesContainer*
+ObjectsContainersList::GetObjectOrGroupVariablesContainer(
+    const gd::String& objectOrGroupName) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
@@ -101,13 +101,31 @@ const gd::VariablesContainer* ObjectsContainersList::GetObjectOrGroupVariablesCo
   return nullptr;
 }
 
-std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String& objectOrGroupName, const gd::String& onlyObjectToSelectIfPresent) const {
-  std::vector<gd::String> realObjects;
-
-  // Check progressively each object container to find the object or the group with the specified name.
+void ObjectsContainersList::ForEachNameWithPrefix(
+    const gd::String& prefix,
+    std::function<void(const gd::String& name,
+                       const gd::ObjectConfiguration* objectConfiguration)> fn)
+    const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
+    for (const auto& object : (*it)->GetObjects()) {
+      if (object->GetName().find(prefix) == 0)
+        fn(object->GetName(), &object->GetConfiguration());
+    }
+    (*it)->GetObjectGroups().ForEachNameWithPrefix(
+        prefix, [&](const gd::String& name) { fn(name, nullptr); });
+  }
+}
 
+std::vector<gd::String> ObjectsContainersList::ExpandObjectName(
+    const gd::String& objectOrGroupName,
+    const gd::String& onlyObjectToSelectIfPresent) const {
+  std::vector<gd::String> realObjects;
+
+  // Check progressively each object container to find the object or the group
+  // with the specified name.
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
       // We found the object, it's a single object with this name.
       realObjects.push_back(objectOrGroupName);
@@ -115,13 +133,15 @@ std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
       // We found a group with this name, expand the object names inside of it.
-      realObjects = (*it)->GetObjectGroups().Get(objectOrGroupName).GetAllObjectsNames();
+      realObjects =
+          (*it)->GetObjectGroups().Get(objectOrGroupName).GetAllObjectsNames();
       break;
     }
   }
 
   // If the "current object" is present, use it and only it.
-  if (!onlyObjectToSelectIfPresent.empty() && find(realObjects.begin(),
+  if (!onlyObjectToSelectIfPresent.empty() &&
+      find(realObjects.begin(),
            realObjects.end(),
            onlyObjectToSelectIfPresent) != realObjects.end()) {
     realObjects.clear();
@@ -140,10 +160,12 @@ std::vector<gd::String> ObjectsContainersList::ExpandObjectName(const gd::String
   return realObjects;
 }
 
-void ObjectsContainersList::ForEachObject(std::function<void(const gd::Object& object)> fn) const {
-  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();++it) {
+void ObjectsContainersList::ForEachObject(
+    std::function<void(const gd::Object& object)> fn) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
     const auto& objectsContainer = **it;
-    for (const auto& object: objectsContainer.GetObjects()) {
+    for (const auto& object : objectsContainer.GetObjects()) {
       fn(*object);
     }
   }
@@ -154,7 +176,8 @@ gd::String ObjectsContainersList::GetTypeOfObject(
   if (objectsContainers.size() != 2) {
     std::cout << this << std::endl;
     std::cout << objectsContainers.size() << std::endl;
-    // TODO: rework forwarded methods so they can work with any number of containers.
+    // TODO: rework forwarded methods so they can work with any number of
+    // containers.
     gd::LogFatalError(
         "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
@@ -166,7 +189,8 @@ gd::String ObjectsContainersList::GetTypeOfObject(
 bool ObjectsContainersList::HasBehaviorInObjectOrGroup(
     const gd::String& objectOrGroupName, const gd::String& behaviorName) const {
   if (objectsContainers.size() != 2) {
-    // TODO: rework forwarded methods so they can work with any number of containers.
+    // TODO: rework forwarded methods so they can work with any number of
+    // containers.
     gd::LogFatalError(
         "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
@@ -178,27 +202,49 @@ bool ObjectsContainersList::HasBehaviorInObjectOrGroup(
                                         true);
 }
 
-gd::String ObjectsContainersList::GetTypeOfBehavior(
-    const gd::String& behaviorName) const {
+gd::String ObjectsContainersList::GetTypeOfBehaviorInObjectOrGroup(
+    const gd::String& objectOrGroupName,
+    const gd::String& behaviorName,
+    bool searchInGroups) const {
   if (objectsContainers.size() != 2) {
-    // TODO: rework forwarded methods so they can work with any number of containers.
+    // TODO: rework forwarded methods so they can work with any number of
+    // containers.
+    gd::LogFatalError(
+        "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
+        "not being exactly 2. This is a logical error and will crash.");
+  }
+  return gd::GetTypeOfBehaviorInObjectOrGroup(*objectsContainers[0],
+                                              *objectsContainers[1],
+                                              objectOrGroupName,
+                                              behaviorName,
+                                              searchInGroups);
+}
+
+gd::String ObjectsContainersList::GetTypeOfBehavior(
+    const gd::String& behaviorName, bool searchInGroups) const {
+  if (objectsContainers.size() != 2) {
+    // TODO: rework forwarded methods so they can work with any number of
+    // containers.
     gd::LogFatalError(
         "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
   }
   return gd::GetTypeOfBehavior(
-      *objectsContainers[0], *objectsContainers[1], behaviorName, true);
+      *objectsContainers[0], *objectsContainers[1], behaviorName, searchInGroups);
 }
 
-std::vector<gd::String> ObjectsContainersList::GetBehaviorsOfObject(const gd::String& objectName, bool searchInGroups) const {
+std::vector<gd::String> ObjectsContainersList::GetBehaviorsOfObject(
+    const gd::String& objectName, bool searchInGroups) const {
   if (objectsContainers.size() != 2) {
-    // TODO: rework forwarded methods so they can work with any number of containers.
+    // TODO: rework forwarded methods so they can work with any number of
+    // containers.
     gd::LogFatalError(
         "ObjectsContainersList::GetTypeOfObject called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
   }
 
-  return gd::GetBehaviorsOfObject(*objectsContainers[0], *objectsContainers[1], objectName, searchInGroups);
+  return gd::GetBehaviorsOfObject(
+      *objectsContainers[0], *objectsContainers[1], objectName, searchInGroups);
 }
 
 }  // namespace gd

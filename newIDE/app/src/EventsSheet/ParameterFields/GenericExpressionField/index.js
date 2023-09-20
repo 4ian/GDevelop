@@ -48,7 +48,6 @@ import {
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
 import {
-  type EventsScope,
   getProjectScopedContainersFromScope,
 } from '../../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
@@ -127,9 +126,7 @@ const MAX_ERRORS_COUNT = 10;
 const extractErrors = (
   platform: gdPlatform,
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
-  scope: EventsScope,
+  projectScopedContainers: gdProjectScopedContainers,
   expressionType: string,
   expressionNode: gdExpressionNode
 ): {|
@@ -138,11 +135,7 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
-    getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    ),
+    projectScopedContainers,
     expressionType
   );
   expressionNode.visit(expressionValidator);
@@ -442,15 +435,18 @@ export default class ExpressionField extends React.Component<Props, State> {
     // a few milliseconds for complex ones).
 
     const parser = new gd.ExpressionParser2();
-
     const expressionNode = parser.parseExpression(expression).get();
+
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    );
 
     const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),
       project,
-      globalObjectsContainer,
-      objectsContainer,
-      scope,
+      projectScopedContainers,
       expressionType,
       expressionNode
     );
@@ -480,21 +476,17 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      getProjectScopedContainersFromScope(
-        scope,
-        globalObjectsContainer,
-        objectsContainer
-      ),
+      projectScopedContainers,
       expressionType,
       expressionNode,
       cursorPosition - 1
     );
+
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
         project,
-        globalObjectsContainer,
-        objectsContainer,
+        projectScopedContainers,
         scope,
       },
       completionDescriptions

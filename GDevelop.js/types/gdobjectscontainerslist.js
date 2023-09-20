@@ -2,6 +2,10 @@
 declare class gdObjectsContainersList {
   static makeNewObjectsContainersListForProjectAndLayout(project: gdProject, layout: gdLayout): gdObjectsContainersList;
   static makeNewObjectsContainersListForContainers(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer): gdObjectsContainersList;
+  getTypeOfObject(objectName: string): string;
+  getTypeOfBehavior(name: string, searchInGroups: boolean): string;
+  getBehaviorsOfObject(name: string, searchInGroups: boolean): gdVectorString;
+  getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   delete(): void;
   ptr: number;
 };

@@ -162,6 +162,14 @@ void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
   variables.insert(variables.begin() + newIndex, nameAndVariable);
 }
 
+void VariablesContainer::ForEachVariableWithPrefix(
+    const gd::String& prefix,
+    std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const {
+  for (const auto& nameAndVariable: variables) {
+    if (nameAndVariable.first.find(prefix) == 0) fn(nameAndVariable.first, *nameAndVariable.second);
+  }
+}
+
 void VariablesContainer::SerializeTo(SerializerElement& element) const {
   if (!persistentUuid.empty())
     element.SetStringAttribute("persistentUuid", persistentUuid);

@@ -131,10 +131,10 @@ type ExpressionCompletionDescription_CompletionKind = 0 | 1 | 2 | 3 | 4 | 5`
       [
         'declare class gdExpressionCompletionDescription {',
         '  static Object: 0;',
-        '  static Behavior: 1;',
-        '  static Expression: 2;',
+        '  static BehaviorWithPrefix: 1;',
+        '  static ExpressionWithPrefix: 2;',
         '  static Variable: 3;',
-        '  static Text: 4;',
+        '  static TextWithPrefix: 4;',
         '  static Property: 5;',
       ].join('\n'),
       'types/gdexpressioncompletiondescription.js'

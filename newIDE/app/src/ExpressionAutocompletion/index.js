@@ -1,14 +1,5 @@
 // @flow
 import { mapFor, mapVector } from '../Utils/MapFor';
-import {
-  enumerateObjectsAndGroups,
-  filterObjectsList,
-  filterGroupsList,
-} from '../ObjectsList/EnumerateObjects';
-import {
-  enumerateVariables,
-  type EnumeratedVariable,
-} from '../EventsSheet/ParameterFields/EnumerateVariables';
 import flatten from 'lodash/flatten';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import {
@@ -28,7 +19,6 @@ import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/Spr
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
 import {
   filterStringListWithPrefix,
-  filterListWithPrefix,
 } from '../Utils/ListFiltering';
 
 const gd: libGDevelop = global.gd;
@@ -68,7 +58,7 @@ export type ExpressionAutocompletion =
     |}
   | {|
       ...BaseExpressionAutocompletion,
-      object?: gdObject,
+      objectConfiguration: ?gdObjectConfiguration,
       kind: 'Object',
     |}
   | {|
@@ -84,9 +74,8 @@ export type ExpressionAutocompletion =
 type ExpressionAutocompletionContext = {|
   gd: libGDevelop,
   project: gdProject,
-  globalObjectsContainer: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
-  scope: EventsScope,
+  projectScopedContainers: gdProjectScopedContainers,
+  scope: EventsScope, // TODO: Should be replaced by usage of projectScopedContainers everywhere.
 |};
 
 const getAutocompletionsForExpressions = (
@@ -162,15 +151,11 @@ const getAutocompletionsForObjectExpressions = function(
   const isExact: boolean = completionDescription.isExact();
   const {
     gd,
-    globalObjectsContainer,
-    objectsContainer,
+    projectScopedContainers
   } = expressionAutocompletionContext;
 
-  const objectType: string = gd.getTypeOfObject(
-    globalObjectsContainer,
-    objectsContainer,
-    objectName,
-    /* searchInGroups= */ true
+  const objectType = projectScopedContainers.getObjectsContainersList().getTypeOfObject(
+    objectName
   );
   const objectExpressions = enumerateObjectExpressions(type, objectType);
   const filteredObjectExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -186,16 +171,12 @@ const getAutocompletionsForObjectExpressions = function(
     type
   );
 
-  const behaviorNames = gd.getBehaviorsOfObject(
-    globalObjectsContainer,
-    objectsContainer,
+  const behaviorNames = projectScopedContainers.getObjectsContainersList().getBehaviorsOfObject(
     objectName,
     true
   );
   mapVector(behaviorNames, behaviorName => {
-    const behaviorType = gd.getTypeOfBehaviorInObjectOrGroup(
-      globalObjectsContainer,
-      objectsContainer,
+    const behaviorType = projectScopedContainers.getObjectsContainersList().getTypeOfBehaviorInObjectOrGroup(
       objectName,
       behaviorName,
       true
@@ -243,15 +224,11 @@ const getAutocompletionsForBehaviorExpressions = function(
   const behaviorName: string = completionDescription.getBehaviorName();
   const isExact: boolean = completionDescription.isExact();
   const {
-    gd,
-    globalObjectsContainer,
-    objectsContainer,
+    projectScopedContainers
   } = expressionAutocompletionContext;
 
   // TODO: could be made more precise with the object name
-  const behaviorType = gd.getTypeOfBehavior(
-    globalObjectsContainer,
-    objectsContainer,
+  const behaviorType = projectScopedContainers.getObjectsContainersList().getTypeOfBehavior(
     behaviorName,
     /* searchInGroups= */ true
   );
@@ -271,57 +248,6 @@ const getAutocompletionsForBehaviorExpressions = function(
     isExact,
     type
   );
-};
-
-const getAutocompletionsForObject = function(
-  expressionAutocompletionContext: ExpressionAutocompletionContext,
-  completionDescription: gdExpressionCompletionDescription
-): Array<ExpressionAutocompletion> {
-  const prefix: string = completionDescription.getPrefix();
-  const type: string = completionDescription.getType();
-  const {
-    gd,
-    globalObjectsContainer,
-    objectsContainer,
-  } = expressionAutocompletionContext;
-
-  const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-    globalObjectsContainer,
-    objectsContainer
-  );
-
-  // We hide exact matches to prevent suggesting options already fully typed.
-  const filteredObjectsList = filterObjectsList(allObjectsList, {
-    searchText: prefix,
-    selectedTags: [],
-    hideExactMatches: true,
-  });
-  const filteredGroupsList = filterGroupsList(allGroupsList, {
-    searchText: prefix,
-    hideExactMatches: true,
-  });
-
-  // If we expect an object, don't add a dot. Otherwise (number, string...),
-  // add a dot to prepare for an object function.
-  const addDot = !gd.ParameterMetadata.isObject(type);
-
-  return [
-    ...filteredObjectsList.map(({ object }) => ({
-      kind: 'Object',
-      completion: object.getName(),
-      replacementStartPosition: completionDescription.getReplacementStartPosition(),
-      replacementEndPosition: completionDescription.getReplacementEndPosition(),
-      object,
-      addDot,
-    })),
-    ...filteredGroupsList.map(({ group }) => ({
-      kind: 'Object',
-      completion: group.getName(),
-      replacementStartPosition: completionDescription.getReplacementStartPosition(),
-      replacementEndPosition: completionDescription.getReplacementEndPosition(),
-      addDot,
-    })),
-  ];
 };
 
 const getAutocompletionsForText = function(
@@ -439,125 +365,6 @@ const getAutocompletionsForText = function(
   }));
 };
 
-const getAutocompletionsForVariable = function(
-  expressionAutocompletionContext: ExpressionAutocompletionContext,
-  completionDescription: gdExpressionCompletionDescription
-): Array<ExpressionAutocompletion> {
-  const prefix: string = completionDescription.getPrefix();
-  const type: string = completionDescription.getType();
-  const objectName: string = completionDescription.getObjectName();
-  const { project, layout } = expressionAutocompletionContext.scope;
-
-  let declaredVariables: Array<EnumeratedVariable>;
-  if (gd.ParameterMetadata.isExpression('variable', type)) {
-    let variablesContainer: gdVariablesContainer;
-    if (type === 'globalvar') {
-      if (!project) {
-        // No variable completion
-        return [];
-      }
-      variablesContainer = project.getVariables();
-    } else if (type === 'scenevar') {
-      if (!layout) {
-        // No variable completion
-        return [];
-      }
-      variablesContainer = layout.getVariables();
-    } else if (type === 'objectvar') {
-      const object = getObjectByName(project, layout, objectName);
-      if (!object) {
-        // No variable completion for unknown objet
-        return [];
-      }
-      variablesContainer = object.getVariables();
-    }
-
-    declaredVariables = enumerateVariables(variablesContainer);
-  } else {
-    // We complete variables that are used "as is" in an expression.
-
-    if (objectName) {
-      const object = getObjectByName(project, layout, objectName);
-      if (!object) return [];
-
-      declaredVariables = enumerateVariables(object.getVariables());
-    } else {
-      declaredVariables = [
-        ...enumerateVariables(project.getVariables()),
-        ...(layout ? enumerateVariables(layout.getVariables()) : []),
-      ];
-    }
-  }
-
-  // Hide invalid variable names - they would not
-  // be parsed correctly anyway.
-  const declaredAndValidVariables = declaredVariables.filter(
-    enumeratedVariable => !!enumeratedVariable.isValidName
-  );
-
-  const filteredVariablesList = filterListWithPrefix(
-    declaredAndValidVariables,
-    prefix,
-    ({ name }) => name
-  );
-
-  return filteredVariablesList.map(enumeratedVariable => ({
-    kind: 'Variable',
-    completion: enumeratedVariable.name,
-    replacementStartPosition: completionDescription.getReplacementStartPosition(),
-    replacementEndPosition: completionDescription.getReplacementEndPosition(),
-    variableType: enumeratedVariable.type,
-  }));
-};
-
-const getAutocompletionsForProperty = function(
-  expressionAutocompletionContext: ExpressionAutocompletionContext,
-  completionDescription: gdExpressionCompletionDescription
-): Array<ExpressionAutocompletion> {
-  const prefix: string = completionDescription.getPrefix();
-  const {
-    eventsBasedBehavior,
-    eventsBasedObject,
-  } = expressionAutocompletionContext.scope;
-
-  const enumerateExpressionAutocompletionForProperties = (
-    properties: gdPropertiesContainer
-  ): Array<ExpressionAutocompletion> =>
-    mapFor(0, properties.getCount(), i => {
-      const property = properties.getAt(i);
-
-      return {
-        kind: 'Property',
-        completion: property.getName(),
-        replacementStartPosition: completionDescription.getReplacementStartPosition(),
-        replacementEndPosition: completionDescription.getReplacementEndPosition(),
-        propertyType: property.getType(),
-      };
-    });
-
-  return filterListWithPrefix(
-    [
-      ...(eventsBasedBehavior
-        ? enumerateExpressionAutocompletionForProperties(
-            eventsBasedBehavior.getPropertyDescriptors()
-          )
-        : []),
-      ...(eventsBasedBehavior
-        ? enumerateExpressionAutocompletionForProperties(
-            eventsBasedBehavior.getSharedPropertyDescriptors()
-          )
-        : []),
-      ...(eventsBasedObject
-        ? enumerateExpressionAutocompletionForProperties(
-            eventsBasedObject.getPropertyDescriptors()
-          )
-        : []),
-    ],
-    prefix,
-    ({ completion }) => completion
-  );
-};
-
 const getAutocompletionsForBehavior = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
@@ -567,23 +374,17 @@ const getAutocompletionsForBehavior = function(
   const objectName: string = completionDescription.getObjectName();
 
   const {
-    gd,
-    globalObjectsContainer,
-    objectsContainer,
+    projectScopedContainers,
   } = expressionAutocompletionContext;
-  return gd
+  return projectScopedContainers.getObjectsContainersList()
     .getBehaviorsOfObject(
-      globalObjectsContainer,
-      objectsContainer,
       objectName,
       true
     )
     .toJSArray()
     .filter(behaviorName => behaviorName.indexOf(prefix) !== -1)
     .map(behaviorName => {
-      const behaviorType = gd.getTypeOfBehaviorInObjectOrGroup(
-        globalObjectsContainer,
-        objectsContainer,
+      const behaviorType = projectScopedContainers.getObjectsContainersList().getTypeOfBehaviorInObjectOrGroup(
         objectName,
         behaviorName,
         true
@@ -610,7 +411,7 @@ export const getAutocompletionsFromDescriptions = (
     mapVector(expressionCompletionDescriptions, completionDescription => {
       const completionKind = completionDescription.getCompletionKind();
 
-      if (completionKind === gd.ExpressionCompletionDescription.Expression) {
+      if (completionKind === gd.ExpressionCompletionDescription.ExpressionWithPrefix) {
         const objectName: string = completionDescription.getObjectName();
         const behaviorName: string = completionDescription.getBehaviorName();
 
@@ -631,18 +432,22 @@ export const getAutocompletionsFromDescriptions = (
           );
         }
       } else if (completionKind === gd.ExpressionCompletionDescription.Object) {
-        return getAutocompletionsForObject(
-          expressionAutocompletionContext,
-          completionDescription
-        );
+        return [{
+          kind: 'Object',
+          completion: completionDescription.getCompletion(),
+          replacementStartPosition: completionDescription.getReplacementStartPosition(),
+          replacementEndPosition: completionDescription.getReplacementEndPosition(),
+          objectConfiguration: completionDescription.hasObjectConfiguration() ? completionDescription.getObjectConfiguration() : null,
+          addDot: !gd.ParameterMetadata.isObject(completionDescription.getType()),
+        }]
       } else if (
-        completionKind === gd.ExpressionCompletionDescription.Behavior
+        completionKind === gd.ExpressionCompletionDescription.BehaviorWithPrefix
       ) {
         return getAutocompletionsForBehavior(
           expressionAutocompletionContext,
           completionDescription
         );
-      } else if (completionKind === gd.ExpressionCompletionDescription.Text) {
+      } else if (completionKind === gd.ExpressionCompletionDescription.TextWithPrefix) {
         return getAutocompletionsForText(
           expressionAutocompletionContext,
           completionDescription
@@ -650,17 +455,23 @@ export const getAutocompletionsFromDescriptions = (
       } else if (
         completionKind === gd.ExpressionCompletionDescription.Variable
       ) {
-        return getAutocompletionsForVariable(
-          expressionAutocompletionContext,
-          completionDescription
-        );
+        return [{
+          kind: 'Variable',
+          completion: completionDescription.getCompletion(),
+          replacementStartPosition: completionDescription.getReplacementStartPosition(),
+          replacementEndPosition: completionDescription.getReplacementEndPosition(),
+          variableType: completionDescription.getVariableType(),
+        }];
       } else if (
         completionKind === gd.ExpressionCompletionDescription.Property
       ) {
-        return getAutocompletionsForProperty(
-          expressionAutocompletionContext,
-          completionDescription
-        );
+        return [{
+          kind: 'Property',
+          completion: completionDescription.getCompletion(),
+          replacementStartPosition: completionDescription.getReplacementStartPosition(),
+          replacementEndPosition: completionDescription.getReplacementEndPosition(),
+          propertyType: completionDescription.getType(),
+        }];
       }
 
       return [];

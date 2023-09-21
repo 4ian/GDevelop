@@ -414,6 +414,7 @@ interface ObjectsContainer {
     void ObjectsContainer();
 
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);
@@ -555,6 +556,7 @@ interface Project {
 
     //Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);
@@ -800,6 +802,7 @@ interface Layout {
 
     //Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);
@@ -2759,6 +2762,7 @@ interface EventsBasedObject {
 
     // Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);

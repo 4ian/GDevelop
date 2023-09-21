@@ -112,6 +112,7 @@ declare class gdProject extends gdObjectsContainer {
   getTypeOfBehaviorInObjectOrGroup(layout: gdLayout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   getBehaviorNamesInObjectOrGroup(layout: gdLayout, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): gdVectorString;
   insertNewObject(project: gdProject, type: string, name: string, pos: number): gdObject;
+  insertNewObjectInFolder(project: gdProject, type: string, name: string, folder: gdObjectFolderOrObject, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
   hasObjectNamed(name: string): boolean;
   getObject(name: string): gdObject;

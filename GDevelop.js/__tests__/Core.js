@@ -4716,6 +4716,21 @@ Array [
       expect(rootFolder.getChildrenCount()).toEqual(1);
     });
 
+    test('an object can be added to a specific folder', () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Enemies', 0);
+      const subSubFolder = subFolder.insertNewFolder('Turtles', 0);
+      layout.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'RedTurtle',
+        subSubFolder,
+        0
+      );
+      expect(layout.hasObjectNamed('RedTurtle')).toBe(true);
+      expect(subSubFolder.hasObjectNamed('RedTurtle')).toBe(true);
+    });
+
     test('an ObjectFolderOrObject can be serialized and unserialized', () => {
       const rootFolder = layout.getRootFolder();
       const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
@@ -4765,7 +4780,6 @@ Array [
 
       const layoutObject = JSON.parse(gd.Serializer.toJSON(element));
       delete layoutObject.folderStructure;
-      console.log(layoutObject);
 
       project.removeLayout('Scene');
 

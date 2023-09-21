@@ -99,6 +99,19 @@ class GD_CORE_API ObjectsContainer {
                               const gd::String& objectType,
                               const gd::String& name,
                               std::size_t position);
+  /**
+   * \brief Add a new empty object of type \a objectType called \a name in the
+   * given folder at the specified position.<br>
+   *
+   * \note The object is created using the project's current platform.
+   * \return A reference to the object in the list.
+   */
+  gd::Object& InsertNewObjectInFolder(
+      const gd::Project& project,
+      const gd::String& objectType,
+      const gd::String& name,
+      gd::ObjectFolderOrObject& objectFolderOrObject,
+      std::size_t position);
 
   /**
    * \brief Add a new object to the list

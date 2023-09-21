@@ -4744,6 +4744,13 @@ Array [
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder.getChildrenCount()).toEqual(3);
+      expect(
+        rootFolder.getChildPosition(rootFolder.getObjectChild('MyObject'))
+      ).toEqual(0);
+      expect(rootFolder.getChildPosition(subFolder)).toEqual(1);
+      expect(
+        rootFolder.getChildPosition(rootFolder.getObjectChild('OtherObject'))
+      ).toEqual(2);
 
       const element = new gd.SerializerElement();
       layout.serializeTo(element);

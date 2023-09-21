@@ -42,11 +42,9 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
 ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) {
   return *children[index];
 }
-ObjectFolderOrObject& ObjectFolderOrObject::GetChild(const gd::String& name) {
+ObjectFolderOrObject& ObjectFolderOrObject::GetObjectChild(const gd::String& name) {
   for (std::size_t j = 0; j < children.size(); j++) {
-    if (children[j]->IsFolder()) {
-      if (children[j]->GetFolderName() == name) return *children[j];
-    } else {
+    if (!children[j]->IsFolder()) {
       if (children[j]->GetObject().GetName() == name) return *children[j];
     };
   }
@@ -65,6 +63,14 @@ void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject,
   children.insert(
       position < children.size() ? children.begin() + position : children.end(),
       std::move(objectFolderOrObject));
+}
+
+std::size_t ObjectFolderOrObject::GetChildPosition(
+    ObjectFolderOrObject& child) const {
+  for (std::size_t j = 0; j < children.size(); j++) {
+    if (&(*children[j]) == &child) return j;
+  }
+  return gd::String::npos;
 }
 
 ObjectFolderOrObject& ObjectFolderOrObject::InsertNewFolder(

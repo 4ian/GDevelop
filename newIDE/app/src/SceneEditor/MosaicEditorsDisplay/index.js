@@ -150,10 +150,15 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (!editorMosaicRef.current) return false;
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
-  const renameObjectWithContext = React.useCallback(objectWithContext => {
-    if (objectsListRef.current)
-      objectsListRef.current.renameObjectWithContext(objectWithContext);
-  }, []);
+  const renameObjectFolderOrObjectWithContext = React.useCallback(
+    objectWithContext => {
+      if (objectsListRef.current)
+        objectsListRef.current.renameObjectFolderOrObjectWithContext(
+          objectWithContext
+        );
+    },
+    []
+  );
 
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
@@ -167,7 +172,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView,
       isEditorVisible,
-      renameObjectWithContext,
+      renameObjectFolderOrObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,
@@ -240,6 +245,14 @@ const MosaicEditorsDisplay = React.forwardRef<
     },
     [selectedObjectTags, getAllObjectTags]
   );
+
+  const selectedObjectNames = props.selectedObjectFolderOrObjectsWithContext
+    .map(objectFolderOrObjectWithContext => {
+      const { objectFolderOrObject } = objectFolderOrObjectWithContext;
+      if (objectFolderOrObject.isFolder()) return null;
+      return objectFolderOrObject.getObject().getName();
+    })
+    .filter(Boolean);
 
   const editors = {
     properties: {
@@ -317,7 +330,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           onInstancesMoved={props.onInstancesMoved}
           onInstancesResized={props.onInstancesResized}
           onInstancesRotated={props.onInstancesRotated}
-          selectedObjectNames={props.selectedObjectNames}
+          selectedObjectNames={selectedObjectNames}
           onContextMenu={props.onContextMenu}
           isInstanceOf3DObject={props.isInstanceOf3DObject}
           instancesEditorShortcutsCallbacks={
@@ -355,7 +368,9 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.onSelectAllInstancesOfObjectInLayout
               }
               resourceManagementProps={props.resourceManagementProps}
-              selectedObjectNames={props.selectedObjectNames}
+              selectedObjectFolderOrObjectsWithContext={
+                props.selectedObjectFolderOrObjectsWithContext
+              }
               canInstallPrivateAsset={props.canInstallPrivateAsset}
               onEditObject={props.onEditObject}
               onExportObject={props.onExportObject}
@@ -366,8 +381,10 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.getValidatedObjectOrGroupName(newName, global, i18n)
               }
               onObjectCreated={props.onObjectCreated}
-              onObjectSelected={props.onObjectSelected}
-              onRenameObjectFinish={props.onRenameObjectFinish}
+              onObjectFolderOrObjectWithContextSelected={
+                props.onObjectFolderOrObjectWithContextSelected
+              }
+              onRenameObjectFolderOrObjectWithContextFinish={props.onRenameObjectFolderOrObjectWithContextFinish}
               onAddObjectInstance={props.onAddObjectInstance}
               onObjectPasted={props.updateBehaviorsSharedData}
               selectedObjectTags={selectedObjectTags}

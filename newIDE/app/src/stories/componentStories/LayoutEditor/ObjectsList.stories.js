@@ -33,14 +33,14 @@ export const Default = () => (
         onExportObject={action('On export object')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
-        selectedObjectNames={[]}
+        selectedObjectFolderOrObjectsWithContext={[]}
         selectedObjectTags={[]}
         onChangeSelectedObjectTags={selectedObjectTags => {}}
         getAllObjectTags={() => []}
         getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
-        onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
-        onObjectSelected={() => {}}
+        onRenameObjectFolderOrObjectWithContextFinish={(objectWithContext, newName, cb) => cb(true)}
+        onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         canInstallPrivateAsset={() => false}
       />
@@ -62,14 +62,14 @@ export const WithSerializedObjectView = () => (
           onExportObject={action('On export object')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
-          selectedObjectNames={[]}
+          selectedObjectFolderOrObjectsWithContext={[]}
           selectedObjectTags={[]}
           onChangeSelectedObjectTags={selectedObjectTags => {}}
           getAllObjectTags={() => []}
           getValidatedObjectOrGroupName={newName => newName}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
-          onObjectSelected={() => {}}
+          onRenameObjectFolderOrObjectWithContextFinish={(objectWithContext, newName, cb) => cb(true)}
+          onObjectFolderOrObjectWithContextSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           canInstallPrivateAsset={() => false}
         />
@@ -91,7 +91,7 @@ export const WithTags = () => (
         onExportObject={action('On export object')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
-        selectedObjectNames={[]}
+        selectedObjectFolderOrObjectsWithContext={[]}
         selectedObjectTags={['Tag1', 'Tag2']}
         onChangeSelectedObjectTags={action('on change selected object tags')}
         getAllObjectTags={() => [
@@ -102,8 +102,8 @@ export const WithTags = () => (
         ]}
         getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
-        onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
-        onObjectSelected={() => {}}
+        onRenameObjectFolderOrObjectWithContextFinish={(objectWithContext, newName, cb) => cb(true)}
+        onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         canInstallPrivateAsset={() => false}
       />

@@ -43,7 +43,6 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
   type ObjectWithContext,
   type GroupWithContext,
-  enumerateObjects,
 } from '../ObjectsList/EnumerateObjects';
 import InfoBar from '../UI/Messages/InfoBar';
 import { type SelectedTags } from '../Utils/TagsHelper';
@@ -63,6 +62,11 @@ import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
 import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import {
+  enumerateObjectFolderOrObjects,
+  getObjectFolderOrObjectUnifiedName,
+  type ObjectFolderOrObjectWithContext,
+} from '../ObjectsList/EnumerateObjectFolderOrObject';
 
 const gd: libGDevelop = global.gd;
 
@@ -134,7 +138,7 @@ type State = {|
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
 
-  selectedObjectsWithContext: Array<ObjectWithContext>,
+  selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   selectedLayer: string,
 |};
 
@@ -189,7 +193,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       selectedObjectTags: [],
 
-      selectedObjectsWithContext: [],
+      selectedObjectFolderOrObjectsWithContext: [],
       selectedLayer: BASE_LAYER_NAME,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
     };
@@ -284,7 +288,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          canRenameObject={this.state.selectedObjectsWithContext.length === 1}
+          canRenameObject={
+            this.state.selectedObjectFolderOrObjectsWithContext.length === 1
+          }
           onRenameObject={this._startRenamingSelectedObject}
         />
       );
@@ -313,7 +319,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          canRenameObject={this.state.selectedObjectsWithContext.length === 1}
+          canRenameObject={
+            this.state.selectedObjectFolderOrObjectsWithContext.length === 1
+          }
           onRenameObject={this._startRenamingSelectedObject}
         />
       );
@@ -508,15 +516,19 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
-    const selectedObjectsWithContext = [];
-    if (objectWithContext) {
-      selectedObjectsWithContext.push(objectWithContext);
+  _onObjectFolderOrObjectWithContextSelected = (
+    objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
+  ) => {
+    const selectedObjectFolderOrObjectsWithContext = [];
+    if (objectFolderOrObjectWithContext) {
+      selectedObjectFolderOrObjectsWithContext.push(
+        objectFolderOrObjectWithContext
+      );
     }
 
     this.setState(
       {
-        selectedObjectsWithContext,
+        selectedObjectFolderOrObjectsWithContext,
       },
       () => {
         // We update the toolbar because we need to update the objects selected
@@ -621,13 +633,18 @@ export default class SceneEditor extends React.Component<Props, State> {
       instances.map(instance => instance.getObjectName())
     );
 
-    const selectedObjectsWithContext = enumerateObjects(project, layout, {
-      names: instancesObjectNames,
-    }).allObjectsList;
+    const objectFolderOrObjectLists = enumerateObjectFolderOrObjects(
+      project,
+      layout,
+      {
+        selectByNames: instancesObjectNames,
+      }
+    );
 
     this.setState(
       {
-        selectedObjectsWithContext,
+        selectedObjectFolderOrObjectsWithContext:
+          objectFolderOrObjectLists.selectedByNamesObjectFolderOrObjectsList,
       },
       () => {
         this.updateToolbar();
@@ -793,11 +810,14 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _startRenamingSelectedObject = () => {
-    const firstSelectedObject = this.state.selectedObjectsWithContext[0];
-    if (!firstSelectedObject) return;
+    const firstSelectedObjectFolderOrObject = this.state
+      .selectedObjectFolderOrObjectsWithContext[0];
+    if (!firstSelectedObjectFolderOrObject) return;
 
     if (this.editorDisplay)
-      this.editorDisplay.renameObjectWithContext(firstSelectedObject);
+      this.editorDisplay.renameObjectFolderOrObjectWithContext(
+        firstSelectedObjectFolderOrObject
+      );
     this.updateToolbar();
   };
 
@@ -914,42 +934,75 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { editedObjectWithContext } = this.state;
 
     if (editedObjectWithContext) {
-      this._onRenameObjectFinish(editedObjectWithContext, newName, () => {});
+      this._onRenameObjectFinish(editedObjectWithContext, newName);
     }
   };
 
   _onRenameObjectFinish = (
     objectWithContext: ObjectWithContext,
-    newName: string,
-    done: boolean => void
+    newName: string
   ) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
     // newName is supposed to have been already validated.
-
     // Avoid triggering renaming refactoring if name has not really changed
-    if (object.getName() !== newName) {
-      if (global) {
-        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
-          project,
-          object.getName(),
-          newName,
-          /* isObjectGroup=*/ false
-        );
-      } else {
-        gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
-          project,
-          layout,
-          object.getName(),
-          newName,
-          /* isObjectGroup=*/ false
-        );
-      }
+    if (object.getName() === newName) {
+      return;
+    }
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+        project,
+        object.getName(),
+        newName,
+        /* isObjectGroup=*/ false
+      );
+    } else {
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+        project,
+        layout,
+        object.getName(),
+        newName,
+        /* isObjectGroup=*/ false
+      );
     }
 
     object.setName(newName);
-    this._onObjectSelected(objectWithContext);
+  };
+
+  _onRenameObjectFolderOrObjectFinish = (
+    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+    newName: string,
+    done: boolean => void
+  ) => {
+    const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
+
+    const unifiedName = getObjectFolderOrObjectUnifiedName(
+      objectFolderOrObject
+    );
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (unifiedName === newName) {
+      this._onObjectFolderOrObjectWithContextSelected(
+        objectFolderOrObjectWithContext
+      );
+      done(false);
+      return;
+    }
+    // newName is supposed to have been already validated.
+
+    if (objectFolderOrObject.isFolder()) {
+      objectFolderOrObject.renameFolder(newName);
+      done(true);
+      return;
+    }
+
+    const object = objectFolderOrObject.getObject();
+
+    this._onRenameObjectFinish({ object, global }, newName);
+    this._onObjectFolderOrObjectWithContextSelected(
+      objectFolderOrObjectWithContext
+    );
     done(true);
   };
 
@@ -1106,7 +1159,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.setState(
       {
-        selectedObjectsWithContext: [],
+        selectedObjectFolderOrObjectsWithContext: [],
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
@@ -1203,7 +1256,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     let contextMenuItems = [];
     if (
       options.ignoreSelectedObjectsForContextMenu ||
-      this.state.selectedObjectsWithContext.length === 0
+      this.state.selectedObjectFolderOrObjectsWithContext.length === 0
     ) {
       contextMenuItems = [
         ...contextMenuItems,
@@ -1222,7 +1275,17 @@ export default class SceneEditor extends React.Component<Props, State> {
         ...this.getContextMenuZoomItems(i18n),
       ];
     } else {
-      const objectName = this.state.selectedObjectsWithContext[0].object.getName();
+      const {
+        objectFolderOrObject,
+      } = this.state.selectedObjectFolderOrObjectsWithContext[0];
+      if (objectFolderOrObject.isFolder()) return [];
+
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        this.props.project.getCurrentPlatform(),
+        objectFolderOrObject.getObject().getType()
+      );
+
+      const objectName = objectFolderOrObject.getObject().getName();
       contextMenuItems = [
         ...contextMenuItems,
         {
@@ -1294,6 +1357,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         {
           label: i18n._(t`Edit effects`),
           click: () => this.editObjectByName(objectName, 'effects'),
+          enabled: objectMetadata.hasDefaultBehavior(
+            'EffectCapability::EffectBehavior'
+          ),
         },
       ];
     }
@@ -1490,7 +1556,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       resourceManagementProps,
       isActive,
     } = this.props;
-    const { editedObjectWithContext } = this.state;
+    const {
+      editedObjectWithContext,
+      selectedObjectFolderOrObjectsWithContext,
+    } = this.state;
     const variablesEditedAssociatedObjectName = this.state
       .variablesEditedInstance
       ? this.state.variablesEditedInstance.getObjectName()
@@ -1498,9 +1567,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
-    const selectedObjectNames = this.state.selectedObjectsWithContext.map(
-      objWithContext => objWithContext.object.getName()
-    );
+
     // Deactivate prettier on this variable to prevent spaces to be added by
     // line breaks.
     // prettier-ignore
@@ -1553,7 +1620,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 editLayerEffects={this.editLayerEffects}
                 editInstanceVariables={this.editInstanceVariables}
                 editObjectByName={this.editObjectByName}
-                selectedObjectNames={selectedObjectNames}
+                selectedObjectFolderOrObjectsWithContext={
+                  selectedObjectFolderOrObjectsWithContext
+                }
                 onRenameLayer={this._onRenameLayer}
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={(layer: string) =>
@@ -1570,9 +1639,13 @@ export default class SceneEditor extends React.Component<Props, State> {
                 canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
                 updateBehaviorsSharedData={this.updateBehaviorsSharedData}
                 onEditObject={this.props.onEditObject || this.editObject}
-                onRenameObjectFinish={this._onRenameObjectFinish}
+                onRenameObjectFolderOrObjectWithContextFinish={
+                  this._onRenameObjectFolderOrObjectFinish
+                }
                 onObjectCreated={this._onObjectCreated}
-                onObjectSelected={this._onObjectSelected}
+                onObjectFolderOrObjectWithContextSelected={
+                  this._onObjectFolderOrObjectWithContextSelected
+                }
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 historyHandler={{
                   undo: this.undo,

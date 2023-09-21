@@ -404,7 +404,8 @@ interface ObjectFolderOrObject {
     boolean HasObjectNamed([Const] DOMString name);
     unsigned long GetChildrenCount();
     [Ref] ObjectFolderOrObject GetChildAt(unsigned long pos);
-    [Ref] ObjectFolderOrObject GetChild([Const] DOMString name);
+    [Ref] ObjectFolderOrObject GetObjectChild([Const] DOMString name);
+    unsigned long GetChildPosition([Ref] ObjectFolderOrObject child);
     void RenameFolder([Const] DOMString name);
     [Ref] ObjectFolderOrObject GetParent();
     [Ref] ObjectFolderOrObject InsertNewFolder([Const] DOMString name, unsigned long newPosition);

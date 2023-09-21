@@ -39,7 +39,7 @@ class GD_CORE_API ObjectFolderOrObject {
     return 0;
   }
   ObjectFolderOrObject& GetChildAt(std::size_t index);
-  ObjectFolderOrObject& GetChild(const gd::String& name);
+  ObjectFolderOrObject& GetObjectChild(const gd::String& name);
 
   ObjectFolderOrObject& GetParent() {
     if (parent == nullptr) {
@@ -52,6 +52,8 @@ class GD_CORE_API ObjectFolderOrObject {
   void InsertObject(gd::Object* insertedObject, std::size_t position);
   ObjectFolderOrObject& InsertNewFolder(const gd::String newFolderName,
                                         std::size_t position);
+
+  std::size_t GetChildPosition(ObjectFolderOrObject& child) const;
 
   void RemoveRecursivelyObjectNamed(const gd::String& name);
 

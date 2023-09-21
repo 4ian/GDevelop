@@ -54,7 +54,7 @@ const getOptions = () => {
   return options;
 };
 
-const getVariableTypeToIcon = () => {
+export const getVariableTypeToIcon = (): { [Variable_Type]: any } => {
   if (!variableTypeToIcon) {
     variableTypeToIcon = {
       [gd.Variable.String]: VariableStringIcon,

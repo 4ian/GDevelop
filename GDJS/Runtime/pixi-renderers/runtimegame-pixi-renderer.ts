@@ -1,8 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('PIXI game renderer');
 
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * Codes (as in `event.code`) of keys that should have their event `preventDefault`
    * called. This is used to avoid scrolling in a webpage when these keys are pressed
@@ -108,7 +106,7 @@ namespace gdjs {
           antialias: false,
         }) as PIXI.Renderer;
 
-        gameCanvas = this._pixiRenderer.view;
+        gameCanvas = this._pixiRenderer.view as HTMLCanvasElement;
       }
 
       // Add the renderer view element to the DOM

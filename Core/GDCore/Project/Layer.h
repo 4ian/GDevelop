@@ -13,18 +13,74 @@
 
 namespace gd {
 class Effect;
-}
-namespace gd {
 class Camera;
-}
-namespace gd {
 class SerializerElement;
-}
-namespace gd {
 class EffectsContainer;
 }
 
 namespace gd {
+
+/**
+ * \brief A camera is used to render a specific area of a layout.
+ *
+ * \see gd::Layout
+ * \ingroup PlatformDefinition
+ */
+class GD_CORE_API Camera {
+ public:
+  Camera();
+  ~Camera(){};
+
+  /**
+   * \brief Change the viewport, i.e the area of the window where the camera
+   * will be displayed. \note The coordinates must be between 0 and 1.
+   */
+  void SetViewport(float x1_, float y1_, float x2_, float y2_) {
+    x1 = x1_;
+    x2 = x2_;
+    y1 = y1_;
+    y2 = y2_;
+  };
+  void SetViewportX1(float x1_) { x1 = x1_; };
+  void SetViewportY1(float y1_) { y1 = y1_; };
+  void SetViewportX2(float x2_) { x2 = x2_; };
+  void SetViewportY2(float y2_) { y2 = y2_; };
+  float GetViewportX1() const { return x1; };
+  float GetViewportY1() const { return y1; };
+  float GetViewportX2() const { return x2; };
+  float GetViewportY2() const { return y2; };
+
+  /**
+   * \brief Change the size of the rendered area of the scene, in pixels.
+   */
+  void SetSize(float width_, float height_) {
+    width = width_;
+    height = height_;
+  };
+  float GetWidth() const { return width; };
+  float GetHeight() const { return height; };
+
+  void SetUseDefaultSize(bool useDefaultSize = true) {
+    defaultSize = useDefaultSize;
+  };
+  bool UseDefaultSize() const { return defaultSize; }
+
+  void SetUseDefaultViewport(bool useDefaultViewport = true) {
+    defaultViewport = useDefaultViewport;
+  };
+  bool UseDefaultViewport() const { return defaultViewport; }
+
+ private:
+  bool defaultSize;      ///< True if the camera use the default window size
+  bool defaultViewport;  ///< True if the camera use the default viewport size
+
+  float x1;
+  float y1;
+  float x2;
+  float y2;
+  float width;   ///< The width of the rendered area
+  float height;  ///< The height of the rendered area
+};
 
 /**
  * \brief Represents a layer of a layout.
@@ -239,68 +295,6 @@ struct LayerHasName : public std::binary_function<gd::Layer, gd::String, bool> {
   bool operator()(const Layer& layer, const gd::String& name) const {
     return layer.GetName() == name;
   }
-};
-
-/**
- * \brief A camera is used to render a specific area of a layout.
- *
- * \see gd::Layout
- * \ingroup PlatformDefinition
- */
-class GD_CORE_API Camera {
- public:
-  Camera();
-  ~Camera(){};
-
-  /**
-   * \brief Change the viewport, i.e the area of the window where the camera
-   * will be displayed. \note The coordinates must be between 0 and 1.
-   */
-  void SetViewport(float x1_, float y1_, float x2_, float y2_) {
-    x1 = x1_;
-    x2 = x2_;
-    y1 = y1_;
-    y2 = y2_;
-  };
-  void SetViewportX1(float x1_) { x1 = x1_; };
-  void SetViewportY1(float y1_) { y1 = y1_; };
-  void SetViewportX2(float x2_) { x2 = x2_; };
-  void SetViewportY2(float y2_) { y2 = y2_; };
-  float GetViewportX1() const { return x1; };
-  float GetViewportY1() const { return y1; };
-  float GetViewportX2() const { return x2; };
-  float GetViewportY2() const { return y2; };
-
-  /**
-   * \brief Change the size of the rendered area of the scene, in pixels.
-   */
-  void SetSize(float width_, float height_) {
-    width = width_;
-    height = height_;
-  };
-  float GetWidth() const { return width; };
-  float GetHeight() const { return height; };
-
-  void SetUseDefaultSize(bool useDefaultSize = true) {
-    defaultSize = useDefaultSize;
-  };
-  bool UseDefaultSize() const { return defaultSize; }
-
-  void SetUseDefaultViewport(bool useDefaultViewport = true) {
-    defaultViewport = useDefaultViewport;
-  };
-  bool UseDefaultViewport() const { return defaultViewport; }
-
- private:
-  bool defaultSize;      ///< True if the camera use the default window size
-  bool defaultViewport;  ///< True if the camera use the default viewport size
-
-  float x1;
-  float y1;
-  float x2;
-  float y2;
-  float width;   ///< The width of the rendered area
-  float height;  ///< The height of the rendered area
 };
 
 }  // namespace gd

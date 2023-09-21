@@ -35,6 +35,9 @@ let text = new MultiStyleText("Let's make some <ml>multiline</ml>\nand <ms>multi
 
 ## Build instructions
 
+The library is no longer maintain and need this fix to work with Pixi 7: 
+- [Fix empty color attribute errors with Pixi 7](https://github.com/D8H/pixi-multistyle-text/pull/1)
+
 ```bash
 yarn install
 yarn build

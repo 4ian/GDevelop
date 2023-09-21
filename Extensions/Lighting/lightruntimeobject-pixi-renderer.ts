@@ -1,6 +1,5 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Light object');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   /**
    * Pixi renderer for light runtime objects.

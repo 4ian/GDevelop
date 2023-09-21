@@ -312,11 +312,7 @@ export const enumerateObjectsAndGroups = (
   );
 
   return {
-    containerObjectsList,
-    projectObjectsList,
     allObjectsList,
-    containerGroupsList,
-    projectGroupsList,
     allGroupsList,
   };
 };

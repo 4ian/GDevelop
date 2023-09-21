@@ -1,5 +1,5 @@
 // @flow
-import gesture from 'pixi-simple-gesture';
+import panable, { type PanMoveEvent } from '../../Utils/PixiSimpleGesture/pan';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import RenderedInstance from '../../ObjectsRendering/Renderers/RenderedInstance';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -154,17 +154,17 @@ export default class LayerRenderer {
         | null = this.getRendererOfInstance(instance);
       if (!renderedInstance) return;
 
-      const pixiObject = renderedInstance.getPixiObject();
+      const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) pixiObject.zOrder = instance.getZOrder();
 
       // "Culling" improves rendering performance of large levels
       const isVisible = this._isInstanceVisible(instance);
       if (pixiObject) {
         pixiObject.visible = isVisible;
-        pixiObject.interactive = !(
-          this.layer.isLocked() ||
-          (instance.isLocked() && instance.isSealed())
-        );
+        pixiObject.eventMode =
+          this.layer.isLocked() || (instance.isLocked() && instance.isSealed())
+            ? 'auto'
+            : 'static';
       }
       if (isVisible) renderedInstance.update();
 
@@ -360,20 +360,20 @@ export default class LayerRenderer {
         this._threeGroup
       );
 
-      renderedInstance._pixiObject.interactive = true;
-      gesture.panable(renderedInstance._pixiObject);
+      renderedInstance._pixiObject.eventMode = 'static';
+      panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
-      renderedInstance._pixiObject.on('click', event => {
+      renderedInstance._pixiObject.addEventListener('click', event => {
         if (event.data.originalEvent.button === 0)
           this.onInstanceClicked(instance);
       });
-      renderedInstance._pixiObject.on('doubleclick', () => {
+      renderedInstance._pixiObject.addEventListener('doubleclick', () => {
         this.onInstanceDoubleClicked(instance);
       });
-      renderedInstance._pixiObject.on('mouseover', () => {
+      renderedInstance._pixiObject.addEventListener('mouseover', () => {
         this.onOverInstance(instance);
       });
-      renderedInstance._pixiObject.on(
+      renderedInstance._pixiObject.addEventListener(
         'mousedown',
         (event: PIXI.InteractionEvent) => {
           if (event.data.originalEvent.button === 0) {
@@ -386,31 +386,34 @@ export default class LayerRenderer {
           }
         }
       );
-      renderedInstance._pixiObject.on('rightclick', interactionEvent => {
-        const {
-          data: { global: viewPoint, originalEvent: event },
-        } = interactionEvent;
+      renderedInstance._pixiObject.addEventListener(
+        'rightclick',
+        interactionEvent => {
+          const {
+            data: { global: viewPoint, originalEvent: event },
+          } = interactionEvent;
 
-        // First select the instance
-        const scenePoint = this.viewPosition.toSceneCoordinates(
-          viewPoint.x,
-          viewPoint.y
-        );
-        this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+          // First select the instance
+          const scenePoint = this.viewPosition.toSceneCoordinates(
+            viewPoint.x,
+            viewPoint.y
+          );
+          this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
 
-        // Then call right click callback
-        if (this.onInstanceRightClicked) {
-          this.onInstanceRightClicked({
-            offsetX: event.offsetX,
-            offsetY: event.offsetY,
-            x: event.clientX,
-            y: event.clientY,
-          });
+          // Then call right click callback
+          if (this.onInstanceRightClicked) {
+            this.onInstanceRightClicked({
+              offsetX: event.offsetX,
+              offsetY: event.offsetY,
+              x: event.clientX,
+              y: event.clientY,
+            });
+          }
+
+          return false;
         }
-
-        return false;
-      });
-      renderedInstance._pixiObject.on('touchstart', event => {
+      );
+      renderedInstance._pixiObject.addEventListener('touchstart', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
@@ -422,17 +425,20 @@ export default class LayerRenderer {
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
-      renderedInstance._pixiObject.on('mouseout', () => {
+      renderedInstance._pixiObject.addEventListener('mouseout', () => {
         this.onOutInstance(instance);
       });
-      renderedInstance._pixiObject.on('panmove', event => {
-        if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
-          return null;
-        }
+      renderedInstance._pixiObject.addEventListener(
+        'panmove',
+        (event: PanMoveEvent) => {
+          if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+            return null;
+          }
 
-        this.onMoveInstance(instance, event.deltaX, event.deltaY);
-      });
-      renderedInstance._pixiObject.on('panend', event => {
+          this.onMoveInstance(instance, event.deltaX, event.deltaY);
+        }
+      );
+      renderedInstance._pixiObject.addEventListener('panend', event => {
         this.onMoveInstanceEnd();
       });
     }
@@ -637,9 +643,10 @@ export default class LayerRenderer {
       this._oldWidth !== pixiRenderer.screen.width ||
       this._oldHeight !== pixiRenderer.screen.height
     ) {
+      // A size of 0 is forbidden by Pixi.
       this._renderTexture.resize(
-        pixiRenderer.screen.width,
-        pixiRenderer.screen.height
+        pixiRenderer.screen.width || 100,
+        pixiRenderer.screen.height || 100
       );
       this._oldWidth = pixiRenderer.screen.width;
       this._oldHeight = pixiRenderer.screen.height;

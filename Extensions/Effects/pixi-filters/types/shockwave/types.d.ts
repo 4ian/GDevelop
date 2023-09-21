@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class ShockwaveFilter extends PIXI.Filter {
     constructor(
       center?: PIXI.Point | number[],

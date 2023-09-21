@@ -1445,14 +1445,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     PixiResourcesLoader.loadTextures(
       project,
       objectResourceNames,
-      () => {},
-      () => {
-        if (this.editorDisplay)
-          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-            object.getName()
-          );
-      }
-    );
+      () => {}
+    ).then(() => {
+      if (this.editorDisplay)
+        this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          object.getName()
+        );
+    });
   };
 
   render() {
@@ -1697,6 +1696,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               {!!this.state.variablesEditedInstance &&
                 !!variablesEditedAssociatedObject && (
                   <VariablesEditorDialog
+                    project={project}
                     open
                     variablesContainer={this.state.variablesEditedInstance.getVariables()}
                     inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}

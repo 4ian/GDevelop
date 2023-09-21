@@ -3,6 +3,10 @@ import { unserializeFromJSObject } from '../../Utils/Serializer';
 import { mapVector } from '../../Utils/MapFor';
 import { getFreeEventsFunctionType } from '../../EventsFunctionsExtensionsLoader';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+import {
+  getProjectScopedContainersFromScope,
+  type EventsScope,
+} from '../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -13,11 +17,13 @@ const gd: libGDevelop = global.gd;
 export const setupFunctionFromEvents = ({
   globalObjectsContainer,
   objectsContainer,
+  scope,
   serializedEvents,
   project,
   eventsFunction,
 }: {
   project: gdProject,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   serializedEvents: Object,
@@ -34,12 +40,18 @@ export const setupFunctionFromEvents = ({
   );
 
   // Analyze events...
-  const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
-    gd.JsPlatform.get(),
+  const projectScopedContainers = getProjectScopedContainersFromScope(
+    scope,
     globalObjectsContainer,
     objectsContainer
   );
-  eventsContextAnalyzer.launch(eventsFunction.getEvents());
+  const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
+    gd.JsPlatform.get()
+  );
+  eventsContextAnalyzer.launch(
+    eventsFunction.getEvents(),
+    projectScopedContainers
+  );
   const eventsContext = eventsContextAnalyzer.getEventsContext();
 
   // ...to extract objects and groups
@@ -86,12 +98,9 @@ export const setupFunctionFromEvents = ({
     newParameter.setType('objectList');
     newParameter.setName(objectName);
     newParameter.setExtraInfo(
-      gd.getTypeOfObject(
-        globalObjectsContainer,
-        objectsContainer,
-        objectName,
-        true
-      )
+      projectScopedContainers
+        .getObjectsContainersList()
+        .getTypeOfObject(objectName)
     );
     parameters.push_back(newParameter);
 
@@ -105,12 +114,9 @@ export const setupFunctionFromEvents = ({
       newParameter.setType('behavior');
       newParameter.setName(behaviorName);
       newParameter.setExtraInfo(
-        gd.getTypeOfBehavior(
-          globalObjectsContainer,
-          objectsContainer,
-          behaviorName,
-          false
-        )
+        projectScopedContainers
+          .getObjectsContainersList()
+          .getTypeOfBehavior(behaviorName, false)
       );
       parameters.push_back(newParameter);
     });

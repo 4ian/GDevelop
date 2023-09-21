@@ -151,6 +151,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             unsavedChanges={this.props.unsavedChanges}
             project={project}
             scope={{
+              project,
               layout,
               externalEvents,
             }}

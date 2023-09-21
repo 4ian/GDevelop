@@ -52,7 +52,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
-    setUseUndefinedVariablesInAutocompletion,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
@@ -260,19 +259,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             toggled={values.eventsSheetUseAssignmentOperators}
             labelPosition="right"
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
-          />
-          <Toggle
-            onToggle={(e, check) =>
-              setUseUndefinedVariablesInAutocompletion(check)
-            }
-            toggled={values.useUndefinedVariablesInAutocompletion}
-            labelPosition="right"
-            label={
-              <Trans>
-                Suggest names of variables used in events but not declared in
-                the list of variables
-              </Trans>
-            }
           />
           <SelectField
             floatingLabelText={

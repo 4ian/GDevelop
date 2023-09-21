@@ -5,8 +5,6 @@
  */
 
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   const logger = new gdjs.Logger('LayerPixiRenderer');
 
   /**
@@ -539,14 +537,15 @@ namespace gdjs {
         this._oldWidth !== pixiRenderer.screen.width ||
         this._oldHeight !== pixiRenderer.screen.height
       ) {
+        // A size of 0 is forbidden by Pixi.
         this._renderTexture.resize(
-          pixiRenderer.screen.width,
-          pixiRenderer.screen.height
+          pixiRenderer.screen.width || 100,
+          pixiRenderer.screen.height || 100
         );
         this._oldWidth = pixiRenderer.screen.width;
         this._oldHeight = pixiRenderer.screen.height;
       }
-      const oldRenderTexture = pixiRenderer.renderTexture.current;
+      const oldRenderTexture = pixiRenderer.renderTexture.current || undefined;
       const oldSourceFrame = pixiRenderer.renderTexture.sourceFrame;
       pixiRenderer.renderTexture.bind(this._renderTexture);
 

@@ -435,6 +435,7 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout);
  * \note If a group contains only objects of a same type, then the group has
  * this type. Otherwise, it is considered as an object without any specific
  * type.
+ * \deprecated Use gd::ObjectsContainersList::GetTypeOfObject instead.
  *
  * @return Type of the object/group.
  */
@@ -444,6 +445,7 @@ gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
                                        bool searchInGroups = true);
 /**
  * \brief Check if an object or all objects of a group has a behavior.
+ * \deprecated Use gd::ObjectsContainersList::HasBehaviorInObjectOrGroup instead.
  */
 bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
                                             const gd::ObjectsContainer &layout,
@@ -479,6 +481,7 @@ gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContain
 /**
  * \brief Get a type from a behavior name
  * @return Type of the behavior.
+ * @deprecated - Use GetTypeOfBehaviorInObjectOrGroup instead.
  */
 gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
                                          const ObjectsContainer& layout,
@@ -495,7 +498,7 @@ gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
 std::vector<gd::String> GD_CORE_API
 GetBehaviorsOfObject(const ObjectsContainer& game,
                      const ObjectsContainer& layout,
-                     gd::String objectName,
+                     const gd::String& objectName,
                      bool searchInGroups = true);
 
 }  // namespace gd

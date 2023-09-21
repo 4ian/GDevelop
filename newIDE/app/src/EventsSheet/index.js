@@ -76,7 +76,10 @@ import PreferencesContext, {
 } from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
-import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+import {
+  getProjectScopedContainersFromScope,
+  type EventsScope,
+} from '../InstructionOrExpression/EventsScope.flow';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -1448,11 +1451,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _openEventsContextAnalyzer = () => {
-    const { globalObjectsContainer, objectsContainer } = this.props;
-    const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
-      gd.JsPlatform.get(),
+    const { scope, globalObjectsContainer, objectsContainer } = this.props;
+
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
       globalObjectsContainer,
       objectsContainer
+    );
+    const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
+      gd.JsPlatform.get()
     );
 
     const eventsList = new gd.EventsList();
@@ -1460,7 +1467,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
-    eventsContextAnalyzer.launch(eventsList);
+    eventsContextAnalyzer.launch(eventsList, projectScopedContainers);
     eventsList.delete();
 
     this.setState({
@@ -1943,6 +1950,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 {this.state.serializedEventsToExtract && (
                   <EventsFunctionExtractorDialog
                     project={project}
+                    scope={scope}
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     onClose={() =>

@@ -35,6 +35,11 @@ class GD_CORE_API ParameterMetadata {
   gd::ValueTypeMetadata &GetValueTypeMetadata() { return valueTypeMetadata; }
 
   /**
+   * \brief Return the metadata of the parameter type.
+   */
+  const gd::ValueTypeMetadata &GetValueTypeMetadata() const { return valueTypeMetadata; }
+
+  /**
    * \brief Set the metadata of the parameter type.
    */
   ParameterMetadata &SetValueTypeMetadata(const gd::ValueTypeMetadata &valueTypeMetadata_) {

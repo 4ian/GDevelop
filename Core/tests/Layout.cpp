@@ -17,13 +17,6 @@
 
 using namespace gd;
 
-namespace {
-
-void SetupProject(gd::Project &project, gd::Platform &platform){
-
-};
-} // namespace
-
 TEST_CASE("Layout", "[common]") {
 
   SECTION("Find the type of a behavior in a object") {

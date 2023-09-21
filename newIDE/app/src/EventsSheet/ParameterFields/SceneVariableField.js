@@ -44,7 +44,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainer={layout ? layout.getVariables() : null}
-          onComputeAllVariableNames={onComputeAllVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -62,8 +61,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
         />
-        {editorOpen && layout && (
+        {editorOpen && layout && project && (
           <VariablesEditorDialog
+            project={project}
             title={<Trans>{layout.getName()} variables</Trans>}
             open
             variablesContainer={layout.getVariables()}
@@ -80,6 +80,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             }
             helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
+            preventRefactoringToDeleteInstructions
           />
         )}
       </React.Fragment>

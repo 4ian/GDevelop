@@ -264,6 +264,8 @@ interface Variable {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+    [Ref] Variable ResetPersistentUuid();
+    [Ref] Variable ClearPersistentUuid();
 };
 
 interface VariablesContainer {
@@ -286,6 +288,15 @@ interface VariablesContainer {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+    [Ref] VariablesContainer ResetPersistentUuid();
+    [Ref] VariablesContainer ClearPersistentUuid();
+};
+
+interface VariablesContainersList {
+  [Value] VariablesContainersList STATIC_MakeNewVariablesContainersListForProjectAndLayout(
+        [Const, Ref] Project project,
+        [Const, Ref] Layout layout);
+  [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
 };
 
 interface ObjectGroup {
@@ -547,6 +558,35 @@ interface Project {
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
+interface ObjectsContainersList {
+  [Value] ObjectsContainersList STATIC_MakeNewObjectsContainersListForProjectAndLayout(
+        [Const, Ref] Project project,
+        [Const, Ref] Layout layout);
+  [Value] ObjectsContainersList STATIC_MakeNewObjectsContainersListForContainers(
+        [Const, Ref] ObjectsContainer globalObjectsContainer,
+        [Const, Ref] ObjectsContainer objectsContainer);
+
+  [Const, Value] DOMString GetTypeOfObject([Const] DOMString objectName);
+  [Const, Value] DOMString GetTypeOfBehavior([Const] DOMString name, boolean searchInGroups);
+  [Value] VectorString GetBehaviorsOfObject([Const] DOMString name, boolean searchInGroups);
+  [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
+};
+
+interface ProjectScopedContainers {
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForProjectAndLayout(
+        [Const, Ref] Project project,
+        [Const, Ref] Layout layout);
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
+        [Const, Ref] ObjectsContainer globalObjectsContainer,
+        [Const, Ref] ObjectsContainer objectsContainer);
+
+  [Ref] ProjectScopedContainers AddPropertiesContainer(
+        [Const, Ref] PropertiesContainer propertiesContainer);
+
+  [Const, Ref] ObjectsContainersList GetObjectsContainersList();
+  [Const, Ref] VariablesContainersList GetVariablesContainersList();
+};
+
 interface ExtensionProperties {
     [Const, Ref] DOMString GetValue([Const] DOMString extension, [Const] DOMString property);
     void SetValue([Const] DOMString extension, [Const] DOMString property, [Const] DOMString newValue);
@@ -661,6 +701,8 @@ interface gdObject {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+    [Ref] gdObject ResetPersistentUuid();
+    [Ref] gdObject ClearPersistentUuid();
 };
 
 interface UniquePtrObject {
@@ -2230,8 +2272,8 @@ interface VectorEventsSearchResult {
 };
 
 interface EventsRefactorer {
-    void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
-    void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString name);
+    void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ProjectScopedContainers projectScopedContainers, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
+    void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ProjectScopedContainers projectScopedContainers, [Ref] EventsList events, [Const] DOMString name);
     [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
@@ -2257,7 +2299,18 @@ interface ResourceExposer {
     void STATIC_ExposeWholeProjectResources([Ref] Project project, [Ref] ArbitraryResourceWorker worker);
 };
 
+interface VariablesChangeset {
+    boolean HasRemovedVariables();
+    [Ref] VariablesChangeset ClearRemovedVariables();
+};
+
 interface WholeProjectRefactorer {
+    [Value] VariablesChangeset STATIC_ComputeChangesetForVariablesContainer([Ref] Project project,
+      [Const, Ref] SerializerElement oldSerializedVariablesContainer,
+      [Const, Ref] VariablesContainer newVariablesContainer);
+    void STATIC_ApplyRefactoringForVariablesContainer([Ref] Project project,
+      [Const, Ref] VariablesContainer newVariablesContainer,
+      [Const, Ref] VariablesChangeset changeset);
     void STATIC_RenameEventsFunctionsExtension(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2486,7 +2539,10 @@ interface ExpressionParser2NodeWorker {
 };
 
 interface ExpressionValidator {
-    void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
+    void ExpressionValidator(
+        [Const, Ref] Platform platform,
+        [Const, Ref] ProjectScopedContainers projectScopedContainers,
+        [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetAllErrors();
     [Const, Ref] VectorExpressionParserDiagnostic GetFatalErrors();
@@ -2496,16 +2552,19 @@ interface ExpressionValidator {
 
 enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Object",
-  "ExpressionCompletionDescription::Behavior",
-  "ExpressionCompletionDescription::Expression",
+  "ExpressionCompletionDescription::BehaviorWithPrefix",
+  "ExpressionCompletionDescription::ExpressionWithPrefix",
   "ExpressionCompletionDescription::Variable",
-  "ExpressionCompletionDescription::Text"
+  "ExpressionCompletionDescription::TextWithPrefix",
+  "ExpressionCompletionDescription::Property"
 };
 
 interface ExpressionCompletionDescription {
   ExpressionCompletionDescription_CompletionKind GetCompletionKind();
   [Const, Ref] DOMString GetType();
+  Variable_Type GetVariableType();
   [Const, Ref] DOMString GetPrefix();
+  [Const, Ref] DOMString GetCompletion();
   [Const, Ref] DOMString GetObjectName();
   [Const, Ref] DOMString GetBehaviorName();
   boolean IsExact();
@@ -2513,6 +2572,10 @@ interface ExpressionCompletionDescription {
   unsigned long GetReplacementStartPosition();
   unsigned long GetReplacementEndPosition();
   [Const, Ref] ParameterMetadata GetParameterMetadata();
+  boolean HasObjectConfiguration();
+  [Const, Ref] ObjectConfiguration GetObjectConfiguration();
+
+  [Const, Value] DOMString ToString();
 };
 
 interface VectorExpressionCompletionDescription {
@@ -2521,7 +2584,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ProjectScopedContainers projectScopedContainers, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
@@ -2533,7 +2596,7 @@ interface ExpressionNodeLocationFinder {
 };
 
 interface ExpressionTypeFinder {
-    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node);
+    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainersList objectsContainersList, [Const] DOMString rootType, [Ref] ExpressionNode node);
 };
 
 interface ExpressionNode {
@@ -2595,6 +2658,12 @@ interface EventsFunction {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+enum EventsFunctionsContainer_FunctionOwner {
+    "EventsFunctionsContainer::Extension",
+    "EventsFunctionsContainer::Behavior",
+    "EventsFunctionsContainer::Object"
+};
+
 interface EventsFunctionsContainer {
     [Ref] EventsFunction InsertNewEventsFunction([Const] DOMString name, unsigned long pos);
     [Ref] EventsFunction InsertEventsFunction([Const, Ref] EventsFunction eventsFunction, unsigned long pos);
@@ -2609,7 +2678,7 @@ interface EventsFunctionsContainer {
 
 interface AbstractEventsBasedEntity {
     [Ref] EventsFunctionsContainer GetEventsFunctions();
-    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
+    [Ref] PropertiesContainer GetPropertyDescriptors();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -2629,7 +2698,7 @@ interface EventsBasedBehavior {
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
     boolean IsPrivate();
 
-    [Ref] NamedPropertyDescriptorsList GetSharedPropertyDescriptors();
+    [Ref] PropertiesContainer GetSharedPropertyDescriptors();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
@@ -2706,8 +2775,8 @@ interface EventsBasedObjectsList {
     [Ref] EventsBasedObject at(unsigned long index);
 };
 
-interface NamedPropertyDescriptorsList {
-    void NamedPropertyDescriptorsList();
+interface PropertiesContainer {
+    void PropertiesContainer(EventsFunctionsContainer_FunctionOwner owner);
 
     [Ref] NamedPropertyDescriptor InsertNew([Const] DOMString name, unsigned long pos);
     [Ref] NamedPropertyDescriptor Insert([Const, Ref] NamedPropertyDescriptor item, unsigned long pos);
@@ -2867,11 +2936,11 @@ interface EventsContext {
 };
 
 interface EventsContextAnalyzer {
-    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer);
+    void EventsContextAnalyzer([Const, Ref] Platform platform);
     [Const, Ref] EventsContext GetEventsContext();
 
-    //Inherited from ArbitraryEventsWorker
-    void Launch([Ref] EventsList events);
+    //Inherited from ArbitraryEventsWorkerWithContext
+    void Launch([Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
 
 interface ArbitraryResourceWorker {

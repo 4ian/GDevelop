@@ -1,8 +1,74 @@
 /*!
- * @pixi/filter-twist - v3.1.1
- * Compiled Wed, 08 Apr 2020 11:09:37 UTC
+ * @pixi/filter-twist - v5.1.1
+ * Compiled Thu, 31 Aug 2023 09:18:38 UTC
  *
  * @pixi/filter-twist is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
- */
-var __filters=function(o,n){"use strict";var r="attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}",t="varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform float radius;\nuniform float angle;\nuniform vec2 offset;\nuniform vec4 filterArea;\n\nvec2 mapCoord( vec2 coord )\n{\n    coord *= filterArea.xy;\n    coord += filterArea.zw;\n\n    return coord;\n}\n\nvec2 unmapCoord( vec2 coord )\n{\n    coord -= filterArea.zw;\n    coord /= filterArea.xy;\n\n    return coord;\n}\n\nvec2 twist(vec2 coord)\n{\n    coord -= offset;\n\n    float dist = length(coord);\n\n    if (dist < radius)\n    {\n        float ratioDist = (radius - dist) / radius;\n        float angleMod = ratioDist * ratioDist * angle;\n        float s = sin(angleMod);\n        float c = cos(angleMod);\n        coord = vec2(coord.x * c - coord.y * s, coord.x * s + coord.y * c);\n    }\n\n    coord += offset;\n\n    return coord;\n}\n\nvoid main(void)\n{\n\n    vec2 coord = mapCoord(vTextureCoord);\n\n    coord = twist(coord);\n\n    coord = unmapCoord(coord);\n\n    gl_FragColor = texture2D(uSampler, coord );\n\n}\n",e=function(o){function n(n,e,i){void 0===n&&(n=200),void 0===e&&(e=4),void 0===i&&(i=20),o.call(this,r,t),this.radius=n,this.angle=e,this.padding=i}o&&(n.__proto__=o),n.prototype=Object.create(o&&o.prototype),n.prototype.constructor=n;var e={offset:{configurable:!0},radius:{configurable:!0},angle:{configurable:!0}};return e.offset.get=function(){return this.uniforms.offset},e.offset.set=function(o){this.uniforms.offset=o},e.radius.get=function(){return this.uniforms.radius},e.radius.set=function(o){this.uniforms.radius=o},e.angle.get=function(){return this.uniforms.angle},e.angle.set=function(o){this.uniforms.angle=o},Object.defineProperties(n.prototype,e),n}(n.Filter);return o.TwistFilter=e,o}({},PIXI);Object.assign(PIXI.filters,__filters);
+ */var __filters=function(n,r){"use strict";var i=`attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
+
+uniform mat3 projectionMatrix;
+
+varying vec2 vTextureCoord;
+
+void main(void)
+{
+    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+    vTextureCoord = aTextureCoord;
+}`,s=`varying vec2 vTextureCoord;
+
+uniform sampler2D uSampler;
+uniform float radius;
+uniform float angle;
+uniform vec2 offset;
+uniform vec4 filterArea;
+
+vec2 mapCoord( vec2 coord )
+{
+    coord *= filterArea.xy;
+    coord += filterArea.zw;
+
+    return coord;
+}
+
+vec2 unmapCoord( vec2 coord )
+{
+    coord -= filterArea.zw;
+    coord /= filterArea.xy;
+
+    return coord;
+}
+
+vec2 twist(vec2 coord)
+{
+    coord -= offset;
+
+    float dist = length(coord);
+
+    if (dist < radius)
+    {
+        float ratioDist = (radius - dist) / radius;
+        float angleMod = ratioDist * ratioDist * angle;
+        float s = sin(angleMod);
+        float c = cos(angleMod);
+        coord = vec2(coord.x * c - coord.y * s, coord.x * s + coord.y * c);
+    }
+
+    coord += offset;
+
+    return coord;
+}
+
+void main(void)
+{
+
+    vec2 coord = mapCoord(vTextureCoord);
+
+    coord = twist(coord);
+
+    coord = unmapCoord(coord);
+
+    gl_FragColor = texture2D(uSampler, coord );
+
+}
+`;const e=class extends r.Filter{constructor(o){super(i,s),Object.assign(this,e.defaults,o)}get offset(){return this.uniforms.offset}set offset(o){this.uniforms.offset=o}get radius(){return this.uniforms.radius}set radius(o){this.uniforms.radius=o}get angle(){return this.uniforms.angle}set angle(o){this.uniforms.angle=o}};let t=e;return t.defaults={radius:200,angle:4,padding:20,offset:new r.Point},n.TwistFilter=t,Object.defineProperty(n,"__esModule",{value:!0}),n}({},PIXI);Object.assign(PIXI.filters,__filters);

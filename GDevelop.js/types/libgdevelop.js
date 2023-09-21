@@ -65,6 +65,7 @@ declare class libGDevelop {
   Variable_Type: Class<Variable_Type>;
   Variable: Class<gdVariable>;
   VariablesContainer: Class<gdVariablesContainer>;
+  VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
@@ -72,6 +73,8 @@ declare class libGDevelop {
   Watermark: Class<gdWatermark>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  ObjectsContainersList: Class<gdObjectsContainersList>;
+  ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
@@ -158,6 +161,7 @@ declare class libGDevelop {
   VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
   ProjectBrowserHelper: Class<gdProjectBrowserHelper>;
   ResourceExposer: Class<gdResourceExposer>;
+  VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
@@ -184,13 +188,14 @@ declare class libGDevelop {
   ExpressionParser2: Class<gdExpressionParser2>;
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
+  EventsFunctionsContainer_FunctionOwner: Class<EventsFunctionsContainer_FunctionOwner>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;
   EventsBasedBehavior: Class<gdEventsBasedBehavior>;
   EventsBasedBehaviorsList: Class<gdEventsBasedBehaviorsList>;
   EventsBasedObject: Class<gdEventsBasedObject>;
   EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
-  NamedPropertyDescriptorsList: Class<gdNamedPropertyDescriptorsList>;
+  PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;

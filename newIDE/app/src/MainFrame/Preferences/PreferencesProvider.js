@@ -113,9 +113,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
-      this
-    ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
@@ -261,20 +258,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ];
     if (!tutorialProgresses) return undefined;
     return tutorialProgresses[userIdKey];
-  }
-
-  _setUseUndefinedVariablesInAutocompletion(
-    useUndefinedVariablesInAutocompletion: boolean
-  ) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          useUndefinedVariablesInAutocompletion,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
   }
 
   _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {

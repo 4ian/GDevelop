@@ -15,6 +15,7 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Tools/Localization.h"
 
 namespace gd {
@@ -31,6 +32,10 @@ namespace gd {
  * \brief Find the object name that should be used as a context of the
  * expression or sub-expression that a given node represents.
  *
+ * This is needed because of the legacy convention where a "objectvar"
+ * parameter represents a variable of the object represented by the previous "object"
+ * parameter.
+ *
  * \see gd::ExpressionParser2
  */
 class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWorker {
@@ -41,12 +46,11 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
    * context of the expression or sub-expression that a given node represents.
    */
   static const gd::String GetObjectName(const gd::Platform &platform,
-                      const gd::ObjectsContainer &globalObjectsContainer,
-                      const gd::ObjectsContainer &objectsContainer,
+                      const gd::ObjectsContainersList &objectsContainersList,
                       const gd::String& rootObjectName,
                       gd::ExpressionNode& node) {
     gd::ExpressionVariableOwnerFinder typeFinder(
-        platform, globalObjectsContainer, objectsContainer, rootObjectName);
+        platform, objectsContainersList, rootObjectName);
     node.Visit(typeFinder);
     return typeFinder.GetObjectName();
   }
@@ -55,12 +59,10 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
 
  protected:
   ExpressionVariableOwnerFinder(const gd::Platform &platform_,
-                       const gd::ObjectsContainer &globalObjectsContainer_,
-                       const gd::ObjectsContainer &objectsContainer_,
+                       const gd::ObjectsContainersList &objectsContainersList_,
                        const gd::String& rootObjectName_)
       : platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        objectsContainersList(objectsContainersList_),
         rootObjectName(rootObjectName_),
         objectName(""),
         variableNode(nullptr) {};
@@ -126,9 +128,8 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
     }
     const gd::ParameterMetadata* parameterMetadata =
         MetadataProvider::GetFunctionCallParameterMetadata(
-            platform, 
-            globalObjectsContainer,
-            objectsContainer,
+            platform,
+            objectsContainersList,
             functionCall,
             parameterIndex);
     if (parameterMetadata == nullptr
@@ -142,9 +143,8 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
     for (int previousIndex = parameterIndex - 1; previousIndex >= 0; previousIndex--) {
       const gd::ParameterMetadata* previousParameterMetadata =
           MetadataProvider::GetFunctionCallParameterMetadata(
-              platform, 
-              globalObjectsContainer,
-              objectsContainer,
+              platform,
+              objectsContainersList,
               functionCall,
               previousIndex);
       if (previousParameterMetadata != nullptr
@@ -162,8 +162,7 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
   gd::ExpressionNode *variableNode;
 
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ObjectsContainersList &objectsContainersList;
   const gd::String &rootObjectName;
 };
 

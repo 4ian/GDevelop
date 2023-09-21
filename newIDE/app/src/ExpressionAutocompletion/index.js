@@ -17,9 +17,7 @@ import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMet
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
-import {
-  filterStringListWithPrefix,
-} from '../Utils/ListFiltering';
+import { filterStringListWithPrefix } from '../Utils/ListFiltering';
 
 const gd: libGDevelop = global.gd;
 
@@ -149,14 +147,11 @@ const getAutocompletionsForObjectExpressions = function(
   const type: string = completionDescription.getType();
   const objectName: string = completionDescription.getObjectName();
   const isExact: boolean = completionDescription.isExact();
-  const {
-    gd,
-    projectScopedContainers
-  } = expressionAutocompletionContext;
+  const { gd, projectScopedContainers } = expressionAutocompletionContext;
 
-  const objectType = projectScopedContainers.getObjectsContainersList().getTypeOfObject(
-    objectName
-  );
+  const objectType = projectScopedContainers
+    .getObjectsContainersList()
+    .getTypeOfObject(objectName);
   const objectExpressions = enumerateObjectExpressions(type, objectType);
   const filteredObjectExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(objectExpressions, prefix),
@@ -171,16 +166,13 @@ const getAutocompletionsForObjectExpressions = function(
     type
   );
 
-  const behaviorNames = projectScopedContainers.getObjectsContainersList().getBehaviorsOfObject(
-    objectName,
-    true
-  );
+  const behaviorNames = projectScopedContainers
+    .getObjectsContainersList()
+    .getBehaviorsOfObject(objectName, true);
   mapVector(behaviorNames, behaviorName => {
-    const behaviorType = projectScopedContainers.getObjectsContainersList().getTypeOfBehaviorInObjectOrGroup(
-      objectName,
-      behaviorName,
-      true
-    );
+    const behaviorType = projectScopedContainers
+      .getObjectsContainersList()
+      .getTypeOfBehaviorInObjectOrGroup(objectName, behaviorName, true);
     if (!behaviorType) {
       return;
     }
@@ -223,15 +215,12 @@ const getAutocompletionsForBehaviorExpressions = function(
   const type: string = completionDescription.getType();
   const behaviorName: string = completionDescription.getBehaviorName();
   const isExact: boolean = completionDescription.isExact();
-  const {
-    projectScopedContainers
-  } = expressionAutocompletionContext;
+  const { projectScopedContainers } = expressionAutocompletionContext;
 
   // TODO: could be made more precise with the object name
-  const behaviorType = projectScopedContainers.getObjectsContainersList().getTypeOfBehavior(
-    behaviorName,
-    /* searchInGroups= */ true
-  );
+  const behaviorType = projectScopedContainers
+    .getObjectsContainersList()
+    .getTypeOfBehavior(behaviorName, /* searchInGroups= */ true);
 
   const behaviorExpressions = enumerateBehaviorExpressions(type, behaviorType);
 
@@ -373,22 +362,16 @@ const getAutocompletionsForBehavior = function(
   const isExact: boolean = completionDescription.isExact();
   const objectName: string = completionDescription.getObjectName();
 
-  const {
-    projectScopedContainers,
-  } = expressionAutocompletionContext;
-  return projectScopedContainers.getObjectsContainersList()
-    .getBehaviorsOfObject(
-      objectName,
-      true
-    )
+  const { projectScopedContainers } = expressionAutocompletionContext;
+  return projectScopedContainers
+    .getObjectsContainersList()
+    .getBehaviorsOfObject(objectName, true)
     .toJSArray()
     .filter(behaviorName => behaviorName.indexOf(prefix) !== -1)
     .map(behaviorName => {
-      const behaviorType = projectScopedContainers.getObjectsContainersList().getTypeOfBehaviorInObjectOrGroup(
-        objectName,
-        behaviorName,
-        true
-      );
+      const behaviorType = projectScopedContainers
+        .getObjectsContainersList()
+        .getTypeOfBehaviorInObjectOrGroup(objectName, behaviorName, true);
       return {
         kind: 'Behavior',
         completion: behaviorName,
@@ -411,7 +394,10 @@ export const getAutocompletionsFromDescriptions = (
     mapVector(expressionCompletionDescriptions, completionDescription => {
       const completionKind = completionDescription.getCompletionKind();
 
-      if (completionKind === gd.ExpressionCompletionDescription.ExpressionWithPrefix) {
+      if (
+        completionKind ===
+        gd.ExpressionCompletionDescription.ExpressionWithPrefix
+      ) {
         const objectName: string = completionDescription.getObjectName();
         const behaviorName: string = completionDescription.getBehaviorName();
 
@@ -432,14 +418,20 @@ export const getAutocompletionsFromDescriptions = (
           );
         }
       } else if (completionKind === gd.ExpressionCompletionDescription.Object) {
-        return [{
-          kind: 'Object',
-          completion: completionDescription.getCompletion(),
-          replacementStartPosition: completionDescription.getReplacementStartPosition(),
-          replacementEndPosition: completionDescription.getReplacementEndPosition(),
-          objectConfiguration: completionDescription.hasObjectConfiguration() ? completionDescription.getObjectConfiguration() : null,
-          addDot: !gd.ParameterMetadata.isObject(completionDescription.getType()),
-        }]
+        return [
+          {
+            kind: 'Object',
+            completion: completionDescription.getCompletion(),
+            replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            objectConfiguration: completionDescription.hasObjectConfiguration()
+              ? completionDescription.getObjectConfiguration()
+              : null,
+            addDot: !gd.ParameterMetadata.isObject(
+              completionDescription.getType()
+            ),
+          },
+        ];
       } else if (
         completionKind === gd.ExpressionCompletionDescription.BehaviorWithPrefix
       ) {
@@ -447,7 +439,9 @@ export const getAutocompletionsFromDescriptions = (
           expressionAutocompletionContext,
           completionDescription
         );
-      } else if (completionKind === gd.ExpressionCompletionDescription.TextWithPrefix) {
+      } else if (
+        completionKind === gd.ExpressionCompletionDescription.TextWithPrefix
+      ) {
         return getAutocompletionsForText(
           expressionAutocompletionContext,
           completionDescription
@@ -455,23 +449,27 @@ export const getAutocompletionsFromDescriptions = (
       } else if (
         completionKind === gd.ExpressionCompletionDescription.Variable
       ) {
-        return [{
-          kind: 'Variable',
-          completion: completionDescription.getCompletion(),
-          replacementStartPosition: completionDescription.getReplacementStartPosition(),
-          replacementEndPosition: completionDescription.getReplacementEndPosition(),
-          variableType: completionDescription.getVariableType(),
-        }];
+        return [
+          {
+            kind: 'Variable',
+            completion: completionDescription.getCompletion(),
+            replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            variableType: completionDescription.getVariableType(),
+          },
+        ];
       } else if (
         completionKind === gd.ExpressionCompletionDescription.Property
       ) {
-        return [{
-          kind: 'Property',
-          completion: completionDescription.getCompletion(),
-          replacementStartPosition: completionDescription.getReplacementStartPosition(),
-          replacementEndPosition: completionDescription.getReplacementEndPosition(),
-          propertyType: completionDescription.getType(),
-        }];
+        return [
+          {
+            kind: 'Property',
+            completion: completionDescription.getCompletion(),
+            replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            propertyType: completionDescription.getType(),
+          },
+        ];
       }
 
       return [];

@@ -84,7 +84,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
 
-    if (gd::ParameterMetadata::IsExpression("variable", type)) {
+    if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.name == objectName) {
@@ -110,7 +110,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
         node.identifierName == objectName) {
       hasDoneRenaming = true;
       node.identifierName = objectNewName;
-    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+    } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.identifierName == objectName) {

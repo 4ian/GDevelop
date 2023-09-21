@@ -63,7 +63,23 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
       revision: 0,
     },
     objects: [],
-    layouts: [],
+    layouts: [
+      {
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: '',
+        name: '',
+        objects: [],
+        layers: [],
+        instances: [],
+        behaviorsSharedData: [],
+        stopSoundsOnStartup: false,
+        title: '',
+        variables: [],
+        usedResources: [],
+      },
+    ],
     externalLayouts: [],
     resources: {
       resources: [
@@ -76,7 +92,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
         },
       ],
     },
-    usedResources: [],
+    usedResources: ['base/tests-utils/assets/64x64.jpg'],
     // Used in CustomRuntimeObjects.js
     eventsFunctionsExtensions: [
       {

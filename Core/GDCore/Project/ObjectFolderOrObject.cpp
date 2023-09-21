@@ -58,6 +58,14 @@ void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject) {
       gd::make_unique<ObjectFolderOrObject>(insertedObject, this);
   children.push_back(std::move(objectFolderOrObject));
 }
+void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject,
+                                        std::size_t position) {
+  auto objectFolderOrObject =
+      gd::make_unique<ObjectFolderOrObject>(insertedObject, this);
+  children.insert(
+      position < children.size() ? children.begin() + position : children.end(),
+      std::move(objectFolderOrObject));
+}
 
 ObjectFolderOrObject& ObjectFolderOrObject::InsertNewFolder(
     const gd::String newFolderName, std::size_t position) {

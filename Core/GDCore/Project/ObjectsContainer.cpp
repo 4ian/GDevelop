@@ -108,6 +108,20 @@ gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
   return newlyCreatedObject;
 }
 
+gd::Object& ObjectsContainer::InsertNewObjectInFolder(
+    const gd::Project& project,
+    const gd::String& objectType,
+    const gd::String& name,
+    gd::ObjectFolderOrObject& objectFolderOrObject,
+    std::size_t position) {
+  gd::Object& newlyCreatedObject = *(*(initialObjects.insert(
+      initialObjects.end(), project.CreateObject(objectType, name))));
+
+  objectFolderOrObject.InsertObject(&newlyCreatedObject, position);
+
+  return newlyCreatedObject;
+}
+
 gd::Object& ObjectsContainer::InsertObject(const gd::Object& object,
                                            std::size_t position) {
   gd::Object& newlyCreatedObject = *(*(initialObjects.insert(

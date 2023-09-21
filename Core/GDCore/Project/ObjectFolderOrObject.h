@@ -49,6 +49,7 @@ class GD_CORE_API ObjectFolderOrObject {
   };
 
   void InsertObject(gd::Object* insertedObject);
+  void InsertObject(gd::Object* insertedObject, std::size_t position);
   ObjectFolderOrObject& InsertNewFolder(const gd::String newFolderName,
                                         std::size_t position);
 

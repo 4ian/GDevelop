@@ -39,8 +39,18 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
   return object->GetName() == name;
 }
 
-ObjectFolderOrObject& ObjectFolderOrObject::GetChild(std::size_t index) {
+ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) {
   return *children[index];
+}
+ObjectFolderOrObject& ObjectFolderOrObject::GetChild(const gd::String& name) {
+  for (std::size_t j = 0; j < children.size(); j++) {
+    if (children[j]->IsFolder()) {
+      if (children[j]->GetFolderName() == name) return *children[j];
+    } else {
+      if (children[j]->GetObject().GetName() == name) return *children[j];
+    };
+  }
+  return badObjectFolderOrObject;
 }
 
 void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject) {

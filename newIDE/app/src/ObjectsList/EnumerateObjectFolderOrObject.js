@@ -40,7 +40,7 @@ export const enumerateObjectFolderOrObjects = (
     0,
     containerRootFolder.getChildrenCount(),
     i => {
-      const objectFolderOrObject = containerRootFolder.getChild(i);
+      const objectFolderOrObject = containerRootFolder.getChildAt(i);
       return objectFolderOrObject;
     }
   ).map(
@@ -65,7 +65,7 @@ export const enumerateObjectFolderOrObjects = (
     0,
     projectRootFolder.getChildrenCount(),
     i => {
-      const objectFolderOrObject = projectRootFolder.getChild(i);
+      const objectFolderOrObject = projectRootFolder.getChildAt(i);
       return objectFolderOrObject;
     }
   ).map(

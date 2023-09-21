@@ -19,7 +19,7 @@ namespace gdjs {
       // Obtain the bitmap font to use in the object.
       const bitmapFont = instanceContainer
         .getGame()
-        .getBitmapFontManager()
+        .getBitmapFontManager()!
         .obtainBitmapFont(
           runtimeObject._bitmapFontResourceName,
           runtimeObject._textureAtlasResourceName
@@ -32,7 +32,7 @@ namespace gdjs {
       // Set the object on the scene
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
       // Set the anchor in the center, so that the object rotates around
@@ -60,7 +60,7 @@ namespace gdjs {
       this._object
         .getInstanceContainer()
         .getGame()
-        .getBitmapFontManager()
+        .getBitmapFontManager()!
         .releaseBitmapFont(this._pixiObject.fontName);
 
       this._pixiObject.destroy();
@@ -75,7 +75,7 @@ namespace gdjs {
       const bitmapFont = this._object
         .getInstanceContainer()
         .getGame()
-        .getBitmapFontManager()
+        .getBitmapFontManager()!
         .obtainBitmapFont(
           this._object._bitmapFontResourceName,
           this._object._textureAtlasResourceName
@@ -85,7 +85,7 @@ namespace gdjs {
       this._object
         .getInstanceContainer()
         .getGame()
-        .getBitmapFontManager()
+        .getBitmapFontManager()!
         .releaseBitmapFont(this._pixiObject.fontName);
 
       // Update the font used by the object:
@@ -173,5 +173,12 @@ namespace gdjs {
       return this._pixiObject.textHeight * this.getScale();
     }
   }
-  export const BitmapTextRuntimeObjectRenderer = BitmapTextRuntimeObjectPixiRenderer;
+
+  export type BitmapTextRuntimeObjectRenderer =
+    | BitmapTextRuntimeObjectPixiRenderer
+    | undefined;
+  type BitmapTextRuntimeObjectRendererClass =
+    | typeof BitmapTextRuntimeObjectPixiRenderer
+    | undefined;
+  export const BitmapTextRuntimeObjectRenderer: BitmapTextRuntimeObjectRendererClass = BitmapTextRuntimeObjectPixiRenderer;
 }

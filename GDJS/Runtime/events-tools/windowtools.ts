@@ -19,7 +19,7 @@ namespace gdjs {
         runtimeScene
           .getGame()
           .getRenderer()
-          .setMargins(top, right, bottom, left);
+          ?.setMargins(top, right, bottom, left);
       };
 
       export const setFullScreen = function (
@@ -27,14 +27,14 @@ namespace gdjs {
         enable: boolean,
         keepAspectRatio: boolean
       ) {
-        runtimeScene.getGame().getRenderer().keepAspectRatio(keepAspectRatio);
-        runtimeScene.getGame().getRenderer().setFullScreen(enable);
+        runtimeScene.getGame().getRenderer()?.keepAspectRatio(keepAspectRatio);
+        runtimeScene.getGame().getRenderer()?.setFullScreen(enable);
       };
 
       export const isFullScreen = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
-        return runtimeScene.getGame().getRenderer().isFullScreen();
+        return !!runtimeScene.getGame().getRenderer()?.isFullScreen();
       };
 
       export const setWindowSize = function (
@@ -43,14 +43,14 @@ namespace gdjs {
         height: float,
         updateGameResolution: boolean
       ) {
-        runtimeScene.getGame().getRenderer().setWindowSize(width, height);
+        runtimeScene.getGame().getRenderer()?.setWindowSize(width, height);
         if (updateGameResolution) {
           runtimeScene.getGame().setGameResolutionSize(width, height);
         }
       };
 
       export const centerWindow = function (runtimeScene: gdjs.RuntimeScene) {
-        runtimeScene.getGame().getRenderer().centerWindow();
+        runtimeScene.getGame().getRenderer()?.centerWindow();
       };
 
       export const setGameResolutionSize = function (
@@ -79,13 +79,13 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         title: string
       ) {
-        runtimeScene.getGame().getRenderer().setWindowTitle(title);
+        runtimeScene.getGame().getRenderer()?.setWindowTitle(title);
       };
 
       export const getWindowTitle = function (
         runtimeScene: gdjs.RuntimeScene
       ): string {
-        return runtimeScene.getGame().getRenderer().getWindowTitle();
+        return runtimeScene.getGame().getRenderer()?.getWindowTitle() || '';
       };
 
       export const getWindowInnerWidth = function (): number {
@@ -126,7 +126,7 @@ namespace gdjs {
         url: string,
         runtimeScene: gdjs.RuntimeScene
       ) {
-        return runtimeScene.getGame().getRenderer().openURL(url);
+        runtimeScene.getGame().getRenderer()?.openURL(url);
       };
     }
   }

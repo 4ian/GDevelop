@@ -16,7 +16,7 @@ namespace gdjs {
         this._graphics = new PIXI.Graphics();
         instanceContainer
           .getLayer('')
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(this._graphics, runtimeObject.getZOrder());
       }
 

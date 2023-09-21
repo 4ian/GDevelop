@@ -275,6 +275,7 @@ namespace gdjs {
   }
 
   // Expose the effect manager to the game engine.
-  export const EffectsManager = PixiEffectsManager;
-  export type EffectsManager = PixiEffectsManager;
+  export type EffectsManager = PixiEffectsManager | undefined;
+  type EffectsManagerClass = typeof PixiEffectsManager | undefined;
+  export const EffectsManager: EffectsManagerClass = PixiEffectsManager;
 }

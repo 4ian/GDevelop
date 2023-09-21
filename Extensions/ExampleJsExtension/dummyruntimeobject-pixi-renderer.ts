@@ -32,7 +32,7 @@ namespace gdjs {
       this._text.anchor.y = 0.5;
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._text, runtimeObject.getZOrder());
       this.updatePosition();
     }
@@ -73,6 +73,18 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export const DummyRuntimeObjectRenderer = DummyRuntimeObjectPixiRenderer;
-  export type DummyRuntimeObjectRenderer = DummyRuntimeObjectPixiRenderer;
+  // Note that we export the type and class in a way that mark that they might always be undefined:
+  //  that is to enforce through static typing that all core engine logic is completely independent
+  //  from the renderer.
+  // This is necessary for "server builds" of the game that do not do any rendering,
+  //  and also to keep the codebase flexible by being able to change renderers without having to re-write
+  //  half the logic of every object because some renderers were not fully "pure" rendering but also state
+  //  containers for the object.
+  export type DummyRuntimeObjectRenderer =
+    | DummyRuntimeObjectPixiRenderer
+    | undefined;
+  type DummyRuntimeObjectRendererClass =
+    | typeof DummyRuntimeObjectPixiRenderer
+    | undefined;
+  export const DummyRuntimeObjectRenderer: DummyRuntimeObjectRendererClass = DummyRuntimeObjectPixiRenderer;
 }

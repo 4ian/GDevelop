@@ -10,7 +10,7 @@ namespace gdjs {
         const electronRemote = runtimeScene
           .getGame()
           .getRenderer()
-          .getElectronRemote();
+          ?.getElectronRemote();
         if (electronRemote) {
           return electronRemote.getCurrentWindow();
         }

@@ -300,6 +300,8 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export const BitmapFontManager = gdjs.PixiBitmapFontManager;
-  export type BitmapFontManager = gdjs.PixiBitmapFontManager;
+  export type BitmapFontManager = gdjs.PixiBitmapFontManager | undefined;
+  type BitmapFontManagerClass = typeof PixiBitmapFontManager | undefined;
+  export const BitmapFontManager: BitmapFontManagerClass =
+    gdjs.PixiBitmapFontManager;
 }

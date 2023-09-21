@@ -65,7 +65,7 @@ namespace gdjs {
       if (this._light) {
         instanceContainer
           .getLayer('')
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(
             this.getRendererObject(),
             runtimeObject.getZOrder()
@@ -559,7 +559,11 @@ namespace gdjs {
   }`;
   }
 
-  // @ts-ignore - Register the class to let the engine use it.
-  export const LightRuntimeObjectRenderer = LightRuntimeObjectPixiRenderer;
-  export type LightRuntimeObjectRenderer = LightRuntimeObjectPixiRenderer;
+  export type LightRuntimeObjectRenderer =
+    | LightRuntimeObjectPixiRenderer
+    | undefined;
+  type LightRuntimeObjectRendererClass =
+    | typeof LightRuntimeObjectPixiRenderer
+    | undefined;
+  export const LightRuntimeObjectRenderer: LightRuntimeObjectRendererClass = LightRuntimeObjectPixiRenderer;
 }

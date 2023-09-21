@@ -249,5 +249,9 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
-  export const LoadingScreenRenderer = LoadingScreenPixiRenderer;
+  export type LoadingScreenRenderer = LoadingScreenPixiRenderer | undefined;
+  type LoadingScreenRendererClass =
+    | typeof LoadingScreenPixiRenderer
+    | undefined;
+  export const LoadingScreenRenderer: LoadingScreenRendererClass = LoadingScreenPixiRenderer;
 }

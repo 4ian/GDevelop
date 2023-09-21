@@ -42,7 +42,11 @@ namespace gdjs {
       this._obstaclesManager = gdjs.LightObstaclesManager.getManager(
         runtimeScene
       );
-      this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
+      if (gdjs.LightRuntimeObjectRenderer)
+        this._renderer = new gdjs.LightRuntimeObjectRenderer(
+          this,
+          runtimeScene
+        );
       this._instanceContainer = runtimeScene;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -55,7 +59,7 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     updateFromObjectData(
@@ -67,21 +71,21 @@ namespace gdjs {
       }
       if (oldObjectData.content.color !== newObjectData.content.color) {
         this._color = gdjs.rgbOrHexToRGBColor(newObjectData.content.color);
-        this._renderer.updateColor();
+        if (this._renderer) this._renderer.updateColor();
       }
       if (oldObjectData.content.texture !== newObjectData.content.texture) {
         this._texture = newObjectData.content.texture;
-        this._renderer.updateMesh();
+        if (this._renderer) this._renderer.updateMesh();
       }
       if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
         this._debugMode = newObjectData.content.debugMode;
-        this._renderer.updateDebugMode();
+        if (this._renderer) this._renderer.updateDebugMode();
       }
       return true;
     }
 
     updatePreRender(): void {
-      this._renderer.ensureUpToDate();
+      if (this._renderer) this._renderer.ensureUpToDate();
     }
 
     /**
@@ -97,7 +101,7 @@ namespace gdjs {
      */
     setRadius(radius: number): void {
       this._radius = radius > 0 ? radius : 1;
-      this._renderer.updateRadius();
+      if (this._renderer) this._renderer.updateRadius();
     }
 
     /**
@@ -145,7 +149,7 @@ namespace gdjs {
      */
     setColor(color: string): void {
       this._color = gdjs.rgbOrHexToRGBColor(color);
-      this._renderer.updateColor();
+      if (this._renderer) this._renderer.updateColor();
     }
 
     /**

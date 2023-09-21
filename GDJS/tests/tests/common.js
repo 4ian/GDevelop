@@ -29,7 +29,7 @@ describe('gdjs.evtTools.object.twoListsTest', function() {
 		var map1 = new Hashtable();
 		var map2 = new Hashtable();
 
-		var runtimeScene = new gdjs.RuntimeScene(null);
+		var runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
 		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
@@ -64,7 +64,7 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 	it('should properly pick objects', function(){
 		var map1 = new Hashtable();
 
-		var runtimeScene = new gdjs.RuntimeScene(null);
+		var runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
 		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
@@ -88,7 +88,7 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 
 describe('gdjs.evtTools.object.pickRandomObject', function() {
 	it('should pick only one object', function(){
-		var runtimeScene = new gdjs.RuntimeScene(null);
+		var runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
 		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
@@ -118,7 +118,7 @@ describe('gdjs.evtTools.object.pickRandomObject', function() {
 
 describe('gdjs.evtTools.object.pickOnly', function() {
 	it('picks only the object passed as parameter', function(){
-		var runtimeScene = new gdjs.RuntimeScene(null);
+		var runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
 		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
@@ -154,7 +154,7 @@ describe('gdjs.evtTools.object.pickOnly', function() {
 describe('gdjs.evtTools.object.pickNearestObject', function() {
 	var map1 = new Hashtable();
 
-	var runtimeScene = new gdjs.RuntimeScene(null);
+	var runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
 	var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 	var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 	var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});

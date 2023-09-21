@@ -4,7 +4,7 @@ namespace gdjs {
     export let steamAPI: import('steamworks.js').Client | null = null;
 
     gdjs.registerFirstRuntimeSceneLoadedCallback((runtimeScene) => {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = runtimeScene.getGame().getRenderer()?.getElectronRemote();
       if (!remote) return; // Steamworks is only supported on electron
 
       try {

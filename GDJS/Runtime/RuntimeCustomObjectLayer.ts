@@ -20,7 +20,7 @@ namespace gdjs {
       super(layerData, instanceContainer);
 
       // Let the renderer do its final set up:
-      this._renderer.onCreated();
+      this._renderer?.onCreated();
     }
 
     onGameResolutionResized(

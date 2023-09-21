@@ -1,5 +1,5 @@
 describe('gdjs.RuntimeObject', function() {
-    const runtimeScene = new gdjs.RuntimeScene(null);
+    const runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
     
 	it('benchmark getAABB of rotated vs non rotated objects', function(){
     this.timeout(20000);

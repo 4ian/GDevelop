@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <functional>
 
 namespace gd {
 class String;

@@ -305,9 +305,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         object.setTags(getStringFromTags(selectedObjectTags));
 
-        const objectWithContext: ObjectWithContext = {
-          object,
-          global: false, // A new object is always added to the scene (layout) by default.
+        const objectFolderOrObjectWithContext = {
+          // A new object is always added to the scene (layout) by default.
+          objectFolderOrObject: objectsContainer
+            .getRootFolder()
+            .getObjectChild(name),
+          global: false,
         };
 
         if (treeViewRef.current)
@@ -318,7 +321,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(objectWithContext);
+          scrollToItem(objectFolderOrObjectWithContext);
         }, 100); // A few ms is enough for a new render to be done.
 
         setNewObjectDialogOpen(false);
@@ -326,7 +329,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (onEditObject) {
           onEditObject(object);
           onObjectCreated(object);
-          onObjectFolderOrObjectWithContextSelected(objectWithContext);
+          onObjectFolderOrObjectWithContextSelected(
+            objectFolderOrObjectWithContext
+          );
         }
       },
       [
@@ -348,9 +353,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (treeViewRef.current)
           treeViewRef.current.openItem(sceneObjectsRootFolderId);
 
-        const lastObjectWithContext = {
-          object: objects[objects.length - 1],
-          // Objects are added as scene objects.
+        const lastObject = objects[objects.length - 1];
+        const objectFolderOrObjectWithContext = {
+          // A new object is always added to the scene (layout) by default.
+          objectFolderOrObject: objectsContainer
+            .getRootFolder()
+            .getObjectChild(lastObject.getName()),
           global: false,
         };
 
@@ -359,10 +367,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(lastObjectWithContext);
+          scrollToItem(objectFolderOrObjectWithContext);
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [onObjectCreated, selectedObjectTags]
+      [onObjectCreated, selectedObjectTags, objectsContainer]
     );
 
     const onAddNewObject = React.useCallback(() => {
@@ -451,15 +459,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const addSerializedObjectToObjectsContainer = React.useCallback(
       ({
         objectName,
-        positionObjectName,
+        positionObjectFolderOrObjectWithContext,
         objectType,
-        global,
         serializedObject,
       }: {|
         objectName: string,
-        positionObjectName: string,
+        positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
         objectType: string,
-        global: boolean,
         serializedObject: Object,
       |}): ObjectWithContext => {
         const newName = newNameGenerator(
@@ -470,18 +476,30 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ''
         );
 
+        const {
+          objectFolderOrObject,
+          global,
+        } = positionObjectFolderOrObjectWithContext;
+
+        const positionFolder = objectFolderOrObject.getParent();
+        const positionInFolder = positionFolder.getChildPosition(
+          objectFolderOrObject
+        );
+
         const newObject = global
-          ? project.insertNewObject(
+          ? project.insertNewObjectInFolder(
               project,
               objectType,
               newName,
-              project.getObjectPosition(positionObjectName) + 1
+              positionFolder,
+              positionInFolder + 1
             )
-          : objectsContainer.insertNewObject(
+          : objectsContainer.insertNewObjectInFolder(
               project,
               objectType,
               newName,
-              objectsContainer.getObjectPosition(positionObjectName) + 1
+              positionFolder,
+              positionInFolder + 1
             );
 
         unserializeFromJSObject(
@@ -498,10 +516,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const paste = React.useCallback(
-      (objectWithContext: ObjectWithContext): ?ObjectWithContext => {
-        if (!Clipboard.has(CLIPBOARD_KIND)) return null;
+      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
+        if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
-        const { object: pasteObject, global } = objectWithContext;
         const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
         const copiedObject = SafeExtractor.extractObjectProperty(
           clipboardContent,
@@ -519,16 +536,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const newObjectWithContext = addSerializedObjectToObjectsContainer({
           objectName: name,
-          positionObjectName: pasteObject.getName(),
+          positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
           objectType: type,
           serializedObject: copiedObject,
-          global,
         });
 
         onObjectModified(false);
         if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
-
-        return newObjectWithContext;
       },
       [addSerializedObjectToObjectsContainer, onObjectModified, onObjectPasted]
     );
@@ -557,15 +571,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const newObjectWithContext = addSerializedObjectToObjectsContainer({
           objectName: name,
-          positionObjectName: name,
+          positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
           objectType: type,
           serializedObject,
-          global,
         });
 
-        editName(newObjectWithContext);
+        const newObjectFolderOrObjectWithContext = {
+          objectFolderOrObject: objectFolderOrObject
+            .getParent()
+            .getObjectChild(newObjectWithContext.object.getName()),
+          global,
+        };
+
+        forceUpdateList();
+        editName(newObjectFolderOrObjectWithContext);
       },
-      [addSerializedObjectToObjectsContainer, editName]
+      [addSerializedObjectToObjectsContainer, editName, forceUpdateList]
     );
 
     const rename = React.useCallback(
@@ -579,11 +600,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
 
         const validatedNewName = getValidatedObjectOrGroupName(newName, global);
-        onRenameObjectFolderOrObjectWithContextFinish(item, validatedNewName, doRename => {
-          if (!doRename) return;
+        onRenameObjectFolderOrObjectWithContextFinish(
+          item,
+          validatedNewName,
+          doRename => {
+            if (!doRename) return;
 
-          onObjectModified(false);
-        });
+            onObjectModified(false);
+          }
+        );
       },
       [
         getValidatedObjectOrGroupName,

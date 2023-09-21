@@ -39,6 +39,10 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
   return object->GetName() == name;
 }
 
+ObjectFolderOrObject& ObjectFolderOrObject::GetChild(std::size_t index) {
+  return *children[index];
+}
+
 void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject) {
   auto objectFolderOrObject =
       gd::make_unique<ObjectFolderOrObject>(insertedObject, this);

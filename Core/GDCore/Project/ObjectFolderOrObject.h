@@ -34,6 +34,10 @@ class GD_CORE_API ObjectFolderOrObject {
   bool IsFolder() const { return !folderName.empty(); }
   gd::String GetFolderName() const { return folderName; }
   bool HasObjectNamed(const gd::String& name);
+  size_t GetChildrenCount() const {
+    if (IsFolder()) return children.size();
+    return 0;
+  }
 
   ObjectFolderOrObject& GetParent() {
     if (parent == nullptr) {

@@ -4559,14 +4559,17 @@ Array [
       expect(rootFolder.getFolderName()).toEqual('__ROOT');
       expect(rootFolder.getParent().isFolder()).toBe(true);
       expect(rootFolder.getParent().getFolderName()).toEqual('__NULL');
+      expect(rootFolder.getChildrenCount()).toEqual(0);
     });
 
     test('an object added to the object container is added to the root ObjectFolderOrObject', () => {
       let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
       const rootFolder = layout.getRootFolder();
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(1);
       layout.removeObject('MyObject');
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(false);
+      expect(rootFolder.getChildrenCount()).toEqual(0);
     });
 
     test('a folder can be added to the root folder', () => {
@@ -4576,6 +4579,7 @@ Array [
       subFolder.renameFolder('Players');
       expect(subFolder.getFolderName()).toEqual('Players');
       expect(subFolder.getParent()).toBe(rootFolder);
+      expect(rootFolder.getChildrenCount()).toEqual(1);
     });
 
     test('an ObjectFolderOrObject can be serialized', () => {
@@ -4590,6 +4594,7 @@ Array [
       );
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(3);
 
       const element = new gd.SerializerElement();
       layout.serializeTo(element);
@@ -4604,6 +4609,7 @@ Array [
       const rootFolder2 = layout.getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toEqual(3);
     });
   });
 });

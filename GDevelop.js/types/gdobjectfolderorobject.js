@@ -6,6 +6,7 @@ declare class gdObjectFolderOrObject {
   getFolderName(): string;
   hasObjectNamed(name: string): boolean;
   getChildrenCount(): number;
+  getChild(pos: number): gdObjectFolderOrObject;
   renameFolder(name: string): void;
   getParent(): gdObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): gdObjectFolderOrObject;

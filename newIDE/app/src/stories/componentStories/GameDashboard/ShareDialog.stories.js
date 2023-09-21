@@ -6,7 +6,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 
 import paperDecorator from '../../PaperDecorator';
-import ShareDialog from '../../../GameDashboard/ShareDialog';
+import ShareGameDialog from '../../../GameDashboard/ShareGameDialog';
 import {
   fakeSilverAuthenticatedUser,
   game1,
@@ -14,13 +14,13 @@ import {
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export default {
-  title: 'GameDashboard/ShareDialog',
-  component: ShareDialog,
+  title: 'GameDashboard/ShareGameDialog',
+  component: ShareGameDialog,
   decorators: [muiDecorator, paperDecorator],
 };
 
-export const DefaultShareDialog = () => (
+export const DefaultShareGameDialog = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <ShareDialog game={game1} onClose={action('onClose')} />
+    <ShareGameDialog game={game1} onClose={action('onClose')} />
   </AuthenticatedUserContext.Provider>
 );

@@ -57,7 +57,7 @@ import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
   type PreviewLauncherComponent,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -83,7 +83,7 @@ import PreferencesContext, {
   type InAppTutorialUserProgress,
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
+import { type ExportDialogWithoutExportsProps } from '../ExportAndShare/ShareDialog';
 import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -389,7 +389,7 @@ const MainFrame = (props: Props) => {
     isProjectClosedSoAvoidReloadingExtensions,
     setIsProjectClosedSoAvoidReloadingExtensions,
   ] = React.useState<boolean>(false);
-  const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState<boolean>(false);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
@@ -2848,7 +2848,7 @@ const MainFrame = (props: Props) => {
     onCloseProject: async () => {
       askToCloseProject();
     },
-    onExportGame: React.useCallback(() => openExportDialog(true), []),
+    onExportGame: React.useCallback(() => setShareDialogOpen(true), []),
     onOpenLayout: name => {
       openLayout(name);
     },
@@ -2896,7 +2896,7 @@ const MainFrame = (props: Props) => {
     onSaveProjectAs: saveProjectAs,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
-    onExportProject: () => openExportDialog(true),
+    onExportProject: () => setShareDialogOpen(true),
     onCreateProject: () => setExampleStoreDialogOpen(true),
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
@@ -3046,7 +3046,7 @@ const MainFrame = (props: Props) => {
         canSave={canSave}
         onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
-        exportProject={() => openExportDialog(true)}
+        exportProject={() => setShareDialogOpen(true)}
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -3194,11 +3194,11 @@ const MainFrame = (props: Props) => {
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
       {!!renderExportDialog &&
-        exportDialogOpen &&
+        shareDialogOpen &&
         renderExportDialog({
-          onClose: () => openExportDialog(false),
+          onClose: () => setShareDialogOpen(false),
           onChangeSubscription: () => {
-            openExportDialog(false);
+            setShareDialogOpen(false);
           },
           project: state.currentProject,
           onSaveProject: saveProject,
@@ -3235,7 +3235,7 @@ const MainFrame = (props: Props) => {
           {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openExportDialog(true),
+            onExport: () => setShareDialogOpen(true),
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;

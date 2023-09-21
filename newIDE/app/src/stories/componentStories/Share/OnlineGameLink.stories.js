@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import { OnlineGameLink } from '../../../Export/GenericExporters/OnlineWebExport';
+import { OnlineGameLink } from '../../../ExportAndShare/GenericExporters/OnlineWebExport';
 import {
   completeWebBuild,
   fakeGame,

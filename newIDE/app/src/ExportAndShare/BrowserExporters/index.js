@@ -1,5 +1,5 @@
 // @flow
-import { type Exporter } from '../ExportDialog';
+import { type Exporter } from '../ShareDialog';
 import { browserOnlineCordovaExportPipeline } from './BrowserOnlineCordovaExport';
 import { browserOnlineElectronExportPipeline } from './BrowserOnlineElectronExport';
 import { browserOnlineWebExportPipeline } from './BrowserOnlineWebExport';

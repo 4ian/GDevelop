@@ -3,9 +3,9 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import { type Exporter } from '../../../../Export/ExportDialog';
+import { type Exporter } from '../../../../ExportAndShare/ShareDialog';
 
-import ExportHome from '../../../../Export/ExportDialog/ExportHome';
+import ShareHome from '../../../../ExportAndShare/ShareDialog/ShareHome';
 import { fakeSilverAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
 import GDevelopJsInitializerDecorator, {
   testProject,
@@ -13,8 +13,8 @@ import GDevelopJsInitializerDecorator, {
 import { fakeBrowserOnlineWebExportPipeline } from '../../../../fixtures/TestExporters';
 
 export default {
-  title: 'Export/ExportHome',
-  component: ExportHome,
+  title: 'Export/ShareHome',
+  component: ShareHome,
   decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
 };
 
@@ -28,7 +28,7 @@ const onlineWebExporter: Exporter = {
 
 export const Default = () => {
   return (
-    <ExportHome
+    <ShareHome
       onlineWebExporter={onlineWebExporter}
       setChosenExporterKey={action('chooseExporterKey')}
       setChosenExporterSection={action('chooseExporterSection')}
@@ -46,7 +46,7 @@ export const Default = () => {
 
 export const OnlineWebExportOnly = () => {
   return (
-    <ExportHome
+    <ShareHome
       onlineWebExporter={onlineWebExporter}
       setChosenExporterKey={action('chooseExporterKey')}
       setChosenExporterSection={action('chooseExporterSection')}

@@ -6,7 +6,7 @@ import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { type HotReloaderLog } from '../Export/PreviewLauncher.flow';
+import { type HotReloaderLog } from '../ExportAndShare/PreviewLauncher.flow';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 
 type Props = {|

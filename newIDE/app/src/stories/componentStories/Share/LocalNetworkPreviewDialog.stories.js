@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
-import LocalNetworkPreviewDialog from '../../../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
+import LocalNetworkPreviewDialog from '../../../ExportAndShare/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 
 export default {
   title: 'Export/LocalNetworkPreviewDialog',

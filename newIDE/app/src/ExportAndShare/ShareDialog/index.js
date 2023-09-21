@@ -11,7 +11,7 @@ import { type ExportPipeline } from '../ExportPipeline.flow';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import AlertMessage from '../../UI/AlertMessage';
 import { Tabs } from '../../UI/Tabs';
-import ExportHome from './ExportHome';
+import ShareHome from './ShareHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import TutorialButton from '../../UI/TutorialButton';
@@ -243,7 +243,7 @@ const ExportDialog = ({
           </Trans>
         </AlertMessage>
       ) : chosenExporterSection === 'home' ? (
-        <ExportHome
+        <ShareHome
           onlineWebExporter={onlineWebExporter}
           setChosenExporterKey={setChosenExporterKey}
           setChosenExporterSection={setChosenExporterSection}

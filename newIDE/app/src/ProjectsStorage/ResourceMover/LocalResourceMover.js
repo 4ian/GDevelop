@@ -8,7 +8,7 @@ import LocalFileStorageProvider from '../LocalFileStorageProvider';
 import { moveUrlResourcesToLocalFiles } from '../LocalFileStorageProvider/LocalFileResourceMover';
 import UrlStorageProvider from '../UrlStorageProvider';
 import CloudStorageProvider from '../CloudStorageProvider';
-import LocalFileSystem from '../../Export/LocalExporters/LocalFileSystem';
+import LocalFileSystem from '../../ExportAndShare/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { moveUrlResourcesToCloudProject } from '../CloudStorageProvider/CloudResourceMover';

@@ -6,12 +6,11 @@ import { LineStackLayout } from '../../UI/Layout';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
-import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 
-export type PreviewAndPublishButtonsProps = {|
+export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
   onOpenDebugger: () => void,
   onNetworkPreview: () => void,
@@ -28,8 +27,8 @@ export type PreviewAndPublishButtonsProps = {|
   exportProject: () => void,
 |};
 
-const PreviewAndPublishButtons = React.memo<PreviewAndPublishButtonsProps>(
-  function PreviewAndPublishButtons({
+const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
+  function PreviewAndShareButtons({
     onPreviewWithoutHotReload,
     onNetworkPreview,
     onOpenDebugger,
@@ -40,7 +39,7 @@ const PreviewAndPublishButtons = React.memo<PreviewAndPublishButtonsProps>(
     previewState,
     setPreviewOverride,
     exportProject,
-  }: PreviewAndPublishButtonsProps) {
+  }: PreviewAndShareButtonsProps) {
     const windowWidth = useResponsiveWindowWidth();
     const isMobileScreen = windowWidth === 'small';
 
@@ -137,19 +136,19 @@ const PreviewAndPublishButtons = React.memo<PreviewAndPublishButtonsProps>(
               )
             ) : null
           }
-          id={'toolbar-preview-button'}
+          id="toolbar-preview-button"
           buildMenuTemplate={previewBuildMenuTemplate}
         />
         <ResponsiveRaisedButton
           primary
           onClick={exportProject}
-          icon={<PublishIcon />}
-          label={<Trans>Publish</Trans>}
-          id={'toolbar-publish-button'}
+          label={<Trans>Share</Trans>}
+          // This ID is used for guided lessons, let's keep it stable.
+          id="toolbar-publish-button"
         />
       </LineStackLayout>
     );
   }
 );
 
-export default PreviewAndPublishButtons;
+export default PreviewAndShareButtons;

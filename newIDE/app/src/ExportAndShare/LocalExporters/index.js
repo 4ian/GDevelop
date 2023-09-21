@@ -1,5 +1,5 @@
 // @flow
-import { type Exporter } from '../ExportDialog';
+import { type Exporter } from '../ShareDialog';
 import { localCordovaExportPipeline } from './LocalCordovaExport';
 import { localElectronExportPipeline } from './LocalElectronExport';
 import { localHTML5ExportPipeline } from './LocalHTML5Export';

@@ -2,19 +2,19 @@
 import * as React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
-import ExportDialog from './Export/ExportDialog';
+import ShareDialog from './ExportAndShare/ShareDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for browser only IDE
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
-import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
+import BrowserS3PreviewLauncher from './ExportAndShare/BrowserExporters/BrowserS3PreviewLauncher';
 import {
   browserAutomatedExporters,
   browserManualExporters,
   browserOnlineWebExporter,
-} from './Export/BrowserExporters';
+} from './ExportAndShare/BrowserExporters';
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
@@ -68,7 +68,7 @@ export const create = (authentication: Authentication) => {
                 <BrowserS3PreviewLauncher {...props} ref={ref} />
               )}
               renderExportDialog={props => (
-                <ExportDialog
+                <ShareDialog
                   project={props.project}
                   onSaveProject={props.onSaveProject}
                   onChangeSubscription={props.onChangeSubscription}

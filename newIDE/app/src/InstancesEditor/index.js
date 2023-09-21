@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import panable from '../Utils/PixiSimpleGesture/pan';
+import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
@@ -316,7 +316,7 @@ export default class InstancesEditor extends Component<Props> {
       const cursorY = event.data.global.y || 0;
       this._onMouseMove(cursorX, cursorY);
     });
-    this.backgroundArea.addEventListener('panmove', event =>
+    this.backgroundArea.addEventListener('panmove', (event: PanMoveEvent) =>
       this._onPanMove(
         event.deltaX,
         event.deltaY,

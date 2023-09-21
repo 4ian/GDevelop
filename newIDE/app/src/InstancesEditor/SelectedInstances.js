@@ -1,5 +1,5 @@
 // @flow
-import panable from '../Utils/PixiSimpleGesture/pan';
+import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js-legacy';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
@@ -137,7 +137,7 @@ export default class SelectedInstances {
 
   _makeButton(
     objectButton: PIXI.Graphics,
-    onMove: (event: any) => void,
+    onMove: (event: PanMoveEvent) => void,
     onEnd: () => void,
     cursor: string
   ) {

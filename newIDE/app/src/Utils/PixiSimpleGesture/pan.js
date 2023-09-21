@@ -12,17 +12,8 @@ export default function panable(
   sprite: PIXI.DisplayObject,
   inertia: boolean = false
 ) {
-  function mouseDown(e: PIXI.FederatedPointerEvent) {
-    start(e.data.originalEvent);
-  }
-
-  function touchStart(e: PIXI.FederatedPointerEvent) {
-    if (
-      e.data.originalEvent.targetTouches &&
-      e.data.originalEvent.targetTouches[0]
-    ) {
-      start(e.data.originalEvent.targetTouches[0]);
-    }
+  function pointerDown(e: PIXI.FederatedPointerEvent) {
+    start(e.data.originalEvent.nativeEvent);
   }
 
   function start(t: Touch) {
@@ -40,21 +31,16 @@ export default function panable(
         date: new Date(),
       },
     };
-    sprite.addEventListener('globalmousemove', mouseMove);
-    sprite.addEventListener('globaltouchmove', touchMove);
+    sprite.addEventListener('globalpointermove', pointerMove);
   }
 
-  function mouseMove(e: PIXI.FederatedPointerEvent) {
-    move(e, e.data.originalEvent);
-  }
-
-  function touchMove(e: PIXI.FederatedPointerEvent) {
-    let t = e.data.originalEvent.targetTouches;
-    if (!t || t.length > 1) {
-      end(e, t[0]);
+  function pointerMove(e: PIXI.FederatedPointerEvent) {
+    let touch = e.data.originalEvent.nativeEvent;
+    if (!e.data.isPrimary) {
+      end(e, touch);
       return;
     }
-    move(e, t[0]);
+    move(e, touch);
   }
 
   function move(e: PIXI.FederatedPointerEvent, t: Touch) {
@@ -94,21 +80,12 @@ export default function panable(
     };
   }
 
-  function mouseUp(e: PIXI.FederatedPointerEvent) {
-    end(e, e.data.originalEvent);
-  }
-
-  function touchEnd(e: PIXI.FederatedPointerEvent) {
-    end(
-      e,
-      e.data.originalEvent.changedTouches &&
-        e.data.originalEvent.changedTouches[0]
-    );
+  function pointerUp(e: PIXI.FederatedPointerEvent) {
+    end(e, e.data.originalEvent.nativeEvent);
   }
 
   function end(e: PIXI.FederatedPointerEvent, t: Touch) {
-    sprite.removeEventListener('globalmousemove', mouseMove);
-    sprite.removeEventListener('globaltouchmove', touchMove);
+    sprite.removeEventListener('globalpointermove', pointerMove);
     if (!sprite._pan || !sprite._pan.pp) {
       sprite._pan = null;
       return;
@@ -143,10 +120,7 @@ export default function panable(
   }
 
   sprite.eventMode = 'static';
-  sprite.addEventListener('mousedown', mouseDown);
-  sprite.addEventListener('touchstart', touchStart);
-  sprite.addEventListener('mouseup', mouseUp);
-  sprite.addEventListener('mouseupoutside', mouseUp);
-  sprite.addEventListener('touchend', touchEnd);
-  sprite.addEventListener('touchendoutside', touchEnd);
+  sprite.addEventListener('pointerdown', pointerDown);
+  sprite.addEventListener('pointerup', pointerUp);
+  sprite.addEventListener('pointerupoutside', pointerUp);
 }

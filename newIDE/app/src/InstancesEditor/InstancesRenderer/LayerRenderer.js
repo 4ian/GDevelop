@@ -1,5 +1,5 @@
 // @flow
-import panable from '../../Utils/PixiSimpleGesture/pan';
+import panable, { type PanMoveEvent } from '../../Utils/PixiSimpleGesture/pan';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import RenderedInstance from '../../ObjectsRendering/Renderers/RenderedInstance';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -428,13 +428,16 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.addEventListener('mouseout', () => {
         this.onOutInstance(instance);
       });
-      renderedInstance._pixiObject.addEventListener('panmove', event => {
-        if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
-          return null;
-        }
+      renderedInstance._pixiObject.addEventListener(
+        'panmove',
+        (event: PanMoveEvent) => {
+          if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+            return null;
+          }
 
-        this.onMoveInstance(instance, event.deltaX, event.deltaY);
-      });
+          this.onMoveInstance(instance, event.deltaX, event.deltaY);
+        }
+      );
       renderedInstance._pixiObject.addEventListener('panend', event => {
         this.onMoveInstanceEnd();
       });

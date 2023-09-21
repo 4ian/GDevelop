@@ -193,8 +193,9 @@ export default class InstancesEditor extends Component<Props> {
         preserveDrawingBuffer: true,
         antialias: false,
         backgroundAlpha: 0,
-        // It's the default mode of Pixi 6.
-        eventMode: 'passive',
+        // It's the default value, but it's better to make it explicit.
+        // It allows instances composed of several pixi objects to detect hovering.
+        eventMode: 'auto',
         // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
       });
 

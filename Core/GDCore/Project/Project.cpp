@@ -844,6 +844,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   if (element.HasChild("folderStructure")) {
     UnserializeFoldersFrom(*this, element.GetChild("folderStructure", 0));
   }
+  AddMissingObjectsInRootFolder();
 
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 

@@ -42,6 +42,7 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   if (element.HasChild("folderStructure")) {
     UnserializeFoldersFrom(project, element.GetChild("folderStructure", 0));
   }
+  AddMissingObjectsInRootFolder();
 }
 
 }  // namespace gd

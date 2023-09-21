@@ -4716,7 +4716,7 @@ Array [
       expect(rootFolder.getChildrenCount()).toEqual(1);
     });
 
-    test('an ObjectFolderOrObject can be serialized', () => {
+    test('an ObjectFolderOrObject can be serialized and unserialized', () => {
       const rootFolder = layout.getRootFolder();
       const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
       const subFolder = rootFolder.insertNewFolder('Enemies', 1);
@@ -4744,6 +4744,43 @@ Array [
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);
+    });
+
+    test('an ObjectFolderOrObject can be serialized and unserialized and missing object folders or objects are added', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        1
+      );
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(3);
+
+      const element = new gd.SerializerElement();
+      layout.serializeTo(element);
+
+      const layoutObject = JSON.parse(gd.Serializer.toJSON(element));
+      delete layoutObject.folderStructure;
+      console.log(layoutObject);
+
+      project.removeLayout('Scene');
+
+      const layout2 = project.insertNewLayout('Scene2', 0);
+      layout2.unserializeFrom(
+        project,
+        gd.Serializer.fromJSObject(layoutObject)
+      );
+
+      expect(layout2.hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getRootFolder();
+      expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toEqual(2);
     });
   });
 });

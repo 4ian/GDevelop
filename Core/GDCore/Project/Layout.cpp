@@ -357,6 +357,7 @@ void Layout::UnserializeFrom(gd::Project& project,
   if (element.HasChild("folderStructure")) {
     UnserializeFoldersFrom(project, element.GetChild("folderStructure", 0));
   }
+  AddMissingObjectsInRootFolder();
 
   initialInstances.UnserializeFrom(
       element.GetChild("instances", 0, "Positions"));

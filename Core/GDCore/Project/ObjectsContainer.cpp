@@ -36,6 +36,14 @@ void ObjectsContainer::UnserializeFoldersFrom(
   rootFolder->UnserializeFrom(project, element, *this);
 }
 
+void ObjectsContainer::AddMissingObjectsInRootFolder() {
+  for (std::size_t i = 0; i < initialObjects.size(); ++i) {
+    if (!rootFolder->HasObjectNamed(initialObjects[i]->GetName())) {
+      rootFolder->InsertObject(&(*initialObjects[i]));
+    }
+  }
+}
+
 void ObjectsContainer::UnserializeObjectsFrom(
     gd::Project& project, const SerializerElement& element) {
   initialObjects.clear();

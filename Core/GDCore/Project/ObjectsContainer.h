@@ -153,6 +153,8 @@ class GD_CORE_API ObjectsContainer {
       return *rootFolder;
   }
 
+  void AddMissingObjectsInRootFolder();
+
   /** \name Saving and loading
    * Members functions related to saving and loading the objects of the class.
    */

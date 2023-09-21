@@ -162,4 +162,11 @@ void ObjectGroupsContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
   objectGroups.insert(objectGroups.begin() + newIndex, std::move(objectGroup));
 }
 
+void ObjectGroupsContainer::ForEachNameWithPrefix(const gd::String& prefix,
+                                                std::function<void(const gd::String& name)> fn) const {
+  for (const auto& objectGroup: objectGroups) {
+    if (objectGroup->GetName().find(prefix) == 0) fn(objectGroup->GetName());
+  }
+}
+
 }  // namespace gd

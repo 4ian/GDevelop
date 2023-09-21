@@ -56,6 +56,7 @@ export const insertInVariablesContainer = (
   const newVariable = new gd.Variable();
   if (serializedVariable) {
     unserializeFromJSObject(newVariable, serializedVariable);
+    newVariable.resetPersistentUuid();
   } else {
     newVariable.setString('');
   }
@@ -75,6 +76,7 @@ export const insertInVariableChildrenArray = (
 ) => {
   const newVariable = new gd.Variable();
   unserializeFromJSObject(newVariable, serializedVariable);
+  newVariable.resetPersistentUuid();
   targetParentVariable.insertAtIndex(newVariable, index);
   newVariable.delete();
 };
@@ -91,6 +93,7 @@ export const insertInVariableChildren = (
   );
   const newVariable = new gd.Variable();
   unserializeFromJSObject(newVariable, serializedVariable);
+  newVariable.resetPersistentUuid();
   targetParentVariable.insertChild(newName, newVariable);
   newVariable.delete();
   return newName;

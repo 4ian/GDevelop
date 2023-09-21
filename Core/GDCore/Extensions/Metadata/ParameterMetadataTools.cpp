@@ -8,6 +8,7 @@
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include "InstructionMetadata.h"
@@ -105,8 +106,7 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
 
 void ParameterMetadataTools::IterateOverParametersWithIndex(
     const gd::Platform &platform,
-    const gd::ObjectsContainer &globalObjectsContainer,
-    const gd::ObjectsContainer &objectsContainer, FunctionCallNode &node,
+    const gd::ObjectsContainersList &objectsContainersList, FunctionCallNode &node,
     std::function<void(const gd::ParameterMetadata &parameterMetadata,
                        std::unique_ptr<gd::ExpressionNode> &parameterNode,
                        size_t parameterIndex, const gd::String &lastObjectName)>
@@ -117,8 +117,7 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
   const gd::ExpressionMetadata &metadata =
       isObjectFunction ? MetadataProvider::GetObjectAnyExpressionMetadata(
                              platform,
-                             GetTypeOfObject(globalObjectsContainer,
-                                             objectsContainer, node.objectName),
+                             objectsContainersList.GetTypeOfObject(node.objectName),
                              node.functionName)
                        : MetadataProvider::GetAnyExpressionMetadata(
                              platform, node.functionName);

@@ -1123,7 +1123,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     globalObjectsContainer={this._globalObjectsContainer}
                     objectsContainer={this._objectsContainer}
                     onConfigurationUpdated={this._onConfigurationUpdated}
-                    // TODO EBO prepare a page
                     helpPagePath={
                       selectedEventsBasedObject
                         ? '/behaviors/events-based-objects'
@@ -1179,6 +1178,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 ref={editor => (this.editor = editor)}
                 project={project}
                 scope={{
+                  project,
                   layout: null,
                   externalEvents: null,
                   eventsFunctionsExtension,

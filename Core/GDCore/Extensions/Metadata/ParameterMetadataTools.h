@@ -13,6 +13,7 @@ namespace gd {
 class Platform;
 class Project;
 class ObjectsContainer;
+class ObjectsContainersList;
 class ParameterMetadata;
 class Expression;
 struct FunctionCallNode;
@@ -59,8 +60,7 @@ class GD_CORE_API ParameterMetadataTools {
    */
   static void IterateOverParametersWithIndex(
       const gd::Platform &platform,
-      const gd::ObjectsContainer &globalObjectsContainer,
-      const gd::ObjectsContainer &objectsContainer, FunctionCallNode &node,
+      const gd::ObjectsContainersList &objectsContainersList, FunctionCallNode &node,
       std::function<void(const gd::ParameterMetadata &parameterMetadata,
                          std::unique_ptr<gd::ExpressionNode> &parameterNode,
                          size_t parameterIndex,

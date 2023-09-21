@@ -21,6 +21,7 @@
 namespace gd {
 class Expression;
 class ObjectsContainer;
+class ObjectsContainersList;
 class Platform;
 class ParameterMetadata;
 class ExpressionMetadata;
@@ -31,7 +32,7 @@ namespace gd {
 /**
  * \brief Find the type of the expression or sub-expression that a given node
  * represents.
- * 
+ *
  * The type returned by this worker is a mix of:
  * - an expected type looking up like a parameter declaration
  * - an actual type looking down, but only looking at the most left branch
@@ -50,12 +51,11 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
    * sub-expression that a given node represents.
    */
   static const gd::String GetType(const gd::Platform &platform,
-                      const gd::ObjectsContainer &globalObjectsContainer,
-                      const gd::ObjectsContainer &objectsContainer,
+                      const gd::ObjectsContainersList &objectsContainersList,
                       const gd::String &rootType,
                       gd::ExpressionNode& node) {
     gd::ExpressionTypeFinder typeFinder(
-        platform, globalObjectsContainer, objectsContainer, rootType);
+        platform, objectsContainersList, rootType);
     node.Visit(typeFinder);
     return typeFinder.GetType();
   }
@@ -64,12 +64,10 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
 
  protected:
   ExpressionTypeFinder(const gd::Platform &platform_,
-                       const gd::ObjectsContainer &globalObjectsContainer_,
-                       const gd::ObjectsContainer &objectsContainer_,
+                       const gd::ObjectsContainersList &objectsContainersList_,
                        const gd::String &rootType_)
       : platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        objectsContainersList(objectsContainersList_),
         rootType(rootType_),
         type(ExpressionTypeFinder::unknownType),
         child(nullptr) {};
@@ -114,9 +112,8 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       type = ExpressionTypeFinder::unknownType;
     }
     auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
-        platform, 
-        globalObjectsContainer,
-        objectsContainer,
+        platform,
+        objectsContainersList,
         node);
     if (leftSideType == ExpressionTypeFinder::numberType
      || leftSideType == ExpressionTypeFinder::stringType) {
@@ -129,7 +126,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (child == nullptr) {
       const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
-          platform, globalObjectsContainer, objectsContainer, node);
+          platform, objectsContainersList, node);
       if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
         VisitParent(node);
       }
@@ -141,8 +138,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       const gd::ParameterMetadata* parameterMetadata =
           gd::MetadataProvider::GetFunctionCallParameterMetadata(
               platform,
-              globalObjectsContainer,
-              objectsContainer,
+              objectsContainersList,
               node,
               *child);
       if (parameterMetadata == nullptr || parameterMetadata->GetType().empty()) {
@@ -162,9 +158,8 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     }
     else if (rootType == ExpressionTypeFinder::numberOrStringType) {
       auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
-          platform, 
-          globalObjectsContainer,
-          objectsContainer,
+          platform,
+          objectsContainersList,
           node);
       if (leftSideType == ExpressionTypeFinder::numberType
        || leftSideType == ExpressionTypeFinder::stringType) {
@@ -188,8 +183,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   ExpressionNode *child;
 
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ObjectsContainersList &objectsContainersList;
   const gd::String rootType;
 };
 

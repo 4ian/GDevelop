@@ -132,6 +132,24 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
+   * \brief Return true if the type is a variable but from a specific scope
+   * (scene, project or object). In new code, prefer to use the more generic "variable"
+   * parameter (which accepts any variable coming from an object or from containers in the scope).
+   */
+  bool IsLegacyPreScopedVariable() const {
+    return gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(name);
+  }
+
+  /**
+   * \brief Return true if the type is a variable but from a specific scope
+   * (scene, project or object). In new code, prefer to use the more generic "variable"
+   * parameter (which accepts any variable coming from an object or from containers in the scope).
+   */
+  static bool IsTypeLegacyPreScopedVariable(const gd::String &type) {
+    return type == "scenevar" || type == "globalvar" || type == "objectvar";
+  }
+
+  /**
    * \brief Return true if the type is representing one object
    * (or more, i.e: an object group).
    */
@@ -176,7 +194,10 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "leaderboardId" ||
              parameterType == "identifier";
     } else if (type == "variable") {
-      return parameterType == "objectvar" || parameterType == "globalvar" ||
+      return
+             parameterType == "variable" || // Any variable.
+             // Old, "pre-scoped" variables:
+             parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";
     } else if (type == "resource") {
       return parameterType == "fontResource" ||
@@ -196,7 +217,7 @@ class GD_CORE_API ValueTypeMetadata {
    * \brief Return the expression type from the parameter type.
    * Declinations of "number" and "string" types (like "forceMultiplier" or
    * "sceneName") are replaced by "number" and "string".
-   * 
+   *
    * \note It only maps string and number types.
    */
   static const gd::String &GetExpressionPrimitiveValueType(const gd::String &parameterType);
@@ -205,7 +226,7 @@ class GD_CORE_API ValueTypeMetadata {
    * \brief Return the primitive type from the parameter type.
    * Declinations of "number" and "string" types (like "forceMultiplier" or
    * "sceneName") are replaced by "number" and "string".
-   * 
+   *
    * \note It also maps variable and boolean types.
    */
   static const gd::String &GetPrimitiveValueType(const gd::String &parameterType);

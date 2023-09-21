@@ -60,7 +60,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT WIN32 AND CMAKE_COMPILER_IS_
 endif()
 
 #Activate C++11
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11) # Upgrading to C++17 would need to remove usage of bind2nd (should be easy).
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Mark some warnings as errors
@@ -77,7 +77,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-unused-private-field
 
 		# Make as much warnings considered as errors as possible (only one for now).
-		-Werror=return-stack-address)
+		-Werror=return-stack-address
+		-Werror=return-type)
 endif()
 
 # Define common directories:

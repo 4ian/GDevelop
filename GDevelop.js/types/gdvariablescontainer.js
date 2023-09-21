@@ -17,6 +17,8 @@ declare class gdVariablesContainer {
   removeRecursively(variableToRemove: gdVariable): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
+  resetPersistentUuid(): gdVariablesContainer;
+  clearPersistentUuid(): gdVariablesContainer;
   delete(): void;
   ptr: number;
 };

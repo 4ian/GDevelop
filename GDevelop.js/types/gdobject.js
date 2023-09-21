@@ -22,6 +22,8 @@ declare class gdObject {
   renameBehavior(oldName: string, name: string): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
+  resetPersistentUuid(): gdObject;
+  clearPersistentUuid(): gdObject;
   delete(): void;
   ptr: number;
 };

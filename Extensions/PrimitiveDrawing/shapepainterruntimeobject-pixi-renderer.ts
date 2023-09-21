@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
@@ -493,7 +491,7 @@ namespace gdjs {
     updateAntialiasing(): void {
       if (this._object.getAntialiasing() !== 'none') {
         if (!this._antialiasingFilter) {
-          this._antialiasingFilter = new PIXI.filters.FXAAFilter();
+          this._antialiasingFilter = new PIXI.FXAAFilter();
         }
 
         const antialiasingFilter = this._antialiasingFilter;

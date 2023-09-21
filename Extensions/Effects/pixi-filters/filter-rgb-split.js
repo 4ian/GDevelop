@@ -1,8 +1,35 @@
 /*!
- * @pixi/filter-rgb-split - v3.1.1
- * Compiled Wed, 08 Apr 2020 11:09:37 UTC
+ * @pixi/filter-rgb-split - v5.1.1
+ * Compiled Thu, 31 Aug 2023 09:18:38 UTC
  *
  * @pixi/filter-rgb-split is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
- */
-var __filters=function(e,r){"use strict";var t="attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}",n="precision mediump float;\n\nvarying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\nuniform vec2 red;\nuniform vec2 green;\nuniform vec2 blue;\n\nvoid main(void)\n{\n   gl_FragColor.r = texture2D(uSampler, vTextureCoord + red/filterArea.xy).r;\n   gl_FragColor.g = texture2D(uSampler, vTextureCoord + green/filterArea.xy).g;\n   gl_FragColor.b = texture2D(uSampler, vTextureCoord + blue/filterArea.xy).b;\n   gl_FragColor.a = texture2D(uSampler, vTextureCoord).a;\n}\n",o=function(e){function r(r,o,i){void 0===r&&(r=[-10,0]),void 0===o&&(o=[0,10]),void 0===i&&(i=[0,0]),e.call(this,t,n),this.red=r,this.green=o,this.blue=i}e&&(r.__proto__=e),r.prototype=Object.create(e&&e.prototype),r.prototype.constructor=r;var o={red:{configurable:!0},green:{configurable:!0},blue:{configurable:!0}};return o.red.get=function(){return this.uniforms.red},o.red.set=function(e){this.uniforms.red=e},o.green.get=function(){return this.uniforms.green},o.green.set=function(e){this.uniforms.green=e},o.blue.get=function(){return this.uniforms.blue},o.blue.set=function(e){this.uniforms.blue=e},Object.defineProperties(r.prototype,o),r}(r.Filter);return e.RGBSplitFilter=o,e}({},PIXI);Object.assign(PIXI.filters,__filters);
+ */var __filters=function(r,t){"use strict";var n=`attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
+
+uniform mat3 projectionMatrix;
+
+varying vec2 vTextureCoord;
+
+void main(void)
+{
+    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+    vTextureCoord = aTextureCoord;
+}`,i=`precision mediump float;
+
+varying vec2 vTextureCoord;
+
+uniform sampler2D uSampler;
+uniform vec4 filterArea;
+uniform vec2 red;
+uniform vec2 green;
+uniform vec2 blue;
+
+void main(void)
+{
+   gl_FragColor.r = texture2D(uSampler, vTextureCoord + red/filterArea.xy).r;
+   gl_FragColor.g = texture2D(uSampler, vTextureCoord + green/filterArea.xy).g;
+   gl_FragColor.b = texture2D(uSampler, vTextureCoord + blue/filterArea.xy).b;
+   gl_FragColor.a = texture2D(uSampler, vTextureCoord).a;
+}
+`;class o extends t.Filter{constructor(e=[-10,0],u=[0,10],a=[0,0]){super(n,i),this.red=e,this.green=u,this.blue=a}get red(){return this.uniforms.red}set red(e){this.uniforms.red=e}get green(){return this.uniforms.green}set green(e){this.uniforms.green=e}get blue(){return this.uniforms.blue}set blue(e){this.uniforms.blue=e}}return r.RGBSplitFilter=o,Object.defineProperty(r,"__esModule",{value:!0}),r}({},PIXI);Object.assign(PIXI.filters,__filters);

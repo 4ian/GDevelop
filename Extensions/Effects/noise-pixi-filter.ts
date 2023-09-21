@@ -1,16 +1,14 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Noise',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target, effectData) {
-        const noiseFilter = new PIXI.filters.NoiseFilter();
+        const noiseFilter = new PIXI.NoiseFilter();
         return noiseFilter;
       }
       updatePreRender(filter, target) {}
       updateDoubleParameter(filter, parameterName, value) {
-        // @ts-ignore - unsure why PIXI.filters is not recognised.
-        const noiseFilter = (filter as unknown) as PIXI.filters.NoiseFilter;
+        const noiseFilter = (filter as unknown) as PIXI.NoiseFilter;
         if (parameterName !== 'noise') {
           return;
         }

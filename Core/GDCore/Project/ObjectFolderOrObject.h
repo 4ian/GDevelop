@@ -38,7 +38,8 @@ class GD_CORE_API ObjectFolderOrObject {
     if (IsFolder()) return children.size();
     return 0;
   }
-  ObjectFolderOrObject& GetChild(std::size_t index);
+  ObjectFolderOrObject& GetChildAt(std::size_t index);
+  ObjectFolderOrObject& GetChild(const gd::String& name);
 
   ObjectFolderOrObject& GetParent() {
     if (parent == nullptr) {

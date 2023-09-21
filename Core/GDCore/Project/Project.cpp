@@ -125,7 +125,7 @@ Project::CreateObject(const gd::String &objectType, const gd::String &name) cons
     }
   }
 
-  
+
   return std::move(object);
 }
 
@@ -849,6 +849,10 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   resourcesManager.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
   UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
+  if (element.HasChild("folderStructure")) {
+    UnserializeFoldersFrom(*this, element.GetChild("folderStructure", 0));
+  }
+
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
   scenes.clear();
@@ -1000,6 +1004,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   resourcesManager.SerializeTo(element.AddChild("resources"));
   SerializeObjectsTo(element.AddChild("objects"));
+  SerializeFoldersTo(element.AddChild("folderStructure"));
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
 

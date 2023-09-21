@@ -306,7 +306,7 @@ const void SetupEvents(gd::EventsList &eventList) {
       action.SetParameter(
           0,
           gd::Expression(
-              "ObjectWithMyBehavior.GetObjectNumber() + ObjectWithMyBehavior.MyVariable"));
+              "ObjectWithMyBehavior.GetObjectNumber() + ObjectWithMyBehavior.MyVariable + ObjectWithMyBehavior.MyStructureVariable.Child"));
       event.GetActions().Insert(action);
       eventList.InsertEvent(event);
     }
@@ -1073,6 +1073,7 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         project, "MyExtension::Sprite", "ObjectWithMyBehavior", 0);
     childObject.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
     childObject.GetVariables().InsertNew("MyVariable");
+    childObject.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
     auto &group = eventsBasedObject.GetObjectGroups().InsertNew("GroupWithMyBehavior");
     group.AddObject(childObject.GetName());
 
@@ -1160,6 +1161,7 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
                                           "ObjectWithMyBehavior", 0);
     object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
     object.GetVariables().InsertNew("MyVariable");
+    object.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
     auto &group = layout.GetObjectGroups().InsertNew("GroupWithMyBehavior", 0);
     group.AddObject("ObjectWithMyBehavior");
 
@@ -1464,7 +1466,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         // Check object name has been renamed in expressions and in object variables.
         REQUIRE(GetEventFirstActionFirstParameterString(
                     eventsList->GetEvent(FreeFunctionWithObjectExpression)) ==
-                "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable");
+                "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
       }
     }
   }
@@ -1575,7 +1577,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       // Simulate a variable in ObjectWithMyBehavior, even if this is not
       // supported by the editor.
-      objectsContainer.GetObject("ObjectWithMyBehavior").GetVariables().InsertNew("MyVariable");
+      auto& objectWithMyBehavior = objectsContainer.GetObject("ObjectWithMyBehavior");
+      objectWithMyBehavior.GetVariables().InsertNew("MyVariable");
+      objectWithMyBehavior.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
 
       // Trigger the refactoring after the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
@@ -1593,7 +1597,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionFirstParameterString(
                   eventsFunction.GetEvents().GetEvent(
                       FreeFunctionWithObjectExpression)) ==
-              "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable");
+              "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
     }
   }
 
@@ -1631,7 +1635,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Check object name has been renamed in expressions and object variables.
     REQUIRE(GetEventFirstActionFirstParameterString(
                 objectFunctionEvents.GetEvent(FreeFunctionWithObjectExpression)) ==
-              "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable");
+              "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
   }
 
   SECTION("Object deleted (in events function)") {

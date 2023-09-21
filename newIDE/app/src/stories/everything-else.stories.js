@@ -2154,6 +2154,7 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
   .add('default', () => (
     <EventsFunctionExtractorDialog
       project={testProject.project}
+      scope={{ project: testProject.project, layout: testProject.testLayout }}
       globalObjectsContainer={testProject.project}
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEvents}
@@ -2164,6 +2165,7 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
   .add('with a lot of parameters', () => (
     <EventsFunctionExtractorDialog
       project={testProject.project}
+      scope={{ project: testProject.project, layout: testProject.testLayout }}
       globalObjectsContainer={testProject.project}
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEventsWithLotsOfObjects}

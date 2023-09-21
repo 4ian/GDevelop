@@ -70,7 +70,8 @@ class GD_CORE_API ExpressionFunctionRenamer
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    // Nothing to do as this is either a variable or an object variable.
+    // Nothing to do as this is either a variable, an object variable a property or something else
+    // but not an expression.
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     if (!node.behaviorFunctionName.empty()) {

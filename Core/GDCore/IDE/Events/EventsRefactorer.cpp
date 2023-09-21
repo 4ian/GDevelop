@@ -88,9 +88,17 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.name == objectName) {
-        // This is an object variable.
-        hasDoneRenaming = true;
-        node.name = objectNewName;
+        projectScopedContainers.MatchIdentifierWithName<void>(node.name, [&]() {
+          // This is an object variable.
+          hasDoneRenaming = true;
+          node.name = objectNewName;
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+        }, [&]() {
+          // This is something else.
+        });
       }
     }
 
@@ -114,9 +122,17 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.identifierName == objectName) {
-        // This is an object variable.
-        hasDoneRenaming = true;
-        node.identifierName = objectNewName;
+        projectScopedContainers.MatchIdentifierWithName<void>(node.identifierName, [&]() {
+          // This is an object variable.
+          hasDoneRenaming = true;
+          node.identifierName = objectNewName;
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+        }, [&]() {
+          // This is something else.
+        });
       }
     }
   }
@@ -200,12 +216,20 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
 
-    if (gd::ParameterMetadata::IsExpression("variable", type)) {
+    if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.name == searchedObjectName) {
-        // This is an object variable.
-        hasObject = true;
+        projectScopedContainers.MatchIdentifierWithName<void>(node.name, [&]() {
+          // This is an object variable.
+          hasObject = true;
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+        }, [&]() {
+          // This is something else.
+        });
       }
     }
 
@@ -224,12 +248,20 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == searchedObjectName) {
       hasObject = true;
-    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+    } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.identifierName == searchedObjectName) {
-        // This is an object variable.
-        hasObject = true;
+        projectScopedContainers.MatchIdentifierWithName<void>(node.identifierName, [&]() {
+          // This is an object variable.
+          hasObject = true;
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+        }, [&]() {
+          // This is something else.
+        });
       }
     }
   }

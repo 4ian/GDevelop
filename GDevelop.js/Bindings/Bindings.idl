@@ -2936,11 +2936,11 @@ interface EventsContext {
 };
 
 interface EventsContextAnalyzer {
-    void EventsContextAnalyzer([Const, Ref] Platform platform, [Ref] ObjectsContainersList objectsContainerList);
+    void EventsContextAnalyzer([Const, Ref] Platform platform);
     [Const, Ref] EventsContext GetEventsContext();
 
-    //Inherited from ArbitraryEventsWorker
-    void Launch([Ref] EventsList events);
+    //Inherited from ArbitraryEventsWorkerWithContext
+    void Launch([Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
 
 interface ArbitraryResourceWorker {

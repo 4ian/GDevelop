@@ -25,10 +25,12 @@ import { EventsFunctionParametersEditor } from '../../EventsFunctionsExtensionEd
 import EventsFunctionPropertiesEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   serializedEvents: Object,
@@ -57,6 +59,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
   componentDidMount() {
     const {
       project,
+      scope,
       globalObjectsContainer,
       objectsContainer,
       serializedEvents,
@@ -66,6 +69,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     const eventsFunction = new gd.EventsFunction();
     setupFunctionFromEvents({
       project,
+      scope,
       globalObjectsContainer,
       objectsContainer,
       serializedEvents,

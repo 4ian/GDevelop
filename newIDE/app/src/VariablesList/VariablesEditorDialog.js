@@ -1,6 +1,5 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -12,7 +11,6 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import { Column, Line } from '../UI/Grid';
 import VariablesList from './VariablesList';
 import HelpButton from '../UI/HelpButton';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -62,7 +60,6 @@ const VariablesEditorDialog = ({
   preventRefactoringToDeleteInstructions,
   id,
 }: Props) => {
-  const { showConfirmation } = useAlertDialog();
   const {
     onCancelChanges,
     notifyOfChange,
@@ -88,21 +85,17 @@ const VariablesEditorDialog = ({
           getOriginalContentSerializedElement(),
           variablesContainer
         );
-        if (preventRefactoringToDeleteInstructions) {
+        if (
+          preventRefactoringToDeleteInstructions ||
+          // While we support refactoring that would remove all references (actions, conditions...)
+          // it's both a bit dangerous for the user and we would need to show the user what
+          // will be removed before doing so. For now, just clear the removed variables so they don't
+          // trigger any refactoring.
+          true
+        ) {
           // Clear the removed variables from the changeset, so they do not trigger
           // deletion of actions/conditions or events using them.
           changeset.clearRemovedVariables();
-        }
-        if (changeset.hasRemovedVariables()) {
-          const shouldRemoveVariables = await showConfirmation({
-            title: t`Remove actions and conditions?`,
-            message: t`You've removed some variables. Do you want to also remove all the actions and conditions in events using them?`,
-            confirmButtonLabel: t`Don't remove anything else`,
-            dismissButtonLabel: t`Delete all references to these variables`,
-          });
-          if (shouldRemoveVariables) {
-            changeset.clearRemovedVariables();
-          }
         }
 
         gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
@@ -121,7 +114,6 @@ const VariablesEditorDialog = ({
       getOriginalContentSerializedElement,
       variablesContainer,
       inheritedVariablesContainer,
-      showConfirmation,
       preventRefactoringToDeleteInstructions,
     ]
   );

@@ -108,15 +108,11 @@ const InnerDialog = (props: InnerDialogProps) => {
       props.object.getVariables()
     );
     if (changeset.hasRemovedVariables()) {
-      const shouldRemoveVariables = await showConfirmation({
-        title: t`Remove actions and conditions?`,
-        message: t`You've removed some variables. Do you want to also remove all the actions and conditions in events using them?`,
-        confirmButtonLabel: t`Don't remove anything else`,
-        dismissButtonLabel: t`Delete all references to these variables`,
-      });
-      if (shouldRemoveVariables) {
-        changeset.clearRemovedVariables();
-      }
+      // While we support refactoring that would remove all references (actions, conditions...)
+      // it's both a bit dangerous for the user and we would need to show the user what
+      // will be removed before doing so. For now, just clear the removed variables so they don't
+      // trigger any refactoring.
+      changeset.clearRemovedVariables();
     }
 
     gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(

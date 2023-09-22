@@ -416,7 +416,10 @@ describe('libGD.js', function () {
 
       // Prepare two containers, one with 3 objects and one empty
       const objectsContainer1 = new gd.ObjectsContainer();
+      const rootFolder1 = objectsContainer1.getRootFolder();
       const objectsContainer2 = new gd.ObjectsContainer();
+      const rootFolder2 = objectsContainer2.getRootFolder();
+      const subFolder2 = rootFolder2.insertNewFolder('Folder', 1);
       const mySpriteObject = objectsContainer1.insertNewObject(
         project,
         'Sprite',
@@ -436,9 +439,11 @@ describe('libGD.js', function () {
         2
       );
 
-      // Find the pointer to the objects in memory
       expect(objectsContainer1.getObjectsCount()).toBe(3);
       expect(objectsContainer2.getObjectsCount()).toBe(0);
+      expect(rootFolder1.getChildrenCount()).toBe(3);
+      expect(rootFolder2.getChildrenCount()).toBe(1);
+      // Find the pointer to the objects in memory
       const mySpriteObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(0));
       const mySprite2ObjectPtr = gd.getPointer(
         objectsContainer1.getObjectAt(1)
@@ -446,11 +451,24 @@ describe('libGD.js', function () {
       const mySprite3ObjectPtr = gd.getPointer(
         objectsContainer1.getObjectAt(2)
       );
+      const mySpriteObjectFolderOrObject = rootFolder1.getChildAt(0);
+      const mySprite2ObjectFolderOrObject = rootFolder1.getChildAt(1);
+      const mySprite3ObjectFolderOrObject = rootFolder1.getChildAt(2);
+      const mySpriteObjectFolderOrObjectPtr = gd.getPointer(
+        mySpriteObjectFolderOrObject
+      );
+      const mySprite2ObjectFolderOrObjectPtr = gd.getPointer(
+        mySprite2ObjectFolderOrObject
+      );
+      const mySprite3ObjectFolderOrObjectPtr = gd.getPointer(
+        mySprite3ObjectFolderOrObject
+      );
 
       // Move objects between containers
-      objectsContainer1.moveObjectToAnotherContainer(
-        'MySprite2',
+      objectsContainer1.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite2ObjectFolderOrObject,
         objectsContainer2,
+        rootFolder2,
         0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
@@ -458,17 +476,34 @@ describe('libGD.js', function () {
       expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite3');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
+      expect(rootFolder2.hasObjectNamed('MySprite2')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toBe(2);
+      expect(gd.getPointer(rootFolder2.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(rootFolder2.getObjectChild('MySprite2')).toBe(
+        mySprite2ObjectFolderOrObject
+      );
+      expect(mySprite2ObjectFolderOrObject.getParent()).toBe(rootFolder2);
 
-      objectsContainer1.moveObjectToAnotherContainer(
-        'MySprite3',
+      // Move object in sub folder.
+      objectsContainer1.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite3ObjectFolderOrObject,
         objectsContainer2,
-        1
+        subFolder2,
+        0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(1);
       expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
       expect(objectsContainer2.getObjectsCount()).toBe(2);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
       expect(objectsContainer2.getObjectAt(1).getName()).toBe('MySprite3');
+      expect(subFolder2.hasObjectNamed('MySprite3')).toBe(true);
+      expect(subFolder2.getChildrenCount()).toBe(1);
+      expect(gd.getPointer(subFolder2.getObjectChild('MySprite3'))).toBe(
+        mySprite3ObjectFolderOrObjectPtr
+      );
+      expect(mySprite3ObjectFolderOrObject.getParent()).toBe(subFolder2);
 
       // Check that the object in memory are the same, even if moved to another container
       expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
@@ -481,27 +516,53 @@ describe('libGD.js', function () {
         mySprite3ObjectPtr
       );
 
-      objectsContainer2.moveObjectToAnotherContainer(
-        'MySprite2',
+      expect(gd.getPointer(rootFolder2.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(rootFolder2.getObjectChild('MySprite2')).toBe(
+        mySprite2ObjectFolderOrObject
+      );
+
+      // Move back first object to first container
+      objectsContainer2.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite2ObjectFolderOrObject,
         objectsContainer1,
+        rootFolder1,
         0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
-      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite2');
-      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite');
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite2');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite3');
+      expect(rootFolder2.hasObjectNamed('MySprite2')).toBe(false);
+      expect(rootFolder2.getChildrenCount()).toBe(1);
+      expect(rootFolder1.getChildrenCount()).toBe(2);
+      expect(rootFolder1.getChildAt(0).getObject().getName()).toBe('MySprite2');
+      expect(rootFolder1.getChildAt(1).getObject().getName()).toBe('MySprite');
+      expect(rootFolder1.hasObjectNamed('MySprite2')).toBe(true);
+      expect(mySprite2ObjectFolderOrObject.getParent()).toBe(rootFolder1);
 
       // Check again that the object in memory are the same, even if moved to another container
       expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
-        mySprite2ObjectPtr
+        mySpriteObjectPtr
       );
       expect(gd.getPointer(objectsContainer1.getObjectAt(1))).toBe(
-        mySpriteObjectPtr
+        mySprite2ObjectPtr
       );
       expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(
         mySprite3ObjectPtr
       );
+      expect(gd.getPointer(rootFolder1.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(gd.getPointer(rootFolder1.getObjectChild('MySprite'))).toBe(
+        mySpriteObjectFolderOrObjectPtr
+      );
+      expect(gd.getPointer(subFolder2.getObjectChild('MySprite3'))).toBe(
+        mySprite3ObjectFolderOrObjectPtr
+      );
+
       project.delete();
     });
   });

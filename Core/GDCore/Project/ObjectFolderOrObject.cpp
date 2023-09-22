@@ -42,7 +42,8 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
 ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) {
   return *children[index];
 }
-ObjectFolderOrObject& ObjectFolderOrObject::GetObjectChild(const gd::String& name) {
+ObjectFolderOrObject& ObjectFolderOrObject::GetObjectChild(
+    const gd::String& name) {
   for (std::size_t j = 0; j < children.size(); j++) {
     if (!children[j]->IsFolder()) {
       if (children[j]->GetObject().GetName() == name) return *children[j];
@@ -100,6 +101,33 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
     it.get()->RemoveRecursivelyObjectNamed(name);
   }
 };
+
+void ObjectFolderOrObject::MoveObjectFolderOrObjectToAnotherFolder(
+    gd::ObjectFolderOrObject& objectFolderOrObject,
+    gd::ObjectFolderOrObject& newParentFolder,
+    std::size_t newPosition) {
+  if (objectFolderOrObject.IsFolder() || !newParentFolder.IsFolder()) return;
+
+  std::vector<std::unique_ptr<gd::ObjectFolderOrObject>>::iterator it =
+      find_if(children.begin(),
+              children.end(),
+              [&objectFolderOrObject](std::unique_ptr<gd::ObjectFolderOrObject>&
+                                          childObjectFolderOrObject) {
+                return &(*childObjectFolderOrObject) == &objectFolderOrObject;
+              });
+  if (it == children.end()) return;
+
+  std::unique_ptr<gd::ObjectFolderOrObject> objectFolderOrObjectPtr =
+      std::move(*it);
+  children.erase(it);
+
+  objectFolderOrObjectPtr->parent = &newParentFolder;
+  newParentFolder.children.insert(
+      newPosition < newParentFolder.children.size()
+          ? newParentFolder.children.begin() + newPosition
+          : newParentFolder.children.end(),
+      std::move(objectFolderOrObjectPtr));
+}
 
 void ObjectFolderOrObject::SerializeTo(SerializerElement& element) const {
   if (IsFolder()) {

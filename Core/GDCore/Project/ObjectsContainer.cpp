@@ -153,24 +153,28 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
   initialObjects.erase(objectIt);
 }
 
-void ObjectsContainer::MoveObjectToAnotherContainer(
-    const gd::String& name,
+void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
+    gd::ObjectFolderOrObject& objectFolderOrObject,
     gd::ObjectsContainer& newContainer,
+    gd::ObjectFolderOrObject& newParentFolder,
     std::size_t newPosition) {
-  std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
-      find_if(initialObjects.begin(),
-              initialObjects.end(),
-              [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; });
+  if (objectFolderOrObject.IsFolder() || !newParentFolder.IsFolder()) return;
+
+  std::vector<std::unique_ptr<gd::Object>>::iterator objectIt = find_if(
+      initialObjects.begin(),
+      initialObjects.end(),
+      [&objectFolderOrObject](std::unique_ptr<gd::Object>& object) {
+        return object->GetName() == objectFolderOrObject.GetObject().GetName();
+      });
   if (objectIt == initialObjects.end()) return;
 
   std::unique_ptr<gd::Object> object = std::move(*objectIt);
   initialObjects.erase(objectIt);
 
-  newContainer.initialObjects.insert(
-      newPosition < newContainer.initialObjects.size()
-          ? newContainer.initialObjects.begin() + newPosition
-          : newContainer.initialObjects.end(),
-      std::move(object));
+  newContainer.initialObjects.push_back(std::move(object));
+
+  objectFolderOrObject.GetParent().MoveObjectFolderOrObjectToAnotherFolder(
+      objectFolderOrObject, newParentFolder, newPosition);
 }
 
 }  // namespace gd

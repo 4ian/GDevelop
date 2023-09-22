@@ -409,6 +409,7 @@ interface ObjectFolderOrObject {
     void RenameFolder([Const] DOMString name);
     [Ref] ObjectFolderOrObject GetParent();
     [Ref] ObjectFolderOrObject InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectFolderOrObject newParentFolder, unsigned long newPosition);
 };
 
 interface ObjectsContainer {
@@ -423,7 +424,7 @@ interface ObjectsContainer {
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
     [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
@@ -565,7 +566,7 @@ interface Project {
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
     [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
@@ -811,7 +812,7 @@ interface Layout {
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
     [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
@@ -2771,7 +2772,7 @@ interface EventsBasedObject {
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
 
     [Ref] ObjectGroupsContainer GetObjectGroups();

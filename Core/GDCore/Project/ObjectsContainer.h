@@ -139,13 +139,18 @@ class GD_CORE_API ObjectsContainer {
   void MoveObject(std::size_t oldIndex, std::size_t newIndex);
 
   /**
-   * Move the specified object to another container, removing it from the current one
-   * and adding it to the new one at the specified position.
+   * Move the specified object to another container, removing it from the
+   * current one and adding it to the new one at the specified position in the
+   * given folder.
    *
-   * \note This does not invalidate the references to the object (object is not moved in memory,
-   * as referenced by smart pointers internally).
+   * \note This does not invalidate the references to the object (object is not
+   * moved in memory, as referenced by smart pointers internally).
    */
-  void MoveObjectToAnotherContainer(const gd::String& name, gd::ObjectsContainer & newContainer, std::size_t newPosition);
+  void MoveObjectFolderOrObjectToAnotherContainerInFolder(
+      gd::ObjectFolderOrObject& objectFolderOrObject,
+      gd::ObjectsContainer& newContainer,
+      gd::ObjectFolderOrObject& newParentFolder,
+      std::size_t newPosition);
 
   /**
    * Provide a raw access to the vector containing the objects

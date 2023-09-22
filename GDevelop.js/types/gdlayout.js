@@ -41,7 +41,7 @@ declare class gdLayout extends gdObjectsContainer {
   getObjectPosition(name: string): number;
   removeObject(name: string): void;
   moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectToAnotherContainer(name: string, newObjectsContainer: gdObjectsContainer, newPosition: number): void;
+  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: gdObjectFolderOrObject, newObjectsContainer: gdObjectsContainer, parentObjectFolderOrObject: gdObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
   getRootFolder(): gdObjectFolderOrObject;
   getObjectGroups(): gdObjectGroupsContainer;

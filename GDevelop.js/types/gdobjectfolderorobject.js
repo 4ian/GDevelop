@@ -12,6 +12,7 @@ declare class gdObjectFolderOrObject {
   renameFolder(name: string): void;
   getParent(): gdObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): gdObjectFolderOrObject;
+  moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: gdObjectFolderOrObject, newParentFolder: gdObjectFolderOrObject, newPosition: number): void;
   delete(): void;
   ptr: number;
 };

@@ -606,15 +606,17 @@ namespace gdjs {
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       await this.loadAssetsWithLoadingScreen(async (onProgress) => {
+        // TODO Is a setting needed?
         if (false) {
-          this._resourcesLoader.loadAllResources(onProgress);
+          await this._resourcesLoader.loadAllResources(onProgress);
         } else {
-          const firstSceneName = this._data.firstLayout;
+          const firstSceneName = this.getFirstSceneName();
           await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
             firstSceneName,
             onProgress
           );
-          this._resourcesLoader.loadAllLayoutInBackground(firstSceneName);
+          // Don't await as it must not block the first layout from starting.
+          this._resourcesLoader.loadAllLayoutInBackground();
         }
       }, progressCallback);
     }
@@ -672,6 +674,14 @@ namespace gdjs {
       await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
     }
 
+    private getFirstSceneName(): string {
+      const firstSceneName = this._data.firstLayout;
+      return this.hasScene(firstSceneName)
+        ? firstSceneName
+        : // @ts-ignore - no risk of null object.
+          this.getSceneData().name;
+    }
+
     /**
      * Start the game loop, to be called once assets are loaded.
      */
@@ -684,12 +694,8 @@ namespace gdjs {
         this._forceGameResolutionUpdate();
 
         // Load the first scene
-        const firstSceneName = this._data.firstLayout;
         this._sceneStack.push(
-          this.hasScene(firstSceneName)
-            ? firstSceneName
-            : // @ts-ignore - no risk of null object.
-              this.getSceneData().name,
+          this.getFirstSceneName(),
           this._injectExternalLayout
         );
         this._watermark.displayAtStartup();

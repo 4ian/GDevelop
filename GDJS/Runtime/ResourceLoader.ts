@@ -202,6 +202,7 @@ namespace gdjs {
           onProgress(loadedCount, this._resources.size);
         })
       );
+      this._loadedLayoutNames = new Set(this._layoutResources.keys());
     }
 
     /**
@@ -236,9 +237,11 @@ namespace gdjs {
      * This is done in background to try to avoid loading screens when changing
      * layouts.
      */
-    async loadAllLayoutInBackground(firstSceneName: string): Promise<void> {
+    async loadAllLayoutInBackground(): Promise<void> {
       while (this._layoutToLoadQueue.length > 0) {
-        const task = this._layoutToLoadQueue.pop();
+        const task = this._layoutToLoadQueue[
+          this._layoutToLoadQueue.length - 1
+        ];
         if (task === undefined) {
           continue;
         }
@@ -246,7 +249,10 @@ namespace gdjs {
           await this._doLoadLayoutResources(task.layoutName, (count, total) =>
             task.onProgress(count, total)
           );
+          this._layoutToLoadQueue.pop();
           task.onFinish();
+        } else {
+          this._layoutToLoadQueue.pop();
         }
       }
     }
@@ -283,6 +289,7 @@ namespace gdjs {
         (task) => task.layoutName === layoutName
       );
       if (taskIndex < 0) {
+        // The layout is already loaded.
         return null;
       }
       const task = this._layoutToLoadQueue[taskIndex];

@@ -502,48 +502,62 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         </Line>
         <div style={styles.listContainer}>
           <I18n>
-            {({ i18n }) => (
-              <div style={{ flex: 1 }}>
-                <AutoSizer style={{ width: '100%' }} disableWidth>
-                  {({ height }) => (
-                    <TreeView
-                      key={listKey}
-                      ref={treeView => (this.treeView = treeView)}
-                      items={this._getTreeViewData(i18n)}
-                      height={height}
-                      searchText={searchText}
-                      getItemName={getTreeViewItemName}
-                      getItemChildren={getTreeViewItemChildren}
-                      multiSelect={false}
-                      getItemId={getTreeViewItemId}
-                      onEditItem={this._editItem}
-                      selectedItems={
-                        selectedGroupWithContext
-                          ? [selectedGroupWithContext]
-                          : []
-                      }
-                      onSelectItems={items => {
-                        if (!items) this._selectGroup(null);
-                        const itemToSelect = items[0];
-                        if (
-                          'isRoot' in itemToSelect ||
-                          'isPlaceholder' in itemToSelect
-                        )
-                          return;
-                        this._selectGroup(itemToSelect || null);
-                      }}
-                      onRenameItem={this._onRename}
-                      buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
-                      onMoveSelectionToItem={(destinationItem, where) =>
-                        this._moveSelectionTo(i18n, destinationItem, where)
-                      }
-                      canMoveSelectionToItem={this._canMoveSelectionTo}
-                      reactDndType={groupWithContextReactDndType}
-                    />
-                  )}
-                </AutoSizer>
-              </div>
-            )}
+            {({ i18n }) => {
+              const treeViewData = this._getTreeViewData(i18n);
+              const globalRootItem = treeViewData[0];
+              const initiallyOpenedNodeIds = [
+                globalRootItem.isRoot &&
+                globalRootItem.children.length === 1 &&
+                'isPlaceholder' in globalRootItem.children[0]
+                  ? null
+                  : globalGroupsRootFolderId,
+                sceneGroupsRootFolderId,
+              ].filter(Boolean);
+
+              return (
+                <div style={{ flex: 1 }}>
+                  <AutoSizer style={{ width: '100%' }} disableWidth>
+                    {({ height }) => (
+                      <TreeView
+                        key={listKey}
+                        ref={treeView => (this.treeView = treeView)}
+                        items={treeViewData}
+                        height={height}
+                        searchText={searchText}
+                        getItemName={getTreeViewItemName}
+                        getItemChildren={getTreeViewItemChildren}
+                        multiSelect={false}
+                        getItemId={getTreeViewItemId}
+                        onEditItem={this._editItem}
+                        selectedItems={
+                          selectedGroupWithContext
+                            ? [selectedGroupWithContext]
+                            : []
+                        }
+                        onSelectItems={items => {
+                          if (!items) this._selectGroup(null);
+                          const itemToSelect = items[0];
+                          if (
+                            'isRoot' in itemToSelect ||
+                            'isPlaceholder' in itemToSelect
+                          )
+                            return;
+                          this._selectGroup(itemToSelect || null);
+                        }}
+                        onRenameItem={this._onRename}
+                        buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
+                        onMoveSelectionToItem={(destinationItem, where) =>
+                          this._moveSelectionTo(i18n, destinationItem, where)
+                        }
+                        canMoveSelectionToItem={this._canMoveSelectionTo}
+                        reactDndType={groupWithContextReactDndType}
+                        initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                      />
+                    )}
+                  </AutoSizer>
+                </div>
+              );
+            }}
           </I18n>
         </div>
         <Line>

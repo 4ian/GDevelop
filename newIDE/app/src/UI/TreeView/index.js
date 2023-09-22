@@ -120,6 +120,7 @@ type Props<Item> = {|
   canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
   reactDndType: string,
   forceAllOpened?: boolean,
+  initiallyOpenedNodeIds?: string[],
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -144,11 +145,14 @@ const TreeView = <Item: ItemBaseAttributes>(
     canMoveSelectionToItem,
     reactDndType,
     forceAllOpened,
+    initiallyOpenedNodeIds,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
   const selectedNodeIds = selectedItems.map(item => getItemId(item));
-  const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
+  const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>(
+    initiallyOpenedNodeIds || []
+  );
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
   const listRef = React.useRef<any>(null);
@@ -426,7 +430,6 @@ const TreeView = <Item: ItemBaseAttributes>(
     },
     [searchText]
   );
-  console.log(flattenedData)
 
   return (
     <>

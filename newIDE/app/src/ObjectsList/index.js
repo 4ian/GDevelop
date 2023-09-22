@@ -1066,6 +1066,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
+    const initiallyOpenedNodeIds = [
+      projectObjectFolderOrObjectsList.length === 0
+        ? null
+        : globalObjectsRootFolderId,
+      sceneObjectsRootFolderId,
+    ].filter(Boolean);
 
     return (
       <Background maxWidth>
@@ -1118,6 +1124,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       }
                       canMoveSelectionToItem={canMoveSelectionTo}
                       reactDndType={objectWithContextReactDndType}
+                      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                     />
                   )}
                 </AutoSizer>

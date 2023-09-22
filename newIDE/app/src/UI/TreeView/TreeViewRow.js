@@ -228,7 +228,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                               node.item.isRoot ? '' : ' row-content-side-left'
                             }`}
                           >
-                            {node.hasChildren ? (
+                            {node.hasChildren || node.thumbnailSrc === 'FOLDER' ? (
                               <>
                                 <IconButton
                                   size="small"

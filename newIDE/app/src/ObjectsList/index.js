@@ -49,6 +49,9 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import { mapFor } from '../Utils/MapFor';
+import IconButton from '../UI/IconButton';
+import AddFolder from '../UI/CustomSvgIcons/AddFolder';
+import { LineStackLayout } from '../UI/Layout';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -911,6 +914,23 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [getThumbnail, project]
     );
 
+    const addFolder = React.useCallback(
+      () => {
+        if (selectedObjectFolderOrObjectsWithContext.length === 1) {
+          const {
+            objectFolderOrObject: selectedObjectFolderOrObject,
+          } = selectedObjectFolderOrObjectsWithContext[0];
+          const parentFolder = selectedObjectFolderOrObject.getParent();
+          parentFolder.insertNewFolder(
+            'NewFolder',
+            parentFolder.getChildPosition(selectedObjectFolderOrObject)
+          );
+        }
+        forceUpdateList();
+      },
+      [selectedObjectFolderOrObjectsWithContext, forceUpdateList]
+    );
+
     const eventsFunctionsExtensionsState = React.useContext(
       EventsFunctionsExtensionsContext
     );
@@ -1075,16 +1095,23 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     return (
       <Background maxWidth>
-        <Line>
-          <Column expand>
-            <SearchBar
-              value={searchText}
-              onRequestSearch={() => {}}
-              onChange={text => setSearchText(text)}
-              placeholder={t`Search objects`}
-            />
-          </Column>
-        </Line>
+        <Column>
+          <LineStackLayout>
+            <Column expand noMargin>
+              <SearchBar
+                value={searchText}
+                onRequestSearch={() => {}}
+                onChange={text => setSearchText(text)}
+                placeholder={t`Search objects`}
+              />
+            </Column>
+            <Column noMargin>
+              <IconButton size="small" onClick={addFolder}>
+                <AddFolder />
+              </IconButton>
+            </Column>
+          </LineStackLayout>
+        </Column>
         <TagChips
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}

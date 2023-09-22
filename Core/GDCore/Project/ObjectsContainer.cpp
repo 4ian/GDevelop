@@ -72,7 +72,9 @@ bool ObjectsContainer::HasObjectNamed(const gd::String& name) const {
 gd::Object& ObjectsContainer::GetObject(const gd::String& name) {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
-                    bind2nd(gd::ObjectHasName(), name)));
+                    [&name](std::unique_ptr<gd::Object>& object) {
+                      return object->GetName() == name;
+                    }));
 }
 const gd::Object& ObjectsContainer::GetObject(const gd::String& name) const {
   return *(*find_if(initialObjects.begin(),
@@ -145,7 +147,9 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
   std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
       find_if(initialObjects.begin(),
               initialObjects.end(),
-              bind2nd(ObjectHasName(), name));
+              [&name](std::unique_ptr<gd::Object>& object) {
+                return object->GetName() == name;
+              });
   if (objectIt == initialObjects.end()) return;
 
   rootFolder->RemoveRecursivelyObjectNamed(name);

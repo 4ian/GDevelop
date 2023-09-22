@@ -814,6 +814,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               objectFolderOrObjectWithContext:
                 selectedObjectFolderOrObjectsWithContext[0],
             });
+            onObjectModified(true)
             return;
           }
           return;

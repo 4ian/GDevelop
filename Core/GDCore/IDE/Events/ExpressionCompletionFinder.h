@@ -49,7 +49,8 @@ struct GD_CORE_API ExpressionCompletionDescription {
     ExpressionWithPrefix,
     Variable,
     TextWithPrefix,
-    Property
+    Property,
+    Parameter
   };
 
   /**
@@ -825,6 +826,9 @@ class GD_CORE_API ExpressionCompletionFinder
         },
         [&](const gd::NamedPropertyDescriptor& property) {
           // Ignore properties here.
+        },
+        [&](const gd::ParameterMetadata& parameter) {
+          // Ignore parameters here.
         });
   }
 
@@ -869,6 +873,15 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(property.GetName());
           description.SetType(property.GetType());
+          completions.push_back(description);
+        },
+        [&](const gd::ParameterMetadata& parameter) {
+          ExpressionCompletionDescription description(
+              ExpressionCompletionDescription::Parameter,
+              location.GetStartPosition(),
+              location.GetEndPosition());
+          description.SetCompletion(parameter.GetName());
+          description.SetType(parameter.GetType());
           completions.push_back(description);
         });
   }

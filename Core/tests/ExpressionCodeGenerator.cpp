@@ -443,6 +443,47 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "getPropertyMyProperty() + getPropertyMyProperty2()");
     }
   }
+  SECTION("Parameters (1 level)") {
+    std::vector<gd::ParameterMetadata> parameters;
+    gd::ParameterMetadata param1;
+    param1.SetName("MyParameter1");
+    param1.SetType("number");
+    gd::ParameterMetadata param2;
+    param2.SetName("MyParameter2");
+    param2.SetType("string");
+    parameters.push_back(param1);
+    parameters.push_back(param2);
+
+    auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithParameters.AddParameters(parameters);
+
+    gd::EventsCodeGenerator codeGeneratorWithProperties(platform, projectScopedContainersWithParameters);
+
+    {
+      auto node =
+        parser.ParseExpression("MyParameter1 + 1");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGeneratorWithProperties,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getParameterMyParameter1() + 1");
+    }
+    {
+      auto node =
+        parser.ParseExpression("MyParameter1 + MyParameter2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGeneratorWithProperties,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getParameterMyParameter1() + getParameterMyParameter2()");
+    }
+  }
   SECTION("Scene variables (1 level)") {
     {
       auto node =

@@ -117,6 +117,10 @@ class GD_CORE_API ExpressionVariableReplacer
           if (node.child) node.child->Visit(*this);
         },
         [&]() {
+          // This is a parameter.
+          if (node.child) node.child->Visit(*this);
+        },
+        [&]() {
           // This is something else - potentially a deleted variable.
           if (projectScopedContainers.GetVariablesContainersList()
                   .HasVariablesContainer(targetVariablesContainer)) {
@@ -193,6 +197,9 @@ class GD_CORE_API ExpressionVariableReplacer
         },
         [&]() {
           // This is a property.
+        },
+        [&]() {
+          // This is a parameter.
         },
         [&]() {
           // This is something else - potentially a deleted variable.

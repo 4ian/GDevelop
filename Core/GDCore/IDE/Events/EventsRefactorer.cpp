@@ -97,6 +97,8 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
         }, [&]() {
           // This is a property.
         }, [&]() {
+          // This is a parameter.
+        }, [&]() {
           // This is something else.
         });
       }
@@ -130,6 +132,8 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
           // This is a variable.
         }, [&]() {
           // This is a property.
+        }, [&]() {
+          // This is a parameter.
         }, [&]() {
           // This is something else.
         });
@@ -228,6 +232,8 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
         }, [&]() {
           // This is a property.
         }, [&]() {
+          // This is a parameter.
+        }, [&]() {
           // This is something else.
         });
       }
@@ -259,6 +265,8 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
           // This is a variable.
         }, [&]() {
           // This is a property.
+        }, [&]() {
+          // This is a parameter.
         }, [&]() {
           // This is something else.
         });

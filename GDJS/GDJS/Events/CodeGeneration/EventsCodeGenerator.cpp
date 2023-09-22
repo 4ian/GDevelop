@@ -128,6 +128,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       objectsAndGroups);
 
   gd::ProjectScopedContainers projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
+  projectScopedContainers.AddParameters(eventsFunction.GetParameters());
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -173,6 +174,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   gd::ProjectScopedContainers projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
   projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetSharedPropertyDescriptors());
   projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetPropertyDescriptors());
+  projectScopedContainers.AddParameters(eventsFunction.GetParameters());
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -244,6 +246,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
 
   gd::ProjectScopedContainers projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
   projectScopedContainers.AddPropertiesContainer(eventsBasedObject.GetPropertyDescriptors());
+  projectScopedContainers.AddParameters(eventsFunction.GetParameters());
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -1398,6 +1401,38 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
     }
   } else {
     gd::LogError("Unrecognized expression type for using a property: " + type);
+    return "0 /* Unrecognized type */";
+  }
+}
+
+gd::String EventsCodeGenerator::GenerateParameterGetter(
+    const gd::ParameterMetadata& parameter,
+    const gd::String& type,
+    gd::EventsCodeGenerationContext& context) {
+
+  gd::String parameterGetterCode =
+      "eventsFunctionContext.getArgument(" + ConvertToStringExplicit(parameter.GetName()) + ")";
+
+  if (type == "string") {
+    if (parameter.GetValueTypeMetadata().IsNumber()) {
+      return "(\"\" + " + parameterGetterCode + ")";
+    } else if (parameter.GetValueTypeMetadata().IsBoolean()) {
+      return "(" + parameterGetterCode + " ? \"true\" : \"false\")";
+    } else {
+      // Assume type is String or equivalent.
+      return "(Number(" + parameterGetterCode + ") || 0)";
+    }
+  } else if (type == "number") {
+    if (parameter.GetValueTypeMetadata().IsNumber()) {
+      return parameterGetterCode;
+    } else if (parameter.GetValueTypeMetadata().IsBoolean()) {
+      return "(" + parameterGetterCode + " ? 1 : 0)";
+    } else {
+      // Assume type is String or equivalent.
+      return "(Number(" + parameterGetterCode + ") || 0)";
+    }
+  } else {
+    gd::LogError("Unrecognized expression type for using a parameter: " + type);
     return "0 /* Unrecognized type */";
   }
 }

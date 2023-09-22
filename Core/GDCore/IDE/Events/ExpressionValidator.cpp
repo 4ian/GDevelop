@@ -87,6 +87,7 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
   const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
   const auto& propertiesContainersList = projectScopedContainers.GetPropertiesContainersList();
+  const auto& parametersVectorsList = projectScopedContainers.GetParametersVectorsList();
 
   return projectScopedContainers.MatchIdentifierWithName<bool>(identifier.identifierName,
     [&]() {
@@ -141,6 +142,23 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
       }
 
       return true; // We found a property.
+    }, [&]() {
+      // This is a parameter.
+      if (!identifier.childIdentifierName.empty()) {
+        RaiseTypeError(_("Accessing a child variable of a parameter is not possible - just write the parameter name."),
+            identifier.childIdentifierNameLocation);
+        return true; // We found a parameter, even if the child is not allowed.
+      }
+
+      const auto& parameter = gd::ParameterMetadataTools::Get(parametersVectorsList, identifier.identifierName);
+      const auto& valueTypeMetadata = parameter.GetValueTypeMetadata();
+      if (!valueTypeMetadata.IsNumber() && !valueTypeMetadata.IsString() && !valueTypeMetadata.IsBoolean()) {
+        RaiseTypeError(_("This parameter is not a string, number or boolean - it can't be used in an expression."),
+            identifier.identifierNameLocation);
+        return true; // We found a parameter, even though the type is incompatible.
+      }
+
+      return true; // We found a parameter.
     }, [&]() {
       // This is something else.
       return false;

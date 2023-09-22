@@ -39,6 +39,7 @@ describe('gdjs.SceneStack', function () {
     ],
   });
   var sceneStack = runtimeGame._sceneStack;
+  runtimeGame.loadAllAssets();
 
   it('should support pushing, replacing and popping scenes', function () {
     // Set up some scene callbacks.

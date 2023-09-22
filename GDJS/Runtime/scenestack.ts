@@ -100,7 +100,10 @@ namespace gdjs {
      * Pause the scene currently being played and start the new scene that is specified.
      * If `externalLayoutName` is set, also instantiate the objects from this external layout.
      */
-    push(newSceneName: string, externalLayoutName?: string): void {
+    push(
+      newSceneName: string,
+      externalLayoutName?: string
+    ): gdjs.RuntimeScene | null {
       // Tell the scene it's being paused
       const currentScene = this._stack[this._stack.length - 1];
       if (currentScene) {
@@ -108,14 +111,15 @@ namespace gdjs {
       }
 
       if (this._runtimeGame.isLayoutAssetsLoaded(newSceneName)) {
-        this._loadNewLayout(newSceneName, externalLayoutName);
-      } else {
-        this._nextLayout = newSceneName;
-        this._isNextLayoutLoading = true;
-        this._runtimeGame.loadLayoutAssetsAsync(newSceneName).then(() => {
-          this._isNextLayoutLoading = false;
-        });
+        return this._loadNewLayout(newSceneName, externalLayoutName);
       }
+
+      this._nextLayout = newSceneName;
+      this._isNextLayoutLoading = true;
+      this._runtimeGame.loadLayoutAssetsAsync(newSceneName).then(() => {
+        this._isNextLayoutLoading = false;
+      });
+      return null;
     }
 
     private _loadNewLayout(
@@ -152,7 +156,7 @@ namespace gdjs {
      * Start the specified scene, replacing the one currently being played.
      * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
      */
-    replace(newSceneName: string, clear?: boolean): void {
+    replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene | null {
       if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {

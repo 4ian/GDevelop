@@ -57,6 +57,11 @@ class GD_CORE_API ObjectFolderOrObject {
 
   void RemoveRecursivelyObjectNamed(const gd::String& name);
 
+  void MoveObjectFolderOrObjectToAnotherFolder(
+      gd::ObjectFolderOrObject& objectFolderOrObject,
+      gd::ObjectFolderOrObject& newParentFolder,
+      std::size_t newPosition);
+
   void RenameFolder(const gd::String& name) { folderName = name; }
 
   /** \name Saving and loading

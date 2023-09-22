@@ -71,6 +71,8 @@ class GD_CORE_API ExpressionObjectsAnalyzer
         }, [&]() {
           // This is a property.
         }, [&]() {
+          // This is a parameter.
+        }, [&]() {
           // This is something else.
         });
     }
@@ -99,6 +101,8 @@ class GD_CORE_API ExpressionObjectsAnalyzer
           // This is a variable.
         }, [&]() {
           // This is a property.
+        }, [&]() {
+          // This is a parameter.
         }, [&]() {
           // This is something else.
         });

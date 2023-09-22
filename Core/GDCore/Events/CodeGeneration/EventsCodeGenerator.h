@@ -582,6 +582,10 @@ class GD_CORE_API EventsCodeGenerator {
                                             const gd::String& type,
                                             gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GenerateParameterGetter(const gd::ParameterMetadata& parameter,
+                                             const gd::String& type,
+                                             gd::EventsCodeGenerationContext& context);
+
   /**
    * \brief Generate the code to reference an object which is
    * in an empty/null state.

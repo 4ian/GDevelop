@@ -1215,6 +1215,12 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(const gd::PropertiesConta
   return "getProperty" + property.GetName() + "()";
 }
 
+gd::String EventsCodeGenerator::GenerateParameterGetter(const gd::ParameterMetadata& parameter,
+                                                        const gd::String& type,
+                                                        gd::EventsCodeGenerationContext& context) {
+  return "getParameter" + parameter.GetName() + "()";
+}
+
 EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
                                          const gd::Layout& layout,
                                          const gd::Platform& platform_)

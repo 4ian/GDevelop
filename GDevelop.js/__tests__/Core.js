@@ -3742,6 +3742,17 @@ describe('libGD.js', function () {
         );
       }
       const expression = expressionWithCaret.replace('|', '');
+      const parameters = new gd.VectorParameterMetadata();
+      const parameter1 = new gd.ParameterMetadata();
+      parameter1.setType('string');
+      parameter1.setName('MyParameter1');
+      const parameter2 = new gd.ParameterMetadata();
+      parameter2.setType('number');
+      parameter2.setName('MyParameter2');
+      parameters.push_back(parameter1);
+      parameters.push_back(parameter2);
+      parameter1.delete();
+      parameter2.delete();
 
       const parser = new gd.ExpressionParser2();
       const expressionNode = parser.parseExpression(expression).get();
@@ -3752,7 +3763,8 @@ describe('libGD.js', function () {
           layout
         )
           .addPropertiesContainer(sharedPropertiesContainer)
-          .addPropertiesContainer(propertiesContainer),
+          .addPropertiesContainer(propertiesContainer)
+          .addParameters(parameters),
         type,
         expressionNode,
         // We're looking for completion for the character just before the caret.
@@ -3767,6 +3779,7 @@ describe('libGD.js', function () {
       }
 
       parser.delete();
+      parameters.delete();
       return completionDescriptionAsStrings;
     }
 
@@ -3781,6 +3794,8 @@ Array [
   "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, UnrelatedVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 5, no type, 1, no prefix, UnrelatedProperty2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -3802,6 +3817,8 @@ Array [
   "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 2, number, 1, My, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -3847,6 +3864,8 @@ Array [
   "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 2, string, 1, My, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",

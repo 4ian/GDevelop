@@ -56,6 +56,11 @@ export type ExpressionAutocompletion =
     |}
   | {|
       ...BaseExpressionAutocompletion,
+      kind: 'Parameter',
+      parameterType: string,
+    |}
+  | {|
+      ...BaseExpressionAutocompletion,
       objectConfiguration: ?gdObjectConfiguration,
       kind: 'Object',
     |}
@@ -468,6 +473,18 @@ export const getAutocompletionsFromDescriptions = (
             replacementStartPosition: completionDescription.getReplacementStartPosition(),
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
             propertyType: completionDescription.getType(),
+          },
+        ];
+      } else if (
+        completionKind === gd.ExpressionCompletionDescription.Parameter
+      ) {
+        return [
+          {
+            kind: 'Parameter',
+            completion: completionDescription.getCompletion(),
+            replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            parameterType: completionDescription.getType(),
           },
         ];
       }

@@ -20,7 +20,13 @@ export const getProjectScopedContainersFromScope = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer
 ): gdProjectScopedContainers => {
-  const { project, layout, eventsBasedBehavior, eventsBasedObject } = scope;
+  const {
+    project,
+    layout,
+    eventsBasedBehavior,
+    eventsBasedObject,
+    eventsFunction,
+  } = scope;
   if (layout) {
     return gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
       project,
@@ -46,6 +52,10 @@ export const getProjectScopedContainersFromScope = (
     projectScopedContainers.addPropertiesContainer(
       eventsBasedObject.getPropertyDescriptors()
     );
+  }
+
+  if (eventsFunction) {
+    projectScopedContainers.addParameters(eventsFunction.getParameters());
   }
 
   return projectScopedContainers;

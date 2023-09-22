@@ -129,6 +129,8 @@ void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
       }, [&]() {
         // This is a property.
       }, [&]() {
+        // This is a parameter.
+      }, [&]() {
         // This is something else.
       });
   }

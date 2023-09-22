@@ -583,6 +583,9 @@ interface ProjectScopedContainers {
   [Ref] ProjectScopedContainers AddPropertiesContainer(
         [Const, Ref] PropertiesContainer propertiesContainer);
 
+  [Ref] ProjectScopedContainers AddParameters(
+        [Const, Ref] VectorParameterMetadata parameters);
+
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
 };
@@ -2556,7 +2559,8 @@ enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::ExpressionWithPrefix",
   "ExpressionCompletionDescription::Variable",
   "ExpressionCompletionDescription::TextWithPrefix",
-  "ExpressionCompletionDescription::Property"
+  "ExpressionCompletionDescription::Property",
+  "ExpressionCompletionDescription::Parameter"
 };
 
 interface ExpressionCompletionDescription {

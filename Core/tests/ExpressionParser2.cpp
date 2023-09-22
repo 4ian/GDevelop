@@ -1460,6 +1460,129 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid parameter") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid parameter (wrong type)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("audioResource");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "This parameter is not a string, number or boolean - it can't be used in an expression.");
+    }
+  }
+
+  SECTION("Invalid parameter (non existing name)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+    }
+  }
+
+  SECTION("Invalid parameter (unsupported child syntax, 1 level)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2.child");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a parameter is not possible - just write the parameter name.");
+    }
+  }
+  SECTION("Invalid parameter (unsupported child syntax, 2 levels)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2.child.grandChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a parameter is not possible - just write the parameter name.");
+    }
+  }
+
   SECTION("Valid function calls ('number|string' type)") {
     {
       auto node =

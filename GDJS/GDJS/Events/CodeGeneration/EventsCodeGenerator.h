@@ -319,6 +319,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
                                             const gd::String& type,
                                             gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GenerateParameterGetter(const gd::ParameterMetadata& parameter,
+                                             const gd::String& type,
+                                             gd::EventsCodeGenerationContext& context);
+
   virtual gd::String GenerateBadObject() { return "null"; }
 
   virtual gd::String GenerateObject(const gd::String& objectName,

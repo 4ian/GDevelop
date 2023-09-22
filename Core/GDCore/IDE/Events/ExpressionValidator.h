@@ -219,6 +219,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
               node.location);
         }, [&]() {
+          // This is a parameter.
+          // Being in this node implies that there is at least a child - which is not supported for parameters.
+          RaiseTypeError(_("Accessing a child variable of a parameter is not possible - just write the parameter name."),
+              node.location);
+        }, [&]() {
           // This is something else.
           RaiseTypeError(_("No object, variable or property with this name found."),
               node.location);

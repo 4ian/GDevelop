@@ -148,7 +148,6 @@ const TreeView = <Item: ItemBaseAttributes>(
   ref: TreeViewInterface<Item>
 ) => {
   const selectedNodeIds = selectedItems.map(item => getItemId(item));
-  console.log(selectedNodeIds)
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>([]);
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);

@@ -17,7 +17,6 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { enumerateObjects } from './EnumerateObjects';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
@@ -636,7 +635,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       }
     };
 
-    const lists = enumerateObjects(project, objectsContainer);
     const {
       projectObjectFolderOrObjectsList,
       containerObjectFolderOrObjectsList,
@@ -684,17 +682,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem) => {
         if (destinationItem.isRoot) return false;
-        const selectedObjectsWithContext = lists.allObjectsList.filter(
-          objectWithContext =>
-            selectedObjectFolderOrObjectsWithContext.indexOf(
-              objectWithContext.object.getName()
-            ) !== -1
-        );
         if (destinationItem.isPlaceholder) {
           if (
             destinationItem.id === globalObjectsEmptyPlaceholderId &&
-            selectedObjectsWithContext.length === 1 &&
-            !selectedObjectsWithContext[0].global
+            selectedObjectFolderOrObjectsWithContext.length === 1 &&
+            !selectedObjectFolderOrObjectsWithContext[0].global
           ) {
             // In that case, the user is drag n dropping a scene object on the
             // empty placeholder of the global objects section.
@@ -704,14 +696,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }
         // Check if at least one element in the selection can be moved.
         if (
-          selectedObjectsWithContext.every(
+          selectedObjectFolderOrObjectsWithContext.every(
             selectedObject => selectedObject.global === destinationItem.global
           )
         ) {
           return true;
         } else if (
-          selectedObjectsWithContext.length === 1 &&
-          selectedObjectsWithContext.every(
+          selectedObjectFolderOrObjectsWithContext.length === 1 &&
+          selectedObjectFolderOrObjectsWithContext.every(
             selectedObject => selectedObject.global === false
           ) &&
           destinationItem.global === true
@@ -721,16 +713,26 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         return false;
       },
-      [lists.allObjectsList, selectedObjectFolderOrObjectsWithContext]
+      [selectedObjectFolderOrObjectsWithContext]
     );
 
     const setAsGlobalObject = React.useCallback(
-      (
+      ({
+        i18n,
+        objectFolderOrObjectWithContext,
+        index,
+        folder,
+      }: {
         i18n: I18nType,
-        objectWithContext: ObjectWithContext,
-        index?: number
-      ) => {
-        const { object } = objectWithContext;
+        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        index?: number,
+        folder?: gdObjectFolderOrObject,
+      }) => {
+        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
+        const destinationFolder =
+          folder && folder.isFolder() ? folder : project.getRootFolder();
+        if (objectFolderOrObject.isFolder()) return;
+        const object = objectFolderOrObject.getObject();
 
         const objectName: string = object.getName();
         if (!objectsContainer.hasObjectNamed(objectName)) return;
@@ -759,22 +761,28 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (treeViewRef.current)
           treeViewRef.current.openItem(globalObjectsRootFolderId);
 
-        // It's safe to call moveObjectToAnotherContainer because it does not invalidate the
-        // references to the object in memory - so other editors like InstancesRenderer can
-        // continue to work.
-        objectsContainer.moveObjectToAnotherContainer(
-          objectName,
+        // It's safe to call moveObjectFolderOrObjectToAnotherContainerInFolder because
+        // it does not invalidate the references to the object in memory - so other editors
+        // like InstancesRenderer can continue to work.
+        objectsContainer.moveObjectFolderOrObjectToAnotherContainerInFolder(
+          objectFolderOrObject,
           project,
+          destinationFolder,
           typeof index === 'number' ? index : project.getObjectsCount()
         );
         onObjectModified(true);
+
+        const newObjectFolderOrObjectWithContext = {
+          objectFolderOrObject,
+          global: true,
+        };
 
         // Scroll to the moved object.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(objectWithContext);
+          scrollToItem(newObjectFolderOrObjectWithContext);
         }, 100); // A few ms is enough for a new render to be done.
       },
       [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
@@ -786,73 +794,78 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         destinationItem: TreeViewItem,
         where: 'after' | 'before'
       ) => {
-        if (destinationItem.isRoot) return;
-
-        const selectedObjectsWithContext = lists.allObjectsList.filter(
-          objectWithContext =>
-            selectedObjectFolderOrObjectsWithContext.indexOf(
-              objectWithContext.object.getName()
-            ) !== -1
-        );
+        if (
+          destinationItem.isRoot ||
+          selectedObjectFolderOrObjectsWithContext.length !== 1
+        )
+          return;
 
         if (destinationItem.isPlaceholder) {
           if (
             destinationItem.id === globalObjectsEmptyPlaceholderId &&
-            selectedObjectsWithContext.length === 1 &&
-            !selectedObjectsWithContext[0].global
+            selectedObjectFolderOrObjectsWithContext.length === 1 &&
+            !selectedObjectFolderOrObjectsWithContext[0].global
           ) {
-            const selectedObjectWithContext = selectedObjectsWithContext[0];
-            setAsGlobalObject(i18n, selectedObjectWithContext, 0);
+            setAsGlobalObject({
+              i18n,
+              objectFolderOrObjectWithContext:
+                selectedObjectFolderOrObjectsWithContext[0],
+            });
             return;
           }
           return;
         }
 
-        if (selectedObjectsWithContext.length === 1) {
-          const selectedObjectWithContext = selectedObjectsWithContext[0];
-          if (
-            selectedObjectWithContext.global === false &&
-            destinationItem.global === true
-          ) {
-            const destinationIndex = project.getObjectPosition(
-              destinationItem.object.getName()
-            );
-            setAsGlobalObject(
-              i18n,
-              selectedObjectWithContext,
-              destinationIndex
-            );
-            return;
-          }
+        const selectedObjectFolderOrObjectWithContext =
+          selectedObjectFolderOrObjectsWithContext[0];
+
+        if (
+          destinationItem.objectFolderOrObject ===
+          selectedObjectFolderOrObjectWithContext.objectFolderOrObject
+        ) {
+          return;
         }
 
-        selectedObjectsWithContext.forEach(movedObjectWithContext => {
-          let container: gdObjectsContainer;
-          let fromIndex: number;
-          let toIndex: number;
-          if (movedObjectWithContext.global === destinationItem.global) {
-            container = destinationItem.global ? project : objectsContainer;
+        if (
+          selectedObjectFolderOrObjectWithContext.global === false &&
+          destinationItem.global === true
+        ) {
+          const parent = destinationItem.objectFolderOrObject.getParent();
+          setAsGlobalObject({
+            i18n,
+            objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
+            folder: parent,
+            index:
+              parent.getChildPosition(destinationItem.objectFolderOrObject) +
+              (where === 'after' ? 1 : 0),
+          });
+          onObjectModified(true);
+          return;
+        }
 
-            fromIndex = container.getObjectPosition(
-              movedObjectWithContext.object.getName()
-            );
-            toIndex = container.getObjectPosition(
-              destinationItem.object.getName()
-            );
-          } else {
-            return;
-          }
-          if (toIndex > fromIndex) toIndex -= 1;
-          if (where === 'after') toIndex += 1;
-          container.moveObject(fromIndex, toIndex);
-        });
+        // At that point, the move is done from within the same container.
+        if (
+          selectedObjectFolderOrObjectWithContext.global ===
+          destinationItem.global
+        ) {
+          const selectedObjectFolderOrObject =
+            selectedObjectFolderOrObjectWithContext.objectFolderOrObject;
+          const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
+          const destinationObjectFolderOrObject =
+            destinationItem.objectFolderOrObject;
+          const destinationParent = destinationObjectFolderOrObject.getParent();
+          selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
+            selectedObjectFolderOrObject,
+            destinationParent,
+            destinationParent.getChildPosition(destinationObjectFolderOrObject)
+          );
+        } else {
+          return;
+        }
         onObjectModified(true);
       },
       [
-        lists.allObjectsList,
-        objectsContainer,
         onObjectModified,
-        project,
         selectedObjectFolderOrObjectsWithContext,
         setAsGlobalObject,
       ]
@@ -978,7 +991,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectFolderOrObjectWithContextGlobal(item),
-            click: () => setAsGlobalObject(i18n, item),
+            click: () =>
+              setAsGlobalObject({
+                i18n,
+                objectFolderOrObjectWithContext: item,
+              }),
             visible: canSetAsGlobalObject !== false,
           },
           {

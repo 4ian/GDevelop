@@ -134,10 +134,10 @@ void ObjectFolderOrObject::SerializeTo(SerializerElement& element) const {
     element.SetAttribute("folderName", GetFolderName());
     if (children.size() > 0) {
       SerializerElement& childrenElement = element.AddChild("children");
-      childrenElement.ConsiderAsArrayOf("objectFolderOrObjet");
+      childrenElement.ConsiderAsArrayOf("objectFolderOrObject");
       for (std::size_t j = 0; j < children.size(); j++) {
         children[j]->SerializeTo(
-            childrenElement.AddChild("objectFolderOrObjet"));
+            childrenElement.AddChild("objectFolderOrObject"));
       }
     }
   } else {
@@ -150,14 +150,16 @@ void ObjectFolderOrObject::UnserializeFrom(
     const SerializerElement& element,
     gd::ObjectsContainer& objectsContainer) {
   children.clear();
-  if (element.HasAttribute("folderName")) {
+  gd::String potentialFolderName = element.GetStringAttribute("folderName", "");
+
+  if (!potentialFolderName.empty()) {
     object = nullptr;
-    folderName = element.GetStringAttribute("folderName", "");
+    folderName = potentialFolderName;
 
     if (element.HasChild("children")) {
-      SerializerElement& childrenElements = element.GetChild("children");
-      childrenElements.ConsiderAsArrayOf("objectFolderOrObjet");
-
+      const SerializerElement& childrenElements =
+          element.GetChild("children", 0);
+      childrenElements.ConsiderAsArrayOf("objectFolderOrObject");
       for (std::size_t i = 0; i < childrenElements.GetChildrenCount(); ++i) {
         std::unique_ptr<ObjectFolderOrObject> childObjectFolderOrObject =
             make_unique<ObjectFolderOrObject>();

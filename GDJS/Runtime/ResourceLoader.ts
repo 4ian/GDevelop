@@ -109,7 +109,7 @@ namespace gdjs {
      * The resource managers that actually download and remember downloaded
      * content.
      */
-    private _resourceManagersMap: Map<ResourceKind, ResourceManager>;
+    _resourceManagersMap: Map<ResourceKind, ResourceManager>;
     private _imageManager: ImageManager;
     private _soundManager: SoundManager;
     private _fontManager: FontManager;
@@ -229,6 +229,7 @@ namespace gdjs {
         })
       );
       this._loadedLayoutNames.add(firstSceneName);
+      console.log('loadGlobalAndFirstLayoutResources done: ' + firstSceneName);
     }
 
     /**
@@ -317,12 +318,13 @@ namespace gdjs {
       let loadedCount = 0;
       await Promise.all(
         [...layoutResources.values()].map(async (resource) => {
-          this.loadResource(resource);
+          await this.loadResource(resource);
           loadedCount++;
           onProgress && onProgress(loadedCount, this._resources.size);
         })
       );
       this._loadedLayoutNames.add(layoutName);
+      console.log('Done: ' + layoutName);
     }
 
     isLayoutAssetsLoaded(layoutName: string): boolean {
@@ -338,7 +340,7 @@ namespace gdjs {
         logger.warn('Unable to find resource "' + resourceName + '".');
         return;
       }
-      return await this._loadResource(resource);
+      await this._loadResource(resource);
     }
 
     private async _loadResource(resource: ResourceData): Promise<void> {
@@ -354,7 +356,7 @@ namespace gdjs {
         return;
       }
       console.log('Load: ' + resource.name);
-      return await resourceManager.loadResource(resource.name);
+      await resourceManager.loadResource(resource.name);
     }
 
     getResource(resourceName: string): ResourceData | null {

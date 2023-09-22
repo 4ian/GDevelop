@@ -28,7 +28,7 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
       .AddAction("CreateObjectsFromExternalLayout",
                  _("Create objects from an external layout"),
                  _("Create objects from an external layout."),
-                 _("Create objects from the external layout named _PARAM1_"),
+                 _("Create objects from the external layout named _PARAM1_ at position _PARAM2_;_PARAM3 (Pick objects: _PARAM4_)"),
                  "",
                  "res/ribbon_default/externallayout32.png",
                  "res/ribbon_default/externallayout32.png")
@@ -38,6 +38,8 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
       .SetDefaultValue("0")
       .AddParameter("expression", _("Y position of the origin"), "", true)
       .SetDefaultValue("0")
+      .AddParameter("yesorno", _("Pick objects: "), "", true)
+      .SetDefaultValue("no")
       .MarkAsAdvanced();
 }
 

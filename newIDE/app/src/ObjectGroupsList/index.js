@@ -517,7 +517,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                       multiSelect={false}
                       getItemId={getTreeViewItemId}
                       onEditItem={this._editItem}
-                      // $FlowFixMe
                       selectedItems={
                         selectedGroupWithContext
                           ? [selectedGroupWithContext]

@@ -176,7 +176,7 @@ module.exports = {
       )
       .setCategoryFullName(_('Text'))
       .addDefaultBehavior('EffectCapability::EffectBehavior')
-      .addDefaultBehavior("OpacityCapability::OpacityBehavior");
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.
@@ -398,7 +398,7 @@ module.exports = {
         conditionDescription: _('Check the current text alignment.'),
         conditionSentence: _('The text alignment of _PARAM0_ is _PARAM1_'),
         actionDescription: _('Change the alignment of the text.'),
-        actionSentence: _('Set text alignment of _PARAM0_ to _PARAM1_'),
+        actionSentence: _('text alignment'),
         expressionLabel: _('Get the text alignment'),
         expressionDescription: _('Get the text alignment'),
       },

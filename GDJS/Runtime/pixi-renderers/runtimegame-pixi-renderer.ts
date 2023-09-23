@@ -916,6 +916,10 @@ namespace gdjs {
 
       return null;
     };
+
+    getGame() {
+      return this._game;
+    }
   }
 
   //Register the class to let the engine use it.

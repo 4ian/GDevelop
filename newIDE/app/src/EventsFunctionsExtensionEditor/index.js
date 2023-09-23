@@ -79,6 +79,8 @@ type State = {|
   ) => void,
 |};
 
+const extensionEditIconReactNode = <ExtensionEditIcon />;
+
 // The event based object editor is hidden in releases
 // because it's not handled by GDJS.
 const getInitialMosaicEditorNodes = (showEventBasedObjectsEditor: boolean) => ({
@@ -1199,7 +1201,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
                 onCreateEventsFunction={this.onCreateEventsFunction}
                 onOpenSettings={this._editOptions}
-                settingsIcon={<ExtensionEditIcon />}
+                settingsIcon={extensionEditIconReactNode}
                 unsavedChanges={this.props.unsavedChanges}
                 isActive={true}
               />

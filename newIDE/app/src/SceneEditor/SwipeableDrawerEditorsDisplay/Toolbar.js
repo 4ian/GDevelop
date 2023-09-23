@@ -7,7 +7,6 @@ import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import IconButton from '../../UI/IconButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import ToolbarCommands from '../ToolbarCommands';
-import InstancesSelection from '../../InstancesEditor/InstancesSelection';
 import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import UndoIcon from '../../UI/CustomSvgIcons/Undo';
 import RedoIcon from '../../UI/CustomSvgIcons/Redo';
@@ -27,10 +26,10 @@ type Props = {|
   redo: () => void,
   canRedo: boolean,
   deleteSelection: () => void,
-  instancesSelection: InstancesSelection,
-  isWindowMaskShown: () => boolean,
+  selectedInstancesCount: number,
+  isWindowMaskShown: boolean,
   toggleWindowMask: () => void,
-  isGridShown: () => boolean,
+  isGridShown: boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
   getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
@@ -41,7 +40,7 @@ type Props = {|
   onRenameObject: () => void,
 |};
 
-const Toolbar = (props: Props) => {
+const Toolbar = React.memo<Props>(function(props) {
   return (
     <>
       <ToolbarCommands
@@ -58,9 +57,7 @@ const Toolbar = (props: Props) => {
         toggleWindowMask={props.toggleWindowMask}
         toggleGrid={props.toggleGrid}
         setupGrid={props.openSetupGrid}
-        canDeleteSelection={
-          props.instancesSelection.getSelectedInstances().length !== 0
-        }
+        canDeleteSelection={props.selectedInstancesCount !== 0}
         canRenameObject={props.canRenameObject}
         onRenameObject={props.onRenameObject}
       />
@@ -109,7 +106,7 @@ const Toolbar = (props: Props) => {
         size="small"
         color="default"
         onClick={props.deleteSelection}
-        disabled={!props.instancesSelection.getSelectedInstances().length}
+        disabled={!props.selectedInstancesCount}
         tooltip={t`Delete the selected instances from the scene`}
       >
         <TrashIcon />
@@ -130,13 +127,13 @@ const Toolbar = (props: Props) => {
             {
               type: 'checkbox',
               label: i18n._(t`Show Mask`),
-              checked: props.isWindowMaskShown(),
+              checked: props.isWindowMaskShown,
               click: () => props.toggleWindowMask(),
             },
             {
               type: 'checkbox',
               label: i18n._(t`Show grid`),
-              checked: props.isGridShown(),
+              checked: props.isGridShown,
               click: () => props.toggleGrid(),
             },
             { type: 'separator' },
@@ -158,6 +155,6 @@ const Toolbar = (props: Props) => {
       </ToolbarGroup>
     </>
   );
-};
+});
 
 export default Toolbar;

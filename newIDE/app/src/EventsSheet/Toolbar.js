@@ -42,7 +42,7 @@ type Props = {|
   canMoveEventsIntoNewGroup: boolean,
 |};
 
-const Toolbar = ({
+const Toolbar = React.memo<Props>(function Toolbar({
   onAddStandardEvent,
   onAddSubEvent,
   canAddSubEvent,
@@ -64,7 +64,7 @@ const Toolbar = ({
   settingsIcon,
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
-}: Props) => {
+}: Props) {
   const shortcutMap = useShortcutMap();
 
   return (
@@ -214,6 +214,6 @@ const Toolbar = ({
       </ToolbarGroup>
     </>
   );
-};
+});
 
 export default Toolbar;

@@ -25,6 +25,8 @@ const styles = {
   },
 };
 
+const editSceneIconReactNode = <EditSceneIcon />;
+
 type State = {|
   externalPropertiesDialogOpen: boolean,
 |};
@@ -159,7 +161,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             objectsContainer={layout}
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
-            settingsIcon={<EditSceneIcon />}
+            settingsIcon={editSceneIconReactNode}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             isActive={this.props.isActive}
           />

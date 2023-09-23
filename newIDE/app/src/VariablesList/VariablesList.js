@@ -280,26 +280,37 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         .filter(Boolean)
     : [];
 
-  const _onChange = () => {
-    props.historyHandler
-      ? props.historyHandler.saveToHistory()
-      : setHistory(saveToHistory(history, props.variablesContainer));
-    if (props.onVariablesUpdated) props.onVariablesUpdated();
-  };
+  const { historyHandler, onVariablesUpdated, variablesContainer } = props;
+  const _onChange = React.useCallback(
+    () => {
+      historyHandler
+        ? historyHandler.saveToHistory()
+        : setHistory(saveToHistory(history, variablesContainer));
+      if (onVariablesUpdated) onVariablesUpdated();
+    },
+    [history, historyHandler, onVariablesUpdated, variablesContainer]
+  );
 
-  const _undo = () => {
-    props.historyHandler
-      ? props.historyHandler.undo()
-      : setHistory(undo(history, props.variablesContainer));
-    setSelectedNodes([]);
-  };
+  const _undo = React.useCallback(
+    () => {
+      historyHandler
+        ? historyHandler.undo()
+        : setHistory(undo(history, props.variablesContainer));
+      setSelectedNodes([]);
+    },
+    [history, historyHandler, props.variablesContainer]
+  );
 
-  const _redo = () => {
-    props.historyHandler
-      ? props.historyHandler.redo()
-      : setHistory(redo(history, props.variablesContainer));
-    setSelectedNodes([]);
-  };
+  const _redo = React.useCallback(
+    () => {
+      historyHandler
+        ? historyHandler.redo()
+        : setHistory(redo(history, props.variablesContainer));
+      setSelectedNodes([]);
+    },
+    [history, historyHandler, props.variablesContainer]
+  );
+
   const _canUndo = (): boolean =>
     props.historyHandler ? props.historyHandler.canUndo() : canUndo(history);
 
@@ -311,163 +322,180 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     shortcutCallbacks: { onUndo: _undo, onRedo: _redo },
   });
 
-  const copySelection = () => {
-    Clipboard.set(
-      CLIPBOARD_KIND,
-      selectedNodes
-        .map(nodeId => {
-          const { variable, name, lineage } = getVariableContextFromNodeId(
-            nodeId,
-            nodeId.startsWith(inheritedPrefix) &&
-              props.inheritedVariablesContainer
-              ? props.inheritedVariablesContainer
-              : props.variablesContainer
-          );
-          if (!variable || !name) return null;
+  const copySelection = React.useCallback(
+    () => {
+      Clipboard.set(
+        CLIPBOARD_KIND,
+        selectedNodes
+          .map(nodeId => {
+            const { variable, name, lineage } = getVariableContextFromNodeId(
+              nodeId,
+              nodeId.startsWith(inheritedPrefix) &&
+                props.inheritedVariablesContainer
+                ? props.inheritedVariablesContainer
+                : props.variablesContainer
+            );
+            if (!variable || !name) return null;
 
-          let hasName = false;
-          const parentVariable = getDirectParentVariable(lineage);
-          if (
-            !parentVariable ||
-            parentVariable.getType() === gd.Variable.Structure
-          ) {
-            hasName = true;
-          }
-          return {
-            nameOrIndex: name,
-            serializedVariable: serializeToJSObject(variable),
-            hasName,
-          };
-        })
-        .filter(Boolean)
-    );
-    forceUpdate();
-  };
-
-  const pasteClipboardContent = () => {
-    if (!Clipboard.has(CLIPBOARD_KIND)) return;
-    const newSelectedNodes = [];
-
-    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-    const variablesContent = SafeExtractor.extractArray(clipboardContent);
-    if (!variablesContent) return;
-
-    let pastedElementOffsetIndex = 0;
-
-    variablesContent.forEach(variableContent => {
-      const nameOrIndex = SafeExtractor.extractStringProperty(
-        variableContent,
-        'nameOrIndex'
+            let hasName = false;
+            const parentVariable = getDirectParentVariable(lineage);
+            if (
+              !parentVariable ||
+              parentVariable.getType() === gd.Variable.Structure
+            ) {
+              hasName = true;
+            }
+            return {
+              nameOrIndex: name,
+              serializedVariable: serializeToJSObject(variable),
+              hasName,
+            };
+          })
+          .filter(Boolean)
       );
-      const serializedVariable = SafeExtractor.extractObjectProperty(
-        variableContent,
-        'serializedVariable'
-      );
-      const hasName = SafeExtractor.extractBooleanProperty(
-        variableContent,
-        'hasName'
-      );
-      if (!nameOrIndex || !serializedVariable || hasName === null) return;
+      forceUpdate();
+    },
+    [
+      forceUpdate,
+      props.inheritedVariablesContainer,
+      props.variablesContainer,
+      selectedNodes,
+    ]
+  );
 
-      const pasteAtTopLevel =
-        selectedNodes.length === 0 ||
-        selectedNodes.some(nodeId => nodeId.startsWith(inheritedPrefix));
+  const pasteClipboardContent = React.useCallback(
+    () => {
+      if (!Clipboard.has(CLIPBOARD_KIND)) return;
+      const newSelectedNodes = [];
 
-      const name = hasName ? nameOrIndex : null;
+      const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+      const variablesContent = SafeExtractor.extractArray(clipboardContent);
+      if (!variablesContent) return;
 
-      if (pasteAtTopLevel) {
-        if (!name) return;
-        const { name: newName } = insertInVariablesContainer(
-          props.variablesContainer,
-          name,
-          serializedVariable
+      let pastedElementOffsetIndex = 0;
+
+      variablesContent.forEach(variableContent => {
+        const nameOrIndex = SafeExtractor.extractStringProperty(
+          variableContent,
+          'nameOrIndex'
         );
-        newSelectedNodes.push(newName);
-      } else {
-        const targetNode = selectedNodes[0];
-        if (targetNode.startsWith(inheritedPrefix)) return;
-
-        const {
-          name: targetVariableName,
-          lineage: targetVariableLineage,
-        } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
-        if (!targetVariableName) return;
-
-        const targetParentVariable = getDirectParentVariable(
-          targetVariableLineage
+        const serializedVariable = SafeExtractor.extractObjectProperty(
+          variableContent,
+          'serializedVariable'
         );
-        if (!targetParentVariable) {
+        const hasName = SafeExtractor.extractBooleanProperty(
+          variableContent,
+          'hasName'
+        );
+        if (!nameOrIndex || !serializedVariable || hasName === null) return;
+
+        const pasteAtTopLevel =
+          selectedNodes.length === 0 ||
+          selectedNodes.some(nodeId => nodeId.startsWith(inheritedPrefix));
+
+        const name = hasName ? nameOrIndex : null;
+
+        if (pasteAtTopLevel) {
           if (!name) return;
           const { name: newName } = insertInVariablesContainer(
             props.variablesContainer,
             name,
-            serializedVariable,
-            props.variablesContainer.getPosition(targetVariableName) + 1
+            serializedVariable
           );
           newSelectedNodes.push(newName);
         } else {
-          const targetParentType = targetParentVariable.getType();
+          const targetNode = selectedNodes[0];
+          if (targetNode.startsWith(inheritedPrefix)) return;
 
-          if (
-            (targetParentType === gd.Variable.Structure && !name) ||
-            (targetParentType === gd.Variable.Array && !!name)
-          ) {
-            // Early return if trying to paste array element in structure or vice versa
-            return;
-          }
-          if (targetParentType === gd.Variable.Array) {
-            const index = parseInt(targetVariableName, 10) + 1;
-            insertInVariableChildrenArray(
-              targetParentVariable,
-              serializedVariable,
-              index
-            );
-            const bits = targetNode.split(separator);
-            bits.splice(
-              bits.length - 1,
-              1,
-              (index + pastedElementOffsetIndex).toString()
-            );
+          const {
+            name: targetVariableName,
+            lineage: targetVariableLineage,
+          } = getVariableContextFromNodeId(
+            targetNode,
+            props.variablesContainer
+          );
+          if (!targetVariableName) return;
 
-            newSelectedNodes.push(bits.join(separator));
-            pastedElementOffsetIndex += 1;
-          } else {
+          const targetParentVariable = getDirectParentVariable(
+            targetVariableLineage
+          );
+          if (!targetParentVariable) {
             if (!name) return;
-            const newName = insertInVariableChildren(
-              targetParentVariable,
+            const { name: newName } = insertInVariablesContainer(
+              props.variablesContainer,
               name,
-              serializedVariable
+              serializedVariable,
+              props.variablesContainer.getPosition(targetVariableName) + 1
             );
-            const bits = targetNode.split(separator);
-            bits.splice(bits.length - 1, 1, newName);
-            newSelectedNodes.push(bits.join(separator));
+            newSelectedNodes.push(newName);
+          } else {
+            const targetParentType = targetParentVariable.getType();
+
+            if (
+              (targetParentType === gd.Variable.Structure && !name) ||
+              (targetParentType === gd.Variable.Array && !!name)
+            ) {
+              // Early return if trying to paste array element in structure or vice versa
+              return;
+            }
+            if (targetParentType === gd.Variable.Array) {
+              const index = parseInt(targetVariableName, 10) + 1;
+              insertInVariableChildrenArray(
+                targetParentVariable,
+                serializedVariable,
+                index
+              );
+              const bits = targetNode.split(separator);
+              bits.splice(
+                bits.length - 1,
+                1,
+                (index + pastedElementOffsetIndex).toString()
+              );
+
+              newSelectedNodes.push(bits.join(separator));
+              pastedElementOffsetIndex += 1;
+            } else {
+              if (!name) return;
+              const newName = insertInVariableChildren(
+                targetParentVariable,
+                name,
+                serializedVariable
+              );
+              const bits = targetNode.split(separator);
+              bits.splice(bits.length - 1, 1, newName);
+              newSelectedNodes.push(bits.join(separator));
+            }
           }
         }
-      }
-    });
-    _onChange();
-    setSelectedNodes(newSelectedNodes);
-  };
+      });
+      _onChange();
+      setSelectedNodes(newSelectedNodes);
+    },
+    [_onChange, props.variablesContainer, selectedNodes]
+  );
 
-  const _deleteNode = (nodeId: string): boolean => {
-    if (nodeId.startsWith(inheritedPrefix)) return false;
-    const { name, lineage } = getVariableContextFromNodeId(
-      nodeId,
-      props.variablesContainer
-    );
-    if (!name) return false;
-    const parentVariable = getDirectParentVariable(lineage);
-    if (!parentVariable) {
-      props.variablesContainer.remove(name);
-    } else {
-      if (parentVariable.getType() === gd.Variable.Array) {
-        parentVariable.removeAtIndex(parseInt(name, 10));
+  const _deleteNode = React.useCallback(
+    (nodeId: string): boolean => {
+      if (nodeId.startsWith(inheritedPrefix)) return false;
+      const { name, lineage } = getVariableContextFromNodeId(
+        nodeId,
+        props.variablesContainer
+      );
+      if (!name) return false;
+      const parentVariable = getDirectParentVariable(lineage);
+      if (!parentVariable) {
+        props.variablesContainer.remove(name);
       } else {
-        parentVariable.removeChild(name);
+        if (parentVariable.getType() === gd.Variable.Array) {
+          parentVariable.removeAtIndex(parseInt(name, 10));
+        } else {
+          parentVariable.removeChild(name);
+        }
       }
-    }
-    return true;
-  };
+      return true;
+    },
+    [props.variablesContainer]
+  );
 
   const deleteNode = (nodeId: string): void => {
     const success = _deleteNode(nodeId);
@@ -476,12 +504,15 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     }
   };
 
-  const deleteSelection = () => {
-    const deleteSuccesses = selectedNodes.map(_deleteNode);
-    if (deleteSuccesses.some(Boolean)) {
-      setSelectedNodes([]);
-    }
-  };
+  const deleteSelection = React.useCallback(
+    () => {
+      const deleteSuccesses = selectedNodes.map(_deleteNode);
+      if (deleteSuccesses.some(Boolean)) {
+        setSelectedNodes([]);
+      }
+    },
+    [_deleteNode, selectedNodes]
+  );
 
   const updateExpandedAndSelectedNodesFollowingNameChange = (
     oldNodeId: string,
@@ -773,47 +804,51 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     newVariable.delete();
   };
 
-  const onAdd = () => {
-    const addAtTopLevel =
-      selectedNodes.length === 0 ||
-      selectedNodes.some(node => node.startsWith(inheritedPrefix));
+  const onAdd = React.useCallback(
+    () => {
+      const addAtTopLevel =
+        selectedNodes.length === 0 ||
+        selectedNodes.some(node => node.startsWith(inheritedPrefix));
 
-    if (addAtTopLevel) {
+      if (addAtTopLevel) {
+        const { name: newName, variable } = insertInVariablesContainer(
+          props.variablesContainer,
+          'Variable',
+          null,
+          props.variablesContainer.count()
+        );
+        _onChange();
+        setSelectedNodes([newName]);
+        refocusNameField({ identifier: variable.ptr });
+        return;
+      }
+
+      const targetNode = selectedNodes[0];
+      const {
+        name: targetVariableName,
+        lineage: targetLineage,
+      } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
+      if (!targetVariableName) return;
+      const oldestAncestry = getOldestAncestryVariable(targetLineage);
+      let position;
+      if (!oldestAncestry) {
+        position = props.variablesContainer.getPosition(targetVariableName) + 1;
+      } else {
+        position =
+          props.variablesContainer.getPosition(oldestAncestry.name) + 1;
+      }
       const { name: newName, variable } = insertInVariablesContainer(
         props.variablesContainer,
         'Variable',
         null,
-        props.variablesContainer.count()
+        position
       );
       _onChange();
       setSelectedNodes([newName]);
       refocusNameField({ identifier: variable.ptr });
-      return;
-    }
-
-    const targetNode = selectedNodes[0];
-    const {
-      name: targetVariableName,
-      lineage: targetLineage,
-    } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
-    if (!targetVariableName) return;
-    const oldestAncestry = getOldestAncestryVariable(targetLineage);
-    let position;
-    if (!oldestAncestry) {
-      position = props.variablesContainer.getPosition(targetVariableName) + 1;
-    } else {
-      position = props.variablesContainer.getPosition(oldestAncestry.name) + 1;
-    }
-    const { name: newName, variable } = insertInVariablesContainer(
-      props.variablesContainer,
-      'Variable',
-      null,
-      position
-    );
-    _onChange();
-    setSelectedNodes([newName]);
-    refocusNameField({ identifier: variable.ptr });
-  };
+    },
+    [_onChange, props.variablesContainer, refocusNameField, selectedNodes]
+  );
 
   const renderVariableAndChildrenRows = (
     {

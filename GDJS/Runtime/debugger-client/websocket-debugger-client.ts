@@ -37,7 +37,11 @@ namespace gdjs {
       } catch {
         try {
           this._ws = new WebSocket(
-            'ws://' + location.hostname + ':' + location.port + '/'
+            (location.protocol === 'https:' ? 'wss://' : 'ws://') +
+              location.hostname +
+              ':' +
+              location.port +
+              '/'
           );
         } catch {
           try {

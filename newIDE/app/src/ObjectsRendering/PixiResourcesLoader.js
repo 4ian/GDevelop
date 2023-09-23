@@ -196,7 +196,7 @@ export default class PixiResourcesLoader {
           const loadedTexture = await PIXI.Assets.load(url);
           loadedTextures[resourceName] = loadedTexture;
           // TODO What if 2 assets share the same file with different settings?
-          applyPixiTextureSettings(loadedTexture, resource);
+          applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
           console.error(
             'Unable to load file ' + resource.getFile() + ' with error:',

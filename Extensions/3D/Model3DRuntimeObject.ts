@@ -298,6 +298,11 @@ namespace gdjs {
       return this.getHeight() * centerPoint[1];
     }
 
+    getCenterZ(): float {
+      const centerPoint = this._renderer.getCenterPoint();
+      return this.getDepth() * centerPoint[2];
+    }
+
     getDrawableX(): float {
       const originPoint = this._renderer.getOriginPoint();
       return this.getX() - this.getWidth() * originPoint[0];
@@ -306,6 +311,11 @@ namespace gdjs {
     getDrawableY(): float {
       const originPoint = this._renderer.getOriginPoint();
       return this.getY() - this.getHeight() * originPoint[1];
+    }
+
+    getDrawableZ(): float {
+      const originPoint = this._renderer.getOriginPoint();
+      return this.getZ() - this.getDepth() * originPoint[2];
     }
   }
 

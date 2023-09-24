@@ -147,9 +147,9 @@ namespace gdjs {
     /**
      * Get the Z position of the rendered object.
      *
-     * For most objects, this will returns the same value as getZ(). But if the object
-     * has an origin that is not the same as the point (0,0) of the object displayed,
-     * getDrawableZ will differ.
+     * For most objects, this will returns the same value as getZ(). But if the
+     * object has an origin that is not the same as the point (0,0,0) of the
+     * object displayed, getDrawableZ will differ.
      *
      * @return The Z position of the rendered object.
      */
@@ -158,10 +158,13 @@ namespace gdjs {
     }
 
     /**
-     * Return the Z position of the object center, **relative to the object Z position** (`getDrawableX`).
+     * Return the Z position of the object center, **relative to the object Z
+     * position** (`getDrawableX`).
+     * 
      * Use `getCenterZInScene` to get the position of the center in the scene.
      *
-     * @return the Z position of the object center, relative to `getDrawableZ()`.
+     * @return the Z position of the object center, relative to
+     * `getDrawableZ()`.
      */
     getCenterZ(): float {
       return this.getDepth() / 2;

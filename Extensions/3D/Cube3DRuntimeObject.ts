@@ -118,10 +118,6 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getCenterZ(): float {
-      return this.getDepth() / 2;
-    }
-
     /**
      * Sets the visibility of a face of the 3D box.
      *

@@ -165,6 +165,7 @@ void ObjectFolderOrObject::UnserializeFrom(
             make_unique<ObjectFolderOrObject>();
         childObjectFolderOrObject->UnserializeFrom(
             project, childrenElements.GetChild(i), objectsContainer);
+        childObjectFolderOrObject->parent = this;
         children.push_back(std::move(childObjectFolderOrObject));
       }
     }

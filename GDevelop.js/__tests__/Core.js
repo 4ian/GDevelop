@@ -4,6 +4,7 @@ const {
   makeFakeAbstractFileSystem,
 } = require('../TestUtils/FakeAbstractFileSystem');
 const extend = require('extend');
+const { mapFor } = require('../../newIDE/app/src/Utils/MapFor.js');
 
 describe('libGD.js', function () {
   let gd = null;
@@ -4668,6 +4669,12 @@ Array [
         'OtherObject',
         1
       );
+      const object3 = layout.insertNewObject(project, 'Sprite', 'SubObject', 2);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('SubObject'),
+        subFolder,
+        0
+      );
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder.getChildrenCount()).toEqual(3);
@@ -4678,6 +4685,8 @@ Array [
       expect(
         rootFolder.getChildPosition(rootFolder.getObjectChild('OtherObject'))
       ).toEqual(2);
+      expect(rootFolder.hasObjectNamed('SubObject')).toBe(true);
+      expect(subFolder.hasObjectNamed('SubObject')).toBe(true);
 
       const element = new gd.SerializerElement();
       layout.serializeTo(element);
@@ -4693,6 +4702,19 @@ Array [
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder2.getChildrenCount()).toEqual(3);
+      const parentEqualities = mapFor(
+        0,
+        rootFolder2.getChildrenCount(),
+        (i) => {
+          const childObjectFolderOrObject = rootFolder2.getChildAt(i);
+          return childObjectFolderOrObject.getParent() === rootFolder2;
+        }
+      );
+      expect(parentEqualities.every((equality) => equality)).toBe(true);
+      const subFolder2 = rootFolder2.getChildAt(1);
+      expect(subFolder2.isFolder()).toBe(true);
+      const subObject = subFolder2.getObjectChild('SubObject');
+      expect(subObject.getParent()).toBe(subFolder2);
     });
 
     test('an ObjectFolderOrObject can be serialized and unserialized and missing object folders or objects are added', () => {
@@ -4705,9 +4727,17 @@ Array [
         'OtherObject',
         1
       );
+      const object3 = layout.insertNewObject(project, 'Sprite', 'SubObject', 2);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('SubObject'),
+        subFolder,
+        0
+      );
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
       expect(rootFolder.getChildrenCount()).toEqual(3);
+      expect(rootFolder.hasObjectNamed('SubObject')).toBe(true);
+      expect(subFolder.hasObjectNamed('SubObject')).toBe(true);
 
       const element = new gd.SerializerElement();
       layout.serializeTo(element);
@@ -4728,7 +4758,16 @@ Array [
       const rootFolder2 = layout.getRootFolder();
       expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
       expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
-      expect(rootFolder2.getChildrenCount()).toEqual(2);
+      expect(rootFolder2.getChildrenCount()).toEqual(3);
+      const parentEqualities = mapFor(
+        0,
+        rootFolder2.getChildrenCount(),
+        (i) => {
+          const childObjectFolderOrObject = rootFolder2.getChildAt(i);
+          return childObjectFolderOrObject.getParent() === rootFolder2;
+        }
+      );
+      expect(parentEqualities.every((equality) => equality)).toBe(true);
     });
   });
 });

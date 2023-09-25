@@ -317,7 +317,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         };
 
         if (treeViewRef.current)
-          treeViewRef.current.openItem(sceneObjectsRootFolderId);
+          treeViewRef.current.openItems([sceneObjectsRootFolderId]);
 
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
@@ -354,7 +354,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           onObjectCreated(object);
         });
         if (treeViewRef.current)
-          treeViewRef.current.openItem(sceneObjectsRootFolderId);
+          treeViewRef.current.openItems([sceneObjectsRootFolderId]);
 
         const lastObject = objects[objects.length - 1];
         const objectFolderOrObjectWithContext = {
@@ -763,7 +763,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (!answer) return;
 
         if (treeViewRef.current)
-          treeViewRef.current.openItem(globalObjectsRootFolderId);
+          treeViewRef.current.openItems([globalObjectsRootFolderId]);
 
         // It's safe to call moveObjectFolderOrObjectToAnotherContainerInFolder because
         // it does not invalidate the references to the object in memory - so other editors
@@ -999,12 +999,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     );
                   onObjectModified(true);
                   if (treeViewRef.current)
-                    treeViewRef.current.openItem(
+                    treeViewRef.current.openItems([
                       getTreeViewItemId({
                         objectFolderOrObject: folder,
                         global: item.global,
                       })
-                    );
+                    ]);
                 },
               })),
             },
@@ -1105,12 +1105,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   );
                 onObjectModified(true);
                 if (treeViewRef.current)
-                  treeViewRef.current.openItem(
+                  treeViewRef.current.openItems([
                     getTreeViewItemId({
                       objectFolderOrObject: folder,
                       global: item.global,
                     })
-                  );
+                  ]);
               },
             })),
           },

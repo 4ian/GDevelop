@@ -160,7 +160,7 @@ namespace gdjs {
     /**
      * Return the Z position of the object center, **relative to the object Z
      * position** (`getDrawableX`).
-     * 
+     *
      * Use `getCenterZInScene` to get the position of the center in the scene.
      *
      * @return the Z position of the object center, relative to

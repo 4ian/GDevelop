@@ -102,6 +102,17 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
   }
 };
 
+void ObjectFolderOrObject::MoveChild(std::size_t oldIndex,
+                                     std::size_t newIndex) {
+  if (!IsFolder()) return;
+  if (oldIndex >= children.size() || newIndex >= children.size()) return;
+
+  std::unique_ptr<gd::ObjectFolderOrObject> objectFolderOrObject =
+      std::move(children[oldIndex]);
+  children.erase(children.begin() + oldIndex);
+  children.insert(children.begin() + newIndex, std::move(objectFolderOrObject));
+}
+
 void ObjectFolderOrObject::MoveObjectFolderOrObjectToAnotherFolder(
     gd::ObjectFolderOrObject& objectFolderOrObject,
     gd::ObjectFolderOrObject& newParentFolder,

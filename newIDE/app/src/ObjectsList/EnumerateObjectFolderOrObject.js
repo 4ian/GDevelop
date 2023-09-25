@@ -100,13 +100,14 @@ const recursivelyEnumerateFoldersInFolder = (
   mapFor(0, folder.getChildrenCount(), i => {
     const child = folder.getChildAt(i);
     if (child.isFolder()) {
+      const newPrefix = prefix
+        ? prefix + '/' + child.getFolderName()
+        : child.getFolderName();
       result.push({
-        path: prefix
-          ? prefix + '/' + child.getFolderName()
-          : child.getFolderName(),
+        path: newPrefix,
         folder: child,
       });
-      recursivelyEnumerateFoldersInFolder(child, child.getFolderName(), result);
+      recursivelyEnumerateFoldersInFolder(child, newPrefix, result);
     }
   });
 };

@@ -705,6 +705,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             selectedObject => selectedObject.global === destinationItem.global
           )
         ) {
+          if (
+            destinationItem.objectFolderOrObject.isADescendantOf(
+              selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject
+            )
+          ) {
+            return false;
+          }
           return true;
         } else if (
           selectedObjectFolderOrObjectsWithContext.length === 1 &&
@@ -906,6 +913,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             if (where === 'after') toIndex += 1;
             selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
           } else {
+            if (
+              destinationObjectFolderOrObject.isADescendantOf(
+                selectedObjectFolderOrObject
+              )
+            ) {
+              return;
+            }
             selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
               selectedObjectFolderOrObject,
               parent,
@@ -985,13 +999,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const { objectFolderOrObject, global } = item;
 
         const container = global ? project : objectsContainer;
-        const folderAndPathsInContainer = enumerateFoldersInContainer(
-          container
-        ).filter(
-          folderAndPath =>
-            folderAndPath.folder !== item.objectFolderOrObject.getParent()
-        );
-        if (objectFolderOrObject.isFolder())
+        let folderAndPathsInContainer = enumerateFoldersInContainer(container);
+        folderAndPathsInContainer.unshift({
+          path: i18n._(t`Root folder`),
+          folder: container.getRootFolder(),
+        });
+        if (objectFolderOrObject.isFolder()) {
+          folderAndPathsInContainer = folderAndPathsInContainer.filter(
+            folderAndPath =>
+              !folderAndPath.folder.isADescendantOf(objectFolderOrObject) &&
+              folderAndPath.folder !== objectFolderOrObject
+          );
           return [
             {
               label: i18n._(t`Rename`),
@@ -1015,6 +1033,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               label: i18n._('Move to folder'),
               submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
                 label: path,
+                enabled: folder !== objectFolderOrObject.getParent(),
                 click: () => {
                   objectFolderOrObject
                     .getParent()
@@ -1053,6 +1072,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               },
             },
           ];
+        }
 
         const object = objectFolderOrObject.getObject();
         const instanceCountOnScene = initialInstances
@@ -1139,6 +1159,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             label: i18n._('Move to folder'),
             submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
               label: path,
+              enabled: folder !== objectFolderOrObject.getParent(),
               click: () => {
                 item.objectFolderOrObject
                   .getParent()

@@ -44,6 +44,7 @@ import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
+  enumerateFoldersInContainer,
   enumerateObjectFolderOrObjects,
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
@@ -880,7 +881,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
             selectedObjectFolderOrObject,
             destinationParent,
-            destinationParent.getChildPosition(destinationObjectFolderOrObject)
+            destinationParent.getChildPosition(
+              destinationObjectFolderOrObject
+            ) + (where === 'after' ? 1 : 0)
           );
         } else {
           return;
@@ -950,9 +953,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
-        if (item.isRoot || item.isPlaceholder) return;
+        if (item.isRoot || item.isPlaceholder) return [];
         const { objectFolderOrObject } = item;
-        if (objectFolderOrObject.isFolder()) return;
+        if (objectFolderOrObject.isFolder()) return [];
 
         const object = objectFolderOrObject.getObject();
         const instanceCountOnScene = initialInstances
@@ -961,6 +964,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               object.getName()
             )
           : undefined;
+        const container = item.global ? project : objectsContainer;
+        const folderAndPathsInContainer = enumerateFoldersInContainer(
+          container
+        ).filter(
+          folderAndPath =>
+            folderAndPath.folder !== item.objectFolderOrObject.getParent()
+        );
 
         const objectMetadata = gd.MetadataProvider.getObjectMetadata(
           project.getCurrentPlatform(),
@@ -1033,6 +1043,29 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             visible: canSetAsGlobalObject !== false,
           },
           {
+            label: i18n._('Move to folder'),
+            submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
+              label: path,
+              click: () => {
+                item.objectFolderOrObject
+                  .getParent()
+                  .moveObjectFolderOrObjectToAnotherFolder(
+                    item.objectFolderOrObject,
+                    folder,
+                    0
+                  );
+                onObjectModified(true);
+                if (treeViewRef.current)
+                  treeViewRef.current.openItem(
+                    getTreeViewItemId({
+                      objectFolderOrObject: folder,
+                      global: item.global,
+                    })
+                  );
+              },
+            })),
+          },
+          {
             label: i18n._(t`Tags`),
             submenu: buildTagsMenuTemplate({
               noTagLabel: i18n._(t`No tags`),
@@ -1094,6 +1127,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         canSetAsGlobalObject,
         initialInstances,
         selectObject,
+        objectsContainer,
+        onObjectModified,
       ]
     );
 

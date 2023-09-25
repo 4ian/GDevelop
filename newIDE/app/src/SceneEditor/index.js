@@ -992,7 +992,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     // newName is supposed to have been already validated.
 
     if (objectFolderOrObject.isFolder()) {
-      objectFolderOrObject.renameFolder(newName);
+      objectFolderOrObject.setFolderName(newName);
       done(true);
       return;
     }

@@ -26,9 +26,11 @@
   position: relative;
 }
 
-.tree-view .row-content-side.row-content-side-left {
+.tree-view .row-content-side.row-content-extra-padding {
   /* Used for a better dragging preview. */
   padding: 0 6px;
+}
+.tree-view .row-content-side.row-content-side-left {
   /* Necessary for item-name to be overflown. */
   width: 80%;
 }

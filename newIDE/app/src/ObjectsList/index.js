@@ -791,6 +791,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
     );
 
+    const selectObject = React.useCallback(
+      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
+        onObjectFolderOrObjectWithContextSelected(
+          objectFolderOrObjectWithContext
+        );
+      },
+      [onObjectFolderOrObjectWithContextSelected]
+    );
+
     const moveSelectionTo = React.useCallback(
       (
         i18n: I18nType,
@@ -809,12 +818,18 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             selectedObjectFolderOrObjectsWithContext.length === 1 &&
             !selectedObjectFolderOrObjectsWithContext[0].global
           ) {
+            const selectedObjectFolderOrObjectWithContext =
+              selectedObjectFolderOrObjectsWithContext[0];
+
             setAsGlobalObject({
               i18n,
-              objectFolderOrObjectWithContext:
-                selectedObjectFolderOrObjectsWithContext[0],
+              objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
             });
-            onObjectModified(true)
+            onObjectModified(true);
+            selectObject({
+              ...selectedObjectFolderOrObjectWithContext,
+              global: true,
+            });
             return;
           }
           return;
@@ -844,6 +859,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               (where === 'after' ? 1 : 0),
           });
           onObjectModified(true);
+          selectObject({
+            ...selectedObjectFolderOrObjectWithContext,
+            global: true,
+          });
           return;
         }
 
@@ -872,6 +891,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectModified,
         selectedObjectFolderOrObjectsWithContext,
         setAsGlobalObject,
+        selectObject,
       ]
     );
 
@@ -891,15 +911,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectModified(true);
       },
       [onObjectModified]
-    );
-
-    const selectObject = React.useCallback(
-      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
-        onObjectFolderOrObjectWithContextSelected(
-          objectFolderOrObjectWithContext
-        );
-      },
-      [onObjectFolderOrObjectWithContextSelected]
     );
 
     const getTreeViewItemThumbnail = React.useCallback(
@@ -1012,11 +1023,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectFolderOrObjectWithContextGlobal(item),
-            click: () =>
+            click: () => {
+              selectObject(null);
               setAsGlobalObject({
                 i18n,
                 objectFolderOrObjectWithContext: item,
-              }),
+              });
+            },
             visible: canSetAsGlobalObject !== false,
           },
           {
@@ -1080,6 +1093,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         preferences.values.userShortcutMap,
         canSetAsGlobalObject,
         initialInstances,
+        selectObject,
       ]
     );
 

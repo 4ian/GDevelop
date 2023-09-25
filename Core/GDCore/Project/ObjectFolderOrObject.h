@@ -63,10 +63,7 @@ class GD_CORE_API ObjectFolderOrObject {
    * \brief Set the folder name. Does nothing if called on an instance not
    * representing a folder.
    */
-  void SetFolderName(const gd::String& name) {
-    if (!IsFolder()) return;
-    folderName = name;
-  }
+  void SetFolderName(const gd::String& name);
 
   /**
    * \brief Returns true if the instance contains the object with the given name

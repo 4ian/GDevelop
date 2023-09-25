@@ -867,7 +867,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
 
-        // At that point, the move is done from within the same container.
+        // At this point, the move is done from within the same container.
         if (
           selectedObjectFolderOrObjectWithContext.global ===
           destinationItem.global
@@ -878,13 +878,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           const destinationObjectFolderOrObject =
             destinationItem.objectFolderOrObject;
           const destinationParent = destinationObjectFolderOrObject.getParent();
-          selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
-            selectedObjectFolderOrObject,
-            destinationParent,
-            destinationParent.getChildPosition(
+          if (destinationParent === selectedObjectFolderOrObjectParent) {
+            const fromIndex = selectedObjectFolderOrObjectParent.getChildPosition(
+              selectedObjectFolderOrObject
+            );
+            let toIndex = selectedObjectFolderOrObjectParent.getChildPosition(
               destinationObjectFolderOrObject
-            ) + (where === 'after' ? 1 : 0)
-          );
+            );
+            if (toIndex > fromIndex) toIndex -= 1;
+            if (where === 'after') toIndex += 1;
+            selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
+          } else {
+            selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
+              selectedObjectFolderOrObject,
+              destinationParent,
+              destinationParent.getChildPosition(
+                destinationObjectFolderOrObject
+              ) + (where === 'after' ? 1 : 0)
+            );
+          }
         } else {
           return;
         }

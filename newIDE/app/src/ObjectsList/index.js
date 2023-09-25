@@ -967,7 +967,48 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
         if (item.isRoot || item.isPlaceholder) return [];
         const { objectFolderOrObject } = item;
-        if (objectFolderOrObject.isFolder()) return [];
+
+        const container = item.global ? project : objectsContainer;
+        const folderAndPathsInContainer = enumerateFoldersInContainer(
+          container
+        ).filter(
+          folderAndPath =>
+            folderAndPath.folder !== item.objectFolderOrObject.getParent()
+        );
+        if (objectFolderOrObject.isFolder())
+          return [
+            {
+              label: i18n._(t`Rename`),
+              click: () => editName(item),
+              accelerator: getShortcutDisplayName(
+                preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
+                  defaultShortcuts.RENAME_SCENE_OBJECT
+              ),
+            },
+            {
+              label: i18n._('Move to folder'),
+              submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
+                label: path,
+                click: () => {
+                  item.objectFolderOrObject
+                    .getParent()
+                    .moveObjectFolderOrObjectToAnotherFolder(
+                      item.objectFolderOrObject,
+                      folder,
+                      0
+                    );
+                  onObjectModified(true);
+                  if (treeViewRef.current)
+                    treeViewRef.current.openItem(
+                      getTreeViewItemId({
+                        objectFolderOrObject: folder,
+                        global: item.global,
+                      })
+                    );
+                },
+              })),
+            },
+          ];
 
         const object = objectFolderOrObject.getObject();
         const instanceCountOnScene = initialInstances
@@ -976,14 +1017,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               object.getName()
             )
           : undefined;
-        const container = item.global ? project : objectsContainer;
-        const folderAndPathsInContainer = enumerateFoldersInContainer(
-          container
-        ).filter(
-          folderAndPath =>
-            folderAndPath.folder !== item.objectFolderOrObject.getParent()
-        );
-
         const objectMetadata = gd.MetadataProvider.getObjectMetadata(
           project.getCurrentPlatform(),
           object.getType()
@@ -1005,6 +1038,18 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Duplicate`),
             click: () => duplicateObject(item),
+          },
+          {
+            label: i18n._(t`Rename`),
+            click: () => editName(item),
+            accelerator: getShortcutDisplayName(
+              preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
+                defaultShortcuts.RENAME_SCENE_OBJECT
+            ),
+          },
+          {
+            label: i18n._(t`Delete`),
+            click: () => deleteObject(i18n, item),
           },
           { type: 'separator' },
           {
@@ -1034,14 +1079,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               }
             : null,
           { type: 'separator' },
-          {
-            label: i18n._(t`Rename`),
-            click: () => editName(item),
-            accelerator: getShortcutDisplayName(
-              preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
-                defaultShortcuts.RENAME_SCENE_OBJECT
-            ),
-          },
           {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectFolderOrObjectWithContextGlobal(item),
@@ -1089,10 +1126,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               editTagsLabel: i18n._(t`Add/edit tags...`),
               onEditTags: () => openEditTagDialog(object),
             }),
-          },
-          {
-            label: i18n._(t`Delete`),
-            click: () => deleteObject(i18n, item),
           },
           { type: 'separator' },
           {

@@ -274,9 +274,11 @@ export const WithObjectsList = () => (
                   getAllObjectTags={() => []}
                   getValidatedObjectOrGroupName={newName => newName}
                   onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameObjectFolderOrObjectWithContextFinish={(objectFolderOrObjectWithContext, newName, cb) =>
-                    cb(true)
-                  }
+                  onRenameObjectFolderOrObjectWithContextFinish={(
+                    objectFolderOrObjectWithContext,
+                    newName,
+                    cb
+                  ) => cb(true)}
                   onObjectCreated={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

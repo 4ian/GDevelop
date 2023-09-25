@@ -813,7 +813,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (
         i18n: I18nType,
         destinationItem: TreeViewItem,
-        where: 'after' | 'before'
+        where: 'afterOrInside' | 'before'
       ) => {
         if (
           destinationItem.isRoot ||
@@ -860,7 +860,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         ) {
           let parent, index;
           if (
-            where === 'after' &&
+            where === 'afterOrInside' &&
             destinationItem.objectFolderOrObject.isFolder()
           ) {
             parent = destinationItem.objectFolderOrObject;
@@ -869,7 +869,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             parent = destinationItem.objectFolderOrObject.getParent();
             index =
               parent.getChildPosition(destinationItem.objectFolderOrObject) +
-              (where === 'after' ? 1 : 0);
+              (where === 'afterOrInside' ? 1 : 0);
           }
           setAsGlobalObject({
             i18n,
@@ -896,7 +896,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             destinationItem.objectFolderOrObject;
           let parent;
 
-          if (where === 'after' && destinationObjectFolderOrObject.isFolder()) {
+          if (
+            where === 'afterOrInside' &&
+            destinationObjectFolderOrObject.isFolder()
+          ) {
             parent = destinationObjectFolderOrObject;
           } else {
             parent = destinationObjectFolderOrObject.getParent();
@@ -910,7 +913,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               destinationObjectFolderOrObject
             );
             if (toIndex > fromIndex) toIndex -= 1;
-            if (where === 'after') toIndex += 1;
+            if (where === 'afterOrInside') toIndex += 1;
             selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
           } else {
             if (
@@ -924,7 +927,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               selectedObjectFolderOrObject,
               parent,
               parent.getChildPosition(destinationObjectFolderOrObject) +
-                (where === 'after' ? 1 : 0)
+                (where === 'afterOrInside' ? 1 : 0)
             );
           }
         } else {

@@ -338,7 +338,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onObjectFolderOrObjectWithContextSelected={
                         props.onObjectFolderOrObjectWithContextSelected
                       }
-                      onRenameObjectFolderOrObjectWithContextFinish={props.onRenameObjectFolderOrObjectWithContextFinish}
+                      onRenameObjectFolderOrObjectWithContextFinish={
+                        props.onRenameObjectFolderOrObjectWithContextFinish
+                      }
                       onAddObjectInstance={objectName =>
                         props.onAddObjectInstance(objectName, 'upperCenter')
                       }

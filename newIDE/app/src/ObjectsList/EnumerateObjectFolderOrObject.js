@@ -92,7 +92,7 @@ export const enumerateObjectFolderOrObjects = (
   };
 };
 
-const enumerateFoldersInFolder = (
+const recursivelyEnumerateFoldersInFolder = (
   folder: gdObjectFolderOrObject,
   prefix: string,
   result: {| path: string, folder: gdObjectFolderOrObject |}[]
@@ -106,9 +106,16 @@ const enumerateFoldersInFolder = (
           : child.getFolderName(),
         folder: child,
       });
-      enumerateFoldersInFolder(child, child.getFolderName(), result);
+      recursivelyEnumerateFoldersInFolder(child, child.getFolderName(), result);
     }
   });
+};
+
+export const enumerateFoldersInFolder = (folder: gdObjectFolderOrObject) => {
+  if (!folder.isFolder()) return [];
+  const result = [];
+  recursivelyEnumerateFoldersInFolder(folder, '', result);
+  return result;
 };
 
 export const enumerateFoldersInContainer = (
@@ -116,6 +123,6 @@ export const enumerateFoldersInContainer = (
 ): {| path: string, folder: gdObjectFolderOrObject |}[] => {
   const rootFolder = container.getRootFolder();
   const result = [];
-  enumerateFoldersInFolder(rootFolder, '', result);
+  recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
   return result;
 };

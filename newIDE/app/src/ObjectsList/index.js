@@ -45,6 +45,7 @@ import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
   enumerateFoldersInContainer,
+  enumerateFoldersInFolder,
   enumerateObjectFolderOrObjects,
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
@@ -966,9 +967,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
         if (item.isRoot || item.isPlaceholder) return [];
-        const { objectFolderOrObject } = item;
+        const { objectFolderOrObject, global } = item;
 
-        const container = item.global ? project : objectsContainer;
+        const container = global ? project : objectsContainer;
         const folderAndPathsInContainer = enumerateFoldersInContainer(
           container
         ).filter(
@@ -990,10 +991,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
                 label: path,
                 click: () => {
-                  item.objectFolderOrObject
+                  objectFolderOrObject
                     .getParent()
                     .moveObjectFolderOrObjectToAnotherFolder(
-                      item.objectFolderOrObject,
+                      objectFolderOrObject,
                       folder,
                       0
                     );
@@ -1003,10 +1004,28 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getTreeViewItemId({
                         objectFolderOrObject: folder,
                         global: item.global,
-                      })
+                      }),
                     ]);
                 },
               })),
+            },
+            { type: 'separator' },
+            {
+              label: i18n._(t`Expand all sub folders`),
+              click: () => {
+                const subFoldersAndPaths = enumerateFoldersInFolder(
+                  objectFolderOrObject
+                ).map(folderAndPath => folderAndPath.folder);
+                if (treeViewRef.current)
+                  treeViewRef.current.openItems(
+                    [objectFolderOrObject, ...subFoldersAndPaths].map(folder =>
+                      getTreeViewItemId({
+                        objectFolderOrObject: folder,
+                        global,
+                      })
+                    )
+                  );
+              },
             },
           ];
 
@@ -1108,8 +1127,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   treeViewRef.current.openItems([
                     getTreeViewItemId({
                       objectFolderOrObject: folder,
-                      global: item.global,
-                    })
+                      global,
+                    }),
                   ]);
               },
             })),

@@ -101,7 +101,7 @@ const recursivelyEnumerateFoldersInFolder = (
     const child = folder.getChildAt(i);
     if (child.isFolder()) {
       const newPrefix = prefix
-        ? prefix + '/' + child.getFolderName()
+        ? prefix + ' > ' + child.getFolderName()
         : child.getFolderName();
       result.push({
         path: newPrefix,

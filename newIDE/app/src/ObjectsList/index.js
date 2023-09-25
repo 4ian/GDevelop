@@ -987,6 +987,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               ),
             },
             {
+              label: i18n._(t`Delete`),
+              click: () => {
+                objectFolderOrObject
+                  .getParent()
+                  .removeFolderChild(objectFolderOrObject);
+                onObjectModified(true);
+              },
+              enabled: objectFolderOrObject.getChildrenCount() === 0,
+            },
+            {
               label: i18n._('Move to folder'),
               submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
                 label: path,

@@ -117,7 +117,7 @@ void ObjectFolderOrObject::MoveObjectFolderOrObjectToAnotherFolder(
     gd::ObjectFolderOrObject& objectFolderOrObject,
     gd::ObjectFolderOrObject& newParentFolder,
     std::size_t newPosition) {
-  if (objectFolderOrObject.IsFolder() || !newParentFolder.IsFolder()) return;
+  if (!newParentFolder.IsFolder()) return;
 
   std::vector<std::unique_ptr<gd::ObjectFolderOrObject>>::iterator it =
       find_if(children.begin(),

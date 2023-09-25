@@ -47,6 +47,12 @@
   border-radius: 6px;
   width: 100%;
 }
+.tree-view .row-container.with-can-drop-inside-indicator {
+  outline: 1px solid var(--theme-drop-indicator-can-drop-color);
+}
+.tree-view .row-container.with-cannot-drop-inside-indicator {
+  outline: 1px solid var(--theme-drop-indicator-cannot-drop-color);
+}
 .tree-view .row-container.selected {
   background-color: var(--table-row-selected-background-color);
 }

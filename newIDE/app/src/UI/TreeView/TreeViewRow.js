@@ -91,9 +91,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const left = node.depth * 15;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
-  const [whereToDrop, setWhereToDrop] = React.useState<'before' | 'after'>(
-    'before'
-  );
+  const [whereToDrop, setWhereToDrop] = React.useState<
+    'before' | 'afterOrInside'
+  >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const openContextMenu = React.useCallback(
     ({ clientX, clientY }) => {
@@ -157,7 +157,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     }
   }, []);
 
-  const displayAsFolder = node.hasChildren || node.thumbnailSrc === 'FOLDER'
+  const displayAsFolder = node.hasChildren || node.thumbnailSrc === 'FOLDER';
 
   return (
     <div style={style} ref={containerRef}>
@@ -180,7 +180,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             getContainerYPosition
           );
           if (containerYPosition) {
-            setWhereToDrop(y - containerYPosition <= 16 ? 'before' : 'after');
+            setWhereToDrop(
+              y - containerYPosition <= 16 ? 'before' : 'afterOrInside'
+            );
           }
         }}
       >
@@ -207,7 +209,15 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   onClick={onClick}
                   tabIndex={0}
                   className={
-                    'row-container' + (node.selected ? ' selected' : '')
+                    'row-container' +
+                    (node.selected ? ' selected' : '') +
+                    (isOver &&
+                    whereToDrop === 'afterOrInside' &&
+                    displayAsFolder
+                      ? canDrop
+                        ? ' with-can-drop-inside-indicator'
+                        : ' with-cannot-drop-inside-indicator'
+                      : '')
                   }
                   {...dataObjectToProps(node.dataset)}
                 >
@@ -229,7 +239,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             className={`row-content-side${
                               node.item.isRoot ? '' : ' row-content-side-left'
                             }${
-                              displayAsFolder ? '' : ' row-content-extra-padding'
+                              displayAsFolder
+                                ? ''
+                                : ' row-content-extra-padding'
                             }`}
                           >
                             {displayAsFolder ? (
@@ -318,9 +330,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             </div>
                           )}
                       </div>
-                      {isOver && whereToDrop === 'after' && (
-                        <DropIndicator canDrop={canDrop} />
-                      )}
+                      {isOver &&
+                        whereToDrop === 'afterOrInside' &&
+                        !displayAsFolder && <DropIndicator canDrop={canDrop} />}
                     </div>
                   )}
                 </div>

@@ -384,7 +384,9 @@ const MosaicEditorsDisplay = React.forwardRef<
               onObjectFolderOrObjectWithContextSelected={
                 props.onObjectFolderOrObjectWithContextSelected
               }
-              onRenameObjectFolderOrObjectWithContextFinish={props.onRenameObjectFolderOrObjectWithContextFinish}
+              onRenameObjectFolderOrObjectWithContextFinish={
+                props.onRenameObjectFolderOrObjectWithContextFinish
+              }
               onAddObjectInstance={props.onAddObjectInstance}
               onObjectPasted={props.updateBehaviorsSharedData}
               selectedObjectTags={selectedObjectTags}

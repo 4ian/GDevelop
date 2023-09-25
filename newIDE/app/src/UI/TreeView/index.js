@@ -45,7 +45,7 @@ export type ItemData<Item> = {|
   |}) => void,
   renamedItemId: ?string,
   canDrop?: ?(Item) => boolean,
-  onDrop: (Item, where: 'before' | 'after') => void,
+  onDrop: (Item, where: 'before' | 'afterOrInside') => void,
   onEditItem?: Item => void,
   isMobileScreen: boolean,
   DragSourceAndDropTarget: any => React.Node,
@@ -67,7 +67,7 @@ const getItemProps = memoizeOne(
       y: number,
     |}) => void,
     canDrop?: ?(Item) => boolean,
-    onDrop: (Item, where: 'before' | 'after') => void,
+    onDrop: (Item, where: 'before' | 'afterOrInside') => void,
     onEditItem?: Item => void,
     isMobileScreen: boolean,
     DragSourceAndDropTarget: any => React.Node,
@@ -115,7 +115,7 @@ type Props<Item> = {|
   onRenameItem: (Item, newName: string) => void,
   onMoveSelectionToItem: (
     destinationItem: Item,
-    where: 'before' | 'after'
+    where: 'before' | 'afterOrInside'
   ) => void,
   canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
   reactDndType: string,

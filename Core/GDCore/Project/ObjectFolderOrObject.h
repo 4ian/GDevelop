@@ -55,6 +55,7 @@ class GD_CORE_API ObjectFolderOrObject {
   void InsertObject(gd::Object* insertedObject, std::size_t position);
   ObjectFolderOrObject& InsertNewFolder(const gd::String newFolderName,
                                         std::size_t position);
+  bool IsADescendantOf(ObjectFolderOrObject& otherObjectFolderOrObject);
 
   std::size_t GetChildPosition(ObjectFolderOrObject& child) const;
 

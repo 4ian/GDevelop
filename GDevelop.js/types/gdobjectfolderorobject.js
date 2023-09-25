@@ -4,12 +4,12 @@ declare class gdObjectFolderOrObject {
   isFolder(): boolean;
   getObject(): gdObject;
   getFolderName(): string;
+  setFolderName(name: string): void;
   hasObjectNamed(name: string): boolean;
   getChildrenCount(): number;
   getChildAt(pos: number): gdObjectFolderOrObject;
   getObjectChild(name: string): gdObjectFolderOrObject;
   getChildPosition(child: gdObjectFolderOrObject): number;
-  renameFolder(name: string): void;
   getParent(): gdObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): gdObjectFolderOrObject;
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: gdObjectFolderOrObject, newParentFolder: gdObjectFolderOrObject, newPosition: number): void;

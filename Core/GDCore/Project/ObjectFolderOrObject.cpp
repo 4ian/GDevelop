@@ -113,6 +113,23 @@ void ObjectFolderOrObject::MoveChild(std::size_t oldIndex,
   children.insert(children.begin() + newIndex, std::move(objectFolderOrObject));
 }
 
+void ObjectFolderOrObject::RemoveFolderChild(
+    ObjectFolderOrObject& childToRemove) {
+  if (!IsFolder() || !childToRemove.IsFolder() ||
+      childToRemove.GetChildrenCount() > 0) {
+    return;
+  }
+  std::vector<std::unique_ptr<gd::ObjectFolderOrObject>>::iterator it = find_if(
+      children.begin(),
+      children.end(),
+      [&childToRemove](std::unique_ptr<gd::ObjectFolderOrObject>& child) {
+        return &(*child) == &childToRemove;
+      });
+  if (it == children.end()) return;
+
+  children.erase(it);
+}
+
 void ObjectFolderOrObject::MoveObjectFolderOrObjectToAnotherFolder(
     gd::ObjectFolderOrObject& objectFolderOrObject,
     gd::ObjectFolderOrObject& newParentFolder,

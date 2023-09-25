@@ -49,6 +49,7 @@ class GD_CORE_API ObjectFolderOrObject {
   };
 
   void MoveChild(std::size_t oldIndex, std::size_t newIndex);
+  void RemoveFolderChild(gd::ObjectFolderOrObject& childToRemove);
 
   void InsertObject(gd::Object* insertedObject);
   void InsertObject(gd::Object* insertedObject, std::size_t position);

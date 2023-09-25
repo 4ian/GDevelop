@@ -4903,5 +4903,46 @@ Array [
       );
       expect(parentEqualities.every((equality) => equality)).toBe(true);
     });
+
+    test('a folder can be removed from its parent if empty', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        2
+      );
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('OtherObject'),
+        subFolder,
+        0
+      );
+      rootFolder.removeFolderChild(subFolder);
+
+      // Check subfolder is still here since it was not empty.
+      expect(rootFolder.getChildrenCount()).toEqual(2);
+      subFolder = rootFolder.getChildAt(1);
+      expect(subFolder.isFolder()).toBe(true);
+      expect(subFolder.getChildrenCount()).toEqual(1);
+      expect(subFolder.hasObjectNamed('OtherObject')).toBe(true);
+
+      // Empty subfolder and remove it.
+      subFolder.moveObjectFolderOrObjectToAnotherFolder(
+        subFolder.getObjectChild('OtherObject'),
+        rootFolder,
+        0
+      );
+      rootFolder.removeFolderChild(subFolder);
+
+      expect(rootFolder.getChildrenCount()).toEqual(2);
+      const objectFolderOrObject = rootFolder.getChildAt(1)
+      const otherObjectFolderOrObject = rootFolder.getChildAt(0)
+      expect(otherObjectFolderOrObject.isFolder()).toBe(false);
+      expect(otherObjectFolderOrObject.getObject().getName()).toBe('OtherObject');
+      expect(objectFolderOrObject.isFolder()).toBe(false);
+      expect(objectFolderOrObject.getObject().getName()).toBe('MyObject');
+    });
   });
 });

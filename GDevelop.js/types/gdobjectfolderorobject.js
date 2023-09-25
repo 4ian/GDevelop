@@ -15,6 +15,7 @@ declare class gdObjectFolderOrObject {
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: gdObjectFolderOrObject, newParentFolder: gdObjectFolderOrObject, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: gdObjectFolderOrObject): void;
+  isADescendantOf(otherObjectFolderOrObject: gdObjectFolderOrObject): boolean;
   delete(): void;
   ptr: number;
 };

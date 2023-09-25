@@ -102,6 +102,12 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
   }
 };
 
+bool ObjectFolderOrObject::IsADescendantOf(ObjectFolderOrObject& otherObjectFolderOrObject) {
+  if (parent == nullptr) return false;
+  if (&(*parent) == &otherObjectFolderOrObject) return true;
+  return parent->IsADescendantOf(otherObjectFolderOrObject);
+}
+
 void ObjectFolderOrObject::MoveChild(std::size_t oldIndex,
                                      std::size_t newIndex) {
   if (!IsFolder()) return;

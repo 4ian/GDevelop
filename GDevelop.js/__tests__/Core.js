@@ -4944,5 +4944,45 @@ Array [
       expect(objectFolderOrObject.isFolder()).toBe(false);
       expect(objectFolderOrObject.getObject().getName()).toBe('MyObject');
     });
+
+    test("an ObjectFolderOrObject can test if it's a descendant of another one", () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Depth1', 0);
+      const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('MyObject'),
+        subSubFolder,
+        0
+      );
+      const objectFolderOrObject = subSubFolder.getChildAt(0);
+      expect(objectFolderOrObject.isFolder()).toBe(false);
+      expect(objectFolderOrObject.getObject().getName()).toEqual('MyObject');
+
+      expect(objectFolderOrObject.isADescendantOf(subSubFolder)).toBe(true);
+      expect(objectFolderOrObject.isADescendantOf(subFolder)).toBe(true);
+      expect(objectFolderOrObject.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(subSubFolder.isADescendantOf(subFolder)).toBe(true);
+      expect(subSubFolder.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(subFolder.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(rootFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(rootFolder.isADescendantOf(subSubFolder)).toBe(false);
+      expect(rootFolder.isADescendantOf(subFolder)).toBe(false);
+      expect(rootFolder.isADescendantOf(rootFolder)).toBe(false);
+
+      expect(subFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(subFolder.isADescendantOf(subSubFolder)).toBe(false);
+      expect(subFolder.isADescendantOf(subFolder)).toBe(false);
+
+      expect(subSubFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(subSubFolder.isADescendantOf(subSubFolder)).toBe(false);
+
+      expect(objectFolderOrObject.isADescendantOf(objectFolderOrObject)).toBe(
+        false
+      );
+    });
   });
 });

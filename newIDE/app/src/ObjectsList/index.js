@@ -695,7 +695,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ) {
             // In that case, the user is drag n dropping a scene object on the
             // empty placeholder of the global objects section.
-            return true;
+            return !selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder();
           }
           return false;
         }
@@ -713,7 +713,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ) &&
           destinationItem.global === true
         ) {
-          return true;
+          return !selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder();
         }
 
         return false;

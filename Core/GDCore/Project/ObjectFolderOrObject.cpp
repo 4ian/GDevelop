@@ -39,6 +39,11 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
   return object->GetName() == name;
 }
 
+void ObjectFolderOrObject::SetFolderName(const gd::String& name) {
+  if (!IsFolder()) return;
+  folderName = name;
+}
+
 ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) {
   return *children[index];
 }
@@ -102,7 +107,8 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
   }
 };
 
-bool ObjectFolderOrObject::IsADescendantOf(ObjectFolderOrObject& otherObjectFolderOrObject) {
+bool ObjectFolderOrObject::IsADescendantOf(
+    ObjectFolderOrObject& otherObjectFolderOrObject) {
   if (parent == nullptr) return false;
   if (&(*parent) == &otherObjectFolderOrObject) return true;
   return parent->IsADescendantOf(otherObjectFolderOrObject);

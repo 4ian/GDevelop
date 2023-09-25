@@ -93,7 +93,7 @@ export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
   scrollToItem: Item => void,
   renameItem: Item => void,
-  openItem: string => void,
+  openItems: (string[]) => void,
 |};
 
 type Props<Item> = {|
@@ -358,10 +358,13 @@ const TreeView = <Item: ItemBaseAttributes>(
     [getItemId]
   );
 
-  const openItem = React.useCallback(
-    (itemId: string) => {
-      if (!openedNodeIds.includes(itemId))
-        setOpenedNodeIds([...openedNodeIds, itemId]);
+  const openItems = React.useCallback(
+    (itemIds: string[]) => {
+      const notAlreadyOpenedNodeIds = itemIds.filter(
+        itemId => !openedNodeIds.includes(itemId)
+      );
+      if (notAlreadyOpenedNodeIds.length > 0)
+        setOpenedNodeIds([...openedNodeIds, ...notAlreadyOpenedNodeIds]);
     },
     [openedNodeIds]
   );
@@ -373,7 +376,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       forceUpdateList: forceUpdate,
       scrollToItem,
       renameItem,
-      openItem,
+      openItems,
     })
   );
 

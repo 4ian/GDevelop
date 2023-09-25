@@ -146,7 +146,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       global: false, // A new group is not global by default.
     };
 
-    if (this.treeView) this.treeView.openItem(sceneGroupsRootFolderId);
+    if (this.treeView) this.treeView.openItems([sceneGroupsRootFolderId]);
 
     // Scroll to the new group.
     // Ideally, we'd wait for the list to be updated to scroll, but
@@ -275,7 +275,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    if (this.treeView) this.treeView.openItem(globalGroupsRootFolderId);
+    if (this.treeView) this.treeView.openItems([globalGroupsRootFolderId]);
     globalObjectGroups.insert(
       group,
       typeof index === 'number' ? index : globalObjectGroups.count()

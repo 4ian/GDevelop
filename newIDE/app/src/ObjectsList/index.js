@@ -851,14 +851,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           selectedObjectFolderOrObjectWithContext.global === false &&
           destinationItem.global === true
         ) {
-          const parent = destinationItem.objectFolderOrObject.getParent();
+          let parent, index;
+          if (
+            where === 'after' &&
+            destinationItem.objectFolderOrObject.isFolder()
+          ) {
+            parent = destinationItem.objectFolderOrObject;
+            index = 0;
+          } else {
+            parent = destinationItem.objectFolderOrObject.getParent();
+            index =
+              parent.getChildPosition(destinationItem.objectFolderOrObject) +
+              (where === 'after' ? 1 : 0);
+          }
           setAsGlobalObject({
             i18n,
             objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
             folder: parent,
-            index:
-              parent.getChildPosition(destinationItem.objectFolderOrObject) +
-              (where === 'after' ? 1 : 0),
+            index,
           });
           onObjectModified(true);
           selectObject({
@@ -875,11 +885,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         ) {
           const selectedObjectFolderOrObject =
             selectedObjectFolderOrObjectWithContext.objectFolderOrObject;
-          const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
           const destinationObjectFolderOrObject =
             destinationItem.objectFolderOrObject;
-          const destinationParent = destinationObjectFolderOrObject.getParent();
-          if (destinationParent === selectedObjectFolderOrObjectParent) {
+          let parent;
+
+          if (where === 'after' && destinationObjectFolderOrObject.isFolder()) {
+            parent = destinationObjectFolderOrObject;
+          } else {
+            parent = destinationObjectFolderOrObject.getParent();
+          }
+          const selectedObjectFolderOrObjectParent = selectedObjectFolderOrObject.getParent();
+          if (parent === selectedObjectFolderOrObjectParent) {
             const fromIndex = selectedObjectFolderOrObjectParent.getChildPosition(
               selectedObjectFolderOrObject
             );
@@ -892,10 +908,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           } else {
             selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
               selectedObjectFolderOrObject,
-              destinationParent,
-              destinationParent.getChildPosition(
-                destinationObjectFolderOrObject
-              ) + (where === 'after' ? 1 : 0)
+              parent,
+              parent.getChildPosition(destinationObjectFolderOrObject) +
+                (where === 'after' ? 1 : 0)
             );
           }
         } else {

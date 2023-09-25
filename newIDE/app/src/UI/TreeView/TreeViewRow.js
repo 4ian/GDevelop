@@ -88,7 +88,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     getItemHtmlId,
   } = data;
   const node = flattenedData[index];
-  const left = node.depth * 20;
+  const left = node.depth * 15;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
   const [whereToDrop, setWhereToDrop] = React.useState<'before' | 'after'>(
@@ -156,6 +156,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       return containerRef.current.getBoundingClientRect().top;
     }
   }, []);
+
+  const displayAsFolder = node.hasChildren || node.thumbnailSrc === 'FOLDER'
 
   return (
     <div style={style} ref={containerRef}>
@@ -226,9 +228,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                           <div
                             className={`row-content-side${
                               node.item.isRoot ? '' : ' row-content-side-left'
+                            }${
+                              displayAsFolder ? '' : ' row-content-extra-padding'
                             }`}
                           >
-                            {node.hasChildren || node.thumbnailSrc === 'FOLDER' ? (
+                            {displayAsFolder ? (
                               <>
                                 <IconButton
                                   size="small"

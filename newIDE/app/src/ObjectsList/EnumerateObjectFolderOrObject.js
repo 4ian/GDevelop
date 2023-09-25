@@ -14,7 +14,6 @@ export const getObjectFolderOrObjectUnifiedName = (
     ? objectFolderOrObject.getFolderName()
     : objectFolderOrObject.getObject().getName();
 
-
 export const enumerateObjectFolderOrObjects = (
   project: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -91,4 +90,32 @@ export const enumerateObjectFolderOrObjects = (
     projectObjectFolderOrObjectsList,
     selectedByNamesObjectFolderOrObjectsList,
   };
+};
+
+const enumerateFoldersInFolder = (
+  folder: gdObjectFolderOrObject,
+  prefix: string,
+  result: {| path: string, folder: gdObjectFolderOrObject |}[]
+) => {
+  mapFor(0, folder.getChildrenCount(), i => {
+    const child = folder.getChildAt(i);
+    if (child.isFolder()) {
+      result.push({
+        path: prefix
+          ? prefix + '/' + child.getFolderName()
+          : child.getFolderName(),
+        folder: child,
+      });
+      enumerateFoldersInFolder(child, child.getFolderName(), result);
+    }
+  });
+};
+
+export const enumerateFoldersInContainer = (
+  container: gdObjectsContainer
+): {| path: string, folder: gdObjectFolderOrObject |}[] => {
+  const rootFolder = container.getRootFolder();
+  const result = [];
+  enumerateFoldersInFolder(rootFolder, '', result);
+  return result;
 };

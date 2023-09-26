@@ -6,7 +6,6 @@ import { t } from '@lingui/macro';
 import Fuse from 'fuse.js';
 
 import * as React from 'react';
-import Chip from '@material-ui/core/Chip';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,

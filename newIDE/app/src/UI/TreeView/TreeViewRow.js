@@ -45,6 +45,11 @@ const SemiControlledRowInput = ({
         onBlur={() => {
           onEndRenaming(value);
         }}
+        onKeyDown={e => {
+          if (shouldCloseOrCancel(e)) {
+            e.stopPropagation(); // Prevent closing dialog if TreeView is displayed in dialog.
+          }
+        }}
         onKeyUp={e => {
           if (shouldCloseOrCancel(e)) {
             e.preventDefault();

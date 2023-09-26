@@ -183,7 +183,7 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   onRenameObjectFolderOrObjectWithContextFinish: (
-    objectWithContext: ObjectFolderOrObjectWithContext,
+    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     newName: string,
     cb: (boolean) => void
   ) => void,
@@ -708,6 +708,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           )
         ) {
           if (
+            selectedObjectFolderOrObjectsWithContext[0] &&
             destinationItem.objectFolderOrObject.isADescendantOf(
               selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject
             )
@@ -987,10 +988,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             'NewFolder',
             parentFolder.getChildPosition(selectedObjectFolderOrObject)
           );
+        } else {
+          const rootFolder = objectsContainer.getRootFolder();
+          rootFolder.insertNewFolder(
+            'NewFolder',
+            rootFolder.getChildrenCount()
+          );
         }
         forceUpdateList();
       },
-      [selectedObjectFolderOrObjectsWithContext, forceUpdateList]
+      [
+        selectedObjectFolderOrObjectsWithContext,
+        forceUpdateList,
+        objectsContainer,
+      ]
     );
 
     const eventsFunctionsExtensionsState = React.useContext(

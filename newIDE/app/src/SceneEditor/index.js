@@ -927,7 +927,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     object.setName(newName);
   };
 
-  _onRenameObjectFolderOrObjectFinish = (
+  _onRenameObjectFolderOrObjectWithContextFinish = (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     newName: string,
     done: boolean => void
@@ -1600,7 +1600,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 updateBehaviorsSharedData={this.updateBehaviorsSharedData}
                 onEditObject={this.props.onEditObject || this.editObject}
                 onRenameObjectFolderOrObjectWithContextFinish={
-                  this._onRenameObjectFolderOrObjectFinish
+                  this._onRenameObjectFolderOrObjectWithContextFinish
                 }
                 onObjectCreated={this._onObjectCreated}
                 onObjectFolderOrObjectWithContextSelected={

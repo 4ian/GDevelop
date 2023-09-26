@@ -5,7 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import uniq from 'lodash/uniq';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -61,10 +60,10 @@ import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
 import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import {
-  enumerateObjectFolderOrObjects,
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
+import uniq from 'lodash/uniq';
 
 const gd: libGDevelop = global.gd;
 
@@ -578,28 +577,14 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
-    const { project, layout } = this.props;
-    const instancesObjectNames = uniq(
-      instances.map(instance => instance.getObjectName())
-    );
-
-    const objectFolderOrObjectLists = enumerateObjectFolderOrObjects(
-      project,
-      layout,
-      {
-        selectByNames: instancesObjectNames,
-      }
-    );
-
-    this.setState(
-      {
-        selectedObjectFolderOrObjectsWithContext:
-          objectFolderOrObjectLists.selectedByNamesObjectFolderOrObjectsList,
-      },
-      () => {
-        this.updateToolbar();
-      }
-    );
+    // TODO: This method used to change the selection of objects in the ObjectsList
+    // when instances selection changes on the InstancesEditor.
+    // Now that the ObjectsList manipulates ObjectFolderOrObject instances, it's hard
+    // for the scene editor to get those instances from the object names only.
+    // Either this method is removed and the feature mentioned above is definitely
+    // abandoned. Either a method getObjectFolderOfObjectsByNames is implemented on
+    // the root folder of the containers in order to select the corresponding
+    // children (whatever the depth) that represent the objects.
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
@@ -1169,6 +1154,73 @@ export default class SceneEditor extends React.Component<Props, State> {
     ];
   };
 
+  getContextMenuLayoutItems = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Open scene events`),
+      click: () => this.props.onOpenEvents(this.props.layout.getName()),
+    },
+    {
+      label: i18n._(t`Open scene properties`),
+      click: () => this.openSceneProperties(true),
+    },
+  ];
+
+  getContextMenuInstancesWiseItems = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Copy`),
+      click: () => this.copySelection(),
+      enabled: this.instancesSelection.hasSelectedInstances(),
+      accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Cut`),
+      click: () => this.cutSelection(),
+      enabled: this.instancesSelection.hasSelectedInstances(),
+      accelerator: 'CmdOrCtrl+X',
+    },
+    {
+      label: i18n._(t`Paste`),
+      click: () => this.paste(),
+      enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+      accelerator: 'CmdOrCtrl+V',
+    },
+    {
+      label: i18n._(t`Duplicate`),
+      enabled: this.instancesSelection.hasSelectedInstances(),
+      click: () => {
+        this.duplicateSelection();
+      },
+      accelerator: 'CmdOrCtrl+D',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Bring to front`),
+      enabled: this.instancesSelection.hasSelectedInstances(),
+      click: () => {
+        this._onMoveInstancesZOrder('front');
+      },
+    },
+    {
+      label: i18n._(t`Send to back`),
+      enabled: this.instancesSelection.hasSelectedInstances(),
+      click: () => {
+        this._onMoveInstancesZOrder('back');
+      },
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Show/Hide instance properties`),
+      click: () => this.toggleProperties(),
+      enabled: this.instancesSelection.hasSelectedInstances(),
+    },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this.deleteSelection(),
+      enabled: this.instancesSelection.hasSelectedInstances(),
+      accelerator: 'Delete',
+    },
+  ];
+
   setZoomFactor = (zoomFactor: number) => {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.setZoomFactor(zoomFactor);
@@ -1203,13 +1255,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {
-    let contextMenuItems = [];
     if (
       options.ignoreSelectedObjectsForContextMenu ||
-      this.state.selectedObjectFolderOrObjectsWithContext.length === 0
+      !this.instancesSelection.hasSelectedInstances()
     ) {
-      contextMenuItems = [
-        ...contextMenuItems,
+      return [
         {
           label: i18n._(t`Paste`),
           click: () => this.paste(),
@@ -1223,74 +1273,28 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
         { type: 'separator' },
         ...this.getContextMenuZoomItems(i18n),
+        { type: 'separator' },
+        ...this.getContextMenuLayoutItems(i18n),
       ];
-    } else {
-      const {
-        objectFolderOrObject,
-      } = this.state.selectedObjectFolderOrObjectsWithContext[0];
-      if (objectFolderOrObject.isFolder()) return [];
+    }
+    const instances = this.instancesSelection.getSelectedInstances();
+    if (
+      instances.length === 1 ||
+      uniq(instances.map(instance => instance.getObjectName())).length === 1
+    ) {
+      const { project, layout } = this.props;
+      const objectName = instances[0].getObjectName();
+      const object = getObjectByName(project, layout, objectName);
 
-      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-        this.props.project.getCurrentPlatform(),
-        objectFolderOrObject.getObject().getType()
-      );
+      const objectMetadata = object
+        ? gd.MetadataProvider.getObjectMetadata(
+            project.getCurrentPlatform(),
+            object.getType()
+          )
+        : null;
 
-      const objectName = objectFolderOrObject.getObject().getName();
-      contextMenuItems = [
-        ...contextMenuItems,
-        {
-          label: i18n._(t`Copy`),
-          click: () => this.copySelection(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          accelerator: 'CmdOrCtrl+C',
-        },
-        {
-          label: i18n._(t`Cut`),
-          click: () => this.cutSelection(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          accelerator: 'CmdOrCtrl+X',
-        },
-        {
-          label: i18n._(t`Paste`),
-          click: () => this.paste(),
-          enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
-          accelerator: 'CmdOrCtrl+V',
-        },
-        {
-          label: i18n._(t`Duplicate`),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          click: () => {
-            this.duplicateSelection();
-          },
-          accelerator: 'CmdOrCtrl+D',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Bring to front`),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          click: () => {
-            this._onMoveInstancesZOrder('front');
-          },
-        },
-        {
-          label: i18n._(t`Send to back`),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          click: () => {
-            this._onMoveInstancesZOrder('back');
-          },
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Show/Hide instance properties`),
-          click: () => this.toggleProperties(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-        },
-        {
-          label: i18n._(t`Delete`),
-          click: () => this.deleteSelection(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          accelerator: 'Delete',
-        },
+      return [
+        ...this.getContextMenuInstancesWiseItems(i18n),
         { type: 'separator' },
         {
           label: i18n._(t`Edit object ${shortenString(objectName, 14)}`),
@@ -1304,30 +1308,24 @@ export default class SceneEditor extends React.Component<Props, State> {
           label: i18n._(t`Edit behaviors`),
           click: () => this.editObjectByName(objectName, 'behaviors'),
         },
-        {
-          label: i18n._(t`Edit effects`),
-          click: () => this.editObjectByName(objectName, 'effects'),
-          enabled: objectMetadata.hasDefaultBehavior(
-            'EffectCapability::EffectBehavior'
-          ),
-        },
-      ];
+        objectMetadata
+          ? {
+              label: i18n._(t`Edit effects`),
+              click: () => this.editObjectByName(objectName, 'effects'),
+              enabled: objectMetadata.hasDefaultBehavior(
+                'EffectCapability::EffectBehavior'
+              ),
+            }
+          : null,
+        { type: 'separator' },
+        ...this.getContextMenuLayoutItems(i18n),
+      ].filter(Boolean);
     }
-
-    contextMenuItems = [
-      ...contextMenuItems,
+    return [
+      ...this.getContextMenuInstancesWiseItems(i18n),
       { type: 'separator' },
-      {
-        label: i18n._(t`Open scene events`),
-        click: () => this.props.onOpenEvents(layout.getName()),
-      },
-      {
-        label: i18n._(t`Open scene properties`),
-        click: () => this.openSceneProperties(true),
-      },
+      ...this.getContextMenuLayoutItems(i18n),
     ];
-
-    return contextMenuItems;
   };
 
   copySelection = ({

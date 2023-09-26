@@ -16,24 +16,13 @@ export const getObjectFolderOrObjectUnifiedName = (
 
 export const enumerateObjectFolderOrObjects = (
   project: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
-  options?: { selectByNames?: string[] }
+  objectsContainer: gdObjectsContainer
 ): {|
   containerObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[],
   projectObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[],
-  selectedByNamesObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[],
 |} => {
   const projectRootFolder = project.getRootFolder();
   const containerRootFolder = objectsContainer.getRootFolder();
-  const selectedByNamesObjectFolderOrObjectsList = [];
-  const selectByNames = options ? options.selectByNames : undefined;
-  const filterObjectFolderOrObjectByName = selectByNames
-    ? (objectFolderOrObject: gdObjectFolderOrObject): boolean => {
-        return selectByNames.includes(
-          objectFolderOrObject.getObject().getName()
-        );
-      }
-    : null;
 
   const containerObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[] = mapFor(
     0,
@@ -50,12 +39,6 @@ export const enumerateObjectFolderOrObjects = (
         objectFolderOrObject,
         global: false,
       };
-      if (
-        filterObjectFolderOrObjectByName &&
-        filterObjectFolderOrObjectByName(objectFolderOrObject)
-      ) {
-        selectedByNamesObjectFolderOrObjectsList.push(item);
-      }
       return item;
     }
   );
@@ -75,12 +58,6 @@ export const enumerateObjectFolderOrObjects = (
         objectFolderOrObject,
         global: true,
       };
-      if (
-        filterObjectFolderOrObjectByName &&
-        filterObjectFolderOrObjectByName(objectFolderOrObject)
-      ) {
-        selectedByNamesObjectFolderOrObjectsList.push(item);
-      }
       return item;
     }
   );
@@ -88,7 +65,6 @@ export const enumerateObjectFolderOrObjects = (
   return {
     containerObjectFolderOrObjectsList,
     projectObjectFolderOrObjectsList,
-    selectedByNamesObjectFolderOrObjectsList,
   };
 };
 

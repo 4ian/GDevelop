@@ -117,10 +117,10 @@ const getTreeViewItemId = (item: TreeViewItem) => {
   if (item.isRoot || item.isPlaceholder) return item.id;
   const { objectFolderOrObject } = item;
   if (objectFolderOrObject.isFolder()) {
-    // Add the ptr to the id since two folders can have the same name.
-    return `object-folder-${objectFolderOrObject.getFolderName()}-${
-      objectFolderOrObject.ptr
-    }`;
+    // Use the ptr as id since two folders can have the same name.
+    // If using folder name, this would need for methods when renaming
+    // the folder to keep it open.
+    return `object-folder-${objectFolderOrObject.ptr}`;
   }
   return objectFolderOrObject.getObject().getName();
 };

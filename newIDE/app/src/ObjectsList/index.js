@@ -603,7 +603,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         )
           return;
 
-        const validatedNewName = getValidatedObjectOrGroupName(newName, global);
+        const validatedNewName = objectFolderOrObject.isFolder()
+          ? newName
+          : getValidatedObjectOrGroupName(newName, global);
         onRenameObjectFolderOrObjectWithContextFinish(
           item,
           validatedNewName,

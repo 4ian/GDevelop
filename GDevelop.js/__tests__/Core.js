@@ -2927,13 +2927,11 @@ describe('libGD.js', function () {
   });
 
   describe('gd.SpriteObject', function () {
-    it('is a gd.Object and can have tags', function () {
+    it('is a gd.Object', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
       let object = project.insertNewObject(project, 'Sprite', 'MySpriteObject');
 
       expect(object instanceof gd.Object).toBe(true);
-      object.setTags('tag1, tag2, tag3');
-      expect(object.getTags()).toBe('tag1, tag2, tag3');
       expect(object.getVariables()).toBeTruthy();
       project.delete();
     });

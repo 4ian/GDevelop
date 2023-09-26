@@ -120,14 +120,6 @@ class GD_CORE_API Object {
    */
   const gd::String& GetType() const { return configuration->GetType(); }
 
-  /** \brief Change the tags of the object.
-   */
-  void SetTags(const gd::String& tags_) { tags = tags_; }
-
-  /** \brief Return the tags of the object.
-   */
-  const gd::String& GetTags() const { return tags; }
-
   /** \brief Shortcut to check if the object is a 3D object.
    */
   bool Is3DObject() const { return configuration->Is3DObject(); }
@@ -268,7 +260,6 @@ class GD_CORE_API Object {
                   ///< object.
   gd::VariablesContainer
       objectVariables;  ///< List of the variables of the object
-  gd::String tags;      ///< Comma-separated list of tags
   gd::EffectsContainer
       effectsContainer;  ///< The effects container for the object.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,

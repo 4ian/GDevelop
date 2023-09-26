@@ -45,7 +45,6 @@ import {
   type GroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
 import InfoBar from '../UI/Messages/InfoBar';
-import { type SelectedTags } from '../Utils/TagsHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
@@ -134,9 +133,6 @@ type State = {|
   showAdditionalWorkInfoBar: boolean,
   additionalWorkInfoBar: InfoBarDetails,
 
-  // State for tags of objects:
-  selectedObjectTags: SelectedTags,
-
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   selectedLayer: string,
 |};
@@ -189,8 +185,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         message: '',
         touchScreenMessage: '',
       },
-
-      selectedObjectTags: [],
 
       selectedObjectFolderOrObjectsWithContext: [],
       selectedLayer: BASE_LAYER_NAME,

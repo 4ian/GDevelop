@@ -98,7 +98,7 @@ type Props = {|
   title: React.Node,
   openingState: DrawerOpeningState,
   setOpeningState: DrawerOpeningState => void,
-  topBarControls: ?React.Node,
+  topBarControls?: ?React.Node,
 |};
 
 const SwipeableDrawer = (props: Props) => {

@@ -26,14 +26,14 @@ import {
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import AlertMessage from '../../../UI/AlertMessage';
 import OnlineGamePropertiesDialog from './OnlineGamePropertiesDialog';
-import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropertiesDialog';
 import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
-import LinearProgress from '../../../UI/LinearProgress';
-import CircularProgress from '../../../UI/CircularProgress';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import LinearProgress from '../../../UI/LinearProgress';
+import { CircularProgress } from '@material-ui/core';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -42,6 +42,8 @@ type OnlineGameLinkProps = {|
   errored: boolean,
   exportStep: BuildStep,
 |};
+
+const timeForExport = 5; // seconds.
 
 const OnlineGameLink = ({
   build,
@@ -65,6 +67,11 @@ const OnlineGameLink = ({
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
+  const [
+    timeBeforeExportFinished,
+    setTimeBeforeExportFinished,
+  ] = React.useState<number>(timeForExport);
+  const { showAlert } = useAlertDialog();
 
   const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
   const isBuildComplete = build && build.status === 'complete';
@@ -76,6 +83,23 @@ const OnlineGameLink = ({
       : isBuildPublished
       ? gameUrl
       : getBuildArtifactUrl(build, 's3Key');
+
+  // When export is started, start a timer to give information
+  // about the build being ready after a few seconds.
+  React.useEffect(
+    () => {
+      if (exportPending) {
+        const timeout = setTimeout(() => {
+          const newTimeBeforeExportFinished = timeBeforeExportFinished
+            ? timeBeforeExportFinished - 1
+            : 0;
+          setTimeBeforeExportFinished(newTimeBeforeExportFinished);
+        }, 1000);
+        return () => clearTimeout(timeout);
+      }
+    },
+    [exportPending, timeBeforeExportFinished]
+  );
 
   const loadGame = React.useCallback(
     async () => {
@@ -114,20 +138,16 @@ const OnlineGameLink = ({
           'Unable to update the authors:',
           error.response || error.message
         );
-        showErrorBox({
-          message:
-            i18n._(t`Unable to update the authors of the project.`) +
-            ' ' +
-            i18n._(t`Verify your internet connection or try again later.`),
-          rawError: error,
-          errorId: 'author-update-error',
+        await showAlert({
+          title: t`Unable to update the authors of the project.`,
+          message: t`Verify your internet connection or try again later.`,
         });
         return false;
       }
 
       return true;
     },
-    [build, game, getAuthorizationHeader, profile, project]
+    [build, game, getAuthorizationHeader, profile, project, showAlert]
   );
 
   const tryUpdateSlug = React.useCallback(
@@ -150,15 +170,9 @@ const OnlineGameLink = ({
             'Unable to update the game slug:',
             error.response || error.message
           );
-          showErrorBox({
-            message:
-              i18n._(
-                t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
-              ) +
-              ' ' +
-              i18n._(t`Verify your internet connection or try again later.`),
-            rawError: error,
-            errorId: 'game-slug-update-error',
+          await showAlert({
+            title: t`Unable to update the game slug.`,
+            message: t`Remember that a slug must be 6 to 30 characters long and only contains letters, digits or dashes. Verify your internet connection or try again later.`,
           });
           return false;
         }
@@ -166,7 +180,7 @@ const OnlineGameLink = ({
 
       return true;
     },
-    [build, game, getAuthorizationHeader, profile]
+    [build, game, getAuthorizationHeader, profile, showAlert]
   );
 
   React.useEffect(
@@ -182,6 +196,7 @@ const OnlineGameLink = ({
   React.useEffect(
     () => {
       if (exportStep === 'done') {
+        setTimeBeforeExportFinished(timeForExport); // reset.
         setIsShareDialogOpen(true);
       }
     },
@@ -223,12 +238,9 @@ const OnlineGameLink = ({
           return false;
         }
       } catch (err) {
-        showErrorBox({
-          message: i18n._(
-            t`There was an error updating your game. Verify that your internet connection is working or try again later.`
-          ),
-          rawError: err,
-          errorId: 'update-game-error',
+        await showAlert({
+          title: t`Unable to update the game.`,
+          message: t`Verify that your internet connection is working or try again later.`,
         });
         console.error('Unable to update the game', err);
         return false;
@@ -247,6 +259,7 @@ const OnlineGameLink = ({
       tryUpdateAuthors,
       tryUpdateSlug,
       loadGame,
+      showAlert,
     ]
   );
 
@@ -279,7 +292,18 @@ const OnlineGameLink = ({
                 <Trans>Just a few seconds while we generate the link...</Trans>
               </Text>
               <Line expand>
-                <LinearProgress />
+                <LinearProgress
+                  value={
+                    ((timeForExport - timeBeforeExportFinished) /
+                      timeForExport) *
+                    100
+                  }
+                  variant={
+                    timeBeforeExportFinished === 0
+                      ? 'indeterminate'
+                      : 'determinate'
+                  }
+                />
               </Line>
             </>
           )}

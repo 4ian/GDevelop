@@ -80,7 +80,7 @@ export const localCordovaExportPipeline: ExportPipeline<
     </Column>
   ),
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

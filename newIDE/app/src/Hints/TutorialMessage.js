@@ -42,9 +42,9 @@ const TutorialMessage = ({ tutorial }: Props) => {
               icon={tutorial.type === 'video' ? <Video /> : <Book />}
               label={
                 tutorial.type === 'video' ? (
-                  <Trans>Watch the tutorial</Trans>
+                  <Trans>Watch tutorial</Trans>
                 ) : (
-                  <Trans>Read the tutorial</Trans>
+                  <Trans>Read tutorial</Trans>
                 )
               }
               onClick={() => {

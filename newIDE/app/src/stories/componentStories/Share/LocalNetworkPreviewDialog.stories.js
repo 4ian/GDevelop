@@ -7,7 +7,7 @@ import paperDecorator from '../../PaperDecorator';
 import LocalNetworkPreviewDialog from '../../../ExportAndShare/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 
 export default {
-  title: 'Export/LocalNetworkPreviewDialog',
+  title: 'Share/LocalNetworkPreviewDialog',
   component: LocalNetworkPreviewDialog,
   decorators: [paperDecorator, muiDecorator],
 };

@@ -72,7 +72,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Create package</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

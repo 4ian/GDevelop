@@ -6,6 +6,7 @@ import { LineStackLayout } from '../../UI/Layout';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
+import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
@@ -24,7 +25,7 @@ export type PreviewAndShareButtonsProps = {|
   isPreviewEnabled: boolean,
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
-  exportProject: () => void,
+  openShareDialog: () => void,
 |};
 
 const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
@@ -38,7 +39,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
     hasPreviewsRunning,
     previewState,
     setPreviewOverride,
-    exportProject,
+    openShareDialog,
   }: PreviewAndShareButtonsProps) {
     const windowWidth = useResponsiveWindowWidth();
     const isMobileScreen = windowWidth === 'small';
@@ -141,7 +142,8 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
         />
         <ResponsiveRaisedButton
           primary
-          onClick={exportProject}
+          onClick={openShareDialog}
+          icon={<PublishIcon />}
           label={<Trans>Share</Trans>}
           // This ID is used for guided lessons, let's keep it stable.
           id="toolbar-publish-button"

@@ -5,23 +5,16 @@ import Text from '../../UI/Text';
 import Checkbox from '../../UI/Checkbox';
 import { Column, Line } from '../../UI/Grid';
 import { type TargetName } from '../../Utils/GDevelopServices/Build';
+import { type HeaderProps } from '../ExportPipeline.flow';
 
 export type ExportState = {|
   targets: Array<TargetName>,
 |};
 
-type HeaderProps = {|
-  project: gdProject,
-  exportState: ExportState,
-  updateExportState: (
-    updater: (prevExportState: ExportState) => ExportState
-  ) => void,
-|};
-
 export const SetupExportHeader = ({
   exportState,
   updateExportState,
-}: HeaderProps) => {
+}: HeaderProps<ExportState>) => {
   const setTarget = (targetName: TargetName, enable: boolean) => {
     updateExportState(prevExportState => {
       if (enable && prevExportState.targets.indexOf(targetName) === -1) {
@@ -45,7 +38,7 @@ export const SetupExportHeader = ({
 
   return (
     <React.Fragment>
-      <Column noMargin>
+      <Column noMargin expand>
         <Line>
           <Text>
             <Trans>

@@ -68,7 +68,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   isNavigationDisabled: () => false,
 
   renderHeader: ({ project, exportState, updateExportState }) => (
-    <Column noMargin>
+    <Column noMargin expand>
       <Line>
         <ExplanationHeader />
       </Line>
@@ -95,7 +95,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
     </Column>
   ),
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

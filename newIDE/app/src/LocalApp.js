@@ -76,7 +76,7 @@ export const create = (authentication: Authentication) => {
               renderPreviewLauncher={(props, ref) => (
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
-              renderExportDialog={props => (
+              renderShareDialog={props => (
                 <ShareDialog
                   project={props.project}
                   onSaveProject={props.onSaveProject}
@@ -85,6 +85,8 @@ export const create = (authentication: Authentication) => {
                   automatedExporters={localAutomatedExporters}
                   manualExporters={localManualExporters}
                   onlineWebExporter={localOnlineWebExporter}
+                  fileMetadata={props.fileMetadata}
+                  storageProvider={props.storageProvider}
                 />
               )}
               renderGDJSDevelopmentWatcher={

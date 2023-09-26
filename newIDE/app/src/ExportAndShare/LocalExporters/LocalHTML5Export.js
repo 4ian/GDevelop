@@ -55,7 +55,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
   isNavigationDisabled: () => false,
 
   renderHeader: ({ project, exportState, updateExportState }) => (
-    <Column noMargin>
+    <Column noMargin expand>
       <Line>
         <ExplanationHeader />
       </Line>

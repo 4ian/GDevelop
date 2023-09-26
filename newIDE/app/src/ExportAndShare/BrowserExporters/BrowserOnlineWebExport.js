@@ -68,7 +68,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ game }) => <ExplanationHeader game={game} />,
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 

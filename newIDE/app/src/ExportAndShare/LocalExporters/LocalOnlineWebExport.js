@@ -22,6 +22,7 @@ import {
   OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { Column } from '../../UI/Grid';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -65,7 +66,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ game }) => <ExplanationHeader game={game} />,
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 
@@ -76,13 +77,15 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     errored,
     exportStep,
   }) => (
-    <OnlineGameLink
-      build={build}
-      project={project}
-      onSaveProject={onSaveProject}
-      errored={errored}
-      exportStep={exportStep}
-    />
+    <Column>
+      <OnlineGameLink
+        build={build}
+        project={project}
+        onSaveProject={onSaveProject}
+        errored={errored}
+        exportStep={exportStep}
+      />
+    </Column>
   ),
 
   prepareExporter: (

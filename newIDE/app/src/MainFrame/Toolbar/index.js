@@ -13,7 +13,7 @@ import { Spacer } from '../../UI/Grid';
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
   toggleProjectManager: () => void,
-  exportProject: () => void,
+  openShareDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
 
@@ -86,7 +86,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 isPreviewEnabled={props.isPreviewEnabled}
                 previewState={props.previewState}
                 hasPreviewsRunning={props.hasPreviewsRunning}
-                exportProject={props.exportProject}
+                openShareDialog={props.openShareDialog}
               />
               <Spacer />
             </ToolbarGroup>

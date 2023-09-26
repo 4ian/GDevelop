@@ -1,23 +1,27 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
 import FlatButton from '../../UI/FlatButton';
 import BuildsDialog from '../Builds/BuildsDialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import ExportLauncher from './ExportLauncher';
+import PublishHome from './PublishHome';
 import { type ExportPipeline } from '../ExportPipeline.flow';
-import { useOnlineStatus } from '../../Utils/OnlineStatus';
-import AlertMessage from '../../UI/AlertMessage';
 import { Tabs } from '../../UI/Tabs';
-import ShareHome from './ShareHome';
+import InviteHome from './InviteHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
-import { showWarningBox } from '../../UI/Messages/MessageBox';
 import TutorialButton from '../../UI/TutorialButton';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import TextButton from '../../UI/TextButton';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
+import { useOnlineStatus } from '../../Utils/OnlineStatus';
 
-export type ExporterSection = 'automated' | 'manual' | 'home';
+type ShareTab = 'invite' | 'publish';
+export type ExporterSection = 'browser' | 'desktop' | 'mobile';
+export type ExporterSubSection = 'online' | 'offline' | 'facebook';
 export type ExporterKey =
   | 'onlinewebexport'
   | 'onlineelectronexport'
@@ -26,6 +30,25 @@ export type ExporterKey =
   | 'facebookinstantgamesexport'
   | 'electronexport'
   | 'cordovaexport';
+
+/** @type {{[key: ExporterSection]: {[key: ExporterSubSection] : ExporterKey}}} */
+const exporterSectionMapping = {
+  browser: {
+    online: 'onlinewebexport',
+    offline: 'webexport',
+    facebook: 'facebookinstantgamesexport',
+  },
+  desktop: {
+    online: 'onlineelectronexport',
+    offline: 'electronexport',
+    facebook: null,
+  },
+  mobile: {
+    online: 'onlinecordovaexport',
+    offline: 'cordovaexport',
+    facebook: null,
+  },
+};
 
 export type Exporter = {|
   name: React.Node,
@@ -36,15 +59,18 @@ export type Exporter = {|
   exportPipeline: ExportPipeline<any, any, any, any, any>,
 |};
 
-export type ExportDialogWithoutExportsProps = {|
+export type ShareDialogWithoutExportsProps = {|
   project: ?gdProject,
   onSaveProject: () => Promise<void>,
   onClose: () => void,
   onChangeSubscription: () => void,
+  initialTab?: ShareTab,
+  fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
 |};
 
 type Props = {|
-  ...ExportDialogWithoutExportsProps,
+  ...ShareDialogWithoutExportsProps,
   /**
    * Use `null` to hide automated exporters.
    * It should be used with manualExporters set to `null` as well.
@@ -55,11 +81,17 @@ type Props = {|
    * It should be used with automatedExporters set to `null` as well.
    */
   manualExporters: ?Array<Exporter>,
+  // GDevelop's game platform exporter.
   onlineWebExporter: Exporter,
+  /**
+   * If true, all exporters will be disabled if the user is offline.
+   * This is mainly helpful on browser, where we need to download resources
+   * before exporting.
+   */
   allExportersRequireOnline?: boolean,
 |};
 
-const ExportDialog = ({
+const ShareDialog = ({
   project,
   onSaveProject,
   onClose,
@@ -68,13 +100,34 @@ const ExportDialog = ({
   automatedExporters,
   manualExporters,
   onlineWebExporter,
+  initialTab,
+  fileMetadata,
+  storageProvider,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+  const {
+    setShareDialogDefaultTab,
+    getShareDialogDefaultTab,
+  } = React.useContext(PreferencesContext);
+  const [currentTab, setCurrentTab] = React.useState<ShareTab>(
+    initialTab || getShareDialogDefaultTab()
+  );
   const [
     chosenExporterSection,
     setChosenExporterSection,
-  ] = React.useState<ExporterSection>('home');
+  ] = React.useState<?ExporterSection>(null);
+  const [
+    chosenExporterSubSection,
+    setChosenExporterSubSection,
+  ] = React.useState<?ExporterSubSection>(null);
+
+  React.useEffect(() => setShareDialogDefaultTab(currentTab), [
+    setShareDialogDefaultTab,
+    currentTab,
+  ]);
+  const isOnline = useOnlineStatus();
+
   const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
     false
   );
@@ -82,20 +135,28 @@ const ExportDialog = ({
     isNavigationDisabled,
     setIsNavigationDisabled,
   ] = React.useState<boolean>(false);
-  const [chosenExporterKey, setChosenExporterKey] = React.useState<ExporterKey>(
-    'onlinewebexport'
-  );
   const [game, setGame] = React.useState<?Game>(null);
+  const [gameError, setGameError] = React.useState<?'not-found' | 'not-owned'>(
+    null
+  );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
-  const onlineStatus = useOnlineStatus();
-  const cantExportBecauseOffline = !!allExportersRequireOnline && !onlineStatus;
+  const { showAlert } = useAlertDialog();
 
   const openBuildDialog = () => {
     if (!game) {
-      showWarningBox(
-        "Either this game is not registered or you are not its owner, so you can't see the builds or publish a build to the game page on gd.games."
-      );
+      const title = t`Cannot see the exports`;
+      const message =
+        gameError === 'not-found'
+          ? t`Register or publish your game first to see its exports.`
+          : gameError === 'not-owned'
+          ? t`You are not the owner of this game, ask the owner to add you as an owner to see its exports.`
+          : t`Either this game is not registered or you are not its owner, so you cannot see its builds.`;
+
+      showAlert({
+        title,
+        message,
+      });
       return;
     }
     setBuildsDialogOpen(true);
@@ -107,6 +168,7 @@ const ExportDialog = ({
 
       const { id } = profile;
       try {
+        setGameError(null);
         const game = await getGame(
           getAuthorizationHeader,
           id,
@@ -115,6 +177,14 @@ const ExportDialog = ({
         setGame(game);
       } catch (err) {
         console.error('Unable to load the game', err);
+        if (err && err.status === 404) {
+          setGameError('not-found');
+          return;
+        }
+        if (err && err.status === 403) {
+          setGameError('not-owned');
+          return;
+        }
       }
     },
     [project, getAuthorizationHeader, profile]
@@ -130,142 +200,144 @@ const ExportDialog = ({
     [loadGame, game]
   );
 
-  if (!project) return null;
-  const exporters = [
-    ...(automatedExporters || []),
-    ...(manualExporters || []),
-    onlineWebExporter,
-  ];
-
-  const exporter = exporters.find(
-    exporter => exporter.key === chosenExporterKey
+  const exporters = React.useMemo(
+    () => [
+      ...(automatedExporters || []),
+      ...(manualExporters || []),
+      onlineWebExporter,
+    ],
+    [automatedExporters, manualExporters, onlineWebExporter]
+  );
+  const showOnlineWebExporterOnly = React.useMemo(
+    () => !automatedExporters && !manualExporters,
+    [automatedExporters, manualExporters]
   );
 
-  if (!exporter || !exporter.exportPipeline) return null;
+  const exporter: ?Exporter = React.useMemo(
+    () => {
+      if (!chosenExporterSection) return null;
+      if (!chosenExporterSubSection) return null;
 
-  const shouldShowOnlineWebExporterOnly =
-    !manualExporters && !automatedExporters;
+      const exporterKey =
+        exporterSectionMapping[chosenExporterSection][chosenExporterSubSection];
+      const chosenExporter = exporters.find(
+        exporter => exporter.key === exporterKey
+      );
+
+      return chosenExporter || null;
+    },
+    [chosenExporterSection, chosenExporterSubSection, exporters]
+  );
+
+  if (!project) return null;
+
+  const mainActions = [
+    <FlatButton
+      label={<Trans>Close</Trans>}
+      key="close"
+      primary={false}
+      onClick={onClose}
+      disabled={isNavigationDisabled}
+    />,
+  ];
+
+  const secondaryActions =
+    currentTab === 'publish'
+      ? [
+          exporter ? (
+            <HelpButton key="help" helpPagePath={exporter.helpPage} />
+          ) : null,
+          exporter &&
+          exporter.exportPipeline &&
+          (exporter.exportPipeline.name === 'local-html5' ||
+            exporter.exportPipeline.name === 'browser-html5') ? (
+            <TutorialButton
+              key="tutorial"
+              tutorialId="export-to-itch"
+              label={
+                isMobileScreen ? (
+                  'Itch.io'
+                ) : (
+                  <Trans>How to export to Itch.io</Trans>
+                )
+              }
+            />
+          ) : null,
+          <TextButton
+            key="exports"
+            label={
+              isMobileScreen ? (
+                <Trans>Exports</Trans>
+              ) : (
+                <Trans>See all exports</Trans>
+              )
+            }
+            onClick={openBuildDialog}
+            disabled={isNavigationDisabled || !isOnline}
+          />,
+        ].filter(Boolean)
+      : [];
 
   return (
     <Dialog
+      // Keep ID for backward compatibility with guided lessons.
       id="export-dialog"
-      maxWidth={shouldShowOnlineWebExporterOnly ? 'sm' : 'md'}
-      title={
-        chosenExporterSection === 'automated' ? (
-          <Trans>Publish your game</Trans>
-        ) : chosenExporterSection === 'manual' ? (
-          <Trans>Build manually</Trans>
-        ) : null
-      }
-      actions={[
-        chosenExporterSection !== 'home' && (
-          <FlatButton
-            label={<Trans>Back</Trans>}
-            key="back"
-            primary={false}
-            onClick={() => {
-              setChosenExporterSection('home');
-              setChosenExporterKey('onlinewebexport');
-            }}
-            disabled={isNavigationDisabled}
-          />
-        ),
-        <FlatButton
-          label={<Trans>Close</Trans>}
-          key="close"
-          primary={false}
-          onClick={onClose}
-          disabled={isNavigationDisabled}
-        />,
-      ]}
-      secondaryActions={[
-        <HelpButton key="help" helpPagePath={exporter.helpPage} />,
-        exporter.exportPipeline.name === 'local-html5' ||
-        exporter.exportPipeline.name === 'browser-html5' ? (
-          <TutorialButton
-            key="tutorial"
-            tutorialId="export-to-itch"
-            label={
-              isMobileScreen ? (
-                'Itch.io'
-              ) : (
-                <Trans>How to export to Itch.io</Trans>
-              )
-            }
-          />
-        ) : null,
-        <FlatButton
-          key="builds"
-          label={
-            isMobileScreen ? (
-              <Trans>Builds</Trans>
-            ) : (
-              <Trans>See this game builds</Trans>
-            )
-          }
-          onClick={openBuildDialog}
-          disabled={isNavigationDisabled}
-        />,
-      ]}
+      maxWidth={'sm'}
+      title={<Trans>Share</Trans>}
+      actions={mainActions}
+      secondaryActions={secondaryActions}
       onRequestClose={onClose}
       open
       fixedContent={
-        automatedExporters && manualExporters ? (
-          chosenExporterSection === 'automated' ? (
-            <Tabs
-              value={chosenExporterKey}
-              onChange={setChosenExporterKey}
-              options={automatedExporters.map(exporter => ({
-                value: exporter.key,
-                label: exporter.tabName,
-                disabled: isNavigationDisabled,
-              }))}
-            />
-          ) : chosenExporterSection === 'manual' ? (
-            <Tabs
-              value={chosenExporterKey}
-              onChange={setChosenExporterKey}
-              options={manualExporters.map(exporter => ({
-                value: exporter.key,
-                label: exporter.tabName,
-                disabled: isNavigationDisabled,
-              }))}
-            />
-          ) : null
-        ) : null
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              value: 'invite',
+              label: <Trans>Invite</Trans>,
+              id: 'invite-tab',
+              disabled: isNavigationDisabled,
+            },
+            {
+              value: 'publish',
+              label: <Trans>Publish</Trans>,
+              id: 'publish-tab',
+              disabled: isNavigationDisabled,
+            },
+          ]}
+        />
       }
     >
-      {cantExportBecauseOffline ? (
-        <AlertMessage kind="error">
-          <Trans>
-            You must be online and have a proper internet connection to export
-            your game.
-          </Trans>
-        </AlertMessage>
-      ) : chosenExporterSection === 'home' ? (
-        <ShareHome
-          onlineWebExporter={onlineWebExporter}
-          setChosenExporterKey={setChosenExporterKey}
-          setChosenExporterSection={setChosenExporterSection}
+      {currentTab === 'invite' && (
+        <InviteHome
+          cloudProjectId={
+            storageProvider.internalName === 'Cloud' && fileMetadata
+              ? fileMetadata.fileIdentifier
+              : null
+          }
+        />
+      )}
+      {currentTab === 'publish' && (
+        <PublishHome
           project={project}
           onSaveProject={onSaveProject}
+          onGameUpdated={setGame}
           onChangeSubscription={onChangeSubscription}
-          authenticatedUser={authenticatedUser}
           isNavigationDisabled={isNavigationDisabled}
           setIsNavigationDisabled={setIsNavigationDisabled}
-          onGameUpdated={setGame}
-          showOnlineWebExporterOnly={shouldShowOnlineWebExporterOnly}
-        />
-      ) : (
-        <ExportLauncher
-          exportPipeline={exporter.exportPipeline}
-          project={project}
-          onSaveProject={onSaveProject}
-          onChangeSubscription={onChangeSubscription}
-          authenticatedUser={authenticatedUser}
-          key={chosenExporterKey}
-          setIsNavigationDisabled={setIsNavigationDisabled}
-          onGameUpdated={setGame}
+          selectedExporter={exporter}
+          onChooseSection={setChosenExporterSection}
+          onChooseSubSection={setChosenExporterSubSection}
+          chosenSection={
+            showOnlineWebExporterOnly ? 'browser' : chosenExporterSection
+          }
+          chosenSubSection={
+            showOnlineWebExporterOnly ? 'online' : chosenExporterSubSection
+          }
+          game={game}
+          allExportersRequireOnline={allExportersRequireOnline}
+          showOnlineWebExporterOnly={showOnlineWebExporterOnly}
         />
       )}
       {game && (
@@ -281,4 +353,4 @@ const ExportDialog = ({
   );
 };
 
-export default ExportDialog;
+export default ShareDialog;

@@ -15,7 +15,7 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { GDevelopGameApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 
 export default {
-  title: 'Export/OnlineGameLink',
+  title: 'Share/OnlineGameLink',
   component: OnlineGameLink,
   decorators: [paperDecorator, muiDecorator],
   parameters: {

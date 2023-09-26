@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type Build } from '../Utils/GDevelopServices/Build';
+import { type Game } from '../Utils/GDevelopServices/Game';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
 
@@ -8,6 +9,15 @@ export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
   exportState: ExportState,
   updateStepProgress: (count: number, total: number) => void,
+|};
+
+export type HeaderProps<ExportState> = {|
+  project: gdProject,
+  exportState: ExportState,
+  updateExportState: (
+    updater: (prevExportState: ExportState) => ExportState
+  ) => void,
+  game: ?Game,
 |};
 
 /**
@@ -27,13 +37,7 @@ export type ExportPipeline<
 
   getInitialExportState: (project: gdProject) => ExportState,
 
-  renderHeader: ({|
-    project: gdProject,
-    exportState: ExportState,
-    updateExportState: (
-      updater: (prevExportState: ExportState) => ExportState
-    ) => void,
-  |}) => React.Node,
+  renderHeader: (HeaderProps<ExportState>) => React.Node,
 
   renderLaunchButtonLabel: () => React.Node,
 

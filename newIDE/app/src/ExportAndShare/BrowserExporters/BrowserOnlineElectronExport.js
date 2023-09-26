@@ -75,7 +75,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Create installation file</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

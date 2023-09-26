@@ -169,6 +169,7 @@ const MockTeamProvider = ({
         )}`,
         lastModifiedAt: '2021-11-20T11:59:50.417Z',
         createdAt: '2021-11-18T10:19:50.417Z',
+        updatedAt: '2021-11-18T10:19:50.417Z',
       },
       {
         id: 'cloudProject2',
@@ -179,6 +180,7 @@ const MockTeamProvider = ({
         )}`,
         lastModifiedAt: '2022-02-20T11:59:50.417Z',
         createdAt: '2022-01-08T10:19:50.417Z',
+        updatedAt: '2022-01-08T10:19:50.417Z',
       },
     ];
   };

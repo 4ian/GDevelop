@@ -59,7 +59,7 @@ export const localElectronExportPipeline: ExportPipeline<
   isNavigationDisabled: () => false,
 
   renderHeader: ({ project, exportState, updateExportState }) => (
-    <Column noMargin>
+    <Column noMargin expand>
       <Line>
         <Column noMargin>
           <ExplanationHeader />
@@ -80,7 +80,7 @@ export const localElectronExportPipeline: ExportPipeline<
     </Column>
   ),
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

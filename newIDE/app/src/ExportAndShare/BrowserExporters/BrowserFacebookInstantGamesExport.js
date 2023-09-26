@@ -63,7 +63,7 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

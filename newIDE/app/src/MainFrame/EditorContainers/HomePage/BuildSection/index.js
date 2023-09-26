@@ -41,7 +41,6 @@ import {
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
 import optionalRequire from '../../../../Utils/OptionalRequire';
-import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
@@ -149,6 +148,7 @@ export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
           lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
           name: cloudProject.name,
           gameId: cloudProject.gameId,
+          version: cloudProject.currentVersion,
         },
       };
       if (ownerId) {
@@ -176,7 +176,7 @@ export const ProjectFileListItem = ({
 }: ProjectFileListItemProps) => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const iconClasses = useStylesForListItemIcon();
-  const { showDeleteConfirmation } = useAlertDialog();
+  const { showDeleteConfirmation, showAlert } = useAlertDialog();
   const { navigateToRoute } = React.useContext(RouterContext);
   const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
@@ -218,12 +218,13 @@ export const ProjectFileListItem = ({
       await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
       authenticatedUser.onCloudProjectsChanged();
     } catch (error) {
-      showErrorBox({
-        message: i18n._(
-          t`An error occurred when deleting cloud project ${projectName}. Please try again later.`
-        ),
-        rawError: error,
-        errorId: 'cloud-project-delete-error',
+      const message =
+        error.response && error.response.status === 403
+          ? t`You don't have permissions to delete this project.`
+          : t`An error occurred when saving the project. Please try again later.`;
+      showAlert({
+        title: t`Unable to delete the project`,
+        message,
       });
     } finally {
       setPendingProject(null);

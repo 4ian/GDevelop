@@ -60,7 +60,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ game }) => <ExplanationHeader game={game} />,
 
   renderLaunchButtonLabel: () => 'Generate link',
 

@@ -10,6 +10,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import HelpButton from '../../UI/HelpButton';
+import { type HeaderProps } from '../ExportPipeline.flow';
 
 export type ExportState = {|
   targets: Array<TargetName>,
@@ -17,20 +18,12 @@ export type ExportState = {|
   signingDialogOpen: boolean,
 |};
 
-type HeaderProps = {|
-  project: gdProject,
-  exportState: ExportState,
-  updateExportState: (
-    updater: (prevExportState: ExportState) => ExportState
-  ) => void,
-|};
-
 export const SetupExportHeader = ({
   exportState,
   updateExportState,
-}: HeaderProps) => {
+}: HeaderProps<ExportState>) => {
   return (
-    <Column noMargin>
+    <Column noMargin expand>
       <Line>
         <Text>
           <Trans>

@@ -83,7 +83,7 @@ import PreferencesContext, {
   type InAppTutorialUserProgress,
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import { type ExportDialogWithoutExportsProps } from '../ExportAndShare/ShareDialog';
+import { type ShareDialogWithoutExportsProps } from '../ExportAndShare/ShareDialog';
 import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -178,6 +178,13 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  getCloudProject,
+  getProjectVersion,
+  type CloudProjectWithUserAccessInfo,
+} from '../Utils/GDevelopServices/Project';
+import { format } from 'date-fns';
+import { getUserPublicProfile } from '../Utils/GDevelopServices/User';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -297,7 +304,7 @@ export type Props = {|
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
-  renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
+  renderShareDialog?: ShareDialogWithoutExportsProps => React.Node,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -469,7 +476,7 @@ const MainFrame = (props: Props) => {
     eventsFunctionsExtensionsError,
   } = state;
   const {
-    renderExportDialog,
+    renderShareDialog,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -2398,6 +2405,63 @@ const MainFrame = (props: Props) => {
           // We don't block the save, as the user may want to save it anyway.
         }
 
+        if (storageProviderInternalName === 'Cloud') {
+          // If the project is saved on the cloud, first fetch it.
+          // If the version of the project opened is different than the last version of the cloud project,
+          // it means that the project was modified by someone else. In this case, we should warn
+          // the user and ask them if they want to overwrite the changes.
+          const cloudProjectId = currentFileMetadata.fileIdentifier;
+          const openedProjectVersion = currentFileMetadata.version;
+          const cloudProject: ?CloudProjectWithUserAccessInfo = await getCloudProject(
+            authenticatedUser,
+            cloudProjectId
+          );
+          if (!cloudProject) {
+            await showAlert({
+              title: t`Unable to save the project`,
+              message: t`The project could not be saved. Please try again later.`,
+            });
+            return;
+          }
+          const { currentVersion, committedAt } = cloudProject;
+          if (
+            openedProjectVersion &&
+            currentVersion && // should always be defined.
+            committedAt && // should always be defined.
+            currentVersion !== openedProjectVersion
+          ) {
+            let lastUsernameWhoModifiedProject = null;
+            const committedAtDate = new Date(committedAt);
+            const formattedDate = format(committedAtDate, 'dd-MM-yyyy');
+            const formattedTime = format(committedAtDate, 'HH:mm:ss');
+            const lastProjectVersion = await getProjectVersion(
+              authenticatedUser,
+              cloudProjectId,
+              currentVersion
+            );
+            if (lastProjectVersion && lastProjectVersion.userId) {
+              const lastUser = await getUserPublicProfile(
+                lastProjectVersion.userId
+              );
+              if (lastUser) {
+                lastUsernameWhoModifiedProject = lastUser.username;
+              }
+            }
+            const answer = await showConfirmation({
+              title: t`Project was modified`,
+              message: lastUsernameWhoModifiedProject
+                ? t`This project was modified by ${lastUsernameWhoModifiedProject} on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`
+                : t`This project was modified by someone else on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`,
+              level: 'warning',
+              confirmButtonLabel: t`Overwrite`,
+              makeDismissButtonPrimary: true,
+            });
+            if (!answer) {
+              return;
+            }
+          }
+        }
+
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
@@ -2447,13 +2511,14 @@ const MainFrame = (props: Props) => {
           unsavedChanges.sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
-      } catch (rawError) {
-        showErrorBox({
-          message: i18n._(
-            t`Unable to save the project! Please try again later or save the project in another location.`
-          ),
-          rawError,
-          errorId: 'project-save-error',
+      } catch (error) {
+        const message =
+          error.response && error.response.status === 403
+            ? t`You don't have permissions to save this project. Please choose another location.`
+            : t`An error occurred when saving the project. Please try again later.`;
+        showAlert({
+          title: t`Unable to save the project`,
+          message,
         });
         _closeSnackMessage();
       } finally {
@@ -2481,6 +2546,7 @@ const MainFrame = (props: Props) => {
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
       showAlert,
+      showConfirmation,
     ]
   );
 
@@ -3046,7 +3112,7 @@ const MainFrame = (props: Props) => {
         canSave={canSave}
         onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
-        exportProject={() => setShareDialogOpen(true)}
+        openShareDialog={() => setShareDialogOpen(true)}
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -3193,15 +3259,17 @@ const MainFrame = (props: Props) => {
         }}
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
-      {!!renderExportDialog &&
+      {!!renderShareDialog &&
         shareDialogOpen &&
-        renderExportDialog({
+        renderShareDialog({
           onClose: () => setShareDialogOpen(false),
           onChangeSubscription: () => {
             setShareDialogOpen(false);
           },
           project: state.currentProject,
           onSaveProject: saveProject,
+          fileMetadata: currentFileMetadata,
+          storageProvider: getStorageProvider(),
         })}
       {exampleStoreDialogOpen && (
         <ExampleStoreDialog

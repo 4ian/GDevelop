@@ -67,7 +67,7 @@ export const create = (authentication: Authentication) => {
               renderPreviewLauncher={(props, ref) => (
                 <BrowserS3PreviewLauncher {...props} ref={ref} />
               )}
-              renderExportDialog={props => (
+              renderShareDialog={props => (
                 <ShareDialog
                   project={props.project}
                   onSaveProject={props.onSaveProject}
@@ -77,6 +77,8 @@ export const create = (authentication: Authentication) => {
                   manualExporters={browserManualExporters}
                   onlineWebExporter={browserOnlineWebExporter}
                   allExportersRequireOnline
+                  fileMetadata={props.fileMetadata}
+                  storageProvider={props.storageProvider}
                 />
               )}
               storageProviders={storageProviders}

@@ -55,6 +55,7 @@ type Props = {|
   exportPipeline: ExportPipeline<any, any, any, any, any>,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
   onGameUpdated: (game: Game) => void,
+  game: ?Game,
 |};
 
 /**
@@ -252,7 +253,7 @@ export default class ExportLauncher extends Component<Props, State> {
     } catch (registerError) {
       // But if it fails, we don't prevent building the game.
       console.warn('Error while registering the game.');
-      if (registerError.response.status === 403) {
+      if (registerError.response && registerError.response.status === 403) {
         if (
           registerError.response.data &&
           registerError.response.data.code === 'game-creation/existing-game'
@@ -270,6 +271,7 @@ export default class ExportLauncher extends Component<Props, State> {
             errorId: 'existing-game-register',
           });
         } else if (
+          registerError.response &&
           registerError.response.data &&
           registerError.response.data.code === 'game-creation/too-many-games'
         ) {
@@ -434,11 +436,12 @@ export default class ExportLauncher extends Component<Props, State> {
                   </DismissableAlertMessage>
                 </Line>
               )}
-            <Line>
+            <Line alignItems="center" justifyContent="center">
               {exportPipeline.renderHeader({
                 project,
                 exportState,
                 updateExportState: this._updateExportState,
+                game: this.props.game,
               })}
             </Line>
             {(!exportPipeline.onlineBuildType ||

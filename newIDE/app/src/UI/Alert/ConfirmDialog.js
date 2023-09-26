@@ -16,49 +16,74 @@ type Props = {|
   onDismiss: () => void,
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
-  // TODO: Add notion of level (info, warning, error)
-  // level: string,
+  level: 'info' | 'warning' | 'error',
+  makeDismissButtonPrimary?: boolean,
 |};
 
 function ConfirmDialog(props: Props) {
   return (
     <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={i18n._(props.title)}
-          open={props.open}
-          actions={[
-            <FlatButton
-              key="dismiss"
-              keyboardFocused
-              label={
-                props.dismissButtonLabel ? (
-                  i18n._(props.dismissButtonLabel)
-                ) : (
-                  <Trans>Cancel</Trans>
-                )
-              }
-              onClick={props.onDismiss}
-            />,
-            <DialogPrimaryButton
-              key="confirm"
-              label={
-                props.confirmButtonLabel ? (
-                  i18n._(props.confirmButtonLabel)
-                ) : (
-                  <Trans>Confirm</Trans>
-                )
-              }
-              onClick={props.onConfirm}
-              primary
-            />,
-          ]}
-          maxWidth="xs"
-          noMobileFullScreen
-        >
-          <MarkdownText translatableSource={props.message} isStandaloneText />
-        </Dialog>
-      )}
+      {({ i18n }) => {
+        const dismissButtonLabel = props.dismissButtonLabel ? (
+          i18n._(props.dismissButtonLabel)
+        ) : (
+          <Trans>Cancel</Trans>
+        );
+        const dismissActionButton = props.makeDismissButtonPrimary ? (
+          <DialogPrimaryButton
+            key="dismiss"
+            keyboardFocused
+            label={dismissButtonLabel}
+            onClick={props.onDismiss}
+            primary
+          />
+        ) : (
+          <FlatButton
+            key="dismiss"
+            keyboardFocused
+            label={dismissButtonLabel}
+            onClick={props.onDismiss}
+          />
+        );
+        const confirmButtonLabel = props.confirmButtonLabel ? (
+          i18n._(props.confirmButtonLabel)
+        ) : (
+          <Trans>Confirm</Trans>
+        );
+        const confirmActionButton = props.makeDismissButtonPrimary ? (
+          <FlatButton
+            key="confirm"
+            label={confirmButtonLabel}
+            onClick={props.onConfirm}
+          />
+        ) : (
+          <DialogPrimaryButton
+            key="confirm"
+            label={confirmButtonLabel}
+            onClick={props.onConfirm}
+            primary
+          />
+        );
+        const dialogActions = [dismissActionButton, confirmActionButton];
+        return (
+          <Dialog
+            dangerLevel={
+              props.level === 'warning'
+                ? 'warning'
+                : props.level === 'error'
+                ? 'danger'
+                : undefined
+            }
+            title={i18n._(props.title)}
+            open={props.open}
+            actions={dialogActions}
+            maxWidth="xs"
+            noMobileFullScreen
+          >
+            <MarkdownText translatableSource={props.message} isStandaloneText />
+          </Dialog>
+        );
+      }}
     </I18n>
   );
 }

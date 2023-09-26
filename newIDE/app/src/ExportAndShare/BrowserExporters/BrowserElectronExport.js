@@ -64,7 +64,7 @@ export const browserElectronExportPipeline: ExportPipeline<
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Package</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

@@ -151,17 +151,24 @@ const isObjectFolderOrObjectWithContextGlobal = (
   objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
 ) => objectFolderOrObjectWithContext.global;
 
-const getPasteLabel = (i18n: I18nType, isGlobalObject: boolean) => {
-  let clipboardObjectName = '';
+const getPasteLabel = (
+  i18n: I18nType,
+  { isGlobalObject, isFolder }: {| isGlobalObject: boolean, isFolder: boolean |}
+) => {
+  let translation = t`Paste`;
   if (Clipboard.has(CLIPBOARD_KIND)) {
     const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-    clipboardObjectName =
+    const clipboardObjectName =
       SafeExtractor.extractStringProperty(clipboardContent, 'name') || '';
+    translation = isGlobalObject
+      ? isFolder
+        ? t`Paste ${clipboardObjectName} as a Global Object inside folder`
+        : t`Paste ${clipboardObjectName} as a Global Object`
+      : isFolder
+      ? t`Paste ${clipboardObjectName} inside folder`
+      : t`Paste ${clipboardObjectName}`;
   }
-
-  return isGlobalObject
-    ? i18n._(t`Paste ${clipboardObjectName} as a Global Object`)
-    : i18n._(t`Paste ${clipboardObjectName}`);
+  return i18n._(translation);
 };
 
 export type ObjectsListInterface = {|
@@ -466,11 +473,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         positionObjectFolderOrObjectWithContext,
         objectType,
         serializedObject,
+        pasteInside,
       }: {|
         objectName: string,
         positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
         objectType: string,
         serializedObject: Object,
+        pasteInside?: boolean,
       |}): ObjectWithContext => {
         const newName = newNameGenerator(
           objectName,
@@ -484,11 +493,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           objectFolderOrObject,
           global,
         } = positionObjectFolderOrObjectWithContext;
-
-        const positionFolder = objectFolderOrObject.getParent();
-        const positionInFolder = positionFolder.getChildPosition(
-          objectFolderOrObject
-        );
+        let positionFolder, positionInFolder;
+        if (pasteInside && objectFolderOrObject.isFolder()) {
+          positionFolder = objectFolderOrObject;
+          positionInFolder = objectFolderOrObject.getChildrenCount();
+        } else {
+          positionFolder = objectFolderOrObject.getParent();
+          positionInFolder = positionFolder.getChildPosition(
+            objectFolderOrObject
+          );
+        }
 
         const newObject = global
           ? project.insertNewObjectInFolder(
@@ -520,7 +534,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const paste = React.useCallback(
-      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
+      (
+        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        pasteInside?: boolean
+      ) => {
         if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
         const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
@@ -543,10 +560,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
           objectType: type,
           serializedObject: copiedObject,
+          pasteInside,
         });
 
         onObjectModified(false);
         if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
+        if (pasteInside && treeViewRef.current)
+          treeViewRef.current.openItems([
+            getTreeViewItemId(objectFolderOrObjectWithContext),
+          ]);
       },
       [addSerializedObjectToObjectsContainer, onObjectModified, onObjectPasted]
     );
@@ -1028,6 +1050,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           );
           return [
             {
+              label: getPasteLabel(i18n, {
+                isGlobalObject: item.global,
+                isFolder: true,
+              }),
+              enabled: Clipboard.has(CLIPBOARD_KIND),
+              click: () => paste(item, true),
+            },
+            {
               label: i18n._(t`Rename`),
               click: () => editName(item),
               accelerator: getShortcutDisplayName(
@@ -1111,7 +1141,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             click: () => cutObject(i18n, item),
           },
           {
-            label: getPasteLabel(i18n, item.global),
+            label: getPasteLabel(i18n, {
+              isGlobalObject: item.global,
+              isFolder: false,
+            }),
             enabled: Clipboard.has(CLIPBOARD_KIND),
             click: () => paste(item),
           },

@@ -89,7 +89,6 @@ export default class LocalEventsFunctionsExtensionWriter {
     filepath: string
   ): Promise<void> => {
     const exportedObject = customObject.clone().get();
-    exportedObject.setTags('');
     exportedObject.getVariables().clear();
     exportedObject.getEffects().clear();
     exportedObject

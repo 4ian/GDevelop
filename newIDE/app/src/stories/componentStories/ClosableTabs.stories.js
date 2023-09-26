@@ -269,9 +269,6 @@ export const WithObjectsList = () => (
                   onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}
-                  selectedObjectTags={[]}
-                  onChangeSelectedObjectTags={() => {}}
-                  getAllObjectTags={() => []}
                   getValidatedObjectOrGroupName={newName => newName}
                   onDeleteObject={(objectWithContext, cb) => cb(true)}
                   onRenameObjectFolderOrObjectWithContextFinish={(

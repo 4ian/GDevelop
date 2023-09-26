@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -14,19 +13,12 @@ import InstancePropertiesEditor, {
 } from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import FullSizeInstancesEditorWithScrollbars from '../../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
-import TagsButton from '../../UI/EditorMosaic/TagsButton';
 import CloseButton from '../../UI/EditorMosaic/CloseButton';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
 import ObjectGroupsList from '../../ObjectGroupsList';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
-import {
-  getTagsFromString,
-  buildTagsMenuTemplate,
-  type SelectedTags,
-} from '../../Utils/TagsHelper';
-import { enumerateObjects } from '../../ObjectsList/EnumerateObjects';
 import Rectangle from '../../Utils/Rectangle';
 import { type EditorId } from '..';
 import {
@@ -95,10 +87,6 @@ const MosaicEditorsDisplay = React.forwardRef<
     setDefaultEditorMosaicNode,
   } = React.useContext(PreferencesContext);
   const selectedInstances = props.instancesSelection.getSelectedInstances();
-  const [
-    selectedObjectTags,
-    setSelectedObjectTags,
-  ] = React.useState<SelectedTags>([]);
 
   const instancesPropertiesEditorRef = React.useRef<?InstancePropertiesEditorInterface>(
     null
@@ -231,30 +219,6 @@ const MosaicEditorsDisplay = React.forwardRef<
     ]
   );
 
-  const getAllObjectTags = React.useCallback(
-    (): Array<string> => {
-      const tagsSet: Set<string> = new Set();
-      enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
-        getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
-      });
-
-      return Array.from(tagsSet);
-    },
-    [project, layout]
-  );
-
-  const buildObjectTagsMenuTemplate = React.useCallback(
-    (i18n: I18nType): Array<any> => {
-      return buildTagsMenuTemplate({
-        noTagLabel: i18n._(t`No tags - add a tag to an object first`),
-        getAllTags: getAllObjectTags,
-        selectedTags: selectedObjectTags,
-        onChange: setSelectedObjectTags,
-      });
-    },
-    [selectedObjectTags, getAllObjectTags]
-  );
-
   const selectedObjectNames = props.selectedObjectFolderOrObjectsWithContext
     .map(objectFolderOrObjectWithContext => {
       const { objectFolderOrObject } = objectFolderOrObjectWithContext;
@@ -355,13 +319,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     'objects-list': {
       type: 'secondary',
       title: t`Objects`,
-      toolbarControls: [
-        <TagsButton
-          key="tags"
-          buildMenuTemplate={buildObjectTagsMenuTemplate}
-        />,
-        <CloseButton key="close" />,
-      ],
+      toolbarControls: [<CloseButton key="close" />],
       renderEditor: () => (
         <I18n>
           {({ i18n }) => (
@@ -398,12 +356,9 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               onAddObjectInstance={props.onAddObjectInstance}
               onObjectPasted={props.updateBehaviorsSharedData}
-              selectedObjectTags={selectedObjectTags}
               beforeSetAsGlobalObject={objectName =>
                 props.canObjectOrGroupBeGlobal(i18n, objectName)
               }
-              onChangeSelectedObjectTags={setSelectedObjectTags}
-              getAllObjectTags={getAllObjectTags}
               ref={objectsListRef}
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}

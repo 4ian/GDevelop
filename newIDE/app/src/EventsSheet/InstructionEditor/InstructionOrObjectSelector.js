@@ -28,12 +28,9 @@ import { Tabs } from '../../UI/Tabs';
 import Subheader from '../../UI/Subheader';
 import {
   enumerateObjectsAndGroups,
-  filterObjectByTags,
   type ObjectWithContext,
   type GroupWithContext,
-  enumerateObjects,
 } from '../../ObjectsList/EnumerateObjects';
-import TagChips from '../../UI/TagChips';
 import RaisedButton from '../../UI/RaisedButton';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
@@ -41,10 +38,6 @@ import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem
 import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionOrExpressionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../UI/EmptyMessage';
-import {
-  buildTagsMenuTemplate,
-  getTagsFromString,
-} from '../../Utils/TagsHelper';
 import {
   getObjectOrObjectGroupListItemValue,
   getInstructionListItemValue,
@@ -71,12 +64,8 @@ type State = {|
   searchResults: {
     objects: Array<SearchResult<ObjectWithContext>>,
     groups: Array<SearchResult<GroupWithContext>>,
-    tags: Array<SearchResult<string>>,
     instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
   },
-
-  // State for tags of objects:
-  selectedObjectTags: Array<string>,
 |};
 
 type Props = {|
@@ -111,8 +100,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 > {
   state = {
     searchText: '',
-    selectedObjectTags: [],
-    searchResults: { objects: [], groups: [], instructions: [], tags: [] },
+    searchResults: { objects: [], groups: [], instructions: [] },
   };
   _searchBar = React.createRef<SearchBarInterface>();
   _scrollView = React.createRef<ScrollViewInterface>();
@@ -137,7 +125,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   instructionSearchApi = null;
   objectSearchApi = null;
   groupSearchApi = null;
-  tagSearchApi = null;
 
   reEnumerateInstructions = (i18n: I18nType) => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -187,9 +174,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       getFn: (item, property) => item.group.getName(),
       keys: ['name'], // Not used as we only use the name of the group
     });
-    this.tagSearchApi = new Fuse(this._getAllObjectTags(), {
-      ...sharedFuseConfiguration,
-    });
   }
 
   _search = (searchText: string) => {
@@ -224,47 +208,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                 matches: tuneMatches(result, searchText),
               }))
           : [],
-        tags: this.tagSearchApi
-          ? this.tagSearchApi.search(extendedSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-          : [],
-      },
-    });
-  };
-
-  _selectTag = (tag: string) => {
-    this.setState({
-      selectedObjectTags: [...this.state.selectedObjectTags, tag],
-      searchText: '',
-    });
-    this._searchBar.current && this._searchBar.current.focus();
-  };
-
-  _getAllObjectTags = (): Array<string> => {
-    const { globalObjectsContainer, objectsContainer } = this.props;
-
-    const tagsSet: Set<string> = new Set();
-    enumerateObjects(
-      globalObjectsContainer,
-      objectsContainer
-    ).allObjectsList.forEach(({ object }) => {
-      getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
-    });
-
-    return Array.from(tagsSet);
-  };
-
-  _buildObjectTagsMenuTemplate = (i18n: I18nType): Array<any> => {
-    const { selectedObjectTags } = this.state;
-
-    return buildTagsMenuTemplate({
-      noTagLabel: i18n._(t`No tags - add a tag to an object first`),
-      getAllTags: this._getAllObjectTags,
-      selectedTags: selectedObjectTags,
-      onChange: selectedObjectTags => {
-        this.setState({ selectedObjectTags });
       },
     });
   };
@@ -285,7 +228,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       onSearchStartOrReset,
       onClickMore,
     } = this.props;
-    const { searchText, selectedObjectTags, searchResults } = this.state;
+    const { searchText, searchResults } = this.state;
 
     // If the global objects container is not the project, consider that we're
     // not in the events of a layout or an external events sheet - but in an extension.
@@ -300,13 +243,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     let filteredObjectsList = [];
     let displayedObjectGroupsList = [];
     let filteredInstructionsList = [];
-    let displayedTags = [];
 
     if (isSearching) {
       filteredObjectsList = searchResults.objects;
       displayedObjectGroupsList = searchResults.groups;
       filteredInstructionsList = searchResults.instructions;
-      displayedTags = searchResults.tags;
     } else {
       filteredObjectsList = allObjectsList.map(object => ({
         item: object,
@@ -317,10 +258,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         matches: [],
       }));
     }
-    const displayedObjectsList = filteredObjectsList.filter(searchResult =>
-      filterObjectByTags(searchResult.item, selectedObjectTags)
-    );
-
     const displayedInstructionsList = filteredInstructionsList.slice(
       0,
       DISPLAYED_INSTRUCTIONS_MAX_LENGTH
@@ -335,20 +272,17 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
     const hasResults =
       !isSearching ||
-      !!displayedObjectsList.length ||
+      !!filteredObjectsList.length ||
       !!displayedObjectGroupsList.length ||
-      !!displayedInstructionsList.length ||
-      !!displayedTags.length;
+      !!displayedInstructionsList.length;
 
     const onSubmitSearch = () => {
       if (!isSearching) return;
 
-      if (displayedObjectsList.length > 0) {
-        onChooseObject(displayedObjectsList[0].item.object.getName());
+      if (filteredObjectsList.length > 0) {
+        onChooseObject(filteredObjectsList[0].item.object.getName());
       } else if (displayedObjectGroupsList.length > 0) {
         onChooseObject(displayedObjectGroupsList[0].item.group.getName());
-      } else if (displayedTags.length > 0) {
-        this._selectTag(displayedTags[0].item);
       } else if (displayedInstructionsList.length > 0) {
         onChooseInstruction(
           displayedInstructionsList[0].item.type,
@@ -358,7 +292,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     };
 
     return (
-      <I18n key="tags">
+      <I18n>
         {({ i18n }) => (
           <div
             id="instruction-or-object-selector"
@@ -388,7 +322,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                 }
               }}
               onRequestSearch={onSubmitSearch}
-              buildMenuTemplate={() => this._buildObjectTagsMenuTemplate(i18n)}
               ref={this._searchBar}
               autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
               placeholder={
@@ -422,21 +355,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
               </Line>
             )}
             <ScrollView ref={this._scrollView} autoHideScrollbar>
-              {!isSearching && currentTab === 'objects' && (
-                <TagChips
-                  tags={selectedObjectTags}
-                  onChange={selectedObjectTags =>
-                    this.setState({
-                      selectedObjectTags,
-                    })
-                  }
-                />
-              )}
               {hasResults && (
                 <List>
                   {(isSearching || currentTab === 'objects') && (
                     <React.Fragment>
-                      {displayedObjectsList.map(
+                      {filteredObjectsList.map(
                         ({ item: objectWithContext, matches }, index) =>
                           renderObjectListItem({
                             project: project,
@@ -485,24 +408,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       )}
                     </React.Fragment>
                   )}
-                  {isSearching &&
-                    currentTab === 'objects' &&
-                    displayedTags.length > 0 && (
-                      <Subheader>
-                        <Trans>Object tags</Trans>
-                      </Subheader>
-                    )}
-                  {currentTab === 'objects' &&
-                    displayedTags.map(({ item: tag, matches }) => (
-                      <ListItem
-                        key={tag}
-                        primaryText={<Chip label={tag} />}
-                        onClick={() => {
-                          this._selectTag(tag);
-                        }}
-                        disableAutoTranslate
-                      />
-                    ))}
                   {isSearching && displayedInstructionsList.length > 0 && (
                     <Subheader>
                       {isCondition ? (

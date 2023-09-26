@@ -266,9 +266,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Instances can't be created from this context.
                 onAddObjectInstance={() => {}}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
-                selectedObjectTags={[]}
-                onChangeSelectedObjectTags={selectedObjectTags => {}}
-                getAllObjectTags={() => []}
                 ref={
                   objectsList => (this._objectsList = objectsList)
                 }

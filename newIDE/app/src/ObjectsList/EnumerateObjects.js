@@ -1,7 +1,6 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
-import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
 import { type RequiredExtension } from '../AssetStore/InstallAsset';
 
 const gd: libGDevelop = global.gd;
@@ -158,30 +157,16 @@ export const enumerateObjectTypes = (
 
 export type ObjectFilteringOptions = {|
   searchText: string,
-  selectedTags: SelectedTags,
   hideExactMatches?: boolean,
 |};
 
-export const filterObjectByTags = (
-  objectWithContext: ObjectWithContext,
-  selectedTags: SelectedTags
-): boolean => {
-  if (!selectedTags.length) return true;
-
-  const objectTags = objectWithContext.object.getTags();
-  return hasStringAllTags(objectTags, selectedTags);
-};
-
 export const filterObjectsList = (
   list: ObjectWithContextList,
-  { searchText, selectedTags, hideExactMatches }: ObjectFilteringOptions
+  { searchText, hideExactMatches }: ObjectFilteringOptions
 ): ObjectWithContextList => {
-  if (!searchText && !selectedTags.length) return list;
+  if (!searchText) return list;
 
   return list
-    .filter(objectWithContext =>
-      filterObjectByTags(objectWithContext, selectedTags)
-    )
     .filter((objectWithContext: ObjectWithContext) => {
       const objectName = objectWithContext.object.getName();
 

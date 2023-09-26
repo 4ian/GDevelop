@@ -20,15 +20,6 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
-import TagChips from '../UI/TagChips';
-import EditTagsDialog from '../UI/EditTagsDialog';
-import {
-  type Tags,
-  type SelectedTags,
-  getStringFromTags,
-  buildTagsMenuTemplate,
-  getTagsFromString,
-} from '../Utils/TagsHelper';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -197,10 +188,6 @@ type Props = {|
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   canInstallPrivateAsset: () => boolean,
 
-  selectedObjectTags: SelectedTags,
-  getAllObjectTags: () => Tags,
-  onChangeSelectedObjectTags: SelectedTags => void,
-
   beforeSetAsGlobalObject?: (groupName: string) => boolean,
   canSetAsGlobalObject?: boolean,
 
@@ -235,10 +222,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onRenameObjectFolderOrObjectWithContextFinish,
       selectedObjectFolderOrObjectsWithContext,
       canInstallPrivateAsset,
-
-      selectedObjectTags,
-      getAllObjectTags,
-      onChangeSelectedObjectTags,
 
       beforeSetAsGlobalObject,
       canSetAsGlobalObject,
@@ -292,9 +275,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }));
 
     const [searchText, setSearchText] = React.useState('');
-    const [tagEditedObject, setTagEditedObject] = React.useState<?gdObject>(
-      null
-    );
 
     const addObject = React.useCallback(
       (objectType: string) => {
@@ -314,7 +294,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           name,
           objectsContainer.getObjectsCount()
         );
-        object.setTags(getStringFromTags(selectedObjectTags));
 
         const objectFolderOrObjectWithContext = {
           // A new object is always added to the scene (layout) by default.
@@ -348,7 +327,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [
         project,
         objectsContainer,
-        selectedObjectTags,
         onEditObject,
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
@@ -358,7 +336,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const onObjectsAddedFromAssets = React.useCallback(
       (objects: Array<gdObject>) => {
         objects.forEach(object => {
-          object.setTags(getStringFromTags(selectedObjectTags));
           onObjectCreated(object);
         });
         if (treeViewRef.current)
@@ -381,7 +358,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           scrollToItem(objectFolderOrObjectWithContext);
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [onObjectCreated, selectedObjectTags, objectsContainer]
+      [onObjectCreated, objectsContainer]
     );
 
     const onAddNewObject = React.useCallback(() => {
@@ -968,24 +945,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
-    const openEditTagDialog = React.useCallback(
-      (tagEditedObject: ?gdObject) => {
-        setTagEditedObject(tagEditedObject);
-      },
-      []
-    );
-
-    const changeObjectTags = React.useCallback(
-      (object: gdObject, tags: Tags) => {
-        object.setTags(getStringFromTags(tags));
-
-        // Force update the list as it's possible that user removed a tag
-        // from an object, that should then not be shown anymore in the list.
-        onObjectModified(true);
-      },
-      [onObjectModified]
-    );
-
     const getTreeViewItemThumbnail = React.useCallback(
       (item: TreeViewItem) => {
         if (item.isRoot || item.isPlaceholder) return null;
@@ -1228,19 +1187,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               },
             })),
           },
-          {
-            label: i18n._(t`Tags`),
-            submenu: buildTagsMenuTemplate({
-              noTagLabel: i18n._(t`No tags`),
-              getAllTags: getAllObjectTags,
-              selectedTags: getTagsFromString(object.getTags()),
-              onChange: objectTags => {
-                changeObjectTags(object, objectTags);
-              },
-              editTagsLabel: i18n._(t`Add/edit tags...`),
-              onEditTags: () => openEditTagDialog(object),
-            }),
-          },
           { type: 'separator' },
           {
             label: i18n._(t`Add instance to the scene`),
@@ -1265,19 +1211,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         ].filter(Boolean);
       },
       [
-        changeObjectTags,
         copyObject,
         cutObject,
         deleteObject,
         duplicateObject,
         editName,
-        getAllObjectTags,
         onAddNewObject,
         onAddObjectInstance,
         onEditObject,
         onExportObject,
         onSelectAllInstancesOfObjectInLayout,
-        openEditTagDialog,
         paste,
         project,
         setAsGlobalObject,
@@ -1321,10 +1264,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             </Column>
           </LineStackLayout>
         </Column>
-        <TagChips
-          tags={selectedObjectTags}
-          onChange={onChangeSelectedObjectTags}
-        />
         <div style={styles.listContainer} id="objects-list">
           <I18n>
             {({ i18n }) => (
@@ -1391,16 +1330,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             canInstallPrivateAsset={canInstallPrivateAsset}
           />
         )}
-        {tagEditedObject && (
-          <EditTagsDialog
-            tagsString={tagEditedObject.getTags()}
-            onEdit={tags => {
-              changeObjectTags(tagEditedObject, tags);
-              openEditTagDialog(null);
-            }}
-            onCancel={() => openEditTagDialog(null)}
-          />
-        )}
       </Background>
     );
   }
@@ -1415,7 +1344,6 @@ const areEqual = (prevProps: Props, nextProps: Props): boolean =>
   // call forceUpdate.
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
-  prevProps.selectedObjectTags === nextProps.selectedObjectTags &&
   prevProps.project === nextProps.project &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 

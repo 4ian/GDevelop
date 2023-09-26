@@ -704,8 +704,6 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
     boolean Is3DObject();
 
     [Ref] ObjectConfiguration GetConfiguration();

@@ -166,14 +166,13 @@ export const filterObjectsList = (
 ): ObjectWithContextList => {
   if (!searchText) return list;
 
-  return list
-    .filter((objectWithContext: ObjectWithContext) => {
-      const objectName = objectWithContext.object.getName();
+  return list.filter((objectWithContext: ObjectWithContext) => {
+    const objectName = objectWithContext.object.getName();
 
-      if (hideExactMatches && searchText === objectName) return undefined;
+    if (hideExactMatches && searchText === objectName) return undefined;
 
-      return objectName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
-    });
+    return objectName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
+  });
 };
 
 export type GroupFilteringOptions = {|

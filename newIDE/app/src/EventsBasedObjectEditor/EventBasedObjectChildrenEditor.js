@@ -266,9 +266,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Instances can't be created from this context.
                 onAddObjectInstance={() => {}}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
-                ref={
-                  objectsList => (this._objectsList = objectsList)
-                }
+                ref={objectsList => (this._objectsList = objectsList)}
                 unsavedChanges={null}
                 // TODO EBO Hide the preview button or implement it.
                 // Note that it will be hard to do hot reload as extensions need

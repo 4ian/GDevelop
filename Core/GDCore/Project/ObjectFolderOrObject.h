@@ -57,7 +57,7 @@ class GD_CORE_API ObjectFolderOrObject {
   /**
    * \brief Returns the name of the folder.
    */
-  gd::String GetFolderName() const { return folderName; }
+  const gd::String& GetFolderName() const { return folderName; }
 
   /**
    * \brief Set the folder name. Does nothing if called on an instance not

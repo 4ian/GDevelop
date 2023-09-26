@@ -93,7 +93,6 @@
   box-shadow: none;
   color: inherit;
   width: 100%;
-  max-width: 200px;
 }
 
 .tree-view .item-name-input-container:before {
@@ -109,4 +108,5 @@
 
 .tree-view .item-name-input-container {
   position: relative;
+  flex: 1;
 }

@@ -13,6 +13,10 @@ import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import {
+  getObjectFolderOrObjectUnifiedName,
+  type ObjectFolderOrObjectWithContext,
+} from '../ObjectsList/EnumerateObjectFolderOrObject';
 
 const gd: libGDevelop = global.gd;
 
@@ -26,7 +30,7 @@ type Props = {|
 type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
-  selectedObjectsWithContext: ObjectWithContext[],
+  selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
 |};
 
 export default class EventBasedObjectChildrenEditor extends React.Component<
@@ -38,7 +42,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   state = {
     editedObjectWithContext: null,
     editedObjectInitialTab: 'properties',
-    selectedObjectsWithContext: [],
+    selectedObjectFolderOrObjectsWithContext: [],
   };
 
   _onDeleteObject = (i18n: I18nType) => (
@@ -70,7 +74,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     done(true);
   };
 
-  _getValidatedObjectOrGroupName = (newName: string, i18n: I18nType) => {
+  _getValidatedObjectOrGroupName = (newName: string) => {
     const { eventsBasedObject } = this.props;
 
     const safeAndUniqueNewName = newNameGenerator(
@@ -92,20 +96,15 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     return safeAndUniqueNewName;
   };
 
-  _onRenameEditedObject = (newName: string, i18n: I18nType) => {
+  _onRenameEditedObject = (newName: string) => {
     const { editedObjectWithContext } = this.state;
 
     if (editedObjectWithContext) {
-      this._onRenameObject(editedObjectWithContext, newName, () => {}, i18n);
+      this._onRenameObject(editedObjectWithContext, newName);
     }
   };
 
-  _onRenameObject = (
-    objectWithContext: ObjectWithContext,
-    newName: string,
-    done: boolean => void,
-    i18n: I18nType
-  ) => {
+  _onRenameObject = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
     const { project, globalObjectsContainer, eventsBasedObject } = this.props;
 
@@ -124,6 +123,40 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     }
 
     object.setName(newName);
+  };
+
+  _onRenameObjectFolderOrObjectFinish = (
+    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+    newName: string,
+    done: boolean => void
+  ) => {
+    const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
+
+    const unifiedName = getObjectFolderOrObjectUnifiedName(
+      objectFolderOrObject
+    );
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (unifiedName === newName) {
+      this._onObjectFolderOrObjectWithContextSelected(
+        objectFolderOrObjectWithContext
+      );
+      done(false);
+      return;
+    }
+    // newName is supposed to have been already validated.
+
+    if (objectFolderOrObject.isFolder()) {
+      objectFolderOrObject.setFolderName(newName);
+      done(true);
+      return;
+    }
+
+    const object = objectFolderOrObject.getObject();
+
+    this._onRenameObject({ object, global }, newName);
+    this._onObjectFolderOrObjectWithContextSelected(
+      objectFolderOrObjectWithContext
+    );
     done(true);
   };
 
@@ -144,15 +177,19 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     }
   };
 
-  _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
-    const selectedObjectsWithContext = [];
-    if (objectWithContext) {
-      selectedObjectsWithContext.push(objectWithContext);
+  _onObjectFolderOrObjectWithContextSelected = (
+    objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
+  ) => {
+    const selectedObjectFolderOrObjectsWithContext = [];
+    if (objectFolderOrObjectWithContext) {
+      selectedObjectFolderOrObjectsWithContext.push(
+        objectFolderOrObjectWithContext
+      );
     }
 
     this.setState(
       {
-        selectedObjectsWithContext,
+        selectedObjectFolderOrObjectsWithContext,
       },
       () => {
         this.forceUpdateObjectsList();
@@ -179,10 +216,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
 
   render() {
     const { eventsBasedObject, project, eventsFunctionsExtension } = this.props;
-
-    const selectedObjectNames = this.state.selectedObjectsWithContext.map(
-      objWithContext => objWithContext.object.getName()
-    );
+    const { selectedObjectFolderOrObjectsWithContext } = this.state;
 
     // TODO EBO When adding an object, filter the object types to excludes
     // object that depend (transitively) on this object to avoid cycles.
@@ -211,19 +245,23 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   onFetchNewlyAddedResources: async () => {},
                   getStorageProviderResourceOperations: () => null,
                 }}
-                selectedObjectNames={selectedObjectNames}
+                selectedObjectFolderOrObjectsWithContext={
+                  selectedObjectFolderOrObjectsWithContext
+                }
                 onEditObject={this.editObject}
                 // Don't allow export as there is no assets.
                 onExportObject={() => {}}
                 onDeleteObject={this._onDeleteObject(i18n)}
-                getValidatedObjectOrGroupName={newName =>
-                  this._getValidatedObjectOrGroupName(newName, i18n)
+                getValidatedObjectOrGroupName={
+                  this._getValidatedObjectOrGroupName
                 }
                 // Nothing special to do.
                 onObjectCreated={() => {}}
-                onObjectSelected={this._onObjectSelected}
-                onRenameObjectFinish={(objectWithContext, newName, done) =>
-                  this._onRenameObject(objectWithContext, newName, done, i18n)
+                onObjectFolderOrObjectWithContextSelected={
+                  this._onObjectFolderOrObjectWithContextSelected
+                }
+                onRenameObjectFolderOrObjectWithContextFinish={
+                  this._onRenameObjectFolderOrObjectFinish
                 }
                 // Instances can't be created from this context.
                 onAddObjectInstance={() => {}}
@@ -232,7 +270,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onChangeSelectedObjectTags={selectedObjectTags => {}}
                 getAllObjectTags={() => []}
                 ref={
-                  // $FlowFixMe Make this component functional.
                   objectsList => (this._objectsList = objectsList)
                 }
                 unsavedChanges={null}
@@ -279,12 +316,10 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onCancel={() => {
                   this.editObject(null);
                 }}
-                getValidatedObjectOrGroupName={newName =>
-                  this._getValidatedObjectOrGroupName(newName, i18n)
+                getValidatedObjectOrGroupName={
+                  this._getValidatedObjectOrGroupName
                 }
-                onRename={newName => {
-                  this._onRenameEditedObject(newName, i18n);
-                }}
+                onRename={this._onRenameEditedObject}
                 onApply={() => {
                   this.editObject(null);
                   this.updateBehaviorsSharedData();

@@ -24,6 +24,7 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   moveObject(oldIndex: number, newIndex: number): void;
   moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: gdObjectFolderOrObject, newObjectsContainer: gdObjectsContainer, parentObjectFolderOrObject: gdObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
+  getRootFolder(): gdObjectFolderOrObject;
   getObjectGroups(): gdObjectGroupsContainer;
   delete(): void;
   ptr: number;

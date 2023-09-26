@@ -2778,6 +2778,7 @@ interface EventsBasedObject {
     void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
 
+    [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 EventsBasedObject implements AbstractEventsBasedEntity;

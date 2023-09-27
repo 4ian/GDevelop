@@ -279,7 +279,7 @@ const ShareDialog = ({
       : [
           <HelpButton
             key="help"
-            helpPagePath="/all-features/invite-collaborators"
+            helpPagePath="/collaboration/invite-collaborators"
           />,
         ];
 

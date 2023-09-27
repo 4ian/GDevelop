@@ -40,7 +40,8 @@ namespace gdjs {
     constructor(
       runtimeGamePixiRenderer: gdjs.RuntimeGamePixiRenderer,
       imageManager: gdjs.PixiImageManager,
-      loadingScreenData: LoadingScreenData
+      loadingScreenData: LoadingScreenData,
+      isFirstLayout: boolean
     ) {
       this._loadingScreenData = loadingScreenData;
       this._loadingScreenContainer = new PIXI.Container();
@@ -63,7 +64,7 @@ namespace gdjs {
         this._loadingScreenContainer.addChild(this._backgroundSprite);
       }
 
-      if (loadingScreenData.showGDevelopSplash) {
+      if (loadingScreenData.showGDevelopSplash && isFirstLayout) {
         this._gdevelopLogoSprite = PIXI.Sprite.from(gdjs.gdevelopLogo);
         this._gdevelopLogoSprite.alpha = 0;
         this._gdevelopLogoSprite.anchor.x = 0.5;

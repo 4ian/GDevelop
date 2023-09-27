@@ -629,20 +629,24 @@ namespace gdjs {
     async loadFirstAssetsAsync(
       progressCallback?: (progress: float) => void
     ): Promise<void> {
-      await this.loadAssetsWithLoadingScreen(async (onProgress) => {
-        // TODO Is a setting needed?
-        if (false) {
-          await this._resourcesLoader.loadAllResources(onProgress);
-        } else {
-          const firstSceneName = this.getFirstSceneName();
-          await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
-            firstSceneName,
-            onProgress
-          );
-          // Don't await as it must not block the first layout from starting.
-          this._resourcesLoader.loadAllLayoutInBackground();
-        }
-      }, progressCallback);
+      await this.loadAssetsWithLoadingScreen(
+        /* isFirstLayout = */ true,
+        async (onProgress) => {
+          // TODO Is a setting needed?
+          if (false) {
+            await this._resourcesLoader.loadAllResources(onProgress);
+          } else {
+            const firstSceneName = this.getFirstSceneName();
+            await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
+              firstSceneName,
+              onProgress
+            );
+            // Don't await as it must not block the first layout from starting.
+            this._resourcesLoader.loadAllLayoutInBackground();
+          }
+        },
+        progressCallback
+      );
       await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
     }
 
@@ -657,9 +661,16 @@ namespace gdjs {
         if (false) {
           return;
         }
-        await this.loadAssetsWithLoadingScreen(async (onProgress) => {
-          await this._resourcesLoader.loadLayoutResources(layoutName, onProgress);
-        }, progressCallback);
+        await this.loadAssetsWithLoadingScreen(
+          /* isFirstLayout = */ false,
+          async (onProgress) => {
+            await this._resourcesLoader.loadLayoutResources(
+              layoutName,
+              onProgress
+            );
+          },
+          progressCallback
+        );
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 
@@ -671,6 +682,7 @@ namespace gdjs {
      * Load assets, displaying progress in renderer.
      */
     async loadAssetsWithLoadingScreen(
+      isFirstLayout: boolean,
       loadAssets: (
         onProgress: (count: integer, total: integer) => void
       ) => Promise<void>,
@@ -680,7 +692,8 @@ namespace gdjs {
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
         this._resourcesLoader.getImageManager(),
-        this._data.properties.loadingScreen
+        this._data.properties.loadingScreen,
+        isFirstLayout
       );
 
       const onProgress = (count: integer, total: integer) => {

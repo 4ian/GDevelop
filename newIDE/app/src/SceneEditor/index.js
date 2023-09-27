@@ -621,14 +621,38 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
-    // TODO: This method used to change the selection of objects in the ObjectsList
-    // when instances selection changes on the InstancesEditor.
-    // Now that the ObjectsList manipulates ObjectFolderOrObject instances, it's hard
-    // for the scene editor to get those instances from the object names only.
-    // Either this method is removed and the feature mentioned above is definitely
-    // abandoned. Either a method getObjectFolderOfObjectsByNames is implemented on
-    // the root folder of the containers in order to select the corresponding
-    // children (whatever the depth) that represent the objects.
+    if (instances.length === 0) {
+      this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
+      return;
+    }
+    const { project, layout } = this.props;
+    // TODO: Find a way to select efficiently the ObjectFolderOrObject instances
+    // representing all the instances selected.
+    const lastSelectedInstance = instances[instances.length - 1];
+    const objectName = lastSelectedInstance.getObjectName();
+    if (project.hasObjectNamed(objectName)) {
+      this.setState({
+        selectedObjectFolderOrObjectsWithContext: [
+          {
+            objectFolderOrObject: project
+              .getRootFolder()
+              .getObjectNamed(objectName),
+            global: true,
+          },
+        ],
+      });
+    } else if (layout.hasObjectNamed(objectName)) {
+      this.setState({
+        selectedObjectFolderOrObjectsWithContext: [
+          {
+            objectFolderOrObject: layout
+              .getRootFolder()
+              .getObjectNamed(objectName),
+            global: false,
+          },
+        ],
+      });
+    }
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {

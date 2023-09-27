@@ -4982,5 +4982,19 @@ Array [
         false
       );
     });
+    test("an ObjectFolderOrObject representing an object can be retrieved using the object name only", () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Depth1', 0);
+      const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('MyObject'),
+        subSubFolder,
+        0
+      );
+      const objectFolderOrObject = subSubFolder.getChildAt(0);
+      const objectFolderOrObjectFoundByName = rootFolder.getObjectNamed('MyObject');
+      expect(objectFolderOrObjectFoundByName).toBe(objectFolderOrObject);
+    });
   });
 });

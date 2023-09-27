@@ -66,13 +66,15 @@ class GD_CORE_API ObjectFolderOrObject {
   void SetFolderName(const gd::String& name);
 
   /**
-   * \brief Returns true if the instance contains the object with the given name
-   * (directly of indirectly through the children).
-   *
-   * Returns true if the instance represents the object with the given name or
-   * if any of the children does (recursive search).
+   * \brief Returns true if the instance represents the object with the given
+   * name or if any of the children does (recursive search).
    */
   bool HasObjectNamed(const gd::String& name);
+  /**
+   * \brief Returns the child instance holding the object with the given name
+   * (recursive search).
+   */
+  ObjectFolderOrObject& GetObjectNamed(const gd::String& name);
 
   /**
    * \brief Returns the number of children. Returns 0 if the instance represents

@@ -75,6 +75,7 @@ import { useRefWithInit } from '../Utils/UseRefInitHook';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import Text from '../UI/Text';
 import { MultilineVariableEditorDialog } from './MultilineVariableEditorDialog';
+import { MarkdownText } from '../UI/MarkdownText';
 const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
@@ -521,11 +522,11 @@ const VariablesList = (props: Props) => {
   );
 
   const [searchText, setSearchText] = React.useState<string>('');
-  // const onComputeAllVariableNames = props;
-  // const allVariablesNames = React.useMemo<?Array<string>>(
-  //   () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
-  //   [onComputeAllVariableNames]
-  // );
+  const { onComputeAllVariableNames } = props;
+  const allVariablesNames = React.useMemo<?Array<string>>(
+    () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
+    [onComputeAllVariableNames]
+  );
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<
     Array<string>
@@ -594,16 +595,11 @@ const VariablesList = (props: Props) => {
     [containerWidth, props.size]
   );
 
-  // const undefinedVariableNames = allVariablesNames
-  //   ? allVariablesNames
-  //       .map(variableName => {
-  //         if (!props.variablesContainer.has(variableName)) {
-  //           return { text: variableName, value: variableName };
-  //         }
-  //         return null;
-  //       })
-  //       .filter(Boolean)
-  //   : [];
+  const undefinedVariableNames = allVariablesNames
+    ? allVariablesNames.filter(variableName => {
+        return !props.variablesContainer.has(variableName);
+      })
+    : [];
 
   const { historyHandler, onVariablesUpdated, variablesContainer } = props;
   const _onChange = React.useCallback(
@@ -1707,6 +1703,15 @@ const VariablesList = (props: Props) => {
                           ? renderTree(i18n, true)
                           : null}
                         {renderTree(i18n)}
+                        {!!undefinedVariableNames.length && (
+                          <Text>
+                            <MarkdownText
+                              translatableSource={t`There are variables used in events but not declared in this list: ${'`' +
+                                undefinedVariableNames.join('`, `') +
+                                '`'}.`}
+                            />
+                          </Text>
+                        )}
                       </ScrollView>
                     )}
                     {isNarrow ? toolbar : null}

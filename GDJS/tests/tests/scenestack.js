@@ -231,7 +231,7 @@ describe('gdjs.SceneStack', () => {
       )
     ).to.be(true);
 
-    // No layout has load.
+    // No layout has loaded.
     expect(lastLoadedScene).to.be(null);
     expect(firstLoadedScene).to.be(null);
     expect(sceneStack.wasFirstSceneLoaded()).to.be(false);
@@ -264,14 +264,14 @@ describe('gdjs.SceneStack', () => {
     ).to.be(true);
     expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
 
-    // Finish to load  "Scene 2" assets as it was started.
+    // Finish to load "Scene 2" assets.
     mockedResourceManager.markPendingResourcesAsLoaded(
       'fake-heavy-resource2.png'
     );
     await delay(10);
     expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(true);
 
-    // Player trigger "Scene 2" to start.
+    // The player triggers "Scene 2" to start.
     let scene2 = sceneStack.push('Scene 2');
     expect(scene2).not.to.be(null);
     expect(lastPausedScene).not.to.be(null);
@@ -330,7 +330,7 @@ describe('gdjs.SceneStack', () => {
       )
     ).to.be(true);
 
-    // No layout has load.
+    // No layout has loaded.
     expect(lastLoadedScene).to.be(null);
     expect(firstLoadedScene).to.be(null);
     expect(sceneStack.wasFirstSceneLoaded()).to.be(false);
@@ -355,18 +355,19 @@ describe('gdjs.SceneStack', () => {
     expect(runtimeGame.isLayoutAssetsLoaded('Scene 1')).to.be(true);
     expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
 
-    // Pushing a new layout trigger it as the next to load assets for if not
-    // already the case.
-    let scene2 = sceneStack.push('Scene 2');
-    await delay(10);
+    // The 2nd layout is loading in background.
     expect(
       mockedResourceManager.isResourceDownloadPending(
         'fake-heavy-resource2.png'
       )
     ).to.be(true);
 
-    // The 2nd layout is not loaded because its assets are still being downloading.
+    // The player triggers "Scene 2" to load.
+    let scene2 = sceneStack.push('Scene 2');
     expect(scene2).to.be(null);
+    await delay(10);
+
+    // The 2nd layout is not loaded because its assets are still being downloaded.
     //@ts-ignore
     expect(lastPausedScene.getName()).to.be('Scene 1');
     //@ts-ignore
@@ -437,7 +438,7 @@ describe('gdjs.SceneStack', () => {
       )
     ).to.be(true);
 
-    // No layout has load.
+    // No layout has loaded.
     expect(lastLoadedScene).to.be(null);
     expect(firstLoadedScene).to.be(null);
     expect(sceneStack.wasFirstSceneLoaded()).to.be(false);
@@ -471,10 +472,12 @@ describe('gdjs.SceneStack', () => {
     ).to.be(true);
     expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
 
-    // Pushing a new layout trigger it as the next to load assets for.
+    // The player triggers "Scene 4" to load.
     let scene4 = sceneStack.push('Scene 4');
     expect(scene4).to.be(null);
     await delay(10);
+    // "Scene 4" loading doesn't start yet as assets are currently downloading
+    // for "Scene 2".
     expect(
       mockedResourceManager.isResourceDownloadPending(
         'fake-heavy-resource4.png'
@@ -483,12 +486,13 @@ describe('gdjs.SceneStack', () => {
     expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
     expect(runtimeGame.isLayoutAssetsLoaded('Scene 4')).to.be(false);
 
-    // Finish to load  "Scene 2" assets as it was started.
+    // Finish to download "Scene 2" assets.
     mockedResourceManager.markPendingResourcesAsLoaded(
       'fake-heavy-resource2.png'
     );
     await delay(10);
 
+    // "Scene 4" assets are now downloading.
     expect(
       mockedResourceManager.isResourceDownloadPending(
         'fake-heavy-resource4.png'

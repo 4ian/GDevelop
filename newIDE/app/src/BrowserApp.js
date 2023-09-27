@@ -79,6 +79,7 @@ export const create = (authentication: Authentication) => {
                   allExportersRequireOnline
                   fileMetadata={props.fileMetadata}
                   storageProvider={props.storageProvider}
+                  initialTab={props.initialTab}
                 />
               )}
               storageProviders={storageProviders}

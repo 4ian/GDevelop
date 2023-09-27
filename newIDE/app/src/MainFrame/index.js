@@ -83,7 +83,10 @@ import PreferencesContext, {
   type InAppTutorialUserProgress,
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import { type ShareDialogWithoutExportsProps } from '../ExportAndShare/ShareDialog';
+import {
+  type ShareDialogWithoutExportsProps,
+  type ShareTab,
+} from '../ExportAndShare/ShareDialog';
 import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -397,6 +400,10 @@ const MainFrame = (props: Props) => {
     setIsProjectClosedSoAvoidReloadingExtensions,
   ] = React.useState<boolean>(false);
   const [shareDialogOpen, setShareDialogOpen] = React.useState<boolean>(false);
+  const [
+    shareDialogInitialTab,
+    setShareDialogInitialTab,
+  ] = React.useState<?ShareTab>(null);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
@@ -710,6 +717,22 @@ const MainFrame = (props: Props) => {
       setTimeout(() => _showSnackMessage(snackMessage, autoHideDuration), 200);
     },
     [_closeSnackMessage, _showSnackMessage]
+  );
+
+  const openShareDialog = React.useCallback(
+    (initialTab?: ShareTab) => {
+      setShareDialogInitialTab(initialTab || null);
+      setShareDialogOpen(true);
+    },
+    [setShareDialogOpen, setShareDialogInitialTab]
+  );
+
+  const closeShareDialog = React.useCallback(
+    () => {
+      setShareDialogOpen(false);
+      setShareDialogInitialTab(null);
+    },
+    [setShareDialogOpen, setShareDialogInitialTab]
   );
 
   const openInitialFileMetadata = async () => {
@@ -2914,7 +2937,8 @@ const MainFrame = (props: Props) => {
     onCloseProject: async () => {
       askToCloseProject();
     },
-    onExportGame: React.useCallback(() => setShareDialogOpen(true), []),
+    onExportGame: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
     onOpenLayout: name => {
       openLayout(name);
     },
@@ -2962,7 +2986,8 @@ const MainFrame = (props: Props) => {
     onSaveProjectAs: saveProjectAs,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
-    onExportProject: () => setShareDialogOpen(true),
+    onExportProject: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
     onCreateProject: () => setExampleStoreDialogOpen(true),
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
@@ -3112,7 +3137,9 @@ const MainFrame = (props: Props) => {
         canSave={canSave}
         onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
-        openShareDialog={() => setShareDialogOpen(true)}
+        openShareDialog={() =>
+          openShareDialog(/* leave the dialog decide which tab to open */)
+        }
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -3262,14 +3289,13 @@ const MainFrame = (props: Props) => {
       {!!renderShareDialog &&
         shareDialogOpen &&
         renderShareDialog({
-          onClose: () => setShareDialogOpen(false),
-          onChangeSubscription: () => {
-            setShareDialogOpen(false);
-          },
+          onClose: closeShareDialog,
+          onChangeSubscription: closeShareDialog,
           project: state.currentProject,
           onSaveProject: saveProject,
           fileMetadata: currentFileMetadata,
           storageProvider: getStorageProvider(),
+          initialTab: shareDialogInitialTab,
         })}
       {exampleStoreDialogOpen && (
         <ExampleStoreDialog
@@ -3303,7 +3329,7 @@ const MainFrame = (props: Props) => {
           {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => setShareDialogOpen(true),
+            onExport: () => openShareDialog('publish'),
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;

@@ -87,6 +87,7 @@ export const create = (authentication: Authentication) => {
                   onlineWebExporter={localOnlineWebExporter}
                   fileMetadata={props.fileMetadata}
                   storageProvider={props.storageProvider}
+                  initialTab={props.initialTab}
                 />
               )}
               renderGDJSDevelopmentWatcher={

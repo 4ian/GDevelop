@@ -19,7 +19,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 
-type ShareTab = 'invite' | 'publish';
+export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'mobile';
 export type ExporterSubSection = 'online' | 'offline' | 'facebook';
 export type ExporterKey =
@@ -64,7 +64,7 @@ export type ShareDialogWithoutExportsProps = {|
   onSaveProject: () => Promise<void>,
   onClose: () => void,
   onChangeSubscription: () => void,
-  initialTab?: ShareTab,
+  initialTab: ?ShareTab,
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
 |};
@@ -276,7 +276,12 @@ const ShareDialog = ({
             disabled={isNavigationDisabled || !isOnline}
           />,
         ].filter(Boolean)
-      : [];
+      : [
+          <HelpButton
+            key="help"
+            helpPagePath="/all-features/invite-collaborators"
+          />,
+        ];
 
   return (
     <Dialog

@@ -121,6 +121,15 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
       ]
     );
 
+    // Create a separate function to avoid the button passing its event as
+    // the first argument.
+    const onShareClick = React.useCallback(
+      () => {
+        openShareDialog();
+      },
+      [openShareDialog]
+    );
+
     return (
       <LineStackLayout noMargin>
         <FlatButtonWithSplitMenu
@@ -142,7 +151,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
         />
         <ResponsiveRaisedButton
           primary
-          onClick={openShareDialog}
+          onClick={onShareClick}
           icon={<PublishIcon />}
           label={<Trans>Share</Trans>}
           // This ID is used for guided lessons, let's keep it stable.

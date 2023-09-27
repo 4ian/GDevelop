@@ -1564,6 +1564,7 @@ export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData 
   description: 'This is a fake private game template',
   id: 'fake-id',
   sellerId: 'fake-seller-id',
+  isSellerGDevelop: false,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
   categories: ['adventure'],

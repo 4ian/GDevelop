@@ -25,6 +25,7 @@ export default {
 const privateAssetPackListingData: PrivateAssetPackListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
   productType: 'ASSET_PACK',
   thumbnailUrls: [
     'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
@@ -109,6 +110,7 @@ export const Default = () => {
         {
           id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
           sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+          isSellerGDevelop: false,
           productType: 'ASSET_PACK',
           thumbnailUrls: [
             'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
@@ -127,6 +129,7 @@ export const Default = () => {
         {
           id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
           sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+          isSellerGDevelop: false,
           productType: 'ASSET_PACK',
           thumbnailUrls: [
             'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
@@ -203,6 +206,7 @@ export const ForAlreadyPurchasedAssetPack = () => {
           {
             id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
             sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+            isSellerGDevelop: false,
             productType: 'ASSET_PACK',
             thumbnailUrls: [
               'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
@@ -221,6 +225,7 @@ export const ForAlreadyPurchasedAssetPack = () => {
           {
             id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
             sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+            isSellerGDevelop: false,
             productType: 'ASSET_PACK',
             thumbnailUrls: [
               'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',

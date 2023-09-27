@@ -23,6 +23,7 @@ type ErrorBoundaryScope =
   | 'mainframe'
   | 'list-search-result'
   | 'box-search-result'
+  | 'variables-list'
   | 'app';
 
 const errorHandler = (

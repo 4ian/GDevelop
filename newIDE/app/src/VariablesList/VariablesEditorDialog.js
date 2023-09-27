@@ -168,7 +168,6 @@ const VariablesEditorDialog = ({
           </Line>
         )}
         <VariablesList
-          commitChangesOnBlur
           variablesContainer={variablesContainer}
           inheritedVariablesContainer={inheritedVariablesContainer}
           emptyPlaceholderTitle={emptyPlaceholderTitle}

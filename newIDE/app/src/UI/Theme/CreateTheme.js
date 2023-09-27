@@ -13,6 +13,7 @@ export function getRootClassNames(theme: string) {
     eventsSheetRootClassName: theme,
     tableRootClassName: theme,
     markdownRootClassName: theme,
+    uiRootClassName: theme,
   };
 }
 

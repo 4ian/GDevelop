@@ -1303,6 +1303,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       canMoveSelectionToItem={canMoveSelectionTo}
                       reactDndType={objectWithContextReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                      renderHiddenElements={!!currentlyRunningInAppTutorial}
                     />
                   )}
                 </AutoSizer>

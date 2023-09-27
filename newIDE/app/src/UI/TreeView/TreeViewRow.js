@@ -6,7 +6,7 @@ import memoizeOne from 'memoize-one';
 import { areEqual } from 'react-window';
 import IconButton from '../IconButton';
 import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
-import ArrowHeadTop from '../CustomSvgIcons/ArrowHeadTop';
+import ArrowHeadRight from '../CustomSvgIcons/ArrowHeadRight';
 import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
 import './TreeView.css';
@@ -265,9 +265,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                                   disabled={node.disableCollapse}
                                 >
                                   {node.collapsed ? (
-                                    <ArrowHeadBottom fontSize="small" />
+                                    <ArrowHeadRight fontSize="small" />
                                   ) : (
-                                    <ArrowHeadTop fontSize="small" />
+                                    <ArrowHeadBottom fontSize="small" />
                                   )}
                                 </IconButton>
                                 {!node.item.isRoot && (

@@ -29,6 +29,7 @@ const getAssetPacksListingData = (
   {
     id: 'assetPackId',
     sellerId: userId,
+    isSellerGDevelop: false,
     productType: 'ASSET_PACK',
     listing: 'ASSET_PACK',
     name: 'French food',

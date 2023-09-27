@@ -6,6 +6,7 @@ declare class gdObjectFolderOrObject {
   getFolderName(): string;
   setFolderName(name: string): void;
   hasObjectNamed(name: string): boolean;
+  getObjectNamed(name: string): gdObjectFolderOrObject;
   getChildrenCount(): number;
   getChildAt(pos: number): gdObjectFolderOrObject;
   getObjectChild(name: string): gdObjectFolderOrObject;

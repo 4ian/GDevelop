@@ -403,6 +403,7 @@ interface ObjectFolderOrObject {
     [Const, Ref] DOMString GetFolderName();
     void SetFolderName([Const] DOMString name);
     boolean HasObjectNamed([Const] DOMString name);
+    [Ref] ObjectFolderOrObject GetObjectNamed([Const] DOMString name);
     unsigned long GetChildrenCount();
     [Ref] ObjectFolderOrObject GetChildAt(unsigned long pos);
     [Ref] ObjectFolderOrObject GetObjectChild([Const] DOMString name);

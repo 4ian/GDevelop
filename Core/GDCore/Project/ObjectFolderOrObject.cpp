@@ -38,6 +38,21 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
   }
   return object->GetName() == name;
 }
+ObjectFolderOrObject& ObjectFolderOrObject::GetObjectNamed(
+    const gd::String& name) {
+  if (!IsFolder() && object->GetName() == name) {
+    return *this;
+  }
+  if (IsFolder()) {
+    for (std::size_t j = 0; j < children.size(); j++) {
+      ObjectFolderOrObject& foundInChild = children[j]->GetObjectNamed(name);
+      if (&(foundInChild) != &badObjectFolderOrObject) {
+        return foundInChild;
+      }
+    }
+  }
+  return badObjectFolderOrObject;
+}
 
 void ObjectFolderOrObject::SetFolderName(const gd::String& name) {
   if (!IsFolder()) return;

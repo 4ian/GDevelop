@@ -15,9 +15,10 @@ const gd = global.gd;
 
 type Props = {|
   variableType: Variable_Type,
-  onChange: (newVariableType: string) => void,
+  onChange: (newVariableType: string, nodeId: string) => void,
+  nodeId: string,
   isHighlighted?: boolean,
-  disabled?: boolean,
+  readOnlyWithIcon?: boolean,
   id?: string,
 |};
 
@@ -80,7 +81,7 @@ const getVariableTypeToString = () => {
   return variableTypeToString;
 };
 
-const VariableTypeSelector = (props: Props) => {
+const VariableTypeSelector = React.memo<Props>((props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const Icon = getVariableTypeToIcon()[props.variableType];
 
@@ -94,26 +95,33 @@ const VariableTypeSelector = (props: Props) => {
             : undefined
         }
       />
-      <Spacer />
-      <SelectField
-        value={props.variableType}
-        margin="none"
-        stopPropagationOnClick
-        onChange={event =>
-          props.onChange(getVariableTypeToString()[event.target.value])
-        }
-        inputStyle={
-          props.isHighlighted
-            ? { color: gdevelopTheme.listItem.selectedTextColor }
-            : undefined
-        }
-        disabled={props.disabled}
-        id={props.id}
-      >
-        {getOptions()}
-      </SelectField>
+      {!props.readOnlyWithIcon && (
+        <>
+          <Spacer />
+          <SelectField
+            value={props.variableType}
+            margin="none"
+            stopPropagationOnClick
+            onChange={event =>
+              props.onChange(
+                getVariableTypeToString()[event.target.value],
+                props.nodeId
+              )
+            }
+            inputStyle={{
+              fontSize: 14,
+              color: props.isHighlighted
+                ? gdevelopTheme.listItem.selectedTextColor
+                : undefined,
+            }}
+            id={props.id}
+          >
+            {getOptions()}
+          </SelectField>
+        </>
+      )}
     </Line>
   );
-};
+});
 
 export default VariableTypeSelector;

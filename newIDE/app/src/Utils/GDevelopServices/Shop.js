@@ -18,6 +18,7 @@ type StripePrice = {|
 type ProductListingData = {|
   id: string,
   sellerId: string,
+  isSellerGDevelop: boolean,
   productType: 'ASSET_PACK' | 'GAME_TEMPLATE',
   listing: 'ASSET_PACK' | 'GAME_TEMPLATE',
   name: string,

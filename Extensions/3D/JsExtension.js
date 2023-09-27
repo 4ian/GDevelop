@@ -67,6 +67,22 @@ module.exports = {
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setZ')
         .setGetter('getZ');
+    
+      base3D
+        .addExpressionAndConditionAndAction(
+          'number',
+          'CenterZ',
+          _('Center Z position'),
+          _('the Z position of the center of rotation'),
+          _('the Z position of the center'),
+          _('Position/Center'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setCenterZInScene')
+        .setGetter('getCenterZInScene');
 
       base3D
         .addExpressionAndConditionAndAction(

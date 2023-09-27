@@ -276,7 +276,7 @@ const Effect = React.forwardRef(
                   { type: 'separator' },
                   {
                     type: 'checkbox',
-                    label: i18n._(t`Show Parameter Names`),
+                    label: i18n._(t`Show Properties Names`),
                     checked: showEffectParameterNames,
                     click: () =>
                       setShowEffectParameterNames(!showEffectParameterNames),
@@ -304,7 +304,7 @@ const Effect = React.forwardRef(
                           showEffectParameterNames
                             ? parameterName =>
                                 i18n._(
-                                  t`Parameter name in events: \`${parameterName}\` `
+                                  t`Property name in events: \`${parameterName}\` `
                                 )
                             : undefined
                         }

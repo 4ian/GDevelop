@@ -34,11 +34,25 @@ namespace gdjs {
             runtimeGameOptions.websocketDebuggerServerPort) ||
           '3030';
         this._ws = new WebSocket('ws://' + address + ':' + port + '/');
-      } catch (e) {
-        logger.log(
-          "WebSocket could not initialize, debugger/hot-reload won't work."
-        );
-        return;
+      } catch {
+        try {
+          this._ws = new WebSocket(
+            (location.protocol === 'https:' ? 'wss://' : 'ws://') +
+              location.hostname +
+              ':' +
+              location.port +
+              '/'
+          );
+        } catch {
+          try {
+            this._ws = new WebSocket('ws://localhost:3030/');
+          } catch {
+            logger.log(
+              "WebSocket could not initialize, debugger/hot-reload won't work."
+            );
+            return;
+          }
+        }
       }
       this._ws.onopen = function open() {
         logger.info('Debugger connection open');
@@ -60,9 +74,15 @@ namespace gdjs {
       };
     }
 
+    private hasLoggedError: boolean = false;
     protected _sendMessage(message: string) {
       if (!this._ws) {
-        logger.warn('No connection to debugger opened to send a message.');
+        // The error can be logged only once, since logger.warn will call this function again,
+        // leading to an endless recursive call if we do not call it only once.
+        if (!this.hasLoggedError) {
+          this.hasLoggedError = true;
+          logger.warn('No connection to debugger opened to send a message.');
+        }
         return;
       }
       if (this._ws.readyState === 1) this._ws.send(message);

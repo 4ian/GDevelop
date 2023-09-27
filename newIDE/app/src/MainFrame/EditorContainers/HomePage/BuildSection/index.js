@@ -64,6 +64,7 @@ import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
 import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
+import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -491,6 +492,21 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       authenticatedUser
     );
 
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const refreshCloudProjects = React.useCallback(
+      async () => {
+        if (isRefreshing) return;
+        try {
+          setIsRefreshing(true);
+          await onCloudProjectsChanged();
+        } finally {
+          // Wait a bit to avoid spam.
+          setTimeout(() => setIsRefreshing(false), 1000);
+        }
+      },
+      [onCloudProjectsChanged, isRefreshing]
+    );
+
     projectFiles.sort((a, b) => {
       if (!a.fileMetadata.lastModifiedDate) return 1;
       if (!b.fileMetadata.lastModifiedDate) return -1;
@@ -620,9 +636,18 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               expand
             >
               <Column noMargin>
-                <Text size="section-title">
-                  <Trans>Existing projects</Trans>
-                </Text>
+                <LineStackLayout noMargin alignItems="center">
+                  <Text size="section-title">
+                    <Trans>My projects</Trans>
+                  </Text>
+                  <IconButton
+                    size="small"
+                    onClick={refreshCloudProjects}
+                    disabled={isRefreshing}
+                  >
+                    <Refresh />
+                  </IconButton>
+                </LineStackLayout>
               </Column>
               <Column noMargin>
                 <LineStackLayout noMargin>

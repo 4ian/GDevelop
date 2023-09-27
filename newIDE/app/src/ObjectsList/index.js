@@ -450,13 +450,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         positionObjectFolderOrObjectWithContext,
         objectType,
         serializedObject,
-        pasteInside,
+        addInsideFolder,
       }: {|
         objectName: string,
         positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
         objectType: string,
         serializedObject: Object,
-        pasteInside?: boolean,
+        addInsideFolder?: boolean,
       |}): ObjectWithContext => {
         const newName = newNameGenerator(
           objectName,
@@ -471,7 +471,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           global,
         } = positionObjectFolderOrObjectWithContext;
         let positionFolder, positionInFolder;
-        if (pasteInside && objectFolderOrObject.isFolder()) {
+        if (addInsideFolder && objectFolderOrObject.isFolder()) {
           positionFolder = objectFolderOrObject;
           positionInFolder = objectFolderOrObject.getChildrenCount();
         } else {
@@ -513,7 +513,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const paste = React.useCallback(
       (
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        pasteInside?: boolean
+        addInsideFolder?: boolean
       ) => {
         if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
@@ -537,12 +537,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
           objectType: type,
           serializedObject: copiedObject,
-          pasteInside,
+          addInsideFolder,
         });
 
         onObjectModified(false);
         if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
-        if (pasteInside && treeViewRef.current)
+        if (addInsideFolder && treeViewRef.current)
           treeViewRef.current.openItems([
             getTreeViewItemId(objectFolderOrObjectWithContext),
           ]);
@@ -560,7 +560,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const duplicateObject = React.useCallback(
-      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
+      (
+        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        duplicateInScene?: boolean
+      ) => {
         const {
           objectFolderOrObject,
           global,

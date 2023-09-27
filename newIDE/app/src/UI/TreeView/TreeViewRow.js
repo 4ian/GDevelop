@@ -274,15 +274,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                                 </IconButton>
                                 {!node.item.isRoot && (
                                   <Folder
-                                    fontSize="small"
-                                    style={{ marginRight: 4 }}
+                                    style={{ marginRight: 4, width: 20 }}
                                   />
                                 )}
                               </>
                             ) : node.thumbnailSrc ? (
                               <div style={{ marginRight: 6 }}>
                                 <ListIcon
-                                  iconSize={16}
+                                  iconSize={20}
                                   src={node.thumbnailSrc}
                                 />
                               </div>

@@ -20,9 +20,10 @@ export const MultilineVariableEditorDialog = ({
       open
       title={null}
       flexColumnBody
+      noMobileFullScreen
       actions={[
         <DialogPrimaryButton
-          id="ok"
+          key="ok"
           label={<Trans>Ok</Trans>}
           primary
           onClick={() => onClose(value)}

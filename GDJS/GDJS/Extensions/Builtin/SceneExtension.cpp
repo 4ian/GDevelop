@@ -39,6 +39,15 @@ SceneExtension::SceneExtension() {
   GetAllConditions()["DoesSceneExist"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.doesSceneExist");
 
+  GetAllActions()["PrioritizeLoadingOfLayout"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.prioritizeLoadingOfLayout");
+  GetAllConditions()["IsLayoutAssetsLoaded"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.isLayoutAssetsLoaded");
+  GetAllConditions()["LayoutLoadingProgress"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.getLayoutLoadingProgress");
+  GetAllExpressions()["LayoutLoadingProgress"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.getLayoutLoadingProgress");
+
   StripUnimplementedInstructionsAndExpressions();
 }
 

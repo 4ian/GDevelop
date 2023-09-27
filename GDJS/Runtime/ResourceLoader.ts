@@ -119,6 +119,15 @@ namespace gdjs {
     private _bitmapFontManager: BitmapFontManager;
 
     /**
+     * Only used by events.
+     */
+    private currentLayoutLoadingName: string = '';
+    /**
+     * Only used by events.
+     */
+    private currentLayoutLoadingProgress: float = 0;
+
+    /**
      * @param runtimeGame The game.
      * @param resourceDataArray The resources data of the game.
      * @param globalResources The resources needed for any layer.
@@ -247,6 +256,7 @@ namespace gdjs {
         if (task === undefined) {
           continue;
         }
+        this.currentLayoutLoadingName = task.layoutName;
         if (!this.isLayoutAssetsLoaded(task.layoutName)) {
           await this._doLoadLayoutResources(task.layoutName, (count, total) =>
             task.onProgress(count, total)
@@ -262,7 +272,8 @@ namespace gdjs {
           this._layoutToLoadQueue.pop();
         }
       }
-      console.log("Done loading all layout in background");
+      this.currentLayoutLoadingName = '';
+      console.log('Done loading all layout in background');
     }
 
     /**
@@ -327,11 +338,21 @@ namespace gdjs {
         [...layoutResources.values()].map(async (resource) => {
           await this.loadResource(resource);
           loadedCount++;
+          this.currentLayoutLoadingProgress =
+            loadedCount / this._resources.size;
           onProgress && onProgress(loadedCount, this._resources.size);
         })
       );
       this._loadedLayoutNames.add(layoutName);
       console.log('Done: ' + layoutName);
+    }
+
+    getLayoutLoadingProgress(layoutName: string): float {
+      return layoutName === this.currentLayoutLoadingName
+        ? this.currentLayoutLoadingProgress
+        : this.isLayoutAssetsLoaded(layoutName)
+        ? 1
+        : 0;
     }
 
     isLayoutAssetsLoaded(layoutName: string): boolean {

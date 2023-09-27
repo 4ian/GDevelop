@@ -114,11 +114,11 @@ namespace gdjs {
         return this._loadNewLayout(newSceneName, externalLayoutName);
       }
 
-      console.log("Wait downloading to load layout: " + newSceneName);
+      console.log('Wait downloading to load layout: ' + newSceneName);
       this._nextLayout = newSceneName;
       this._isNextLayoutLoading = true;
       this._runtimeGame.loadLayoutAssetsAsync(newSceneName).then(() => {
-        console.log("Next layout assets are loaded: " + newSceneName);
+        console.log('Next layout assets are loaded: ' + newSceneName);
         this._isNextLayoutLoading = false;
       });
       return null;
@@ -128,7 +128,7 @@ namespace gdjs {
       newSceneName: string,
       externalLayoutName?: string
     ): gdjs.RuntimeScene {
-      console.log("Load layout: " + newSceneName);
+      console.log('Load layout: ' + newSceneName);
       this._nextLayout = null;
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);

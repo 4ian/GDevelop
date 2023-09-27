@@ -572,7 +572,7 @@ namespace gdjs {
      * @param enable true to pause the game, false to unpause
      */
     pause(enable: boolean) {
-      console.log("Pause game: " + enable);
+      console.log('Pause game: ' + enable);
       if (this._paused === enable) return;
 
       this._paused = enable;
@@ -588,6 +588,29 @@ namespace gdjs {
      */
     hasJustResumed() {
       return this._hasJustResumed;
+    }
+
+    /**
+     * Preload a scene assets as soon as possible in background.
+     */
+    prioritizeLoadingOfLayout(layoutName: string) {
+      // Don't await the layout assets to be loaded.
+      this._resourcesLoader.loadLayoutResources(layoutName);
+    }
+
+    /**
+     * @return The progress of assets loading in background for a scene
+     * (between 0 and 1).
+     */
+    getLayoutLoadingProgress(layoutName: string): number {
+      return this._resourcesLoader.getLayoutLoadingProgress(layoutName);
+    }
+
+    /**
+     * Check if scene assets have finished to load in background.
+     */
+    isLayoutAssetsLoaded(layoutName: string): boolean {
+      return this._resourcesLoader.isLayoutAssetsLoaded(layoutName);
     }
 
     /**
@@ -642,10 +665,6 @@ namespace gdjs {
 
         throw e;
       }
-    }
-
-    isLayoutAssetsLoaded(layoutName: string): boolean {
-      return this._resourcesLoader.isLayoutAssetsLoaded(layoutName);
     }
 
     /**

@@ -572,6 +572,7 @@ namespace gdjs {
      * @param enable true to pause the game, false to unpause
      */
     pause(enable: boolean) {
+      console.log("Pause game: " + enable);
       if (this._paused === enable) return;
 
       this._paused = enable;
@@ -619,6 +620,7 @@ namespace gdjs {
           this._resourcesLoader.loadAllLayoutInBackground();
         }
       }, progressCallback);
+      await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
     }
 
     /**
@@ -647,7 +649,7 @@ namespace gdjs {
     }
 
     /**
-     * Load all assets, displaying progress in renderer.
+     * Load assets, displaying progress in renderer.
      */
     async loadAssetsWithLoadingScreen(
       loadAssets: (
@@ -655,6 +657,7 @@ namespace gdjs {
       ) => Promise<void>,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
+      this.pause(true);
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
         this._resourcesLoader.getImageManager(),
@@ -671,7 +674,7 @@ namespace gdjs {
       await loadAssets(onProgress);
 
       await loadingScreen.unload();
-      await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+      this.pause(false);
     }
 
     private getFirstSceneName(): string {

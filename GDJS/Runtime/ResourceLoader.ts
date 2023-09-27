@@ -70,6 +70,7 @@ namespace gdjs {
     }
 
     onFinish() {
+      console.log('onFinish: ' + this.layoutName);
       this.isFinished = true;
       for (const onFinish of this.onFinishCallbacks) {
         onFinish();
@@ -250,12 +251,18 @@ namespace gdjs {
           await this._doLoadLayoutResources(task.layoutName, (count, total) =>
             task.onProgress(count, total)
           );
-          this._layoutToLoadQueue.pop();
+          // A layer may have been moved last while awaiting resources to be
+          // downloaded (see _prioritizeLayout).
+          this._layoutToLoadQueue.splice(
+            this._layoutToLoadQueue.findIndex((element) => element === task),
+            1
+          );
           task.onFinish();
         } else {
           this._layoutToLoadQueue.pop();
         }
       }
+      console.log("Done loading all layout in background");
     }
 
     /**
@@ -270,10 +277,13 @@ namespace gdjs {
       const task = this._prioritizeLayout(layoutName);
       return new Promise((resolve, reject) => {
         if (!task) {
+          console.log('Already downloaded layout: ' + layoutName);
           resolve();
           return;
         }
+        console.log('Register task callback for: ' + layoutName);
         task.registerCallback(() => {
+          console.log('Downloaded layout: ' + layoutName);
           resolve();
         }, onProgress);
       });
@@ -286,6 +296,7 @@ namespace gdjs {
      * this layout will be the next to be pre-loaded.
      */
     private _prioritizeLayout(layoutName: string): LayoutLoadingTask | null {
+      console.log('Prioritize layout: ' + layoutName);
       const taskIndex = this._layoutToLoadQueue.findIndex(
         (task) => task.layoutName === layoutName
       );
@@ -294,11 +305,7 @@ namespace gdjs {
         return null;
       }
       const task = this._layoutToLoadQueue[taskIndex];
-      this._layoutToLoadQueue.splice(
-        this._layoutToLoadQueue.findIndex(
-          (task) => task.layoutName === layoutName
-        )
-      );
+      this._layoutToLoadQueue.splice(taskIndex, 1);
       this._layoutToLoadQueue.push(task);
       return task;
     }

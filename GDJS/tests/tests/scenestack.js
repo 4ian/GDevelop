@@ -150,6 +150,8 @@ describe('gdjs.SceneStack', () => {
     layouts: [
       createSene('Scene 1', [{ name: 'fake-heavy-resource1.png' }]),
       createSene('Scene 2', [{ name: 'fake-heavy-resource2.png' }]),
+      createSene('Scene 3', [{ name: 'fake-heavy-resource3.png' }]),
+      createSene('Scene 4', [{ name: 'fake-heavy-resource4.png' }]),
     ],
     resources: {
       resources: [
@@ -167,11 +169,124 @@ describe('gdjs.SceneStack', () => {
           file: 'fake-heavy-resource2.png',
           userAdded: true,
         },
+        {
+          kind: 'fake-heavy-resource',
+          name: 'fake-heavy-resource3.png',
+          metadata: '',
+          file: 'fake-heavy-resource3.png',
+          userAdded: true,
+        },
+        {
+          kind: 'fake-heavy-resource',
+          name: 'fake-heavy-resource4.png',
+          metadata: '',
+          file: 'fake-heavy-resource4.png',
+          userAdded: true,
+        },
       ],
     },
   };
 
-  it('can wait for assets to be loaded and change of layout', async () => {
+  it('can start a layout when all its assets are already downloaded', async () => {
+    const mockedResourceManager = new gdjs.MockedResourceManager();
+    //@ts-ignore
+    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);
+    runtimeGame._resourcesLoader._resourceManagersMap.set(
+      //@ts-ignore
+      'fake-heavy-resource',
+      mockedResourceManager
+    );
+    let sceneStack = runtimeGame._sceneStack;
+
+    console.log('start test');
+
+    // Set up some scene callbacks.
+    /** @type gdjs.RuntimeScene | null  */
+    let firstLoadedScene = null;
+    /** @type gdjs.RuntimeScene | null  */
+    let lastLoadedScene = null;
+    /** @type gdjs.RuntimeScene | null  */
+    let lastPausedScene = null;
+
+    const onFirstRuntimeSceneLoaded = (runtimeScene) => {
+      firstLoadedScene = runtimeScene;
+    };
+    const onRuntimeSceneLoaded = (runtimeScene) => {
+      lastLoadedScene = runtimeScene;
+    };
+    const onRuntimeScenePaused = (runtimeScene) => {
+      lastPausedScene = runtimeScene;
+    };
+
+    gdjs.registerFirstRuntimeSceneLoadedCallback(onFirstRuntimeSceneLoaded);
+    gdjs.registerRuntimeSceneLoadedCallback(onRuntimeSceneLoaded);
+    gdjs.registerRuntimeScenePausedCallback(onRuntimeScenePaused);
+
+    // The test do not await because test test will unblock
+    // `loadFirstAssetsAsync` with `markPendingResourcesAsLoaded`.
+    runtimeGame.loadFirstAssetsAsync();
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'fake-heavy-resource1.png'
+      )
+    ).to.be(true);
+
+    // No layout has load.
+    expect(lastLoadedScene).to.be(null);
+    expect(firstLoadedScene).to.be(null);
+    expect(sceneStack.wasFirstSceneLoaded()).to.be(false);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 1')).to.be(false);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
+
+    // Assets of the 1st layout are downloaded before the layout is pushed.
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'fake-heavy-resource1.png'
+    );
+    await delay(10);
+    sceneStack.push('Scene 1');
+
+    // The 1st layout is loaded
+    expect(lastLoadedScene).not.to.be(null);
+    expect(firstLoadedScene).not.to.be(null);
+    //@ts-ignore
+    expect(lastLoadedScene.getName()).to.be('Scene 1');
+    //@ts-ignore
+    expect(firstLoadedScene.getName()).to.be('Scene 1');
+    expect(sceneStack.wasFirstSceneLoaded()).to.be(true);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 1')).to.be(true);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
+
+    // "Scene 2" is loading in background.
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'fake-heavy-resource2.png'
+      )
+    ).to.be(true);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
+
+    // Finish to load  "Scene 2" assets as it was started.
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'fake-heavy-resource2.png'
+    );
+    await delay(10);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(true);
+
+    // Player trigger "Scene 2" to start.
+    let scene2 = sceneStack.push('Scene 2');
+    expect(scene2).not.to.be(null);
+    expect(lastPausedScene).not.to.be(null);
+    //@ts-ignore
+    expect(lastPausedScene.getName()).to.be('Scene 1');
+    //@ts-ignore
+    expect(lastLoadedScene.getName()).to.be('Scene 2');
+
+    // Remove all the global callbacks
+    gdjs._unregisterCallback(onFirstRuntimeSceneLoaded);
+    gdjs._unregisterCallback(onRuntimeSceneLoaded);
+    gdjs._unregisterCallback(onRuntimeScenePaused);
+  });
+
+  it('can start a layout while assets loading and wait them to finish', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
     //@ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);
@@ -271,6 +386,136 @@ describe('gdjs.SceneStack', () => {
     expect(lastPausedScene.getName()).to.be('Scene 1');
     //@ts-ignore
     expect(lastLoadedScene.getName()).to.be('Scene 2');
+
+    // Remove all the global callbacks
+    gdjs._unregisterCallback(onFirstRuntimeSceneLoaded);
+    gdjs._unregisterCallback(onRuntimeSceneLoaded);
+    gdjs._unregisterCallback(onRuntimeScenePaused);
+  });
+
+  it('can start a layout which assets loading didn\'t stated yet and wait them to finish', async () => {
+    const mockedResourceManager = new gdjs.MockedResourceManager();
+    //@ts-ignore
+    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);
+    runtimeGame._resourcesLoader._resourceManagersMap.set(
+      //@ts-ignore
+      'fake-heavy-resource',
+      mockedResourceManager
+    );
+    let sceneStack = runtimeGame._sceneStack;
+
+    console.log('start test');
+
+    // Set up some scene callbacks.
+    /** @type gdjs.RuntimeScene | null  */
+    let firstLoadedScene = null;
+    /** @type gdjs.RuntimeScene | null  */
+    let lastLoadedScene = null;
+    /** @type gdjs.RuntimeScene | null  */
+    let lastPausedScene = null;
+
+    const onFirstRuntimeSceneLoaded = (runtimeScene) => {
+      firstLoadedScene = runtimeScene;
+    };
+    const onRuntimeSceneLoaded = (runtimeScene) => {
+      lastLoadedScene = runtimeScene;
+    };
+    const onRuntimeScenePaused = (runtimeScene) => {
+      lastPausedScene = runtimeScene;
+    };
+
+    gdjs.registerFirstRuntimeSceneLoadedCallback(onFirstRuntimeSceneLoaded);
+    gdjs.registerRuntimeSceneLoadedCallback(onRuntimeSceneLoaded);
+    gdjs.registerRuntimeScenePausedCallback(onRuntimeScenePaused);
+
+    // The test do not await because test test will unblock
+    // `loadFirstAssetsAsync` with `markPendingResourcesAsLoaded`.
+    runtimeGame.loadFirstAssetsAsync();
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'fake-heavy-resource1.png'
+      )
+    ).to.be(true);
+
+    // No layout has load.
+    expect(lastLoadedScene).to.be(null);
+    expect(firstLoadedScene).to.be(null);
+    expect(sceneStack.wasFirstSceneLoaded()).to.be(false);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 1')).to.be(false);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
+
+    // Assets of the 1st layout are downloaded before the layout is pushed.
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'fake-heavy-resource1.png'
+    );
+    await delay(10);
+    sceneStack.push('Scene 1');
+
+    // The 1st layout is loaded
+    expect(lastLoadedScene).not.to.be(null);
+    expect(firstLoadedScene).not.to.be(null);
+    //@ts-ignore
+    expect(lastLoadedScene.getName()).to.be('Scene 1');
+    //@ts-ignore
+    expect(firstLoadedScene.getName()).to.be('Scene 1');
+    expect(sceneStack.wasFirstSceneLoaded()).to.be(true);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 1')).to.be(true);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
+
+    // "Scene 2" is loaded on background but is blocked because
+    // 'fake-heavy-resource2.png' take a lot of time to load.
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'fake-heavy-resource2.png'
+      )
+    ).to.be(true);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
+
+    // Pushing a new layout trigger it as the next to load assets for.
+    let scene4 = sceneStack.push('Scene 4');
+    expect(scene4).to.be(null);
+    await delay(10);
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'fake-heavy-resource4.png'
+      )
+    ).to.be(false);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(false);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 4')).to.be(false);
+
+    // Finish to load  "Scene 2" assets as it was started.
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'fake-heavy-resource2.png'
+    );
+    await delay(10);
+
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'fake-heavy-resource4.png'
+      )
+    ).to.be(true);
+
+    // "Scene 4" is not loaded because its assets are still being downloading.
+    //@ts-ignore
+    expect(lastPausedScene.getName()).to.be('Scene 1');
+    //@ts-ignore
+    expect(lastLoadedScene.getName()).to.be('Scene 1');
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 2')).to.be(true);
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 4')).to.be(false);
+
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'fake-heavy-resource4.png'
+    );
+    await delay(10);
+    sceneStack.step(1000 / 60);
+
+    // "Scene 4" is now loaded.
+    expect(runtimeGame.isLayoutAssetsLoaded('Scene 4')).to.be(true);
+    expect(lastPausedScene).not.to.be(null);
+    //@ts-ignore
+    expect(lastPausedScene.getName()).to.be('Scene 1');
+    //@ts-ignore
+    expect(lastLoadedScene.getName()).to.be('Scene 4');
 
     // Remove all the global callbacks
     gdjs._unregisterCallback(onFirstRuntimeSceneLoaded);

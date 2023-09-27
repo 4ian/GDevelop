@@ -3,11 +3,13 @@ import * as React from 'react';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
+import { type Subscription } from '../Utils/GDevelopServices/Usage';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
   exportState: ExportState,
   updateStepProgress: (count: number, total: number) => void,
+  subscription: ?Subscription,
 |};
 
 /**

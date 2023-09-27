@@ -26,6 +26,10 @@ import {
   ExplanationHeader,
   OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
+import {
+  hasValidSubscriptionPlan,
+  onlineWebExportSizeOptions,
+} from '../../Utils/GDevelopServices/Usage';
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -152,12 +156,16 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
+    const hasValidSubscription = hasValidSubscriptionPlan(context.subscription);
     return archiveFiles({
       blobFiles,
       textFiles,
       basePath: '/export/',
       onProgress: context.updateStepProgress,
-      sizeLimit: 250 * 1000 * 1000,
+      // Higher limit for users with a subscription.
+      sizeOptions: hasValidSubscription
+        ? onlineWebExportSizeOptions.subscribed
+        : onlineWebExportSizeOptions.guest,
     });
   },
 

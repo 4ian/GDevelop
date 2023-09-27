@@ -22,6 +22,10 @@ import {
   OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import {
+  hasValidSubscriptionPlan,
+  onlineWebExportSizeOptions,
+} from '../../Utils/GDevelopServices/Usage';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -156,11 +160,15 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     { temporaryOutputDir }: ResourcesDownloadOutput
   ): Promise<CompressionOutput> => {
+    const hasValidSubscription = hasValidSubscriptionPlan(context.subscription);
     const archiveOutputDir = os.tmpdir();
     return archiveLocalFolder({
       path: temporaryOutputDir,
       outputFilename: path.join(archiveOutputDir, 'game-archive.zip'),
-      sizeLimit: 250 * 1000 * 1000,
+      // Higher limit for users with a subscription.
+      sizeOptions: hasValidSubscription
+        ? onlineWebExportSizeOptions.subscribed
+        : onlineWebExportSizeOptions.guest,
     });
   },
 

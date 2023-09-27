@@ -248,6 +248,29 @@ export const businessPlan: PlanDetails = {
   descriptionBullets: [],
 };
 
+const SUBSCRIBED_SIZE_LIMIT_IN_MB = 250;
+const GUEST_SIZE_LIMIT_IN_MB = 50;
+
+export type ExportSizeOptions = {|
+  limit: number,
+  getErrorMessage: (fileSizeInMb: number) => string,
+|};
+
+export const onlineWebExportSizeOptions: {
+  [key: 'guest' | 'subscribed']: ExportSizeOptions,
+} = {
+  guest: {
+    limit: SUBSCRIBED_SIZE_LIMIT_IN_MB * 1000 * 1000,
+    getErrorMessage: (fileSizeInMb: number) =>
+      `Archive is of size ${fileSizeInMb} MB, which is above the limit allowed of ${SUBSCRIBED_SIZE_LIMIT_IN_MB} MB`,
+  },
+  subscribed: {
+    limit: GUEST_SIZE_LIMIT_IN_MB * 1000 * 1000,
+    getErrorMessage: (fileSizeInMb: number) =>
+      `Archive is of size ${fileSizeInMb} MB, which is above the limit allowed of ${GUEST_SIZE_LIMIT_IN_MB} MB. You can subscribe to GDevelop to increase the limit to ${SUBSCRIBED_SIZE_LIMIT_IN_MB} MB.`,
+  },
+};
+
 export const getUserUsages = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string

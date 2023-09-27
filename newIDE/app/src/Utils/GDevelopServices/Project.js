@@ -92,6 +92,7 @@ export type CloudProjectVersion = {|
 export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
   lastModifiedAt: string,
+  lastCommittedBy?: string,
 |};
 
 export type Feature = 'ownership' | 'collaboration';

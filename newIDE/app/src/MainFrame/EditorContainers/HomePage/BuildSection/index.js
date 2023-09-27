@@ -65,6 +65,9 @@ import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateG
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
+import { getUserPublicProfilesByIds } from '../../../../Utils/GDevelopServices/User';
+import { Avatar, Tooltip } from '@material-ui/core';
+import { getGravatarUrl } from '../../../../UI/GravatarUrl';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -160,8 +163,15 @@ export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
     .filter(Boolean);
 };
 
+type LastModifiedInfo = {|
+  lastModifiedByUsername: string,
+  lastModifiedByIconUrl: string,
+  lastModifiedAt: number,
+|};
+
 type ProjectFileListItemProps = {|
   file: FileMetadataAndStorageProviderName,
+  lastModifiedInfo?: LastModifiedInfo | null,
   storageProviders: Array<StorageProvider>,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   isWindowWidthMediumOrLarger: boolean,
@@ -170,6 +180,7 @@ type ProjectFileListItemProps = {|
 
 export const ProjectFileListItem = ({
   file,
+  lastModifiedInfo, // If null, the project has been modified last by the current user.
   storageProviders,
   onOpenRecentFile,
   isWindowWidthMediumOrLarger,
@@ -369,14 +380,48 @@ export const ProjectFileListItem = ({
                     </Text>
                   </Column>
                   <Column expand>
-                    {file.fileMetadata.lastModifiedDate && (
-                      <Text noMargin>
-                        {getRelativeOrAbsoluteDisplayDate(
-                          i18n,
-                          file.fileMetadata.lastModifiedDate
-                        )}
-                      </Text>
-                    )}
+                    {lastModifiedInfo ? (
+                      <LineStackLayout noMargin alignItems="center">
+                        <Tooltip
+                          title={lastModifiedInfo.lastModifiedByUsername}
+                        >
+                          <Avatar
+                            src={lastModifiedInfo.lastModifiedByIconUrl}
+                            style={{ width: 20, height: 20 }}
+                          />
+                        </Tooltip>
+                        <Text noMargin>
+                          {getRelativeOrAbsoluteDisplayDate(
+                            i18n,
+                            lastModifiedInfo.lastModifiedAt
+                          )}
+                        </Text>
+                      </LineStackLayout>
+                    ) : file.fileMetadata.lastModifiedDate ? (
+                      <LineStackLayout noMargin alignItems="center">
+                        {storageProvider &&
+                          storageProvider.internalName === 'Cloud' &&
+                          authenticatedUser.profile &&
+                          authenticatedUser.profile.email && (
+                            <Tooltip title={authenticatedUser.profile.username}>
+                              <Avatar
+                                src={getGravatarUrl(
+                                  authenticatedUser.profile.email,
+                                  { size: 40 }
+                                )}
+                                style={{ height: 20, width: 20 }}
+                              />
+                            </Tooltip>
+                          )}
+
+                        <Text noMargin>
+                          {getRelativeOrAbsoluteDisplayDate(
+                            i18n,
+                            file.fileMetadata.lastModifiedDate
+                          )}
+                        </Text>
+                      </LineStackLayout>
+                    ) : null}
                   </Column>
                   <ListItemSecondaryAction>
                     <IconButton
@@ -464,6 +509,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       SubscriptionSuggestionContext
     );
     const {
+      profile,
       cloudProjects,
       limits,
       cloudProjectsFetchingErrorLabel,
@@ -472,6 +518,10 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const windowWidth = useResponsiveWindowWidth();
     const isMobile = windowWidth === 'small';
     const forceUpdate = useForceUpdate();
+    const [
+      lastModifiedInfoByProjectId,
+      setLastModifiedInfoByProjectId,
+    ] = React.useState({});
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
@@ -488,6 +538,51 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         )
       );
     }
+
+    // We only look at projects where lastModifiedAt is different than committedAt,
+    // as it means the project has been modified by someone else.
+    // Otherwise, we assume the project has been modified by the current user.
+    React.useEffect(
+      () => {
+        const updateModificationInfoByProjectId = async () => {
+          if (!cloudProjects || !profile) return;
+
+          const cloudProjectsLastModifiedBySomeoneElse = cloudProjects.filter(
+            cloudProject =>
+              !!cloudProject.committedAt &&
+              !!cloudProject.lastCommittedBy &&
+              cloudProject.lastCommittedBy !== profile.id
+          );
+
+          const allOtherContributorIds = new Set(
+            cloudProjectsLastModifiedBySomeoneElse
+              .map(cloudProject => cloudProject.lastCommittedBy)
+              .filter(Boolean)
+          );
+
+          const userPublicProfileByIds = await getUserPublicProfilesByIds(
+            Array.from(allOtherContributorIds)
+          );
+          const _lastModifiedInfoByProjectId = {};
+          cloudProjects.forEach(project => {
+            if (!project.lastCommittedBy || !project.committedAt) return;
+            const contributorPublicProfile =
+              userPublicProfileByIds[project.lastCommittedBy];
+            if (!contributorPublicProfile) return;
+            _lastModifiedInfoByProjectId[project.id] = {
+              lastModifiedByUsername: contributorPublicProfile.username,
+              lastModifiedByIconUrl: contributorPublicProfile.iconUrl,
+              lastModifiedAt: Date.parse(project.committedAt),
+            };
+          });
+          setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
+        };
+
+        updateModificationInfoByProjectId();
+      },
+      [cloudProjects, profile]
+    );
+
     const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
       authenticatedUser
     );
@@ -744,6 +839,11 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         storageProviders={storageProviders}
                         isWindowWidthMediumOrLarger={!isMobile}
                         onOpenRecentFile={onOpenRecentFile}
+                        lastModifiedInfo={
+                          lastModifiedInfoByProjectId[
+                            file.fileMetadata.fileIdentifier
+                          ]
+                        }
                       />
                     ))
                   ) : (

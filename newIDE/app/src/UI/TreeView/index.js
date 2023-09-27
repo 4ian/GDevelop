@@ -121,6 +121,7 @@ type Props<Item> = {|
   reactDndType: string,
   forceAllOpened?: boolean,
   initiallyOpenedNodeIds?: string[],
+  renderHiddenElements?: boolean,
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -146,6 +147,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     reactDndType,
     forceAllOpened,
     initiallyOpenedNodeIds,
+    renderHiddenElements,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
@@ -447,6 +449,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         // $FlowFixMe
         itemData={itemData}
         ref={listRef}
+        overscanCount={renderHiddenElements ? 20 : 2}
         className={`${treeView} ${theme.treeViewRootClassName}`}
       >
         {TreeViewRow}

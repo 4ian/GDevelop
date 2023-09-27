@@ -72,6 +72,8 @@ const objectTypeToDefaultName = {
   'MyDummyExtension::DummyObject': 'NewDummyObject',
   'Lighting::LightObject': 'NewLight',
   'TextInput::TextInputObject': 'NewTextInput',
+  'Scene3D::Model3DObject': 'New3DModel',
+  'Scene3D::Cube3DObject': 'New3DBox',
   'Video::VideoObject': 'NewVideo',
 };
 
@@ -105,6 +107,7 @@ export type ObjectsListInterface = {|
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  initialInstances?: gdInitialInstancesContainer,
   objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
@@ -134,7 +137,7 @@ type Props = {|
   onObjectCreated: gdObject => void,
   onObjectSelected: (?ObjectWithContext) => void,
   onObjectPasted?: gdObject => void,
-  canRenameObject: (newName: string, global: boolean) => boolean,
+  getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onAddObjectInstance: (objectName: string) => void,
 
   getThumbnail: (
@@ -150,6 +153,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     {
       project,
       layout,
+      initialInstances,
       objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
@@ -172,7 +176,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onObjectCreated,
       onObjectSelected,
       onObjectPasted,
-      canRenameObject,
+      getValidatedObjectOrGroupName,
       onAddObjectInstance,
 
       getThumbnail,
@@ -305,7 +309,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         // It's important to call onDeleteObject, because the parent might
         // have to do some refactoring/clean up work before the object is deleted
-        // (typically, the SceneEditor will remove instances refering to the object,
+        // (typically, the SceneEditor will remove instances referring to the object,
         // leading to the removal of their renderer - which can keep a reference to
         // the object).
         onDeleteObject(objectWithContext, doRemove => {
@@ -460,22 +464,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
-        const { object, global } = objectWithContext;
+        const { global } = objectWithContext;
         onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
 
-        if (canRenameObject(newName, global)) {
-          onRenameObjectFinish(objectWithContext, newName, doRename => {
-            if (!doRename) return;
+        const validatedNewName = getValidatedObjectOrGroupName(newName, global);
+        onRenameObjectFinish(objectWithContext, validatedNewName, doRename => {
+          if (!doRename) return;
 
-            object.setName(newName);
-            onObjectModified(false);
-          });
-        }
+          onObjectModified(false);
+        });
       },
       [
-        canRenameObject,
+        getValidatedObjectOrGroupName,
         onObjectModified,
         onRenameObjectStart,
         onRenameObjectFinish,
@@ -695,8 +697,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         index: number
       ) => {
         const { object } = objectWithContext;
-        const instanceCountOnScene = layout
-          ? getInstanceCountInLayoutForObject(layout, object.getName())
+        const instanceCountOnScene = initialInstances
+          ? getInstanceCountInLayoutForObject(
+              initialInstances,
+              object.getName()
+            )
           : undefined;
 
         const objectMetadata = gd.MetadataProvider.getObjectMetadata(
@@ -737,8 +742,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Edit effects`),
             click: () => onEditObject(object, 'effects'),
-            enabled: !objectMetadata.isUnsupportedBaseObjectCapability(
-              'effect'
+            enabled: objectMetadata.hasDefaultBehavior(
+              'EffectCapacity::EffectBehavior'
             ),
           },
           eventsFunctionsExtensionWriter &&
@@ -811,7 +816,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         duplicateObject,
         editName,
         getAllObjectTags,
-        layout,
         onAddNewObject,
         onAddObjectInstance,
         onEditObject,
@@ -824,6 +828,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         eventsFunctionsExtensionWriter,
         preferences.values.userShortcutMap,
         canSetAsGlobalObject,
+        initialInstances,
       ]
     );
 
@@ -939,4 +944,4 @@ const areEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.project === nextProps.project &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
-export default React.memo<Props>(ObjectsList, areEqual);
+export default React.memo<Props, ObjectsListInterface>(ObjectsList, areEqual);

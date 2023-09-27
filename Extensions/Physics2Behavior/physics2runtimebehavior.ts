@@ -166,17 +166,21 @@ namespace gdjs {
 
     step(deltaTime: float): void {
       this.frameTime += deltaTime;
-      if (this.frameTime >= this.timeStep) {
-        let numberOfSteps = Math.floor(this.frameTime / this.timeStep);
-        this.frameTime -= numberOfSteps * this.timeStep;
-        if (numberOfSteps > 5) {
-          numberOfSteps = 5;
-        }
-        for (let i = 0; i < numberOfSteps; i++) {
-          this.world.Step(this.timeStep * this.timeScale, 8, 10);
-        }
-        this.world.ClearForces();
+      // `frameTime` can take negative values.
+      // It's better to be a bit early rather than skipping a frame and being
+      // a lot more late.
+      let numberOfSteps = Math.max(
+        0,
+        Math.round(this.frameTime / this.timeStep)
+      );
+      this.frameTime -= numberOfSteps * this.timeStep;
+      if (numberOfSteps > 5) {
+        numberOfSteps = 5;
       }
+      for (let i = 0; i < numberOfSteps; i++) {
+        this.world.Step(this.timeStep * this.timeScale, 8, 10);
+      }
+      this.world.ClearForces();
       this.stepped = true;
     }
 

@@ -64,7 +64,7 @@ describe('LocalResourceMover', () => {
   });
 
   test('load resources and upload them', async () => {
-    // Simulate readig and uploading files without issues.
+    // Simulate reading and uploading files without issues.
     mockFn(readLocalFileToFile).mockImplementation(async filePath => {
       return {
         name: 'fake-file-for-' + filePath,

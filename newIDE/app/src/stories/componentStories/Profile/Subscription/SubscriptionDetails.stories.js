@@ -8,11 +8,15 @@ import {
   noSubscription,
   silverSubscriptionWithExpiredRedemptionCode,
   silverSubscriptionWithRedemptionCode,
+  silverSubscriptionButCancelAtPeriodEnd,
   subscriptionForGoldUser,
+  subscriptionForStartupUser,
   subscriptionForIndieUser,
   subscriptionForProUser,
+  subscriptionForEducationPlan,
   subscriptionForSilverUser,
   purchaselyGoldSubscription,
+  subscriptionForGoldUserFromEducationPlan,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
@@ -68,6 +72,46 @@ export const WithGoldSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
       subscription={subscriptionForGoldUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithStartupSubscription = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForStartupUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithGoldSubscriptionFromEducationPlan = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForGoldUserFromEducationPlan}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithEducationSubscription = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForEducationPlan}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithSilverSubscriptionButCancelAtPeriodEnd = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={silverSubscriptionButCancelAtPeriodEnd}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />

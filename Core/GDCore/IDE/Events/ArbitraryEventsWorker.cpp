@@ -11,6 +11,8 @@
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Events/Expression.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/String.h"
 
 using namespace std;
@@ -47,7 +49,14 @@ bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
   for (std::size_t j = 0; j < actionsVectors.size(); ++j)
     VisitInstructionList(*actionsVectors[j], false);
 
-  return false;
+  auto allExpressionsWithMetadata = event.GetAllExpressionsWithMetadata();
+  for (auto& expressionAndMetadata : allExpressionsWithMetadata) {
+    shouldDelete |= VisitEventExpression(
+      *expressionAndMetadata.first, expressionAndMetadata.second);
+  }
+
+
+  return shouldDelete;
 }
 
 bool ArbitraryEventsWorker::VisitLinkEvent(gd::LinkEvent& linkEvent) {
@@ -75,6 +84,11 @@ bool ArbitraryEventsWorker::VisitInstruction(gd::Instruction& instruction,
   return DoVisitInstruction(instruction, isCondition);
 }
 
+bool ArbitraryEventsWorker::VisitEventExpression(gd::Expression& expression,
+                                                 const gd::ParameterMetadata& metadata) {
+  return DoVisitEventExpression(expression, metadata);
+}
+
 ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
 
 
@@ -84,6 +98,9 @@ void ReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList& events)
   DoVisitEventList(events);
 
   for (std::size_t i = 0; i < events.size(); ++i) {
+    if (shouldStopIteration) {
+      break;
+    }
     events[i].AcceptVisitor(*this);
 
     if (events[i].CanHaveSubEvents()) {
@@ -98,11 +115,17 @@ void ReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& event) {
   const vector<const gd::InstructionsList*> conditionsVectors =
       event.GetAllConditionsVectors();
   for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
+    if (shouldStopIteration) {
+      break;
+    }
     VisitInstructionList(*conditionsVectors[j], true);
   }
 
   const vector<const gd::InstructionsList*> actionsVectors = event.GetAllActionsVectors();
   for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
+    if (shouldStopIteration) {
+      break;
+    }
     VisitInstructionList(*actionsVectors[j], false);
   }
 }
@@ -116,6 +139,9 @@ void ReadOnlyArbitraryEventsWorker::VisitInstructionList(
   DoVisitInstructionList(instructions, areConditions);
 
   for (std::size_t i = 0; i < instructions.size(); ++i) {
+    if (shouldStopIteration) {
+      break;
+    }
     VisitInstruction(instructions[i], areConditions);
     if (!instructions[i].GetSubInstructions().empty()) {
       VisitInstructionList(instructions[i].GetSubInstructions(),
@@ -127,6 +153,16 @@ void ReadOnlyArbitraryEventsWorker::VisitInstructionList(
 void ReadOnlyArbitraryEventsWorker::VisitInstruction(const gd::Instruction& instruction,
                                              bool isCondition) {
   DoVisitInstruction(instruction, isCondition);
+}
+
+
+void ReadOnlyArbitraryEventsWorker::VisitEventExpression(const gd::Expression& expression,
+                                                 const gd::ParameterMetadata& metadata) {
+  DoVisitEventExpression(expression, metadata);
+}
+
+void ReadOnlyArbitraryEventsWorker::StopAnyEventIteration() {
+  shouldStopIteration = true;
 }
 
 ReadOnlyArbitraryEventsWorkerWithContext::~ReadOnlyArbitraryEventsWorkerWithContext() {}

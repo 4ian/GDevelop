@@ -87,7 +87,7 @@ export const getInspectorDescriptions = (
                 return Object.keys(instances.items).map(objectName => {
                   if (
                     !instances.items[objectName] ||
-                    typeof instances.items[objectName].length === undefined
+                    typeof instances.items[objectName].length === 'undefined'
                   )
                     return null;
 

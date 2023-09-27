@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class NightPixiFilter extends PIXI.Filter {
     constructor() {
       const vertexShader = undefined;
@@ -26,23 +25,26 @@ namespace gdjs {
     }
   }
   NightPixiFilter.prototype.constructor = gdjs.NightPixiFilter;
-  gdjs.PixiFiltersTools.registerFilterCreator('Night', {
-    makePIXIFilter: function (target, effectData) {
-      const filter = new gdjs.NightPixiFilter();
-      return filter;
-    },
-    updatePreRender: function (filter, target) {},
-    updateDoubleParameter: function (filter, parameterName, value) {
-      if (parameterName !== 'intensity' && parameterName !== 'opacity') {
-        return;
+  gdjs.PixiFiltersTools.registerFilterCreator(
+    'Night',
+    new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
+      makePIXIFilter(target, effectData) {
+        const filter = new gdjs.NightPixiFilter();
+        return filter;
       }
-      filter.uniforms[parameterName] = gdjs.PixiFiltersTools.clampValue(
-        value,
-        0,
-        1
-      );
-    },
-    updateStringParameter: function (filter, parameterName, value) {},
-    updateBooleanParameter: function (filter, parameterName, value) {},
-  });
+      updatePreRender(filter, target) {}
+      updateDoubleParameter(filter, parameterName, value) {
+        if (parameterName !== 'intensity' && parameterName !== 'opacity') {
+          return;
+        }
+        filter.uniforms[parameterName] = gdjs.PixiFiltersTools.clampValue(
+          value,
+          0,
+          1
+        );
+      }
+      updateStringParameter(filter, parameterName, value) {}
+      updateBooleanParameter(filter, parameterName, value) {}
+    })()
+  );
 }

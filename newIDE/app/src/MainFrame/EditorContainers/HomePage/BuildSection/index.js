@@ -18,7 +18,7 @@ import {
   LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
-
+import Carousel from '../../../../UI/Carousel';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -32,7 +32,10 @@ import ContextMenu, {
 import CircularProgress from '../../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
-import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
+import {
+  deleteCloudProject,
+  type CloudProjectWithUserAccessInfo,
+} from '../../../../Utils/GDevelopServices/Project';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
@@ -46,8 +49,7 @@ import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '../../../../UI/CustomSvgIcons/Add';
-import ImageTileRow from '../../../../UI/ImageTileRow';
-import { prepareExamples } from '../../../../AssetStore/ExampleStore';
+import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
@@ -58,6 +60,11 @@ import IconButton from '../../../../UI/IconButton';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import RouterContext from '../../../RouterContext';
 import { useLongTouch } from '../../../../Utils/UseLongTouch';
+import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
+import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
+import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -73,19 +80,7 @@ const styles = {
   noProjectsContainer: { padding: 10 },
 };
 
-const getTemplatesGridSizeFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 2;
-    case 'medium':
-      return 4;
-    case 'large':
-    default:
-      return 6;
-  }
-};
-
-const getProjectLineHeight = (width: WidthType) => {
+export const getProjectLineHeight = (width: WidthType) => {
   const lineHeight = width === 'small' ? 52 : 36;
 
   return lineHeight - 2 * marginsSize;
@@ -96,9 +91,12 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
   onShowAllExamples: () => void,
-  onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
+  onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
+  onSelectPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -137,17 +135,45 @@ const useStylesForListItemIcon = makeStyles({
   },
 });
 
-const ProjectFileListItem = ({
-  file,
-  storageProviders,
-  onOpenRecentFile,
-  isWindowWidthMediumOrLarger,
-}: {|
+export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
+  cloudProjects: Array<CloudProjectWithUserAccessInfo>,
+  ownerId?: string
+): Array<FileMetadataAndStorageProviderName> => {
+  return cloudProjects
+    .map(cloudProject => {
+      if (cloudProject.deletedAt) return null;
+      const file: FileMetadataAndStorageProviderName = {
+        storageProviderName: 'Cloud',
+        fileMetadata: {
+          fileIdentifier: cloudProject.id,
+          lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
+          name: cloudProject.name,
+          gameId: cloudProject.gameId,
+        },
+      };
+      if (ownerId) {
+        file.fileMetadata.ownerId = ownerId;
+      }
+      return file;
+    })
+    .filter(Boolean);
+};
+
+type ProjectFileListItemProps = {|
   file: FileMetadataAndStorageProviderName,
   storageProviders: Array<StorageProvider>,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   isWindowWidthMediumOrLarger: boolean,
-|}) => {
+  hideDeleteContextMenuAction?: boolean,
+|};
+
+export const ProjectFileListItem = ({
+  file,
+  storageProviders,
+  onOpenRecentFile,
+  isWindowWidthMediumOrLarger,
+  hideDeleteContextMenuAction,
+}: ProjectFileListItemProps) => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const iconClasses = useStylesForListItemIcon();
   const { showDeleteConfirmation } = useAlertDialog();
@@ -213,12 +239,14 @@ const ProjectFileListItem = ({
       { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
     ];
     if (file.storageProviderName === 'Cloud') {
-      actions = actions.concat([
-        {
-          label: i18n._(t`Delete`),
-          click: () => onDeleteCloudProject(i18n, file),
-        },
-      ]);
+      if (!hideDeleteContextMenuAction) {
+        actions = actions.concat([
+          {
+            label: i18n._(t`Delete`),
+            click: () => onDeleteCloudProject(i18n, file),
+          },
+        ]);
+      }
     } else if (file.storageProviderName === 'LocalFile') {
       actions = actions.concat([
         {
@@ -417,14 +445,18 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onChooseProject,
       onOpenNewProjectSetupDialog,
       onShowAllExamples,
-      onSelectExample,
+      onSelectExampleShortHeader,
+      onSelectPrivateGameTemplateListingData,
       onOpenRecentFile,
       storageProviders,
     },
     ref
   ) => {
     const { getRecentProjectFiles } = React.useContext(PreferencesContext);
-    const { allExamples } = React.useContext(ExampleStoreContext);
+    const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+    const { privateGameTemplateListingDatas } = React.useContext(
+      PrivateGameTemplateStoreContext
+    );
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
@@ -436,6 +468,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onCloudProjectsChanged,
     } = authenticatedUser;
     const windowWidth = useResponsiveWindowWidth();
+    const isMobile = windowWidth === 'small';
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
@@ -448,21 +481,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
 
     if (cloudProjects) {
       projectFiles = projectFiles.concat(
-        cloudProjects
-          .map(cloudProject => {
-            if (cloudProject.deletedAt) return null;
-            const file: FileMetadataAndStorageProviderName = {
-              storageProviderName: 'Cloud',
-              fileMetadata: {
-                fileIdentifier: cloudProject.id,
-                lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
-                name: cloudProject.name,
-                gameId: cloudProject.gameId,
-              },
-            };
-            return file;
-          })
-          .filter(Boolean)
+        transformCloudProjectsIntoFileMetadataWithStorageProviderName(
+          cloudProjects
+        )
       );
     }
     const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
@@ -475,46 +496,119 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
     });
 
-    const isWindowWidthMediumOrLarger = windowWidth !== 'small';
     const skeletonLineHeight = getProjectLineHeight(windowWidth);
+
+    // Show a premium game template every 3 examples.
+    const examplesAndTemplatesToDisplay = React.useMemo(
+      () => {
+        const allItems = [];
+        const privateGameTemplateItems = [
+          ...(privateGameTemplateListingDatas
+            ? privateGameTemplateListingDatas.map(
+                privateGameTemplateListingData => {
+                  const isTemplateOwned =
+                    !!authenticatedUser.receivedGameTemplates &&
+                    !!authenticatedUser.receivedGameTemplates.find(
+                      receivedGameTemplate =>
+                        receivedGameTemplate.id ===
+                        privateGameTemplateListingData.id
+                    );
+                  return {
+                    id: privateGameTemplateListingData.id,
+                    title: privateGameTemplateListingData.name,
+                    thumbnailUrl:
+                      privateGameTemplateListingData.thumbnailUrls[0],
+                    onClick: () => {
+                      sendGameTemplateInformationOpened({
+                        gameTemplateName: privateGameTemplateListingData.name,
+                        gameTemplateId: privateGameTemplateListingData.id,
+                        source: 'homepage',
+                      });
+                      onSelectPrivateGameTemplateListingData(
+                        privateGameTemplateListingData
+                      );
+                    },
+                    overlayText: (
+                      <ProductPriceTag
+                        productListingData={privateGameTemplateListingData}
+                        owned={isTemplateOwned}
+                      />
+                    ),
+                    overlayTextPosition: 'topLeft',
+                  };
+                }
+              )
+            : []),
+        ];
+
+        const exampleShortHeaderItems = [
+          ...(exampleShortHeaders
+            ? prepareExampleShortHeaders(exampleShortHeaders)
+                .map(example => ({
+                  id: example.id,
+                  title: example.name,
+                  onClick: () => onSelectExampleShortHeader(example),
+                  thumbnailUrl: example.previewImageUrls[0],
+                }))
+                .filter(exampleShortHeader => !!exampleShortHeader.thumbnailUrl)
+            : []),
+        ];
+
+        for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
+          allItems.push(exampleShortHeaderItems[i]);
+          if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
+            const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+            if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
+              allItems.push(
+                privateGameTemplateItems[nextPrivateGameTemplateIndex]
+              );
+          }
+        }
+
+        return allItems.slice(0, 12); // Only show 12 items.
+      },
+      [
+        authenticatedUser.receivedGameTemplates,
+        exampleShortHeaders,
+        onSelectExampleShortHeader,
+        onSelectPrivateGameTemplateListingData,
+        privateGameTemplateListingDatas,
+      ]
+    );
 
     return (
       <>
         <SectionContainer
           title={<Trans>My projects</Trans>}
-          renderFooter={() =>
-            limits && hasTooManyCloudProjects ? (
-              <Line>
-                <Column expand>
-                  <MaxProjectCountAlertMessage
-                    limits={limits}
-                    onUpgrade={() =>
-                      openSubscriptionDialog({
-                        reason: 'Cloud Project limit reached',
-                      })
-                    }
-                  />
-                </Column>
-              </Line>
-            ) : null
+          renderFooter={
+            limits && hasTooManyCloudProjects
+              ? () => (
+                  <Line>
+                    <Column expand>
+                      <MaxProjectCountAlertMessage
+                        limits={limits}
+                        onUpgrade={() =>
+                          openSubscriptionDialog({
+                            reason: 'Cloud Project limit reached',
+                          })
+                        }
+                      />
+                    </Column>
+                  </Line>
+                )
+              : undefined
           }
         >
           <SectionRow>
-            <ImageTileRow
-              isLoading={!allExamples}
-              items={
-                allExamples
-                  ? prepareExamples(allExamples).map(example => ({
-                      onClick: () => onSelectExample(example),
-                      imageUrl: example.previewImageUrls[0],
-                    }))
-                  : []
-              }
-              title={<Trans>Recommended templates</Trans>}
-              onShowAll={onShowAllExamples}
-              showAllIcon={<Add fontSize="small" />}
-              getColumnsFromWidth={getTemplatesGridSizeFromWidth}
-              getLimitFromWidth={getTemplatesGridSizeFromWidth}
+            <Carousel
+              title={<Trans>Game templates</Trans>}
+              displayItemTitles={false}
+              browseAllLabel={<Trans>Browse all templates</Trans>}
+              onBrowseAllClick={onShowAllExamples}
+              items={examplesAndTemplatesToDisplay}
+              browseAllIcon={<ChevronArrowRight fontSize="small" />}
+              roundedImages
+              hideArrows
             />
           </SectionRow>
           <SectionRow>
@@ -534,10 +628,14 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                   <RaisedButton
                     primary
                     fullWidth={!canOpen}
-                    label={<Trans>Create a project</Trans>}
-                    onClick={() =>
-                      onOpenNewProjectSetupDialog(/*exampleShortHeader=*/ null)
+                    label={
+                      isMobile ? (
+                        <Trans>Create</Trans>
+                      ) : (
+                        <Trans>Create a project</Trans>
+                      )
                     }
+                    onClick={onOpenNewProjectSetupDialog}
                     icon={<Add fontSize="small" />}
                     id="home-create-project-button"
                   />
@@ -549,7 +647,13 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                       <Spacer />
                       <TextButton
                         primary
-                        label={<Trans>Open a project</Trans>}
+                        label={
+                          isMobile ? (
+                            <Trans>Open</Trans>
+                          ) : (
+                            <Trans>Open a project</Trans>
+                          )
+                        }
                         onClick={onChooseProject}
                       />
                     </>
@@ -568,8 +672,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             )}
             <Line>
               <Column noMargin expand>
-                {isWindowWidthMediumOrLarger && (
-                  <LineStackLayout justifyContent="space-between">
+                {!isMobile && (
+                  <Line justifyContent="space-between">
                     <Column expand>
                       <Text color="secondary">
                         <Trans>File name</Trans>
@@ -585,7 +689,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         <Trans>Last edited</Trans>
                       </Text>
                     </Column>
-                  </LineStackLayout>
+                  </Line>
                 )}
                 <List>
                   {authenticatedUser.loginState === 'loggingIn' &&
@@ -612,9 +716,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         key={file.fileMetadata.fileIdentifier}
                         file={file}
                         storageProviders={storageProviders}
-                        isWindowWidthMediumOrLarger={
-                          isWindowWidthMediumOrLarger
-                        }
+                        isWindowWidthMediumOrLarger={!isMobile}
                         onOpenRecentFile={onOpenRecentFile}
                       />
                     ))

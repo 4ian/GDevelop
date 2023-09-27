@@ -33,6 +33,8 @@ export function getFullTheme({
 |}): FullTheme {
   let theme: Theme = themes[themeName];
 
+  const isMobileScreen = windowWidth === 'small';
+
   if (!theme) {
     console.warn(
       `Theme '${themeName}' is unavailable; '${defaultThemeName}' is used`
@@ -47,9 +49,7 @@ export function getFullTheme({
     muiTheme: createMuiTheme(
       muiThemeOptions,
       {
-        ...(windowWidth === 'small'
-          ? { overrides: smallScreenMuiOverrides }
-          : {}),
+        ...(isMobileScreen ? { overrides: smallScreenMuiOverrides } : {}),
       },
       { ...(ltr ? {} : { overrides: rtlMuiOverrides }) }
     ),

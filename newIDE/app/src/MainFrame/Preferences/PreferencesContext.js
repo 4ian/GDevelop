@@ -6,8 +6,10 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+import { isWebGLSupported } from '../../Utils/WebGL';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -38,7 +40,8 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'new-generate-project-from-prompt';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -163,6 +166,10 @@ export const allAlertMessages: Array<{
       <Trans>Project package names should not begin with com.example</Trans>
     ),
   },
+  {
+    key: 'new-generate-project-from-prompt',
+    label: <Trans>New project generation from prompt warning</Trans>,
+  },
 ];
 
 /**
@@ -182,7 +189,6 @@ export type PreferencesValues = {|
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
-  useUndefinedVariablesInAutocompletion: boolean,
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   eventsSheetZoomLevel: number,
@@ -201,10 +207,13 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
+  use3DEditor: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
   newProjectsDefaultFolder: string,
   newProjectsDefaultStorageProviderName: string,
   useShortcutToClosePreviewWindow: boolean,
+  allowUsageOfUnicodeIdentifierNames: boolean,
+  editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
 |};
 
 /**
@@ -227,7 +236,6 @@ export type Preferences = {|
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
-  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setEventsSheetZoomLevel: (zoomLevel: number) => void,
@@ -268,6 +276,8 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  setUse3DEditor: (enabled: boolean) => void,
+  getUse3DEditor: () => boolean,
   setNewProjectsDefaultStorageProviderName: (name: string) => void,
   saveTutorialProgress: ({|
     tutorialId: string,
@@ -280,6 +290,14 @@ export type Preferences = {|
   |}) => ?InAppTutorialUserProgress,
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
   setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
+  setAllowUsageOfUnicodeIdentifierNames: (enabled: boolean) => void,
+  getEditorStateForProject: (
+    projectId: string
+  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  setEditorStateForProject: (
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -300,7 +318,6 @@ export const initialPreferences = {
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
-    useUndefinedVariablesInAutocompletion: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     eventsSheetZoomLevel: 14,
@@ -319,10 +336,13 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
+    use3DEditor: isWebGLSupported(),
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
+    allowUsageOfUnicodeIdentifierNames: false,
+    editorStateByProject: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -339,7 +359,6 @@ export const initialPreferences = {
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
-  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setEventsSheetZoomLevel: (zoomLevel: number) => {},
@@ -372,11 +391,16 @@ export const initialPreferences = {
   setShowGetStartedSection: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
+  setUse3DEditor: (enabled: boolean) => {},
+  getUse3DEditor: () => false,
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},
   setNewProjectsDefaultStorageProviderName: () => {},
   setUseShortcutToClosePreviewWindow: () => {},
+  setAllowUsageOfUnicodeIdentifierNames: () => {},
+  getEditorStateForProject: projectId => {},
+  setEditorStateForProject: (projectId, editorState) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

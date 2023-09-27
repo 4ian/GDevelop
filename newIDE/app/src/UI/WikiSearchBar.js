@@ -78,7 +78,9 @@ const WikiSearchBar = ({ id }: Props) => {
                   the moment.
                 </Trans>
               ),
-              hierarchy: {},
+              objectID: 'no-result',
+              url: 'https://wiki.gdevelop.io',
+              hierarchy: { lvl0: '' },
             },
             handler: () => {},
           },
@@ -93,7 +95,9 @@ const WikiSearchBar = ({ id }: Props) => {
                   again later.
                 </Trans>
               ),
-              hierarchy: {},
+              objectID: 'error',
+              url: 'https://wiki.gdevelop.io',
+              hierarchy: { lvl0: '' },
             },
             handler: () => {},
           },
@@ -114,7 +118,7 @@ const WikiSearchBar = ({ id }: Props) => {
 
   const handleAutocompleteInput = (
     event: any,
-    newValue: ?AlgoliaSearchHitType,
+    newValue: ?GoToWikiCommand,
     reason:
       | 'create-option'
       | 'select-option'
@@ -128,7 +132,7 @@ const WikiSearchBar = ({ id }: Props) => {
       // Clear the value that was entered as an option was selected.
       setAutocompleteValue('');
     } else {
-      setAutocompleteValue(newValue || '');
+      setAutocompleteValue('');
     }
   };
 
@@ -171,6 +175,7 @@ const WikiSearchBar = ({ id }: Props) => {
               PopperComponent={props => (
                 <div style={popperContainerStyle}>{props.children}</div>
               )}
+              getOptionLabel={() => ''}
               renderOption={({ hit }) => <AlgoliaSearchHit hit={hit} />}
               renderInput={params => (
                 <MuiTextField

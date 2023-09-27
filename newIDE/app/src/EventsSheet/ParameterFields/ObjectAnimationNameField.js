@@ -76,6 +76,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         })
           .filter(Boolean)
           .sort();
+      } else if (object.getType() === 'Scene3D::Model3DObject') {
+        const model3DConfiguration = gd.asModel3DConfiguration(
+          object.getConfiguration()
+        );
+
+        return mapFor(0, model3DConfiguration.getAnimationsCount(), index => {
+          const animationName = model3DConfiguration
+            .getAnimation(index)
+            .getName();
+          return animationName.length > 0 ? animationName : null;
+        })
+          .filter(Boolean)
+          .sort();
       }
 
       return [];
@@ -89,7 +102,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // If the current value is not in the list of animation names, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInAnimationNamesList
+      (!!props.value && !isCurrentValueInAnimationNamesList) ||
+        props.scope.eventsFunctionsExtension
     );
 
     const switchFieldType = () => {
@@ -159,7 +173,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          isExpressionField ? (
+          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
             <FlatButton
               id="switch-expression-select"
               leftIcon={<TypeCursorSelect />}

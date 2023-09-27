@@ -5,7 +5,7 @@ import { type StorageProvider } from '../index';
 import {
   onOpenWithPicker,
   onOpen,
-  hasAutoSave,
+  getAutoSaveCreationDate,
   onGetAutoSave,
 } from './LocalProjectOpener';
 import {
@@ -14,7 +14,8 @@ import {
   onSaveProjectAs,
   onAutoSaveProject,
   getWriteErrorMessage,
-  onRenderNewProjectSaveAsLocationChooser,
+  renderNewProjectSaveAsLocationChooser,
+  getProjectLocation,
 } from './LocalProjectWriter';
 import {
   type AppArguments,
@@ -47,11 +48,12 @@ export default ({
       fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
     };
   },
-  onRenderNewProjectSaveAsLocationChooser: onRenderNewProjectSaveAsLocationChooser,
+  getProjectLocation: getProjectLocation,
+  renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,
   createOperations: () => ({
     onOpenWithPicker,
     onOpen,
-    hasAutoSave,
+    getAutoSaveCreationDate,
     onSaveProject,
     onChooseSaveProjectAsLocation,
     onSaveProjectAs,

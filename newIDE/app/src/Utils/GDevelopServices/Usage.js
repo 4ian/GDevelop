@@ -22,10 +22,14 @@ export type Subscription = {|
   paypalSubscriptionId?: string,
   paypalPayerId?: string,
 
+  cancelAtPeriodEnd?: boolean,
+
   purchaselyPlan?: string,
 
   redemptionCode?: string | null,
   redemptionCodeValidUntil?: number | null,
+
+  benefitsFromEducationPlan?: boolean,
 |};
 
 /**
@@ -61,6 +65,7 @@ export type Capabilities = {
     maximumCountPerGame: number,
     canMaximumCountPerGameBeIncreased: boolean,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
+    canUseCustomCss: boolean,
   },
 };
 
@@ -79,13 +84,20 @@ export type Limits = {
 
 export type PlanDetails = {
   planId: string | null,
+  legacyPlanId?: string,
   name: string,
   monthlyPriceInEuros: number | null,
+  yearlyPriceInEuros?: number | null,
+  isPerUser?: true,
   smallDescription?: MessageDescriptor,
+  hideInSubscriptionDialog?: boolean,
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
 };
+
+export const EDUCATION_PLAN_MIN_SEATS = 5;
+export const EDUCATION_PLAN_MAX_SEATS = 300;
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
   {
@@ -107,6 +119,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
   },
   {
     planId: 'gdevelop_silver',
+    legacyPlanId: 'gdevelop_indie',
     name: 'GDevelop Silver',
     monthlyPriceInEuros: 4.99,
     smallDescription: t`Build more and faster.`,
@@ -127,6 +140,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
   },
   {
     planId: 'gdevelop_gold',
+    legacyPlanId: 'gdevelop_pro',
     name: 'GDevelop Gold',
     monthlyPriceInEuros: 9.99,
     smallDescription: t`Experimented creators, ambitious games.`,
@@ -142,6 +156,45 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_startup',
+    name: 'GDevelop Startup',
+    monthlyPriceInEuros: 30,
+    smallDescription: t`Small game studios and startups.`,
+    descriptionBullets: [
+      {
+        message: t`500 cloud projects with 5GB of resources per project.`,
+      },
+      {
+        message: t`Unlimited packagings per day for Android, web and desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+      {
+        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_education',
+    name: 'GDevelop Education',
+    monthlyPriceInEuros: 2.99,
+    yearlyPriceInEuros: 29.99,
+    isPerUser: true,
+    smallDescription: t`Schools and universities.`,
+    descriptionBullets: [
+      {
+        message: t`Students anonymity.`,
+      },
+      {
+        message: t`Organize students per classroom.`,
+      },
+      {
+        message: t`You and your students receive a Gold subscription.`,
       },
     ],
   },
@@ -272,9 +325,24 @@ export const changeUserSubscription = (
     .then(response => response.data);
 };
 
-export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
+export const canSeamlesslyChangeSubscription = (
+  subscription: Subscription,
+  planId: string
+) => {
   // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
   // Otherwise (Paypal), it needs to be cancelled first.
+  // If the user changes for an education plan and already has a subscription made with
+  // Stripe, the Stripe subscription has to be cancelled first.
+  return (
+    !!subscription.stripeSubscriptionId &&
+    !planId.startsWith('gdevelop_education')
+  );
+};
+
+export const canCancelAtEndOfPeriod = (subscription: Subscription) => {
+  // If the subscription is on Stripe, it can be set as cancelled and only removed at the
+  // end of the period alreayd paid.
+  // Otherwise (Paypal), it will be cancelled immediately.
   return !!subscription.stripeSubscriptionId;
 };
 
@@ -351,18 +419,26 @@ export const getRedirectToSubscriptionPortalUrl = (
     });
 };
 
-export const getRedirectToCheckoutUrl = (
+export const getRedirectToCheckoutUrl = ({
+  planId,
+  userId,
+  userEmail,
+  quantity,
+}: {
   planId: string,
   userId: string,
-  userEmail: string
-): string => {
-  return `${
-    GDevelopUsageApi.baseUrl
-  }/subscription-v2/action/redirect-to-checkout?planId=${encodeURIComponent(
-    planId
-  )}&userId=${encodeURIComponent(userId)}&customerEmail=${encodeURIComponent(
-    userEmail
-  )}`;
+  userEmail: string,
+  quantity?: number,
+}): string => {
+  const url = new URL(
+    `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout`
+  );
+  url.searchParams.set('planId', planId);
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('customerEmail', userEmail);
+  if (quantity !== undefined && quantity > 1)
+    url.searchParams.set('quantity', quantity.toString());
+  return url.toString();
 };
 
 export const redeemCode = async (

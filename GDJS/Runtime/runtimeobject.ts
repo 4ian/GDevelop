@@ -12,7 +12,7 @@ namespace gdjs {
     max: FloatPoint;
   };
 
-  type RendererObjectInterface = {
+  export type RendererObjectInterface = {
     visible: boolean;
   };
 
@@ -153,7 +153,7 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject implements EffectsTarget {
+  export class RuntimeObject implements EffectsTarget, gdjs.EffectHandler {
     name: string;
     type: string;
     x: float = 0;
@@ -193,16 +193,29 @@ namespace gdjs {
     protected _variables: gdjs.VariablesContainer;
 
     //Effects:
-    protected _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
+    protected _rendererEffects: Record<
+      string,
+      gdjs.PixiFiltersTools.Filter
+    > = {};
 
     //Forces:
     protected _forces: gdjs.Force[] = [];
     _averageForce: gdjs.Force;
 
     /**
-     * Contains the behaviors of the object.
+     * Contains the behaviors of the object, except those not having lifecycle functions.
+     *
+     * This means default, hidden, "capability" behaviors are not included in this array.
+     * This avoids wasting time iterating on them when we know their lifecycle functions
+     * are never used.
      */
     protected _behaviors: gdjs.RuntimeBehavior[] = [];
+    /**
+     * Contains the behaviors of the object by name.
+     *
+     * This includes the default, hidden, "capability" behaviors (those to handle opacity,
+     * effects, scale, size...).
+     */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;
 
@@ -233,13 +246,15 @@ namespace gdjs {
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
         this.updateAllEffectParameters(objectData.effects[i]);
       }
-
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
         const autoData = objectData.behaviors[i];
         const Ctor = gdjs.getBehaviorConstructor(autoData.type);
-        this._behaviors.push(new Ctor(instanceContainer, autoData, this));
-        this._behaviorsTable.put(autoData.name, this._behaviors[i]);
+        const behavior = new Ctor(instanceContainer, autoData, this);
+        if (behavior.usesLifecycleFunction()) {
+          this._behaviors.push(behavior);
+        }
+        this._behaviorsTable.put(autoData.name, behavior);
       }
       this._timers = new Hashtable();
     }
@@ -258,11 +273,7 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
         for (const effectName in this._rendererEffects) {
-          this._runtimeScene
-            .getGame()
-            .getEffectsManager()
-            // @ts-expect-error - the effects manager is typed with the PIXI object.
-            .applyEffect(rendererObject, this._rendererEffects[effectName]);
+          this._rendererEffects[effectName].applyEffect(this);
         }
       }
 
@@ -281,7 +292,7 @@ namespace gdjs {
      * To implement this in your object:
      * * Set `gdjs.YourRuntimeObject.supportsReinitialization = true;` to declare support for recycling.
      * * Implement `reinitialize`. It **must** call the `reinitialize` of `gdjs.RuntimeObject`, and call `this.onCreated();`
-     * at the end of `reinitizalize`.
+     * at the end of `reinitialize`.
      * * It must reset the object as if it was newly constructed (be careful about your renderers and any global state).
      * * The `_runtimeScene`, `_nameId`, `name` and `type` are guaranteed to stay the same and do not
      * need to be set again.
@@ -312,19 +323,28 @@ namespace gdjs {
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
-      let i = 0;
-      for (const len = objectData.behaviors.length; i < len; ++i) {
-        const behaviorData = objectData.behaviors[i];
+      const behaviorsDataCount = objectData.behaviors.length;
+      let behaviorsUsingLifecycleFunctionCount = 0;
+      for (
+        let behaviorDataIndex = 0;
+        behaviorDataIndex < behaviorsDataCount;
+        ++behaviorDataIndex
+      ) {
+        const behaviorData = objectData.behaviors[behaviorDataIndex];
         const Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
-        if (i < this._behaviors.length) {
-          // TODO: Add support for behavior recycling with a `reinitialize` method.
-          this._behaviors[i] = new Ctor(runtimeScene, behaviorData, this);
-        } else {
-          this._behaviors.push(new Ctor(runtimeScene, behaviorData, this));
+        // TODO: Add support for behavior recycling with a `reinitialize` method.
+        const behavior = new Ctor(runtimeScene, behaviorData, this);
+        if (behavior.usesLifecycleFunction()) {
+          if (behaviorsUsingLifecycleFunctionCount < this._behaviors.length) {
+            this._behaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
+          } else {
+            this._behaviors.push(behavior);
+          }
+          behaviorsUsingLifecycleFunctionCount++;
         }
-        this._behaviorsTable.put(behaviorData.name, this._behaviors[i]);
+        this._behaviorsTable.put(behaviorData.name, behavior);
       }
-      this._behaviors.length = i;
+      this._behaviors.length = behaviorsUsingLifecycleFunctionCount;
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
@@ -451,6 +471,10 @@ namespace gdjs {
       if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
       }
+      const rendererObject3D = this.get3DRendererObject();
+      if (rendererObject3D) {
+        theLayer.getRenderer().remove3DRendererObject(rendererObject3D);
+      }
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
       }
@@ -476,12 +500,16 @@ namespace gdjs {
 
     //Rendering:
     /**
-     * Called with a callback function that should be called with the internal
-     * object used for rendering by the object (PIXI.DisplayObject...)
-     *
-     * @return The internal rendered object (PIXI.DisplayObject...)
+     * @return The internal object for a 2D rendering (PIXI.DisplayObject...)
      */
     getRendererObject(): RendererObjectInterface | null | undefined {
+      return undefined;
+    }
+
+    /**
+     * @return The internal object for a 3D rendering (PIXI.DisplayObject...)
+     */
+    get3DRendererObject(): THREE.Object3D | null | undefined {
       return undefined;
     }
 
@@ -720,6 +748,11 @@ namespace gdjs {
       if (rendererObject) {
         oldLayer.getRenderer().removeRendererObject(rendererObject);
         newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
+      }
+      const rendererObject3D = this.get3DRendererObject();
+      if (rendererObject3D) {
+        oldLayer.getRenderer().remove3DRendererObject(rendererObject3D);
+        newLayer.getRenderer().add3DRendererObject(rendererObject3D);
       }
     }
 
@@ -1007,13 +1040,10 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return (
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          // @ts-expect-error - the effects manager is typed with the PIXI object.
-          .addEffect(effectData, this._rendererEffects, rendererObject, this)
-      );
+      return this._runtimeScene
+        .getGame()
+        .getEffectsManager()
+        .addEffect(effectData, this._rendererEffects, this);
     }
 
     /**
@@ -1024,13 +1054,10 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return (
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          // @ts-expect-error - the effects manager is typed with the PIXI object.
-          .removeEffect(this._rendererEffects, rendererObject, effectName)
-      );
+      return this._runtimeScene
+        .getGame()
+        .getEffectsManager()
+        .removeEffect(this._rendererEffects, this, effectName);
     }
 
     /**
@@ -1051,9 +1078,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are numbers).
+     * Change an effect property value (for properties that are numbers).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (number).
      */
     setEffectDoubleParameter(
@@ -1073,9 +1100,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are strings).
+     * Change an effect property value (for properties that are strings).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (string).
      */
     setEffectStringParameter(
@@ -1095,9 +1122,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are booleans).
+     * Change an effect property value (for properties that are booleans).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (boolean).
      */
     setEffectBooleanParameter(
@@ -1136,7 +1163,7 @@ namespace gdjs {
       this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .enableEffect(this._rendererEffects, name, enable);
+        .enableEffect(this._rendererEffects, this, name, enable);
     }
 
     /**
@@ -1148,7 +1175,7 @@ namespace gdjs {
       return this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .isEffectEnabled(this._rendererEffects, name);
+        .isEffectEnabled(this._rendererEffects, this, name);
     }
 
     /**
@@ -1216,7 +1243,7 @@ namespace gdjs {
     }
 
     /**
-     * Return the width of the object.
+     * Return the height of the object.
      * @return The height of the object
      */
     getHeight(): float {
@@ -1810,7 +1837,7 @@ namespace gdjs {
     }
 
     /**
-     * Create the behavior decribed by the given BehaviorData
+     * Create the behavior described by the given BehaviorData
      *
      * @param behaviorData The data to be used to construct the behavior.
      * @returns true if the behavior was properly created, false otherwise.
@@ -1825,7 +1852,9 @@ namespace gdjs {
         behaviorData,
         this
       );
-      this._behaviors.push(newRuntimeBehavior);
+      if (newRuntimeBehavior.usesLifecycleFunction()) {
+        this._behaviors.push(newRuntimeBehavior);
+      }
       this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
       return true;
     }

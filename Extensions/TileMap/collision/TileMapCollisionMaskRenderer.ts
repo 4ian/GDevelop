@@ -1,7 +1,5 @@
 namespace gdjs {
   export namespace TileMap {
-    import PIXI = GlobalPIXIModule.PIXI;
-
     /**
      * This render is only useful for debugging purposes.
      * @see {@link PixiTileMapHelper.updatePixiCollisionMask}, the render used by the GUI.

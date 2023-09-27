@@ -384,6 +384,26 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetPixelsRounding(bool enable) { pixelsRounding = enable; }
 
   /**
+   * Return the antialiasing mode used by the game ("none" or "MSAA").
+   */
+  const gd::String& GetAntialiasingMode() const { return antialiasingMode; }
+
+  /**
+   * Set the antialiasing mode used by the game ("none" or "MSAA").
+   */
+  void SetAntialiasingMode(const gd::String& antialiasingMode_) { antialiasingMode = antialiasingMode_; }
+
+  /**
+   * Return true if antialising is enabled on mobiles.
+   */
+  bool IsAntialisingEnabledOnMobile() const { return isAntialisingEnabledOnMobile; }
+
+  /**
+   * Set whether antialising is enabled on mobiles or not.
+   */
+  void SetAntialisingEnabledOnMobile(bool enable) { isAntialisingEnabledOnMobile = enable; }
+
+  /**
    * \brief Return if the project should set 0 as Z-order for objects created
    * from events (which is deprecated) - instead of the highest Z order that was
    * found on each layer when the scene started.
@@ -922,16 +942,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   ResourcesManager& GetResourcesManager() { return resourcesManager; }
 
-  /**
-   * \brief Called ( e.g. during compilation ) so as to inventory internal
-   * resources, sometimes update their filename or any other work or resources.
-   *
-   * See WholeProjectRefactorer for the same thing for events.
-   *
-   * \see WholeProjectRefactorer
-   * \see ArbitraryResourceWorker
-   */
-  void ExposeResources(gd::ArbitraryResourceWorker& worker);
   ///@}
 
   /** \name Variable management
@@ -955,15 +965,35 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   ///@}
 
-  /** \name Other
+  /** \name Identifier names
    */
   ///@{
+
+  /**
+   * Check if unicode names are allowed in identifier names.
+   * \see IsNameSafe
+   * \see GetSafeName
+   */
+  static bool IsUsageOfUnicodeIdentifierNamesAllowed() { return allowUsageOfUnicodeIdentifierNames; };
+
+  /**
+   * Set if unicode names are allowed in identifier names.
+   * \see IsNameSafe
+   * \see GetSafeName
+   */
+  static void AllowUsageOfUnicodeIdentifierNames(bool enable);
 
   /**
    * Return true if \a name is valid (can be used safely for an object,
    * behavior, events function name, etc...).
    */
-  static bool ValidateName(const gd::String& name);
+  static bool IsNameSafe(const gd::String& name);
+
+  /**
+   * Return a name, based on the one passed in parameter, that can be safely used
+   * for an object, behavior, events function name, etc...
+   */
+  static gd::String GetSafeName(const gd::String& name);
   ///@}
 
   /** \name External source files
@@ -1040,6 +1070,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String
       sizeOnStartupMode;   ///< How to adapt the game size to the screen. Can be
                            ///< "adaptWidth", "adaptHeight" or empty
+  gd::String antialiasingMode;
+  bool isAntialisingEnabledOnMobile;
   gd::String projectUuid;  ///< UUID useful to identify the game in online
                            ///< services or database that would require it.
   bool useDeprecatedZeroAsDefaultZOrder;  ///< If true, objects created from
@@ -1096,6 +1128,8 @@ class GD_CORE_API Project : public ObjectsContainer {
                                         ///< time the project was saved.
   mutable unsigned int gdBuildVersion;  ///< The GD build version used the last
                                         ///< time the project was saved.
+
+  static bool allowUsageOfUnicodeIdentifierNames;
 };
 
 }  // namespace gd

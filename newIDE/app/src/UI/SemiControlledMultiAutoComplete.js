@@ -28,6 +28,14 @@ const renderItem = (option: AutocompleteOption, state: Object): React.Node => (
   </ListItem>
 );
 
+const styles = {
+  listbox: {
+    maxHeight: 250,
+    overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
+  },
+};
+
 export type AutocompleteOption = {|
   text: string, // The text displayed
   value: string, // The internal value selected
@@ -63,8 +71,25 @@ type Props = {|
   disableAutoTranslate?: boolean,
 |};
 
-export default function SemiControlledMultiAutoComplete(props: Props) {
+export type SemiControlledMultiAutoCompleteInterface = {|
+  focusInput: () => void,
+|};
+
+const SemiControlledMultiAutoComplete = React.forwardRef<
+  Props,
+  SemiControlledMultiAutoCompleteInterface
+>((props, ref) => {
   const chipStyles = useChipStyles();
+  const inputRef = React.useRef<?TextField>(null);
+
+  React.useImperativeHandle(ref, () => ({
+    focusInput: () => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    },
+  }));
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -89,6 +114,10 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           loading={props.loading}
           ListboxProps={{
             className: props.disableAutoTranslate ? 'notranslate' : '',
+            style: {
+              ...autocompleteStyles.listbox,
+              ...styles.listbox,
+            },
           }}
           renderInput={params => (
             <TextField
@@ -102,6 +131,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
               helperText={props.error || props.helperText}
               variant="filled"
               error={!!props.error}
+              inputRef={inputRef}
               disabled={props.disabled || props.loading}
             />
           )}
@@ -125,4 +155,6 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
       )}
     </I18n>
   );
-}
+});
+
+export default SemiControlledMultiAutoComplete;

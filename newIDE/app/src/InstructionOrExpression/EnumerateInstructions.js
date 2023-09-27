@@ -218,14 +218,6 @@ const enumerateExtensionInstructions = (
     const instrMetadata = instructions.get(type);
     if (instrMetadata.isHidden()) continue;
 
-    if (
-      scope.objectMetadata &&
-      scope.objectMetadata.isUnsupportedBaseObjectCapability(
-        instrMetadata.getRequiredBaseObjectCapability()
-      )
-    )
-      continue; // Skip instructions not supported by the object.
-
     allInstructions.push(
       enumerateInstruction(prefix, type, instrMetadata, scope)
     );

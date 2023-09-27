@@ -438,7 +438,7 @@ module.exports = {
   },
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.
@@ -563,8 +563,8 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-      // Custom size can be read in instance.getCustomWidth() and
-      // instance.getCustomHeight()
+      // Custom size can be read in this.getCustomWidth() and
+      // this.getCustomHeight()
     };
 
     /**

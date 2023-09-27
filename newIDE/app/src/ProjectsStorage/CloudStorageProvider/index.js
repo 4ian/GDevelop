@@ -8,7 +8,9 @@ import {
   generateOnChooseSaveProjectAsLocation,
   generateOnSaveProjectAs,
   getWriteErrorMessage,
-  onRenderNewProjectSaveAsLocationChooser,
+  renderNewProjectSaveAsLocationChooser,
+  getProjectLocation,
+  generateOnAutoSaveProject,
 } from './CloudProjectWriter';
 import {
   type AppArguments,
@@ -18,6 +20,8 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import {
   generateOnOpen,
   generateOnEnsureCanAccessResources,
+  generateGetAutoSaveCreationDate,
+  generateOnGetAutoSave,
 } from './CloudProjectOpener';
 import Cloud from '../../UI/CustomSvgIcons/Cloud';
 import { generateGetResourceActions } from './CloudProjectResourcesHandler';
@@ -49,7 +53,8 @@ export default ({
       fileIdentifier,
     };
   },
-  onRenderNewProjectSaveAsLocationChooser: onRenderNewProjectSaveAsLocationChooser,
+  getProjectLocation: getProjectLocation,
+  renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
     onOpen: generateOnOpen(authenticatedUser),
     onEnsureCanAccessResources: generateOnEnsureCanAccessResources(
@@ -66,6 +71,9 @@ export default ({
       setDialog,
       closeDialog
     ),
+    onAutoSaveProject: generateOnAutoSaveProject(authenticatedUser),
+    getAutoSaveCreationDate: generateGetAutoSaveCreationDate(authenticatedUser),
+    onGetAutoSave: generateOnGetAutoSave(authenticatedUser),
     onChangeProjectProperty: generateOnChangeProjectProperty(authenticatedUser),
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`An error occurred when opening the project. Check that your internet connection is working and that your browser allows the use of cookies.`;

@@ -448,7 +448,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
           ],
         });
 
-        // Query with selector fitler
+        // Query with selector filter
         gdjs.evtTools.firebaseTools.firestore.startQueryFrom(
           'selector',
           'main'
@@ -533,7 +533,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     const password2 = `myNewPass${Math.random().toString(16)}${Date.now()}!`;
 
     const expectToNotLogin = async (password) => {
-      if (gdjs.evtTools.firebaseTools.auth.isAuthentified())
+      if (gdjs.evtTools.firebaseTools.auth.isAuthenticated())
         await firebase.auth().signOut();
 
       let errors = false;
@@ -549,15 +549,15 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         errors = true;
       }
 
-      // No error was throwm, there is an issue
+      // No error was thrown, there is an issue
       if (!errors)
         throw new Error('Expected wrong credentials to prevent login');
 
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.not.be.ok();
     };
 
     const expectToLogin = async (password) => {
-      if (gdjs.evtTools.firebaseTools.auth.isAuthentified())
+      if (gdjs.evtTools.firebaseTools.auth.isAuthenticated())
         await firebase.auth().signOut();
 
       await promisifyCallbackVariables((callback) =>
@@ -568,13 +568,13 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         )
       );
 
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.be.ok();
     };
 
     before(async () => firebase.auth().signOut());
 
     it('let users create accounts', async () => {
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.not.be.ok();
 
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.auth.createAccountWithEmail(
@@ -584,13 +584,13 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         )
       );
 
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.be.ok();
     });
 
     it('let users log out', async () => {
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.be.ok();
       await firebase.auth().signOut();
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.not.be.ok();
     });
 
     it('prevents logging in with invalid credentials', async () =>

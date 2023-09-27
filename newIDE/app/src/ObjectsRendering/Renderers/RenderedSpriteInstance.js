@@ -44,7 +44,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
 
     //Setup the PIXI object:
     this._pixiObject = new PIXI.Sprite(
-      PixiResourcesLoader.getInvalidPIXITexture()
+      this._pixiResourcesLoader.getInvalidPIXITexture()
     );
     this._pixiContainer.addChild(this._pixiObject);
     this.updatePIXITextureAndSprite();
@@ -73,7 +73,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
         .getDirection(0)
         .getSprite(0)
         .getImageName();
-      return ResourcesLoader.getResourceFullUrl(project, imageName, {});
+      return resourcesLoader.getResourceFullUrl(project, imageName, {});
     }
 
     return 'res/unknown32.png';
@@ -89,10 +89,9 @@ export default class RenderedSpriteInstance extends RenderedInstance {
       : RenderedInstance.toRad(this._instance.getAngle());
     if (this._instance.hasCustomSize()) {
       this._pixiObject.scale.x =
-        this._instance.getCustomWidth() / this._pixiObject.texture.frame.width;
+        this.getCustomWidth() / this._pixiObject.texture.frame.width;
       this._pixiObject.scale.y =
-        this._instance.getCustomHeight() /
-        this._pixiObject.texture.frame.height;
+        this.getCustomHeight() / this._pixiObject.texture.frame.height;
     } else {
       this._pixiObject.scale.x = 1;
       this._pixiObject.scale.y = 1;
@@ -146,7 +145,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     const sprite = this._sprite;
     if (!sprite) return;
 
-    const texture = PixiResourcesLoader.getPIXITexture(
+    const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
       sprite.getImageName()
     );

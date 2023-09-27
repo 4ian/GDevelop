@@ -35,6 +35,7 @@ export default class StandardEvent extends React.Component<
         })}
         renderConditionsList={({ style, className }) => (
           <InstructionsList
+            platform={this.props.project.getCurrentPlatform()}
             instrsList={standardEvent.getConditions()}
             style={style}
             className={className}
@@ -62,6 +63,7 @@ export default class StandardEvent extends React.Component<
         )}
         renderActionsList={({ className }) => (
           <InstructionsList
+            platform={this.props.project.getCurrentPlatform()}
             instrsList={standardEvent.getActions()}
             style={
               {

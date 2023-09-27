@@ -114,6 +114,7 @@ export default function NewObjectDialog({
   canInstallPrivateAsset,
 }: Props) {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const {
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,
@@ -128,15 +129,15 @@ export default function NewObjectDialog({
   ]);
 
   const {
-    searchResults,
-    navigationState,
+    assetShortHeadersSearchResults,
+    shopNavigationState,
     environment,
     setEnvironment,
   } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
-  } = navigationState.getCurrentPage();
+  } = shopNavigationState.getCurrentPage();
   const [
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
@@ -312,50 +313,69 @@ export default function NewObjectDialog({
   );
 
   const mainAction =
-    currentTab !== 'asset-store' ? null : openedAssetPack ? (
+    currentTab === 'asset-store' ? (
+      openedAssetPack ? (
+        <RaisedButton
+          key="add-all-assets"
+          primary
+          label={<Trans>Add all assets to my scene</Trans>}
+          onClick={() => setIsAssetPackDialogInstallOpen(true)}
+          disabled={
+            !assetShortHeadersSearchResults ||
+            assetShortHeadersSearchResults.length === 0
+          }
+        />
+      ) : openedAssetShortHeader ? (
+        <RaisedButton
+          key="add-asset"
+          primary={!isAssetAddedToScene}
+          label={
+            isAssetBeingInstalled ? (
+              <Trans>Adding...</Trans>
+            ) : isAssetAddedToScene ? (
+              <Trans>Add again</Trans>
+            ) : (
+              <Trans>Add to the scene</Trans>
+            )
+          }
+          onClick={async () => {
+            onInstallAsset(openedAssetShortHeader);
+          }}
+          disabled={isAssetBeingInstalled}
+          id="add-asset-button"
+        />
+      ) : isDev ? (
+        <RaisedButton
+          key="show-dev-assets"
+          label={
+            environment === 'staging' ? (
+              <Trans>Show live assets</Trans>
+            ) : (
+              <Trans>Show staging assets</Trans>
+            )
+          }
+          onClick={() => {
+            setEnvironment(environment === 'staging' ? 'live' : 'staging');
+          }}
+        />
+      ) : null
+    ) : !!selectedCustomObjectEnumeratedMetadata &&
+      currentTab === 'new-object' ? (
       <RaisedButton
-        key="add-all-assets"
-        primary
-        label={<Trans>Add all assets to my scene</Trans>}
-        onClick={() => setIsAssetPackDialogInstallOpen(true)}
-        disabled={!searchResults || searchResults.length === 0}
-      />
-    ) : openedAssetShortHeader ? (
-      <RaisedButton
-        key="add-asset"
-        primary={!isAssetAddedToScene}
+        key="skip-and-create"
         label={
-          isAssetBeingInstalled ? (
+          !isAssetBeingInstalled ? (
+            <Trans>Skip and create from scratch</Trans>
+          ) : (
             <Trans>Adding...</Trans>
-          ) : isAssetAddedToScene ? (
-            <Trans>Add again</Trans>
-          ) : (
-            <Trans>Add to the scene</Trans>
           )
         }
-        onClick={async () => {
-          onInstallAsset(openedAssetShortHeader);
-        }}
+        primary
+        onClick={onInstallEmptyCustomObject}
+        id="skip-and-create-button"
         disabled={isAssetBeingInstalled}
-        id="add-asset-button"
       />
-    ) : isDev ? (
-      <RaisedButton
-        key="show-dev-assets"
-        label={
-          environment === 'staging' ? (
-            <Trans>Show live assets</Trans>
-          ) : (
-            <Trans>Show staging assets</Trans>
-          )
-        }
-        onClick={() => {
-          setEnvironment(environment === 'staging' ? 'live' : 'staging');
-        }}
-      />
-    ) : (
-      undefined
-    );
+    ) : null;
 
   const assetStore = React.useRef<?AssetStoreInterface>(null);
   const handleClose = React.useCallback(
@@ -376,30 +396,13 @@ export default function NewObjectDialog({
               <HelpButton helpPagePath="/objects" key="help" />,
             ]}
             actions={[
-              !selectedCustomObjectEnumeratedMetadata ? (
-                <FlatButton
-                  key="close"
-                  label={<Trans>Close</Trans>}
-                  primary={false}
-                  onClick={handleClose}
-                  id="close-button"
-                />
-              ) : (
-                <FlatButton
-                  key="skip-and-create"
-                  label={
-                    !isAssetBeingInstalled ? (
-                      <Trans>Skip and create from scratch</Trans>
-                    ) : (
-                      <Trans>Adding...</Trans>
-                    )
-                  }
-                  primary={false}
-                  onClick={onInstallEmptyCustomObject}
-                  id="skip-and-create-button"
-                  disabled={isAssetBeingInstalled}
-                />
-              ),
+              <FlatButton
+                key="close"
+                label={<Trans>Close</Trans>}
+                primary={false}
+                onClick={handleClose}
+                id="close-button"
+              />,
               mainAction,
             ]}
             onRequestClose={handleClose}
@@ -432,12 +435,14 @@ export default function NewObjectDialog({
                     id: 'new-object-from-scratch-tab',
                   },
                 ]}
-                // Enforce scroll on small screen, because the tabs have long names.
-                variant={windowWidth === 'small' ? 'scrollable' : undefined}
+                // Enforce scroll on mobile, because the tabs have long names.
+                variant={isMobileScreen ? 'scrollable' : undefined}
               />
             }
           >
-            {currentTab === 'asset-store' && <AssetStore ref={assetStore} />}
+            {currentTab === 'asset-store' && (
+              <AssetStore ref={assetStore} hideGameTemplates />
+            )}
             {currentTab === 'new-object' && (
               <NewObjectFromScratch
                 onCreateNewObject={onCreateNewObject}
@@ -457,22 +462,24 @@ export default function NewObjectDialog({
               />
             )}
           </Dialog>
-          {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-            <AssetPackInstallDialog
-              assetPack={openedAssetPack}
-              assetShortHeaders={searchResults}
-              addedAssetIds={existingAssetStoreIds}
-              onClose={() => setIsAssetPackDialogInstallOpen(false)}
-              onAssetsAdded={() => {
-                setIsAssetPackDialogInstallOpen(false);
-              }}
-              project={project}
-              objectsContainer={objectsContainer}
-              onObjectsAddedFromAssets={onObjectsAddedFromAssets}
-              canInstallPrivateAsset={canInstallPrivateAsset}
-              resourceManagementProps={resourceManagementProps}
-            />
-          )}
+          {isAssetPackDialogInstallOpen &&
+            assetShortHeadersSearchResults &&
+            openedAssetPack && (
+              <AssetPackInstallDialog
+                assetPack={openedAssetPack}
+                assetShortHeaders={assetShortHeadersSearchResults}
+                addedAssetIds={existingAssetStoreIds}
+                onClose={() => setIsAssetPackDialogInstallOpen(false)}
+                onAssetsAdded={() => {
+                  setIsAssetPackDialogInstallOpen(false);
+                }}
+                project={project}
+                objectsContainer={objectsContainer}
+                onObjectsAddedFromAssets={onObjectsAddedFromAssets}
+                canInstallPrivateAsset={canInstallPrivateAsset}
+                resourceManagementProps={resourceManagementProps}
+              />
+            )}
         </>
       )}
     </I18n>

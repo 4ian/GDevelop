@@ -316,6 +316,7 @@ const EditProfileDialog = ({
                 }}
                 disabled={actionInProgress}
                 floatingLabelFixed
+                maxLength={10000}
               />
               <CommunityLinkLine
                 id="personalWebsiteLink"

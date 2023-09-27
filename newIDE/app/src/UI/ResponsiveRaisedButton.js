@@ -1,27 +1,16 @@
 // @flow
 import * as React from 'react';
-import RaisedButton, {
-  type RaisedButtonPropsWithoutOnClick,
-} from './RaisedButton';
+import RaisedButton, { type RaisedButtonProps } from './RaisedButton';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
-
-type Props = {|
-  ...RaisedButtonPropsWithoutOnClick,
-  onClick: ?() => void | Promise<void>,
-|};
 
 /**
  * A button which hides its label on small screens.
  * Same interface as RaisedButton.
  */
-const ResponsiveRaisedButton = (props: Props) => {
+const ResponsiveRaisedButton = (props: RaisedButtonProps) => {
   const windowWidth = useResponsiveWindowWidth();
-  return (
-    <RaisedButton
-      {...props}
-      label={windowWidth === 'small' ? '' : props.label}
-    />
-  );
+  const isMobileScreen = windowWidth === 'small';
+  return <RaisedButton {...props} label={isMobileScreen ? '' : props.label} />;
 };
 
 export default ResponsiveRaisedButton;

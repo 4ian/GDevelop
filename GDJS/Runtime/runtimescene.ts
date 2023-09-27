@@ -32,6 +32,10 @@ namespace gdjs {
     _requestedChange: SceneChangeRequest;
     /** Black background by default. */
     _backgroundColor: integer = 0;
+
+    /** Should the canvas be cleared before this scene rendering. */
+    _clearCanvas: boolean = true;
+
     _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
 
@@ -72,7 +76,9 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
-      this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
+      const layer = new gdjs.Layer(layerData, this);
+      this._layers.put(layerData.name, layer);
+      this._orderedLayers.push(layer);
     }
 
     /**
@@ -452,6 +458,8 @@ namespace gdjs {
         // (so we have a "safety margin") but these objects should be fixed
         // instead.
         // - objects having effects rendering outside of their visibility AABB.
+
+        // TODO (3D) culling - add support for 3D object culling?
         this._updateLayersCameraCoordinates(2);
         const allInstancesList = this.getAdhocListOfAllInstances();
         for (let i = 0, len = allInstancesList.length; i < len; ++i) {
@@ -518,6 +526,22 @@ namespace gdjs {
      */
     getBackgroundColor(): number {
       return this._backgroundColor;
+    }
+
+    /**
+     * Set whether the canvas should be cleared before this scene rendering.
+     * This is experimental: if possible, try to avoid relying on this and use
+     * custom objects to build complex scenes.
+     */
+    setClearCanvas(shouldClearCanvas: boolean): void {
+      this._clearCanvas = shouldClearCanvas;
+    }
+
+    /**
+     * Get whether the canvas should be cleared before this scene rendering.
+     */
+    getClearCanvas(): boolean {
+      return this._clearCanvas;
     }
 
     /**

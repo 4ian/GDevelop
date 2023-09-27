@@ -8,6 +8,7 @@
 #define FOREACHCHILDVARIABLEEVENT_H
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
+#include "GDCore/Events/Expression.h"
 namespace gd {
 class Instruction;
 class Project;
@@ -44,7 +45,7 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
    *
    * It is the structure variable that will be iterated on.
    */
-  const gd::String& GetIterableVariableName() const { return iterableVariableName; };
+  const gd::String& GetIterableVariableName() const { return iterableVariableName.GetPlainString(); };
 
   /**
    * \brief Set the iterable variable name attached to the event.
@@ -56,15 +57,15 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
   /**
    * \brief Get the value iterator variable attached to the event.
    *
-   * It is the variable that will contain the value of the 
+   * It is the variable that will contain the value of the
    * iterable's child being iterated on.
    */
-  const gd::String& GetValueIteratorVariableName() const { return valueIteratorVariableName; };
+  const gd::String& GetValueIteratorVariableName() const { return valueIteratorVariableName.GetPlainString(); };
 
   /**
    * \brief Set the value iterator variable attached to the event.
    *
-   * It is the variable that will contain the value of the 
+   * It is the variable that will contain the value of the
    * iterable's child being iterated on.
    */
   void SetValueIteratorVariableName(gd::String newName) { valueIteratorVariableName = newName; };
@@ -72,15 +73,15 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
   /**
    * \brief Get the key iterator variable attached to the event.
    *
-   * It is the variable that will contain the name of the 
+   * It is the variable that will contain the name of the
    * iterable's child being iterated on.
    */
-  const gd::String& GetKeyIteratorVariableName() const { return keyIteratorVariableName; };
+  const gd::String& GetKeyIteratorVariableName() const { return keyIteratorVariableName.GetPlainString(); };
 
   /**
    * \brief Set the key iterator variable attached to the event.
    *
-   * It is the variable that will contain the name of the 
+   * It is the variable that will contain the name of the
    * iterable's child being iterated on.
    */
   void SetKeyIteratorVariableName(gd::String newName) { keyIteratorVariableName = newName; };
@@ -92,14 +93,19 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
   virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors();
   virtual std::vector<gd::InstructionsList*> GetAllActionsVectors();
 
+  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+        GetAllExpressionsWithMetadata() const;
+  virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
+        GetAllExpressionsWithMetadata();
+
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element);
 
  private:
-  gd::String valueIteratorVariableName;
-  gd::String keyIteratorVariableName;
-  gd::String iterableVariableName;
+  gd::Expression valueIteratorVariableName;
+  gd::Expression keyIteratorVariableName;
+  gd::Expression iterableVariableName;
   gd::InstructionsList conditions;
   gd::InstructionsList actions;
   gd::EventsList events;

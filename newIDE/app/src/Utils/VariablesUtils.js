@@ -45,25 +45,28 @@ export const hasChildThatContainsStringInNameOrValue = (
 export const insertInVariablesContainer = (
   variablesContainer: gdVariablesContainer,
   name: string,
-  serializedVariable: ?any,
-  index: ?number
+  serializedVariable: any | null,
+  index: number,
+  inheritedVariablesContainer: ?gdVariablesContainer
 ): { name: string, variable: gdVariable } => {
   const newName = newNameGenerator(
     name,
-    name => variablesContainer.has(name),
+    name => {
+      return (
+        variablesContainer.has(name) ||
+        (!!inheritedVariablesContainer && inheritedVariablesContainer.has(name))
+      );
+    },
     serializedVariable ? 'CopyOf' : undefined
   );
   const newVariable = new gd.Variable();
   if (serializedVariable) {
     unserializeFromJSObject(newVariable, serializedVariable);
+    newVariable.resetPersistentUuid();
   } else {
     newVariable.setString('');
   }
-  const variable = variablesContainer.insert(
-    newName,
-    newVariable,
-    index || variablesContainer.count()
-  );
+  const variable = variablesContainer.insert(newName, newVariable, index);
   newVariable.delete();
   return { name: newName, variable };
 };
@@ -75,6 +78,7 @@ export const insertInVariableChildrenArray = (
 ) => {
   const newVariable = new gd.Variable();
   unserializeFromJSObject(newVariable, serializedVariable);
+  newVariable.resetPersistentUuid();
   targetParentVariable.insertAtIndex(newVariable, index);
   newVariable.delete();
 };
@@ -91,6 +95,7 @@ export const insertInVariableChildren = (
   );
   const newVariable = new gd.Variable();
   unserializeFromJSObject(newVariable, serializedVariable);
+  newVariable.resetPersistentUuid();
   targetParentVariable.insertChild(newName, newVariable);
   newVariable.delete();
   return newName;

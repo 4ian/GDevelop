@@ -18,6 +18,8 @@ export type FileMetadata = {|
   lastModifiedDate?: number,
   name?: string,
   gameId?: string,
+  /** The user id of the user owning the project if not the authenticated user. */
+  ownerId?: string,
 |};
 
 /**
@@ -133,10 +135,10 @@ export type StorageProviderOperations = {|
     project: gdProject,
     fileMetadata: FileMetadata
   ) => Promise<void>,
-  hasAutoSave?: (
+  getAutoSaveCreationDate?: (
     fileMetadata: FileMetadata,
     compareLastModified: boolean
-  ) => Promise<boolean>,
+  ) => Promise<?number>,
   onGetAutoSave?: (fileMetadata: FileMetadata) => Promise<FileMetadata>,
 |};
 
@@ -152,7 +154,12 @@ export type StorageProvider = {|
   disabled?: boolean,
   renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
   getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
-  onRenderNewProjectSaveAsLocationChooser?: (props: {|
+  getProjectLocation?: ({|
+    projectName: string,
+    saveAsLocation: ?SaveAsLocation,
+    newProjectsDefaultFolder?: string,
+  |}) => SaveAsLocation,
+  renderNewProjectSaveAsLocationChooser?: (props: {|
     projectName: string,
     saveAsLocation: ?SaveAsLocation,
     setSaveAsLocation: (?SaveAsLocation) => void,

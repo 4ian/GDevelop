@@ -45,3 +45,11 @@ export const SvgResource = () => (
     </ResourceStoreStateProvider>
   </FixedHeightFlexContainer>
 );
+
+export const Model3DResource = () => (
+  <FixedHeightFlexContainer height={400}>
+    <ResourceStoreStateProvider>
+      <ResourceStore onChoose={action('onChoose')} resourceKind="model3D" />
+    </ResourceStoreStateProvider>
+  </FixedHeightFlexContainer>
+);

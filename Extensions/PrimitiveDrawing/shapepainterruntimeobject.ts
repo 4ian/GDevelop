@@ -40,7 +40,9 @@ namespace gdjs {
   /**
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
    */
-  export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
+  export class ShapePainterRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
     _scaleX: number = 1;
     _scaleY: number = 1;
     _blendMode: number = 0;
@@ -555,11 +557,6 @@ namespace gdjs {
       );
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param newWidth The new width of the object, in pixels.
-     */
     setWidth(newWidth: float): void {
       const unscaledWidth = this._renderer.getUnscaledWidth();
       if (unscaledWidth !== 0) {
@@ -567,16 +564,16 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param newHeight The new height of the object, in pixels.
-     */
     setHeight(newHeight: float): void {
       const unscaledHeight = this._renderer.getUnscaledHeight();
       if (unscaledHeight !== 0) {
         this.setScaleY(newHeight / unscaledHeight);
       }
+    }
+
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     /**

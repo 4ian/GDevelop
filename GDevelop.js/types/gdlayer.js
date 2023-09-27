@@ -3,6 +3,8 @@ declare class gdLayer {
   constructor(): void;
   setName(name: string): void;
   getName(): string;
+  setRenderingType(renderingType: string): void;
+  getRenderingType(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
   setLocked(isLocked: boolean): void;
@@ -11,6 +13,12 @@ declare class gdLayer {
   isLightingLayer(): boolean;
   setFollowBaseLayerCamera(followBaseLayerCamera: boolean): void;
   isFollowingBaseLayerCamera(): boolean;
+  getCamera3DNearPlaneDistance(): number;
+  setCamera3DNearPlaneDistance(distance: number): void;
+  getCamera3DFarPlaneDistance(): number;
+  setCamera3DFarPlaneDistance(distance: number): void;
+  getCamera3DFieldOfView(): number;
+  setCamera3DFieldOfView(angle: number): void;
   setAmbientLightColor(r: number, g: number, b: number): void;
   getAmbientLightColorRed(): number;
   getAmbientLightColorGreen(): number;

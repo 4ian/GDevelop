@@ -47,6 +47,7 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
+import { getProjectScopedContainersFromScope } from '../../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -58,7 +59,7 @@ const styles = {
     flex: 1,
     minWidth: 200,
   },
-  textFieldAndHightlightContainer: {
+  textFieldAndHighlightContainer: {
     position: 'relative',
   },
   expressionSelectorPopoverContentSmall: {
@@ -122,8 +123,8 @@ const MAX_ERRORS_COUNT = 10;
 
 const extractErrors = (
   platform: gdPlatform,
-  globalObjectsContainer: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
+  project: gdProject,
+  projectScopedContainers: gdProjectScopedContainers,
   expressionType: string,
   expressionNode: gdExpressionNode
 ): {|
@@ -132,8 +133,7 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
-    globalObjectsContainer,
-    objectsContainer,
+    projectScopedContainers,
     expressionType
   );
   expressionNode.visit(expressionValidator);
@@ -298,8 +298,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
     const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      gd.ObjectsContainersList.makeNewObjectsContainersListForContainers(
+        globalObjectsContainer,
+        objectsContainer
+      ),
       expressionType,
       currentNode
     );
@@ -431,13 +433,18 @@ export default class ExpressionField extends React.Component<Props, State> {
     // a few milliseconds for complex ones).
 
     const parser = new gd.ExpressionParser2();
-
     const expressionNode = parser.parseExpression(expression).get();
+
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    );
 
     const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      project,
+      projectScopedContainers,
       expressionType,
       expressionNode
     );
@@ -467,18 +474,17 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainers,
       expressionType,
       expressionNode,
       cursorPosition - 1
     );
+
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
         project,
-        globalObjectsContainer,
-        objectsContainer,
+        projectScopedContainers,
         scope,
       },
       completionDescriptions
@@ -547,7 +553,7 @@ export default class ExpressionField extends React.Component<Props, State> {
           margin={this.props.isInline ? 'none' : 'dense'}
           renderTextField={() => (
             <div style={styles.textFieldContainer}>
-              <div style={styles.textFieldAndHightlightContainer}>
+              <div style={styles.textFieldAndHighlightContainer}>
                 <BackgroundHighlighting
                   value={this.state.validatedValue}
                   style={{ ...styles.input, ...backgroundHighlightingStyle }}

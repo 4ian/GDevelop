@@ -140,6 +140,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
@@ -152,6 +153,8 @@ namespace gdjs {
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
+    _antialiasingMode: 'none' | 'MSAA';
+    _isAntialisingEnabledOnMobile: boolean;
     /**
      * Game loop management (see startGameLoop method)
      */
@@ -208,30 +211,36 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
       this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
+
+      const resources = this._data.resources.resources;
       this._imageManager = new gdjs.ImageManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._soundManager = new gdjs.SoundManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._fontManager = new gdjs.FontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._jsonManager = new gdjs.JsonManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader,
         this._imageManager
       );
+      this._model3DManager = new gdjs.Model3DManager(
+        resources,
+        this._resourcesLoader
+      );
       this._effectsManager = new gdjs.EffectsManager();
-      this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
-      this._minFPS = this._data ? this._data.properties.minFPS : 15;
+      this._maxFPS = this._data.properties.maxFPS;
+      this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
       this._gameResolutionHeight = this._data.properties.windowHeight;
       this._originalWidth = this._gameResolutionWidth;
@@ -240,6 +249,8 @@ namespace gdjs {
       this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
       this._pixelsRounding = this._data.properties.pixelsRounding;
+      this._antialiasingMode = this._data.properties.antialiasingMode;
+      this._isAntialisingEnabledOnMobile = this._data.properties.antialisingEnabledOnMobile;
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
@@ -272,7 +283,7 @@ namespace gdjs {
             }
           } catch {
             logger.error(
-              'Some metadata of resources can not be succesfully parsed.'
+              'Some metadata of resources can not be successfully parsed.'
             );
           }
         }
@@ -309,6 +320,7 @@ namespace gdjs {
       this._fontManager.setResources(this._data.resources.resources);
       this._jsonManager.setResources(this._data.resources.resources);
       this._bitmapFontManager.setResources(this._data.resources.resources);
+      this._model3DManager.setResources(this._data.resources.resources);
     }
 
     /**
@@ -380,6 +392,15 @@ namespace gdjs {
      */
     getJsonManager(): gdjs.JsonManager {
       return this._jsonManager;
+    }
+
+    /**
+     * Get the 3D model manager of the game, used to load 3D model from game
+     * resources.
+     * @return The 3D model manager for the game
+     */
+    getModel3DManager(): gdjs.Model3DManager {
+      return this._model3DManager;
     }
 
     /**
@@ -623,6 +644,20 @@ namespace gdjs {
     }
 
     /**
+     * Return the antialiasing mode used by the game ("none" or "MSAA").
+     */
+    getAntialiasingMode(): 'none' | 'MSAA' {
+      return this._antialiasingMode;
+    }
+
+    /**
+     * Return true if antialising is enabled on mobiles.
+     */
+    isAntialisingEnabledOnMobile(): boolean {
+      return this._isAntialisingEnabledOnMobile;
+    }
+
+    /**
      * Set or unset the game as paused.
      * When paused, the game won't step and will be freezed. Useful for debugging.
      * @param enable true to pause the game, false to unpause
@@ -648,97 +683,47 @@ namespace gdjs {
     /**
      * Load all assets, displaying progress in renderer.
      */
-    loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
+    loadAllAssets(
+      callback: () => void,
+      progressCallback?: (progress: float) => void
+    ) {
+      this.loadAllAssetsAsync(progressCallback).then(callback);
+    }
+
+    /**
+     * Load all assets, displaying progress in renderer.
+     */
+    loadAllAssetsAsync = async (
+      progressCallback?: (progress: float) => void
+    ) => {
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
         this._imageManager,
         this._data.properties.loadingScreen
       );
       const allAssetsTotal = this._data.resources.resources.length;
-      const that = this;
+      let loadedAssets = 0;
 
-      // TODO: All the `loadXXX` (or `preloadXXX`) methods would be
-      // better converted to return promises, for better readability of the code.
-      // See how `loadBitmapFontData` is done.
-      this._imageManager.loadTextures(
-        function (count, total) {
-          const percent = Math.floor((count / allAssetsTotal) * 100);
-          loadingScreen.setPercent(percent);
-          if (progressCallback) {
-            progressCallback(percent);
-          }
-        },
-        function (texturesTotalCount) {
-          that._soundManager.preloadAudio(
-            function (count, total) {
-              const percent = Math.floor(
-                ((texturesTotalCount + count) / allAssetsTotal) * 100
-              );
-              loadingScreen.setPercent(percent);
-              if (progressCallback) {
-                progressCallback(percent);
-              }
-            },
-            function (audioTotalCount) {
-              that._fontManager.loadFonts(
-                function (count, total) {
-                  const percent = Math.floor(
-                    ((texturesTotalCount + audioTotalCount + count) /
-                      allAssetsTotal) *
-                      100
-                  );
-                  loadingScreen.setPercent(percent);
-                  if (progressCallback) {
-                    progressCallback(percent);
-                  }
-                },
-                function (fontTotalCount) {
-                  that._jsonManager.preloadJsons(
-                    function (count, total) {
-                      const percent = Math.floor(
-                        ((texturesTotalCount +
-                          audioTotalCount +
-                          fontTotalCount +
-                          count) /
-                          allAssetsTotal) *
-                          100
-                      );
-                      loadingScreen.setPercent(percent);
-                      if (progressCallback) {
-                        progressCallback(percent);
-                      }
-                    },
-                    function (jsonTotalCount) {
-                      that._bitmapFontManager
-                        .loadBitmapFontData((count) => {
-                          var percent = Math.floor(
-                            ((texturesTotalCount +
-                              audioTotalCount +
-                              fontTotalCount +
-                              jsonTotalCount +
-                              count) /
-                              allAssetsTotal) *
-                              100
-                          );
-                          loadingScreen.setPercent(percent);
-                          if (progressCallback) progressCallback(percent);
-                        })
-                        .then(() => loadingScreen.unload())
-                        .then(() =>
-                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
-                        )
-                        .then(() => {
-                          callback();
-                        });
-                    }
-                  );
-                }
-              );
-            }
-          );
+      const onProgress = (count: integer, total: integer) => {
+        const percent = Math.floor(
+          (100 * (loadedAssets + count)) / allAssetsTotal
+        );
+        loadingScreen.setPercent(percent);
+        if (progressCallback) {
+          progressCallback(percent);
         }
-      );
-    }
+      };
+
+      loadedAssets += await this._imageManager.loadTextures(onProgress);
+      loadedAssets += await this._soundManager.preloadAudio(onProgress);
+      loadedAssets += await this._fontManager.loadFonts(onProgress);
+      loadedAssets += await this._jsonManager.preloadJsons(onProgress);
+      loadedAssets += await this._model3DManager.loadModels(onProgress);
+      await this._bitmapFontManager.loadBitmapFontData(onProgress);
+
+      await loadingScreen.unload();
+      await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+    };
 
     /**
      * Start the game loop, to be called once assets are loaded.

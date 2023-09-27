@@ -23,11 +23,23 @@ namespace gd {
 class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
  public:
 
-  Behavior(): BehaviorConfigurationContainer() {};
+  Behavior(): BehaviorConfigurationContainer(), isDefaultBehavior(false) {};
   Behavior(const gd::String& name_, const gd::String& type_)
-      : BehaviorConfigurationContainer(name_, type_) {};
+      : BehaviorConfigurationContainer(name_, type_),
+      isDefaultBehavior(false) {};
   virtual ~Behavior();
   virtual Behavior* Clone() const override { return new Behavior(*this); }
+
+  bool IsDefaultBehavior() const {
+    return isDefaultBehavior;
+  }
+
+  void SetDefaultBehavior(bool isDefaultBehavior_) {
+    isDefaultBehavior = isDefaultBehavior_;
+  }
+
+  private:
+  bool isDefaultBehavior;
 };
 
 }  // namespace gd

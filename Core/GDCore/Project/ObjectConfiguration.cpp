@@ -20,7 +20,7 @@ namespace gd {
 
 ObjectConfiguration::~ObjectConfiguration() {}
 
-ObjectConfiguration::ObjectConfiguration() {}
+ObjectConfiguration::ObjectConfiguration(): is3DObject(false) {}
 
 std::map<gd::String, gd::PropertyDescriptor> ObjectConfiguration::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;

@@ -22,6 +22,10 @@
 #include "DummyPlatform.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "catch.hpp"
+#include "GDCore/IDE/ResourceExposer.h"
+#include "GDCore/Project/Effect.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/ExternalEvents.h"
 
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker {
  public:
@@ -55,7 +59,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
         "res4", "path/to/file4.png", "audio");
     ArbitraryResourceWorkerTest worker;
 
-    project.ExposeResources(worker);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
     REQUIRE(worker.files.size() == 4);
     REQUIRE(std::find(worker.files.begin(),
                       worker.files.end(),
@@ -78,7 +82,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
 
       worker.files.clear();
       worker.images.clear();
-      project.ExposeResources(worker);
+      gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
       REQUIRE(worker.files.size() == 4);
       REQUIRE(worker.images.size() == 1);
       REQUIRE(worker.images[0] == "res1");
@@ -124,12 +128,215 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
     standardEvent.GetActions().Insert(instruction);
     layout.GetEvents().InsertEvent(standardEvent);
 
-    project.ExposeResources(worker);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
     REQUIRE(worker.bitmapFonts.size() == 1);
     REQUIRE(worker.bitmapFonts[0] == "res3");
     REQUIRE(worker.images.size() == 1);
     REQUIRE(worker.images[0] == "res1");
     REQUIRE(worker.audios.size() == 1);
     REQUIRE(worker.audios[0] == "res4");
+  }
+
+  SECTION("Can find resource usage in external events") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.fnt", "bitmapFont");
+    project.GetResourcesManager().AddResource(
+        "res4", "path/to/file4.png", "audio");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& externalEvents = project.InsertNewExternalEvents("MyExternalEvents", 0);
+
+    gd::StandardEvent standardEvent;
+    gd::Instruction instruction;
+    instruction.SetType("MyExtension::DoSomethingWithResources");
+    instruction.SetParametersCount(3);
+    instruction.SetParameter(0, "res3");
+    instruction.SetParameter(1, "res1");
+    instruction.SetParameter(2, "res4");
+    standardEvent.GetActions().Insert(instruction);
+    externalEvents.GetEvents().InsertEvent(standardEvent);
+
+    // MyExternalEvents doesn't need to be used in any layout events.
+
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.bitmapFonts.size() == 1);
+    REQUIRE(worker.bitmapFonts[0] == "res3");
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
+    REQUIRE(worker.audios.size() == 1);
+    REQUIRE(worker.audios[0] == "res4");
+  }
+
+  SECTION("Can find resource usage in event-based functions") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.png", "image");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+    auto& function = extension.InsertNewEventsFunction("MyFreeFunction", 0);
+    
+    gd::StandardEvent standardEvent;
+    gd::Instruction instruction;
+    instruction.SetType("MyExtension::DoSomethingWithResources");
+    instruction.SetParametersCount(3);
+    instruction.SetParameter(0, "res3");
+    instruction.SetParameter(1, "res1");
+    instruction.SetParameter(2, "res4");
+    standardEvent.GetActions().Insert(instruction);
+    function.GetEvents().InsertEvent(standardEvent);
+
+    // MyEventExtention::MyFreeFunction doesn't need to be actually used in events.
+
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.bitmapFonts.size() == 1);
+    REQUIRE(worker.bitmapFonts[0] == "res3");
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
+    REQUIRE(worker.audios.size() == 1);
+    REQUIRE(worker.audios[0] == "res4");
+  }
+
+  SECTION("Can find resource usage in event-based behavior functions") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.png", "image");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+    auto& behavior = extension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
+    auto& function = behavior.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
+    
+    gd::StandardEvent standardEvent;
+    gd::Instruction instruction;
+    instruction.SetType("MyExtension::DoSomethingWithResources");
+    instruction.SetParametersCount(3);
+    instruction.SetParameter(0, "res3");
+    instruction.SetParameter(1, "res1");
+    instruction.SetParameter(2, "res4");
+    standardEvent.GetActions().Insert(instruction);
+    function.GetEvents().InsertEvent(standardEvent);
+
+    // MyEventExtention::MyBehavior::MyFunction doesn't need to be actually used in events.
+
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.bitmapFonts.size() == 1);
+    REQUIRE(worker.bitmapFonts[0] == "res3");
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
+    REQUIRE(worker.audios.size() == 1);
+    REQUIRE(worker.audios[0] == "res4");
+  }
+
+  SECTION("Can find resource usage in event-based object functions") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.png", "image");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+    auto& object = extension.GetEventsBasedObjects().InsertNew("MyObject", 0);
+    auto& function = object.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
+    
+    gd::StandardEvent standardEvent;
+    gd::Instruction instruction;
+    instruction.SetType("MyExtension::DoSomethingWithResources");
+    instruction.SetParametersCount(3);
+    instruction.SetParameter(0, "res3");
+    instruction.SetParameter(1, "res1");
+    instruction.SetParameter(2, "res4");
+    standardEvent.GetActions().Insert(instruction);
+    function.GetEvents().InsertEvent(standardEvent);
+
+    // MyEventExtention::MyObject::MyFunction doesn't need to be actually used in events.
+
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.bitmapFonts.size() == 1);
+    REQUIRE(worker.bitmapFonts[0] == "res3");
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
+    REQUIRE(worker.audios.size() == 1);
+    REQUIRE(worker.audios[0] == "res4");
+  }
+
+  SECTION("Can find resource usage in layer effects") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.png", "image");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& layout = project.InsertNewLayout("Scene", 0);
+    layout.InsertNewLayer("MyLayer", 0);
+    auto& layer = layout.GetLayer("MyLayer");
+    auto& effect = layer.GetEffects().InsertNewEffect("MyEffect", 0);
+    effect.SetEffectType("MyExtension::EffectWithResource");
+    effect.SetStringParameter("texture", "res1");
+
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.files.size() == 3);
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
+  }
+
+  SECTION("Can find resource usage in object effects") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.png", "image");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& layout = project.InsertNewLayout("Scene", 0);
+    layout.InsertNewLayer("MyLayer", 0);
+    auto& layer = layout.GetLayer("MyLayer");
+    auto& object = layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto& effect = object.GetEffects().InsertNewEffect("MyEffect", 0);
+    effect.SetEffectType("MyExtension::EffectWithResource");
+    effect.SetStringParameter("texture", "res1");
+
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.files.size() == 3);
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
   }
 }

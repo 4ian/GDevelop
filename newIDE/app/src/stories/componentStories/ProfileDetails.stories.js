@@ -8,38 +8,28 @@ import paperDecorator from '../PaperDecorator';
 import ProfileDetails from '../../Profile/ProfileDetails';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
+import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
 
 const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
   username: null,
   description: null,
+  communityLinks: {},
 };
 
 export default {
   title: 'Profile/ProfileDetails',
   component: ProfileDetails,
   decorators: [paperDecorator, muiDecorator],
-  argTypes: {
-    profile: {
-      control: { type: 'radio' },
-      options: ['Complete profile', 'Without username nor bio'],
-      defaultValue: 'Complete profile',
-      mapping: {
-        'Complete profile': indieUserProfile,
-        'Without username nor bio': indieUserWithoutUsernameNorDescriptionProfile,
-      },
-    },
-  },
 };
 
-type ArgsTypes = {|
-  profile: Profile,
-|};
-
-const getAssetPacksListingData = userId => [
+const getAssetPacksListingData = (
+  userId
+): Array<PrivateAssetPackListingData> => [
   {
     id: 'assetPackId',
     sellerId: userId,
+    isSellerGDevelop: false,
     productType: 'ASSET_PACK',
     listing: 'ASSET_PACK',
     name: 'French food',
@@ -57,32 +47,37 @@ const getAssetPacksListingData = userId => [
         stripePriceId: 'stripePriceId',
       },
     ],
+    appStoreProductId: null,
   },
 ];
 
-export const MyProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} isAuthenticatedUserProfile />
+export const MyProfile = () => (
+  <ProfileDetails profile={indieUserProfile} isAuthenticatedUserProfile />
 );
 
-export const OtherUserProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} assetPacksListingData={[]} />
+export const OtherUserProfile = () => (
+  <ProfileDetails profile={indieUserProfile} assetPacksListingDatas={[]} />
 );
 
-export const OtherUserProfileWithPremiumAssetPacks = (args: ArgsTypes) => (
+export const IncompleteUserProfile = () => (
   <ProfileDetails
-    {...args}
-    assetPacksListingData={getAssetPacksListingData(args.profile.id)}
+    profile={indieUserWithoutUsernameNorDescriptionProfile}
+    assetPacksListingDatas={[]}
+  />
+);
+
+export const OtherUserProfileWithPremiumAssetPacks = () => (
+  <ProfileDetails
+    profile={indieUserProfile}
+    assetPacksListingDatas={getAssetPacksListingData(indieUserProfile.id)}
     onAssetPackOpen={action('open asset pack')}
   />
 );
 
-export const Loading = (args: ArgsTypes) => (
-  <ProfileDetails {...args} profile={null} />
-);
+export const Loading = () => <ProfileDetails profile={null} />;
 
-export const Errored = (args: ArgsTypes) => (
+export const Errored = () => (
   <ProfileDetails
-    {...args}
     profile={null}
     error={new Error('Connectivity Problems')}
     onRetry={() => {
@@ -90,9 +85,3 @@ export const Errored = (args: ArgsTypes) => (
     }}
   />
 );
-Loading.argTypes = {
-  profile: { control: { disable: true } },
-};
-Errored.argTypes = {
-  profile: { control: { disable: true } },
-};

@@ -38,6 +38,7 @@ type Props = {|
   id?: string,
   inputStyle?: Object,
   maxLength?: number,
+  precision?: number,
   max?: number,
   min?: number,
   multiline?: boolean,

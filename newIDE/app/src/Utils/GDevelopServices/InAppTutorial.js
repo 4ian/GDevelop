@@ -18,6 +18,7 @@ export const CAMERA_PARALLAX_IN_APP_TUTORIAL_ID = 'cameraParallax';
 export const HEALTH_BAR_IN_APP_TUTORIAL_ID = 'healthBar';
 export const JOYSTICK_IN_APP_TUTORIAL_ID = 'joystick';
 export const TIMER_IN_APP_TUTORIAL_ID = 'timer';
+export const OBJECT_3D_IN_APP_TUTORIAL_ID = 'object3d';
 
 export const guidedLessonsIds = [
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
@@ -25,6 +26,7 @@ export const guidedLessonsIds = [
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
+  OBJECT_3D_IN_APP_TUTORIAL_ID,
 ];
 
 const fullTutorialIds = [FLING_GAME_IN_APP_TUTORIAL_ID];
@@ -76,6 +78,7 @@ export type InAppTutorialFlowStepFormattedTrigger =
 export type InAppTutorialTooltip = {|
   standalone?: true,
   placement?: 'bottom' | 'left' | 'right' | 'top',
+  mobilePlacement?: 'bottom' | 'left' | 'right' | 'top',
   title?: TranslatedText,
   description?: TranslatedText,
   touchDescription?: TranslatedText,
@@ -206,4 +209,5 @@ export const isMiniTutorial = (tutorialId: string) =>
     CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
     HEALTH_BAR_IN_APP_TUTORIAL_ID,
     JOYSTICK_IN_APP_TUTORIAL_ID,
+    OBJECT_3D_IN_APP_TUTORIAL_ID,
   ].includes(tutorialId);

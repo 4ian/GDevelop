@@ -19,8 +19,10 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GrammarTerminals.h"
 
 using namespace std;
+using namespace gd::GrammarTerminals;
 
 namespace gd {
 

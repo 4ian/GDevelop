@@ -17,6 +17,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import {
   getBrowserLanguageOrLocale,
   setLanguageInDOM,
@@ -60,6 +61,12 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
     } else if (values.themeName === 'Dark') {
       values.themeName = 'Blue Dark';
     }
+
+    // Synchronize the global state(s).
+    const gd: libGDevelop = global.gd;
+    gd.Project.allowUsageOfUnicodeIdentifierNames(
+      values.allowUsageOfUnicodeIdentifierNames
+    );
 
     return values;
   } catch (e) {
@@ -106,9 +113,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
-      this
-    ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
@@ -148,6 +152,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    setUse3DEditor: this._setUse3DEditor.bind(this),
+    getUse3DEditor: this._getUse3DEditor.bind(this),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
@@ -157,6 +163,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
       this
     ),
+    setAllowUsageOfUnicodeIdentifierNames: this._setAllowUsageOfUnicodeIdentifierNames.bind(
+      this
+    ),
+    getEditorStateForProject: this._getEditorStateForProject.bind(this),
+    setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
 
   componentDidMount() {
@@ -247,20 +258,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ];
     if (!tutorialProgresses) return undefined;
     return tutorialProgresses[userIdKey];
-  }
-
-  _setUseUndefinedVariablesInAutocompletion(
-    useUndefinedVariablesInAutocompletion: boolean
-  ) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          useUndefinedVariablesInAutocompletion,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
   }
 
   _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {
@@ -427,6 +424,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getShowEventBasedObjectsEditor() {
     return this.state.values.showEventBasedObjectsEditor;
+  }
+
+  _setUse3DEditor(use3DEditor: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          use3DEditor,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getUse3DEditor() {
+    return this.state.values.use3DEditor;
   }
 
   _checkUpdates(forceDownload?: boolean) {
@@ -795,6 +808,42 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           newProjectsDefaultStorageProviderName: newStorageProviderName,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAllowUsageOfUnicodeIdentifierNames(enable: boolean) {
+    const gd: libGDevelop = global.gd;
+    gd.Project.allowUsageOfUnicodeIdentifierNames(enable);
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          allowUsageOfUnicodeIdentifierNames: enable,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getEditorStateForProject(projectId: string) {
+    return this.state.values.editorStateByProject[projectId];
+  }
+
+  _setEditorStateForProject(
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          editorStateByProject: {
+            ...state.values.editorStateByProject,
+            [projectId]: editorState,
+          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

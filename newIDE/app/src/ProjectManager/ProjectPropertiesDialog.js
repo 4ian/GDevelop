@@ -61,6 +61,8 @@ type ProjectProperties = {|
   scaleMode: string,
   pixelsRounding: boolean,
   sizeOnStartupMode: string,
+  antialiasingMode: string,
+  isAntialisingEnabledOnMobile: boolean,
   minFPS: number,
   maxFPS: number,
   isFolderProject: boolean,
@@ -83,6 +85,8 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     scaleMode: project.getScaleMode(),
     pixelsRounding: project.getPixelsRounding(),
     sizeOnStartupMode: project.getSizeOnStartupMode(),
+    antialiasingMode: project.getAntialiasingMode(),
+    isAntialisingEnabledOnMobile: project.isAntialisingEnabledOnMobile(),
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
@@ -110,6 +114,8 @@ function applyPropertiesToProject(
     scaleMode,
     pixelsRounding,
     sizeOnStartupMode,
+    antialiasingMode,
+    isAntialisingEnabledOnMobile,
     minFPS,
     maxFPS,
     isFolderProject,
@@ -134,6 +140,8 @@ function applyPropertiesToProject(
   project.setScaleMode(scaleMode);
   project.setPixelsRounding(pixelsRounding);
   project.setSizeOnStartupMode(sizeOnStartupMode);
+  project.setAntialiasingMode(antialiasingMode);
+  project.setAntialisingEnabledOnMobile(isAntialisingEnabledOnMobile);
   project.setMinimumFPS(minFPS);
   project.setMaximumFPS(maxFPS);
   project.setFolderProject(isFolderProject);
@@ -185,6 +193,13 @@ const ProjectPropertiesDialog = (props: Props) => {
   let [sizeOnStartupMode, setSizeOnStartupMode] = React.useState(
     initialProperties.sizeOnStartupMode
   );
+  let [antialiasingMode, setAntialiasingMode] = React.useState(
+    initialProperties.antialiasingMode
+  );
+  let [
+    isAntialisingEnabledOnMobile,
+    setAntialisingEnabledOnMobile,
+  ] = React.useState(initialProperties.isAntialisingEnabledOnMobile);
   let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
   let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
   let [isFolderProject, setIsFolderProject] = React.useState(
@@ -241,6 +256,8 @@ const ProjectPropertiesDialog = (props: Props) => {
         orientation,
         scaleMode,
         pixelsRounding,
+        antialiasingMode,
+        isAntialisingEnabledOnMobile,
         sizeOnStartupMode,
         minFPS,
         maxFPS,
@@ -434,7 +451,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                       onClick={() => {
                         const answer = Window.showConfirmDialog(
                           i18n._(
-                            t`Make sure to verify all your events creating objects, and optionally add an action to set the Z order back to 0 if it's important for your game. Do you want to continue (recommened)?`
+                            t`Make sure to verify all your events creating objects, and optionally add an action to set the Z order back to 0 if it's important for your game. Do you want to continue (recommended)?`
                           )
                         );
                         if (!answer) return;
@@ -658,6 +675,31 @@ const ProjectPropertiesDialog = (props: Props) => {
                     </Trans>
                   </DismissableAlertMessage>
                 )}
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>Antialising for 3D</Trans>}
+                  value={
+                    antialiasingMode === 'none'
+                      ? 'never'
+                      : isAntialisingEnabledOnMobile
+                      ? 'always'
+                      : 'notOnMobile'
+                  }
+                  onChange={(e, i, newScaleMode: string) => {
+                    if (newScaleMode === scaleMode) {
+                      return;
+                    }
+                    setAntialiasingMode(
+                      newScaleMode === 'never' ? 'none' : 'MSAA'
+                    );
+                    setAntialisingEnabledOnMobile(newScaleMode === 'always');
+                    notifyOfChange();
+                  }}
+                >
+                  <SelectOption value="notOnMobile" label={t`Not on mobile`} />
+                  <SelectOption value="always" label={t`Always`} />
+                  <SelectOption value="never" label={t`Never`} />
+                </SelectField>
 
                 <Text size="block-title">
                   <Trans>Project files</Trans>
@@ -675,7 +717,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                   helperMarkdownText={i18n._(
-                    t`Note that this option will only have an effect when saving your project on your computer's filesystem from the desktop app.`
+                    t`Note that this option will only have an effect when saving your project on your computer's filesystem from the desktop app. Read about [using Git or GitHub with projects in multiple files](https://wiki.gdevelop.io/gdevelop5/tutorials/using-github-desktop/).`
                   )}
                 >
                   <SelectOption

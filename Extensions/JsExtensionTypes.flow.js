@@ -17,8 +17,12 @@
 export type ObjectsRenderingService = {
   gd: libGDevelop,
   PIXI: any,
+  THREE: any,
+  THREE_ADDONS: {SkeletonUtils: any},
   RenderedInstance: any,
+  Rendered3DInstance: any,
   registerInstanceRenderer: (objectType: string, renderer: any) => void,
+  registerInstance3DRenderer: (objectType: string, renderer: any) => void,
   requireModule: (dirname: string, moduleName: string) => any,
   getThumbnail: (project: gdProject, objectConfiguration: gdObjectConfiguration) => string,
   rgbOrHexToHexNumber: (value: string) => number,

@@ -1,8 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('PIXI game renderer');
 
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * Codes (as in `event.code`) of keys that should have their event `preventDefault`
    * called. This is used to avoid scrolling in a webpage when these keys are pressed
@@ -29,6 +27,8 @@ namespace gdjs {
     _forceFullscreen: any;
 
     _pixiRenderer: PIXI.Renderer | null = null;
+    private _threeRenderer: THREE.WebGLRenderer | null = null;
+    private _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
@@ -62,19 +62,57 @@ namespace gdjs {
      *
      */
     createStandardCanvas(parentElement: HTMLElement) {
-      // Create the renderer and setup the rendering area.
-      // "preserveDrawingBuffer: true" is needed to avoid flickering
-      // and background issues on some mobile phones (see #585 #572 #566 #463).
-      this._pixiRenderer = PIXI.autoDetectRenderer({
-        width: this._game.getGameResolutionWidth(),
-        height: this._game.getGameResolutionHeight(),
-        preserveDrawingBuffer: true,
-        antialias: false,
-      }) as PIXI.Renderer;
-      const gameCanvas = this._pixiRenderer.view;
+      let gameCanvas: HTMLCanvasElement;
+      if (typeof THREE !== 'undefined') {
+        gameCanvas = document.createElement('canvas');
+        this._threeRenderer = new THREE.WebGLRenderer({
+          canvas: gameCanvas,
+          antialias:
+            this._game.getAntialiasingMode() !== 'none' &&
+            (this._game.isAntialisingEnabledOnMobile() ||
+              !gdjs.evtTools.common.isMobile()),
+        });
+        this._threeRenderer.autoClear = false;
+        this._threeRenderer.setSize(
+          this._game.getGameResolutionWidth(),
+          this._game.getGameResolutionHeight()
+        );
+
+        // Create a PixiJS renderer that use the same GL context as Three.js
+        // so that both can render to the canvas and even have PixiJS rendering
+        // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
+        this._pixiRenderer = new PIXI.Renderer({
+          width: this._game.getGameResolutionWidth(),
+          height: this._game.getGameResolutionHeight(),
+          view: gameCanvas,
+          // @ts-ignore - reuse the context from Three.js.
+          context: this._threeRenderer.getContext(),
+          clearBeforeRender: false,
+          preserveDrawingBuffer: true,
+          antialias: false,
+          backgroundAlpha: 0,
+          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+        });
+
+        gameCanvas = this._threeRenderer.domElement;
+      } else {
+        // Create the renderer and setup the rendering area.
+        // "preserveDrawingBuffer: true" is needed to avoid flickering
+        // and background issues on some mobile phones (see #585 #572 #566 #463).
+        this._pixiRenderer = PIXI.autoDetectRenderer({
+          width: this._game.getGameResolutionWidth(),
+          height: this._game.getGameResolutionHeight(),
+          preserveDrawingBuffer: true,
+          antialias: false,
+        }) as PIXI.Renderer;
+
+        gameCanvas = this._pixiRenderer.view as HTMLCanvasElement;
+      }
 
       // Add the renderer view element to the DOM
       parentElement.appendChild(gameCanvas);
+      this._gameCanvas = gameCanvas;
+
       gameCanvas.style.position = 'absolute';
 
       // Ensure that the canvas has the focus.
@@ -118,12 +156,10 @@ namespace gdjs {
 
       // Handle scale mode.
       if (this._game.getScaleMode() === 'nearest') {
-        this._pixiRenderer.view.style['image-rendering'] = '-moz-crisp-edges';
-        this._pixiRenderer.view.style['image-rendering'] =
-          '-webkit-optimize-contrast';
-        this._pixiRenderer.view.style['image-rendering'] =
-          '-webkit-crisp-edges';
-        this._pixiRenderer.view.style['image-rendering'] = 'pixelated';
+        gameCanvas.style['image-rendering'] = '-moz-crisp-edges';
+        gameCanvas.style['image-rendering'] = '-webkit-optimize-contrast';
+        gameCanvas.style['image-rendering'] = '-webkit-crisp-edges';
+        gameCanvas.style['image-rendering'] = 'pixelated';
       }
 
       // Handle pixels rounding.
@@ -199,17 +235,26 @@ namespace gdjs {
     private _resizeCanvas() {
       if (!this._pixiRenderer || !this._domElementsContainer) return;
 
-      // Set the Pixi renderer size to the game size.
+      // Set the Pixi (and/or Three) renderer size to the game size.
       // There is no "smart" resizing to be done here: the rendering of the game
       // should be done with the size set on the game.
       if (
         this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
         this._pixiRenderer.height !== this._game.getGameResolutionHeight()
       ) {
+        // TODO (3D): It might be useful to resize pixi view in 3D depending on FOV value
+        // to enable a mode where pixi always fills the whole screen.
         this._pixiRenderer.resize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
         );
+
+        if (this._threeRenderer) {
+          this._threeRenderer.setSize(
+            this._game.getGameResolutionWidth(),
+            this._game.getGameResolutionHeight()
+          );
+        }
       }
 
       // Set the canvas size.
@@ -246,12 +291,14 @@ namespace gdjs {
       }
 
       // Apply the calculations to the canvas element...
-      this._pixiRenderer.view.style.top =
-        this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
-      this._pixiRenderer.view.style.left =
-        this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
-      this._pixiRenderer.view.style.width = canvasWidth + 'px';
-      this._pixiRenderer.view.style.height = canvasHeight + 'px';
+      if (this._gameCanvas) {
+        this._gameCanvas.style.top =
+          this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
+        this._gameCanvas.style.left =
+          this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
+        this._gameCanvas.style.width = canvasWidth + 'px';
+        this._gameCanvas.style.height = canvasHeight + 'px';
+      }
 
       // ...and to the div on top of it showing DOM elements (like inputs).
       this._domElementsContainer.style.top =
@@ -447,36 +494,33 @@ namespace gdjs {
       window: Window,
       document: Document
     ) {
-      const renderer = this._pixiRenderer;
-      if (!renderer) return;
-      const canvas = renderer.view;
+      const canvas = this._gameCanvas;
+      if (!canvas) return;
 
       //Translate an event (mouse or touch) made on the canvas on the page
       //to game coordinates.
-      const that = this;
-
-      function getEventPosition(e: MouseEvent | Touch) {
+      const getEventPosition = (e: MouseEvent | Touch) => {
         const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
 
         // Handle the fact that the game is stretched to fill the canvas.
         pos[0] *=
-          that._game.getGameResolutionWidth() / (that._canvasWidth || 1);
+          this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
         pos[1] *=
-          that._game.getGameResolutionHeight() / (that._canvasHeight || 1);
+          this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
         return pos;
-      }
+      };
 
-      function isInsideCanvas(e: MouseEvent | Touch) {
+      const isInsideCanvas = (e: MouseEvent | Touch) => {
         const x = e.pageX - canvas.offsetLeft;
         const y = e.pageY - canvas.offsetTop;
 
         return (
           0 <= x &&
-          x < (that._canvasWidth || 1) &&
+          x < (this._canvasWidth || 1) &&
           0 <= y &&
-          y < (that._canvasHeight || 1)
+          y < (this._canvasHeight || 1)
         );
-      }
+      };
 
       //Some browsers lacks definition of some variables used to do calculations
       //in getEventPosition. They are defined to 0 as they are useless.
@@ -569,17 +613,26 @@ namespace gdjs {
       };
 
       // Mouse:
+
+      // Converts HTML mouse button to InputManager mouse button.
+      // This function is used to align HTML button values with GDevelop 3 C++ SFML Mouse button enum values,
+      // notably the middle and right buttons.
+      function convertHtmlMouseButtonToInputManagerMouseButton(button: number) {
+        switch (button) {
+          case 1: // Middle button
+            return gdjs.InputManager.MOUSE_MIDDLE_BUTTON;
+          case 2: // Right button
+            return gdjs.InputManager.MOUSE_RIGHT_BUTTON;
+        }
+        return button;
+      }
       canvas.onmousemove = function (e) {
         const pos = getEventPosition(e);
         manager.onMouseMove(pos[0], pos[1]);
       };
       canvas.onmousedown = function (e) {
         manager.onMouseButtonPressed(
-          e.button === 2
-            ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
-            : e.button === 1
-            ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            : gdjs.InputManager.MOUSE_LEFT_BUTTON
+          convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
         if (window.focus !== undefined) {
           window.focus();
@@ -588,11 +641,7 @@ namespace gdjs {
       };
       canvas.onmouseup = function (e) {
         manager.onMouseButtonReleased(
-          e.button === 2
-            ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
-            : e.button === 1
-            ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            : gdjs.InputManager.MOUSE_LEFT_BUTTON
+          convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
         return false;
       };
@@ -603,42 +652,21 @@ namespace gdjs {
         manager.onMouseEnter();
         // There is no mouse event when the cursor is outside of the canvas.
         // We catchup what happened.
-        {
-          const leftIsPressed = (e.buttons & 1) !== 0;
-          const leftWasPressed = manager.isMouseButtonPressed(
-            gdjs.InputManager.MOUSE_LEFT_BUTTON
-          );
-          if (leftIsPressed && !leftWasPressed) {
-            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-          }
-          if (!leftIsPressed && leftWasPressed) {
-            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-          }
-        }
-        {
-          const rightIsPressed = (e.buttons & 2) !== 0;
-          const rightWasPressed = manager.isMouseButtonPressed(
-            gdjs.InputManager.MOUSE_RIGHT_BUTTON
-          );
-          if (rightIsPressed && !rightWasPressed) {
-            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
-          }
-          if (!rightIsPressed && rightWasPressed) {
-            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
-          }
-        }
-        {
-          const middleIsPressed = (e.buttons & 4) !== 0;
-          const middleWasPressed = manager.isMouseButtonPressed(
-            gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-          );
-          if (middleIsPressed && !middleWasPressed) {
-            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
-          }
-          if (!middleIsPressed && middleWasPressed) {
-            manager.onMouseButtonReleased(
-              gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            );
+        const buttons = [
+          gdjs.InputManager.MOUSE_LEFT_BUTTON,
+          gdjs.InputManager.MOUSE_RIGHT_BUTTON,
+          gdjs.InputManager.MOUSE_MIDDLE_BUTTON,
+          gdjs.InputManager.MOUSE_BACK_BUTTON,
+          gdjs.InputManager.MOUSE_FORWARD_BUTTON,
+        ];
+        for (let i = 0, len = buttons.length; i < len; ++i) {
+          const button = buttons[i];
+          const buttonIsPressed = (e.buttons & (1 << i)) !== 0;
+          const buttonWasPressed = manager.isMouseButtonPressed(button);
+          if (buttonIsPressed && !buttonWasPressed) {
+            manager.onMouseButtonPressed(button);
+          } else if (!buttonIsPressed && buttonWasPressed) {
+            manager.onMouseButtonReleased(button);
           }
         }
       };
@@ -775,6 +803,17 @@ namespace gdjs {
       return this._pixiRenderer;
     }
 
+    /**
+     * Get the Three.js renderer for the game - if any.
+     */
+    getThreeRenderer(): THREE.WebGLRenderer | null {
+      return this._threeRenderer;
+    }
+
+    /**
+     * Get the DOM element used as a container for HTML elements to display
+     * on top of the game.
+     */
     getDomElementContainer() {
       return this._domElementsContainer;
     }
@@ -828,9 +867,8 @@ namespace gdjs {
     /**
      * Get the canvas DOM element.
      */
-    getCanvas() {
-      // @ts-ignore
-      return this._pixiRenderer.view;
+    getCanvas(): HTMLCanvasElement | null {
+      return this._gameCanvas;
     }
 
     /**
@@ -878,6 +916,10 @@ namespace gdjs {
 
       return null;
     };
+
+    getGame() {
+      return this._game;
+    }
   }
 
   //Register the class to let the engine use it.

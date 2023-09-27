@@ -13,6 +13,7 @@ import {
   isPixelArt,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
@@ -24,16 +25,14 @@ import SelectOption from '../UI/SelectOption';
 import IconButton from '../UI/IconButton';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
-import { AssetCard } from './AssetCard';
+import AssetsList from './AssetsList';
 import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import EmptyMessage from '../UI/EmptyMessage';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import Link from '../UI/Link';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
-import PublicProfileContext from '../Profile/PublicProfileContext';
 import {
   getUserPublicProfilesByIds,
   type UserPublicProfile,
@@ -41,6 +40,7 @@ import {
 import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
+import PublicProfileDialog from '../Profile/PublicProfileDialog';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -73,11 +73,6 @@ const styles = {
   arrowContainer: {
     padding: 6,
   },
-  scrollView: {
-    // This is needed to make the scroll view take the full height of the container,
-    // allowing the Autosizer of the BoxSearchResults to be visible.
-    display: 'flex',
-  },
 };
 
 const makeFirstLetterUppercase = (str: string) =>
@@ -88,6 +83,7 @@ type Props = {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
   onAssetLoaded?: () => void,
+  onPrivateAssetPackSelection: (assetPack: PrivateAssetPackListingData) => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -109,7 +105,13 @@ export type AssetDetailsInterface = {|
 
 export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
   (
-    { onTagSelection, assetShortHeader, onOpenDetails, onAssetLoaded }: Props,
+    {
+      onTagSelection,
+      assetShortHeader,
+      onOpenDetails,
+      onAssetLoaded,
+      onPrivateAssetPackSelection,
+    }: Props,
     ref
   ) => {
     const {
@@ -117,7 +119,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       licenses,
       environment,
       error: filterError,
-      fetchAssetsAndFilters,
       useSearchItem,
     } = React.useContext(AssetStoreContext);
     const [asset, setAsset] = React.useState<?Asset>(null);
@@ -130,10 +131,13 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const { fetchPrivateAsset } = React.useContext(
       PrivateAssetsAuthorizationContext
     );
-    const { openUserPublicProfile } = React.useContext(PublicProfileContext);
     const [authorPublicProfiles, setAuthorPublicProfiles] = React.useState<
       UserPublicProfile[]
     >([]);
+    const [
+      selectedAuthorPublicProfile,
+      setSelectedAuthorPublicProfile,
+    ] = React.useState<?UserPublicProfile>(null);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -211,9 +215,11 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
 
     React.useEffect(
       () => {
-        loadAsset();
+        if (!asset) {
+          loadAsset();
+        }
       },
-      [loadAsset]
+      [asset, loadAsset]
     );
 
     const loadAuthorPublicProfiles = React.useCallback(
@@ -288,7 +294,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
     return (
-      <ScrollView ref={scrollView} style={styles.scrollView}>
+      <ScrollView ref={scrollView}>
         <Column expand noMargin>
           <Line justifyContent="space-between" noMargin>
             <Column>
@@ -325,7 +331,9 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                               key={userPublicProfile.id}
                               href="#"
                               onClick={() =>
-                                openUserPublicProfile(userPublicProfile.id)
+                                setSelectedAuthorPublicProfile(
+                                  userPublicProfile
+                                )
                               }
                             >
                               {username}
@@ -539,33 +547,34 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                 </Text>
               </Line>
               <Line expand noMargin justifyContent="center">
-                <BoxSearchResults
-                  baseSize={128}
-                  onRetry={fetchAssetsAndFilters}
-                  error={filterError}
-                  searchItems={truncatedSearchResults}
-                  spacing={8}
-                  renderSearchItem={(assetShortHeader, size) => (
-                    <AssetCard
-                      size={size}
-                      onOpenDetails={() => {
-                        setAsset(null);
-                        onOpenDetails(assetShortHeader);
-                      }}
-                      assetShortHeader={assetShortHeader}
-                    />
-                  )}
-                  noResultPlaceholder={
+                <AssetsList
+                  assetShortHeaders={truncatedSearchResults}
+                  onOpenDetails={assetShortHeader => {
+                    setAsset(null);
+                    onOpenDetails(assetShortHeader);
+                  }}
+                  noScroll
+                  noResultsPlaceHolder={
                     <Line alignItems="flex-start">
                       <EmptyMessage>
                         <Trans>No similar asset was found.</Trans>
                       </EmptyMessage>
                     </Line>
                   }
-                  noScroll
+                  error={filterError}
                 />
               </Line>
             </Column>
+          )}
+          {selectedAuthorPublicProfile && (
+            <PublicProfileDialog
+              userId={selectedAuthorPublicProfile.id}
+              onClose={() => setSelectedAuthorPublicProfile(null)}
+              onAssetPackOpen={assetPack => {
+                onPrivateAssetPackSelection(assetPack);
+                setSelectedAuthorPublicProfile(null);
+              }}
+            />
           )}
         </Column>
       </ScrollView>

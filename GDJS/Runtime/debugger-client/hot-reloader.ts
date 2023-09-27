@@ -429,7 +429,7 @@ namespace gdjs {
             );
           else {
             // Arrays cannot be hot reloaded.
-            // As indices can change at runtime, and in the IDE, they can be desychronized.
+            // As indices can change at runtime, and in the IDE, they can be desynchronized.
             // It will in that case mess up the whole array,
             // and there is no way to know if that was the case.
             //
@@ -494,7 +494,7 @@ namespace gdjs {
               );
             else {
               // Arrays cannot be hot reloaded.
-              // As indices can change at runtime, and in the IDE, they can be desychronized.
+              // As indices can change at runtime, and in the IDE, they can be desynchronized.
               // It will in that case mess up the whole array,
               // and there is no way to know if that was the case.
               //
@@ -1060,7 +1060,19 @@ namespace gdjs {
         }
       }
 
-      // TODO: cameras
+      // Rendering type can't be easily changed at runtime.
+      if (oldLayer.renderingType !== newLayer.renderingType) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not change the rendering type (2D, 3D...) layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
+      if (newLayer.isLightingLayer !== oldLayer.isLightingLayer) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not add/remove a lighting layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
 
       // Effects
       this._hotReloadRuntimeLayerEffects(
@@ -1240,6 +1252,29 @@ namespace gdjs {
         runtimeObject.setLayer(newInstance.layer);
         somethingChanged = true;
       }
+      if (
+        gdjs.RuntimeObject3D &&
+        runtimeObject instanceof gdjs.RuntimeObject3D
+      ) {
+        if (oldInstance.z !== newInstance.z && newInstance.z !== undefined) {
+          runtimeObject.setZ(newInstance.z);
+          somethingChanged = true;
+        }
+        if (
+          oldInstance.rotationX !== newInstance.rotationX &&
+          newInstance.rotationX !== undefined
+        ) {
+          runtimeObject.setRotationX(newInstance.rotationX);
+          somethingChanged = true;
+        }
+        if (
+          oldInstance.rotationY !== newInstance.rotationY &&
+          newInstance.rotationY !== undefined
+        ) {
+          runtimeObject.setRotationY(newInstance.rotationY);
+          somethingChanged = true;
+        }
+      }
 
       // Check if size changed
       let sizeChanged = false;
@@ -1266,6 +1301,28 @@ namespace gdjs {
       } else {
         if (!newInstance.customSize && oldInstance.customSize) {
           // The custom size was removed. Just flag the size as changed
+          // and hope the object will handle this in
+          // `extraInitializationFromInitialInstance`.
+          sizeChanged = true;
+        }
+      }
+      if (
+        gdjs.RuntimeObject3D &&
+        runtimeObject instanceof gdjs.RuntimeObject3D
+      ) {
+        // A custom depth was set or changed
+        if (
+          oldInstance.depth !== newInstance.depth &&
+          newInstance.depth !== undefined
+        ) {
+          runtimeObject.setDepth(newInstance.depth);
+          somethingChanged = true;
+          sizeChanged = true;
+        } else if (
+          newInstance.depth === undefined &&
+          oldInstance.depth !== undefined
+        ) {
+          // The custom depth was removed. Just flag the depth as changed
           // and hope the object will handle this in
           // `extraInitializationFromInitialInstance`.
           sizeChanged = true;

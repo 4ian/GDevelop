@@ -3,7 +3,7 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
-import { basename } from 'path';
+import { basename } from 'path-browserify';
 
 export type TargetName =
   | 'winExe'

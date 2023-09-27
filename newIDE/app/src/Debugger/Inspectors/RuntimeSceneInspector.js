@@ -14,6 +14,7 @@ import mapValues from 'lodash/mapValues';
 import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import Text from '../../UI/Text';
+import TimersInspector from './TimersInspector';
 
 type Props = {|
   runtimeScene: GameData,
@@ -123,6 +124,10 @@ export default class RuntimeSceneInspector extends React.Component<
           groupArraysAfterLength={50}
           theme="monokai"
         />
+        <Text>
+          <Trans>Timers:</Trans>
+        </Text>
+        <TimersInspector timers={runtimeScene._timeManager._timers} />
         <Text>
           <Trans>
             Create a new instance on the scene (will be at position 0;0):

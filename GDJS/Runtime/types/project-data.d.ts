@@ -107,16 +107,26 @@ declare interface ExternalLayoutData {
 
 declare interface InstanceData {
   persistentUuid: string;
-  angle: number;
-  customSize: boolean;
-  height: number;
+
   layer: string;
   locked: boolean;
   name: string;
-  width: number;
+
   x: number;
   y: number;
+  z?: number;
+
+  angle: number;
+  rotationX?: number;
+  rotationY?: number;
+
   zOrder: number;
+
+  customSize: boolean;
+  width: number;
+  height: number;
+  depth?: number;
+
   numberProperties: InstanceNumberProperty[];
   stringProperties: InstanceStringProperty[];
   initialVariables: RootVariableData[];
@@ -133,12 +143,16 @@ declare interface InstanceStringProperty {
 
 declare interface LayerData {
   name: string;
+  renderingType?: '' | '2d' | '3d' | '2d+3d';
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
+  camera3DFieldOfView?: float;
+  camera3DFarPlaneDistance?: float;
+  camera3DNearPlaneDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
 }
@@ -176,6 +190,8 @@ declare interface ProjectPropertiesData {
   projectFile: string;
   scaleMode: 'linear' | 'nearest';
   pixelsRounding: boolean;
+  antialiasingMode: 'none' | 'MSAA';
+  antialisingEnabledOnMobile: boolean;
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;
@@ -256,4 +272,5 @@ declare type ResourceKind =
   | 'json'
   | 'tilemap'
   | 'tileset'
-  | 'bitmapFont';
+  | 'bitmapFont'
+  | 'model3D';

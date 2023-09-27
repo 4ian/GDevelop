@@ -34,13 +34,12 @@ class GD_CORE_API ExpressionIdentifierStringFinder
 public:
   ExpressionIdentifierStringFinder(
       const gd::Platform &platform_,
-      const gd::ObjectsContainer &globalObjectsContainer_,
-      const gd::ObjectsContainer &objectsContainer_,
+      const gd::ProjectScopedContainers& projectScopedContainers_,
       const gd::String &expressionPlainString_,
       const gd::String &parameterType_, const gd::String &objectName_,
       const gd::String &layerName_, const gd::String &oldName_)
-      : platform(platform_), globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+      : platform(platform_),
+        projectScopedContainers(projectScopedContainers_),
         expressionPlainString(expressionPlainString_),
         parameterType(parameterType_), objectName(objectName_),
         layerName(layerName_), oldName(oldName_){};
@@ -82,16 +81,27 @@ protected:
   void OnVisitFunctionCallNode(FunctionCallNode &node) override {
     gd::String lastLayerName;
     gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-        platform, globalObjectsContainer, objectsContainer, node,
+        platform, projectScopedContainers.GetObjectsContainersList(), node,
         [&](const gd::ParameterMetadata &parameterMetadata,
             std::unique_ptr<gd::ExpressionNode> &parameterNode,
             size_t parameterIndex, const gd::String &lastObjectName) {
           if (parameterMetadata.GetType() == "layer") {
-            // Remove quotes, it won't match if it's not a literal anyway.
-            lastLayerName = expressionPlainString.substr(
-                parameterNode->location.GetStartPosition() + 1,
-                parameterNode->location.GetEndPosition() -
-                    parameterNode->location.GetStartPosition() - 2);
+            if (parameterNode->location.GetEndPosition() -
+                    parameterNode->location.GetStartPosition() <
+                2) {
+              // This is either the base layer or an invalid layer name.
+              // Keep it as is.
+              lastLayerName = expressionPlainString.substr(
+                  parameterNode->location.GetStartPosition(),
+                  parameterNode->location.GetEndPosition() -
+                      parameterNode->location.GetStartPosition());
+            } else {
+              // Remove quotes, so it can be compared to the layer name.
+              lastLayerName = expressionPlainString.substr(
+                  parameterNode->location.GetStartPosition() + 1,
+                  parameterNode->location.GetEndPosition() -
+                      parameterNode->location.GetStartPosition() - 2);
+            }
           }
           if (parameterMetadata.GetType() == parameterType) {
             auto parameterExpressionPlainString = expressionPlainString.substr(
@@ -112,8 +122,7 @@ protected:
 
 private:
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ProjectScopedContainers &projectScopedContainers;
   /// It's used to extract parameter content.
   const gd::String &expressionPlainString;
   const gd::String &oldName;
@@ -143,9 +152,15 @@ bool ProjectElementRenamer::DoVisitInstruction(gd::Instruction &instruction,
           const gd::Expression &parameterValue, size_t parameterIndex,
           const gd::String &lastObjectName) {
         if (parameterMetadata.GetType() == "layer") {
-          // Remove quotes, it won't match if it's not a literal anyway.
-          lastLayerName = parameterValue.GetPlainString().substr(
-              1, parameterValue.GetPlainString().length() - 2);
+          if (parameterValue.GetPlainString().length() < 2) {
+            // This is either the base layer or an invalid layer name.
+            // Keep it as is.
+            lastLayerName = parameterValue.GetPlainString();
+          } else {
+            // Remove quotes, so it can be compared to the layer name.
+            lastLayerName = parameterValue.GetPlainString().substr(
+                1, parameterValue.GetPlainString().length() - 2);
+          }
         }
 
         if (parameterMetadata.GetType() == parameterType &&
@@ -159,13 +174,12 @@ bool ProjectElementRenamer::DoVisitInstruction(gd::Instruction &instruction,
         auto node = parameterValue.GetRootNode();
         if (node) {
           ExpressionIdentifierStringFinder finder(
-              platform, GetGlobalObjectsContainer(), GetObjectsContainer(),
+              platform, GetProjectScopedContainers(),
               parameterValue.GetPlainString(), parameterType, objectName,
               layerName, oldName);
           node->Visit(finder);
 
           if (finder.GetOccurrences().size() > 0) {
-
             gd::String newNameWithQuotes = "\"" + newName + "\"";
             gd::String oldParameterValue = parameterValue.GetPlainString();
             gd::String newParameterValue;

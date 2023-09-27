@@ -43,7 +43,7 @@ type Props = {|
   disabled?: boolean,
   stopPropagationOnClick?: boolean,
 
-  id?: string,
+  id?: ?string,
   style?: {
     flex?: 1,
     width?: 'auto',
@@ -59,6 +59,7 @@ type Props = {|
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
   translatableHintText?: MessageDescriptor,
+  errorText?: React.Node,
 |};
 
 /**
@@ -98,7 +99,9 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
     }
     const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
 
-    const helperText = props.helperMarkdownText ? (
+    const helperText = props.errorText ? (
+      props.errorText
+    ) : props.helperMarkdownText ? (
       <MarkdownText source={props.helperMarkdownText} />
     ) : null;
 
@@ -114,6 +117,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
             fullWidth={props.fullWidth}
             label={props.floatingLabelText}
             helperText={helperText}
+            error={!!props.errorText}
             value={displayedValue}
             onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
             onChange={

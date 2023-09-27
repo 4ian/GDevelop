@@ -34,7 +34,9 @@ namespace gdjs {
   /**
    * Displays a text.
    */
-  export class TextRuntimeObject extends gdjs.RuntimeObject {
+  export class TextRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.OpacityHandler {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -304,10 +306,24 @@ namespace gdjs {
     }
 
     /**
-     * Get scale of the text.
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
+     */
+    getScaleMean(): float {
+      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): float {
-      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**
@@ -464,7 +480,7 @@ namespace gdjs {
      * Set the shadow for the text object.
      * @param str color as a "R;G;B" string, for example: "255;0;0"
      * @param distance distance between the shadow and the text, in pixels.
-     * @param blur amout of shadow blur, in pixels.
+     * @param blur amount of shadow blur, in pixels.
      * @param angle shadow offset direction, in degrees.
      */
     setShadow(

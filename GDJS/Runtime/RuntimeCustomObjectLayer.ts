@@ -18,6 +18,9 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       super(layerData, instanceContainer);
+
+      // Let the renderer do its final set up:
+      this._renderer.onCreated();
     }
 
     onGameResolutionResized(
@@ -48,6 +51,12 @@ namespace gdjs {
     setCameraZoom(newZoom: float, cameraId?: integer): void {}
 
     getCameraZoom(cameraId?: integer): float {
+      return 1;
+    }
+
+    setCameraZ(z: float, fov: float, cameraId?: integer): void {}
+
+    getCameraZ(fov: float = 45, cameraId?: integer): float {
       return 0;
     }
 

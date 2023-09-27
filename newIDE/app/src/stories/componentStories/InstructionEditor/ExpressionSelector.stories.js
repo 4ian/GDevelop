@@ -7,6 +7,7 @@ import muiDecorator from '../../ThemeDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import paperDecorator from '../../PaperDecorator';
 import ExpressionSelector from '../../../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
+import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 export default {
   title: 'InstructionEditor/ExpressionSelector',
@@ -21,7 +22,7 @@ export const DefaultStringNoScope = () => (
       selectedType=""
       onChoose={action('Expression chosen')}
       focusOnMount
-      scope={{}}
+      scope={{ project: testProject.project }}
     />
   </FixedHeightFlexContainer>
 );
@@ -33,7 +34,7 @@ export const DefaultNumberNoScope = () => (
       selectedType=""
       onChoose={action('Expression chosen')}
       focusOnMount
-      scope={{}}
+      scope={{ project: testProject.project }}
     />
   </FixedHeightFlexContainer>
 );

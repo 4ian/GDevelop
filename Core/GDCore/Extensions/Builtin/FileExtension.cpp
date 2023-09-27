@@ -69,12 +69,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
   extension
       .AddAction(
           "EcrireFichierExp",
-          _("Write a value"),
-          _("Write the result of the expression in the stored data, in the "
+          _("Save a value"),
+          _("Save the result of the expression in the stored data, in the "
             "specified element.\nSpecify the structure leading to the "
             "element using / (example : Root/Level/Current)\nSpaces are "
             "forbidden in element names."),
-          _("Write _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
+          _("Save _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
           "",
           "res/actions/fichier24.png",
           "res/actions/fichier.png")
@@ -85,12 +85,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
   extension
       .AddAction(
           "EcrireFichierTxt",
-          _("Write a text"),
-          _("Write the text in the specified storage, in the specified "
+          _("Save a text"),
+          _("Save the text in the specified storage, in the specified "
             "element.\nSpecify "
             "the structure leading to the element using / (example : "
             "Root/Level/Current)\nSpaces are forbidden in element names."),
-          _("Write _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
+          _("Save _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
           "",
           "res/actions/fichier24.png",
           "res/actions/fichier.png")
@@ -101,13 +101,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
   extension
       .AddAction(
           "LireFichierExp",
-          _("Read a value"),
-          _("Read the value saved in the specified element and store it in a "
+          _("Load a value"),
+          _("Load the value saved in the specified element and store it in a "
             "scene "
             "variable.\nSpecify the structure leading to the element using / "
             "(example : Root/Level/Current)\nSpaces are forbidden in element "
             "names."),
-          _("Read _PARAM1_ from storage _PARAM0_ and store value in _PARAM3_"),
+          _("Load _PARAM1_ from storage _PARAM0_ and store value in _PARAM3_"),
           "",
           "res/actions/fichier24.png",
           "res/actions/fichier.png")
@@ -119,13 +119,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
   extension
       .AddAction(
           "LireFichierTxt",
-          _("Read a text"),
-          _("Read the text saved in the specified element and store it in a "
+          _("Load a text"),
+          _("Load the text saved in the specified element and store it in a "
             "scene "
             "variable.\nSpecify the structure leading to the element using / "
             "(example : Root/Level/Current)\nSpaces are forbidden in element "
             "names."),
-          _("Read _PARAM1_ from storage _PARAM0_ and store as text in "
+          _("Load _PARAM1_ from storage _PARAM0_ and store as text in "
             "_PARAM3_"),
           "",
           "res/actions/fichier24.png",

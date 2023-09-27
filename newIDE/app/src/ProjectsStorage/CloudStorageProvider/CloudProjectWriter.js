@@ -17,6 +17,8 @@ import {
   createZipWithSingleTextFile,
   unzipFirstEntryOfBlob,
 } from '../../Utils/Zip.js/Utils';
+import ProjectCache from '../../Utils/ProjectCache';
+import { getProjectCache } from './CloudProjectOpener';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -85,9 +87,12 @@ export const generateOnSaveProject = (
       // Do not throw, as this is not a blocking error.
     }
   }
-  const newFileMetadata = {
+  const newFileMetadata: FileMetadata = {
     ...fileMetadata,
     gameId: project.getProjectUuid(),
+    // lastModifiedDate is not set since it will be set by backend services
+    // and then frontend will use it to transform the list of cloud project
+    // items into a list of FileMetadata.
   };
   const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,
@@ -256,10 +261,25 @@ export const generateOnSaveProjectAs = (
   }
 };
 
-export const onRenderNewProjectSaveAsLocationChooser = ({
+export const getProjectLocation = ({
+  projectName,
+  saveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  newProjectsDefaultFolder?: string,
+|}): SaveAsLocation => {
+  return {
+    name: projectName,
+  };
+};
+
+export const renderNewProjectSaveAsLocationChooser = ({
   projectName,
   saveAsLocation,
   setSaveAsLocation,
+  newProjectsDefaultFolder,
 }: {|
   projectName: string,
   saveAsLocation: ?SaveAsLocation,
@@ -267,10 +287,32 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
   newProjectsDefaultFolder?: string,
 |}) => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
-    setSaveAsLocation({
-      name: projectName,
-    });
+    setSaveAsLocation(
+      getProjectLocation({
+        projectName,
+        saveAsLocation,
+        newProjectsDefaultFolder,
+      })
+    );
   }
-
   return null;
 };
+
+export const generateOnAutoSaveProject = (
+  authenticatedUser: AuthenticatedUser
+) =>
+  ProjectCache.isAvailable()
+    ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
+        const { profile } = authenticatedUser;
+        if (!profile) return;
+        const cloudProjectId = fileMetadata.fileIdentifier;
+        const projectCache = getProjectCache();
+        projectCache.put(
+          {
+            userId: profile.id,
+            cloudProjectId,
+          },
+          project
+        );
+      }
+    : undefined;

@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The renderer for a {@link gdjs.CustomRuntimeObject} using Pixi.js.
    */
@@ -9,6 +7,7 @@ namespace gdjs {
     _object: gdjs.CustomRuntimeObject;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
+    _threeGroup: THREE.Group | null;
     _isContainerDirty: boolean = true;
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
@@ -27,7 +26,12 @@ namespace gdjs {
     ) {
       this._object = object;
       this._instanceContainer = instanceContainer;
+
+      // TODO (3D) - optimization: don't create a PixiJS container if only 3D objects.
+      // And same, in reverse, for 2D only objects.
       this._pixiContainer = new PIXI.Container();
+      this._threeGroup =
+        typeof THREE !== 'undefined' ? new THREE.Group() : null;
       this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
@@ -39,6 +43,9 @@ namespace gdjs {
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
+        if (this._threeGroup) {
+          layer.getRenderer().add3DRendererObject(this._threeGroup);
+        }
       }
     }
 
@@ -53,11 +60,18 @@ namespace gdjs {
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
+        if (this._threeGroup) {
+          layer.getRenderer().add3DRendererObject(this._threeGroup);
+        }
       }
     }
 
     getRendererObject() {
       return this._pixiContainer;
+    }
+
+    get3DRendererObject(): THREE.Object3D | null {
+      return this._threeGroup;
     }
 
     /**
@@ -82,12 +96,31 @@ namespace gdjs {
       this._isContainerDirty = false;
     }
 
+    _updateThreeGroup() {
+      if (!this._threeGroup) return;
+
+      const pivotX = this._object.getUnscaledCenterX();
+      const pivotY = this._object.getUnscaledCenterY();
+
+      // TODO (3D): fix the pivot point for custom objects.
+      this._threeGroup.position.x =
+        this._object.getX() + pivotX * Math.abs(this._object._scaleX);
+      this._threeGroup.position.y =
+        this._object.getY() + pivotY * Math.abs(this._object._scaleY);
+
+      this._threeGroup.rotation.z = gdjs.toRad(this._object.angle);
+      this._threeGroup.scale.x = this._object._scaleX;
+      this._threeGroup.scale.y = this._object._scaleY;
+      this._threeGroup.visible = !this._object.hidden;
+    }
+
     /**
      * Call this to make sure the sprite is ready to be rendered.
      */
     ensureUpToDate() {
       if (this._isContainerDirty) {
         this._updatePIXIContainer();
+        this._updateThreeGroup();
       }
     }
 
@@ -99,16 +132,28 @@ namespace gdjs {
       this._pixiContainer.position.x =
         this._object.x +
         this._pixiContainer.pivot.x * Math.abs(this._object._scaleX);
+
+      if (this._threeGroup)
+        this._threeGroup.position.x =
+          this._object.getX() +
+          /*this._threeGroup.pivot.x*/ 0.5 * Math.abs(this._object._scaleX);
     }
 
     updateY(): void {
       this._pixiContainer.position.y =
         this._object.y +
         this._pixiContainer.pivot.y * Math.abs(this._object._scaleY);
+
+      if (this._threeGroup)
+        this._threeGroup.position.y =
+          this._object.getY() +
+          /*this._threeGroup.pivot.y*/ 0.5 * Math.abs(this._object._scaleY);
     }
 
     updateAngle(): void {
       this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
+      if (this._threeGroup)
+        this._threeGroup.rotation.z = gdjs.toRad(this._object.angle);
     }
 
     updateOpacity(): void {
@@ -117,6 +162,7 @@ namespace gdjs {
 
     updateVisibility(): void {
       this._pixiContainer.visible = !this._object.hidden;
+      if (this._threeGroup) this._threeGroup.visible = !this._object.hidden;
     }
 
     getPIXIContainer() {

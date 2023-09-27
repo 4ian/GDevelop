@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -25,6 +24,40 @@ import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/Announcemen
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import RouterContext from '../../RouterContext';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
+import TeamSection from './TeamSection';
+import TeamProvider from '../../../Profile/Team/TeamProvider';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
+import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    marginTop: 0,
+    marginBottom: 0,
+    flex: 1,
+    minHeight: 0,
+    width: '100%',
+  },
+  mobileContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    width: '100%',
+  },
+  scrollableContainer: {
+    display: 'flex',
+    marginLeft: 0,
+    marginRight: 0,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    flex: 1,
+    height: '100%',
+    minWidth: 0,
+    overflowY: 'auto',
+  },
+};
 
 type Props = {|
   project: ?gdProject,
@@ -40,7 +73,14 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: (ExampleShortHeader | null) => void,
+  onOpenExampleStore: () => void,
+  onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
+  onOpenExampleStoreWithPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
+  onOpenPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
@@ -52,7 +92,7 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
 
   // Project save
   onSave: () => Promise<void>,
@@ -77,7 +117,10 @@ export const HomePage = React.memo<Props>(
         onChooseProject,
         onOpenRecentFile,
         onOpenNewProjectSetupDialog,
-        onCreateProject,
+        onOpenExampleStore,
+        onOpenExampleStoreWithExampleShortHeader,
+        onOpenExampleStoreWithPrivateGameTemplateListingData,
+        onOpenPrivateGameTemplateListingData,
         onOpenProjectManager,
         onOpenHelpFinder,
         onOpenLanguageDialog,
@@ -103,18 +146,25 @@ export const HomePage = React.memo<Props>(
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
+        fetchGameTemplates,
+        shop: { setInitialGameTemplateUserFriendlySlug },
+      } = React.useContext(PrivateGameTemplateStoreContext);
+      const {
         values: { showGetStartedSection },
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
       const buildSectionRef = React.useRef<?BuildSectionInterface>(null);
+      const windowWidth = useResponsiveWindowWidth();
+      const isMobile = windowWidth === 'small';
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
         () => {
           fetchExamplesAndFilters();
+          fetchGameTemplates();
           fetchTutorials();
         },
-        [fetchExamplesAndFilters, fetchTutorials]
+        [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -186,92 +236,123 @@ export const HomePage = React.memo<Props>(
         AssetStoreContext
       );
 
-      // Open the asset store and a pack if asked to do so.
+      // Open the store and a pack or game template if asked to do so.
       React.useEffect(
         () => {
-          if (routeArguments['initial-dialog'] === 'asset-store') {
+          if (
+            routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
+            routeArguments['initial-dialog'] === 'store' // New way of opening the store
+          ) {
             setActiveTab('shop');
-            setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            if (routeArguments['asset-pack']) {
+              setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            }
+            if (routeArguments['game-template']) {
+              setInitialGameTemplateUserFriendlySlug(
+                routeArguments['game-template']
+              );
+            }
             // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments(['initial-dialog', 'asset-pack']);
+            removeRouteArguments([
+              'initial-dialog',
+              'asset-pack',
+              'game-template',
+            ]);
           }
         },
-        [routeArguments, removeRouteArguments, setInitialPackUserFriendlySlug]
+        [
+          routeArguments,
+          removeRouteArguments,
+          setInitialPackUserFriendlySlug,
+          setInitialGameTemplateUserFriendlySlug,
+        ]
       );
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(
         showGetStartedSection ? 'get-started' : 'build'
       );
 
+      // If the user logs out and is on the team view section, go back to the build section.
+      React.useEffect(
+        () => {
+          if (activeTab === 'team-view' && !authenticated) {
+            setActiveTab('build');
+          }
+        },
+        [authenticated, activeTab]
+      );
+
       return (
         <I18n>
           {({ i18n }) => (
-            <>
-              <Column expand noMargin noOverflowParent>
-                <Line expand noMargin useFullHeight>
-                  <HomePageMenu
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    onOpenPreferences={onOpenPreferences}
-                    onOpenAbout={onOpenAbout}
-                  />
-                  <Column noMargin expand noOverflowParent>
-                    {activeTab !== 'community' && !!announcements && (
-                      <AnnouncementsFeed canClose level="urgent" addMargins />
-                    )}
-                    {activeTab === 'get-started' && (
-                      <GetStartedSection
-                        onTabChange={setActiveTab}
-                        onCreateProject={() =>
-                          onCreateProject(/*exampleShortHeader=*/ null)
-                        }
-                        selectInAppTutorial={selectInAppTutorial}
-                        showGetStartedSection={showGetStartedSection}
-                        setShowGetStartedSection={setShowGetStartedSection}
-                      />
-                    )}
-                    {activeTab === 'build' && (
-                      <BuildSection
-                        ref={buildSectionRef}
-                        project={project}
-                        canOpen={canOpen}
-                        onChooseProject={onChooseProject}
-                        onOpenNewProjectSetupDialog={
-                          onOpenNewProjectSetupDialog
-                        }
-                        onShowAllExamples={() =>
-                          onCreateProject(/*exampleShortHeader=*/ null)
-                        }
-                        onSelectExample={exampleShortHeader =>
-                          onCreateProject(exampleShortHeader)
-                        }
-                        onOpenRecentFile={onOpenRecentFile}
-                        storageProviders={storageProviders}
-                      />
-                    )}
-                    {activeTab === 'learn' && (
-                      <LearnSection
-                        onCreateProject={() =>
-                          onCreateProject(/*exampleShortHeader=*/ null)
-                        }
-                        onTabChange={setActiveTab}
-                        onOpenHelpFinder={onOpenHelpFinder}
-                        selectInAppTutorial={selectInAppTutorial}
-                      />
-                    )}
-                    {activeTab === 'play' && <PlaySection />}
-                    {activeTab === 'community' && <CommunitySection />}
-                    {activeTab === 'shop' && (
-                      <StoreSection
-                        project={project}
-                        resourceManagementProps={resourceManagementProps}
-                        canInstallPrivateAsset={canInstallPrivateAsset}
-                      />
-                    )}
-                  </Column>
-                </Line>
-              </Column>
-            </>
+            <TeamProvider>
+              <div style={isMobile ? styles.mobileContainer : styles.container}>
+                <div style={styles.scrollableContainer}>
+                  {activeTab !== 'community' && !!announcements && (
+                    <AnnouncementsFeed canClose level="urgent" addMargins />
+                  )}
+                  {activeTab === 'get-started' && (
+                    <GetStartedSection
+                      onTabChange={setActiveTab}
+                      selectInAppTutorial={selectInAppTutorial}
+                      showGetStartedSection={showGetStartedSection}
+                      setShowGetStartedSection={setShowGetStartedSection}
+                    />
+                  )}
+                  {activeTab === 'build' && (
+                    <BuildSection
+                      ref={buildSectionRef}
+                      project={project}
+                      canOpen={canOpen}
+                      onChooseProject={onChooseProject}
+                      onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+                      onShowAllExamples={onOpenExampleStore}
+                      onSelectExampleShortHeader={
+                        onOpenExampleStoreWithExampleShortHeader
+                      }
+                      onSelectPrivateGameTemplateListingData={
+                        onOpenExampleStoreWithPrivateGameTemplateListingData
+                      }
+                      onOpenRecentFile={onOpenRecentFile}
+                      storageProviders={storageProviders}
+                    />
+                  )}
+                  {activeTab === 'learn' && (
+                    <LearnSection
+                      onOpenExampleStore={onOpenExampleStore}
+                      onTabChange={setActiveTab}
+                      onOpenHelpFinder={onOpenHelpFinder}
+                      selectInAppTutorial={selectInAppTutorial}
+                    />
+                  )}
+                  {activeTab === 'play' && <PlaySection />}
+                  {activeTab === 'community' && <CommunitySection />}
+                  {activeTab === 'shop' && (
+                    <StoreSection
+                      project={project}
+                      resourceManagementProps={resourceManagementProps}
+                      canInstallPrivateAsset={canInstallPrivateAsset}
+                      onOpenPrivateGameTemplateListingData={
+                        onOpenPrivateGameTemplateListingData
+                      }
+                    />
+                  )}
+                  {activeTab === 'team-view' && (
+                    <TeamSection
+                      project={project}
+                      onOpenRecentFile={onOpenRecentFile}
+                      storageProviders={storageProviders}
+                    />
+                  )}
+                </div>
+                <HomePageMenu
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  onOpenPreferences={onOpenPreferences}
+                  onOpenAbout={onOpenAbout}
+                />
+              </div>
+            </TeamProvider>
           )}
         </I18n>
       );
@@ -294,7 +375,16 @@ export const renderHomePageContainer = (
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
-    onCreateProject={props.onCreateProject}
+    onOpenExampleStore={props.onOpenExampleStore}
+    onOpenExampleStoreWithExampleShortHeader={
+      props.onOpenExampleStoreWithExampleShortHeader
+    }
+    onOpenExampleStoreWithPrivateGameTemplateListingData={
+      props.onOpenExampleStoreWithPrivateGameTemplateListingData
+    }
+    onOpenPrivateGameTemplateListingData={
+      props.onOpenPrivateGameTemplateListingData
+    }
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}

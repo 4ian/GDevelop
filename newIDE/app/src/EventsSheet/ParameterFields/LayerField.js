@@ -45,7 +45,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // If the current value is not in the list of layers, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInLayersList
+      (!!props.value && !isCurrentValueInLayersList) ||
+        props.scope.eventsFunctionsExtension
     );
 
     const switchFieldType = () => {
@@ -119,7 +120,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          isExpressionField ? (
+          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
             <FlatButton
               id="switch-expression-select"
               leftIcon={<TypeCursorSelect />}

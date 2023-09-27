@@ -12,8 +12,11 @@ import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
+  canCancelAtEndOfPeriod,
   businessPlan,
   hasValidSubscriptionPlan,
+  EDUCATION_PLAN_MAX_SEATS,
+  EDUCATION_PLAN_MIN_SEATS,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -25,13 +28,21 @@ import {
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from '../RedeemCodeDialog';
 import PlanCard from './PlanCard';
 import LeftLoader from '../../UI/LeftLoader';
 import RaisedButton from '../../UI/RaisedButton';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
+import AlertMessage from '../../UI/AlertMessage';
 
 const styles = {
   descriptionText: {
@@ -52,6 +63,12 @@ const cancelConfirmationTexts = {
   title: t`Cancel your subscription`,
   message: t`Are you sure you want to cancel your subscription?`,
   confirmButtonLabel: t`Cancel my subscription`,
+  dismissButtonLabel: t`Go back`,
+};
+const cancelImmediatelyConfirmationTexts = {
+  title: t`Cancel your subscription`,
+  message: t`Are you sure you want to cancel your subscription? Your access to GDevelop premium features will end IMMEDIATELY.`,
+  confirmButtonLabel: t`Cancel my subscription now`,
   dismissButtonLabel: t`Go back`,
 };
 const seamlesslyChangeConfirmationTexts = {
@@ -91,6 +108,14 @@ export default function SubscriptionDialog({
     false
   );
   const [
+    educationPlanPeriodicity,
+    setEducationPlanPeriodicity,
+  ] = React.useState<'yearly' | 'monthly'>('yearly');
+  const [
+    educationPlanSeatsCount,
+    setEducationPlanSeatsCount,
+  ] = React.useState<number>(20);
+  const [
     subscriptionPendingDialogOpen,
     setSubscriptionPendingDialogOpen,
   ] = React.useState(false);
@@ -118,8 +143,18 @@ export default function SubscriptionDialog({
     // Subscribing from an account without a subscription
     if (!subscription.planId) {
       setSubscriptionPendingDialogOpen(true);
+      const isEducationPlan = plan.planId === 'gdevelop_education';
+      const planId = isEducationPlan
+        ? `gdevelop_education_${educationPlanPeriodicity}`
+        : plan.planId || '';
+      const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
       Window.openExternalURL(
-        getRedirectToCheckoutUrl(plan.planId || '', profile.id, profile.email)
+        getRedirectToCheckoutUrl({
+          planId,
+          userId: profile.id,
+          userEmail: profile.email,
+          quantity,
+        })
       );
       return;
     }
@@ -127,7 +162,11 @@ export default function SubscriptionDialog({
     const { planId } = plan;
     if (!planId) {
       // Cancelling the existing subscription.
-      const answer = await showConfirmation(cancelConfirmationTexts);
+      const answer = await showConfirmation(
+        canCancelAtEndOfPeriod(subscription)
+          ? cancelConfirmationTexts
+          : cancelImmediatelyConfirmationTexts
+      );
       if (!answer) return;
 
       setIsChangingSubscription(true);
@@ -154,7 +193,8 @@ export default function SubscriptionDialog({
       }
     } else {
       const needToCancelSubscription = !canSeamlesslyChangeSubscription(
-        subscription
+        subscription,
+        planId
       );
       const hasValidRedeemedSubscription =
         !!subscription.redemptionCodeValidUntil &&
@@ -225,7 +265,11 @@ export default function SubscriptionDialog({
         // Then redirect as if a new subscription is being chosen.
         setSubscriptionPendingDialogOpen(true);
         Window.openExternalURL(
-          getRedirectToCheckoutUrl(planId, profile.id, profile.email)
+          getRedirectToCheckoutUrl({
+            planId,
+            userId: profile.id,
+            userEmail: profile.email,
+          })
         );
       }
     }
@@ -237,6 +281,10 @@ export default function SubscriptionDialog({
     isChangingSubscription;
 
   const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
+
+  const willCancelAtPeriodEnd =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.cancelAtPeriodEnd;
 
   return (
     <I18n>
@@ -283,47 +331,144 @@ export default function SubscriptionDialog({
                 }
               />
             </LineStackLayout>
-            {getSubscriptionPlans().map(plan => {
-              const isCurrentPlan =
-                !!authenticatedUser.subscription &&
-                authenticatedUser.subscription.planId === plan.planId;
-              // If no plan (free usage), do not display button.
-              const button = !plan.planId ? null : isCurrentPlan &&
-                isPlanValid ? (
-                <React.Fragment key="cancel">
-                  <LeftLoader isLoading={isLoading}>
+            {willCancelAtPeriodEnd && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  Your subscription is being cancelled: you will lose the
+                  benefits at the end of the period you already paid for.
+                </Trans>
+              </AlertMessage>
+            )}
+            {getSubscriptionPlans()
+              .filter(plan => !plan.hideInSubscriptionDialog)
+              .map(plan => {
+                const userPlanId = authenticatedUser.subscription
+                  ? authenticatedUser.subscription.planId
+                  : null;
+                const isFreePlan = !plan.planId;
+                const isUserCurrentOrLegacyPlan =
+                  userPlanId === plan.planId ||
+                  (!!userPlanId && userPlanId === plan.legacyPlanId);
+                let actions: React.Node = null;
+                if (isFreePlan) {
+                  // If no plan (free usage), do not display button.
+                } else if (plan.planId === 'gdevelop_education') {
+                  if (!isUserCurrentOrLegacyPlan) {
+                    actions = [
+                      <ResponsiveLineStackLayout
+                        key="options"
+                        expand
+                        noColumnMargin
+                        noMargin
+                      >
+                        <SemiControlledTextField
+                          value={educationPlanSeatsCount.toString()}
+                          floatingLabelFixed
+                          fullWidth
+                          floatingLabelText={<Trans>Number of seats</Trans>}
+                          commitOnBlur
+                          type="number"
+                          onChange={value => {
+                            const newValue = parseInt(value);
+                            setEducationPlanSeatsCount(
+                              Math.min(
+                                EDUCATION_PLAN_MAX_SEATS,
+                                Math.max(
+                                  Number.isNaN(newValue)
+                                    ? EDUCATION_PLAN_MIN_SEATS
+                                    : newValue,
+                                  EDUCATION_PLAN_MIN_SEATS
+                                )
+                              )
+                            );
+                          }}
+                          min={EDUCATION_PLAN_MIN_SEATS}
+                          max={EDUCATION_PLAN_MAX_SEATS}
+                          step={1}
+                          helperMarkdownText={i18n._(
+                            t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
+                          )}
+                        />
+                        <SelectField
+                          value={educationPlanPeriodicity}
+                          floatingLabelText={<Trans>Engagement</Trans>}
+                          fullWidth
+                          onChange={(e, i, newValue) => {
+                            // $FlowExpectedError - Flow does not infer the type given the select options.
+                            setEducationPlanPeriodicity(newValue);
+                          }}
+                        >
+                          <SelectOption value="yearly" label={t`Per year`} />
+                          <SelectOption value="monthly" label={t`Per month`} />
+                        </SelectField>
+                      </ResponsiveLineStackLayout>,
+                      <RaisedButton
+                        primary
+                        key="upgrade"
+                        disabled={isLoading}
+                        label={
+                          <LeftLoader isLoading={isLoading}>
+                            <Trans>Choose this plan</Trans>
+                          </LeftLoader>
+                        }
+                        onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
+                      />,
+                    ];
+                  } else {
+                    actions = [
+                      <Text key="contact">
+                        <Trans>Contact us for more information.</Trans>
+                      </Text>,
+                    ];
+                  }
+                } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
+                  actions = [
                     <FlatButton
-                      disabled={isLoading}
-                      label={<Trans>Cancel your subscription</Trans>}
+                      key="cancel"
+                      disabled={isLoading || willCancelAtPeriodEnd}
+                      label={
+                        <LeftLoader isLoading={isLoading}>
+                          {willCancelAtPeriodEnd ? (
+                            <Trans>
+                              Already cancelled - will expire in the future
+                            </Trans>
+                          ) : (
+                            <Trans>Cancel your subscription</Trans>
+                          )}
+                        </LeftLoader>
+                      }
                       onClick={() =>
                         buyUpdateOrCancelPlan(i18n, { planId: null })
                       }
-                    />
-                  </LeftLoader>
-                </React.Fragment>
-              ) : (
-                <React.Fragment key="upgrade">
-                  <LeftLoader isLoading={isLoading}>
+                    />,
+                  ];
+                } else {
+                  actions = [
                     <RaisedButton
                       primary
+                      key="upgrade"
                       disabled={isLoading}
-                      label={<Trans>Choose this plan</Trans>}
+                      label={
+                        <LeftLoader isLoading={isLoading}>
+                          <Trans>Choose this plan</Trans>
+                        </LeftLoader>
+                      }
                       onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
-                    />
-                  </LeftLoader>
-                </React.Fragment>
-              );
-              return (
-                <PlanCard
-                  key={plan.planId || 'free'}
-                  plan={plan}
-                  actions={[button]}
-                  isPending={isLoading}
-                  isHighlighted={isCurrentPlan} // highlight the plan even if it's expired.
-                  background="medium"
-                />
-              );
-            })}
+                    />,
+                  ];
+                }
+
+                return (
+                  <PlanCard
+                    key={plan.planId || 'free'}
+                    plan={plan}
+                    actions={actions}
+                    isPending={isLoading}
+                    isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.
+                    background="medium"
+                  />
+                );
+              })}
             <PlanCard
               plan={businessPlan}
               actions={

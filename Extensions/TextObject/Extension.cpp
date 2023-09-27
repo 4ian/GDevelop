@@ -34,7 +34,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                  _("Text"),
                                  _("Displays a text on the screen."),
                                  "CppPlatform/Extensions/texticon.png")
-          .SetCategoryFullName(_("Text"));
+          .SetCategoryFullName(_("Text"))
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
+          .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
 
   obj.AddAction("String",
                 _("Modify the text"),
@@ -78,6 +81,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("police", _("Font"))
       .SetFunctionName("ChangeFont");
 
+  // Deprecated
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
                    _("Compare the scale of the text on the X axis"),
@@ -91,8 +95,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale to compare to (1 by default)")))
+      .SetHidden()
       .SetFunctionName("GetScaleX");
 
+  // Deprecated
   obj.AddAction(
          "ScaleX",
          _("Scale on X axis"),
@@ -107,8 +113,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .SetFunctionName("SetScaleX");
 
+  // Deprecated
   obj.AddCondition("ScaleY",
                    _("Scale on Y axis"),
                    _("Compare the scale of the text on the Y axis"),
@@ -122,8 +130,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale to compare to (1 by default)")))
+      .SetHidden()
       .SetFunctionName("GetScaleY");
 
+  // Deprecated
   obj.AddAction(
          "ScaleY",
          _("Scale on Y axis"),
@@ -138,8 +148,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .SetFunctionName("SetScaleY");
 
+  // Deprecated
   obj.AddAction(
          "Scale",
          _("Scale"),
@@ -154,6 +166,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .SetFunctionName("SetScale");
 
   obj.AddAction(
@@ -228,6 +241,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Show the shadow"));
 
+  // Deprecated
   obj.AddAction("Opacity",
                 _("Text opacity"),
                 _("Change the opacity of a Text. 0 is fully transparent, 255 "
@@ -243,8 +257,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Opacity (0-255)")))
       .SetFunctionName("SetOpacity")
-      .SetGetter("GetOpacity");
+      .SetGetter("GetOpacity")
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Text object, between 0 (fully "
@@ -259,7 +275,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Opacity to compare to (0-255)")))
-      .SetFunctionName("GetOpacity");
+      .SetFunctionName("GetOpacity")
+      .SetHidden();
 
   obj.AddAction("SetSmooth",
                 _("Smoothing"),
@@ -497,29 +514,35 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     "res/actions/textPadding_black.png")
       .AddParameter("object", _("Object"), "Text");
 
+  // Deprecated
   obj.AddExpression("ScaleX",
                     _("X Scale of a Text object"),
                     _("X Scale of a Text object"),
                     _("Scale"),
                     "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "Text")
+      .SetHidden()
       .SetFunctionName("GetScaleX");
 
+  // Deprecated
   obj.AddExpression("ScaleY",
                     _("Y Scale of a Text object"),
                     _("Y Scale of a Text object"),
                     _("Scale"),
                     "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "Text")
+      .SetHidden()
       .SetFunctionName("GetScaleY");
 
+  // Deprecated
   obj.AddExpression("Opacity",
                     _("Opacity of a Text object"),
                     _("Opacity of a Text object"),
                     _("Opacity"),
                     "res/actions/opacity.png")
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetOpacity");
+      .SetFunctionName("GetOpacity")
+      .SetHidden();
 
   obj.AddExpression("Angle",
                     _("Angle"),

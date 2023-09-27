@@ -311,11 +311,11 @@ namespace gdjs {
       };
 
       /**
-       * Update a layer effect parameter (with a number).
+       * Update a layer effect property (with a number).
        * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
-       * @param parameter The parameter to update
+       * @param parameter The property to update
        * @param value The new value
        */
       export const setLayerEffectDoubleParameter = function (
@@ -334,11 +334,11 @@ namespace gdjs {
       };
 
       /**
-       * Update a layer effect parameter (with a string).
+       * Update a layer effect property (with a string).
        * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
-       * @param parameter The parameter to update
+       * @param parameter The property to update
        * @param value The new value
        */
       export const setLayerEffectStringParameter = function (
@@ -357,11 +357,11 @@ namespace gdjs {
       };
 
       /**
-       * Enable or disable a layer effect parameter (boolean).
+       * Enable or disable a layer effect property (boolean).
        * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
-       * @param parameter The parameter to update
+       * @param parameter The property to update
        * @param value The new value
        */
       export const setLayerEffectBooleanParameter = function (

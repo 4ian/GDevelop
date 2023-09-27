@@ -1,5 +1,6 @@
 // @flow
 import RenderedInstance from './RenderedInstance';
+import Rendered3DInstance from './Rendered3DInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
@@ -15,18 +16,22 @@ import {
   getProportionalPositionY,
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
-export default class RenderedCustomObjectInstance extends RenderedInstance
-  implements LayoutedParent<RenderedInstance> {
+export default class RenderedCustomObjectInstance extends Rendered3DInstance
+  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
   childrenInstances: ChildInstance[];
   childrenLayouts: ChildLayout[];
-  childrenRenderedInstances: RenderedInstance[];
-  childrenRenderedInstanceByNames: Map<string, RenderedInstance>;
+  childrenRenderedInstances: Array<RenderedInstance | Rendered3DInstance>;
+  childrenRenderedInstanceByNames: Map<
+    string,
+    RenderedInstance | Rendered3DInstance
+  >;
   _proportionalOriginX: number;
   _proportionalOriginY: number;
 
@@ -36,6 +41,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -44,12 +50,19 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       instance,
       associatedObjectConfiguration,
       pixiContainer,
+      threeGroup,
       pixiResourcesLoader
     );
 
-    //Setup the PIXI object:
+    // Setup the PIXI object:
     this._pixiObject = new PIXI.Container();
     this._pixiContainer.addChild(this._pixiObject);
+
+    if (this._threeGroup) {
+      // No Three group means the instance should only be rendered in 2D.
+      this._threeObject = new THREE.Group();
+      this._threeGroup.add(this._threeObject);
+    }
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
@@ -87,7 +100,10 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     this.childrenInstances = [];
     this.childrenLayouts = [];
     this.childrenRenderedInstances = [];
-    this.childrenRenderedInstanceByNames = new Map<string, RenderedInstance>();
+    this.childrenRenderedInstanceByNames = new Map<
+      string,
+      RenderedInstance | Rendered3DInstance
+    >();
 
     if (!eventBasedObject) {
       return;
@@ -117,7 +133,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         // $FlowFixMe Use real object instances.
         childInstance,
         childObjectConfiguration,
-        this._pixiObject
+        this._pixiObject,
+        this._threeObject
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
@@ -202,18 +219,20 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     this._pixiObject.scale.y = 1;
     this._pixiObject.position.x = this._instance.getX() + centerX - originX;
     this._pixiObject.position.y = this._instance.getY() + centerY - originY;
-  }
 
-  getWidth() {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomWidth()
-      : this.getDefaultWidth();
-  }
-
-  getHeight() {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
-      : this.getDefaultHeight();
+    if (this._threeObject) {
+      this._threeObject.position.set(
+        this._instance.getX(),
+        this._instance.getY(),
+        0
+      );
+      // TODO (3D) Handle rotation center for the three group.
+      // this._threeObject.rotation.set(
+      //   0,
+      //   0,
+      //   RenderedInstance.toRad(this._instance.getAngle())
+      // );
+    }
   }
 
   getDefaultWidth() {

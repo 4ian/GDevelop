@@ -147,6 +147,9 @@ var adaptNamingConventions = function (gd) {
   gd.asCustomObjectConfiguration = function (evt) {
     return gd.castObject(evt, gd.CustomObjectConfiguration);
   };
+  gd.asModel3DConfiguration = function (evt) {
+    return gd.castObject(evt, gd.Model3DObjectConfiguration);
+  };
 
   gd.asImageResource = function (evt) {
     return gd.castObject(evt, gd.ImageResource);

@@ -95,6 +95,12 @@ export const GDevelopProjectApi = {
     : 'https://api.gdevelop.io/project',
 };
 
+export const GDevelopGenerationApi = {
+  baseUrl: isDev
+    ? 'https://api-dev.gdevelop.io/generation'
+    : 'https://api.gdevelop.io/generation',
+};
+
 export const GDevelopProjectResourcesStorage = {
   baseUrl: isDev
     ? 'https://project-resources-dev.gdevelop.io'
@@ -105,6 +111,12 @@ export const GDevelopPrivateAssetsStorage = {
   baseUrl: isDev
     ? 'https://private-assets-dev.gdevelop.io'
     : 'https://private-assets.gdevelop.io',
+};
+
+export const GDevelopPrivateGameTemplatesStorage = {
+  baseUrl: isDev
+    ? 'https://private-game-templates-dev.gdevelop.io'
+    : 'https://private-game-templates.gdevelop.io',
 };
 
 export const GDevelopPublicAssetResourcesStorageBaseUrl =

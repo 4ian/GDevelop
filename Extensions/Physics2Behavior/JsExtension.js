@@ -34,7 +34,8 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/behaviors/physics2')
-      .setCategory('Movement');
+      .setCategory('Movement')
+      .setTags("physics, gravity, obstacle, collision");
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');
@@ -758,7 +759,7 @@ module.exports = {
 
     aut
       .addAction(
-        'SetSleepingaAllowed',
+        'SetSleepingAllowed',
         _('Sleeping allowed'),
         _(
           'Allow or not an object to sleep. If enabled the object will be able to sleep, improving performance for non-currently-moving objects.'
@@ -774,6 +775,11 @@ module.exports = {
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('setSleepingAllowed');
+    
+    // Deprecated action (fixed typo):
+    aut
+      .addDuplicatedAction("SetSleepingaAllowed", "SetSleepingAllowed")
+      .setHidden();
 
     aut
       .addCondition(

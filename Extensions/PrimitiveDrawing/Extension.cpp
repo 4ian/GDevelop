@@ -31,7 +31,11 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
               _("Allows you to draw simple shapes on the screen using the "
                 "events."),
               "CppPlatform/Extensions/primitivedrawingicon.png")
-          .SetCategoryFullName(_("Advanced"));
+          .SetCategoryFullName(_("Advanced"))
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
 
 #if defined(GD_IDE_ONLY)
   obj.AddAction(
@@ -612,6 +616,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("AreCoordinatesRelative");
 
+  // Deprecated
   obj.AddAction("Scale",
                 _("Scale"),
                 _("Modify the scale of the specified object."),
@@ -624,8 +629,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddExpressionAndConditionAndAction("number",
                                          "ScaleX",
                                          _("Scale on X axis"),
@@ -638,8 +645,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddExpressionAndConditionAndAction("number",
                                          "ScaleY",
                                          _("Scale on Y axis"),
@@ -652,6 +661,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .MarkAsAdvanced();
 
   obj.AddAction("FlipX",
@@ -663,6 +673,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/flipX.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddAction("FlipY",
@@ -674,6 +685,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/flipY.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddCondition("FlippedX",
@@ -683,7 +695,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
-      .AddParameter("object", _("Object"), "Drawer");
+      .AddParameter("object", _("Object"), "Drawer")
+      .SetHidden();
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
@@ -692,8 +705,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
-      .AddParameter("object", _("Object"), "Drawer");
+      .AddParameter("object", _("Object"), "Drawer")
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("Width",
                 _("Width"),
                 _("Change the width of an object."),
@@ -704,8 +719,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddAction("Height",
                 _("Height"),
                 _("Change the height of an object."),
@@ -716,6 +733,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .MarkAsAdvanced();
 
   obj.AddAction(

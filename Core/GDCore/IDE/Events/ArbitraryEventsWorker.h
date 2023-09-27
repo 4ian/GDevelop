@@ -10,6 +10,7 @@
 #include <vector>
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventVisitor.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 namespace gd {
 class Instruction;
@@ -17,6 +18,8 @@ class BaseEvent;
 class LinkEvent;
 class EventsList;
 class ObjectsContainer;
+class Expression;
+class ParameterMetadata;
 }  // namespace gd
 
 namespace gd {
@@ -47,6 +50,7 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
   void VisitInstructionList(gd::InstructionsList& instructions,
                             bool areConditions);
   bool VisitInstruction(gd::Instruction& instruction, bool isCondition);
+  bool VisitEventExpression(gd::Expression& expression, const gd::ParameterMetadata& metadata);
 
   /**
    * Called to do some work on an event list.
@@ -62,9 +66,9 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
 
   /**
    * Called to do some work on a link event.
-   * 
+   *
    * Note that DoVisitEvent is also called with this event.
-   * 
+   *
    * \return true if the event must be deleted from the events list, false
    * otherwise (default).
    */
@@ -85,6 +89,16 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
                                   bool isCondition) {
     return false;
   };
+
+  /**
+   * Called to do some work on an expression of an event.
+   * \return true if the event must be deleted from the list, false
+   * otherwise (default).
+   */
+  virtual bool DoVisitEventExpression(gd::Expression& expression,
+                                      const gd::ParameterMetadata& metadata) {
+    return false;
+  }
 };
 
 /**
@@ -99,8 +113,7 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
     : public ArbitraryEventsWorker {
  public:
   ArbitraryEventsWorkerWithContext()
-      : currentGlobalObjectsContainer(nullptr),
-        currentObjectsContainer(nullptr){};
+      : projectScopedContainers(nullptr){};
   virtual ~ArbitraryEventsWorkerWithContext();
 
   /**
@@ -108,30 +121,27 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(gd::EventsList& events,
-              const gd::ObjectsContainer& globalObjectsContainer_,
-              const gd::ObjectsContainer& objectsContainer_) {
-    currentGlobalObjectsContainer = &globalObjectsContainer_;
-    currentObjectsContainer = &objectsContainer_;
+              const gd::ProjectScopedContainers& projectScopedContainers_) {
+    projectScopedContainers = &projectScopedContainers_;
     ArbitraryEventsWorker::Launch(events);
   };
 
   void Launch(gd::EventsList& events) = delete;
 
  protected:
-  const gd::ObjectsContainer& GetGlobalObjectsContainer() {
+  const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *currentGlobalObjectsContainer;
+    return *projectScopedContainers;
   };
-  const gd::ObjectsContainer& GetObjectsContainer() {
+  const gd::ObjectsContainersList& GetObjectsContainersList() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *currentObjectsContainer;
+    return projectScopedContainers->GetObjectsContainersList();
   };
 
  private:
-  const gd::ObjectsContainer* currentGlobalObjectsContainer;
-  const gd::ObjectsContainer* currentObjectsContainer;
+  const gd::ProjectScopedContainers* projectScopedContainers;
 };
 
 /**
@@ -144,13 +154,16 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
  */
 class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
  public:
-  ReadOnlyArbitraryEventsWorker(){};
+  ReadOnlyArbitraryEventsWorker() : shouldStopIteration(false) {};
   virtual ~ReadOnlyArbitraryEventsWorker();
 
   /**
    * \brief Launch the worker on the specified events list.
    */
   void Launch(const gd::EventsList& events) { VisitEventList(events); };
+
+protected:
+  void StopAnyEventIteration() override;
 
  private:
   void VisitEventList(const gd::EventsList& events);
@@ -159,6 +172,7 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
   void VisitInstructionList(const gd::InstructionsList& instructions,
                             bool areConditions);
   void VisitInstruction(const gd::Instruction& instruction, bool isCondition);
+  void VisitEventExpression(const gd::Expression& expression, const gd::ParameterMetadata& metadata);
 
   /**
    * Called to do some work on an event list.
@@ -172,7 +186,7 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
 
   /**
    * Called to do some work on a link event.
-   * 
+   *
    * Note that DoVisitEvent is also called with this event.
    */
   virtual void DoVisitLinkEvent(const gd::LinkEvent& linkEvent) {};
@@ -188,6 +202,15 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
    */
   virtual void DoVisitInstruction(const gd::Instruction& instruction,
                                   bool isCondition) {};
+
+  /**
+   * Called to do some work on an expression of an event.
+   */
+  virtual void DoVisitEventExpression(const gd::Expression& expression,
+                                      const gd::ParameterMetadata& metadata) {
+  }
+
+  bool shouldStopIteration;
 };
 
 /**
@@ -202,8 +225,7 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
     : public ReadOnlyArbitraryEventsWorker {
  public:
   ReadOnlyArbitraryEventsWorkerWithContext()
-      : currentGlobalObjectsContainer(nullptr),
-        currentObjectsContainer(nullptr){};
+      : projectScopedContainers(nullptr){};
   virtual ~ReadOnlyArbitraryEventsWorkerWithContext();
 
   /**
@@ -211,30 +233,22 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(const gd::EventsList& events,
-              const gd::ObjectsContainer& globalObjectsContainer_,
-              const gd::ObjectsContainer& objectsContainer_) {
-    currentGlobalObjectsContainer = &globalObjectsContainer_;
-    currentObjectsContainer = &objectsContainer_;
+              const gd::ProjectScopedContainers& projectScopedContainers_) {
+    projectScopedContainers = &projectScopedContainers_;
     ReadOnlyArbitraryEventsWorker::Launch(events);
   };
 
   void Launch(gd::EventsList& events) = delete;
 
  protected:
-  const gd::ObjectsContainer& GetGlobalObjectsContainer() {
+  const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *currentGlobalObjectsContainer;
-  };
-  const gd::ObjectsContainer& GetObjectsContainer() {
-    // Pointers are guaranteed to be not nullptr after
-    // Launch was called.
-    return *currentObjectsContainer;
+    return *projectScopedContainers;
   };
 
  private:
-  const gd::ObjectsContainer* currentGlobalObjectsContainer;
-  const gd::ObjectsContainer* currentObjectsContainer;
+  const gd::ProjectScopedContainers* projectScopedContainers;
 };
 
 }  // namespace gd

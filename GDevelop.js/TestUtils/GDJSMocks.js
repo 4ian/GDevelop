@@ -1,5 +1,20 @@
 /** A minimal RuntimeBehavior base class */
-class RuntimeBehavior {}
+class RuntimeBehavior {
+  /**
+   * @param {RuntimeScene} instanceContainer The container owning the object of the behavior
+   * @param {any} behaviorData The properties used to setup the behavior
+   * @param {RuntimeObject} owner The object owning the behavior
+   */
+  constructor(
+    runtimeScene,
+    behaviorData,
+    owner
+  ) {
+    this.name = behaviorData.name || '';
+    this.type = behaviorData.type || '';
+    this.owner = owner;
+  }
+}
 
 /** A minimal implementation of OnceTriggers */
 function OnceTriggers() {
@@ -128,7 +143,7 @@ class Variable {
   }
 
   /**
-   * @param {string} childName 
+   * @param {string} childName
    * @returns {Variable}
    */
   getChild(childName) {
@@ -175,10 +190,10 @@ class Variable {
   }
 
   /**
-   * 
-   * @param {Variable} source 
-   * @param {Variable} target 
-   * @param {?boolean} merge 
+   *
+   * @param {Variable} source
+   * @param {Variable} target
+   * @param {?boolean} merge
    * @returns {Variable}
    */
   static copy(
@@ -210,7 +225,7 @@ class VariablesContainer {
   }
 
   /**
-   * @param {string} name 
+   * @param {string} name
    * @returns {Variable}
    */
   get(name) {
@@ -232,6 +247,7 @@ class RuntimeObject {
     this.name = objectData.name || '';
     this._variables = new VariablesContainer();
     this._livingOnScene = true;
+    this._behaviors = new Map();
 
     /** @type {Set<() => void>} */
     this.destroyCallbacks = new Set();
@@ -283,6 +299,18 @@ class RuntimeObject {
   doFakeAsyncAction() {
     this._task = new FakeAsyncTask();
     return this._task;
+  }
+
+  /** @param {RuntimeBehavior} behavior */
+  addBehavior(behavior) {
+    this._behaviors.set(behavior.name, behavior);
+  }
+
+  /** @param {string} behaviorName */
+  getBehavior(behaviorName) {
+    const behavior = this._behaviors.get(behaviorName);
+    if (!behavior) throw new Error(`No behavior called ${behaviorName} found.`);
+    return behavior;
   }
 
   noop() {}
@@ -536,7 +564,7 @@ class RuntimeScene {
   }
 
   getInitialSharedDataForBehavior(name) {
-    return null;
+    return {};
   }
 
   getScene() {

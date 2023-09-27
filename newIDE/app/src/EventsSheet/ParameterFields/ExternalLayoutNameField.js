@@ -40,7 +40,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // If the current value is not in the list of layouts, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInLayoutsList
+      (!!props.value && !isCurrentValueInLayoutsList) ||
+        props.scope.eventsFunctionsExtension
     );
 
     const switchFieldType = () => {

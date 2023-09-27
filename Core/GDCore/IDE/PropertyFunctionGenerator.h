@@ -16,7 +16,7 @@ class EventsBasedObject;
 class AbstractEventsBasedEntity;
 class PropertyDescriptor;
 class NamedPropertyDescriptor;
-} // namespace gd
+}  // namespace gd
 
 namespace gd {
 
@@ -24,22 +24,24 @@ namespace gd {
  * \brief Generate a getter and a setter functions for properties.
  */
 class GD_CORE_API PropertyFunctionGenerator {
-public:
+ public:
   /**
    * \brief Generate a getter and a setter for the given behavior property.
    */
   static void GenerateBehaviorGetterAndSetter(
-      gd::Project &project, gd::EventsFunctionsExtension &extension,
+      gd::Project &project,
+      gd::EventsFunctionsExtension &extension,
       gd::EventsBasedBehavior &eventsBasedBehavior,
-      const gd::NamedPropertyDescriptor &property, bool isSharedProperties);
+      const gd::NamedPropertyDescriptor &property,
+      bool isSharedProperties);
   /**
    * \brief Generate a getter and a setter for the given object property.
    */
-  static void
-  GenerateObjectGetterAndSetter(gd::Project &project,
-                                gd::EventsFunctionsExtension &extension,
-                                gd::EventsBasedObject &eventsBasedObject,
-                                const gd::NamedPropertyDescriptor &property);
+  static void GenerateObjectGetterAndSetter(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &extension,
+      gd::EventsBasedObject &eventsBasedObject,
+      const gd::NamedPropertyDescriptor &property);
   static bool CanGenerateGetterAndSetter(
       const gd::AbstractEventsBasedEntity &eventsBasedEntity,
       const gd::NamedPropertyDescriptor &property);
@@ -50,23 +52,26 @@ public:
   static void GenerateConditionSkeleton(gd::Project &project,
                                         gd::EventsFunction &eventFunction);
 
-  ~PropertyFunctionGenerator();
+  ~PropertyFunctionGenerator(){};
 
-private:
+ private:
   static void GenerateGetterAndSetter(
-      gd::Project &project, gd::EventsFunctionsExtension &extension,
+      gd::Project &project,
+      gd::EventsFunctionsExtension &extension,
       gd::AbstractEventsBasedEntity &eventsBasedEntity,
-      const gd::NamedPropertyDescriptor &property, const gd::String &objectType,
-      bool isBehavior, bool isSharedProperties);
+      const gd::NamedPropertyDescriptor &property,
+      const gd::String &objectType,
+      bool isBehavior,
+      bool isSharedProperties);
 
   static gd::String CapitalizeFirstLetter(const gd::String &string);
   static gd::String UnCapitalizeFirstLetter(const gd::String &string);
-  static gd::String
-  GetStringifiedExtraInfo(const gd::PropertyDescriptor &property);
+  static gd::String GetStringifiedExtraInfo(
+      const gd::PropertyDescriptor &property);
 
   PropertyFunctionGenerator();
 };
 
-} // namespace gd
+}  // namespace gd
 
-#endif // GDCORE_PROPERTYFUNCTIONGENERATOR_H
+#endif  // GDCORE_PROPERTYFUNCTIONGENERATOR_H

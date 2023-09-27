@@ -10,6 +10,7 @@ import AuthenticatedUserContext, {
 import {
   fakeAuthenticatedUserLoggingIn,
   fakeSilverAuthenticatedUser,
+  fakeSilverButCancelAtPeriodEndAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
   fakeNotAuthenticatedUser,
   fakeAuthenticatedUserWithValidSilverRedemptionCode,
@@ -17,6 +18,8 @@ import {
   fakeAuthenticatedUserWithLegacyIndieSubscription,
   fakeGoldAuthenticatedUser,
   fakeAuthenticatedUserWithLegacyProSubscription,
+  fakeAuthenticatedUserWithEducationPlan,
+  fakeStartupAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
@@ -63,8 +66,24 @@ export const WithSilverSubscription = () => (
   <SubscriptionDialogWrapper authenticatedUser={fakeSilverAuthenticatedUser} />
 );
 
+export const WithSilverButCancelAtPeriodEndSubscription = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeSilverButCancelAtPeriodEndAuthenticatedUser}
+  />
+);
+
 export const WithGoldSubscription = () => (
   <SubscriptionDialogWrapper authenticatedUser={fakeGoldAuthenticatedUser} />
+);
+
+export const WithStartupSubscription = () => (
+  <SubscriptionDialogWrapper authenticatedUser={fakeStartupAuthenticatedUser} />
+);
+
+export const WithEducationPlan = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithEducationPlan}
+  />
 );
 
 export const WithValidSilverRedemptionCodeSubscription = () => (

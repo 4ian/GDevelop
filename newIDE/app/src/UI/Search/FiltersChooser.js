@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import capitalize from 'lodash/capitalize';
 import {
   type Filters,
   type TagsTreeNode,
@@ -69,12 +70,6 @@ export const useFilters = (): FiltersState => {
       setChosenFilters(newChosenFilters);
     },
   };
-};
-
-const capitalize = (str: string) => {
-  if (!str) return '';
-
-  return str[0].toUpperCase() + str.substr(1);
 };
 
 type Props = {|

@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js-legacy';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 
 /**
- * RenderedInstance is the base class used for creating renderers of instances,
+ * RenderedInstance is the base class used for creating 2D renderers of instances,
  * which display on the scene editor, using Pixi.js, the instance of an object (see InstancesEditor).
  */
 export default class RenderedInstance {
@@ -13,7 +13,7 @@ export default class RenderedInstance {
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
-  _pixiObject: any;
+  _pixiObject: PIXI.DisplayObject;
   wasUsed: boolean;
 
   constructor(
@@ -38,7 +38,7 @@ export default class RenderedInstance {
    * Convert an angle from degrees to radians.
    */
   static toRad(angleInDegrees: number) {
-    return (angleInDegrees / 180) * 3.14159;
+    return (angleInDegrees / 180) * Math.PI;
   }
 
   /**
@@ -48,11 +48,11 @@ export default class RenderedInstance {
     //Nothing to do.
   }
 
-  getPixiObject() {
+  getPixiObject(): PIXI.DisplayObject | null {
     return this._pixiObject;
   }
 
-  getInstance() {
+  getInstance(): gdInitialInstance {
     return this._instance;
   }
 
@@ -61,44 +61,66 @@ export default class RenderedInstance {
    * the scene. The PIXI object should probably be removed from the container: This is what
    * the default implementation of the method does.
    */
-  onRemovedFromScene() {
+  onRemovedFromScene(): void {
     if (this._pixiObject !== null)
       this._pixiContainer.removeChild(this._pixiObject);
   }
 
-  getOriginX() {
+  getOriginX(): number {
     return 0;
   }
 
-  getOriginY() {
+  getOriginY(): number {
     return 0;
   }
 
-  getCenterX() {
-    if (this._instance.hasCustomSize())
-      return this._instance.getCustomWidth() / 2;
-
-    return this.getDefaultWidth() / 2;
+  getCenterX(): number {
+    return this.getWidth() / 2;
   }
 
-  getCenterY() {
-    if (this._instance.hasCustomSize())
-      return this._instance.getCustomHeight() / 2;
+  getCenterY(): number {
+    return this.getHeight() / 2;
+  }
 
-    return this.getDefaultHeight() / 2;
+  getCustomWidth(): number {
+    return this._instance.getCustomWidth();
+  }
+
+  getCustomHeight(): number {
+    return this._instance.getCustomHeight();
+  }
+
+  getWidth(): number {
+    return this._instance.hasCustomSize()
+      ? this.getCustomWidth()
+      : this.getDefaultWidth();
+  }
+
+  getHeight(): number {
+    return this._instance.hasCustomSize()
+      ? this.getCustomHeight()
+      : this.getDefaultHeight();
+  }
+
+  getDepth(): number {
+    return 0;
   }
 
   /**
    * Return the width of the instance when the instance doesn't have a custom size.
    */
-  getDefaultWidth() {
+  getDefaultWidth(): number {
     return 32;
   }
 
   /**
    * Return the height of the instance when the instance doesn't have a custom size.
    */
-  getDefaultHeight() {
+  getDefaultHeight(): number {
     return 32;
+  }
+
+  getDefaultDepth(): number {
+    return 0;
   }
 }

@@ -42,8 +42,10 @@ export const fetchRelativeResourcesToFullUrls = async ({
   let fetchedResourcesCount = 0;
   const resourcesToFetch = allResourceNames.filter(resourceName => {
     const resource = resourcesManager.getResource(resourceName);
+    const isResourceAnUrl = isURL(resource.getFile());
 
-    return !isURL(resource.getFile());
+    // We fetch all resources that are not URLs.
+    return !isResourceAnUrl;
   });
 
   await PromisePool.withConcurrency(20)

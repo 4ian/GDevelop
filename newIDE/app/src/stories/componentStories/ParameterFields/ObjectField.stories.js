@@ -23,7 +23,7 @@ export const Default = () => (
     render={(value, onChange) => (
       <ObjectField
         project={testProject.project}
-        scope={{ layout: testProject.testLayout }}
+        scope={{ project: testProject.project, layout: testProject.testLayout }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
         value={value}
@@ -39,7 +39,7 @@ export const NonExistingObject = () => (
     render={(value, onChange) => (
       <ObjectField
         project={testProject.project}
-        scope={{ layout: testProject.testLayout }}
+        scope={{ project: testProject.project, layout: testProject.testLayout }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
         value={value}
@@ -68,7 +68,10 @@ export const WrongObjectType = () => {
       render={(value, onChange) => (
         <ObjectField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           instructionMetadata={instructionMetadata}
@@ -83,16 +86,11 @@ export const WrongObjectType = () => {
 };
 WrongObjectType.storyName = 'Error: wrong object type';
 
-export const WithRequiredCapability = () => {
+export const WithRequiredBehavior = () => {
   const instructionMetadata = gd.MetadataProvider.getActionMetadata(
     gd.JsPlatform.get(),
-    'EnableEffect'
+    'EffectCapability::EffectBehavior::EnableEffect'
   );
-  if (instructionMetadata.getRequiredBaseObjectCapability() !== 'effect') {
-    throw new Error(
-      "The required base object capability is not 'effect' for the instruction used in this story."
-    );
-  }
 
   return (
     <ValueStateHolder
@@ -100,10 +98,14 @@ export const WithRequiredCapability = () => {
       render={(value, onChange) => (
         <ObjectField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           instructionMetadata={instructionMetadata}
+          parameterIndex={0}
           value={value}
           onChange={onChange}
         />
@@ -111,5 +113,5 @@ export const WithRequiredCapability = () => {
     />
   );
 };
-WithRequiredCapability.storyName =
+WithRequiredBehavior.storyName =
   'Error: object not having a required capability';

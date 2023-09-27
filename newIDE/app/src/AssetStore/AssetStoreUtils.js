@@ -4,7 +4,10 @@ import {
   type PrivateAssetPack,
   type PublicAssetPack,
 } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 
 /**
  * A simple slug generator that allows to link to asset packs on
@@ -37,14 +40,14 @@ const getPublicAssetPackUserFriendlySlug = (
   return `${slugify(publicAssetPack.name)}-${slugify(publicAssetPack.tag)}`;
 };
 
-const getIdFromPrivateAssetPackUserFriendlySlug = (slug: string) =>
+const getIdFromPrivateProductUserFriendlySlug = (slug: string) =>
   slug.slice(-36);
 
 const findPublicAssetPackWithUserFriendlySlug = (
-  publisAssetPacks: PublicAssetPacks,
+  publicAssetPacks: PublicAssetPacks,
   userFriendlySlug: string
 ): PublicAssetPack | null => {
-  for (const publicAssetPack of publisAssetPacks.starterPacks) {
+  for (const publicAssetPack of publicAssetPacks.starterPacks) {
     const publicAssetPackUserFriendlySlug = getPublicAssetPackUserFriendlySlug(
       publicAssetPack
     );
@@ -64,7 +67,7 @@ export const getAssetPackFromUserFriendlySlug = ({
   publicAssetPacks: PublicAssetPacks,
   userFriendlySlug: string,
 |}): PublicAssetPack | PrivateAssetPack | null => {
-  const receivedAssetPackId = getIdFromPrivateAssetPackUserFriendlySlug(
+  const receivedAssetPackId = getIdFromPrivateProductUserFriendlySlug(
     userFriendlySlug
   );
   const receivedAssetPack = receivedAssetPacks.find(
@@ -81,20 +84,38 @@ export const getAssetPackFromUserFriendlySlug = ({
   return null;
 };
 
-export const getPrivateAssetPackListingData = ({
-  privateAssetPacks,
+export const getPrivateAssetPackListingDataFromUserFriendlySlug = ({
+  privateAssetPackListingDatas,
   userFriendlySlug,
 }: {|
-  privateAssetPacks: Array<PrivateAssetPackListingData>,
+  privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   userFriendlySlug: string,
 |}): ?PrivateAssetPackListingData => {
-  const privateAssetPackId = getIdFromPrivateAssetPackUserFriendlySlug(
+  const privateAssetPackId = getIdFromPrivateProductUserFriendlySlug(
     userFriendlySlug
   );
-  const privateAssetPack = privateAssetPacks.find(
+  const privateAssetPackListingData = privateAssetPackListingDatas.find(
     privateAssetPack => privateAssetPackId === privateAssetPack.id
   );
-  if (privateAssetPack) return privateAssetPack;
+  if (privateAssetPackListingData) return privateAssetPackListingData;
+
+  return null;
+};
+
+export const getPrivateGameTemplateListingDataFromUserFriendlySlug = ({
+  privateGameTemplateListingDatas,
+  userFriendlySlug,
+}: {|
+  privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
+  userFriendlySlug: string,
+|}): ?PrivateGameTemplateListingData => {
+  const privateGameTemplateId = getIdFromPrivateProductUserFriendlySlug(
+    userFriendlySlug
+  );
+  const privateGameTemplateListingData = privateGameTemplateListingDatas.find(
+    privateGameTemplate => privateGameTemplateId === privateGameTemplate.id
+  );
+  if (privateGameTemplateListingData) return privateGameTemplateListingData;
 
   return null;
 };

@@ -59,6 +59,9 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   virtual void ExposeBitmapFont(gd::String& bitmapFontName) override {
     RenameIfNeeded(bitmapFontName);
   };
+  virtual void ExposeModel3D(gd::String& resourceName) override {
+    RenameIfNeeded(resourceName);
+  };
 
  private:
   void RenameIfNeeded(gd::String& resourceName) {

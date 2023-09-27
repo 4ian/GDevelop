@@ -2,11 +2,10 @@
 const gd: libGDevelop = global.gd;
 
 export const getInstancesInLayoutForObject = (
-  layout: gdLayout,
+  initialInstancesContainer: gdInitialInstancesContainer,
   objectName: string
 ): Array<gdInitialInstance> => {
-  const instances = layout.getInitialInstances();
-  if (instances.getInstancesCount() === 0) return [];
+  if (initialInstancesContainer.getInstancesCount() === 0) return [];
   const objectInstances = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe - invoke is not writable
@@ -21,17 +20,16 @@ export const getInstancesInLayoutForObject = (
     }
   };
   // $FlowFixMe - JSFunctor is incompatible with Functor
-  instances.iterateOverInstances(instanceGetter);
+  initialInstancesContainer.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
   return objectInstances;
 };
 
 export const getInstancesInLayoutForLayer = (
-  layout: gdLayout,
+  initialInstancesContainer: gdInitialInstancesContainer,
   layerName: string
 ): Array<gdInitialInstance> => {
-  const instances = layout.getInitialInstances();
-  if (instances.getInstancesCount() === 0) return [];
+  if (initialInstancesContainer.getInstancesCount() === 0) return [];
   const objectInstances = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe - invoke is not writable
@@ -46,21 +44,15 @@ export const getInstancesInLayoutForLayer = (
     }
   };
   // $FlowFixMe - JSFunctor is incompatible with Functor
-  instances.iterateOverInstances(instanceGetter);
+  initialInstancesContainer.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
   return objectInstances;
 };
 
 export const getInstanceCountInLayoutForObject = (
-  layout: gdLayout,
+  initialInstancesContainer: gdInitialInstancesContainer,
   objectName: string
 ): number => {
-  return getInstancesInLayoutForObject(layout, objectName).length;
-};
-
-export const getInstanceCountInLayoutForLayer = (
-  layout: gdLayout,
-  layerName: string
-): number => {
-  return getInstancesInLayoutForLayer(layout, layerName).length;
+  return getInstancesInLayoutForObject(initialInstancesContainer, objectName)
+    .length;
 };

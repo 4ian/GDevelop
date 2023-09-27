@@ -4,7 +4,7 @@
     "module": "esnext",
     "noImplicitAny": true,
     "outDir": "./dist/tsc",
-    "target": "ES5",
+    "target": "ES2017",
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,

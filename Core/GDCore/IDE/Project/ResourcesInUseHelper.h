@@ -13,6 +13,7 @@
 
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/String.h"
+#include "GDCore/IDE/ResourceExposer.h"
 
 namespace gd {
 
@@ -23,7 +24,7 @@ namespace gd {
  * Usage example:
 \code
 gd::ResourcesInUseHelper resourcesInUse;
-project.ExposeResources(resourcesInUse);
+gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesInUse);
 
 //Get a set with the name of all images in the project:
 std::set<gd::String> & usedImages = resourcesInUse.GetAllImages();
@@ -44,6 +45,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String>& GetAllTilesets() { return GetAll("tileset"); };
   std::set<gd::String>& GetAllVideos() { return GetAll("video"); };
   std::set<gd::String>& GetAllBitmapFonts() { return GetAll("bitmapFont"); };
+  std::set<gd::String>& GetAll3DModels() { return GetAll("model3D"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
     if (resourceType == "image") return allImages;
     if (resourceType == "audio") return allAudios;
@@ -53,6 +55,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
     if (resourceType == "tileset") return allTilesets;
     if (resourceType == "video") return allVideos;
     if (resourceType == "bitmapFont") return allBitmapFonts;
+    if (resourceType == "model3D") return allModel3Ds;
 
     return emptyResources;
   };
@@ -84,6 +87,9 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   virtual void ExposeBitmapFont(gd::String& bitmapFontResourceName) override {
     allBitmapFonts.insert(bitmapFontResourceName);
   };
+  virtual void ExposeModel3D(gd::String& resourceName) override {
+    allModel3Ds.insert(resourceName);
+  };
 
  protected:
   std::set<gd::String> allImages;
@@ -94,6 +100,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String> allTilesets;
   std::set<gd::String> allVideos;
   std::set<gd::String> allBitmapFonts;
+  std::set<gd::String> allModel3Ds;
   std::set<gd::String> emptyResources;
 };
 

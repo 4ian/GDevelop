@@ -84,7 +84,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // If the current value is not in the list of animation names, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInEffectParameterNamesList
+      (!!props.value && !isCurrentValueInEffectParameterNamesList) ||
+        props.scope.eventsFunctionsExtension
     );
 
     const switchFieldType = () => {
@@ -158,13 +159,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          isExpressionField ? (
+          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
             <FlatButton
               id="switch-expression-select"
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select an Effect Parameter</Trans>}
+              label={<Trans>Select an Effect Property</Trans>}
               onClick={switchFieldType}
             />
           ) : (

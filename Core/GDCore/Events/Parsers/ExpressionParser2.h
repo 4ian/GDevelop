@@ -18,6 +18,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GrammarTerminals.h"
 namespace gd {
 class Expression;
 class ObjectsContainer;
@@ -27,6 +28,8 @@ class ExpressionMetadata;
 }  // namespace gd
 
 namespace gd {
+
+using namespace gd::GrammarTerminals;
 
 /** \brief Parse an expression, returning a tree of node corresponding
  * to the parsed expression.
@@ -44,14 +47,9 @@ class GD_CORE_API ExpressionParser2 {
   virtual ~ExpressionParser2(){};
 
   /**
-   * Parse the given expression with the specified type.
+   * Parse the given expression into a tree of nodes.
    *
-   * \param type Type of the expression: "string", "number",
-   * type supported by gd::ParameterMetadata::IsObject, types supported by
-   * gd::ParameterMetadata::IsExpression or "unknown".
-   * \param expression The expression to parse
-   * \param objectName Specify the object name, only for the
-   * case of "objectvar" type.
+   * \param expression The expression to parse.
    *
    * \return The node representing the expression as a parsed tree.
    */
@@ -211,7 +209,7 @@ class GD_CORE_API ExpressionParser2 {
       }
       SkipIfChar(IsClosingParenthesis);
       return factor;
-    } else if (IsIdentifierAllowedChar()) {
+    } else if (CheckIfChar(IsAllowedInIdentifier)) {
       return Identifier();
     }
 
@@ -264,12 +262,11 @@ class GD_CORE_API ExpressionParser2 {
     } else if (CheckIfChar(IsDot)) {
       ExpressionParserLocation dotLocation = SkipChar();
       SkipAllWhitespaces();
-      return ObjectFunctionOrBehaviorFunction(
+      return ObjectFunctionOrBehaviorFunctionOrVariable(
           name, nameLocation, dotLocation);
     } else if (CheckIfChar(IsOpeningSquareBracket)) {
       return Variable(name, nameLocation);
-    }
-    else {
+    } else {
       auto identifier = gd::make_unique<IdentifierNode>(name);
       identifier->location = ExpressionParserLocation(
           nameLocation.GetStartPosition(), GetCurrentPosition());
@@ -315,7 +312,7 @@ class GD_CORE_API ExpressionParser2 {
       auto dotLocation = SkipChar();
       SkipAllWhitespaces();
 
-      auto identifierAndLocation = ReadIdentifierName();
+      auto identifierAndLocation = ReadIdentifierName(/*allowDeprecatedSpacesInName=*/ false);
       auto child =
           gd::make_unique<VariableAccessorNode>(identifierAndLocation.name);
       child->child = VariableAccessorOrVariableBracketAccessor();
@@ -355,11 +352,11 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
-  ObjectFunctionOrBehaviorFunction(
+  ObjectFunctionOrBehaviorFunctionOrVariable(
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,
       const ExpressionParserLocation &parentIdentifierDotLocation) {
-    auto childIdentifierAndLocation = ReadIdentifierName();
+    auto childIdentifierAndLocation = ReadIdentifierName(/*allowDeprecatedSpacesInName=*/ false);
     const gd::String &childIdentifierName = childIdentifierAndLocation.name;
     const auto &childIdentifierNameLocation =
         childIdentifierAndLocation.location;
@@ -417,12 +414,6 @@ class GD_CORE_API ExpressionParser2 {
 
     auto node = gd::make_unique<IdentifierNode>(
         parentIdentifier, childIdentifierName);
-    if (!CheckIfChar(IsParameterSeparator) && !CheckIfChar(IsClosingParenthesis) && !IsEndReached()) {
-      node->diagnostic = RaiseSyntaxError(
-          _("An opening parenthesis (for an object expression), a double colon "
-            "(:: for a behavior expression), a dot or an opening bracket (for "
-            "a child variable) where expected."));
-    }
     node->location = ExpressionParserLocation(
         parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());
     node->identifierNameLocation = parentIdentifierLocation;
@@ -606,95 +597,6 @@ class GD_CORE_API ExpressionParser2 {
     return predicate(character);
   }
 
-  bool IsIdentifierAllowedChar() {
-    if (currentPosition >= expression.size()) return false;
-    gd::String::value_type character = expression[currentPosition];
-
-    // Quickly compare if the character is a number or ASCII character.
-    if ((character >= '0' && character <= '9') ||
-        (character >= 'A' && character <= 'Z') ||
-        (character >= 'a' && character <= 'z'))
-      return true;
-
-    // Otherwise do the full check against separators forbidden in identifiers.
-    if (!IsParameterSeparator(character) && !IsDot(character) &&
-        !IsQuote(character) && !IsBracket(character) &&
-        !IsExpressionOperator(character) && !IsTermOperator(character)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  static bool IsWhitespace(gd::String::value_type character) {
-    return character == ' ' || character == '\n' || character == '\r';
-  }
-
-  static bool IsParameterSeparator(gd::String::value_type character) {
-    return character == ',';
-  }
-
-  static bool IsDot(gd::String::value_type character) {
-    return character == '.';
-  }
-
-  static bool IsQuote(gd::String::value_type character) {
-    return character == '"';
-  }
-
-  static bool IsBracket(gd::String::value_type character) {
-    return character == '(' || character == ')' || character == '[' ||
-           character == ']' || character == '{' || character == '}';
-  }
-
-  static bool IsOpeningParenthesis(gd::String::value_type character) {
-    return character == '(';
-  }
-
-  static bool IsClosingParenthesis(gd::String::value_type character) {
-    return character == ')';
-  }
-
-  static bool IsOpeningSquareBracket(gd::String::value_type character) {
-    return character == '[';
-  }
-
-  static bool IsClosingSquareBracket(gd::String::value_type character) {
-    return character == ']';
-  }
-
-  static bool IsExpressionEndingChar(gd::String::value_type character) {
-    return character == ',' || IsClosingParenthesis(character) ||
-           IsClosingSquareBracket(character);
-  }
-
-  static bool IsExpressionOperator(gd::String::value_type character) {
-    return character == '+' || character == '-' || character == '<' ||
-           character == '>' || character == '?' || character == '^' ||
-           character == '=' || character == '\\' || character == ':' ||
-           character == '!';
-  }
-
-  static bool IsUnaryOperator(gd::String::value_type character) {
-    return character == '+' || character == '-';
-  }
-
-  static bool IsTermOperator(gd::String::value_type character) {
-    return character == '/' || character == '*';
-  }
-
-  static bool IsNumberFirstChar(gd::String::value_type character) {
-    return character == '.' || (character >= '0' && character <= '9');
-  }
-
-  static bool IsNonZeroDigit(gd::String::value_type character) {
-    return (character >= '1' && character <= '9');
-  }
-
-  static bool IsZeroDigit(gd::String::value_type character) {
-    return character == '0';
-  }
-
   bool IsNamespaceSeparator() {
     // Namespace separator is a special kind of delimiter as it is 2 characters
     // long
@@ -711,13 +613,13 @@ class GD_CORE_API ExpressionParser2 {
     ExpressionParserLocation location;
   };
 
-  IdentifierAndLocation ReadIdentifierName() {
+  IdentifierAndLocation ReadIdentifierName(bool allowDeprecatedSpacesInName = true) {
     gd::String name;
     size_t startPosition = currentPosition;
     while (currentPosition < expression.size() &&
-           (IsIdentifierAllowedChar()
+           (CheckIfChar(IsAllowedInIdentifier)
             // Allow whitespace in identifier name for compatibility
-            || expression[currentPosition] == ' ')) {
+            || (allowDeprecatedSpacesInName && expression[currentPosition] == ' '))) {
       name += expression[currentPosition];
       currentPosition++;
     }

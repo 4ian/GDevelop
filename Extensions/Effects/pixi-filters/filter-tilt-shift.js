@@ -1,171 +1,57 @@
 /*!
- * @pixi/filter-tilt-shift - v3.1.1
- * Compiled Wed, 08 Apr 2020 11:09:37 UTC
+ * @pixi/filter-tilt-shift - v5.2.0
+ * Compiled Thu, 31 Aug 2023 09:18:38 UTC
  *
  * @pixi/filter-tilt-shift is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
- */
-// This was patched to add the missing "clearMode" argument in some functions.
-var __filters = (function (t, r, i) {
-  'use strict';
-  var e =
-      'attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}',
-    n =
-      'varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform float blur;\nuniform float gradientBlur;\nuniform vec2 start;\nuniform vec2 end;\nuniform vec2 delta;\nuniform vec2 texSize;\n\nfloat random(vec3 scale, float seed)\n{\n    return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);\n}\n\nvoid main(void)\n{\n    vec4 color = vec4(0.0);\n    float total = 0.0;\n\n    float offset = random(vec3(12.9898, 78.233, 151.7182), 0.0);\n    vec2 normal = normalize(vec2(start.y - end.y, end.x - start.x));\n    float radius = smoothstep(0.0, 1.0, abs(dot(vTextureCoord * texSize - start, normal)) / gradientBlur) * blur;\n\n    for (float t = -30.0; t <= 30.0; t++)\n    {\n        float percent = (t + offset - 0.5) / 30.0;\n        float weight = 1.0 - abs(percent);\n        vec4 sample = texture2D(uSampler, vTextureCoord + delta / texSize * percent * radius);\n        sample.rgb *= sample.a;\n        color += sample * weight;\n        total += weight;\n    }\n\n    color /= total;\n    color.rgb /= color.a + 0.00001;\n\n    gl_FragColor = color;\n}\n',
-    o = (function (t) {
-      function r(r, o, l, u) {
-        void 0 === r && (r = 100),
-          void 0 === o && (o = 600),
-          void 0 === l && (l = null),
-          void 0 === u && (u = null),
-          t.call(this, e, n),
-          (this.uniforms.blur = r),
-          (this.uniforms.gradientBlur = o),
-          (this.uniforms.start = l || new i.Point(0, window.innerHeight / 2)),
-          (this.uniforms.end = u || new i.Point(600, window.innerHeight / 2)),
-          (this.uniforms.delta = new i.Point(30, 30)),
-          (this.uniforms.texSize = new i.Point(
-            window.innerWidth,
-            window.innerHeight
-          )),
-          this.updateDelta();
-      }
-      t && (r.__proto__ = t),
-        (r.prototype = Object.create(t && t.prototype)),
-        (r.prototype.constructor = r);
-      var o = {
-        blur: { configurable: !0 },
-        gradientBlur: { configurable: !0 },
-        start: { configurable: !0 },
-        end: { configurable: !0 },
-      };
-      return (
-        (r.prototype.updateDelta = function () {
-          (this.uniforms.delta.x = 0), (this.uniforms.delta.y = 0);
-        }),
-        (o.blur.get = function () {
-          return this.uniforms.blur;
-        }),
-        (o.blur.set = function (t) {
-          this.uniforms.blur = t;
-        }),
-        (o.gradientBlur.get = function () {
-          return this.uniforms.gradientBlur;
-        }),
-        (o.gradientBlur.set = function (t) {
-          this.uniforms.gradientBlur = t;
-        }),
-        (o.start.get = function () {
-          return this.uniforms.start;
-        }),
-        (o.start.set = function (t) {
-          (this.uniforms.start = t), this.updateDelta();
-        }),
-        (o.end.get = function () {
-          return this.uniforms.end;
-        }),
-        (o.end.set = function (t) {
-          (this.uniforms.end = t), this.updateDelta();
-        }),
-        Object.defineProperties(r.prototype, o),
-        r
-      );
-    })(r.Filter),
-    l = (function (t) {
-      function r() {
-        t.apply(this, arguments);
-      }
-      return (
-        t && (r.__proto__ = t),
-        (r.prototype = Object.create(t && t.prototype)),
-        (r.prototype.constructor = r),
-        (r.prototype.updateDelta = function () {
-          var t = this.uniforms.end.x - this.uniforms.start.x,
-            r = this.uniforms.end.y - this.uniforms.start.y,
-            i = Math.sqrt(t * t + r * r);
-          (this.uniforms.delta.x = t / i), (this.uniforms.delta.y = r / i);
-        }),
-        r
-      );
-    })(o),
-    u = (function (t) {
-      function r() {
-        t.apply(this, arguments);
-      }
-      return (
-        t && (r.__proto__ = t),
-        (r.prototype = Object.create(t && t.prototype)),
-        (r.prototype.constructor = r),
-        (r.prototype.updateDelta = function () {
-          var t = this.uniforms.end.x - this.uniforms.start.x,
-            r = this.uniforms.end.y - this.uniforms.start.y,
-            i = Math.sqrt(t * t + r * r);
-          (this.uniforms.delta.x = -r / i), (this.uniforms.delta.y = t / i);
-        }),
-        r
-      );
-    })(o),
-    s = (function (t) {
-      function r(r, i, e, n) {
-        void 0 === r && (r = 100),
-          void 0 === i && (i = 600),
-          void 0 === e && (e = null),
-          void 0 === n && (n = null),
-          t.call(this),
-          (this.tiltShiftXFilter = new l(r, i, e, n)),
-          (this.tiltShiftYFilter = new u(r, i, e, n));
-      }
-      t && (r.__proto__ = t),
-        (r.prototype = Object.create(t && t.prototype)),
-        (r.prototype.constructor = r);
-      var i = {
-        blur: { configurable: !0 },
-        gradientBlur: { configurable: !0 },
-        start: { configurable: !0 },
-        end: { configurable: !0 },
-      };
-      return (
-        (r.prototype.apply = function (t, r, i, clearMode) {
-          var e = t.getFilterTexture();
-          // Patch missing clearMode.
-          this.tiltShiftXFilter.apply(t, r, e, clearMode),
-            this.tiltShiftYFilter.apply(t, e, i, clearMode),
-            t.returnFilterTexture(e);
-        }),
-        (i.blur.get = function () {
-          return this.tiltShiftXFilter.blur;
-        }),
-        (i.blur.set = function (t) {
-          this.tiltShiftXFilter.blur = this.tiltShiftYFilter.blur = t;
-        }),
-        (i.gradientBlur.get = function () {
-          return this.tiltShiftXFilter.gradientBlur;
-        }),
-        (i.gradientBlur.set = function (t) {
-          this.tiltShiftXFilter.gradientBlur = this.tiltShiftYFilter.gradientBlur = t;
-        }),
-        (i.start.get = function () {
-          return this.tiltShiftXFilter.start;
-        }),
-        (i.start.set = function (t) {
-          this.tiltShiftXFilter.start = this.tiltShiftYFilter.start = t;
-        }),
-        (i.end.get = function () {
-          return this.tiltShiftXFilter.end;
-        }),
-        (i.end.set = function (t) {
-          this.tiltShiftXFilter.end = this.tiltShiftYFilter.end = t;
-        }),
-        Object.defineProperties(r.prototype, i),
-        r
-      );
-    })(r.Filter);
-  return (
-    (t.TiltShiftAxisFilter = o),
-    (t.TiltShiftFilter = s),
-    (t.TiltShiftXFilter = l),
-    (t.TiltShiftYFilter = u),
-    t
-  );
-})({}, PIXI, PIXI);
-Object.assign(PIXI.filters, __filters);
+ */var __filters=function(s,n){"use strict";var h=`attribute vec2 aVertexPosition;
+attribute vec2 aTextureCoord;
+
+uniform mat3 projectionMatrix;
+
+varying vec2 vTextureCoord;
+
+void main(void)
+{
+    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+    vTextureCoord = aTextureCoord;
+}`,m=`varying vec2 vTextureCoord;
+
+uniform sampler2D uSampler;
+uniform float blur;
+uniform float gradientBlur;
+uniform vec2 start;
+uniform vec2 end;
+uniform vec2 delta;
+uniform vec2 texSize;
+
+float random(vec3 scale, float seed)
+{
+    return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);
+}
+
+void main(void)
+{
+    vec4 color = vec4(0.0);
+    float total = 0.0;
+
+    float offset = random(vec3(12.9898, 78.233, 151.7182), 0.0);
+    vec2 normal = normalize(vec2(start.y - end.y, end.x - start.x));
+    float radius = smoothstep(0.0, 1.0, abs(dot(vTextureCoord * texSize - start, normal)) / gradientBlur) * blur;
+
+    for (float t = -30.0; t <= 30.0; t++)
+    {
+        float percent = (t + offset - 0.5) / 30.0;
+        float weight = 1.0 - abs(percent);
+        vec4 sample = texture2D(uSampler, vTextureCoord + delta / texSize * percent * radius);
+        sample.rgb *= sample.a;
+        color += sample * weight;
+        total += weight;
+    }
+
+    color /= total;
+    color.rgb /= color.a + 0.00001;
+
+    gl_FragColor = color;
+}
+`;class l extends n.Filter{constructor(t){var e,r;super(h,m),this.uniforms.blur=t.blur,this.uniforms.gradientBlur=t.gradientBlur,this.uniforms.start=(e=t.start)!=null?e:new n.Point(0,window.innerHeight/2),this.uniforms.end=(r=t.end)!=null?r:new n.Point(600,window.innerHeight/2),this.uniforms.delta=new n.Point(30,30),this.uniforms.texSize=new n.Point(window.innerWidth,window.innerHeight),this.updateDelta()}updateDelta(){this.uniforms.delta.x=0,this.uniforms.delta.y=0}get blur(){return this.uniforms.blur}set blur(t){this.uniforms.blur=t}get gradientBlur(){return this.uniforms.gradientBlur}set gradientBlur(t){this.uniforms.gradientBlur=t}get start(){return this.uniforms.start}set start(t){this.uniforms.start=t,this.updateDelta()}get end(){return this.uniforms.end}set end(t){this.uniforms.end=t,this.updateDelta()}}class o extends l{updateDelta(){const t=this.uniforms.end.x-this.uniforms.start.x,e=this.uniforms.end.y-this.uniforms.start.y,r=Math.sqrt(t*t+e*e);this.uniforms.delta.x=t/r,this.uniforms.delta.y=e/r}}class u extends l{updateDelta(){const t=this.uniforms.end.x-this.uniforms.start.x,e=this.uniforms.end.y-this.uniforms.start.y,r=Math.sqrt(t*t+e*e);this.uniforms.delta.x=-e/r,this.uniforms.delta.y=t/r}}const d=class extends n.Filter{constructor(i,t,e,r){super(),typeof i=="number"&&(n.utils.deprecation("5.3.0","TiltShiftFilter constructor arguments is deprecated, use options."),i={blur:i,gradientBlur:t,start:e,end:r}),i=Object.assign({},d.defaults,i),this.tiltShiftXFilter=new o(i),this.tiltShiftYFilter=new u(i)}apply(i,t,e,r){const a=i.getFilterTexture();this.tiltShiftXFilter.apply(i,t,a,1),this.tiltShiftYFilter.apply(i,a,e,r),i.returnFilterTexture(a)}get blur(){return this.tiltShiftXFilter.blur}set blur(i){this.tiltShiftXFilter.blur=this.tiltShiftYFilter.blur=i}get gradientBlur(){return this.tiltShiftXFilter.gradientBlur}set gradientBlur(i){this.tiltShiftXFilter.gradientBlur=this.tiltShiftYFilter.gradientBlur=i}get start(){return this.tiltShiftXFilter.start}set start(i){this.tiltShiftXFilter.start=this.tiltShiftYFilter.start=i}get end(){return this.tiltShiftXFilter.end}set end(i){this.tiltShiftXFilter.end=this.tiltShiftYFilter.end=i}};let f=d;return f.defaults={blur:100,gradientBlur:600,start:void 0,end:void 0},s.TiltShiftAxisFilter=l,s.TiltShiftFilter=f,s.TiltShiftXFilter=o,s.TiltShiftYFilter=u,Object.defineProperty(s,"__esModule",{value:!0}),s}({},PIXI);Object.assign(PIXI.filters,__filters);

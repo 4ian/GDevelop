@@ -4,17 +4,39 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  export enum RuntimeLayerRenderingType {
+    TWO_D,
+    THREE_D,
+    TWO_D_PLUS_THREE_D,
+  }
+
+  const getRenderingTypeFromString = (
+    renderingTypeAsString: string | undefined
+  ) =>
+    renderingTypeAsString === '3d'
+      ? RuntimeLayerRenderingType.THREE_D
+      : renderingTypeAsString === '2d+3d' || renderingTypeAsString === ''
+      ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
+      : RuntimeLayerRenderingType.TWO_D;
+
   /**
-   * Represents a layer of a container, used to display objects.
-   *
-   * Viewports and multiple cameras are not supported.
+   * Represents a layer of a "container", used to display objects.
+   * The container can be a scene (see gdjs.Layer)
+   * or a custom object (see gdjs.RuntimeCustomObjectLayer).
    */
   export abstract class RuntimeLayer implements EffectsTarget {
     _name: string;
+    _renderingType: RuntimeLayerRenderingType;
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
     _hidden: boolean;
     _initialEffectsData: Array<EffectData>;
+
+    // TODO EBO Don't store scene layer related data in layers used by custom objects.
+    // (both these 3D settings and the lighting layer properties below).
+    _initialCamera3DFieldOfView: float;
+    _initialCamera3DFarPlaneDistance: float;
+    _initialCamera3DNearPlaneDistance: float;
 
     _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
@@ -24,7 +46,7 @@ namespace gdjs {
     _followBaseLayerCamera: boolean;
     _clearColor: Array<integer>;
 
-    _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
+    _rendererEffects: Record<string, gdjs.PixiFiltersTools.Filter> = {};
     _renderer: gdjs.LayerRenderer;
 
     /**
@@ -36,7 +58,13 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._name = layerData.name;
+      this._renderingType = getRenderingTypeFromString(layerData.renderingType);
       this._hidden = !layerData.visibility;
+      this._initialCamera3DFieldOfView = layerData.camera3DFieldOfView || 45;
+      this._initialCamera3DFarPlaneDistance =
+        layerData.camera3DFarPlaneDistance || 0.1;
+      this._initialCamera3DNearPlaneDistance =
+        layerData.camera3DNearPlaneDistance || 2000;
       this._initialEffectsData = layerData.effects || [];
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
@@ -51,7 +79,7 @@ namespace gdjs {
       this._renderer = new gdjs.LayerRenderer(
         this,
         instanceContainer.getRenderer(),
-        instanceContainer.getGame().getRenderer().getPIXIRenderer()
+        instanceContainer.getGame().getRenderer()
       );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
@@ -61,6 +89,18 @@ namespace gdjs {
 
     getRenderer(): gdjs.LayerRenderer {
       return this._renderer;
+    }
+
+    getRendererObject() {
+      return this._renderer.getRendererObject();
+    }
+
+    get3DRendererObject() {
+      return this._renderer.getThreeScene();
+    }
+
+    getRenderingType(): RuntimeLayerRenderingType {
+      return this._renderingType;
     }
 
     /**
@@ -200,6 +240,24 @@ namespace gdjs {
     abstract getCameraZoom(cameraId?: integer): float;
 
     /**
+     * Set the camera center Z position.
+     *
+     * @param z The new y position.
+     * @param fov The field of view.
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract setCameraZ(z: float, fov: float, cameraId?: integer): void;
+
+    /**
+     * Get the camera center Z position.
+     *
+     * @param fov The field of view.
+     * @param cameraId The camera number. Currently ignored.
+     * @return The z position of the camera
+     */
+    abstract getCameraZ(fov: float, cameraId?: integer): float;
+
+    /**
      * Get the rotation of the camera, expressed in degrees.
      *
      * @param cameraId The camera number. Currently ignored.
@@ -293,6 +351,16 @@ namespace gdjs {
       return this._runtimeScene.getViewportHeight();
     }
 
+    getInitialCamera3DFieldOfView(): float {
+      return this._initialCamera3DFieldOfView;
+    }
+    getInitialCamera3DNearPlaneDistance(): float {
+      return this._initialCamera3DNearPlaneDistance;
+    }
+    getInitialCamera3DFarPlaneDistance(): float {
+      return this._initialCamera3DFarPlaneDistance;
+    }
+
     /**
      * Return the initial effects data for the layer. Only to
      * be used by renderers.
@@ -307,12 +375,7 @@ namespace gdjs {
      * @param effectData The data of the effect to add.
      */
     addEffect(effectData: EffectData): void {
-      this._effectsManager.addEffect(
-        effectData,
-        this._rendererEffects,
-        this._renderer.getRendererObject(),
-        this
-      );
+      this._effectsManager.addEffect(effectData, this._rendererEffects, this);
     }
 
     /**
@@ -322,15 +385,15 @@ namespace gdjs {
     removeEffect(effectName: string): void {
       this._effectsManager.removeEffect(
         this._rendererEffects,
-        this._renderer.getRendererObject(),
+        this,
         effectName
       );
     }
 
     /**
-     * Change an effect parameter value (for parameters that are numbers).
+     * Change an effect property value (for properties that are numbers).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (number).
      */
     setEffectDoubleParameter(
@@ -347,9 +410,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are strings).
+     * Change an effect property value (for properties that are strings).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (string).
      */
     setEffectStringParameter(
@@ -366,9 +429,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are booleans).
+     * Change an effect property value (for properties that are booleans).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (boolean).
      */
     setEffectBooleanParameter(
@@ -390,7 +453,12 @@ namespace gdjs {
      * @param enable true to enable, false to disable
      */
     enableEffect(name: string, enable: boolean): void {
-      this._effectsManager.enableEffect(this._rendererEffects, name, enable);
+      this._effectsManager.enableEffect(
+        this._rendererEffects,
+        this,
+        name,
+        enable
+      );
     }
 
     /**
@@ -399,7 +467,11 @@ namespace gdjs {
      * @return true if the effect is enabled, false otherwise.
      */
     isEffectEnabled(name: string): boolean {
-      return this._effectsManager.isEffectEnabled(this._rendererEffects, name);
+      return this._effectsManager.isEffectEnabled(
+        this._rendererEffects,
+        this,
+        name
+      );
     }
 
     /**

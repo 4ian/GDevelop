@@ -13,13 +13,18 @@
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/Project/VariablesContainersList.h"
 
 namespace gd {
 class Expression;
 class ObjectsContainer;
+class VariablesContainer;
 class Platform;
 class ParameterMetadata;
 class ExpressionMetadata;
+class VariablesContainersList;
+class ProjectScopedContainers;
 }  // namespace gd
 
 namespace gd {
@@ -33,14 +38,13 @@ namespace gd {
 class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
  public:
   ExpressionValidator(const gd::Platform &platform_,
-                      const gd::ObjectsContainer &globalObjectsContainer_,
-                      const gd::ObjectsContainer &objectsContainer_,
+                      const gd::ProjectScopedContainers & projectScopedContainers_,
                       const gd::String &rootType_)
       : platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        projectScopedContainers(projectScopedContainers_),
         parentType(StringToType(gd::ParameterMetadata::GetExpressionValueType(rootType_))),
-        childType(Type::Unknown) {};
+        childType(Type::Unknown),
+        forbidsUsageOfBracketsBecauseParentIsObject(false) {};
   virtual ~ExpressionValidator(){};
 
   /**
@@ -48,11 +52,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
    * any error including non-fatal ones.
    */
   static bool HasNoErrors(const gd::Platform &platform,
-                      const gd::ObjectsContainer &globalObjectsContainer,
-                      const gd::ObjectsContainer &objectsContainer,
+                      const gd::ProjectScopedContainers & projectScopedContainers,
                       const gd::String &rootType,
                       gd::ExpressionNode& node) {
-    gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, rootType);
+    gd::ExpressionValidator validator(platform, projectScopedContainers, rootType);
     node.Visit(validator);
     return validator.GetAllErrors().empty();
   }
@@ -82,7 +85,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
     ReportAnyError(node);
-    
+
     node.leftHandSide->Visit(*this);
     const Type leftType = childType;
 
@@ -185,28 +188,69 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitVariableNode(VariableNode& node) override {
     ReportAnyError(node);
-    if (node.child) {
-      node.child->Visit(*this);
-    }
-    childType = Type::Variable;
-    if (parentType == Type::String) {
-      RaiseTypeError(_("Variables must be surrounded by VariableString()."),
-                     node.location);
-    } else if (parentType == Type::Number) {
-      RaiseTypeError(_("Variables must be surrounded by Variable()."),
-                     node.location);
-    } else if (parentType == Type::NumberOrString) {
-      RaiseTypeError(
-          _("Variables must be surrounded by Variable() or VariableString()."),
-          node.location);
-    } else if (parentType != Type::Variable) {
+
+    if (parentType == Type::Variable) {
+      childType = Type::Variable;
+
+      if (node.child) {
+        node.child->Visit(*this);
+      }
+    } else if (parentType == Type::String || parentType == Type::Number || parentType == Type::NumberOrString) {
+      // The node represents a variable or an object variable in an expression waiting for its *value* to be returned.
+      childType = parentType;
+
+      const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
+      const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+      const auto& propertiesContainerList = projectScopedContainers.GetPropertiesContainersList();
+
+      forbidsUsageOfBracketsBecauseParentIsObject = false;
+      projectScopedContainers.MatchIdentifierWithName<void>(node.name,
+        [&]() {
+          // This represents an object.
+
+          // While understood by the parser, it's forbidden to use the bracket notation just after
+          // an object name (`MyObject["MyVariable"]`).
+          forbidsUsageOfBracketsBecauseParentIsObject = true;
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+          // Being in this node implies that there is at least a child - which is not supported for properties.
+          RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
+              node.location);
+        }, [&]() {
+          // This is a parameter.
+          // Being in this node implies that there is at least a child - which is not supported for parameters.
+          RaiseTypeError(_("Accessing a child variable of a parameter is not possible - just write the parameter name."),
+              node.location);
+        }, [&]() {
+          // This is something else.
+          RaiseTypeError(_("No object, variable or property with this name found."),
+              node.location);
+        });
+
+      if (node.child) {
+        node.child->Visit(*this);
+      }
+
+      forbidsUsageOfBracketsBecauseParentIsObject = false;
+    } else {
       RaiseTypeError(_("You entered a variable, but this type was expected:") +
                          " " + TypeToString(parentType),
                      node.location);
+
+      if (node.child) {
+        node.child->Visit(*this);
+      }
     }
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     ReportAnyError(node);
+
+    // In the case we accessed an object variable (`MyObject.MyVariable`),
+    // brackets can now be used (`MyObject.MyVariable["MyChildVariable"]` is now valid).
+    forbidsUsageOfBracketsBecauseParentIsObject = false;
+
     if (node.child) {
       node.child->Visit(*this);
     }
@@ -214,6 +258,15 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
+
+    if (forbidsUsageOfBracketsBecauseParentIsObject) {
+      RaiseError("brackets_not_allowed_for_objects",
+                 _("You can't use the brackets to access an object variable. "
+                   "Use a dot followed by the variable name, like this: "
+                   "`MyObject.MyVariable`."),
+                 node.location);
+    }
+    forbidsUsageOfBracketsBecauseParentIsObject = false;
 
     Type currentParentType = parentType;
     parentType = Type::NumberOrString;
@@ -227,19 +280,29 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     ReportAnyError(node);
     if (parentType == Type::String) {
-      RaiseTypeError(_("You must wrap your text inside double quotes "
-                            "(example: \"Hello world\")."),
-                          node.location);
+      if (!ValidateObjectVariableOrVariableOrProperty(node)) {
+        // The identifier is not a variable, so either the variable is not properly declared
+        // or it's a text without quotes.
+        RaiseTypeError(_("You must wrap your text inside double quotes "
+                              "(example: \"Hello world\")."),
+                            node.location);
+      }
     }
     else if (parentType == Type::Number) {
-      RaiseTypeError(
-          _("You must enter a number."), node.location);
+      if (!ValidateObjectVariableOrVariableOrProperty(node)) {
+        // The identifier is not a variable, so the variable is not properly declared.
+        RaiseTypeError(
+            _("You must enter a number."), node.location);
+      }
     }
     else if (parentType == Type::NumberOrString) {
-      RaiseTypeError(
-          _("You must enter a number or a text, wrapped inside double quotes "
-            "(example: \"Hello world\")."),
-          node.location);
+      if (!ValidateObjectVariableOrVariableOrProperty(node)) {
+        // The identifier is not a variable, so either the variable is not properly declared
+        // or it's a text without quotes.
+        RaiseTypeError(
+            _("You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name."),
+            node.location);
+      }
     }
     else if (parentType != Type::Object && parentType != Type::Variable) {
       // It can't happen.
@@ -278,6 +341,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
  private:
   enum Type {Unknown = 0, Number, String, NumberOrString, Variable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
+  bool ValidateObjectVariableOrVariableOrProperty(const gd::IdentifierNode& identifier);
 
   void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {
     if (node.diagnostic && node.diagnostic->IsError()) {
@@ -291,7 +355,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     }
   }
 
-  void RaiseError(const gd::String &type, 
+  void RaiseError(const gd::String &type,
       const gd::String &message, const ExpressionParserLocation &location, bool isFatal = true) {
     auto diagnostic = gd::make_unique<ExpressionParserError>(
         type, message, location);
@@ -329,11 +393,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   std::vector<ExpressionParserDiagnostic*> fatalErrors;
   std::vector<ExpressionParserDiagnostic*> allErrors;
   std::vector<std::unique_ptr<ExpressionParserDiagnostic>> supplementalErrors;
-  Type childType;
-  Type parentType;
+  Type childType; ///< The type "discovered" down the tree and passed up.
+  Type parentType; ///< The type "required" by the top of the tree.
+  bool forbidsUsageOfBracketsBecauseParentIsObject;
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ProjectScopedContainers &projectScopedContainers;
 };
 
 }  // namespace gd

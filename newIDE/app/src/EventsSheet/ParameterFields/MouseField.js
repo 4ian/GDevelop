@@ -37,12 +37,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         value={value}
         ref={field}
         onChange={(e, i, value) => props.onChange(value)}
+        translatableHintText={t`Choose a mouse button`}
       >
         <SelectOption value="Left" label={t`Left (primary)`} />
         <SelectOption value="Right" label={t`Right (secondary)`} />
         <SelectOption
           value="Middle"
           label={t`Middle (Auxiliary button, usually the wheel button)`}
+        />
+        <SelectOption
+          value="Back"
+          label={t`Back (Additional button, typically the Browser Back button)`}
+        />
+        <SelectOption
+          value="Forward"
+          label={t`Forward (Additional button, typically the Browser Forward button)`}
         />
       </SelectField>
     );

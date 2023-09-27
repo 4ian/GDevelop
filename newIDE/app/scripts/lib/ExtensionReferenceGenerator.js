@@ -181,9 +181,9 @@ const translateTypeToHumanReadableDescription = type => {
   if (type === 'identifier') return "🔤 Name (String)";
   if (type === 'sceneName') return "🔤 Name of a scene (String)";
   if (type === 'layerEffectName') return "🔤 Layer Effect Name (String)";
-  if (type === 'layerEffectParameterName') return "🔤 Layer Effect Parameter Name (String)";
+  if (type === 'layerEffectParameterName') return "🔤 Layer Effect Property Name (String)";
   if (type === 'objectEffectName') return "🔤 Object Effect Name (String)";
-  if (type === 'objectEffectParameterName') return "🔤 Object Effect Parameter Name (String)";
+  if (type === 'objectEffectParameterName') return "🔤 Object Effect Property Name (String)";
   if (type === 'objectPointName') return "🔤 Object Point Name (String)";
   if (type === 'objectAnimationName') return "🔤 Object Animation Name (String)";
   if (type === 'functionParameterName') return "🔤 Function Parameter Name (String)";
@@ -215,9 +215,9 @@ const translateTypeToHumanReadableType = type => {
   if (type === 'identifier') return "string";
   if (type === 'sceneName') return "scene name";
   if (type === 'layerEffectName') return "layer effect name";
-  if (type === 'layerEffectParameterName') return "layer effect parameter name";
+  if (type === 'layerEffectParameterName') return "layer effect property name";
   if (type === 'objectEffectName') return "object effect name";
-  if (type === 'objectEffectParameterName') return "object effect parameter name";
+  if (type === 'objectEffectParameterName') return "object effect property name";
   if (type === 'objectPointName') return "object point name";
   if (type === 'objectAnimationName') return "object animation name";
   if (type === 'functionParameterName') return "function parameter name";

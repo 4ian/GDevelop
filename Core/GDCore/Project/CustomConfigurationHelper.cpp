@@ -5,6 +5,8 @@
  */
 #include "CustomConfigurationHelper.h"
 
+#include <map>
+
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Project.h"
@@ -12,8 +14,6 @@
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
-
-#include <map>
 
 using namespace gd;
 
@@ -25,7 +25,8 @@ void CustomConfigurationHelper::InitializeContent(
     auto propertyType = property->GetType();
 
     if (propertyType == "String" || propertyType == "Choice" ||
-        propertyType == "Color" || propertyType == "Behavior") {
+        propertyType == "Color" || propertyType == "Behavior" ||
+        propertyType == "resource") {
       element.SetStringValue(property->GetValue());
     } else if (propertyType == "Number") {
       element.SetDoubleValue(property->GetValue().To<double>());
@@ -51,7 +52,8 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
 
     if (configurationContent.HasChild(propertyName)) {
       if (propertyType == "String" || propertyType == "Choice" ||
-          propertyType == "Color" || propertyType == "Behavior") {
+          propertyType == "Color" || propertyType == "Behavior" ||
+          propertyType == "resource") {
         newProperty.SetValue(
             configurationContent.GetChild(propertyName).GetStringValue());
       } else if (propertyType == "Number") {
@@ -59,8 +61,9 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
             configurationContent.GetChild(propertyName).GetDoubleValue()));
       } else if (propertyType == "Boolean") {
         newProperty.SetValue(
-            configurationContent.GetChild(propertyName).GetBoolValue() ? "true"
-                                                                  : "false");
+            configurationContent.GetChild(propertyName).GetBoolValue()
+                ? "true"
+                : "false");
       }
     } else {
       // No value was serialized for this property. `newProperty`
@@ -85,7 +88,8 @@ bool CustomConfigurationHelper::UpdateProperty(
   const gd::String &propertyType = property.GetType();
 
   if (propertyType == "String" || propertyType == "Choice" ||
-      propertyType == "Color" || propertyType == "Behavior") {
+      propertyType == "Color" || propertyType == "Behavior" ||
+      propertyType == "resource") {
     element.SetStringValue(newValue);
   } else if (propertyType == "Number") {
     element.SetDoubleValue(newValue.To<double>());

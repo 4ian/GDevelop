@@ -77,7 +77,6 @@ function ListIcon(props: Props) {
   return (
     <div
       style={{
-        display: 'flex',
         width: iconWidth,
         height: iconHeight,
         lineHeight: `${iconHeight}px`, // Vertical centering

@@ -229,6 +229,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                         : ' with-cannot-drop-inside-indicator'
                       : '')
                   }
+                  aria-selected={node.selected}
+                  aria-expanded={displayAsFolder ? !node.collapsed : false}
                   {...dataObjectToProps(node.dataset)}
                 >
                   {connectDragSource(

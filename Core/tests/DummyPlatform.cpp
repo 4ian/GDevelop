@@ -578,15 +578,15 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   extension
       ->AddExpression(
           "LayerEffectParameter",
-          _("Effect parameter (number)"),
-          _("Return the value of a parameter of an effect."),
+          _("Effect property (number)"),
+          _("Return the value of a property of an effect."),
           _("Effects"),
           "")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
-      .AddParameter("layerEffectParameterName", _("Parameter name"));
+      .AddParameter("layerEffectParameterName", _("Property name"));
   }
 
   {

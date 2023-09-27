@@ -1277,9 +1277,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   // Deprecated
   obj.AddAction("SetEffectDoubleParameter",
-                _("Effect parameter (number)"),
-                _("Change the value of a parameter of an effect.") + "\n" +
-                    _("You can find the parameter names (and change the effect "
+                _("Effect property (number)"),
+                _("Change the value of a property of an effect.") + "\n" +
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
@@ -1287,17 +1287,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
       .AddParameter("expression", _("New value"))
       .MarkAsSimple()
       .SetHidden();
 
   // Deprecated
   obj.AddAction("SetEffectStringParameter",
-                _("Effect parameter (string)"),
-                _("Change the value (string) of a parameter of an effect.") +
+                _("Effect property (string)"),
+                _("Change the value (string) of a property of an effect.") +
                     "\n" +
-                    _("You can find the parameter names (and change the effect "
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
@@ -1305,16 +1305,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
       .AddParameter("string", _("New value"))
       .MarkAsSimple()
       .SetHidden();
 
   // Deprecated
   obj.AddAction("SetEffectBooleanParameter",
-                _("Effect parameter (enable or disable)"),
-                _("Enable or disable a parameter of an effect.") + "\n" +
-                    _("You can find the parameter names (and change the effect "
+                _("Effect property (enable or disable)"),
+                _("Enable or disable a property of an effect.") + "\n" +
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Enable _PARAM2_ for effect _PARAM1_ of _PARAM0_: _PARAM3_"),
                 _("Effects"),
@@ -1322,8 +1322,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
-      .AddParameter("yesorno", _("Enable?"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
+      .AddParameter("yesorno", _("Enable this property"))
       .MarkAsSimple()
       .SetHidden();
 

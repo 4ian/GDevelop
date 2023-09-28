@@ -217,7 +217,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     getItemHtmlId ? getItemHtmlId(node.item, index) : undefined
                   }
                   onClick={onClick}
-                  tabIndex={0}
                   className={
                     'row-container' +
                     (node.selected ? ' selected' : '') +

@@ -1248,6 +1248,43 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       sceneObjectsRootFolderId,
     ].filter(Boolean);
 
+    const arrowKeyNavigationProps = React.useMemo(
+      () => ({
+        onArrowRight: (item, isOpened) => {
+          if (item.isPlaceholder || item.isRoot) return null;
+          if (!item.objectFolderOrObject.isFolder()) return null;
+          if (!isOpened) {
+            if (treeViewRef.current) {
+              treeViewRef.current.openItems([getTreeViewItemId(item)]);
+            }
+            return null;
+          } else {
+            if (item.objectFolderOrObject.getChildrenCount() === 0) return null;
+            return {
+              objectFolderOrObject: item.objectFolderOrObject.getChildAt(0),
+              global: item.global,
+            };
+          }
+        },
+        onArrowLeft: (item, isOpened) => {
+          if (item.isPlaceholder || item.isRoot) return null;
+          if (!item.objectFolderOrObject.isFolder() || !isOpened) {
+            const parent = item.objectFolderOrObject.getParent();
+            if (parent.getFolderName() === '__ROOT') return null;
+            return {
+              objectFolderOrObject: parent,
+              global: item.global,
+            };
+          }
+          if (treeViewRef.current) {
+            treeViewRef.current.closeItems([getTreeViewItemId(item)]);
+          }
+          return null;
+        },
+      }),
+      []
+    );
+
     return (
       <Background maxWidth>
         <Column>
@@ -1304,6 +1341,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       reactDndType={objectWithContextReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       renderHiddenElements={!!currentlyRunningInAppTutorial}
+                      arrowKeyNavigationProps={arrowKeyNavigationProps}
                     />
                   )}
                 </AutoSizer>

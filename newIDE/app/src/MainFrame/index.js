@@ -2478,6 +2478,10 @@ const MainFrame = (props: Props) => {
           }
         }
 
+        // Ensure snackbar is shown long enough, in case the user stayed on the previous alert dialog
+        // for too long.
+        _replaceSnackMessage(i18n._(t`Saving...`), null);
+
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,

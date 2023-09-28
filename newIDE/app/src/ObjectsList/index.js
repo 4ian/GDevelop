@@ -45,6 +45,7 @@ import { mapFor } from '../Utils/MapFor';
 import IconButton from '../UI/IconButton';
 import AddFolder from '../UI/CustomSvgIcons/AddFolder';
 import { LineStackLayout } from '../UI/Layout';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -255,6 +256,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [forceUpdate]
     );
+    const eventsFunctionsExtensionsState = React.useContext(
+      EventsFunctionsExtensionsContext
+    );
+    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState(false);
 
@@ -379,13 +384,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const deleteObjectFolderOrObjectWithContext = React.useCallback(
       (
         i18n: I18nType,
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
+        objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
       ) => {
+        if (!objectFolderOrObjectWithContext) return;
         const {
           objectFolderOrObject,
           global,
         } = objectFolderOrObjectWithContext;
-        if (objectFolderOrObject.isFolder()) return;
+        if (objectFolderOrObject.isFolder()) {
+          if (objectFolderOrObject.getChildrenCount() === 0) {
+            objectFolderOrObject
+              .getParent()
+              .removeFolderChild(objectFolderOrObject);
+            forceUpdateList();
+          }
+          return;
+        }
 
         const answer = Window.showConfirmDialog(
           i18n._(
@@ -417,7 +431,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           onObjectModified(false);
         });
       },
-      [objectsContainer, onDeleteObject, onObjectModified, project]
+      [
+        objectsContainer,
+        onDeleteObject,
+        onObjectModified,
+        project,
+        forceUpdateList,
+      ]
     );
 
     const copyObjectFolderOrObjectWithContext = React.useCallback(
@@ -1008,10 +1028,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
-    const eventsFunctionsExtensionsState = React.useContext(
-      EventsFunctionsExtensionsContext
+    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+      new KeyboardShortcuts({
+        shortcutCallbacks: {},
+      })
     );
-    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
@@ -1049,13 +1070,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             },
             {
               label: i18n._(t`Delete`),
-              click: () => {
-                objectFolderOrObject
-                  .getParent()
-                  .removeFolderChild(objectFolderOrObject);
-                onObjectModified(true);
-              },
+              click: () => deleteObjectFolderOrObjectWithContext(i18n, item),
               enabled: objectFolderOrObject.getChildrenCount() === 0,
+              accelerator: 'Backspace',
             },
             {
               label: i18n._('Move to folder'),
@@ -1145,6 +1162,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Delete`),
             click: () => deleteObjectFolderOrObjectWithContext(i18n, item),
+            accelerator: 'Backspace',
           },
           { type: 'separator' },
           {
@@ -1324,51 +1342,65 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             </Column>
           </LineStackLayout>
         </Column>
-        <div style={styles.listContainer} id="objects-list">
+        <div
+          style={styles.listContainer}
+          onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+          onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+          id="objects-list"
+        >
           <I18n>
-            {({ i18n }) => (
-              <div style={{ flex: 1 }}>
-                <AutoSizer style={{ width: '100%' }} disableWidth>
-                  {({ height }) => (
-                    <TreeView
-                      key={listKey}
-                      ref={treeViewRef}
-                      items={getTreeViewData(i18n)}
-                      height={height}
-                      forceAllOpened={!!currentlyRunningInAppTutorial}
-                      searchText={searchText}
-                      getItemName={getTreeViewItemName}
-                      getItemThumbnail={getTreeViewItemThumbnail}
-                      getItemChildren={getTreeViewItemChildren}
-                      multiSelect={false}
-                      getItemId={getTreeViewItemId}
-                      getItemHtmlId={getTreeViewItemHtmlId}
-                      getItemDataset={getTreeViewItemData}
-                      onEditItem={editItem}
-                      selectedItems={selectedObjectFolderOrObjectsWithContext}
-                      onSelectItems={items => {
-                        if (!items) selectObjectFolderOrObjectWithContext(null);
-                        const itemToSelect = items[0];
-                        if ('isRoot' in itemToSelect) return;
-                        selectObjectFolderOrObjectWithContext(
-                          itemToSelect || null
-                        );
-                      }}
-                      onRenameItem={rename}
-                      buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                      onMoveSelectionToItem={(destinationItem, where) =>
-                        moveSelectionTo(i18n, destinationItem, where)
-                      }
-                      canMoveSelectionToItem={canMoveSelectionTo}
-                      reactDndType={objectWithContextReactDndType}
-                      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                      renderHiddenElements={!!currentlyRunningInAppTutorial}
-                      arrowKeyNavigationProps={arrowKeyNavigationProps}
-                    />
-                  )}
-                </AutoSizer>
-              </div>
-            )}
+            {({ i18n }) => {
+              keyboardShortcutsRef.current.setShortcutCallback('onDelete', () =>
+                deleteObjectFolderOrObjectWithContext(
+                  i18n,
+                  selectedObjectFolderOrObjectsWithContext[0]
+                )
+              );
+              return (
+                <div style={{ flex: 1 }}>
+                  <AutoSizer style={{ width: '100%' }} disableWidth>
+                    {({ height }) => (
+                      <TreeView
+                        key={listKey}
+                        ref={treeViewRef}
+                        items={getTreeViewData(i18n)}
+                        height={height}
+                        forceAllOpened={!!currentlyRunningInAppTutorial}
+                        searchText={searchText}
+                        getItemName={getTreeViewItemName}
+                        getItemThumbnail={getTreeViewItemThumbnail}
+                        getItemChildren={getTreeViewItemChildren}
+                        multiSelect={false}
+                        getItemId={getTreeViewItemId}
+                        getItemHtmlId={getTreeViewItemHtmlId}
+                        getItemDataset={getTreeViewItemData}
+                        onEditItem={editItem}
+                        selectedItems={selectedObjectFolderOrObjectsWithContext}
+                        onSelectItems={items => {
+                          if (!items)
+                            selectObjectFolderOrObjectWithContext(null);
+                          const itemToSelect = items[0];
+                          if ('isRoot' in itemToSelect) return;
+                          selectObjectFolderOrObjectWithContext(
+                            itemToSelect || null
+                          );
+                        }}
+                        onRenameItem={rename}
+                        buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                        onMoveSelectionToItem={(destinationItem, where) =>
+                          moveSelectionTo(i18n, destinationItem, where)
+                        }
+                        canMoveSelectionToItem={canMoveSelectionTo}
+                        reactDndType={objectWithContextReactDndType}
+                        initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                        renderHiddenElements={!!currentlyRunningInAppTutorial}
+                        arrowKeyNavigationProps={arrowKeyNavigationProps}
+                      />
+                    )}
+                  </AutoSizer>
+                </div>
+              );
+            }}
           </I18n>
         </div>
         <Line>

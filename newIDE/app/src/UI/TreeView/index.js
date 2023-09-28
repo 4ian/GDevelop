@@ -466,12 +466,34 @@ const TreeView = <Item: ItemBaseAttributes>(
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         if (itemIndexInFlattenedData < flattenedData.length - 1) {
-          newFocusedItem = flattenedData[itemIndexInFlattenedData + 1].item;
+          let delta = 1;
+          let newFocusedNode = flattenedData[itemIndexInFlattenedData + delta];
+          while (newFocusedNode && newFocusedNode.depth === 0) {
+            if (itemIndexInFlattenedData + delta > flattenedData.length - 1) {
+              newFocusedNode = null;
+            }
+            delta += 1;
+            newFocusedNode = flattenedData[itemIndexInFlattenedData + delta];
+          }
+          if (newFocusedNode) {
+            newFocusedItem = newFocusedNode.item;
+          }
         }
       } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         if (itemIndexInFlattenedData > 0) {
-          newFocusedItem = flattenedData[itemIndexInFlattenedData - 1].item;
+          let delta = -1;
+          let newFocusedNode = flattenedData[itemIndexInFlattenedData + delta];
+          while (newFocusedNode && newFocusedNode.depth === 0) {
+            if (itemIndexInFlattenedData + delta < 0) {
+              newFocusedNode = null;
+            }
+            delta -= 1;
+            newFocusedNode = flattenedData[itemIndexInFlattenedData + delta];
+          }
+          if (newFocusedNode) {
+            newFocusedItem = newFocusedNode.item;
+          }
         }
       } else if (event.key === 'ArrowRight' && arrowKeyNavigationProps) {
         event.preventDefault();

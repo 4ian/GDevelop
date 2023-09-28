@@ -94,6 +94,7 @@ export type TreeViewInterface<Item> = {|
   scrollToItem: Item => void,
   renameItem: Item => void,
   openItems: (string[]) => void,
+  closeItems: (string[]) => void,
 |};
 
 type Props<Item> = {|
@@ -122,6 +123,10 @@ type Props<Item> = {|
   forceAllOpened?: boolean,
   initiallyOpenedNodeIds?: string[],
   renderHiddenElements?: boolean,
+  arrowKeyNavigationProps?: {|
+    onArrowRight: (item: Item, isOpened: boolean) => ?Item,
+    onArrowLeft: (item: Item, isOpened: boolean) => ?Item,
+  |},
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -148,6 +153,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     forceAllOpened,
     initiallyOpenedNodeIds,
     renderHiddenElements,
+    arrowKeyNavigationProps,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
@@ -371,6 +377,16 @@ const TreeView = <Item: ItemBaseAttributes>(
     [openedNodeIds]
   );
 
+  const closeItems = React.useCallback(
+    (itemIds: string[]) => {
+      const newOpenedNodesIds = openedNodeIds.filter(
+        openedNodeId => !itemIds.includes(openedNodeId)
+      );
+      setOpenedNodeIds(newOpenedNodesIds);
+    },
+    [openedNodeIds]
+  );
+
   React.useImperativeHandle(
     // $FlowFixMe
     ref,
@@ -379,6 +395,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       scrollToItem,
       renameItem,
       openItems,
+      closeItems,
     })
   );
 
@@ -436,24 +453,71 @@ const TreeView = <Item: ItemBaseAttributes>(
     [searchText]
   );
 
+  const onKeyDown = React.useCallback(
+    (event: KeyboardEvent) => {
+      let newFocusedItem;
+      const item = selectedItems[0];
+      const itemIndexInFlattenedData = flattenedData.findIndex(
+        node => node.id === getItemId(item)
+      );
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        if (itemIndexInFlattenedData < flattenedData.length - 1) {
+          newFocusedItem = flattenedData[itemIndexInFlattenedData + 1].item;
+        }
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (itemIndexInFlattenedData > 0) {
+          newFocusedItem = flattenedData[itemIndexInFlattenedData - 1].item;
+        }
+      } else if (event.key === 'ArrowRight' && arrowKeyNavigationProps) {
+        event.preventDefault();
+        newFocusedItem = arrowKeyNavigationProps.onArrowRight(
+          item,
+          openedNodeIds.includes(getItemId(item))
+        );
+      } else if (event.key === 'ArrowLeft' && arrowKeyNavigationProps) {
+        event.preventDefault();
+        newFocusedItem = arrowKeyNavigationProps.onArrowLeft(
+          item,
+          openedNodeIds.includes(getItemId(item))
+        );
+      }
+      if (newFocusedItem) onSelectItems([newFocusedItem]);
+    },
+    [
+      flattenedData,
+      arrowKeyNavigationProps,
+      getItemId,
+      onSelectItems,
+      openedNodeIds,
+      selectedItems,
+    ]
+  );
+
   return (
     <>
-      <FixedSizeList
-        height={height}
-        itemCount={flattenedData.length}
-        itemSize={32}
-        width={typeof width === 'number' ? width : '100%'}
-        itemKey={index => flattenedData[index].id}
-        // Flow does not seem to accept the generic used in FixedSizeList
-        // can itself use a generic.
-        // $FlowFixMe
-        itemData={itemData}
-        ref={listRef}
-        overscanCount={renderHiddenElements ? 20 : 2}
+      <div
+        tabIndex={0}
         className={`${treeView} ${theme.treeViewRootClassName}`}
+        onKeyDown={onKeyDown}
       >
-        {TreeViewRow}
-      </FixedSizeList>
+        <FixedSizeList
+          height={height}
+          itemCount={flattenedData.length}
+          itemSize={32}
+          width={typeof width === 'number' ? width : '100%'}
+          itemKey={index => flattenedData[index].id}
+          // Flow does not seem to accept the generic used in FixedSizeList
+          // can itself use a generic.
+          // $FlowFixMe
+          itemData={itemData}
+          ref={listRef}
+          overscanCount={renderHiddenElements ? 20 : 2}
+        >
+          {TreeViewRow}
+        </FixedSizeList>
+      </div>
       <ContextMenu
         ref={contextMenuRef}
         buildMenuTemplate={(i18n, options) =>

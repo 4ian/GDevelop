@@ -47,6 +47,12 @@
   border-radius: 6px;
   width: 100%;
 }
+.tree-view:focus-visible {
+  /**
+   * Remove browser-specific style around focused element when hitting an arrow key.
+   */
+  outline: none;
+}
 .tree-view .row-container.with-can-drop-inside-indicator {
   outline: 1px solid var(--theme-drop-indicator-can-drop-color);
 }

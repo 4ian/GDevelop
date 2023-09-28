@@ -1,18 +1,13 @@
 // @flow
 import * as React from 'react';
-import { Trans, t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Trans } from '@lingui/macro';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 
 import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
 import RaisedButton from '../../../../UI/RaisedButton';
-import { Line, Column, Spacer, marginsSize } from '../../../../UI/Grid';
+import { Line, Column, Spacer } from '../../../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   LineStackLayout,
@@ -24,54 +19,34 @@ import {
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
-import AuthenticatedUserContext, {
-  type AuthenticatedUser,
-} from '../../../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import SectionContainer, { SectionRow } from '../SectionContainer';
-import ContextMenu, {
-  type ContextMenuInterface,
-} from '../../../../UI/Menu/ContextMenu';
-import CircularProgress from '../../../../UI/CircularProgress';
-import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
-import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
-import {
-  deleteCloudProject,
-  type CloudProjectWithUserAccessInfo,
-} from '../../../../Utils/GDevelopServices/Project';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
-import optionalRequire from '../../../../Utils/OptionalRequire';
-import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '../../../../UI/CustomSvgIcons/Add';
-import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import AlertMessage from '../../../../UI/AlertMessage';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '../../../../UI/IconButton';
-import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
-import RouterContext from '../../../RouterContext';
-import { useLongTouch } from '../../../../Utils/UseLongTouch';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
-import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
 import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
-import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
-import { getUserPublicProfilesByIds } from '../../../../Utils/GDevelopServices/User';
-import { Avatar, Tooltip } from '@material-ui/core';
-import { getGravatarUrl } from '../../../../UI/GravatarUrl';
-const electron = optionalRequire('electron');
-const path = optionalRequire('path');
+import ProjectFileListItem from './ProjectFileListItem';
+import {
+  getExampleAndTemplateItemsForCarousel,
+  getLastModifiedInfoByProjectId,
+  getProjectLineHeight,
+  transformCloudProjectsIntoFileMetadataWithStorageProviderName,
+} from './utils';
 
 const styles = {
   listItem: {
@@ -83,12 +58,6 @@ const styles = {
   },
   projectSkeleton: { borderRadius: 6 },
   noProjectsContainer: { padding: 10 },
-};
-
-export const getProjectLineHeight = (width: WidthType) => {
-  const lineHeight = width === 'small' ? 52 : 36;
-
-  return lineHeight - 2 * marginsSize;
 };
 
 type Props = {|
@@ -108,404 +77,6 @@ type Props = {|
 export type BuildSectionInterface = {|
   forceUpdate: () => void,
 |};
-
-const PrettyBreakablePath = ({ path }: {| path: string |}) => {
-  const separatorIndices = Array.from(path)
-    .map((char, index) => (['/', '\\'].includes(char) ? index : null))
-    .filter(Boolean);
-  if (separatorIndices.length === 0) return path;
-
-  return separatorIndices.reduce((acc, separatorIndex, listIndex) => {
-    const nextSeparatorIndex = separatorIndices[listIndex + 1];
-    return [
-      ...acc,
-      <wbr key={separatorIndex} />,
-      path.substring(separatorIndex, nextSeparatorIndex || path.length),
-    ];
-  }, []);
-};
-
-const getStorageProviderByInternalName = (
-  storageProviders: Array<StorageProvider>,
-  internalName: string
-): ?StorageProvider => {
-  return storageProviders.find(
-    storageProvider => storageProvider.internalName === internalName
-  );
-};
-
-const useStylesForListItemIcon = makeStyles({
-  root: {
-    minWidth: 0,
-  },
-});
-
-export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
-  cloudProjects: Array<CloudProjectWithUserAccessInfo>,
-  ownerId?: string
-): Array<FileMetadataAndStorageProviderName> => {
-  return cloudProjects
-    .map(cloudProject => {
-      if (cloudProject.deletedAt) return null;
-      const file: FileMetadataAndStorageProviderName = {
-        storageProviderName: 'Cloud',
-        fileMetadata: {
-          fileIdentifier: cloudProject.id,
-          lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
-          name: cloudProject.name,
-          gameId: cloudProject.gameId,
-          version: cloudProject.currentVersion,
-        },
-      };
-      if (ownerId) {
-        file.fileMetadata.ownerId = ownerId;
-      }
-      return file;
-    })
-    .filter(Boolean);
-};
-
-type LastModifiedInfo = {|
-  lastModifiedByUsername: string,
-  lastModifiedByIconUrl: string,
-  lastModifiedAt: number,
-|};
-
-const ListItemLastModification = ({
-  file,
-  lastModifiedInfo,
-  storageProvider,
-  authenticatedUser,
-}: {|
-  file: FileMetadataAndStorageProviderName,
-  lastModifiedInfo?: LastModifiedInfo | null,
-  storageProvider: ?StorageProvider,
-  authenticatedUser: AuthenticatedUser,
-|}) => {
-  const userEmail =
-    authenticatedUser.profile && authenticatedUser.profile.email;
-  const userUsername =
-    authenticatedUser.profile && authenticatedUser.profile.username;
-  const projectIsCloud =
-    !!storageProvider && storageProvider.internalName === 'Cloud';
-  const avatarUrl = lastModifiedInfo
-    ? lastModifiedInfo.lastModifiedByIconUrl
-    : projectIsCloud && userEmail
-    ? getGravatarUrl(userEmail, {
-        size: 40,
-      })
-    : null;
-  const lastModifiedByUsername = lastModifiedInfo
-    ? lastModifiedInfo.lastModifiedByUsername
-    : userUsername;
-  const lastModifiedAt = lastModifiedInfo
-    ? lastModifiedInfo.lastModifiedAt
-    : file.fileMetadata.lastModifiedDate
-    ? file.fileMetadata.lastModifiedDate
-    : null;
-
-  if (!lastModifiedAt) return null;
-
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <LineStackLayout noMargin alignItems="center">
-          {avatarUrl ? (
-            lastModifiedByUsername ? (
-              <Tooltip title={lastModifiedByUsername}>
-                <Avatar src={avatarUrl} style={{ width: 20, height: 20 }} />
-              </Tooltip>
-            ) : (
-              <Avatar src={avatarUrl} style={{ width: 20, height: 20 }} />
-            )
-          ) : null}
-          <Text noMargin>
-            {getRelativeOrAbsoluteDisplayDate(i18n, lastModifiedAt)}
-          </Text>
-        </LineStackLayout>
-      )}
-    </I18n>
-  );
-};
-
-type ProjectFileListItemProps = {|
-  file: FileMetadataAndStorageProviderName,
-  lastModifiedInfo?: LastModifiedInfo | null,
-  storageProviders: Array<StorageProvider>,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  isWindowWidthMediumOrLarger: boolean,
-  hideDeleteContextMenuAction?: boolean,
-|};
-
-export const ProjectFileListItem = ({
-  file,
-  lastModifiedInfo, // If null, the project has been modified last by the current user.
-  storageProviders,
-  onOpenRecentFile,
-  isWindowWidthMediumOrLarger,
-  hideDeleteContextMenuAction,
-}: ProjectFileListItemProps) => {
-  const contextMenu = React.useRef<?ContextMenuInterface>(null);
-  const iconClasses = useStylesForListItemIcon();
-  const { showDeleteConfirmation, showAlert } = useAlertDialog();
-  const { navigateToRoute } = React.useContext(RouterContext);
-  const [pendingProject, setPendingProject] = React.useState<?string>(null);
-  const { removeRecentProjectFile } = React.useContext(PreferencesContext);
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
-
-  const storageProvider = getStorageProviderByInternalName(
-    storageProviders,
-    file.storageProviderName
-  );
-
-  const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
-    electron.shell.showItemInFolder(
-      path.resolve(file.fileMetadata.fileIdentifier)
-    );
-  };
-
-  const onDeleteCloudProject = async (
-    i18n: I18nType,
-    { fileMetadata, storageProviderName }: FileMetadataAndStorageProviderName
-  ) => {
-    if (storageProviderName !== 'Cloud') return;
-    const projectName = fileMetadata.name;
-    if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
-
-    // Extract word translation to ensure it is not wrongly translated in the sentence.
-    const translatedConfirmText = i18n._(t`delete`);
-
-    const deleteAnswer = await showDeleteConfirmation({
-      title: t`Do you really want to permanently delete your project ${projectName}?`,
-      message: t`You’re about to permanently delete your project ${projectName}. You will no longer be able to access it.`,
-      fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
-      confirmText: translatedConfirmText,
-      confirmButtonLabel: t`Delete project`,
-    });
-    if (!deleteAnswer) return;
-
-    try {
-      setPendingProject(fileMetadata.fileIdentifier);
-      await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
-      authenticatedUser.onCloudProjectsChanged();
-    } catch (error) {
-      const message =
-        error.response && error.response.status === 403
-          ? t`You don't have permissions to delete this project.`
-          : t`An error occurred when saving the project. Please try again later.`;
-      showAlert({
-        title: t`Unable to delete the project`,
-        message,
-      });
-    } finally {
-      setPendingProject(null);
-    }
-  };
-
-  const buildContextMenu = (
-    i18n: I18nType,
-    file: ?FileMetadataAndStorageProviderName
-  ): Array<MenuItemTemplate> => {
-    if (!file) return [];
-    let actions = [
-      { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
-    ];
-    if (file.storageProviderName === 'Cloud') {
-      if (!hideDeleteContextMenuAction) {
-        actions = actions.concat([
-          {
-            label: i18n._(t`Delete`),
-            click: () => onDeleteCloudProject(i18n, file),
-          },
-        ]);
-      }
-    } else if (file.storageProviderName === 'LocalFile') {
-      actions = actions.concat([
-        {
-          label: i18n._(t`Show in local folder`),
-          click: () => locateProjectFile(file),
-        },
-        {
-          label: i18n._(t`Remove from list`),
-          click: () => removeRecentProjectFile(file),
-        },
-      ]);
-    } else {
-      actions = actions.concat([
-        {
-          label: i18n._(t`Remove from list`),
-          click: () => removeRecentProjectFile(file),
-        },
-      ]);
-    }
-
-    const gameId = file.fileMetadata.gameId;
-    if (gameId) {
-      actions = actions.concat([
-        { type: 'separator' },
-        {
-          label: i18n._(t`Manage game`),
-          click: () =>
-            navigateToRoute('games-dashboard', {
-              'game-id': gameId,
-            }),
-        },
-      ]);
-    }
-
-    return actions;
-  };
-
-  const openContextMenu = (
-    event: MouseEvent,
-    file: FileMetadataAndStorageProviderName
-  ) => {
-    if (contextMenu.current) {
-      contextMenu.current.open(event.clientX, event.clientY, { file });
-    }
-  };
-
-  const longTouchForContextMenuProps = useLongTouch(
-    React.useCallback(
-      event => {
-        if (contextMenu.current) {
-          contextMenu.current.open(event.clientX, event.clientY, { file });
-        }
-      },
-      [contextMenu, file]
-    )
-  );
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <>
-          <ListItem
-            button
-            key={file.fileMetadata.fileIdentifier}
-            onClick={() => {
-              onOpenRecentFile(file);
-            }}
-            style={styles.listItem}
-            onContextMenu={event => openContextMenu(event, file)}
-            {...longTouchForContextMenuProps}
-          >
-            <>
-              {storageProvider &&
-                storageProvider.renderIcon &&
-                !isWindowWidthMediumOrLarger && (
-                  <ListItemAvatar
-                    classes={iconClasses}
-                    style={{
-                      marginTop: 8,
-                      alignSelf: 'flex-start',
-                    }}
-                  >
-                    {storageProvider.renderIcon({
-                      size: 'small',
-                    })}
-                  </ListItemAvatar>
-                )}
-              {isWindowWidthMediumOrLarger ? (
-                <LineStackLayout justifyContent="flex-start" expand>
-                  <Column expand>
-                    <Line noMargin alignItems="center">
-                      {storageProvider && storageProvider.renderIcon && (
-                        <>
-                          {storageProvider.renderIcon({
-                            size: 'small',
-                          })}
-                          <Spacer />
-                        </>
-                      )}
-                      <Text noMargin>
-                        {file.fileMetadata.name || (
-                          <PrettyBreakablePath
-                            path={file.fileMetadata.fileIdentifier}
-                          />
-                        )}
-                      </Text>
-
-                      {pendingProject === file.fileMetadata.fileIdentifier && (
-                        <>
-                          <Spacer />
-                          <CircularProgress size={16} />
-                        </>
-                      )}
-                    </Line>
-                  </Column>
-                  <Column expand>
-                    <Text noMargin>
-                      {storageProvider ? i18n._(storageProvider.name) : ''}
-                    </Text>
-                  </Column>
-                  <Column expand>
-                    <ListItemLastModification
-                      file={file}
-                      lastModifiedInfo={lastModifiedInfo}
-                      storageProvider={storageProvider}
-                      authenticatedUser={authenticatedUser}
-                    />
-                  </Column>
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      size="small"
-                      edge="end"
-                      aria-label="menu"
-                      onClick={event => {
-                        // prevent triggering the click on the list item.
-                        event.stopPropagation();
-                        openContextMenu(event, file);
-                      }}
-                    >
-                      <ThreeDotsMenu />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </LineStackLayout>
-              ) : (
-                <Column expand>
-                  <Line
-                    noMargin
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <ListItemText
-                      primary={
-                        file.fileMetadata.name || (
-                          <PrettyBreakablePath
-                            path={file.fileMetadata.fileIdentifier}
-                          />
-                        )
-                      }
-                      secondary={
-                        file.fileMetadata.lastModifiedDate
-                          ? getRelativeOrAbsoluteDisplayDate(
-                              i18n,
-                              file.fileMetadata.lastModifiedDate
-                            )
-                          : undefined
-                      }
-                      onContextMenu={event => openContextMenu(event, file)}
-                      {...longTouchForContextMenuProps}
-                    />
-                    {pendingProject === file.fileMetadata.fileIdentifier && (
-                      <CircularProgress size={24} />
-                    )}
-                  </Line>
-                </Column>
-              )}
-            </>
-          </ListItem>
-          <ContextMenu
-            ref={contextMenu}
-            buildMenuTemplate={(_i18n, { file }) =>
-              buildContextMenu(_i18n, file)
-            }
-          />
-        </>
-      )}
-    </I18n>
-  );
-};
 
 const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
   (
@@ -569,34 +140,12 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         const updateModificationInfoByProjectId = async () => {
           if (!cloudProjects || !profile) return;
 
-          const cloudProjectsLastModifiedBySomeoneElse = cloudProjects.filter(
-            cloudProject =>
-              !!cloudProject.committedAt &&
-              !!cloudProject.lastCommittedBy &&
-              cloudProject.lastCommittedBy !== profile.id
+          const _lastModifiedInfoByProjectId = await getLastModifiedInfoByProjectId(
+            {
+              cloudProjects,
+              profile,
+            }
           );
-
-          const allOtherContributorIds = new Set(
-            cloudProjectsLastModifiedBySomeoneElse
-              .map(cloudProject => cloudProject.lastCommittedBy)
-              .filter(Boolean)
-          );
-
-          const userPublicProfileByIds = await getUserPublicProfilesByIds(
-            Array.from(allOtherContributorIds)
-          );
-          const _lastModifiedInfoByProjectId = {};
-          cloudProjects.forEach(project => {
-            if (!project.lastCommittedBy || !project.committedAt) return;
-            const contributorPublicProfile =
-              userPublicProfileByIds[project.lastCommittedBy];
-            if (!contributorPublicProfile) return;
-            _lastModifiedInfoByProjectId[project.id] = {
-              lastModifiedByUsername: contributorPublicProfile.username,
-              lastModifiedByIconUrl: contributorPublicProfile.iconUrl,
-              lastModifiedAt: Date.parse(project.committedAt),
-            };
-          });
           setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
         };
 
@@ -634,75 +183,16 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
 
     // Show a premium game template every 3 examples.
     const examplesAndTemplatesToDisplay = React.useMemo(
-      () => {
-        const allItems = [];
-        const privateGameTemplateItems = [
-          ...(privateGameTemplateListingDatas
-            ? privateGameTemplateListingDatas.map(
-                privateGameTemplateListingData => {
-                  const isTemplateOwned =
-                    !!authenticatedUser.receivedGameTemplates &&
-                    !!authenticatedUser.receivedGameTemplates.find(
-                      receivedGameTemplate =>
-                        receivedGameTemplate.id ===
-                        privateGameTemplateListingData.id
-                    );
-                  return {
-                    id: privateGameTemplateListingData.id,
-                    title: privateGameTemplateListingData.name,
-                    thumbnailUrl:
-                      privateGameTemplateListingData.thumbnailUrls[0],
-                    onClick: () => {
-                      sendGameTemplateInformationOpened({
-                        gameTemplateName: privateGameTemplateListingData.name,
-                        gameTemplateId: privateGameTemplateListingData.id,
-                        source: 'homepage',
-                      });
-                      onSelectPrivateGameTemplateListingData(
-                        privateGameTemplateListingData
-                      );
-                    },
-                    overlayText: (
-                      <ProductPriceTag
-                        productListingData={privateGameTemplateListingData}
-                        owned={isTemplateOwned}
-                      />
-                    ),
-                    overlayTextPosition: 'topLeft',
-                  };
-                }
-              )
-            : []),
-        ];
-
-        const exampleShortHeaderItems = [
-          ...(exampleShortHeaders
-            ? prepareExampleShortHeaders(exampleShortHeaders)
-                .map(example => ({
-                  id: example.id,
-                  title: example.name,
-                  onClick: () => onSelectExampleShortHeader(example),
-                  thumbnailUrl: example.previewImageUrls[0],
-                }))
-                .filter(exampleShortHeader => !!exampleShortHeader.thumbnailUrl)
-            : []),
-        ];
-
-        for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
-          allItems.push(exampleShortHeaderItems[i]);
-          if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
-            const nextPrivateGameTemplateIndex = Math.floor(i / 3);
-            if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
-              allItems.push(
-                privateGameTemplateItems[nextPrivateGameTemplateIndex]
-              );
-          }
-        }
-
-        return allItems.slice(0, 12); // Only show 12 items.
-      },
+      () =>
+        getExampleAndTemplateItemsForCarousel({
+          authenticatedUser,
+          privateGameTemplateListingDatas,
+          exampleShortHeaders,
+          onSelectPrivateGameTemplateListingData,
+          onSelectExampleShortHeader,
+        }),
       [
-        authenticatedUser.receivedGameTemplates,
+        authenticatedUser,
         exampleShortHeaders,
         onSelectExampleShortHeader,
         onSelectPrivateGameTemplateListingData,

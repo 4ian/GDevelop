@@ -26,7 +26,7 @@ type OverlayTextPosition =
   | 'bottomLeft'
   | 'bottomRight';
 
-type Thumbnail = {
+export type CarouselThumbnail = {
   id: string,
   title: string,
   thumbnailUrl: string,
@@ -37,7 +37,7 @@ type Thumbnail = {
 };
 
 type SkeletonThumbnail = {
-  ...Thumbnail,
+  ...CarouselThumbnail,
   skeleton: boolean,
 };
 
@@ -181,7 +181,7 @@ const ImageOverlay = ({
   );
 };
 
-const Carousel = <ThumbnailType: Thumbnail>({
+const Carousel = <ThumbnailType: CarouselThumbnail>({
   title,
   items,
   additionalAction,

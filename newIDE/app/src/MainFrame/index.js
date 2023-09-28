@@ -176,17 +176,10 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
-import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
-import {
-  getCloudProject,
-  type CloudProjectWithUserAccessInfo,
-} from '../Utils/GDevelopServices/Project';
-import { format } from 'date-fns';
-import { getUserPublicProfile } from '../Utils/GDevelopServices/User';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2198,6 +2191,7 @@ const MainFrame = (props: Props) => {
         onSaveProjectAs,
         onChooseSaveProjectAsLocation,
         getWriteErrorMessage,
+        canFileMetadadataBeSafelySavedAs,
       } = newStorageProviderOperations;
       if (!onSaveProjectAs) {
         // The new storage provider can't even save as. It's strange that it was even
@@ -2223,16 +2217,16 @@ const MainFrame = (props: Props) => {
             return; // Save as was cancelled.
           }
 
-          if (
-            newStorageProvider.internalName === 'LocalFile' &&
-            saveAsLocation.fileIdentifier &&
-            isTryingToSaveInForbiddenPath(saveAsLocation.fileIdentifier)
-          ) {
-            await showAlert({
-              title: t`Choose another location`,
-              message: t`You are trying to save the project in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location.`,
-            });
-            return;
+          if (canFileMetadadataBeSafelySavedAs && currentFileMetadata) {
+            const canProjectBeSafelySavedAs = await canFileMetadadataBeSafelySavedAs(
+              currentFileMetadata,
+              {
+                showAlert,
+                showConfirmation,
+              }
+            );
+
+            if (!canProjectBeSafelySavedAs) return;
           }
           newSaveAsLocation = saveAsLocation;
         }
@@ -2342,6 +2336,7 @@ const MainFrame = (props: Props) => {
       authenticatedUser,
       currentlyRunningInAppTutorial,
       showAlert,
+      showConfirmation,
     ]
   );
 
@@ -2392,7 +2387,10 @@ const MainFrame = (props: Props) => {
       }
 
       const storageProviderOperations = getStorageProviderOperations();
-      const { onSaveProject } = storageProviderOperations;
+      const {
+        onSaveProject,
+        canFileMetadadataBeSafelySaved,
+      } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
@@ -2416,69 +2414,19 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        if (
-          storageProviderInternalName === 'LocalFile' &&
-          isTryingToSaveInForbiddenPath(currentFileMetadata.fileIdentifier)
-        ) {
-          await showAlert({
-            title: t`Choose another location`,
-            message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
-          });
-          // We don't block the save, as the user may want to save it anyway.
-        }
-
-        if (storageProviderInternalName === 'Cloud') {
-          // If the project is saved on the cloud, first fetch it.
-          // If the version of the project opened is different than the last version of the cloud project,
-          // it means that the project was modified by someone else. In this case, we should warn
-          // the user and ask them if they want to overwrite the changes.
-          const cloudProjectId = currentFileMetadata.fileIdentifier;
-          const openedProjectVersion = currentFileMetadata.version;
-          const cloudProject: ?CloudProjectWithUserAccessInfo = await getCloudProject(
-            authenticatedUser,
-            cloudProjectId
+        if (canFileMetadadataBeSafelySaved) {
+          const canProjectBeSafelySaved = await canFileMetadadataBeSafelySaved(
+            currentFileMetadata,
+            {
+              showAlert,
+              showConfirmation,
+            }
           );
-          if (!cloudProject) {
-            await showAlert({
-              title: t`Unable to save the project`,
-              message: t`The project could not be saved. Please try again later.`,
-            });
-            return;
-          }
-          const { currentVersion, committedAt } = cloudProject;
-          if (
-            openedProjectVersion &&
-            currentVersion && // should always be defined.
-            committedAt && // should always be defined.
-            currentVersion !== openedProjectVersion
-          ) {
-            let lastUsernameWhoModifiedProject = null;
-            const committedAtDate = new Date(committedAt);
-            const formattedDate = format(committedAtDate, 'dd-MM-yyyy');
-            const formattedTime = format(committedAtDate, 'HH:mm:ss');
-            const lastCommittedBy = cloudProject.lastCommittedBy;
-            if (lastCommittedBy) {
-              const lastUser = await getUserPublicProfile(lastCommittedBy);
-              if (lastUser) {
-                lastUsernameWhoModifiedProject = lastUser.username;
-              }
-            }
-            const answer = await showConfirmation({
-              title: t`Project was modified`,
-              message: lastUsernameWhoModifiedProject
-                ? t`This project was modified by ${lastUsernameWhoModifiedProject} on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`
-                : t`This project was modified by someone else on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`,
-              level: 'warning',
-              confirmButtonLabel: t`Overwrite`,
-              makeDismissButtonPrimary: true,
-            });
-            if (!answer) {
-              return;
-            }
-            // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
-            // for too long.
-            _replaceSnackMessage(i18n._(t`Saving...`), null);
-          }
+          if (!canProjectBeSafelySaved) return;
+
+          // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
+          // for too long.
+          _replaceSnackMessage(i18n._(t`Saving...`), null);
         }
 
         const { wasSaved, fileMetadata } = await onSaveProject(

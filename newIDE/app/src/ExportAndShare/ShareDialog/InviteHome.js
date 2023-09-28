@@ -32,6 +32,7 @@ import Trash from '../../UI/CustomSvgIcons/Trash';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+import Form from '../../UI/Form';
 
 export const emailRegex = /^(.+)@(.+)$/;
 
@@ -175,7 +176,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
           : [];
         setProjectUserAcls(collaboratorProjectUserAcls);
       } catch (error) {
-        console.error(error);
+        console.error('Unable to fetch the project user acls', error);
         if (error.response && error.response.status === 404) {
           setFetchError('project-not-found');
           return;
@@ -212,7 +213,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
         );
         setUserPublicProfileByIds(userPublicProfileByIds);
       } catch (error) {
-        console.error(error);
+        console.error('Unable to fetch the collaborator profiles', error);
         // Do not throw if the user profile cannot be fetched as
         // they're only used to display the username.
       }
@@ -261,7 +262,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
       setCollaboratorLevel('writer');
       await fetchProjectUserAcls();
     } catch (error) {
-      console.error(error);
+      console.error('Unable to add collaborator', error);
       if (error.response && error.response.status === 400) {
         if (
           error.response.data.code ===
@@ -331,7 +332,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
         userId: projectUserAcl.userId,
       });
     } catch (error) {
-      console.error(error);
+      console.error('Unable to remove collaborator', error);
       showAlert({
         title: t`Unable to remove collaborator`,
         message: t`An error happened while removing the collaborator. Verify your internet connection or retry later.`,
@@ -466,15 +467,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
           onApply={doAddCollaborator}
           open
         >
-          <form
-            onSubmit={event => {
-              // Prevent browser to navigate on form submission.
-              event.preventDefault();
-              doAddCollaborator();
-            }}
-            autoComplete="on"
-            name="resetPassword"
-          >
+          <Form onSubmit={doAddCollaborator} name="addCollaborator">
             <ColumnStackLayout noMargin>
               <TextField
                 autoFocus="desktop"
@@ -519,7 +512,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
                 ))}
               </SelectField>
             </ColumnStackLayout>
-          </form>
+          </Form>
         </Dialog>
       )}
     </>

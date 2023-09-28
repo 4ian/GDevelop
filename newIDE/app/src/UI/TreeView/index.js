@@ -508,7 +508,10 @@ const TreeView = <Item: ItemBaseAttributes>(
           openedNodeIds.includes(getItemId(item))
         );
       }
-      if (newFocusedItem) onSelectItems([newFocusedItem]);
+      if (newFocusedItem) {
+        scrollToItem(newFocusedItem);
+        onSelectItems([newFocusedItem]);
+      }
     },
     [
       flattenedData,
@@ -517,6 +520,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       onSelectItems,
       openedNodeIds,
       selectedItems,
+      scrollToItem,
     ]
   );
 

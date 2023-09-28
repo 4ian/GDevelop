@@ -806,7 +806,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
     );
 
-    const selectObject = React.useCallback(
+    const selectObjectFolderOrObjectWithContext = React.useCallback(
       (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
         onObjectFolderOrObjectWithContextSelected(
           objectFolderOrObjectWithContext
@@ -841,7 +841,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
             });
             onObjectModified(true);
-            selectObject({
+            selectObjectFolderOrObjectWithContext({
               ...selectedObjectFolderOrObjectWithContext,
               global: true,
             });
@@ -884,7 +884,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             index,
           });
           onObjectModified(true);
-          selectObject({
+          selectObjectFolderOrObjectWithContext({
             ...selectedObjectFolderOrObjectWithContext,
             global: true,
           });
@@ -945,7 +945,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectModified,
         selectedObjectFolderOrObjectsWithContext,
         setAsGlobalObject,
-        selectObject,
+        selectObjectFolderOrObjectWithContext,
       ]
     );
 
@@ -964,28 +964,41 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const addFolder = React.useCallback(
       () => {
+        let newObjectFolderOrObjectWithContext;
         if (selectedObjectFolderOrObjectsWithContext.length === 1) {
           const {
             objectFolderOrObject: selectedObjectFolderOrObject,
+            global,
           } = selectedObjectFolderOrObjectsWithContext[0];
           const parentFolder = selectedObjectFolderOrObject.getParent();
-          parentFolder.insertNewFolder(
+          const newFolder = parentFolder.insertNewFolder(
             'NewFolder',
             parentFolder.getChildPosition(selectedObjectFolderOrObject)
           );
+          newObjectFolderOrObjectWithContext = {
+            objectFolderOrObject: newFolder,
+            global,
+          };
         } else {
           const rootFolder = objectsContainer.getRootFolder();
-          rootFolder.insertNewFolder(
-            'NewFolder',
-            rootFolder.getChildrenCount()
-          );
+          const newFolder = rootFolder.insertNewFolder('NewFolder', 0);
+          newObjectFolderOrObjectWithContext = {
+            objectFolderOrObject: newFolder,
+            global: true,
+          };
         }
+        selectObjectFolderOrObjectWithContext(
+          newObjectFolderOrObjectWithContext
+        );
+        editName(newObjectFolderOrObjectWithContext);
         forceUpdateList();
       },
       [
         selectedObjectFolderOrObjectsWithContext,
         forceUpdateList,
         objectsContainer,
+        selectObjectFolderOrObjectWithContext,
+        editName,
       ]
     );
 
@@ -1159,7 +1172,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             label: i18n._(t`Set as global object`),
             enabled: !isObjectFolderOrObjectWithContextGlobal(item),
             click: () => {
-              selectObject(null);
+              selectObjectFolderOrObjectWithContext(null);
               setAsGlobalObject({
                 i18n,
                 objectFolderOrObjectWithContext: item,
@@ -1232,7 +1245,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         preferences.values.userShortcutMap,
         canSetAsGlobalObject,
         initialInstances,
-        selectObject,
+        selectObjectFolderOrObjectWithContext,
         objectsContainer,
         onObjectModified,
       ]
@@ -1328,10 +1341,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       onEditItem={editItem}
                       selectedItems={selectedObjectFolderOrObjectsWithContext}
                       onSelectItems={items => {
-                        if (!items) selectObject(null);
+                        if (!items) selectObjectFolderOrObjectWithContext(null);
                         const itemToSelect = items[0];
                         if ('isRoot' in itemToSelect) return;
-                        selectObject(itemToSelect || null);
+                        selectObjectFolderOrObjectWithContext(
+                          itemToSelect || null
+                        );
                       }}
                       onRenameItem={rename}
                       buildMenuTemplate={renderObjectMenuTemplate(i18n)}

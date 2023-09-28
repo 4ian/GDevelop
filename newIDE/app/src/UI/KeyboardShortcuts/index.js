@@ -81,6 +81,10 @@ export default class KeyboardShortcuts {
     this._isActive = isActive;
   }
 
+  setShortcutCallback(key: $Keys<ShortcutCallbacks>, callback: () => void) {
+    this._shortcutCallbacks[key] = callback;
+  }
+
   shouldCloneInstances() {
     return this._isControlOrCmdPressed();
   }

@@ -95,6 +95,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const node = flattenedData[index];
   const left = node.depth * 15;
   const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
+  const [
+    hasDelayPassedBeforeEditingName,
+    setHasDelayPassedBeforeEditingName,
+  ] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
   const [whereToDrop, setWhereToDrop] = React.useState<
     'before' | 'afterOrInside'
@@ -136,6 +140,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onClick, openContextMenu]
   );
 
+  /**
+   * Effect that opens the node if the user is dragging another node and stays
+   * over the node.
+   */
   React.useEffect(
     () => {
       if (
@@ -154,6 +162,25 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       }
     },
     [isStayingOver, onOpen, node]
+  );
+
+  /**
+   * Effect allows editing the name of the node after a delay has passed after its selection
+   * by the user.
+   */
+  React.useEffect(
+    () => {
+      if (isMobileScreen) return;
+      if (node.selected) {
+        const timeoutId = setTimeout(() => {
+          setHasDelayPassedBeforeEditingName(true);
+        }, 1000);
+        return () => clearTimeout(timeoutId);
+      } else {
+        setHasDelayPassedBeforeEditingName(false);
+      }
+    },
+    [node.selected, isMobileScreen]
   );
 
   const getContainerYPosition = React.useCallback(() => {
@@ -300,11 +327,18 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                                     : node.item.isPlaceholder
                                     ? ' placeholder'
                                     : ''
+                                }${
+                                  node.item.isRoot || node.item.isPlaceholder
+                                    ? ''
+                                    : hasDelayPassedBeforeEditingName
+                                    ? ' editable'
+                                    : ''
                                 }`}
                                 onClick={
                                   node.item.isRoot ||
                                   node.item.isPlaceholder ||
-                                  isMobileScreen
+                                  isMobileScreen ||
+                                  !hasDelayPassedBeforeEditingName
                                     ? null
                                     : e => {
                                         if (!e.metaKey && !e.shiftKey) {

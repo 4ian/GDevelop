@@ -58,6 +58,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  autoSizerContainer: { flex: 1 },
+  autoSizer: { width: '100%' },
 };
 
 export type RootFolder = {|
@@ -1357,8 +1359,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 )
               );
               return (
-                <div style={{ flex: 1 }}>
-                  <AutoSizer style={{ width: '100%' }} disableWidth>
+                <div style={styles.autoSizerContainer}>
+                  <AutoSizer style={styles.autoSizer} disableWidth>
                     {({ height }) => (
                       <TreeView
                         key={listKey}

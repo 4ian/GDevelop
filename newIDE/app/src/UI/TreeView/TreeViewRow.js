@@ -29,11 +29,22 @@ const SemiControlledRowInput = ({
   onEndRenaming: (newName: string) => void,
 }) => {
   const [value, setValue] = React.useState<string>(initialValue);
+  const inputRef = React.useRef<?HTMLInputElement>(null);
+
+  /**
+   * When mounting the input, select content.
+   */
+  React.useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.select();
+    }
+  }, []);
 
   return (
     <div className="item-name-input-container">
       <input
         autoFocus
+        ref={inputRef}
         type="text"
         className="item-name-input"
         value={value}

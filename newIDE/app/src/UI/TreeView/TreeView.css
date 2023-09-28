@@ -74,7 +74,7 @@
   text-overflow: ellipsis;
   user-select: none;
 }
-.tree-view .item-name:not(.root-folder):not(.placeholder) {
+.tree-view .item-name.editable {
   cursor: text;
 }
 

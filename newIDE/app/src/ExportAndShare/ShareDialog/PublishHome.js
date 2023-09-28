@@ -166,14 +166,18 @@ const SectionLine = ({
         <Column>
           <LineStackLayout expand noMargin alignItems="center">
             <div style={styles.iconContainer}>{icon}</div>
-            <Text noMargin size={small ? 'sub-title' : 'block-title'}>
+            <Text
+              noMargin
+              size={small ? 'sub-title' : 'block-title'}
+              align="left"
+            >
               {label}
             </Text>
           </LineStackLayout>
         </Column>
         <Column noMargin>
           <LineStackLayout expand noMargin alignItems="center">
-            <Text color="secondary" size="body2">
+            <Text color="secondary" size="body2" align="right">
               {description}
             </Text>
             <ChevronArrowRight color="secondary" />
@@ -221,10 +225,20 @@ const PublishHome = ({
 }: PublishHomeProps) => {
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [
+    hasSkippedSubSectionSelection,
+    setHasSkippedSubSectionSelection,
+  ] = React.useState<boolean>(false);
 
   const onBack = () => {
     if (chosenSubSection) {
       onChooseSubSection(null);
+      // In case the user navigated directly to the sub-section, we need to
+      // reset the section too.
+      if (hasSkippedSubSectionSelection) {
+        onChooseSection(null);
+        setHasSkippedSubSectionSelection(false);
+      }
     } else if (chosenSection) {
       onChooseSection(null);
     }
@@ -281,20 +295,33 @@ const PublishHome = ({
       {!chosenSection && !showOnlineWebExporterOnly && (
         <ColumnStackLayout expand noMargin>
           <SectionLine
+            label={<Trans>gd.games</Trans>}
+            icon={getSubSectionIcon('browser', 'online')}
+            description={<Trans>Free link on GDevelop gaming platform</Trans>}
+            onClick={() => {
+              setHasSkippedSubSectionSelection(true);
+              onChooseSection('browser');
+              onChooseSubSection('online');
+            }}
+            highlighted
+            disabled={!isOnline}
+          />
+          <SectionLine
             label={<Trans>Browser</Trans>}
             icon={getSectionIcon({ section: 'browser' })}
             description={
-              <Trans>Gaming portals (gd.games, Itch.io, Facebook...)</Trans>
+              <Trans>Gaming portals (Itch.io, Poki, Facebook...)</Trans>
             }
             onClick={() => onChooseSection('browser')}
-            highlighted
             disabled={allExportersRequireOnline && !isOnline}
           />
           {!showOnlineWebExporterOnly && (
             <SectionLine
               label={<Trans>Desktop</Trans>}
               icon={getSectionIcon({ section: 'desktop' })}
-              description={<Trans>Windows, MacOS and Linux</Trans>}
+              description={
+                <Trans>Windows, MacOS, Linux (Steam, MS Store...)</Trans>
+              }
               onClick={() => onChooseSection('desktop')}
               disabled={allExportersRequireOnline && !isOnline}
             />
@@ -303,7 +330,7 @@ const PublishHome = ({
             <SectionLine
               label={<Trans>Mobile</Trans>}
               icon={getSectionIcon({ section: 'mobile' })}
-              description={<Trans>Android and iOS</Trans>}
+              description={<Trans>Android and iOS (App stores)</Trans>}
               onClick={() => onChooseSection('mobile')}
               disabled={allExportersRequireOnline && !isOnline}
             />
@@ -315,7 +342,7 @@ const PublishHome = ({
           <SectionLine
             label={<Trans>gd.games</Trans>}
             icon={getSubSectionIcon('browser', 'online')}
-            description={<Trans>Free link on GDevelop's platform</Trans>}
+            description={<Trans>Free link on GDevelop gaming platform</Trans>}
             onClick={() => onChooseSubSection('online')}
             highlighted
             disabled={!isOnline}
@@ -324,7 +351,7 @@ const PublishHome = ({
             <SectionLine
               label={<Trans>External websites</Trans>}
               icon={getSubSectionIcon('browser', 'offline')}
-              description={<Trans>Itch.io, CrazyGames, Poki...</Trans>}
+              description={<Trans>Itch.io, Poki, CrazyGames...</Trans>}
               onClick={() => onChooseSubSection('offline')}
               disabled={allExportersRequireOnline && !isOnline}
             />

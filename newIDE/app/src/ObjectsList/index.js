@@ -376,7 +376,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [forceUpdate, forceUpdateList, unsavedChanges]
     );
 
-    const deleteObject = React.useCallback(
+    const deleteObjectFolderOrObjectWithContext = React.useCallback(
       (
         i18n: I18nType,
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
@@ -420,7 +420,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [objectsContainer, onDeleteObject, onObjectModified, project]
     );
 
-    const copyObject = React.useCallback(
+    const copyObjectFolderOrObjectWithContext = React.useCallback(
       (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
         const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         if (objectFolderOrObject.isFolder()) return;
@@ -434,15 +434,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       []
     );
 
-    const cutObject = React.useCallback(
+    const cutObjectFolderOrObjectWithContext = React.useCallback(
       (
         i18n: I18nType,
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
       ) => {
-        copyObject(objectFolderOrObjectWithContext);
-        deleteObject(i18n, objectFolderOrObjectWithContext);
+        copyObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
+        deleteObjectFolderOrObjectWithContext(
+          i18n,
+          objectFolderOrObjectWithContext
+        );
       },
-      [copyObject, deleteObject]
+      [
+        copyObjectFolderOrObjectWithContext,
+        deleteObjectFolderOrObjectWithContext,
+      ]
     );
 
     const addSerializedObjectToObjectsContainer = React.useCallback(
@@ -1110,11 +1116,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         return [
           {
             label: i18n._(t`Copy`),
-            click: () => copyObject(item),
+            click: () => copyObjectFolderOrObjectWithContext(item),
           },
           {
             label: i18n._(t`Cut`),
-            click: () => cutObject(i18n, item),
+            click: () => cutObjectFolderOrObjectWithContext(i18n, item),
           },
           {
             label: getPasteLabel(i18n, {
@@ -1138,7 +1144,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Delete`),
-            click: () => deleteObject(i18n, item),
+            click: () => deleteObjectFolderOrObjectWithContext(i18n, item),
           },
           { type: 'separator' },
           {
@@ -1228,9 +1234,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         ].filter(Boolean);
       },
       [
-        copyObject,
-        cutObject,
-        deleteObject,
+        copyObjectFolderOrObjectWithContext,
+        cutObjectFolderOrObjectWithContext,
+        deleteObjectFolderOrObjectWithContext,
         duplicateObject,
         editName,
         onAddNewObject,

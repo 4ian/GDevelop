@@ -88,6 +88,14 @@
   font-size: 16px;
 }
 
+.tree-view .folder-icon {
+  margin-right: 4px;
+  width: 20px;
+}
+.tree-view .thumbnail {
+  margin-right: 6px;
+}
+
 .tree-view .item-name-input {
   outline: none;
   border: none;

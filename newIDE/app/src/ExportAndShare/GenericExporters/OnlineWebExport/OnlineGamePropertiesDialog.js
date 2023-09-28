@@ -17,6 +17,7 @@ import {
 import { getWebBuildThumbnailUrl } from '../../../Utils/GDevelopServices/Build';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import LeftLoader from '../../../UI/LeftLoader';
 
 type Props = {|
   project: gdProject,
@@ -115,21 +116,22 @@ export const OnlineGamePropertiesDialog = ({
           onClick={onClose}
           disabled={isLoading}
         />,
-        <RaisedButtonWithSplitMenu
-          label={<Trans>Save project and publish</Trans>}
-          key="publish"
-          primary
-          onClick={() => {
-            onPublish({ saveProject: true });
-          }}
-          disabled={isLoading}
-          buildMenuTemplate={i18n => [
-            {
-              label: i18n._(t`Publish without saving project`),
-              click: () => onPublish({ saveProject: false }),
-            },
-          ]}
-        />,
+        <LeftLoader isLoading={isLoading} key="publish">
+          <RaisedButtonWithSplitMenu
+            label={<Trans>Save project and publish</Trans>}
+            primary
+            onClick={() => {
+              onPublish({ saveProject: true });
+            }}
+            disabled={isLoading}
+            buildMenuTemplate={i18n => [
+              {
+                label: i18n._(t`Publish without saving project`),
+                click: () => onPublish({ saveProject: false }),
+              },
+            ]}
+          />
+        </LeftLoader>,
       ]}
       cannotBeDismissed={isLoading}
       onRequestClose={onClose}

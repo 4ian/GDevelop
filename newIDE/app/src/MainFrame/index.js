@@ -183,7 +183,6 @@ import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import {
   getCloudProject,
-  getProjectVersion,
   type CloudProjectWithUserAccessInfo,
 } from '../Utils/GDevelopServices/Project';
 import { format } from 'date-fns';
@@ -2457,15 +2456,9 @@ const MainFrame = (props: Props) => {
             const committedAtDate = new Date(committedAt);
             const formattedDate = format(committedAtDate, 'dd-MM-yyyy');
             const formattedTime = format(committedAtDate, 'HH:mm:ss');
-            const lastProjectVersion = await getProjectVersion(
-              authenticatedUser,
-              cloudProjectId,
-              currentVersion
-            );
-            if (lastProjectVersion && lastProjectVersion.userId) {
-              const lastUser = await getUserPublicProfile(
-                lastProjectVersion.userId
-              );
+            const lastCommittedBy = cloudProject.lastCommittedBy;
+            if (lastCommittedBy) {
+              const lastUser = await getUserPublicProfile(lastCommittedBy);
               if (lastUser) {
                 lastUsernameWhoModifiedProject = lastUser.username;
               }
@@ -3293,6 +3286,7 @@ const MainFrame = (props: Props) => {
           onChangeSubscription: closeShareDialog,
           project: state.currentProject,
           onSaveProject: saveProject,
+          isSavingProject: isSavingProject,
           fileMetadata: currentFileMetadata,
           storageProvider: getStorageProvider(),
           initialTab: shareDialogInitialTab,

@@ -50,6 +50,7 @@ type State = {|
 type Props = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
@@ -395,6 +396,7 @@ export default class ExportLauncher extends Component<Props, State> {
       authenticatedUser,
       exportPipeline,
       onSaveProject,
+      isSavingProject,
     } = this.props;
     if (!project) return null;
     const getBuildCurrentUsage = (
@@ -476,6 +478,7 @@ export default class ExportLauncher extends Component<Props, State> {
                   build,
                   project,
                   onSaveProject,
+                  isSavingProject,
                   errored,
                   exportStep,
                 })

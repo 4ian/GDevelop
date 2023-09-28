@@ -38,7 +38,7 @@ const ExplanationHeader = ({ game }: Props) => {
     },
     [firebaseUser, game, getAuthorizationHeader]
   );
-  const hasGamePublishedOnGdGames = !!game && !!game.publicWebBuildId;
+  const isGamePublishedOnGdGames = !!game && !!game.publicWebBuildId;
 
   return (
     <Column noMargin expand>
@@ -54,7 +54,7 @@ const ExplanationHeader = ({ game }: Props) => {
       <Line justifyContent="center">
         <GdGames color="secondary" style={iconStyle} />
       </Line>
-      {!!hasGamePublishedOnGdGames ? (
+      {!!isGamePublishedOnGdGames ? (
         <AlertMessage kind="info">
           <Trans>
             A new private link will be created without replacing the version

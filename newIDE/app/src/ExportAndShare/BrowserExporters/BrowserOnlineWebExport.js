@@ -76,6 +76,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     build,
     project,
     onSaveProject,
+    isSavingProject,
     errored,
     exportStep,
   }) => (
@@ -83,6 +84,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
       build={build}
       project={project}
       onSaveProject={onSaveProject}
+      isSavingProject={isSavingProject}
       errored={errored}
       exportStep={exportStep}
     />

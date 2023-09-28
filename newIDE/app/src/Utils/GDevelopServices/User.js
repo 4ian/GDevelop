@@ -47,7 +47,7 @@ export type UserPublicProfile = {|
   description: ?string,
   donateLink: ?string,
   communityLinks: CommunityLinks,
-  iconUrl: ?string,
+  iconUrl: string,
 |};
 
 export type UserPublicProfileByIds = {|

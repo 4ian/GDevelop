@@ -55,6 +55,21 @@ export const Export = () => {
         errored={false}
         exportStep={'export'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
+        project={testProject.project}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+export const SavingProject = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <OnlineGameLink
+        build={completeWebBuild}
+        errored={false}
+        exportStep={'export'}
+        onSaveProject={action('onSaveProject')}
+        isSavingProject
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>
@@ -68,6 +83,7 @@ export const ResourcesDownload = () => {
         errored={false}
         exportStep={'resources-download'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>
@@ -81,6 +97,7 @@ export const Compress = () => {
         errored={false}
         exportStep={'compress'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>
@@ -94,6 +111,7 @@ export const Upload = () => {
         errored={false}
         exportStep={'upload'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>
@@ -107,6 +125,7 @@ export const WaitingForBuild = () => {
         errored={false}
         exportStep={'waiting-for-build'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>
@@ -120,6 +139,7 @@ export const Build = () => {
         errored={false}
         exportStep={'build'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>
@@ -133,6 +153,7 @@ export const DoneWithPublicBuild = () => {
         errored={false}
         exportStep={'done'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>
@@ -146,6 +167,7 @@ export const DoneWithPrivateBuild = () => {
         errored={false}
         exportStep={'done'}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         project={testProject.project}
       />
     </AuthenticatedUserContext.Provider>

@@ -187,6 +187,7 @@ const SectionLine = ({
 type PublishHomeProps = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
   onGameUpdated: () => void,
   onChangeSubscription: () => void,
   isNavigationDisabled: boolean,
@@ -204,6 +205,7 @@ type PublishHomeProps = {|
 const PublishHome = ({
   project,
   onSaveProject,
+  isSavingProject,
   onChangeSubscription,
   isNavigationDisabled,
   setIsNavigationDisabled,
@@ -384,6 +386,7 @@ const PublishHome = ({
           exportPipeline={selectedExporter.exportPipeline}
           project={project}
           onSaveProject={onSaveProject}
+          isSavingProject={isSavingProject}
           onGameUpdated={onGameUpdated}
           onChangeSubscription={onChangeSubscription}
           setIsNavigationDisabled={setIsNavigationDisabled}

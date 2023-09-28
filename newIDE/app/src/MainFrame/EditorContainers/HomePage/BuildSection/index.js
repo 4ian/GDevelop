@@ -24,7 +24,9 @@ import {
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
-import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../../../../Profile/AuthenticatedUserContext';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ContextMenu, {
   type ContextMenuInterface,
@@ -168,6 +170,63 @@ type LastModifiedInfo = {|
   lastModifiedByIconUrl: string,
   lastModifiedAt: number,
 |};
+
+const ListItemLastModification = ({
+  file,
+  lastModifiedInfo,
+  storageProvider,
+  authenticatedUser,
+}: {|
+  file: FileMetadataAndStorageProviderName,
+  lastModifiedInfo?: LastModifiedInfo | null,
+  storageProvider: ?StorageProvider,
+  authenticatedUser: AuthenticatedUser,
+|}) => {
+  const userEmail =
+    authenticatedUser.profile && authenticatedUser.profile.email;
+  const userUsername =
+    authenticatedUser.profile && authenticatedUser.profile.username;
+  const projectIsCloud =
+    !!storageProvider && storageProvider.internalName === 'Cloud';
+  const avatarUrl = lastModifiedInfo
+    ? lastModifiedInfo.lastModifiedByIconUrl
+    : projectIsCloud && userEmail
+    ? getGravatarUrl(userEmail, {
+        size: 40,
+      })
+    : null;
+  const lastModifiedByUsername = lastModifiedInfo
+    ? lastModifiedInfo.lastModifiedByUsername
+    : userUsername;
+  const lastModifiedAt = lastModifiedInfo
+    ? lastModifiedInfo.lastModifiedAt
+    : file.fileMetadata.lastModifiedDate
+    ? file.fileMetadata.lastModifiedDate
+    : null;
+
+  if (!lastModifiedAt) return null;
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <LineStackLayout noMargin alignItems="center">
+          {avatarUrl ? (
+            lastModifiedByUsername ? (
+              <Tooltip title={lastModifiedByUsername}>
+                <Avatar src={avatarUrl} style={{ width: 20, height: 20 }} />
+              </Tooltip>
+            ) : (
+              <Avatar src={avatarUrl} style={{ width: 20, height: 20 }} />
+            )
+          ) : null}
+          <Text noMargin>
+            {getRelativeOrAbsoluteDisplayDate(i18n, lastModifiedAt)}
+          </Text>
+        </LineStackLayout>
+      )}
+    </I18n>
+  );
+};
 
 type ProjectFileListItemProps = {|
   file: FileMetadataAndStorageProviderName,
@@ -380,48 +439,12 @@ export const ProjectFileListItem = ({
                     </Text>
                   </Column>
                   <Column expand>
-                    {lastModifiedInfo ? (
-                      <LineStackLayout noMargin alignItems="center">
-                        <Tooltip
-                          title={lastModifiedInfo.lastModifiedByUsername}
-                        >
-                          <Avatar
-                            src={lastModifiedInfo.lastModifiedByIconUrl}
-                            style={{ width: 20, height: 20 }}
-                          />
-                        </Tooltip>
-                        <Text noMargin>
-                          {getRelativeOrAbsoluteDisplayDate(
-                            i18n,
-                            lastModifiedInfo.lastModifiedAt
-                          )}
-                        </Text>
-                      </LineStackLayout>
-                    ) : file.fileMetadata.lastModifiedDate ? (
-                      <LineStackLayout noMargin alignItems="center">
-                        {storageProvider &&
-                          storageProvider.internalName === 'Cloud' &&
-                          authenticatedUser.profile &&
-                          authenticatedUser.profile.email && (
-                            <Tooltip title={authenticatedUser.profile.username}>
-                              <Avatar
-                                src={getGravatarUrl(
-                                  authenticatedUser.profile.email,
-                                  { size: 40 }
-                                )}
-                                style={{ height: 20, width: 20 }}
-                              />
-                            </Tooltip>
-                          )}
-
-                        <Text noMargin>
-                          {getRelativeOrAbsoluteDisplayDate(
-                            i18n,
-                            file.fileMetadata.lastModifiedDate
-                          )}
-                        </Text>
-                      </LineStackLayout>
-                    ) : null}
+                    <ListItemLastModification
+                      file={file}
+                      lastModifiedInfo={lastModifiedInfo}
+                      storageProvider={storageProvider}
+                      authenticatedUser={authenticatedUser}
+                    />
                   </Column>
                   <ListItemSecondaryAction>
                     <IconButton
@@ -539,9 +562,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       );
     }
 
-    // We only look at projects where lastModifiedAt is different than committedAt,
-    // as it means the project has been modified by someone else.
-    // Otherwise, we assume the project has been modified by the current user.
+    // Look at projects where lastCommittedBy is not the current user, and fetch
+    // public profiles of the users that have modified them.
     React.useEffect(
       () => {
         const updateModificationInfoByProjectId = async () => {
@@ -595,8 +617,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           setIsRefreshing(true);
           await onCloudProjectsChanged();
         } finally {
-          // Wait a bit to avoid spam.
-          setTimeout(() => setIsRefreshing(false), 1000);
+          // Wait a bit to avoid spam as we don't have a "loading" state.
+          setTimeout(() => setIsRefreshing(false), 2000);
         }
       },
       [onCloudProjectsChanged, isRefreshing]

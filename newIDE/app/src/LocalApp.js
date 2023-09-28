@@ -80,6 +80,7 @@ export const create = (authentication: Authentication) => {
                 <ShareDialog
                   project={props.project}
                   onSaveProject={props.onSaveProject}
+                  isSavingProject={props.isSavingProject}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
                   automatedExporters={localAutomatedExporters}

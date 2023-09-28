@@ -31,8 +31,9 @@ export type ExporterKey =
   | 'electronexport'
   | 'cordovaexport';
 
-/** @type {{[key: ExporterSection]: {[key: ExporterSubSection] : ExporterKey}}} */
-const exporterSectionMapping = {
+const exporterSectionMapping: {
+  [key: ExporterSection]: { [key: ExporterSubSection]: ?ExporterKey },
+} = {
   browser: {
     online: 'onlinewebexport',
     offline: 'webexport',
@@ -62,6 +63,7 @@ export type Exporter = {|
 export type ShareDialogWithoutExportsProps = {|
   project: ?gdProject,
   onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
   onClose: () => void,
   onChangeSubscription: () => void,
   initialTab: ?ShareTab,
@@ -94,6 +96,7 @@ type Props = {|
 const ShareDialog = ({
   project,
   onSaveProject,
+  isSavingProject,
   onClose,
   allExportersRequireOnline,
   onChangeSubscription,
@@ -327,6 +330,7 @@ const ShareDialog = ({
         <PublishHome
           project={project}
           onSaveProject={onSaveProject}
+          isSavingProject={isSavingProject}
           onGameUpdated={setGame}
           onChangeSubscription={onChangeSubscription}
           isNavigationDisabled={isNavigationDisabled}

@@ -44,6 +44,7 @@ export const Default = () => {
     <PublishHome
       project={testProject.project}
       onSaveProject={action('onSaveProject')}
+      isSavingProject={false}
       onGameUpdated={action('onGameUpdated')}
       onChangeSubscription={action('onChangeSubscription')}
       isNavigationDisabled={false}
@@ -72,6 +73,7 @@ export const OnlineWebExporterSelected = () => {
       <PublishHome
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         onGameUpdated={action('onGameUpdated')}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}
@@ -101,6 +103,7 @@ export const OnlyOnlineWebExporter = () => {
       <PublishHome
         project={testProject.project}
         onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
         onGameUpdated={action('onGameUpdated')}
         onChangeSubscription={action('onChangeSubscription')}
         isNavigationDisabled={false}

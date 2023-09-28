@@ -32,13 +32,14 @@ import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import LinearProgress from '../../../UI/LinearProgress';
-import { CircularProgress } from '@material-ui/core';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import CircularProgress from '../../../UI/CircularProgress';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
   project: gdProject,
   onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
   errored: boolean,
   exportStep: BuildStep,
 |};
@@ -49,6 +50,7 @@ const OnlineGameLink = ({
   build,
   project,
   onSaveProject,
+  isSavingProject,
   errored,
   exportStep,
 }: OnlineGameLinkProps) => {
@@ -366,7 +368,7 @@ const OnlineGameLink = ({
               ) : (
                 <Column alignItems="center">
                   <Line>
-                    <CircularProgress />
+                    <CircularProgress size={40} />
                   </Line>
                   <Text>
                     <Trans>Loading your link...</Trans>
@@ -396,7 +398,7 @@ const OnlineGameLink = ({
                 }
               }}
               game={game}
-              isLoading={isGameLoading}
+              isLoading={isSavingProject || isGameLoading}
               i18n={i18n}
             />
           )}

@@ -91,7 +91,9 @@ export type CloudProjectVersion = {|
 
 export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
+  /** Represents when the current user last modified the project. */
   lastModifiedAt: string,
+  /** Was not always recorded so can be undefined. Represents the last user who committed. */
   lastCommittedBy?: string,
 |};
 

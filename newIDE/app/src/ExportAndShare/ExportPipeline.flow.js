@@ -49,13 +49,14 @@ export type ExportPipeline<
 
   isNavigationDisabled: (exportStep: BuildStep, errored: boolean) => boolean,
 
-  renderCustomStepsProgress?: ({
+  renderCustomStepsProgress?: ({|
     build: ?Build,
     project: gdProject,
     onSaveProject: () => Promise<void>,
+    isSavingProject: boolean,
     errored: boolean,
     exportStep: BuildStep,
-  }) => React.Node,
+  |}) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

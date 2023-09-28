@@ -22,6 +22,7 @@ type FlattenedNode<Item> = {|
   id: string,
   name: string,
   hasChildren: boolean,
+  canHaveChildren: boolean,
   depth: number,
   dataset?: ?HTMLDataset,
   collapsed: boolean,
@@ -183,6 +184,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     ): FlattenedNode<Item>[] => {
       const id = getItemId(item);
       const children = getItemChildren(item);
+      const canHaveChildren = Array.isArray(children);
       const collapsed = !forceAllOpened && !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
       let flattenedChildren = [];
@@ -231,6 +233,7 @@ const TreeView = <Item: ItemBaseAttributes>(
             id,
             name,
             hasChildren: !!children && children.length > 0,
+            canHaveChildren,
             depth,
             selected,
             thumbnailSrc,

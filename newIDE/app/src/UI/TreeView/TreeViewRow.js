@@ -141,7 +141,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       if (
         isStayingOver &&
         !openWhenOverTimeoutId.current &&
-        node.hasChildren &&
+        node.canHaveChildren &&
         node.collapsed
       ) {
         openWhenOverTimeoutId.current = setTimeout(() => {
@@ -162,7 +162,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     }
   }, []);
 
-  const displayAsFolder = node.hasChildren || node.thumbnailSrc === 'FOLDER';
+  const displayAsFolder = node.canHaveChildren;
 
   return (
     <div style={style} ref={containerRef}>

@@ -123,6 +123,7 @@ const getTreeViewItemChildren = (item: TreeViewItem) => {
   if (item.isPlaceholder) return null;
   if (item.isRoot) return item.children;
   const { objectFolderOrObject, global } = item;
+  if (!objectFolderOrObject.isFolder()) return null;
   return mapFor(0, objectFolderOrObject.getChildrenCount(), i => ({
     objectFolderOrObject: objectFolderOrObject.getChildAt(i),
     global,

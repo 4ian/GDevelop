@@ -998,15 +998,31 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObject: selectedObjectFolderOrObject,
             global,
           } = selectedObjectFolderOrObjectsWithContext[0];
-          const parentFolder = selectedObjectFolderOrObject.getParent();
-          const newFolder = parentFolder.insertNewFolder(
-            'NewFolder',
-            parentFolder.getChildPosition(selectedObjectFolderOrObject)
-          );
-          newObjectFolderOrObjectWithContext = {
-            objectFolderOrObject: newFolder,
-            global,
-          };
+          if (selectedObjectFolderOrObject.isFolder()) {
+            const newFolder = selectedObjectFolderOrObject.insertNewFolder(
+              'NewFolder',
+              0
+            );
+            newObjectFolderOrObjectWithContext = {
+              objectFolderOrObject: newFolder,
+              global,
+            };
+            if (treeViewRef.current) {
+              treeViewRef.current.openItems([
+                getTreeViewItemId(selectedObjectFolderOrObjectsWithContext[0]),
+              ]);
+            }
+          } else {
+            const parentFolder = selectedObjectFolderOrObject.getParent();
+            const newFolder = parentFolder.insertNewFolder(
+              'NewFolder',
+              parentFolder.getChildPosition(selectedObjectFolderOrObject)
+            );
+            newObjectFolderOrObjectWithContext = {
+              objectFolderOrObject: newFolder,
+              global,
+            };
+          }
         } else {
           const rootFolder = objectsContainer.getRootFolder();
           const newFolder = rootFolder.insertNewFolder('NewFolder', 0);

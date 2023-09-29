@@ -517,8 +517,9 @@ namespace gdjs {
       const height = this._oldHeight;
       const resolution = pixiRenderer.resolution;
       this._renderTexture = PIXI.RenderTexture.create({
-        width,
-        height,
+        // A size of 0 is forbidden by Pixi.
+        width: width || 100,
+        height: height || 100,
         resolution,
       });
       this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;

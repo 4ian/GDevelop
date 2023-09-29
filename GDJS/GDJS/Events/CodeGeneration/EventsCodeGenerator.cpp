@@ -823,6 +823,22 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   return conditionCode;
 }
 
+gd::String EventsCodeGenerator::GenerateRelationalOperation(
+    const gd::String& relationalOperator,
+    const gd::String& lhs,
+    const gd::String& rhs) {
+  if (relationalOperator == "startsWith") {
+    return "(" + lhs + ").startsWith(" + rhs + ")";
+  }
+  if (relationalOperator == "endsWith") {
+    return "(" + lhs + ").endsWith(" + rhs + ")";
+  }
+  if (relationalOperator == "contains") {
+    return "(" + lhs + ").includes(" + rhs + ")";
+  }
+  return gd::EventsCodeGenerator::GenerateRelationalOperation(relationalOperator, lhs, rhs);
+}
+
 gd::String EventsCodeGenerator::GenerateObjectAction(
     const gd::String& objectName,
     const gd::ObjectMetadata& objInfo,

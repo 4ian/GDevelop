@@ -69,18 +69,36 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(
     }
   }
 
-  // Check type of Relational Operator
-  if (relationalOperator == "startsWith") {
-    return rhs + " != '' && " + callStartString + "(" + argumentsStr + ").match(new RegExp('^' + " + rhs + ")) !== null";
-  } else if (relationalOperator == "endsWith") {
-    return rhs + " != '' && " + callStartString + "(" + argumentsStr + ").match(new RegExp(" + rhs + " + '$')) !== null";
-  } else if (relationalOperator == "contains") {
-    return rhs + " != '' && " + callStartString + "(" + argumentsStr + ").match(new RegExp(" + rhs + ")) !== null";
-  }
+  auto lhs = callStartString + "(" + argumentsStr + ")";
+  return GenerateRelationalOperation(relationalOperator, lhs, rhs);
+}
 
-  // Standard Relational Operator (==, !=)
-  return callStartString + "(" + argumentsStr + ") " + relationalOperator +
-         " " + rhs;
+/**
+ * @brief Generate a relational operation
+ * 
+ * @param relationalOperator the operator
+ * @param lhs the left hand operand
+ * @param rhs the right hand operand
+ * @return gd::String 
+ */
+gd::String EventsCodeGenerator::GenerateRelationalOperation(
+    const gd::String& relationalOperator,
+    const gd::String& lhs,
+    const gd::String& rhs) {
+  return lhs + " " + GenerateRelationalOperatorCodes(relationalOperator) + " " + rhs;
+}
+
+const gd::String EventsCodeGenerator::GenerateRelationalOperatorCodes(const gd::String &operatorString) {
+    if (operatorString == "=") {
+        return "==";
+    }
+    if (operatorString != "<" && operatorString != ">" &&
+        operatorString != "<=" && operatorString != ">=" && operatorString != "!=" &&
+        operatorString != "startsWith" && operatorString != "endsWith" && operatorString != "contains") {
+      cout << "Warning: Bad relational operator: Set to == by default." << endl;
+      return "==";
+    }
+    return operatorString;
 }
 
 /**
@@ -648,19 +666,6 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
   return outputCode;
 }
 
-const gd::String EventsCodeGenerator::GenerateRelationalOperatorCodes(const gd::String &operatorString) {
-    if (operatorString == "=") {
-        return "==";
-    }
-    if (operatorString != "<" && operatorString != ">" &&
-        operatorString != "<=" && operatorString != ">=" && operatorString != "!=" &&
-        operatorString != "startsWith" && operatorString != "endsWith" && operatorString != "contains") {
-      cout << "Warning: Bad relational operator: Set to == by default." << endl;
-      return "==";
-    }
-    return operatorString;
-}
-
 gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
@@ -685,7 +690,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput =
         GenerateObject(parameter.GetPlainString(), metadata.GetType(), context);
   } else if (metadata.GetType() == "relationalOperator") {
-    argOutput += GenerateRelationalOperatorCodes(parameter.GetPlainString());
+    argOutput += parameter.GetPlainString();
     argOutput = "\"" + argOutput + "\"";
   } else if (metadata.GetType() == "operator") {
     argOutput += parameter.GetPlainString();

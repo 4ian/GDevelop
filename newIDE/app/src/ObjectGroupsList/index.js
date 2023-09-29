@@ -331,7 +331,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   _moveSelectionTo = (
     i18n: I18nType,
     destinationItem: TreeViewItem,
-    where: 'afterOrInside' | 'before'
+    where: 'before' | 'inside' | 'after'
   ) => {
     if (destinationItem.isRoot) return false;
     const { selectedGroupWithContext } = this.state;
@@ -374,7 +374,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return;
     }
     if (toIndex > fromIndex) toIndex -= 1;
-    if (where === 'afterOrInside') toIndex += 1;
+    if (where === 'after') toIndex += 1;
 
     container.move(fromIndex, toIndex);
     this._onObjectGroupModified();

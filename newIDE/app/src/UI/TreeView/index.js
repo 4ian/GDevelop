@@ -458,8 +458,13 @@ const TreeView = <Item: ItemBaseAttributes>(
 
   const onKeyDown = React.useCallback(
     (event: KeyboardEvent) => {
+      if (
+        !['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(event.key)
+      )
+        return;
       let newFocusedItem;
       const item = selectedItems[0];
+      if (!item) return;
       const itemIndexInFlattenedData = flattenedData.findIndex(
         node => node.id === getItemId(item)
       );

@@ -25,13 +25,16 @@ namespace gd {
 
 Animation SpriteObject::badAnimation;
 
-SpriteObject::SpriteObject() : updateIfNotVisible(false) {}
+SpriteObject::SpriteObject()
+    : updateIfNotVisible(false), adaptCollisionMaskAutomatically(true) {}
 
 SpriteObject::~SpriteObject(){};
 
 void SpriteObject::DoUnserializeFrom(gd::Project& project,
                                      const gd::SerializerElement& element) {
   updateIfNotVisible = element.GetBoolAttribute("updateIfNotVisible", true);
+  adaptCollisionMaskAutomatically =
+      element.GetBoolAttribute("adaptCollisionMaskAutomatically", false);
 
   RemoveAllAnimations();
   const gd::SerializerElement& animationsElement =
@@ -80,6 +83,8 @@ void SpriteObject::DoUnserializeFrom(gd::Project& project,
 
 void SpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("updateIfNotVisible", updateIfNotVisible);
+  element.SetAttribute("adaptCollisionMaskAutomatically",
+                       adaptCollisionMaskAutomatically);
 
   // Animations
   gd::SerializerElement& animationsElement = element.AddChild("animations");

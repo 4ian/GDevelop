@@ -119,6 +119,8 @@ export const installResource = (
     newResource = new gd.VideoResource();
   } else if (serializedResource.kind === 'json') {
     newResource = new gd.JsonResource();
+  } else if (serializedResource.kind === 'model3D') {
+    newResource = new gd.Model3DResource();
   } else {
     throw new Error(
       `Resource of kind "${serializedResource.kind}" is not supported.`
@@ -371,7 +373,7 @@ export const checkRequiredExtensionsUpdate = async ({
 
   const requiredExtensionShortHeaders = requiredExtensions.map(
     requiredExtension => {
-      const extensionShortHeader = extensionsRegistry.extensionShortHeaders.find(
+      const extensionShortHeader = extensionsRegistry.headers.find(
         extensionShortHeader => {
           return extensionShortHeader.name === requiredExtension.extensionName;
         }

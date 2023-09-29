@@ -30,6 +30,57 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     })
   );
 
+  it('does not generate anything for a disabled event and its sub events', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Counter', '+', '1'],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        disabled: true,
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Counter', '+', '1'],
+          },
+        ],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['Counter', '+', '1'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(1);
+  });
+
   it('can generate a While event', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
@@ -552,7 +603,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     eventsFunction
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
-    const group = eventsFunction.getObjectGroups().insert('MyObjectGroup', 0);
+    const group = eventsFunction
+      .getObjectGroups()
+      .insertNew('MyObjectGroup', 0);
     group.setName('MyObjectGroup');
     group.addObject('ObjectParam1');
     group.addObject('ObjectParam2');

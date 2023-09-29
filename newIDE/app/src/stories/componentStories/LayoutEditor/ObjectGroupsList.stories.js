@@ -25,7 +25,7 @@ export const Default = () => (
           globalObjectGroups={testProject.project.getObjectGroups()}
           objectGroups={testProject.testLayout.getObjectGroups()}
           onEditGroup={() => {}}
-          canRenameGroup={() => true}
+          getValidatedObjectOrGroupName={newName => newName}
         />
       </div>
     </SerializedObjectDisplay>

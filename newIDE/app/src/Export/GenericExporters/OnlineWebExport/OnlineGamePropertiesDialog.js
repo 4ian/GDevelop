@@ -1,5 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import { type Game } from '../../../Utils/GDevelopServices/Game';
@@ -25,6 +26,7 @@ type Props = {|
   onClose: () => void,
   onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
+  i18n: I18nType,
 |};
 
 export const OnlineGamePropertiesDialog = ({
@@ -35,6 +37,7 @@ export const OnlineGamePropertiesDialog = ({
   onClose,
   onApply,
   isLoading,
+  i18n,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -80,7 +83,7 @@ export const OnlineGamePropertiesDialog = ({
   const onPublish = async ({ saveProject }: { saveProject: boolean }) => {
     // First update the project with the new properties.
     if (
-      applyPublicPropertiesToProject(project, {
+      applyPublicPropertiesToProject(project, i18n, {
         name,
         categories: categories || [],
         description: description || '',

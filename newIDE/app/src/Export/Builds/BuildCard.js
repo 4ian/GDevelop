@@ -17,7 +17,10 @@ import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import BackgroundText from '../../UI/BackgroundText';
-import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../../UI/KeyboardShortcuts/InteractionKeys';
 import { LineStackLayout } from '../../UI/Layout';
 import Card from '../../UI/Card';
 
@@ -95,6 +98,9 @@ const BuildAndCreatedAt = ({ build }: { build: Build }) => (
   </Line>
 );
 
+const BUILD_NAME_MAX_LENGTH = 50;
+const BUILD_DEFAULT_NAME_TIME_FORMAT = 'yyyy-MM-dd-HH-mm-ss';
+
 type Props = {|
   build: Build,
   game: Game,
@@ -119,7 +125,11 @@ export const BuildCard = ({
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()
-    .replace(/ /g, '-')}-${format(build.updatedAt, 'yyyy-MM-dd-HH-mm-ss')}`;
+    .replace(/ /g, '-')
+    .slice(
+      0,
+      BUILD_NAME_MAX_LENGTH - BUILD_DEFAULT_NAME_TIME_FORMAT.length - 1
+    )}-${format(build.updatedAt, BUILD_DEFAULT_NAME_TIME_FORMAT)}`;
   const buildName = build.name ? build.name : defaultBuildName;
   const isOnlineBuild = game.publicWebBuildId === build.id;
   const isOld =
@@ -130,11 +140,12 @@ export const BuildCard = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const nameInput = React.useRef<?TextFieldInterface>(null);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
 
   const [isEditingName, setIsEditingName] = React.useState(false);
-  const [name, setName] = React.useState(build.name || '');
+  const [name, setName] = React.useState(buildName);
 
   const onCopyUuid = () => {
     navigator.clipboard.writeText(build.id);
@@ -234,7 +245,7 @@ export const BuildCard = ({
             }
             header={
               <Line noMargin alignItems="start" justifyContent="space-between">
-                {windowWidth !== 'small' && <BuildAndCreatedAt build={build} />}
+                {!isMobileScreen && <BuildAndCreatedAt build={build} />}
                 <Column expand noMargin justifyContent="center">
                   <Line noMargin justifyContent="end">
                     {isOnlineBuild ? (
@@ -263,7 +274,7 @@ export const BuildCard = ({
             }
           >
             <Column expand noMargin>
-              {windowWidth === 'small' && <BuildAndCreatedAt build={build} />}
+              {isMobileScreen && <BuildAndCreatedAt build={build} />}
               <Spacer />
               <Line noMargin>
                 {isEditingName ? (
@@ -283,7 +294,14 @@ export const BuildCard = ({
                         if (shouldValidate(event) && nameInput.current)
                           nameInput.current.blur();
                       }}
-                      maxLength={50}
+                      onKeyDown={event => {
+                        if (shouldCloseOrCancel(event)) {
+                          event.stopPropagation();
+                          setIsEditingName(false);
+                          setName(buildName);
+                        }
+                      }}
+                      maxLength={BUILD_NAME_MAX_LENGTH}
                     />
                     {gameUpdating && (
                       <>

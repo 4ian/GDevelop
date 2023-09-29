@@ -17,6 +17,7 @@
 #include <GDCore/Extensions/Metadata/EffectMetadata.h>
 #include <GDCore/Extensions/Metadata/MetadataProvider.h>
 #include <GDCore/Extensions/Metadata/MultipleInstructionMetadata.h>
+#include <GDCore/Extensions/Metadata/AbstractFunctionMetadata.h>
 #include <GDCore/Extensions/Metadata/ParameterOptions.h>
 #include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
 #include <GDCore/Extensions/Platform.h>
@@ -44,6 +45,7 @@
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
+#include <GDCore/IDE/Events/EventsFunctionSelfCallChecker.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ProjectResourcesAdder.h>
 #include <GDCore/IDE/Project/ProjectResourcesCopier.h>
@@ -73,9 +75,13 @@
 #include <GDCore/Project/ObjectConfiguration.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
+#include <GDCore/Project/ProjectScopedContainers.h>
+#include <GDCore/Project/PropertiesContainer.h>
+#include <GDCore/Project/PropertiesContainersList.h>
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
+#include <GDCore/Project/VariablesContainersList.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
@@ -83,6 +89,7 @@
 #include <GDJS/Events/CodeGeneration/ObjectCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/LayoutCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/MetadataDeclarationHelper.h>
 #include <GDJS/IDE/Exporter.h>
 #include <GDJS/IDE/ExporterHelper.h>
 #include <emscripten.h>
@@ -99,6 +106,7 @@
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"
+#include "../../Extensions/3D/Model3DObjectConfiguration.h"
 #include "BehaviorJsImplementation.h"
 #include "BehaviorSharedDataJsImplementation.h"
 #include "ObjectJsImplementation.h"
@@ -373,6 +381,12 @@ void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
   vec.erase(vec.begin() + pos);
 }
 
+void insertIntoVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
+                                       size_t pos,
+                                       const ParameterMetadata& parameterMetadata) {
+  vec.insert(vec.begin() + pos, parameterMetadata);
+}
+
 void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
                                    size_t oldIndex,
                                    size_t newIndex) {
@@ -421,6 +435,7 @@ typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;
 typedef EventsFunction::FunctionType EventsFunction_FunctionType;
+typedef EventsFunctionsContainer::FunctionOwner EventsFunctionsContainer_FunctionOwner;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<gd::ObjectConfiguration> UniquePtrObjectConfiguration;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
@@ -430,8 +445,6 @@ typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::EventsBasedObject>
     EventsBasedObjectsList;
-typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor>
-    NamedPropertyDescriptorsList;
 typedef ExpressionCompletionDescription::CompletionKind
     ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription>
@@ -512,7 +525,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_CreateNewGDJSProject CreateNewGDJSProject
 #define STATIC_InitializePlatforms InitializePlatforms
-#define STATIC_ValidateName ValidateName
+#define STATIC_IsUsageOfUnicodeIdentifierNamesAllowed IsUsageOfUnicodeIdentifierNamesAllowed
+#define STATIC_AllowUsageOfUnicodeIdentifierNames AllowUsageOfUnicodeIdentifierNames
+#define STATIC_IsNameSafe IsNameSafe
+#define STATIC_GetSafeName GetSafeName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(x)
 #define STATIC_IsObject IsObject
@@ -527,6 +543,12 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Get Get
 #define STATIC_GetAllUseless GetAllUseless
 #define STATIC_RemoveAllUseless RemoveAllUseless
+#define STATIC_MakeNewVariablesContainersListForProjectAndLayout MakeNewVariablesContainersListForProjectAndLayout
+#define STATIC_MakeNewEmptyVariablesContainersList MakeNewEmptyVariablesContainersList
+#define STATIC_MakeNewObjectsContainersListForProjectAndLayout MakeNewObjectsContainersListForProjectAndLayout
+#define STATIC_MakeNewObjectsContainersListForContainers MakeNewObjectsContainersListForContainers
+#define STATIC_MakeNewProjectScopedContainersForProjectAndLayout MakeNewProjectScopedContainersForProjectAndLayout
+#define STATIC_MakeNewProjectScopedContainersFor MakeNewProjectScopedContainersFor
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata
@@ -552,6 +574,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
 #define STATIC_ReplaceStringInEvents ReplaceStringInEvents
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
+#define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 
 #define STATIC_GetBehaviorMetadata GetBehaviorMetadata
 #define STATIC_GetObjectMetadata GetObjectMetadata
@@ -596,6 +619,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   EnsureObjectEventsFunctionsProperParameters
 #define STATIC_AddBehaviorAndRequiredBehaviors \
   AddBehaviorAndRequiredBehaviors
+#define STATIC_AddRequiredBehaviorsFor AddRequiredBehaviorsFor
 #define STATIC_FindDependentBehaviorNames \
   FindDependentBehaviorNames
 #define STATIC_FindInvalidRequiredBehaviorProperties \
@@ -604,6 +628,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetBehaviorsWithType
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
+#define STATIC_RemoveLayer RemoveLayer
+#define STATIC_MergeLayers MergeLayers
+#define STATIC_GetLayoutAndExternalLayoutLayerInstancesCount GetLayoutAndExternalLayoutLayerInstancesCount
+
 #define STATIC_GenerateBehaviorGetterAndSetter GenerateBehaviorGetterAndSetter
 #define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
@@ -619,6 +647,11 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindAllLayoutVariables FindAllLayoutVariables
 #define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_FindAllIdentifierExpressions FindAllIdentifierExpressions
+
+#define STATIC_IsFreeFunctionOnlyCallingItself IsFreeFunctionOnlyCallingItself
+#define STATIC_IsBehaviorFunctionOnlyCallingItself IsBehaviorFunctionOnlyCallingItself
+#define STATIC_IsObjectFunctionOnlyCallingItself IsObjectFunctionOnlyCallingItself
+
 #define STATIC_SearchInEvents SearchInEvents
 #define STATIC_UnfoldWhenContaining UnfoldWhenContaining
 #define STATIC_FoldAll FoldAll
@@ -631,6 +664,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetObjectParameterIndexFor GetObjectParameterIndexFor
 
 #define STATIC_GetNamespaceSeparator GetNamespaceSeparator
+#define STATIC_GetBehaviorFullType GetBehaviorFullType
+#define STATIC_ApplyRefactoringForVariablesContainer ApplyRefactoringForVariablesContainer
+#define STATIC_ComputeChangesetForVariablesContainer ComputeChangesetForVariablesContainer
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior UpdateExtensionNameInEventsBasedBehavior
 #define STATIC_RenameEventsFunction RenameEventsFunction
@@ -672,6 +708,19 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetSharedPropertyConditionName GetSharedPropertyConditionName
 #define STATIC_GetSharedPropertyExpressionName GetSharedPropertyExpressionName
 #define STATIC_GetSharedPropertyToggleActionName GetSharedPropertyToggleActionName
+
+#define STATIC_DeclareExtension DeclareExtension
+#define STATIC_GenerateBehaviorMetadata GenerateBehaviorMetadata
+#define STATIC_GenerateObjectMetadata GenerateObjectMetadata
+#define STATIC_GetExtensionCodeNamespacePrefix GetExtensionCodeNamespacePrefix
+#define STATIC_GetFreeFunctionCodeName GetFreeFunctionCodeName
+#define STATIC_GetFreeFunctionCodeNamespace GetFreeFunctionCodeNamespace
+#define STATIC_GetBehaviorFunctionCodeNamespace GetBehaviorFunctionCodeNamespace
+#define STATIC_GetObjectFunctionCodeNamespace GetObjectFunctionCodeNamespace
+#define STATIC_IsBehaviorLifecycleEventsFunction IsBehaviorLifecycleEventsFunction
+#define STATIC_IsObjectLifecycleEventsFunction IsObjectLifecycleEventsFunction
+#define STATIC_IsExtensionLifecycleEventsFunction IsExtensionLifecycleEventsFunction
+#define STATIC_ShiftSentenceParamIndexes ShiftSentenceParamIndexes
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 

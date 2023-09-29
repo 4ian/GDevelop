@@ -1,6 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import capitalize from 'lodash/capitalize';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { mapFor } from '../../Utils/MapFor';
@@ -37,6 +38,16 @@ import {
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import {
+  type EventsScope,
+  getProjectScopedContainersFromScope,
+} from '../../InstructionOrExpression/EventsScope.flow';
+import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
+import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
+import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -50,17 +61,12 @@ const styles = {
 
 export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
 
-const capitalize = (str: string) => {
-  if (!str) return '';
-
-  return str[0].toUpperCase() + str.substr(1);
-};
-
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
   isCondition: boolean,
 }>(reactDndInstructionType);
 
 type Props = {|
+  platform: gdPlatform,
   instruction: gdInstruction,
   isCondition: boolean,
   onClick: Function,
@@ -96,6 +102,8 @@ type Props = {|
   screenType: ScreenType,
   windowWidth: WidthType,
 
+  scope: EventsScope,
+  resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
@@ -123,8 +131,72 @@ const formatValue = ({
     ? i18n._(t`Base layer`)
     : value;
 
+const InstructionMissing = (props: {|
+  instructionType: string,
+  isCondition: boolean,
+|}) => {
+  const { hasExtensionNamed } = React.useContext(ExtensionStoreContext);
+  const { name, behaviorName, extensionName } = getFunctionNameFromType(
+    props.instructionType
+  );
+  const extensionStoreMention = hasExtensionNamed(extensionName) ? (
+    <Trans>Try installing it from the extension store.</Trans>
+  ) : (
+    ''
+  );
+
+  const functionNode = <span className="function-name">{name}</span>;
+  const behaviorNode = <span className="behavior-name">{behaviorName}</span>;
+  const extensionNode = <span className="extension-name">{extensionName}</span>;
+
+  if (behaviorName) {
+    if (props.isCondition) {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} condition on behavior {behaviorNode} from
+            {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    } else {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} action on behavior {behaviorNode} from
+            {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    }
+  } else {
+    if (props.isCondition) {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} condition from {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    } else {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} action from {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    }
+  }
+};
+
 const Instruction = (props: Props) => {
   const {
+    platform,
     instruction,
     isCondition,
     onClick,
@@ -133,6 +205,8 @@ const Instruction = (props: Props) => {
     globalObjectsContainer,
     objectsContainer,
     id,
+    resourcesManager,
+    scope,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -181,6 +255,15 @@ const Instruction = (props: Props) => {
             parameterIndex >= 0 && parameterIndex < parametersCount;
 
           if (!isParameter) {
+            if (value === 'Unknown or unsupported instruction') {
+              return (
+                <InstructionMissing
+                  instructionType={instruction.getType()}
+                  isCondition={isCondition}
+                  key={`unknown-behavior-instruction-${i}`}
+                />
+              );
+            }
             return <span key={i}>{i === 0 ? capitalize(value) : value}</span>;
           }
 
@@ -203,8 +286,11 @@ const Instruction = (props: Props) => {
                 .getRootNode();
               const expressionValidator = new gd.ExpressionValidator(
                 gd.JsPlatform.get(),
-                globalObjectsContainer,
-                objectsContainer,
+                getProjectScopedContainersFromScope(
+                  scope,
+                  globalObjectsContainer,
+                  objectsContainer
+                ),
                 parameterType
               );
               expressionNode.visit(expressionValidator);
@@ -228,7 +314,63 @@ const Instruction = (props: Props) => {
                     objectsContainer,
                     objectOrGroupName,
                     /*searchInGroups=*/ true
-                  ) === parameterMetadata.getExtraInfo());
+                  ) === parameterMetadata.getExtraInfo()) &&
+                checkHasRequiredCapability({
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectName: objectOrGroupName,
+                  requiredBehaviorTypes: getRequiredBehaviorTypes(
+                    platform,
+                    metadata,
+                    parameterIndex
+                  ),
+                });
+            } else if (
+              gd.ParameterMetadata.isExpression('resource', parameterType)
+            ) {
+              const resourceName = instruction
+                .getParameter(parameterIndex)
+                .getPlainString();
+              expressionIsValid = resourcesManager.hasResource(resourceName);
+            }
+            if (
+              expressionIsValid &&
+              parameterType === 'functionParameterName'
+            ) {
+              const eventsFunction = props.scope.eventsFunction;
+              if (eventsFunction) {
+                const eventsBasedEntity =
+                  props.scope.eventsBasedBehavior ||
+                  props.scope.eventsBasedObject;
+                const functionsContainer = eventsBasedEntity
+                  ? eventsBasedEntity.getEventsFunctions()
+                  : props.scope.eventsFunctionsExtension;
+
+                if (functionsContainer) {
+                  const allowedParameterTypes = parameterMetadata
+                    .getExtraInfo()
+                    .split(',');
+                  const parameters = enumerateParametersUsableInExpressions(
+                    functionsContainer,
+                    eventsFunction,
+                    allowedParameterTypes
+                  );
+                  const functionParameterNameExpression = instruction
+                    .getParameter(parameterIndex)
+                    .getPlainString();
+                  const functionParameterName = functionParameterNameExpression.substring(
+                    1,
+                    functionParameterNameExpression.length - 1
+                  );
+                  expressionIsValid = parameters.some(
+                    parameter => parameter.getName() === functionParameterName
+                  );
+                }
+              } else {
+                // This can happen if function-dedicated instructions are
+                // copied to scene events.
+                expressionIsValid = false;
+              }
             }
           }
 
@@ -292,7 +434,8 @@ const Instruction = (props: Props) => {
         onContextMenu(event.clientX, event.clientY);
       },
       [onContextMenu]
-    )
+    ),
+    'events-tree-event-component'
   );
 
   return (
@@ -435,6 +578,7 @@ const Instruction = (props: Props) => {
                 {instructionDragSourceDropTargetElement}
                 {metadata.canHaveSubInstructions() && (
                   <InstructionsList
+                    platform={props.platform}
                     style={
                       {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
                     }
@@ -459,6 +603,8 @@ const Instruction = (props: Props) => {
                     renderObjectThumbnail={props.renderObjectThumbnail}
                     screenType={props.screenType}
                     windowWidth={props.windowWidth}
+                    scope={props.scope}
+                    resourcesManager={props.resourcesManager}
                     globalObjectsContainer={props.globalObjectsContainer}
                     objectsContainer={props.objectsContainer}
                     idPrefix={props.id}

@@ -8,7 +8,6 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import SearchBar from '../UI/SearchBar';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -138,7 +137,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
   _toggleAsync = (eventsFunction: gdEventsFunction) => {
     eventsFunction.setAsync(!eventsFunction.isAsync());
-    this.forceUpdate();
+    this.forceUpdateList();
   };
 
   _deleteEventsFunction = (
@@ -217,23 +216,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     }
   };
   _rename = (eventsFunction: gdEventsFunction, newName: string) => {
-    const { eventsFunctionsContainer } = this.props;
     this.setState({
       renamedEventsFunction: null,
     });
 
     if (eventsFunction.getName() === newName) return;
 
-    if (eventsFunctionsContainer.hasEventsFunctionNamed(newName)) {
-      showWarningBox('Another function with this name already exists.', {
-        delayToNextTick: true,
-      });
-      return;
-    }
-
     this.props.onRenameEventsFunction(eventsFunction, newName, doRename => {
       if (!doRename) return;
-      eventsFunction.setName(newName);
       this._onEventsFunctionModified();
     });
   };
@@ -355,7 +345,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       {
         label: eventsFunction.isAsync()
           ? i18n._(t`Make synchronous`)
-          : i18n._(t`Make asynchrounous`),
+          : i18n._(t`Make asynchronous`),
         click: () => this._toggleAsync(eventsFunction),
       },
       {

@@ -3,7 +3,7 @@ import {
   addGDevelopResourceJwtTokenToUrl,
   cleanGDevelopResourceJwtToken,
   extractFilenameFromProjectResourceUrl,
-  extractProjectUuidFromProjetResourceUrl,
+  extractProjectUuidFromProjectResourceUrl,
   storeGDevelopResourceJwtToken,
 } from './Project';
 
@@ -87,22 +87,22 @@ describe('Project service', () => {
       );
     });
   });
-  describe('getProjectUuidFromProjetResourceUrl', () => {
+  describe('extractProjectUuidFromProjectResourceUrl', () => {
     it('gives the project UUID from an URL', () => {
       expect(
-        extractProjectUuidFromProjetResourceUrl(
+        extractProjectUuidFromProjectResourceUrl(
           'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
         )
       ).toBe('a9fe5bce-de39-4147-a669-93fc5cd69632');
       expect(
-        extractProjectUuidFromProjetResourceUrl(
+        extractProjectUuidFromProjectResourceUrl(
           'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
         )
       ).toBe(null);
       expect(
-        extractProjectUuidFromProjetResourceUrl('https://example.com')
+        extractProjectUuidFromProjectResourceUrl('https://example.com')
       ).toBe(null);
-      expect(extractProjectUuidFromProjetResourceUrl('example')).toBe(null);
+      expect(extractProjectUuidFromProjectResourceUrl('example')).toBe(null);
     });
   });
   describe('addGDevelopResourceJwtTokenToUrl', () => {

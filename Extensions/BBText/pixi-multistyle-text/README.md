@@ -12,31 +12,35 @@ In the example below, we are defining 4 text styles.
 ```js
 let text = new MultiStyleText("Let's make some <ml>multiline</ml>\nand <ms>multistyle</ms> text for\n<pixi>Pixi.js!</pixi>",
 {
-	"default": {
-		fontFamily: "Arial",
-		fontSize: "24px",
-		fill: "#cccccc",
-		align: "center"
-	},
-	"ml": {
-		fontStyle: "italic",
-		fill: "#ff8888"
-	},
-	"ms": {
-		fontStyle: "italic",
-		fill: "#4488ff"
-	},
-	"pixi": {
-		fontSize: "64px",
-		fill: "#efefef"
-	}
+    "default": {
+        fontFamily: "Arial",
+        fontSize: "24px",
+        fill: "#cccccc",
+        align: "center"
+    },
+    "ml": {
+        fontStyle: "italic",
+        fill: "#ff8888"
+    },
+    "ms": {
+        fontStyle: "italic",
+        fill: "#4488ff"
+    },
+    "pixi": {
+        fontSize: "64px",
+        fill: "#efefef"
+    }
 });
 ```
+
 ## Build instructions
 
-```
-$ yarn install
-$ yarn build
+The library is no longer maintain and need this fix to work with Pixi 7: 
+- [Fix empty color attribute errors with Pixi 7](https://github.com/D8H/pixi-multistyle-text/pull/1)
+
+```bash
+yarn install
+yarn build
 ```
 
 ## Usage
@@ -46,6 +50,7 @@ $ yarn build
 Creates a new `MultiStyleText` with the given text and styles.
 
 #### `textStyles`
+
 Type: `{ [key: string]: ExtendedTextStyle }`
 
 Each key of this dictionary should match with a tag in the text. Use the key `default` for the default style.
@@ -57,10 +62,10 @@ The `align`, `wordWrap`, `wordWrapWidth`, and `breakWord` properties are ignored
 If text is rendered without any value assigned to a given parameter, Pixi's defaults are used.
 
 ## Demo
-```
-$ yarn demo
-```
 
+```bash
+yarn demo
+```
 
 ## License
 

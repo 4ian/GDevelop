@@ -9,8 +9,8 @@ const serializedEvents = [
     folded: false,
     type: 'BuiltinCommonInstructions::Standard',
     conditions: [
-      // Condition refering to a group, with a behavior:
-      // 1) The group will be refered as such in the parameters
+      // Condition referring to a group, with a behavior:
+      // 1) The group will be referred as such in the parameters
       //    (because no object of the group is used directly in the rest of events)
       // 2) The behavior will be the next parameter after the group.
       {
@@ -20,13 +20,13 @@ const serializedEvents = [
       },
     ],
     actions: [
-      // Action refering directly to MySpriteObject
+      // Action referring directly to MySpriteObject
       {
         type: { inverted: false, value: 'ChangeAnimation' },
         parameters: ['MySpriteObject', '=', '1'],
         subInstructions: [],
       },
-      // Action refering to GroupOfObjects, which contains MySpriteObject and MyTextObject.
+      // Action referring to GroupOfObjects, which contains MySpriteObject and MyTextObject.
       // As MySpriteObject is used separately, the group will be expanded.
       {
         type: { inverted: false, value: 'Montre' },
@@ -45,6 +45,7 @@ describe('EventsFunctionExtractor', () => {
 
     setupFunctionFromEvents({
       project,
+      scope: { project, layout: testLayout },
       globalObjectsContainer: project,
       objectsContainer: testLayout,
       serializedEvents,

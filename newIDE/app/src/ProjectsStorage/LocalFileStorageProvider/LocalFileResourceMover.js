@@ -6,6 +6,8 @@ import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type FileMetadata } from '../index';
 import {
   extractFilenameWithExtensionFromProductAuthorizedUrl,
+  fetchTokenForPrivateGameTemplateAuthorizationIfNeeded,
+  isPrivateGameTemplateResourceAuthorizedUrl,
   isProductAuthorizedResourceUrl,
 } from '../../Utils/GDevelopServices/Shop';
 import {
@@ -18,6 +20,7 @@ import {
   parseLocalFilePathOrExtensionFromMetadata,
 } from '../../ResourcesList/ResourceUtils';
 import { sanitizeFilename } from '../../Utils/Filename';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 import axios from 'axios';
 const electron = optionalRequire('electron');
@@ -29,6 +32,7 @@ type Options = {|
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress: (number, number) => void,
+  authenticatedUser: AuthenticatedUser,
 |};
 
 const generateUnusedFilepath = (
@@ -65,21 +69,32 @@ const downloadBlobToLocalFile = async (
   );
 };
 
+// This mover can be used for both public URLs and Cloud project resources.
 export const moveUrlResourcesToLocalFiles = async ({
   project,
   fileMetadata,
   onProgress,
+  authenticatedUser,
 }: Options) => {
   if (!fs || !ipcRenderer) throw new Error('Unsupported');
 
   // Get all resources to download.
   const resourcesManager = project.getResourcesManager();
   const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
-  const resourceToFetchNames = allResourceNames.filter(resourceName => {
+  const resourcesToFetchNames = allResourceNames.filter(resourceName => {
     const resource = resourcesManager.getResource(resourceName);
-
-    return isURL(resource.getFile());
+    const resourceFile = resource.getFile();
+    return isURL(resourceFile);
   });
+  const tokenForPrivateGameTemplateAuthorization = await fetchTokenForPrivateGameTemplateAuthorizationIfNeeded(
+    {
+      authenticatedUser,
+      allResourcePaths: resourcesToFetchNames.map(resourceName => {
+        const resource = resourcesManager.getResource(resourceName);
+        return resource.getFile();
+      }),
+    }
+  );
 
   const projectPath = path.dirname(fileMetadata.fileIdentifier);
   const baseAssetsPath = path.join(projectPath, 'assets');
@@ -89,74 +104,91 @@ export const moveUrlResourcesToLocalFiles = async ({
   let fetchedResourcesCount = 0;
 
   await PromisePool.withConcurrency(50)
-    .for(resourceToFetchNames)
+    .for(resourcesToFetchNames) // It's important not to loop on allResourceNames, as calling the onProgress can be costly on the UI.
     .process(async resourceName => {
       const resource = resourcesManager.getResource(resourceName);
 
-      const url = resource.getFile();
-      if (isBlobURL(url)) {
-        try {
-          const {
-            localFilePath,
-            extension,
-          } = parseLocalFilePathOrExtensionFromMetadata(resource);
-          const downloadedFilePath = localFilePath
-            ? path.resolve(projectPath, localFilePath)
-            : generateUnusedFilepath(
-                baseAssetsPath,
-                downloadedFilePaths,
-                sanitizeFilename(resource.getName() + (extension || ''))
-              );
+      const resourceFile = resource.getFile();
+      if (isURL(resourceFile)) {
+        if (isBlobURL(resourceFile)) {
+          try {
+            const {
+              localFilePath,
+              extension,
+            } = parseLocalFilePathOrExtensionFromMetadata(resource);
+            const downloadedFilePath = localFilePath
+              ? path.resolve(projectPath, localFilePath)
+              : generateUnusedFilepath(
+                  baseAssetsPath,
+                  downloadedFilePaths,
+                  sanitizeFilename(resource.getName() + (extension || ''))
+                );
 
-          await fs.ensureDir(baseAssetsPath);
-          await downloadBlobToLocalFile(url, downloadedFilePath);
-          resource.setFile(
-            path.relative(projectPath, downloadedFilePath).replace(/\\/g, '/')
-          );
-        } catch (error) {
-          erroredResources.push({ resourceName, error });
-        }
-      } else {
-        let filename;
-        if (isProductAuthorizedResourceUrl(url)) {
-          // Resource is a private asset.
-          filename = extractFilenameWithExtensionFromProductAuthorizedUrl(url);
-        } else if (isPublicAssetResourceUrl(url)) {
-          // Resource is a public asset.
-          filename = extractFilenameWithExtensionFromPublicAssetResourceUrl(
-            url
-          );
-        } else {
-          // Resource is a project resource or a generic url.
-          filename = extractFilenameFromProjectResourceUrl(url);
-        }
-
-        // Find a new file for the resource to download.
-        const downloadedFilePath = generateUnusedFilepath(
-          baseAssetsPath,
-          downloadedFilePaths,
-          filename
-        );
-        downloadedFilePaths.add(downloadedFilePath);
-
-        try {
-          await retryIfFailed({ times: 2 }, async () => {
             await fs.ensureDir(baseAssetsPath);
-            await ipcRenderer.invoke(
-              'local-file-download',
-              url,
-              downloadedFilePath
-            );
+            await downloadBlobToLocalFile(resourceFile, downloadedFilePath);
             resource.setFile(
               path.relative(projectPath, downloadedFilePath).replace(/\\/g, '/')
             );
-          });
-        } catch (error) {
-          erroredResources.push({ resourceName, error });
+          } catch (error) {
+            erroredResources.push({ resourceName, error });
+          }
+        } else {
+          let filename;
+          if (isProductAuthorizedResourceUrl(resourceFile)) {
+            // Resource is coming from a private asset or private game template.
+            filename = extractFilenameWithExtensionFromProductAuthorizedUrl(
+              resourceFile
+            );
+          } else if (isPublicAssetResourceUrl(resourceFile)) {
+            // Resource is coming from a public asset.
+            filename = extractFilenameWithExtensionFromPublicAssetResourceUrl(
+              resourceFile
+            );
+          } else {
+            // Resource is a project resource or a generic url.
+            filename = extractFilenameFromProjectResourceUrl(resourceFile);
+          }
+
+          // Find a new file for the resource to download.
+          const downloadedFilePath = generateUnusedFilepath(
+            baseAssetsPath,
+            downloadedFilePaths,
+            filename
+          );
+          downloadedFilePaths.add(downloadedFilePath);
+
+          try {
+            await retryIfFailed({ times: 2 }, async () => {
+              await fs.ensureDir(baseAssetsPath);
+              const resourceUrl = new URL(resourceFile);
+              if (
+                isPrivateGameTemplateResourceAuthorizedUrl(resourceUrl.href) &&
+                tokenForPrivateGameTemplateAuthorization
+              ) {
+                resourceUrl.searchParams.set(
+                  'token',
+                  tokenForPrivateGameTemplateAuthorization
+                );
+              }
+              const encodedUrl = resourceUrl.href; // Encode the URL to support special characters in file names.
+              await ipcRenderer.invoke(
+                'local-file-download',
+                encodedUrl,
+                downloadedFilePath
+              );
+              resource.setFile(
+                path
+                  .relative(projectPath, downloadedFilePath)
+                  .replace(/\\/g, '/')
+              );
+            });
+          } catch (error) {
+            erroredResources.push({ resourceName, error });
+          }
         }
       }
 
-      onProgress(fetchedResourcesCount++, resourceToFetchNames.length);
+      onProgress(fetchedResourcesCount++, resourcesToFetchNames.length);
     });
 
   return {

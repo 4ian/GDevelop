@@ -35,6 +35,11 @@ class GD_CORE_API ParameterMetadata {
   gd::ValueTypeMetadata &GetValueTypeMetadata() { return valueTypeMetadata; }
 
   /**
+   * \brief Return the metadata of the parameter type.
+   */
+  const gd::ValueTypeMetadata &GetValueTypeMetadata() const { return valueTypeMetadata; }
+
+  /**
    * \brief Set the metadata of the parameter type.
    */
   ParameterMetadata &SetValueTypeMetadata(const gd::ValueTypeMetadata &valueTypeMetadata_) {
@@ -209,10 +214,10 @@ class GD_CORE_API ParameterMetadata {
    * \brief Return the expression type from the parameter type.
    * Declinations of "number" and "string" types (like "forceMultiplier" or
    * "sceneName") are replaced by "number" and "string".
-   * \deprecated Use gd::ValueTypeMetadata instead.
+   * \deprecated Use gd::ValueTypeMetadata or gd::GetExpressionPrimitiveValueType instead.
    */
   static const gd::String &GetExpressionValueType(const gd::String &parameterType) {
-    return gd::ValueTypeMetadata::GetPrimitiveValueType(parameterType);
+    return gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(parameterType);
   }
 
   /** \name Serialization

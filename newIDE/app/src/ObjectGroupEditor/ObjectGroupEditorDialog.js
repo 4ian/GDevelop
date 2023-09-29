@@ -61,7 +61,7 @@ const ObjectGroupEditorDialog = ({
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
         onSizeUpdated={
-          forceUpdate /*Force update to ensure dialog is properly positionned*/
+          forceUpdate /*Force update to ensure dialog is properly positioned*/
         }
         onObjectGroupUpdated={notifyOfChange}
       />

@@ -18,16 +18,16 @@ import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Slider from '../../UI/Slider';
 import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
 import {
-  clampImagePreviewZoom,
   getWheelStepZoomFactor,
-  imagePreviewMaxZoom,
-  imagePreviewMinZoom,
-  willZoomChange,
   zoomInFactor,
   zoomOutFactor,
-  zoomStepBasePower,
 } from '../../Utils/ZoomUtils';
+import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
+
 const gd: libGDevelop = global.gd;
+
+const imagePreviewMaxZoom = 4;
+const imagePreviewMinZoom = 1 / 4;
 
 type Point = { x: number, y: number };
 
@@ -60,6 +60,7 @@ const styles = {
     width: '100%',
     height: '100%',
     boxSizing: 'border-box',
+    outline: 'none',
 
     // The container contains the image and the "overlay" that can display
     // points or polygons that can be drag'n'dropped. `touch-action` must
@@ -86,9 +87,11 @@ type Props = {|
   renderOverlay?: ({|
     imageWidth: number,
     imageHeight: number,
-    offsetTop: number,
-    offsetLeft: number,
+    imageOffsetTop: number,
+    imageOffsetLeft: number,
     imageZoomFactor: number,
+    forcedCursor: string | null,
+    deactivateControls?: boolean,
   |}) => React.Node,
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
@@ -146,22 +149,52 @@ const ImagePreview = ({
   const { xOffset, yOffset, factor: imageZoomFactor } = zoomState;
   const previousDoubleTouchInfo = React.useRef<any>(null);
   const previousSingleTouchCoordinates = React.useRef<?[number, number]>(null);
+  const previousPointerCoordinates = React.useRef<?[number, number]>(null);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const handleImageError = () => {
     setErrored(true);
   };
+  const [shouldMoveView, setShouldMoveView] = React.useState<boolean>(false);
+  const keyboardShortcuts = React.useRef<KeyboardShortcuts>(
+    new KeyboardShortcuts({
+      isActive: () => !deactivateControls,
+      shortcutCallbacks: {
+        onToggleGrabbingTool: setShouldMoveView,
+      },
+    })
+  );
+
+  const getZoomFactorToFitImage = React.useCallback(
+    () => {
+      if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
+        return 1;
+      }
+      const zoomFactor = Math.min(
+        containerWidth / imageWidth,
+        containerHeight / imageHeight
+      );
+      let zoomFactorWithMargins = zoomFactor * (displaySpacedView ? 0.7 : 0.95);
+      if (zoomFactorWithMargins > 1) {
+        zoomFactorWithMargins = Math.floor(zoomFactorWithMargins);
+      }
+      return zoomFactorWithMargins;
+    },
+    [
+      imageWidth,
+      imageHeight,
+      containerHeight,
+      containerWidth,
+      displaySpacedView,
+    ]
+  );
 
   const adaptZoomFactorToImage = React.useCallback(
-    (displaySpacedView?: boolean) => {
+    () => {
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
         return false;
       }
-      const zoomFactor = clampImagePreviewZoom(
-        Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
-      );
-      const zoomFactorWithMargins =
-        zoomFactor * (displaySpacedView ? 0.7 : 0.95);
+      const zoomFactorWithMargins = getZoomFactorToFitImage();
       setZoomState({
         factor: zoomFactorWithMargins,
         xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
@@ -169,28 +202,44 @@ const ImagePreview = ({
       });
       return true;
     },
-    [imageHeight, imageWidth, containerHeight, containerWidth]
+    [
+      imageWidth,
+      imageHeight,
+      containerHeight,
+      containerWidth,
+      getZoomFactorToFitImage,
+    ]
+  );
+
+  const clampZoomFactor = React.useCallback(
+    (zoom: number) => {
+      const fitZoomFactor = getZoomFactorToFitImage();
+      return Math.max(
+        Math.min(zoom, fitZoomFactor * imagePreviewMaxZoom),
+        fitZoomFactor * imagePreviewMinZoom
+      );
+    },
+    [getZoomFactorToFitImage]
   );
 
   const zoomAroundPointBy = React.useCallback(
     async (imageZoomFactorMultiplier: number, point: [number, number]) => {
-      if (!willZoomChange(imageZoomFactor, imageZoomFactorMultiplier)) {
-        return;
-      }
-      const newFactor = clampImagePreviewZoom(
+      const newFactor = clampZoomFactor(
         imageZoomFactor * imageZoomFactorMultiplier
       );
-      setZoomState(zoomState => ({
-        xOffset:
-          zoomState.xOffset +
-          (point[0] - zoomState.xOffset) * (1 - newFactor / zoomState.factor),
-        yOffset:
-          zoomState.yOffset +
-          (point[1] - zoomState.yOffset) * (1 - newFactor / zoomState.factor),
-        factor: newFactor,
-      }));
+      if (zoomState.factor !== newFactor) {
+        setZoomState(zoomState => ({
+          xOffset:
+            zoomState.xOffset +
+            (point[0] - zoomState.xOffset) * (1 - newFactor / zoomState.factor),
+          yOffset:
+            zoomState.yOffset +
+            (point[1] - zoomState.yOffset) * (1 - newFactor / zoomState.factor),
+          factor: newFactor,
+        }));
+      }
     },
-    [imageZoomFactor]
+    [clampZoomFactor, imageZoomFactor, zoomState.factor]
   );
 
   const zoomAroundPointTo = React.useCallback(
@@ -352,11 +401,9 @@ const ImagePreview = ({
         // or if the zoom has already been adapted.
         return;
       }
-      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage(
-        displaySpacedView
-      );
+      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
     },
-    [adaptZoomFactorToImage, displaySpacedView]
+    [adaptZoomFactorToImage]
   );
 
   const handleImageLoaded = React.useCallback(
@@ -398,6 +445,40 @@ const ImagePreview = ({
     }
   }, []);
 
+  const onPointerDown = React.useCallback(
+    (event: PointerEvent) => {
+      if (containerRef.current) {
+        containerRef.current.focus();
+      }
+      if (shouldMoveView) {
+        previousPointerCoordinates.current = [event.clientX, event.clientY];
+      }
+    },
+    [shouldMoveView]
+  );
+  const onPointerMove = React.useCallback(
+    (event: PointerEvent) => {
+      if (shouldMoveView && previousPointerCoordinates.current) {
+        const [previousX, previousY] = previousPointerCoordinates.current;
+        const newPosition = [event.clientX, event.clientY];
+        previousPointerCoordinates.current = newPosition;
+        setZoomState(zoomState => ({
+          ...zoomState,
+          xOffset: zoomState.xOffset + (newPosition[0] - previousX),
+          yOffset: zoomState.yOffset + (newPosition[1] - previousY),
+        }));
+      }
+    },
+    [shouldMoveView]
+  );
+  const onPointerUp = React.useCallback((event: PointerEvent) => {
+    previousPointerCoordinates.current = null;
+  }, []);
+  const onPointerLeave = React.useCallback((event: PointerEvent) => {
+    previousPointerCoordinates.current = null;
+    setShouldMoveView(false);
+  }, []);
+
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
 
@@ -411,8 +492,24 @@ const ImagePreview = ({
   // TODO: handle a proper loader.
   const visibility = containerLoaded ? undefined : 'hidden';
 
+  const forcedCursor = shouldMoveView ? 'grab' : null;
+  const forcedCursorStyle = forcedCursor
+    ? {
+        cursor: forcedCursor,
+      }
+    : {};
+
+  const imageContainerBorderStyle = {
+    transform: `translate(${xOffset}px, ${yOffset}px)`,
+    // Apply margin only once the container is loaded, to avoid a shift in the image
+    outline: renderOverlay ? `1px solid ${frameBorderColor}` : undefined,
+    width: imageWidth != null ? imageWidth * imageZoomFactor : null,
+    height: imageHeight != null ? imageHeight * imageZoomFactor : null,
+    transformOrigin: '0 0',
+  };
+
   const imageContainerStyle = {
-    transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,
+    transform: `scale(${imageZoomFactor})`,
     width: imageWidth,
     height: imageHeight,
     transformOrigin: '0 0',
@@ -421,12 +518,9 @@ const ImagePreview = ({
 
   const imageStyle = {
     ...styles.spriteThumbnailImage,
-    // Apply margin only once the container is loaded, to avoid a shift in the image
-    outline: renderOverlay
-      ? `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`
-      : undefined,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
+    cursor: forcedCursor,
   };
 
   const overlayStyle = {
@@ -461,9 +555,13 @@ const ImagePreview = ({
                 </IconButton>
                 <div style={styles.sliderContainer}>
                   <Slider
-                    min={Math.log2(imagePreviewMinZoom)}
-                    max={Math.log2(imagePreviewMaxZoom)}
-                    step={zoomStepBasePower * 4}
+                    min={Math.log2(
+                      getZoomFactorToFitImage() * imagePreviewMinZoom
+                    )}
+                    max={Math.log2(
+                      getZoomFactorToFitImage() * imagePreviewMaxZoom
+                    )}
+                    step={1 / 16}
                     value={Math.log2(imageZoomFactor)}
                     onChange={value => {
                       zoomAroundPointTo(Math.pow(2, value), containerCenter);
@@ -503,6 +601,7 @@ const ImagePreview = ({
                 style={{
                   ...styles.imagePreviewContainer,
                   overflow: containerLoaded ? 'unset' : 'hidden',
+                  ...forcedCursorStyle,
                 }}
                 ref={ref => {
                   measureRef(ref);
@@ -511,6 +610,19 @@ const ImagePreview = ({
                 onTouchStart={deactivateControls ? null : onTouchStart}
                 onTouchMove={deactivateControls ? null : handleTouchMove}
                 onTouchEnd={deactivateControls ? null : onTouchEnd}
+                tabIndex={0}
+                onPointerDown={deactivateControls ? null : onPointerDown}
+                onPointerMove={deactivateControls ? null : onPointerMove}
+                onPointerUp={deactivateControls ? null : onPointerUp}
+                onPointerLeave={deactivateControls ? null : onPointerLeave}
+                onKeyDown={
+                  deactivateControls
+                    ? null
+                    : keyboardShortcuts.current.onKeyDown
+                }
+                onKeyUp={
+                  deactivateControls ? null : keyboardShortcuts.current.onKeyUp
+                }
               >
                 {!!errored && (
                   <PlaceholderMessage>
@@ -520,25 +632,27 @@ const ImagePreview = ({
                   </PlaceholderMessage>
                 )}
                 {!errored && (
-                  <div style={imageContainerStyle}>
-                    {isImagePrivate ? (
-                      <AuthorizedAssetImage
-                        style={imageStyle}
-                        alt={resourceName}
-                        url={imageResourceSource}
-                        onError={handleImageError}
-                        onLoad={handleImageLoaded}
-                        hideLoader={hideLoader}
-                      />
-                    ) : (
-                      <CorsAwareImage
-                        style={imageStyle}
-                        alt={resourceName}
-                        src={imageResourceSource}
-                        onError={handleImageError}
-                        onLoad={handleImageLoaded}
-                      />
-                    )}
+                  <div style={imageContainerBorderStyle}>
+                    <div style={imageContainerStyle}>
+                      {isImagePrivate ? (
+                        <AuthorizedAssetImage
+                          style={imageStyle}
+                          alt={resourceName}
+                          url={imageResourceSource}
+                          onError={handleImageError}
+                          onLoad={handleImageLoaded}
+                          hideLoader={hideLoader}
+                        />
+                      ) : (
+                        <CorsAwareImage
+                          style={imageStyle}
+                          alt={resourceName}
+                          src={imageResourceSource}
+                          onError={handleImageError}
+                          onLoad={handleImageLoaded}
+                        />
+                      )}
+                    </div>
                   </div>
                 )}
                 {imageLoaded && renderOverlay && (
@@ -546,9 +660,11 @@ const ImagePreview = ({
                     {renderOverlay({
                       imageWidth: imageWidth || 0,
                       imageHeight: imageHeight || 0,
-                      offsetTop: yOffset,
-                      offsetLeft: xOffset,
+                      imageOffsetTop: yOffset,
+                      imageOffsetLeft: xOffset,
                       imageZoomFactor: imageZoomFactor,
+                      forcedCursor,
+                      deactivateControls: shouldMoveView,
                     })}
                   </div>
                 )}

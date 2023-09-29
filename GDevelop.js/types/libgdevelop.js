@@ -7,6 +7,9 @@ declare class libGDevelop {
   getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
+  isDefaultBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): boolean;
+  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;
+  getBehaviorNamesInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): gdVectorString;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
@@ -32,6 +35,7 @@ declare class libGDevelop {
   asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;
   asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;
   asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;
+  asModel3DConfiguration(gdObjectConfiguration): gdModel3DObjectConfiguration;
 
   asImageResource(gdResource): gdImageResource;
 
@@ -52,6 +56,7 @@ declare class libGDevelop {
   ProjectHelper: Class<gdProjectHelper>;
   EventsVariablesFinder: Class<gdEventsVariablesFinder>;
   EventsIdentifiersFinder: Class<gdEventsIdentifiersFinder>;
+  EventsFunctionSelfCallChecker: Class<gdEventsFunctionSelfCallChecker>;
   InstructionOrExpressionGroupMetadata: Class<gdInstructionOrExpressionGroupMetadata>;
   VersionWrapper: Class<gdVersionWrapper>;
   Platform: Class<gdPlatform>;
@@ -60,6 +65,7 @@ declare class libGDevelop {
   Variable_Type: Class<Variable_Type>;
   Variable: Class<gdVariable>;
   VariablesContainer: Class<gdVariablesContainer>;
+  VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
@@ -67,6 +73,8 @@ declare class libGDevelop {
   Watermark: Class<gdWatermark>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  ObjectsContainersList: Class<gdObjectsContainersList>;
+  ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
@@ -101,6 +109,7 @@ declare class libGDevelop {
   JsonResource: Class<gdJsonResource>;
   TilemapResource: Class<gdTilemapResource>;
   TilesetResource: Class<gdTilesetResource>;
+  Model3DResource: Class<gdModel3DResource>;
   InitialInstance: Class<gdInitialInstance>;
   InitialInstancesContainer: Class<gdInitialInstancesContainer>;
   HighestZOrderFinder: Class<gdHighestZOrderFinder>;
@@ -117,9 +126,8 @@ declare class libGDevelop {
   VectorPairStringTextFormatting: Class<gdVectorPairStringTextFormatting>;
   TextFormatting: Class<gdTextFormatting>;
   InstructionSentenceFormatter: Class<gdInstructionSentenceFormatter>;
-  ExtraInformation: Class<gdExtraInformation>;
-  ExpressionCodeGenerationInformation: Class<gdExpressionCodeGenerationInformation>;
   ParameterOptions: Class<gdParameterOptions>;
+  AbstractFunctionMetadata: Class<gdAbstractFunctionMetadata>;
   InstructionMetadata: Class<gdInstructionMetadata>;
   ExpressionMetadata: Class<gdExpressionMetadata>;
   MultipleInstructionMetadata: Class<gdMultipleInstructionMetadata>;
@@ -152,6 +160,8 @@ declare class libGDevelop {
   UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
   VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
   ProjectBrowserHelper: Class<gdProjectBrowserHelper>;
+  ResourceExposer: Class<gdResourceExposer>;
+  VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
@@ -178,13 +188,14 @@ declare class libGDevelop {
   ExpressionParser2: Class<gdExpressionParser2>;
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
+  EventsFunctionsContainer_FunctionOwner: Class<EventsFunctionsContainer_FunctionOwner>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;
   EventsBasedBehavior: Class<gdEventsBasedBehavior>;
   EventsBasedBehaviorsList: Class<gdEventsBasedBehaviorsList>;
   EventsBasedObject: Class<gdEventsBasedObject>;
   EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
-  NamedPropertyDescriptorsList: Class<gdNamedPropertyDescriptorsList>;
+  PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;
@@ -213,6 +224,8 @@ declare class libGDevelop {
   Direction: Class<gdDirection>;
   Animation: Class<gdAnimation>;
   SpriteObject: Class<gdSpriteObject>;
+  Model3DAnimation: Class<gdModel3DAnimation>;
+  Model3DObjectConfiguration: Class<gdModel3DObjectConfiguration>;
   Vector2f: Class<gdVector2f>;
   VectorVector2f: Class<gdVectorVector2f>;
   TextObject: Class<gdTextObject>;
@@ -230,4 +243,5 @@ declare class libGDevelop {
   ExportOptions: Class<gdExportOptions>;
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
+  MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;
 };

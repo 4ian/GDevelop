@@ -17,11 +17,11 @@ export default {
 export const Default = () => (
   <ColumnStackLayout>
     <LineStackLayout>
-      <PriceTag value={800} />
-      <PriceTag value={850} />
-      <PriceTag value={1200} />
-      <PriceTag value={1225} />
-      <PriceTag value={1225} owned />
+      <PriceTag label={'$8'} />
+      <PriceTag label={'$8.50'} />
+      <PriceTag label={'$1.20'} />
+      <PriceTag label={'$1.23'} />
+      <PriceTag label={'✅ Owned'} />
     </LineStackLayout>
     <LineStackLayout>
       <div
@@ -36,7 +36,7 @@ export const Default = () => (
           alignItems: 'flex-start',
         }}
       >
-        <PriceTag value={1200} withOverlay />
+        <PriceTag label={'$1.20'} withOverlay />
       </div>
     </LineStackLayout>
     <LineStackLayout>
@@ -52,7 +52,7 @@ export const Default = () => (
           alignItems: 'flex-start',
         }}
       >
-        <PriceTag value={1200} withOverlay owned />
+        <PriceTag label={'✅ Owned'} withOverlay />
       </div>
     </LineStackLayout>
   </ColumnStackLayout>

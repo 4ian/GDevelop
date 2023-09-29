@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
-import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
+import { Trans, t } from '@lingui/macro';
 import { mapFor } from '../../Utils/MapFor';
 import {
   type ParameterFieldProps,
@@ -16,7 +15,7 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import RaisedButton from '../../UI/RaisedButton';
 import Functions from '@material-ui/icons/Functions';
 import FlatButton from '../../UI/FlatButton';
-import Layers from '../../UI/CustomSvgIcons/Layers';
+import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerField(props, ref) {
@@ -46,7 +45,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // If the current value is not in the list of layers, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInLayersList
+      (!!props.value && !isCurrentValueInLayersList) ||
+        props.scope.eventsFunctionsExtension
     );
 
     const switchFieldType = () => {
@@ -81,72 +81,66 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     });
 
     return (
-      <I18n>
-        {({ i18n }) => (
-          <>
-            <TextFieldWithButtonLayout
-              renderTextField={() =>
-                !isExpressionField ? (
-                  <SelectField
-                    ref={field}
-                    id={
-                      props.parameterIndex !== undefined
-                        ? `parameter-${props.parameterIndex}-layer-field`
-                        : undefined
-                    }
-                    value={props.value}
-                    onChange={onChangeSelectValue}
-                    margin={props.isInline ? 'none' : 'dense'}
-                    fullWidth
-                    floatingLabelText={fieldLabel}
-                    translatableHintText={t`Choose a layer`}
-                    helperMarkdownText={
-                      (props.parameterMetadata &&
-                        props.parameterMetadata.getLongDescription()) ||
-                      null
-                    }
-                  >
-                    {selectOptions}
-                  </SelectField>
-                ) : (
-                  <GenericExpressionField
-                    ref={field}
-                    id={
-                      props.parameterIndex !== undefined
-                        ? `parameter-${props.parameterIndex}-layer-field`
-                        : undefined
-                    }
-                    expressionType="string"
-                    {...props}
-                    onChange={onChangeTextValue}
-                  />
-                )
+      <TextFieldWithButtonLayout
+        renderTextField={() =>
+          !isExpressionField ? (
+            <SelectField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-layer-field`
+                  : undefined
               }
-              renderButton={style =>
-                isExpressionField ? (
-                  <FlatButton
-                    id="switch-expression-select"
-                    leftIcon={<Layers />}
-                    style={style}
-                    primary
-                    label={i18n._(t`Select a Layer`)}
-                    onClick={switchFieldType}
-                  />
-                ) : (
-                  <RaisedButton
-                    id="switch-expression-select"
-                    icon={<Functions />}
-                    style={style}
-                    primary
-                    label={i18n._(t`Use an Expression`)}
-                    onClick={switchFieldType}
-                  />
-                )
+              value={props.value}
+              onChange={onChangeSelectValue}
+              margin={props.isInline ? 'none' : 'dense'}
+              fullWidth
+              floatingLabelText={fieldLabel}
+              translatableHintText={t`Choose a layer`}
+              helperMarkdownText={
+                (props.parameterMetadata &&
+                  props.parameterMetadata.getLongDescription()) ||
+                null
               }
+            >
+              {selectOptions}
+            </SelectField>
+          ) : (
+            <GenericExpressionField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-layer-field`
+                  : undefined
+              }
+              expressionType="string"
+              {...props}
+              onChange={onChangeTextValue}
             />
-          </>
-        )}
-      </I18n>
+          )
+        }
+        renderButton={style =>
+          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
+            <FlatButton
+              id="switch-expression-select"
+              leftIcon={<TypeCursorSelect />}
+              style={style}
+              primary
+              label={<Trans>Select a Layer</Trans>}
+              onClick={switchFieldType}
+            />
+          ) : (
+            <RaisedButton
+              id="switch-expression-select"
+              icon={<Functions />}
+              style={style}
+              primary
+              label={<Trans>Use an Expression</Trans>}
+              onClick={switchFieldType}
+            />
+          )
+        }
+      />
     );
   }
 );

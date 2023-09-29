@@ -2,8 +2,6 @@ import { ResourceCache } from "./ResourceCache";
 import { EditableTileMap } from "../model/TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
 import { PixiTileMapHelper } from "./TileMapPixiHelper";
-
-import PIXI = GlobalPIXIModule.PIXI;
 import { TileMapLoader } from "../load/TileMapLoader";
 import { TileMapFileContent } from "../load/TileMapFileContent";
 

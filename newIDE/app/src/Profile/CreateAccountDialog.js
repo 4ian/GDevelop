@@ -24,12 +24,15 @@ import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
-const getStyles = ({ windowWidth }) => ({
-  formContainer: {
-    width: windowWidth === 'small' ? '95%' : '60%',
-    marginTop: 20,
-  },
-});
+const getStyles = ({ windowWidth }) => {
+  const isMobileScreen = windowWidth === 'small';
+  return {
+    formContainer: {
+      width: isMobileScreen ? '95%' : '60%',
+      marginTop: 20,
+    },
+  };
+};
 
 type Props = {|
   onClose: () => void,
@@ -45,7 +48,7 @@ export const getEmailErrorText = (error: ?AuthError) => {
   if (error.code === 'auth/invalid-email')
     return <Trans>This email is invalid.</Trans>;
   if (error.code === 'auth/user-disabled')
-    return <Trans>The user was disabled.</Trans>;
+    return <Trans>This account has been deactivated or deleted.</Trans>;
   if (error.code === 'auth/user-not-found')
     return (
       <Trans>This user was not found: have you created your account?</Trans>
@@ -163,6 +166,7 @@ const CreateAccountDialog = ({
       }}
       maxWidth="sm"
       open
+      flexColumnBody
     >
       <ColumnStackLayout
         noMargin

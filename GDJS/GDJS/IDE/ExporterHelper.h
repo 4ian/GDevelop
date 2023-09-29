@@ -83,7 +83,7 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the (optional) external layout to be instanciated in the scene
+   * \brief Set the (optional) external layout to be instantiated in the scene
    * at the beginning of the previewed game.
    */
   PreviewExportOptions &SetExternalLayoutName(
@@ -152,8 +152,8 @@ struct PreviewExportOptions {
   }
 
   /**
-   * Set the token to use by the game engine when requiring any resource stored on
-   * GDevelop Cloud buckets. Note that this is only useful during previews.
+   * Set the token to use by the game engine when requiring any resource stored
+   * on GDevelop Cloud buckets. Note that this is only useful during previews.
    */
   PreviewExportOptions &SetGDevelopResourceToken(
       const gd::String &gdevelopResourceToken_) {
@@ -261,7 +261,7 @@ class ExporterHelper {
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
-   * in gdjs.runtimeGameOptions \return Empty string if everthing is ok,
+   * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
    * description of the error otherwise.
    */
   static gd::String ExportProjectData(
@@ -288,6 +288,7 @@ class ExporterHelper {
    * \brief Add libraries files to the list of includes.
    */
   void AddLibsInclude(bool pixiRenderers,
+                      bool pixiInThreeRenderers,
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       gd::String gdevelopLogoStyle,
@@ -330,7 +331,7 @@ class ExporterHelper {
   /**
    * \brief Add the project effects include files.
    */
-  bool ExportEffectIncludes(const gd::Project &project,
+  bool ExportEffectIncludes(gd::Project &project,
                             std::vector<gd::String> &includesFiles);
 
   /**

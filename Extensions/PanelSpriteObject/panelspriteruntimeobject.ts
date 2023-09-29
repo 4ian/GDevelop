@@ -27,7 +27,9 @@ namespace gdjs {
   /**
    * The PanelSpriteRuntimeObject displays a tiled texture.
    */
-  export class PanelSpriteRuntimeObject extends gdjs.RuntimeObject {
+  export class PanelSpriteRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.OpacityHandler {
     _rBorder: integer;
     _lBorder: integer;
     _tBorder: integer;
@@ -190,10 +192,6 @@ namespace gdjs {
       return this._height;
     }
 
-    /**
-     * Set the width of the panel sprite.
-     * @param width The new width in pixels.
-     */
     setWidth(width: float): void {
       if (this._width === width) return;
 
@@ -202,10 +200,6 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    /**
-     * Set the height of the panel sprite.
-     * @param height The new height in pixels.
-     */
     setHeight(height: float): void {
       if (this._height === height) return;
 
@@ -214,10 +208,11 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
+    }
+
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -229,10 +224,6 @@ namespace gdjs {
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
     getOpacity(): number {
       return this.opacity;
     }
@@ -258,10 +249,14 @@ namespace gdjs {
     // Implement support for get/set scale:
 
     /**
-     * Get scale of the tiled sprite object.
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): float {
-      return (this.getScaleX() + this.getScaleY()) / 2.0;
+      const scaleX = Math.abs(this.getScaleX());
+      const scaleY = Math.abs(this.getScaleY());
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**

@@ -318,7 +318,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
           {authenticatedUser.authenticated && isErrored && (
             <PlaceholderError onRetry={loadFeedbacksAndBuilds}>
               <Trans>
-                An error occured while retrieving feedbacks for this game.
+                An error occurred while retrieving feedbacks for this game.
               </Trans>
             </PlaceholderError>
           )}
@@ -373,7 +373,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                 )}
               </ResponsiveLineStackLayout>
               <ColumnStackLayout expand noMargin>
-                {!!feedbacks && feedbacks.length && (
+                {!!feedbacks && feedbacks.length > 0 && (
                   <FeedbackAverageCard feedbacks={feedbacks} />
                 )}
               </ColumnStackLayout>

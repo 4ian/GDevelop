@@ -1,7 +1,7 @@
 // @flow
 import { initializeZipJs } from './Zip.js';
 import { downloadUrlsToBlobs, type ItemResult } from './BlobDownloader';
-import path from 'path';
+import path from 'path-browserify';
 import { shortenString } from './StringHelpers.js';
 
 export type BlobFileDescriptor = {|

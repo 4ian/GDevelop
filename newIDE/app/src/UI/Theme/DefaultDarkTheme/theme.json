@@ -168,6 +168,13 @@
         }
       }
     },
+    "swipeable-drawer": {
+      "top-bar": {
+        "pill-color": {
+          "value": "#1D1D26"
+        }
+      }
+    },
     "icon-button": {
       "selected": {
         "color": {

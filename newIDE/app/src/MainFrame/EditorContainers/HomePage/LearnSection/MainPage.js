@@ -12,8 +12,6 @@ import {
   type TutorialCategory,
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { isMobile } from '../../../../Utils/Platform';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -30,6 +28,7 @@ import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
+import WikiSearchBar from '../../../../UI/WikiSearchBar';
 
 const useStyles = makeStyles({
   tile: {
@@ -37,34 +36,37 @@ const useStyles = makeStyles({
   },
 });
 
-const getHelpItemsColumnsFromWidth = (
-  width: WidthType,
-  showTourHelpItem: boolean
-) => {
+const getHelpItemsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
     case 'small':
       return 1;
     case 'medium':
       return 3;
     case 'large':
+      return 4;
+    case 'xlarge':
+      return 5;
     default:
-      return showTourHelpItem ? 4 : 3;
+      return 3;
   }
 };
 
 const getTutorialsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
     case 'small':
-      return 2;
+      return 1;
     case 'medium':
       return 3;
     case 'large':
-    default:
       return 5;
+    case 'xlarge':
+      return 6;
+    default:
+      return 3;
   }
 };
 
-const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large', true);
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('xlarge');
 const styles = {
   grid: {
     textAlign: 'center',
@@ -79,7 +81,7 @@ const styles = {
 
 type Props = {|
   onStartTutorial: () => void,
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
@@ -89,7 +91,7 @@ type Props = {|
 
 const MainPage = ({
   onStartTutorial,
-  onCreateProject,
+  onOpenExampleStore,
   onTabChange,
   onOpenHelpFinder,
   onSelectCategory,
@@ -101,27 +103,27 @@ const MainPage = ({
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowInAppTutorialButtons = !isMobile() && windowWidth !== 'small';
+  const isMobile = windowWidth === 'small';
+  const isTabletOrSmallLaptop =
+    windowWidth === 'small' || windowWidth === 'medium';
   const helpItems: {
     title: React.Node,
     description: React.Node,
     action: () => void,
     disabled?: boolean,
   }[] = [
-    shouldShowInAppTutorialButtons
-      ? {
-          title: <Trans>Guided Tour</Trans>,
-          description: (
-            <Trans>
-              Learn the fundamentals of the editor with our assisted tutorial.
-            </Trans>
-          ),
-          action: () => {
-            onStartTutorial();
-          },
-          disabled: !!currentlyRunningInAppTutorial,
-        }
-      : undefined,
+    {
+      title: <Trans>Guided Tour</Trans>,
+      description: (
+        <Trans>
+          Learn the fundamentals of the editor with our assisted tutorial.
+        </Trans>
+      ),
+      action: () => {
+        onStartTutorial();
+      },
+      disabled: !!currentlyRunningInAppTutorial,
+    },
     {
       title: <Trans>Documentation</Trans>,
       description: <Trans>Find the complete documentation on everything</Trans>,
@@ -130,7 +132,7 @@ const MainPage = ({
     {
       title: <Trans>Examples</Trans>,
       description: <Trans>Have look at existing games from the inside</Trans>,
-      action: onCreateProject,
+      action: onOpenExampleStore,
     },
     {
       title: <Trans>Community</Trans>,
@@ -162,12 +164,15 @@ const MainPage = ({
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
       <SectionRow>
+        <Text>
+          <Trans>Quick search</Trans>
+        </Text>
+        <WikiSearchBar />
+      </SectionRow>
+      <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getHelpItemsColumnsFromWidth(
-              windowWidth,
-              shouldShowInAppTutorialButtons
-            )}
+            cols={getHelpItemsColumnsFromWidth(windowWidth)}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}
@@ -201,14 +206,12 @@ const MainPage = ({
           </GridList>
         </Line>
       </SectionRow>
-      {shouldShowInAppTutorialButtons && (
-        <SectionRow>
-          <Text noMargin size="section-title">
-            <Trans>Guided lessons</Trans>
-          </Text>
-          <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
-        </SectionRow>
-      )}
+      <SectionRow>
+        <Text noMargin size="section-title">
+          <Trans>Guided lessons</Trans>
+        </Text>
+        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+      </SectionRow>
       <>
         <SectionRow>
           <Line noMargin>
@@ -238,7 +241,7 @@ const MainPage = ({
               </Text>
             </Column>
             <LineStackLayout noMargin>
-              {windowWidth === 'large' && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -247,10 +250,16 @@ const MainPage = ({
                   }}
                   primary
                   leftIcon={<Upload />}
-                  label={<Trans>Submit your project as an example</Trans>}
+                  label={
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit an example</Trans>
+                    ) : (
+                      <Trans>Submit your project as an example</Trans>
+                    )
+                  }
                 />
               )}
-              {windowWidth === 'large' && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -260,7 +269,13 @@ const MainPage = ({
                   primary
                   leftIcon={<TranslateIcon />}
                   label={
-                    <Trans>Submit a tutorial translated in your language</Trans>
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit a tutorial</Trans>
+                    ) : (
+                      <Trans>
+                        Submit a tutorial translated in your language
+                      </Trans>
+                    )
                   }
                 />
               )}

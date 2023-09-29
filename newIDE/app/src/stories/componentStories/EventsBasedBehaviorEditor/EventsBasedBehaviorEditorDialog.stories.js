@@ -8,6 +8,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import EventsBasedBehaviorEditorDialog from '../../../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
+import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export default {
   title: 'EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog',
@@ -16,23 +17,27 @@ export default {
 };
 
 export const Default = () => (
-  <EventsBasedBehaviorEditorDialog
-    project={testProject.project}
-    eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
-    eventsBasedBehavior={testProject.testEventsBasedBehavior}
-    onApply={action('apply')}
-    onRenameProperty={action('property rename')}
-    onRenameSharedProperty={action('shared property rename')}
-  />
+  <DragAndDropContextProvider>
+    <EventsBasedBehaviorEditorDialog
+      project={testProject.project}
+      eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
+      eventsBasedBehavior={testProject.testEventsBasedBehavior}
+      onApply={action('apply')}
+      onRenameProperty={action('property rename')}
+      onRenameSharedProperty={action('shared property rename')}
+    />
+  </DragAndDropContextProvider>
 );
 
 export const WithoutFunction = () => (
-  <EventsBasedBehaviorEditorDialog
-    project={testProject.project}
-    eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
-    eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}
-    onApply={action('apply')}
-    onRenameProperty={action('property rename')}
-    onRenameSharedProperty={action('shared property rename')}
-  />
+  <DragAndDropContextProvider>
+    <EventsBasedBehaviorEditorDialog
+      project={testProject.project}
+      eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
+      eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}
+      onApply={action('apply')}
+      onRenameProperty={action('property rename')}
+      onRenameSharedProperty={action('shared property rename')}
+    />
+  </DragAndDropContextProvider>
 );

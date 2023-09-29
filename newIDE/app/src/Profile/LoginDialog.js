@@ -45,6 +45,7 @@ const LoginDialog = ({
   error,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [
@@ -98,6 +99,7 @@ const LoginDialog = ({
       }}
       maxWidth="sm"
       open
+      flexColumnBody
     >
       <ColumnStackLayout
         noMargin
@@ -126,7 +128,8 @@ const LoginDialog = ({
         <div
           style={{
             ...styles.formContainer,
-            width: windowWidth === 'small' ? '100%' : '60%',
+            // Take full width on mobile.
+            width: isMobileScreen ? '100%' : '60%',
           }}
         >
           <form

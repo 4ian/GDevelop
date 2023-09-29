@@ -205,6 +205,10 @@ const defineTileMap = function (
       objectTileMap
     )
     .setCategoryFullName(_('Advanced'))
+    .addDefaultBehavior('EffectCapability::EffectBehavior')
+    .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+    .addDefaultBehavior('ScalableCapability::ScalableBehavior')
+    .addDefaultBehavior('OpacityCapability::OpacityBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js')
@@ -239,7 +243,7 @@ const defineTileMap = function (
       _(
         'Set the Tiled or LDtk file containing the Tilemap data to display. This is usually the main file exported from Tiled/LDtk.'
       ),
-      _('Set the tilemape file of _PARAM0_ to _PARAM1_'),
+      _('Set the tilemap file of _PARAM0_ to _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
@@ -274,7 +278,7 @@ const defineTileMap = function (
       'SetTilesetJsonFile',
       _('Tileset JSON file'),
       _(
-        'Set the JSON file with the tileset data (sometimes that is embeded in the Tilemap, so not needed)'
+        'Set the JSON file with the tileset data (sometimes that is embedded in the Tilemap, so not needed)'
       ),
       _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
       '',
@@ -387,7 +391,7 @@ const defineTileMap = function (
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-    .setFunctionName('getLevelndex');
+    .setFunctionName('getLevelIndex');
 
   object
     .addCondition(
@@ -495,6 +499,7 @@ const defineTileMap = function (
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
 
+  // Deprecated
   object
     .addAction(
       'Scale',
@@ -513,9 +518,12 @@ const defineTileMap = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
-    .setFunctionName('setScale');
+    .setFunctionName('setScale')
+    .setGetter('getScale');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -534,9 +542,11 @@ const defineTileMap = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleX')
     .setGetter('getScaleX');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -555,9 +565,11 @@ const defineTileMap = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleY')
     .setGetter('getScaleY');
 
+  // Deprecated
   object
     .addAction(
       'Width',
@@ -574,9 +586,11 @@ const defineTileMap = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setWidth');
 
+  // Deprecated
   object
     .addAction(
       'Height',
@@ -593,6 +607,7 @@ const defineTileMap = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setHeight');
 };
@@ -788,6 +803,9 @@ const defineCollisionMask = function (
       collisionMaskObject
     )
     .setCategoryFullName(_('Advanced'))
+    .addDefaultBehavior('EffectCapability::EffectBehavior')
+    .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+    .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
@@ -798,7 +816,7 @@ const defineCollisionMask = function (
     );
 
   object
-    .addCondition(
+    .addScopedCondition(
       'TilemapJsonFile',
       _('Tilemap JSON file'),
       _('Check the Tilemap JSON file being used.'),
@@ -818,7 +836,7 @@ const defineCollisionMask = function (
     .setFunctionName('isTilemapJsonFile');
 
   object
-    .addAction(
+    .addScopedAction(
       'SetTilemapJsonFile',
       _('Tilemap JSON file'),
       _(
@@ -840,7 +858,7 @@ const defineCollisionMask = function (
     .setFunctionName('setTilemapJsonFile');
 
   object
-    .addCondition(
+    .addScopedCondition(
       'TilesetJsonFile',
       _('Tileset JSON file'),
       _('Check the tileset JSON file being used.'),
@@ -860,7 +878,7 @@ const defineCollisionMask = function (
     .setFunctionName('isTilesetJsonFile');
 
   object
-    .addAction(
+    .addScopedAction(
       'SetTilesetJsonFile',
       _('Tileset JSON file'),
       _(
@@ -881,8 +899,9 @@ const defineCollisionMask = function (
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
 
+  // Deprecated
   object
-    .addAction(
+    .addScopedAction(
       'Scale',
       _('Scale'),
       _('Modify the scale of the specified object.'),
@@ -904,9 +923,12 @@ const defineCollisionMask = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
-    .setFunctionName('setScale');
+    .setFunctionName('setScale')
+    .setGetter('getScale');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -930,9 +952,11 @@ const defineCollisionMask = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleX')
     .setGetter('getScaleX');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -956,11 +980,13 @@ const defineCollisionMask = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleY')
     .setGetter('getScaleY');
 
+  // Deprecated
   object
-    .addAction(
+    .addScopedAction(
       'Width',
       _('Width'),
       _('Change the width of an object.'),
@@ -980,11 +1006,13 @@ const defineCollisionMask = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setWidth');
 
+  // Deprecated
   object
-    .addAction(
+    .addScopedAction(
       'Height',
       _('Height'),
       _('Change the height of an object.'),
@@ -1004,6 +1032,7 @@ const defineCollisionMask = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setHeight');
 };
@@ -1345,9 +1374,9 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
+        this._pixiObject.scale.x = this.getCustomWidth() / this.width;
         this._pixiObject.scale.y =
-          this._instance.getCustomHeight() / this.height;
+          this.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;
@@ -1529,7 +1558,7 @@ module.exports = {
         this._loadTiledMapWithCallback.bind(this),
         tilemapJsonFile,
         tilesetJsonFile,
-        0, // leveIndex
+        0, // levelIndex
         pako,
         (tileMap) => {
           if (!tileMap) {
@@ -1597,9 +1626,9 @@ module.exports = {
      */
     RenderedCollisionMaskInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
+        this._pixiObject.scale.x = this.getCustomWidth() / this.width;
         this._pixiObject.scale.y =
-          this._instance.getCustomHeight() / this.height;
+          this.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;

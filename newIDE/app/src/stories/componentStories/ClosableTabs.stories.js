@@ -12,13 +12,12 @@ import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 import { Column } from '../../UI/Grid';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import ObjectsList from '../../ObjectsList';
-import fakeResourceExternalEditors from '../FakeResourceExternalEditors';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
 import Home from '../../UI/CustomSvgIcons/Home';
+import fakeResourceManagementProps from '../FakeResourceManagement';
 
 export default {
   title: 'UI Building Blocks/ClosableTabs',
@@ -265,13 +264,7 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  resourceManagementProps={{
-                    getStorageProvider: () => emptyStorageProvider,
-                    onFetchNewlyAddedResources: async () => {},
-                    resourceSources: [],
-                    onChooseResource: () => Promise.reject('Unimplemented'),
-                    resourceExternalEditors: fakeResourceExternalEditors,
-                  }}
+                  resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
                   onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}
@@ -279,7 +272,7 @@ export const WithObjectsList = () => (
                   selectedObjectTags={[]}
                   onChangeSelectedObjectTags={() => {}}
                   getAllObjectTags={() => []}
-                  canRenameObject={() => true}
+                  getValidatedObjectOrGroupName={newName => newName}
                   onDeleteObject={(objectWithContext, cb) => cb(true)}
                   onRenameObjectStart={() => {}}
                   onRenameObjectFinish={(objectWithContext, newName, cb) =>

@@ -109,6 +109,11 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getXOffset")
         .SetIncludeFile(
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllExpressionsForObject(
+        "TiledSpriteObject::TiledSprite")["XOffset"]
+        .SetFunctionName("getXOffset")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
     GetAllActionsForObject(
         "TiledSpriteObject::TiledSprite")["TiledSpriteObject::YOffset"]
         .SetFunctionName("setYOffset")
@@ -117,6 +122,11 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension {
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
     GetAllConditionsForObject(
         "TiledSpriteObject::TiledSprite")["TiledSpriteObject::YOffset"]
+        .SetFunctionName("getYOffset")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllExpressionsForObject(
+        "TiledSpriteObject::TiledSprite")["YOffset"]
         .SetFunctionName("getYOffset")
         .SetIncludeFile(
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");

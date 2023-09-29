@@ -38,6 +38,7 @@ type Props = {|
   id?: string,
   inputStyle?: Object,
   maxLength?: number,
+  precision?: number,
   max?: number,
   min?: number,
   multiline?: boolean,
@@ -56,6 +57,7 @@ export type SemiControlledTextFieldInterface = {|
   forceSetSelection: (start: number, end: number) => void,
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
+  getCaretPosition: () => ?number,
 |};
 
 /**
@@ -96,12 +98,17 @@ const SemiControlledTextField = React.forwardRef<
     if (textFieldRef.current) return textFieldRef.current.getFieldWidth();
   };
 
+  const getCaretPosition = () => {
+    if (textFieldRef.current) return textFieldRef.current.getCaretPosition();
+  };
+
   React.useImperativeHandle(ref, () => ({
     focus,
     getInputNode,
     forceSetSelection,
     forceSetValue,
     getFieldWidth,
+    getCaretPosition,
   }));
 
   const {

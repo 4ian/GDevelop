@@ -32,7 +32,7 @@ type Props = {|
   onChangeSearchText: string => void,
 |};
 
-const VariablesListToolbar = (props: Props) => {
+const VariablesListToolbar = React.memo<Props>((props: Props) => {
   const buttons = [
     {
       key: 'copy',
@@ -144,6 +144,6 @@ const VariablesListToolbar = (props: Props) => {
       </Column>
     </Line>
   );
-};
+});
 
 export default VariablesListToolbar;

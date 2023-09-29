@@ -49,6 +49,8 @@ import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import { useLongTouch } from '../../Utils/UseLongTouch';
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
@@ -126,86 +128,107 @@ type EventsContainerProps = {|
   idPrefix: string,
 |};
 
+const hiddenBecauseHeightNotComputedYetStyle = {
+  visibility: 'hidden',
+};
+
 /**
  * The component containing an event.
  * It will report the rendered event height so that the EventsTree can
  * update accordingly.
  */
-class EventContainer extends Component<EventsContainerProps, {||}> {
-  _container: ?any;
-  componentDidMount() {
-    const height = this._container ? this._container.offsetHeight : 0;
-    this.props.eventsHeightsCache.setEventHeight(this.props.event, height);
-  }
+const EventContainer = (props: EventsContainerProps) => {
+  const {
+    event,
+    project,
+    scope,
+    disabled,
+    eventsHeightsCache,
+    onEventContextMenu,
+  } = props;
+  const forceUpdate = useForceUpdate();
+  const containerRef = React.useRef<?HTMLDivElement>(null);
+  const height = containerRef.current ? containerRef.current.offsetHeight : 0;
+  React.useEffect(
+    () => {
+      eventsHeightsCache.setEventHeight(event, height);
+    },
+    [event, eventsHeightsCache, height]
+  );
 
-  componentDidUpdate() {
-    const height = this._container ? this._container.offsetHeight : 0;
-    this.props.eventsHeightsCache.setEventHeight(this.props.event, height);
-  }
+  const _onEventContextMenu = React.useCallback(
+    (domEvent: MouseEvent) => {
+      domEvent.preventDefault();
+      onEventContextMenu(domEvent.clientX, domEvent.clientY);
+    },
+    [onEventContextMenu]
+  );
 
-  _onEventUpdated = () => {
-    this.forceUpdate();
-  };
+  const longTouchForContextMenuProps = useLongTouch(
+    React.useCallback(
+      (domEvent: any) => {
+        onEventContextMenu(domEvent.clientX, domEvent.clientY);
+      },
+      [onEventContextMenu]
+    ),
+    'events-tree-event-component'
+  );
 
-  _onEventContextMenu = (domEvent: any) => {
-    domEvent.preventDefault();
-    this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
-  };
+  const EventComponent = EventsRenderingService.getEventComponent(event);
 
-  render() {
-    const { event, project, scope, disabled } = this.props;
-    const EventComponent = EventsRenderingService.getEventComponent(event);
-
-    return (
-      <div
-        ref={container => (this._container = container)}
-        onClick={this.props.onEventClick}
-        onContextMenu={this._onEventContextMenu}
-      >
-        {!!EventComponent && (
-          <div style={styles.eventComponentContainer}>
-            {this.props.connectDragSource(<div className={handle} />)}
-            <div style={styles.container}>
-              <EventComponent
-                project={project}
-                scope={scope}
-                event={event}
-                globalObjectsContainer={this.props.globalObjectsContainer}
-                objectsContainer={this.props.objectsContainer}
-                selected={isEventSelected(this.props.selection, event)}
-                selection={this.props.selection}
-                leftIndentWidth={this.props.leftIndentWidth}
-                onUpdate={this._onEventUpdated}
-                onAddNewInstruction={this.props.onAddNewInstruction}
-                onPasteInstructions={this.props.onPasteInstructions}
-                onMoveToInstruction={this.props.onMoveToInstruction}
-                onMoveToInstructionsList={this.props.onMoveToInstructionsList}
-                onInstructionClick={this.props.onInstructionClick}
-                onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-                onInstructionContextMenu={this.props.onInstructionContextMenu}
-                onAddInstructionContextMenu={
-                  this.props.onAddInstructionContextMenu
-                }
-                onEndEditingEvent={this.props.onEndEditingEvent}
-                onParameterClick={this.props.onParameterClick}
-                onOpenExternalEvents={this.props.onOpenExternalEvents}
-                onOpenLayout={this.props.onOpenLayout}
-                disabled={
-                  disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
-                }
-                renderObjectThumbnail={this.props.renderObjectThumbnail}
-                screenType={this.props.screenType}
-                eventsSheetHeight={this.props.eventsSheetHeight}
-                windowWidth={this.props.windowWidth}
-                idPrefix={this.props.idPrefix}
-              />
-            </div>
+  return (
+    <div
+      ref={containerRef}
+      onClick={props.onEventClick}
+      onContextMenu={_onEventContextMenu}
+      {...longTouchForContextMenuProps}
+      style={
+        eventsHeightsCache.getEventHeight(event)
+          ? undefined
+          : hiddenBecauseHeightNotComputedYetStyle
+      }
+    >
+      {!!EventComponent && (
+        <div style={styles.eventComponentContainer}>
+          {props.connectDragSource(<div className={handle} />)}
+          <div style={styles.container}>
+            <EventComponent
+              project={project}
+              scope={scope}
+              event={event}
+              globalObjectsContainer={props.globalObjectsContainer}
+              objectsContainer={props.objectsContainer}
+              selected={isEventSelected(props.selection, event)}
+              selection={props.selection}
+              leftIndentWidth={props.leftIndentWidth}
+              onUpdate={forceUpdate}
+              onAddNewInstruction={props.onAddNewInstruction}
+              onPasteInstructions={props.onPasteInstructions}
+              onMoveToInstruction={props.onMoveToInstruction}
+              onMoveToInstructionsList={props.onMoveToInstructionsList}
+              onInstructionClick={props.onInstructionClick}
+              onInstructionDoubleClick={props.onInstructionDoubleClick}
+              onInstructionContextMenu={props.onInstructionContextMenu}
+              onAddInstructionContextMenu={props.onAddInstructionContextMenu}
+              onEndEditingEvent={props.onEndEditingEvent}
+              onParameterClick={props.onParameterClick}
+              onOpenExternalEvents={props.onOpenExternalEvents}
+              onOpenLayout={props.onOpenLayout}
+              disabled={
+                disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
+              }
+              renderObjectThumbnail={props.renderObjectThumbnail}
+              screenType={props.screenType}
+              eventsSheetHeight={props.eventsSheetHeight}
+              windowWidth={props.windowWidth}
+              idPrefix={props.idPrefix}
+            />
           </div>
-        )}
-      </div>
-    );
-  }
-}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SortableTree = ({ className, ...otherProps }) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

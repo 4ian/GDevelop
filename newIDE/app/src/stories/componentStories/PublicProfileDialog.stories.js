@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
@@ -18,6 +17,7 @@ const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   username: null,
   description: null,
   donateLink: null,
+  communityLinks: {},
 };
 
 export default {
@@ -100,7 +100,6 @@ export const FullProfile = () => (
     onAssetPackOpen={() => {}}
   />
 );
-FullProfile.decorators = [withMock];
 FullProfile.parameters = apiDataFullUser;
 
 export const EmptyProfile = () => (
@@ -110,5 +109,4 @@ export const EmptyProfile = () => (
     onAssetPackOpen={() => {}}
   />
 );
-EmptyProfile.decorators = [withMock];
 EmptyProfile.parameters = apiDataEmptyUser;

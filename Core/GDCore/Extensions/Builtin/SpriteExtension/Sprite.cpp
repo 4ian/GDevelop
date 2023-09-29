@@ -4,7 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
+
 #include <iostream>
+
 #include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.h"
 
 using namespace std;
@@ -14,11 +16,10 @@ namespace gd {
 Point Sprite::badPoint("");
 
 Sprite::Sprite()
-    : automaticCollisionMask(true),
+    : fullImageCollisionMask(false),
       origine("origine"),
       centre("centre"),
-      automaticCentre(true) {
-}
+      automaticCentre(true) {}
 
 Sprite::~Sprite(){};
 

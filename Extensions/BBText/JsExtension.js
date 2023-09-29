@@ -174,7 +174,9 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('Text'));
+      .setCategoryFullName(_('Text'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.
@@ -396,7 +398,7 @@ module.exports = {
         conditionDescription: _('Check the current text alignment.'),
         conditionSentence: _('The text alignment of _PARAM0_ is _PARAM1_'),
         actionDescription: _('Change the alignment of the text.'),
-        actionSentence: _('Set text alignment of _PARAM0_ to _PARAM1_'),
+        actionSentence: _('text alignment'),
         expressionLabel: _('Get the text alignment'),
         expressionDescription: _('Get the text alignment'),
       },
@@ -434,12 +436,20 @@ module.exports = {
 
     addSettersAndGettersToObject(object, setterAndGetterProperties, 'BBText');
 
+    const actions = object.getAllActions();
+    const conditions = object.getAllConditions();
+    const expressions = object.getAllExpressions();
+
+    actions.get('BBText::SetOpacity').setHidden();
+    conditions.get('BBText::IsOpacity').setHidden();
+    expressions.get('GetOpacity').setHidden();
+
     return extension;
   },
 
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.
@@ -606,7 +616,7 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize() && this._pixiObject) {
-        const customWidth = this._instance.getCustomWidth();
+        const customWidth = this.getCustomWidth();
         if (
           this._pixiObject &&
           this._pixiObject._style.wordWrapWidth !== customWidth

@@ -280,6 +280,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           windowWidth={this.props.windowWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachChildVariableEvent.getConditions()}
               style={style}
               className={className}
@@ -300,6 +301,8 @@ export default class ForEachChildVariableEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
               idPrefix={this.props.idPrefix}
@@ -307,6 +310,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachChildVariableEvent.getActions()}
               style={
                 {
@@ -331,6 +335,8 @@ export default class ForEachChildVariableEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
               idPrefix={this.props.idPrefix}

@@ -47,8 +47,7 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
-  bool UpdateProperty(const gd::String& name,
-                      const gd::String& value) override;
+  bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(
       const gd::InitialInstance& position,
@@ -118,14 +117,30 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
   const std::vector<Animation>& GetAllAnimations() const { return animations; }
 
   /**
-   * \brief Set if the object animation should be played even if the object is hidden
-   * or far from the camera.
+   * @brief Check if the collision mask adapts automatically to the animation.
    */
-  void SetUpdateIfNotVisible(bool updateIfNotVisible_) { updateIfNotVisible = updateIfNotVisible_; }
+  bool AdaptCollisionMaskAutomatically() const {
+    return adaptCollisionMaskAutomatically;
+  }
 
   /**
-   * \brief Check if the object animation should be played even if the object is hidden
-   * or far from the camera (false by default).
+   * @brief Set if the collision mask adapts automatically to the animation.
+   */
+  void SetAdaptCollisionMaskAutomatically(bool enable) {
+    adaptCollisionMaskAutomatically = enable;
+  }
+
+  /**
+   * \brief Set if the object animation should be played even if the object is
+   * hidden or far from the camera.
+   */
+  void SetUpdateIfNotVisible(bool updateIfNotVisible_) {
+    updateIfNotVisible = updateIfNotVisible_;
+  }
+
+  /**
+   * \brief Check if the object animation should be played even if the object
+   * is hidden or far from the camera (false by default).
    */
   bool GetUpdateIfNotVisible() const { return updateIfNotVisible; }
   ///@}
@@ -137,11 +152,15 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
 
   mutable std::vector<Animation> animations;
   bool updateIfNotVisible;  ///< If set to true, ask the game engine to play
-                            ///< object animation even if hidden or far from the
-                            ///< screen.
+                            ///< object animation even if hidden or far from
+                            ///< the screen.
 
-  static Animation badAnimation;  //< Bad animation when an out of bound
-                                  // animation is requested.
+  static Animation badAnimation;         //< Bad animation when an out of bound
+                                         // animation is requested.
+  bool adaptCollisionMaskAutomatically;  ///< If set to true, the collision
+                                         ///< mask will be automatically
+                                         ///< adapted to the animation of the
+                                         ///< object.
 };
 
 }  // namespace gd

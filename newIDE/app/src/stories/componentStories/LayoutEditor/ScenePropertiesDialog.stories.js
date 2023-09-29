@@ -3,13 +3,11 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-// Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import ScenePropertiesDialog from '../../../SceneEditor/ScenePropertiesDialog';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'LayoutEditor/ScenePropertiesDialog',
@@ -25,13 +23,7 @@ export const Default = () => (
     onClose={() => action('Close the dialog')}
     onApply={() => action('Apply changes')}
     onEditVariables={() => action('Edit variables')}
-    resourceManagementProps={{
-      getStorageProvider: () => emptyStorageProvider,
-      onFetchNewlyAddedResources: async () => {},
-      resourceSources: [],
-      onChooseResource: () => Promise.reject('Unimplemented'),
-      resourceExternalEditors: fakeResourceExternalEditors,
-    }}
+    resourceManagementProps={fakeResourceManagementProps}
   />
 );
 
@@ -44,12 +36,6 @@ export const MoreSettings = () => (
     onApply={() => action('Apply changes')}
     onEditVariables={() => action('Edit variables')}
     onOpenMoreSettings={() => action('Open more settings')}
-    resourceManagementProps={{
-      getStorageProvider: () => emptyStorageProvider,
-      onFetchNewlyAddedResources: async () => {},
-      resourceSources: [],
-      onChooseResource: () => Promise.reject('Unimplemented'),
-      resourceExternalEditors: fakeResourceExternalEditors,
-    }}
+    resourceManagementProps={fakeResourceManagementProps}
   />
 );

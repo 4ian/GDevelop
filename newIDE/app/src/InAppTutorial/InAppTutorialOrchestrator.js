@@ -64,7 +64,7 @@ const interpolateText = (
       if (objectName && project && project.getLayoutsCount() > 0) {
         const layout = project.getLayoutAt(0);
         replacement = getInstanceCountInLayoutForObject(
-          layout,
+          layout.getInitialInstances(),
           objectName
         ).toString();
       }
@@ -186,7 +186,7 @@ const interpolateElementId = (
   ) {
     const splittedElementId = elementId.split(':');
     const sceneKey = splittedElementId[1];
-    return `div[role="presentation"]:not([aria-hidden=true]) #project-manager [id^="scene-item"][data-scene="${
+    return `div[role="presentation"][data-open="true"] #project-manager [id^="scene-item"][data-scene="${
       data[sceneKey]
     }"]`;
   } else if (
@@ -703,11 +703,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         const { nextStepTrigger, elementToHighlightId } = currentStep;
         if (nextStepTrigger && nextStepTrigger.valueEquals) {
           if (!elementToHighlightId) return;
-          const elementToWatch = document.querySelector(elementToHighlightId);
-
-          if (elementToWatch) {
-            inputExpectedValueRef.current = nextStepTrigger.valueEquals;
-          }
+          inputExpectedValueRef.current = nextStepTrigger.valueEquals;
           setElementWithValueToWatchIfEquals(elementToHighlightId);
         } else if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
           if (!elementToHighlightId) return;
@@ -814,7 +810,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         } else {
           // Otherwise, we check if there is the expected number of instances.
           const instancesCount = getInstanceCountInLayoutForObject(
-            layout,
+            layout.getInitialInstances(),
             objectName
           );
           if (instancesCount >= count) goToNextStep();

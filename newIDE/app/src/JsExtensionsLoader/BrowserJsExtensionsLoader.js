@@ -165,6 +165,12 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TextInput/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'Scene3D',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/3D/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

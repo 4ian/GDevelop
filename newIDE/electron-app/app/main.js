@@ -26,7 +26,7 @@ const {
   downloadLocalFile,
   saveLocalFileFromArrayBuffer,
 } = require('./LocalFileDownloader');
-const { openPreviewWindow } = require('./PreviewWindow');
+const { openPreviewWindow, closePreviewWindow } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
@@ -180,6 +180,9 @@ app.on('ready', function() {
       alwaysOnTop: options.alwaysOnTop,
       hideMenuBar: options.hideMenuBar,
     });
+  });
+  ipcMain.handle('preview-close', async (event, options) => {
+    return closePreviewWindow(options.windowId);
   });
 
   // Piskel image editor

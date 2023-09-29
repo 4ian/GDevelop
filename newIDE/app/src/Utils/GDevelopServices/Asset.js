@@ -3,15 +3,27 @@ import axios from 'axios';
 import {
   GDevelopAssetApi,
   GDevelopPrivateAssetsStorage,
+  GDevelopPrivateGameTemplatesStorage,
   GDevelopPublicAssetResourcesStorageBaseUrl,
   GDevelopPublicAssetResourcesStorageStagingBaseUrl,
 } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type Filters } from './Filters';
 import {
+  type PrivateGameTemplateListingData,
   createProductAuthorizedUrl,
-  isProductAuthorizedResourceUrl,
+  isPrivateAssetResourceAuthorizedUrl,
 } from './Shop';
+
+export type License = {|
+  name: string,
+  website: string,
+|};
+
+export type Author = {|
+  name: string,
+  website: string,
+|};
 
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,
@@ -75,6 +87,8 @@ export type PublicAssetPack = {|
   externalWebLink?: ?string,
   userFriendlyPrice?: ?string,
   categories: Array<string>,
+  authors: Array<Author>,
+  licenses: Array<License>,
 |};
 
 export type PublicAssetPacks = {|
@@ -88,7 +102,8 @@ type PrivateAssetPackAssetType =
   | '9patch'
   | 'tiled'
   | 'partial'
-  | 'particleEmitter';
+  | 'particleEmitter'
+  | 'Scene3D::Model3DObject';
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 
@@ -102,6 +117,16 @@ export type PrivateAssetPack = {|
   tag: string,
   longDescription: string,
   content: PrivateAssetPackContent,
+|};
+
+export type PrivateGameTemplate = {|
+  id: string,
+  name: string,
+  previewImageUrls: Array<string>,
+  updatedAt: string,
+  createdAt: string,
+  tag: string,
+  longDescription: string,
 |};
 
 export type AllPublicAssets = {|
@@ -121,16 +146,6 @@ export type Resource = {|
 export type AllResources = {|
   resources: Array<Resource>,
   filters: Filters,
-|};
-
-export type License = {|
-  name: string,
-  website: string,
-|};
-
-export type Author = {|
-  name: string,
-  website: string,
 |};
 
 export type Environment = 'staging' | 'live';
@@ -265,10 +280,15 @@ export const listAllResources = ({
       return Promise.all([
         client.get(resourcesUrl).then(response => response.data),
         client.get(filtersUrl).then(response => response.data),
-      ]).then(([resources, filters]) => ({
-        resources,
-        filters,
-      }));
+      ]).then(([resources, filters]) => {
+        if (!resources || !filters) {
+          throw new Error('Unexpected response from the resources endpoints.');
+        }
+        return {
+          resources,
+          filters,
+        };
+      });
     });
 };
 
@@ -319,6 +339,27 @@ export const getPrivateAssetPack = async (
   return response.data;
 };
 
+export const getPrivateGameTemplate = async (
+  gameTemplateId: string
+): Promise<PrivateGameTemplate> => {
+  const response = await client.get(`/game-template/${gameTemplateId}`);
+  return response.data;
+};
+
+export const createPrivateGameTemplateUrl = async (
+  privateGameTemplateListingData: PrivateGameTemplateListingData,
+  authorizationToken: string
+): Promise<string> => {
+  const gameTemplateUrl = `${GDevelopPrivateGameTemplatesStorage.baseUrl}/${
+    privateGameTemplateListingData.id
+  }/game.json`;
+  const authorizedUrl = createProductAuthorizedUrl(
+    gameTemplateUrl,
+    authorizationToken
+  );
+  return authorizedUrl;
+};
+
 export const isPixelArt = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
@@ -331,7 +372,7 @@ export const isPrivateAsset = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
   const imageUrl = assetOrAssetShortHeader.previewImageUrls[0];
-  return !!imageUrl && isProductAuthorizedResourceUrl(imageUrl);
+  return !!imageUrl && isPrivateAssetResourceAuthorizedUrl(imageUrl);
 };
 
 export const listReceivedAssetShortHeaders = async (
@@ -360,6 +401,22 @@ export const listReceivedAssetPacks = async (
 ): Promise<Array<PrivateAssetPack>> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.get('/asset-pack', {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
+export const listReceivedGameTemplates = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<Array<PrivateGameTemplate>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/game-template', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });

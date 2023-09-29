@@ -41,7 +41,7 @@ type Props = {|
 
   // Object renaming:
   onRename: string => void,
-  canRenameObject: string => boolean,
+  getValidatedObjectOrGroupName: string => string,
 
   // Passed down to object editors:
   project: gdProject,
@@ -69,6 +69,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
+  const { showConfirmation } = useAlertDialog();
   const { openBehaviorEvents } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
@@ -79,26 +80,48 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancelChanges,
     notifyOfChange,
     hasUnsavedChanges,
+    getOriginalContentSerializedElement,
   } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
+    resetThenClearPersistentUuid: true,
   });
 
-  const objectMetadata = React.useMemo(
-    () =>
-      gd.MetadataProvider.getObjectMetadata(
-        props.project.getCurrentPlatform(),
-        props.object.getType()
-      ),
-    [props.project, props.object]
+  // Don't use a memo for this because metadata from custom objects are built
+  // from event-based object when extensions are refreshed after an extension
+  // installation.
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    props.project.getCurrentPlatform(),
+    props.object.getType()
   );
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
 
-  const onApply = () => {
+  const onApply = async () => {
     props.onApply();
+
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      props.project,
+      getOriginalContentSerializedElement().getChild('variables'),
+      props.object.getVariables()
+    );
+    if (changeset.hasRemovedVariables()) {
+      // While we support refactoring that would remove all references (actions, conditions...)
+      // it's both a bit dangerous for the user and we would need to show the user what
+      // will be removed before doing so. For now, just clear the removed variables so they don't
+      // trigger any refactoring.
+      changeset.clearRemovedVariables();
+    }
+
+    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+      props.project,
+      props.object.getVariables(),
+      changeset
+    );
+    props.object.clearPersistentUuid();
+
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will
     // override the name.
@@ -117,8 +140,6 @@ const InnerDialog = (props: InnerDialogProps) => {
     },
     [currentTab]
   );
-
-  const { showConfirmation } = useAlertDialog();
 
   const askConfirmationAndOpenBehaviorEvents = React.useCallback(
     async (extensionName, behaviorName) => {
@@ -185,12 +206,14 @@ const InnerDialog = (props: InnerDialogProps) => {
               label: <Trans>Variables</Trans>,
               value: 'variables',
             },
-            objectMetadata.isUnsupportedBaseObjectCapability('effect')
-              ? null
-              : {
+            objectMetadata.hasDefaultBehavior(
+              'EffectCapability::EffectBehavior'
+            )
+              ? {
                   label: <Trans>Effects</Trans>,
                   value: 'effects',
-                },
+                }
+              : null,
           ].filter(Boolean)}
         />
       }
@@ -220,10 +243,10 @@ const InnerDialog = (props: InnerDialogProps) => {
                 onChange={newObjectName => {
                   if (newObjectName === objectName) return;
 
-                  if (props.canRenameObject(newObjectName)) {
-                    setObjectName(newObjectName);
-                    notifyOfChange();
-                  }
+                  setObjectName(
+                    props.getValidatedObjectOrGroupName(newObjectName)
+                  );
+                  notifyOfChange();
                 }}
                 autoFocus="desktop"
               />
@@ -268,7 +291,6 @@ const InnerDialog = (props: InnerDialogProps) => {
               </Line>
             )}
           <VariablesList
-            commitChangesOnBlur
             variablesContainer={props.object.getVariables()}
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>
@@ -287,6 +309,8 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'effects' && (
         <EffectsList
           target="object"
+          // TODO (3D): declare the renderer type in object metadata.
+          layerRenderingType="2d"
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}

@@ -40,7 +40,8 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
                 _("Displays a large number of small particles to create visual "
                   "effects."),
                 "CppPlatform/Extensions/particleSystemicon.png")
-            .SetCategoryFullName(_("Visual effect"));
+            .SetCategoryFullName(_("Visual effect"))
+            .AddDefaultBehavior("EffectCapability::EffectBehavior");
 
     // Declaration is too big to be compiled by GCC in one file, unless you have
     // 4GB+ ram. :/

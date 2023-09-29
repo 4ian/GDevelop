@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class RadialBlurFilter extends PIXI.Filter {
     constructor(
       angle?: number,

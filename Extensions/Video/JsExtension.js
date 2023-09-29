@@ -136,7 +136,9 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
-      .setCategoryFullName(_('User interface'));
+      .setCategoryFullName(_('User interface'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
+      .addDefaultBehavior("OpacityCapability::OpacityBehavior");
 
     object
       .addAction(
@@ -425,8 +427,10 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
+    // Deprecated
     object
       .addCondition(
         'GetOpacity',
@@ -445,8 +449,10 @@ module.exports = {
         )
       )
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .setFunctionName('getOpacity')
+      .setHidden();
 
+    // Deprecated
     object
       .addExpression(
         'Opacity',
@@ -457,7 +463,8 @@ module.exports = {
       )
       .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .setFunctionName('getOpacity')
+      .setHidden();
 
     object
       .addAction(
@@ -518,7 +525,7 @@ module.exports = {
   },
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.
@@ -664,8 +671,8 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
+        this._pixiObject.width = this.getCustomWidth();
+        this._pixiObject.height = this.getCustomHeight();
       }
     };
 

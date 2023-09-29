@@ -39,10 +39,11 @@ type Props = {|
     marginRight?: number,
     margin?: number,
   |},
+  id?: string,
 |};
 
 /**
- * A text field based on Material-UI text field.
+ * A checkbox based on Material-UI checkbox.
  */
 const Checkbox = (props: Props) => {
   const { onCheck } = props;
@@ -59,6 +60,7 @@ const Checkbox = (props: Props) => {
       icon={props.uncheckedIcon}
       checkedIcon={props.checkedIcon}
       style={props.label ? undefined : props.style}
+      id={props.id}
     />
   );
   return props.label ? (

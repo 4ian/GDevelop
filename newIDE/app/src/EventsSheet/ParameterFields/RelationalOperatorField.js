@@ -31,6 +31,13 @@ const mapTypeToOperators: { [string]: Array<string> } = {
   color: ['=', '!='],
 };
 
+const defaultOperators: { [string]: string } = {
+  number: '=',
+  time: '>=',
+  string: '=',
+  color: '=',
+};
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function RelationalOperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
@@ -51,6 +58,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       : 'unknown';
     const operators =
       mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
+
+    if (!props.value) {
+      const defaultOperator = defaultOperators[comparedValueType];
+      if (defaultOperator) {
+        props.onChange(defaultOperator);
+      }
+    }
 
     return (
       <SelectField

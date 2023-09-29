@@ -26,6 +26,8 @@ const getClientXY = (event: TouchEvent): CallbackEvent => {
 const delay = 600; // ms
 const moveTolerance = 10; // px
 
+const contextLocks: { [string]: true } = {};
+
 /**
  * A hook to listen to a long touch ("long press") on an element, to workaround the
  * non working onContextMenu on some platforms (Safari on iOS).
@@ -33,15 +35,26 @@ const moveTolerance = 10; // px
  * A long press is characterized by starting a touch and staying pressed, without
  * moving too far from the initial position (to avoid being confused with a drag/scroll).
  */
-export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
+export const useLongTouch = (
+  callback: (e: CallbackEvent) => void,
+  /**
+   * To be set when nested elements with watched touches events are in conflict to run a callback.
+   * Priority will be given to the nested element.
+   */
+  context?: string
+) => {
   const timeout = React.useRef<?TimeoutID>(null);
   const currentTouchCallbackEvent = React.useRef<CallbackEvent>({
     clientX: 0,
     clientY: 0,
   });
-  const clear = React.useCallback(() => {
-    timeout.current && clearTimeout(timeout.current);
-  }, []);
+  const clear = React.useCallback(
+    () => {
+      if (context) delete contextLocks[context];
+      timeout.current && clearTimeout(timeout.current);
+    },
+    [context]
+  );
 
   React.useEffect(
     () => {
@@ -75,13 +88,17 @@ export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
       // if there is one already. This can happen if start is called
       // multiple times.
       timeout.current && clearTimeout(timeout.current);
+      if (context) {
+        if (contextLocks[context]) return;
+        contextLocks[context] = true;
+      }
 
       currentTouchCallbackEvent.current = getClientXY(event);
       timeout.current = setTimeout(() => {
         callback(currentTouchCallbackEvent.current);
       }, delay);
     },
-    [callback]
+    [callback, context]
   );
 
   const onMove = React.useCallback(

@@ -175,7 +175,10 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('Text'));
+      .setCategoryFullName(_('Text'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior')
+      .addDefaultBehavior('ScalableCapability::ScalableBehavior');
 
     object
       .addExpressionAndConditionAndAction(
@@ -192,6 +195,7 @@ module.exports = {
       .setFunctionName('setText')
       .setGetter('getText');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -210,7 +214,8 @@ module.exports = {
         )
       )
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
     object
       .addExpressionAndCondition(
@@ -226,6 +231,7 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontSize');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -243,6 +249,7 @@ module.exports = {
           _('Scale (1 by default)')
         )
       )
+      .setHidden()
       .setFunctionName('setScale')
       .setGetter('getScale');
 
@@ -392,7 +399,7 @@ module.exports = {
 
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.
@@ -554,7 +561,7 @@ module.exports = {
       if (!texture.valid) {
         // Post pone texture update if texture is not loaded.
         // (otherwise, the bitmap font would not get updated when the
-        // texture is loaded and udpated).
+        // texture is loaded and updated).
         return new Promise((resolve) => {
           texture.once('update', () => {
             resolve(loadBitmapFont());
@@ -711,7 +718,7 @@ module.exports = {
       const wordWrap = properties.get('wordWrap').getValue() === 'true';
       if (wordWrap && this._instance.hasCustomSize()) {
         this._pixiObject.maxWidth =
-          this._instance.getCustomWidth() / this._pixiObject.scale.x;
+          this.getCustomWidth() / this._pixiObject.scale.x;
         this._pixiObject.dirty = true;
       } else {
         this._pixiObject.maxWidth = 0;
@@ -730,8 +737,9 @@ module.exports = {
     RenderedBitmapTextInstance.prototype.onRemovedFromScene = function () {
       RenderedInstance.prototype.onRemovedFromScene.call(this);
 
-      releaseBitmapFont(this._pixiObject.fontName);
+      const fontName = this._pixiObject.fontName;
       this._pixiObject.destroy();
+      releaseBitmapFont(fontName);
     };
 
     /**

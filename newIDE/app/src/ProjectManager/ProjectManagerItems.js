@@ -3,7 +3,6 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import WarningIcon from '@material-ui/icons/Warning';
 
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
@@ -25,6 +24,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Text from '../UI/Text';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
+import Warning from '../UI/CustomSvgIcons/Warning';
 
 const styles = {
   noIndentNestedList: {
@@ -76,7 +76,7 @@ export const ProjectStructureItem = ({
       onReload={onRefresh}
       noPadding
       nestedListStyle={styles.noIndentNestedList}
-      leftIcon={error ? <WarningIcon /> : undefined}
+      leftIcon={error ? <Warning /> : undefined}
       displayReloadButton={!!error}
       reloadButtonTooltip={
         <Trans>An error has occurred in functions. Click to reload them.</Trans>

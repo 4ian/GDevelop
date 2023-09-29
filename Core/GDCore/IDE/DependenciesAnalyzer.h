@@ -42,7 +42,7 @@ class GD_CORE_API DependenciesAnalyzer {
    *
    * You can also call then
    * DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene to check if the
-   * external events can be compiled separatly and called by a scene. \see
+   * external events can be compiled separately and called by a scene. \see
    * DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene
    */
   DependenciesAnalyzer(const gd::Project& project_,

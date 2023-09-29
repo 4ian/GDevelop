@@ -57,6 +57,9 @@ type Props = {|
   acceleratorString?: string,
   'aria-label'?: string,
 
+  disableRipple?: boolean,
+  disableFocusRipple?: boolean,
+
   color?: 'default',
 |};
 
@@ -117,7 +120,7 @@ const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
           title={
             i18n._(tooltip) +
             (acceleratorString
-              ? ' ' + adaptAcceleratorString(acceleratorString)
+              ? ' (' + adaptAcceleratorString(acceleratorString) + ')'
               : '')
           }
           placement="bottom"

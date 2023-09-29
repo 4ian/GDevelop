@@ -9,9 +9,9 @@ import {
   fakeAssetWithCustomObject,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
-import withMock from 'storybook-addon-mock';
 import { GDevelopUserApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import PublicProfileProvider from '../../../../Profile/PublicProfileProvider';
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore/AssetDetails',
@@ -19,18 +19,29 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
+const Wrapper = ({ children }: { children: React.Node }) => {
+  const navigationState = useShopNavigation();
+  return (
+    <PublicProfileProvider>
+      <AssetStoreStateProvider shopNavigationState={navigationState}>
+        {children}
+      </AssetStoreStateProvider>
+    </PublicProfileProvider>
+  );
+};
+
 export const PublicAsset = () => {
   return (
-    <AssetStoreStateProvider>
+    <Wrapper>
       <AssetDetails
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
+        onPrivateAssetPackSelection={() => {}}
       />
-    </AssetStoreStateProvider>
+    </Wrapper>
   );
 };
-PublicAsset.decorators = [withMock];
 PublicAsset.parameters = {
   mockData: [
     {
@@ -45,17 +56,15 @@ PublicAsset.parameters = {
 };
 
 export const PrivateAsset = () => (
-  <PublicProfileProvider>
-    <AssetStoreStateProvider>
-      <AssetDetails
-        onTagSelection={() => {}}
-        assetShortHeader={fakeAssetShortHeader1}
-        onOpenDetails={assetShortHeader => {}}
-      />
-    </AssetStoreStateProvider>
-  </PublicProfileProvider>
+  <Wrapper>
+    <AssetDetails
+      onTagSelection={() => {}}
+      assetShortHeader={fakeAssetShortHeader1}
+      onOpenDetails={assetShortHeader => {}}
+      onPrivateAssetPackSelection={() => {}}
+    />
+  </Wrapper>
 );
-PrivateAsset.decorators = [withMock];
 PrivateAsset.parameters = {
   mockData: [
     {
@@ -70,6 +79,16 @@ PrivateAsset.parameters = {
           username: 'Clem',
           description: "I'm Clement\n\ntada",
           donateLink: 'https://ko-fi/clem',
+          personalWebsiteLink: 'https://indie-user.com',
+          personalWebsite2Link: 'https://indie-user2.com',
+          twitterUsername: 'indie-user',
+          facebookUsername: 'indie-user',
+          youtubeUsername: 'indie-user',
+          tiktokUsername: 'indie-user',
+          instagramUsername: 'indie-user',
+          redditUsername: 'indie-user',
+          snapchatUsername: 'indie-user',
+          discordServerLink: 'https://discord.gg/indie-user',
         },
       },
     },
@@ -89,17 +108,15 @@ PrivateAsset.parameters = {
 };
 
 export const AssetWithMultipleAuthors = () => (
-  <PublicProfileProvider>
-    <AssetStoreStateProvider>
-      <AssetDetails
-        onTagSelection={() => {}}
-        assetShortHeader={fakeAssetShortHeader1}
-        onOpenDetails={assetShortHeader => {}}
-      />
-    </AssetStoreStateProvider>
-  </PublicProfileProvider>
+  <Wrapper>
+    <AssetDetails
+      onTagSelection={() => {}}
+      assetShortHeader={fakeAssetShortHeader1}
+      onOpenDetails={assetShortHeader => {}}
+      onPrivateAssetPackSelection={() => {}}
+    />
+  </Wrapper>
 );
-PrivateAsset.decorators = [withMock];
 PrivateAsset.parameters = {
   mockData: [
     {
@@ -114,12 +131,32 @@ PrivateAsset.parameters = {
           username: 'Clem',
           description: "I'm Clement\n\ntada",
           donateLink: 'https://ko-fi/clem',
+          personalWebsiteLink: 'https://indie-user.com',
+          personalWebsite2Link: 'https://indie-user2.com',
+          twitterUsername: 'indie-user',
+          facebookUsername: 'indie-user',
+          youtubeUsername: 'indie-user',
+          tiktokUsername: 'indie-user',
+          instagramUsername: 'indie-user',
+          redditUsername: 'indie-user',
+          snapchatUsername: 'indie-user',
+          discordServerLink: 'https://discord.gg/indie-user',
         },
         ABCWdIDmJzUA5iAWryEItxINA7n1: {
           id: 'ABCWdIDmJzUA5iAWryEItxINA7n1',
           username: 'Clem2',
           description: "I'm Clement 2\n\ntada",
           donateLink: 'https://ko-fi/clem2',
+          personalWebsiteLink: 'https://indie-user.com',
+          personalWebsite2Link: 'https://indie-user2.com',
+          twitterUsername: 'indie-user',
+          facebookUsername: 'indie-user',
+          youtubeUsername: 'indie-user',
+          tiktokUsername: 'indie-user',
+          instagramUsername: 'indie-user',
+          redditUsername: 'indie-user',
+          snapchatUsername: 'indie-user',
+          discordServerLink: 'https://discord.gg/indie-user',
         },
       },
     },

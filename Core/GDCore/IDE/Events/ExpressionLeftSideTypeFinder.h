@@ -20,6 +20,7 @@
 namespace gd {
 class Expression;
 class ObjectsContainer;
+class ObjectsContainersList;
 class Platform;
 class ParameterMetadata;
 class ExpressionMetadata;
@@ -40,11 +41,10 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
    * operations.
    */
   static const gd::String GetType(const gd::Platform &platform,
-                      const gd::ObjectsContainer &globalObjectsContainer,
-                      const gd::ObjectsContainer &objectsContainer,
+                      const gd::ObjectsContainersList &objectsContainersList,
                       gd::ExpressionNode& node) {
     gd::ExpressionLeftSideTypeFinder typeFinder(
-        platform, globalObjectsContainer, objectsContainer);
+        platform, objectsContainersList);
     node.Visit(typeFinder);
     return typeFinder.GetType();
   }
@@ -53,11 +53,9 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
 
  protected:
   ExpressionLeftSideTypeFinder(const gd::Platform &platform_,
-                       const gd::ObjectsContainer &globalObjectsContainer_,
-                       const gd::ObjectsContainer &objectsContainer_)
+                       const gd::ObjectsContainersList &objectsContainersList_)
       : platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        objectsContainersList(objectsContainersList_),
         type("unknown") {};
 
   const gd::String &GetType() {
@@ -85,7 +83,7 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
-        platform, globalObjectsContainer, objectsContainer, node);
+        platform, objectsContainersList, node);
     if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
       type = "unknown";
     }
@@ -113,8 +111,7 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   gd::String type;
 
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ObjectsContainersList &objectsContainersList;
   const gd::String rootType;
 };
 

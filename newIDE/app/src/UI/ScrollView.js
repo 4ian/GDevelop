@@ -6,6 +6,7 @@ import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 const styles = {
   container: {
     flex: 1,
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 
@@ -23,7 +24,9 @@ type Props = {|
 
 export type ScrollViewInterface = {|
   getScrollPosition: () => number,
-  scrollTo: (target: ?React$Component<any, any>) => void,
+  scrollTo: (
+    target: ?React$Component<any, any> | ?React.ElementRef<any>
+  ) => void,
   scrollToPosition: (number: number) => void,
   scrollToBottom: () => void,
 |};

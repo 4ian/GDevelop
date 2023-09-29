@@ -15,6 +15,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "catch.hpp"
 
 namespace {
@@ -35,6 +36,8 @@ TEST_CASE("EventsBehaviorRenamer (expressions)", "[common]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
+  auto projectScopedContainers =
+    gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
 
   auto &object1 =
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
@@ -57,7 +60,7 @@ TEST_CASE("EventsBehaviorRenamer (expressions)", "[common]") {
   // Rename the first behavior.
   gd::EventsBehaviorRenamer behaviorRenamer(
       platform, "Object1", "MyBehavior", "MyRenamedBehavior");
-  behaviorRenamer.Launch(layout1.GetEvents(), project, layout1);
+  behaviorRenamer.Launch(layout1.GetEvents(), projectScopedContainers);
 
   // Verify the expression were updated.
   REQUIRE(EnsureStandardEvent(layout1.GetEvents().GetEvent(0))
@@ -74,6 +77,8 @@ TEST_CASE("EventsBehaviorRenamer (instructions)", "[common]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
+  auto projectScopedContainers =
+    gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
 
   auto &object1 =
       layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
@@ -109,7 +114,7 @@ TEST_CASE("EventsBehaviorRenamer (instructions)", "[common]") {
   // Rename MyBehavior.
   gd::EventsBehaviorRenamer behaviorRenamer(
       platform, "Object1", "MyBehavior", "MyRenamedBehavior");
-  behaviorRenamer.Launch(layout1.GetEvents(), project, layout1);
+  behaviorRenamer.Launch(layout1.GetEvents(), projectScopedContainers);
 
   // Ensure the action using MyBehavior has its parameter renamed.
   REQUIRE(EnsureStandardEvent(layout1.GetEvents().GetEvent(0))

@@ -89,7 +89,7 @@ module.exports = {
         _('Change user UID'),
         _(
           "Changes the current user's analytics identifier. " +
-            'This is what let Analytics differienciate user, ' +
+            'This is what let Analytics differentiate user, ' +
             'so it should always be unique for each user. ' +
             'For advanced usage only.'
         ),
@@ -178,9 +178,9 @@ module.exports = {
     extension
       .addAction(
         'SetRemoteConfigAutoUpdateInterval',
-        _('Set Remote Config Auto Update Inteval'),
-        _('Sets Remote Config Auto Update Inteval.'),
-        _('Set Remote Config Auto Update Inteval to _PARAM0_'),
+        _('Set Remote Config Auto Update Interval'),
+        _('Sets Remote Config Auto Update Interval.'),
+        _('Set Remote Config Auto Update Interval to _PARAM0_'),
         _('Remote Config'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -395,14 +395,14 @@ module.exports = {
       .addIncludeFile('Extensions/Firebase/A_firebasejs/B_firebase-auth.js')
       .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
       .addIncludeFile('Extensions/Firebase/B_firebasetools/D_authtools.js')
-      .setFunctionName('gdjs.evtTools.firebaseTools.auth.isAuthentified');
+      .setFunctionName('gdjs.evtTools.firebaseTools.auth.isAuthenticated');
 
     extension
       .addStrExpression(
         'GetAuthToken',
-        _('Get the user authentififcation token'),
+        _('Get the user authentication token'),
         _(
-          'Get the user authentififcation token. The token is the proof of authentication.'
+          'Get the user authentication token. The token is the proof of authentication.'
         ),
         _('Authentication'),
         'JsPlatform/Extensions/firebase.png'
@@ -1085,7 +1085,7 @@ module.exports = {
         'ServerTimestamp',
         _('Get server timestamp'),
         _(
-          'Set a field to the timstamp on the server when the request arrives there'
+          'Set a field to the timestamp on the server when the request arrives there'
         ),
         _('Cloud Firestore Database'),
         'JsPlatform/Extensions/firebase.png'
@@ -1376,11 +1376,11 @@ module.exports = {
         'FirestoreWatchQuery',
         _('Continuously run (watch) a query'),
         _(
-          'Runs a query continously, so that every time a new documents starts ' +
+          'Runs a query continuously, so that every time a new documents starts ' +
             'or stops matching the query, or a document that matches the query has been changed, the variables will be filled with the new results.'
         ),
         _(
-          'Run query _PARAM0_ continously and store results into _PARAM1_ each time documents matching the query are changed (store result state in _PARAM2_)'
+          'Run query _PARAM0_ continuously and store results into _PARAM1_ each time documents matching the query are changed (store result state in _PARAM2_)'
         ),
         _('Cloud Firestore Database/Queries/Run'),
         'JsPlatform/Extensions/firebase.png',

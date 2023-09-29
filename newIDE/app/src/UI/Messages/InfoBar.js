@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
+import { Button } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 type Props = {|
   message: React.Node,
@@ -9,6 +11,8 @@ type Props = {|
   visible: boolean,
   duration?: number,
   hide: () => void,
+  actionLabel?: React.Node,
+  onActionClick?: () => void | Promise<void>,
 |};
 
 const InfoBar = ({
@@ -16,8 +20,11 @@ const InfoBar = ({
   touchScreenMessage,
   message,
   hide,
+  actionLabel,
+  onActionClick,
   duration = 3000,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();
 
   React.useEffect(
@@ -39,6 +46,19 @@ const InfoBar = ({
         screenType === 'touch' && touchScreenMessage
           ? touchScreenMessage
           : message
+      }
+      action={
+        actionLabel && onActionClick ? (
+          <Button
+            color={
+              gdevelopTheme.palette.type === 'light' ? 'secondary' : 'primary'
+            }
+            size="small"
+            onClick={onActionClick}
+          >
+            {actionLabel}
+          </Button>
+        ) : null
       }
     />
   );

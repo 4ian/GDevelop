@@ -93,7 +93,9 @@ export const ResourceStoreStateProvider = ({
           });
 
           console.info(
-            `Loaded ${resources.length} resources from the asset store.`
+            `Loaded ${
+              resources ? resources.length : 0
+            } resources from the asset store.`
           );
           setResourcesByUrl(resourcesByUrl);
           setFilters(filters);

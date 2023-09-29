@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { I18n } from '@lingui/react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
@@ -29,13 +30,15 @@ const makeMarkdownCustomComponents = (
     ) : (
       props.children
     ),
-  // Add paragraphs only if we explictly opt in.
+  // Add paragraphs only if we explicitly opt in.
   p: props =>
     isStandaloneText || allowParagraphs ? (
       <p>{props.children}</p>
     ) : (
       props.children
     ),
+  // eslint-disable-next-line jsx-a11y/alt-text
+  img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />,
 });
 
 type Props = {|
@@ -62,7 +65,10 @@ export const MarkdownText = (props: Props) => {
   const markdownElement = (
     <I18n>
       {({ i18n }) => (
-        <ReactMarkdown components={markdownCustomComponents}>
+        <ReactMarkdown
+          components={markdownCustomComponents}
+          remarkPlugins={[remarkGfm]}
+        >
           {props.translatableSource
             ? i18n._(props.translatableSource)
             : props.source}

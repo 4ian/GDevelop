@@ -1,5 +1,5 @@
 // @flow
-import { configure, addDecorator } from '@storybook/react';
+import GDevelopJsInitializerDecorator from '../src/stories/GDevelopJsInitializerDecorator';
 import i18nProviderDecorator from '../src/stories/I18nProviderDecorator';
 import '../src/UI/icomoon-font.css'; // Styles for Icomoon font.
 import './app-level-styling.css';
@@ -33,4 +33,7 @@ export const parameters = {
   docs: { disable: true },
 };
 
-addDecorator(i18nProviderDecorator);
+export const decorators = [
+  GDevelopJsInitializerDecorator,
+  i18nProviderDecorator
+]

@@ -201,7 +201,7 @@ class GD_CORE_API EventsFunction {
   /**
    * \brief Returns true if the function is private.
    */
-  bool IsPrivate() { return isPrivate; }
+  bool IsPrivate() const { return isPrivate; }
 
   /**
    * \brief Sets the privateness of the function.
@@ -217,7 +217,7 @@ class GD_CORE_API EventsFunction {
   bool IsAsync() const { return isAsync; }
 
   /**
-   * \brief Sets the asycronity of the function.
+   * \brief Sets the asynchronicity of the function.
    */
   EventsFunction& SetAsync(bool _isAsync) {
     isAsync = _isAsync;

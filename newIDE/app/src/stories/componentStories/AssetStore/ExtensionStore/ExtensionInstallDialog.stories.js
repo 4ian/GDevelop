@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -16,6 +15,7 @@ import {
   uncompatibleFireBulletExtensionShortHeader,
   alreadyInstalledExtensionShortHeader,
   alreadyInstalledCommunityExtensionShortHeader,
+  newerVersionExtensionShortHeader,
 } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -67,7 +67,6 @@ export const Default = () => (
     onEdit={action('edit')}
   />
 );
-Default.decorators = [withMock];
 Default.parameters = apiDataFakeFireBulletExtension;
 
 export const BeingInstalled = () => (
@@ -80,7 +79,6 @@ export const BeingInstalled = () => (
     onEdit={action('edit')}
   />
 );
-Default.decorators = [withMock];
 Default.parameters = apiDataFakeFireBulletExtension;
 
 export const IncompatibleGdevelopVersion = () => (
@@ -93,7 +91,6 @@ export const IncompatibleGdevelopVersion = () => (
     onEdit={action('edit')}
   />
 );
-IncompatibleGdevelopVersion.decorators = [withMock];
 IncompatibleGdevelopVersion.parameters = apiDataFakeFireBulletExtension;
 
 export const AlreadyInstalled = () => (
@@ -106,8 +103,19 @@ export const AlreadyInstalled = () => (
     onEdit={action('edit')}
   />
 );
-AlreadyInstalled.decorators = [withMock];
 AlreadyInstalled.parameters = apiDataFakeFireBulletExtension;
+
+export const Outdated = () => (
+  <ExtensionInstallDialog
+    project={testProject.project}
+    extensionShortHeader={newerVersionExtensionShortHeader}
+    isInstalling={false}
+    onClose={action('close')}
+    onInstall={() => Promise.resolve()}
+    onEdit={action('edit')}
+  />
+);
+Outdated.parameters = apiDataFakeFireBulletExtension;
 
 export const AlreadyInstalledCommunityExtension = () => (
   <ExtensionInstallDialog
@@ -119,7 +127,6 @@ export const AlreadyInstalledCommunityExtension = () => (
     onEdit={action('edit')}
   />
 );
-AlreadyInstalled.decorators = [withMock];
 AlreadyInstalled.parameters = apiDataFakeFireBulletExtension;
 
 export const WithServerSideError = () => (
@@ -132,7 +139,6 @@ export const WithServerSideError = () => (
     onEdit={action('edit')}
   />
 );
-WithServerSideError.decorators = [withMock];
 WithServerSideError.parameters = apiDataServerSideError;
 
 export const CommunityExtension = () => (
@@ -145,5 +151,4 @@ export const CommunityExtension = () => (
     onEdit={action('edit')}
   />
 );
-CommunityExtension.decorators = [withMock];
 CommunityExtension.parameters = apiDataFakeCommunityExtension;

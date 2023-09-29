@@ -126,8 +126,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
   extension
       .AddExpression(
           "StrFindLast",
-          _("Search the last occurence in a text"),
-          _("Search the last occurence in a string (return the position of "
+          _("Search the last occurrence in a text"),
+          _("Search the last occurrence in a string (return the position of "
             "the result, from the beginning of the string, or -1 if not "
             "found)"),
           "",
@@ -169,10 +169,10 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
   extension
       .AddExpression(
           "StrFindLastFrom",
-          _("Search the last occurence in a text, starting from a position"),
-          _("Search in a text the last occurence, starting from a position "
+          _("Search the last occurrence in a text, starting from a position"),
+          _("Search in a text the last occurrence, starting from a position "
             "(return "
-            " the position of the result, from the beginning of the string, or "
+            "the position of the result, from the beginning of the string, or "
             "-1 if not found)"),
           "",
           "res/conditions/toujours24_black.png")

@@ -23,6 +23,7 @@ class BehaviorMetadata;
 class InstructionMetadata;
 class ExpressionCodeGenerationInformation;
 class EventsCodeGenerationContext;
+class ProjectScopedContainers;
 }  // namespace gd
 
 namespace gdjs {
@@ -313,14 +314,23 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
     return "gdjs.VariablesContainer.badVariable";
   }
 
+  virtual gd::String GeneratePropertyGetter(const gd::PropertiesContainer& propertiesContainer,
+                                            const gd::NamedPropertyDescriptor& property,
+                                            const gd::String& type,
+                                            gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String GenerateParameterGetter(const gd::ParameterMetadata& parameter,
+                                             const gd::String& type,
+                                             gd::EventsCodeGenerationContext& context);
+
   virtual gd::String GenerateBadObject() { return "null"; }
 
   virtual gd::String GenerateObject(const gd::String& objectName,
                                     const gd::String& type,
                                     gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
-    return "!(" + predicat + ")";
+  virtual gd::String GenerateNegatedPredicate(const gd::String& predicate) const {
+    return "!(" + predicate + ")";
   };
 
   virtual gd::String GenerateObjectsDeclarationCode(
@@ -415,10 +425,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   EventsCodeGenerator(const gd::Project& project, const gd::Layout& layout);
 
   /**
-   * \brief Construct a code generator for the specified objects and groups.
+   * \brief Construct a code generator for the specified containers.
    */
-  EventsCodeGenerator(gd::ObjectsContainer& globalObjectsAndGroups,
-                      const gd::ObjectsContainer& objectsAndGroups);
+  EventsCodeGenerator(const gd::ProjectScopedContainers& projectScopedContainers);
   virtual ~EventsCodeGenerator();
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,

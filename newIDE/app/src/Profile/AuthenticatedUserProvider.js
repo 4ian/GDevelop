@@ -22,10 +22,12 @@ import {
   onUserLogoutForAnalytics,
   sendSignupDone,
   identifyUserForAnalytics,
+  aliasUserForAnalyticsAfterSignUp,
 } from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
+  authenticatedUserLoggedOutAttributes,
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
@@ -42,6 +44,7 @@ import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvide
 import {
   listReceivedAssetShortHeaders,
   listReceivedAssetPacks,
+  listReceivedGameTemplates,
 } from '../Utils/GDevelopServices/Asset';
 import AdditionalUserInfoDialog, {
   shouldAskForAdditionalUserInfo,
@@ -49,6 +52,7 @@ import AdditionalUserInfoDialog, {
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
+import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
 
 type Props = {|
   authentication: Authentication,
@@ -63,6 +67,7 @@ type State = {|
   createAccountInProgress: boolean,
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
+  deleteInProgress: boolean,
   additionalUserInfoDialogOpen: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
@@ -77,6 +82,13 @@ type State = {|
   userSnackbarMessage: ?React.Node,
 |};
 
+const cleanUserTracesOnDevice = async () => {
+  await Promise.all([
+    clearCloudProjectCookies(),
+    burstCloudProjectAutoSaveCache(),
+  ]);
+};
+
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
   State
@@ -89,6 +101,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     createAccountInProgress: false,
     editProfileDialogOpen: false,
     editInProgress: false,
+    deleteInProgress: false,
     additionalUserInfoDialogOpen: false,
     authError: null,
     resetPasswordDialogOpen: false,
@@ -115,7 +128,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   >(listUserCloudProjects);
 
   async componentDidMount() {
-    this._resetAuthenticatedUser();
+    this._initializeAuthenticatedUser();
 
     // Those callbacks are added a bit too late (after the authentication `hasAuthChanged` has already been triggered)
     // So this is not called at the startup, but only when the user logs in or log out.
@@ -160,13 +173,16 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
+      console.info('No authenticated user found at startup.');
+      this._markAuthenticatedUserAsLoggedOut();
       // If the user is not logged, we still need to identify the user for analytics.
       // But don't do anything else, the user is already logged or being logged.
       identifyUserForAnalytics(this.state.authenticatedUser);
     }
   }
 
-  _resetAuthenticatedUser() {
+  // This should be called only on the first mount of the provider.
+  _initializeAuthenticatedUser() {
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...initialAuthenticatedUser,
@@ -182,7 +198,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           await this._reloadFirebaseProfile();
         },
         onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
-        onPurchaseSuccessful: this._fetchUserAssets,
+        onPurchaseSuccessful: this._fetchUserPurchases,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
           sendEmailAutomatically,
@@ -199,6 +215,21 @@ export default class AuthenticatedUserProvider extends React.Component<
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
+      },
+    }));
+    this._hasNotifiedUserAboutAdditionalInfo = false;
+    this._hasNotifiedUserAboutEmailVerification = false;
+  }
+
+  // This should be called every time the user is detected as logged out.
+  // - At startup, if the user is not logged in.
+  // - When the user logs out.
+  // - When the user deletes their account.
+  _markAuthenticatedUserAsLoggedOut() {
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        ...authenticatedUserLoggedOutAttributes,
       },
     }));
     this._hasNotifiedUserAboutAdditionalInfo = false;
@@ -266,21 +297,13 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       firebaseUser = await this._reloadFirebaseProfile();
       if (!firebaseUser) {
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            loginState: 'done',
-          },
-        }));
+        console.info('User is not authenticated.');
+        this._markAuthenticatedUserAsLoggedOut();
         return;
       }
     } catch (error) {
-      this.setState(({ authenticatedUser }) => ({
-        authenticatedUser: {
-          ...authenticatedUser,
-          loginState: 'done',
-        },
-      }));
+      console.error('Unable to fetch the authenticated Firebase user:', error);
+      this._markAuthenticatedUserAsLoggedOut();
       throw error;
     }
 
@@ -385,6 +408,20 @@ export default class AuthenticatedUserProvider extends React.Component<
         );
       }
     );
+    listReceivedGameTemplates(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedGameTemplates =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedGameTemplates,
+          },
+        })),
+      error => {
+        console.error('Error while loading received game templates:', error);
+      }
+    );
     this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
@@ -406,18 +443,21 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     }
 
-    this.setState(({ authenticatedUser }) => ({
-      authenticatedUser: {
-        ...authenticatedUser,
-        profile: userProfile,
-        loginState: 'done',
-      },
-    }));
-
-    // We call this function every time the user is fetched, as it will
-    // automatically prevent the event to be sent if the user attributes haven't changed.
-    identifyUserForAnalytics(this.state.authenticatedUser);
-    this._notifyUserAboutEmailVerificationAndAdditionalInfo();
+    this.setState(
+      ({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          profile: userProfile,
+          loginState: 'done',
+        },
+      }),
+      () => {
+        // We call this function every time the user is fetched, as it will
+        // automatically prevent the event to be sent if the user attributes haven't changed.
+        identifyUserForAnalytics(this.state.authenticatedUser);
+        this._notifyUserAboutEmailVerificationAndAdditionalInfo();
+      }
+    );
   };
 
   _fetchUserSubscriptionLimitsAndUsages = async () => {
@@ -471,7 +511,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _fetchUserAssets = async () => {
+  _fetchUserAssetPacks = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
     if (!firebaseUser) return;
@@ -493,6 +533,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading received asset packs:', error);
     }
+  };
+
+  _fetchUserAssetShortHeaders = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
 
     try {
       const receivedAssetShortHeaders = await listReceivedAssetShortHeaders(
@@ -511,6 +557,38 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading received asset short headers:', error);
     }
+  };
+
+  _fetchUserGameTemplates = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const receivedGameTemplates = await listReceivedGameTemplates(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedGameTemplates,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received game templates:', error);
+    }
+  };
+
+  _fetchUserPurchases = async () => {
+    await Promise.all([
+      this._fetchUserAssetPacks(),
+      this._fetchUserAssetShortHeaders(),
+      this._fetchUserGameTemplates(),
+    ]);
   };
 
   _fetchUserCloudProjects = async () => {
@@ -620,8 +698,8 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (this.props.authentication) {
       await this.props.authentication.logout();
     }
-    this._resetAuthenticatedUser();
-    clearCloudProjectCookies();
+    this._markAuthenticatedUserAsLoggedOut();
+    cleanUserTracesOnDevice();
     this.showUserSnackbar({
       message: <Trans>You're now logged out</Trans>,
     });
@@ -677,6 +755,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           getNewsletterEmail: form.getNewsletterEmail,
           appLanguage: preferences.language,
           donateLink: form.donateLink,
+          communityLinks: form.communityLinks,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
@@ -720,6 +799,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openCreateAccountDialog(false);
       sendSignupDone(form.email);
+      const firebaseUser = this.state.authenticatedUser.firebaseUser;
+      aliasUserForAnalyticsAfterSignUp(firebaseUser);
       const profile = this.state.authenticatedUser.profile;
       const username = profile ? profile.username : null;
       this.showUserSnackbar({
@@ -734,6 +815,32 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
     this.setState({
       createAccountInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _doDeleteAccount = async () => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      deleteInProgress: true,
+      authError: null,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.deleteAccount(authentication.getAuthorizationHeader);
+      this._markAuthenticatedUserAsLoggedOut();
+      cleanUserTracesOnDevice();
+      this.openEditProfileDialog(false);
+      this.showUserSnackbar({
+        message: <Trans>Your account has been deleted!</Trans>,
+      });
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      deleteInProgress: false,
     });
     this._automaticallyUpdateUserProfile = true;
   };
@@ -944,9 +1051,13 @@ export default class AuthenticatedUserProvider extends React.Component<
               this.state.editProfileDialogOpen && (
                 <EditProfileDialog
                   profile={this.state.authenticatedUser.profile}
+                  subscription={this.state.authenticatedUser.subscription}
                   onClose={() => this.openEditProfileDialog(false)}
                   onEdit={form => this._doEdit(form, preferences)}
-                  updateProfileInProgress={this.state.editInProgress}
+                  onDelete={this._doDeleteAccount}
+                  actionInProgress={
+                    this.state.editInProgress || this.state.deleteInProgress
+                  }
                   error={this.state.authError}
                 />
               )}

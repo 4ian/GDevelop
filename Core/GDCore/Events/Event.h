@@ -240,7 +240,7 @@ class GD_CORE_API BaseEvent {
    */
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element){};
-  
+
   virtual bool AcceptVisitor(gd::EventVisitor& eventVisitor);
   virtual void AcceptVisitor(gd::ReadOnlyEventVisitor& eventVisitor) const;
   ///@}
@@ -281,7 +281,6 @@ class GD_CORE_API BaseEvent {
    * \brief True if the event should be folded in the events editor.
    */
   bool IsFolded() const { return folded; }
-
   ///@}
 
   std::weak_ptr<gd::BaseEvent>

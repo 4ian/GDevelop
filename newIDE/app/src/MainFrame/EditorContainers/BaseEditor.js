@@ -5,8 +5,12 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import {
+  type FileMetadataAndStorageProviderName,
+  type FileMetadata,
+} from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -22,6 +26,7 @@ export type RenderEditorContainerProps = {|
   isActive: boolean,
   projectItemName: ?string,
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   setToolbar: (?React.Node) => void,
 
   // Some optional extra props to pass to the rendered editor
@@ -71,7 +76,12 @@ export type RenderEditorContainerProps = {|
   onCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
+  onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
+  onOpenExampleStoreWithPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
+  onOpenPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
@@ -89,7 +99,7 @@ export type RenderEditorContainerProps = {|
   canInstallPrivateAsset: () => boolean,
 
   // Project creation
-  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: () => void,
 
   // Project save
   onSave: () => Promise<void>,

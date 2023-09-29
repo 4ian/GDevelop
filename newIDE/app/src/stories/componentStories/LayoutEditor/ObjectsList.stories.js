@@ -12,8 +12,7 @@ import paperDecorator from '../../PaperDecorator';
 import ObjectsList from '../../../ObjectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'LayoutEditor/ObjectsList',
@@ -29,13 +28,7 @@ export const Default = () => (
         project={testProject.project}
         objectsContainer={testProject.testLayout}
         layout={testProject.testLayout}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
         onExportObject={action('On export object')}
         onAddObjectInstance={action('On add instance to the scene')}
@@ -44,7 +37,7 @@ export const Default = () => (
         selectedObjectTags={[]}
         onChangeSelectedObjectTags={selectedObjectTags => {}}
         getAllObjectTags={() => []}
-        canRenameObject={() => true}
+        getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
         onRenameObjectStart={() => {}}
         onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
@@ -66,13 +59,7 @@ export const WithSerializedObjectView = () => (
           project={testProject.project}
           objectsContainer={testProject.testLayout}
           layout={testProject.testLayout}
-          resourceManagementProps={{
-            getStorageProvider: () => emptyStorageProvider,
-            onFetchNewlyAddedResources: async () => {},
-            resourceSources: [],
-            onChooseResource: () => Promise.reject('Unimplemented'),
-            resourceExternalEditors: fakeResourceExternalEditors,
-          }}
+          resourceManagementProps={fakeResourceManagementProps}
           onEditObject={action('On edit object')}
           onExportObject={action('On export object')}
           onAddObjectInstance={action('On add instance to the scene')}
@@ -81,7 +68,7 @@ export const WithSerializedObjectView = () => (
           selectedObjectTags={[]}
           onChangeSelectedObjectTags={selectedObjectTags => {}}
           getAllObjectTags={() => []}
-          canRenameObject={() => true}
+          getValidatedObjectOrGroupName={newName => newName}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
           onRenameObjectStart={() => {}}
           onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
@@ -103,13 +90,7 @@ export const WithTags = () => (
         project={testProject.project}
         objectsContainer={testProject.testLayout}
         layout={testProject.testLayout}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
         onExportObject={action('On export object')}
         onAddObjectInstance={action('On add instance to the scene')}
@@ -123,7 +104,7 @@ export const WithTags = () => (
           'Looooooooooong Tag 3',
           'Unselected Tag 4',
         ]}
-        canRenameObject={() => true}
+        getValidatedObjectOrGroupName={newName => newName}
         onDeleteObject={(objectWithContext, cb) => cb(true)}
         onRenameObjectStart={() => {}}
         onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}

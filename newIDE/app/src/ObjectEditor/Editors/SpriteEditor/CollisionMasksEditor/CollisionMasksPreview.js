@@ -12,12 +12,6 @@ import {
 
 const gd = global.gd;
 
-const styles = {
-  vertexCircle: {
-    cursor: 'move',
-  },
-};
-
 type SelectedVertex = {|
   vertex: gdVector2f,
   polygonIndex: number,
@@ -29,13 +23,16 @@ type Props = {|
   isDefaultBoundingBox: boolean,
   imageWidth: number,
   imageHeight: number,
-  offsetTop: number,
-  offsetLeft: number,
+  imageOffsetTop: number,
+  imageOffsetLeft: number,
   highlightedVerticePtr: ?number,
   selectedVerticePtr: ?number,
   onClickVertice: (ptr: ?number) => void,
   imageZoomFactor: number,
   onPolygonsUpdated: () => void,
+  forcedCursor: string | null,
+  deactivateControls?: boolean,
+  hideControls?: boolean,
 |};
 
 const CollisionMasksPreview = (props: Props) => {
@@ -54,12 +51,24 @@ const CollisionMasksPreview = (props: Props) => {
     imageZoomFactor,
     imageHeight,
     imageWidth,
-    offsetTop,
-    offsetLeft,
+    imageOffsetTop,
+    imageOffsetLeft,
     isDefaultBoundingBox,
     onPolygonsUpdated,
     onClickVertice,
+    forcedCursor,
+    deactivateControls,
+    hideControls,
   } = props;
+
+  if (deactivateControls) {
+    if (draggedVertex) {
+      setDraggedVertex(null);
+    }
+    if (newVertexHintPoint) {
+      setNewVertexHintPoint(null);
+    }
+  }
 
   const forceUpdate = useForceUpdate();
 
@@ -271,9 +280,24 @@ const CollisionMasksPreview = (props: Props) => {
     ]
   );
 
+  const forcedCursorStyle = forcedCursor
+    ? {
+        cursor: forcedCursor,
+      }
+    : {};
+
+  const vertexCircleStyle = {
+    cursor: 'move',
+    ...forcedCursorStyle,
+  };
+  const polygonStyle = {
+    ...forcedCursorStyle,
+  };
+
   const renderBoundingBox = () => {
     return (
       <polygon
+        style={forcedCursorStyle}
         fill="rgba(255,133,105,0.2)"
         stroke="rgba(255,133,105,0.5)"
         strokeWidth={1}
@@ -303,39 +327,47 @@ const CollisionMasksPreview = (props: Props) => {
                   `${vertex.get_x() * imageZoomFactor},${vertex.get_y() *
                     imageZoomFactor}`
               ).join(' ')}
+              style={polygonStyle}
             />
           );
         })}
-        {mapVector(polygons, (polygon, polygonIndex) => {
-          const vertices = polygon.getVertices();
-          return mapVector(vertices, (vertex, vertexIndex) => (
-            <circle
-              onPointerDown={() =>
-                onStartDragVertex(vertex, polygonIndex, vertexIndex)
-              }
-              {...dataObjectToProps({ draggable: 'true' })}
-              key={`polygon-${polygonIndex}-vertex-${vertexIndex}`}
-              fill={
-                vertex.ptr === props.highlightedVerticePtr
-                  ? 'rgba(0,0,0,0.75)'
-                  : vertex.ptr === props.selectedVerticePtr
-                  ? 'rgba(107,175,255,0.75)'
-                  : 'rgba(255,133,105,0.75)'
-              }
-              stroke={
-                vertex.ptr === props.highlightedVerticePtr ? 'white' : undefined
-              }
-              strokeWidth={2}
-              cx={vertex.get_x() * imageZoomFactor}
-              cy={vertex.get_y() * imageZoomFactor}
-              r={7}
-              style={styles.vertexCircle}
-            />
-          ));
-        })}
-        {newVertexHintPoint && (
+        {!hideControls &&
+          mapVector(polygons, (polygon, polygonIndex) => {
+            const vertices = polygon.getVertices();
+            return mapVector(vertices, (vertex, vertexIndex) => (
+              <circle
+                onPointerDown={
+                  deactivateControls
+                    ? null
+                    : () => onStartDragVertex(vertex, polygonIndex, vertexIndex)
+                }
+                {...dataObjectToProps({ draggable: 'true' })}
+                key={`polygon-${polygonIndex}-vertex-${vertexIndex}`}
+                fill={
+                  vertex.ptr === props.highlightedVerticePtr
+                    ? 'rgba(0,0,0,0.75)'
+                    : vertex.ptr === props.selectedVerticePtr
+                    ? 'rgba(107,175,255,0.75)'
+                    : 'rgba(255,133,105,0.75)'
+                }
+                stroke={
+                  vertex.ptr === props.highlightedVerticePtr
+                    ? 'white'
+                    : undefined
+                }
+                strokeWidth={2}
+                cx={vertex.get_x() * imageZoomFactor}
+                cy={vertex.get_y() * imageZoomFactor}
+                r={7}
+                style={vertexCircleStyle}
+              />
+            ));
+          })}
+        {!hideControls && newVertexHintPoint && (
           <circle
-            onPointerDown={() => addVertex(newVertexHintPoint)}
+            onPointerDown={
+              deactivateControls ? null : () => addVertex(newVertexHintPoint)
+            }
             key={`new-vertex`}
             fill={'rgba(0,0,0,0.75)'}
             stroke={'white'}
@@ -343,7 +375,7 @@ const CollisionMasksPreview = (props: Props) => {
             cx={newVertexHintPoint.x * imageZoomFactor}
             cy={newVertexHintPoint.y * imageZoomFactor}
             r={5}
-            style={styles.vertexCircle}
+            style={vertexCircleStyle}
           />
         )}
       </React.Fragment>
@@ -354,23 +386,25 @@ const CollisionMasksPreview = (props: Props) => {
     position: 'relative',
     width: '100%',
     height: '100%',
+    ...forcedCursorStyle,
   };
 
   const svgStyle = {
     position: 'absolute',
-    top: offsetTop || 0,
-    left: offsetLeft || 0,
+    top: imageOffsetTop || 0,
+    left: imageOffsetLeft || 0,
     width: imageWidth * imageZoomFactor,
     height: imageHeight * imageZoomFactor,
     overflow: 'visible',
+    ...forcedCursorStyle,
   };
 
   return (
     <div
       style={containerStyle}
-      onPointerMove={onPointerMove}
-      onPointerUp={onEndDragVertex}
-      onPointerDown={onPointerDown}
+      onPointerMove={deactivateControls ? null : onPointerMove}
+      onPointerUp={deactivateControls ? null : onEndDragVertex}
+      onPointerDown={deactivateControls ? null : onPointerDown}
     >
       <svg style={svgStyle} ref={svgRef}>
         {isDefaultBoundingBox && renderBoundingBox()}

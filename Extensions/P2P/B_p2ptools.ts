@@ -63,7 +63,7 @@ namespace gdjs {
         }
 
         /**
-         * Deleted the last event data, to be called when it is sure the event was processed throughly.
+         * Deleted the last event data, to be called when it is sure the event was processed thoroughly.
          */
         popData() {
           this.data.shift();
@@ -116,7 +116,7 @@ namespace gdjs {
       let ready = false;
 
       /**
-       * True if an error occured.
+       * True if an error occurred.
        */
       let error = false;
 

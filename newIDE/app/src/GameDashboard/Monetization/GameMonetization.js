@@ -68,7 +68,7 @@ export const GameMonetization = ({ game, onGameUpdated }: Props) => {
             }}
             label={
               <Trans>
-                Allow to display advertisments on the game page on gd.games.
+                Allow to display advertisements on the game page on gd.games.
               </Trans>
             }
             tooltipOrHelperText={

@@ -53,7 +53,7 @@
       "scene": "startScene"
     }
   },
-  "availableLocales": ["en", "fr", "es", "pt", "th"],
+  "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
   "endDialog": {
     "content": [
       {
@@ -62,7 +62,8 @@
           "fr": "# Votre jeu est terminé !",
           "es": "# ¡Has terminado tu juego Fling!",
           "pt": "# Você terminou seu jogo Fling!",
-          "th": "เกม Fling ของคุณเสร็จแล้ว"
+          "th": "เกม Fling ของคุณเสร็จแล้ว",
+          "ar": "# لقد أنهيت لعبة القذف الخاصة بك!"
         }
       },
       {
@@ -71,7 +72,8 @@
           "fr": "Partagez le avec vos amis pour voir qui obtiendra le meilleur score !",
           "es": "¡Compártelo con tus amigos y ve quién obtiene la puntuación más alta!",
           "pt": "Compartilhe com seus amigos e veja quem consegue a maior pontuação!",
-          "th": "แชร์กับเพื่อนของคุณ และมาลองดูกันว่าใครจะทำคะแนนได้สูงที่สุด!"
+          "th": "แชร์กับเพื่อนของคุณ และมาลองดูกันว่าใครจะทำคะแนนได้สูงที่สุด!",
+          "ar": "شاركها مع الأصدقاء وشاهد من سيحصل على أعلى نتيجة!"
         }
       },
       {
@@ -80,7 +82,8 @@
           "fr": "Prêt à créer un nouveau jeu ? Cliquez sur l'image pour découvrir de quoi GDevelop est capable !",
           "es": "¿Listo para crear un nuevo juego? ¡Haz clic para descubrir lo que puede hacer GDevelop!",
           "pt": "Pronto para criar um novo jogo? Clique para descobrir o que o GDevelop pode fazer!",
-          "th": "พร้อมสร้างเกมใหม่แล้ว? คลิกเพื่อสำรวจดูว่า GDevelop สามารถทำอะไรได้บ้าง"
+          "th": "พร้อมสร้างเกมใหม่แล้ว? คลิกเพื่อสำรวจดูว่า GDevelop สามารถทำอะไรได้บ้าง",
+          "ar": "هل أنت مستعد لصنع لعبة جديدة؟ النقر لإكتشاف ماذا يمكن لـ GDevelop أن يفعل!"
         }
       },
       {
@@ -105,7 +108,8 @@
             "fr": "Commençons par aller dans l'onglet **Créer**.",
             "es": "Vamos a la sección **Crear**.",
             "pt": "Vamos para a seção **Criar**.",
-            "th": "ไปยัง **Build section**"
+            "th": "ไปยัง **Build section**",
+            "ar": "التوجه إلى القسم **بناء**."
           }
         },
         "placement": "right"
@@ -123,7 +127,8 @@
             "fr": "Créons un nouveau **projet** pour ce tutoriel.",
             "es": "¡Vamos a crear un nuevo **proyecto** para este tutorial!",
             "pt": "Vamos criar um novo **projeto** para este tutorial!",
-            "th": "มาสร้าง **โปรเจกต์** ใหม่ สำหรับบทเรียนนี้กันเถอะ!"
+            "th": "มาสร้าง **โปรเจกต์** ใหม่ สำหรับบทเรียนนี้กันเถอะ!",
+            "ar": "دعنا نقوم بإنشاء **مشروع** جديد لهذا البرنامج التعليمي!"
           }
         }
       }
@@ -140,7 +145,8 @@
             "fr": "C'est parti !",
             "es": "¡Vamos!",
             "pt": "Vamos!",
-            "th": "ไปกันเลย!"
+            "th": "ไปกันเลย!",
+            "ar": "لنبدأ!"
           }
         }
       },
@@ -153,7 +159,7 @@
       "id": "OpenPropertiesManager",
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings"
       },
       "tooltip": {
         "description": {
@@ -162,14 +168,15 @@
             "fr": "Ouvrez le **Gestionnaire de projet**.",
             "es": "Abre el **Gestor de proyectos**.",
             "pt": "Abra o **Gerenciador de projetos**.",
-            "th": "เปิด **โปรเจกต์เมเนเจอร์**"
+            "th": "เปิด **โปรเจกต์เมเนเจอร์**",
+            "ar": "فتح **مدير المشروع**."
           }
         },
         "placement": "right"
       }
     },
     {
-      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings",
+      "elementToHighlightId": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings",
       "nextStepTrigger": {
         "presenceOfElement": "#project-manager-tab-game-properties"
       },
@@ -180,7 +187,8 @@
             "fr": "Ouvrez les **Paramètres du jeu**.",
             "es": "Abre la pestaña **Configuración del juego**.",
             "pt": "Abra a guia **Configurações do jogo**.",
-            "th": "เปิดแท็บ **ตั้งค่าเกม**"
+            "th": "เปิดแท็บ **ตั้งค่าเกม**",
+            "ar": "فتح نافذة **إعدادات اللعبة**."
           }
         }
       },
@@ -199,7 +207,8 @@
             "fr": "Ouvrez les **Propriétés** du jeu.",
             "es": "Abre las **Propiedades** del juego.",
             "pt": "Abra as **Propriedades** do jogo.",
-            "th": "เปิด **คุณสมบัติ** ของเกม"
+            "th": "เปิด **คุณสมบัติ** ของเกม",
+            "ar": "فتح **الخصائص** التابعة للعبة."
           }
         }
       },
@@ -218,7 +227,8 @@
             "fr": "Définissez une largeur de **1280** pixels.",
             "es": "Cambia el ancho a **1280** píxeles.",
             "pt": "Mude a largura para **1280** pixels.",
-            "th": "เปลี่ยนความกว้างเป็น **1280** พิกเซล"
+            "th": "เปลี่ยนความกว้างเป็น **1280** พิกเซล",
+            "ar": "تغيير العرض إلى **1280** بكسل."
           }
         }
       },
@@ -237,7 +247,8 @@
             "fr": "Et une hauteur de **720** pixels.",
             "es": "Cambia la altura a **720** píxeles.",
             "pt": "Mude a altura para **720** pixels.",
-            "th": "เปลี่ยนความสูงเป็น **720** พิกเซล"
+            "th": "เปลี่ยนความสูงเป็น **720** พิกเซล",
+            "ar": "تغيير الارتفاع إلى **720** بكسل."
           }
         }
       },
@@ -255,7 +266,8 @@
             "fr": "Choisissez l'option **Aucune modification de la taille du jeu**.",
             "es": "Establece esto en **No hay cambios en el tamaño del juego**.",
             "pt": "Defina isso como **Nenhuma alteração no tamanho do jogo**.",
-            "th": "ตั้งค่าเป็น **ไม่เปลี่ยนแปลงขนาดของเกม**"
+            "th": "ตั้งค่าเป็น **ไม่เปลี่ยนแปลงขนาดของเกม**",
+            "ar": "تعيين هذه إلى **لا تغيير في حجم اللعبة**."
           }
         }
       },
@@ -273,7 +285,8 @@
             "fr": "On a terminé.",
             "es": "Ya hemos terminado.",
             "pt": "Estamos prontos.",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهينا."
           }
         }
       }
@@ -290,7 +303,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -305,13 +319,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "First, let's find a border for our **scene**.",
             "fr": "Commençons par trouver une bordure à notre **scène**.",
             "es": "Primero, busquemos un borde para nuestra **escena**.",
             "pt": "Primeiro, vamos encontrar uma borda para nossa **cena**.",
-            "th": "ขั้นแรก หาขอบเขตของ **scene**"
+            "th": "ขั้นแรก หาขอบเขตของ **scene**",
+            "ar": "أولًا، دعنا نعثر على حدود **مشهدنا**."
           }
         }
       }
@@ -327,7 +343,8 @@
             "en": "Let's choose an **object** from the asset store",
             "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
             "es": "Vamos a elegir un **objeto** de la tienda de recursos.",
-            "th": "เลือก **วัตถุ** จาก ร้านค้า asset"
+            "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
+            "ar": "دعنا نقوم بإختيار **كائن** من متجر العناصر"
           }
         },
         "placement": "bottom"
@@ -347,7 +364,8 @@
             "fr": "Nous allons chercher une mosaïque que nous pouvons facilement redimensionner",
             "es": "Buscamos un sprite mosaico que podamos redimensionar fácilmente",
             "pt": "Estamos procurando por um sprite em mosaico que possamos redimensionar facilmente",
-            "th": "เรากำลังมองหา tiled sprite ที่สามารถปรับขนาดได้ง่าย"
+            "th": "เรากำลังมองหา tiled sprite ที่สามารถปรับขนาดได้ง่าย",
+            "ar": "نحن نبحث عن كائن مبلط يمكن إعادة تحجيمه بسهولة"
           }
         },
         "description": {
@@ -356,7 +374,8 @@
             "fr": "Un conseil, cherchez la traduction en anglais: “**tiled sprite**”.",
             "es": "Consejo: busca “**tiled sprite**”.",
             "pt": "Dica: procure por “**tiled sprite**”.",
-            "th": "แนะนำ: ค้นหาเป็นภาษาอังกฤษ “**tiled sprite**”"
+            "th": "แนะนำ: ค้นหาเป็นภาษาอังกฤษ “**tiled sprite**”",
+            "ar": "تلميح: البحث عن **tiled sprite**."
           }
         }
       },
@@ -383,7 +402,8 @@
             "fr": "Ajoutez cette ressource à votre projet.",
             "es": "Agrega este recurso a tu proyecto.",
             "pt": "Adicione este recurso ao seu projeto.",
-            "th": "เพิ่ม asset ไปยังโปรเจกต์ของคุณ"
+            "th": "เพิ่ม asset ไปยังโปรเจกต์ของคุณ",
+            "ar": "إضافة هذا العنصر إلى مشروعك."
           }
         }
       },
@@ -405,7 +425,8 @@
             "fr": "Ajoutons $(border) à notre projet !",
             "es": "¡Agreguemos $(border) a nuestro juego!",
             "pt": "Vamos adicionar $(border) ao nosso jogo!",
-            "th": "มาใส่ $(border) ในเกมกันเถอะ!"
+            "th": "มาใส่ $(border) ในเกมกันเถอะ!",
+            "ar": "دعنا نقوم  بإضافة الـ $(border) إلى لعبتنا"
           }
         }
       }
@@ -422,7 +443,8 @@
             "fr": "Faites glisser $(border) du menu au canvas.",
             "es": "Arrastra $(border) desde el menú al lienzo.",
             "pt": "Arraste $(border) do menu para o canvas.",
-            "th": "ลาก $(border) จากเมนูไปยังแคนวาส"
+            "th": "ลาก $(border) จากเมนูไปยังแคนวาส",
+            "ar": "سحب $(border) من القائمة إلى اللوحة."
           }
         },
         "placement": "left"
@@ -436,7 +458,8 @@
             "fr": "J'ai terminé",
             "es": "Ya terminé",
             "pt": "Terminei",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهيت!"
           }
         }
       },
@@ -448,7 +471,8 @@
             "fr": "Ajoutez et redimensionnez 4 instances de $(border) de manière à créer un cadre fermé autour de l'écran ($(instancesCount:border)/4).",
             "es": "Coloca y redimensiona al menos 4 instancias de $(border) para crear un marco cerrado alrededor de la pantalla ($(instancesCount:border)/4).",
             "pt": "Coloque e redimensione pelo menos 4 instâncias de $(border) para criar um quadro fechado ao redor da tela ($(instancesCount:border)/4).",
-            "th": "วางและปรับขนาดอย่างน้อย 4 อินสแตนซ์ ของ $(border) เพื่อสร้างกรอบรอบหน้าจอ ($(instancesCount:border)/4)"
+            "th": "วางและปรับขนาดอย่างน้อย 4 อินสแตนซ์ ของ $(border) เพื่อสร้างกรอบรอบหน้าจอ ($(instancesCount:border)/4)",
+            "ar": "إدراج وإعادة تحجيم 4 مثيلات على الأقل من $(border) لإنشاء إطار مغلق حول الشاشة ($(instancesCount:border)/4)."
           }
         },
         "placement": "top",
@@ -469,7 +493,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -484,13 +509,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's find an **object** that we can throw.",
             "fr": "Maintenant, trouvons un **objet** que nous allons lancer.",
             "es": "Ahora, busquemos un **objeto** que podamos lanzar.",
             "pt": "Agora, vamos encontrar um **objeto** que possamos jogar.",
-            "th": "ทีนี้เราจะหา **วัตถุ** ที่เราจะใช้สำหรับโยน"
+            "th": "ทีนี้เราจะหา **วัตถุ** ที่เราจะใช้สำหรับโยน",
+            "ar": "الآن دعنا نعثر على **كائن** يمكننا قذفه."
           }
         }
       }
@@ -507,7 +534,8 @@
             "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
             "es": "Vamos a elegir un objeto de la **tienda de recursos**.",
             "pt": "Vamos escolher um objeto da **loja de recursos**.",
-            "th": "เลือก **วัตถุ** จาก ร้านค้า asset"
+            "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
+            "ar": "دعنا نقوم بإختيار كائن من **متجر العناصر**."
           }
         },
         "placement": "bottom"
@@ -527,7 +555,8 @@
             "fr": "Ajoutez un objet rond que vous aimeriez lancer (essayez **ball**).",
             "es": "Agrega un objeto redondo que te gustaría lanzar (intenta con **ball**).",
             "pt": "Adicione um objeto redondo que você gostaria de jogar (tente **ball**).",
-            "th": "เลือกวัตถุที่กลมที่คุณอยากจะโยน (ลอง **ball**)"
+            "th": "เลือกวัตถุที่กลมที่คุณอยากจะโยน (ลอง **ball**)",
+            "ar": "تحديد كائن مستدير تحب إلقائه (تجربة **ball**)."
           }
         }
       },
@@ -572,7 +601,8 @@
             "fr": "Parfait, voyons maintenant comment le lancer.",
             "es": "Perfecto, veamos cómo lanzarlo fácilmente.",
             "pt": "Perfeito, vamos ver como jogá-lo facilmente.",
-            "th": "สมบูรณ์แบบ ลองมาดูวิธีโยนมันแบบง่ายๆกัน"
+            "th": "สมบูรณ์แบบ ลองมาดูวิธีโยนมันแบบง่ายๆกัน",
+            "ar": "ممتاز، دعنا نرى كيفية رميه بسهولة."
           }
         }
       }
@@ -590,7 +620,8 @@
             "fr": "Ajoutez 3 **instances** de **l'objet** *$(projectile)* dans le cadre.",
             "es": "Agrega 3 **instancias** del **objeto** *$(projectile)* dentro del marco.",
             "pt": "Adicione 3 **instâncias** do **objeto** *$(projectile)* dentro do quadro.",
-            "th": "เพิ่ม 3 **instances** ของ **วัตถุ** *$(projectile)* ภายในเฟรม"
+            "th": "เพิ่ม 3 **instances** ของ **วัตถุ** *$(projectile)* ภายในเฟรม",
+            "ar": "إضافة 3 **مثيلات** من **الكائن** *$(projectile)* داخل الإطار."
           }
         }
       }
@@ -607,7 +638,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -622,13 +654,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's find a target to aim.",
             "fr": "Maintenant trouvons une cible à atteindre.",
             "es": "Ahora busquemos un objetivo para apuntar.",
             "pt": "Agora vamos encontrar um alvo para mirar.",
-            "th": "ทีนี้เราจะหาเป้าสำหรับโยนวัตถุใส่"
+            "th": "ทีนี้เราจะหาเป้าสำหรับโยนวัตถุใส่",
+            "ar": "الآن دعنا نعثر على هدف لإصابته."
           }
         }
       }
@@ -645,7 +679,8 @@
             "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
             "es": "Vamos a elegir un **objeto** nuevo desde la tienda de recursos.",
             "pt": "Vamos escolher um novo **objeto** da loja de recursos.",
-            "th": "เลือก **วัตถุ** จาก ร้านค้า asset"
+            "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
+            "ar": "دعنا نقوم بإختيار **كائن** جديد من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -665,7 +700,8 @@
             "fr": "Cherchez une cible qui vous plaît (essayez **target**).",
             "es": "Busca un objeto que te gustaría usar como un objetivo para lanzar $(projectile) a.",
             "pt": "Selecione um objeto que você gostaria de usar como um alvo para jogar $(projectile) em.",
-            "th": "เลือกวัตถุที่คุณอยากจะโยน $(projectile) ใส่ (ลอง **target**)"
+            "th": "เลือกวัตถุที่คุณอยากจะโยน $(projectile) ใส่ (ลอง **target**)",
+            "ar": "تحديد كائن تحب أن يتم استخدامه كهدف لقذف الـ $(projectile) عليه."
           }
         }
       },
@@ -710,7 +746,8 @@
             "fr": "Ajoutez cet objet à votre **scène**.",
             "es": "Perfecto, agreguemoslo a la **escena**.",
             "pt": "Perfeito, vamos adicioná-lo à **cena**.",
-            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**"
+            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
+            "ar": "ممتاز، دعنا نقوم بإضافته إلى **المشهد**."
           }
         }
       }
@@ -727,7 +764,8 @@
             "fr": "Ajoutez $(target) dans le cadre.",
             "es": "Agrega $(target) dentro del marco.",
             "pt": "Adicione $(target) dentro do quadro.",
-            "th": "เพิ่ม $(target) เข้าไปภายในเฟรม"
+            "th": "เพิ่ม $(target) เข้าไปภายในเฟรม",
+            "ar": "إضافة $(target) داخل الإطار."
           }
         }
       }
@@ -744,7 +782,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -759,13 +798,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Finally let's find something to protect $(target).",
             "fr": "Finalement, trouvons quelque chose pour protéger $(target).",
             "es": "Finalmente, encontremos algo para proteger $(target).",
             "pt": "Finalmente, vamos encontrar algo para proteger $(target).",
-            "th": "ขั้นสุดท้าย เราจะหาอะไรมาป้องกัน $(target)"
+            "th": "ขั้นสุดท้าย เราจะหาอะไรมาป้องกัน $(target)",
+            "ar": "أخيرًا وليس آخرًا، دعنا نعثر على شيء يحمي $(target)."
           }
         }
       }
@@ -782,7 +823,8 @@
             "fr": "Nous allons choisir un objet dans le **Magasin de ressources**.",
             "es": "Vamos a elegir un nuevo objeto de la tienda de recursos.",
             "pt": "Vamos escolher um novo objeto da loja de recursos.",
-            "th": "เลือก **วัตถุ** จาก ร้านค้า asset"
+            "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
+            "ar": "دعنا نقوم بإختيار **كائن** جديد من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -802,7 +844,8 @@
             "fr": "Cherchez un objet qui servira d'obstacle aux $(projectile) (cherchez **block**).",
             "es": "Busca un objeto que sirva como obstáculo para tus $(projectile) (busca **block**).",
             "pt": "Procure um objeto que sirva como obstáculo para seus $(projectile) (procure **block**).",
-            "th": "เลือกวัตถุ **block** ที่คุณอยากจะใช้เป็นสิ่งกีดขวาง $(projectile) (ลอง **block**)"
+            "th": "เลือกวัตถุ **block** ที่คุณอยากจะใช้เป็นสิ่งกีดขวาง $(projectile) (ลอง **block**)",
+            "ar": "تحديد **كتلة** تحبها أن تكون حاجزًا للـ $(projectile) خاصتك."
           }
         }
       },
@@ -847,7 +890,8 @@
             "fr": "Parfait, ajoutez le à la **scène**.",
             "es": "Perfecto, agreguemoslo a la **escena**.",
             "pt": "Perfeito, vamos adicioná-lo à **cena**.",
-            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**"
+            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
+            "ar": "ممتاز، دعنا نقوم بإضافته إلى **المشهد**."
           }
         }
       }
@@ -865,7 +909,8 @@
             "fr": "Ajoutez plusieurs instances de $(block) dans le cadre.",
             "es": "Agrega múltiples instancias de $(block) dentro del marco.",
             "pt": "Adicione várias instâncias de $(block) dentro do quadro.",
-            "th": "เพิ่ม $(block) ปริมาณมากใส่ลงไปในเฟรม"
+            "th": "เพิ่ม $(block) ปริมาณมากใส่ลงไปในเฟรม",
+            "ar": "إضافة العديد من الـ $(block) داخل الإطار."
           }
         }
       }
@@ -882,7 +927,8 @@
             "fr": "Maintenant, ajoutons un moteur physique à nos **objets**.",
             "es": "Ahora, agreguemos un motor físico a nuestros **objetos**.",
             "pt": "Agora, vamos adicionar um motor físico aos nossos **objetos**.",
-            "th": "ทีนี้เราจะเพิ่มฟิสิกส์ให้ **objects**"
+            "th": "ทีนี้เราจะเพิ่มฟิสิกส์ให้ **objects**",
+            "ar": "الآن، دعنا نقوم بإضافة بعض الفيزيائيات إلى **كائننا**."
           }
         },
         "placement": "left",
@@ -892,7 +938,8 @@
             "fr": "Faites un clic droit sur $(border) et cliquez sur “Modifier les comportements”.",
             "es": "Haz clic derecho en $(border) y selecciona “Editar comportamientos”.",
             "pt": "Clique com o botão direito em $(border) e selecione “Editar comportamentos”.",
-            "th": "คลิกขวา $(border) และเลือก “แก้ไขพฤติกรรม”"
+            "th": "คลิกขวา $(border) และเลือก “แก้ไขพฤติกรรม”",
+            "ar": "نقرة بزر الفأرة الأيمن على $(border) وتحديد **تحرير السلوكيات**."
           }
         }
       }
@@ -909,7 +956,8 @@
             "fr": "Les **comportements** de **l'objet** se trouvent dans cet onglet.",
             "es": "Los **comportamientos** del **objeto** se encuentran en esta pestaña.",
             "pt": "Os **comportamentos** do **objeto** estão nesta guia.",
-            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่"
+            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่",
+            "ar": "رؤية **سلوكيات الكائن** هنا."
           }
         },
         "placement": "bottom"
@@ -929,7 +977,8 @@
             "fr": "Ajoutez un nouveau comportement.",
             "es": "Agrega un nuevo comportamiento.",
             "pt": "Adicione um novo comportamento.",
-            "th": "เพิ่มพฤติกรรมใหม่"
+            "th": "เพิ่มพฤติกรรมใหม่",
+            "ar": "إضافة سلوك جديد."
           }
         }
       },
@@ -947,7 +996,8 @@
             "fr": "Sélectionnez le comportement **Moteur physique**.",
             "es": "Selecciona el comportamiento **Motor físico**.",
             "pt": "Selecione o comportamento **Motor físico**.",
-            "th": "เลือก **พฤติกรรมฟิสิกส์**"
+            "th": "เลือก **พฤติกรรมฟิสิกส์**",
+            "ar": "تحديد **سلوك الفيزياء**."
           }
         }
       },
@@ -956,7 +1006,7 @@
     {
       "elementToHighlightId": "#physics2-parameter-body-type",
       "nextStepTrigger": {
-        "valueHasChanged": true
+        "valueEquals": "Static"
       },
       "tooltip": {
         "description": {
@@ -965,7 +1015,8 @@
             "fr": "Choisissez l'option **Fixe**.",
             "es": "Selecciona **estático**.",
             "pt": "Selecione **estático**.",
-            "th": "เลือก **คงที่**"
+            "th": "เลือก **คงที่**",
+            "ar": "تحديد **ثابت**."
           }
         },
         "placement": "top"
@@ -984,7 +1035,8 @@
             "fr": "Nous verrons plus tard à quoi servent les autres paramètres. C'est tout pour le moment.",
             "es": "Más adelante veremos cómo usar los otros parámetros. Por ahora, estamos bien.",
             "pt": "Mais tarde veremos como usar os outros parâmetros. Por enquanto, estamos bem.",
-            "th": "สำหรับพารามิเตอร์อื่นๆเดี๋ยวจะกลับมาดูอีกครั้ง ตอนนี้ยังไม่ต้องไปสนใจ"
+            "th": "สำหรับพารามิเตอร์อื่นๆเดี๋ยวจะกลับมาดูอีกครั้ง ตอนนี้ยังไม่ต้องไปสนใจ",
+            "ar": "سوف نرى لاحقًا كيفية استخدام الخصائص الأخرى. نحن على الطريق الصحيح حاليًا."
           }
         }
       }
@@ -1002,7 +1054,8 @@
             "fr": "Faites un clic droit sur $(projectile) et cliquez sur “Modifier les comportements”.",
             "es": "Haz clic derecho en $(projectile) y selecciona “Editar comportamientos”.",
             "pt": "Clique com o botão direito em $(projectile) e selecione “Editar comportamentos”.",
-            "th": "คลิกขวาที่ $(projectile) และเลือก “แก้ไขพฤติกรรม”"
+            "th": "คลิกขวาที่ $(projectile) และเลือก “แก้ไขพฤติกรรม”",
+            "ar": "الآن نقرة بزر الفأرة الأيمن على $(projectile) وتحديد **تحرير السلوكيات**."
           }
         }
       }
@@ -1019,7 +1072,8 @@
             "fr": "Les **comportements** de **l'objet** se trouvent dans cet onglet.",
             "es": "Los **comportamientos** del **objeto** se encuentran en esta pestaña.",
             "pt": "Os **comportamentos** do **objeto** estão nesta guia.",
-            "th": "ดู **พฤติกรรม** จาก **วัตถุ** ที่นี่"
+            "th": "ดู **พฤติกรรม** จาก **วัตถุ** ที่นี่",
+            "ar": "رؤية **سلوكيات الكائن** هنا."
           }
         },
         "placement": "bottom"
@@ -1039,7 +1093,8 @@
             "fr": "Ajoutez un nouveau comportement.",
             "es": "Agrega un nuevo comportamiento.",
             "pt": "Adicione um novo comportamento.",
-            "th": "เพิ่มพฤติกรรมใหม่"
+            "th": "เพิ่มพฤติกรรมใหม่",
+            "ar": "إضافة سلوك جديد."
           }
         }
       },
@@ -1057,7 +1112,8 @@
             "fr": "Sélectionnez le comportement Moteur physique.",
             "es": "Selecciona el comportamiento Motor físico.",
             "pt": "Selecione o comportamento Motor físico.",
-            "th": "เลือกพฤติกรรมฟิสิกส์"
+            "th": "เลือกพฤติกรรมฟิสิกส์",
+            "ar": "تحديد سلوك الفيزياء."
           }
         }
       },
@@ -1066,7 +1122,7 @@
     {
       "elementToHighlightId": "#physics2-parameter-shape",
       "nextStepTrigger": {
-        "valueHasChanged": true
+        "valueEquals": "Circle"
       },
       "tooltip": {
         "description": {
@@ -1075,7 +1131,8 @@
             "fr": "Choisissez l'option **Cercle**.",
             "es": "Selecciona **Círculo**.",
             "pt": "Selecione **Círculo**.",
-            "th": "เลือก **วงกลม**"
+            "th": "เลือก **วงกลม**",
+            "ar": "تحديد **دائرة**."
           }
         },
         "placement": "top"
@@ -1094,7 +1151,8 @@
             "fr": "Utilisez une densité de 5.",
             "es": "Cambia la densidad a 5.",
             "pt": "Mude a densidade para 5.",
-            "th": "ปรับความหนาแน่นเป็น 5"
+            "th": "ปรับความหนาแน่นเป็น 5",
+            "ar": "تغيير الكثافة (Density) إلى 5."
           }
         },
         "placement": "top"
@@ -1113,7 +1171,8 @@
             "fr": "Utilisez un amortissement angulaire de 15.",
             "es": "Cambia el amortiguamiento angular a 15.",
             "pt": "Mude o amortecimento angular para 15.",
-            "th": "ปรับการลดแรงสั่นสะเทือนเชิงมุมเป็น 15"
+            "th": "ปรับการลดแรงสั่นสะเทือนเชิงมุมเป็น 15",
+            "ar": "تغيير التثبيط الزاوي (Angular Damping) إلى 15."
           }
         },
         "placement": "top"
@@ -1132,7 +1191,8 @@
             "fr": "C'est bon.",
             "es": "Está bien.",
             "pt": "Está bom.",
-            "th": "เรียบร้อยแล้ว"
+            "th": "เรียบร้อยแล้ว",
+            "ar": "نحن على الطريق الصحيح."
           }
         }
       }
@@ -1150,7 +1210,8 @@
             "fr": "Faites un clic droit sur $(target) et cliquez sur “Modifier les comportements”.",
             "es": "Ahora haz clic derecho en $(target) y selecciona “Editar comportamientos”.",
             "pt": "Agora clique com o botão direito em $(target) e selecione “Editar comportamentos”.",
-            "th": "คลิกขวาที่ $(target) และเลือก “แก้ไขพฤติกรรม”"
+            "th": "คลิกขวาที่ $(target) และเลือก “แก้ไขพฤติกรรม”",
+            "ar": "الآن نقرة بزر الفأرة الأيمن على $(target) وتحديد **تحرير السلوكيات**."
           }
         }
       }
@@ -1167,7 +1228,8 @@
             "fr": "Les **comportements** de **l'objet** se trouvent dans cet onglet.",
             "es": "Aquí puedes ver los **comportamientos** del **objeto**.",
             "pt": "Veja os **comportamentos** do **objeto** aqui.",
-            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่"
+            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่",
+            "ar": "رؤية **سلوكيات الكائن** هنا."
           }
         },
         "placement": "bottom"
@@ -1194,7 +1256,8 @@
             "fr": "Sélectionnez le comportement Moteur physique.",
             "es": "Selecciona el comportamiento Física.",
             "pt": "Selecione o comportamento Física.",
-            "th": "เลือกพฤติกรรมฟิสิกส์"
+            "th": "เลือกพฤติกรรมฟิสิกส์",
+            "ar": "تحديد سلوك الفيزياء."
           }
         }
       },
@@ -1212,7 +1275,8 @@
             "fr": "La configuration de base suffit. Continuons.",
             "es": "No necesitas cambiar nada.",
             "pt": "Não é necessário alterar nada.",
-            "th": "ไม่ต้องเปลี่ยนแปลงอะไร"
+            "th": "ไม่ต้องเปลี่ยนแปลงอะไร",
+            "ar": "لا حاجة إلى تغيير أي شيء"
           }
         }
       }
@@ -1230,7 +1294,8 @@
             "fr": "Faites un clic droit sur $(block) et cliquez sur “Modifier les comportements”.",
             "es": "Ahora haz clic derecho en $(block) y selecciona “Editar comportamientos”.",
             "pt": "Agora clique com o botão direito em $(block) e selecione “Editar comportamentos”.",
-            "th": "คลิกขวาที่ $(block) และเลือก “แก้ไขพฤติกรรม”"
+            "th": "คลิกขวาที่ $(block) และเลือก “แก้ไขพฤติกรรม”",
+            "ar": "الآن نقرة بزر الفأرة الأيمن على $(block) وتحديد **تحرير السلوكيات**."
           }
         }
       }
@@ -1247,7 +1312,8 @@
             "fr": "Les **comportements** de **l'objet** se trouvent dans cet onglet.",
             "es": "Aquí puedes ver los **comportamientos** del **objeto**.",
             "pt": "Veja os **comportamentos** do **objeto** aqui.",
-            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่"
+            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่",
+            "ar": "رؤية **سلوكيات الكائن** هنا."
           }
         },
         "placement": "bottom"
@@ -1274,7 +1340,8 @@
             "fr": "Sélectionnez le comportement Moteur physique.",
             "es": "Selecciona el comportamiento Física.",
             "pt": "Selecione o comportamento Física.",
-            "th": "เลือกพฤติกรรมฟิสิกส์"
+            "th": "เลือกพฤติกรรมฟิสิกส์",
+            "ar": "تحديد سلوك الفيزياء."
           }
         }
       },
@@ -1290,7 +1357,7 @@
       "id": "OpenPropertiesManagerForExtension",
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-extensions"
       },
       "tooltip": {
         "title": {
@@ -1299,7 +1366,8 @@
             "fr": "Maintenant, nous allons faire en sorte que le joueur puisse faire glisser $(projectile) avec sa souris.",
             "es": "Ahora vamos a hacer que el jugador pueda arrastrar $(projectile) con el ratón.",
             "pt": "Agora vamos fazer com que o jogador possa arrastar $(projectile) com o mouse.",
-            "th": "ทีนี้เราจะทำให้ผู้เล่นสามารถลาก $(projectile)"
+            "th": "ทีนี้เราจะทำให้ผู้เล่นสามารถลาก $(projectile)",
+            "ar": "الآن دعنا نقوم بجعل اللاعبين قادرين على سحب الـ $(projectile)."
           }
         },
         "description": {
@@ -1308,14 +1376,15 @@
             "fr": "Pour cela, nous allons installer un **extension**.\n\nOuvrez le **Gestionnaire de projet**.",
             "es": "Para ello, vamos a instalar una **extensión**.\n\nAbre el **Gestor de proyectos**.",
             "pt": "Para isso, vamos instalar uma **extensão**.\n\nAbra o **Gerenciador de projetos**.",
-            "th": "โดยเราจะติดตั้ง **extension**\n\nเปิด **โปรเจกต์เมเนเจอร์**"
+            "th": "โดยเราจะติดตั้ง **extension**\n\nเปิด **โปรเจกต์เมเนเจอร์**",
+            "ar": "للقيام بذلك، سوف نقوم بتثبيت **ملحق**.\n\nفتح **مدير المشروع**."
           }
         },
         "placement": "right"
       }
     },
     {
-      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions",
+      "elementToHighlightId": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-extensions",
       "nextStepTrigger": {
         "presenceOfElement": "#project-manager-extension-search-or-create"
       },
@@ -1326,7 +1395,8 @@
             "fr": "Ouvrez l'onglet **Extensions**.",
             "es": "Abre la pestaña **Extensiones**.",
             "pt": "Abra a guia **Extensões**.",
-            "th": "เปิดแท็บ **Extensions**"
+            "th": "เปิดแท็บ **Extensions**",
+            "ar": "فتح نافذة **الملحقات**."
           }
         }
       },
@@ -1345,7 +1415,8 @@
             "fr": "Ouvrez le **Magasin d'extension**.",
             "es": "Abre la **Tienda de extensiones**.",
             "pt": "Abra a **Loja de extensões**.",
-            "th": "เปิดร้านค้า extension"
+            "th": "เปิดร้านค้า extension",
+            "ar": "فتح متجر الملحقات"
           }
         }
       },
@@ -1363,7 +1434,8 @@
             "fr": "Cherchez l'extension **draggable**.",
             "es": "Busca la extensión **draggable**.",
             "pt": "Procure pela extensão **draggable**.",
-            "th": "ค้นหา **draggable** extension (สำหรับวัตถุฟิสิกส์)"
+            "th": "ค้นหา **draggable** extension (สำหรับวัตถุฟิสิกส์)",
+            "ar": "البحث عن الملحق **draggable (for physics object)**."
           }
         }
       },
@@ -1382,7 +1454,8 @@
             "fr": "Cliquez sur l'extension.",
             "es": "Haz clic en la extensión.",
             "pt": "Clique na extensão.",
-            "th": "คลิกที่ extension"
+            "th": "คลิกที่ extension",
+            "ar": "النقر على الملحق."
           }
         }
       },
@@ -1400,10 +1473,12 @@
             "fr": "Installez l'extension dans votre projet.",
             "es": "Instala la extensión en tu proyecto.",
             "pt": "Instale a extensão no seu projeto.",
-            "th": "ติดตั้ง extension ในโปรเจกต์ของคุณ"
+            "th": "ติดตั้ง extension ในโปรเจกต์ของคุณ",
+            "ar": "تثبيت الملحق في مشروعك."
           }
         },
-        "placement": "left"
+        "placement": "left",
+        "mobilePlacement": "top"
       },
       "isOnClosableDialog": true
     },
@@ -1419,7 +1494,8 @@
             "fr": "Fermez le magasin.",
             "es": "Cierra la tienda.",
             "pt": "Feche a loja.",
-            "th": "ปิดหน้าต่างของร้านค้า"
+            "th": "ปิดหน้าต่างของร้านค้า",
+            "ar": "إغلاق المتجر."
           }
         }
       }
@@ -1437,7 +1513,8 @@
             "fr": "Faites un clic droit sur $(projectile) et cliquez sur “Modifier les comportements”.",
             "es": "Haz clic derecho en $(projectile) y selecciona “Editar comportamientos”.",
             "pt": "Clique com o botão direito em $(projectile) e selecione “Editar comportamentos”.",
-            "th": "คลิกขวาที่ $(projectile) และเลือก “แก้ไขพฤติกรรม”"
+            "th": "คลิกขวาที่ $(projectile) และเลือก “แก้ไขพฤติกรรม”",
+            "ar": "الآن نقرة بزر الفأرة الأيمن على $(projectile) وتحديد **تحرير السلوكيات**."
           }
         }
       }
@@ -1454,7 +1531,8 @@
             "fr": "Les **comportements** de **l'objet** se trouvent dans cet onglet.",
             "es": "Los **comportamientos** del **objeto** se encuentran en esta pestaña.",
             "pt": "Os **comportamentos** do **objeto** estão nesta guia.",
-            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่"
+            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่",
+            "ar": "رؤية **سلوكيات الكائن** هنا."
           }
         },
         "placement": "bottom"
@@ -1474,7 +1552,8 @@
             "fr": "Ajoutez un nouveau comportement.",
             "es": "Agrega un nuevo comportamiento.",
             "pt": "Adicione um novo comportamento.",
-            "th": "เพิ่มพฤติกรรมใหม่"
+            "th": "เพิ่มพฤติกรรมใหม่",
+            "ar": "إضافة سلوك جديد."
           }
         }
       },
@@ -1492,7 +1571,8 @@
             "fr": "Sélectionnez le comportement Draggable.",
             "es": "Selecciona el comportamiento Draggable.",
             "pt": "Selecione o comportamento Draggable.",
-            "th": "เลือกพฤติกรรม Draggable"
+            "th": "เลือกพฤติกรรม Draggable",
+            "ar": "تحديد السلوك Draggable."
           }
         }
       },
@@ -1510,7 +1590,8 @@
             "fr": "C'est tout !",
             "es": "¡Eso es todo!",
             "pt": "É isso aí!",
-            "th": "เรียบร้อยแล้ว!"
+            "th": "เรียบร้อยแล้ว!",
+            "ar": "هذا كل شيء!"
           }
         }
       }
@@ -1527,7 +1608,8 @@
             "fr": "Cliquez sur **Aperçu** pour tester votre jeu. Cliquez et faites glisser $(projectile) dans la scène !",
             "es": "¡Haz clic en el botón **Vista previa** para ver cómo puedes hacer clic y arrastrar tu $(projectile) por la escena!",
             "pt": "Clique no botão **Pré-visualizar** para ver como você pode clicar e arrastar seu $(projectile) pela cena!",
-            "th": "ลองคลิกที่ **ดูตัวอย่าง** แล้วทำการคลิกและลาก $(projectile) ไปมาเพื่อทดสอบกันเถอะ!"
+            "th": "ลองคลิกที่ **ดูตัวอย่าง** แล้วทำการคลิกและลาก $(projectile) ไปมาเพื่อทดสอบกันเถอะ!",
+            "ar": "الضغط على الزر **معاينة** لرؤية كيف يمكنك ضغط وسحب كائنك $(projectile) في أرجاء المشهد!"
           }
         },
         "placement": "bottom"
@@ -1543,7 +1625,8 @@
               "fr": "## Félicitations !",
               "es": "## ¡Felicidades!",
               "pt": "## Parabéns!",
-              "th": "## ยินดีด้วย!"
+              "th": "## ยินดีด้วย!",
+              "ar": "## تهانينا!"
             }
           },
           {
@@ -1552,7 +1635,8 @@
               "fr": "Vous avez terminé la première partie de votre jeu.",
               "es": "Has terminado la primera parte de tu juego.",
               "pt": "Você terminou a primeira parte do seu jogo.",
-              "th": "ส่วนแรกของเกม Fling ของคุณเสร็จแล้ว"
+              "th": "ส่วนแรกของเกม Fling ของคุณเสร็จแล้ว",
+              "ar": "لقد أنهيت أول جزء من لعبة القذف خاصتك."
             }
           },
           {
@@ -1561,7 +1645,8 @@
               "fr": "Vous avez découvert les bases de GDevelop:\n- [les objets](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=In%20GDevelop%2C%20everything%20on%20the,add%20text%20to%20a%20game)\n- [les instances](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=After%20creating%20an%20object%2C%20GDevelop,an%20instance%20of%20the%20object)\n- [les comportements](https://wiki.gdevelop.io/gdevelop5/behaviors#:~:text=In%20GDevelop%2C%20behaviors%20add%20significant,following%20the%20laws%20of%20physics)\n- [les scènes](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor#:~:text=The%20Scene%20Editor%20is%20where,events%20in%20the%20Events%20Editor)",
               "es": "Has descubierto los fundamentos de GDevelop:\n- [Objetos](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=In%20GDevelop%2C%20everything%20on%20the,add%20text%20to%20a%20game)\n- [Instancias](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=After%20creating%20an%20object%2C%20GDevelop,an%20instance%20of%20the%20object)\n- [Comportamientos](https://wiki.gdevelop.io/gdevelop5/behaviors#:~:text=In%20GDevelop%2C%20behaviors%20add%20significant,following%20the%20laws%20of%20physics)\n- [Escenas](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor#:~:text=The%20Scene%20Editor%20is%20where,events%20in%20the%20Events%20Editor)",
               "pt": "Você descobriu os fundamentos do GDevelop:\n- [Objetos](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=In%20GDevelop%2C%20everything%20on%20the,add%20text%20to%20a%20game)\n- [Instâncias](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=After%20creating%20an%20object%2C%20GDevelop,an%20instance%20of%20the%20object)\n- [Comportamentos](https://wiki.gdevelop.io/gdevelop5/behaviors#:~:text=In%20GDevelop%2C%20behaviors%20add%20significant,following%20the%20laws%20of%20physics)\n- [Cenas](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor#:~:text=The%20Scene%20Editor%20is%20where,events%20in%20the%20Events%20Editor)",
-              "th": "คุณได้เรียนรู้พื้นฐานของ GDevelop:\n- [Objects](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=In%20GDevelop%2C%20everything%20on%20the,add%20text%20to%20a%20game)\n- [Instances](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=After%20creating%20an%20object%2C%20GDevelop,an%20instance%20of%20the%20object)\n- [Behaviors](https://wiki.gdevelop.io/gdevelop5/behaviors#:~:text=In%20GDevelop%2C%20behaviors%20add%20significant,following%20the%20laws%20of%20physics)\n- [Scenes](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor#:~:text=The%20Scene%20Editor%20is%20where,events%20in%20the%20Events%20Editor"
+              "th": "คุณได้เรียนรู้พื้นฐานของ GDevelop:\n- [Objects](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=In%20GDevelop%2C%20everything%20on%20the,add%20text%20to%20a%20game)\n- [Instances](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=After%20creating%20an%20object%2C%20GDevelop,an%20instance%20of%20the%20object)\n- [Behaviors](https://wiki.gdevelop.io/gdevelop5/behaviors#:~:text=In%20GDevelop%2C%20behaviors%20add%20significant,following%20the%20laws%20of%20physics)\n- [Scenes](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor#:~:text=The%20Scene%20Editor%20is%20where,events%20in%20the%20Events%20Editor",
+              "ar": "لقد اكتشفت أساسيات GDevelop:\n- [كائنات](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=In%20GDevelop%2C%20everything%20on%20the,add%20text%20to%20a%20game)\n- [مثيلات](https://wiki.gdevelop.io/gdevelop5/objects#:~:text=After%20creating%20an%20object%2C%20GDevelop,an%20instance%20of%20the%20object)\n- [سلوكيات](https://wiki.gdevelop.io/gdevelop5/behaviors#:~:text=In%20GDevelop%2C%20behaviors%20add%20significant,following%20the%20laws%20of%20physics)\n- [مشاهد](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor#:~:text=The%20Scene%20Editor%20is%20where,events%20in%20the%20Events%20Editor)"
             }
           },
           {
@@ -1570,7 +1655,8 @@
               "fr": "Vous pouvez maintenant faire une pause avant de commencer le prochain chapitre.",
               "es": "Ahora puedes hacer una pausa antes de comenzar el próximo capítulo.",
               "pt": "Agora você pode fazer uma pausa antes de começar o próximo capítulo.",
-              "th": "คุณสามารถหยุดพักบทเรียนตรงนี้ หรือเข้าสู่บทเรียนถัดไปเลยก็ได้"
+              "th": "คุณสามารถหยุดพักบทเรียนตรงนี้ หรือเข้าสู่บทเรียนถัดไปเลยก็ได้",
+              "ar": "يمكنك الآن أخذ استراحة أو استئناف البرنامج التعليمي إلى الفصل التالي."
             }
           }
         ]
@@ -1588,7 +1674,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -1603,13 +1690,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Let's find a background for our game.",
             "fr": "Cherchons un arrière-plan pour notre jeu.",
             "es": "Busquemos un fondo para nuestro juego.",
             "pt": "Vamos encontrar um fundo para o nosso jogo.",
-            "th": "หาพื้นหลังสำหรับเกม"
+            "th": "หาพื้นหลังสำหรับเกม",
+            "ar": "دعنا نعثر على خلفية للعبتنا."
           }
         }
       }
@@ -1626,7 +1715,8 @@
             "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
             "es": "Vamos a elegir un **objeto** de la tienda de recursos.",
             "pt": "Vamos escolher um **objeto** na loja de recursos.",
-            "th": "ค้นหา **วัตถุ** จาก ร้านค้า asset"
+            "th": "ค้นหา **วัตถุ** จาก ร้านค้า asset",
+            "ar": "دعنا نقوم بإختيار **كائن** من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -1646,7 +1736,8 @@
             "fr": "Cherchez “**background**”.",
             "es": "Escribe “**background**”.",
             "pt": "Digite “**background**”.",
-            "th": "ประเภท “**background**”"
+            "th": "ประเภท “**background**”",
+            "ar": "كتابة **background**."
           }
         }
       },
@@ -1691,7 +1782,8 @@
             "fr": "Parfait, ajoutez le à la **scène**.",
             "es": "Perfecto, añádelo a la **escena**.",
             "pt": "Perfeito, vamos usá-lo na nossa **cena**.",
-            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**"
+            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
+            "ar": "ممتاز، دعنا نستخدمه في **مشهدنا**."
           }
         }
       }
@@ -1708,7 +1800,8 @@
             "fr": "Faites glisser $(background) du menu au canvas.",
             "es": "Arrastra $(background) desde el menú al lienzo.",
             "pt": "Arraste $(background) do menu para o canvas.",
-            "th": "ลาก $(background) จากเมนูไปยังแคนวาส"
+            "th": "ลาก $(background) จากเมนูไปยังแคนวาส",
+            "ar": "سحب $(background) من القائمة إلى اللوحة."
           }
         },
         "placement": "left"
@@ -1722,7 +1815,8 @@
             "fr": "J'ai terminé",
             "es": "He terminado",
             "pt": "Eu terminei",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهيت!"
           }
         }
       },
@@ -1734,7 +1828,8 @@
             "fr": "Redimensionnez $(background) de façon à ce qu'il couvre toute la zone de jeu.",
             "es": "Arrastra para ampliar el tamaño de $(background) hasta que se estire sobre toda la zona de juego.",
             "pt": "Arraste para expandir o tamanho de $(background) até que ele se estenda sobre toda a área do jogo.",
-            "th": "ลากเพื่อปรับขนาด $(background) จนมันครอบคลุมบริเวณทั้งหมดในเกมของคุณ"
+            "th": "ลากเพื่อปรับขนาด $(background) จนมันครอบคลุมบริเวณทั้งหมดในเกมของคุณ",
+            "ar": "سحب لتوسيع حجم الـ $(background) حتى يتم تغطية اللعبة بأكملها."
           }
         },
         "image": {
@@ -1755,7 +1850,8 @@
             "fr": "Ouvrez le panneau d'édition des propriétés de **l'instance** et sélectionnez l'instance de $(background) sur la scène.",
             "es": "Abre el panel de edición de propiedades de **la instancia** y selecciona la instancia de $(background) en la escena.",
             "pt": "Abra o painel de edição de propriedades da **instância** e selecione a instância de $(background) na cena.",
-            "th": "เปิดแผงควบคุมสำหรับแก้ไขคุณสมบัติ **instance** และเลือก instance ของ $(background) ใน scence"
+            "th": "เปิดแผงควบคุมสำหรับแก้ไขคุณสมบัติ **instance** และเลือก instance ของ $(background) ใน scence",
+            "ar": "فتح لوحة خصائص **المثيل** وتحديد مثيل الـ $(background) على الشاشة."
           }
         },
         "placement": "bottom"
@@ -1774,15 +1870,36 @@
             "fr": "Sélectionnez l'instance de $(background) sur la scène.",
             "es": "Selecciona la instancia de $(background) en la escena.",
             "pt": "Selecione a instância de $(background) na cena.",
-            "th": "เลือก instance ของ $(background) ใน scence"
+            "th": "เลือก instance ของ $(background) ใน scence",
+            "ar": "تحديد المثيل $(background) بالمشهد."
           }
         }
       }
     },
     {
+      "elementToHighlightId": "#toolbar-open-properties-panel-button",
+      "skippable": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#instance-properties-editor"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **instance** properties editor panel and select the instance of $(grabArea) on the scene.",
+            "fr": "Ouvrez le panneau d'édition des propriétés de **l'instance** et sélectionnez l'instance de $(grabArea) sur la scène.",
+            "es": "Abre el panel de edición de propiedades de **la instancia** y selecciona la instancia de $(grabArea) en la escena.",
+            "pt": "Abra o painel de edição de propriedades da **instância** e selecione a instância de $(grabArea) na cena.",
+            "th": "เปิดแผงควบคุมสำหรับแก้ไขคุณสมบัติ **instance** และเลือก instance ของ $(grabArea) ใน scence",
+            "ar": "فتح لوحة خصائص **المثيل** وتحديد مثيل الـ $(grabArea) على الشاشة."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
       "elementToHighlightId": "#instance-properties-editor [id=\"Z Order\"]",
       "nextStepTrigger": {
-        "valueHasChanged": true
+        "valueEquals": "-1"
       },
       "tooltip": {
         "description": {
@@ -1791,10 +1908,12 @@
             "fr": "Définissez la position sur l'axe z de $(background) à -1 pour qu'il soit derrière toutes les autres **instances** de la scène.",
             "es": "Cambia el orden z de $(background) a **-1** para que esté detrás de todas las demás **instancias** de la **escena**.",
             "pt": "Altere a ordem z de $(background) para **-1** para que ele fique atrás de todas as outras **instâncias** na **cena**.",
-            "th": "ปรับค่าลำดับ z ของ $(background) เป็น **-1** เพื่อให้พื้นหลังปรากฏอยู่ข้างหลัง **instances** อื่น"
+            "th": "ปรับค่าลำดับ z ของ $(background) เป็น **-1** เพื่อให้พื้นหลังปรากฏอยู่ข้างหลัง **instances** อื่น",
+            "ar": "تغيير ترتيب $(background) إلى **-1** حيث يكون خلف كل **المثيلات** الأخرى في **المشهد**."
           }
         },
-        "placement": "right"
+        "placement": "right",
+        "mobilePlacement": "top"
       }
     },
     {
@@ -1809,7 +1928,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -1824,13 +1944,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Let's add some protection for $(target).",
             "fr": "Ajoutons un objet pour protéger $(target).",
             "es": "Agreguemos un objeto para proteger a $(target).",
             "pt": "Vamos adicionar um objeto para proteger $(target).",
-            "th": "เพิ่มวัตถุป้องกันให้ $(target)"
+            "th": "เพิ่มวัตถุป้องกันให้ $(target)",
+            "ar": "دعنا نقوم بإضافة بعض الحماية لصالح $(target)."
           }
         }
       }
@@ -1847,7 +1969,8 @@
             "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
             "es": "Vamos a elegir un **objeto** de la tienda de recursos.",
             "pt": "Vamos escolher um **objeto** na loja de recursos.",
-            "th": "เพิ่ม **วัตถุ** จาก ร้านค้า asset"
+            "th": "เพิ่ม **วัตถุ** จาก ร้านค้า asset",
+            "ar": "دعنا نقوم بإختيار **كائن** من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -1867,7 +1990,8 @@
             "fr": "Cherchez “**block**”.",
             "es": "Busca **block**.",
             "pt": "Procure por **block**.",
-            "th": "ค้นหา “**block**”"
+            "th": "ค้นหา “**block**”",
+            "ar": "البحث عن **block**."
           }
         }
       },
@@ -1912,7 +2036,8 @@
             "fr": "Parfait, ajoutez le à la **scène**.",
             "es": "Perfecto, agreguemoslo a la **escena**.",
             "pt": "Perfeito, vamos adicioná-lo à **cena**.",
-            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**"
+            "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
+            "ar": "ممتاز، دعنا نقوم بإضافته إلى **المشهد**."
           }
         }
       }
@@ -1930,7 +2055,8 @@
             "fr": "Faisons en sorte qu'il reste fixe comme un mur.",
             "es": "Hagamos que se mantengan estáticos como una pared.",
             "pt": "Vamos mantê-los estáticos como uma parede.",
-            "th": "ทำให้คงที่เพื่อใช้ทำหน้าที่เป็นผนัง"
+            "th": "ทำให้คงที่เพื่อใช้ทำหน้าที่เป็นผนัง",
+            "ar": "دعنا نعينه ككائن ثابت حيث سيمثل الجدار."
           }
         },
         "description": {
@@ -1939,7 +2065,8 @@
             "fr": "Faites un clic droit sur $(obstacle) et cliquez sur “Modifier les comportements”.",
             "es": "Haga clic derecho en $(obstacle) y seleccione “Editar comportamientos”.",
             "pt": "Clique com o botão direito em $(obstacle) e selecione “Editar comportamentos”.",
-            "th": "คลิกขวาที่ $(obstacle) และเลือก “แก้ไขพฤติกรรม”"
+            "th": "คลิกขวาที่ $(obstacle) และเลือก “แก้ไขพฤติกรรม”",
+            "ar": "نقرة بزر الفأرة الأيمن على $(obstacle) وتحديد **تحرير السلوكيات**."
           }
         }
       }
@@ -1956,7 +2083,8 @@
             "fr": "Les **comportements** de **l'objet** se trouvent dans cet onglet.",
             "es": "Aquí puedes ver los **comportamientos** del **objeto**.",
             "pt": "Veja os **comportamentos** do **objeto** aqui.",
-            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่"
+            "th": "ดู **พฤติกรรม** ของ **วัตถุ** ที่นี่",
+            "ar": "رؤية **سلوكيات الكائن** هنا."
           }
         },
         "placement": "bottom"
@@ -1976,7 +2104,8 @@
             "fr": "Ajoutez un nouveau comportement.",
             "es": "Agrega un nuevo comportamiento.",
             "pt": "Adicione um novo comportamento.",
-            "th": "เพิ่มพฤติกรรมใหม่"
+            "th": "เพิ่มพฤติกรรมใหม่",
+            "ar": "إضافة سلوك جديد."
           }
         }
       },
@@ -1994,7 +2123,8 @@
             "fr": "Sélectionnez le comportement Moteur physique.",
             "es": "Selecciona el comportamiento Física.",
             "pt": "Selecione o comportamento Física.",
-            "th": "เลือกพฤติกรรมฟิสิกส์"
+            "th": "เลือกพฤติกรรมฟิสิกส์",
+            "ar": "تحديد سلوك الفيزياء."
           }
         }
       },
@@ -2003,7 +2133,7 @@
     {
       "elementToHighlightId": "#physics2-parameter-body-type",
       "nextStepTrigger": {
-        "valueHasChanged": true
+        "valueEquals": "Static"
       },
       "tooltip": {
         "description": {
@@ -2012,7 +2142,8 @@
             "fr": "Choisissez l'option **Fixe**.",
             "es": "Selecciona **estático**.",
             "pt": "Selecione **estático**.",
-            "th": "เลือก **คงที่**"
+            "th": "เลือก **คงที่**",
+            "ar": "تحديد **ثابت**."
           }
         },
         "placement": "top"
@@ -2031,7 +2162,8 @@
             "fr": "C'est bon.",
             "es": "Está bien.",
             "pt": "Está bom.",
-            "th": "เรียบร้อยแล้ว"
+            "th": "เรียบร้อยแล้ว",
+            "ar": "نحن على الطريق الصحيح."
           }
         }
       }
@@ -2048,7 +2180,8 @@
             "en": "Add a few $(obstacle) to the **scene** to protect $(target).",
             "fr": "Ajoutez quelques $(obstacle) à la **scène** pour protéger $(target).",
             "es": "Agrega algunos $(obstacle) a la **escena** para proteger a $(target).",
-            "th": "เพิ่ม $(obstacle) ปริมาณนิดหน่อยลงใน **scene** เพื่อป้องกัน $(target)"
+            "th": "เพิ่ม $(obstacle) ปริมาณนิดหน่อยลงใน **scene** เพื่อป้องกัน $(target)",
+            "ar": "إضافة بضعة $(obstacle) إلى **المشهد** لحماية $(target)."
           }
         }
       }
@@ -2065,7 +2198,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -2080,13 +2214,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's create a winning message!",
             "fr": "Maintenant, nous allons ajouter un message quand le joueur atteint la cible.",
             "es": "¡Ahora creemos un mensaje de victoria!",
             "pt": "Agora vamos criar uma mensagem de vitória!",
-            "th": "ทีนี้เราจะสร้างข้อความแสดงชัยชนะ!"
+            "th": "ทีนี้เราจะสร้างข้อความแสดงชัยชนะ!",
+            "ar": "الآن دعنا نقوم بإنشاء رسالة الفوز!"
           }
         }
       }
@@ -2103,7 +2239,8 @@
             "fr": "Cette fois-ci, nous allons créer un texte de zéro.",
             "es": "Esta vez crearemos un texto desde cero.",
             "pt": "Desta vez, vamos criar um texto do zero.",
-            "th": "คราวนี้ เราจะสร้างข้อความโดยทำขึ้นมาเอง"
+            "th": "คราวนี้ เราจะสร้างข้อความโดยทำขึ้นมาเอง",
+            "ar": "هذه المرة، سنقوم بإنشاء نص من الصفر."
           }
         },
         "placement": "bottom"
@@ -2123,7 +2260,8 @@
             "fr": "Sélectionnez l'objet **Texte**",
             "es": "Selecciona el objeto **Texto**",
             "pt": "Selecione o objeto **Texto**",
-            "th": "เลือกวัตถุ **ข้อความ**"
+            "th": "เลือกวัตถุ **ข้อความ**",
+            "ar": "تحديد الكائن **نص**"
           }
         },
         "placement": "bottom"
@@ -2142,7 +2280,8 @@
             "fr": "Utilisez “**YouWin**” comme nom d'objet.",
             "es": "Cambia el nombre del objeto a “**YouWin**”.",
             "pt": "Mude o nome do objeto para “**YouWin**”.",
-            "th": "แก้ไขชื่อของวัตถุเป็น “**YouWin**”"
+            "th": "แก้ไขชื่อของวัตถุเป็น “**YouWin**”",
+            "ar": "تغيير اسم الكائن إلى **YouWin**."
           }
         },
         "placement": "bottom"
@@ -2161,7 +2300,8 @@
             "fr": "Utilisez une taille de **200**.",
             "es": "Cambia el tamaño de la fuente a **200**.",
             "pt": "Mude o tamanho da fonte para **200**.",
-            "th": "แก้ไขขนาดฟอนต์เป็น **200**"
+            "th": "แก้ไขขนาดฟอนต์เป็น **200**",
+            "ar": "تغيير حجم الخط إلى **200**."
           }
         },
         "placement": "bottom"
@@ -2180,7 +2320,8 @@
             "fr": "Cet objet texte devra afficher “**Gagné !**”",
             "es": "Cambia el texto a “**¡Ganaste!**”",
             "pt": "Mude o texto para “**Você Venceu!**”",
-            "th": "แก้ไขข้อความเป็น “**คุณชนะ!**”"
+            "th": "แก้ไขข้อความเป็น “**คุณชนะ!**”",
+            "ar": "إدخال أي نص يدل على فوز اللاعبين\n(على سبيل المثال:** لقد فزت**)."
           }
         },
         "placement": "bottom"
@@ -2199,7 +2340,8 @@
             "fr": "Nous avons terminé.",
             "es": "¡Terminamos!",
             "pt": "Terminamos.",
-            "th": "เรียบร้อยแล้ว"
+            "th": "เรียบร้อยแล้ว",
+            "ar": "انتهينا."
           }
         }
       },
@@ -2219,7 +2361,8 @@
             "fr": "Faites glisser $(youWinText) du menu au canvas et centrez le sur la scène.",
             "es": "Arrastra $(youWinText) al **escenario** y centra el objeto lo mejor que puedas.",
             "pt": "Arraste $(youWinText) para a **cena** e centralize-o o mais próximo possível.",
-            "th": "ลาก $(youWinText) ไปยัง **scene** และพยายามจัดตำแหน่งให้อยู่ตรงกลาง"
+            "th": "ลาก $(youWinText) ไปยัง **scene** และพยายามจัดตำแหน่งให้อยู่ตรงกลาง",
+            "ar": "سحب $(youWinText) داخل **المشهد**، وإدراجه في المنتصف قدر الإمكان."
           }
         },
         "placement": "left"
@@ -2237,7 +2380,8 @@
             "fr": "Ouvrez le panneau des **calques*.",
             "es": "Abre el panel de **Capas**.",
             "pt": "Abra o painel **Camadas**.",
-            "th": "เปิดแผงควบคุม **Layers**"
+            "th": "เปิดแผงควบคุม **Layers**",
+            "ar": "فتح لوحة **الطبقات**."
           }
         },
         "placement": "bottom"
@@ -2256,7 +2400,8 @@
             "fr": "Créez un nouveau calque.",
             "es": "Añade una nueva capa.",
             "pt": "Adicione uma nova camada.",
-            "th": "เพิ่มเลเยอร์ใหม่"
+            "th": "เพิ่มเลเยอร์ใหม่",
+            "ar": "إضافة طبقة جديدة."
           }
         },
         "placement": "top"
@@ -2274,7 +2419,8 @@
             "fr": "Utlisez le nom **WinLayer**.",
             "es": "Cambia el nombre a **WinLayer**.",
             "pt": "Mude o nome para **WinLayer**.",
-            "th": "เปลี่ยนชื่อเป็น **WinLayer**"
+            "th": "เปลี่ยนชื่อเป็น **WinLayer**",
+            "ar": "تغيير الاسم إلى **WinLayer**."
           }
         },
         "placement": "top"
@@ -2292,7 +2438,8 @@
             "fr": "Cachez le **calque**.",
             "es": "Oculta la **capa**.",
             "pt": "Esconda a **camada**.",
-            "th": "ซ่อน *เลเยอร์*"
+            "th": "ซ่อน *เลเยอร์*",
+            "ar": "إخفاء **الطبقة**."
           }
         },
         "placement": "top"
@@ -2306,7 +2453,8 @@
             "fr": "J'ai terminé",
             "es": "Terminé",
             "pt": "Terminei",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهيت"
           }
         }
       },
@@ -2317,7 +2465,8 @@
             "fr": "Sélectionnez l'instance de $(youWinText) sur la **scène** et changez son **calque** en utilisant le **panneau des propriétés**.\n\nIl devrait maintenant être caché.",
             "es": "Ahora selecciona la **instancia** de $(youWinText) en la **escena** y cambia su **capa** usando el **panel de propiedades**.\n\n¡Debería haber desaparecido!",
             "pt": "Agora selecione a **instância** de $(youWinText) na **cena** e altere sua **camada** usando o **painel de propriedades**.\n\nEle deve ter desaparecido!",
-            "th": "ทีนี้เลือก $(youWinText) **instance** บน **scence** และเปลี่ยน **เลเยอร์** โดยใช้ **แผงควบคุมคุณสมบัติ**\n\nมันควรจะหายไป!"
+            "th": "ทีนี้เลือก $(youWinText) **instance** บน **scence** และเปลี่ยน **เลเยอร์** โดยใช้ **แผงควบคุมคุณสมบัติ**\n\nมันควรจะหายไป!",
+            "ar": "الآن تحديد **المثيل** $(youWinText) **بالمشهد** وتغيير طبقته باستخدام **لوحة الخصائص**.\n\nمن المفترض أن تختفي!"
           }
         },
         "standalone": true
@@ -2335,7 +2484,8 @@
             "fr": "Nous allons maintenant ajouter de la logique à notre jeu.",
             "es": "Ahora vamos a añadir lógica a nuestro juego.",
             "pt": "Agora vamos adicionar lógica ao nosso jogo.",
-            "th": "เราจะเพิ่มโลจิกบางอย่างเข้าไปในเกม"
+            "th": "เราจะเพิ่มโลจิกบางอย่างเข้าไปในเกม",
+            "ar": "سوف نقوم الآن بإضافة بعض المنطق إلى لعبتنا."
           }
         }
       }
@@ -2353,7 +2503,8 @@
             "fr": "Créons notre premier **évènement** !",
             "es": "¡Añadamos nuestro primer **evento**!",
             "pt": "Vamos adicionar nosso primeiro **evento**!",
-            "th": "มาเพิ่ม **อีเวนท์** แรกกันเถอะ!"
+            "th": "มาเพิ่ม **อีเวนท์** แรกกันเถอะ!",
+            "ar": "دعنا نقوم بإضافة أول **حدث** لنا!"
           }
         }
       }
@@ -2370,7 +2521,8 @@
             "fr": "Créez une **condition**.",
             "es": "Añade una **condición**.",
             "pt": "Adicione uma **condição**.",
-            "th": "เพิ่ม **เงื่อนไข**"
+            "th": "เพิ่ม **เงื่อนไข**",
+            "ar": "إضافة **شرط**."
           }
         }
       }
@@ -2387,7 +2539,8 @@
             "fr": "Cliquez sur $(projectile).",
             "es": "Selecciona $(projectile).",
             "pt": "Selecione $(projectile).",
-            "th": "เลือก $(projectile)"
+            "th": "เลือก $(projectile)",
+            "ar": "تحديد $(projectile)."
           }
         }
       },
@@ -2405,7 +2558,8 @@
             "fr": "Cliquez sur la condition collision.",
             "es": "Selecciona la condición de colisión.",
             "pt": "Selecione a condição de colisão.",
-            "th": "เลือกเงื่อนไขการชนกัน"
+            "th": "เลือกเงื่อนไขการชนกัน",
+            "ar": "تحديد شرط التصادم."
           }
         }
       },
@@ -2423,7 +2577,8 @@
             "fr": "Cliquez sur $(target).",
             "es": "Selecciona $(target).",
             "pt": "Selecione $(target).",
-            "th": "เลือก $(target)"
+            "th": "เลือก $(target)",
+            "ar": "تحديد  $(target)."
           }
         },
         "placement": "top"
@@ -2442,7 +2597,8 @@
             "fr": "La condition est maintenant configurée.",
             "es": "La condición está configurada.",
             "pt": "A condição está configurada.",
-            "th": "เอาล่ะ **เงื่อนไข** ได้ถูกกำหนดเอาไว้เรียบร้อยแล้ว"
+            "th": "เอาล่ะ **เงื่อนไข** ได้ถูกกำหนดเอาไว้เรียบร้อยแล้ว",
+            "ar": "حسنًا، تم ضبط **شرط** تمامًا."
           }
         },
         "placement": "top"
@@ -2460,7 +2616,8 @@
             "fr": "Créez une **action** maintenant.",
             "es": "Añade una **acción** ahora.",
             "pt": "Adicione uma **ação** agora.",
-            "th": "เพิ่ม **การกระทำ**"
+            "th": "เพิ่ม **การกระทำ**",
+            "ar": "دعنا نقوم بإضافة **إجراء** الآن."
           }
         }
       }
@@ -2477,7 +2634,8 @@
             "fr": "Cliquez sur $(target).",
             "es": "Selecciona $(target).",
             "pt": "Selecione $(target).",
-            "th": "เลือก $(target)"
+            "th": "เลือก $(target)",
+            "ar": "تحديد $(target)."
           }
         }
       },
@@ -2495,7 +2653,8 @@
             "fr": "Nous allons faire disparaître $(target) au moment de la collision.",
             "es": "Haremos que $(target) desaparezca en la colisión.",
             "pt": "Vamos fazer com que $(target) desapareça na colisão.",
-            "th": "เราจะทำให้ $(target) หายไปหลังจากชน"
+            "th": "เราจะทำให้ $(target) หายไปหลังจากชน",
+            "ar": "سوف نجعل $(target) يختفي مع التصادم."
           }
         }
       },
@@ -2513,7 +2672,8 @@
             "fr": "Parfait, $(target) va disparaître quand un $(projectile) l'atteindra.",
             "es": "Perfecto, $(target) desaparecerá cuando $(projectile) lo golpee.",
             "pt": "Ótimo, $(target) desaparecerá quando $(projectile) o atingir.",
-            "th": "เอาล่ะ ทีนี้ $(target) จะหายไปเมื่อถูก $(projectile) ชน"
+            "th": "เอาล่ะ ทีนี้ $(target) จะหายไปเมื่อถูก $(projectile) ชน",
+            "ar": "حسنًا، الآن سوف يختفي $(target) وقتما يضربه $(projectile)."
           }
         },
         "placement": "top"
@@ -2531,7 +2691,8 @@
             "fr": "Créons une autre **action** qui sera exécutée pour la même **condition**.",
             "es": "Añade otra **acción** que se ejecutará para la misma **condición**.",
             "pt": "Adicione outra **ação** que será executada para a mesma **condição**.",
-            "th": "สร้าง **การกระทำ** เพิ่มอีก ซึ่งจะใช้ในกรณี **เงื่อนไข** เดียวกัน"
+            "th": "สร้าง **การกระทำ** เพิ่มอีก ซึ่งจะใช้ในกรณี **เงื่อนไข** เดียวกัน",
+            "ar": "دعنا نقوم بإضافة **إجراء** آخر حيث سيتم تنفيذه بواسطة نفس **الشرط**."
           }
         }
       }
@@ -2548,7 +2709,8 @@
             "fr": "Cherchez “calque”.",
             "es": "Busca “capa”.",
             "pt": "Procure por “camada”.",
-            "th": "ค้นหา “layer”"
+            "th": "ค้นหา “layer”",
+            "ar": "البحث عن **طبقة**."
           }
         }
       },
@@ -2566,7 +2728,8 @@
             "fr": "Cliquez sur l'action **Afficher un calque**.",
             "es": "Selecciona la **acción Mostrar una capa**.",
             "pt": "Selecione a **ação Mostrar uma camada**.",
-            "th": "เลือกการกระทำ **แสดงเลเยอร์**"
+            "th": "เลือกการกระทำ **แสดงเลเยอร์**",
+            "ar": "تحديد الإجراء **إظهار طبقة**."
           }
         }
       },
@@ -2584,7 +2747,8 @@
             "fr": "Sélectionnez le **calque** que vous avez créé.",
             "es": "Selecciona la **capa** que has creado.",
             "pt": "Selecione a **camada** que você criou.",
-            "th": "เลือก **เลเยอร์** ที่คุณสร้าง"
+            "th": "เลือก **เลเยอร์** ที่คุณสร้าง",
+            "ar": "تحديد **الطبقة** التي قمتَ بإنشائها."
           }
         },
         "placement": "top"
@@ -2603,7 +2767,8 @@
             "fr": "Maintenant, le titre de victoire devrait apparaître quand le joueur touche $(target) avec $(projectile).",
             "es": "Ahora, el título de victoria debería aparecer cuando el jugador golpee a $(target) con $(projectile).",
             "pt": "Agora, o título de vitória deve aparecer quando o jogador atingir $(target) com $(projectile).",
-            "th": "เอาล่ะ ทีนี้ข้อความควรจะปรากฎเมื่อผู้เล่นโยน $(projectile) ชน $(target)"
+            "th": "เอาล่ะ ทีนี้ข้อความควรจะปรากฎเมื่อผู้เล่นโยน $(projectile) ชน $(target)",
+            "ar": "حسنًا، من المفترض أن يظهر العنوان عندما يقوم اللاعبون بضرب $(target) بواسطة $(projectile)."
           }
         },
         "placement": "top"
@@ -2621,7 +2786,8 @@
             "fr": "Retournons à la **scène** pour ajouter des contraintes au joueur ou à la joueuse.",
             "es": "Volvamos a la **escena** para crear algunas restricciones para el jugador.",
             "pt": "Vamos voltar para a **cena** para criar algumas restrições para o jogador.",
-            "th": "กลับไปยัง **scene** เพื่อสร้างขีดจำกัดให้ผู้เล่น "
+            "th": "กลับไปยัง **scene** เพื่อสร้างขีดจำกัดให้ผู้เล่น ",
+            "ar": "دعنا نعود إلى **المشهد**  لفرض بعض القيود على اللاعبين."
           }
         }
       }
@@ -2638,7 +2804,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -2659,7 +2826,8 @@
             "fr": "Nous allons définir une zone où le joueur ou la joueuse peut attraper les $(projectile)s. En dehors de cette zone, les $(projectile)s seront en mouvement libre.",
             "es": "Definiremos un área donde el jugador pueda coger $(projectile)s. Fuera de esta área, los $(projectile)s serán libres.",
             "pt": "Vamos definir uma área onde o jogador pode pegar $(projectile)s. Fora desta área, os $(projectile)s serão livres.",
-            "th": "เราจะกำหนดพื้นที่ที่ผู้เล่นจะสามารถจับ $(projectile) นอกเหนือจากพื้นที่ดังกล่าวนั้น $(projectile) จะเป็นอิสระ"
+            "th": "เราจะกำหนดพื้นที่ที่ผู้เล่นจะสามารถจับ $(projectile) นอกเหนือจากพื้นที่ดังกล่าวนั้น $(projectile) จะเป็นอิสระ",
+            "ar": "سوف نقوم بتحديد المنطقة التي يمكن للاعبين الإمساك بكل الـ $(projectile). وخارج تلك المنطقة، ستكون كل الـ $(projectile) حرة."
           }
         }
       }
@@ -2676,7 +2844,8 @@
             "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
             "es": "Vamos a elegir un objeto de la tienda de recursos.",
             "pt": "Vamos escolher um objeto da loja de recursos.",
-            "th": "เลือกวัตถุจากร้านค้า asset"
+            "th": "เลือกวัตถุจากร้านค้า asset",
+            "ar": "دعنا نقوم بإختيار كائن من متجر العناصر"
           }
         },
         "placement": "bottom"
@@ -2696,7 +2865,8 @@
             "fr": "Cherchez “**background**”.",
             "es": "Escribe “**background**”.",
             "pt": "Digite “**background**”.",
-            "th": "พิมพ์ “**background**”"
+            "th": "พิมพ์ “**background**”",
+            "ar": "كتابة **background**."
           }
         }
       },
@@ -2741,7 +2911,8 @@
             "fr": "Mettons la zone en place.",
             "es": "¡Vamos a usarla ahora!",
             "pt": "Vamos usá-la agora!",
-            "th": "เอาไปใช้เลย!"
+            "th": "เอาไปใช้เลย!",
+            "ar": "دعنا نقوم باستخدام هذا الآن!"
           }
         }
       }
@@ -2758,7 +2929,8 @@
             "fr": "Faites glisser $(grabArea) du menu à au canvas.",
             "es": "Arrastra $(grabArea) desde el menú al lienzo.",
             "pt": "Arraste $(grabArea) do menu para o canvas.",
-            "th": "ลาก $(grabArea) จากเมนูไปยังแคนวาส"
+            "th": "ลาก $(grabArea) จากเมนูไปยังแคนวาส",
+            "ar": "سحب $(grabArea) من القائمة إلى اللوحة."
           }
         },
         "placement": "left"
@@ -2772,7 +2944,8 @@
             "fr": "J'ai terminé",
             "es": "He terminado",
             "pt": "Eu terminei",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهيت"
           }
         }
       },
@@ -2784,7 +2957,8 @@
             "fr": "Placez et redimensionnez $(grabArea) de telle sorte à ce qu'il couvre le coin en bas à gauche de l'écran de jeu.",
             "es": "Arrastra y redimensiona $(grabArea) hasta que cubra la parte inferior izquierda de la pantalla del juego.",
             "pt": "Arraste e redimensione $(grabArea) até que ele cubra a parte inferior esquerda da tela do jogo.",
-            "th": "ลากและปรับขนาด $(grabArea) จนมันครอบคลุมบริเวณซ้ายล่างในหน้าจอเกมของคุณ"
+            "th": "ลากและปรับขนาด $(grabArea) จนมันครอบคลุมบริเวณซ้ายล่างในหน้าจอเกมของคุณ",
+            "ar": "سحب وإعادة تحجيم $(grabArea) حتى يغطي أسفل الجانب الأيسر من شاشة اللعبة."
           }
         },
         "image": {
@@ -2804,10 +2978,12 @@
             "fr": "Sélectionnez l'instance de $(grabArea) et définissez sa position sur l'axe z à **0**.",
             "es": "Asegúrate de que $(grabArea) está seleccionado y cambia este valor a **0**.",
             "pt": "Certifique-se de que $(grabArea) está selecionado e mude este valor para **0**.",
-            "th": "ดูให้แน่ใจว่า $(grabArea) ถูกเลือกอยู่ และปรับค่านี้เป็น **0**"
+            "th": "ดูให้แน่ใจว่า $(grabArea) ถูกเลือกอยู่ และปรับค่านี้เป็น **0**",
+            "ar": "التحقق أنه تم تحديد $(grabArea) مع تغيير قيمته إلى **0**."
           }
         },
-        "placement": "right"
+        "placement": "right",
+        "mobilePlacement": "top"
       }
     },
     {
@@ -2822,7 +2998,8 @@
             "fr": "Maintenant, désactivons le **comportement** “draggable” quand les $(projectile)s sont en dehors de la zone $(grabArea).",
             "es": "Ahora, desactivemos el **comportamiento** “draggable” cuando los $(projectile)s estén fuera de la zona $(grabArea).",
             "pt": "Agora, desative o **comportamento** “draggable” quando os $(projectile)s estiverem fora da área $(grabArea).",
-            "th": "ปิดฟังก์ชันในการสามารถถูกลาก **พฤติกรรม** ของ $(projectile) เมื่ออยู่ภายนอก $(grabArea)"
+            "th": "ปิดฟังก์ชันในการสามารถถูกลาก **พฤติกรรม** ของ $(projectile) เมื่ออยู่ภายนอก $(grabArea)",
+            "ar": "دعنا نقوم بإلغاء تفعيل السلوك (Draggable) الخاص بكل الـ $(projectile) عندما يكون خارج الـ $(grabArea)."
           }
         }
       }
@@ -2841,7 +3018,8 @@
             "fr": "Créez un nouvel évènement.",
             "es": "¡Creemos un nuevo evento!",
             "pt": "Vamos criar um novo evento!",
-            "th": "สร้างอีเวนท์ใหม่กันเถอะ!"
+            "th": "สร้างอีเวนท์ใหม่กันเถอะ!",
+            "ar": "دعنا نقوم بإنشاء حدث جديد!"
           }
         }
       }
@@ -2858,7 +3036,8 @@
             "fr": "Ajoutez une **condition**.",
             "es": "Agrega una **condición**.",
             "pt": "Adicione uma **condição**.",
-            "th": "เพิ่ม **เงื่อนไข**"
+            "th": "เพิ่ม **เงื่อนไข**",
+            "ar": "إضافة **شرط**."
           }
         }
       }
@@ -2875,7 +3054,8 @@
             "fr": "Cliquez sur $(projectile).",
             "es": "Selecciona $(projectile).",
             "pt": "Selecione $(projectile).",
-            "th": "เลือก $(projectile)"
+            "th": "เลือก $(projectile)",
+            "ar": "تحديد $(projectile)."
           }
         }
       },
@@ -2893,7 +3073,8 @@
             "fr": "Cliquez sur la condition collision.",
             "es": "Selecciona la condición de colisión.",
             "pt": "Selecione a condição de colisão.",
-            "th": "เลือกเงื่อนไขการชนกัน"
+            "th": "เลือกเงื่อนไขการชนกัน",
+            "ar": "تحديد شرط التصادم."
           }
         }
       },
@@ -2911,7 +3092,8 @@
             "fr": "Cliquez sur $(grabArea).",
             "es": "Selecciona $(grabArea).",
             "pt": "Selecione $(grabArea).",
-            "th": "เลือก $(grabArea)"
+            "th": "เลือก $(grabArea)",
+            "ar": "تحديد $(grabArea)."
           }
         },
         "placement": "top"
@@ -2930,7 +3112,8 @@
             "fr": "La **condition** est maintenant prête.",
             "es": "¡La **condición** está lista!",
             "pt": "A **condição** está pronta!",
-            "th": "เอาล่ะ เงื่อนไขถูกกำหนดเอาไว้เรียบร้อยแล้ว"
+            "th": "เอาล่ะ เงื่อนไขถูกกำหนดเอาไว้เรียบร้อยแล้ว",
+            "ar": "حسنًا، تم ضبط **الشرط** تمامًا."
           }
         },
         "placement": "top"
@@ -2948,7 +3131,8 @@
             "fr": "Faites un clic droit sur la nouvelle **condition** et sélectionnez “Inverser une condition”.",
             "es": "Haz clic derecho en la nueva **condición** y selecciona “Invertir condición”.",
             "pt": "Clique com o botão direito na nova **condição** e selecione “Inverter condição”.",
-            "th": "คลิกขวาที่ **เงื่อนไข** ที่เพิ่งสร้างขึ้นมาและเลือก “เงื่อนไขแบบตรงกันข้าม”"
+            "th": "คลิกขวาที่ **เงื่อนไข** ที่เพิ่งสร้างขึ้นมาและเลือก “เงื่อนไขแบบตรงกันข้าม”",
+            "ar": "نقرة بزر الفأرة الأيمن على هذا **الشرط** الذي أنشأناه للتو وتحديد **عكس الشرط**."
           }
         },
         "placement": "right"
@@ -2966,7 +3150,8 @@
             "fr": "Ajoutez une action.",
             "es": "Agrega una acción.",
             "pt": "Adicione uma ação.",
-            "th": "เพิ่มการกระทำ"
+            "th": "เพิ่มการกระทำ",
+            "ar": "إضافة إجراء."
           }
         }
       }
@@ -2983,7 +3168,8 @@
             "fr": "Cliquez sur $(projectile).",
             "es": "Selecciona $(projectile).",
             "pt": "Selecione $(projectile).",
-            "th": "เลือก $(projectile)"
+            "th": "เลือก $(projectile)",
+            "ar": "تحديد $(projectile)."
           }
         }
       },
@@ -3001,7 +3187,8 @@
             "fr": "Sélectionnez **l'action** qui libère le $(projectile) de la souris du joueur ou de la joueuse.",
             "es": "Selecciona la **acción** que libera el $(projectile) del arrastre del jugador.",
             "pt": "Selecione a **ação** que libera o $(projectile) do arrasto do jogador.",
-            "th": "เลือก **การกระทำ** ที่ปล่อย $(projectile) จากการถูกผู้เล่นจับลาก"
+            "th": "เลือก **การกระทำ** ที่ปล่อย $(projectile) จากการถูกผู้เล่นจับลาก",
+            "ar": "تحديد **الإجراء** الذي يحرر الـ $(projectile) من تحكم اللاعبين."
           }
         }
       },
@@ -3019,7 +3206,8 @@
             "fr": "C'est bon.",
             "es": "¡Está bien!",
             "pt": "Está bom.",
-            "th": "มาถูกทางแล้ว"
+            "th": "มาถูกทางแล้ว",
+            "ar": "نحن على الطريق الصحيح."
           }
         },
         "placement": "top"
@@ -3037,7 +3225,8 @@
             "fr": "Revenons à la **scène** pour placer les $(projectile)s correctement.",
             "es": "Volvamos a la **escena** para colocar los $(projectile)s correctamente.",
             "pt": "Vamos voltar para a **cena** para colocar os $(projectile)s corretamente.",
-            "th": "กลับไปยัง **scene** เพื่อวาง $(projectile) ให้ถูกต้อง"
+            "th": "กลับไปยัง **scene** เพื่อวาง $(projectile) ให้ถูกต้อง",
+            "ar": "دعنا نعود إلى **المشهد** لإدراج كل الـ $(projectile) بشكل صحيح."
           }
         }
       }
@@ -3051,7 +3240,8 @@
             "fr": "J'ai terminé",
             "es": "Ya terminé",
             "pt": "Terminei",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهيت"
           }
         }
       },
@@ -3064,7 +3254,8 @@
             "fr": "Repositionnez les $(projectile)s.",
             "es": "Reordena los $(projectile)s.",
             "pt": "Reorganize os $(projectile)s.",
-            "th": "จัดระเบียบ $(projectile)"
+            "th": "จัดระเบียบ $(projectile)",
+            "ar": "إعادة ترتيب كل الـ $(projectile)."
           }
         },
         "description": {
@@ -3073,7 +3264,8 @@
             "fr": "Faites glisser les **instances** de $(projectile) à l'intérieur de $(background).",
             "es": "Arrastra todas las **instancias** de $(projectile) dentro de los límites de $(background).",
             "pt": "Arraste todas as **instâncias** de $(projectile) dentro dos limites de $(background).",
-            "th": "ลาก **instances** ของ $(projectile) ภายในขอบเขต $(background)"
+            "th": "ลาก **instances** ของ $(projectile) ภายในขอบเขต $(background)",
+            "ar": "سحب كل **مثيلات** الـ $(projectile) داخل حدود الـ $(background)."
           }
         }
       }
@@ -3086,7 +3278,8 @@
             "fr": "J'ai terminé",
             "es": "Ya terminé",
             "pt": "Terminei",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهيت"
           }
         }
       },
@@ -3099,7 +3292,8 @@
             "fr": "Créez une protection pour $(target).",
             "es": "Configura la protección de $(target).",
             "pt": "Configure a proteção de $(target).",
-            "th": "ตั้งที่ป้องกัน $(target)"
+            "th": "ตั้งที่ป้องกัน $(target)",
+            "ar": "إعداد حماية الـ $(target)."
           }
         },
         "description": {
@@ -3108,7 +3302,8 @@
             "fr": "Positionnez les instances de $(block) et de $(obstacle) de manière à protéger $(target).",
             "es": "Coloca las instancias de $(block) y $(obstacle) de manera que protejan a $(target).",
             "pt": "Coloque as instâncias de $(block) e $(obstacle) de forma a proteger $(target).",
-            "th": "จัดวาง $(block) และ $(obstacle) โดยมีเป้าหมายเพื่อปกป้อง $(target)"
+            "th": "จัดวาง $(block) และ $(obstacle) โดยมีเป้าหมายเพื่อปกป้อง $(target)",
+            "ar": "ترتيب كلًا من الـ $(block) والـ $(obstacle) بحيث تحمي الـ $(target)."
           }
         }
       }
@@ -3125,7 +3320,8 @@
             "fr": "Lancez un **Aperçu** du jeu et assurez-vous qu'il est possible de toucher $(target).",
             "es": "**Previsualiza** el juego y asegúrate de que es posible ganar.",
             "pt": "**Pré-visualize** o jogo e certifique-se de que é possível ganhar.",
-            "th": "ลองเล่น **ดูตัวอย่าง** เพื่อให้มั่นใจว่าสามารถเล่นเกมชนะได้"
+            "th": "ลองเล่น **ดูตัวอย่าง** เพื่อให้มั่นใจว่าสามารถเล่นเกมชนะได้",
+            "ar": "**معاينة** اللعبة والتحقق أنها قابلة للفوز فيها."
           }
         },
         "placement": "bottom"
@@ -3143,7 +3339,8 @@
             "fr": "Une fois que c'est bon, nous allons générer un lien pour partager votre jeu.",
             "es": "Una vez que estés listo, generaremos un enlace para compartir tu juego.",
             "pt": "Quando estiver pronto, criaremos um link para compartilhar o seu jogo.",
-            "th": "เมื่อพร้อมแล้ว เราจะสร้างลิงค์สำหรับแชร์เกม"
+            "th": "เมื่อพร้อมแล้ว เราจะสร้างลิงค์สำหรับแชร์เกม",
+            "ar": "بمجرد الاستعداد، سوف نقوم بإنشاء رابط لمشاركة لعبتك."
           }
         },
         "placement": "bottom"
@@ -3161,7 +3358,8 @@
             "fr": "Tout d'abord, vous devez vous créer un compte.",
             "es": "Primero, debes crear una cuenta.",
             "pt": "Primeiro, você precisa criar uma conta.",
-            "th": "ก่อนอื่น คุณจะต้องมีบัญชี"
+            "th": "ก่อนอื่น คุณจะต้องมีบัญชี",
+            "ar": "أولًا، نحتاج إلى إنشاء حساب."
           }
         },
         "placement": "bottom"
@@ -3194,7 +3392,8 @@
             "fr": "Remplissez le formulaire et cliquez ici.",
             "es": "Rellena el formulario y luego haz clic aquí.",
             "pt": "Preencha o formulário e clique aqui.",
-            "th": "กรอกฟอร์มแล้วกดตรงนี้"
+            "th": "กรอกฟอร์มแล้วกดตรงนี้",
+            "ar": "كتابة المعلومات وثم النقر هنا."
           }
         },
         "placement": "bottom"
@@ -3214,7 +3413,8 @@
             "fr": "Après avoir rempli le formulaire, cliquez ici.",
             "es": "Después de rellenar el formulario, haz clic aquí.",
             "pt": "Depois de preencher o formulário, clique aqui.",
-            "th": "หลังจากกรอกข้อมูลของคุณแล้ว กดตรงนี้"
+            "th": "หลังจากกรอกข้อมูลของคุณแล้ว กดตรงนี้",
+            "ar": "بعد كتابة معلوماتك، النقر هنا."
           }
         },
         "placement": "bottom"
@@ -3234,7 +3434,8 @@
             "fr": "Cliquez ici pour **publier** votre jeu.",
             "es": "Haz clic aquí para **publicar** tu juego.",
             "pt": "Clique aqui para **publicar** o seu jogo.",
-            "th": "กดที่นี่เพื่อ **เผยแพร่** เกมของคุณ"
+            "th": "กดที่นี่เพื่อ **เผยแพร่** เกมของคุณ",
+            "ar": "النقر هنا ل**نشر** لعبتك."
           }
         },
         "placement": "bottom"
@@ -3259,7 +3460,8 @@
             "fr": "Cliquez ici pour ouvrir votre jeu dans votre navigateur. Pensez à partager le lien pour que d'autres puissent y jouer!\n\nUne fois que vous avez terminé, fermez cette fenêtre.",
             "es": "Haz clic aquí para abrir tu juego en tu navegador. ¡Recuerda compartir el enlace para que otros puedan jugar tu juego!\n\nUna vez que hayas terminado, cierra esta ventana.",
             "pt": "Clique aqui para abrir o seu jogo no seu navegador. Lembre-se de compartilhar o link para que outros possam jogar o seu jogo!\n\nUma vez que você terminar, feche esta janela.",
-            "th": "คลิกที่นี่เพื่อเปิดเกมของคุณบนเบราวเซอร์ อย่าลืมแชร์ลิงค์เพื่อให้ผู้เล่นคนอื่นสามารถเล่นเกมของคุณได้!\n\nหลังจากเสร็จแล้ว ปิดหน้าต่างนี้"
+            "th": "คลิกที่นี่เพื่อเปิดเกมของคุณบนเบราวเซอร์ อย่าลืมแชร์ลิงค์เพื่อให้ผู้เล่นคนอื่นสามารถเล่นเกมของคุณได้!\n\nหลังจากเสร็จแล้ว ปิดหน้าต่างนี้",
+            "ar": "النقر هنا لفتح لعبتك على متصفحك، تذكر مشاركة الرابط حتى يتنسى للآخرين إمكانية لعب لعبتك!\n\nيمكنك الإغلاق بمجرد الانتهاء."
           }
         },
         "placement": "top"
@@ -3276,7 +3478,8 @@
               "fr": "## Félicitations !",
               "es": "## ¡Felicidades!",
               "pt": "## Parabéns!",
-              "th": "## ยินดีด้วย!"
+              "th": "## ยินดีด้วย!",
+              "ar": "## تهانينا!"
             }
           },
           {
@@ -3285,7 +3488,8 @@
               "fr": "Vous avez terminé la seconde partie de votre jeu.",
               "es": "Has terminado la segunda parte de tu juego.",
               "pt": "Você terminou a segunda parte do seu jogo.",
-              "th": "ส่วนแรกของเกม Fling ของคุณเสร็จแล้ว"
+              "th": "ส่วนแรกของเกม Fling ของคุณเสร็จแล้ว",
+              "ar": "لقد انهيت الجزء الثاني من لعبة القذف."
             }
           },
           {
@@ -3294,7 +3498,8 @@
               "fr": "Vous avez découvert de nouveaux concepts de GDevelop:\n- [les évènements](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [les objets texte](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [les calques](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [les actions et les conditions](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)",
               "es": "Has descubierto otros conceptos básicos de GDevelop:\n- [Eventos](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [Objetos de texto](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [Capas](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [Acciones y condiciones](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)",
               "pt": "Você descobriu outros conceitos básicos do GDevelop:\n- [Eventos](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [Objetos de texto](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [Camadas](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [Ações e Condições](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)",
-              "th": "คุณได้เรียนรู้พื้นฐานของ GDevelop:\n- [Events](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [Text objects](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [Layers](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [Actions and Conditions](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)"
+              "th": "คุณได้เรียนรู้พื้นฐานของ GDevelop:\n- [Events](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [Text objects](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [Layers](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [Actions and Conditions](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)",
+              "ar": "لقد اكتشفت المزيد من أساسياتGDevelop:\n- [أحداث](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [كائنات نصية](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [طبقات](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [شروط وإجراءات](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)"
             }
           },
           {
@@ -3303,7 +3508,8 @@
               "fr": "Vous pouvez maintenant faire une pause avant de commencer le prochain chapitre pour ajouter un tableau de score.",
               "es": "Ahora puedes hacer una pausa antes de comenzar el próximo capítulo para agregar una tabla de clasificación.",
               "pt": "Agora você pode fazer uma pausa antes de começar o próximo capítulo para adicionar uma tabela de classificação.",
-              "th": "คุณสามารถหยุดพักบทเรียนตรงนี้ หรือเข้าสู่บทเรียนถัดไปเพื่อเพิ่มกระดานคะแนนเลยก็ได้"
+              "th": "คุณสามารถหยุดพักบทเรียนตรงนี้ หรือเข้าสู่บทเรียนถัดไปเพื่อเพิ่มกระดานคะแนนเลยก็ได้",
+              "ar": "يمكنك الآن أخذ استراحة من البرنامج التعليمي، أو إضافة لوحة صدارة في الفصل التالي."
             }
           }
         ]
@@ -3321,7 +3527,8 @@
             "fr": "Faites un clic droit sur $(background) et sélectionnez “Définir comme **objet global**”.",
             "es": "Haga clic derecho en $(background) y seleccione “Definir como **objeto global**”.",
             "pt": "Clique com o botão direito em $(background) e selecione “Definir como **objeto global**”.",
-            "th": "คลิกขวาที่ $(background) และเลือก “ตั้งเป็น **วัตถุโกลบอล**”"
+            "th": "คลิกขวาที่ $(background) และเลือก “ตั้งเป็น **วัตถุโกลบอล**”",
+            "ar": "نقرة بزر الفأرة الأيمن على $(background) ونقر **تعيين ككائن عمومي**."
           }
         },
         "placement": "left"
@@ -3330,7 +3537,7 @@
     {
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings"
       },
       "tooltip": {
         "title": {
@@ -3339,7 +3546,8 @@
             "fr": "Créons une scène qui servira d'écran d'ouverture du jeu.",
             "es": "Ahora creemos una nueva **escena** para nuestra pantalla de inicio.",
             "pt": "Agora vamos criar uma nova **cena** para a nossa tela inicial.",
-            "th": "ทีนี้สร้าง **scene** ใหม่ สำหรับฉากเริ่มต้น"
+            "th": "ทีนี้สร้าง **scene** ใหม่ สำหรับฉากเริ่มต้น",
+            "ar": "الآن دعنا نقوم بإنشاء **مشهد** جديد لشاشة البداية خاصتنا."
           }
         },
         "placement": "right"
@@ -3357,10 +3565,12 @@
             "fr": "Cliquez ici.",
             "es": "Haga clic aquí.",
             "pt": "Clique aqui.",
-            "th": "คลิกที่นี่"
+            "th": "คลิกที่นี่",
+            "ar": "النقر هنا."
           }
         },
-        "placement": "right"
+        "placement": "right",
+        "mobilePlacement": "bottom"
       },
       "mapProjectData": {
         "startScene": "projectLastSceneName"
@@ -3378,7 +3588,8 @@
             "fr": "Faites un clic droit sur la nouvelle scène et changez son nom pour “**EcranOuverture**”.\n\nUne fois terminé, cliquez sur l'élément pour ouvrir la scène.",
             "es": "Haga clic derecho en la nueva escena y cambie su nombre a “**PantallaInicio**”.\n\nUna vez terminado, haga clic en el elemento para abrir la escena.",
             "pt": "Clique com o botão direito na nova cena e altere o nome para “**TelaInicial**”.\n\nUma vez terminado, clique no item para abrir a nova cena.",
-            "th": "คลิกขวาที่ scene ใหม่และเปลี่ยนชื่อเป็น “**StartScreen**”\n\nเมื่อเสร็จแล้ว คลิกที่ไอเทมเพื่อเปิด scene ใหม่"
+            "th": "คลิกขวาที่ scene ใหม่และเปลี่ยนชื่อเป็น “**StartScreen**”\n\nเมื่อเสร็จแล้ว คลิกที่ไอเทมเพื่อเปิด scene ใหม่",
+            "ar": "نقرة بزر الفأرة الأيمن على المشهد الجديد وإعادة تسميته إلى **StartScreen**.\n\nبمجرد الإنتهاء، النقر عليه لفتح المشهد الجديد."
           }
         },
         "placement": "right"
@@ -3397,7 +3608,8 @@
             "fr": "Faites glisser $(background) du menu au canvas.",
             "es": "Arrastre $(background) desde el menú al lienzo.",
             "pt": "Arraste $(background) do menu para a cena.",
-            "th": "ลาก $(background) มาใส่ใน scene"
+            "th": "ลาก $(background) มาใส่ใน scene",
+            "ar": "سحب $(background) إلى المشهد."
           }
         },
         "placement": "left"
@@ -3411,7 +3623,8 @@
             "fr": "J'ai terminé",
             "es": "He terminado",
             "pt": "Terminei",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهيت"
           }
         }
       },
@@ -3423,7 +3636,8 @@
             "fr": "Positionnez et redimensionnez $(background) de telle sorte qu'il recouvre l'écran de jeu.",
             "es": "Arrastre para expandir el tamaño de $(background) hasta que se estire sobre toda la área del juego.",
             "pt": "Arraste para expandir o tamanho de $(background) até que ele se estenda sobre toda a área do jogo.",
-            "th": "ลากเพื่อปรับขนาด $(background) จนมันครอบคลุมบริเวณทั้งหมดในเกมของคุณ"
+            "th": "ลากเพื่อปรับขนาด $(background) จนมันครอบคลุมบริเวณทั้งหมดในเกมของคุณ",
+            "ar": "سحب وتوسيع حجم الـ $(background) حتى يتم تغطية اللعبة بأكملها."
           }
         },
         "image": {
@@ -3443,7 +3657,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -3458,13 +3673,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's create a title!",
             "fr": "Maintenant, créons un titre!",
             "es": "¡Ahora creemos un título!",
             "pt": "Agora, vamos criar um título!",
-            "th": "ทีนี้ได้เวลาสร้าง title!"
+            "th": "ทีนี้ได้เวลาสร้าง title!",
+            "ar": "الآن دعنا نقوم بإنشاء عنوان!"
           }
         }
       }
@@ -3481,7 +3698,8 @@
             "fr": "Nous allons créer un objet texte de zéro.",
             "es": "Vamos a crear un texto desde cero.",
             "pt": "Vamos criar um texto do zero.",
-            "th": "สร้างข้อความเอง"
+            "th": "สร้างข้อความเอง",
+            "ar": "الآن دعنا نقوم بإنشاء نص من الصفر."
           }
         },
         "placement": "bottom"
@@ -3501,7 +3719,8 @@
             "fr": "Sélectionnez l'objet **Texte**",
             "es": "Selecciona el objeto **Texto**",
             "pt": "Selecione o objeto **Texto**",
-            "th": "เลือกวัตถุ **ข้อความ**"
+            "th": "เลือกวัตถุ **ข้อความ**",
+            "ar": "تحديد الكائن **نص**"
           }
         },
         "placement": "bottom"
@@ -3520,7 +3739,8 @@
             "fr": "Changez le nom de l'objet pour “Title”.",
             "es": "Cambia el nombre del objeto a “Title”.",
             "pt": "Mude o nome do objeto para “Title”.",
-            "th": "เปลี่ยนชื่อวัตถุเป็น “Title”"
+            "th": "เปลี่ยนชื่อวัตถุเป็น “Title”",
+            "ar": "تغيير اسم الكائن إلى **Title**."
           }
         },
         "placement": "bottom"
@@ -3539,7 +3759,8 @@
             "fr": "Utilisez une taille de **200**.",
             "es": "Utiliza un tamaño de **200**.",
             "pt": "Use um tamanho de **200**.",
-            "th": "แก้ไขขนาดฟอนต์เป็น **200**"
+            "th": "แก้ไขขนาดฟอนต์เป็น **200**",
+            "ar": "تغيير حجم الخط إلى **200**."
           }
         },
         "placement": "bottom"
@@ -3558,7 +3779,8 @@
             "fr": "Entrez le nom que vous avez choisi pour votre jeu.",
             "es": "Escribe el nombre que has elegido para tu juego.",
             "pt": "Digite o nome que você escolheu para o seu jogo.",
-            "th": "เปลี่ยนข้อความเริ่มต้นเป็นชื่อเกมของคุณ อะไรก็ได้"
+            "th": "เปลี่ยนข้อความเริ่มต้นเป็นชื่อเกมของคุณ อะไรก็ได้",
+            "ar": "تغيير نص المثيل ليقوم بعرض **-أيًا كان-** عنوان اللعبة الذي يناسب ذوقك."
           }
         },
         "placement": "bottom"
@@ -3577,7 +3799,8 @@
             "fr": "Nous avons terminé.",
             "es": "Hemos terminado.",
             "pt": "Terminamos.",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهينا."
           }
         }
       },
@@ -3597,7 +3820,8 @@
             "fr": "Faites glisser $(title) du menu au canvas et placez le où vous voulez dans l'écran de jeu.",
             "es": "Arrastra $(title) desde el menú al lienzo y colócalo donde quieras en la pantalla de juego.",
             "pt": "Arraste $(title) do menu para o canvas e coloque-o onde quiser na tela do jogo.",
-            "th": "ลาก $(title) ไปยัง **scene** ที่คุณต้องการใส่ชื่อเกม"
+            "th": "ลาก $(title) ไปยัง **scene** ที่คุณต้องการใส่ชื่อเกม",
+            "ar": "سحب $(title) إلى **المشهد** أينما كان المكان الذي يعجبك."
           }
         },
         "placement": "left"
@@ -3615,7 +3839,8 @@
             "fr": "Faites un clic droit sur $(title) et sélectionnez “Dupliquer”.",
             "es": "Haz clic derecho en $(title) y selecciona “Duplicar”.",
             "pt": "Clique com o botão direito em $(title) e selecione “Duplicar”.",
-            "th": "คลิกขวาที่ $(title) และเลือก “คัดลอกซ้ำ”"
+            "th": "คลิกขวาที่ $(title) และเลือก “คัดลอกซ้ำ”",
+            "ar": "نقرة بزر الفأرة الأيمن على $(title) وتحديد **تكرار**."
           }
         },
         "placement": "left"
@@ -3636,7 +3861,8 @@
             "fr": "Double-cliquez sur $(startText).",
             "es": "Haz doble clic en $(startText).",
             "pt": "Clique duas vezes em $(startText).",
-            "th": "ดับเบิ้ลคลิกที่ $(startText)"
+            "th": "ดับเบิ้ลคลิกที่ $(startText)",
+            "ar": "نقرة مزدوجة على $(startText)."
           }
         },
         "placement": "left"
@@ -3654,7 +3880,8 @@
             "fr": "Changez le nom de **l'objet** pour “**Start**”.",
             "es": "Cambia el nombre del **objeto** a “**Start**”.",
             "pt": "Mude o nome do **objeto** para “**Start**”.",
-            "th": "เปลี่ยนชื่อ **วัตถุ** เป็น “**Start**”"
+            "th": "เปลี่ยนชื่อ **วัตถุ** เป็น “**Start**”",
+            "ar": "تغيير اسم **الكائن** إلى **Start**."
           }
         },
         "placement": "bottom"
@@ -3673,7 +3900,8 @@
             "fr": "Utilisez une taille de **50**.",
             "es": "Utiliza un tamaño de **50**.",
             "pt": "Use um tamanho de **50**.",
-            "th": "แก้ไขขนาดฟอนต์เป็น **50**"
+            "th": "แก้ไขขนาดฟอนต์เป็น **50**",
+            "ar": "تغيير حجم الخط إلى **50**."
           }
         },
         "placement": "bottom"
@@ -3692,7 +3920,8 @@
             "fr": "Définissez le texte de l'objet à “Jouer”.",
             "es": "Define el texto del objeto como “Jugar”.",
             "pt": "Defina o texto do objeto como “Jogar”.",
-            "th": "เปลี่ยนข้อความเริ่มต้นเป็น “Start Game”"
+            "th": "เปลี่ยนข้อความเริ่มต้นเป็น “Start Game”",
+            "ar": "تغيير نص المثيل إلى أي شيء يدل على أن اللعبة ستبدأ بمجرد الضغط عليه.\n(على سبيل المثال: بدء اللعبة)"
           }
         },
         "placement": "bottom"
@@ -3711,7 +3940,8 @@
             "fr": "Nous avons terminé.",
             "es": "Hemos terminado.",
             "pt": "Terminamos.",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهينا."
           }
         }
       },
@@ -3731,7 +3961,8 @@
             "fr": "Faites glisser $(startText) du menu au canvas à l'endroit où vous voulez.",
             "es": "Arrastra $(startText) desde el menú al lienzo en el lugar donde quieras.",
             "pt": "Arraste $(startText) do menu para o canvas no lugar onde você deseja.",
-            "th": "ลาก $(startText) ไปยัง **scene** ที่คุณต้องการใส่ปุ่มเริ่มเกม"
+            "th": "ลาก $(startText) ไปยัง **scene** ที่คุณต้องการใส่ปุ่มเริ่มเกม",
+            "ar": "سحب $(startText) إلى **المشهد** أينما كان المكان الذي يعجبك."
           }
         },
         "placement": "left"
@@ -3749,7 +3980,8 @@
             "fr": "Maintenant, faisons en sorte de pouvoir cliquer sur le texte.",
             "es": "Ahora, hagamos que se pueda hacer clic en el texto.",
             "pt": "Agora, vamos fazer com que seja possível clicar no texto.",
-            "th": "โต้ตอบกับข้อความ"
+            "th": "โต้ตอบกับข้อความ",
+            "ar": "الآن دعنا نتفاعل مع ذلك العنوانين."
           }
         }
       }
@@ -3767,7 +3999,8 @@
             "fr": "Créez un nouvel **évènement**.",
             "es": "Crea un nuevo **evento**.",
             "pt": "Crie um novo **evento**.",
-            "th": "สร้าง **event** ใหม่"
+            "th": "สร้าง **event** ใหม่",
+            "ar": "دعنا نقوم بإنشاء **حدث** جديد."
           }
         }
       }
@@ -3784,7 +4017,8 @@
             "fr": "Ajoutez une **condition**.",
             "es": "Agrega una **condición**.",
             "pt": "Adicione uma **condição**.",
-            "th": "เพิ่ม **เงื่อนไข**"
+            "th": "เพิ่ม **เงื่อนไข**",
+            "ar": "إضافة **شرط**."
           }
         }
       }
@@ -3801,7 +4035,8 @@
             "fr": "Cliquez sur $(startText).",
             "es": "Haz clic en $(startText).",
             "pt": "Clique em $(startText).",
-            "th": "เลือก $(startText)"
+            "th": "เลือก $(startText)",
+            "ar": "تحديد $(startText)."
           }
         }
       },
@@ -3819,7 +4054,8 @@
             "fr": "Cliquez sur cette condition de position du curseur.",
             "es": "Haz clic en esta condición de posición del cursor.",
             "pt": "Clique nesta condição de posição do cursor.",
-            "th": "เลือกเงื่อนไขเคอร์เซอร์"
+            "th": "เลือกเงื่อนไขเคอร์เซอร์",
+            "ar": "تحديد شرط المؤشر."
           }
         }
       },
@@ -3837,7 +4073,8 @@
             "fr": "Rien de plus à configurer.",
             "es": "Nada más que configurar.",
             "pt": "Nada mais para configurar.",
-            "th": "เอาล่ะ เงื่อนไขถูกกำหนดเอาไว้เรียบร้อยแล้ว"
+            "th": "เอาล่ะ เงื่อนไขถูกกำหนดเอาไว้เรียบร้อยแล้ว",
+            "ar": "حسنًا، تم ضبط **الشرط** تمامًا."
           }
         },
         "placement": "top"
@@ -3855,7 +4092,8 @@
             "fr": "Ajoutez une autre **condition**.",
             "es": "Agrega otra **condición**.",
             "pt": "Adicione outra **condição**.",
-            "th": "เพิ่ม **เงื่อนไข** อีก"
+            "th": "เพิ่ม **เงื่อนไข** อีก",
+            "ar": "إضافة **شرط** آخر."
           }
         }
       }
@@ -3872,7 +4110,8 @@
             "fr": "Cherchez “**Souris**”",
             "es": "Escribe “**Ratón**”.",
             "pt": "Digite “**Mouse**”.",
-            "th": "พิมพ์ “**Mouse**”"
+            "th": "พิมพ์ “**Mouse**”",
+            "ar": "كتابة **فأرة**."
           }
         }
       },
@@ -3890,7 +4129,8 @@
             "fr": "Cliquez sur “Bouton de la souris relâché”.",
             "es": "Haz clic en “Botón del ratón liberado”.",
             "pt": "Clique em “Botão do mouse liberado”.",
-            "th": "เลือก “ปุ่มจากเมาส์ถูกปล่อย”"
+            "th": "เลือก “ปุ่มจากเมาส์ถูกปล่อย”",
+            "ar": "تحديد **تم تحرير زر الفأرة**."
           }
         }
       },
@@ -3899,7 +4139,7 @@
     {
       "elementToHighlightId": "#instruction-parameters-container select",
       "nextStepTrigger": {
-        "valueHasChanged": true
+        "valueEquals": "Left"
       },
       "tooltip": {
         "description": {
@@ -3908,7 +4148,8 @@
             "fr": "Sélectionnez “Gauche (principal)”.",
             "es": "Selecciona “Izquierda (principal)”.",
             "pt": "Selecione “Esquerda (principal)”.",
-            "th": "เลือก “ซ้าย (หลัก)”"
+            "th": "เลือก “ซ้าย (หลัก)”",
+            "ar": "تحديد **يسار (أساسي)**."
           }
         },
         "placement": "top"
@@ -3927,7 +4168,8 @@
             "fr": "C'est bon pour cette condition.",
             "es": "Está bien para esta condición.",
             "pt": "Está tudo certo para esta condição.",
-            "th": "เอาล่ะ เงื่อนไขถูกกำหนดเอาไว้เรียบร้อยแล้ว"
+            "th": "เอาล่ะ เงื่อนไขถูกกำหนดเอาไว้เรียบร้อยแล้ว",
+            "ar": "حسنًا، تم ضبط **الشرط** تمامًا."
           }
         },
         "placement": "top"
@@ -3945,7 +4187,8 @@
             "fr": "Ajoutons une **action** maintenant.",
             "es": "Agreguemos una **acción** ahora.",
             "pt": "Vamos adicionar uma **ação** agora.",
-            "th": "เพิ่ม **การกระทำ**"
+            "th": "เพิ่ม **การกระทำ**",
+            "ar": "دعنا نقوم بإضافة **إجراء** الآن."
           }
         }
       }
@@ -3962,7 +4205,8 @@
             "fr": "Cherchez “**scène**”.",
             "es": "Escribe “**Escena**”.",
             "pt": "Digite “**Cena**”.",
-            "th": "พิมพ์ “**Scene**”"
+            "th": "พิมพ์ “**Scene**”",
+            "ar": "كتابة **مشهد**."
           }
         }
       },
@@ -3980,7 +4224,8 @@
             "fr": "Cliquez sur “**Changer la scène**”.",
             "es": "Haz clic en “**Cambiar la escena**”.",
             "pt": "Clique em “**Alterar a cena**”.",
-            "th": "เลือก “**Change the scene**”"
+            "th": "เลือก “**Change the scene**”",
+            "ar": "تحديد **تغيير المشهد**."
           }
         }
       },
@@ -3998,7 +4243,8 @@
             "fr": "Sélectionnez “$(playScene)”.",
             "es": "Selecciona “$(playScene)”.",
             "pt": "Selecione “$(playScene)”.",
-            "th": "เลือก “$(playScene)”"
+            "th": "เลือก “$(playScene)”",
+            "ar": "تحديد $(playScene)."
           }
         },
         "placement": "top"
@@ -4017,7 +4263,8 @@
             "fr": "L'action est bien configurée.",
             "es": "La acción está bien configurada.",
             "pt": "A ação está configurada corretamente.",
-            "th": "เอาล่ะ การกระทำถูกกำหนดเอาไว้เรียบร้อยแล้ว"
+            "th": "เอาล่ะ การกระทำถูกกำหนดเอาไว้เรียบร้อยแล้ว",
+            "ar": "حسنًا، تم ضبط **الإجراء** تمامًا."
           }
         },
         "placement": "top"
@@ -4035,7 +4282,8 @@
             "fr": "Retournons à la **scène** pour afficher le score.",
             "es": "Volvamos a la **escena** para mostrar el puntaje.",
             "pt": "Vamos voltar para a **cena** para adicionar um score.",
-            "th": "กลับไปยัง **scene** เพื่อเพิ่มคะแนน"
+            "th": "กลับไปยัง **scene** เพื่อเพิ่มคะแนน",
+            "ar": "دعنا نعود إلى **المشهد** لإضافة النتيجة."
           }
         }
       }
@@ -4052,7 +4300,8 @@
             "fr": "Ouvrez le panneau des **objets**.",
             "es": "Abre el panel de **objetos**.",
             "pt": "Abra o painel de **objetos**.",
-            "th": "เปิดแผงควบคุม **วัตถุ**"
+            "th": "เปิดแผงควบคุม **วัตถุ**",
+            "ar": "فتح لوحة **الكائنات**."
           }
         },
         "placement": "bottom"
@@ -4067,13 +4316,15 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Let's create a text that will display the player score.",
             "fr": "Créez un object texte qui affichera le score du joueur ou de la joueuse.",
             "es": "Crea un objeto de texto que muestre la puntuación del jugador o jugadora.",
             "pt": "Vamos criar um texto que irá exibir o score do jogador.",
-            "th": "สร้างข้อความสำหรับแสดงคะแนนผู้เล่น"
+            "th": "สร้างข้อความสำหรับแสดงคะแนนผู้เล่น",
+            "ar": "دعنا نقوم بإنشاء نص ليعرض نتيجة اللاعبين."
           }
         }
       }
@@ -4090,7 +4341,8 @@
             "fr": "Nous allons créer un objet texte de zéro.",
             "es": "Vamos a crear un objeto de texto desde cero.",
             "pt": "Vamos criar um texto do zero.",
-            "th": "สร้างข้อความเอง"
+            "th": "สร้างข้อความเอง",
+            "ar": "دعنا نقوم بإنشاء نص من الصفر."
           }
         },
         "placement": "bottom"
@@ -4110,7 +4362,8 @@
             "fr": "Sélectionnez l'objet **Texte**",
             "es": "Selecciona el objeto **Texto**",
             "pt": "Selecione o objeto **Texto**",
-            "th": "เลือกวัตถุ **ข้อความ**"
+            "th": "เลือกวัตถุ **ข้อความ**",
+            "ar": "تحديد الكائن **نص**."
           }
         },
         "placement": "bottom"
@@ -4129,7 +4382,8 @@
             "fr": "Changez le nom de l'objet pour “**Score**”.",
             "es": "Cambia el nombre del objeto a “**Score**”.",
             "pt": "Mude o nome do objeto para “**Score**”.",
-            "th": "เปลี่ยนชื่อวัตถุเป็น “**Score**”"
+            "th": "เปลี่ยนชื่อวัตถุเป็น “**Score**”",
+            "ar": "تغيير اسم الكائن إلى **Score**."
           }
         },
         "placement": "bottom"
@@ -4148,7 +4402,8 @@
             "fr": "Utilisez une taille de **50**.",
             "es": "Usa un tamaño de **50**.",
             "pt": "Use um tamanho de **50**.",
-            "th": "แก้ไขขนาดฟอนต์เป็น **50**"
+            "th": "แก้ไขขนาดฟอนต์เป็น **50**",
+            "ar": "تغيير حجم الخط إلى **50**."
           }
         },
         "placement": "bottom"
@@ -4167,7 +4422,8 @@
             "fr": "Utilisez comme texte initial “Temps : 0”.",
             "es": "Usa como texto inicial “Tiempo: 0”.",
             "pt": "Use como texto inicial “Tempo: 0”.",
-            "th": "เปลี่ยนข้อความเริ่มต้นเป็น “Time: 0”"
+            "th": "เปลี่ยนข้อความเริ่มต้นเป็น “Time: 0”",
+            "ar": "تغيير نص المثيل إلى **الوقت: 0**."
           }
         },
         "placement": "bottom"
@@ -4186,7 +4442,8 @@
             "fr": "Nous avons terminé.",
             "es": "Hemos terminado.",
             "pt": "Estamos prontos.",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهينا."
           }
         }
       },
@@ -4206,7 +4463,8 @@
             "fr": "Faites glisser $(scoreText) du menu au canvas et mettez le en haut à droite de l'écran de jeu.",
             "es": "Arrastra $(scoreText) desde el menú al lienzo y colócalo en la esquina superior izquierda de la pantalla de juego.",
             "pt": "Arraste $(scoreText) do menu para o canvas e coloque-o no canto superior esquerdo da tela de jogo.",
-            "th": "ลาก $(scoreText) ไปยังมุมซ้ายบนของหน้าจอ"
+            "th": "ลาก $(scoreText) ไปยังมุมซ้ายบนของหน้าจอ",
+            "ar": "سحب $(scoreText) إلى أعلى يسار الشاشة."
           }
         },
         "placement": "left"
@@ -4224,7 +4482,8 @@
             "fr": "Maintenant, changeons le score du joueur ou de la joueuse en fonction du temps écoulé.",
             "es": "Ahora, cambiemos la puntuación del jugador o jugadora en función del tiempo transcurrido.",
             "pt": "Agora, vamos mudar a pontuação do jogador ou jogadora de acordo com o tempo decorrido.",
-            "th": "เปลี่ยนแปลงคะแนนแบบไดนามิก"
+            "th": "เปลี่ยนแปลงคะแนนแบบไดนามิก",
+            "ar": "دعنا نقوم بتغيير النتيجة بفعالية."
           }
         }
       }
@@ -4242,7 +4501,8 @@
             "fr": "Nous allons créer un chronomètre qui commencera au moment où la **scène** démarre.",
             "es": "Vamos a crear un temporizador que comenzará cuando la **escena** comience.",
             "pt": "Vamos criar um cronômetro que começará quando a **cena** começar.",
-            "th": "เราจะสร้างนาฬิกาจับเวลาโดยเริ่มจับเวลาเมื่อ **scene** เริ่มต้น"
+            "th": "เราจะสร้างนาฬิกาจับเวลาโดยเริ่มจับเวลาเมื่อ **scene** เริ่มต้น",
+            "ar": "سوف نقوم بإنشاء مؤقت يبدأ مع **بداية** المشهد."
           }
         }
       },
@@ -4260,7 +4520,8 @@
             "fr": "Ajoutez une **condition**.",
             "es": "Agrega una **condición**.",
             "pt": "Adicione uma **condição**.",
-            "th": "เพิ่ม **เงื่อนไข**"
+            "th": "เพิ่ม **เงื่อนไข**",
+            "ar": "إضافة **شرط**."
           }
         }
       }
@@ -4277,7 +4538,8 @@
             "fr": "Cherchez “**Scène**”.",
             "es": "Busca “**Escena**”.",
             "pt": "Procure por “**Cena**”.",
-            "th": "ค้นหา “**Scene**”"
+            "th": "ค้นหา “**Scene**”",
+            "ar": "البحث عن **مشهد**."
           }
         }
       },
@@ -4295,7 +4557,8 @@
             "fr": "Cliquez sur la condition *Au lancement de la scène*.",
             "es": "Haz clic en la condición *Al inicio de la escena*.",
             "pt": "Clique na condição *No início da cena*.",
-            "th": "เลือก *เงื่อนไข** ขณะที่เริ่มฉาก*"
+            "th": "เลือก *เงื่อนไข** ขณะที่เริ่มฉาก*",
+            "ar": "تحديد الشرط *في بداية المشهد*."
           }
         }
       },
@@ -4313,7 +4576,8 @@
             "fr": "Nous allons maintenant créer le chronomètre.",
             "es": "Ahora creemos el temporizador.",
             "pt": "Agora, vamos criar o cronômetro.",
-            "th": "สร้างนาฬืกาจับเวลา"
+            "th": "สร้างนาฬืกาจับเวลา",
+            "ar": "دعنا نقوم بإنشاء مؤقت الآن."
           }
         },
         "placement": "top"
@@ -4331,7 +4595,8 @@
             "fr": "Créez une **action**.",
             "es": "Crea una **acción**.",
             "pt": "Crie uma **ação**.",
-            "th": "สร้าง **การกระทำ**"
+            "th": "สร้าง **การกระทำ**",
+            "ar": "إنشاء **إجراء**."
           }
         }
       }
@@ -4348,7 +4613,8 @@
             "fr": "Cherchez “chrono”.",
             "es": "Busca “temporizador”.",
             "pt": "Procure por “cronômetro”.",
-            "th": "ค้นหา “ตัวจับเวลา Scene”"
+            "th": "ค้นหา “ตัวจับเวลา Scene”",
+            "ar": "البحث عن **مؤقت**."
           }
         }
       },
@@ -4366,7 +4632,8 @@
             "fr": "Cliquez sur l'action *Démarrer (ou réinitialiser) un chronomètre de scène*.",
             "es": "Haz clic en la acción *Iniciar (o reiniciar) un temporizador de escena*.",
             "pt": "Clique na ação *Iniciar (ou reiniciar) um cronômetro de cena*.",
-            "th": "เลือกการกระทำ *เริ่มต้น (หรือรีเซ็ต) ตัวจับเวลา*"
+            "th": "เลือกการกระทำ *เริ่มต้น (หรือรีเซ็ต) ตัวจับเวลา*",
+            "ar": "تحديد الإجراء *بدء (أو إعادة تعيين) مؤقت المشهد*."
           }
         }
       },
@@ -4384,7 +4651,8 @@
             "fr": "Entrez **\"Score\"** (entre guillements).",
             "es": "Escribe **\"Score\"** (entre comillas).",
             "pt": "Digite **\"Score\"** (entre aspas).",
-            "th": "พิมพ์ **\"Score\"** (ใส่ quotations ด้วย)"
+            "th": "พิมพ์ **\"Score\"** (ใส่ quotations ด้วย)",
+            "ar": "كتابة **\"Score\"** (داخل علامتا تنصيص)."
           }
         }
       },
@@ -4403,7 +4671,8 @@
             "fr": "Nous avons terminé.",
             "es": "Hemos terminado.",
             "pt": "Terminamos.",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهينا."
           }
         },
         "placement": "top"
@@ -4421,7 +4690,8 @@
             "fr": "Maintenant, affichons le score.",
             "es": "Ahora, muestremos el marcador.",
             "pt": "Agora, vamos exibir a pontuação.",
-            "th": "แสดงคะแนน"
+            "th": "แสดงคะแนน",
+            "ar": "الآن دعنا نقوم بعرض النتيجة."
           }
         }
       },
@@ -4439,7 +4709,8 @@
             "fr": "Nous allons rendre le score dynamique.",
             "es": "Hagamos que el marcador sea dinámico.",
             "pt": "Vamos tornar a pontuação dinâmica.",
-            "th": "เปลี่ยนแปลงคะแนนให้เป็นแบบไดนามิก"
+            "th": "เปลี่ยนแปลงคะแนนให้เป็นแบบไดนามิก",
+            "ar": "دعنا نقوم بجعل النتيجة متفاعلة."
           }
         }
       }
@@ -4456,7 +4727,8 @@
             "fr": "Cliquez sur $(scoreText).",
             "es": "Haz clic en $(scoreText).",
             "pt": "Clique em $(scoreText).",
-            "th": "เลือก $(scoreText)"
+            "th": "เลือก $(scoreText)",
+            "ar": "تحديد $(scoreText)."
           }
         }
       },
@@ -4474,7 +4746,8 @@
             "fr": "Nous allons changer le contenu du texte.",
             "es": "Cambiamos el texto.",
             "pt": "Vamos alterar o texto.",
-            "th": "เราจะแก้ไขข้อความ"
+            "th": "เราจะแก้ไขข้อความ",
+            "ar": "سوف نقوم بتغيير النص."
           }
         }
       },
@@ -4483,8 +4756,9 @@
     {
       "elementToHighlightId": "#instruction-parameters-container select",
       "nextStepTrigger": {
-        "valueHasChanged": true
+        "valueEquals": "="
       },
+      "skippable": true,
       "tooltip": {
         "description": {
           "messageByLocale": {
@@ -4492,7 +4766,8 @@
             "fr": "Cliquez sur “= (définir à)”.",
             "es": "Selecciona “= (establecer en)”.",
             "pt": "Selecione “= (definir como)”.",
-            "th": "เลือก “= (ตั้งเป็น)”"
+            "th": "เลือก “= (ตั้งเป็น)”",
+            "ar": "تحديد **= (تعيين إلى)**."
           }
         }
       },
@@ -4511,7 +4786,8 @@
             "fr": "Double cliquez sur cette ligne pour la sélectionner et copiez-collez là ici : `\"Temps : \" + ToString(round( TimerElapsedTime(\"Score\")))`.",
             "es": "Haz doble clic para resaltar esta línea, luego copia y pega aquí: `\"Tiempo: \" + ToString(round( TimerElapsedTime(\"Score\")))`.",
             "pt": "Clique duas vezes para destacar esta linha, depois copie e cole aqui: `\"Tempo: \" + ToString(round( TimerElapsedTime(\"Score\")))`.",
-            "th": "ดับเบิ้ลคลิกเพื่อไฮไลต์ จากนั้นคัดลองและวางที่นี่: `\"Time: \" + ToString(round( TimerElapsedTime(\"Score\")))`"
+            "th": "ดับเบิ้ลคลิกเพื่อไฮไลต์ จากนั้นคัดลองและวางที่นี่: `\"Time: \" + ToString(round( TimerElapsedTime(\"Score\")))`",
+            "ar": "نقرة مزدوجة لتحديد هذا السطر، ثم نسخ ولصق هذا هنا:\n\n`\"الوقت: \" + ToString(round( TimerElapsedTime(\"Score\")))`."
           }
         }
       },
@@ -4530,7 +4806,8 @@
             "fr": "On est tout bon.",
             "es": "Estamos listos.",
             "pt": "Estamos prontos.",
-            "th": "เรียบร้อยแล้ว"
+            "th": "เรียบร้อยแล้ว",
+            "ar": "ضبطنا كل شيء."
           }
         },
         "placement": "top"
@@ -4548,7 +4825,8 @@
             "fr": "Maintenant, sauvegardons le score du joueur ou de la joueuse.",
             "es": "Ahora, guardemos la puntuación del jugador o jugadora.",
             "pt": "Agora, vamos salvar a pontuação do jogador ou jogadora.",
-            "th": "ทีนี้ เราจะบันทึกคะแนนของผู้เล่น"
+            "th": "ทีนี้ เราจะบันทึกคะแนนของผู้เล่น",
+            "ar": "الآن دعنا نقوم بحفظ نتيجة اللاعبين."
           }
         },
         "description": {
@@ -4557,7 +4835,8 @@
             "fr": "Dans **l'évènement** où $(target) est supprimé, cliquez sur “Ajouter une action”.",
             "es": "En el evento donde $(target) se elimina, haz clic en “Añadir acción”.",
             "pt": "No evento onde $(target) é excluído, clique em “Adicionar ação”.",
-            "th": "ในอีเวนท์ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”"
+            "th": "ในอีเวนท์ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”",
+            "ar": "في الحدث الذي يتم حذف $(target) فيه، النقر على **إضافة إجراء**."
           }
         }
       }
@@ -4574,7 +4853,8 @@
             "fr": "Cherchez “**classement**”.",
             "es": "Busca “**clasificación**”.",
             "pt": "Procure por “**classificação**”.",
-            "th": "ค้นหา “leaderboard”"
+            "th": "ค้นหา “leaderboard”",
+            "ar": "البحث عن **حفظ**."
           }
         }
       },
@@ -4592,7 +4872,8 @@
             "fr": "Sélectionnez l'action **Enregistrer le score du joueur connecté**.",
             "es": "Selecciona la acción **Guardar la puntuación del jugador conectado**.",
             "pt": "Selecione a ação **Salvar pontuação do jogador conectado**.",
-            "th": "เลือกการกระทำ **บันทึกคะแนนผู้เล่นที่เชื่อมต่อ**"
+            "th": "เลือกการกระทำ **บันทึกคะแนนผู้เล่นที่เชื่อมต่อ**",
+            "ar": "تحديد الإجراء **حفظ نتيجة اللاعب المتصل**."
           }
         }
       },
@@ -4610,7 +4891,8 @@
             "fr": "Ouvrez le panneau de gestion des classements.",
             "es": "Abre el panel de administración de clasificaciones.",
             "pt": "Abra o painel de administração de classificações.",
-            "th": "เปิด **Leaderboard admin**"
+            "th": "เปิด **Leaderboard admin**",
+            "ar": "فتح **مسؤول لوحات الصدارة**."
           }
         }
       },
@@ -4628,7 +4910,8 @@
             "fr": "Créez un nouveau classement.",
             "es": "Crea una clasificación.",
             "pt": "Crie uma classificação.",
-            "th": "สร้าง leaderboard"
+            "th": "สร้าง leaderboard",
+            "ar": "إنشاء لوحة صدارة."
           }
         }
       },
@@ -4646,7 +4929,8 @@
             "fr": "Changez son nom.",
             "es": "Cambiamos su nombre.",
             "pt": "Vamos mudar o nome.",
-            "th": "เปลี่ยนชื่อ"
+            "th": "เปลี่ยนชื่อ",
+            "ar": "دعنا نقوم بتغيير اسمه."
           }
         }
       },
@@ -4664,7 +4948,8 @@
             "fr": "Entrez “*Score*”.",
             "es": "Escribe “*Score*”.",
             "pt": "Digite “*Score*”.",
-            "th": "พิมพ์ “*Score*”"
+            "th": "พิมพ์ “*Score*”",
+            "ar": "كتابة *Score*."
           }
         }
       },
@@ -4682,7 +4967,8 @@
             "fr": "Sauvegardez quand vous avez terminé.",
             "es": "Guarda cuando hayas terminado.",
             "pt": "Salve quando terminar.",
-            "th": "บันทึกการเปลี่ยนแปลงหลังจากเสร็จแล้ว"
+            "th": "บันทึกการเปลี่ยนแปลงหลังจากเสร็จแล้ว",
+            "ar": "حفظ التغييرات عند الإنتهاء."
           }
         }
       },
@@ -4700,7 +4986,8 @@
             "fr": "Notre classement est bien configuré, vous pouvez fermer.",
             "es": "Nuestra clasificación está lista, puedes cerrar.",
             "pt": "Nossa classificação está pronta, você pode fechar.",
-            "th": "leaderboard ของเราพร้อมแล้ว"
+            "th": "leaderboard ของเราพร้อมแล้ว",
+            "ar": "لوحة الصدارة خاصتنا جاهزة."
           }
         }
       },
@@ -4718,7 +5005,8 @@
             "fr": "Sélectionnez l'option *Sélectionnez le classement dans une liste*.",
             "es": "Selecciona la opción *Selecciona la clasificación de una lista*.",
             "pt": "Selecione a opção *Selecione a classificação de uma lista*.",
-            "th": "เลือกตัวเลือก *เลือก leaderboard จากในลิสต์*"
+            "th": "เลือกตัวเลือก *เลือก leaderboard จากในลิสต์*",
+            "ar": "تحديد الخيار *تحديد لوحة الصدارة من قائمة*."
           }
         },
         "placement": "top"
@@ -4738,7 +5026,8 @@
             "fr": "Sélectionnez le classement qui s'appelle “Score”.",
             "es": "Selecciona la clasificación que se llama “Score”.",
             "pt": "Selecione a classificação que se chama “Score”.",
-            "th": "เลือก leaderboard ที่ชื่อ “Score”"
+            "th": "เลือก leaderboard ที่ชื่อ “Score”",
+            "ar": "تحديد  لوحة الصدارة المسماة *Score*."
           }
         }
       },
@@ -4756,7 +5045,8 @@
             "fr": "Ouvrez le constructeur **d'expression**.",
             "es": "Abre el constructor de **expresiones**.",
             "pt": "Abra o construtor de **expressões**.",
-            "th": "เปิด เมนูสร้าง **expression**"
+            "th": "เปิด เมนูสร้าง **expression**",
+            "ar": "فتح **بناء التعبيرات**."
           }
         }
       },
@@ -4774,7 +5064,8 @@
             "fr": "Cherchez “*chrono*”.",
             "es": "Busca “*temporizador*”.",
             "pt": "Procure por “*cronômetro*”.",
-            "th": "ค้นหา “*Timer*”"
+            "th": "ค้นหา “*Timer*”",
+            "ar": "البحث عن **مؤقت**."
           }
         }
       },
@@ -4792,7 +5083,8 @@
             "fr": "Cliquez sur **Valeur du chronomètre de scène**.",
             "es": "Selecciona **Valor del temporizador de escena**.",
             "pt": "Selecione **Valor do cronômetro da cena**.",
-            "th": "เลือก **ค่าจากตัวจับเวลา**"
+            "th": "เลือก **ค่าจากตัวจับเวลา**",
+            "ar": "تحديد **قيمة مؤقت المشهد**."
           }
         }
       },
@@ -4810,7 +5102,8 @@
             "fr": "Sélectionnez le chronomètre “Score”.",
             "es": "Selecciona el temporizador “Score”.",
             "pt": "Selecione o cronômetro “Score”.",
-            "th": "เลือกตัวจับเวลา “Score”"
+            "th": "เลือกตัวจับเวลา “Score”",
+            "ar": "تحديد المؤقت **Score**."
           }
         },
         "placement": "top"
@@ -4829,7 +5122,8 @@
             "fr": "C'est terminé.",
             "es": "Este parámetro está listo.",
             "pt": "Este parâmetro está pronto.",
-            "th": "พารามิเตอร์ได้ถูกกำหนดเอาไว้เรียบร้อยแล้ว"
+            "th": "พารามิเตอร์ได้ถูกกำหนดเอาไว้เรียบร้อยแล้ว",
+            "ar": "تم ضبط المعامل تمامًا."
           }
         },
         "placement": "top"
@@ -4848,7 +5142,8 @@
             "fr": "L'action est prête.",
             "es": "La acción está lista.",
             "pt": "A ação está pronta.",
-            "th": "การกระทำพร้อมแล้ว"
+            "th": "การกระทำพร้อมแล้ว",
+            "ar": "الإجراء جاهز."
           }
         },
         "placement": "top"
@@ -4866,7 +5161,8 @@
             "fr": "Maintenant, nous allons afficher le score des autres joueurs et joueuses après un délai de 2 secondes.",
             "es": "Ahora mostraremos los puntajes de los otros jugadores después de un retraso de 2 segundos.",
             "pt": "Agora, mostraremos os pontos dos outros jogadores após um atraso de 2 segundos.",
-            "th": "ทีนี้เราจะแสดงคะแนนผู้เล่นคนอื่นโดยดีเลย์ 2 วินาที"
+            "th": "ทีนี้เราจะแสดงคะแนนผู้เล่นคนอื่นโดยดีเลย์ 2 วินาที",
+            "ar": "الآن سوف نقوم بعرض نتيجة اللاعبين الآخرين بعد ثانيتين (2)."
           }
         },
         "description": {
@@ -4875,7 +5171,8 @@
             "fr": "Dans **l'évènement** où $(target) est supprimé, cliquez sur “Ajouter une action”.",
             "es": "En el **evento** donde $(target) se elimina, haz clic en “Agregar acción”.",
             "pt": "No **evento** onde $(target) é excluído, clique em “Adicionar ação”.",
-            "th": "ใน **อีเวนท์** ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”"
+            "th": "ใน **อีเวนท์** ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”",
+            "ar": "في الحدث الذي يتم حذف $(target) فيه، النقر على **إضافة إجراء**."
           }
         }
       }
@@ -4892,7 +5189,8 @@
             "fr": "Cherchez “**Attendre**”.",
             "es": "Busca “**Esperar**”.",
             "pt": "Procure por “**Esperar**”.",
-            "th": "ค้นหา “**รอ**”"
+            "th": "ค้นหา “**รอ**”",
+            "ar": "البحث عن **ثوان**."
           }
         }
       },
@@ -4910,7 +5208,8 @@
             "fr": "Cliquez sur l'action *Attendre X secondes*.",
             "es": "Haz clic en la acción *Esperar X segundos*.",
             "pt": "Clique em *Esperar X segundos*.",
-            "th": "เลือกการกระทำ *รอ X วินาที*"
+            "th": "เลือกการกระทำ *รอ X วินาที*",
+            "ar": "تحديد الإجراء *انتظار لثوان*."
           }
         }
       },
@@ -4928,7 +5227,8 @@
             "fr": "Tapez **2**.",
             "es": "Escribe **2**.",
             "pt": "Digite **2**.",
-            "th": "พิมพ์ **2**"
+            "th": "พิมพ์ **2**",
+            "ar": "كتابة **2**."
           }
         }
       },
@@ -4946,7 +5246,8 @@
             "fr": "Maintenant, le jeu va attendre 2 secondes avant de passer à **l'action** suivante dans **l'évènement**.",
             "es": "Ahora el juego esperará 2 segundos antes de pasar a la **acción** siguiente en el **evento**.",
             "pt": "Agora, o jogo vai esperar 2 segundos antes de ir para a **ação** seguinte no **evento**.",
-            "th": "ทีนี้เกมจะรอ 2 วินาที ก่อนจะทำ **การกระทำ** ใน **อีเวนท์**"
+            "th": "ทีนี้เกมจะรอ 2 วินาที ก่อนจะทำ **การกระทำ** ใน **อีเวนท์**",
+            "ar": "الآن ستنتظر اللعبة لمدة 2 من الثوان قبل تنفيذ **الإجراء** التالي في **الحدث**."
           }
         },
         "placement": "top"
@@ -4964,7 +5265,8 @@
             "fr": "Maintenant, nous allons afficher un classement des scores.",
             "es": "Ahora mostraremos una tabla de clasificación.",
             "pt": "Agora, mostraremos uma classificação.",
-            "th": "แสดง leaderboard"
+            "th": "แสดง leaderboard",
+            "ar": "الآن سوف نقوم بعرض لوحة صدارة."
           }
         },
         "description": {
@@ -4973,7 +5275,8 @@
             "fr": "Dans **l'évènement** où $(target) est supprimé, cliquez sur “Ajouter une action”.",
             "es": "En el **evento** donde $(target) se elimina, haz clic en “Agregar acción”.",
             "pt": "No **evento** onde $(target) é excluído, clique em “Adicionar ação”.",
-            "th": "ใน **อีเวนท์** ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”"
+            "th": "ใน **อีเวนท์** ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”",
+            "ar": "في الحدث الذي يتم حذف $(target) فيه، النقر على **إضافة إجراء**."
           }
         }
       }
@@ -4990,7 +5293,8 @@
             "fr": "Cherchez “**classement**”.",
             "es": "Busca “**clasificación**”.",
             "pt": "Procure por “**classificação**”.",
-            "th": "ค้นหา “**leaderboard**”"
+            "th": "ค้นหา “**leaderboard**”",
+            "ar": "البحث عن **عرض**."
           }
         }
       },
@@ -5008,7 +5312,8 @@
             "fr": "Cliquez sur l'action *Afficher le classement*.",
             "es": "Haz clic en la acción *Mostrar clasificación*.",
             "pt": "Clique em *Mostrar classificação*.",
-            "th": "เลือกการกระทำ *แสดง leaderboard*"
+            "th": "เลือกการกระทำ *แสดง leaderboard*",
+            "ar": "تحديد الإجراء *عرض لوحة الصدارة*."
           }
         }
       },
@@ -5026,7 +5331,8 @@
             "fr": "Sélectionnez le classement qui s'appelle “Score”.",
             "es": "Selecciona la clasificación que se llama “Score”.",
             "pt": "Selecione a classificação chamada “Score”.",
-            "th": "เลือก leaderboard ที่ชื่อ “Score”"
+            "th": "เลือก leaderboard ที่ชื่อ “Score”",
+            "ar": "تحديد لوحة الصدارة المسماة **Score**."
           }
         }
       },
@@ -5044,7 +5350,8 @@
             "fr": "Nous allons utiliser l'écran de chargement intégré par défaut.",
             "es": "Usaremos el cargador integrado.",
             "pt": "Usaremos o carregador integrado.",
-            "th": "เราจะใช้โหลดเดอร์ built-in"
+            "th": "เราจะใช้โหลดเดอร์ built-in",
+            "ar": "سوف نقوم باستخدام شاشة التحميل المبنية مسبقًا."
           }
         }
       },
@@ -5063,7 +5370,8 @@
             "fr": "Maintenant, le classement devrait s'afficher quand les $(projectile)s atteignent $(target).",
             "es": "Ahora, la tabla de clasificación debería mostrarse cuando $(projectile) llegue a $(target).",
             "pt": "Agora, a classificação deve ser exibida quando $(projectile) atingir $(target).",
-            "th": "leaderboard ควรจะแสดง เมื่อ $(projectile) ไปถึง $(target)"
+            "th": "leaderboard ควรจะแสดง เมื่อ $(projectile) ไปถึง $(target)",
+            "ar": "الآن من المفترض أن يتم عرض لوحة الصدارة وقتما يصل $(projectile) إلى $(target)."
           }
         },
         "placement": "top"
@@ -5081,7 +5389,8 @@
             "fr": "Maintenant, nous allons demander au joueur ou à la joueuse de s'identifier à l'ouverture du jeu.",
             "es": "Ahora, pediremos al jugador que se autentique al abrir el juego.",
             "pt": "Agora, pediremos ao jogador que se autentique ao abrir o jogo.",
-            "th": "ทีนี้เราจะถามผู้เล่นให้ยืนยันตอนที่เปิดเกม"
+            "th": "ทีนี้เราจะถามผู้เล่นให้ยืนยันตอนที่เปิดเกม",
+            "ar": "الآن سوف نطلب من اللاعبين المصادقة في بداية اللعبة."
           }
         }
       }
@@ -5100,7 +5409,8 @@
             "fr": "Créez un nouvel **évènement**.",
             "es": "¡Vamos a crear un **evento**!",
             "pt": "Vamos criar um **evento**!",
-            "th": "สร้าง **อีเวนท์** กันเถอะ!"
+            "th": "สร้าง **อีเวนท์** กันเถอะ!",
+            "ar": "سوف نقوم بإنشاء **حدث**!"
           }
         }
       }
@@ -5117,7 +5427,8 @@
             "fr": "Ajoutez une condition.",
             "es": "Agrega una condición.",
             "pt": "Adicione uma condição.",
-            "th": "เพิ่มเงื่อนไข"
+            "th": "เพิ่มเงื่อนไข",
+            "ar": "إضافة شرط."
           }
         }
       },
@@ -5142,7 +5453,8 @@
             "fr": "Cherchez “**Scène**”.",
             "es": "Busca “**Escena**”.",
             "pt": "Procure por “**Cena**”.",
-            "th": "ค้นหา “**Scene**”"
+            "th": "ค้นหา “**Scene**”",
+            "ar": "البحث عن **مشهد**."
           }
         }
       },
@@ -5160,7 +5472,8 @@
             "fr": "Cliquez sur la condition *Au lancement de la scène*.",
             "es": "Selecciona la condición **Al inicio de la escena**.",
             "pt": "Selecione a condição **No início da cena**.",
-            "th": "เลือกเงื่อนไข **ขณะที่เริ่มฉาก**"
+            "th": "เลือกเงื่อนไข **ขณะที่เริ่มฉาก**",
+            "ar": "تحديد الشرط **في بداية المشهد**."
           }
         }
       },
@@ -5178,7 +5491,8 @@
             "fr": "Nous avons terminé.",
             "es": "Ya terminamos.",
             "pt": "Já terminamos.",
-            "th": "เสร็จแล้ว"
+            "th": "เสร็จแล้ว",
+            "ar": "انتهينا."
           }
         },
         "placement": "top"
@@ -5196,7 +5510,8 @@
             "fr": "Choisissons une **action**.",
             "es": "Vamos a elegir una **acción**.",
             "pt": "Vamos escolher uma **ação**.",
-            "th": "เลือก **การกระทำ**"
+            "th": "เลือก **การกระทำ**",
+            "ar": "دعنا نقوم بإختيار **إجراء**."
           }
         }
       }
@@ -5213,7 +5528,8 @@
             "fr": "Cherchez “**Authentification**”.",
             "es": "Busca “**Autenticación**”.",
             "pt": "Procure por “**Autenticação**”.",
-            "th": "ค้นหา “**Authentication**”"
+            "th": "ค้นหา “**Authentication**”",
+            "ar": "البحث عن **مصادقة**."
           }
         }
       },
@@ -5231,7 +5547,8 @@
             "fr": "Cliquez sur *Afficher la bannière d'authentification*.",
             "es": "Selecciona *Mostrar banner de autenticación*.",
             "pt": "Selecione *Mostrar banner de autenticação*.",
-            "th": "เลือก *แสดงแบนเนอร์ authentication*"
+            "th": "เลือก *แสดงแบนเนอร์ authentication*",
+            "ar": "تحديد *عرض لافتة المصادقة**."
           }
         }
       },
@@ -5249,7 +5566,8 @@
             "fr": "Maintenant, les joueurs et les joueuses pourront s'identifier.",
             "es": "Ahora, los jugadores podrán iniciar sesión.",
             "pt": "Agora, os jogadores poderão fazer login.",
-            "th": "เอาล่ะ ทีนี้ผู้เล่นจะถูกขอให้ล็อกอิน"
+            "th": "เอาล่ะ ทีนี้ผู้เล่นจะถูกขอให้ล็อกอิน",
+            "ar": "حسنًا، الآن سوف يتم طلب اللاعبين تسجيل الدخول."
           }
         },
         "placement": "top"
@@ -5267,7 +5585,8 @@
             "fr": "Faisons en sorte que le joueur ou la joueuse revienne à l'écran d'ouverture après avoir fermé le **classement**.",
             "es": "Vamos a asegurarnos de que el jugador vuelva a la pantalla de inicio después de cerrar el **tablero de clasificación**.",
             "pt": "Vamos garantir que o jogador volte para a tela inicial depois de fechar o **quadro de classificação**.",
-            "th": "ทำให้มั่นใจว่าผู้เล่นจะกลับมาที่หน้าเริ่มต้นหลังกดปิด **leaderboard**"
+            "th": "ทำให้มั่นใจว่าผู้เล่นจะกลับมาที่หน้าเริ่มต้นหลังกดปิด **leaderboard**",
+            "ar": "دعنا نتحقق أن اللاعبين سيعودون إلى شاشة البداية بعد إغلاق **لوحة الصدارة**."
           }
         }
       }
@@ -5285,7 +5604,8 @@
             "fr": "Dans **l'évènement** où $(target) est supprimé, cliquez sur “Ajouter une action”.",
             "es": "En el **evento** donde $(target) se elimina, haz clic en “Agregar acción”.",
             "pt": "No **evento** onde $(target) é excluído, clique em “Adicionar ação”.",
-            "th": "ในอีเวนท์ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”"
+            "th": "ในอีเวนท์ที่ $(target) ถูกลบ กด “เพิ่มการกระทำ”",
+            "ar": "في الحدث الذي يتم حذف $(target) فيه، النقر على **إضافة إجراء**."
           }
         }
       }
@@ -5302,7 +5622,8 @@
             "fr": "Cherchez “**Scène**”.",
             "es": "Escribe “**Escena**”.",
             "pt": "Digite “**Cena**”.",
-            "th": "พิมพ์ “*Scene*”"
+            "th": "พิมพ์ “*Scene*”",
+            "ar": "كتابة *مشهد*."
           }
         }
       },
@@ -5320,7 +5641,8 @@
             "fr": "Cliquez sur “**Changer la scène**”.",
             "es": "Selecciona “**Cambiar la escena**”.",
             "pt": "Selecione “**Alterar a cena**”.",
-            "th": "เลือก “เปลี่ยน scene”"
+            "th": "เลือก “เปลี่ยน scene”",
+            "ar": "تحديد **تغيير المشهد**."
           }
         }
       },
@@ -5338,7 +5660,8 @@
             "fr": "Sélectionnez “$(startScene)”.",
             "es": "Selecciona “$(startScene)”.",
             "pt": "Selecione “$(startScene)”.",
-            "th": "เลือก “$(startScene)”"
+            "th": "เลือก “$(startScene)”",
+            "ar": "تحديد $(startScene)."
           }
         },
         "placement": "top"
@@ -5358,7 +5681,8 @@
             "fr": "L'action est bien configurée.",
             "es": "La acción está configurada.",
             "pt": "A ação está configurada.",
-            "th": "เอาล่ะ การกระทำถูกกำหนดเอาไว้เรียบร้อยแล้ว"
+            "th": "เอาล่ะ การกระทำถูกกำหนดเอาไว้เรียบร้อยแล้ว",
+            "ar": "حسنًا، تم ضبط الإجراء تمامًا."
           }
         },
         "placement": "top"
@@ -5367,7 +5691,7 @@
     {
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings"
       },
       "tooltip": {
         "description": {
@@ -5376,7 +5700,8 @@
             "fr": "Ouvrez le **Gestionnaire de projet**.",
             "es": "Abre el **Administrador de proyectos**.",
             "pt": "Abra o **Gerenciador de projetos**.",
-            "th": "เปิด **โปรเจกต์เมเนเจอร์**"
+            "th": "เปิด **โปรเจกต์เมเนเจอร์**",
+            "ar": "فتح **مدير المشروع**."
           }
         },
         "placement": "right"
@@ -5394,7 +5719,8 @@
             "fr": "Faites un clic droit sur $(startScene) et sélectionnez **Définir comme scène de départ**.",
             "es": "Haz clic derecho en $(startScene) y selecciona **Establecer como escena de inicio**.",
             "pt": "Clique com o botão direito em $(startScene) e selecione **Definir como cena inicial**.",
-            "th": "คลิกขวาที่ $(startScene) และเลือก **ตั้งเป็น scene เริ่มต้น**"
+            "th": "คลิกขวาที่ $(startScene) และเลือก **ตั้งเป็น scene เริ่มต้น**",
+            "ar": "نقرة بزر الفأرة الأيمن على $(startScene) وتحديد **تعيين كمشهد بداية**."
           }
         },
         "placement": "right"
@@ -5413,7 +5739,8 @@
             "fr": "Retournons à la scène d'ouverture *$(startScene)*.",
             "es": "Vuelve a la escena de inicio *$(startScene)*.",
             "pt": "Volte para a cena inicial *$(startScene)*.",
-            "th": "กลับไปยัง scene เริ่มต้น *$(startScene)*"
+            "th": "กลับไปยัง scene เริ่มต้น *$(startScene)*",
+            "ar": "العودة إلى مشهد البداية *$(startScene)*."
           }
         },
         "placement": "bottom"
@@ -5433,7 +5760,8 @@
             "fr": "Lancez un **Aperçu** de votre jeu.",
             "es": "Haz clic en el botón **Vista previa**.",
             "pt": "Clique no botão **Pré-visualizar**.",
-            "th": "คลิกปุ่ม **ดูตัวอย่าง**"
+            "th": "คลิกปุ่ม **ดูตัวอย่าง**",
+            "ar": "وأخيرًا.. النقر على الزر **معاينة**."
           }
         },
         "placement": "bottom"

@@ -14,6 +14,9 @@ import Text from '../UI/Text';
 import { Line } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { MarkdownText } from '../UI/MarkdownText';
+import Paper from '../UI/Paper';
+import { getAnnouncementContent } from './AnnouncementFormatting';
+import RouterContext from '../MainFrame/RouterContext';
 
 type AnnouncementsFeedProps = {|
   level?: 'urgent' | 'normal',
@@ -30,6 +33,7 @@ export const AnnouncementsFeed = ({
     AnnouncementsFeedContext
   );
   const { values, showAnnouncement } = React.useContext(PreferencesContext);
+  const { navigateToRoute } = React.useContext(RouterContext);
 
   if (error) {
     return (
@@ -59,53 +63,62 @@ export const AnnouncementsFeed = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Line noMargin={!addMargins}>
-          <ColumnStackLayout noMargin={!addMargins} expand>
-            {displayedAnnouncements.map(announcement => {
-              const { buttonLabelByLocale, buttonUrl } = announcement;
+        <Paper square background="dark">
+          <Line noMargin={!addMargins}>
+            <ColumnStackLayout noMargin={!addMargins} expand>
+              {displayedAnnouncements.map(announcement => {
+                const { buttonLabelByLocale, buttonUrl } = announcement;
+                const {
+                  title,
+                  message,
+                  routeNavigationParams,
+                } = getAnnouncementContent(i18n, announcement);
 
-              return (
-                <AlertMessage
-                  kind={announcement.type}
-                  renderRightButton={
-                    buttonLabelByLocale && buttonUrl
-                      ? () => (
-                          <RaisedButton
-                            label={selectMessageByLocale(
-                              i18n,
-                              buttonLabelByLocale
-                            )}
-                            onClick={() => Window.openExternalURL(buttonUrl)}
-                          />
-                        )
-                      : null
-                  }
-                  onHide={
-                    canClose
-                      ? () => {
-                          showAnnouncement(announcement.id, false);
-                        }
-                      : null
-                  }
-                  key={announcement.id}
-                >
-                  <Text size="block-title">
-                    <Trans>
-                      {selectMessageByLocale(i18n, announcement.titleByLocale)}
-                    </Trans>
-                  </Text>
-                  <MarkdownText
-                    source={selectMessageByLocale(
-                      i18n,
-                      announcement.markdownMessageByLocale
-                    )}
-                    allowParagraphs={false}
-                  />
-                </AlertMessage>
-              );
-            })}
-          </ColumnStackLayout>
-        </Line>
+                const onClick = routeNavigationParams
+                  ? () =>
+                      navigateToRoute(
+                        routeNavigationParams.route,
+                        routeNavigationParams.params
+                      )
+                  : null;
+
+                return (
+                  <AlertMessage
+                    kind={announcement.type}
+                    renderRightButton={
+                      buttonLabelByLocale && buttonUrl
+                        ? () => (
+                            <RaisedButton
+                              label={selectMessageByLocale(
+                                i18n,
+                                buttonLabelByLocale
+                              )}
+                              onClick={() => Window.openExternalURL(buttonUrl)}
+                            />
+                          )
+                        : null
+                    }
+                    onHide={
+                      canClose
+                        ? () => {
+                            showAnnouncement(announcement.id, false);
+                          }
+                        : null
+                    }
+                    hideButtonSize="small"
+                    key={announcement.id}
+                    markdownImageOnly={!title}
+                  >
+                    {title ? <Text size="block-title">{title}</Text> : null}
+                    <div onClick={onClick}>
+                      <MarkdownText source={message} allowParagraphs={false} />
+                    </div>
+                  </AlertMessage>
+                );
+              })}
+            </ColumnStackLayout>
+          </Line>
+        </Paper>
       )}
     </I18n>
   );

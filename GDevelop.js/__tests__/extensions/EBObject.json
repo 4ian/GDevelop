@@ -1,0 +1,87 @@
+{
+  "author": "",
+  "category": "",
+  "extensionNamespace": "",
+  "fullName": "",
+  "helpPath": "",
+  "iconUrl": "",
+  "name": "EBObject",
+  "previewIconUrl": "",
+  "shortDescription": "",
+  "version": "",
+  "description": "",
+  "tags": [],
+  "authorIds": [],
+  "dependencies": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "defaultName": "",
+      "description": "",
+      "fullName": "",
+      "name": "Object",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "testProperties",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": ["SuccessVariable", "+", "MyFirstProperty + MySecondProperty + MyThirdProperty"]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "EBObject::Object",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "name": "MyFirstProperty",
+          "value": "2",
+          "type": "Number",
+          "label": "My first property",
+          "description": "",
+          "group": "",
+          "extraInformation": []
+        },
+        {
+          "name": "MySecondProperty",
+          "value": "4",
+          "type": "String",
+          "label": "My second property",
+          "description": "",
+          "group": "",
+          "extraInformation": []
+        },
+        {
+          "name": "MyThirdProperty",
+          "value": "true",
+          "type": "Boolean",
+          "label": "My third property",
+          "description": "",
+          "group": "",
+          "extraInformation": []
+        }
+      ],
+      "objects": []
+    }
+  ]
+}

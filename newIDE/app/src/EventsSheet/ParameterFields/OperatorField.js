@@ -19,7 +19,7 @@ const operatorLabels = {
   '/': t`/ (divide by)`,
 };
 
-const mapTypeToOperators = {
+const mapTypeToOperators: { [string]: Array<string> } = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '+', '-', '*', '/'],
   string: ['=', '+'],
@@ -36,7 +36,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { parameterMetadata } = props;
+    const { parameterMetadata, value, onChange } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -47,6 +47,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const operators =
       mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
 
+    React.useEffect(
+      () => {
+        if (!value && comparedValueType !== 'unknown') {
+          onChange('=');
+        }
+      },
+      [value, onChange, comparedValueType]
+    );
+
     return (
       <SelectField
         margin={props.isInline ? 'none' : 'dense'}
@@ -55,8 +64,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
-        value={props.value}
-        onChange={(e, i, value: string) => props.onChange(value)}
+        value={value}
+        onChange={(e, i, value: string) => onChange(value)}
         ref={field}
         translatableHintText={t`Choose an operator`}
         id={

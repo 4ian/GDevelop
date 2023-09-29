@@ -119,6 +119,23 @@
   color: var(--event-sheet-instruction-parameter-number-color);
 }
 
+.gd-events-sheet .instruction-missing {
+  text-decoration: var(--event-sheet-instruction-parameter-error-color) underline wavy;
+}
+
+.gd-events-sheet .instruction-missing .function-name {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  font-weight: bold;
+}
+.gd-events-sheet .instruction-missing .behavior-name {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  font-weight: bold;
+}
+.gd-events-sheet .instruction-missing .extension-name {
+  user-select: all;
+  font-weight: bold;
+}
+
 .gd-events-sheet .instruction-parameter.object,
 .gd-events-sheet .instruction-parameter.objectPtr,
 .gd-events-sheet .instruction-parameter.objectList,

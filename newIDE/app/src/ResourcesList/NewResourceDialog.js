@@ -39,6 +39,7 @@ export const NewResourceDialog = ({
   onChooseResources,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const storageProvider = React.useMemo(() => getStorageProvider(), [
     getStorageProvider,
   ]);
@@ -131,9 +132,8 @@ export const NewResourceDialog = ({
       ]}
       secondaryActions={[
         importTabAdvancedResourceSources.length > 0 ? (
-          <Column>
+          <Column key="show-advanced-toggle">
             <Toggle
-              key="show-advanced-toggle"
               onToggle={(e, check) => setIsShowingAdvanced(check)}
               toggled={isShowingAdvanced}
               labelPosition="right"
@@ -154,8 +154,8 @@ export const NewResourceDialog = ({
             })),
             { label: <Trans>Choose a file</Trans>, value: 'import' },
           ]}
-          // Enforce scroll on small screen, because the tabs have long names.
-          variant={windowWidth === 'small' ? 'scrollable' : undefined}
+          // Enforce scroll on very small screens, because the tabs have long names.
+          variant={isMobileScreen ? 'scrollable' : undefined}
         />
       }
     >

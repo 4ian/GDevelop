@@ -1,9 +1,9 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
 import IconButton from '../../../UI/IconButton';
 import FlatButton from '../../../UI/FlatButton';
@@ -13,23 +13,11 @@ import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Text from '../../../UI/Text';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
-import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
-import DragHandle from '../../../UI/DragHandle';
-import ContextMenu, {
-  type ContextMenuInterface,
-} from '../../../UI/Menu/ContextMenu';
-import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
-import Window from '../../../Utils/Window';
-import {
-  deleteSpritesFromAnimation,
-  duplicateSpritesInAnimation,
-} from './Utils/SpriteObjectHelper';
 import { type EditorProps } from '../EditorProps.flow';
-import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
-import { Column } from '../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
@@ -40,10 +28,34 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 import Add from '../../../UI/CustomSvgIcons/Add';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
+import { makeDragSourceAndDropTarget } from '../../../UI/DragAndDrop/DragSourceAndDropTarget';
+import { DragHandleIcon } from '../../../UI/DragHandle';
+import DropIndicator from '../../../UI/SortableVirtualizedItemList/DropIndicator';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import { getMatchingCollisionMask } from './CollisionMasksEditor/CollisionMaskHelper';
+import {
+  getCurrentElements,
+  getTotalSpritesCount,
+} from './Utils/SpriteObjectHelper';
 
 const gd: libGDevelop = global.gd;
 
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
+  'sprite-animations-list'
+);
+
 const styles = {
+  rowContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginTop: 5,
+  },
+  rowContent: {
+    display: 'flex',
+    flex: 1,
+    alignItems: 'center',
+  },
   animationLine: {
     // Use a non standard spacing because:
     // - The SortableAnimationsList won't work with <Spacer /> or <LargeSpacer /> between elements.
@@ -51,396 +63,6 @@ const styles = {
     marginBottom: 16,
   },
 };
-
-type AnimationProps = {|
-  animation: gdAnimation,
-  id: number,
-  project: gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  onRemove: () => void,
-  resourcesLoader: typeof ResourcesLoader,
-  onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
-  selectedSprites: {
-    [number]: boolean,
-  },
-  onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
-  onReplaceDirection: (
-    directionIndex: number,
-    newDirection: gdDirection
-  ) => void,
-  objectName: string,
-  onChangeName: string => void,
-  isAnimationListLocked: boolean,
-  onSpriteUpdated: () => void,
-|};
-
-class Animation extends React.Component<AnimationProps, void> {
-  render() {
-    const {
-      animation,
-      id,
-      project,
-      onRemove,
-      resourceManagementProps,
-      resourcesLoader,
-      onSpriteContextMenu,
-      selectedSprites,
-      onSelectSprite,
-      onReplaceDirection,
-      objectName,
-      onChangeName,
-      isAnimationListLocked,
-      onSpriteUpdated,
-    } = this.props;
-
-    const animationName = animation.getName();
-    return (
-      <div style={styles.animationLine}>
-        <Column expand noMargin>
-          {isAnimationListLocked && (
-            <Column expand noMargin>
-              <Text size="block-title">{animation.getName()}</Text>
-            </Column>
-          )}
-          {!isAnimationListLocked && (
-            <MiniToolbar noPadding>
-              <DragHandle />
-              <MiniToolbarText>
-                {<Trans>Animation #{id}</Trans>}
-              </MiniToolbarText>
-              <Column expand>
-                <SemiControlledTextField
-                  commitOnBlur
-                  margin="none"
-                  value={animation.getName()}
-                  translatableHintText={t`Optional animation name`}
-                  onChange={text => onChangeName(text)}
-                  fullWidth
-                />
-              </Column>
-              <IconButton size="small" onClick={onRemove}>
-                <Trash />
-              </IconButton>
-            </MiniToolbar>
-          )}
-          {mapFor(0, animation.getDirectionsCount(), i => {
-            const direction = animation.getDirection(i);
-            return (
-              <SpritesList
-                direction={direction}
-                key={i}
-                project={project}
-                resourcesLoader={resourcesLoader}
-                resourceManagementProps={resourceManagementProps}
-                onSpriteContextMenu={onSpriteContextMenu}
-                selectedSprites={selectedSprites}
-                onSelectSprite={onSelectSprite}
-                onReplaceByDirection={newDirection =>
-                  onReplaceDirection(i, newDirection)
-                }
-                objectName={objectName}
-                animationName={animationName}
-                onChangeName={onChangeName}
-                onSpriteUpdated={onSpriteUpdated}
-              />
-            );
-          })}
-        </Column>
-      </div>
-    );
-  }
-}
-
-const SortableAnimation = SortableElement(Animation);
-
-const SortableAnimationsList = SortableContainer(
-  ({
-    spriteConfiguration,
-    objectName,
-    onAddAnimation,
-    onRemoveAnimation,
-    onChangeAnimationName,
-    project,
-    resourcesLoader,
-    resourceManagementProps,
-    extraBottomTools,
-    onSpriteContextMenu,
-    selectedSprites,
-    onSelectSprite,
-    onReplaceDirection,
-    isAnimationListLocked,
-    onSpriteUpdated,
-    scrollViewRef,
-  }) => {
-    // Note that it's important to have <ScrollView> *inside* this
-    // component, otherwise the sortable list won't work (because the
-    // SortableContainer would not find a root div to use).
-    return (
-      <ScrollView ref={scrollViewRef}>
-        {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-          const animation = spriteConfiguration.getAnimation(i);
-          return (
-            <SortableAnimation
-              isAnimationListLocked={isAnimationListLocked}
-              key={i}
-              index={i}
-              id={i}
-              animation={animation}
-              project={project}
-              resourcesLoader={resourcesLoader}
-              resourceManagementProps={resourceManagementProps}
-              onRemove={() => onRemoveAnimation(i)}
-              onChangeName={newName => onChangeAnimationName(i, newName)}
-              onSpriteContextMenu={onSpriteContextMenu}
-              selectedSprites={selectedSprites}
-              onSelectSprite={onSelectSprite}
-              onReplaceDirection={(directionId, newDirection) =>
-                onReplaceDirection(i, directionId, newDirection)
-              }
-              objectName={objectName}
-              onSpriteUpdated={onSpriteUpdated}
-            />
-          );
-        })}
-      </ScrollView>
-    );
-  }
-);
-
-type AnimationsListContainerProps = {|
-  spriteConfiguration: gdSpriteObject,
-  project: gdProject,
-  layout?: gdLayout,
-  object?: gdObject,
-  resourceManagementProps: ResourceManagementProps,
-  resourcesLoader: typeof ResourcesLoader,
-  extraBottomTools: React.Node,
-  onSizeUpdated: () => void,
-  objectName: string,
-  onObjectUpdated?: () => void,
-  isAnimationListLocked: boolean,
-|};
-
-type AnimationsListContainerState = {|
-  selectedSprites: {
-    [number]: boolean,
-  },
-|};
-
-class AnimationsListContainer extends React.Component<
-  AnimationsListContainerProps,
-  AnimationsListContainerState
-> {
-  state = {
-    selectedSprites: {},
-  };
-  spriteContextMenu: ?ContextMenuInterface;
-  _scrollView = React.createRef<ScrollViewInterface>();
-
-  onSortEnd = ({ oldIndex, newIndex }) => {
-    this.props.spriteConfiguration.moveAnimation(oldIndex, newIndex);
-    this.forceUpdate();
-  };
-
-  addAnimation = () => {
-    const emptyAnimation = new gd.Animation();
-    emptyAnimation.setDirectionsCount(1);
-    this.props.spriteConfiguration.addAnimation(emptyAnimation);
-    emptyAnimation.delete();
-    this.forceUpdate();
-    this.props.onSizeUpdated();
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-
-    // Scroll to the bottom of the list.
-    // Ideally, we'd wait for the list to be updated to scroll, but
-    // to simplify the code, we just wait a few ms for a new render
-    // to be done.
-    setTimeout(() => {
-      if (this._scrollView.current) {
-        this._scrollView.current.scrollToBottom();
-      }
-    }, 100); // A few ms is enough for a new render to be done.
-  };
-
-  removeAnimation = i => {
-    const answer = Window.showConfirmDialog(
-      'Are you sure you want to remove this animation?'
-    );
-
-    if (answer) {
-      this.props.spriteConfiguration.removeAnimation(i);
-      this.forceUpdate();
-      this.props.onSizeUpdated();
-      if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-    }
-  };
-
-  changeAnimationName = (i, newName) => {
-    const { spriteConfiguration, project, layout, object } = this.props;
-
-    const currentName = spriteConfiguration.getAnimation(i).getName();
-    if (currentName === newName) return;
-
-    const otherNames = mapFor(
-      0,
-      spriteConfiguration.getAnimationsCount(),
-      index => {
-        return index === i
-          ? undefined // Don't check the current animation name as we're changing it.
-          : currentName;
-      }
-    );
-
-    if (newName !== '' && otherNames.filter(name => name === newName).length) {
-      showWarningBox(
-        'Another animation with this name already exists. Please use another name.',
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    const animation = spriteConfiguration.getAnimation(i);
-    const oldName = animation.getName();
-    animation.setName(newName);
-    // TODO EBO Refactor event-based object events when an animation is renamed.
-    if (layout && object) {
-      gd.WholeProjectRefactorer.renameObjectAnimation(
-        project,
-        layout,
-        object,
-        oldName,
-        newName
-      );
-    }
-    this.forceUpdate();
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
-
-  deleteSelection = () => {
-    const { spriteConfiguration } = this.props;
-
-    mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-      const animation = spriteConfiguration.getAnimation(index);
-      deleteSpritesFromAnimation(animation, this.state.selectedSprites);
-    });
-
-    this.setState({
-      selectedSprites: {},
-    });
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
-
-  duplicateSelection = () => {
-    const { spriteConfiguration } = this.props;
-
-    mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-      const animation = spriteConfiguration.getAnimation(index);
-      duplicateSpritesInAnimation(animation, this.state.selectedSprites);
-    });
-
-    this.setState({
-      selectedSprites: {},
-    });
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
-
-  openSpriteContextMenu = (x, y, sprite, index) => {
-    this.selectSprite(sprite, true);
-    if (this.spriteContextMenu) this.spriteContextMenu.open(x, y);
-  };
-
-  selectSprite = (sprite, selected) => {
-    this.setState({
-      selectedSprites: {
-        ...this.state.selectedSprites,
-        [sprite.ptr]: selected,
-      },
-    });
-  };
-
-  replaceDirection = (animationId, directionId, newDirection) => {
-    this.props.spriteConfiguration
-      .getAnimation(animationId)
-      .setDirection(newDirection, directionId);
-    this.forceUpdate();
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
-
-  render() {
-    return (
-      <Column noMargin expand useFullHeight>
-        {this.props.spriteConfiguration.getAnimationsCount() === 0 ? (
-          <Column noMargin expand justifyContent="center">
-            <EmptyPlaceholder
-              title={<Trans>Add your first animation</Trans>}
-              description={<Trans>Animations are a sequence of images.</Trans>}
-              actionLabel={<Trans>Add an animation</Trans>}
-              helpPagePath="/objects/sprite"
-              tutorialId="intermediate-changing-animations"
-              onAction={this.addAnimation}
-            />
-          </Column>
-        ) : (
-          <React.Fragment>
-            <SpacedDismissableTutorialMessage />
-            <SortableAnimationsList
-              isAnimationListLocked={this.props.isAnimationListLocked}
-              spriteConfiguration={this.props.spriteConfiguration}
-              objectName={this.props.objectName}
-              helperClass="sortable-helper"
-              project={this.props.project}
-              onSortEnd={this.onSortEnd}
-              onChangeAnimationName={this.changeAnimationName}
-              onRemoveAnimation={this.removeAnimation}
-              onReplaceDirection={this.replaceDirection}
-              onSpriteContextMenu={this.openSpriteContextMenu}
-              selectedSprites={this.state.selectedSprites}
-              onSelectSprite={this.selectSprite}
-              resourcesLoader={this.props.resourcesLoader}
-              resourceManagementProps={this.props.resourceManagementProps}
-              useDragHandle
-              lockAxis="y"
-              axis="y"
-              onSpriteUpdated={this.props.onObjectUpdated}
-              scrollViewRef={this._scrollView}
-            />
-            <Column noMargin>
-              <ResponsiveLineStackLayout
-                justifyContent="space-between"
-                noColumnMargin
-              >
-                {this.props.extraBottomTools}
-                {!this.props.isAnimationListLocked && (
-                  <RaisedButton
-                    label={<Trans>Add an animation</Trans>}
-                    primary
-                    onClick={this.addAnimation}
-                    icon={<Add />}
-                  />
-                )}
-              </ResponsiveLineStackLayout>
-            </Column>
-            <ContextMenu
-              ref={spriteContextMenu =>
-                (this.spriteContextMenu = spriteContextMenu)
-              }
-              buildMenuTemplate={(i18n: I18nType) => [
-                {
-                  label: i18n._(t`Delete selection`),
-                  click: () => this.deleteSelection(),
-                },
-                {
-                  label: i18n._(t`Duplicate selection`),
-                  click: () => this.duplicateSelection(),
-                },
-              ]}
-            />
-          </React.Fragment>
-        )}
-      </Column>
-    );
-  }
-}
 
 export function LockedSpriteEditor({
   objectConfiguration,
@@ -492,174 +114,673 @@ export default function SpriteEditor({
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
-  const hasNoAnimations = spriteConfiguration.getAnimationsCount() === 0;
+  const isMobileScreen = windowWidth === 'small';
+  const hasNoSprites = () => {
+    for (
+      let animationIndex = 0;
+      animationIndex < spriteConfiguration.getAnimationsCount();
+      animationIndex++
+    ) {
+      const animation = spriteConfiguration.getAnimation(animationIndex);
+      for (
+        let directionIndex = 0;
+        directionIndex < animation.getDirectionsCount();
+        directionIndex++
+      ) {
+        const direction = animation.getDirection(directionIndex);
+        if (direction.getSpritesCount() > 0) return false;
+      }
+    }
+    return true;
+  };
+
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
+
+  const [
+    justAddedAnimationName,
+    setJustAddedAnimationName,
+  ] = React.useState<?string>(null);
+  const justAddedAnimationElement = React.useRef<?any>(null);
+
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedAnimationElement.current &&
+        justAddedAnimationName
+      ) {
+        scrollView.current.scrollTo(justAddedAnimationElement.current);
+        setJustAddedAnimationName(null);
+        justAddedAnimationElement.current = null;
+      }
+    },
+    [justAddedAnimationName]
+  );
+  const { showConfirmation } = useAlertDialog();
+
+  const draggedAnimationIndex = React.useRef<number | null>(null);
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
+    {}
+  );
+
+  // The matching collision mask only takes the first sprite of the first
+  // animation of the object. We consider this is enough to start with, and
+  // the user can then edit the collision mask for further needs.
+  const onCreateMatchingSpriteCollisionMask = React.useCallback(
+    async () => {
+      if (spriteConfiguration.getAnimationsCount() === 0) return;
+      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (firstAnimation.getDirectionsCount() === 0) return;
+      const firstDirection = firstAnimation.getDirection(0);
+      if (firstDirection.getSpritesCount() === 0) return;
+      const firstSprite = firstDirection.getSprite(0);
+      const firstSpriteResourceName = firstSprite.getImageName();
+      const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
+        project,
+        firstSpriteResourceName,
+        {}
+      );
+      let matchingCollisionMask = null;
+      try {
+        matchingCollisionMask = await getMatchingCollisionMask(
+          firstAnimationResourceSource
+        );
+      } catch (e) {
+        console.error(
+          'Unable to create a matching collision mask for the sprite, fallback to full image collision mask.',
+          e
+        );
+      }
+
+      for (
+        let animationIndex = 0;
+        animationIndex < spriteConfiguration.getAnimationsCount();
+        animationIndex++
+      ) {
+        const animation = spriteConfiguration.getAnimation(animationIndex);
+        for (
+          let directionIndex = 0;
+          directionIndex < animation.getDirectionsCount();
+          directionIndex++
+        ) {
+          const direction = animation.getDirection(directionIndex);
+          for (
+            let spriteIndex = 0;
+            spriteIndex < direction.getSpritesCount();
+            spriteIndex++
+          ) {
+            const sprite = direction.getSprite(spriteIndex);
+            sprite.setFullImageCollisionMask(!matchingCollisionMask);
+            if (matchingCollisionMask)
+              sprite.setCustomCollisionMask(matchingCollisionMask);
+          }
+        }
+      }
+      forceUpdate();
+    },
+    [spriteConfiguration, project, forceUpdate]
+  );
+
+  const onApplyFirstSpriteCollisionMaskToSprite = React.useCallback(
+    (sprite: gdSprite) => {
+      if (spriteConfiguration.getAnimationsCount() === 0) return;
+      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (firstAnimation.getDirectionsCount() === 0) return;
+      const firstDirection = firstAnimation.getDirection(0);
+      if (firstDirection.getSpritesCount() === 0) return;
+      const firstSprite = firstDirection.getSprite(0);
+      sprite.setFullImageCollisionMask(firstSprite.isFullImageCollisionMask());
+      sprite.setCustomCollisionMask(firstSprite.getCustomCollisionMask());
+
+      forceUpdate();
+    },
+    [spriteConfiguration, forceUpdate]
+  );
+
+  const moveAnimation = React.useCallback(
+    (targetIndex: number) => {
+      const draggedIndex = draggedAnimationIndex.current;
+      if (draggedIndex === null) return;
+
+      setNameErrors({});
+
+      spriteConfiguration.moveAnimation(
+        draggedIndex,
+        targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+      );
+      if (
+        (draggedIndex === 0 || targetIndex === 0) &&
+        spriteConfiguration.adaptCollisionMaskAutomatically()
+      ) {
+        // If the first animation is changed and the collision mask is adapted automatically,
+        // then we need to recompute it.
+        onCreateMatchingSpriteCollisionMask();
+      }
+      forceUpdate();
+    },
+    [spriteConfiguration, forceUpdate, onCreateMatchingSpriteCollisionMask]
+  );
+
+  const addAnimation = React.useCallback(
+    () => {
+      setNameErrors({});
+
+      const emptyAnimation = new gd.Animation();
+      emptyAnimation.setDirectionsCount(1);
+      spriteConfiguration.addAnimation(emptyAnimation);
+      emptyAnimation.delete();
+      forceUpdate();
+      onSizeUpdated();
+      if (onObjectUpdated) onObjectUpdated();
+
+      // Scroll to the bottom of the list.
+      // Ideally, we'd wait for the list to be updated to scroll, but
+      // to simplify the code, we just wait a few ms for a new render
+      // to be done.
+      setTimeout(() => {
+        if (scrollView.current) {
+          scrollView.current.scrollToBottom();
+        }
+      }, 100); // A few ms is enough for a new render to be done.
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, spriteConfiguration]
+  );
+
+  const removeAnimation = React.useCallback(
+    async (index: number, i18n: I18nType) => {
+      const totalSpritesCount = getTotalSpritesCount(spriteConfiguration);
+      const isDeletingLastSprites =
+        spriteConfiguration
+          .getAnimation(index)
+          .getDirection(0)
+          .getSpritesCount() === totalSpritesCount;
+      const firstSpriteInAnimationDeleted = getCurrentElements(
+        spriteConfiguration,
+        index,
+        0,
+        0
+      ).sprite;
+      const isUsingCustomCollisionMask =
+        !spriteConfiguration.adaptCollisionMaskAutomatically() &&
+        firstSpriteInAnimationDeleted &&
+        !firstSpriteInAnimationDeleted.isFullImageCollisionMask();
+      const shouldWarnBecauseLosingCustomCollisionMask =
+        isDeletingLastSprites && isUsingCustomCollisionMask;
+
+      const message = shouldWarnBecauseLosingCustomCollisionMask
+        ? t`Are you sure you want to remove this animation? You will lose the custom collision mask you have set for this object.`
+        : t`Are you sure you want to remove this animation?`;
+      const deleteAnswer = await showConfirmation({
+        title: t`Remove the animation`,
+        message,
+        confirmButtonLabel: t`Remove`,
+        dismissButtonLabel: t`Cancel`,
+      });
+      if (!deleteAnswer) return;
+
+      setNameErrors({});
+
+      spriteConfiguration.removeAnimation(index);
+      forceUpdate();
+      onSizeUpdated();
+      if (
+        index === 0 &&
+        spriteConfiguration.adaptCollisionMaskAutomatically()
+      ) {
+        // If the first animation is removed and the collision mask is
+        // automatically adapted, then recompute it.
+        onCreateMatchingSpriteCollisionMask();
+      }
+      if (shouldWarnBecauseLosingCustomCollisionMask) {
+        // The user has deleted the last custom collision mask, so revert to automatic
+        // collision mask adaptation.
+        spriteConfiguration.setAdaptCollisionMaskAutomatically(true);
+      }
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [
+      forceUpdate,
+      onObjectUpdated,
+      onSizeUpdated,
+      showConfirmation,
+      spriteConfiguration,
+      onCreateMatchingSpriteCollisionMask,
+    ]
+  );
+
+  const changeAnimationName = React.useCallback(
+    (changedAnimationIndex: number, newName: string) => {
+      const animation = spriteConfiguration.getAnimation(changedAnimationIndex);
+      const currentName = animation.getName();
+      if (currentName === newName) return;
+
+      setNameErrors({});
+
+      const otherNames = mapFor(
+        0,
+        spriteConfiguration.getAnimationsCount(),
+        index => {
+          return index === changedAnimationIndex
+            ? undefined // Don't check the current animation name as we're changing it.
+            : spriteConfiguration.getAnimation(index).getName();
+        }
+      ).filter(Boolean);
+
+      if (newName !== '' && otherNames.some(name => name === newName)) {
+        // The indexes can be used as a key because errors are cleared when
+        // animations are moved.
+        setNameErrors({
+          ...nameErrors,
+          [changedAnimationIndex]: (
+            <Trans>The animation name {newName} is already taken</Trans>
+          ),
+        });
+        return;
+      }
+
+      animation.setName(newName);
+      // TODO EBO Refactor event-based object events when an animation is renamed.
+      if (layout && object) {
+        gd.WholeProjectRefactorer.renameObjectAnimation(
+          project,
+          layout,
+          object,
+          currentName,
+          newName
+        );
+      }
+      forceUpdate();
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [
+      forceUpdate,
+      layout,
+      nameErrors,
+      object,
+      onObjectUpdated,
+      project,
+      spriteConfiguration,
+    ]
+  );
+
+  const replaceDirection = React.useCallback(
+    (animationId, directionId, newDirection) => {
+      spriteConfiguration
+        .getAnimation(animationId)
+        .setDirection(newDirection, directionId);
+      forceUpdate();
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [forceUpdate, onObjectUpdated, spriteConfiguration]
+  );
 
   return (
-    <>
-      <AnimationsListContainer
-        isAnimationListLocked={isAnimationListLocked}
-        spriteConfiguration={spriteConfiguration}
-        resourcesLoader={ResourcesLoader}
-        resourceManagementProps={resourceManagementProps}
-        project={project}
-        layout={layout}
-        object={object}
-        objectName={objectName}
-        onSizeUpdated={onSizeUpdated}
-        onObjectUpdated={onObjectUpdated}
-        extraBottomTools={
-          windowWidth !== 'small' ? (
-            <ResponsiveLineStackLayout noMargin noColumnMargin>
-              <FlatButton
-                label={<Trans>Edit collision masks</Trans>}
-                onClick={() => setCollisionMasksEditorOpen(true)}
-                disabled={hasNoAnimations}
+    <I18n>
+      {({ i18n }) => (
+        <>
+          {spriteConfiguration.getAnimationsCount() === 0 ? (
+            <Column noMargin expand justifyContent="center">
+              <EmptyPlaceholder
+                title={<Trans>Add your first animation</Trans>}
+                description={
+                  <Trans>Animations are a sequence of images.</Trans>
+                }
+                actionLabel={<Trans>Add an animation</Trans>}
+                helpPagePath="/objects/sprite"
+                tutorialId="intermediate-changing-animations"
+                onAction={addAnimation}
               />
-              {!isAnimationListLocked && (
-                <FlatButton
-                  label={<Trans>Edit points</Trans>}
-                  onClick={() => setPointsEditorOpen(true)}
-                  disabled={hasNoAnimations}
+            </Column>
+          ) : (
+            <ScrollView ref={scrollView}>
+              <React.Fragment>
+                <SpacedDismissableTutorialMessage />
+                {mapFor(
+                  0,
+                  spriteConfiguration.getAnimationsCount(),
+                  animationIndex => {
+                    const animation = spriteConfiguration.getAnimation(
+                      animationIndex
+                    );
+                    const animationName = animation.getName();
+
+                    const animationRef =
+                      justAddedAnimationName === animationName
+                        ? justAddedAnimationElement
+                        : null;
+
+                    return (
+                      <DragSourceAndDropTarget
+                        key={animationIndex}
+                        beginDrag={() => {
+                          draggedAnimationIndex.current = animationIndex;
+                          return {};
+                        }}
+                        canDrag={() => true}
+                        canDrop={() => true}
+                        drop={() => {
+                          moveAnimation(animationIndex);
+                        }}
+                      >
+                        {({
+                          connectDragSource,
+                          connectDropTarget,
+                          isOver,
+                          canDrop,
+                        }) =>
+                          connectDropTarget(
+                            <div
+                              key={animationIndex}
+                              style={styles.rowContainer}
+                            >
+                              {isAnimationListLocked && (
+                                <Column expand noMargin>
+                                  <Text size="block-title">
+                                    {animationName}
+                                  </Text>
+                                </Column>
+                              )}
+                              {!isAnimationListLocked && isOver && (
+                                <DropIndicator canDrop={canDrop} />
+                              )}
+                              {!isAnimationListLocked && (
+                                <div
+                                  ref={animationRef}
+                                  style={{
+                                    ...styles.rowContent,
+                                    backgroundColor:
+                                      gdevelopTheme.list.itemsBackgroundColor,
+                                  }}
+                                >
+                                  <Line noMargin expand alignItems="center">
+                                    {connectDragSource(
+                                      <span>
+                                        <Column>
+                                          <DragHandleIcon />
+                                        </Column>
+                                      </span>
+                                    )}
+                                    <Text noMargin noShrink>
+                                      <Trans>Animation #{animationIndex}</Trans>
+                                    </Text>
+                                    <Spacer />
+                                    <SemiControlledTextField
+                                      margin="none"
+                                      commitOnBlur
+                                      errorText={nameErrors[animationIndex]}
+                                      translatableHintText={t`Optional animation name`}
+                                      value={animation.getName()}
+                                      onChange={newName =>
+                                        changeAnimationName(
+                                          animationIndex,
+                                          newName
+                                        )
+                                      }
+                                      fullWidth
+                                    />
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        removeAnimation(animationIndex, i18n)
+                                      }
+                                    >
+                                      <Trash />
+                                    </IconButton>
+                                  </Line>
+                                  <Spacer />
+                                </div>
+                              )}
+                              <div style={styles.animationLine}>
+                                <Column expand noMargin>
+                                  {mapFor(
+                                    0,
+                                    animation.getDirectionsCount(),
+                                    directionIndex => {
+                                      const direction = animation.getDirection(
+                                        directionIndex
+                                      );
+                                      return (
+                                        <SpritesList
+                                          spriteConfiguration={
+                                            spriteConfiguration
+                                          }
+                                          direction={direction}
+                                          key={directionIndex}
+                                          project={project}
+                                          resourcesLoader={ResourcesLoader}
+                                          resourceManagementProps={
+                                            resourceManagementProps
+                                          }
+                                          onReplaceByDirection={newDirection =>
+                                            replaceDirection(
+                                              animationIndex,
+                                              directionIndex,
+                                              newDirection
+                                            )
+                                          }
+                                          objectName={objectName}
+                                          animationName={animationName}
+                                          onChangeName={newName =>
+                                            changeAnimationName(
+                                              animationIndex,
+                                              newName
+                                            )
+                                          }
+                                          onSpriteUpdated={onObjectUpdated}
+                                          onFirstSpriteUpdated={
+                                            animationIndex === 0
+                                              ? () => {
+                                                  // If the first sprite of the first animation is updated,
+                                                  // we update the automatic collision mask of the object,
+                                                  // if the option is enabled.
+                                                  if (
+                                                    spriteConfiguration.adaptCollisionMaskAutomatically()
+                                                  ) {
+                                                    onCreateMatchingSpriteCollisionMask();
+                                                  }
+                                                }
+                                              : undefined
+                                          }
+                                          onSpriteAdded={(sprite: gdSprite) => {
+                                            // If a sprite is added, we want to ensure it gets the automatic
+                                            // collision mask of the object, if the option is enabled.
+                                            if (
+                                              spriteConfiguration.adaptCollisionMaskAutomatically()
+                                            ) {
+                                              onApplyFirstSpriteCollisionMaskToSprite(
+                                                sprite
+                                              );
+                                            }
+                                          }}
+                                        />
+                                      );
+                                    }
+                                  )}
+                                </Column>
+                              </div>
+                            </div>
+                          )
+                        }
+                      </DragSourceAndDropTarget>
+                    );
+                  }
+                )}
+              </React.Fragment>
+            </ScrollView>
+          )}
+          <Column noMargin>
+            <ResponsiveLineStackLayout
+              justifyContent="space-between"
+              noColumnMargin
+            >
+              {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
+                <ResponsiveLineStackLayout noMargin noColumnMargin>
+                  <FlatButton
+                    label={<Trans>Edit collision masks</Trans>}
+                    onClick={() => setCollisionMasksEditorOpen(true)}
+                    disabled={hasNoSprites()}
+                  />
+                  {!isAnimationListLocked && (
+                    <FlatButton
+                      label={<Trans>Edit points</Trans>}
+                      onClick={() => setPointsEditorOpen(true)}
+                      disabled={hasNoSprites()}
+                    />
+                  )}
+                  {!isAnimationListLocked && (
+                    <FlatButton
+                      label={<Trans>Advanced options</Trans>}
+                      onClick={() => setAdvancedOptionsOpen(true)}
+                      disabled={hasNoSprites()}
+                    />
+                  )}
+                </ResponsiveLineStackLayout>
+              ) : (
+                <FlatButtonWithSplitMenu
+                  label={<Trans>Edit collision masks</Trans>}
+                  onClick={() => setCollisionMasksEditorOpen(true)}
+                  disabled={hasNoSprites()}
+                  buildMenuTemplate={i18n => [
+                    {
+                      label: i18n._(t`Edit points`),
+                      disabled: hasNoSprites(),
+                      click: () => setPointsEditorOpen(true),
+                    },
+                    {
+                      label: i18n._(t`Advanced options`),
+                      disabled: hasNoSprites(),
+                      click: () => setAdvancedOptionsOpen(true),
+                    },
+                  ]}
                 />
               )}
               {!isAnimationListLocked && (
-                <FlatButton
-                  label={<Trans>Advanced options</Trans>}
-                  onClick={() => setAdvancedOptionsOpen(true)}
-                  disabled={hasNoAnimations}
+                <RaisedButton
+                  label={<Trans>Add an animation</Trans>}
+                  primary
+                  onClick={addAnimation}
+                  icon={<Add />}
                 />
               )}
             </ResponsiveLineStackLayout>
-          ) : (
-            <FlatButtonWithSplitMenu
-              label={<Trans>Edit collision masks</Trans>}
-              onClick={() => setCollisionMasksEditorOpen(true)}
-              disabled={hasNoAnimations}
-              buildMenuTemplate={i18n => [
-                {
-                  label: i18n._(t`Edit points`),
-                  disabled: hasNoAnimations,
-                  click: () => setPointsEditorOpen(true),
-                },
-                {
-                  label: i18n._(t`Advanced options`),
-                  disabled: hasNoAnimations,
-                  click: () => setAdvancedOptionsOpen(true),
-                },
-              ]}
-            />
-          )
-        }
-      />
-      {advancedOptionsOpen && (
-        <Dialog
-          title={<Trans>Advanced options</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary
-              onClick={() => setAdvancedOptionsOpen(false)}
-            />,
-          ]}
-          maxWidth="sm"
-          flexBody
-          onRequestClose={() => setAdvancedOptionsOpen(false)}
-          open
-        >
-          <Column noMargin>
-            <Checkbox
-              label={
-                <Trans>
-                  Don't play the animation when the object is far from the
-                  camera or hidden (recommended for performance)
-                </Trans>
-              }
-              checked={!spriteConfiguration.getUpdateIfNotVisible()}
-              onCheck={(_, value) => {
-                spriteConfiguration.setUpdateIfNotVisible(!value);
-
-                forceUpdate();
-                if (onObjectUpdated) onObjectUpdated();
-              }}
-            />
           </Column>
-        </Dialog>
+          {advancedOptionsOpen && (
+            <Dialog
+              title={<Trans>Advanced options</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setAdvancedOptionsOpen(false)}
+                />,
+              ]}
+              maxWidth="sm"
+              flexBody
+              onRequestClose={() => setAdvancedOptionsOpen(false)}
+              open
+            >
+              <Column noMargin>
+                <Checkbox
+                  label={
+                    <Trans>
+                      Don't play the animation when the object is far from the
+                      camera or hidden (recommended for performance)
+                    </Trans>
+                  }
+                  checked={!spriteConfiguration.getUpdateIfNotVisible()}
+                  onCheck={(_, value) => {
+                    spriteConfiguration.setUpdateIfNotVisible(!value);
+
+                    forceUpdate();
+                    if (onObjectUpdated) onObjectUpdated();
+                  }}
+                />
+              </Column>
+            </Dialog>
+          )}
+          {pointsEditorOpen && (
+            <Dialog
+              title={<Trans>Edit points</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setPointsEditorOpen(false)}
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  helpPagePath="/objects/sprite/edit-points"
+                  key="help"
+                />,
+              ]}
+              onRequestClose={() => setPointsEditorOpen(false)}
+              maxWidth="lg"
+              flexBody
+              fullHeight
+              open={pointsEditorOpen}
+            >
+              <PointsEditor
+                objectConfiguration={spriteConfiguration}
+                resourcesLoader={ResourcesLoader}
+                project={project}
+                onPointsUpdated={onObjectUpdated}
+                onRenamedPoint={(oldName, newName) =>
+                  // TODO EBO Refactor event-based object events when a point is renamed.
+                  layout &&
+                  object &&
+                  gd.WholeProjectRefactorer.renameObjectPoint(
+                    project,
+                    layout,
+                    object,
+                    oldName,
+                    newName
+                  )
+                }
+              />
+            </Dialog>
+          )}
+          {collisionMasksEditorOpen && (
+            <Dialog
+              title={<Trans>Edit collision masks</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setCollisionMasksEditorOpen(false)}
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  helpPagePath="/objects/sprite/collision-mask"
+                  key="help"
+                />,
+              ]}
+              maxWidth="lg"
+              flexBody
+              fullHeight
+              onRequestClose={() => setCollisionMasksEditorOpen(false)}
+              open={collisionMasksEditorOpen}
+            >
+              <CollisionMasksEditor
+                objectConfiguration={spriteConfiguration}
+                resourcesLoader={ResourcesLoader}
+                project={project}
+                onMasksUpdated={onObjectUpdated}
+                onCreateMatchingSpriteCollisionMask={
+                  onCreateMatchingSpriteCollisionMask
+                }
+              />
+            </Dialog>
+          )}
+        </>
       )}
-      {pointsEditorOpen && (
-        <Dialog
-          title={<Trans>Edit points</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary
-              onClick={() => setPointsEditorOpen(false)}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              helpPagePath="/objects/sprite/edit-points"
-              key="help"
-            />,
-          ]}
-          onRequestClose={() => setPointsEditorOpen(false)}
-          maxWidth="lg"
-          flexBody
-          fullHeight
-          open={pointsEditorOpen}
-        >
-          <PointsEditor
-            objectConfiguration={spriteConfiguration}
-            resourcesLoader={ResourcesLoader}
-            project={project}
-            onPointsUpdated={onObjectUpdated}
-            onRenamedPoint={(oldName, newName) =>
-              // TODO EBO Refactor event-based object events when a point is renamed.
-              layout &&
-              object &&
-              gd.WholeProjectRefactorer.renameObjectPoint(
-                project,
-                layout,
-                object,
-                oldName,
-                newName
-              )
-            }
-          />
-        </Dialog>
-      )}
-      {collisionMasksEditorOpen && (
-        <Dialog
-          title={<Trans>Edit collision masks</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary
-              onClick={() => setCollisionMasksEditorOpen(false)}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              helpPagePath="/objects/sprite/collision-mask"
-              key="help"
-            />,
-          ]}
-          maxWidth="lg"
-          flexBody
-          fullHeight
-          onRequestClose={() => setCollisionMasksEditorOpen(false)}
-          open={collisionMasksEditorOpen}
-        >
-          <CollisionMasksEditor
-            objectConfiguration={spriteConfiguration}
-            resourcesLoader={ResourcesLoader}
-            project={project}
-            onMasksUpdated={onObjectUpdated}
-          />
-        </Dialog>
-      )}
-    </>
+    </I18n>
   );
 }

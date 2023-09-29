@@ -153,6 +153,7 @@ export const UsernameField = ({
         )
       }
       disabled={disabled}
+      maxLength={50}
     />
   );
 };

@@ -33,6 +33,7 @@ type ExtensionStoreState = {|
   setChosenCategory: string => void,
   extensionShortHeadersByName: { [name: string]: ExtensionShortHeader },
   filtersState: FiltersState,
+  hasExtensionNamed: (extensionName: string) => boolean,
 |};
 
 export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
@@ -54,6 +55,7 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
     chosenCategory: null,
     setChosenCategory: () => {},
   },
+  hasExtensionNamed: () => false,
 });
 
 type ExtensionStoreStateProviderProps = {|
@@ -73,8 +75,6 @@ export const ExtensionStoreStateProvider = ({
   }>({});
   const preferences = React.useContext(PreferencesContext);
   const { showCommunityExtensions } = preferences.values;
-  const [filters, setFilters] = React.useState<?Filters>(null);
-  const [allCategories, setAllCategories] = React.useState<Array<string>>([]);
   const [firstExtensionIds, setFirstExtensionIds] = React.useState<
     Array<string>
   >([]);
@@ -100,45 +100,20 @@ export const ExtensionStoreStateProvider = ({
 
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
-          const {
-            extensionShortHeaders,
-            allTags,
-            allCategories,
-          } = extensionRegistry;
-
-          const sortedTags = allTags
-            .slice()
-            .sort((tag1, tag2) =>
-              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
-            );
-          const sortedCategories = allCategories
-            .slice()
-            .sort((tag1, tag2) =>
-              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
-            );
+          const { headers } = extensionRegistry;
 
           const extensionShortHeadersByName = {};
-          extensionShortHeaders.forEach(extension => {
+          headers.forEach(extension => {
             extensionShortHeadersByName[extension.name] = extension;
           });
 
           console.info(
             `Loaded ${
-              extensionShortHeaders.length
+              headers ? headers.length : 0
             } extensions from the extension store.`
           );
           setExtensionShortHeadersByName(extensionShortHeadersByName);
-          setFilters({
-            allTags: sortedTags,
-            defaultTags: sortedTags,
-            tagsTree: [],
-          });
-          setAllCategories(sortedCategories);
-          setFirstExtensionIds(
-            extensionRegistry.views
-              ? extensionRegistry.views.default.firstExtensionIds
-              : []
-          );
+          setFirstExtensionIds(extensionRegistry.views.default.firstIds);
         } catch (error) {
           console.error(
             `Unable to load the extensions from the extension store:`,
@@ -169,6 +144,38 @@ export const ExtensionStoreStateProvider = ({
     [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]
   );
 
+  const allCategories = React.useMemo(
+    () => {
+      const categoriesSet = new Set();
+      for (const name in extensionShortHeadersByName) {
+        categoriesSet.add(extensionShortHeadersByName[name].category);
+      }
+      const sortedCategories = [...categoriesSet].sort((tag1, tag2) =>
+        tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+      );
+      return sortedCategories;
+    },
+    [extensionShortHeadersByName]
+  );
+
+  const filters = React.useMemo(
+    () => {
+      const tagsSet = new Set();
+      for (const name in extensionShortHeadersByName) {
+        extensionShortHeadersByName[name].tags.forEach(tag => tagsSet.add(tag));
+      }
+      const sortedTags = [...tagsSet].sort((tag1, tag2) =>
+        tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+      );
+      return {
+        allTags: sortedTags,
+        defaultTags: sortedTags,
+        tagsTree: [],
+      };
+    },
+    [extensionShortHeadersByName]
+  );
+
   const searchResults: ?Array<{|
     item: ExtensionShortHeader,
     matches: SearchMatch[],
@@ -183,6 +190,13 @@ export const ExtensionStoreStateProvider = ({
     defaultFirstSearchItemIds: firstExtensionIds,
   });
 
+  const hasExtensionNamed = React.useCallback(
+    (extensionName: string) => {
+      return !!extensionShortHeadersByName[extensionName];
+    },
+    [extensionShortHeadersByName]
+  );
+
   const extensionStoreState = React.useMemo(
     () => ({
       searchResults,
@@ -196,6 +210,7 @@ export const ExtensionStoreStateProvider = ({
       setSearchText,
       extensionShortHeadersByName,
       filtersState,
+      hasExtensionNamed,
     }),
     [
       searchResults,
@@ -208,6 +223,7 @@ export const ExtensionStoreStateProvider = ({
       extensionShortHeadersByName,
       filtersState,
       fetchExtensionsAndFilters,
+      hasExtensionNamed,
     ]
   );
 

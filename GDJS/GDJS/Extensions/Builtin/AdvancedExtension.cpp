@@ -18,7 +18,6 @@ AdvancedExtension::AdvancedExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
   GetAllActions()["SetReturnNumber"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -35,7 +34,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["SetReturnString"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -52,7 +50,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["SetReturnBoolean"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -66,8 +63,43 @@ AdvancedExtension::AdvancedExtension() {
                booleanCode + "; }";
       });
 
+  GetAllActions()["CopyArgumentToVariable"]
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "scenevar", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
+               parameter + "), " + variable +
+               ", false);\n"
+               "}\n";
+      });
+
+  GetAllActions()["CopyVariableToArgument"]
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "scenevar", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(" +
+               variable + ", eventsFunctionContext.getArgument(" + parameter +
+               "), false);\n"
+               "}\n";
+      });
+
   GetAllConditions()["GetArgumentAsBoolean"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -123,7 +155,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllConditions()["CompareArgumentAsNumber"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
@@ -150,7 +181,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllConditions()["CompareArgumentAsString"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {

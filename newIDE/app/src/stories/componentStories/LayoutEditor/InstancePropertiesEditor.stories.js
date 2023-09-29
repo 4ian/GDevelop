@@ -28,6 +28,7 @@ export const Default = () => (
           layout={testProject.testLayout}
           instances={[testProject.testLayoutInstance1]}
           editInstanceVariables={action('edit instance variables')}
+          onGetInstanceSize={() => [100, 101, 102]}
           onEditObjectByName={action('edit object')}
         />
       </SerializedObjectDisplay>

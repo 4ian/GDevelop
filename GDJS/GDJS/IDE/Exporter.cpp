@@ -90,9 +90,14 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         fs, exportedProject.GetResourcesManager(), exportDir);
     // end of compatibility code
 
+    bool isUsingScene3DExtension =
+        usedExtensionsResult.GetUsedExtensions().find("Scene3D") !=
+        usedExtensionsResult.GetUsedExtensions().end();
+
     // Export engine libraries
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
+        /*pixiInThreeRenderers=*/isUsingScene3DExtension,
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),

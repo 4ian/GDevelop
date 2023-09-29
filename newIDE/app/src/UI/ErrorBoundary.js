@@ -23,6 +23,7 @@ type ErrorBoundaryScope =
   | 'mainframe'
   | 'list-search-result'
   | 'box-search-result'
+  | 'variables-list'
   | 'app';
 
 const errorHandler = (
@@ -32,7 +33,7 @@ const errorHandler = (
 ) => {
   console.error('Error caught by Boundary:', error, componentStack);
   sendErrorMessage(
-    'Error catched by error boundary',
+    'Error caught by error boundary',
     // $FlowFixMe - Flow does not infer string type possibilities from interpolation.
     `error-boundary_${scope}`,
     {

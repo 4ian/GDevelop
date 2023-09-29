@@ -19,6 +19,7 @@ import {
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
+  OBJECT_3D_IN_APP_TUTORIAL_ID,
   guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
@@ -33,6 +34,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Text from '../../../../UI/Text';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Trophy from '../../../../UI/CustomSvgIcons/Trophy';
+import Object3D from './Icons/Object3D';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -41,12 +43,15 @@ const getColumnsFromWidth = (width: WidthType) => {
     case 'medium':
       return 2;
     case 'large':
-    default:
       return 3;
+    case 'xlarge':
+      return 4;
+    default:
+      return 2;
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('large');
+const MAX_COLUMNS = getColumnsFromWidth('xlarge');
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {
@@ -120,6 +125,18 @@ const GuidedLessons = ({ selectInAppTutorial }: Props) => {
       keyPoints: [t`Add a layer`, t`Download and use a prefab`],
       durationInMinutes: 2,
       renderImage: props => <HealthBar {...props} />,
+    },
+    {
+      id: OBJECT_3D_IN_APP_TUTORIAL_ID,
+      title: t`Add a 3D object`,
+      description: t`Learn how to add a 3D object to your game.`,
+      keyPoints: [
+        t`Add a 3D box`,
+        t`Add a behavior`,
+        t`Update the elevation of a 3D box`,
+      ],
+      durationInMinutes: 2,
+      renderImage: props => <Object3D {...props} />,
     },
     {
       id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,

@@ -1,21 +1,31 @@
 // @flow
 import * as React from 'react';
+import { Trans, t } from '@lingui/macro';
 import GenericExpressionField from './GenericExpressionField';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import getObjectByName from '../../Utils/GetObjectByName';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import { mapFor } from '../../Utils/MapFor';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
+import Functions from '@material-ui/icons/Functions';
+import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 
 const gd: libGDevelop = global.gd;
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectAnimationNameField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?GenericExpressionField>(null);
+    const field = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
@@ -23,17 +33,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const getAnimationNames = (): Array<ExpressionAutocompletion> => {
-      const {
-        project,
-        scope,
-        instructionMetadata,
-        instruction,
-        expressionMetadata,
-        expression,
-        parameterIndex,
-      } = props;
+    const {
+      project,
+      scope,
+      instructionMetadata,
+      instruction,
+      expressionMetadata,
+      expression,
+      parameterIndex,
+    } = props;
 
+    // We don't memo/callback this, as we want to recompute it every time something changes.
+    // Because of the function getLastObjectParameterValue.
+    const getAnimationNames = () => {
       const objectName = getLastObjectParameterValue({
         instructionMetadata,
         instruction,
@@ -41,6 +53,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         expression,
         parameterIndex,
       });
+
       if (!objectName || !project) {
         return [];
       }
@@ -62,26 +75,124 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           return animationName.length > 0 ? animationName : null;
         })
           .filter(Boolean)
-          .sort()
-          .map(animationName => ({
-            kind: 'Text',
-            completion: `"${animationName}"`,
-          }));
+          .sort();
+      } else if (object.getType() === 'Scene3D::Model3DObject') {
+        const model3DConfiguration = gd.asModel3DConfiguration(
+          object.getConfiguration()
+        );
+
+        return mapFor(0, model3DConfiguration.getAnimationsCount(), index => {
+          const animationName = model3DConfiguration
+            .getAnimation(index)
+            .getName();
+          return animationName.length > 0 ? animationName : null;
+        })
+          .filter(Boolean)
+          .sort();
       }
 
       return [];
     };
 
+    const animationNames = getAnimationNames();
+
+    const isCurrentValueInAnimationNamesList = !!animationNames.find(
+      animationName => `"${animationName}"` === props.value
+    );
+
+    // If the current value is not in the list of animation names, display an expression field.
+    const [isExpressionField, setIsExpressionField] = React.useState(
+      (!!props.value && !isCurrentValueInAnimationNamesList) ||
+        props.scope.eventsFunctionsExtension
+    );
+
+    const switchFieldType = () => {
+      setIsExpressionField(!isExpressionField);
+    };
+
+    const onChangeSelectValue = (event, value) => {
+      props.onChange(event.target.value);
+    };
+
+    const onChangeTextValue = (value: string) => {
+      props.onChange(value);
+    };
+
+    const fieldLabel = props.parameterMetadata
+      ? props.parameterMetadata.getDescription()
+      : undefined;
+
+    const selectOptions = animationNames.map(animationName => {
+      return (
+        <SelectOption
+          key={animationName}
+          value={`"${animationName}"`}
+          label={animationName}
+          shouldNotTranslate
+        />
+      );
+    });
+
     return (
-      <GenericExpressionField
-        expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
-          getAnimationNames().filter(
-            ({ completion }) => completion.indexOf(expression) === 0
+      <TextFieldWithButtonLayout
+        renderTextField={() =>
+          !isExpressionField ? (
+            <SelectField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-animation-name-field`
+                  : undefined
+              }
+              value={props.value}
+              onChange={onChangeSelectValue}
+              margin={props.isInline ? 'none' : 'dense'}
+              fullWidth
+              floatingLabelText={fieldLabel}
+              translatableHintText={t`Choose an animation`}
+              helperMarkdownText={
+                (props.parameterMetadata &&
+                  props.parameterMetadata.getLongDescription()) ||
+                null
+              }
+            >
+              {selectOptions}
+            </SelectField>
+          ) : (
+            <GenericExpressionField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-animation-name-field`
+                  : undefined
+              }
+              expressionType="string"
+              {...props}
+              onChange={onChangeTextValue}
+            />
           )
         }
-        ref={field}
-        {...props}
+        renderButton={style =>
+          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
+            <FlatButton
+              id="switch-expression-select"
+              leftIcon={<TypeCursorSelect />}
+              style={style}
+              primary
+              label={<Trans>Select an Animation</Trans>}
+              onClick={switchFieldType}
+            />
+          ) : (
+            <RaisedButton
+              id="switch-expression-select"
+              icon={<Functions />}
+              style={style}
+              primary
+              label={<Trans>Use an Expression</Trans>}
+              onClick={switchFieldType}
+            />
+          )
+        }
       />
     );
   }

@@ -11,6 +11,8 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/IDE/WholeProjectBrowser.h"
+#include "GDCore/IDE/Events/BehaviorDefaultFlagClearer.h"
 
 namespace gd {
 
@@ -18,6 +20,10 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
   project.GetObjectGroups().Clear();
   while (project.GetExternalEventsCount() > 0)
     project.RemoveExternalEvents(project.GetExternalEvents(0).GetName());
+
+  gd::BehaviorDefaultFlagClearer behaviorDefaultFlagClearer;
+  gd::WholeProjectBrowser wholeProjectBrowser;
+  wholeProjectBrowser.ExposeObjects(project, behaviorDefaultFlagClearer);
 
   for (unsigned int i = 0; i < project.GetLayoutsCount(); ++i) {
     project.GetLayout(i).GetObjectGroups().Clear();

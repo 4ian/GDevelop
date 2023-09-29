@@ -66,8 +66,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     const oldWidth = this._width;
     const oldHeight = this._height;
     if (this._instance.hasCustomSize()) {
-      this._width = this._instance.getCustomWidth();
-      this._height = this._instance.getCustomHeight();
+      this._width = this.getCustomWidth();
+      this._height = this.getCustomHeight();
     } else {
       var tiledSprite = gd.asPanelSpriteConfiguration(
         this._associatedObjectConfiguration
@@ -236,7 +236,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       return;
     }
 
-    console.log('Updating PanelSprite instance texture');
     function makeInsideTexture(rect) {
       if (rect.width < 0) rect.width = 0;
       if (rect.height < 0) rect.height = 0;

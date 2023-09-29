@@ -1,6 +1,5 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Light object');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   /**
    * Pixi renderer for light runtime objects.
@@ -303,7 +302,7 @@ namespace gdjs {
       }
       const verticesCount = vertices.length;
 
-      // If the array buffer which is already allocated is atmost
+      // If the array buffer which is already allocated is at most
       // twice the size of memory required, we could avoid re-allocation
       // and instead use a subarray. Otherwise, allocate new array buffers as
       // there would be memory wastage.

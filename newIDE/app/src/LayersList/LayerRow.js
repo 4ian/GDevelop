@@ -17,11 +17,16 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import LockIcon from '../UI/CustomSvgIcons/Lock';
+import LockOpenIcon from '../UI/CustomSvgIcons/LockOpen';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import EditIcon from '../UI/CustomSvgIcons/Edit';
 import LightbulbIcon from '../UI/CustomSvgIcons/Lightbulb';
 import LightModeIcon from '../UI/CustomSvgIcons/LightMode';
+import Object2dIcon from '../UI/CustomSvgIcons/Object2d';
+import Object3dIcon from '../UI/CustomSvgIcons/Object3d';
+import Layer2dAnd3dIcon from '../UI/CustomSvgIcons/Layer2dAnd3d';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('layers-list');
 
@@ -43,6 +48,8 @@ type Props = {|
   onDrop: () => void,
   isVisible: boolean,
   onChangeVisibility: boolean => void,
+  isLocked: boolean,
+  onChangeLockState: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
   onEdit: () => void,
@@ -58,6 +65,8 @@ const LayerRow = ({
   onBlur,
   onRemove,
   isVisible,
+  isLocked,
+  onChangeLockState,
   effectsCount,
   onEditEffects,
   onChangeVisibility,
@@ -70,6 +79,19 @@ const LayerRow = ({
 
   const layerName = layer.getName();
   const isLightingLayer = layer.isLightingLayer();
+  const renderingType = layer.getRenderingType();
+
+  const editPropertiesIcon = isLightingLayer ? (
+    <LightbulbIcon />
+  ) : renderingType === '2d' ? (
+    <Object2dIcon />
+  ) : renderingType === '3d' ? (
+    <Object3dIcon />
+  ) : renderingType === '2d+3d' ? (
+    <Layer2dAnd3dIcon />
+  ) : (
+    <EditIcon />
+  );
 
   const isBaseLayer = !layerName;
 
@@ -160,6 +182,13 @@ const LayerRow = ({
                             checked: isVisible,
                             click: () => onChangeVisibility(!isVisible),
                           },
+                          {
+                            type: 'checkbox',
+                            label: i18n._(t`Locked`),
+                            enabled: isVisible,
+                            checked: isLocked || !isVisible,
+                            click: () => onChangeLockState(!isLocked),
+                          },
                           { type: 'separator' },
                           {
                             label: i18n._(t`Delete`),
@@ -172,6 +201,7 @@ const LayerRow = ({
                       <React.Fragment>
                         <InlineCheckbox
                           id="layer-visibility"
+                          paddingSize="small"
                           checked={isVisible}
                           checkedIcon={<VisibilityIcon />}
                           uncheckedIcon={<VisibilityOffIcon />}
@@ -181,6 +211,22 @@ const LayerRow = ({
                               <Trans>Hide layer</Trans>
                             ) : (
                               <Trans>Show layer</Trans>
+                            )
+                          }
+                        />
+                        <InlineCheckbox
+                          id="layer-lock"
+                          paddingSize="small"
+                          disabled={!isVisible}
+                          checked={isLocked || !isVisible}
+                          checkedIcon={<LockIcon />}
+                          uncheckedIcon={<LockOpenIcon />}
+                          onCheck={(e, value) => onChangeLockState(value)}
+                          tooltipOrHelperText={
+                            isLocked ? (
+                              <Trans>Unlock layer</Trans>
+                            ) : (
+                              <Trans>Lock layer</Trans>
                             )
                           }
                         />
@@ -202,7 +248,7 @@ const LayerRow = ({
                               : t`Edit properties`
                           }
                         >
-                          {isLightingLayer ? <LightbulbIcon /> : <EditIcon />}
+                          {editPropertiesIcon}
                         </IconButton>
                         <IconButton
                           size="small"

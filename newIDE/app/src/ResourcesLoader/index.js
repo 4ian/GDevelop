@@ -183,7 +183,7 @@ export default class ResourcesLoader {
 
   /**
    * Get the fully qualified URL/filename associated with the given resource, with potential
-   * changes to accomodate browsers CORS/cache.
+   * changes to accommodate browsers CORS/cache.
    */
   static getResourceFullUrl(
     project: gdProject,

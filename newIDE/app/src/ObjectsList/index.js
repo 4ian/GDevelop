@@ -72,6 +72,8 @@ const objectTypeToDefaultName = {
   'MyDummyExtension::DummyObject': 'NewDummyObject',
   'Lighting::LightObject': 'NewLight',
   'TextInput::TextInputObject': 'NewTextInput',
+  'Scene3D::Model3DObject': 'New3DModel',
+  'Scene3D::Cube3DObject': 'New3DBox',
   'Video::VideoObject': 'NewVideo',
 };
 
@@ -105,6 +107,7 @@ export type ObjectsListInterface = {|
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  initialInstances?: gdInitialInstancesContainer,
   objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
@@ -126,12 +129,15 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
+  beforeSetAsGlobalObject?: (groupName: string) => boolean,
+  canSetAsGlobalObject?: boolean,
+
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: (?ObjectWithContext) => void,
   onObjectPasted?: gdObject => void,
-  canRenameObject: (newName: string) => boolean,
+  getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onAddObjectInstance: (objectName: string) => void,
 
   getThumbnail: (
@@ -147,6 +153,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     {
       project,
       layout,
+      initialInstances,
       objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
@@ -161,12 +168,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       getAllObjectTags,
       onChangeSelectedObjectTags,
 
+      beforeSetAsGlobalObject,
+      canSetAsGlobalObject,
+
       onEditObject,
       onExportObject,
       onObjectCreated,
       onObjectSelected,
       onObjectPasted,
-      canRenameObject,
+      getValidatedObjectOrGroupName,
       onAddObjectInstance,
 
       getThumbnail,
@@ -299,7 +309,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         // It's important to call onDeleteObject, because the parent might
         // have to do some refactoring/clean up work before the object is deleted
-        // (typically, the SceneEditor will remove instances refering to the object,
+        // (typically, the SceneEditor will remove instances referring to the object,
         // leading to the removal of their renderer - which can keep a reference to
         // the object).
         onDeleteObject(objectWithContext, doRemove => {
@@ -454,22 +464,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
-        const { object } = objectWithContext;
+        const { global } = objectWithContext;
         onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
 
-        if (canRenameObject(newName)) {
-          onRenameObjectFinish(objectWithContext, newName, doRename => {
-            if (!doRename) return;
+        const validatedNewName = getValidatedObjectOrGroupName(newName, global);
+        onRenameObjectFinish(objectWithContext, validatedNewName, doRename => {
+          if (!doRename) return;
 
-            object.setName(newName);
-            onObjectModified(false);
-          });
-        }
+          onObjectModified(false);
+        });
       },
       [
-        canRenameObject,
+        getValidatedObjectOrGroupName,
         onObjectModified,
         onRenameObjectStart,
         onRenameObjectFinish,
@@ -607,7 +615,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const setAsGlobalObject = React.useCallback(
-      (objectWithContext: ObjectWithContext) => {
+      (i18n: I18nType, objectWithContext: ObjectWithContext) => {
         const { object } = objectWithContext;
 
         const objectName: string = object.getName();
@@ -615,14 +623,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         if (project.hasObjectNamed(objectName)) {
           showWarningBox(
-            'A global object with this name already exists. Please change the object name before setting it as a global object',
+            i18n._(
+              t`A global object with this name already exists. Please change the object name before setting it as a global object`
+            ),
             { delayToNextTick: true }
           );
           return;
         }
 
+        if (beforeSetAsGlobalObject && !beforeSetAsGlobalObject(objectName)) {
+          return;
+        }
+
         const answer = Window.showConfirmDialog(
-          "This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?"
+          i18n._(
+            t`This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?`
+          )
         );
         if (!answer) return;
 
@@ -636,7 +652,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         onObjectModified(true);
       },
-      [objectsContainer, onObjectModified, project]
+      [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
     );
 
     const openEditTagDialog = React.useCallback(
@@ -681,8 +697,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         index: number
       ) => {
         const { object } = objectWithContext;
-        const instanceCountOnScene = layout
-          ? getInstanceCountInLayoutForObject(layout, object.getName())
+        const instanceCountOnScene = initialInstances
+          ? getInstanceCountInLayoutForObject(
+              initialInstances,
+              object.getName()
+            )
           : undefined;
 
         const objectMetadata = gd.MetadataProvider.getObjectMetadata(
@@ -723,8 +742,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Edit effects`),
             click: () => onEditObject(object, 'effects'),
-            enabled: !objectMetadata.isUnsupportedBaseObjectCapability(
-              'effect'
+            enabled: objectMetadata.hasDefaultBehavior(
+              'EffectCapacity::EffectBehavior'
             ),
           },
           eventsFunctionsExtensionWriter &&
@@ -746,7 +765,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectWithContextGlobal(objectWithContext),
-            click: () => setAsGlobalObject(objectWithContext),
+            click: () => setAsGlobalObject(i18n, objectWithContext),
+            visible: canSetAsGlobalObject !== false,
           },
           {
             label: i18n._(t`Tags`),
@@ -796,7 +816,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         duplicateObject,
         editName,
         getAllObjectTags,
-        layout,
         onAddNewObject,
         onAddObjectInstance,
         onEditObject,
@@ -808,6 +827,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         eventsFunctionsExtensionWriter,
         preferences.values.userShortcutMap,
+        canSetAsGlobalObject,
+        initialInstances,
       ]
     );
 
@@ -923,4 +944,4 @@ const areEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.project === nextProps.project &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
-export default React.memo<Props>(ObjectsList, areEqual);
+export default React.memo<Props, ObjectsListInterface>(ObjectsList, areEqual);

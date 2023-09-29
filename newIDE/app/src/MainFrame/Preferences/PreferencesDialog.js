@@ -23,6 +23,10 @@ import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { adaptAcceleratorString } from '../../UI/AcceleratorString';
+import { getElectronAccelerator } from '../../KeyboardShortcuts';
+import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
+import AlertMessage from '../../UI/AlertMessage';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -32,6 +36,7 @@ type Props = {|
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
     false
@@ -47,7 +52,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
-    setUseUndefinedVariablesInAutocompletion,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
@@ -61,8 +65,13 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setUse3DEditor,
     setNewProjectsDefaultFolder,
+    setUseShortcutToClosePreviewWindow,
+    setAllowUsageOfUnicodeIdentifierNames,
   } = React.useContext(PreferencesContext);
+
+  const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
 
   return (
     <Dialog
@@ -89,8 +98,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               ? [{ value: 'folders', label: <Trans>Folders</Trans> }]
               : []),
           ]}
-          // Enforce scroll on small screen, because the tabs have long names.
-          variant={windowWidth === 'small' ? 'scrollable' : undefined}
+          // Enforce scroll on very small screens, because the tabs have long names.
+          variant={isMobileScreen ? 'scrollable' : undefined}
         />
       }
     >
@@ -251,19 +260,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             labelPosition="right"
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
           />
-          <Toggle
-            onToggle={(e, check) =>
-              setUseUndefinedVariablesInAutocompletion(check)
-            }
-            toggled={values.useUndefinedVariablesInAutocompletion}
-            labelPosition="right"
-            label={
-              <Trans>
-                Suggest names of variables used in events but not declared in
-                the list of variables
-              </Trans>
-            }
-          />
           <SelectField
             floatingLabelText={
               <Trans>
@@ -345,6 +341,33 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
+          <Toggle
+            onToggle={(e, check) =>
+              setAllowUsageOfUnicodeIdentifierNames(check)
+            }
+            toggled={values.allowUsageOfUnicodeIdentifierNames}
+            labelPosition="right"
+            label={
+              <Trans>
+                Allow unicode characters (non English languages and emojis) in
+                object, behavior and other names (experimental)
+              </Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setUse3DEditor(check)}
+            toggled={values.use3DEditor}
+            labelPosition="right"
+            label={<Trans>Show objects in 3D in the scene editor</Trans>}
+          />
+          {initialUse3DEditor.current !== values.use3DEditor && (
+            <AlertMessage kind="info">
+              <Trans>
+                For the 3D change to take effect, close and reopen all currently
+                opened scenes.
+              </Trans>
+            </AlertMessage>
+          )}
           {electron && (
             <>
               <ColumnStackLayout expand noMargin>
@@ -361,6 +384,25 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   label={
                     <Trans>
                       Always display the preview window on top of the editor
+                    </Trans>
+                  }
+                />
+                <Toggle
+                  onToggle={(e, check) =>
+                    setUseShortcutToClosePreviewWindow(check)
+                  }
+                  toggled={values.useShortcutToClosePreviewWindow}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Enable "Close project" shortcut (
+                      {adaptAcceleratorString(
+                        getElectronAccelerator(
+                          values.userShortcutMap['CLOSE_PROJECT'] ||
+                            defaultShortcuts['CLOSE_PROJECT']
+                        )
+                      )}
+                      ) to close preview window
                     </Trans>
                   }
                 />

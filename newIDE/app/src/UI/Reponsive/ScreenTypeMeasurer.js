@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react';
-import { useResponsiveWindowWidth } from './ResponsiveWindowMeasurer';
 
 export type ScreenType = 'normal' | 'touch';
 
 let userHasTouchedScreen = false;
+let userHasMovedMouse = false;
+
 if (typeof window !== 'undefined') {
   window.addEventListener(
     'touchstart',
@@ -12,6 +13,27 @@ if (typeof window !== 'undefined') {
       console.info('Touch detected, considering the screen as touch enabled.');
       userHasTouchedScreen = true;
       window.removeEventListener('touchstart', onFirstTouch, false);
+    },
+    false
+  );
+
+  // An event listener is added (and then removed at the first event triggering) and
+  // will determine if the user is on a device that uses a mouse.
+  // If the first pointermove event is not triggered by a mouse move, the device
+  // will never be considered as mouse-enabled.
+  // Note: mousemove cannot be used since browsers emulate the mouse movement when
+  // the screen is touched.
+  window.addEventListener(
+    'pointermove',
+    function onPointerMove(event: PointerEvent) {
+      console.info('Pointer move detected.');
+      if (event.pointerType === 'mouse') {
+        console.info(
+          'Pointer type is mouse, considering the device is a desktop/laptop computer.'
+        );
+        userHasMovedMouse = true;
+      }
+      window.removeEventListener('pointermove', onPointerMove, false);
     },
     false
   );
@@ -41,8 +63,8 @@ export const useScreenType = (): ScreenType => {
 
 export const useShouldAutofocusInput = (): boolean => {
   const isTouchscreen = useScreenType() === 'touch';
-  const windowWidth = useResponsiveWindowWidth();
-  return (
-    windowWidth === 'large' || (windowWidth === 'medium' && !isTouchscreen)
-  );
+  // Whatever size the screen is, if a touch event has been detected, no autofocus should
+  // be triggered (that would annoyingly open the keyboard) unless a mouse move has been
+  // detected (in that case, the device should be a touch-enabled desktop/laptop computer).
+  return !(isTouchscreen && !userHasMovedMouse);
 };

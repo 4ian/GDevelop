@@ -24,6 +24,40 @@ export type ToolbarInterface = {|
   setEditorToolbar: (React.Node | null) => void,
 |};
 
+type LeftButtonsToolbarGroupProps = {|
+  toggleProjectManager: () => void,
+  onSave: () => Promise<void>,
+  canSave: boolean,
+|};
+
+const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
+  function LeftButtonsToolbarGroup(props) {
+    return (
+      <ToolbarGroup firstChild>
+        <IconButton
+          size="small"
+          id="main-toolbar-project-manager-button"
+          onClick={props.toggleProjectManager}
+          tooltip={t`Project Manager`}
+          color="default"
+        >
+          <ProjectManagerIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          id="toolbar-save-button"
+          onClick={props.onSave}
+          tooltip={t`Save project`}
+          color="default"
+          disabled={!props.canSave}
+        >
+          <FloppyIcon />
+        </IconButton>
+      </ToolbarGroup>
+    );
+  }
+);
+
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
@@ -35,27 +69,11 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       <Toolbar>
         {props.showProjectButtons ? (
           <>
-            <ToolbarGroup firstChild>
-              <IconButton
-                size="small"
-                id="main-toolbar-project-manager-button"
-                onClick={props.toggleProjectManager}
-                tooltip={t`Project Manager`}
-                color="default"
-              >
-                <ProjectManagerIcon />
-              </IconButton>
-              <IconButton
-                size="small"
-                id="toolbar-save-button"
-                onClick={props.onSave}
-                tooltip={t`Save project`}
-                color="default"
-                disabled={!props.canSave}
-              >
-                <FloppyIcon />
-              </IconButton>
-            </ToolbarGroup>
+            <LeftButtonsToolbarGroup
+              toggleProjectManager={props.toggleProjectManager}
+              onSave={props.onSave}
+              canSave={props.canSave}
+            />
             <ToolbarGroup>
               <Spacer />
               <PreviewAndPublishButtons

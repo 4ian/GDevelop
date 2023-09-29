@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { type StorageProvider } from '../index';
 import {
   onOpenWithPicker,
   onOpen,
-  hasAutoSave,
+  getAutoSaveCreationDate,
   onGetAutoSave,
 } from './LocalProjectOpener';
 import {
@@ -14,7 +14,8 @@ import {
   onSaveProjectAs,
   onAutoSaveProject,
   getWriteErrorMessage,
-  onRenderNewProjectSaveAsLocationChooser,
+  renderNewProjectSaveAsLocationChooser,
+  getProjectLocation,
 } from './LocalProjectWriter';
 import {
   type AppArguments,
@@ -22,6 +23,14 @@ import {
 } from '../../Utils/Window';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import Computer from '../../UI/CustomSvgIcons/Computer';
+import {
+  copyResourceFilePath,
+  locateResourceFile,
+  openResourceFile,
+  removeAllResourcesWithInvalidPath,
+  scanForNewResources,
+} from './LocalProjectResourcesHandler';
+import { allResourceKindsAndMetadata } from '../../ResourcesList/ResourceSource';
 
 /**
  * Use the Electron APIs to provide access to the native
@@ -39,11 +48,12 @@ export default ({
       fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
     };
   },
-  onRenderNewProjectSaveAsLocationChooser: onRenderNewProjectSaveAsLocationChooser,
+  getProjectLocation: getProjectLocation,
+  renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,
   createOperations: () => ({
     onOpenWithPicker,
     onOpen,
-    hasAutoSave,
+    getAutoSaveCreationDate,
     onSaveProject,
     onChooseSaveProjectAsLocation,
     onSaveProjectAs,
@@ -54,4 +64,59 @@ export default ({
     },
     getWriteErrorMessage,
   }),
+  createResourceOperations: () => ({
+    project,
+    resource,
+    i18n,
+    updateInterface,
+    cleanUserSelectionOfResources,
+    informUser,
+  }) => [
+    {
+      label: i18n._(t`Locate file`),
+      click: () => locateResourceFile({ project, resource }),
+    },
+    {
+      label: i18n._(t`Open file`),
+      click: () => openResourceFile({ project, resource }),
+    },
+    {
+      label: i18n._(t`Copy file path`),
+      click: () => {
+        copyResourceFilePath({ project, resource });
+        informUser({
+          message: <Trans>Resource file path copied to clipboard</Trans>,
+        });
+      },
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Scan in the project folder for...`),
+      submenu: allResourceKindsAndMetadata.map(
+        ({ displayName, fileExtensions, createNewResource }) => ({
+          label: i18n._(displayName),
+          click: async () => {
+            await scanForNewResources({
+              project,
+              extensions: fileExtensions,
+              createResource: createNewResource,
+            });
+            updateInterface();
+          },
+        })
+      ),
+    },
+    {
+      label: i18n._(t`Remove resources with invalid path`),
+      click: () => {
+        removeAllResourcesWithInvalidPath({ project });
+        // Remove user selection in case the user selected a resource
+        // that was just removed.
+        cleanUserSelectionOfResources();
+        // Force update of the resources list as otherwise it could render
+        // resources that were just deleted.
+        updateInterface();
+      },
+    },
+  ],
 }: StorageProvider);

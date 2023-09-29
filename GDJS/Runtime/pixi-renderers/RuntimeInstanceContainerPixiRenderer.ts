@@ -4,8 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * A render for instance container.
    *
@@ -23,6 +21,8 @@ namespace gdjs {
     setLayerIndex(layer: gdjs.RuntimeLayer, index: integer): void;
 
     getRendererObject(): PIXI.Container;
+
+    get3DRendererObject(): THREE.Object3D | null;
   }
 
   // Register the class to let the engine use it.

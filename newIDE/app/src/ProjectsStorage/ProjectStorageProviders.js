@@ -7,6 +7,7 @@ import {
 } from '.';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type AppArguments } from '../Utils/Window';
+import { type ResourcesActionsMenuBuilder } from '.';
 
 /**
  * An empty StorageProvider doing nothing.
@@ -25,6 +26,7 @@ type Props = {|
   defaultStorageProvider?: StorageProvider,
   children: ({
     storageProviders: Array<StorageProvider>,
+    getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
     getStorageProviderOperations: (
       newStorageProvider?: ?StorageProvider
     ) => StorageProviderOperations,
@@ -73,6 +75,9 @@ const ProjectStorageProviders = (props: Props) => {
   const storageProviderOperations = React.useRef<?StorageProviderOperations>(
     null
   );
+  const storageProviderResourceOperations = React.useRef<?ResourcesActionsMenuBuilder>(
+    null
+  );
   const [renderDialog, setRenderDialog] = React.useState<?() => React.Node>(
     null
   );
@@ -104,6 +109,7 @@ const ProjectStorageProviders = (props: Props) => {
       if (!newStorageProvider) {
         if (!storageProviderOperations.current) {
           currentStorageProvider.current = emptyStorageProvider;
+          storageProviderResourceOperations.current = null;
           storageProviderOperations.current = emptyStorageProvider.createOperations(
             {
               setDialog,
@@ -138,6 +144,9 @@ const ProjectStorageProviders = (props: Props) => {
       if (keepForNextOperations) {
         currentStorageProvider.current = newStorageProvider;
         storageProviderOperations.current = storageProviderOperationsToUse;
+        storageProviderResourceOperations.current = newStorageProvider.createResourceOperations
+          ? newStorageProvider.createResourceOperations({ authenticatedUser })
+          : null;
       }
 
       return storageProviderOperationsToUse;
@@ -147,6 +156,10 @@ const ProjectStorageProviders = (props: Props) => {
 
   const getStorageProvider = React.useCallback(() => {
     return currentStorageProvider.current || emptyStorageProvider;
+  }, []);
+
+  const getStorageProviderResourceOperations = React.useCallback(() => {
+    return storageProviderResourceOperations.current;
   }, []);
 
   // Some storage providers might need the current authenticated user
@@ -161,6 +174,9 @@ const ProjectStorageProviders = (props: Props) => {
         closeDialog,
         authenticatedUser,
       });
+      storageProviderResourceOperations.current = storageProvider.createResourceOperations
+        ? storageProvider.createResourceOperations({ authenticatedUser })
+        : null;
     },
     [authenticatedUser, setDialog, closeDialog]
   );
@@ -173,6 +189,7 @@ const ProjectStorageProviders = (props: Props) => {
         initialFileMetadataToOpen:
           defaultConfiguration.initialFileMetadataToOpen,
         getStorageProvider,
+        getStorageProviderResourceOperations,
       })}
       {renderDialog && renderDialog()}
     </React.Fragment>

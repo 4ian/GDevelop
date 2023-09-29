@@ -14,6 +14,8 @@
 namespace gd {
 class EventsList;
 class ObjectsContainer;
+class ObjectsContainersList;
+class ProjectScopedContainers;
 class Platform;
 class ExternalEvents;
 class BaseEvent;
@@ -79,8 +81,7 @@ class GD_CORE_API EventsRefactorer {
    * events ).
    */
   static void RenameObjectInEvents(const gd::Platform& platform,
-                                   gd::ObjectsContainer& project,
-                                   gd::ObjectsContainer& layout,
+                                   gd::ProjectScopedContainers& projectScopedContainers,
                                    gd::EventsList& events,
                                    gd::String oldName,
                                    gd::String newName);
@@ -89,8 +90,7 @@ class GD_CORE_API EventsRefactorer {
    * Remove all actions or conditions using an object
    */
   static void RemoveObjectInEvents(const gd::Platform& platform,
-                                   gd::ObjectsContainer& project,
-                                   gd::ObjectsContainer& layout,
+                                   gd::ProjectScopedContainers& projectScopedContainers,
                                    gd::EventsList& events,
                                    gd::String name);
 
@@ -136,8 +136,7 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RenameObjectInActions(const gd::Platform& platform,
-                                    gd::ObjectsContainer& project,
-                                    gd::ObjectsContainer& layout,
+                                    gd::ProjectScopedContainers& projectScopedContainers,
                                     gd::InstructionsList& instructions,
                                     gd::String oldName,
                                     gd::String newName);
@@ -149,8 +148,7 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RenameObjectInConditions(const gd::Platform& platform,
-                                       gd::ObjectsContainer& project,
-                                       gd::ObjectsContainer& layout,
+                                       gd::ProjectScopedContainers& projectScopedContainers,
                                        gd::InstructionsList& instructions,
                                        gd::String oldName,
                                        gd::String newName);
@@ -163,8 +161,7 @@ class GD_CORE_API EventsRefactorer {
    */
   static bool RenameObjectInEventParameters(
       const gd::Platform& platform,
-      gd::ObjectsContainer& project,
-      gd::ObjectsContainer& layout,
+      gd::ProjectScopedContainers& projectScopedContainers,
       gd::Expression& expression,
       gd::ParameterMetadata parameterMetadata,
       gd::String oldName,
@@ -176,8 +173,7 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RemoveObjectInConditions(const gd::Platform& platform,
-                                       gd::ObjectsContainer& project,
-                                       gd::ObjectsContainer& layout,
+                                       gd::ProjectScopedContainers& projectScopedContainers,
                                        gd::InstructionsList& conditions,
                                        gd::String name);
 
@@ -187,8 +183,7 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RemoveObjectInActions(const gd::Platform& platform,
-                                    gd::ObjectsContainer& project,
-                                    gd::ObjectsContainer& layout,
+                                    gd::ProjectScopedContainers& projectScopedContainers,
                                     gd::InstructionsList& conditions,
                                     gd::String name);
 

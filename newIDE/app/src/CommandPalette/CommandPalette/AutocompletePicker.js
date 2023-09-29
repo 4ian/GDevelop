@@ -27,10 +27,15 @@ import {
   getHitLastHierarchyLevel,
   type AlgoliaSearchHit as AlgoliaSearchHitType,
 } from '../../Utils/AlgoliaSearch';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {
     width: '100%',
+  },
+  rootSmallPadding: {
+    paddingLeft: 0,
   },
   wikiPrimaryTextHierarchy: {
     color: theme.palette.text.secondary,
@@ -46,7 +51,7 @@ const styles = {
   },
 };
 
-type Item = NamedCommand | CommandOption | AlgoliaSearchHitType;
+type Item = NamedCommand | CommandOption | GoToWikiCommand;
 
 const HitPrimaryText = (
   hit: any,
@@ -84,7 +89,9 @@ type Props<T> = {|
 
 type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
-const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
+export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -100,7 +107,10 @@ const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
       dense
       component="div"
       ContainerComponent="div"
-      classes={{ container: classes.listItemContainer }}
+      classes={{
+        container: classes.listItemContainer,
+        root: isMobileScreen ? classes.rootSmallPadding : null,
+      }}
     >
       <ListItemIcon>
         <Book />
@@ -118,6 +128,10 @@ const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
 const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
+  const isMediumScreen = windowWidth === 'medium';
+  const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
@@ -133,6 +147,7 @@ const AutocompletePicker = (
 
   const getItemHint = React.useCallback(
     (item: Item) => {
+      if (isMobileScreen || isMediumScreen) return null;
       if (item.text) return null;
       else if (item.name) {
         const shortcutString = shortcutMap[item.name];
@@ -145,7 +160,7 @@ const AutocompletePicker = (
         );
       }
     },
-    [shortcutMap]
+    [shortcutMap, isMobileScreen, isMediumScreen]
   );
 
   const getItemText = React.useCallback(
@@ -177,7 +192,10 @@ const AutocompletePicker = (
           dense
           component="div"
           ContainerComponent="div"
-          classes={{ container: classes.listItemContainer }}
+          classes={{
+            container: classes.listItemContainer,
+            root: isMobileScreen ? classes.rootSmallPadding : null,
+          }}
         >
           <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
           <ListItemText primary={getItemText(item)} />
@@ -185,7 +203,14 @@ const AutocompletePicker = (
         </ListItem>
       );
     },
-    [classes.listItemContainer, getItemText, getItemHint, getItemIcon]
+    [
+      classes.listItemContainer,
+      classes.rootSmallPadding,
+      isMobileScreen,
+      getItemText,
+      getItemHint,
+      getItemIcon,
+    ]
   );
 
   return (
@@ -196,8 +221,10 @@ const AutocompletePicker = (
       options={props.items}
       getOptionLabel={getItemText}
       onChange={handleSelect}
-      onInputChange={(e, value) => {
-        if (props.onInputChange) props.onInputChange(value);
+      onInputChange={(e, value, reason) => {
+        if (reason === 'input' && props.onInputChange) {
+          props.onInputChange(value);
+        }
       }}
       openOnFocus
       autoHighlight
@@ -207,7 +234,7 @@ const AutocompletePicker = (
           {...params}
           placeholder={props.i18n._(props.placeholder)}
           variant="outlined"
-          autoFocus
+          autoFocus={shouldAutofocusInput}
         />
       )}
       renderOption={renderOption}

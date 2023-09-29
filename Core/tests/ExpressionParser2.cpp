@@ -13,6 +13,8 @@
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "catch.hpp"
 
 TEST_CASE("ExpressionParser2", "[common][events]") {
@@ -20,20 +22,31 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
+  layout1.GetVariables().InsertNew("MySceneVariable", 0);
+  layout1.GetVariables().InsertNew("MySceneVariable2", 1);
+  layout1.GetVariables().InsertNew("MySceneStructureVariable", 2).GetChild("MyChild");
+  layout1.GetVariables().InsertNew("MySceneStructureVariable2", 2).GetChild("MyChild");
 
-  auto &myObject = layout1.InsertNewObject(project, "BuiltinObject", "MyObject", 0);
+  // Create an instance of BuiltinObject.
+  // This is not possible in practice.
+  auto &myObject = layout1.InsertNewObject(project, "", "MyObject", 0);
   myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
   auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup", 0);
   myGroup.AddObject(myObject.GetName());
-  
-  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
+
+  auto &mySpriteObject = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
+  mySpriteObject.GetVariables().InsertNew("MyVariable", 0);
+  mySpriteObject.GetVariables().InsertNew("MyVariable2", 1);
   layout1.InsertNewObject(project,
-                          "MyExtension::FakeObjectWithUnsupportedCapability",
-                          "MyFakeObjectWithUnsupportedCapability",
+                          "MyExtension::FakeObjectWithDefaultBehavior",
+                          "FakeObjectWithDefaultBehavior",
                           2);
 
   gd::ExpressionParser2 parser;
+
+  auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+  auto & objectsContainersList = projectScopedContainers.GetObjectsContainersList();
 
   SECTION("Empty expression") {
     SECTION("of type string") {
@@ -41,11 +54,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "string", emptyNode);
+          platform, objectsContainersList, "string", emptyNode);
       REQUIRE(type == "string");
       REQUIRE(emptyNode.text == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -56,11 +69,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", emptyNode);
+          platform, objectsContainersList, "number", emptyNode);
       REQUIRE(type == "number");
       REQUIRE(emptyNode.text == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -71,11 +84,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "object", emptyNode);
+          platform, objectsContainersList, "object", emptyNode);
       REQUIRE(type == "object");
       REQUIRE(emptyNode.text == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -88,7 +101,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "string", emptyNode);
+          platform, objectsContainersList, "string", emptyNode);
       REQUIRE(type == "string");
       REQUIRE(emptyNode.text == "");
     }
@@ -97,7 +110,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", emptyNode);
+          platform, objectsContainersList, "number", emptyNode);
       REQUIRE(type == "number");
       REQUIRE(emptyNode.text == "");
     }
@@ -106,7 +119,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "object", emptyNode);
+          platform, objectsContainersList, "object", emptyNode);
       REQUIRE(type == "object");
       REQUIRE(emptyNode.text == "");
     }
@@ -152,7 +165,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(
@@ -163,7 +176,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("abcd");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -171,10 +184,45 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "world\").");
     }
     {
+      auto node = parser.ParseExpression("abcd[0]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No object, variable or property with this name found.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("abcd.efg.hij");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No object, variable or property with this name found.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      // It could be an object function call, so the error is more generic.
+      auto node = parser.ParseExpression("abcd.efg");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must wrap your text inside double quotes (example: \"Hello "
+              "world\").");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
       auto node = parser.ParseExpression("123");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -184,7 +232,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("abcd efgh");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -197,7 +245,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("abcd + efgh");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -212,7 +260,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -224,7 +272,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"hello world");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -236,7 +284,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"\"\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 3);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -257,7 +305,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"hello\",");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 3);
 
@@ -276,7 +324,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"hello\"]");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 3);
 
@@ -295,7 +343,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("Idontexist(\"hello\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -306,10 +354,24 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "Double check that you've not made any typo in the name.");
     }
     {
+      auto node = parser.ParseExpression("🅸🅳🅾🅽🆃🅴🆇🅸🆂🆃😄(\"hello\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The list of parameters is not terminated. Add a closing "
+              "parenthesis to end the parameters.");
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+              "Cannot find an expression with this name: 🅸🅳🅾🅽🆃🅴🆇🅸🆂🆃😄\n"
+              "Double check that you've not made any typo in the name.");
+    }
+    {
       auto node = parser.ParseExpression("=\"test\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(
@@ -323,7 +385,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("((\"hello\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -337,12 +399,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("MyObject.MyFunction)");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 4);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "You must wrap your text inside double quotes "
-              "(example: \"Hello world\").");
+              "This variable does not exist on this object or group.");
       REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "You must add the operator + between texts or expressions. "
               "For example: \"Your name: \" + VariableString(PlayerName).");
@@ -359,7 +420,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"Hello \" - \"World\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -414,7 +475,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", operatorNode);
+          platform, objectsContainersList, "number", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "number");
       auto &leftNumberNode =
@@ -424,7 +485,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightNumberNode.number == "456");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -433,7 +494,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "string", operatorNode);
+          platform, objectsContainersList, "string", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "string");
       auto &leftTextNode =
@@ -443,7 +504,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightTextNode.text == "def");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -455,7 +516,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", operatorNode);
+          platform, objectsContainersList, "number|string", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "number");
       auto &leftNumberNode =
@@ -465,7 +526,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightNumberNode.number == "456");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -474,7 +535,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", operatorNode);
+          platform, objectsContainersList, "number|string", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "string");
       auto &leftTextNode =
@@ -484,7 +545,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightTextNode.text == "def");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -496,14 +557,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", unaryOperatorNode);
+          platform, objectsContainersList, "number", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -512,14 +573,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", unaryOperatorNode);
+          platform, objectsContainersList, "number", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '+');
       REQUIRE(type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -528,14 +589,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", unaryOperatorNode);
+          platform, objectsContainersList, "number", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123.2");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -546,14 +607,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", unaryOperatorNode);
+          platform, objectsContainersList, "number|string", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -562,14 +623,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", unaryOperatorNode);
+          platform, objectsContainersList, "number|string", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '+');
       REQUIRE(type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -578,14 +639,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", unaryOperatorNode);
+          platform, objectsContainersList, "number|string", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123.2");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -596,7 +657,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("*123");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -607,7 +668,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("-\"hello\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -620,7 +681,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("+-\"hello\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -641,7 +702,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -652,7 +713,52 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("abcd");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("ab😊d");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("abcd[0]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No object, variable or property with this name found.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("abcd.efg.hij");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No object, variable or property with this name found.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      // It could be an object function call, so the error is more generic.
+      auto node = parser.ParseExpression("abcd.efg");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -663,7 +769,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"hello world\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -675,7 +781,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("123 456");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -690,7 +796,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("3..14");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -705,7 +811,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression(".");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -719,33 +825,23 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("123 % 456");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetFatalErrors().size() == 3);
-      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
-              "No operator found. Did you forget to enter an operator (like +, "
-              "-, * or /) between numbers or expressions?");
-      REQUIRE(validator.GetFatalErrors()[1]->GetStartPosition() == 4);
-      // TODO Should error be removed?
-      REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
-              "You must enter a number.");
+      REQUIRE(validator.GetFatalErrors().size() != 0);
     }
     {
       auto node = parser.ParseExpression("123 ? 456");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetFatalErrors().size() == 1);
-      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "You've used an operator that is not supported. Operator should be "
-              "either +, -, / or *.");
+      REQUIRE(validator.GetFatalErrors().size() != 0);
     }
     {
       auto node = parser.ParseExpression("1//2");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -759,7 +855,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("123 + \"hello world\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -771,7 +867,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"hello world\" + 123");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -786,7 +882,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("123 + \"hello world\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -799,7 +895,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("\"hello world\" + 123");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -814,7 +910,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("((123)) + (\"hello world\")");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -827,7 +923,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("((\"hello world\") + (123))");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -844,7 +940,27 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "HelloWorld1");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("😅");
+      REQUIRE(node != nullptr);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "😅");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("中文");
+      REQUIRE(node != nullptr);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "中文");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -855,7 +971,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "Hello World 1");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -865,7 +981,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "Hello World 1");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -875,7 +991,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "Hello World 1");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -886,7 +1002,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -896,7 +1012,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("Hello + World1");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -914,7 +1030,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -927,7 +1043,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -937,7 +1053,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -947,7 +1063,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -960,7 +1076,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "MySpriteObject");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -973,7 +1089,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "MyGroup");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -986,7 +1102,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "MyObject");
       REQUIRE(functionNode.behaviorName == "MyBehavior");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -999,7 +1115,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "MyGroup");
       REQUIRE(functionNode.behaviorName == "MyBehavior");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1023,6 +1139,448 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(textNode.text == "2");
       REQUIRE(identifierNode.identifierName == "three");
     }
+    SECTION("identifier parameter (unicode)") {
+      auto node = parser.ParseExpression(
+          "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", 😄)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "WhateverFunction");
+      REQUIRE(functionNode.objectName == "WhateverObject");
+      REQUIRE(functionNode.behaviorName == "WhateverBehavior");
+      REQUIRE(functionNode.parameters.size() == 3);
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*functionNode.parameters[0]);
+      auto &textNode =
+          dynamic_cast<gd::TextNode &>(*functionNode.parameters[1]);
+      auto &identifierNode =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
+
+      REQUIRE(numberNode.number == "1");
+      REQUIRE(textNode.text == "2");
+      REQUIRE(identifierNode.identifierName == "😄");
+    }
+    SECTION("unicode for object, behavior and function") {
+      auto node = parser.ParseExpression(
+          "🧸.🗣️::🔔(1, \"2\", 😄)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "🔔");
+      REQUIRE(functionNode.objectName == "🧸");
+      REQUIRE(functionNode.behaviorName == "🗣️");
+      REQUIRE(functionNode.parameters.size() == 3);
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*functionNode.parameters[0]);
+      auto &textNode =
+          dynamic_cast<gd::TextNode &>(*functionNode.parameters[1]);
+      auto &identifierNode =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
+
+      REQUIRE(numberNode.number == "1");
+      REQUIRE(textNode.text == "2");
+      REQUIRE(identifierNode.identifierName == "😄");
+    }
+  }
+
+  SECTION("Valid scene variables (1 level)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable + MySceneVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid scene variables (2 levels)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyChild + MySceneStructureVariable2.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid scene variables (2 levels with bracket accessor)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyChild\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable[\"MyChild\"] + MySceneStructureVariable2[\"MyChild\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid scene variables (1 level, variable does not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MyNonExistingSceneVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+    }
+  }
+
+  SECTION("Invalid scene variables (2 levels, child does not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneVariable.MyNonExistingChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No child variable with this name found.");
+    }
+  }
+
+  SECTION("Valid object variables (1 level)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable + MySpriteObject.MyVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid object variables (2 levels)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable.MyChild + MySpriteObject.MyVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable[\"MyChild\"] + MySpriteObject.MyVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid object variables (1 level, non existing object)") {
+    {
+      auto node =
+          parser.ParseExpression("MyNonExistingSpriteObject.MyVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+    }
+  }
+
+  SECTION("Invalid object variables (2 levels, bracket accessor)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject[\"BracketNotationCantBeUsedHere\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject[\"BracketNotationCantBeUsedHere\"].Child");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject[\"BracketNotationCantBeUsedHere\"][\"Child\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You can't use the brackets to access an object variable. Use a dot followed by the variable name, like this: `MyObject.MyVariable`.");
+    }
+  }
+
+  SECTION("Invalid object variables (non existing variable)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyNonExistingVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "This variable does not exist on this object or group.");
+    }
+  }
+
+  SECTION("Invalid object (object entered without any variable)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "An object variable or expression should be entered.");
+    }
+  }
+
+  SECTION("Valid property") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid property (non existing name)") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+    }
+  }
+
+  SECTION("Invalid property (unsupported child syntax, 1 level)") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty2.child");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a property is not possible - just write the property name.");
+    }
+  }
+  SECTION("Invalid property (unsupported child syntax, 2 levels)") {
+    {
+      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+      propertiesContainer.InsertNew("MyProperty2");
+
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty2.child.grandChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a property is not possible - just write the property name.");
+    }
+  }
+
+  SECTION("Valid parameter") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid parameter (wrong type)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("audioResource");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "This parameter is not a string, number or boolean - it can't be used in an expression.");
+    }
+  }
+
+  SECTION("Invalid parameter (non existing name)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+    }
+  }
+
+  SECTION("Invalid parameter (unsupported child syntax, 1 level)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2.child");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a parameter is not possible - just write the parameter name.");
+    }
+  }
+  SECTION("Invalid parameter (unsupported child syntax, 2 levels)") {
+    {
+      std::vector<gd::ParameterMetadata> parameters;
+      gd::ParameterMetadata param1;
+      param1.SetName("MyParameter1");
+      param1.SetType("number");
+      gd::ParameterMetadata param2;
+      param2.SetName("MyParameter2");
+      param2.SetType("string");
+      parameters.push_back(param1);
+      parameters.push_back(param2);
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2.child.grandChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a parameter is not possible - just write the parameter name.");
+    }
   }
 
   SECTION("Valid function calls ('number|string' type)") {
@@ -1032,13 +1590,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", functionNode);
+          platform, objectsContainersList, "number|string", functionNode);
       REQUIRE(functionNode.functionName == "MyExtension::GetNumber");
       REQUIRE(type == "number");
       REQUIRE(functionNode.objectName == "");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1048,13 +1606,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", functionNode);
+          platform, objectsContainersList, "number|string", functionNode);
       REQUIRE(functionNode.functionName == "MyExtension::ToString");
       REQUIRE(type == "string");
       REQUIRE(functionNode.objectName == "");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1070,7 +1628,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1083,7 +1641,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "MySpriteObject");
       REQUIRE(functionNode.behaviorName == "");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1117,7 +1675,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1129,7 +1687,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1138,7 +1696,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1162,7 +1720,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.behaviorFunctionName == "MyFunc");
 
-    gd::ExpressionValidator validator(platform, project, layout1, "number");
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
     node->Visit(validator);
     REQUIRE(validator.GetFatalErrors().size() == 1);
     REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1183,7 +1741,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "string", objectFunctionCall);
+          platform, objectsContainersList, "string", objectFunctionCall);
     REQUIRE(objectFunctionCall.objectName == "MyObject");
     REQUIRE(objectFunctionCall.functionName == "");
     REQUIRE(type == "string");
@@ -1194,7 +1752,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", objectFunctionCall);
+          platform, objectsContainersList, "number", objectFunctionCall);
     REQUIRE(objectFunctionCall.objectName == "MyObject");
     REQUIRE(objectFunctionCall.functionName == "");
     REQUIRE(type == "number");
@@ -1207,7 +1765,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", objectFunctionCall);
+          platform, objectsContainersList, "number|string", objectFunctionCall);
     REQUIRE(objectFunctionCall.objectName == "MyObject");
     REQUIRE(objectFunctionCall.functionName == "");
     REQUIRE(type == "number|string");
@@ -1228,7 +1786,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "string", objectFunctionName);
+          platform, objectsContainersList, "string", objectFunctionName);
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.functionName == "");
@@ -1240,7 +1798,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", objectFunctionName);
+          platform, objectsContainersList, "number", objectFunctionName);
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.functionName == "");
@@ -1255,7 +1813,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", objectFunctionName);
+          platform, objectsContainersList, "number|string", objectFunctionName);
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.functionName == "");
@@ -1267,7 +1825,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "string", freeFunctionCall);
+          platform, objectsContainersList, "string", freeFunctionCall);
     REQUIRE(freeFunctionCall.objectName == "");
     REQUIRE(freeFunctionCall.functionName == "fun");
     REQUIRE(type == "string");
@@ -1278,7 +1836,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number", freeFunctionCall);
+          platform, objectsContainersList, "number", freeFunctionCall);
     REQUIRE(freeFunctionCall.objectName == "");
     REQUIRE(freeFunctionCall.functionName == "fun");
     REQUIRE(type == "number");
@@ -1290,7 +1848,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", freeFunctionCall);
+          platform, objectsContainersList, "number|string", freeFunctionCall);
     REQUIRE(freeFunctionCall.objectName == "");
     REQUIRE(freeFunctionCall.functionName == "fun");
     REQUIRE(type == "number|string");
@@ -1301,7 +1859,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("Idontexist(12)");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1316,7 +1874,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "MyInexistentObject.GetFromBaseExpression()");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 0);
         REQUIRE(validator.GetAllErrors().size() == 1);
@@ -1329,7 +1887,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         auto node = parser.ParseExpression("MyInexistentObject.Idontexist()");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 0);
         REQUIRE(validator.GetAllErrors().size() == 1);
@@ -1342,7 +1900,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         auto node = parser.ParseExpression("MyInexistentObject.Idontexist(");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
         REQUIRE(validator.GetAllErrors().size() == 2);
@@ -1365,7 +1923,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         // There should be no error on the behavior because it's not possible
         // to know if it exist or not.
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 0);
         REQUIRE(validator.GetAllErrors().size() == 1);
@@ -1379,7 +1937,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "MyObject.MyInexistentBehavior::MyMaybeExistingFunction()");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 0);
         REQUIRE(validator.GetAllErrors().size() == 1);
@@ -1393,7 +1951,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "MyObject.MyInexistentBehavior::Idontexist(");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
         REQUIRE(validator.GetAllErrors().size() == 2);
@@ -1414,7 +1972,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             parser.ParseExpression("MyExtension::GetNumber(12)");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
         REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1428,7 +1986,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         auto node = parser.ParseExpression("MySpriteObject.GetObjectNumber(12)");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
         REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1444,7 +2002,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "MyExtension::GetNumberWith2Params(12)");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1458,7 +2016,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "MyExtension::GetNumberWith2Params(1, 1)");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1471,7 +2029,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         auto node = parser.ParseExpression("MyExtension::GetNumber()");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "string");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
         REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1485,7 +2043,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         auto node = parser.ParseExpression("MyExtension::ToString()");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
         REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1501,7 +2059,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         auto node = parser.ParseExpression("MyExtension::(12)");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
         REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1514,7 +2072,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         auto node = parser.ParseExpression("MyObject.MyBehavior::(12)");
         REQUIRE(node != nullptr);
 
-        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
 
@@ -1533,7 +2091,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1543,18 +2101,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("myVariable[myChild]");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-            "You must enter a number or a text, wrapped inside double quotes "
-            "(example: \"Hello world\").");
+            "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
     }
     SECTION("no closing bracket") {
       auto node = parser.ParseExpression("myVariable[\"myChild\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1564,7 +2121,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("1234");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1574,7 +2131,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("\"text\"");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1600,8 +2157,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "myVariable");
       REQUIRE(identifierNode.childIdentifierName == "myChild");
-      
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1618,7 +2175,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &textNode = dynamic_cast<gd::TextNode &>(*childNode.expression);
       REQUIRE(textNode.text == "My named children");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1636,7 +2193,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           dynamic_cast<gd::VariableAccessorNode &>(*childNode.child);
       REQUIRE(grandChildNode.name == "grandChild");
 
-      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1647,21 +2204,21 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("123");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", *node.get());
+          platform, objectsContainersList, "number|string", *node.get());
       REQUIRE(type == "number");
     }
     {
       auto node = parser.ParseExpression("123 + MyExtension::GetNumber()");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", *node.get());
+          platform, objectsContainersList, "number|string", *node.get());
       REQUIRE(type == "number");
     }
     {
       auto node = parser.ParseExpression("\"Hello\"");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", *node.get());
+          platform, objectsContainersList, "number|string", *node.get());
       REQUIRE(type == "string");
     }
     {
@@ -1669,7 +2226,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "\"Hello\" + MyExtension::ToString(3)");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, project, layout1, "number|string", *node.get());
+          platform, objectsContainersList, "number|string", *node.get());
       REQUIRE(type == "string");
     }
   }
@@ -1697,15 +2254,15 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(identifierObject2Node.identifierName == "MyObject2");
       REQUIRE(variable1Node.identifierName == "MyVar1");
       REQUIRE(variable2Node.identifierName == "MyVar2");
-      
+
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, project, layout1, "", variable1Node);
+          platform, objectsContainersList, "", variable1Node);
       REQUIRE(variable1ObjectName == "MyObject1");
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, project, layout1, "", variable2Node);
+          platform, objectsContainersList, "", variable2Node);
       REQUIRE(variable2ObjectName == "MyObject2");
-      
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1728,15 +2285,15 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(identifierObject1Node.identifierName == "MyObject1");
       REQUIRE(variable1Node.identifierName == "MyVar1");
       REQUIRE(variable2Node.identifierName == "MyVar2");
-      
+
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, project, layout1, "", variable1Node);
+          platform, objectsContainersList, "", variable1Node);
       REQUIRE(variable1ObjectName == "MyObject1");
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, project, layout1, "", variable2Node);
+          platform, objectsContainersList, "", variable2Node);
       REQUIRE(variable2ObjectName == "MyObject1");
-      
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1752,12 +2309,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
 
       REQUIRE(variable1Node.identifierName == "MyVar1");
-      
+
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, project, layout1, "MySpriteObject", variable1Node);
+          platform, objectsContainersList, "MySpriteObject", variable1Node);
       REQUIRE(variable1ObjectName == "MySpriteObject");
-      
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1774,12 +2331,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       REQUIRE(variable1Node.identifierName == "MyVar1");
       REQUIRE(variable1Node.childIdentifierName == "MyChild");
-      
+
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, project, layout1, "MySpriteObject", variable1Node);
+          platform, objectsContainersList, "MySpriteObject", variable1Node);
       REQUIRE(variable1ObjectName == "MySpriteObject");
-      
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -1795,7 +2352,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "badly/written object1, MyVar1, MyObject2, MyVar2)");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1817,7 +2374,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "My badly/written var1, MyObject2, MyVar2)");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 2);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -1830,39 +2387,39 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION(
-      "Valid function call with an object expression requiring a capability") {
+      "Valid function call with a default behavior") {
     auto node = parser.ParseExpression(
-        "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
+        "FakeObjectWithDefaultBehavior.Effect::GetSomethingRequiringEffectCapability(123)");
     REQUIRE(node != nullptr);
 
-    gd::ExpressionValidator validator(platform, project, layout1, "string");
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
     node->Visit(validator);
-    REQUIRE(validator.GetFatalErrors().size() == 0);
+    REQUIRE(validator.GetAllErrors().size() == 0);
   }
 
   SECTION(
-      "Invalid function call with an object expression requiring a "
-      "capability") {
+      "Invalid function call with an object that doesn't have a default behavior") {
     auto node =
-        parser.ParseExpression("MyFakeObjectWithUnsupportedCapability."
+        parser.ParseExpression("MySpriteObject.Effect::"
                                "GetSomethingRequiringEffectCapability(123)");
     REQUIRE(node != nullptr);
 
-    gd::ExpressionValidator validator(platform, project, layout1, "string");
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
     node->Visit(validator);
-    REQUIRE(validator.GetFatalErrors().size() == 1);
-    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-            "This expression exists, but it can't be used on this object.");
+    REQUIRE(validator.GetFatalErrors().size() == 0);
+    REQUIRE(validator.GetAllErrors().size() == 1);
+    REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "This behavior is not attached to this object.");
   }
 
   SECTION("Fuzzy/random tests") {
     {
-      auto testExpression = [&parser, platform, project, layout1](const gd::String &expression) {
-        auto testExpressionWithType = [&parser, platform, project, layout1,
+      auto testExpression = [&parser, platform, projectScopedContainers](const gd::String &expression) {
+        auto testExpressionWithType = [&parser, platform, projectScopedContainers,
                                        &expression](const gd::String &type) {
           auto node = parser.ParseExpression(expression);
           REQUIRE(node != nullptr);
-          gd::ExpressionValidator validator(platform, project, layout1, type);
+          gd::ExpressionValidator validator(platform, projectScopedContainers, type);
           node->Visit(validator);
           REQUIRE(validator.GetFatalErrors().size() != 0);
         };

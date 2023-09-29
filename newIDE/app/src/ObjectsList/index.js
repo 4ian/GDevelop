@@ -847,7 +847,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (
         i18n: I18nType,
         destinationItem: TreeViewItem,
-        where: 'afterOrInside' | 'before'
+        where: 'before' | 'inside' | 'after'
       ) => {
         if (
           destinationItem.isRoot ||
@@ -894,7 +894,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         ) {
           let parent, index;
           if (
-            where === 'afterOrInside' &&
+            where === 'inside' &&
             destinationItem.objectFolderOrObject.isFolder()
           ) {
             parent = destinationItem.objectFolderOrObject;
@@ -903,7 +903,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             parent = destinationItem.objectFolderOrObject.getParent();
             index =
               parent.getChildPosition(destinationItem.objectFolderOrObject) +
-              (where === 'afterOrInside' ? 1 : 0);
+              (where === 'after' ? 1 : 0);
           }
           setAsGlobalObject({
             i18n,
@@ -931,7 +931,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           let parent;
 
           if (
-            where === 'afterOrInside' &&
+            where === 'inside' &&
             destinationObjectFolderOrObject.isFolder()
           ) {
             parent = destinationObjectFolderOrObject;
@@ -947,7 +947,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               destinationObjectFolderOrObject
             );
             if (toIndex > fromIndex) toIndex -= 1;
-            if (where === 'afterOrInside') toIndex += 1;
+            if (where === 'after') toIndex += 1;
             selectedObjectFolderOrObjectParent.moveChild(fromIndex, toIndex);
           } else {
             if (
@@ -961,7 +961,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               selectedObjectFolderOrObject,
               parent,
               parent.getChildPosition(destinationObjectFolderOrObject) +
-                (where === 'afterOrInside' ? 1 : 0)
+                (where === 'after' ? 1 : 0)
             );
           }
         } else {

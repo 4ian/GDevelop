@@ -112,7 +112,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   ] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
   const [whereToDrop, setWhereToDrop] = React.useState<
-    'before' | 'afterOrInside'
+    'before' | 'after' | 'inside'
   >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const openContextMenu = React.useCallback(
@@ -228,9 +228,27 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             getContainerYPosition
           );
           if (containerYPosition) {
-            setWhereToDrop(
-              y - containerYPosition <= 16 ? 'before' : 'afterOrInside'
-            );
+            if (displayAsFolder) {
+              if (node.collapsed) {
+                setWhereToDrop(
+                  y - containerYPosition <= 6
+                    ? 'before'
+                    : y - containerYPosition <= 26
+                    ? 'inside'
+                    : 'after'
+                );
+              } else {
+                // If the folder is open, do not suggest to drop after as
+                // the drop indicator can be misleading (displayed under the row
+                // although dropping the element after would put it below the last
+                // displayed child of the folder).
+                setWhereToDrop(
+                  y - containerYPosition <= 6 ? 'before' : 'inside'
+                );
+              }
+            } else {
+              setWhereToDrop(y - containerYPosition <= 16 ? 'before' : 'after');
+            }
           }
         }}
       >
@@ -258,9 +276,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   className={
                     'row-container' +
                     (node.selected ? ' selected' : '') +
-                    (isOver &&
-                    whereToDrop === 'afterOrInside' &&
-                    displayAsFolder
+                    (isOver && whereToDrop === 'inside' && displayAsFolder
                       ? canDrop
                         ? ' with-can-drop-inside-indicator'
                         : ' with-cannot-drop-inside-indicator'
@@ -383,9 +399,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             </div>
                           )}
                       </div>
-                      {isOver &&
-                        whereToDrop === 'afterOrInside' &&
-                        !displayAsFolder && <DropIndicator canDrop={canDrop} />}
+                      {isOver && whereToDrop === 'after' && (
+                        <DropIndicator canDrop={canDrop} />
+                      )}
                     </div>
                   )}
                 </div>

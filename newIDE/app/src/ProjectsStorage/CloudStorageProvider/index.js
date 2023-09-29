@@ -89,7 +89,7 @@ export default ({
       return t`An error occurred when opening the project. Check that your internet connection is working and that your browser allows the use of cookies.`;
     },
     getWriteErrorMessage,
-    canFileMetadadataBeSafelySaved: async (
+    canFileMetadataBeSafelySaved: async (
       fileMetadata: FileMetadata,
       actions: {
         showAlert: ShowAlertFunction,

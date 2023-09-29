@@ -68,7 +68,7 @@ export default ({
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorization to open it.`;
     },
     getWriteErrorMessage,
-    canFileMetadadataBeSafelySaved: async (
+    canFileMetadataBeSafelySaved: async (
       fileMetadata: FileMetadata,
       actions: {
         showAlert: ShowAlertFunction,
@@ -86,7 +86,7 @@ export default ({
       // We don't block the save, in case the user wants to save anyway.
       return true;
     },
-    canFileMetadadataBeSafelySavedAs: async (
+    canFileMetadataBeSafelySavedAs: async (
       fileMetadata: FileMetadata,
       actions: {
         showAlert: ShowAlertFunction,

@@ -126,14 +126,14 @@ export type StorageProviderOperations = {|
     /** This is the location where the project was saved, or null if not persisted. */
     fileMetadata: ?FileMetadata,
   |}>,
-  canFileMetadadataBeSafelySaved?: (
+  canFileMetadataBeSafelySaved?: (
     fileMetadata: FileMetadata,
     actions: {|
       showAlert: ShowAlertFunction,
       showConfirmation: ShowConfirmFunction,
     |}
   ) => Promise<boolean>,
-  canFileMetadadataBeSafelySavedAs?: (
+  canFileMetadataBeSafelySavedAs?: (
     fileMetadata: FileMetadata,
     actions: {|
       showAlert: ShowAlertFunction,

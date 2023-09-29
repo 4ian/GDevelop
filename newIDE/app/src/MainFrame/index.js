@@ -2191,7 +2191,7 @@ const MainFrame = (props: Props) => {
         onSaveProjectAs,
         onChooseSaveProjectAsLocation,
         getWriteErrorMessage,
-        canFileMetadadataBeSafelySavedAs,
+        canFileMetadataBeSafelySavedAs,
       } = newStorageProviderOperations;
       if (!onSaveProjectAs) {
         // The new storage provider can't even save as. It's strange that it was even
@@ -2217,8 +2217,8 @@ const MainFrame = (props: Props) => {
             return; // Save as was cancelled.
           }
 
-          if (canFileMetadadataBeSafelySavedAs && currentFileMetadata) {
-            const canProjectBeSafelySavedAs = await canFileMetadadataBeSafelySavedAs(
+          if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
+            const canProjectBeSafelySavedAs = await canFileMetadataBeSafelySavedAs(
               currentFileMetadata,
               {
                 showAlert,
@@ -2389,7 +2389,7 @@ const MainFrame = (props: Props) => {
       const storageProviderOperations = getStorageProviderOperations();
       const {
         onSaveProject,
-        canFileMetadadataBeSafelySaved,
+        canFileMetadataBeSafelySaved,
       } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
@@ -2414,8 +2414,8 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        if (canFileMetadadataBeSafelySaved) {
-          const canProjectBeSafelySaved = await canFileMetadadataBeSafelySaved(
+        if (canFileMetadataBeSafelySaved) {
+          const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
             currentFileMetadata,
             {
               showAlert,

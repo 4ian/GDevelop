@@ -32,22 +32,22 @@ const ESC_KEY = 27;
 const MID_MOUSE_BUTTON = 1;
 
 type ShortcutCallbacks = {|
-  onDelete?: () => void,
-  onMove?: (number, number) => void,
-  onCopy?: () => void,
-  onCut?: () => void,
-  onPaste?: () => void,
-  onDuplicate?: () => void,
-  onUndo?: () => void,
-  onRedo?: () => void,
-  onSearch?: () => void,
-  onZoomOut?: KeyboardEvent => void,
-  onZoomIn?: KeyboardEvent => void,
-  onEscape?: () => void,
-  onShift1?: () => void,
-  onShift2?: () => void,
-  onShift3?: () => void,
-  onToggleGrabbingTool?: (isEnabled: boolean) => void,
+  onDelete?: () => void | Promise<void>,
+  onMove?: (number, number) => void | Promise<void>,
+  onCopy?: () => void | Promise<void>,
+  onCut?: () => void | Promise<void>,
+  onPaste?: () => void | Promise<void>,
+  onDuplicate?: () => void | Promise<void>,
+  onUndo?: () => void | Promise<void>,
+  onRedo?: () => void | Promise<void>,
+  onSearch?: () => void | Promise<void>,
+  onZoomOut?: KeyboardEvent => void | Promise<void>,
+  onZoomIn?: KeyboardEvent => void | Promise<void>,
+  onEscape?: () => void | Promise<void>,
+  onShift1?: () => void | Promise<void>,
+  onShift2?: () => void | Promise<void>,
+  onShift3?: () => void | Promise<void>,
+  onToggleGrabbingTool?: (isEnabled: boolean) => void | Promise<void>,
 |};
 
 type ConstructorArgs = {|
@@ -81,7 +81,10 @@ export default class KeyboardShortcuts {
     this._isActive = isActive;
   }
 
-  setShortcutCallback(key: $Keys<ShortcutCallbacks>, callback: () => void) {
+  setShortcutCallback(
+    key: $Keys<ShortcutCallbacks>,
+    callback: () => void | Promise<void>
+  ) {
     this._shortcutCallbacks[key] = callback;
   }
 

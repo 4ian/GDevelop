@@ -48,6 +48,7 @@ import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import Link from '../UI/Link';
 import { getHelpLink } from '../Utils/HelpLink';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -259,6 +260,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
+    const { showDeleteConfirmation } = useAlertDialog();
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
 
@@ -404,8 +406,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const deleteObjectFolderOrObjectWithContext = React.useCallback(
-      (
-        i18n: I18nType,
+      async (
         objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
       ) => {
         if (!objectFolderOrObjectWithContext) return;
@@ -424,11 +425,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
 
-        const answer = Window.showConfirmDialog(
-          i18n._(
-            t`Are you sure you want to remove this object? This can't be undone.`
-          )
-        );
+        const answer = await showDeleteConfirmation({
+          message: t`Are you sure you want to remove this object? This can't be undone.`,
+          title: t`Remove object`,
+        });
         if (!answer) return;
 
         const objectWithContext = {
@@ -466,6 +466,32 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         project,
         forceUpdateList,
         selectObjectFolderOrObjectWithContext,
+        showDeleteConfirmation,
+      ]
+    );
+
+    // Initialize keyboard shortcuts as empty.
+    // onDelete callback is set outside because it deletes the selected
+    // item (that is a props). As it is stored in a ref, the keyboard shortcut
+    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
+    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+      new KeyboardShortcuts({
+        shortcutCallbacks: {},
+      })
+    );
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            deleteObjectFolderOrObjectWithContext(
+              selectedObjectFolderOrObjectsWithContext[0]
+            );
+          });
+        }
+      },
+      [
+        selectedObjectFolderOrObjectsWithContext,
+        deleteObjectFolderOrObjectWithContext,
       ]
     );
 
@@ -484,15 +510,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const cutObjectFolderOrObjectWithContext = React.useCallback(
-      (
-        i18n: I18nType,
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-      ) => {
+      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
         copyObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
-        deleteObjectFolderOrObjectWithContext(
-          i18n,
-          objectFolderOrObjectWithContext
-        );
+        deleteObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
       },
       [
         copyObjectFolderOrObjectWithContext,
@@ -1077,12 +1097,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
-    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
-      new KeyboardShortcuts({
-        shortcutCallbacks: {},
-      })
-    );
-
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
         if (item.isRoot || item.isPlaceholder) return [];
@@ -1119,7 +1133,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             },
             {
               label: i18n._(t`Delete`),
-              click: () => deleteObjectFolderOrObjectWithContext(i18n, item),
+              click: () => deleteObjectFolderOrObjectWithContext(item),
               enabled: objectFolderOrObject.getChildrenCount() === 0,
               accelerator: 'Backspace',
             },
@@ -1186,7 +1200,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Cut`),
-            click: () => cutObjectFolderOrObjectWithContext(i18n, item),
+            click: () => cutObjectFolderOrObjectWithContext(item),
           },
           {
             label: getPasteLabel(i18n, {
@@ -1210,7 +1224,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           },
           {
             label: i18n._(t`Delete`),
-            click: () => deleteObjectFolderOrObjectWithContext(i18n, item),
+            click: () => deleteObjectFolderOrObjectWithContext(item),
             accelerator: 'Backspace',
           },
           { type: 'separator' },
@@ -1398,58 +1412,49 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           id="objects-list"
         >
           <I18n>
-            {({ i18n }) => {
-              keyboardShortcutsRef.current.setShortcutCallback('onDelete', () =>
-                deleteObjectFolderOrObjectWithContext(
-                  i18n,
-                  selectedObjectFolderOrObjectsWithContext[0]
-                )
-              );
-              return (
-                <div style={styles.autoSizerContainer}>
-                  <AutoSizer style={styles.autoSizer} disableWidth>
-                    {({ height }) => (
-                      <TreeView
-                        key={listKey}
-                        ref={treeViewRef}
-                        items={getTreeViewData(i18n)}
-                        height={height}
-                        forceAllOpened={!!currentlyRunningInAppTutorial}
-                        searchText={searchText}
-                        getItemName={getTreeViewItemName}
-                        getItemThumbnail={getTreeViewItemThumbnail}
-                        getItemChildren={getTreeViewItemChildren}
-                        multiSelect={false}
-                        getItemId={getTreeViewItemId}
-                        getItemHtmlId={getTreeViewItemHtmlId}
-                        getItemDataset={getTreeViewItemData}
-                        onEditItem={editItem}
-                        selectedItems={selectedObjectFolderOrObjectsWithContext}
-                        onSelectItems={items => {
-                          if (!items)
-                            selectObjectFolderOrObjectWithContext(null);
-                          const itemToSelect = items[0];
-                          if ('isRoot' in itemToSelect) return;
-                          selectObjectFolderOrObjectWithContext(
-                            itemToSelect || null
-                          );
-                        }}
-                        onRenameItem={rename}
-                        buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                        onMoveSelectionToItem={(destinationItem, where) =>
-                          moveSelectionTo(i18n, destinationItem, where)
-                        }
-                        canMoveSelectionToItem={canMoveSelectionTo}
-                        reactDndType={objectWithContextReactDndType}
-                        initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                        renderHiddenElements={!!currentlyRunningInAppTutorial}
-                        arrowKeyNavigationProps={arrowKeyNavigationProps}
-                      />
-                    )}
-                  </AutoSizer>
-                </div>
-              );
-            }}
+            {({ i18n }) => (
+              <div style={styles.autoSizerContainer}>
+                <AutoSizer style={styles.autoSizer} disableWidth>
+                  {({ height }) => (
+                    <TreeView
+                      key={listKey}
+                      ref={treeViewRef}
+                      items={getTreeViewData(i18n)}
+                      height={height}
+                      forceAllOpened={!!currentlyRunningInAppTutorial}
+                      searchText={searchText}
+                      getItemName={getTreeViewItemName}
+                      getItemThumbnail={getTreeViewItemThumbnail}
+                      getItemChildren={getTreeViewItemChildren}
+                      multiSelect={false}
+                      getItemId={getTreeViewItemId}
+                      getItemHtmlId={getTreeViewItemHtmlId}
+                      getItemDataset={getTreeViewItemData}
+                      onEditItem={editItem}
+                      selectedItems={selectedObjectFolderOrObjectsWithContext}
+                      onSelectItems={items => {
+                        if (!items) selectObjectFolderOrObjectWithContext(null);
+                        const itemToSelect = items[0];
+                        if ('isRoot' in itemToSelect) return;
+                        selectObjectFolderOrObjectWithContext(
+                          itemToSelect || null
+                        );
+                      }}
+                      onRenameItem={rename}
+                      buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                      onMoveSelectionToItem={(destinationItem, where) =>
+                        moveSelectionTo(i18n, destinationItem, where)
+                      }
+                      canMoveSelectionToItem={canMoveSelectionTo}
+                      reactDndType={objectWithContextReactDndType}
+                      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                      renderHiddenElements={!!currentlyRunningInAppTutorial}
+                      arrowKeyNavigationProps={arrowKeyNavigationProps}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
+            )}
           </I18n>
         </div>
         <Line>

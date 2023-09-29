@@ -70,8 +70,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String resultingBoolean =
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = (" + value1Code + " " + operatorCode +
-               " " + value2Code + ");\n";
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               value1Code + " " + operatorCode + " " + value2Code + ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"]
       .codeExtraInformation = GetAllConditions()["Egal"].codeExtraInformation;
@@ -100,8 +101,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String resultingBoolean =
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = (" + value1Code + " " + operatorCode +
-               " " + value2Code + ");\n";
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               value1Code + " " + operatorCode + " " + value2Code + ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareStrings"]
       .codeExtraInformation =

@@ -281,6 +281,7 @@ export const Default = () => (
     <FixedHeightFlexContainer height={600}>
       <TeamSection
         project={testProject.project}
+        currentFileMetadata={null}
         onOpenRecentFile={action('onOpenRecentFile')}
         storageProviders={[CloudStorageProvider]}
       />
@@ -293,6 +294,7 @@ export const WithNoGroupsYet = () => (
     <FixedHeightFlexContainer height={600}>
       <TeamSection
         project={testProject.project}
+        currentFileMetadata={null}
         onOpenRecentFile={action('onOpenRecentFile')}
         storageProviders={[CloudStorageProvider]}
       />
@@ -305,6 +307,7 @@ export const Loading = () => (
     <FixedHeightFlexContainer height={600}>
       <TeamSection
         project={testProject.project}
+        currentFileMetadata={null}
         onOpenRecentFile={action('onOpenRecentFile')}
         storageProviders={[CloudStorageProvider]}
       />

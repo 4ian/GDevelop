@@ -35,8 +35,8 @@ export type ShowConfirmDeleteDialogOptions = {|
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
-  fieldMessage: MessageDescriptor,
-  confirmText: string,
+  fieldMessage?: MessageDescriptor,
+  confirmText?: string,
 |};
 export type ShowConfirmDeleteDialogOptionsWithCallback = {|
   ...ShowConfirmDeleteDialogOptions,

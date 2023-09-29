@@ -91,10 +91,10 @@ export default ({
     getWriteErrorMessage,
     canFileMetadataBeSafelySaved: async (
       fileMetadata: FileMetadata,
-      actions: {
+      actions: {|
         showAlert: ShowAlertFunction,
         showConfirmation: ShowConfirmFunction,
-      }
+      |}
     ) => {
       // If the project is saved on the cloud, first fetch it.
       // If the version of the project opened is different than the last version of the cloud project,

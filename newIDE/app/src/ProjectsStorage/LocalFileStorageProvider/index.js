@@ -70,10 +70,10 @@ export default ({
     getWriteErrorMessage,
     canFileMetadataBeSafelySaved: async (
       fileMetadata: FileMetadata,
-      actions: {
+      actions: {|
         showAlert: ShowAlertFunction,
         showConfirmation: ShowConfirmFunction,
-      }
+      |}
     ) => {
       const path = fileMetadata.fileIdentifier;
       if (isTryingToSaveInForbiddenPath(path)) {
@@ -88,10 +88,10 @@ export default ({
     },
     canFileMetadataBeSafelySavedAs: async (
       fileMetadata: FileMetadata,
-      actions: {
+      actions: {|
         showAlert: ShowAlertFunction,
         showConfirmation: ShowConfirmFunction,
-      }
+      |}
     ) => {
       const path = fileMetadata.fileIdentifier;
       if (isTryingToSaveInForbiddenPath(path)) {

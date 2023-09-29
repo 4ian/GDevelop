@@ -15,11 +15,21 @@ import {
   shouldValidate,
 } from '../KeyboardShortcuts/InteractionKeys';
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
-import { type ItemData, type ItemBaseAttributes } from '.';
+import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 
 const stopPropagation = e => e.stopPropagation();
+
+const onInputKeyDown = (event: KeyboardEvent) => {
+  if (navigationKeys.includes(event.key)) {
+    // Prevent navigating in the tree view when renaming an item.
+    event.stopPropagation();
+  } else if (shouldCloseOrCancel(event)) {
+    // Prevent closing dialog if TreeView is displayed in dialog.
+    event.stopPropagation();
+  }
+};
 
 const SemiControlledRowInput = ({
   initialValue,
@@ -56,13 +66,10 @@ const SemiControlledRowInput = ({
         onBlur={() => {
           onEndRenaming(value);
         }}
-        onKeyDown={e => {
-          if (shouldCloseOrCancel(e)) {
-            e.stopPropagation(); // Prevent closing dialog if TreeView is displayed in dialog.
-          }
-        }}
+        onKeyDown={onInputKeyDown}
         onKeyUp={e => {
           if (shouldCloseOrCancel(e)) {
+            // Prevent closing dialog if TreeView is displayed in dialog.
             e.preventDefault();
             onEndRenaming(initialValue);
           } else if (shouldValidate(e)) {

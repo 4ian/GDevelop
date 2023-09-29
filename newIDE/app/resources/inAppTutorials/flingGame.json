@@ -73,7 +73,7 @@
           "es": "¡Compártelo con tus amigos y ve quién obtiene la puntuación más alta!",
           "pt": "Compartilhe com seus amigos e veja quem consegue a maior pontuação!",
           "th": "แชร์กับเพื่อนของคุณ และมาลองดูกันว่าใครจะทำคะแนนได้สูงที่สุด!",
-          "ar": "شاركها مع الأصدقاء وشاهد من سيحصل على أعلى نتيجة!"
+          "ar": "يمكنك مشاركتها مع الأصدقاء ورؤية من سيحصل على أعلى نتيجة!"
         }
       },
       {
@@ -83,7 +83,7 @@
           "es": "¿Listo para crear un nuevo juego? ¡Haz clic para descubrir lo que puede hacer GDevelop!",
           "pt": "Pronto para criar um novo jogo? Clique para descobrir o que o GDevelop pode fazer!",
           "th": "พร้อมสร้างเกมใหม่แล้ว? คลิกเพื่อสำรวจดูว่า GDevelop สามารถทำอะไรได้บ้าง",
-          "ar": "هل أنت مستعد لصنع لعبة جديدة؟ النقر لإكتشاف ماذا يمكن لـ GDevelop أن يفعل!"
+          "ar": "هل لديك الاستعداد لصنع لعبة جديدة؟ النقر لإكتشاف ماذا يمكن لـ GDevelop أن يفعل!"
         }
       },
       {
@@ -128,7 +128,7 @@
             "es": "¡Vamos a crear un nuevo **proyecto** para este tutorial!",
             "pt": "Vamos criar um novo **projeto** para este tutorial!",
             "th": "มาสร้าง **โปรเจกต์** ใหม่ สำหรับบทเรียนนี้กันเถอะ!",
-            "ar": "دعنا نقوم بإنشاء **مشروع** جديد لهذا البرنامج التعليمي!"
+            "ar": "هيّا نقوم بإنشاء **مشروع** جديد لهذا البرنامج التعليمي!"
           }
         }
       }
@@ -208,7 +208,7 @@
             "es": "Abre las **Propiedades** del juego.",
             "pt": "Abra as **Propriedades** do jogo.",
             "th": "เปิด **คุณสมบัติ** ของเกม",
-            "ar": "فتح **الخصائص** التابعة للعبة."
+            "ar": "فتح **خصائص** اللعبة."
           }
         }
       },
@@ -327,7 +327,7 @@
             "es": "Primero, busquemos un borde para nuestra **escena**.",
             "pt": "Primeiro, vamos encontrar uma borda para nossa **cena**.",
             "th": "ขั้นแรก หาขอบเขตของ **scene**",
-            "ar": "أولًا، دعنا نعثر على حدود **مشهدنا**."
+            "ar": "أولًا، هيّا نعثر على حدود **مشهدنا**."
           }
         }
       }
@@ -344,7 +344,7 @@
             "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
             "es": "Vamos a elegir un **objeto** de la tienda de recursos.",
             "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
-            "ar": "دعنا نقوم بإختيار **كائن** من متجر العناصر"
+            "ar": "هيّا نقوم باختيار **كائن** من متجر العناصر"
           }
         },
         "placement": "bottom"
@@ -426,7 +426,7 @@
             "es": "¡Agreguemos $(border) a nuestro juego!",
             "pt": "Vamos adicionar $(border) ao nosso jogo!",
             "th": "มาใส่ $(border) ในเกมกันเถอะ!",
-            "ar": "دعنا نقوم  بإضافة الـ $(border) إلى لعبتنا"
+            "ar": "هيّا نقوم  بإضافة الـ $(border) إلى لعبتنا"
           }
         }
       }
@@ -517,7 +517,7 @@
             "es": "Ahora, busquemos un **objeto** que podamos lanzar.",
             "pt": "Agora, vamos encontrar um **objeto** que possamos jogar.",
             "th": "ทีนี้เราจะหา **วัตถุ** ที่เราจะใช้สำหรับโยน",
-            "ar": "الآن دعنا نعثر على **كائن** يمكننا قذفه."
+            "ar": "الآن هيّا نعثر على **كائن** يمكننا قذفه."
           }
         }
       }
@@ -535,7 +535,7 @@
             "es": "Vamos a elegir un objeto de la **tienda de recursos**.",
             "pt": "Vamos escolher um objeto da **loja de recursos**.",
             "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
-            "ar": "دعنا نقوم بإختيار كائن من **متجر العناصر**."
+            "ar": "هيّا نقوم باختيار كائن من **متجر العناصر**."
           }
         },
         "placement": "bottom"
@@ -556,7 +556,7 @@
             "es": "Agrega un objeto redondo que te gustaría lanzar (intenta con **ball**).",
             "pt": "Adicione um objeto redondo que você gostaria de jogar (tente **ball**).",
             "th": "เลือกวัตถุที่กลมที่คุณอยากจะโยน (ลอง **ball**)",
-            "ar": "تحديد كائن مستدير تحب إلقائه (تجربة **ball**)."
+            "ar": "تحديد كائن مستدير قد يناسبك إلقائه (تجربة **ball**)."
           }
         }
       },
@@ -602,7 +602,7 @@
             "es": "Perfecto, veamos cómo lanzarlo fácilmente.",
             "pt": "Perfeito, vamos ver como jogá-lo facilmente.",
             "th": "สมบูรณ์แบบ ลองมาดูวิธีโยนมันแบบง่ายๆกัน",
-            "ar": "ممتاز، دعنا نرى كيفية رميه بسهولة."
+            "ar": "ممتاز، هيّا نرى كيفية رميه بسهولة."
           }
         }
       }
@@ -662,7 +662,7 @@
             "es": "Ahora busquemos un objetivo para apuntar.",
             "pt": "Agora vamos encontrar um alvo para mirar.",
             "th": "ทีนี้เราจะหาเป้าสำหรับโยนวัตถุใส่",
-            "ar": "الآن دعنا نعثر على هدف لإصابته."
+            "ar": "الآن هيّا نعثر على هدف لإصابته."
           }
         }
       }
@@ -680,7 +680,7 @@
             "es": "Vamos a elegir un **objeto** nuevo desde la tienda de recursos.",
             "pt": "Vamos escolher um novo **objeto** da loja de recursos.",
             "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
-            "ar": "دعنا نقوم بإختيار **كائن** جديد من متجر العناصر."
+            "ar": "هيّا نقوم باختيار **كائن** جديد من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -701,7 +701,7 @@
             "es": "Busca un objeto que te gustaría usar como un objetivo para lanzar $(projectile) a.",
             "pt": "Selecione um objeto que você gostaria de usar como um alvo para jogar $(projectile) em.",
             "th": "เลือกวัตถุที่คุณอยากจะโยน $(projectile) ใส่ (ลอง **target**)",
-            "ar": "تحديد كائن تحب أن يتم استخدامه كهدف لقذف الـ $(projectile) عليه."
+            "ar": "تحديد كائن قد يناسبك استخدامه كهدف لقذف الـ $(projectile) عليه."
           }
         }
       },
@@ -747,7 +747,7 @@
             "es": "Perfecto, agreguemoslo a la **escena**.",
             "pt": "Perfeito, vamos adicioná-lo à **cena**.",
             "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
-            "ar": "ممتاز، دعنا نقوم بإضافته إلى **المشهد**."
+            "ar": "ممتاز، هيّا نقوم بإضافته إلى **المشهد**."
           }
         }
       }
@@ -806,7 +806,7 @@
             "es": "Finalmente, encontremos algo para proteger $(target).",
             "pt": "Finalmente, vamos encontrar algo para proteger $(target).",
             "th": "ขั้นสุดท้าย เราจะหาอะไรมาป้องกัน $(target)",
-            "ar": "أخيرًا وليس آخرًا، دعنا نعثر على شيء يحمي $(target)."
+            "ar": "أخيرًا وليس آخرًا، هيّا نعثر على شيء يحمي $(target)."
           }
         }
       }
@@ -824,7 +824,7 @@
             "es": "Vamos a elegir un nuevo objeto de la tienda de recursos.",
             "pt": "Vamos escolher um novo objeto da loja de recursos.",
             "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
-            "ar": "دعنا نقوم بإختيار **كائن** جديد من متجر العناصر."
+            "ar": "هيّا نقوم باختيار **كائن** جديد من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -845,7 +845,7 @@
             "es": "Busca un objeto que sirva como obstáculo para tus $(projectile) (busca **block**).",
             "pt": "Procure um objeto que sirva como obstáculo para seus $(projectile) (procure **block**).",
             "th": "เลือกวัตถุ **block** ที่คุณอยากจะใช้เป็นสิ่งกีดขวาง $(projectile) (ลอง **block**)",
-            "ar": "تحديد **كتلة** تحبها أن تكون حاجزًا للـ $(projectile) خاصتك."
+            "ar": "تحديد **عقبة** قد يناسبك استخدامه كحاجز لـ $(projectile) خاصتك."
           }
         }
       },
@@ -891,7 +891,7 @@
             "es": "Perfecto, agreguemoslo a la **escena**.",
             "pt": "Perfeito, vamos adicioná-lo à **cena**.",
             "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
-            "ar": "ممتاز، دعنا نقوم بإضافته إلى **المشهد**."
+            "ar": "ممتاز، هيّا نقوم بإضافته إلى **المشهد**."
           }
         }
       }
@@ -928,7 +928,7 @@
             "es": "Ahora, agreguemos un motor físico a nuestros **objetos**.",
             "pt": "Agora, vamos adicionar um motor físico aos nossos **objetos**.",
             "th": "ทีนี้เราจะเพิ่มฟิสิกส์ให้ **objects**",
-            "ar": "الآن، دعنا نقوم بإضافة بعض الفيزيائيات إلى **كائننا**."
+            "ar": "الآن، هيّا نقوم بإضافة بعض الفيزيائيات إلى **كائننا**."
           }
         },
         "placement": "left",
@@ -1367,7 +1367,7 @@
             "es": "Ahora vamos a hacer que el jugador pueda arrastrar $(projectile) con el ratón.",
             "pt": "Agora vamos fazer com que o jogador possa arrastar $(projectile) com o mouse.",
             "th": "ทีนี้เราจะทำให้ผู้เล่นสามารถลาก $(projectile)",
-            "ar": "الآن دعنا نقوم بجعل اللاعبين قادرين على سحب الـ $(projectile)."
+            "ar": "الآن هيّا نجعل اللاعبين قادرين على سحب الـ $(projectile)."
           }
         },
         "description": {
@@ -1435,7 +1435,7 @@
             "es": "Busca la extensión **draggable**.",
             "pt": "Procure pela extensão **draggable**.",
             "th": "ค้นหา **draggable** extension (สำหรับวัตถุฟิสิกส์)",
-            "ar": "البحث عن الملحق **draggable (for physics object)**."
+            "ar": "البحث عن الملحق\n\n**draggable** (for physics objects)"
           }
         }
       },
@@ -1698,7 +1698,7 @@
             "es": "Busquemos un fondo para nuestro juego.",
             "pt": "Vamos encontrar um fundo para o nosso jogo.",
             "th": "หาพื้นหลังสำหรับเกม",
-            "ar": "دعنا نعثر على خلفية للعبتنا."
+            "ar": "هيّا نعثر على خلفية للعبتنا."
           }
         }
       }
@@ -1716,7 +1716,7 @@
             "es": "Vamos a elegir un **objeto** de la tienda de recursos.",
             "pt": "Vamos escolher um **objeto** na loja de recursos.",
             "th": "ค้นหา **วัตถุ** จาก ร้านค้า asset",
-            "ar": "دعنا نقوم بإختيار **كائن** من متجر العناصر."
+            "ar": "هيّا نقوم باختيار **كائن** من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -1783,7 +1783,7 @@
             "es": "Perfecto, añádelo a la **escena**.",
             "pt": "Perfeito, vamos usá-lo na nossa **cena**.",
             "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
-            "ar": "ممتاز، دعنا نستخدمه في **مشهدنا**."
+            "ar": "ممتاز، هيّا نستخدمه في **مشهدنا**."
           }
         }
       }
@@ -1816,7 +1816,7 @@
             "es": "He terminado",
             "pt": "Eu terminei",
             "th": "เสร็จแล้ว",
-            "ar": "انتهيت!"
+            "ar": "انتهيت"
           }
         }
       },
@@ -1952,7 +1952,7 @@
             "es": "Agreguemos un objeto para proteger a $(target).",
             "pt": "Vamos adicionar um objeto para proteger $(target).",
             "th": "เพิ่มวัตถุป้องกันให้ $(target)",
-            "ar": "دعنا نقوم بإضافة بعض الحماية لصالح $(target)."
+            "ar": "هيّا نقوم بإضافة بعض الحماية لصالح $(target)."
           }
         }
       }
@@ -1970,7 +1970,7 @@
             "es": "Vamos a elegir un **objeto** de la tienda de recursos.",
             "pt": "Vamos escolher um **objeto** na loja de recursos.",
             "th": "เพิ่ม **วัตถุ** จาก ร้านค้า asset",
-            "ar": "دعنا نقوم بإختيار **كائن** من متجر العناصر."
+            "ar": "هيّا نقوم باختيار **كائن** من متجر العناصر."
           }
         },
         "placement": "bottom"
@@ -2037,7 +2037,7 @@
             "es": "Perfecto, agreguemoslo a la **escena**.",
             "pt": "Perfeito, vamos adicioná-lo à **cena**.",
             "th": "สมบูรณ์แบบ ใส่มันลงไปใน **scene**",
-            "ar": "ممتاز، دعنا نقوم بإضافته إلى **المشهد**."
+            "ar": "ممتاز، هيّا نقوم بإضافته إلى **المشهد**."
           }
         }
       }
@@ -2056,7 +2056,7 @@
             "es": "Hagamos que se mantengan estáticos como una pared.",
             "pt": "Vamos mantê-los estáticos como uma parede.",
             "th": "ทำให้คงที่เพื่อใช้ทำหน้าที่เป็นผนัง",
-            "ar": "دعنا نعينه ككائن ثابت حيث سيمثل الجدار."
+            "ar": "هيّا نعينه ككائن ثابت حيث سيمثل الجدار."
           }
         },
         "description": {
@@ -2222,7 +2222,7 @@
             "es": "¡Ahora creemos un mensaje de victoria!",
             "pt": "Agora vamos criar uma mensagem de vitória!",
             "th": "ทีนี้เราจะสร้างข้อความแสดงชัยชนะ!",
-            "ar": "الآن دعنا نقوم بإنشاء رسالة الفوز!"
+            "ar": "الآن هيّا نقوم بإنشاء رسالة الفوز!"
           }
         }
       }
@@ -2321,7 +2321,7 @@
             "es": "Cambia el texto a “**¡Ganaste!**”",
             "pt": "Mude o texto para “**Você Venceu!**”",
             "th": "แก้ไขข้อความเป็น “**คุณชนะ!**”",
-            "ar": "إدخال أي نص يدل على فوز اللاعبين\n(على سبيل المثال:** لقد فزت**)."
+            "ar": "إدخال أي نص يدل على فوز اللاعبين\n\n(على سبيل المثال: **لقد فزت**)."
           }
         },
         "placement": "bottom"
@@ -2466,7 +2466,7 @@
             "es": "Ahora selecciona la **instancia** de $(youWinText) en la **escena** y cambia su **capa** usando el **panel de propiedades**.\n\n¡Debería haber desaparecido!",
             "pt": "Agora selecione a **instância** de $(youWinText) na **cena** e altere sua **camada** usando o **painel de propriedades**.\n\nEle deve ter desaparecido!",
             "th": "ทีนี้เลือก $(youWinText) **instance** บน **scence** และเปลี่ยน **เลเยอร์** โดยใช้ **แผงควบคุมคุณสมบัติ**\n\nมันควรจะหายไป!",
-            "ar": "الآن تحديد **المثيل** $(youWinText) **بالمشهد** وتغيير طبقته باستخدام **لوحة الخصائص**.\n\nمن المفترض أن تختفي!"
+            "ar": "الآن تحديد **المثيل** $(youWinText) **بالمشهد** وتغيير طبقته باستخدام **لوحة الخصائص**.\n\nمن المفترض أن يختفي!"
           }
         },
         "standalone": true
@@ -2504,7 +2504,7 @@
             "es": "¡Añadamos nuestro primer **evento**!",
             "pt": "Vamos adicionar nosso primeiro **evento**!",
             "th": "มาเพิ่ม **อีเวนท์** แรกกันเถอะ!",
-            "ar": "دعنا نقوم بإضافة أول **حدث** لنا!"
+            "ar": "هيّا نقوم بإضافة أول **حدث** لنا!"
           }
         }
       }
@@ -2617,7 +2617,7 @@
             "es": "Añade una **acción** ahora.",
             "pt": "Adicione uma **ação** agora.",
             "th": "เพิ่ม **การกระทำ**",
-            "ar": "دعنا نقوم بإضافة **إجراء** الآن."
+            "ar": "هيّا نقوم بإضافة **إجراء** الآن."
           }
         }
       }
@@ -2692,7 +2692,7 @@
             "es": "Añade otra **acción** que se ejecutará para la misma **condición**.",
             "pt": "Adicione outra **ação** que será executada para a mesma **condição**.",
             "th": "สร้าง **การกระทำ** เพิ่มอีก ซึ่งจะใช้ในกรณี **เงื่อนไข** เดียวกัน",
-            "ar": "دعنا نقوم بإضافة **إجراء** آخر حيث سيتم تنفيذه بواسطة نفس **الشرط**."
+            "ar": "هيّا نقوم بإضافة **إجراء** آخر حيث سيتم تنفيذه بواسطة نفس **الشرط**."
           }
         }
       }
@@ -2748,7 +2748,7 @@
             "es": "Selecciona la **capa** que has creado.",
             "pt": "Selecione a **camada** que você criou.",
             "th": "เลือก **เลเยอร์** ที่คุณสร้าง",
-            "ar": "تحديد **الطبقة** التي قمتَ بإنشائها."
+            "ar": "تحديد **الطبقة** التي قمت بإنشائها."
           }
         },
         "placement": "top"
@@ -2787,7 +2787,7 @@
             "es": "Volvamos a la **escena** para crear algunas restricciones para el jugador.",
             "pt": "Vamos voltar para a **cena** para criar algumas restrições para o jogador.",
             "th": "กลับไปยัง **scene** เพื่อสร้างขีดจำกัดให้ผู้เล่น ",
-            "ar": "دعنا نعود إلى **المشهد**  لفرض بعض القيود على اللاعبين."
+            "ar": "هيّا نعود إلى **المشهد**  لفرض بعض القيود على اللاعبين."
           }
         }
       }
@@ -2845,7 +2845,7 @@
             "es": "Vamos a elegir un objeto de la tienda de recursos.",
             "pt": "Vamos escolher um objeto da loja de recursos.",
             "th": "เลือกวัตถุจากร้านค้า asset",
-            "ar": "دعنا نقوم بإختيار كائن من متجر العناصر"
+            "ar": "هيّا نقوم باختيار كائن من متجر العناصر"
           }
         },
         "placement": "bottom"
@@ -2912,7 +2912,7 @@
             "es": "¡Vamos a usarla ahora!",
             "pt": "Vamos usá-la agora!",
             "th": "เอาไปใช้เลย!",
-            "ar": "دعنا نقوم باستخدام هذا الآن!"
+            "ar": "لنستخدم هذا الآن!"
           }
         }
       }
@@ -2999,7 +2999,7 @@
             "es": "Ahora, desactivemos el **comportamiento** “draggable” cuando los $(projectile)s estén fuera de la zona $(grabArea).",
             "pt": "Agora, desative o **comportamento** “draggable” quando os $(projectile)s estiverem fora da área $(grabArea).",
             "th": "ปิดฟังก์ชันในการสามารถถูกลาก **พฤติกรรม** ของ $(projectile) เมื่ออยู่ภายนอก $(grabArea)",
-            "ar": "دعنا نقوم بإلغاء تفعيل السلوك (Draggable) الخاص بكل الـ $(projectile) عندما يكون خارج الـ $(grabArea)."
+            "ar": "هيّا نقوم بإلغاء تفعيل السلوك (Draggable) الخاص بكل الـ $(projectile) عندما يكون خارج الـ $(grabArea)."
           }
         }
       }
@@ -3019,7 +3019,7 @@
             "es": "¡Creemos un nuevo evento!",
             "pt": "Vamos criar um novo evento!",
             "th": "สร้างอีเวนท์ใหม่กันเถอะ!",
-            "ar": "دعنا نقوم بإنشاء حدث جديد!"
+            "ar": "هيّا نقوم بإنشاء حدث جديد!"
           }
         }
       }
@@ -3226,7 +3226,7 @@
             "es": "Volvamos a la **escena** para colocar los $(projectile)s correctamente.",
             "pt": "Vamos voltar para a **cena** para colocar os $(projectile)s corretamente.",
             "th": "กลับไปยัง **scene** เพื่อวาง $(projectile) ให้ถูกต้อง",
-            "ar": "دعنا نعود إلى **المشهد** لإدراج كل الـ $(projectile) بشكل صحيح."
+            "ar": "هيّا نعود إلى **المشهد** لإدراج كل الـ $(projectile) بشكل صحيح."
           }
         }
       }
@@ -3293,7 +3293,7 @@
             "es": "Configura la protección de $(target).",
             "pt": "Configure a proteção de $(target).",
             "th": "ตั้งที่ป้องกัน $(target)",
-            "ar": "إعداد حماية الـ $(target)."
+            "ar": "إعداد حماية $(target)."
           }
         },
         "description": {
@@ -3303,7 +3303,7 @@
             "es": "Coloca las instancias de $(block) y $(obstacle) de manera que protejan a $(target).",
             "pt": "Coloque as instâncias de $(block) e $(obstacle) de forma a proteger $(target).",
             "th": "จัดวาง $(block) และ $(obstacle) โดยมีเป้าหมายเพื่อปกป้อง $(target)",
-            "ar": "ترتيب كلًا من الـ $(block) والـ $(obstacle) بحيث تحمي الـ $(target)."
+            "ar": "ترتيب كلًا من الـ $(block) والـ $(obstacle) بحيث تحمي $(target)."
           }
         }
       }
@@ -3345,6 +3345,48 @@
         },
         "placement": "bottom"
       }
+    },
+    {
+      "elementToHighlightId": "#publish-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#publish-gd-games"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's head to the publish section.",
+            "fr": "Allons dans la section publier.",
+            "es": "Vamos a la sección de publicación.",
+            "pt": "Vamos para a seção de publicação.",
+            "th": "ไปที่ส่วนการเผยแพร่",
+            "ar": "هيّا نتوجه إلى قسم النشر."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#publish-gd-games",
+      "nextStepTrigger": {
+        "presenceOfElement": "#export-dialog #create-account-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will publish this game to gd.games, GDevelop's gaming platform.",
+            "fr": "Nous allons publier ce jeu sur gd.games, la plateforme de jeux de GDevelop.",
+            "es": "Publicaremos este juego en gd.games, la plataforma de juegos de GDevelop.",
+            "pt": "Vamos publicar este jogo no gd.games, a plataforma de jogos do GDevelop.",
+            "th": "เราจะเผยแพร่เกมนี้ไปยัง gd.games แพลตฟอร์มเกมของ GDevelop",
+            "ar": "سوف نقوم بنشر هذه اللعبة على gd.games، منصة ألعاب GDevelop."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
     },
     {
       "elementToHighlightId": "#export-dialog #create-account-button",
@@ -3393,7 +3435,7 @@
             "es": "Rellena el formulario y luego haz clic aquí.",
             "pt": "Preencha o formulário e clique aqui.",
             "th": "กรอกฟอร์มแล้วกดตรงนี้",
-            "ar": "كتابة المعلومات وثم النقر هنا."
+            "ar": "ملء النموذج وثم النقر هنا."
           }
         },
         "placement": "bottom"
@@ -3461,7 +3503,7 @@
             "es": "Haz clic aquí para abrir tu juego en tu navegador. ¡Recuerda compartir el enlace para que otros puedan jugar tu juego!\n\nUna vez que hayas terminado, cierra esta ventana.",
             "pt": "Clique aqui para abrir o seu jogo no seu navegador. Lembre-se de compartilhar o link para que outros possam jogar o seu jogo!\n\nUma vez que você terminar, feche esta janela.",
             "th": "คลิกที่นี่เพื่อเปิดเกมของคุณบนเบราวเซอร์ อย่าลืมแชร์ลิงค์เพื่อให้ผู้เล่นคนอื่นสามารถเล่นเกมของคุณได้!\n\nหลังจากเสร็จแล้ว ปิดหน้าต่างนี้",
-            "ar": "النقر هنا لفتح لعبتك على متصفحك، تذكر مشاركة الرابط حتى يتنسى للآخرين إمكانية لعب لعبتك!\n\nيمكنك الإغلاق بمجرد الانتهاء."
+            "ar": "النقر هنا لفتح لعبتك على متصفحك، يمكنك مشاركة الرابط حتى يتنسى للآخرين إمكانية لعب لعبتك!\n\nيمكنك الإغلاق بمجرد الانتهاء."
           }
         },
         "placement": "top"
@@ -3499,7 +3541,7 @@
               "es": "Has descubierto otros conceptos básicos de GDevelop:\n- [Eventos](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [Objetos de texto](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [Capas](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [Acciones y condiciones](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)",
               "pt": "Você descobriu outros conceitos básicos do GDevelop:\n- [Eventos](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [Objetos de texto](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [Camadas](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [Ações e Condições](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)",
               "th": "คุณได้เรียนรู้พื้นฐานของ GDevelop:\n- [Events](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [Text objects](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [Layers](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [Actions and Conditions](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)",
-              "ar": "لقد اكتشفت المزيد من أساسياتGDevelop:\n- [أحداث](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [كائنات نصية](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [طبقات](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [شروط وإجراءات](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)"
+              "ar": "لقد اكتشفت المزيد من أساسيات GDevelop:\n- [أحداث](https://wiki.gdevelop.io/gdevelop5/events#:~:text=In%20GDevelop%2C%20events%20define%20the,events%20via%20the%20Events%20editor)\n- [كائنات نصية](https://wiki.gdevelop.io/gdevelop5/objects/text#:~:text=Text%20objects%20display%20text%20on,properties%20during%20gameplay%20using%20events)\n- [طبقات](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras#:~:text=A%20layer%20acts%20as%20a,scene%20can%20have%20multiple%20layers)\n- [شروط وإجراءات](https://wiki.gdevelop.io/gdevelop5/events#:~:text=If%20an%20event%20does%20not,the%20value%20of%20a%20variable)"
             }
           },
           {
@@ -3547,7 +3589,7 @@
             "es": "Ahora creemos una nueva **escena** para nuestra pantalla de inicio.",
             "pt": "Agora vamos criar uma nova **cena** para a nossa tela inicial.",
             "th": "ทีนี้สร้าง **scene** ใหม่ สำหรับฉากเริ่มต้น",
-            "ar": "الآن دعنا نقوم بإنشاء **مشهد** جديد لشاشة البداية خاصتنا."
+            "ar": "الآن هيّا نقوم بإنشاء **مشهد** جديد لشاشة البداية خاصتنا."
           }
         },
         "placement": "right"
@@ -3589,7 +3631,7 @@
             "es": "Haga clic derecho en la nueva escena y cambie su nombre a “**PantallaInicio**”.\n\nUna vez terminado, haga clic en el elemento para abrir la escena.",
             "pt": "Clique com o botão direito na nova cena e altere o nome para “**TelaInicial**”.\n\nUma vez terminado, clique no item para abrir a nova cena.",
             "th": "คลิกขวาที่ scene ใหม่และเปลี่ยนชื่อเป็น “**StartScreen**”\n\nเมื่อเสร็จแล้ว คลิกที่ไอเทมเพื่อเปิด scene ใหม่",
-            "ar": "نقرة بزر الفأرة الأيمن على المشهد الجديد وإعادة تسميته إلى **StartScreen**.\n\nبمجرد الإنتهاء، النقر عليه لفتح المشهد الجديد."
+            "ar": "نقرة بزر الفأرة الأيمن على المشهد الجديد وإعادة تسميته إلى **StartScreen**.\n\nبمجرد الانتهاء، النقر عليه لفتح المشهد الجديد."
           }
         },
         "placement": "right"
@@ -3681,7 +3723,7 @@
             "es": "¡Ahora creemos un título!",
             "pt": "Agora, vamos criar um título!",
             "th": "ทีนี้ได้เวลาสร้าง title!",
-            "ar": "الآن دعنا نقوم بإنشاء عنوان!"
+            "ar": "الآن هيّا نقوم بإنشاء عنوان!"
           }
         }
       }
@@ -3699,7 +3741,7 @@
             "es": "Vamos a crear un texto desde cero.",
             "pt": "Vamos criar um texto do zero.",
             "th": "สร้างข้อความเอง",
-            "ar": "الآن دعنا نقوم بإنشاء نص من الصفر."
+            "ar": "الآن هيّا نقوم بإنشاء نص من الصفر."
           }
         },
         "placement": "bottom"
@@ -3921,7 +3963,7 @@
             "es": "Define el texto del objeto como “Jugar”.",
             "pt": "Defina o texto do objeto como “Jogar”.",
             "th": "เปลี่ยนข้อความเริ่มต้นเป็น “Start Game”",
-            "ar": "تغيير نص المثيل إلى أي شيء يدل على أن اللعبة ستبدأ بمجرد الضغط عليه.\n(على سبيل المثال: بدء اللعبة)"
+            "ar": "تغيير نص المثيل إلى أي شيء يدل على أن اللعبة ستبدأ بمجرد الضغط عليه.\n\n(على سبيل المثال: بدء اللعبة)"
           }
         },
         "placement": "bottom"
@@ -3981,7 +4023,7 @@
             "es": "Ahora, hagamos que se pueda hacer clic en el texto.",
             "pt": "Agora, vamos fazer com que seja possível clicar no texto.",
             "th": "โต้ตอบกับข้อความ",
-            "ar": "الآن دعنا نتفاعل مع ذلك العنوانين."
+            "ar": "الآن هيّا نتفاعل مع تلك العنوانين."
           }
         }
       }
@@ -4000,7 +4042,7 @@
             "es": "Crea un nuevo **evento**.",
             "pt": "Crie um novo **evento**.",
             "th": "สร้าง **event** ใหม่",
-            "ar": "دعنا نقوم بإنشاء **حدث** جديد."
+            "ar": "هيّا نقوم بإنشاء **حدث** جديد."
           }
         }
       }
@@ -4188,7 +4230,7 @@
             "es": "Agreguemos una **acción** ahora.",
             "pt": "Vamos adicionar uma **ação** agora.",
             "th": "เพิ่ม **การกระทำ**",
-            "ar": "دعنا نقوم بإضافة **إجراء** الآن."
+            "ar": "هيّا نقوم بإضافة **إجراء** الآن."
           }
         }
       }
@@ -4283,7 +4325,7 @@
             "es": "Volvamos a la **escena** para mostrar el puntaje.",
             "pt": "Vamos voltar para a **cena** para adicionar um score.",
             "th": "กลับไปยัง **scene** เพื่อเพิ่มคะแนน",
-            "ar": "دعنا نعود إلى **المشهد** لإضافة النتيجة."
+            "ar": "هيّا نعود إلى **المشهد** لإضافة النتيجة."
           }
         }
       }
@@ -4324,7 +4366,7 @@
             "es": "Crea un objeto de texto que muestre la puntuación del jugador o jugadora.",
             "pt": "Vamos criar um texto que irá exibir o score do jogador.",
             "th": "สร้างข้อความสำหรับแสดงคะแนนผู้เล่น",
-            "ar": "دعنا نقوم بإنشاء نص ليعرض نتيجة اللاعبين."
+            "ar": "هيّا نقوم بإنشاء نص ليعرض النتيجة للاعبين."
           }
         }
       }
@@ -4342,7 +4384,7 @@
             "es": "Vamos a crear un objeto de texto desde cero.",
             "pt": "Vamos criar um texto do zero.",
             "th": "สร้างข้อความเอง",
-            "ar": "دعنا نقوم بإنشاء نص من الصفر."
+            "ar": "هيّا نقوم بإنشاء نص من الصفر."
           }
         },
         "placement": "bottom"
@@ -4464,7 +4506,7 @@
             "es": "Arrastra $(scoreText) desde el menú al lienzo y colócalo en la esquina superior izquierda de la pantalla de juego.",
             "pt": "Arraste $(scoreText) do menu para o canvas e coloque-o no canto superior esquerdo da tela de jogo.",
             "th": "ลาก $(scoreText) ไปยังมุมซ้ายบนของหน้าจอ",
-            "ar": "سحب $(scoreText) إلى أعلى يسار الشاشة."
+            "ar": "سحب $(scoreText) إلى الشاشة."
           }
         },
         "placement": "left"
@@ -4483,7 +4525,7 @@
             "es": "Ahora, cambiemos la puntuación del jugador o jugadora en función del tiempo transcurrido.",
             "pt": "Agora, vamos mudar a pontuação do jogador ou jogadora de acordo com o tempo decorrido.",
             "th": "เปลี่ยนแปลงคะแนนแบบไดนามิก",
-            "ar": "دعنا نقوم بتغيير النتيجة بفعالية."
+            "ar": "هيّا نقوم بتغيير النتيجة بفعالية."
           }
         }
       }
@@ -4577,7 +4619,7 @@
             "es": "Ahora creemos el temporizador.",
             "pt": "Agora, vamos criar o cronômetro.",
             "th": "สร้างนาฬืกาจับเวลา",
-            "ar": "دعنا نقوم بإنشاء مؤقت الآن."
+            "ar": "هيّا نقوم بإنشاء مؤقت الآن."
           }
         },
         "placement": "top"
@@ -4691,7 +4733,7 @@
             "es": "Ahora, muestremos el marcador.",
             "pt": "Agora, vamos exibir a pontuação.",
             "th": "แสดงคะแนน",
-            "ar": "الآن دعنا نقوم بعرض النتيجة."
+            "ar": "الآن هيّا نقوم بعرض النتيجة."
           }
         }
       },
@@ -4710,7 +4752,7 @@
             "es": "Hagamos que el marcador sea dinámico.",
             "pt": "Vamos tornar a pontuação dinâmica.",
             "th": "เปลี่ยนแปลงคะแนนให้เป็นแบบไดนามิก",
-            "ar": "دعنا نقوم بجعل النتيجة متفاعلة."
+            "ar": "هيّا نقوم بجعل النتيجة متفاعلة."
           }
         }
       }
@@ -4747,7 +4789,7 @@
             "es": "Cambiamos el texto.",
             "pt": "Vamos alterar o texto.",
             "th": "เราจะแก้ไขข้อความ",
-            "ar": "سوف نقوم بتغيير النص."
+            "ar": "سوف نقوم بتعديل النص."
           }
         }
       },
@@ -4826,7 +4868,7 @@
             "es": "Ahora, guardemos la puntuación del jugador o jugadora.",
             "pt": "Agora, vamos salvar a pontuação do jogador ou jogadora.",
             "th": "ทีนี้ เราจะบันทึกคะแนนของผู้เล่น",
-            "ar": "الآن دعنا نقوم بحفظ نتيجة اللاعبين."
+            "ar": "الآن هيّا نقوم بحفظ نتيجة اللاعبين."
           }
         },
         "description": {
@@ -4930,7 +4972,7 @@
             "es": "Cambiamos su nombre.",
             "pt": "Vamos mudar o nome.",
             "th": "เปลี่ยนชื่อ",
-            "ar": "دعنا نقوم بتغيير اسمه."
+            "ar": "هيّا نقوم بتغيير اسمه."
           }
         }
       },
@@ -4968,7 +5010,7 @@
             "es": "Guarda cuando hayas terminado.",
             "pt": "Salve quando terminar.",
             "th": "บันทึกการเปลี่ยนแปลงหลังจากเสร็จแล้ว",
-            "ar": "حفظ التغييرات عند الإنتهاء."
+            "ar": "حفظ التغييرات عند الانتهاء."
           }
         }
       },
@@ -5209,7 +5251,7 @@
             "es": "Haz clic en la acción *Esperar X segundos*.",
             "pt": "Clique em *Esperar X segundos*.",
             "th": "เลือกการกระทำ *รอ X วินาที*",
-            "ar": "تحديد الإجراء *انتظار لثوان*."
+            "ar": "تحديد الإجراء *الانتظار لثوان*."
           }
         }
       },
@@ -5371,7 +5413,7 @@
             "es": "Ahora, la tabla de clasificación debería mostrarse cuando $(projectile) llegue a $(target).",
             "pt": "Agora, a classificação deve ser exibida quando $(projectile) atingir $(target).",
             "th": "leaderboard ควรจะแสดง เมื่อ $(projectile) ไปถึง $(target)",
-            "ar": "الآن من المفترض أن يتم عرض لوحة الصدارة وقتما يصل $(projectile) إلى $(target)."
+            "ar": "الآن من المفترض أن يتم عرض لوحة الصدارة بعدما يصل $(projectile) إلى $(target)."
           }
         },
         "placement": "top"
@@ -5390,7 +5432,7 @@
             "es": "Ahora, pediremos al jugador que se autentique al abrir el juego.",
             "pt": "Agora, pediremos ao jogador que se autentique ao abrir o jogo.",
             "th": "ทีนี้เราจะถามผู้เล่นให้ยืนยันตอนที่เปิดเกม",
-            "ar": "الآن سوف نطلب من اللاعبين المصادقة في بداية اللعبة."
+            "ar": "الآن سوف نطالب اللاعبين بالمصادقة في بداية اللعبة."
           }
         }
       }
@@ -5511,7 +5553,7 @@
             "es": "Vamos a elegir una **acción**.",
             "pt": "Vamos escolher uma **ação**.",
             "th": "เลือก **การกระทำ**",
-            "ar": "دعنا نقوم بإختيار **إجراء**."
+            "ar": "هيّا نقوم باختيار **إجراء**."
           }
         }
       }
@@ -5548,7 +5590,7 @@
             "es": "Selecciona *Mostrar banner de autenticación*.",
             "pt": "Selecione *Mostrar banner de autenticação*.",
             "th": "เลือก *แสดงแบนเนอร์ authentication*",
-            "ar": "تحديد *عرض لافتة المصادقة**."
+            "ar": "تحديد *عرض لافتة المصادقة*."
           }
         }
       },
@@ -5567,7 +5609,7 @@
             "es": "Ahora, los jugadores podrán iniciar sesión.",
             "pt": "Agora, os jogadores poderão fazer login.",
             "th": "เอาล่ะ ทีนี้ผู้เล่นจะถูกขอให้ล็อกอิน",
-            "ar": "حسنًا، الآن سوف يتم طلب اللاعبين تسجيل الدخول."
+            "ar": "حسنًا، الآن سوف يتم مطالبة اللاعبين بتسجيل الدخول."
           }
         },
         "placement": "top"
@@ -5586,7 +5628,7 @@
             "es": "Vamos a asegurarnos de que el jugador vuelva a la pantalla de inicio después de cerrar el **tablero de clasificación**.",
             "pt": "Vamos garantir que o jogador volte para a tela inicial depois de fechar o **quadro de classificação**.",
             "th": "ทำให้มั่นใจว่าผู้เล่นจะกลับมาที่หน้าเริ่มต้นหลังกดปิด **leaderboard**",
-            "ar": "دعنا نتحقق أن اللاعبين سيعودون إلى شاشة البداية بعد إغلاق **لوحة الصدارة**."
+            "ar": "هيّا نتحقق أن اللاعبين سيعودون إلى شاشة البداية بعد إغلاق **لوحة الصدارة**."
           }
         }
       }

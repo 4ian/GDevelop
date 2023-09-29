@@ -132,6 +132,7 @@ const SectionLine = ({
   disabled,
   small,
   highlighted,
+  id,
 }: {|
   icon: React.Node,
   label: React.Node,
@@ -140,6 +141,7 @@ const SectionLine = ({
   disabled?: boolean,
   small?: boolean,
   highlighted?: boolean,
+  id: string,
 |}) => {
   const classes = useStylesForWidget(!!highlighted);
   return (
@@ -156,6 +158,7 @@ const SectionLine = ({
         }
       }}
       disabled={disabled}
+      id={id}
     >
       <LineStackLayout
         expand
@@ -305,6 +308,7 @@ const PublishHome = ({
             }}
             highlighted
             disabled={!isOnline}
+            id="publish-gd-games"
           />
           <SectionLine
             label={<Trans>Browser</Trans>}
@@ -314,6 +318,7 @@ const PublishHome = ({
             }
             onClick={() => onChooseSection('browser')}
             disabled={allExportersRequireOnline && !isOnline}
+            id="publish-browser"
           />
           {!showOnlineWebExporterOnly && (
             <SectionLine
@@ -324,6 +329,7 @@ const PublishHome = ({
               }
               onClick={() => onChooseSection('desktop')}
               disabled={allExportersRequireOnline && !isOnline}
+              id="publish-desktop"
             />
           )}
           {!showOnlineWebExporterOnly && (
@@ -333,6 +339,7 @@ const PublishHome = ({
               description={<Trans>Android and iOS (App stores)</Trans>}
               onClick={() => onChooseSection('mobile')}
               disabled={allExportersRequireOnline && !isOnline}
+              id="publish-mobile"
             />
           )}
         </ColumnStackLayout>
@@ -346,6 +353,7 @@ const PublishHome = ({
             onClick={() => onChooseSubSection('online')}
             highlighted
             disabled={!isOnline}
+            id="publish-gd-games"
           />
           {!showOnlineWebExporterOnly && (
             <SectionLine
@@ -354,6 +362,7 @@ const PublishHome = ({
               description={<Trans>Itch.io, Poki, CrazyGames...</Trans>}
               onClick={() => onChooseSubSection('offline')}
               disabled={allExportersRequireOnline && !isOnline}
+              id="publish-external-websites"
             />
           )}
           {!showOnlineWebExporterOnly && (
@@ -363,6 +372,7 @@ const PublishHome = ({
               description={<Trans>Facebook Instant Games</Trans>}
               onClick={() => onChooseSubSection('facebook')}
               disabled={allExportersRequireOnline && !isOnline}
+              id="publish-facebook"
             />
           )}
         </ColumnStackLayout>
@@ -376,6 +386,7 @@ const PublishHome = ({
             onClick={() => onChooseSubSection('online')}
             highlighted
             disabled={!isOnline}
+            id="publish-desktop-cloud"
           />
           <SectionLine
             label={<Trans>Manual build</Trans>}
@@ -384,6 +395,7 @@ const PublishHome = ({
             onClick={() => onChooseSubSection('offline')}
             disabled={allExportersRequireOnline && !isOnline}
             small
+            id="publish-desktop-manual"
           />
         </ColumnStackLayout>
       )}
@@ -396,6 +408,7 @@ const PublishHome = ({
             onClick={() => onChooseSubSection('online')}
             highlighted
             disabled={!isOnline}
+            id="publish-mobile-cloud"
           />
           <SectionLine
             label={<Trans>Manual build</Trans>}
@@ -404,6 +417,7 @@ const PublishHome = ({
             onClick={() => onChooseSubSection('offline')}
             small
             disabled={allExportersRequireOnline && !isOnline}
+            id="publish-mobile-manual"
           />
         </ColumnStackLayout>
       )}

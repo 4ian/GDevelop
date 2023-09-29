@@ -51,24 +51,36 @@ export const getLastModifiedInfoByProjectId = async ({
       .filter(Boolean)
   );
 
-  const userPublicProfileByIds = await getUserPublicProfilesByIds(
-    Array.from(allOtherContributorIds)
-  );
-  const lastModifiedInfoByProjectId: LastModifiedInfoByProjectId = {};
-  cloudProjects.forEach(project => {
-    if (!project.lastCommittedBy || !project.committedAt) return;
-    const contributorPublicProfile =
-      userPublicProfileByIds[project.lastCommittedBy];
-    if (!contributorPublicProfile) return;
-    lastModifiedInfoByProjectId[project.id] = {
-      lastModifiedByUsername: contributorPublicProfile.username,
-      lastModifiedByIconUrl: contributorPublicProfile.iconUrl,
-      lastModifiedAt: Date.parse(project.committedAt),
-      lastKnownVersionId: project.currentVersion,
-    };
-  });
+  if (allOtherContributorIds.size === 0) return {};
 
-  return lastModifiedInfoByProjectId;
+  try {
+    const userPublicProfileByIds = await getUserPublicProfilesByIds(
+      Array.from(allOtherContributorIds)
+    );
+    const lastModifiedInfoByProjectId: LastModifiedInfoByProjectId = {};
+    cloudProjects.forEach(project => {
+      if (!project.lastCommittedBy || !project.committedAt) return;
+      const contributorPublicProfile =
+        userPublicProfileByIds[project.lastCommittedBy];
+      if (!contributorPublicProfile) return;
+      lastModifiedInfoByProjectId[project.id] = {
+        lastModifiedByUsername: contributorPublicProfile.username,
+        lastModifiedByIconUrl: contributorPublicProfile.iconUrl,
+        lastModifiedAt: Date.parse(project.committedAt),
+        lastKnownVersionId: project.currentVersion,
+      };
+    });
+
+    return lastModifiedInfoByProjectId;
+  } catch (error) {
+    // We don't block the display of the projects if the public profiles
+    // can't be fetched.
+    console.error(
+      'Error while fetching public profiles of contributors of projects:',
+      error
+    );
+    return {};
+  }
 };
 
 export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (

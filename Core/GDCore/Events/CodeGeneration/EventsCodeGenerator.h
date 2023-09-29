@@ -472,10 +472,15 @@ class GD_CORE_API EventsCodeGenerator {
    */
   size_t GenerateSingleUsageUniqueIdForEventsList();
 
+  virtual gd::String GenerateRelationalOperation(
+      const gd::String& relationalOperator,
+      const gd::String& lhs,
+      const gd::String& rhs);
+
+ protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);
 
- protected:
   /**
    * \brief Generate the code for a single parameter.
    *
@@ -726,6 +731,7 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::String& callStartString,
       std::size_t startFromArgument = 0);
+
   gd::String GenerateOperatorCall(const gd::InstructionMetadata& instrInfos,
                                   const std::vector<gd::String>& arguments,
                                   const gd::String& callStartString,

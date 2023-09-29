@@ -63,6 +63,16 @@ export const Default = () => {
     else action('Delete Dismissed')();
   };
 
+  const onOpenConfirmDeleteWithoutConfirmTextDialog = async () => {
+    const answer = await showDeleteConfirmation({
+      title: t`Do you really want to permanently delete your account?`,
+      message: t`You’re about to permanently delete your GDevelop account username@mail.com. You will no longer be able to log into the app with this email address.`,
+      confirmButtonLabel: t`Delete my account`,
+    });
+    if (answer) action('Delete Confirmed')();
+    else action('Delete Dismissed')();
+  };
+
   return (
     <Column alignItems="flex-start">
       <RaisedButton label="Open alert dialog" onClick={onOpenAlertDialog} />
@@ -72,6 +82,11 @@ export const Default = () => {
       <RaisedButton
         label="Open confirm delete dialog"
         onClick={onOpenConfirmDeleteDialog}
+      />
+      <LargeSpacer />
+      <RaisedButton
+        label="Open confirm delete dialog without confirm text"
+        onClick={onOpenConfirmDeleteWithoutConfirmTextDialog}
       />
       <LargeSpacer />
       <RaisedButton

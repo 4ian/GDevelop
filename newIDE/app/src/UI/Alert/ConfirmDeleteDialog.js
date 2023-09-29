@@ -14,8 +14,8 @@ type Props = {|
   open: boolean,
   title: MessageDescriptor,
   message: MessageDescriptor,
-  fieldMessage: MessageDescriptor,
-  confirmText: string,
+  fieldMessage?: MessageDescriptor,
+  confirmText?: string,
   onConfirm: () => void,
   onDismiss: () => void,
   confirmButtonLabel?: MessageDescriptor,
@@ -24,7 +24,7 @@ type Props = {|
 
 function ConfirmDeleteDialog(props: Props) {
   const [textInput, setTextInput] = React.useState<string>('');
-  const canConfirm = textInput === props.confirmText;
+  const canConfirm = props.confirmText ? textInput === props.confirmText : true;
 
   const onConfirm = () => {
     if (!canConfirm) return;
@@ -75,15 +75,19 @@ function ConfirmDeleteDialog(props: Props) {
           <Text size="body" style={{ userSelect: 'text' }}>
             {i18n._(props.message)}
           </Text>
-          <LargeSpacer />
-          <TextField
-            autoFocus="desktop"
-            floatingLabelFixed
-            floatingLabelText={i18n._(props.fieldMessage)}
-            value={textInput}
-            onChange={(e, text) => setTextInput(text)}
-            hintText={props.confirmText}
-          />
+          {props.confirmText && props.fieldMessage && (
+            <>
+              <LargeSpacer />
+              <TextField
+                autoFocus="desktop"
+                floatingLabelFixed
+                floatingLabelText={i18n._(props.fieldMessage)}
+                value={textInput}
+                onChange={(e, text) => setTextInput(text)}
+                hintText={props.confirmText}
+              />
+            </>
+          )}
         </Dialog>
       )}
     </I18n>

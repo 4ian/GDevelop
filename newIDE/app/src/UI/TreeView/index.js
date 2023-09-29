@@ -13,7 +13,12 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
-export const navigationKeys = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft']
+export const navigationKeys = [
+  'ArrowDown',
+  'ArrowUp',
+  'ArrowRight',
+  'ArrowLeft',
+];
 
 export type ItemBaseAttributes = {
   +isRoot?: boolean,
@@ -37,6 +42,7 @@ type FlattenedNode<Item> = {|
 export type ItemData<Item> = {|
   onOpen: (FlattenedNode<Item>) => void,
   onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
+  onBlurField: () => void,
   flattenedData: FlattenedNode<Item>[],
   onStartRenaming: (nodeId: ?string) => void,
   onEndRenaming: (item: Item, newName: string) => void,
@@ -60,6 +66,7 @@ const getItemProps = memoizeOne(
     flattenedData: FlattenedNode<Item>[],
     onOpen: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
+    onBlurField: () => void,
     onStartRenaming: (nodeId: ?string) => void,
     onEndRenaming: (item: Item, newName: string) => void,
     renamedItemId: ?string,
@@ -78,6 +85,7 @@ const getItemProps = memoizeOne(
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
+    onBlurField,
     flattenedData,
     onStartRenaming,
     onEndRenaming,
@@ -166,7 +174,8 @@ const TreeView = <Item: ItemBaseAttributes>(
   );
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
-  const listRef = React.useRef<any>(null);
+  const containerRef = React.useRef<?HTMLDivElement>(null);
+  const listRef = React.useRef<?FixedSizeList>(null);
   const [
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
@@ -431,10 +440,17 @@ const TreeView = <Item: ItemBaseAttributes>(
     []
   );
 
+  const onBlurField = React.useCallback(() => {
+    if (containerRef.current) {
+      containerRef.current.focus();
+    }
+  }, []);
+
   const itemData: ItemData<Item> = getItemProps<Item>(
     flattenedData,
     onOpen,
     onSelect,
+    onBlurField,
     setRenamedItemId,
     onEndRenaming,
     renamedItemId,
@@ -460,10 +476,7 @@ const TreeView = <Item: ItemBaseAttributes>(
 
   const onKeyDown = React.useCallback(
     (event: KeyboardEvent) => {
-      if (
-        !navigationKeys.includes(event.key)
-      )
-        return;
+      if (!navigationKeys.includes(event.key)) return;
       let newFocusedItem;
       const item = selectedItems[0];
       if (!item) return;
@@ -537,6 +550,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         tabIndex={0}
         className={`${treeView} ${theme.treeViewRootClassName}`}
         onKeyDown={onKeyDown}
+        ref={containerRef}
       >
         <FixedSizeList
           height={height}

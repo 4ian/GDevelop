@@ -490,7 +490,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                   key={`${group.getName()}-empty`}
                                   primaryText={
                                     <Text style={{ opacity: 0.6 }} noMargin>
-                                      <Trans>No object in group</Trans>
+                                      <Trans>No objects in the group</Trans>
                                     </Text>
                                   }
                                   style={{ paddingLeft: 45 }}
@@ -530,7 +530,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 key={`${folderWithPath.path}-empty`}
                                 primaryText={
                                   <Text style={{ opacity: 0.6 }} noMargin>
-                                    <Trans>No object in folder</Trans>
+                                    <Trans>No objects in the folder</Trans>
                                   </Text>
                                 }
                                 style={{ paddingLeft: 45 }}

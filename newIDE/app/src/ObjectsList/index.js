@@ -123,7 +123,11 @@ const getTreeViewItemId = (item: TreeViewItem) => {
     // the folder to keep it open.
     return `object-folder-${objectFolderOrObject.ptr}`;
   }
-  return objectFolderOrObject.getObject().getName();
+  const object = objectFolderOrObject.getObject();
+  // Use the ptr to avoid display bugs in the rare case a user set an object
+  // as global although another layout has an object with the same name,
+  // and ignored the warning.
+  return `${object.getName()}-${object.ptr}`;
 };
 
 const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>

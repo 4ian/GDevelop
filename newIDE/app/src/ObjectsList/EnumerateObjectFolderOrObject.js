@@ -23,7 +23,6 @@ export const enumerateObjectFolderOrObjects = (
 |} => {
   const projectRootFolder = project.getRootFolder();
   const containerRootFolder = objectsContainer.getRootFolder();
-
   const containerObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[] = mapFor(
     0,
     containerRootFolder.getChildrenCount(),
@@ -102,4 +101,17 @@ export const enumerateFoldersInContainer = (
   const result = [];
   recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
   return result;
+};
+
+export const getObjectsInFolder = (
+  objectFolderOrObject: gdObjectFolderOrObject
+): gdObject[] => {
+  if (!objectFolderOrObject.isFolder()) return [];
+  return mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
+    const child = objectFolderOrObject.getChildAt(i);
+    if (child.isFolder()) {
+      return null;
+    }
+    return child.getObject();
+  }).filter(Boolean);
 };

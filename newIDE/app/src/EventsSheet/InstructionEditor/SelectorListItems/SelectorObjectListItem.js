@@ -20,6 +20,8 @@ type Props = {|
   matchesCoordinates: number[][],
   id?: ?string,
   data?: HTMLDataset,
+  withIndent?: boolean,
+  keyPrefix?: string,
 |};
 
 export const renderObjectListItem = ({
@@ -31,16 +33,19 @@ export const renderObjectListItem = ({
   matchesCoordinates,
   id,
   data,
+  withIndent,
+  keyPrefix
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
       id={id}
       data={data}
-      key={getObjectListItemKey(objectWithContext)}
+      key={(keyPrefix || '') + getObjectListItemKey(objectWithContext)}
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)
       }
+      style={withIndent ? { paddingLeft: 45 } : undefined}
       primaryText={
         <HighlightedText
           text={objectName}

@@ -621,6 +621,11 @@ export function createGdevelopTheme({
         textColor: styles['ThemeTextDefaultColor'],
         gridColor: styles['ThemeTextDisabledColor'],
       },
+      statusIndicator: {
+        success: styles['ThemeSuccessColor'],
+        error: styles['ThemeErrorColor'],
+        warning: styles['ThemeWarningColor'],
+      },
     },
     muiThemeOptions: {
       typography: {

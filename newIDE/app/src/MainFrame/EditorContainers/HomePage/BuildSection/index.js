@@ -16,6 +16,7 @@ import {
 import Carousel from '../../../../UI/Carousel';
 import {
   type FileMetadataAndStorageProviderName,
+  type FileMetadata,
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
@@ -62,6 +63,7 @@ const styles = {
 
 type Props = {|
   project: ?gdProject,
+  currentFileMetadata: ?FileMetadata,
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
@@ -82,6 +84,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
   (
     {
       project,
+      currentFileMetadata,
       canOpen,
       onChooseProject,
       onOpenNewProjectSetupDialog,
@@ -348,6 +351,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                       <ProjectFileListItem
                         key={file.fileMetadata.fileIdentifier}
                         file={file}
+                        currentFileMetadata={currentFileMetadata}
                         storageProviders={storageProviders}
                         isWindowWidthMediumOrLarger={!isMobile}
                         onOpenRecentFile={onOpenRecentFile}

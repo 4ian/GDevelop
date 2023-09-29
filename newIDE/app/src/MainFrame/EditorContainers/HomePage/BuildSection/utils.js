@@ -15,9 +15,14 @@ import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Exam
 import { type CarouselThumbnail } from '../../../../UI/Carousel';
 
 export type LastModifiedInfo = {|
-  lastModifiedByUsername: string,
+  lastModifiedByUsername: ?string,
   lastModifiedByIconUrl: string,
   lastModifiedAt: number,
+  lastKnownVersionId: ?string,
+|};
+
+type LastModifiedInfoByProjectId = {|
+  [projectId: string]: LastModifiedInfo,
 |};
 
 export const getProjectLineHeight = (width: WidthType) => {
@@ -32,7 +37,7 @@ export const getLastModifiedInfoByProjectId = async ({
 }: {|
   cloudProjects: Array<CloudProjectWithUserAccessInfo>,
   profile: Profile,
-|}): Promise<{| [projectId: string]: LastModifiedInfo |}> => {
+|}): Promise<LastModifiedInfoByProjectId> => {
   const cloudProjectsLastModifiedBySomeoneElse = cloudProjects.filter(
     cloudProject =>
       !!cloudProject.committedAt &&
@@ -49,7 +54,7 @@ export const getLastModifiedInfoByProjectId = async ({
   const userPublicProfileByIds = await getUserPublicProfilesByIds(
     Array.from(allOtherContributorIds)
   );
-  const lastModifiedInfoByProjectId = {};
+  const lastModifiedInfoByProjectId: LastModifiedInfoByProjectId = {};
   cloudProjects.forEach(project => {
     if (!project.lastCommittedBy || !project.committedAt) return;
     const contributorPublicProfile =
@@ -59,6 +64,7 @@ export const getLastModifiedInfoByProjectId = async ({
       lastModifiedByUsername: contributorPublicProfile.username,
       lastModifiedByIconUrl: contributorPublicProfile.iconUrl,
       lastModifiedAt: Date.parse(project.committedAt),
+      lastKnownVersionId: project.currentVersion,
     };
   });
 
@@ -110,6 +116,7 @@ export const getExampleAndTemplateItemsForCarousel = ({
     ...(privateGameTemplateListingDatas
       ? privateGameTemplateListingDatas
           .sort((a, b) => {
+            if (a.isSellerGDevelop && b.isSellerGDevelop) return 0;
             // Show the ones sold by GDevelop first.
             if (a.isSellerGDevelop) return -1;
             if (b.isSellerGDevelop) return 1;

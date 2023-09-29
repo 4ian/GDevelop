@@ -7,6 +7,7 @@ import { Line, Column } from '../../../../UI/Grid';
 
 import {
   type FileMetadataAndStorageProviderName,
+  type FileMetadata,
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import SectionContainer, { SectionRow } from '../SectionContainer';
@@ -52,6 +53,7 @@ const DropTarget = makeDropTarget('team-groups');
 
 type Props = {|
   project: ?gdProject,
+  currentFileMetadata: ?FileMetadata,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   storageProviders: Array<StorageProvider>,
 |};
@@ -61,7 +63,10 @@ export type TeamSectionInterface = {|
 |};
 
 const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
-  ({ project, onOpenRecentFile, storageProviders }, ref) => {
+  (
+    { project, onOpenRecentFile, storageProviders, currentFileMetadata },
+    ref
+  ) => {
     const {
       groups,
       members,
@@ -183,6 +188,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       return (
         <TeamMemberProjectsView
           user={selectedUser}
+          currentFileMetadata={currentFileMetadata}
           projects={selectedUserProjects}
           storageProviders={storageProviders}
           onOpenRecentFile={onOpenRecentFile}

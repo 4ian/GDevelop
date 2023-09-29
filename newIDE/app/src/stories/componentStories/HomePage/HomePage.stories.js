@@ -115,6 +115,7 @@ const WrappedHomePage = ({
             <TutorialStateProvider>
               <HomePage
                 project={project}
+                fileMetadata={null}
                 isActive={true}
                 projectItemName={null}
                 setToolbar={() => {}}

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import { type StorageProvider } from '../index';
+import { type StorageProvider, type FileMetadata } from '../index';
 import {
   onOpenWithPicker,
   onOpen,
@@ -16,6 +16,7 @@ import {
   getWriteErrorMessage,
   renderNewProjectSaveAsLocationChooser,
   getProjectLocation,
+  isTryingToSaveInForbiddenPath,
 } from './LocalProjectWriter';
 import {
   type AppArguments,
@@ -31,6 +32,10 @@ import {
   scanForNewResources,
 } from './LocalProjectResourcesHandler';
 import { allResourceKindsAndMetadata } from '../../ResourcesList/ResourceSource';
+import {
+  type ShowAlertFunction,
+  type ShowConfirmFunction,
+} from '../../UI/Alert/AlertContext';
 
 /**
  * Use the Electron APIs to provide access to the native
@@ -63,6 +68,44 @@ export default ({
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorization to open it.`;
     },
     getWriteErrorMessage,
+    canFileMetadataBeSafelySaved: async (
+      fileMetadata: FileMetadata,
+      actions: {|
+        showAlert: ShowAlertFunction,
+        showConfirmation: ShowConfirmFunction,
+      |}
+    ) => {
+      const path = fileMetadata.fileIdentifier;
+      if (isTryingToSaveInForbiddenPath(path)) {
+        await actions.showAlert({
+          title: t`Choose another location`,
+          message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+        });
+      }
+
+      // We don't block the save, in case the user wants to save anyway.
+      return true;
+    },
+    canFileMetadataBeSafelySavedAs: async (
+      fileMetadata: FileMetadata,
+      actions: {|
+        showAlert: ShowAlertFunction,
+        showConfirmation: ShowConfirmFunction,
+      |}
+    ) => {
+      const path = fileMetadata.fileIdentifier;
+      if (isTryingToSaveInForbiddenPath(path)) {
+        await actions.showAlert({
+          title: t`Choose another location`,
+          message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+        });
+
+        // We block the save as we don't want new projects to be saved there.
+        return false;
+      }
+
+      return true;
+    },
   }),
   createResourceOperations: () => ({
     project,

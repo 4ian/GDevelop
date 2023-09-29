@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { makeStyles } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import { getGravatarUrl } from '../GravatarUrl';
 import DotBadge from '../DotBadge';
@@ -14,14 +13,6 @@ import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { hasPendingNotifications } from '../../Utils/Notification';
 import CircularProgress from '../CircularProgress';
 import User from '../CustomSvgIcons/User';
-
-const useStyles = makeStyles({
-  root: { flexDirection: 'column' },
-  anchorOriginTopRightCircle: {
-    top: 5,
-    right: 5,
-  },
-});
 
 const styles = {
   avatar: {
@@ -39,15 +30,10 @@ const UserChip = ({ onOpenProfile }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, onLogin, onCreateAccount, loginState } = authenticatedUser;
   const displayNotificationBadge = hasPendingNotifications(authenticatedUser);
-  const classes = useStyles();
   return loginState === 'loggingIn' ? (
     <CircularProgress size={25} />
   ) : profile ? (
-    <DotBadge
-      overlap="circle"
-      invisible={!displayNotificationBadge}
-      classes={classes}
-    >
+    <DotBadge overlap="circle" invisible={!displayNotificationBadge}>
       <TextButton
         label={shortenString(profile.username || profile.email, 20)}
         onClick={onOpenProfile}

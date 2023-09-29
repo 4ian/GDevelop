@@ -24,7 +24,7 @@ import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Chip from '@material-ui/core/Chip';
-import Builds from '../Export/Builds';
+import Builds from '../ExportAndShare/Builds';
 import AlertMessage from '../UI/AlertMessage';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';

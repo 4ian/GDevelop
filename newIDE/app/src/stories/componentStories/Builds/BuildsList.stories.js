@@ -6,7 +6,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import BuildsList from '../../../Export/Builds/BuildsList';
+import BuildsList from '../../../ExportAndShare/Builds/BuildsList';
 
 import {
   erroredCordovaBuild,

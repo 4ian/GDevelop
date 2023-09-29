@@ -20,6 +20,7 @@ export const UserPublicProfileChip = () => (
       description: 'something',
       donateLink: 'https://myurl.com',
       communityLinks: {},
+      iconUrl: 'https://resources.gdevelop-app.com/avatars/4ian.png',
     }}
   />
 );

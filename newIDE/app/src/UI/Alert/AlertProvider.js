@@ -96,6 +96,10 @@ function ConfirmProvider({ children }: Props) {
           dismissButtonLabel={confirmDialogConfig.dismissButtonLabel}
           title={confirmDialogConfig.title}
           message={confirmDialogConfig.message}
+          level={confirmDialogConfig.level || 'info'}
+          makeDismissButtonPrimary={
+            confirmDialogConfig.makeDismissButtonPrimary
+          }
         />
       )}
       {confirmDeleteDialogConfig && (

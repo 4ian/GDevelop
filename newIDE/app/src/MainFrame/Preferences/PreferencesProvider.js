@@ -136,6 +136,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
     getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
     setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    getShareDialogDefaultTab: this._getShareDialogDefaultTab.bind(this),
+    setShareDialogDefaultTab: this._setShareDialogDefaultTab.bind(this),
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
@@ -742,6 +744,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, newObjectDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShareDialogDefaultTab() {
+    return this.state.values.shareDialogDefaultTab;
+  }
+
+  _setShareDialogDefaultTab(shareDialogDefaultTab: 'invite' | 'publish') {
+    this.setState(
+      state => ({
+        values: { ...state.values, shareDialogDefaultTab },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import { BuildCard } from '../../../Export/Builds/BuildCard';
+import { BuildCard } from '../../../ExportAndShare/Builds/BuildCard';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';

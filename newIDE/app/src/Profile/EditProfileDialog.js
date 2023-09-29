@@ -34,6 +34,7 @@ import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
 import TextButton from '../UI/TextButton';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import Form from '../UI/Form';
 
 type Props = {|
   profile: Profile,
@@ -281,15 +282,7 @@ const EditProfileDialog = ({
           onApply={edit}
           open
         >
-          <form
-            onSubmit={event => {
-              // Prevent browser to navigate on form submission.
-              event.preventDefault();
-              edit();
-            }}
-            autoComplete="on"
-            name="editProfile"
-          >
+          <Form onSubmit={edit} autoComplete="on" name="editProfile">
             <ColumnStackLayout noMargin>
               <UsernameField
                 initialUsername={profile.username}
@@ -442,13 +435,8 @@ const EditProfileDialog = ({
                 }}
                 disabled={actionInProgress}
               />
-              {/*
-                This input is needed so that the browser submits the form when
-                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
-              */}
-              <input type="submit" value="Submit" style={{ display: 'none' }} />
             </ColumnStackLayout>
-          </form>
+          </Form>
         </Dialog>
       )}
     </I18n>

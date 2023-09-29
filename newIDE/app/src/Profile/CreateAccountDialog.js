@@ -23,6 +23,7 @@ import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Form from '../UI/Form';
 
 const getStyles = ({ windowWidth }) => {
   const isMobileScreen = windowWidth === 'small';
@@ -198,15 +199,7 @@ const CreateAccountDialog = ({
           </LineStackLayout>
         </Column>
         <div style={styles.formContainer}>
-          <form
-            onSubmit={event => {
-              // Prevent browser to navigate on form submission.
-              event.preventDefault();
-              createAccount();
-            }}
-            autoComplete="on"
-            name="createAccount"
-          >
+          <Form onSubmit={createAccount} autoComplete="on" name="createAccount">
             <ColumnStackLayout noMargin>
               <UsernameField
                 value={username}
@@ -253,13 +246,8 @@ const CreateAccountDialog = ({
                 }}
                 disabled={createAccountInProgress}
               />
-              {/*
-                This input is needed so that the browser submits the form when
-                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
-              */}
-              <input type="submit" value="Submit" style={{ display: 'none' }} />
             </ColumnStackLayout>
-          </form>
+          </Form>
         </div>
         <BackgroundText>
           <MarkdownText

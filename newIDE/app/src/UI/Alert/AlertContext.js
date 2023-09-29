@@ -12,6 +12,7 @@ export type ShowAlertDialogOptionsWithCallback = {|
   ...ShowAlertDialogOptions,
   callback: Function,
 |};
+export type ShowAlertFunction = ShowAlertDialogOptions => Promise<void>;
 
 // Confirm
 export type ShowConfirmDialogOptions = {|
@@ -19,11 +20,14 @@ export type ShowConfirmDialogOptions = {|
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
+  level?: 'info' | 'warning',
+  makeDismissButtonPrimary?: boolean,
 |};
 export type ShowConfirmDialogOptionsWithCallback = {|
   ...ShowConfirmDialogOptions,
   callback: Function,
 |};
+export type ShowConfirmFunction = ShowConfirmDialogOptions => Promise<boolean>;
 
 // Confirm Delete
 export type ShowConfirmDeleteDialogOptions = {|
@@ -38,6 +42,7 @@ export type ShowConfirmDeleteDialogOptionsWithCallback = {|
   ...ShowConfirmDeleteDialogOptions,
   callback: Function,
 |};
+export type ShowConfirmDeleteFunction = ShowConfirmDeleteDialogOptions => Promise<boolean>;
 
 export type ConfirmState = {|
   showAlertDialog: ShowAlertDialogOptionsWithCallback => void,

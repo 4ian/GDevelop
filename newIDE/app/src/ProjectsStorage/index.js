@@ -5,6 +5,10 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import {
+  type ShowAlertFunction,
+  type ShowConfirmFunction,
+} from '../UI/Alert/AlertContext';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -122,6 +126,20 @@ export type StorageProviderOperations = {|
     /** This is the location where the project was saved, or null if not persisted. */
     fileMetadata: ?FileMetadata,
   |}>,
+  canFileMetadataBeSafelySaved?: (
+    fileMetadata: FileMetadata,
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
+  ) => Promise<boolean>,
+  canFileMetadataBeSafelySavedAs?: (
+    fileMetadata: FileMetadata,
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
+  ) => Promise<boolean>,
 
   // Project properties saving:
   onChangeProjectProperty?: (

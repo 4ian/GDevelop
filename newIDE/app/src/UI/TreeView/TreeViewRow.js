@@ -34,21 +34,34 @@ const onInputKeyDown = (event: KeyboardEvent) => {
 const SemiControlledRowInput = ({
   initialValue,
   onEndRenaming,
+  onBlur,
 }: {
   initialValue: string,
   onEndRenaming: (newName: string) => void,
+  onBlur: () => void,
 }) => {
   const [value, setValue] = React.useState<string>(initialValue);
   const inputRef = React.useRef<?HTMLInputElement>(null);
 
   /**
-   * When mounting the input, select content.
+   * When mounting the component, select content.
    */
   React.useEffect(() => {
     if (inputRef.current) {
       inputRef.current.select();
     }
   }, []);
+
+  /**
+   * When unmounting the component, call onBlur. If props.onBlur is called
+   * at the end of onKeyUp, focus might before the component is mounted.
+   * This would trigger the blur callback on the input, calling onEndRenaming
+   * with the current value, even if the user hit Escape key and expected the
+   * initialValue to be set.
+   */
+  React.useEffect(() => {
+    return onBlur
+  }, [onBlur])
 
   return (
     <div className="item-name-input-container">
@@ -99,6 +112,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     flattenedData,
     onOpen,
     onSelect,
+    onBlurField,
     onStartRenaming,
     onEndRenaming,
     renamedItemId,
@@ -350,6 +364,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                                 onEndRenaming={value =>
                                   onEndRenaming(node.item, value)
                                 }
+                                onBlur={onBlurField}
                               />
                             ) : (
                               <span

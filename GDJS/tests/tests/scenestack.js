@@ -198,8 +198,6 @@ describe('gdjs.SceneStack', () => {
     );
     let sceneStack = runtimeGame._sceneStack;
 
-    console.log('start test');
-
     // Set up some scene callbacks.
     /** @type gdjs.RuntimeScene | null  */
     let firstLoadedScene = null;
@@ -296,8 +294,6 @@ describe('gdjs.SceneStack', () => {
       mockedResourceManager
     );
     let sceneStack = runtimeGame._sceneStack;
-
-    console.log('start test');
 
     // Set up some scene callbacks.
     /** @type gdjs.RuntimeScene | null  */
@@ -404,8 +400,6 @@ describe('gdjs.SceneStack', () => {
       mockedResourceManager
     );
     let sceneStack = runtimeGame._sceneStack;
-
-    console.log('start test');
 
     // Set up some scene callbacks.
     /** @type gdjs.RuntimeScene | null  */

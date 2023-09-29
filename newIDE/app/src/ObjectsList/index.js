@@ -46,11 +46,18 @@ import IconButton from '../UI/IconButton';
 import AddFolder from '../UI/CustomSvgIcons/AddFolder';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import Link from '../UI/Link';
+import { getHelpLink } from '../Utils/HelpLink';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
 const globalObjectsEmptyPlaceholderId = 'global-empty-placeholder';
+
+const globalObjectsWikiLink = getHelpLink(
+  '/interface/scene-editor/global-objects/',
+  ':~:text=Global%20objects%20are%20objects%20which,are%20usable%20by%20all%20Scenes'
+);
 
 const styles = {
   listContainer: {
@@ -687,7 +694,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 ? projectObjectFolderOrObjectsList
                 : [
                     {
-                      label: i18n._(t`There is no global object yet.`),
+                      label: (
+                        <Trans>
+                          There is no{' '}
+                          <Link
+                            href={globalObjectsWikiLink}
+                            onClick={() =>
+                              Window.openExternalURL(globalObjectsWikiLink)
+                            }
+                          >
+                            global object
+                          </Link>{' '}
+                          yet.
+                        </Trans>
+                      ),
                       id: globalObjectsEmptyPlaceholderId,
                       isPlaceholder: true,
                     },

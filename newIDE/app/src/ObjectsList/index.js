@@ -394,6 +394,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [forceUpdate, forceUpdateList, unsavedChanges]
     );
 
+    const selectObjectFolderOrObjectWithContext = React.useCallback(
+      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
+        onObjectFolderOrObjectWithContextSelected(
+          objectFolderOrObjectWithContext
+        );
+      },
+      [onObjectFolderOrObjectWithContextSelected]
+    );
+
     const deleteObjectFolderOrObjectWithContext = React.useCallback(
       (
         i18n: I18nType,
@@ -410,6 +419,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               .getParent()
               .removeFolderChild(objectFolderOrObject);
             forceUpdateList();
+            selectObjectFolderOrObjectWithContext(null);
           }
           return;
         }
@@ -425,6 +435,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           object: objectFolderOrObject.getObject(),
           global,
         };
+
+        // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
+        // to remove an item using keyboard only and to navigate with the arrow
+        // keys right after deleting it.
+        selectObjectFolderOrObjectWithContext(null);
 
         // It's important to call onDeleteObject, because the parent might
         // have to do some refactoring/clean up work before the object is deleted
@@ -450,6 +465,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectModified,
         project,
         forceUpdateList,
+        selectObjectFolderOrObjectWithContext,
       ]
     );
 
@@ -856,15 +872,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }, 100); // A few ms is enough for a new render to be done.
       },
       [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
-    );
-
-    const selectObjectFolderOrObjectWithContext = React.useCallback(
-      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
-        onObjectFolderOrObjectWithContextSelected(
-          objectFolderOrObjectWithContext
-        );
-      },
-      [onObjectFolderOrObjectWithContextSelected]
     );
 
     const moveSelectionTo = React.useCallback(

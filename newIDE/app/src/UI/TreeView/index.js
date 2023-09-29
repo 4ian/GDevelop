@@ -13,6 +13,8 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
+export const navigationKeys = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft']
+
 export type ItemBaseAttributes = {
   +isRoot?: boolean,
   +isPlaceholder?: boolean,
@@ -459,7 +461,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   const onKeyDown = React.useCallback(
     (event: KeyboardEvent) => {
       if (
-        !['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(event.key)
+        !navigationKeys.includes(event.key)
       )
         return;
       let newFocusedItem;

@@ -16,6 +16,7 @@ export const Default = () => {
     showAlert,
     showConfirmation,
     showDeleteConfirmation,
+    showYesNoCancel,
   } = useAlertDialog();
 
   const onOpenAlertDialog = async () => {
@@ -24,6 +25,20 @@ export const Default = () => {
       message: t`You cannot do this.`,
     });
     action('Dismissed')();
+  };
+
+  const onOpenYesNoCancelDialog = async () => {
+    const answer = await showYesNoCancel({
+      title: t`Warning`,
+      message: t`Do you want to refactor your project?`,
+    });
+    if (answer === 0) {
+      action('Yes')()
+    } else if (answer === 1) {
+      action('No')()
+    } else {
+      action('Cancel')()
+    }
   };
 
   const onOpenConfirmDialog = async () => {
@@ -57,6 +72,11 @@ export const Default = () => {
       <RaisedButton
         label="Open confirm delete dialog"
         onClick={onOpenConfirmDeleteDialog}
+      />
+      <LargeSpacer />
+      <RaisedButton
+        label="Open yes no cancel dialog"
+        onClick={onOpenYesNoCancelDialog}
       />
     </Column>
   );

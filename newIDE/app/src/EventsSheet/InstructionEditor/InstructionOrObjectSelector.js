@@ -51,6 +51,13 @@ import {
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
 import Add from '../../UI/CustomSvgIcons/Add';
+import getObjectByName from '../../Utils/GetObjectByName';
+import {
+  enumerateFoldersInContainer,
+  getObjectsInFolder,
+} from '../../ObjectsList/EnumerateObjectFolderOrObject';
+import { renderFolderListItem } from './SelectorListItems/FolderListItem';
+import Text from '../../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -64,6 +71,13 @@ type State = {|
     objects: Array<SearchResult<ObjectWithContext>>,
     groups: Array<SearchResult<GroupWithContext>>,
     instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
+    folders: Array<
+      SearchResult<{|
+        path: string,
+        folder: gdObjectFolderOrObject,
+        global: boolean,
+      |}>
+    >,
   },
 |};
 
@@ -99,7 +113,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 > {
   state = {
     searchText: '',
-    searchResults: { objects: [], groups: [], instructions: [] },
+    searchResults: { objects: [], groups: [], instructions: [], folders: [] },
   };
   _searchBar = React.createRef<SearchBarInterface>();
   _scrollView = React.createRef<ScrollViewInterface>();
@@ -124,6 +138,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   instructionSearchApi = null;
   objectSearchApi = null;
   groupSearchApi = null;
+  folderSearchApi = null;
 
   reEnumerateInstructions = (i18n: I18nType) => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -153,6 +168,15 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       this.props.objectsContainer
     );
 
+    const allFolders = [
+      ...enumerateFoldersInContainer(this.props.globalObjectsContainer).map(
+        folderWithPath => ({ ...folderWithPath, global: true })
+      ),
+      ...enumerateFoldersInContainer(this.props.objectsContainer).map(
+        folderWithPath => ({ ...folderWithPath, global: false })
+      ),
+    ];
+
     this.instructionSearchApi = new Fuse(
       deduplicateInstructionsList(this.allInstructionsInfo),
       {
@@ -173,6 +197,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       getFn: (item, property) => item.group.getName(),
       keys: ['name'], // Not used as we only use the name of the group
     });
+    this.folderSearchApi = new Fuse(allFolders, {
+      ...sharedFuseConfiguration,
+      getFn: (item, property) => item.path,
+      keys: ['name'], // Not used as we only use the path to the folder
+    });
   }
 
   _search = (searchText: string) => {
@@ -190,6 +219,12 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
           : [],
         groups: this.groupSearchApi
           ? this.groupSearchApi.search(extendedSearchText).map(result => ({
+              item: result.item,
+              matches: tuneMatches(result, searchText),
+            }))
+          : [],
+        folders: this.folderSearchApi
+          ? this.folderSearchApi.search(extendedSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
@@ -242,11 +277,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     let filteredObjectsList = [];
     let displayedObjectGroupsList = [];
     let filteredInstructionsList = [];
+    let filteredFoldersList = [];
 
     if (isSearching) {
       filteredObjectsList = searchResults.objects;
       displayedObjectGroupsList = searchResults.groups;
       filteredInstructionsList = searchResults.instructions;
+      filteredFoldersList = searchResults.folders;
     } else {
       filteredObjectsList = allObjectsList.map(object => ({
         item: object,
@@ -273,7 +310,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       !isSearching ||
       !!filteredObjectsList.length ||
       !!displayedObjectGroupsList.length ||
-      !!displayedInstructionsList.length;
+      !!displayedInstructionsList.length ||
+      !!filteredFoldersList;
 
     const onSubmitSearch = () => {
       if (!isSearching) return;
@@ -389,21 +427,138 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         </Subheader>
                       )}
                       {displayedObjectGroupsList.map(
-                        ({ item: groupWithContext, matches }) =>
-                          renderGroupObjectsListItem({
-                            groupWithContext: groupWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(groupWithContext.group.getName()),
-                            matchesCoordinates: matches.length
-                              ? matches[0].indices // Only field for groups is their name
-                              : [],
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                          })
+                        ({ item: groupWithContext, matches }) => {
+                          const results = [];
+
+                          results.push(
+                            renderGroupObjectsListItem({
+                              groupWithContext,
+                              iconSize,
+                              onClick: () =>
+                                onChooseObject(
+                                  groupWithContext.group.getName()
+                                ),
+                              matchesCoordinates: matches.length
+                                ? matches[0].indices // Only field for groups is their name
+                                : [],
+                              selectedValue: chosenObjectName
+                                ? getObjectOrObjectGroupListItemValue(
+                                    chosenObjectName
+                                  )
+                                : undefined,
+                            })
+                          );
+                          if (isSearching) {
+                            const { group, global } = groupWithContext;
+                            const groupName = group.getName();
+                            const objectsInGroup = group
+                              .getAllObjectsNames()
+                              .toJSArray()
+                              .map(objectName => {
+                                // A global object group can contain scene objects so we cannot use
+                                // the group context to get directly get the object knowing the
+                                // appropriate container.
+                                const object = getObjectByName(
+                                  globalObjectsContainer,
+                                  objectsContainer,
+                                  objectName
+                                );
+                                if (!object) return null;
+
+                                return renderObjectListItem({
+                                  project,
+                                  objectWithContext: {
+                                    object,
+                                    global,
+                                  },
+                                  keyPrefix: `group-${groupName}`,
+                                  withIndent: true,
+                                  iconSize,
+                                  onClick: () => onChooseObject(objectName),
+                                  matchesCoordinates: [],
+                                  selectedValue: chosenObjectName
+                                    ? getObjectOrObjectGroupListItemValue(
+                                        chosenObjectName
+                                      )
+                                    : undefined,
+                                });
+                              })
+                              .filter(Boolean);
+                            if (objectsInGroup.length === 0) {
+                              results.push(
+                                <ListItem
+                                  key={`${group.getName()}-empty`}
+                                  primaryText={
+                                    <Text style={{ opacity: 0.6 }} noMargin>
+                                      <Trans>No object in group</Trans>
+                                    </Text>
+                                  }
+                                  style={{ paddingLeft: 45 }}
+                                />
+                              );
+                            } else {
+                              results.push(...objectsInGroup);
+                            }
+                          }
+                          return results;
+                        }
+                      )}
+                      {filteredFoldersList.length > 0 && (
+                        <Subheader>
+                          <Trans>Folders</Trans>
+                        </Subheader>
+                      )}
+                      {filteredFoldersList.map(
+                        ({ item: folderWithPath, matches }) => {
+                          const results = [];
+
+                          results.push(
+                            renderFolderListItem({
+                              folderWithPath,
+                              iconSize,
+                              matchesCoordinates: matches.length
+                                ? matches[0].indices
+                                : [],
+                            })
+                          );
+                          const objectsInFolder = getObjectsInFolder(
+                            folderWithPath.folder
+                          );
+                          if (objectsInFolder.length === 0) {
+                            results.push(
+                              <ListItem
+                                key={`${folderWithPath.path}-empty`}
+                                primaryText={
+                                  <Text style={{ opacity: 0.6 }} noMargin>
+                                    <Trans>No object in folder</Trans>
+                                  </Text>
+                                }
+                                style={{ paddingLeft: 45 }}
+                              />
+                            );
+                          } else {
+                            results.push(
+                              ...objectsInFolder.map(object =>
+                                renderObjectListItem({
+                                  project,
+                                  selectedValue: '',
+                                  keyPrefix: `folder-${folderWithPath.path}`,
+                                  iconSize,
+                                  matchesCoordinates: [],
+                                  objectWithContext: {
+                                    object,
+                                    global: folderWithPath.global,
+                                  },
+                                  withIndent: true,
+                                  onClick: () =>
+                                    onChooseObject(object.getName()),
+                                })
+                              )
+                            );
+                          }
+
+                          return results;
+                        }
                       )}
                     </React.Fragment>
                   )}

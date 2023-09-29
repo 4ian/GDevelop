@@ -541,7 +541,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                               ...objectsInFolder.map(object =>
                                 renderObjectListItem({
                                   project,
-                                  selectedValue: '',
+                                  selectedValue: chosenObjectName
+                                    ? getObjectOrObjectGroupListItemValue(
+                                        chosenObjectName
+                                      )
+                                    : undefined,
                                   keyPrefix: `folder-${folderWithPath.path}`,
                                   iconSize,
                                   matchesCoordinates: [],

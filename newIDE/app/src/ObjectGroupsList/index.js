@@ -26,6 +26,7 @@ import Add from '../UI/CustomSvgIcons/Add';
 import { type RootFolder, type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -104,6 +105,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const [searchText, setSearchText] = React.useState<string>('');
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
+    const { showDeleteConfirmation } = useAlertDialog();
 
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
@@ -179,12 +181,13 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     );
 
     const onDelete = React.useCallback(
-      (groupWithContext: GroupWithContext) => {
+      async (groupWithContext: GroupWithContext) => {
         const { group, global } = groupWithContext;
 
-        const answer = Window.showConfirmDialog(
-          "Are you sure you want to remove this group? This can't be undone."
-        );
+        const answer = await showDeleteConfirmation({
+          title: t`Remove group`,
+          message: t`Are you sure you want to remove this group? This can't be undone.`,
+        });
         if (!answer) return;
 
         onDeleteGroup(groupWithContext, doRemove => {
@@ -208,6 +211,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         onDeleteGroup,
         onGroupRemoved,
         onObjectGroupModified,
+        showDeleteConfirmation,
       ]
     );
 

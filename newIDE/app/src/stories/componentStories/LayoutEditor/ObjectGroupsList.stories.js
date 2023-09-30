@@ -8,6 +8,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
+import alertDecorator from '../../AlertDecorator';
 import ObjectGroupsList from '../../../ObjectGroupsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
@@ -15,7 +16,7 @@ import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 export default {
   title: 'LayoutEditor/ObjectGroupsList',
   component: ObjectGroupsList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

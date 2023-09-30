@@ -9,6 +9,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
+import alertDecorator from '../../AlertDecorator';
 import ObjectsList from '../../../ObjectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
@@ -17,7 +18,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'LayoutEditor/ObjectsList',
   component: ObjectsList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

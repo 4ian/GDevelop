@@ -59,9 +59,12 @@ const SemiControlledRowInput = ({
    * with the current value, even if the user hit Escape key and expected the
    * initialValue to be set.
    */
-  React.useEffect(() => {
-    return onBlur
-  }, [onBlur])
+  React.useEffect(
+    () => {
+      return onBlur;
+    },
+    [onBlur]
+  );
 
   return (
     <div className="item-name-input-container">
@@ -241,6 +244,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           onDrop(node.item, whereToDrop);
         }}
         hover={monitor => {
+          if (node.item.isRoot) {
+            if (whereToDrop !== 'inside') setWhereToDrop('inside');
+            return;
+          }
           const { y } = monitor.getClientOffset();
           // Use a cached version of container position to avoid recomputing bounding rectangle.
           // Doing this, the position is computed every second the user hovers the target.
@@ -297,7 +304,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   className={
                     'row-container' +
                     (node.selected ? ' selected' : '') +
-                    (isOver && whereToDrop === 'inside' && displayAsFolder
+                    (isOver &&
+                    whereToDrop === 'inside' &&
+                    displayAsFolder &&
+                    !node.item.isRoot
                       ? canDrop
                         ? ' with-can-drop-inside-indicator'
                         : ' with-cannot-drop-inside-indicator'

@@ -8,13 +8,11 @@ import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import { enumerateGroups } from '../ObjectsList/EnumerateObjects';
 import {
   type GroupWithContextList,
   type GroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
-import Window from '../Utils/Window';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import {
   serializeToJSObject,
@@ -105,7 +103,11 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const [searchText, setSearchText] = React.useState<string>('');
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
-    const { showDeleteConfirmation } = useAlertDialog();
+    const {
+      showDeleteConfirmation,
+      showConfirmation,
+      showAlert,
+    } = useAlertDialog();
 
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
@@ -274,18 +276,16 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     );
 
     const setAsGlobalGroup = React.useCallback(
-      (i18n: I18nType, groupWithContext: GroupWithContext, index?: number) => {
+      async (groupWithContext: GroupWithContext, index?: number) => {
         const { group } = groupWithContext;
 
         const groupName = group.getName();
 
         if (globalObjectGroups.has(groupName)) {
-          showWarningBox(
-            i18n._(
-              t`A global object with this name already exists. Please change the object name before setting it as a global object`
-            ),
-            { delayToNextTick: true }
-          );
+          await showAlert({
+            title: t`Set as global group`,
+            message: t`A global object with this name already exists. Please change the group name before setting it as a global group`,
+          });
           return;
         }
 
@@ -293,11 +293,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
           return;
         }
 
-        const answer = Window.showConfirmDialog(
-          i18n._(
-            t`This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?`
-          )
-        );
+        const answer = await showConfirmation({
+          title: t`Set as global group`,
+          message: t`This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?`,
+        });
         if (!answer) return;
 
         if (treeViewRef.current)
@@ -322,6 +321,8 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         onObjectGroupModified,
         beforeSetAsGlobalGroup,
         scrollToItem,
+        showConfirmation,
+        showAlert,
       ]
     );
 
@@ -354,8 +355,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     );
 
     const moveSelectionTo = React.useCallback(
-      (
-        i18n: I18nType,
+      async (
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
@@ -367,7 +367,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             destinationItem.id === globalGroupsEmptyPlaceholderId &&
             !selectedGroupWithContext.global
           ) {
-            setAsGlobalGroup(i18n, selectedGroupWithContext, 0);
+            await setAsGlobalGroup(selectedGroupWithContext, 0);
           }
           return;
         }
@@ -392,7 +392,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
           const destinationIndex = globalObjectGroups.getPosition(
             destinationItem.group.getName()
           );
-          setAsGlobalGroup(i18n, selectedGroupWithContext, destinationIndex);
+          await setAsGlobalGroup(selectedGroupWithContext, destinationIndex);
           return;
         } else {
           return;
@@ -443,7 +443,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
               {
                 label: i18n._(t`Set as global group`),
                 enabled: !isGroupWithContextGlobal(item),
-                click: () => setAsGlobalGroup(i18n, item),
+                click: () => setAsGlobalGroup(item),
                 visible: canSetAsGlobalGroup !== false,
               },
               {
@@ -577,9 +577,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         }}
                         onRenameItem={onRename}
                         buildMenuTemplate={renderGroupMenuTemplate(i18n)}
-                        onMoveSelectionToItem={(destinationItem, where) =>
-                          moveSelectionTo(i18n, destinationItem, where)
-                        }
+                        onMoveSelectionToItem={moveSelectionTo}
                         canMoveSelectionToItem={canMoveSelectionTo}
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}

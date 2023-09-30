@@ -10,7 +10,9 @@ import InstancePropertiesEditor, {
 } from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
-import ObjectGroupsList from '../../ObjectGroupsList';
+import ObjectGroupsList, {
+  type ObjectGroupsListInterface,
+} from '../../ObjectGroupsList';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
@@ -66,7 +68,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const instancesListRef = React.useRef<?InstancesList>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
-  const objectGroupsListRef = React.useRef<?ObjectGroupsList>(null);
+  const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
   const [selectedEditorId, setSelectedEditorId] = React.useState<?EditorId>(
     null

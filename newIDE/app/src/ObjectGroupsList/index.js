@@ -25,8 +25,10 @@ import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
 import { type RootFolder, type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
+
 const sceneGroupsRootFolderId = 'scene-groups';
 const globalGroupsRootFolderId = 'global-groups';
 const globalGroupsEmptyPlaceholderId = 'global-empty-placeholder';
@@ -58,10 +60,7 @@ const getTreeViewItemId = (item: TreeViewItem) =>
 const isGroupWithContextGlobal = (groupWithContext: GroupWithContext) =>
   groupWithContext.global;
 
-type State = {|
-  selectedGroupWithContext: ?GroupWithContext,
-  searchText: string,
-|};
+export type ObjectGroupsListInterface = {| forceUpdate: () => void |};
 
 type Props = {|
   globalObjectGroups: gdObjectGroupsContainer,
@@ -82,402 +81,434 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
 |};
 
-export default class GroupsListContainer extends React.Component<Props, State> {
-  static defaultProps = {
-    onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) =>
-      cb(true),
-    onRenameGroup: (
-      groupWithContext: GroupWithContext,
-      newName: string,
-      cb: Function
-    ) => cb(true),
-  };
-
-  treeView: ?TreeViewInterface<TreeViewItem>;
-  displayedObjectGroupsList: GroupWithContextList = [];
-  displayedGlobalObjectGroupsList: GroupWithContextList = [];
-  state: State = {
-    selectedGroupWithContext: null,
-    searchText: '',
-  };
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    // The component is costly to render, so avoid any re-rendering as much
-    // as possible.
-    // We make the assumption that no changes to groups list is made outside
-    // from the component.
-    // If a change is made, the component won't notice it: you have to manually
-    // call forceUpdate.
-
-    if (
-      this.state.selectedGroupWithContext !==
-        nextState.selectedGroupWithContext ||
-      this.state.searchText !== nextState.searchText
-    )
-      return true;
-
-    if (
-      this.props.globalObjectGroups !== nextProps.globalObjectGroups ||
-      this.props.objectGroups !== nextProps.objectGroups
-    ) {
-      return true;
-    }
-
-    return false;
-  }
-
-  addGroup = () => {
-    const { globalObjectGroups, objectGroups } = this.props;
-
-    const name = newNameGenerator(
-      'Group',
-      name => objectGroups.has(name) || globalObjectGroups.has(name)
-    );
-
-    const newObjectGroup = objectGroups.insertNew(name, objectGroups.count());
-    this._onObjectGroupModified();
-
-    if (this.props.onGroupAdded) {
-      this.props.onGroupAdded();
-    }
-
-    const groupWithContext: GroupWithContext = {
-      group: newObjectGroup,
-      global: false, // A new group is not global by default.
-    };
-
-    if (this.treeView) this.treeView.openItems([sceneGroupsRootFolderId]);
-
-    // Scroll to the new group.
-    // Ideally, we'd wait for the list to be updated to scroll, but
-    // to simplify the code, we just wait a few ms for a new render
-    // to be done.
-    setTimeout(() => {
-      this.scrollToItem(groupWithContext);
-    }, 100); // A few ms is enough for a new render to be done.
-
-    // We focus it so the user can edit the name directly.
-    this._onEditName(groupWithContext);
-  };
-
-  _onDelete = (groupWithContext: GroupWithContext) => {
-    const { group, global } = groupWithContext;
-    const { globalObjectGroups, objectGroups } = this.props;
-
-    const answer = Window.showConfirmDialog(
-      "Are you sure you want to remove this group? This can't be undone."
-    );
-    if (!answer) return;
-
-    this.props.onDeleteGroup(groupWithContext, doRemove => {
-      if (!doRemove) return;
-
-      if (global) {
-        globalObjectGroups.remove(group.getName());
-      } else {
-        objectGroups.remove(group.getName());
-      }
-
-      this._onObjectGroupModified();
-      if (this.props.onGroupRemoved) {
-        this.props.onGroupRemoved();
-      }
-    });
-  };
-
-  _onEditName = (groupWithContext: GroupWithContext) => {
-    if (this.treeView) this.treeView.renameItem(groupWithContext);
-  };
-
-  _onDuplicate = (groupWithContext: GroupWithContext): ?GroupWithContext => {
-    const { group, global } = groupWithContext;
-    const { globalObjectGroups, objectGroups } = this.props;
-
-    const newName = newNameGenerator(
-      group.getName(),
-      name => objectGroups.has(name) || globalObjectGroups.has(name),
-      ''
-    );
-
-    const container: gdObjectGroupsContainer = global
-      ? globalObjectGroups
-      : objectGroups;
-
-    const serializedDuplicatedGroup = serializeToJSObject(group);
-    const newGroup = container.insertNew(
-      newName,
-      container.getPosition(group.getName()) + 1
-    );
-
-    unserializeFromJSObject(
-      newGroup,
-      serializedDuplicatedGroup,
-      'unserializeFrom'
-    );
-    newGroup.setName(newName); // Unserialization has overwritten the name.
-
-    this._onObjectGroupModified();
-  };
-
-  _onRename = (groupWithContext: GroupWithContext, newName: string) => {
-    const { group, global } = groupWithContext;
-
-    if (group.getName() === newName) return;
-
-    const validatedNewName = this.props.getValidatedObjectOrGroupName(
-      newName,
-      global
-    );
-    this.props.onRenameGroup(groupWithContext, validatedNewName, doRename => {
-      if (!doRename) return;
-
-      group.setName(validatedNewName);
-
-      this._onObjectGroupModified();
-      if (this.props.onGroupRenamed) {
-        this.props.onGroupRenamed();
-      }
-    });
-  };
-
-  _setAsGlobalGroup = (
-    i18n: I18nType,
-    groupWithContext: GroupWithContext,
-    index?: number
-  ) => {
-    const { group } = groupWithContext;
+const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
+  (props, ref) => {
     const {
       globalObjectGroups,
       objectGroups,
+      onGroupAdded,
+      onDeleteGroup,
+      onGroupRemoved,
+      getValidatedObjectOrGroupName,
+      onRenameGroup,
+      onGroupRenamed,
       beforeSetAsGlobalGroup,
-    } = this.props;
+      unsavedChanges,
+      onEditGroup,
+      canSetAsGlobalGroup,
+    } = props;
+    const [
+      selectedGroupWithContext,
+      setSelectedGroupWithContext,
+    ] = React.useState<?GroupWithContext>(null);
+    const [searchText, setSearchText] = React.useState<string>('');
+    const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
+    const forceUpdate = useForceUpdate();
 
-    const groupName = group.getName();
+    React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
-    if (globalObjectGroups.has(groupName)) {
-      showWarningBox(
-        i18n._(
-          t`A global object with this name already exists. Please change the object name before setting it as a global object`
-        ),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (beforeSetAsGlobalGroup && !beforeSetAsGlobalGroup(groupName)) {
-      return;
-    }
-
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?`
-      )
+    const scrollToItem = React.useCallback(
+      (groupWithContext: GroupWithContext) => {
+        if (treeViewRef.current) {
+          treeViewRef.current.scrollToItem(groupWithContext);
+        }
+      },
+      []
     );
-    if (!answer) return;
 
-    if (this.treeView) this.treeView.openItems([globalGroupsRootFolderId]);
-    globalObjectGroups.insert(
-      group,
-      typeof index === 'number' ? index : globalObjectGroups.count()
+    const onEditName = React.useCallback(
+      (groupWithContext: GroupWithContext) => {
+        if (treeViewRef.current)
+          treeViewRef.current.renameItem(groupWithContext);
+      },
+      []
     );
-    objectGroups.remove(groupName);
-    this._onObjectGroupModified();
-    // Scroll to the moved group.
-    // Ideally, we'd wait for the list to be updated to scroll, but
-    // to simplify the code, we just wait a few ms for a new render
-    // to be done.
-    setTimeout(() => {
-      this.scrollToItem(groupWithContext);
-    }, 100); // A few ms is enough for a new render to be done.
-  };
 
-  _onObjectGroupModified = () => {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.forceUpdate();
-  };
+    const onObjectGroupModified = React.useCallback(
+      () => {
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        forceUpdate();
+      },
+      [unsavedChanges, forceUpdate]
+    );
 
-  _canMoveSelectionTo = (destinationItem: TreeViewItem) => {
-    if (destinationItem.isRoot) return false;
-    if (!this.state.selectedGroupWithContext) return false;
-    if (destinationItem.isPlaceholder) {
-      if (
-        destinationItem.id === globalGroupsEmptyPlaceholderId &&
-        !this.state.selectedGroupWithContext.global
-      ) {
-        // In that case, the user is drag n dropping a scene group on the
-        // empty placeholder of the global groups section.
-        return true;
-      }
-      return false;
-    }
+    const addGroup = React.useCallback(
+      () => {
+        const name = newNameGenerator(
+          'Group',
+          name => objectGroups.has(name) || globalObjectGroups.has(name)
+        );
 
-    if (
-      this.state.selectedGroupWithContext.global === destinationItem.global ||
-      (!this.state.selectedGroupWithContext.global && destinationItem.global)
-    ) {
-      return true;
-    }
+        const newObjectGroup = objectGroups.insertNew(
+          name,
+          objectGroups.count()
+        );
+        onObjectGroupModified();
 
-    return false;
-  };
+        if (onGroupAdded) {
+          onGroupAdded();
+        }
 
-  _selectGroup = (groupWithContext: ?GroupWithContext) => {
-    this.setState({
-      selectedGroupWithContext: groupWithContext,
-    });
-  };
+        const groupWithContext: GroupWithContext = {
+          group: newObjectGroup,
+          global: false, // A new group is not global by default.
+        };
 
-  _moveSelectionTo = (
-    i18n: I18nType,
-    destinationItem: TreeViewItem,
-    where: 'before' | 'inside' | 'after'
-  ) => {
-    if (destinationItem.isRoot) return false;
-    const { selectedGroupWithContext } = this.state;
-    if (!selectedGroupWithContext) return;
+        if (treeViewRef.current)
+          treeViewRef.current.openItems([sceneGroupsRootFolderId]);
 
-    if (destinationItem.isPlaceholder) {
-      if (
-        destinationItem.id === globalGroupsEmptyPlaceholderId &&
-        !selectedGroupWithContext.global
-      ) {
-        this._setAsGlobalGroup(i18n, selectedGroupWithContext, 0);
-      }
-      return;
-    }
+        // Scroll to the new group.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(groupWithContext);
+        }, 100); // A few ms is enough for a new render to be done.
 
-    const { globalObjectGroups, objectGroups } = this.props;
-    let container: gdObjectGroupsContainer;
-    let fromIndex: number;
-    let toIndex: number;
+        // We focus it so the user can edit the name directly.
+        onEditName(groupWithContext);
+      },
+      [
+        globalObjectGroups,
+        objectGroups,
+        onGroupAdded,
+        onEditName,
+        onObjectGroupModified,
+        scrollToItem,
+      ]
+    );
 
-    const areSelectedAndTargetItemsFromSameContext =
-      selectedGroupWithContext.global === destinationItem.global;
+    const onDelete = React.useCallback(
+      (groupWithContext: GroupWithContext) => {
+        const { group, global } = groupWithContext;
 
-    if (areSelectedAndTargetItemsFromSameContext) {
-      container = selectedGroupWithContext.global
-        ? globalObjectGroups
-        : objectGroups;
+        const answer = Window.showConfirmDialog(
+          "Are you sure you want to remove this group? This can't be undone."
+        );
+        if (!answer) return;
 
-      fromIndex = container.getPosition(
-        selectedGroupWithContext.group.getName()
-      );
-      toIndex = container.getPosition(destinationItem.group.getName());
-    } else if (!selectedGroupWithContext.global && destinationItem.global) {
-      const destinationIndex = globalObjectGroups.getPosition(
-        destinationItem.group.getName()
-      );
-      this._setAsGlobalGroup(i18n, selectedGroupWithContext, destinationIndex);
-      return;
-    } else {
-      return;
-    }
-    if (toIndex > fromIndex) toIndex -= 1;
-    if (where === 'after') toIndex += 1;
+        onDeleteGroup(groupWithContext, doRemove => {
+          if (!doRemove) return;
 
-    container.move(fromIndex, toIndex);
-    this._onObjectGroupModified();
-    if (this.treeView) this.treeView.forceUpdateList();
-  };
+          if (global) {
+            globalObjectGroups.remove(group.getName());
+          } else {
+            objectGroups.remove(group.getName());
+          }
 
-  _editItem = (item: TreeViewItem) => {
-    if (item.isRoot || item.isPlaceholder) return;
-    this.props.onEditGroup(item.group);
-  };
+          onObjectGroupModified();
+          if (onGroupRemoved) {
+            onGroupRemoved();
+          }
+        });
+      },
+      [
+        globalObjectGroups,
+        objectGroups,
+        onDeleteGroup,
+        onGroupRemoved,
+        onObjectGroupModified,
+      ]
+    );
 
-  _renderGroupMenuTemplate = (i18n: I18nType) => (
-    item: TreeViewItem,
-    index: number
-  ) =>
-    item.isRoot || item.isPlaceholder
-      ? null
-      : [
+    const onDuplicate = React.useCallback(
+      (groupWithContext: GroupWithContext): ?GroupWithContext => {
+        const { group, global } = groupWithContext;
+
+        const newName = newNameGenerator(
+          group.getName(),
+          name => objectGroups.has(name) || globalObjectGroups.has(name),
+          ''
+        );
+
+        const container: gdObjectGroupsContainer = global
+          ? globalObjectGroups
+          : objectGroups;
+
+        const serializedDuplicatedGroup = serializeToJSObject(group);
+        const newGroup = container.insertNew(
+          newName,
+          container.getPosition(group.getName()) + 1
+        );
+
+        unserializeFromJSObject(
+          newGroup,
+          serializedDuplicatedGroup,
+          'unserializeFrom'
+        );
+        newGroup.setName(newName); // Unserialization has overwritten the name.
+
+        onObjectGroupModified();
+      },
+      [globalObjectGroups, objectGroups, onObjectGroupModified]
+    );
+
+    const onRename = React.useCallback(
+      (groupWithContext: GroupWithContext, newName: string) => {
+        const { group, global } = groupWithContext;
+
+        if (group.getName() === newName) return;
+
+        const validatedNewName = getValidatedObjectOrGroupName(newName, global);
+        onRenameGroup(groupWithContext, validatedNewName, doRename => {
+          if (!doRename) return;
+
+          group.setName(validatedNewName);
+
+          onObjectGroupModified();
+          if (onGroupRenamed) {
+            onGroupRenamed();
+          }
+        });
+      },
+      [
+        getValidatedObjectOrGroupName,
+        onObjectGroupModified,
+        onRenameGroup,
+        onGroupRenamed,
+      ]
+    );
+
+    const setAsGlobalGroup = React.useCallback(
+      (i18n: I18nType, groupWithContext: GroupWithContext, index?: number) => {
+        const { group } = groupWithContext;
+
+        const groupName = group.getName();
+
+        if (globalObjectGroups.has(groupName)) {
+          showWarningBox(
+            i18n._(
+              t`A global object with this name already exists. Please change the object name before setting it as a global object`
+            ),
+            { delayToNextTick: true }
+          );
+          return;
+        }
+
+        if (beforeSetAsGlobalGroup && !beforeSetAsGlobalGroup(groupName)) {
+          return;
+        }
+
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?`
+          )
+        );
+        if (!answer) return;
+
+        if (treeViewRef.current)
+          treeViewRef.current.openItems([globalGroupsRootFolderId]);
+        globalObjectGroups.insert(
+          group,
+          typeof index === 'number' ? index : globalObjectGroups.count()
+        );
+        objectGroups.remove(groupName);
+        onObjectGroupModified();
+        // Scroll to the moved group.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(groupWithContext);
+        }, 100); // A few ms is enough for a new render to be done.
+      },
+      [
+        globalObjectGroups,
+        objectGroups,
+        onObjectGroupModified,
+        beforeSetAsGlobalGroup,
+        scrollToItem,
+      ]
+    );
+
+    const canMoveSelectionTo = React.useCallback(
+      (destinationItem: TreeViewItem) => {
+        if (destinationItem.isRoot) return false;
+        if (!selectedGroupWithContext) return false;
+        if (destinationItem.isPlaceholder) {
+          if (
+            destinationItem.id === globalGroupsEmptyPlaceholderId &&
+            !selectedGroupWithContext.global
+          ) {
+            // In that case, the user is drag n dropping a scene group on the
+            // empty placeholder of the global groups section.
+            return true;
+          }
+          return false;
+        }
+
+        if (
+          selectedGroupWithContext.global === destinationItem.global ||
+          (!selectedGroupWithContext.global && destinationItem.global)
+        ) {
+          return true;
+        }
+
+        return false;
+      },
+      [selectedGroupWithContext]
+    );
+
+    const moveSelectionTo = React.useCallback(
+      (
+        i18n: I18nType,
+        destinationItem: TreeViewItem,
+        where: 'before' | 'inside' | 'after'
+      ) => {
+        if (destinationItem.isRoot) return false;
+        if (!selectedGroupWithContext) return;
+
+        if (destinationItem.isPlaceholder) {
+          if (
+            destinationItem.id === globalGroupsEmptyPlaceholderId &&
+            !selectedGroupWithContext.global
+          ) {
+            setAsGlobalGroup(i18n, selectedGroupWithContext, 0);
+          }
+          return;
+        }
+
+        let container: gdObjectGroupsContainer;
+        let fromIndex: number;
+        let toIndex: number;
+
+        const areSelectedAndTargetItemsFromSameContext =
+          selectedGroupWithContext.global === destinationItem.global;
+
+        if (areSelectedAndTargetItemsFromSameContext) {
+          container = selectedGroupWithContext.global
+            ? globalObjectGroups
+            : objectGroups;
+
+          fromIndex = container.getPosition(
+            selectedGroupWithContext.group.getName()
+          );
+          toIndex = container.getPosition(destinationItem.group.getName());
+        } else if (!selectedGroupWithContext.global && destinationItem.global) {
+          const destinationIndex = globalObjectGroups.getPosition(
+            destinationItem.group.getName()
+          );
+          setAsGlobalGroup(i18n, selectedGroupWithContext, destinationIndex);
+          return;
+        } else {
+          return;
+        }
+        if (toIndex > fromIndex) toIndex -= 1;
+        if (where === 'after') toIndex += 1;
+
+        container.move(fromIndex, toIndex);
+        onObjectGroupModified();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+      },
+      [
+        globalObjectGroups,
+        objectGroups,
+        onObjectGroupModified,
+        selectedGroupWithContext,
+        setAsGlobalGroup,
+      ]
+    );
+
+    const editItem = React.useCallback(
+      (item: TreeViewItem) => {
+        if (item.isRoot || item.isPlaceholder) return;
+        onEditGroup(item.group);
+      },
+      [onEditGroup]
+    );
+
+    const renderGroupMenuTemplate = React.useCallback(
+      (i18n: I18nType) => (item: TreeViewItem, index: number) =>
+        item.isRoot || item.isPlaceholder
+          ? null
+          : [
+              {
+                label: i18n._(t`Duplicate`),
+                click: () => onDuplicate(item),
+              },
+              { type: 'separator' },
+              {
+                label: i18n._(t`Edit group`),
+                click: () => editItem(item),
+              },
+              { type: 'separator' },
+              {
+                label: i18n._(t`Rename`),
+                click: () => onEditName(item),
+              },
+              {
+                label: i18n._(t`Set as global group`),
+                enabled: !isGroupWithContextGlobal(item),
+                click: () => setAsGlobalGroup(i18n, item),
+                visible: canSetAsGlobalGroup !== false,
+              },
+              {
+                label: i18n._(t`Delete`),
+                click: () => onDelete(item),
+              },
+              { type: 'separator' },
+              {
+                label: i18n._(t`Add a new group...`),
+                click: addGroup,
+              },
+            ],
+      [
+        addGroup,
+        onEditName,
+        editItem,
+        onDelete,
+        onDuplicate,
+        canSetAsGlobalGroup,
+        setAsGlobalGroup,
+      ]
+    );
+
+    const getTreeViewData = React.useCallback(
+      (i18n: I18nType): Array<TreeViewItem> => {
+        const objectGroupsList: GroupWithContextList = enumerateGroups(
+          objectGroups
+        ).map(group => ({ group, global: false }));
+        const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
+          globalObjectGroups
+        ).map(group => ({ group, global: true }));
+
+        const treeViewItems = [
           {
-            label: i18n._(t`Duplicate`),
-            click: () => this._onDuplicate(item),
+            label: i18n._(t`Global Groups`),
+            children:
+              globalObjectGroupsList.length > 0
+                ? globalObjectGroupsList
+                : [
+                    {
+                      label: i18n._(t`There is no global group yet.`),
+                      id: globalGroupsEmptyPlaceholderId,
+                      isPlaceholder: true,
+                    },
+                  ],
+            isRoot: true,
+            id: globalGroupsRootFolderId,
           },
-          { type: 'separator' },
           {
-            label: i18n._(t`Edit group`),
-            click: () => this.props.onEditGroup(item.group),
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Rename`),
-            click: () => this._onEditName(item),
-          },
-          {
-            label: i18n._(t`Set as global group`),
-            enabled: !isGroupWithContextGlobal(item),
-            click: () => this._setAsGlobalGroup(i18n, item),
-            visible: this.props.canSetAsGlobalGroup !== false,
-          },
-          {
-            label: i18n._(t`Delete`),
-            click: () => this._onDelete(item),
-          },
-          { type: 'separator' },
-          {
-            label: i18n._(t`Add a new group...`),
-            click: this.addGroup,
+            label: i18n._(t`Scene Groups`),
+            children:
+              objectGroupsList.length > 0
+                ? objectGroupsList
+                : [
+                    {
+                      label: i18n._(t`Start by adding a new group.`),
+                      id: 'scene-empty-placeholder',
+                      isPlaceholder: true,
+                    },
+                  ],
+            isRoot: true,
+            id: sceneGroupsRootFolderId,
           },
         ];
-
-  scrollToItem = (groupWithContext: GroupWithContext) => {
-    if (this.treeView) {
-      this.treeView.scrollToItem(groupWithContext);
-    }
-  };
-
-  _getTreeViewData = (i18n: I18nType): Array<TreeViewItem> => {
-    const { globalObjectGroups, objectGroups } = this.props;
-    const objectGroupsList: GroupWithContextList = enumerateGroups(
-      objectGroups
-    ).map(group => ({ group, global: false }));
-    const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
-      globalObjectGroups
-    ).map(group => ({ group, global: true }));
-
-    const treeViewItems = [
-      {
-        label: i18n._(t`Global Groups`),
-        children:
-          globalObjectGroupsList.length > 0
-            ? globalObjectGroupsList
-            : [
-                {
-                  label: i18n._(t`There is no global group yet.`),
-                  id: globalGroupsEmptyPlaceholderId,
-                  isPlaceholder: true,
-                },
-              ],
-        isRoot: true,
-        id: globalGroupsRootFolderId,
+        // $FlowFixMe
+        return treeViewItems;
       },
-      {
-        label: i18n._(t`Scene Groups`),
-        children:
-          objectGroupsList.length > 0
-            ? objectGroupsList
-            : [
-                {
-                  label: i18n._(t`Start by adding a new group.`),
-                  id: 'scene-empty-placeholder',
-                  isPlaceholder: true,
-                },
-              ],
-        isRoot: true,
-        id: sceneGroupsRootFolderId,
-      },
-    ];
-    // $FlowFixMe
-    return treeViewItems;
-  };
-
-  render() {
-    const { searchText, selectedGroupWithContext } = this.state;
-    const { globalObjectGroups, objectGroups } = this.props;
+      [globalObjectGroups, objectGroups]
+    );
 
     // Force List component to be mounted again if globalObjectGroups or objectGroups
     // has been changed. Avoid accessing to invalid objects that could
@@ -491,11 +522,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
             <SearchBar
               value={searchText}
               onRequestSearch={() => {}}
-              onChange={text =>
-                this.setState({
-                  searchText: text,
-                })
-              }
+              onChange={setSearchText}
               placeholder={t`Search object groups`}
             />
           </Column>
@@ -503,7 +530,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         <div style={styles.listContainer}>
           <I18n>
             {({ i18n }) => {
-              const treeViewData = this._getTreeViewData(i18n);
+              const treeViewData = getTreeViewData(i18n);
               const globalRootItem = treeViewData[0];
               const initiallyOpenedNodeIds = [
                 globalRootItem.isRoot &&
@@ -520,7 +547,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                     {({ height }) => (
                       <TreeView
                         key={listKey}
-                        ref={treeView => (this.treeView = treeView)}
+                        ref={treeViewRef}
                         items={treeViewData}
                         height={height}
                         searchText={searchText}
@@ -528,28 +555,28 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                         getItemChildren={getTreeViewItemChildren}
                         multiSelect={false}
                         getItemId={getTreeViewItemId}
-                        onEditItem={this._editItem}
+                        onEditItem={editItem}
                         selectedItems={
                           selectedGroupWithContext
                             ? [selectedGroupWithContext]
                             : []
                         }
                         onSelectItems={items => {
-                          if (!items) this._selectGroup(null);
+                          if (!items) setSelectedGroupWithContext(null);
                           const itemToSelect = items[0];
                           if (
                             'isRoot' in itemToSelect ||
                             'isPlaceholder' in itemToSelect
                           )
                             return;
-                          this._selectGroup(itemToSelect || null);
+                          setSelectedGroupWithContext(itemToSelect || null);
                         }}
-                        onRenameItem={this._onRename}
-                        buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
+                        onRenameItem={onRename}
+                        buildMenuTemplate={renderGroupMenuTemplate(i18n)}
                         onMoveSelectionToItem={(destinationItem, where) =>
-                          this._moveSelectionTo(i18n, destinationItem, where)
+                          moveSelectionTo(i18n, destinationItem, where)
                         }
-                        canMoveSelectionToItem={this._canMoveSelectionTo}
+                        canMoveSelectionToItem={canMoveSelectionTo}
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       />
@@ -565,7 +592,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
             <ResponsiveRaisedButton
               label={<Trans>Add a new group</Trans>}
               primary
-              onClick={this.addGroup}
+              onClick={addGroup}
               id="add-new-group-button"
               icon={<Add />}
             />
@@ -574,4 +601,19 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       </Background>
     );
   }
-}
+);
+
+const areEqual = (prevProps: Props, nextProps: Props): boolean =>
+  // The component is costly to render, so avoid any re-rendering as much
+  // as possible.
+  // We make the assumption that no changes to groups list is made outside
+  // from the component.
+  // If a change is made, the component won't notice it: you have to manually
+  // call forceUpdate.
+  prevProps.globalObjectGroups !== nextProps.globalObjectGroups ||
+  prevProps.objectGroups !== nextProps.objectGroups;
+
+export default React.memo<Props, ObjectGroupsListInterface>(
+  ObjectGroupsList,
+  areEqual
+);

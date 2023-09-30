@@ -15,7 +15,9 @@ import LayersList, { type LayersListInterface } from '../../LayersList';
 import FullSizeInstancesEditorWithScrollbars from '../../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import CloseButton from '../../UI/EditorMosaic/CloseButton';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
-import ObjectGroupsList from '../../ObjectGroupsList';
+import ObjectGroupsList, {
+  type ObjectGroupsListInterface,
+} from '../../ObjectGroupsList';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
@@ -96,7 +98,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const editorMosaicRef = React.useRef<?EditorMosaic>(null);
-  const objectGroupsListRef = React.useRef<?ObjectGroupsList>(null);
+  const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
   const forceUpdateInstancesPropertiesEditor = React.useCallback(() => {
     if (instancesPropertiesEditorRef.current)

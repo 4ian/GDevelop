@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -24,7 +25,9 @@ export const Default = () => (
         <ObjectGroupsList
           globalObjectGroups={testProject.project.getObjectGroups()}
           objectGroups={testProject.testLayout.getObjectGroups()}
-          onEditGroup={() => {}}
+          onEditGroup={action('onEditGroup')}
+          onRenameGroup={action('onRenameGroup')}
+          onDeleteGroup={action('onDeleteGroup')}
           getValidatedObjectOrGroupName={newName => newName}
         />
       </div>

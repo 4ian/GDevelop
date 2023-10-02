@@ -849,8 +849,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   resourcesManager.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
   UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
-  if (element.HasChild("folderStructure")) {
-    UnserializeFoldersFrom(*this, element.GetChild("folderStructure", 0));
+  if (element.HasChild("objectsFolderStructure")) {
+    UnserializeFoldersFrom(*this, element.GetChild("objectsFolderStructure", 0));
   }
   AddMissingObjectsInRootFolder();
 
@@ -1005,7 +1005,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   resourcesManager.SerializeTo(element.AddChild("resources"));
   SerializeObjectsTo(element.AddChild("objects"));
-  SerializeFoldersTo(element.AddChild("folderStructure"));
+  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
 

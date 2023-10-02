@@ -1189,61 +1189,64 @@ export default class SceneEditor extends React.Component<Props, State> {
     },
   ];
 
-  getContextMenuInstancesWiseItems = (i18n: I18nType) => [
-    {
-      label: i18n._(t`Copy`),
-      click: () => this.copySelection(),
-      enabled: this.instancesSelection.hasSelectedInstances(),
-      accelerator: 'CmdOrCtrl+C',
-    },
-    {
-      label: i18n._(t`Cut`),
-      click: () => this.cutSelection(),
-      enabled: this.instancesSelection.hasSelectedInstances(),
-      accelerator: 'CmdOrCtrl+X',
-    },
-    {
-      label: i18n._(t`Paste`),
-      click: () => this.paste(),
-      enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
-      accelerator: 'CmdOrCtrl+V',
-    },
-    {
-      label: i18n._(t`Duplicate`),
-      enabled: this.instancesSelection.hasSelectedInstances(),
-      click: () => {
-        this.duplicateSelection();
+  getContextMenuInstancesWiseItems = (i18n: I18nType) => {
+    const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
+    return [
+      {
+        label: i18n._(t`Copy`),
+        click: () => this.copySelection(),
+        enabled: hasSelectedInstances,
+        accelerator: 'CmdOrCtrl+C',
       },
-      accelerator: 'CmdOrCtrl+D',
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Bring to front`),
-      enabled: this.instancesSelection.hasSelectedInstances(),
-      click: () => {
-        this._onMoveInstancesZOrder('front');
+      {
+        label: i18n._(t`Cut`),
+        click: () => this.cutSelection(),
+        enabled: hasSelectedInstances,
+        accelerator: 'CmdOrCtrl+X',
       },
-    },
-    {
-      label: i18n._(t`Send to back`),
-      enabled: this.instancesSelection.hasSelectedInstances(),
-      click: () => {
-        this._onMoveInstancesZOrder('back');
+      {
+        label: i18n._(t`Paste`),
+        click: () => this.paste(),
+        enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+        accelerator: 'CmdOrCtrl+V',
       },
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Show/Hide instance properties`),
-      click: () => this.toggleProperties(),
-      enabled: this.instancesSelection.hasSelectedInstances(),
-    },
-    {
-      label: i18n._(t`Delete`),
-      click: () => this.deleteSelection(),
-      enabled: this.instancesSelection.hasSelectedInstances(),
-      accelerator: 'Delete',
-    },
-  ];
+      {
+        label: i18n._(t`Duplicate`),
+        enabled: hasSelectedInstances,
+        click: () => {
+          this.duplicateSelection();
+        },
+        accelerator: 'CmdOrCtrl+D',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Bring to front`),
+        enabled: hasSelectedInstances,
+        click: () => {
+          this._onMoveInstancesZOrder('front');
+        },
+      },
+      {
+        label: i18n._(t`Send to back`),
+        enabled: hasSelectedInstances,
+        click: () => {
+          this._onMoveInstancesZOrder('back');
+        },
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Show/Hide instance properties`),
+        click: () => this.toggleProperties(),
+        enabled: hasSelectedInstances,
+      },
+      {
+        label: i18n._(t`Delete`),
+        click: () => this.deleteSelection(),
+        enabled: hasSelectedInstances,
+        accelerator: 'Delete',
+      },
+    ];
+  };
 
   setZoomFactor = (zoomFactor: number) => {
     if (this.editorDisplay)

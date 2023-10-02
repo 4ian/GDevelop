@@ -479,16 +479,40 @@ const TreeView = <Item: ItemBaseAttributes>(
       if (!navigationKeys.includes(event.key)) return;
       let newFocusedItem;
       const item = selectedItems[0];
-      if (!item) return;
-      const itemIndexInFlattenedData = flattenedData.findIndex(
-        node => node.id === getItemId(item)
-      );
-      if (event.key === 'ArrowDown') {
+      let itemIndexInFlattenedData = -1;
+      if (item) {
+        itemIndexInFlattenedData = flattenedData.findIndex(
+          node => node.id === getItemId(item)
+        );
+      }
+
+      if (itemIndexInFlattenedData === -1) {
+        // If no row is selected, start from the first row that is selectable.
+        let i = 0;
+        let newFocusedNode = flattenedData[i];
+        console.log(newFocusedNode);
+        while (
+          newFocusedNode &&
+          (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
+        ) {
+          i += 1;
+          if (i > flattenedData.length - 1) {
+            newFocusedNode = null;
+          }
+          newFocusedNode = flattenedData[i];
+        }
+        if (newFocusedNode) {
+          newFocusedItem = newFocusedNode.item;
+        }
+      } else if (event.key === 'ArrowDown') {
         event.preventDefault();
         if (itemIndexInFlattenedData < flattenedData.length - 1) {
           let delta = 1;
           let newFocusedNode = flattenedData[itemIndexInFlattenedData + delta];
-          while (newFocusedNode && newFocusedNode.depth === 0) {
+          while (
+            newFocusedNode &&
+            (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
+          ) {
             if (itemIndexInFlattenedData + delta > flattenedData.length - 1) {
               newFocusedNode = null;
             }
@@ -504,7 +528,10 @@ const TreeView = <Item: ItemBaseAttributes>(
         if (itemIndexInFlattenedData > 0) {
           let delta = -1;
           let newFocusedNode = flattenedData[itemIndexInFlattenedData + delta];
-          while (newFocusedNode && newFocusedNode.depth === 0) {
+          while (
+            newFocusedNode &&
+            (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
+          ) {
             if (itemIndexInFlattenedData + delta < 0) {
               newFocusedNode = null;
             }

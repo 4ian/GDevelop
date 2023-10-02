@@ -200,22 +200,32 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 
   /**
-   * Effect allows editing the name of the node after a delay has passed after its selection
-   * by the user.
+   * Effect allows editing the name of the node after a delay has passed
+   * after its selection by the user.
    */
   React.useEffect(
     () => {
       if (isMobileScreen) return;
       if (node.selected) {
-        const timeoutId = setTimeout(() => {
-          setHasDelayPassedBeforeEditingName(true);
-        }, 1000);
-        return () => clearTimeout(timeoutId);
+        if (!hasDelayPassedBeforeEditingName) {
+          const timeoutId = setTimeout(() => {
+            setHasDelayPassedBeforeEditingName(true);
+          }, 1000);
+          return () => clearTimeout(timeoutId);
+        }
       } else {
         setHasDelayPassedBeforeEditingName(false);
       }
     },
-    [node.selected, isMobileScreen]
+    [node.selected, isMobileScreen, hasDelayPassedBeforeEditingName]
+  );
+
+  const endRenaming = React.useCallback(
+    (newValue: string) => {
+      setHasDelayPassedBeforeEditingName(false);
+      onEndRenaming(node.item, newValue);
+    },
+    [onEndRenaming, node.item]
   );
 
   const getContainerYPosition = React.useCallback(() => {
@@ -371,9 +381,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                             {renamedItemId === node.id ? (
                               <SemiControlledRowInput
                                 initialValue={node.name}
-                                onEndRenaming={value =>
-                                  onEndRenaming(node.item, value)
-                                }
+                                onEndRenaming={endRenaming}
                                 onBlur={onBlurField}
                               />
                             ) : (

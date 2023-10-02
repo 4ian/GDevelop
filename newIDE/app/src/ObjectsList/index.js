@@ -431,8 +431,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         });
         if (!answer) return;
 
+        const object = objectFolderOrObject.getObject()
+
         const objectWithContext = {
-          object: objectFolderOrObject.getObject(),
+          object,
           global,
         };
 
@@ -449,7 +451,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onDeleteObject(objectWithContext, doRemove => {
           if (!doRemove) return;
 
-          const { object } = objectWithContext;
           if (global) {
             project.removeObject(object.getName());
           } else {

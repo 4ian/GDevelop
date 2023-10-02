@@ -431,7 +431,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         });
         if (!answer) return;
 
-        const object = objectFolderOrObject.getObject()
+        const object = objectFolderOrObject.getObject();
 
         const objectWithContext = {
           object,
@@ -963,6 +963,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             folder: parent,
             index,
           });
+          if (treeViewRef.current)
+            treeViewRef.current.openItems([
+              getTreeViewItemId({
+                objectFolderOrObject: parent,
+                global: destinationItem.global,
+              }),
+            ]);
+
           onObjectModified(true);
           selectObjectFolderOrObjectWithContext({
             ...selectedObjectFolderOrObjectWithContext,
@@ -1016,6 +1024,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 (where === 'after' ? 1 : 0)
             );
           }
+          if (treeViewRef.current)
+            treeViewRef.current.openItems([
+              getTreeViewItemId({
+                objectFolderOrObject: parent,
+                global: destinationItem.global,
+              }),
+            ]);
         } else {
           return;
         }

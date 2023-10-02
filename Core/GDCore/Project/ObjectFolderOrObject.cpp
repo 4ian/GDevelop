@@ -108,17 +108,18 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
     const gd::String& name) {
   if (IsFolder()) {
     children.erase(
-        std::remove_if(
-            children.begin(),
-            children.end(),
-            [&name](std::unique_ptr<gd::ObjectFolderOrObject>&
-                        objectFolderOrObject) {
-              return objectFolderOrObject.get()->GetObject().GetName() == name;
-            }),
+        std::remove_if(children.begin(),
+                       children.end(),
+                       [&name](std::unique_ptr<gd::ObjectFolderOrObject>&
+                                   objectFolderOrObject) {
+                         return !objectFolderOrObject->IsFolder() &&
+                                objectFolderOrObject->GetObject().GetName() ==
+                                    name;
+                       }),
         children.end());
-  }
-  for (auto& it : children) {
-    it.get()->RemoveRecursivelyObjectNamed(name);
+    for (auto& it : children) {
+      it->RemoveRecursivelyObjectNamed(name);
+    }
   }
 };
 

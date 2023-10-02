@@ -161,8 +161,9 @@ namespace gdjs {
       }
 
       //Create initial instances of objects
-      this.createObjectsFrom(
+      this.createObjectsFrom2(
         sceneData.instances,
+        0,
         0,
         0,
         /*trackByPersistentUuid=*/

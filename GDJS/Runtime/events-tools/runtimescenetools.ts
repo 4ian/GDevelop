@@ -281,7 +281,8 @@ namespace gdjs {
         scene: gdjs.RuntimeInstanceContainer,
         externalLayout: string,
         xPos: float,
-        yPos: float
+        yPos: float,
+        zPos: float,
       ) {
         const externalLayoutData = scene
           .getGame()
@@ -292,10 +293,11 @@ namespace gdjs {
 
         // trackByPersistentUuid is set to false as we don't want external layouts
         // instantiated at runtime to be hot-reloaded.
-        scene.getScene().createObjectsFrom(
+        scene.getScene().createObjectsFrom2(
           externalLayoutData.instances,
           xPos,
           yPos,
+          zPos,
           /*trackByPersistentUuid=*/
           false
         );

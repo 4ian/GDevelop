@@ -38,6 +38,8 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
       .SetDefaultValue("0")
       .AddParameter("expression", _("Y position of the origin"), "", true)
       .SetDefaultValue("0")
+      .AddParameter("expression", _("Z position of the origin"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 }
 

@@ -62,12 +62,6 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
       values.themeName = 'Blue Dark';
     }
 
-    // Synchronize the global state(s).
-    const gd: libGDevelop = global.gd;
-    gd.Project.allowUsageOfUnicodeIdentifierNames(
-      values.allowUsageOfUnicodeIdentifierNames
-    );
-
     return values;
   } catch (e) {
     return null;
@@ -163,9 +157,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
-      this
-    ),
-    setAllowUsageOfUnicodeIdentifierNames: this._setAllowUsageOfUnicodeIdentifierNames.bind(
       this
     ),
     getEditorStateForProject: this._getEditorStateForProject.bind(this),
@@ -823,20 +814,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           newProjectsDefaultStorageProviderName: newStorageProviderName,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setAllowUsageOfUnicodeIdentifierNames(enable: boolean) {
-    const gd: libGDevelop = global.gd;
-    gd.Project.allowUsageOfUnicodeIdentifierNames(enable);
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          allowUsageOfUnicodeIdentifierNames: enable,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

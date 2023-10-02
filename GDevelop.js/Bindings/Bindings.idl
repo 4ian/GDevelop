@@ -530,8 +530,6 @@ interface Project {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 
-    boolean STATIC_IsUsageOfUnicodeIdentifierNamesAllowed();
-    void STATIC_AllowUsageOfUnicodeIdentifierNames(boolean enable);
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
 

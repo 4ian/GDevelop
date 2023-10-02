@@ -104,7 +104,6 @@ declare class gdProject extends gdObjectsContainer {
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   static isUsageOfUnicodeIdentifierNamesAllowed(): boolean;
-  static allowUsageOfUnicodeIdentifierNames(enable: boolean): void;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
   getTypeOfBehavior(layout: gdLayout, name: string, searchInGroups: boolean): string;

@@ -21,6 +21,9 @@ import { dataObjectToProps } from '../../Utils/HTMLDataset';
 
 const stopPropagation = e => e.stopPropagation();
 
+const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
+const DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION = 1000;
+
 const onInputKeyDown = (event: KeyboardEvent) => {
   if (navigationKeys.includes(event.key)) {
     // Prevent navigating in the tree view when renaming an item.
@@ -189,7 +192,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       ) {
         openWhenOverTimeoutId.current = setTimeout(() => {
           onOpen(node);
-        }, 800);
+        }, DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER);
         return () => {
           clearTimeout(openWhenOverTimeoutId.current);
           openWhenOverTimeoutId.current = null;
@@ -210,7 +213,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         if (!hasDelayPassedBeforeEditingName) {
           const timeoutId = setTimeout(() => {
             setHasDelayPassedBeforeEditingName(true);
-          }, 1000);
+          }, DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION);
           return () => clearTimeout(timeoutId);
         }
       } else {

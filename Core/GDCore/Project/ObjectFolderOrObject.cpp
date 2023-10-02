@@ -10,6 +10,7 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -228,8 +229,12 @@ void ObjectFolderOrObject::UnserializeFrom(
     }
   } else {
     folderName = "";
-    object =
-        &objectsContainer.GetObject(element.GetStringAttribute("objectName"));
+    gd::String objectName = element.GetStringAttribute("objectName");
+    if (objectsContainer.HasObjectNamed(objectName)) {
+      object = &objectsContainer.GetObject(objectName);
+    } else {
+      gd::LogError("Object with name " + objectName + " not found in objects container.");
+    }
   }
 };
 

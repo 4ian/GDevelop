@@ -4875,7 +4875,7 @@ Array [
       layout.serializeTo(element);
 
       const layoutObject = JSON.parse(gd.Serializer.toJSON(element));
-      delete layoutObject.folderStructure;
+      delete layoutObject.objectsFolderStructure;
 
       project.removeLayout('Scene');
 

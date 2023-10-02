@@ -30,7 +30,7 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
 
   AbstractEventsBasedEntity::SerializeTo(element);
   SerializeObjectsTo(element.AddChild("objects"));
-  SerializeFoldersTo(element.AddChild("folderStructure"));
+  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
 }
 
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
@@ -39,8 +39,8 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
 
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   UnserializeObjectsFrom(project, element.GetChild("objects"));
-  if (element.HasChild("folderStructure")) {
-    UnserializeFoldersFrom(project, element.GetChild("folderStructure", 0));
+  if (element.HasChild("objectsFolderStructure")) {
+    UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
   }
   AddMissingObjectsInRootFolder();
 }

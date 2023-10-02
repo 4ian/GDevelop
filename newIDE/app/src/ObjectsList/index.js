@@ -145,9 +145,7 @@ const getTreeViewItemChildren = (item: TreeViewItem) => {
   }));
 };
 const getTreeViewItemData = (item: TreeViewItem) =>
-  item.isRoot || item.isPlaceholder
-    ? undefined
-    : item.objectFolderOrObject.isFolder()
+  item.isRoot || item.isPlaceholder || item.objectFolderOrObject.isFolder()
     ? undefined
     : {
         objectName: item.objectFolderOrObject.getObject().getName(),

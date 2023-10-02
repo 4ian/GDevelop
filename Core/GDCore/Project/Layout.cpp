@@ -294,7 +294,7 @@ void Layout::SerializeTo(SerializerElement& element) const {
   GetVariables().SerializeTo(element.AddChild("variables"));
   GetInitialInstances().SerializeTo(element.AddChild("instances"));
   SerializeObjectsTo(element.AddChild("objects"));
-  SerializeFoldersTo(element.AddChild("folderStructure"));
+  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   gd::EventsListSerialization::SerializeEventsTo(events,
                                                  element.AddChild("events"));
 
@@ -354,8 +354,8 @@ void Layout::UnserializeFrom(gd::Project& project,
       project, GetEvents(), element.GetChild("events", 0, "Events"));
 
   UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
-  if (element.HasChild("folderStructure")) {
-    UnserializeFoldersFrom(project, element.GetChild("folderStructure", 0));
+  if (element.HasChild("objectsFolderStructure")) {
+    UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
   }
   AddMissingObjectsInRootFolder();
 

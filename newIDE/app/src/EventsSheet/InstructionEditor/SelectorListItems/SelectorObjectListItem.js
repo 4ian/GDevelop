@@ -34,7 +34,7 @@ export const renderObjectListItem = ({
   id,
   data,
   withIndent,
-  keyPrefix
+  keyPrefix,
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (

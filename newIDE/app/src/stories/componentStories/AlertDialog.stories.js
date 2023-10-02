@@ -33,11 +33,11 @@ export const Default = () => {
       message: t`Do you want to refactor your project?`,
     });
     if (answer === 0) {
-      action('Yes')()
+      action('Yes')();
     } else if (answer === 1) {
-      action('No')()
+      action('No')();
     } else {
-      action('Cancel')()
+      action('Cancel')();
     }
   };
 

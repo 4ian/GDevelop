@@ -1148,13 +1148,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const { objectFolderOrObject, global } = item;
 
         const container = global ? project : objectsContainer;
-        let folderAndPathsInContainer = enumerateFoldersInContainer(container);
+        const folderAndPathsInContainer = enumerateFoldersInContainer(
+          container
+        );
         folderAndPathsInContainer.unshift({
           path: i18n._(t`Root folder`),
           folder: container.getRootFolder(),
         });
         if (objectFolderOrObject.isFolder()) {
-          folderAndPathsInContainer = folderAndPathsInContainer.filter(
+          const filteredFolderAndPathsInContainer = folderAndPathsInContainer.filter(
             folderAndPath =>
               !folderAndPath.folder.isADescendantOf(objectFolderOrObject) &&
               folderAndPath.folder !== objectFolderOrObject
@@ -1184,15 +1186,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             },
             {
               label: i18n._('Move to folder'),
-              submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
-                label: path,
-                enabled: folder !== objectFolderOrObject.getParent(),
-                click: () =>
-                  moveObjectFolderOrObjectToAnotherFolderInSameContainer(
-                    item,
-                    folder
-                  ),
-              })),
+              submenu: filteredFolderAndPathsInContainer.map(
+                ({ folder, path }) => ({
+                  label: path,
+                  enabled: folder !== objectFolderOrObject.getParent(),
+                  click: () =>
+                    moveObjectFolderOrObjectToAnotherFolderInSameContainer(
+                      item,
+                      folder
+                    ),
+                })
+              ),
             },
             { type: 'separator' },
             {

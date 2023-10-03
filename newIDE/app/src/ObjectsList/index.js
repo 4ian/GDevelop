@@ -1376,15 +1376,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const arrowKeyNavigationProps = React.useMemo(
       () => ({
-        onArrowRight: (item, isOpened) => {
+        onArrowRight: item => {
           if (item.isPlaceholder || item.isRoot) return null;
           if (!item.objectFolderOrObject.isFolder()) return null;
-          if (!isOpened) {
-            if (treeViewRef.current) {
-              treeViewRef.current.openItems([getTreeViewItemId(item)]);
-            }
-            return null;
-          } else {
+          else {
             if (item.objectFolderOrObject.getChildrenCount() === 0) return null;
             return {
               objectFolderOrObject: item.objectFolderOrObject.getChildAt(0),
@@ -1392,20 +1387,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             };
           }
         },
-        onArrowLeft: (item, isOpened) => {
+        onArrowLeft: item => {
           if (item.isPlaceholder || item.isRoot) return null;
-          if (!item.objectFolderOrObject.isFolder() || !isOpened) {
-            const parent = item.objectFolderOrObject.getParent();
-            if (parent.getFolderName() === '__ROOT') return null;
-            return {
-              objectFolderOrObject: parent,
-              global: item.global,
-            };
-          }
-          if (treeViewRef.current) {
-            treeViewRef.current.closeItems([getTreeViewItemId(item)]);
-          }
-          return null;
+          const parent = item.objectFolderOrObject.getParent();
+          if (parent.isRootFolder()) return null;
+          return {
+            objectFolderOrObject: parent,
+            global: item.global,
+          };
         },
       }),
       []

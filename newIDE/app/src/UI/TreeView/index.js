@@ -135,8 +135,8 @@ type Props<Item> = {|
   initiallyOpenedNodeIds?: string[],
   renderHiddenElements?: boolean,
   arrowKeyNavigationProps?: {|
-    onArrowRight: (item: Item, isOpened: boolean) => ?Item,
-    onArrowLeft: (item: Item, isOpened: boolean) => ?Item,
+    onArrowRight: (item: Item) => ?Item,
+    onArrowLeft: (item: Item) => ?Item,
   |},
 |};
 
@@ -490,7 +490,6 @@ const TreeView = <Item: ItemBaseAttributes>(
         // If no row is selected, start from the first row that is selectable.
         let i = 0;
         let newFocusedNode = flattenedData[i];
-        console.log(newFocusedNode);
         while (
           newFocusedNode &&
           (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
@@ -544,16 +543,20 @@ const TreeView = <Item: ItemBaseAttributes>(
         }
       } else if (event.key === 'ArrowRight' && arrowKeyNavigationProps) {
         event.preventDefault();
-        newFocusedItem = arrowKeyNavigationProps.onArrowRight(
-          item,
-          openedNodeIds.includes(getItemId(item))
-        );
+        const node = flattenedData[itemIndexInFlattenedData];
+        if (node.canHaveChildren && node.collapsed) {
+          openItems([node.id]);
+        } else {
+          newFocusedItem = arrowKeyNavigationProps.onArrowRight(item);
+        }
       } else if (event.key === 'ArrowLeft' && arrowKeyNavigationProps) {
         event.preventDefault();
-        newFocusedItem = arrowKeyNavigationProps.onArrowLeft(
-          item,
-          openedNodeIds.includes(getItemId(item))
-        );
+        const node = flattenedData[itemIndexInFlattenedData];
+        if (node.canHaveChildren && !node.collapsed) {
+          closeItems([node.id]);
+        } else {
+          newFocusedItem = arrowKeyNavigationProps.onArrowLeft(item);
+        }
       }
       if (newFocusedItem) {
         scrollToItem(newFocusedItem);
@@ -565,9 +568,10 @@ const TreeView = <Item: ItemBaseAttributes>(
       arrowKeyNavigationProps,
       getItemId,
       onSelectItems,
-      openedNodeIds,
       selectedItems,
       scrollToItem,
+      openItems,
+      closeItems,
     ]
   );
 

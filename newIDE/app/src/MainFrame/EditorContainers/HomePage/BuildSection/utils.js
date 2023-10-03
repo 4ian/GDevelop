@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { getUserPublicProfilesByIds } from '../../../../Utils/GDevelopServices/User';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
 import { type Profile } from '../../../../Utils/GDevelopServices/Authentication';
@@ -8,7 +8,7 @@ import { type FileMetadataAndStorageProviderName } from '../../../../ProjectsSto
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { marginsSize } from '../../../../UI/Grid';
 import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
-import ProductPriceTag from '../../../../AssetStore/ProductPriceTag';
+import { getProductPriceOrOwnedLabel } from '../../../../AssetStore/ProductPriceTag';
 import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
@@ -114,6 +114,7 @@ export const getExampleAndTemplateItemsForCarousel = ({
   exampleShortHeaders,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
+  i18n,
 }: {|
   authenticatedUser: AuthenticatedUser,
   privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
@@ -122,6 +123,7 @@ export const getExampleAndTemplateItemsForCarousel = ({
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
+  i18n: I18nType,
 |}): Array<CarouselThumbnail> => {
   const allItems: Array<CarouselThumbnail> = [];
   const privateGameTemplateItems = [
@@ -155,12 +157,11 @@ export const getExampleAndTemplateItemsForCarousel = ({
                   privateGameTemplateListingData
                 );
               },
-              overlayText: (
-                <ProductPriceTag
-                  productListingData={privateGameTemplateListingData}
-                  owned={isTemplateOwned}
-                />
-              ),
+              overlayText: getProductPriceOrOwnedLabel({
+                i18n,
+                productListingData: privateGameTemplateListingData,
+                owned: isTemplateOwned,
+              }),
               overlayTextPosition: 'topLeft',
             };
           })

@@ -279,11 +279,15 @@ namespace gdjs {
        * @param x The interpolation value between 0 and 1.
        * @returns The interpolated value, now between a and b.
        */
-      export const exponentialInterpolation = (start: float, end: float, progress: float) => {
+      export const exponentialInterpolation = (
+        start: float,
+        end: float,
+        progress: float
+      ) => {
         const startLog = Math.log(start);
         const endLog = Math.log(end);
         return Math.exp(startLog + (endLog - startLog) * progress);
-      }
+      };
 
       /**
        * Truncate a number.

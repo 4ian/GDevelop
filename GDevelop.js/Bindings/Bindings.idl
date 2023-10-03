@@ -399,6 +399,7 @@ interface Watermark {
 interface ObjectFolderOrObject {
     void ObjectFolderOrObject();
     boolean IsFolder();
+    boolean IsRootFolder();
     [Ref] gdObject GetObject();
     [Const, Ref] DOMString GetFolderName();
     void SetFolderName([Const] DOMString name);

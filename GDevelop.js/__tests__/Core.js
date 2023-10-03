@@ -4616,7 +4616,7 @@ Array [
     test('objects container has a root ObjectFolderOrObject', () => {
       const rootFolder = layout.getRootFolder();
       expect(rootFolder.isFolder()).toBe(true);
-      expect(rootFolder.getFolderName()).toEqual('__ROOT');
+      expect(rootFolder.isRootFolder()).toBe(true);
       expect(rootFolder.getParent().isFolder()).toBe(true);
       expect(rootFolder.getParent().getFolderName()).toEqual('__NULL');
       expect(rootFolder.getChildrenCount()).toEqual(0);
@@ -4626,6 +4626,7 @@ Array [
       let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
       const rootFolder = layout.getRootFolder();
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.isRootFolder()).toBe(true);
       expect(rootFolder.getChildrenCount()).toEqual(1);
       layout.removeObject('MyObject');
       expect(rootFolder.hasObjectNamed('MyObject')).toBe(false);
@@ -4636,6 +4637,7 @@ Array [
       const rootFolder = layout.getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Enemies', 1);
       expect(subFolder.getFolderName()).toEqual('Enemies');
+      expect(subFolder.isRootFolder()).toBe(false);
       subFolder.setFolderName('Players');
       expect(subFolder.getFolderName()).toEqual('Players');
       expect(subFolder.getParent()).toBe(rootFolder);
@@ -4804,8 +4806,10 @@ Array [
       const objectFolderOrObject = rootFolder.getChildAt(1)
       const otherObjectFolderOrObject = rootFolder.getChildAt(0)
       expect(otherObjectFolderOrObject.isFolder()).toBe(false);
+      expect(otherObjectFolderOrObject.isRootFolder()).toBe(false);
       expect(otherObjectFolderOrObject.getObject().getName()).toBe('OtherObject');
       expect(objectFolderOrObject.isFolder()).toBe(false);
+      expect(objectFolderOrObject.isRootFolder()).toBe(false);
       expect(objectFolderOrObject.getObject().getName()).toBe('MyObject');
     });
 
@@ -4859,7 +4863,9 @@ Array [
         0
       );
       const objectFolderOrObject = subSubFolder.getChildAt(0);
+      expect(objectFolderOrObject.isRootFolder()).toBe(false);
       const objectFolderOrObjectFoundByName = rootFolder.getObjectNamed('MyObject');
+      expect(objectFolderOrObjectFoundByName.isRootFolder()).toBe(false);
       expect(objectFolderOrObjectFoundByName).toBe(objectFolderOrObject);
     });
   });

@@ -90,7 +90,7 @@ void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject,
 std::size_t ObjectFolderOrObject::GetChildPosition(
     ObjectFolderOrObject& child) const {
   for (std::size_t j = 0; j < children.size(); j++) {
-    if (&(*children[j]) == &child) return j;
+    if (children[j].get() == &child) return j;
   }
   return gd::String::npos;
 }
@@ -152,7 +152,7 @@ void ObjectFolderOrObject::RemoveFolderChild(
       children.begin(),
       children.end(),
       [&childToRemove](std::unique_ptr<gd::ObjectFolderOrObject>& child) {
-        return &(*child) == &childToRemove;
+        return child.get() == &childToRemove;
       });
   if (it == children.end()) return;
 
@@ -171,7 +171,7 @@ void ObjectFolderOrObject::MoveObjectFolderOrObjectToAnotherFolder(
               children.end(),
               [&objectFolderOrObject](std::unique_ptr<gd::ObjectFolderOrObject>&
                                           childObjectFolderOrObject) {
-                return &(*childObjectFolderOrObject) == &objectFolderOrObject;
+                return childObjectFolderOrObject.get() == &objectFolderOrObject;
               });
   if (it == children.end()) return;
 

@@ -858,7 +858,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const answer = Window.showConfirmDialog(
           i18n._(
-            t`This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?`
+            t`Global elements help to manage objects across multiple scenes and it is recommended for the most used objects. This action cannot be undone.
+
+            Do you want to set as global object?`
           )
         );
         if (!answer) return;

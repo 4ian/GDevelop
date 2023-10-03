@@ -1,48 +1,13 @@
-/// <reference path="shifty.d.ts" />
+/*
+GDevelop - Tween Behavior Extension
+Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
+ */
 namespace gdjs {
   export interface RuntimeScene {
-    _tweens: Map<string, shifty.Tweenable>;
+    _tweens: gdjs.TweenRuntimeBehavior.TweenManager;
   }
   export namespace evtTools {
     export namespace tween {
-      const easingFunctions: Record<string, shifty.easingFunction> = {
-        linear: shifty.Tweenable.formulas.linear,
-        easeInQuad: shifty.Tweenable.formulas.easeInQuad,
-        easeOutQuad: shifty.Tweenable.formulas.easeOutQuad,
-        easeInOutQuad: shifty.Tweenable.formulas.easeInOutQuad,
-        easeInCubic: shifty.Tweenable.formulas.easeInCubic,
-        easeOutCubic: shifty.Tweenable.formulas.easeOutCubic,
-        easeInOutCubic: shifty.Tweenable.formulas.easeInOutCubic,
-        easeInQuart: shifty.Tweenable.formulas.easeInQuart,
-        easeOutQuart: shifty.Tweenable.formulas.easeOutQuart,
-        easeInOutQuart: shifty.Tweenable.formulas.easeInOutQuart,
-        easeInQuint: shifty.Tweenable.formulas.easeInQuint,
-        easeOutQuint: shifty.Tweenable.formulas.easeOutQuint,
-        easeInOutQuint: shifty.Tweenable.formulas.easeInOutQuint,
-        easeInSine: shifty.Tweenable.formulas.easeInSine,
-        easeOutSine: shifty.Tweenable.formulas.easeOutSine,
-        easeInOutSine: shifty.Tweenable.formulas.easeInOutSine,
-        easeInExpo: shifty.Tweenable.formulas.easeInExpo,
-        easeOutExpo: shifty.Tweenable.formulas.easeOutExpo,
-        easeInOutExpo: shifty.Tweenable.formulas.easeInOutExpo,
-        easeInCirc: shifty.Tweenable.formulas.easeInCirc,
-        easeOutCirc: shifty.Tweenable.formulas.easeOutCirc,
-        easeInOutCirc: shifty.Tweenable.formulas.easeInOutCirc,
-        easeOutBounce: shifty.Tweenable.formulas.easeOutBounce,
-        easeInBack: shifty.Tweenable.formulas.easeInBack,
-        easeOutBack: shifty.Tweenable.formulas.easeOutBack,
-        easeInOutBack: shifty.Tweenable.formulas.easeInOutBack,
-        elastic: shifty.Tweenable.formulas.elastic,
-        swingFromTo: shifty.Tweenable.formulas.swingFromTo,
-        swingFrom: shifty.Tweenable.formulas.swingFrom,
-        swingTo: shifty.Tweenable.formulas.swingTo,
-        bounce: shifty.Tweenable.formulas.bounce,
-        bouncePast: shifty.Tweenable.formulas.bouncePast,
-        easeFromTo: shifty.Tweenable.formulas.easeFromTo,
-        easeFrom: shifty.Tweenable.formulas.easeFrom,
-        easeTo: shifty.Tweenable.formulas.easeTo,
-      };
-
       /**
        * Tween between 2 values according to an easing function.
        * @param fromValue Start value
@@ -56,61 +21,53 @@ namespace gdjs {
         toValue: float,
         weighting: float
       ) => {
-        const easingFunction = easingFunctions.hasOwnProperty(easingValue)
-          ? easingFunctions[easingValue]
-          : shifty.Tweenable.formulas.linear;
+        const easingFunction =
+          gdjs.TweenRuntimeBehavior.easingFunctions.hasOwnProperty(easingValue)
+            ? gdjs.TweenRuntimeBehavior.easingFunctions[easingValue]
+            : shifty.Tweenable.formulas.linear;
         return fromValue + (toValue - fromValue) * easingFunction(weighting);
       };
 
-      const getTweensMap = (runtimeScene: RuntimeScene) =>
-        runtimeScene._tweens || (runtimeScene._tweens = new Map());
-      const getShiftyScene = (runtimeScene: RuntimeScene) =>
-        runtimeScene.shiftyJsScene ||
-        (runtimeScene.shiftyJsScene = new shifty.Scene());
+      export const getTweensMap = (runtimeScene: RuntimeScene) =>
+        runtimeScene._tweens ||
+        (runtimeScene._tweens = new gdjs.TweenRuntimeBehavior.TweenManager());
+
+      gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
+        const timeDelta = runtimeScene.getElapsedTime() / 1000;
+        gdjs.evtTools.tween.getTweensMap(runtimeScene).step(timeDelta);
+      });
 
       export const sceneTweenExists = (
         runtimeScene: RuntimeScene,
         id: string
-      ) => getTweensMap(runtimeScene).has(id);
+      ) => getTweensMap(runtimeScene).exists(id);
 
       export const sceneTweenIsPlaying = (
         runtimeScene: RuntimeScene,
         id: string
       ) => {
-        const tweenMap = getTweensMap(runtimeScene);
-        const tween = tweenMap.get(id);
-        return !!tween && tween.isPlaying();
+        return getTweensMap(runtimeScene).isPlaying(id);
       };
 
       export const sceneTweenHasFinished = (
         runtimeScene: RuntimeScene,
         id: string
       ) => {
-        const tweenMap = getTweensMap(runtimeScene);
-        const tween = tweenMap.get(id);
-        return !!tween && tween.hasEnded();
+        return getTweensMap(runtimeScene).hasFinished(id);
       };
 
       export const resumeSceneTween = (
         runtimeScene: RuntimeScene,
         id: string
       ) => {
-        const tweenMap = getTweensMap(runtimeScene);
-        const tween = tweenMap.get(id);
-        if (!tween) return;
-        tween.resume();
-        getShiftyScene(runtimeScene).add(tween);
+        getTweensMap(runtimeScene).resumeTween(id);
       };
 
       export const pauseSceneTween = (
         runtimeScene: RuntimeScene,
         id: string
       ) => {
-        const tweenMap = getTweensMap(runtimeScene);
-        const tween = tweenMap.get(id);
-        if (!tween) return;
-        tween.pause();
-        getShiftyScene(runtimeScene).remove(tween);
+        getTweensMap(runtimeScene).pauseTween(id);
       };
 
       export const stopSceneTween = (
@@ -118,24 +75,19 @@ namespace gdjs {
         id: string,
         shouldGoToEnd: boolean
       ) => {
-        const tweenMap = getTweensMap(runtimeScene);
-        const tween = tweenMap.get(id);
-        if (!tween) return;
-        tween.stop(shouldGoToEnd);
-        getShiftyScene(runtimeScene).remove(tween);
+        getTweensMap(runtimeScene).stopTween(id, shouldGoToEnd);
       };
 
       export const removeSceneTween = (
         runtimeScene: RuntimeScene,
         id: string
       ) => {
-        const tweenMap = getTweensMap(runtimeScene);
-        const tween = tweenMap.get(id);
-        if (!tween) return;
-        tweenMap.delete(id);
-        getShiftyScene(runtimeScene).remove(tween);
-        tween.stop().dispose();
+        getTweensMap(runtimeScene).removeTween(id);
       };
+
+      const linearInterpolation = gdjs.evtTools.common.lerp;
+      const exponentialInterpolation =
+        gdjs.evtTools.common.exponentialInterpolation;
 
       /**
        * @deprecated Use tweenVariableNumber2 instead.
@@ -153,38 +105,39 @@ namespace gdjs {
         from: number,
         to: number,
         duration: number,
-        easing: shifty.easingFunction
+        easing: string
       ) => {
-        const tween = shifty.tween({
-          from: { value: from },
-          to: { value: to },
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          duration / 1000,
           easing,
-          duration,
-          render: ({ value }) => variable.setNumber(value),
-        });
-
-        getTweensMap(runtimeScene).set(identifier, tween);
-        getShiftyScene(runtimeScene).add(tween);
+          linearInterpolation,
+          from,
+          to,
+          (value: float) => variable.setNumber(value)
+        );
       };
 
       export const tweenVariableNumber2 = (
         runtimeScene: RuntimeScene,
         identifier: string,
         variable: Variable,
-        to: number,
+        toValue: number,
         duration: number,
-        easing: shifty.easingFunction
+        easing: string
       ) => {
-        const tween = shifty.tween({
-          from: { value: variable.getValue() },
-          to: { value: to },
+        if (variable.getType() !== 'number') {
+          return;
+        }
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          duration / 1000,
           easing,
-          duration,
-          render: ({ value }) => variable.setNumber(value),
-        });
-
-        getTweensMap(runtimeScene).set(identifier, tween);
-        getShiftyScene(runtimeScene).add(tween);
+          linearInterpolation,
+          variable.getValue() as number,
+          toValue,
+          (value: float) => variable.setNumber(value)
+        );
       };
 
       export const tweenCamera = (
@@ -194,22 +147,21 @@ namespace gdjs {
         toY: number,
         layerName: string,
         duration: number,
-        easing: shifty.easingFunction
+        easing: string
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const tween = shifty.tween({
-          from: { x: layer.getCameraX(), y: layer.getCameraY() },
-          to: { x: toX, y: toY },
+        getTweensMap(runtimeScene).addMultiTween(
+          identifier,
+          duration / 1000,
           easing,
-          duration,
-          render: ({ x, y }) => {
+          linearInterpolation,
+          [layer.getCameraX(), layer.getCameraY()],
+          [toX, toY],
+          ([x, y]) => {
             layer.setCameraX(x);
             layer.setCameraY(y);
-          },
-        });
-
-        getTweensMap(runtimeScene).set(identifier, tween);
-        getShiftyScene(runtimeScene).add(tween);
+          }
+        );
       };
 
       export const tweenCameraZoom = (
@@ -218,21 +170,18 @@ namespace gdjs {
         toZoom: number,
         layerName: string,
         duration: number,
-        easing: shifty.easingFunction
+        easing: string
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const tween = shifty.tween({
-          from: { zoom: layer.getCameraZoom() },
-          to: { zoom: toZoom },
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          duration / 1000,
           easing,
-          duration,
-          render: ({ zoom }) => {
-            layer.setCameraZoom(zoom);
-          },
-        });
-
-        getTweensMap(runtimeScene).set(identifier, tween);
-        getShiftyScene(runtimeScene).add(tween);
+          exponentialInterpolation,
+          layer.getCameraZoom(),
+          toZoom,
+          (value: float) => layer.setCameraZoom(value)
+        );
       };
 
       export const tweenCameraRotation = (
@@ -241,21 +190,18 @@ namespace gdjs {
         toRotation: number,
         layerName: string,
         duration: number,
-        easing: shifty.easingFunction
+        easing: string
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const tween = shifty.tween({
-          from: { rotation: layer.getCameraRotation() },
-          to: { rotation: toRotation },
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          duration / 1000,
           easing,
-          duration,
-          render: ({ rotation }) => {
-            layer.setCameraRotation(rotation);
-          },
-        });
-
-        getTweensMap(runtimeScene).set(identifier, tween);
-        getShiftyScene(runtimeScene).add(tween);
+          linearInterpolation,
+          layer.getCameraRotation(),
+          toRotation,
+          (value: float) => layer.setCameraRotation(value)
+        );
       };
     }
   }

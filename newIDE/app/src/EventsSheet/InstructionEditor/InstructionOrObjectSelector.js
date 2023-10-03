@@ -62,6 +62,10 @@ import Text from '../../UI/Text';
 const gd: libGDevelop = global.gd;
 
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
+export const styles = {
+  noObjectsText: { opacity: 0.7 },
+  indentedListItem: { paddingLeft: 45 },
+};
 
 export type TabName = 'objects' | 'free-instructions';
 
@@ -489,11 +493,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 <ListItem
                                   key={`${group.getName()}-empty`}
                                   primaryText={
-                                    <Text style={{ opacity: 0.6 }} noMargin>
+                                    <Text style={styles.noObjectsText} noMargin>
                                       <Trans>No objects in the group</Trans>
                                     </Text>
                                   }
-                                  style={{ paddingLeft: 45 }}
+                                  style={styles.indentedListItem}
                                 />
                               );
                             } else {
@@ -529,11 +533,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                               <ListItem
                                 key={`${folderWithPath.path}-empty`}
                                 primaryText={
-                                  <Text style={{ opacity: 0.6 }} noMargin>
+                                  <Text style={styles.noObjectsText} noMargin>
                                     <Trans>No objects in the folder</Trans>
                                   </Text>
                                 }
-                                style={{ paddingLeft: 45 }}
+                                style={styles.indentedListItem}
                               />
                             );
                           } else {

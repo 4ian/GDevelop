@@ -319,6 +319,7 @@ export const HomePage = React.memo<Props>(
                       }
                       onOpenRecentFile={onOpenRecentFile}
                       storageProviders={storageProviders}
+                      i18n={i18n}
                     />
                   )}
                   {activeTab === 'learn' && (

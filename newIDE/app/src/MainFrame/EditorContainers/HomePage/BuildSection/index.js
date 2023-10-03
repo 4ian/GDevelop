@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -74,6 +75,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   storageProviders: Array<StorageProvider>,
+  i18n: I18nType,
 |};
 
 export type BuildSectionInterface = {|
@@ -93,6 +95,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onSelectPrivateGameTemplateListingData,
       onOpenRecentFile,
       storageProviders,
+      i18n,
     },
     ref
   ) => {
@@ -193,6 +196,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           exampleShortHeaders,
           onSelectPrivateGameTemplateListingData,
           onSelectExampleShortHeader,
+          i18n,
         }),
       [
         authenticatedUser,
@@ -200,6 +204,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         onSelectExampleShortHeader,
         onSelectPrivateGameTemplateListingData,
         privateGameTemplateListingDatas,
+        i18n,
       ]
     );
 

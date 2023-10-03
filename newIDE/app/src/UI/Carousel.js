@@ -15,7 +15,6 @@ import AlertMessage from './AlertMessage';
 import ArrowLeft from './CustomSvgIcons/ArrowLeft';
 import ArrowRight from './CustomSvgIcons/ArrowRight';
 import { Trans } from '@lingui/macro';
-import { Typography } from '@material-ui/core';
 import { CorsAwareImage } from './CorsAwareImage';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -30,7 +29,7 @@ export type CarouselThumbnail = {
   id: string,
   title: string,
   thumbnailUrl: string,
-  overlayText?: React.Node,
+  overlayText?: string,
   overlayTextPosition?: OverlayTextPosition,
   +link?: string,
   +onClick?: () => void,
@@ -108,14 +107,10 @@ const styles = {
   },
   overlay: {
     position: 'absolute',
-    background: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 4,
-    padding: '2px 6px',
-  },
-  overlayText: {
+    padding: '2px 4px',
+    backdropFilter: 'brightness(40%)',
     color: 'white', // Same color for all themes.
-    marginTop: 0,
-    marginBottom: 0,
   },
 };
 
@@ -156,7 +151,7 @@ const ImageOverlay = ({
   content,
   position,
 }: {|
-  content: React.Node,
+  content: string,
   position: OverlayTextPosition,
 |}) => {
   const positionStyles = {
@@ -174,9 +169,9 @@ const ImageOverlay = ({
         ...positionStyles,
       }}
     >
-      <Typography variant="body1" style={styles.overlayText}>
+      <Text noMargin color="inherit" size="sub-title">
         {content}
-      </Typography>
+      </Text>
     </div>
   );
 };

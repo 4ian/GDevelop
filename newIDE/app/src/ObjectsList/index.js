@@ -1501,7 +1501,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
   }
 );
 
-const areEqual = (prevProps: Props, nextProps: Props): boolean =>
+const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // The component is costly to render, so avoid any re-rendering as much
   // as possible.
   // We make the assumption that no changes to objects list is made outside
@@ -1513,4 +1513,7 @@ const areEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.project === nextProps.project &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
-export default React.memo<Props, ObjectsListInterface>(ObjectsList, areEqual);
+export default React.memo<Props, ObjectsListInterface>(
+  ObjectsList,
+  arePropsEqual
+);

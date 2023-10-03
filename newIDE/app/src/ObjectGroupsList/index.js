@@ -608,17 +608,17 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
   }
 );
 
-const areEqual = (prevProps: Props, nextProps: Props): boolean =>
+const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // The component is costly to render, so avoid any re-rendering as much
   // as possible.
   // We make the assumption that no changes to groups list is made outside
   // from the component.
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.
-  prevProps.globalObjectGroups !== nextProps.globalObjectGroups ||
-  prevProps.objectGroups !== nextProps.objectGroups;
+  prevProps.globalObjectGroups === nextProps.globalObjectGroups ||
+  prevProps.objectGroups === nextProps.objectGroups;
 
 export default React.memo<Props, ObjectGroupsListInterface>(
   ObjectGroupsList,
-  areEqual
+  arePropsEqual
 );

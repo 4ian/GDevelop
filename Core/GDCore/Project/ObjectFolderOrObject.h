@@ -110,6 +110,12 @@ class GD_CORE_API ObjectFolderOrObject {
   };
 
   /**
+   * \brief Returns true if the instance is a root folder (that's to say it
+   * has no parent).
+   */
+  bool IsRootFolder() { return !object && !parent; }
+
+  /**
    * \brief Moves a child from a position to a new one.
    */
   void MoveChild(std::size_t oldIndex, std::size_t newIndex);

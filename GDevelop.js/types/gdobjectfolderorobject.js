@@ -2,6 +2,7 @@
 declare class gdObjectFolderOrObject {
   constructor(): void;
   isFolder(): boolean;
+  isRootFolder(): boolean;
   getObject(): gdObject;
   getFolderName(): string;
   setFolderName(name: string): void;

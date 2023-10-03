@@ -300,6 +300,10 @@ export function getMuiOverrides({
       paper: {
         backgroundColor: alternateCanvasBackgroundColor,
       },
+      option: {
+        // Avoid the default min-height of 48px, which is too big to display options.
+        minHeight: 35,
+      },
     },
   };
 }

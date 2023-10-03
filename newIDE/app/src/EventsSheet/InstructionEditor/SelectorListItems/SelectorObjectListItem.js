@@ -9,6 +9,7 @@ import {
   getObjectListItemKey,
 } from './Keys';
 import HighlightedText from '../../../UI/Search/HighlightedText';
+import { styles } from '../InstructionOrObjectSelector';
 import { type HTMLDataset } from '../../../Utils/HTMLDataset';
 
 type Props = {|
@@ -45,7 +46,7 @@ export const renderObjectListItem = ({
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)
       }
-      style={withIndent ? { paddingLeft: 45 } : undefined}
+      style={withIndent ? styles.indentedListItem : undefined}
       primaryText={
         <HighlightedText
           text={objectName}

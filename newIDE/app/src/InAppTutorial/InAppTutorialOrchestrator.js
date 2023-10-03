@@ -491,7 +491,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
     );
 
     const goToStep = React.useCallback(
-      (stepIndex: number, gatherData?: boolean) => {
+      ({
+        stepIndex,
+        gatherData,
+      }: {
+        stepIndex: number,
+        gatherData?: boolean,
+      }) => {
         if (stepIndex >= stepCount) {
           setDisplayEndDialog(true);
           return;
@@ -657,7 +663,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           if (shouldGoToStepAtIndex === null) return;
         }
 
-        goToStep(shouldGoToStepAtIndex, true);
+        goToStep({ stepIndex: shouldGoToStepAtIndex, gatherData: true });
       },
       [
         currentStepIndex,
@@ -672,7 +678,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
     const goToNextStep = React.useCallback(
       (gatherData?: boolean) => {
-        goToStep(currentStepIndex + 1, gatherData);
+        goToStep({ stepIndex: currentStepIndex + 1, gatherData });
       },
       [currentStepIndex, goToStep]
     );

@@ -1113,6 +1113,35 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
+    const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
+      (
+        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        folder: gdObjectFolderOrObject
+      ) => {
+        const {
+          objectFolderOrObject,
+          global,
+        } = objectFolderOrObjectWithContext;
+        if (folder === objectFolderOrObject.getParent()) return;
+        objectFolderOrObject
+          .getParent()
+          .moveObjectFolderOrObjectToAnotherFolder(
+            objectFolderOrObject,
+            folder,
+            0
+          );
+        onObjectModified(true);
+        if (treeViewRef.current)
+          treeViewRef.current.openItems([
+            getTreeViewItemId({
+              objectFolderOrObject: folder,
+              global,
+            }),
+          ]);
+      },
+      [onObjectModified]
+    );
+
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
         if (item.isRoot || item.isPlaceholder) return [];
@@ -1158,23 +1187,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
                 label: path,
                 enabled: folder !== objectFolderOrObject.getParent(),
-                click: () => {
-                  objectFolderOrObject
-                    .getParent()
-                    .moveObjectFolderOrObjectToAnotherFolder(
-                      objectFolderOrObject,
-                      folder,
-                      0
-                    );
-                  onObjectModified(true);
-                  if (treeViewRef.current)
-                    treeViewRef.current.openItems([
-                      getTreeViewItemId({
-                        objectFolderOrObject: folder,
-                        global: item.global,
-                      }),
-                    ]);
-                },
+                click: () =>
+                  moveObjectFolderOrObjectToAnotherFolderInSameContainer(
+                    item,
+                    folder
+                  ),
               })),
             },
             { type: 'separator' },
@@ -1288,23 +1305,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             submenu: folderAndPathsInContainer.map(({ folder, path }) => ({
               label: path,
               enabled: folder !== objectFolderOrObject.getParent(),
-              click: () => {
-                item.objectFolderOrObject
-                  .getParent()
-                  .moveObjectFolderOrObjectToAnotherFolder(
-                    item.objectFolderOrObject,
-                    folder,
-                    0
-                  );
-                onObjectModified(true);
-                if (treeViewRef.current)
-                  treeViewRef.current.openItems([
-                    getTreeViewItemId({
-                      objectFolderOrObject: folder,
-                      global,
-                    }),
-                  ]);
-              },
+              click: () =>
+                moveObjectFolderOrObjectToAnotherFolderInSameContainer(
+                  item,
+                  folder
+                ),
             })),
           },
           { type: 'separator' },
@@ -1350,7 +1355,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         initialInstances,
         selectObjectFolderOrObjectWithContext,
         objectsContainer,
-        onObjectModified,
+        moveObjectFolderOrObjectToAnotherFolderInSameContainer,
       ]
     );
 

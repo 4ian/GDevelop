@@ -231,57 +231,6 @@ namespace gdjs {
     }
 
     /**
-     * @deprecated See createObjectsFrom2 that uses Z axis.
-     *
-     * Create objects from initial instances data (for example, the initial instances
-     * of the scene or the instances of an external layout).
-     *
-     * @param data The instances data
-     * @param xPos The offset on X axis
-     * @param yPos The offset on Y axis
-     * @param trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
-     * to the same as the associated instance. Useful for hot-reloading when instances are changed.
-     */
-    createObjectsFrom(
-      data: InstanceData[],
-      xPos: float,
-      yPos: float,
-      trackByPersistentUuid: boolean
-    ) {
-      for (let i = 0, len = data.length; i < len; ++i) {
-        const instanceData = data[i];
-        const objectName = instanceData.name;
-        const newObject = this.createObject(objectName);
-        if (newObject !== null) {
-          if (trackByPersistentUuid) {
-            // Give the object the same persistentUuid as the instance, so that
-            // it can be hot-reloaded.
-            newObject.persistentUuid = instanceData.persistentUuid || null;
-          }
-          newObject.setPosition(instanceData.x + xPos, instanceData.y + yPos);
-          newObject.setAngle(instanceData.angle);
-          if (
-            gdjs.RuntimeObject3D &&
-            newObject instanceof gdjs.RuntimeObject3D
-          ) {
-            if (instanceData.z !== undefined) newObject.setZ(instanceData.z);
-            if (instanceData.rotationX !== undefined)
-              newObject.setRotationX(instanceData.rotationX);
-            if (instanceData.rotationY !== undefined)
-              newObject.setRotationY(instanceData.rotationY);
-          }
-
-          newObject.setZOrder(instanceData.zOrder);
-          newObject.setLayer(instanceData.layer);
-          newObject
-            .getVariables()
-            .initFrom(instanceData.initialVariables, true);
-          newObject.extraInitializationFromInitialInstance(instanceData);
-        }
-      }
-    }
-
-    /**
      * Create objects from initial instances data (for example, the initial instances
      * of the scene or the instances of an external layout).
      *
@@ -292,19 +241,34 @@ namespace gdjs {
      * @param trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
      * to the same as the associated instance. Useful for hot-reloading when instances are changed.
      */
-    createObjectsFrom2(
+    createObjectsFrom(
       data: InstanceData[],
       xPos: float,
       yPos: float,
       zPos: float,
       trackByPersistentUuid: boolean
-    ) {
+    ): void {
+      let zOffset: number;
+      let shouldTrackByPersistentUuid: boolean;
+
+      if (arguments.length === 5) {
+        zOffset = zPos;
+        shouldTrackByPersistentUuid = trackByPersistentUuid;
+      } else {
+        /**
+         * Support for the previous signature (before 3D was introduced):
+         * createObjectsFrom(data, xPos, yPos, trackByPersistentUuid)
+         */
+        zOffset = 0;
+        shouldTrackByPersistentUuid = arguments[3];
+      }
+
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];
         const objectName = instanceData.name;
         const newObject = this.createObject(objectName);
         if (newObject !== null) {
-          if (trackByPersistentUuid) {
+          if (shouldTrackByPersistentUuid) {
             // Give the object the same persistentUuid as the instance, so that
             // it can be hot-reloaded.
             newObject.persistentUuid = instanceData.persistentUuid || null;
@@ -316,7 +280,7 @@ namespace gdjs {
             newObject instanceof gdjs.RuntimeObject3D
           ) {
             if (instanceData.z !== undefined)
-              newObject.setZ(instanceData.z + zPos);
+              newObject.setZ(instanceData.z + zOffset);
             if (instanceData.rotationX !== undefined)
               newObject.setRotationX(instanceData.rotationX);
             if (instanceData.rotationY !== undefined)

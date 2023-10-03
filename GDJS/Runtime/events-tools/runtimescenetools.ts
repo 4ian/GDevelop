@@ -293,11 +293,16 @@ namespace gdjs {
 
         // trackByPersistentUuid is set to false as we don't want external layouts
         // instantiated at runtime to be hot-reloaded.
-        scene.getScene().createObjectsFrom2(
+        scene.getScene().createObjectsFrom(
           externalLayoutData.instances,
           xPos,
           yPos,
-          zPos,
+          /**
+           * When 3D was introduced, zPos argument was added to the signature.
+           * Existing calls (in JS events) to createObjectsFromExternalLayout will
+           * have zPos undefined. So it is set to 0 in that case.
+           */
+          zPos || 0,
           /*trackByPersistentUuid=*/
           false
         );

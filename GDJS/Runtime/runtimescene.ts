@@ -161,7 +161,7 @@ namespace gdjs {
       }
 
       //Create initial instances of objects
-      this.createObjectsFrom2(
+      this.createObjectsFrom(
         sceneData.instances,
         0,
         0,

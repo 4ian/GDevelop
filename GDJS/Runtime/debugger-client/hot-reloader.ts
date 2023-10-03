@@ -1213,7 +1213,7 @@ namespace gdjs {
         ) {
           // Instance was created (or object name changed, in which case it was destroyed previously)
           // and we verified that runtimeObject does not exist.
-          runtimeScene.createObjectsFrom2(
+          runtimeScene.createObjectsFrom(
             [newInstance],
             0,
             0,

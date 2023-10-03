@@ -18,10 +18,11 @@ namespace gd {
 
 ObjectFolderOrObject ObjectFolderOrObject::badObjectFolderOrObject;
 
-ObjectFolderOrObject::ObjectFolderOrObject() : folderName("__NULL") {}
+ObjectFolderOrObject::ObjectFolderOrObject()
+    : folderName("__NULL"), object(nullptr) {}
 ObjectFolderOrObject::ObjectFolderOrObject(gd::String folderName_,
                                            ObjectFolderOrObject* parent_)
-    : folderName(folderName_), parent(parent_) {}
+    : folderName(folderName_), parent(parent_), object(nullptr) {}
 ObjectFolderOrObject::ObjectFolderOrObject(gd::Object* object_,
                                            ObjectFolderOrObject* parent_)
     : object(object_), parent(parent_) {}
@@ -34,14 +35,15 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
         children.end(),
         [&name](
             std::unique_ptr<gd::ObjectFolderOrObject>& objectFolderOrObject) {
-          return objectFolderOrObject.get()->HasObjectNamed(name);
+          return objectFolderOrObject->HasObjectNamed(name);
         });
   }
+  if (!object) return false;
   return object->GetName() == name;
 }
 ObjectFolderOrObject& ObjectFolderOrObject::GetObjectNamed(
     const gd::String& name) {
-  if (!IsFolder() && object->GetName() == name) {
+  if (object && object->GetName() == name) {
     return *this;
   }
   if (IsFolder()) {
@@ -61,6 +63,7 @@ void ObjectFolderOrObject::SetFolderName(const gd::String& name) {
 }
 
 ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) {
+  if (index >= children.size()) return badObjectFolderOrObject;
   return *children[index];
 }
 ObjectFolderOrObject& ObjectFolderOrObject::GetObjectChild(
@@ -73,22 +76,20 @@ ObjectFolderOrObject& ObjectFolderOrObject::GetObjectChild(
   return badObjectFolderOrObject;
 }
 
-void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject) {
-  auto objectFolderOrObject =
-      gd::make_unique<ObjectFolderOrObject>(insertedObject, this);
-  children.push_back(std::move(objectFolderOrObject));
-}
 void ObjectFolderOrObject::InsertObject(gd::Object* insertedObject,
                                         std::size_t position) {
   auto objectFolderOrObject =
       gd::make_unique<ObjectFolderOrObject>(insertedObject, this);
-  children.insert(
-      position < children.size() ? children.begin() + position : children.end(),
-      std::move(objectFolderOrObject));
+  if (position < children.size()) {
+    children.insert(children.begin() + position,
+                    std::move(objectFolderOrObject));
+  } else {
+    children.push_back(std::move(objectFolderOrObject));
+  }
 }
 
 std::size_t ObjectFolderOrObject::GetChildPosition(
-    ObjectFolderOrObject& child) const {
+    const ObjectFolderOrObject& child) const {
   for (std::size_t j = 0; j < children.size(); j++) {
     if (children[j].get() == &child) return j;
   }
@@ -96,7 +97,7 @@ std::size_t ObjectFolderOrObject::GetChildPosition(
 }
 
 ObjectFolderOrObject& ObjectFolderOrObject::InsertNewFolder(
-    const gd::String newFolderName, std::size_t position) {
+    const gd::String& newFolderName, std::size_t position) {
   auto newFolderPtr =
       gd::make_unique<ObjectFolderOrObject>(newFolderName, this);
   gd::ObjectFolderOrObject& newFolder = *(*(children.insert(
@@ -125,7 +126,7 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
 };
 
 bool ObjectFolderOrObject::IsADescendantOf(
-    ObjectFolderOrObject& otherObjectFolderOrObject) {
+    const ObjectFolderOrObject& otherObjectFolderOrObject) {
   if (parent == nullptr) return false;
   if (&(*parent) == &otherObjectFolderOrObject) return true;
   return parent->IsADescendantOf(otherObjectFolderOrObject);
@@ -143,7 +144,7 @@ void ObjectFolderOrObject::MoveChild(std::size_t oldIndex,
 }
 
 void ObjectFolderOrObject::RemoveFolderChild(
-    ObjectFolderOrObject& childToRemove) {
+    const ObjectFolderOrObject& childToRemove) {
   if (!IsFolder() || !childToRemove.IsFolder() ||
       childToRemove.GetChildrenCount() > 0) {
     return;
@@ -233,7 +234,9 @@ void ObjectFolderOrObject::UnserializeFrom(
     if (objectsContainer.HasObjectNamed(objectName)) {
       object = &objectsContainer.GetObject(objectName);
     } else {
-      gd::LogError("Object with name " + objectName + " not found in objects container.");
+      gd::LogError("Object with name " + objectName +
+                   " not found in objects container.");
+      object = nullptr;
     }
   }
 };

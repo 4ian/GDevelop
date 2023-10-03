@@ -4,6 +4,8 @@ import TouchBackend from 'react-dnd-touch-backend';
 import MultiBackend, { TouchTransition } from 'react-dnd-multi-backend';
 import { DragDropContext } from 'react-dnd';
 
+// react-dnd-multi-backend/lib/HTML5toTouch is not used directly in order to
+// be able to specify the delayTouchStart parameter of the TouchBackend.
 const HTML5toTouch = {
   backends: [
     {

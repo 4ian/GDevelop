@@ -117,7 +117,7 @@ class GD_CORE_API ObjectFolderOrObject {
    * \brief Removes the given child from the instance's children. If the given
    * child contains children of its own, does nothing.
    */
-  void RemoveFolderChild(gd::ObjectFolderOrObject& childToRemove);
+  void RemoveFolderChild(const ObjectFolderOrObject& childToRemove);
   /**
    * \brief Removes the child representing the object with the given name from
    * the instance children and recursively does it for every folder children.
@@ -125,32 +125,28 @@ class GD_CORE_API ObjectFolderOrObject {
   void RemoveRecursivelyObjectNamed(const gd::String& name);
 
   /**
-   * \brief Inserts an instance representing the given object at the end of the
-   * children.
-   */
-  void InsertObject(gd::Object* insertedObject);
-  /**
    * \brief Inserts an instance representing the given object at the given
    * position.
    */
-  void InsertObject(gd::Object* insertedObject, std::size_t position);
+  void InsertObject(gd::Object* insertedObject,
+                    std::size_t position = (size_t)-1);
   /**
    * \brief Inserts an instance representing a folder with the given name at the
    * given position.
    */
-  ObjectFolderOrObject& InsertNewFolder(const gd::String newFolderName,
+  ObjectFolderOrObject& InsertNewFolder(const gd::String& newFolderName,
                                         std::size_t position);
   /**
    * \brief Returns true if the instance is a descendant of the given instance
    * of ObjectFolderOrObject.
    */
-  bool IsADescendantOf(ObjectFolderOrObject& otherObjectFolderOrObject);
+  bool IsADescendantOf(const ObjectFolderOrObject& otherObjectFolderOrObject);
 
   /**
    * \brief Returns the position of the given instance of ObjectFolderOrObject
    * in the instance's children.
    */
-  std::size_t GetChildPosition(ObjectFolderOrObject& child) const;
+  std::size_t GetChildPosition(const ObjectFolderOrObject& child) const;
   /**
    * \brief Moves the given child ObjectFolderOrObject to the given folder at
    * the given position.
@@ -184,7 +180,7 @@ class GD_CORE_API ObjectFolderOrObject {
       parent;  // nullptr if root folder, points to the parent folder otherwise.
 
   // Representing an object:
-  gd::Object* object;  // Empty if folderName is set.
+  gd::Object* object;  // nullptr if folderName is set.
 
   // or representing a folder:
   gd::String folderName;  // Empty if object is set.

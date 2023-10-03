@@ -300,6 +300,9 @@ export function getMuiOverrides({
       paper: {
         backgroundColor: alternateCanvasBackgroundColor,
       },
+      option: {
+        minHeight: 35,
+      },
     },
   };
 }

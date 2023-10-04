@@ -1124,10 +1124,9 @@ module.exports = {
       'pako/dist/pako.min'
     );
 
-    // This isn't done by default from the library and would crash on the webapp.
-    // This used to be done via PIXI.Renderer.registerPlugin, but this is now deprecated.
-    // Checkout https://github.com/pixijs/tilemap/blob/master/src/index.ts#L43-L47
-    // on how this extension is registered.
+    // When on the webapp, and using webpack, the extension does not seem to
+    // be able to register itself properly. So we do it manually.
+    // (This should be done here https://github.com/pixijs/tilemap/blob/master/src/index.ts#L43-L47)
     PIXI.extensions.add({
       name: 'tilemap',
       type: PIXI.ExtensionType.RendererPlugin,

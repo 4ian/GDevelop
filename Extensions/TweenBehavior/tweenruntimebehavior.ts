@@ -824,34 +824,10 @@ namespace gdjs {
     }
 
     onDeActivate() {
-      if (!this._isActive) {
-        return;
-      }
-      for (const key in this._tweens) {
-        if (this._tweens.hasOwnProperty(key)) {
-          const tween = this._tweens[key];
-          if (tween.isPlaying()) {
-            tween.resumeOnActivate = true;
-            this.pauseTween(key);
-          }
-        }
-      }
       this._isActive = false;
     }
 
     onActivate() {
-      if (this._isActive) {
-        return;
-      }
-      for (const key in this._tweens) {
-        if (this._tweens.hasOwnProperty(key)) {
-          const tween = this._tweens[key];
-          if (tween.resumeOnActivate) {
-            tween.resumeOnActivate = false;
-            this.resumeTween(key);
-          }
-        }
-      }
       this._isActive = true;
     }
   }
@@ -1127,13 +1103,11 @@ namespace gdjs {
       protected elapsedTime: float;
       protected totalDuration: float;
       protected easing: (progress: float) => float;
+      protected interpolate: Interpolation;
       protected onFinish: () => void;
       protected isPaused = false;
       // TODO
       protected isStopped = false;
-      // TODO
-      protected resumeOnActivate: boolean = false;
-      protected interpolate: Interpolation;
 
       constructor(
         totalDuration: float,

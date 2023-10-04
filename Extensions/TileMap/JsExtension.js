@@ -105,11 +105,7 @@ const defineTileMap = function (
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Atlas image'))
-        .setDescription(
-          _(
-            'The Atlas image containing the tileset.'
-          )
-        )
+        .setDescription(_('The Atlas image containing the tileset.'))
         .setGroup(_('Tiled only'))
     );
     objectProperties.set(
@@ -1128,6 +1124,15 @@ module.exports = {
       'pako/dist/pako.min'
     );
 
+    // When on the webapp, and using webpack, the extension does not seem to
+    // be able to register itself properly. So we do it manually.
+    // (This should be done here https://github.com/pixijs/tilemap/blob/master/src/index.ts#L43-L47)
+    PIXI.extensions.add({
+      name: 'tilemap',
+      type: PIXI.ExtensionType.RendererPlugin,
+      ref: Tilemap.TileRenderer,
+    });
+
     /**
      * Renderer for instances of TileMap inside the IDE.
      *
@@ -1342,10 +1347,11 @@ module.exports = {
       tilesetJsonFile
     ) {
       try {
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-          this._project,
-          tilemapJsonFile
-        );
+        const tileMapJsonData =
+          await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
         const tileMap = TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
@@ -1375,8 +1381,7 @@ module.exports = {
     RenderedTileMapInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
         this._pixiObject.scale.x = this.getCustomWidth() / this.width;
-        this._pixiObject.scale.y =
-          this.getCustomHeight() / this.height;
+        this._pixiObject.scale.y = this.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;
@@ -1595,10 +1600,11 @@ module.exports = {
       tilesetJsonFile
     ) {
       try {
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-          this._project,
-          tilemapJsonFile
-        );
+        const tileMapJsonData =
+          await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
         const tileMap = TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
@@ -1627,8 +1633,7 @@ module.exports = {
     RenderedCollisionMaskInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
         this._pixiObject.scale.x = this.getCustomWidth() / this.width;
-        this._pixiObject.scale.y =
-          this.getCustomHeight() / this.height;
+        this._pixiObject.scale.y = this.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;

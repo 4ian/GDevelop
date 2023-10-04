@@ -83,8 +83,6 @@ namespace gdjs {
   const exponentialInterpolation =
     gdjs.evtTools.common.exponentialInterpolation;
 
-  // TODO EBO Rewrite this behavior to use standard method to step.
-  // This could also fix layer time scale that seems to be ignored.
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens = new gdjs.TweenRuntimeBehavior.TweenManager();
     private _isActive: boolean = true;
@@ -511,22 +509,13 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       useHSLColorTransition: boolean
     ) {
-      if (
-        !isColorable(this.owner) ||
-        !toColorStr.match(
-          '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]);){2}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
-        )
-      )
-        return;
       const owner = this.owner;
+      if (!isColorable(owner)) {
+        return;
+      }
 
-      // TODO Check if there is an helper method for this.
-      const rgbFromColor: float[] = this.owner
-        .getColor()
-        .split(';')
-        .map(parseFloat);
-      const rgbToColor: float[] = toColorStr.split(';').map(parseFloat);
-      if (rgbToColor.length !== 3) return;
+      const rgbFromColor: float[] = gdjs.rgbOrHexToRGBColor(owner.getColor());
+      const rgbToColor: float[] = gdjs.rgbOrHexToRGBColor(toColorStr);
 
       let initialValue;
       let targetedValue;
@@ -1071,8 +1060,6 @@ namespace gdjs {
       protected interpolate: Interpolation;
       protected onFinish: () => void;
       protected isPaused = false;
-      // TODO
-      protected isStopped = false;
 
       constructor(
         totalDuration: float,

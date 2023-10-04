@@ -1087,7 +1087,18 @@ namespace gdjs {
         this.onFinish = onFinish || noEffect;
       }
 
-      abstract step(timeDelta: number): void;
+      step(timeDelta: number): void {
+        if (!this.isPlaying()) {
+          return;
+        }
+        this.elapsedTime = Math.min(
+          this.elapsedTime + timeDelta,
+          this.totalDuration
+        );
+        this._updateValue();
+      }
+
+      protected abstract _updateValue(): void;
 
       isPlaying(): boolean {
         return !this.isPaused && !this.hasFinished();
@@ -1098,11 +1109,10 @@ namespace gdjs {
       }
 
       stop(jumpToDest: boolean): void {
+        this.elapsedTime = this.totalDuration;
         if (jumpToDest) {
-          this.elapsedTime = this.totalDuration;
+          this._updateValue();
         }
-        // TODO check what it should do.
-        this.isStopped = true;
       }
 
       resume(): void {
@@ -1142,14 +1152,7 @@ namespace gdjs {
         this.setValue = setValue;
       }
 
-      step(timeDelta: number) {
-        if (!this.isPlaying()) {
-          return;
-        }
-        this.elapsedTime = Math.min(
-          this.elapsedTime + timeDelta,
-          this.totalDuration
-        );
+      protected _updateValue() {
         const easedProgress = this.easing(this.getProgress());
         const value = this.interpolate(
           this.initialValue,
@@ -1189,14 +1192,7 @@ namespace gdjs {
         this.setValue = setValue;
       }
 
-      step(timeDelta: number) {
-        if (!this.isPlaying()) {
-          return;
-        }
-        this.elapsedTime = Math.min(
-          this.elapsedTime + timeDelta,
-          this.totalDuration
-        );
+      protected _updateValue() {
         const easedProgress = this.easing(this.getProgress());
         const length = this.initialValue.length;
         this.currentValues.length = length;
@@ -1208,6 +1204,9 @@ namespace gdjs {
           );
         }
         this.setValue(this.currentValues);
+        if (this.hasFinished()) {
+          this.onFinish();
+        }
       }
     }
   }

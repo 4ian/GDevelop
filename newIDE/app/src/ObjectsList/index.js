@@ -976,13 +976,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             folder: parent,
             index,
           });
-          if (treeViewRef.current)
-            treeViewRef.current.openItems([
-              getTreeViewItemId({
-                objectFolderOrObject: parent,
-                global: destinationItem.global,
-              }),
-            ]);
 
           onObjectModified(true);
           selectObjectFolderOrObjectWithContext({
@@ -1041,13 +1034,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               position
             );
           }
-          if (treeViewRef.current)
-            treeViewRef.current.openItems([
-              getTreeViewItemId({
-                objectFolderOrObject: parent,
-                global: destinationItem.global,
-              }),
-            ]);
         } else {
           return;
         }

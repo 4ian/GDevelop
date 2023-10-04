@@ -14,59 +14,6 @@ export const getObjectFolderOrObjectUnifiedName = (
     ? objectFolderOrObject.getFolderName()
     : objectFolderOrObject.getObject().getName();
 
-export const enumerateObjectFolderOrObjects = (
-  project: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer
-): {|
-  containerObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[],
-  projectObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[],
-|} => {
-  const projectRootFolder = project.getRootFolder();
-  const containerRootFolder = objectsContainer.getRootFolder();
-  const containerObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[] = mapFor(
-    0,
-    containerRootFolder.getChildrenCount(),
-    i => {
-      const objectFolderOrObject = containerRootFolder.getChildAt(i);
-      return objectFolderOrObject;
-    }
-  ).map(
-    (
-      objectFolderOrObject: gdObjectFolderOrObject
-    ): ObjectFolderOrObjectWithContext => {
-      const item = {
-        objectFolderOrObject,
-        global: false,
-      };
-      return item;
-    }
-  );
-
-  const projectObjectFolderOrObjectsList: ObjectFolderOrObjectWithContext[] = mapFor(
-    0,
-    projectRootFolder.getChildrenCount(),
-    i => {
-      const objectFolderOrObject = projectRootFolder.getChildAt(i);
-      return objectFolderOrObject;
-    }
-  ).map(
-    (
-      objectFolderOrObject: gdObjectFolderOrObject
-    ): ObjectFolderOrObjectWithContext => {
-      const item = {
-        objectFolderOrObject,
-        global: true,
-      };
-      return item;
-    }
-  );
-
-  return {
-    containerObjectFolderOrObjectsList,
-    projectObjectFolderOrObjectsList,
-  };
-};
-
 const recursivelyEnumerateFoldersInFolder = (
   folder: gdObjectFolderOrObject,
   prefix: string,

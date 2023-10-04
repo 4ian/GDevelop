@@ -1102,7 +1102,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           const newFolder = rootFolder.insertNewFolder('NewFolder', 0);
           newObjectFolderOrObjectWithContext = {
             objectFolderOrObject: newFolder,
-            global: true,
+            global: false,
           };
         }
         selectObjectFolderOrObjectWithContext(

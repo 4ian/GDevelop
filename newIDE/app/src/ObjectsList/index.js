@@ -37,7 +37,6 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
   enumerateFoldersInContainer,
   enumerateFoldersInFolder,
-  enumerateObjectFolderOrObjects,
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
@@ -72,7 +71,9 @@ const styles = {
 
 export type RootFolder = {|
   +label: string,
-  +children: Array<ObjectWithContext>,
+  +children: ?Array<ObjectWithContext>,
+  +objectFolderOrObject: gdObjectFolderOrObject,
+  +global: boolean,
   +isRoot: true,
   +id: string,
 |};
@@ -136,7 +137,7 @@ const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
 
 const getTreeViewItemChildren = (item: TreeViewItem) => {
   if (item.isPlaceholder) return null;
-  if (item.isRoot) return item.children;
+  if (item.isRoot && item.children) return item.children;
   const { objectFolderOrObject, global } = item;
   if (!objectFolderOrObject.isFolder()) return null;
   return mapFor(0, objectFolderOrObject.getChildrenCount(), i => ({
@@ -719,19 +720,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       }
     };
 
-    const {
-      projectObjectFolderOrObjectsList,
-      containerObjectFolderOrObjectsList,
-    } = enumerateObjectFolderOrObjects(project, objectsContainer);
+    const projectRootFolder = project.getRootFolder();
+    const containerRootFolder = objectsContainer.getRootFolder();
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
           {
             label: i18n._(t`Global Objects`),
             children:
-              projectObjectFolderOrObjectsList.length > 0
-                ? projectObjectFolderOrObjectsList
-                : [
+              projectRootFolder.getChildrenCount() === 0
+                ? [
                     {
                       label: (
                         <Trans>
@@ -750,22 +748,27 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       id: globalObjectsEmptyPlaceholderId,
                       isPlaceholder: true,
                     },
-                  ],
+                  ]
+                : null,
+            objectFolderOrObject: projectRootFolder,
+            global: true,
             isRoot: true,
             id: globalObjectsRootFolderId,
           },
           {
             label: i18n._(t`Scene Objects`),
             children:
-              containerObjectFolderOrObjectsList.length > 0
-                ? containerObjectFolderOrObjectsList
-                : [
+              containerRootFolder.getChildrenCount() === 0
+                ? [
                     {
                       label: i18n._(t`Start by adding a new object.`),
                       id: 'scene-empty-placeholder',
                       isPlaceholder: true,
                     },
-                  ],
+                  ]
+                : null,
+            objectFolderOrObject: containerRootFolder,
+            global: false,
             isRoot: true,
             id: sceneObjectsRootFolderId,
           },
@@ -773,7 +776,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // $FlowFixMe
         return treeViewItems;
       },
-      [projectObjectFolderOrObjectsList, containerObjectFolderOrObjectsList]
+      [projectRootFolder, containerRootFolder]
     );
 
     const canMoveSelectionTo = React.useCallback(
@@ -1017,11 +1020,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             ) {
               return;
             }
+            const position =
+              where === 'inside'
+                ? 0
+                : parent.getChildPosition(destinationObjectFolderOrObject) +
+                  (where === 'after' ? 1 : 0);
             selectedObjectFolderOrObjectParent.moveObjectFolderOrObjectToAnotherFolder(
               selectedObjectFolderOrObject,
               parent,
-              parent.getChildPosition(destinationObjectFolderOrObject) +
-                (where === 'after' ? 1 : 0)
+              position
             );
           }
           if (treeViewRef.current)
@@ -1368,7 +1375,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
     const initiallyOpenedNodeIds = [
-      projectObjectFolderOrObjectsList.length === 0
+      projectRootFolder.getChildrenCount() === 0
         ? null
         : globalObjectsRootFolderId,
       sceneObjectsRootFolderId,

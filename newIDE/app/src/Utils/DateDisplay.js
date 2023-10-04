@@ -9,7 +9,7 @@ export const getRelativeOrAbsoluteDisplayDate = (
 ): React.Node => {
   const nowAsNumber = Date.now();
   if (nowAsNumber - dateAsNumber < 60 * 1000) {
-    return i18n._(t`Now`);
+    return i18n._(t`Just now`);
   }
   const now = new Date(nowAsNumber);
   const date = new Date(dateAsNumber);

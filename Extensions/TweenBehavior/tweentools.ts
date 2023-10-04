@@ -21,11 +21,9 @@ namespace gdjs {
         toValue: float,
         weighting: float
       ) => {
-        const easingFunction = gdjs.TweenRuntimeBehavior.easingFunctions.hasOwnProperty(
-          easingValue
-        )
-          ? gdjs.TweenRuntimeBehavior.easingFunctions[easingValue]
-          : shifty.Tweenable.formulas.linear;
+        const easingFunction = easingFunctions.hasOwnProperty(easingValue)
+          ? easingFunctions[easingValue]
+          : easingFunctions.linear;
         return fromValue + (toValue - fromValue) * easingFunction(weighting);
       };
 

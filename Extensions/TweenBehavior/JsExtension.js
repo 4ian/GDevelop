@@ -95,7 +95,7 @@ module.exports = {
       .addParameter('expression', _('Weighting'))
       .setParameterLongDescription(_('From 0 to 1.'))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.ease');
 
@@ -122,7 +122,7 @@ module.exports = {
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setHidden()
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber');
 
@@ -147,7 +147,7 @@ module.exports = {
       .addParameter('expression', _('Duration'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber2');
 
@@ -171,7 +171,7 @@ module.exports = {
       .addParameter('expression', _('Duration'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCamera');
 
@@ -194,7 +194,7 @@ module.exports = {
       .addParameter('expression', _('Duration'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraZoom');
 
@@ -217,7 +217,7 @@ module.exports = {
       .addParameter('expression', _('Duration'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraRotation');
 
@@ -234,7 +234,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenExists');
 
@@ -251,7 +251,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenIsPlaying');
 
@@ -268,7 +268,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenHasFinished');
 
@@ -285,7 +285,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.pauseSceneTween');
 
@@ -303,7 +303,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .addParameter('yesorno', _('Jump to the end'), '', false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.stopSceneTween');
 
@@ -320,7 +320,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.resumeSceneTween');
 
@@ -339,7 +339,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.removeSceneTween');
 
@@ -377,7 +377,7 @@ module.exports = {
         tweenBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
 
     // Behavior related

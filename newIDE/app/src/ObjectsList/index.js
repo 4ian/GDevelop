@@ -37,6 +37,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
   enumerateFoldersInContainer,
   enumerateFoldersInFolder,
+  getFoldersAscendanceWithoutRootFolder,
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
@@ -1116,6 +1117,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectObjectFolderOrObjectWithContext(
           newObjectFolderOrObjectWithContext
         );
+        const itemsToOpen = getFoldersAscendanceWithoutRootFolder(
+          newObjectFolderOrObjectWithContext.objectFolderOrObject
+        ).map(folder =>
+          getTreeViewItemId({
+            objectFolderOrObject: folder,
+            global: newObjectFolderOrObjectWithContext.global,
+          })
+        );
+        itemsToOpen.push(
+          newObjectFolderOrObjectWithContext.global
+            ? globalObjectsRootFolderId
+            : sceneObjectsRootFolderId
+        );
+        if (treeViewRef.current) treeViewRef.current.openItems(itemsToOpen);
+
         editName(newObjectFolderOrObjectWithContext);
         forceUpdateList();
       },

@@ -62,3 +62,12 @@ export const getObjectsInFolder = (
     return child.getObject();
   }).filter(Boolean);
 };
+
+export const getFoldersAscendanceWithoutRootFolder = (
+  objectFolderOrObject: gdObjectFolderOrObject
+): gdObjectFolderOrObject[] => {
+  if (objectFolderOrObject.isRootFolder()) return [];
+  const parent = objectFolderOrObject.getParent();
+  if (parent.isRootFolder()) return [];
+  return [parent, ...getFoldersAscendanceWithoutRootFolder(parent)];
+};

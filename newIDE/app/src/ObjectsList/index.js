@@ -667,8 +667,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         forceUpdateList();
         editName(newObjectFolderOrObjectWithContext);
+        selectObjectFolderOrObjectWithContext(
+          newObjectFolderOrObjectWithContext
+        );
       },
-      [addSerializedObjectToObjectsContainer, editName, forceUpdateList]
+      [
+        addSerializedObjectToObjectsContainer,
+        editName,
+        forceUpdateList,
+        selectObjectFolderOrObjectWithContext,
+      ]
     );
 
     const rename = React.useCallback(

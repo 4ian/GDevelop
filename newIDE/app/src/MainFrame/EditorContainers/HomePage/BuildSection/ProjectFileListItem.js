@@ -3,10 +3,7 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 
 import Text from '../../../../UI/Text';
 import { Line, Column, Spacer } from '../../../../UI/Grid';
@@ -45,8 +42,6 @@ const path = optionalRequire('path');
 const styles = {
   listItem: {
     padding: 0,
-    marginTop: 2,
-    marginBottom: 2,
     borderRadius: 8,
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
@@ -55,6 +50,9 @@ const styles = {
   avatar: {
     width: 20,
     height: 20,
+  },
+  mobileIconContainer: {
+    marginTop: 4, // To align with project title.
   },
 };
 
@@ -200,12 +198,6 @@ const getStorageProviderByInternalName = (
   );
 };
 
-const useStylesForListItemIcon = makeStyles({
-  root: {
-    minWidth: 0,
-  },
-});
-
 type ProjectFileListItemProps = {|
   file: FileMetadataAndStorageProviderName,
   currentFileMetadata: ?FileMetadata,
@@ -226,7 +218,6 @@ export const ProjectFileListItem = ({
   hideDeleteContextMenuAction,
 }: ProjectFileListItemProps) => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
-  const iconClasses = useStylesForListItemIcon();
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
   const { navigateToRoute } = React.useContext(RouterContext);
   const [pendingProject, setPendingProject] = React.useState<?string>(null);
@@ -369,114 +360,99 @@ export const ProjectFileListItem = ({
             onContextMenu={event => openContextMenu(event, file)}
             {...longTouchForContextMenuProps}
           >
-            <>
-              {storageProvider &&
-                storageProvider.renderIcon &&
-                !isWindowWidthMediumOrLarger && (
-                  <ListItemAvatar
-                    classes={iconClasses}
-                    style={{
-                      marginTop: 8,
-                      alignSelf: 'flex-start',
+            {isWindowWidthMediumOrLarger ? (
+              <LineStackLayout justifyContent="flex-start" expand>
+                <Column expand>
+                  <Line noMargin alignItems="center">
+                    {storageProvider && storageProvider.renderIcon && (
+                      <>
+                        {storageProvider.renderIcon({
+                          size: 'small',
+                        })}
+                        <Spacer />
+                      </>
+                    )}
+                    <Text noMargin>
+                      {file.fileMetadata.name || (
+                        <PrettyBreakablePath
+                          path={file.fileMetadata.fileIdentifier}
+                        />
+                      )}
+                    </Text>
+
+                    {pendingProject === file.fileMetadata.fileIdentifier && (
+                      <>
+                        <Spacer />
+                        <CircularProgress size={16} />
+                      </>
+                    )}
+                  </Line>
+                </Column>
+                <Column expand>
+                  <Text noMargin>
+                    {storageProvider ? i18n._(storageProvider.name) : ''}
+                  </Text>
+                </Column>
+                <Column expand>
+                  <ListItemLastModification
+                    file={file}
+                    lastModifiedInfo={lastModifiedInfo}
+                    storageProvider={storageProvider}
+                    authenticatedUser={authenticatedUser}
+                    currentFileMetadata={currentFileMetadata}
+                  />
+                </Column>
+                <ListItemSecondaryAction>
+                  <IconButton
+                    size="small"
+                    edge="end"
+                    aria-label="menu"
+                    onClick={event => {
+                      // prevent triggering the click on the list item.
+                      event.stopPropagation();
+                      openContextMenu(event, file);
                     }}
                   >
-                    {storageProvider.renderIcon({
-                      size: 'small',
-                    })}
-                  </ListItemAvatar>
-                )}
-              {isWindowWidthMediumOrLarger ? (
-                <LineStackLayout justifyContent="flex-start" expand>
-                  <Column expand>
-                    <Line noMargin alignItems="center">
-                      {storageProvider && storageProvider.renderIcon && (
-                        <>
-                          {storageProvider.renderIcon({
-                            size: 'small',
-                          })}
-                          <Spacer />
-                        </>
-                      )}
-                      <Text noMargin>
-                        {file.fileMetadata.name || (
-                          <PrettyBreakablePath
-                            path={file.fileMetadata.fileIdentifier}
-                          />
-                        )}
-                      </Text>
-
-                      {pendingProject === file.fileMetadata.fileIdentifier && (
-                        <>
-                          <Spacer />
-                          <CircularProgress size={16} />
-                        </>
-                      )}
-                    </Line>
-                  </Column>
-                  <Column expand>
+                    <ThreeDotsMenu />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </LineStackLayout>
+            ) : (
+              <Column expand>
+                <LineStackLayout alignItems="start">
+                  {storageProvider && storageProvider.renderIcon && (
+                    <Column noMargin>
+                      <div style={styles.mobileIconContainer}>
+                        {storageProvider.renderIcon({
+                          size: 'small',
+                        })}
+                      </div>
+                    </Column>
+                  )}
+                  <Column noMargin>
                     <Text noMargin>
-                      {storageProvider ? i18n._(storageProvider.name) : ''}
+                      {file.fileMetadata.name || (
+                        <PrettyBreakablePath
+                          path={file.fileMetadata.fileIdentifier}
+                        />
+                      )}
                     </Text>
-                  </Column>
-                  <Column expand>
+
                     <ListItemLastModification
                       file={file}
                       lastModifiedInfo={lastModifiedInfo}
                       storageProvider={storageProvider}
                       authenticatedUser={authenticatedUser}
                       currentFileMetadata={currentFileMetadata}
+                      textColor="secondary"
                     />
                   </Column>
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      size="small"
-                      edge="end"
-                      aria-label="menu"
-                      onClick={event => {
-                        // prevent triggering the click on the list item.
-                        event.stopPropagation();
-                        openContextMenu(event, file);
-                      }}
-                    >
-                      <ThreeDotsMenu />
-                    </IconButton>
-                  </ListItemSecondaryAction>
+                  {pendingProject === file.fileMetadata.fileIdentifier && (
+                    <CircularProgress size={24} />
+                  )}
                 </LineStackLayout>
-              ) : (
-                <Column expand>
-                  <Line
-                    noMargin
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <ListItemText
-                      primary={
-                        file.fileMetadata.name || (
-                          <PrettyBreakablePath
-                            path={file.fileMetadata.fileIdentifier}
-                          />
-                        )
-                      }
-                      secondary={
-                        <ListItemLastModification
-                          file={file}
-                          lastModifiedInfo={lastModifiedInfo}
-                          storageProvider={storageProvider}
-                          authenticatedUser={authenticatedUser}
-                          currentFileMetadata={currentFileMetadata}
-                          textColor="secondary"
-                        />
-                      }
-                      onContextMenu={event => openContextMenu(event, file)}
-                      {...longTouchForContextMenuProps}
-                    />
-                    {pendingProject === file.fileMetadata.fileIdentifier && (
-                      <CircularProgress size={24} />
-                    )}
-                  </Line>
-                </Column>
-              )}
-            </>
+              </Column>
+            )}
           </ListItem>
           <ContextMenu
             ref={contextMenu}

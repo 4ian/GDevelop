@@ -123,7 +123,6 @@ module.exports = {
       .setHidden()
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber');
 
@@ -149,7 +148,6 @@ module.exports = {
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber2');
 
@@ -174,7 +172,6 @@ module.exports = {
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCamera');
 
@@ -198,7 +195,6 @@ module.exports = {
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraZoom');
 
@@ -222,7 +218,6 @@ module.exports = {
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraRotation');
 
@@ -240,7 +235,6 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenExists');
 
@@ -258,7 +252,6 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenIsPlaying');
 
@@ -276,7 +269,6 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenHasFinished');
 
@@ -294,7 +286,6 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.pauseSceneTween');
 
@@ -313,7 +304,6 @@ module.exports = {
       .addParameter('yesorno', _('Jump to the end'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.stopSceneTween');
 
@@ -331,7 +321,6 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.resumeSceneTween');
 
@@ -351,7 +340,6 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.removeSceneTween');
 
@@ -390,7 +378,6 @@ module.exports = {
         new gd.BehaviorsSharedData()
       )
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
 
     // Behavior related

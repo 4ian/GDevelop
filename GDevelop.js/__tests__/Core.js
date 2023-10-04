@@ -4,7 +4,18 @@ const {
   makeFakeAbstractFileSystem,
 } = require('../TestUtils/FakeAbstractFileSystem');
 const extend = require('extend');
-const { mapFor } = require('../../newIDE/app/src/Utils/MapFor.js');
+
+const mapFor = /*:: <T> */ (
+  start /*: number */,
+  end /*: number */,
+  func /*: (number) => T */
+) /*: Array<T> */ => {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(func(i));
+  }
+  return result;
+};
 
 describe('libGD.js', function () {
   let gd = null;

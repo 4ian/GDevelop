@@ -878,9 +878,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         if (!answer) return;
 
-        if (treeViewRef.current)
-          treeViewRef.current.openItems([globalObjectsRootFolderId]);
-
         // It's safe to call moveObjectFolderOrObjectToAnotherContainerInFolder because
         // it does not invalidate the references to the object in memory - so other editors
         // like InstancesRenderer can continue to work.
@@ -1136,10 +1133,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
         folder: gdObjectFolderOrObject
       ) => {
-        const {
-          objectFolderOrObject,
-          global,
-        } = objectFolderOrObjectWithContext;
+        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         if (folder === objectFolderOrObject.getParent()) return;
         objectFolderOrObject
           .getParent()
@@ -1149,13 +1143,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             0
           );
         onObjectModified(true);
-        if (treeViewRef.current)
-          treeViewRef.current.openItems([
-            getTreeViewItemId({
-              objectFolderOrObject: folder,
-              global,
-            }),
-          ]);
       },
       [onObjectModified]
     );

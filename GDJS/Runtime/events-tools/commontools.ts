@@ -262,7 +262,7 @@ namespace gdjs {
       };
 
       /**
-       * Runs a linear interpolation between a and b.
+       * Return a linear interpolation between a and b.
        * @param a Start value.
        * @param b End value.
        * @param x The interpolation value between 0 and 1.
@@ -273,11 +273,11 @@ namespace gdjs {
       };
 
       /**
-       * Runs a linear interpolation between a and b.
-       * @param a Start value.
-       * @param b End value.
-       * @param x The interpolation value between 0 and 1.
-       * @returns The interpolated value, now between a and b.
+       * Return an exponential interpolation between `start` and `end`.
+       * @param start Start value.
+       * @param end End value.
+       * @param progress The interpolation value between 0 and 1.
+       * @returns The interpolated value.
        */
       export const exponentialInterpolation = (
         start: float,

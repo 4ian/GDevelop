@@ -820,7 +820,7 @@ namespace gdjs {
      * @returns Progress of playing tween animation (between 0.0 and 1.0)
      */
     getProgress(identifier: string): float {
-      return this._tweens[identifier].getProgress();
+      return this._tweens.getProgress(identifier);
     }
 
     onDeActivate() {
@@ -896,29 +896,35 @@ namespace gdjs {
       easeTo: shifty.Tweenable.formulas.easeTo,
     };
 
+    /**
+     * A tween manager that is used for layout tweens or object tweens.
+     * @ignore
+     */
     export class TweenManager {
+      /**
+       * All the tweens of a layout or a behavior.
+       */
       private _tweens = new Map<string, TweenRuntimeBehavior.TweenInstance>();
+      /**
+       * Allow fast iteration on tween that are active.
+       */
       private _activeTweens = new Array<TweenRuntimeBehavior.TweenInstance>();
 
-      /**
-       * @param instanceContainer The instance container the behavior belongs to.
-       */
       constructor() {}
 
-      updateFromBehaviorData(
-        oldBehaviorData: BehaviorData,
-        newBehaviorData: BehaviorData
-      ): boolean {
-        // Nothing to update.
-        return true;
-      }
-
+      /**
+       * Make all active tween step toward the end.
+       * @param timeDelta the duration from the previous step in seconds
+       */
       step(timeDelta: float): void {
         for (const tween of this._activeTweens) {
           tween.step(timeDelta);
         }
       }
 
+      /**
+       * Add a tween on one value.
+       */
       addSimpleTween(
         identifier: string,
         totalDuration: number,
@@ -949,6 +955,9 @@ namespace gdjs {
         this._addActiveTween(tween);
       }
 
+      /**
+       * Add a tween on several values.
+       */
       addMultiTween(
         identifier: string,
         totalDuration: number,
@@ -1084,6 +1093,10 @@ namespace gdjs {
       }
     }
 
+    /**
+     * An interpolation function.
+     * @ignore
+     */
     export type Interpolation = (
       from: float,
       to: float,
@@ -1093,7 +1106,7 @@ namespace gdjs {
     const noEffect = () => {};
 
     /**
-     * A tween being played in a behavior.
+     * A tween.
      * @ignore
      */
     export interface TweenInstance {
@@ -1107,7 +1120,7 @@ namespace gdjs {
     }
 
     /**
-     * A tween being played in a behavior.
+     * A tween.
      * @ignore
      */
     export abstract class AbstractTweenInstance implements TweenInstance {
@@ -1167,7 +1180,7 @@ namespace gdjs {
     }
 
     /**
-     * A tween being played in a behavior.
+     * A tween with only one value.
      * @ignore
      */
     export class SimpleTweenInstance extends AbstractTweenInstance {
@@ -1212,7 +1225,7 @@ namespace gdjs {
     }
 
     /**
-     * A tween being played in a behavior.
+     * A tween with multiple values.
      * @ignore
      */
     export class MultiTweenInstance extends AbstractTweenInstance {

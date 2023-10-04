@@ -54,6 +54,7 @@ const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
 const globalObjectsEmptyPlaceholderId = 'global-empty-placeholder';
+const sceneObjectsEmptyPlaceholderId = 'scene-empty-placeholder';
 
 const globalObjectsWikiLink = getHelpLink(
   '/interface/scene-editor/global-objects/',
@@ -70,18 +71,18 @@ const styles = {
   autoSizer: { width: '100%' },
 };
 
-export type RootFolder = {|
-  +label: string,
-  +children: ?Array<ObjectWithContext>,
-  +objectFolderOrObject: gdObjectFolderOrObject,
-  +global: boolean,
-  +isRoot: true,
-  +id: string,
-|};
-
 export type EmptyPlaceholder = {|
   +label: string,
   +isPlaceholder: true,
+  +id: string,
+|};
+
+type RootFolder = {|
+  +label: string,
+  +children: ?Array<EmptyPlaceholder>,
+  +objectFolderOrObject: gdObjectFolderOrObject,
+  +global: boolean,
+  +isRoot: true,
   +id: string,
 |};
 
@@ -771,7 +772,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 ? [
                     {
                       label: i18n._(t`Start by adding a new object.`),
-                      id: 'scene-empty-placeholder',
+                      id: sceneObjectsEmptyPlaceholderId,
                       isPlaceholder: true,
                     },
                   ]
@@ -1480,7 +1481,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       onSelectItems={items => {
                         if (!items) selectObjectFolderOrObjectWithContext(null);
                         const itemToSelect = items[0];
-                        if ('isRoot' in itemToSelect) return;
+                        if (itemToSelect.isRoot) return;
                         selectObjectFolderOrObjectWithContext(
                           itemToSelect || null
                         );

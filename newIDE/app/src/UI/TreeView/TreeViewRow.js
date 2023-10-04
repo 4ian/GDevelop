@@ -22,7 +22,8 @@ import { dataObjectToProps } from '../../Utils/HTMLDataset';
 const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
-const DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION = 1000;
+const DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION_ON_DESKTOP = 1000;
+const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
 
 const onInputKeyDown = (event: KeyboardEvent) => {
   if (navigationKeys.includes(event.key)) {
@@ -155,7 +156,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 
   const longTouchForContextMenuProps = useLongTouch(openContextMenu, {
-    delay: 1000,
+    delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
   });
 
   const onClick = React.useCallback(
@@ -213,7 +214,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         if (!hasDelayPassedBeforeEditingName) {
           const timeoutId = setTimeout(() => {
             setHasDelayPassedBeforeEditingName(true);
-          }, DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION);
+          }, DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION_ON_DESKTOP);
           return () => clearTimeout(timeoutId);
         }
       } else {

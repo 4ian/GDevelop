@@ -21,7 +21,7 @@ import {
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
-import { type RootFolder, type EmptyPlaceholder } from '../ObjectsList';
+import { type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -40,7 +40,25 @@ const styles = {
   },
 };
 
+type RootFolder = {|
+  +label: string,
+  +children: GroupWithContextList | Array<EmptyPlaceholder>,
+  +isRoot: true,
+  +id: string,
+|};
+
 type TreeViewItem = GroupWithContext | RootFolder | EmptyPlaceholder;
+
+const getGlobalGroupsEmptyPlaceholder = (i18n: I18nType): EmptyPlaceholder => ({
+  label: i18n._(t`There is no global group yet.`),
+  id: globalGroupsEmptyPlaceholderId,
+  isPlaceholder: true,
+});
+const getSceneGroupsEmptyPlaceholder = (i18n: I18nType): EmptyPlaceholder => ({
+  label: i18n._(t`Start by adding a new group.`),
+  id: 'scene-empty-placeholder',
+  isPlaceholder: true,
+});
 
 const getGroupWithContextName = (groupWithContext: GroupWithContext): string =>
   groupWithContext.group.getName();
@@ -485,13 +503,8 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               globalObjectGroupsList.length > 0
                 ? globalObjectGroupsList
-                : [
-                    {
-                      label: i18n._(t`There is no global group yet.`),
-                      id: globalGroupsEmptyPlaceholderId,
-                      isPlaceholder: true,
-                    },
-                  ],
+                : // $FlowFixMe
+                  [getGlobalGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
             id: globalGroupsRootFolderId,
           },
@@ -500,18 +513,13 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               objectGroupsList.length > 0
                 ? objectGroupsList
-                : [
-                    {
-                      label: i18n._(t`Start by adding a new group.`),
-                      id: 'scene-empty-placeholder',
-                      isPlaceholder: true,
-                    },
-                  ],
+                : // $FlowFixMe
+                  [getSceneGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
             id: sceneGroupsRootFolderId,
           },
         ];
-        // $FlowFixMe
+
         return treeViewItems;
       },
       [globalObjectGroups, objectGroups]
@@ -542,7 +550,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
               const initiallyOpenedNodeIds = [
                 globalRootItem.isRoot &&
                 globalRootItem.children.length === 1 &&
-                'isPlaceholder' in globalRootItem.children[0]
+                globalRootItem.children[0].isPlaceholder
                   ? null
                   : globalGroupsRootFolderId,
                 sceneGroupsRootFolderId,
@@ -571,10 +579,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         onSelectItems={items => {
                           if (!items) setSelectedGroupWithContext(null);
                           const itemToSelect = items[0];
-                          if (
-                            'isRoot' in itemToSelect ||
-                            'isPlaceholder' in itemToSelect
-                          )
+                          if (itemToSelect.isRoot || itemToSelect.isPlaceholder)
                             return;
                           setSelectedGroupWithContext(itemToSelect || null);
                         }}

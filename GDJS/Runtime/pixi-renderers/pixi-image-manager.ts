@@ -95,7 +95,7 @@ namespace gdjs {
     setResources(resourceDataArray: ResourceData[]): void {
       this._resources.clear();
       for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'image') {
+        if (resourceData.kind === 'image' || resourceData.kind === 'video') {
           this._resources.set(resourceData.name, resourceData);
         }
       }

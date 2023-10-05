@@ -175,11 +175,11 @@ namespace gdjs {
             config: {
               accel: 0,
               // Angle of the spray cone
-              minStart: gdjs.toRad(-objectData.emitterAngleB / 2.0),
-              maxStart: gdjs.toRad(objectData.emitterAngleB / 2.0),
+              minStart: -objectData.emitterAngleB / 2.0,
+              maxStart: objectData.emitterAngleB / 2.0,
               // Rotation speed of the particles
-              maxSpeed: gdjs.toRad(objectData.particleAngle2),
-              minSpeed: gdjs.toRad(objectData.particleAngle1),
+              maxSpeed: objectData.particleAngle2,
+              minSpeed: objectData.particleAngle1,
             },
           },
           {

@@ -139,7 +139,40 @@ namespace gdjs {
         );
       };
 
+      /**
+       * @deprecated Use tweenCamera2 instead.
+       */
       export const tweenCamera = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toX: number,
+        toY: number,
+        layerName: string,
+        duration: number,
+        easing: string
+      ) => {
+        tweenCamera2(
+          runtimeScene,
+          identifier,
+          toX,
+          toY,
+          layerName,
+          duration / 1000,
+          easing
+        );
+      };
+
+      /**
+       * Tween a layer camera position.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param toX The targeted position on X axis
+       * @param toY The targeted position on Y axis
+       * @param layerName The name of the layer to move
+       * @param duration Duration in seconds
+       * @param easing Easing function identifier
+       */
+      export const tweenCamera2 = (
         runtimeScene: RuntimeScene,
         identifier: string,
         toX: number,
@@ -151,7 +184,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         getTweensMap(runtimeScene).addMultiTween(
           identifier,
-          duration / 1000,
+          duration,
           easing,
           linearInterpolation,
           [layer.getCameraX(), layer.getCameraY()],
@@ -163,6 +196,9 @@ namespace gdjs {
         );
       };
 
+      /**
+       * @deprecated Use tweenCameraZoom2 instead.
+       */
       export const tweenCameraZoom = (
         runtimeScene: RuntimeScene,
         identifier: string,
@@ -175,6 +211,35 @@ namespace gdjs {
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
           duration / 1000,
+          easing,
+          linearInterpolation,
+          layer.getCameraZoom(),
+          toZoom,
+          (value: float) => layer.setCameraZoom(value)
+        );
+      };
+
+      /**
+       * Tween a layer camera zoom factor.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param toZoom The targeted zoom factor
+       * @param layerName The name of the layer to zoom
+       * @param duration Duration in seconds
+       * @param easing Easing function identifier
+       */
+      export const tweenCameraZoom2 = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toZoom: number,
+        layerName: string,
+        duration: number,
+        easing: string
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          duration,
           easing,
           exponentialInterpolation,
           layer.getCameraZoom(),
@@ -191,10 +256,37 @@ namespace gdjs {
         duration: number,
         easing: string
       ) => {
+        tweenCameraRotation2(
+          runtimeScene,
+          identifier,
+          toRotation,
+          layerName,
+          duration / 1000,
+          easing
+        );
+      };
+
+      /**
+       * Tween a layer camera rotation angle.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param toRotation The targeted angle in degrees
+       * @param layerName The name of the layer to rotate
+       * @param duration Duration in seconds
+       * @param easing Easing function identifier
+       */
+      export const tweenCameraRotation2 = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toRotation: number,
+        layerName: string,
+        duration: number,
+        easing: string
+      ) => {
         const layer = runtimeScene.getLayer(layerName);
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
-          duration / 1000,
+          duration,
           easing,
           linearInterpolation,
           layer.getCameraRotation(),

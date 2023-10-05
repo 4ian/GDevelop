@@ -3,44 +3,36 @@ GDevelop - Tween Behavior Extension
 Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-  interface IScaleable extends RuntimeObject {
-    setScaleX(x: number): void;
-    setScaleY(y: number): void;
-    getScaleX(): number;
-    getScaleY(): number;
-  }
-
-  interface IOpaque extends RuntimeObject {
-    setOpacity(opacity: number): void;
-    getOpacity(): number;
-  }
-
-  interface IColorable extends RuntimeObject {
+  interface IColorable extends gdjs.RuntimeObject {
     setColor(color: string): void;
     getColor(): string;
   }
 
-  interface ICharacterScaleable extends RuntimeObject {
+  interface ICharacterScalable extends gdjs.RuntimeObject {
     setCharacterSize(characterSize: number): void;
     getCharacterSize(): number;
   }
 
-  function isScaleable(o: RuntimeObject): o is IScaleable {
+  function isScalable(
+    o: gdjs.RuntimeObject
+  ): o is gdjs.RuntimeObject & gdjs.Scalable {
     //@ts-ignore We are checking if the methods are present.
     return o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY;
   }
 
-  function isOpaque(o: RuntimeObject): o is IOpaque {
+  function isOpaque(
+    o: gdjs.RuntimeObject
+  ): o is gdjs.RuntimeObject & gdjs.OpacityHandler {
     //@ts-ignore We are checking if the methods are present.
     return o.setOpacity && o.getOpacity;
   }
 
-  function isColorable(o: RuntimeObject): o is IColorable {
+  function isColorable(o: gdjs.RuntimeObject): o is IColorable {
     //@ts-ignore We are checking if the methods are present.
     return o.setColor && o.getColor;
   }
 
-  function isCharacterScaleable(o: RuntimeObject): o is ICharacterScaleable {
+  function isCharacterScalable(o: gdjs.RuntimeObject): o is ICharacterScalable {
     //@ts-ignore We are checking if the methods are present.
     return o.setCharacterSize && o.getCharacterSize;
   }
@@ -189,6 +181,7 @@ namespace gdjs {
 
     /**
      * Tween an object position.
+     * @deprecated Use addObjectPositionTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param toY The target Y position
@@ -197,6 +190,33 @@ namespace gdjs {
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
      */
     addObjectPositionTween(
+      identifier: string,
+      toX: number,
+      toY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this.addObjectPositionTween2(
+        identifier,
+        toX,
+        toY,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object position.
+     * @param identifier Unique id to identify the tween
+     * @param toX The target X position
+     * @param toY The target Y position
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectPositionTween2(
       identifier: string,
       toX: number,
       toY: number,
@@ -218,6 +238,7 @@ namespace gdjs {
 
     /**
      * Tween an object X position.
+     * @deprecated Use addObjectPositionXTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param easing Easing function identifier
@@ -231,9 +252,33 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this.addObjectPositionXTween2(
+        identifier,
+        toX,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object X position.
+     * @param identifier Unique id to identify the tween
+     * @param toX The target X position
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectPositionXTween2(
+      identifier: string,
+      toX: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
       this._tweens.addSimpleTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         this.owner.getX(),
@@ -245,6 +290,7 @@ namespace gdjs {
 
     /**
      * Tween an object Y position.
+     * @deprecated Use addObjectPositionYTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toY The target Y position
      * @param easing Easing function identifier
@@ -258,9 +304,33 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this.addObjectPositionYTween2(
+        identifier,
+        toY,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object Y position.
+     * @param identifier Unique id to identify the tween
+     * @param toY The target Y position
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectPositionYTween2(
+      identifier: string,
+      toY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
       this._tweens.addSimpleTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         this.owner.getY(),
@@ -272,6 +342,7 @@ namespace gdjs {
 
     /**
      * Tween an object Z position.
+     * @deprecated Use the 3D Tween extension instead.
      * @param identifier Unique id to identify the tween
      * @param toZ The target Z position
      * @param easing Easing function identifier
@@ -302,6 +373,7 @@ namespace gdjs {
 
     /**
      * Tween an object angle.
+     * @deprecated Use addObjectAngleTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toAngle The target angle
      * @param easing Easing function identifier
@@ -315,9 +387,33 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this.addObjectAngleTween2(
+        identifier,
+        toAngle,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object angle.
+     * @param identifier Unique id to identify the tween
+     * @param toAngle The target angle
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectAngleTween2(
+      identifier: string,
+      toAngle: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
       this._tweens.addSimpleTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         this.owner.getAngle(),
@@ -329,6 +425,7 @@ namespace gdjs {
 
     /**
      * Tween an object scale.
+     * @deprecated Use addObjectScaleTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param toScaleY The target Y-scale
@@ -346,9 +443,8 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      // Cast to IScaleable
       const owner = this.owner;
-      if (!isScaleable(owner)) return;
+      if (!isScalable(owner)) return;
 
       if (toScaleX < 0) toScaleX = 0;
       if (toScaleY < 0) toScaleY = 0;
@@ -368,20 +464,69 @@ namespace gdjs {
 
       this._tweens.addMultiTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
-        exponentialInterpolation,
-
+        linearInterpolation,
         [owner.getScaleX(), owner.getScaleY()],
         [toScaleX, toScaleY],
         setValue,
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
 
+    /**
+     * Tween an object scale.
+     * @param identifier Unique id to identify the tween
+     * @param toScaleX The target X-scale
+     * @param toScaleY The target Y-scale
+     * @param easing Easing function identifier
+     * @param duration Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
+     */
+    addObjectScaleTween2(
+      identifier: string,
+      toScaleX: number,
+      toScaleY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
+    ) {
+      const owner = this.owner;
+      if (!isScalable(owner)) return;
+
+      if (toScaleX < 0) toScaleX = 0;
+      if (toScaleY < 0) toScaleY = 0;
+
+      const setValue = scaleFromCenterOfObject
+        ? ([scaleX, scaleY]: float[]) => {
+            const oldX = owner.getCenterXInScene();
+            const oldY = owner.getCenterYInScene();
+            owner.setScaleX(scaleX);
+            owner.setScaleY(scaleY);
+            owner.setCenterPositionInScene(oldX, oldY);
+          }
+        : ([scaleX, scaleY]: float[]) => {
+            owner.setScaleX(scaleX);
+            owner.setScaleY(scaleY);
+          };
+
+      this._tweens.addMultiTween(
+        identifier,
+        duration,
+        easing,
+        exponentialInterpolation,
+        [owner.getScaleX(), owner.getScaleY()],
+        [toScaleX, toScaleY],
+        setValue,
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
 
     /**
      * Tween an object X-scale.
+     * @deprecated Use addObjectScaleXTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param easing Easing function identifier
@@ -397,9 +542,8 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      // Cast to IScaleable
       const owner = this.owner;
-      if (!isScaleable(owner)) return;
+      if (!isScalable(owner)) return;
 
       const setValue = scaleFromCenterOfObject
         ? (scaleX: float) => {
@@ -413,6 +557,46 @@ namespace gdjs {
         identifier,
         duration / 1000,
         easing,
+        linearInterpolation,
+        owner.getScaleX(),
+        toScaleX,
+        setValue,
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
+     * Tween an object X-scale.
+     * @param identifier Unique id to identify the tween
+     * @param toScaleX The target X-scale
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
+     */
+    addObjectScaleXTween2(
+      identifier: string,
+      toScaleX: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
+    ) {
+      const owner = this.owner;
+      if (!isScalable(owner)) return;
+
+      const setValue = scaleFromCenterOfObject
+        ? (scaleX: float) => {
+            const oldX = owner.getCenterXInScene();
+            owner.setScaleX(scaleX);
+            owner.setCenterXInScene(oldX);
+          }
+        : (scaleX: float) => owner.setScaleX(scaleX);
+
+      this._tweens.addSimpleTween(
+        identifier,
+        duration,
+        easing,
         exponentialInterpolation,
         owner.getScaleX(),
         toScaleX,
@@ -423,6 +607,7 @@ namespace gdjs {
 
     /**
      * Tween an object Y-scale.
+     * @deprecated Use addObjectPositionYTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toScaleY The target Y-scale
      * @param easing Easing function identifier
@@ -438,9 +623,8 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      // Cast to IScaleable
       const owner = this.owner;
-      if (!isScaleable(owner)) return;
+      if (!isScalable(owner)) return;
 
       const setValue = scaleFromCenterOfObject
         ? (scaleY: float) => {
@@ -454,6 +638,47 @@ namespace gdjs {
         identifier,
         duration / 1000,
         easing,
+        linearInterpolation,
+        owner.getScaleY(),
+        toScaleY,
+        setValue,
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
+     * Tween an object Y-scale.
+     * @deprecated Use addObjectPositionYTween2 instead.
+     * @param identifier Unique id to identify the tween
+     * @param toScaleY The target Y-scale
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
+     */
+    addObjectScaleYTween2(
+      identifier: string,
+      toScaleY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
+    ) {
+      const owner = this.owner;
+      if (!isScalable(owner)) return;
+
+      const setValue = scaleFromCenterOfObject
+        ? (scaleY: float) => {
+            const oldY = owner.getCenterYInScene();
+            owner.setScaleY(scaleY);
+            owner.setCenterYInScene(oldY);
+          }
+        : (scaleY: float) => owner.setScaleY(scaleY);
+
+      this._tweens.addSimpleTween(
+        identifier,
+        duration,
+        easing,
         exponentialInterpolation,
         owner.getScaleY(),
         toScaleY,
@@ -464,6 +689,7 @@ namespace gdjs {
 
     /**
      * Tween an object opacity.
+     * @deprecated Use addObjectOpacityTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toOpacity The target opacity
      * @param easing Easing function identifier
@@ -477,12 +703,36 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this.addObjectOpacityTween2(
+        identifier,
+        toOpacity,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object opacity.
+     * @param identifier Unique id to identify the tween
+     * @param toOpacity The target opacity
+     * @param easing Easing function identifier
+     * @param duration Duration in second
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectOpacityTween2(
+      identifier: string,
+      toOpacity: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
       const owner = this.owner;
       if (!isOpaque(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         owner.getOpacity(),
@@ -494,6 +744,7 @@ namespace gdjs {
 
     /**
      * Tween an object color.
+     * @deprecated Use addObjectColorTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toColorStr The target RGB color (format "128;200;255" with values between 0 and 255 for red, green and blue)
      * @param easing Easing function identifier
@@ -508,6 +759,33 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean,
       useHSLColorTransition: boolean
+    ) {
+      this.addObjectColorTween2(
+        identifier,
+        toColorStr,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished,
+        useHSLColorTransition
+      );
+    }
+
+    /**
+     * Tween an object color.
+     * @param identifier Unique id to identify the tween
+     * @param toColorStr The target RGB color (format "128;200;255" with values between 0 and 255 for red, green and blue)
+     * @param easing Easing function identifier
+     * @param duration Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param useHSLColorTransition Tween using HSL color mappings, rather than direct RGB line
+     */
+    addObjectColorTween2(
+      identifier: string,
+      toColorStr: string,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      useHSLColorTransition: boolean = true
     ) {
       const owner = this.owner;
       if (!isColorable(owner)) {
@@ -549,7 +827,7 @@ namespace gdjs {
 
       this._tweens.addMultiTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         initialValue,
@@ -561,6 +839,7 @@ namespace gdjs {
 
     /**
      * Tween an object HSL color, with the "to" color given using HSL (H: any number, S and L: 0-100).
+     * @deprecated Use addObjectColorHSLTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
      * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
@@ -571,6 +850,39 @@ namespace gdjs {
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
      */
     addObjectColorHSLTween(
+      identifier: string,
+      toHue: number,
+      animateHue: boolean,
+      toSaturation: number,
+      toLightness: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this.addObjectColorHSLTween2(
+        identifier,
+        toHue,
+        animateHue,
+        toSaturation,
+        toLightness,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object HSL color, with the "to" color given using HSL (H: any number, S and L: 0-100).
+     * @param identifier Unique id to identify the tween
+     * @param toHue The target hue, or the same as the from color's hue if blank
+     * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
+     * @param toSaturation The target saturation, or the same as the from color's saturation if blank
+     * @param toHue The target lightness, or the same as the from color's lightness if blank
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectColorHSLTween2(
       identifier: string,
       toHue: number,
       animateHue: boolean,
@@ -603,7 +915,7 @@ namespace gdjs {
 
       this._tweens.addMultiTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
 
@@ -627,6 +939,7 @@ namespace gdjs {
 
     /**
      * Tween a text object character size.
+     * @deprecated Use addTextObjectCharacterSizeTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toSize The target character size
      * @param easing Easing function identifier
@@ -640,12 +953,36 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this.addTextObjectCharacterSizeTween2(
+        identifier,
+        toSize,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween a text object character size.
+     * @param identifier Unique id to identify the tween
+     * @param toSize The target character size
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addTextObjectCharacterSizeTween2(
+      identifier: string,
+      toSize: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
       const owner = this.owner;
-      if (!isCharacterScaleable(owner)) return;
+      if (!isCharacterScalable(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         owner.getCharacterSize(),
@@ -657,6 +994,7 @@ namespace gdjs {
 
     /**
      * Tween an object width.
+     * @deprecated Use addObjectWidthTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toWidth The target width
      * @param easing Easing function identifier
@@ -670,9 +1008,33 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this.addObjectWidthTween2(
+        identifier,
+        toWidth,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object width.
+     * @param identifier Unique id to identify the tween
+     * @param toWidth The target width
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectWidthTween2(
+      identifier: string,
+      toWidth: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
       this._tweens.addSimpleTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         this.owner.getWidth(),
@@ -684,6 +1046,7 @@ namespace gdjs {
 
     /**
      * Tween an object height.
+     * @deprecated Use addObjectHeightTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toHeight The target height
      * @param easing Easing function identifier
@@ -697,9 +1060,33 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this.addObjectHeightTween2(
+        identifier,
+        toHeight,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object height.
+     * @param identifier Unique id to identify the tween
+     * @param toHeight The target height
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectHeightTween2(
+      identifier: string,
+      toHeight: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
       this._tweens.addSimpleTween(
         identifier,
-        duration / 1000,
+        duration,
         easing,
         linearInterpolation,
         this.owner.getHeight(),
@@ -711,6 +1098,7 @@ namespace gdjs {
 
     /**
      * Tween an object depth.
+     * @deprecated Use the 3D Tween extension instead.
      * @param identifier Unique id to identify the tween
      * @param toDepth The target depth
      * @param easing Easing function identifier

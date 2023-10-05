@@ -206,18 +206,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     return this.state.instancesEditorSettings;
   }
 
-  onResourceExternallyChanged = () => {
+  onResourceExternallyChanged = async (resourceInfo: any) => {
+    const { layout, project } = this.props;
+    await PixiResourcesLoader.reloadTextureForResource(project, resourceInfo);
+
     if (this.editorDisplay) {
-      this.editorDisplay.forceUpdateObjectsList()
+      this.editorDisplay.forceUpdateObjectsList();
     }
-    // console.log("SALUT")
-    // const { layout } = this.props;
-    // const objectsCount = layout.getObjectsCount();
-    // for (let index = 0; index < objectsCount; index++) {
-    //   console.log(index)
-    //   this.reloadResourcesFor(layout.getObjectAt(index));
-    // }
-  }
+    {
+      const objectsCount = layout.getObjectsCount();
+      for (let index = 0; index < objectsCount; index++) {
+        if (this.editorDisplay)
+          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            layout.getObjectAt(index).getName()
+          );
+      }
+    }
+    {
+      const objectsCount = project.getObjectsCount();
+      for (let index = 0; index < objectsCount; index++) {
+        if (this.editorDisplay)
+          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            project.getObjectAt(index).getName()
+          );
+      }
+    }
+  };
 
   updateToolbar = () => {
     const { editorDisplay } = this;

@@ -762,21 +762,19 @@ const MainFrame = (props: Props) => {
   );
 
   const informEditorsResourceExternallyChanged = React.useCallback(
-    () => {
+    (resourceInfo) => {
       ResourcesLoader.burstAllUrlsCache();
-      if (state.currentProject)
-        PixiResourcesLoader.burstCache(state.currentProject);
       state.editorTabs.editors.forEach(editor => {
         if (
           editor.editorRef &&
           editor.editorRef.editor &&
           editor.editorRef.editor.onResourceExternallyChanged
         ) {
-          editor.editorRef.editor.onResourceExternallyChanged();
+          editor.editorRef.editor.onResourceExternallyChanged(resourceInfo);
         }
       });
     },
-    [state.editorTabs, state.currentProject]
+    [state.editorTabs]
   );
 
   React.useEffect(

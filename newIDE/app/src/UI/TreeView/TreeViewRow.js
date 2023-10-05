@@ -9,6 +9,7 @@ import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
 import ArrowHeadRight from '../CustomSvgIcons/ArrowHeadRight';
 import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 import './TreeView.css';
 import {
   shouldCloseOrCancel,
@@ -133,7 +134,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   } = data;
   const node = flattenedData[index];
   const left = node.depth * 15;
-  const [isStayingOver, setIsStayingOver] = React.useState<boolean>(false);
+  const forceUpdate = useForceUpdate();
+  const isStayingOverRef = React.useRef<boolean>(false);
   const [
     hasDelayPassedBeforeEditingName,
     setHasDelayPassedBeforeEditingName,
@@ -179,6 +181,16 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onClick, openContextMenu]
   );
 
+  const setIsStayingOver = React.useCallback(
+    (active: boolean) => {
+      if (active !== isStayingOverRef.current) {
+        isStayingOverRef.current = active;
+        forceUpdate();
+      }
+    },
+    [forceUpdate]
+  );
+
   /**
    * Effect that opens the node if the user is dragging another node and stays
    * over the node.
@@ -186,7 +198,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   React.useEffect(
     () => {
       if (
-        isStayingOver &&
+        isStayingOverRef.current &&
         !openWhenOverTimeoutId.current &&
         node.canHaveChildren &&
         node.collapsed
@@ -200,7 +212,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         };
       }
     },
-    [isStayingOver, onOpen, node]
+    // We want to have isStayingOverRef.current as dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onOpen, node, forceUpdate, isStayingOverRef.current]
   );
 
   /**

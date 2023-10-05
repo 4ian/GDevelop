@@ -32,8 +32,7 @@ namespace gdjs {
         (runtimeScene._tweens = new gdjs.TweenRuntimeBehavior.TweenManager());
 
       gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
-        const timeDelta = runtimeScene.getElapsedTime() / 1000;
-        gdjs.evtTools.tween.getTweensMap(runtimeScene).step(timeDelta);
+        gdjs.evtTools.tween.getTweensMap(runtimeScene).step();
       });
 
       export const sceneTweenExists = (
@@ -108,6 +107,7 @@ namespace gdjs {
       ) => {
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
+          runtimeScene,
           duration / 1000,
           easing,
           linearInterpolation,
@@ -130,6 +130,7 @@ namespace gdjs {
         }
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
+          runtimeScene,
           duration / 1000,
           easing,
           linearInterpolation,
@@ -151,14 +152,15 @@ namespace gdjs {
         duration: number,
         easing: string
       ) => {
-        tweenCamera2(
+        _tweenCamera(
           runtimeScene,
           identifier,
           toX,
           toY,
           layerName,
           duration / 1000,
-          easing
+          easing,
+          runtimeScene
         );
       };
 
@@ -182,8 +184,32 @@ namespace gdjs {
         easing: string
       ) => {
         const layer = runtimeScene.getLayer(layerName);
+        _tweenCamera(
+          runtimeScene,
+          identifier,
+          toX,
+          toY,
+          layerName,
+          duration,
+          easing,
+          layer
+        );
+      };
+
+      const _tweenCamera = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toX: number,
+        toY: number,
+        layerName: string,
+        duration: number,
+        easing: string,
+        timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
         getTweensMap(runtimeScene).addMultiTween(
           identifier,
+          timeSource,
           duration,
           easing,
           linearInterpolation,
@@ -207,15 +233,15 @@ namespace gdjs {
         duration: number,
         easing: string
       ) => {
-        const layer = runtimeScene.getLayer(layerName);
-        getTweensMap(runtimeScene).addSimpleTween(
+        _tweenCameraZoom(
+          runtimeScene,
           identifier,
+          toZoom,
+          layerName,
           duration / 1000,
           easing,
-          linearInterpolation,
-          layer.getCameraZoom(),
-          toZoom,
-          (value: float) => layer.setCameraZoom(value)
+          runtimeScene,
+          linearInterpolation
         );
       };
 
@@ -237,11 +263,35 @@ namespace gdjs {
         easing: string
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        getTweensMap(runtimeScene).addSimpleTween(
+        _tweenCameraZoom(
+          runtimeScene,
           identifier,
+          toZoom,
+          layerName,
           duration,
           easing,
-          exponentialInterpolation,
+          layer,
+          exponentialInterpolation
+        );
+      };
+
+      const _tweenCameraZoom = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toZoom: number,
+        layerName: string,
+        duration: number,
+        easing: string,
+        timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
+        interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          timeSource,
+          duration,
+          easing,
+          interpolation,
           layer.getCameraZoom(),
           toZoom,
           (value: float) => layer.setCameraZoom(value)
@@ -256,13 +306,14 @@ namespace gdjs {
         duration: number,
         easing: string
       ) => {
-        tweenCameraRotation2(
+        _tweenCameraRotation(
           runtimeScene,
           identifier,
           toRotation,
           layerName,
           duration / 1000,
-          easing
+          easing,
+          runtimeScene
         );
       };
 
@@ -284,8 +335,30 @@ namespace gdjs {
         easing: string
       ) => {
         const layer = runtimeScene.getLayer(layerName);
+        _tweenCameraRotation(
+          runtimeScene,
+          identifier,
+          toRotation,
+          layerName,
+          duration,
+          easing,
+          layer
+        );
+      };
+
+      const _tweenCameraRotation = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toRotation: number,
+        layerName: string,
+        duration: number,
+        easing: string,
+        timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
+          timeSource,
           duration,
           easing,
           linearInterpolation,

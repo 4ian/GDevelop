@@ -101,8 +101,7 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      const timeDelta = this.owner.getElapsedTime() / 1000;
-      this._tweens.step(timeDelta);
+      this._tweens.step();
     }
 
     private _deleteFromScene() {
@@ -137,6 +136,7 @@ namespace gdjs {
     ) {
       this._tweens.addSimpleTween(
         identifier,
+        this.owner.getRuntimeScene(),
         duration / 1000,
         easing,
         linearInterpolation,
@@ -169,6 +169,7 @@ namespace gdjs {
       }
       this._tweens.addSimpleTween(
         identifier,
+        this.owner.getRuntimeScene(),
         duration / 1000,
         easing,
         linearInterpolation,
@@ -197,13 +198,14 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectPositionTween2(
+      this._addObjectPositionTween(
         identifier,
         toX,
         toY,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -224,8 +226,29 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectPositionTween(
+        identifier,
+        toX,
+        toY,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectPositionTween(
+      identifier: string,
+      toX: number,
+      toY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       this._tweens.addMultiTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -252,12 +275,13 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectPositionXTween2(
+      this._addObjectPositionXTween(
         identifier,
         toX,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -276,8 +300,27 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectPositionXTween(
+        identifier,
+        toX,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectPositionXTween(
+      identifier: string,
+      toX: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -304,12 +347,13 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectPositionYTween2(
+      this._addObjectPositionYTween(
         identifier,
         toY,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -328,8 +372,27 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectPositionYTween(
+        identifier,
+        toY,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectPositionYTween(
+      identifier: string,
+      toY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -361,6 +424,7 @@ namespace gdjs {
 
       this._tweens.addSimpleTween(
         identifier,
+        this.owner.getRuntimeScene(),
         duration / 1000,
         easing,
         linearInterpolation,
@@ -387,12 +451,13 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectAngleTween2(
+      this._addObjectAngleTween(
         identifier,
         toAngle,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -411,8 +476,27 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectAngleTween(
+        identifier,
+        toAngle,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectAngleTween(
+      identifier: string,
+      toAngle: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -443,34 +527,16 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      const owner = this.owner;
-      if (!isScalable(owner)) return;
-
-      if (toScaleX < 0) toScaleX = 0;
-      if (toScaleY < 0) toScaleY = 0;
-
-      const setValue = scaleFromCenterOfObject
-        ? ([scaleX, scaleY]: float[]) => {
-            const oldX = owner.getCenterXInScene();
-            const oldY = owner.getCenterYInScene();
-            owner.setScaleX(scaleX);
-            owner.setScaleY(scaleY);
-            owner.setCenterPositionInScene(oldX, oldY);
-          }
-        : ([scaleX, scaleY]: float[]) => {
-            owner.setScaleX(scaleX);
-            owner.setScaleY(scaleY);
-          };
-
-      this._tweens.addMultiTween(
+      this._addObjectScaleTween(
         identifier,
-        duration,
+        toScaleX,
+        toScaleY,
         easing,
-        linearInterpolation,
-        [owner.getScaleX(), owner.getScaleY()],
-        [toScaleX, toScaleY],
-        setValue,
-        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+        duration / 1000,
+        destroyObjectWhenFinished,
+        scaleFromCenterOfObject,
+        this.owner.getRuntimeScene(),
+        linearInterpolation
       );
     }
 
@@ -493,6 +559,30 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
+      this._addObjectScaleTween(
+        identifier,
+        toScaleX,
+        toScaleY,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        scaleFromCenterOfObject,
+        this.owner,
+        exponentialInterpolation
+      );
+    }
+
+    private _addObjectScaleTween(
+      identifier: string,
+      toScaleX: number,
+      toScaleY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
+      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+    ) {
       const owner = this.owner;
       if (!isScalable(owner)) return;
 
@@ -514,9 +604,10 @@ namespace gdjs {
 
       this._tweens.addMultiTween(
         identifier,
+        timeSource,
         duration,
         easing,
-        exponentialInterpolation,
+        interpolation,
         [owner.getScaleX(), owner.getScaleY()],
         [toScaleX, toScaleY],
         setValue,
@@ -542,26 +633,15 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      const owner = this.owner;
-      if (!isScalable(owner)) return;
-
-      const setValue = scaleFromCenterOfObject
-        ? (scaleX: float) => {
-            const oldX = owner.getCenterXInScene();
-            owner.setScaleX(scaleX);
-            owner.setCenterXInScene(oldX);
-          }
-        : (scaleX: float) => owner.setScaleX(scaleX);
-
-      this._tweens.addSimpleTween(
+      this._addObjectScaleXTween(
         identifier,
-        duration / 1000,
-        easing,
-        linearInterpolation,
-        owner.getScaleX(),
         toScaleX,
-        setValue,
-        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished,
+        scaleFromCenterOfObject,
+        this.owner.getRuntimeScene(),
+        linearInterpolation
       );
     }
 
@@ -582,6 +662,28 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
+      this._addObjectScaleXTween(
+        identifier,
+        toScaleX,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        scaleFromCenterOfObject,
+        this.owner,
+        exponentialInterpolation
+      );
+    }
+
+    private _addObjectScaleXTween(
+      identifier: string,
+      toScaleX: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
+      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+    ) {
       const owner = this.owner;
       if (!isScalable(owner)) return;
 
@@ -595,9 +697,10 @@ namespace gdjs {
 
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
-        exponentialInterpolation,
+        interpolation,
         owner.getScaleX(),
         toScaleX,
         setValue,
@@ -607,7 +710,7 @@ namespace gdjs {
 
     /**
      * Tween an object Y-scale.
-     * @deprecated Use addObjectPositionYTween2 instead.
+     * @deprecated Use addObjectScaleYTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toScaleY The target Y-scale
      * @param easing Easing function identifier
@@ -623,32 +726,20 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      const owner = this.owner;
-      if (!isScalable(owner)) return;
-
-      const setValue = scaleFromCenterOfObject
-        ? (scaleY: float) => {
-            const oldY = owner.getCenterYInScene();
-            owner.setScaleY(scaleY);
-            owner.setCenterYInScene(oldY);
-          }
-        : (scaleY: float) => owner.setScaleY(scaleY);
-
-      this._tweens.addSimpleTween(
+      this._addObjectScaleYTween(
         identifier,
-        duration / 1000,
-        easing,
-        linearInterpolation,
-        owner.getScaleY(),
         toScaleY,
-        setValue,
-        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished,
+        scaleFromCenterOfObject,
+        this.owner.getRuntimeScene(),
+        linearInterpolation
       );
     }
 
     /**
      * Tween an object Y-scale.
-     * @deprecated Use addObjectPositionYTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toScaleY The target Y-scale
      * @param easing Easing function identifier
@@ -664,6 +755,28 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
+      this._addObjectScaleYTween(
+        identifier,
+        toScaleY,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        scaleFromCenterOfObject,
+        this.owner,
+        exponentialInterpolation
+      );
+    }
+
+    private _addObjectScaleYTween(
+      identifier: string,
+      toScaleY: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
+      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+    ) {
       const owner = this.owner;
       if (!isScalable(owner)) return;
 
@@ -677,9 +790,10 @@ namespace gdjs {
 
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
-        exponentialInterpolation,
+        interpolation,
         owner.getScaleY(),
         toScaleY,
         setValue,
@@ -703,12 +817,13 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectOpacityTween2(
+      this._addObjectOpacityTween(
         identifier,
         toOpacity,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -727,11 +842,30 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectOpacityTween(
+        identifier,
+        toOpacity,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectOpacityTween(
+      identifier: string,
+      toOpacity: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       const owner = this.owner;
       if (!isOpaque(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -760,13 +894,14 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       useHSLColorTransition: boolean
     ) {
-      this.addObjectColorTween2(
+      this._addObjectColorTween(
         identifier,
         toColorStr,
         easing,
         duration / 1000,
         destroyObjectWhenFinished,
-        useHSLColorTransition
+        useHSLColorTransition,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -786,6 +921,26 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean,
       useHSLColorTransition: boolean = true
+    ) {
+      this._addObjectColorTween(
+        identifier,
+        toColorStr,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        useHSLColorTransition,
+        this.owner
+      );
+    }
+
+    private _addObjectColorTween(
+      identifier: string,
+      toColorStr: string,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      useHSLColorTransition: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
     ) {
       const owner = this.owner;
       if (!isColorable(owner)) {
@@ -827,6 +982,7 @@ namespace gdjs {
 
       this._tweens.addMultiTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -859,7 +1015,7 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectColorHSLTween2(
+      this._addObjectColorHSLTween(
         identifier,
         toHue,
         animateHue,
@@ -867,7 +1023,8 @@ namespace gdjs {
         toLightness,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -892,6 +1049,30 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectColorHSLTween(
+        identifier,
+        toHue,
+        animateHue,
+        toSaturation,
+        toLightness,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectColorHSLTween(
+      identifier: string,
+      toHue: number,
+      animateHue: boolean,
+      toSaturation: number,
+      toLightness: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       if (!isColorable(this.owner)) return;
       const owner = this.owner;
 
@@ -915,6 +1096,7 @@ namespace gdjs {
 
       this._tweens.addMultiTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -953,12 +1135,13 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addTextObjectCharacterSizeTween2(
+      this._addTextObjectCharacterSizeTween(
         identifier,
         toSize,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -977,11 +1160,30 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addTextObjectCharacterSizeTween(
+        identifier,
+        toSize,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addTextObjectCharacterSizeTween(
+      identifier: string,
+      toSize: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       const owner = this.owner;
       if (!isCharacterScalable(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -1008,12 +1210,13 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectWidthTween2(
+      this._addObjectWidthTween(
         identifier,
         toWidth,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -1032,8 +1235,27 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectWidthTween(
+        identifier,
+        toWidth,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectWidthTween(
+      identifier: string,
+      toWidth: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -1060,12 +1282,13 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
-      this.addObjectHeightTween2(
+      this._addObjectHeightTween(
         identifier,
         toHeight,
         easing,
         duration / 1000,
-        destroyObjectWhenFinished
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
       );
     }
 
@@ -1084,8 +1307,27 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectHeightTween(
+        identifier,
+        toHeight,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectHeightTween(
+      identifier: string,
+      toHeight: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       this._tweens.addSimpleTween(
         identifier,
+        timeSource,
         duration,
         easing,
         linearInterpolation,
@@ -1117,6 +1359,7 @@ namespace gdjs {
 
       this._tweens.addSimpleTween(
         identifier,
+        this.owner.getRuntimeScene(),
         duration / 1000,
         easing,
         linearInterpolation,
@@ -1233,10 +1476,11 @@ namespace gdjs {
       /**
        * Make all active tween step toward the end.
        * @param timeDelta the duration from the previous step in seconds
+       * @param layoutTimeDelta the duration from the previous step ignoring layer time scale in seconds
        */
-      step(timeDelta: float): void {
+      step(): void {
         for (const tween of this._activeTweens) {
-          tween.step(timeDelta);
+          tween.step();
         }
       }
 
@@ -1245,6 +1489,7 @@ namespace gdjs {
        */
       addSimpleTween(
         identifier: string,
+        timeSource: TimeSource,
         totalDuration: number,
         easingIdentifier: string,
         interpolate: Interpolation,
@@ -1261,6 +1506,7 @@ namespace gdjs {
 
         // Initialize the tween instance
         const tween = new TweenRuntimeBehavior.SimpleTweenInstance(
+          timeSource,
           totalDuration,
           easing,
           interpolate,
@@ -1278,6 +1524,7 @@ namespace gdjs {
        */
       addMultiTween(
         identifier: string,
+        timeSource: TimeSource,
         totalDuration: number,
         easingIdentifier: string,
         interpolate: Interpolation,
@@ -1294,6 +1541,7 @@ namespace gdjs {
 
         // Initialize the tween instance
         const tween = new TweenRuntimeBehavior.MultiTweenInstance(
+          timeSource,
           totalDuration,
           easing,
           interpolate,
@@ -1411,6 +1659,10 @@ namespace gdjs {
       }
     }
 
+    export interface TimeSource {
+      getElapsedTime(): float;
+    }
+
     /**
      * An interpolation function.
      * @ignore
@@ -1428,7 +1680,12 @@ namespace gdjs {
      * @ignore
      */
     export interface TweenInstance {
-      step(timeDelta: float): void;
+      /**
+       * Step toward the end.
+       * @param timeDelta the duration from the previous step in seconds
+       * @param layoutTimeDelta the duration from the previous step ignoring layer time scale in seconds
+       */
+      step(): void;
       isPlaying(): boolean;
       hasFinished(): boolean;
       stop(jumpToDest: boolean): void;
@@ -1447,14 +1704,17 @@ namespace gdjs {
       protected easing: (progress: float) => float;
       protected interpolate: Interpolation;
       protected onFinish: () => void;
+      protected timeSource: TimeSource;
       protected isPaused = false;
 
       constructor(
+        timeSource: TimeSource,
         totalDuration: float,
         easing: (progress: float) => float,
         interpolate: Interpolation,
         onFinish?: (() => void) | null
       ) {
+        this.timeSource = timeSource;
         this.totalDuration = totalDuration;
         this.easing = easing;
         this.interpolate = interpolate;
@@ -1462,12 +1722,12 @@ namespace gdjs {
         this.onFinish = onFinish || noEffect;
       }
 
-      step(timeDelta: number): void {
+      step(): void {
         if (!this.isPlaying()) {
           return;
         }
         this.elapsedTime = Math.min(
-          this.elapsedTime + timeDelta,
+          this.elapsedTime + this.timeSource.getElapsedTime() / 1000,
           this.totalDuration
         );
         this._updateValue();
@@ -1513,6 +1773,7 @@ namespace gdjs {
       setValue: (value: float) => void;
 
       constructor(
+        timeSource: TimeSource,
         totalDuration: float,
         easing: (progress: float) => float,
         interpolate: Interpolation,
@@ -1521,7 +1782,7 @@ namespace gdjs {
         setValue: (value: float) => void,
         onFinish?: (() => void) | null
       ) {
-        super(totalDuration, easing, interpolate, onFinish);
+        super(timeSource, totalDuration, easing, interpolate, onFinish);
         this.initialValue = initialValue;
         this.targetedValue = targetedValue;
         this.setValue = setValue;
@@ -1553,6 +1814,7 @@ namespace gdjs {
       currentValues = new Array<float>();
 
       constructor(
+        timeSource: TimeSource,
         totalDuration: float,
         easing: (progress: float) => float,
         interpolate: Interpolation,
@@ -1561,7 +1823,7 @@ namespace gdjs {
         setValue: (value: Array<float>) => void,
         onFinish?: (() => void) | null
       ) {
-        super(totalDuration, easing, interpolate, onFinish);
+        super(timeSource, totalDuration, easing, interpolate, onFinish);
         this.initialValue = initialValue;
         this.targetedValue = targetedValue;
         this.setValue = setValue;

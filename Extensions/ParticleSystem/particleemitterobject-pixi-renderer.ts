@@ -175,11 +175,11 @@ namespace gdjs {
             config: {
               accel: 0,
               // Angle of the spray cone
-              minStart: -objectData.emitterAngleB / 2.0,
-              maxStart: objectData.emitterAngleB / 2.0,
+              minStart: gdjs.toRad(-objectData.emitterAngleB / 2.0),
+              maxStart: gdjs.toRad(objectData.emitterAngleB / 2.0),
               // Rotation speed of the particles
-              maxSpeed: objectData.particleAngle2,
-              minSpeed: objectData.particleAngle1,
+              maxSpeed: gdjs.toRad(objectData.particleAngle2),
+              minSpeed: gdjs.toRad(objectData.particleAngle1),
             },
           },
           {
@@ -243,8 +243,8 @@ namespace gdjs {
     setAngle(angle1: float, angle2: float): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('rotation');
-      behavior.minStart = angle1;
-      behavior.maxStart = angle2;
+      behavior.minStart = gdjs.toRad(angle1);
+      behavior.maxStart = gdjs.toRad(angle2);
     }
 
     setForce(min: float, max: float): void {
@@ -311,8 +311,8 @@ namespace gdjs {
     setParticleRotationSpeed(min: float, max: float): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('rotation');
-      behavior.minSpeed = min;
-      behavior.maxSpeed = max;
+      behavior.minSpeed = gdjs.toRad(min);
+      behavior.maxSpeed = gdjs.toRad(max);
     }
 
     setMaxParticlesCount(count: float): void {

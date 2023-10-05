@@ -8,7 +8,7 @@ const fileWatcher = optionalRequire('chokidar');
 
 export const setupResourcesWatcher =
   fileWatcher && path
-    ? (fileMetadata: FileMetadata, callback: () => void) => {
+    ? (fileMetadata: FileMetadata, callback: (resourceInfo: any) => void) => {
         const folderPath = path.dirname(fileMetadata.fileIdentifier);
         const gameFile = path.basename(fileMetadata.fileIdentifier);
         const watcher = fileWatcher
@@ -21,8 +21,10 @@ export const setupResourcesWatcher =
             // do never-ending operations on the folder or its children, making the debounce
             // never ending.
             debounce(
-              path => {
-                callback();
+              filePath => {
+                const relativePath = path.relative(folderPath, filePath);
+
+                callback({ path: relativePath });
               },
               200,
               { leading: false, trailing: true }

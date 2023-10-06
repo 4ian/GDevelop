@@ -172,6 +172,12 @@ export default class PixiResourcesLoader {
     if (loadedOrLoading3DModelPromises[resourceName]) {
       delete loadedOrLoading3DModelPromises[resourceName];
     }
+    if (loadedFontFamilies[resourceName]) {
+      delete loadedFontFamilies[resourceName];
+    }
+    if (loadedBitmapFonts[resourceName]) {
+      delete loadedBitmapFonts[resourceName];
+    }
   }
   /**
    * (Re)load the PIXI texture represented by the given resources.

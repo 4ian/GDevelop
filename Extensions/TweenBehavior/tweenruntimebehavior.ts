@@ -1703,7 +1703,11 @@ namespace gdjs {
        * @returns Progress of playing tween animation (between 0.0 and 1.0)
        */
       getProgress(identifier: string): float {
-        return this._tweens[identifier].getProgress();
+        const tween = this._tweens.get(identifier);
+        if (!tween) {
+          return 0;
+        }
+        return tween.getProgress();
       }
 
       /**
@@ -1715,7 +1719,11 @@ namespace gdjs {
        * @returns Value of playing tween animation
        */
       getValue(identifier: string): float {
-        return this._tweens[identifier].getValue();
+        const tween = this._tweens.get(identifier);
+        if (!tween) {
+          return 0;
+        }
+        return tween.getValue();
       }
     }
 
@@ -1833,7 +1841,7 @@ namespace gdjs {
       initialValue: float;
       targetedValue: float;
       setValue: (value: float) => void;
-      currentValue: float = 0;
+      currentValue: float;
 
       constructor(
         timeSource: TimeSource,
@@ -1847,6 +1855,7 @@ namespace gdjs {
       ) {
         super(timeSource, totalDuration, easing, interpolate, onFinish);
         this.initialValue = initialValue;
+        this.currentValue = initialValue;
         this.targetedValue = targetedValue;
         this.setValue = setValue;
       }

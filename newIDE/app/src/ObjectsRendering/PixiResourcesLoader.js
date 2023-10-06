@@ -168,6 +168,10 @@ export default class PixiResourcesLoader {
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName], () => {});
+
+    if (loadedOrLoading3DModelPromises[resourceName]) {
+      delete loadedOrLoading3DModelPromises[resourceName];
+    }
   }
   /**
    * (Re)load the PIXI texture represented by the given resources.

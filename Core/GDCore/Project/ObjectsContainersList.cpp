@@ -61,7 +61,35 @@ bool ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
       return variables.Has(variableName);
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // Could be adapted if objects groups have variables in the future.
+      // This could be adapted if objects groups have variables in the future.
+
+      // Currently, a groups is considered as the "intersection" of all of its objects.
+      // Search "groups is the intersection of its objects" in the codebase.
+      // Consider that a group has a variable if all objects of the group have it:
+      const auto& objectGroup = (*it)->GetObjectGroups().Get(objectOrGroupName);
+      const auto& objectNames = objectGroup.GetAllObjectsNames();
+      if (objectNames.empty()) return false;
+
+      for(const auto& objectName: objectNames) {
+        if (!HasObjectWithVariableNamed(objectName, variableName)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool ObjectsContainersList::HasObjectWithVariableNamed(
+    const gd::String& objectName, const gd::String& variableName) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectName)) {
+      const auto& variables = (*it)->GetObject(objectName).GetVariables();
+      return variables.Has(variableName);
     }
   }
 
@@ -99,6 +127,51 @@ ObjectsContainersList::GetObjectOrGroupVariablesContainer(
   }
 
   return nullptr;
+}
+
+void ObjectsContainersList::ForEachObjectOrGroupVariableWithPrefix(const gd::String& objectOrGroupName, const gd::String& prefix, std::function<void(const gd::String& variableName, const gd::Variable& variable)> fn) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectOrGroupName)) {
+      const auto& variables =
+          (*it)->GetObject(objectOrGroupName).GetVariables();
+      variables.ForEachVariableWithPrefix(prefix, fn);
+    }
+    if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
+      // This could be adapted if objects groups have variables in the future.
+
+      // Currently, a groups is considered as the "intersection" of all of its objects.
+      // Search "groups is the intersection of its objects" in the codebase.
+      // Consider that a group has a variable if all objects of the group have it:
+      const auto& objectGroup = (*it)->GetObjectGroups().Get(objectOrGroupName);
+      const auto& objectNames = objectGroup.GetAllObjectsNames();
+
+      if (objectNames.empty()) return;
+      const auto& firstObjectName = objectNames.front();
+      ForEachObjectVariableWithPrefix(firstObjectName, prefix, [&](const gd::String& variableName, const gd::Variable& variable) {
+        for(const auto& objectName: objectGroup.GetAllObjectsNames()) {
+          if (!HasObjectWithVariableNamed(objectName, variableName)) {
+            return; // This variable is not shared by all objects of the group.
+          }
+        }
+
+        // This variable is shared by all objects in the group. Note that other objects
+        // can have it with a different type - we allow this.
+        fn(variableName, variable);
+      });
+    }
+  }
+}
+
+void ObjectsContainersList::ForEachObjectVariableWithPrefix(const gd::String& objectOrGroupName, const gd::String& prefix, std::function<void(const gd::String& variableName, const gd::Variable& variable)> fn) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectOrGroupName)) {
+      const auto& variables =
+          (*it)->GetObject(objectOrGroupName).GetVariables();
+      variables.ForEachVariableWithPrefix(prefix, fn);
+    }
+  }
 }
 
 void ObjectsContainersList::ForEachNameWithPrefix(

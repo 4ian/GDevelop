@@ -125,12 +125,21 @@ class GD_CORE_API ObjectsContainersList {
    */
   void ForEachNameWithPrefix(const gd::String& prefix, std::function<void(const gd::String& name, const gd::ObjectConfiguration* objectConfiguration)> fn) const;
 
+  /**
+   * \brief Call the callback for each variable of the object (or group) starting with the prefix passed in parameter.
+   */
+  void ForEachObjectOrGroupVariableWithPrefix(const gd::String& objectOrGroupName, const gd::String& prefix, std::function<void(const gd::String& variableName, const gd::Variable& variable)> fn) const;
+
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
   ObjectsContainersList(){};
 
  private:
   bool HasObjectNamed(const gd::String& name) const;
+
+  bool HasObjectWithVariableNamed(const gd::String& objectName, const gd::String& variableName) const;
+
+  void ForEachObjectVariableWithPrefix(const gd::String& objectOrGroupName, const gd::String& prefix, std::function<void(const gd::String& variableName, const gd::Variable& variable)> fn) const;
 
   void Add(const gd::ObjectsContainer& objectsContainer) {
     objectsContainers.push_back(&objectsContainer);

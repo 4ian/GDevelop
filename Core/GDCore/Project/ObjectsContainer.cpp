@@ -48,17 +48,17 @@ void ObjectsContainer::UnserializeObjectsFrom(
 bool ObjectsContainer::HasObjectNamed(const gd::String& name) const {
   return (find_if(initialObjects.begin(),
                   initialObjects.end(),
-                  bind2nd(gd::ObjectHasName(), name)) != initialObjects.end());
+                  [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; }) != initialObjects.end());
 }
 gd::Object& ObjectsContainer::GetObject(const gd::String& name) {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
-                    bind2nd(gd::ObjectHasName(), name)));
+                    [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; }));
 }
 const gd::Object& ObjectsContainer::GetObject(const gd::String& name) const {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
-                    bind2nd(gd::ObjectHasName(), name)));
+                    [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; }));
 }
 gd::Object& ObjectsContainer::GetObject(std::size_t index) {
   return *initialObjects[index];
@@ -120,7 +120,7 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
   std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
       find_if(initialObjects.begin(),
               initialObjects.end(),
-              bind2nd(ObjectHasName(), name));
+              [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; });
   if (objectIt == initialObjects.end()) return;
 
   initialObjects.erase(objectIt);
@@ -133,7 +133,7 @@ void ObjectsContainer::MoveObjectToAnotherContainer(
   std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
       find_if(initialObjects.begin(),
               initialObjects.end(),
-              bind2nd(ObjectHasName(), name));
+              [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; });
   if (objectIt == initialObjects.end()) return;
 
   std::unique_ptr<gd::Object> object = std::move(*objectIt);

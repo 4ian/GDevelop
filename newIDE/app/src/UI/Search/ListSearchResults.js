@@ -46,10 +46,10 @@ export const ListSearchResults = <SearchItem>({
   const cachedHeights = React.useRef({});
   const onItemHeightComputed = React.useCallback(
     (searchItem, height) => {
-      if (cachedHeights.current[getSearchItemUniqueId(searchItem)] === height)
-        return false;
+      const uniqueId = getSearchItemUniqueId(searchItem);
+      if (cachedHeights.current[uniqueId] === height) return false;
 
-      cachedHeights.current[getSearchItemUniqueId(searchItem)] = height;
+      cachedHeights.current[uniqueId] = height;
       return true;
     },
     [getSearchItemUniqueId]

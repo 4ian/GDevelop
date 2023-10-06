@@ -103,6 +103,7 @@ export const SimpleTextField = React.memo<
           }`}
         >
           <input
+            id={props.id}
             disabled={props.disabled}
             ref={inputRef}
             type={props.type}

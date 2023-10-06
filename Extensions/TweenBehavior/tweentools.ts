@@ -83,12 +83,111 @@ namespace gdjs {
         getTweensMap(runtimeScene).removeTween(id);
       };
 
+      /**
+       * Get tween progress.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @returns Progress of playing tween animation (between 0.0 and 1.0)
+       */
+      export const getProgress = (
+        runtimeScene: RuntimeScene,
+        identifier: string
+      ): float => {
+        return getTweensMap(runtimeScene).getProgress(identifier);
+      };
+
+      /**
+       * Get tween value.
+       *
+       * It returns 0 for tweens with several values.
+       *
+       * @param identifier Unique id to identify the tween
+       * @returns Value of playing tween animation
+       */
+      export const getValue = (
+        runtimeScene: RuntimeScene,
+        identifier: string
+      ): float => {
+        return getTweensMap(runtimeScene).getValue(identifier);
+      };
+
       const linearInterpolation = gdjs.evtTools.common.lerp;
       const exponentialInterpolation =
         gdjs.evtTools.common.exponentialInterpolation;
 
       /**
-       * @deprecated Use tweenVariableNumber2 instead.
+       * Add a layout value tween.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param fromValue Start value
+       * @param toValue End value
+       * @param easing Easing function identifier
+       * @param duration Duration in seconds
+       * @param useExponentialInterpolation Set it to true to use a exponential
+       * It's useful for values that are factors like a scale or a zoom.
+       */
+      export const addLayoutValueTween = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        fromValue: float,
+        toValue: float,
+        easing: string,
+        duration: float,
+        useExponentialInterpolation: boolean
+      ): void => {
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          runtimeScene,
+          duration / 1000,
+          easing,
+          useExponentialInterpolation
+            ? exponentialInterpolation
+            : linearInterpolation,
+          fromValue,
+          toValue,
+          (value: float) => {}
+        );
+      };
+
+      /**
+       * Add a layer value tween. The layer time scale is taken ito account.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param fromValue Start value
+       * @param toValue End value
+       * @param easing Easing function identifier
+       * @param duration Duration in seconds
+       * @param useExponentialInterpolation Set it to true to use a exponential
+       * It's useful for values that are factors like a scale or a zoom.
+       * @param layerName The name of layer
+       */
+      export const addLayerValueTween = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        fromValue: float,
+        toValue: float,
+        easing: string,
+        duration: float,
+        useExponentialInterpolation: boolean,
+        layerName: string
+      ): void => {
+        const layer = runtimeScene.getLayer(layerName);
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          layer,
+          duration / 1000,
+          easing,
+          useExponentialInterpolation
+            ? exponentialInterpolation
+            : linearInterpolation,
+          fromValue,
+          toValue,
+          (value: float) => {}
+        );
+      };
+
+      /**
+       * @deprecated Use addLayoutValueTween instead.
        * This function is misleading since one could think that the tween starts
        * right at the moment this function is called whereas the value of the variable
        * will change at the next frame only. Moreover, the variable will not start from
@@ -117,6 +216,9 @@ namespace gdjs {
         );
       };
 
+      /**
+       * @deprecated Use addLayoutValueTween instead.
+       */
       export const tweenVariableNumber2 = (
         runtimeScene: RuntimeScene,
         identifier: string,

@@ -110,7 +110,7 @@ namespace gdjs {
 
     /**
      * Add an object variable tween.
-     * @deprecated Use addVariableTween2 instead.
+     * @deprecated Use addValueTween instead.
      * This function is misleading since one could think that the tween starts
      * right at the moment this function is called whereas the value of the variable
      * will change at the next frame only. Moreover, the variable will not start from
@@ -149,6 +149,7 @@ namespace gdjs {
 
     /**
      * Tween an object variable.
+     * @deprecated Use addValueTween instead.
      * @param identifier Unique id to identify the tween
      * @param variable The object variable to store the tweened value
      * @param toValue End value
@@ -176,6 +177,41 @@ namespace gdjs {
         variable.getValue() as number,
         toValue,
         (value: float) => variable.setNumber(value),
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
+     * Add an object value tween.
+     * @param identifier Unique id to identify the tween
+     * @param fromValue Start value
+     * @param toValue End value
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param useExponentialInterpolation Set it to true to use a exponential
+     * It's useful for values that are factors like a scale or a zoom.
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addValueTween(
+      identifier: string,
+      fromValue: float,
+      toValue: float,
+      easing: string,
+      duration: float,
+      useExponentialInterpolation: boolean,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._tweens.addSimpleTween(
+        identifier,
+        this.owner.getRuntimeScene(),
+        duration / 1000,
+        easing,
+        useExponentialInterpolation
+          ? exponentialInterpolation
+          : linearInterpolation,
+        fromValue,
+        toValue,
+        (value: float) => {},
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1443,6 +1479,18 @@ namespace gdjs {
       return this._tweens.getProgress(identifier);
     }
 
+    /**
+     * Get tween value.
+     *
+     * It returns 0 for tweens with several values.
+     *
+     * @param identifier Unique id to identify the tween
+     * @returns Value of playing tween animation
+     */
+    getValue(identifier: string): float {
+      return this._tweens.getValue(identifier);
+    }
+
     onDeActivate() {
       this._isActive = false;
     }
@@ -1657,6 +1705,18 @@ namespace gdjs {
       getProgress(identifier: string): float {
         return this._tweens[identifier].getProgress();
       }
+
+      /**
+       * Get tween value.
+       *
+       * It returns 0 for tweens with several values.
+       *
+       * @param identifier Unique id to identify the tween
+       * @returns Value of playing tween animation
+       */
+      getValue(identifier: string): float {
+        return this._tweens[identifier].getValue();
+      }
     }
 
     export interface TimeSource {
@@ -1692,6 +1752,7 @@ namespace gdjs {
       resume(): void;
       pause(): void;
       getProgress(): float;
+      getValue(): float;
     }
 
     /**
@@ -1734,6 +1795,7 @@ namespace gdjs {
       }
 
       protected abstract _updateValue(): void;
+      abstract getValue(): float;
 
       isPlaying(): boolean {
         return !this.isPaused && !this.hasFinished();
@@ -1771,6 +1833,7 @@ namespace gdjs {
       initialValue: float;
       targetedValue: float;
       setValue: (value: float) => void;
+      currentValue: float = 0;
 
       constructor(
         timeSource: TimeSource,
@@ -1795,10 +1858,15 @@ namespace gdjs {
           this.targetedValue,
           easedProgress
         );
+        this.currentValue = value;
         this.setValue(value);
         if (this.hasFinished()) {
           this.onFinish();
         }
+      }
+
+      getValue(): float {
+        return this.currentValue;
       }
     }
 
@@ -1844,6 +1912,10 @@ namespace gdjs {
         if (this.hasFinished()) {
           this.onFinish();
         }
+      }
+
+      getValue(): float {
+        return 0;
       }
     }
   }

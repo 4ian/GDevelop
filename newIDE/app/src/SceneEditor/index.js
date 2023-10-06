@@ -207,29 +207,29 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   onResourceExternallyChanged = async (resourceInfo: any) => {
-    const { layout, project } = this.props;
-    await PixiResourcesLoader.reloadTextureForResource(project, resourceInfo);
+    const { project } = this.props;
 
-    if (this.editorDisplay) {
-      this.editorDisplay.forceUpdateObjectsList();
-    }
-    {
-      const objectsCount = layout.getObjectsCount();
-      for (let index = 0; index < objectsCount; index++) {
-        if (this.editorDisplay)
-          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-            layout.getObjectAt(index).getName()
-          );
-      }
-    }
-    {
-      const objectsCount = project.getObjectsCount();
-      for (let index = 0; index < objectsCount; index++) {
-        if (this.editorDisplay)
-          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-            project.getObjectAt(index).getName()
-          );
-      }
+    const resourceName = project
+      .getResourcesManager()
+      .getResourceNameWithFile(resourceInfo.path);
+    if (resourceName) {
+      await PixiResourcesLoader.reloadTextureForResource(project, resourceName);
+
+      const { editorDisplay } = this;
+      if (!editorDisplay) return;
+
+      editorDisplay.forceUpdateObjectsList();
+
+      const objectsCollector = new gd.ObjectsUsingResourceCollector(
+        resourceName
+      );
+      // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
+      gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+      const objectNames = objectsCollector.getObjectNames().toJSArray();
+      objectsCollector.delete();
+      objectNames.forEach(objectName => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
+      });
     }
   };
 

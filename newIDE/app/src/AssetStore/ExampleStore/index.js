@@ -55,7 +55,7 @@ export const prepareExampleShortHeaders = (
 
 const getItemUniqueId = (
   item: ExampleShortHeader | PrivateGameTemplateListingData
-) => (item.productType ? `template-${item.name}` : `example-${item.name}`);
+) => item.id;
 
 type Props = {|
   isOpening: boolean,

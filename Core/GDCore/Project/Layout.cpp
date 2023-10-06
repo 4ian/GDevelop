@@ -451,7 +451,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
     type = project.GetObject(name).GetType();
 
   // Search in groups.
-  // Currently, a groups is considered as the "intersection" of all of its objects.
+  // Currently, a group is considered as the "intersection" of all of its objects.
   // Search "groups is the intersection of its objects" in the codebase.
   else if (searchInGroups) {
     for (std::size_t i = 0; i < layout.GetObjectGroups().size(); ++i) {
@@ -545,7 +545,7 @@ std::vector<gd::String> GD_CORE_API GetBehaviorNamesInObjectOrGroup(
   }
 
   // Search in groups.
-  // Currently, a groups is considered as the "intersection" of all of its objects.
+  // Currently, a group is considered as the "intersection" of all of its objects.
   // Search "groups is the intersection of its objects" in the codebase.
   const gd::ObjectsContainer *container;
   if (layout.GetObjectGroups().Has(objectOrGroupName)) {
@@ -606,7 +606,7 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
   }
 
   // Search in groups.
-  // Currently, a groups is considered as the "intersection" of all of its objects.
+  // Currently, a group is considered as the "intersection" of all of its objects.
   // Search "groups is the intersection of its objects" in the codebase.
   const gd::ObjectsContainer *container;
   if (layout.GetObjectGroups().Has(objectOrGroupName)) {
@@ -656,7 +656,7 @@ bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
   }
 
   // Search in groups.
-  // Currently, a groups is considered as the "intersection" of all of its objects.
+  // Currently, a group is considered as the "intersection" of all of its objects.
   // Search "groups is the intersection of its objects" in the codebase.
   const gd::ObjectsContainer *container;
   if (layout.GetObjectGroups().Has(objectOrGroupName)) {
@@ -706,7 +706,7 @@ gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContain
   }
 
   // Search in groups.
-  // Currently, a groups is considered as the "intersection" of all of its objects.
+  // Currently, a group is considered as the "intersection" of all of its objects.
   // Search "groups is the intersection of its objects" in the codebase.
   const gd::ObjectsContainer *container;
   if (layout.GetObjectGroups().Has(objectOrGroupName)) {
@@ -785,7 +785,7 @@ GetBehaviorsOfObject(const gd::ObjectsContainer& project,
   }
 
   // Search in groups
-  // Currently, a groups is considered as the "intersection" of all of its objects.
+  // Currently, a group is considered as the "intersection" of all of its objects.
   // Search "groups is the intersection of its objects" in the codebase.
   if (searchInGroups) {
     for (std::size_t i = 0; i < layout.GetObjectGroups().size(); ++i) {

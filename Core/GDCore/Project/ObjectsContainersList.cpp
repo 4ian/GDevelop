@@ -65,7 +65,7 @@ ObjectsContainersList::HasObjectOrGroupWithVariableNamed(
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
       // This could be adapted if objects groups have variables in the future.
 
-      // Currently, a groups is considered as the "intersection" of all of its
+      // Currently, a group is considered as the "intersection" of all of its
       // objects. Search "groups is the intersection of its objects" in the
       // codebase. Consider that a group has a variable if all objects of the
       // group have it:
@@ -163,7 +163,7 @@ void ObjectsContainersList::ForEachObjectOrGroupVariableWithPrefix(
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
       // This could be adapted if objects groups have variables in the future.
 
-      // Currently, a groups is considered as the "intersection" of all of its
+      // Currently, a group is considered as the "intersection" of all of its
       // objects. Search "groups is the intersection of its objects" in the
       // codebase. Consider that a group has a variable if all objects of the
       // group have it:

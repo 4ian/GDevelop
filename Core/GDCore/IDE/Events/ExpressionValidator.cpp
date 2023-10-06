@@ -98,8 +98,20 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
         return true; // We should have found a variable.
       }
 
-      if (!objectsContainersList.HasObjectOrGroupWithVariableNamed(identifier.identifierName, identifier.childIdentifierName)) {
+      auto variableExistence = objectsContainersList.HasObjectOrGroupWithVariableNamed(identifier.identifierName, identifier.childIdentifierName);
+
+      if (variableExistence == gd::ObjectsContainersList::DoesNotExist) {
         RaiseTypeError(_("This variable does not exist on this object or group."),
+                        identifier.identifierNameLocation);
+        return true; // We should have found a variable.
+      }
+      else if (variableExistence == gd::ObjectsContainersList::ExistsOnlyOnSomeObjectsOfTheGroup) {
+        RaiseTypeError(_("This variable only exists on some objects of the group. It must be declared for all objects."),
+                        identifier.identifierNameLocation);
+        return true; // We should have found a variable.
+      }
+      else if (variableExistence == gd::ObjectsContainersList::GroupIsEmpty) {
+        RaiseTypeError(_("This group is empty. Add an object to this group first."),
                         identifier.identifierNameLocation);
         return true; // We should have found a variable.
       }

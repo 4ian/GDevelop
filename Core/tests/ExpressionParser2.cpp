@@ -32,16 +32,26 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   auto &myObject = layout1.InsertNewObject(project, "", "MyObject", 0);
   myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
-  auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup", 0);
+  auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup");
   myGroup.AddObject(myObject.GetName());
+
+  layout1.GetObjectGroups().InsertNew("EmptyGroup");
 
   auto &mySpriteObject = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
   mySpriteObject.GetVariables().InsertNew("MyVariable", 0);
   mySpriteObject.GetVariables().InsertNew("MyVariable2", 1);
+  mySpriteObject.GetVariables().InsertNew("MyVariable3", 2);
+  auto &mySpriteObject2 = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject2", 1);
+  mySpriteObject2.GetVariables().InsertNew("MyVariable", 0);
+  mySpriteObject2.GetVariables().InsertNew("MyVariable2", 1);
   layout1.InsertNewObject(project,
                           "MyExtension::FakeObjectWithDefaultBehavior",
                           "FakeObjectWithDefaultBehavior",
                           2);
+
+  auto &mySpriteGroup = layout1.GetObjectGroups().InsertNew("MySpriteObjects", 0);
+  mySpriteGroup.AddObject("MySpriteObject");
+  mySpriteGroup.AddObject("MySpriteObject2");
 
   gd::ExpressionParser2 parser;
 
@@ -1283,6 +1293,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid object variables (object group, 1 level)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObjects.MyVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObjects.MyVariable + MySpriteObjects.MyVariable2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
   SECTION("Valid object variables (2 levels)") {
     {
       auto node =
@@ -1320,6 +1349,45 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+    }
+  }
+
+  SECTION("Invalid object variables (object group, non existing variable)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObjects.MyNonExistingVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "This variable does not exist on this object or group.");
+    }
+  }
+
+  SECTION("Invalid object variables (object group, partially existing variable)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObjects.MyVariable3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "This variable only exists on some objects of the group. It must be declared for all objects.");
+    }
+  }
+
+  SECTION("Invalid object variables (empty object group)") {
+    {
+      auto node =
+          parser.ParseExpression("EmptyGroup.MyVariable");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "This group is empty. Add an object to this group first.");
     }
   }
 

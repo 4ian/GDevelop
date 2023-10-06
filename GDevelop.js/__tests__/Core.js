@@ -1556,6 +1556,73 @@ describe('libGD.js', function () {
     });
   });
 
+  describe('gd.ObjectsUsingResourceCollector', function () {
+    it('should objects that use the given resources', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const sprite1 = new gd.Sprite();
+      sprite1.setImageName('Image1');
+      const sprite2 = new gd.Sprite();
+      sprite2.setImageName('Image2');
+      const sprite3 = new gd.Sprite();
+      sprite3.setImageName('Image3');
+
+      const spriteObject = gd.asSpriteConfiguration(object.getConfiguration());
+      const animation = new gd.Animation();
+      animation.setDirectionsCount(1);
+      animation.getDirection(0).addSprite(sprite1);
+      animation.getDirection(0).addSprite(sprite2);
+      animation.getDirection(0).addSprite(sprite1);
+      spriteObject.addAnimation(animation);
+
+      const object2 = project.insertNewObject(
+        project,
+        'Sprite',
+        'MyObject2',
+        0
+      );
+      const spriteObject2 = gd.asSpriteConfiguration(
+        object2.getConfiguration()
+      );
+      const animation2 = new gd.Animation();
+      animation2.setDirectionsCount(1);
+      animation2.getDirection(0).addSprite(sprite1);
+      animation2.getDirection(0).addSprite(sprite3);
+      animation2.getDirection(0).addSprite(sprite1);
+      spriteObject2.addAnimation(animation2);
+
+      {
+        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image1');
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        expect(objectNames.length).toEqual(2);
+        expect(objectNames).toContain('MyObject');
+        expect(objectNames).toContain('MyObject2');
+      }
+      {
+        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image2');
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        expect(objectNames.length).toEqual(1);
+        expect(objectNames).toContain('MyObject');
+      }
+      {
+        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image3');
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        expect(objectNames.length).toEqual(1);
+        expect(objectNames).toContain('MyObject2');
+      }
+
+      project.delete();
+    });
+  });
+
   describe('gd.Behavior', function () {
     it('update a not existing property', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();

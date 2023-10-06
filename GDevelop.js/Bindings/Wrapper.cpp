@@ -48,6 +48,7 @@
 #include <GDCore/IDE/Events/EventsFunctionSelfCallChecker.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
+#include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>
 #include <GDCore/IDE/Project/ProjectResourcesAdder.h>
 #include <GDCore/IDE/Project/ProjectResourcesCopier.h>
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>

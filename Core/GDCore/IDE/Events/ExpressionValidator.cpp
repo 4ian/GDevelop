@@ -102,12 +102,12 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
 
       if (variableExistence == gd::ObjectsContainersList::DoesNotExist) {
         RaiseTypeError(_("This variable does not exist on this object or group."),
-                        identifier.identifierNameLocation);
+                        identifier.childIdentifierNameLocation);
         return true; // We should have found a variable.
       }
       else if (variableExistence == gd::ObjectsContainersList::ExistsOnlyOnSomeObjectsOfTheGroup) {
         RaiseTypeError(_("This variable only exists on some objects of the group. It must be declared for all objects."),
-                        identifier.identifierNameLocation);
+                        identifier.childIdentifierNameLocation);
         return true; // We should have found a variable.
       }
       else if (variableExistence == gd::ObjectsContainersList::GroupIsEmpty) {

@@ -2983,6 +2983,14 @@ interface ProjectResourcesCopier {
                                  boolean preserveDirectoryStructure);
 };
 
+interface ObjectsUsingResourceCollector {
+    void ObjectsUsingResourceCollector([Const] DOMString resourceName);
+    [Const, Ref] VectorString GetObjectNames();
+
+    //Inherited from ArbitraryObjectsWorker
+    void Launch([Ref] ObjectsContainer container);
+};
+
 interface ResourcesInUseHelper {
     void ResourcesInUseHelper();
 

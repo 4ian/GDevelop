@@ -215,6 +215,7 @@ declare class libGDevelop {
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
   ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
+  ObjectsUsingResourceCollector: Class<gdObjectsUsingResourceCollector>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
   EditorSettings: Class<gdEditorSettings>;
   Point: Class<gdPoint>;

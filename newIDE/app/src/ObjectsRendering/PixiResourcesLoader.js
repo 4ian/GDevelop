@@ -150,19 +150,24 @@ const traverseToRemoveMetalnessFromMeshes = (
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
-  static async reloadTextureForResource(project: gdProject, resourceInfo: any) {
-    const resourceName = project
-      .getResourcesManager()
-      .getResourceNameWithFile(resourceInfo.path);
-    if (resourceName) {
-      for (const key of loadedTextures[resourceName].textureCacheIds) {
-        if (PIXI.utils.BaseTextureCache[key].unload)
-          PIXI.utils.BaseTextureCache[key].unload();
-        delete PIXI.utils.BaseTextureCache[key];
-      }
-
-      await PixiResourcesLoader.loadTextures(project, [resourceName], () => {});
+  static async reloadTextureForResource(
+    project: gdProject,
+    resourceName: string
+  ) {
+    const loadedTexture = loadedTextures[resourceName];
+    if (loadedTexture && loadedTexture.textureCacheIds) {
+      loadedTexture.textureCacheIds.forEach(textureCacheId => {
+        if (
+          PIXI.utils.BaseTextureCache[textureCacheId] &&
+          PIXI.utils.BaseTextureCache[textureCacheId].unload
+        ) {
+          PIXI.utils.BaseTextureCache[textureCacheId].unload();
+        }
+        delete PIXI.utils.BaseTextureCache[textureCacheId];
+      });
     }
+
+    await PixiResourcesLoader.loadTextures(project, [resourceName], () => {});
   }
   /**
    * (Re)load the PIXI texture represented by the given resources.

@@ -2294,6 +2294,7 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+    void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
 };
 
 interface ResourceExposer {
@@ -2880,6 +2881,10 @@ interface ProjectResourcesAdder {
 
 interface ArbitraryEventsWorker {
     void Launch([Ref] EventsList events);
+};
+
+interface ArbitraryObjectsWorker {
+    void Launch([Ref] ObjectsContainer container);
 };
 
 interface EventsLeaderboardsLister {

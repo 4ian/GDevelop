@@ -1,5 +1,5 @@
 // @ts-check
-describe('gdjs.TweenRuntimeBehavior', () => {
+describe.only('gdjs.TweenRuntimeBehavior', () => {
   const behaviorName = 'Tween';
 
   const createScene = (timeDelta = 1000 / 60) => {
@@ -27,21 +27,51 @@ describe('gdjs.TweenRuntimeBehavior', () => {
         },
       ],
     });
-    object.setCustomWidthAndHeight(100, 100);
     runtimeScene.addObject(object);
     return object;
   };
 
+  /**
+   * @param {gdjs.RuntimeScene} runtimeScene
+   * @returns {gdjs.TestRuntimeObject}
+   */
+  const addSprite = (runtimeScene) => {
+    const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
+      name: 'Object',
+      type: 'Sprite',
+      effects: [],
+      behaviors: [
+        {
+          type: 'Tween::TweenBehavior',
+          name: behaviorName,
+        },
+      ],
+      // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
+      animations: [],
+    });
+    runtimeScene.addObject(object);
+    return object;
+  };
+
+  /** @type {gdjs.RuntimeScene} */
   let runtimeScene;
+  /** @type {gdjs.RuntimeObject} */
   let object;
+  /** @type {gdjs.SpriteRuntimeObject} */
+  let sprite;
   /** @type {gdjs.TweenRuntimeBehavior} */
   let behavior;
+  /** @type {gdjs.TweenRuntimeBehavior} */
+  let spriteBehavior;
   beforeEach(() => {
     runtimeScene = createScene();
     runtimeScene.getLayer('').setTimeScale(1.5);
     object = addObject(runtimeScene);
+    sprite = addSprite(runtimeScene);
     //@ts-ignore
     behavior = object.getBehavior(behaviorName);
+    //@ts-ignore
+    spriteBehavior = sprite.getBehavior(behaviorName);
   });
 
   it('can play a tween till the end', () => {
@@ -233,16 +263,74 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(behavior.exists('MyTween')).to.be(true);
   });
 
-  it('can tween the position on X axis', () => {
-    object.setPosition(200, 300);
-    behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0.25, false);
-
-    let oldX;
-    for (let i = 0; i < 6; i++) {
-      oldX = object.getX();
+  const checkProgress = (steps, getValue) => {
+    let oldValue;
+    for (let i = 0; i < steps; i++) {
+      oldValue = getValue();
       runtimeScene.renderAndStep(1000 / 60);
-      expect(object.getX()).to.be.above(oldX);
+      expect(getValue()).to.be.above(oldValue);
     }
+  };
+
+  it('can tween the position on X axis', () => {
+    object.setX(200);
+    behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0.25, false);
+    checkProgress(6, () => object.getX());
     expect(object.getX()).to.be(440);
+  });
+
+  it('can tween the position on Y axis', () => {
+    object.setY(200);
+    behavior.addObjectPositionYTween2('MyTween', 600, 'linear', 0.25, false);
+    checkProgress(6, () => object.getY());
+    expect(object.getY()).to.be(440);
+  });
+
+  it('can tween the angle', () => {
+    object.setAngle(200);
+    behavior.addObjectAngleTween2('MyTween', 600, 'linear', 0.25, false);
+    checkProgress(6, () => object.getAngle());
+    expect(object.getAngle()).to.be(440);
+  });
+
+  it('can tween the width', () => {
+    object.setWidth(200);
+    behavior.addObjectWidthTween2('MyTween', 600, 'linear', 0.25, false);
+    checkProgress(6, () => object.getWidth());
+    expect(object.getWidth()).to.be(440);
+  });
+
+  it('can tween the height', () => {
+    object.setHeight(200);
+    behavior.addObjectHeightTween2('MyTween', 600, 'linear', 0.25, false);
+    checkProgress(6, () => object.getHeight());
+    expect(object.getHeight()).to.be(440);
+  });
+
+  it('can tween the opacity', () => {
+    sprite.setOpacity(128);
+    spriteBehavior.addObjectOpacityTween2(
+      'MyTween',
+      255,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => sprite.getOpacity());
+    expect(sprite.getOpacity()).to.be(204.2);
+  });
+
+  it('can tween the scale on X axis', () => {
+    sprite.setScaleX(200);
+    spriteBehavior.addObjectScaleXTween2('MyTween', 600, 'linear', 0.25, false);
+    checkProgress(6, () => sprite.getScaleX());
+    expect(sprite.getScaleX()).to.be(386.6364089863524);
+  });
+
+  it('can tween the scale on Y axis', () => {
+    sprite.setScaleY(200);
+    spriteBehavior.addObjectScaleYTween2('MyTween', 600, 'linear', 0.25, false);
+    checkProgress(6, () => sprite.getScaleY());
+    expect(sprite.getScaleY()).to.be(386.6364089863524);
   });
 });

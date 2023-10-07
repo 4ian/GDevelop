@@ -1347,7 +1347,7 @@ namespace gdjs {
         identifier,
         toHeight,
         easing,
-        duration / 1000,
+        duration,
         destroyObjectWhenFinished,
         this.owner
       );

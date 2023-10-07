@@ -1212,13 +1212,13 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(const gd::PropertiesConta
                                                        const gd::NamedPropertyDescriptor& property,
                                                        const gd::String& type,
                                                        gd::EventsCodeGenerationContext& context) {
-  return "getProperty" + property.GetName() + "()";
+  return "getProperty" + property.GetName() + "As" + type + "()";
 }
 
 gd::String EventsCodeGenerator::GenerateParameterGetter(const gd::ParameterMetadata& parameter,
                                                         const gd::String& type,
                                                         gd::EventsCodeGenerationContext& context) {
-  return "getParameter" + parameter.GetName() + "()";
+  return "getParameter" + parameter.GetName() + "As" + type + "()";
 }
 
 EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,

@@ -191,6 +191,10 @@ class Variable {
     this.setString(this.getAsString() + str);
   }
 
+  getAsNumberOrString() {
+    return this._value;
+  }
+
   addChild(childName, childVariable) {
     // Make sure this is a structure
     this.castTo('structure');

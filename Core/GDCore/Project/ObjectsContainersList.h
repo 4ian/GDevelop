@@ -73,6 +73,11 @@ class GD_CORE_API ObjectsContainersList {
       const gd::String& objectOrGroupName) const;
 
   /**
+   * \brief Get a type from an object/group variable.
+   */
+  gd::Variable::Type GetTypeOfObjectOrGroupVariable(const gd::String& objectOrGroupName, const gd::String& variableName) const;
+
+  /**
    * \brief Get a type from an object/group name.
    * \note If a group contains only objects of a same type, then the group has
    * this type. Otherwise, it is considered as an object without any specific
@@ -159,6 +164,8 @@ class GD_CORE_API ObjectsContainersList {
 
   bool HasObjectWithVariableNamed(const gd::String& objectName,
                                   const gd::String& variableName) const;
+
+  gd::Variable::Type GetTypeOfObjectVariable(const gd::String& objectName, const gd::String& variableName) const;
 
   void ForEachObjectVariableWithPrefix(
       const gd::String& objectOrGroupName,

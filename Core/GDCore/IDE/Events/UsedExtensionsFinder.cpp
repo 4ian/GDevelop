@@ -110,7 +110,7 @@ void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
   result.GetUsedExtensions().insert("BuiltinVariables");
 
   auto type = gd::ExpressionTypeFinder::GetType(
-      project.GetCurrentPlatform(), GetObjectsContainersList(), rootType, node);
+      project.GetCurrentPlatform(), GetProjectScopedContainers(), rootType, node);
 
   if (gd::ParameterMetadata::IsExpression("variable", type)) {
     // Nothing to do (this can't reference an object)
@@ -154,7 +154,7 @@ void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
 // Add extensions bound to Objects/Behaviors/Functions
 void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode &node) {
   auto type = gd::ExpressionTypeFinder::GetType(
-      project.GetCurrentPlatform(), GetObjectsContainersList(), rootType, node);
+      project.GetCurrentPlatform(), GetProjectScopedContainers(), rootType, node);
   if (gd::ParameterMetadata::IsObject(type) ||
       GetObjectsContainersList().HasObjectOrGroupNamed(node.identifierName)) {
     // An object or object variable is used.

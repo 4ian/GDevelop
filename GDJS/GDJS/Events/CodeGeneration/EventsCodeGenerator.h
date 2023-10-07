@@ -302,11 +302,14 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& objectName);
 
   virtual gd::String GenerateVariableAccessor(gd::String childName) {
+    // TODO: use getChildNamed
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
   };
 
   virtual gd::String GenerateVariableBracketAccessor(
       gd::String expressionCode) {
+    // This uses `getChild` which allows to access a child
+    // with a number (an index, for an array) or a string (for a structure).
     return ".getChild(" + expressionCode + ")";
   };
 

@@ -103,9 +103,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             "example: \"Your name: \" + VariableString(PlayerName).", node.rightHandSide->location);
       }
       else if (node.op != '+') {
-      RaiseOperatorError(
-          _("You've used an operator that is not supported. Only + can be used "
-            "to concatenate texts."),
+        RaiseOperatorError(
+            _("You've used an operator that is not supported. Only + can be used "
+              "to concatenate texts."),
             ExpressionParserLocation(node.leftHandSide->location.GetEndPosition() + 1, node.location.GetEndPosition()));
       }
     } else if (leftType == Type::Object) {
@@ -124,7 +124,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.rightHandSide->Visit(*this);
     const Type rightType = childType;
 
-    childType = leftType;
+    childType = (leftType == Type::Unknown || leftType == Type::NumberOrString) ? leftType : rightType;
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     ReportAnyError(node);
@@ -309,8 +309,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       RaiseTypeError(
           _("You've entered a name, but this type was expected:") + " " + TypeToString(parentType),
           node.location);
+      childType = parentType;
+    } else {
+      childType = parentType;
     }
-    childType = parentType;
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     ReportAnyError(node);
@@ -377,6 +379,16 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void RaiseOperatorError(
       const gd::String &message, const ExpressionParserLocation &location) {
     RaiseError("invalid_operator", message, location);
+  }
+
+  void ReadChildTypeFromVariable(gd::Variable::Type variableType) {
+    if (variableType == gd::Variable::Number) {
+      childType = Type::Number;
+    } else if (variableType == gd::Variable::String) {
+      childType = Type::String;
+    } else {
+      // Nothing - we don't know the precise type (this could be used as a string or as a number).
+    }
   }
 
   static Type StringToType(const gd::String &type);

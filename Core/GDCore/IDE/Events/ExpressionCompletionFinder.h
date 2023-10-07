@@ -395,10 +395,8 @@ class GD_CORE_API ExpressionCompletionFinder
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
     AddCompletionsForAllIdentifiersWithPrefix("", type);
     completions.push_back(
@@ -409,10 +407,8 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
     AddCompletionsForAllIdentifiersWithPrefix("", type);
     completions.push_back(
@@ -488,7 +484,7 @@ class GD_CORE_API ExpressionCompletionFinder
     const auto& objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
     if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       if (type == "globalvar") {
@@ -535,7 +531,7 @@ class GD_CORE_API ExpressionCompletionFinder
     const auto& objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
     if (gd::ParameterMetadata::IsObject(type)) {
       // Only show completions of objects if an object is required.
       AddCompletionsForObjectWithPrefix(
@@ -615,10 +611,8 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
     if (!node.behaviorFunctionName.empty() ||
         node.behaviorNameNamespaceSeparatorLocation.IsValid()) {
       // Behavior function (or behavior function being written, with the
@@ -669,10 +663,8 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
     bool isCaretOnParenthesis = IsCaretOn(node.openingParenthesisLocation) ||
                                 IsCaretOn(node.closingParenthesisLocation);
 
@@ -741,10 +733,8 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
     AddCompletionsForAllIdentifiersWithPrefix(node.text, type, node.location);
     completions.push_back(

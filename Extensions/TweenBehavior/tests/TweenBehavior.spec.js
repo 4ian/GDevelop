@@ -20,6 +20,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       name: 'Object',
       type: '',
       effects: [],
+      variables: [],
       behaviors: [
         {
           type: 'Tween::TweenBehavior',
@@ -39,14 +40,15 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       name: 'Object',
       type: 'Sprite',
       effects: [],
+      variables: [],
       behaviors: [
         {
           type: 'Tween::TweenBehavior',
           name: behaviorName,
         },
       ],
-      // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
       animations: [],
+      updateIfNotVisible: true,
     });
     runtimeScene.addObject(object);
     return object;
@@ -60,6 +62,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       name: 'Object',
       type: 'Sprite',
       effects: [],
+      variables: [],
       behaviors: [
         {
           type: 'Tween::TweenBehavior',
@@ -395,7 +398,14 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can tween the scale on X axis', () => {
     sprite.setScaleX(200);
-    spriteBehavior.addObjectScaleXTween2('MyTween', 600, 'linear', 0.25, false);
+    spriteBehavior.addObjectScaleXTween2(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      false
+    );
     checkProgress(6, () => sprite.getScaleX());
     // The interpolation is exponential.
     expect(sprite.getScaleX()).to.be(386.6364089863524);
@@ -403,7 +413,14 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can tween the scale on Y axis', () => {
     sprite.setScaleY(200);
-    spriteBehavior.addObjectScaleYTween2('MyTween', 600, 'linear', 0.25, false);
+    spriteBehavior.addObjectScaleYTween2(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      false
+    );
     checkProgress(6, () => sprite.getScaleY());
     // The interpolation is exponential.
     expect(sprite.getScaleY()).to.be(386.6364089863524);
@@ -447,6 +464,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       900,
       'linear',
       0.25,
+      false,
       false
     );
     checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);

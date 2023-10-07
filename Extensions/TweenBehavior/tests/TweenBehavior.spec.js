@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.TweenRuntimeBehavior', () => {
+describe('gdjs.TweenRuntimeBehavior', () => {
   const behaviorName = 'Tween';
 
   const createScene = (timeDelta = 1000 / 60) => {
@@ -33,7 +33,6 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
 
   /**
    * @param {gdjs.RuntimeScene} runtimeScene
-   * @returns {gdjs.TestRuntimeObject}
    */
   const addSprite = (runtimeScene) => {
     const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
@@ -53,25 +52,63 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
     return object;
   };
 
+  /**
+   * @param {gdjs.RuntimeScene} runtimeScene
+   */
+  const addTextObject = (runtimeScene) => {
+    const object = new gdjs.TextRuntimeObject(runtimeScene, {
+      name: 'Object',
+      type: 'Sprite',
+      effects: [],
+      behaviors: [
+        {
+          type: 'Tween::TweenBehavior',
+          name: behaviorName,
+        },
+      ],
+      characterSize: 20,
+      font: '',
+      bold: false,
+      italic: false,
+      underlined: false,
+      color: {
+        r: 0,
+        g: 0,
+        b: 0,
+      },
+      string: '',
+      textAlignment: 'left',
+    });
+    runtimeScene.addObject(object);
+    return object;
+  };
+
   /** @type {gdjs.RuntimeScene} */
   let runtimeScene;
   /** @type {gdjs.RuntimeObject} */
   let object;
   /** @type {gdjs.SpriteRuntimeObject} */
   let sprite;
+  /** @type {gdjs.TextRuntimeObject} */
+  let textObject;
   /** @type {gdjs.TweenRuntimeBehavior} */
   let behavior;
   /** @type {gdjs.TweenRuntimeBehavior} */
   let spriteBehavior;
+  /** @type {gdjs.TweenRuntimeBehavior} */
+  let textObjectBehavior;
   beforeEach(() => {
     runtimeScene = createScene();
     runtimeScene.getLayer('').setTimeScale(1.5);
     object = addObject(runtimeScene);
     sprite = addSprite(runtimeScene);
+    textObject = addTextObject(runtimeScene);
     //@ts-ignore
     behavior = object.getBehavior(behaviorName);
     //@ts-ignore
     spriteBehavior = sprite.getBehavior(behaviorName);
+    //@ts-ignore
+    textObjectBehavior = textObject.getBehavior(behaviorName);
   });
 
   it('can play a tween till the end', () => {
@@ -263,12 +300,17 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
     expect(behavior.exists('MyTween')).to.be(true);
   });
 
-  const checkProgress = (steps, getValue) => {
-    let oldValue;
+  const checkProgress = (steps, getValueFunctions) => {
+    if (!Array.isArray(getValueFunctions)) {
+      getValueFunctions = [getValueFunctions];
+    }
     for (let i = 0; i < steps; i++) {
-      oldValue = getValue();
+      const oldValues = getValueFunctions.map((getValue) => getValue());
       runtimeScene.renderAndStep(1000 / 60);
-      expect(getValue()).to.be.above(oldValue);
+
+      for (let index = 0; index < oldValues.length; index++) {
+        expect(getValueFunctions[index]()).not.to.be(oldValues[index]);
+      }
     }
   };
 
@@ -320,10 +362,42 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
     expect(sprite.getOpacity()).to.be(204.2);
   });
 
+  it('can tween the color', () => {
+    sprite.setColor('16;32;64');
+    spriteBehavior.addObjectColorTween2(
+      'MyTween',
+      '255;192;128',
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => sprite.getColor());
+    // Colors are rounded by the tween.
+    expect(sprite.getColor()).to.be('76;235;27');
+  });
+
+  it('can tween the color to HSL', () => {
+    sprite.setColor('16;32;64');
+    spriteBehavior.addObjectColorHSLTween2(
+      'MyTween',
+      180,
+      true,
+      25,
+      50,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => sprite.getColor());
+    // Colors are rounded by the tween.
+    expect(sprite.getColor()).to.be('57;110;129');
+  });
+
   it('can tween the scale on X axis', () => {
     sprite.setScaleX(200);
     spriteBehavior.addObjectScaleXTween2('MyTween', 600, 'linear', 0.25, false);
     checkProgress(6, () => sprite.getScaleX());
+    // The interpolation is exponential.
     expect(sprite.getScaleX()).to.be(386.6364089863524);
   });
 
@@ -331,6 +405,53 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
     sprite.setScaleY(200);
     spriteBehavior.addObjectScaleYTween2('MyTween', 600, 'linear', 0.25, false);
     checkProgress(6, () => sprite.getScaleY());
+    // The interpolation is exponential.
     expect(sprite.getScaleY()).to.be(386.6364089863524);
+  });
+
+  it('can tween the font size', () => {
+    textObject.setCharacterSize(200);
+    textObjectBehavior.addTextObjectCharacterSizeTween2(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => textObject.getCharacterSize());
+    // The interpolation is exponential.
+    expect(textObject.getCharacterSize()).to.be(386.6364089863524);
+  });
+
+  it('can tween the position', () => {
+    object.setPosition(200, 300);
+    behavior.addObjectPositionTween2(
+      'MyTween',
+      600,
+      900,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, [() => object.getX(), () => object.getY()]);
+    expect(object.getX()).to.be(440);
+    expect(object.getY()).to.be(660);
+  });
+
+  it('can tween the scales', () => {
+    sprite.setScaleX(200);
+    sprite.setScaleY(300);
+    spriteBehavior.addObjectScaleTween2(
+      'MyTween',
+      600,
+      900,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    // The interpolation is exponential.
+    expect(sprite.getScaleX()).to.be(386.6364089863524);
+    expect(sprite.getScaleY()).to.be(579.9546134795287);
   });
 });

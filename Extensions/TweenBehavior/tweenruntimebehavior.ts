@@ -1036,7 +1036,7 @@ namespace gdjs {
      * @param toHue The target hue, or the same as the from color's hue if blank
      * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
      * @param toSaturation The target saturation, or the same as the from color's saturation if blank
-     * @param toHue The target lightness, or the same as the from color's lightness if blank
+     * @param toLightness The target lightness, or the same as the from color's lightness if blank
      * @param easing Easing function identifier
      * @param duration Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
@@ -1070,7 +1070,7 @@ namespace gdjs {
      * @param toHue The target hue, or the same as the from color's hue if blank
      * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
      * @param toSaturation The target saturation, or the same as the from color's saturation if blank
-     * @param toHue The target lightness, or the same as the from color's lightness if blank
+     * @param toLightness The target lightness, or the same as the from color's lightness if blank
      * @param easing Easing function identifier
      * @param duration Duration in seconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
@@ -1177,7 +1177,8 @@ namespace gdjs {
         easing,
         duration / 1000,
         destroyObjectWhenFinished,
-        this.owner.getRuntimeScene()
+        this.owner.getRuntimeScene(),
+        linearInterpolation
       );
     }
 
@@ -1202,7 +1203,8 @@ namespace gdjs {
         easing,
         duration,
         destroyObjectWhenFinished,
-        this.owner
+        this.owner,
+        exponentialInterpolation
       );
     }
 
@@ -1212,7 +1214,8 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
+      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
     ) {
       const owner = this.owner;
       if (!isCharacterScalable(owner)) return;
@@ -1222,7 +1225,7 @@ namespace gdjs {
         timeSource,
         duration,
         easing,
-        linearInterpolation,
+        interpolation,
         owner.getCharacterSize(),
         toSize,
         (value: float) => owner.setCharacterSize(value),

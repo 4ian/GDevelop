@@ -263,9 +263,9 @@ namespace gdjs {
 
       /**
        * Return a linear interpolation between a and b.
-       * 
+       *
        * For instance, `lerp(2, 8, 0.5)` is `5`.
-       * 
+       *
        * @param a Start value.
        * @param b End value.
        * @param x The interpolation value between 0 and 1.
@@ -277,9 +277,9 @@ namespace gdjs {
 
       /**
        * Return an exponential interpolation between `start` and `end`.
-       * 
+       *
        * For instance, `exponentialInterpolation(2, 8, 0.5)` is `4`.
-       * 
+       *
        * @param start Start value.
        * @param end End value.
        * @param progress The interpolation value between 0 and 1.

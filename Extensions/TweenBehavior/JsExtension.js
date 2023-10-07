@@ -1502,7 +1502,7 @@ module.exports = {
         'AddObjectColorHSLTween',
         _('Tween object HSL color'),
         _(
-          'Tweens the object color using Hue/Saturation/Lightness. Hue can be any number, Saturation and Lightness are between 0 and 100. Use -1 for Saturation and Lightness to let them unchanged.'
+          'Tweens the object color using Hue/Saturation/Lightness. Hue is in degrees, Saturation and Lightness are between 0 and 100. Use -1 for Saturation and Lightness to let them unchanged.'
         ),
         _(
           'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ (_PARAM4_), S: _PARAM5_, L: _PARAM6_ with easing _PARAM7_ over _PARAM8_ms as _PARAM2_'
@@ -1515,7 +1515,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
-      .addParameter('expression', _('To Hue'), '', false)
+      .addParameter('expression', _('To Hue (in degrees)'), '', false)
       .addParameter('yesorno', _('Animate Hue'), '', false)
       .setDefaultValue('yes')
       .addParameter(
@@ -1550,7 +1550,7 @@ module.exports = {
         'AddObjectColorHSLTween2',
         _('Tween object HSL color'),
         _(
-          'Tweens the object color using Hue/Saturation/Lightness. Hue can be any number, Saturation and Lightness are between 0 and 100. Use -1 for Saturation and Lightness to let them unchanged.'
+          'Tweens the object color using Hue/Saturation/Lightness. Hue is in degrees, Saturation and Lightness are between 0 and 100. Use -1 for Saturation and Lightness to let them unchanged.'
         ),
         _(
           'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ (_PARAM4_), S: _PARAM5_, L: _PARAM6_ with easing _PARAM7_ over _PARAM8_ seconds as _PARAM2_'
@@ -1562,7 +1562,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
-      .addParameter('expression', _('To Hue'), '', false)
+      .addParameter('expression', _('To Hue (in degrees)'), '', false)
       .addParameter('yesorno', _('Animate Hue'), '', false)
       .setDefaultValue('yes')
       .addParameter(

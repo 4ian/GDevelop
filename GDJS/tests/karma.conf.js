@@ -116,6 +116,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TextInput/textinputruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TextInput/textinputruntimeobject-pixi-renderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/TextObject/textruntimeobject.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/TextObject/textruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/standard-easing-functions.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/tweentools.js',

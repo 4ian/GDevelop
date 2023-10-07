@@ -1,5 +1,5 @@
 // @ts-check
-describe('gdjs.TweenRuntimeBehavior', () => {
+describe.only('gdjs.TweenRuntimeBehavior', () => {
   const behaviorName = 'Tween';
 
   const createScene = (timeDelta = 1000 / 60) => {
@@ -47,9 +47,40 @@ describe('gdjs.TweenRuntimeBehavior', () => {
           name: behaviorName,
         },
       ],
-      animations: [],
+      animations: [
+        {
+          name: 'animation',
+          directions: [
+            {
+              sprites: [
+                {
+                  originPoint: { name: 'Center', x: 0, y: 0 },
+                  centerPoint: {
+                    name: 'Origin',
+                    automatic: false,
+                    x: 32,
+                    y: 32,
+                  },
+                  points: [
+                    { name: 'Center', x: 0, y: 0 },
+                    { name: 'Origin', x: 32, y: 32 },
+                  ],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                  image: '',
+                },
+              ],
+              timeBetweenFrames: 0,
+              looping: false,
+            },
+          ],
+          useMultipleDirections: false,
+        },
+      ],
       updateIfNotVisible: true,
     });
+    object.getWidth = () => 64;
+    object.getHeight = () => 64;
     runtimeScene.addObject(object);
     return object;
   };
@@ -397,6 +428,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   });
 
   it('can tween the scale on X axis', () => {
+    sprite.setPosition(100, 400);
     sprite.setScaleX(200);
     spriteBehavior.addObjectScaleXTween2(
       'MyTween',
@@ -409,9 +441,30 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     checkProgress(6, () => sprite.getScaleX());
     // The interpolation is exponential.
     expect(sprite.getScaleX()).to.be(386.6364089863524);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scale on X axis from center', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleX(200);
+    spriteBehavior.addObjectScaleXTween2(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      true
+    );
+    checkProgress(6, () => sprite.getScaleX());
+    // The interpolation is exponential.
+    expect(sprite.getScaleX()).to.be(386.6364089863524);
+    expect(sprite.getX()).to.be(-5872.3650875632775);
+    expect(sprite.getY()).to.be(400);
   });
 
   it('can tween the scale on Y axis', () => {
+    sprite.setPosition(100, 400);
     sprite.setScaleY(200);
     spriteBehavior.addObjectScaleYTween2(
       'MyTween',
@@ -424,6 +477,26 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     checkProgress(6, () => sprite.getScaleY());
     // The interpolation is exponential.
     expect(sprite.getScaleY()).to.be(386.6364089863524);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scale on Y axis from center', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleY(200);
+    spriteBehavior.addObjectScaleYTween2(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      true
+    );
+    checkProgress(6, () => sprite.getScaleY());
+    // The interpolation is exponential.
+    expect(sprite.getScaleY()).to.be(386.6364089863524);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(-5572.3650875632775);
   });
 
   it('can tween the font size', () => {
@@ -456,6 +529,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   });
 
   it('can tween the scales', () => {
+    sprite.setPosition(100, 400);
     sprite.setScaleX(200);
     sprite.setScaleY(300);
     spriteBehavior.addObjectScaleTween2(
@@ -471,5 +545,28 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     // The interpolation is exponential.
     expect(sprite.getScaleX()).to.be(386.6364089863524);
     expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scales from center', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleX(200);
+    sprite.setScaleY(300);
+    spriteBehavior.addObjectScaleTween2(
+      'MyTween',
+      600,
+      900,
+      'linear',
+      0.25,
+      false,
+      true
+    );
+    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    // The interpolation is exponential.
+    expect(sprite.getScaleX()).to.be(386.6364089863524);
+    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getX()).to.be(-5872.3650875632775);
+    expect(sprite.getY()).to.be(-8558.547631344918);
   });
 });

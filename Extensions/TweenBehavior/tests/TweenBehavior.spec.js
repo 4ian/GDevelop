@@ -194,7 +194,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
     // Remove the tween
     expect(behavior.exists('MyTween')).to.be(true);
-    behavior.removeTween('MyTween', false);
+    behavior.removeTween('MyTween');
     expect(behavior.exists('MyTween')).to.be(false);
     expect(object.getX()).to.be(400);
     for (let i = 0; i < 5; i++) {

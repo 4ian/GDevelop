@@ -245,8 +245,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       600,
       'linear',
       0.25 / 1.5,
-      false,
-      ''
+      false
     );
     checkProgress(6, () => tween.getValue(layout, 'MyTween'));
     expect(tween.getValue(layout, 'MyTween')).to.be(440);

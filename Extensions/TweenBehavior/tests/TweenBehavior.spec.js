@@ -145,6 +145,14 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     textObjectBehavior = textObject.getBehavior(behaviorName);
   });
 
+  it("can get default values for tweens that don't exist", () => {
+    expect(behavior.exists('MyTween')).to.be(false);
+    expect(behavior.getValue('MyTween')).to.be(0);
+    expect(behavior.getProgress('MyTween')).to.be(0);
+    expect(behavior.isPlaying('MyTween')).to.be(false);
+    expect(behavior.hasFinished('MyTween')).to.be(false);
+  });
+
   it('can play a tween till the end', () => {
     object.setPosition(200, 300);
 

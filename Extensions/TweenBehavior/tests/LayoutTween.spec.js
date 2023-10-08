@@ -20,6 +20,14 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   const tween = gdjs.evtTools.tween;
   const camera = gdjs.evtTools.camera;
 
+  it("can get default values for tweens that don't exist", () => {
+    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(false);
+    expect(tween.getValue(layout, 'MyTween')).to.be(0);
+    expect(tween.getProgress(layout, 'MyTween')).to.be(0);
+    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+  });
+
   it('can play a tween till the end', () => {
     camera.setCameraRotation(layout, 200, '', 0);
     tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 0.25, 'linear');

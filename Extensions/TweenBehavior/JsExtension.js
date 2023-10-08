@@ -638,7 +638,6 @@ module.exports = {
           false
         )
         .setDefaultValue('no')
-        .setHidden()
         .getCodeExtraInformation()
         .setFunctionName('addValueTween');
 

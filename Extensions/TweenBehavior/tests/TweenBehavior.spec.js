@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.TweenRuntimeBehavior', () => {
+describe('gdjs.TweenRuntimeBehavior', () => {
   const behaviorName = 'Tween';
 
   const createScene = (timeDelta = 1000 / 60) => {
@@ -403,7 +403,8 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       '255;192;128',
       'linear',
       0.25,
-      false
+      false,
+      true
     );
     checkProgress(6, () => sprite.getColor());
     // Colors are rounded by the tween.

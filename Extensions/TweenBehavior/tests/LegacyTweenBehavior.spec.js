@@ -37,7 +37,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
    */
   const addSprite = (runtimeScene) => {
     const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
-      name: 'Object',
+      name: 'Sprite',
       type: 'Sprite',
       effects: [],
       variables: [],
@@ -90,8 +90,8 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
    */
   const addTextObject = (runtimeScene) => {
     const object = new gdjs.TextRuntimeObject(runtimeScene, {
-      name: 'Object',
-      type: 'Sprite',
+      name: 'Text',
+      type: 'TextObject::Text',
       effects: [],
       variables: [],
       behaviors: [

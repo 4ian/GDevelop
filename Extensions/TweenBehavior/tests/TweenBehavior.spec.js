@@ -37,7 +37,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
    */
   const addSprite = (runtimeScene) => {
     const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
-      name: 'Object',
+      name: 'Sprite',
       type: 'Sprite',
       effects: [],
       variables: [],
@@ -90,8 +90,8 @@ describe('gdjs.TweenRuntimeBehavior', () => {
    */
   const addTextObject = (runtimeScene) => {
     const object = new gdjs.TextRuntimeObject(runtimeScene, {
-      name: 'Object',
-      type: 'Sprite',
+      name: 'Text',
+      type: 'TextObject::Text',
       effects: [],
       variables: [],
       behaviors: [
@@ -177,6 +177,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getX()).to.be(600);
     expect(behavior.getValue('MyTween')).to.be(600);
     expect(behavior.getProgress('MyTween')).to.be(1);
+    expect(runtimeScene.getInstancesCountOnScene('Object')).to.be(1);
 
     // The value is not changed after the tween is finished
     runtimeScene.renderAndStep(1000 / 60);
@@ -191,6 +192,25 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     object.setX(123);
     runtimeScene.renderAndStep(1000 / 60);
     expect(object.getX()).to.be(123);
+  });
+
+  it('can remove the object at the end', () => {
+    object.setPosition(200, 300);
+
+    behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0.25, true);
+
+    for (let i = 0; i < 9; i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    // The tween is near the end.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(behavior.isPlaying('MyTween')).to.be(true);
+    expect(behavior.hasFinished('MyTween')).to.be(false);
+    expect(object.getX()).to.be(600);
+
+    expect(runtimeScene.getInstancesCountOnScene('Object')).to.be(1);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(runtimeScene.getInstancesCountOnScene('Object')).to.be(0);
   });
 
   it('can pause and resume a tween', () => {

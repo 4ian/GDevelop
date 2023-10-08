@@ -138,7 +138,7 @@ namespace gdjs {
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
           runtimeScene,
-          duration / 1000,
+          duration,
           easing,
           useExponentialInterpolation
             ? exponentialInterpolation
@@ -175,7 +175,7 @@ namespace gdjs {
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
           layer,
-          duration / 1000,
+          duration,
           easing,
           useExponentialInterpolation
             ? exponentialInterpolation

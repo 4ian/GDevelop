@@ -368,6 +368,12 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     }
   };
 
+  it('can tween an object value', () => {
+    behavior.addValueTween('MyTween', 200, 600, 'linear', 0.25, false, false);
+    checkProgress(6, () => behavior.getValue('MyTween'));
+    expect(behavior.getValue('MyTween')).to.be(440);
+  });
+
   it('can tween the position on X axis', () => {
     object.setX(200);
     behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0.25, false);

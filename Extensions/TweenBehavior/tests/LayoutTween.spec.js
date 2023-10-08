@@ -222,6 +222,36 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     }
   };
 
+  it('can tween a layer value', () => {
+    tween.addLayerValueTween(
+      layout,
+      'MyTween',
+      200,
+      600,
+      'linear',
+      0.25,
+      false,
+      ''
+    );
+    checkProgress(6, () => tween.getValue(layout, 'MyTween'));
+    expect(tween.getValue(layout, 'MyTween')).to.be(440);
+  });
+
+  it('can tween a layout value', () => {
+    tween.addLayoutValueTween(
+      layout,
+      'MyTween',
+      200,
+      600,
+      'linear',
+      0.25 / 1.5,
+      false,
+      ''
+    );
+    checkProgress(6, () => tween.getValue(layout, 'MyTween'));
+    expect(tween.getValue(layout, 'MyTween')).to.be(440);
+  });
+
   it('can tween a layer camera position', () => {
     camera.setCameraX(layout, 200, '', 0);
     camera.setCameraY(layout, 300, '', 0);

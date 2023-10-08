@@ -203,8 +203,8 @@ namespace gdjs {
     ) {
       this._tweens.addSimpleTween(
         identifier,
-        this.owner.getRuntimeScene(),
-        duration / 1000,
+        this.owner,
+        duration,
         easing,
         useExponentialInterpolation
           ? exponentialInterpolation

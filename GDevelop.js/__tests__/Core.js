@@ -3710,7 +3710,22 @@ describe('libGD.js', function () {
         0
       );
       object.getVariables().insertNew('MyObjectVariable', 0);
-      layout.insertNewObject(project, 'Sprite', 'MySpriteObject2', 1);
+      object.getVariables().insertNew('MyObjectGroupVariable1', 0);
+      object.getVariables().insertNew('MyObjectGroupVariable2', 0);
+      object.getVariables().insertNew('MyObjectGroupVariable3', 0);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'MySpriteObject2',
+        1
+      );
+      object2.getVariables().insertNew('MyObjectGroupVariable1', 0);
+      object2.getVariables().insertNew('MyObjectGroupVariable2', 0);
+      const objectGroup = layout
+        .getObjectGroups()
+        .insertNew('MyObjectGroup', 0);
+      objectGroup.addObject('MySpriteObject');
+      objectGroup.addObject('MySpriteObject2');
       layout.insertNewObject(project, 'Sprite', 'UnrelatedSpriteObject3', 2);
       layout.getVariables().insertNew('MyVariable', 0);
       layout.getVariables().insertNew('MyVariable2', 1);
@@ -3790,6 +3805,7 @@ Array [
   "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
   "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
   "{ 0, number, 1, no prefix, UnrelatedSpriteObject3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, UnrelatedVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -3814,6 +3830,7 @@ Array [
 Array [
   "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
   "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -3831,6 +3848,9 @@ Array [
       expect(testCompletions('number', '1 + MySpriteObject.My| '))
         .toMatchInlineSnapshot(`
 Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 1, no type, 1, My, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 2, number, 1, My, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -3842,6 +3862,27 @@ Array [
 Array [
   "{ 1, no type, 1, Func, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 2, number, 1, Func, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
+    it('completes an expression with an object group function, behavior or variable', function () {
+      // List variables, expressions and behaviors, if all of them are present:
+      expect(testCompletions('number', '1 + MyObjectGroup.My| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 1, no type, 1, My, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, My, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      // Only list expressions and behaviors if no matching variables:
+      expect(testCompletions('number', '1 + MyObjectGroup.Func| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 1, no type, 1, Func, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, Func, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
 ]
 `);
     });
@@ -3861,6 +3902,7 @@ Array [
 Array [
   "{ 0, string, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
   "{ 0, string, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, string, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -3894,6 +3936,9 @@ Array [
       expect(testCompletions('number', '1 + MySpriteObject.Variable(My| '))
         .toMatchInlineSnapshot(`
 Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
 ]
 `);
@@ -3904,7 +3949,32 @@ Array [
         )
       ).toMatchInlineSnapshot(`
 Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
   "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
+    it('completes an expression parameters (group, legacy pre-scoped variable)', function () {
+      // Verify only the object group variable is autocompleted:
+      expect(testCompletions('number', '1 + MyObjectGroup.Variable(My| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      expect(
+        testCompletions(
+          'string',
+          '"Score:" + MyObjectGroup.VariableString(My| '
+        )
+      ).toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
 ]
 `);
     });

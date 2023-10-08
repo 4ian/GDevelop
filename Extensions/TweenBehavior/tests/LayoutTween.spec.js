@@ -9,6 +9,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     return runtimeScene;
   };
 
+  /** @type {gdjs.RuntimeScene} */
   let layout;
   /** @type {gdjs.TweenRuntimeBehavior} */
   beforeEach(() => {

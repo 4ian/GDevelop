@@ -1,5 +1,5 @@
 // @ts-check
-describe('gdjs.TweenRuntimeBehavior', () => {
+describe.only('gdjs.TweenRuntimeBehavior', () => {
   const behaviorName = 'Tween';
 
   const createScene = (timeDelta = 1000 / 60) => {
@@ -158,6 +158,37 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       }
     }
   };
+
+  it('can tween an object variable', () => {
+    const variable = object.getVariables().get('MyVariable');
+    variable.setNumber(200);
+    behavior.addVariableTween2(
+      'MyTween',
+      variable,
+      600,
+      'linear',
+      250 / 1.5,
+      false
+    );
+    checkProgress(6, () => variable.getAsNumber());
+    expect(variable.getAsNumber()).to.be(440);
+  });
+
+  it('can tween an object variable (older action)', () => {
+    const variable = object.getVariables().get('MyVariable');
+    variable.setNumber(200);
+    behavior.addVariableTween(
+      'MyTween',
+      variable,
+      200,
+      600,
+      'linear',
+      250 / 1.5,
+      false
+    );
+    checkProgress(6, () => variable.getAsNumber());
+    expect(variable.getAsNumber()).to.be(440);
+  });
 
   it('can tween the position on X axis', () => {
     object.setX(200);

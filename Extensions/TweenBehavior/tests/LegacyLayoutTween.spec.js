@@ -9,6 +9,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     return runtimeScene;
   };
 
+  /** @type {gdjs.RuntimeScene} */
   let layout;
   /** @type {gdjs.TweenRuntimeBehavior} */
   beforeEach(() => {
@@ -32,6 +33,37 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       }
     }
   };
+
+  it('can tween an object variable', () => {
+    const variable = layout.getVariables().get('MyVariable');
+    variable.setNumber(200);
+    tween.tweenVariableNumber2(
+      layout,
+      'MyTween',
+      variable,
+      600,
+      250 / 1.5,
+      'linear'
+    );
+    checkProgress(6, () => variable.getAsNumber());
+    expect(variable.getAsNumber()).to.be(440);
+  });
+
+  it('can tween an object variable (older action)', () => {
+    const variable = layout.getVariables().get('MyVariable');
+    variable.setNumber(200);
+    tween.tweenVariableNumber(
+      layout,
+      'MyTween',
+      variable,
+      200,
+      600,
+      250 / 1.5,
+      'linear'
+    );
+    checkProgress(6, () => variable.getAsNumber());
+    expect(variable.getAsNumber()).to.be(440);
+  });
 
   it('can tween a layer camera position', () => {
     camera.setCameraX(layout, 200, '', 0);

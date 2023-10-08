@@ -42,7 +42,7 @@
                   "type": {
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": ["SuccessStringVariable", "+", "MyFirstProperty + MyThirdProperty + MyFourthProperty"]
+                  "parameters": ["SuccessStringVariable", "=", "MyFirstProperty + MyThirdProperty + MyFourthProperty"]
                 }
               ]
             }
@@ -77,7 +77,7 @@
                   "type": {
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": ["SuccessStringVariable", "+", "MyFirstParameter + MyThirdParameter + MyFourthParameter"]
+                  "parameters": ["SuccessStringVariable", "=", "MyFirstParameter + MyThirdParameter + MyFourthParameter"]
                 }
               ]
             }

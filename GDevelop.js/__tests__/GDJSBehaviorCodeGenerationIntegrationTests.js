@@ -161,7 +161,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
             type: { value: 'ModVarSceneTxt' },
             parameters: [
               'SuccessStringVariable',
-              '+',
+              '=',
               'MyProperty + MyProperty2 + MySharedProperty2',
             ],
           },
@@ -216,7 +216,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     expect(runtimeScene.getVariables().has('SuccessStringVariable')).toBe(true);
     expect(
       runtimeScene.getVariables().get('SuccessStringVariable').getAsString()
-    ).toBe("true2Test");
+    ).toBe('true2Test');
   });
 });
 

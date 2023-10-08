@@ -206,4 +206,45 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(camera.getCameraRotation(layout, '', 0)).to.be(373);
     expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(true);
   });
+
+  const checkProgress = (steps, getValueFunctions) => {
+    if (!Array.isArray(getValueFunctions)) {
+      getValueFunctions = [getValueFunctions];
+    }
+    for (let i = 0; i < steps; i++) {
+      const oldValues = getValueFunctions.map((getValue) => getValue());
+      layout.renderAndStep(1000 / 60);
+
+      for (let index = 0; index < oldValues.length; index++) {
+        expect(getValueFunctions[index]()).not.to.be(oldValues[index]);
+      }
+    }
+  };
+
+  it('can tween a layer camera position', () => {
+    camera.setCameraX(layout, 200, '', 0);
+    camera.setCameraY(layout, 300, '', 0);
+    tween.tweenCamera2(layout, 'MyTween', 600, 900, '', 0.25, 'linear');
+    checkProgress(6, [
+      () => camera.getCameraX(layout, '', 0),
+      () => camera.getCameraY(layout, '', 0),
+    ]);
+    expect(camera.getCameraX(layout, '', 0)).to.be(440);
+    expect(camera.getCameraY(layout, '', 0)).to.be(660);
+  });
+
+  it('can tween a layer camera zoom', () => {
+    camera.setCameraZoom(layout, 200, '', 0);
+    tween.tweenCameraZoom2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    checkProgress(6, () => camera.getCameraZoom(layout, '', 0));
+    // The interpolation is exponential.
+    expect(camera.getCameraZoom(layout, '', 0)).to.be(386.6364089863524);
+  });
+
+  it('can tween a layer camera rotation', () => {
+    camera.setCameraRotation(layout, 200, '', 0);
+    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    checkProgress(6, () => camera.getCameraRotation(layout, '', 0));
+    expect(camera.getCameraRotation(layout, '', 0)).to.be(440);
+  });
 });

@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.TweenRuntimeBehavior', () => {
+describe('gdjs.TweenRuntimeBehavior', () => {
   const behaviorName = 'Tween';
 
   const createScene = (timeDelta = 1000 / 60) => {
@@ -263,7 +263,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       false
     );
     checkProgress(6, () => sprite.getScaleX());
-    // The interpolation is exponential.
+    // The interpolation was not exponential.
     expect(sprite.getScaleX()).to.be(440);
     expect(sprite.getX()).to.be(100);
     expect(sprite.getY()).to.be(400);
@@ -281,7 +281,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       true
     );
     checkProgress(6, () => sprite.getScaleX());
-    // The interpolation is exponential.
+    // The interpolation was not exponential.
     expect(sprite.getScaleX()).to.be(440);
     expect(sprite.getX()).to.be(-7580);
     expect(sprite.getY()).to.be(400);
@@ -299,7 +299,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       false
     );
     checkProgress(6, () => sprite.getScaleY());
-    // The interpolation is exponential.
+    // The interpolation was not exponential.
     expect(sprite.getScaleY()).to.be(440);
     expect(sprite.getX()).to.be(100);
     expect(sprite.getY()).to.be(400);
@@ -317,7 +317,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       true
     );
     checkProgress(6, () => sprite.getScaleY());
-    // The interpolation is exponential.
+    // The interpolation was not exponential.
     expect(sprite.getScaleY()).to.be(440);
     expect(sprite.getX()).to.be(100);
     expect(sprite.getY()).to.be(-7280);
@@ -333,7 +333,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       false
     );
     checkProgress(6, () => textObject.getCharacterSize());
-    // The interpolation is exponential.
+    // The interpolation was not exponential.
     expect(textObject.getCharacterSize()).to.be(440);
   });
 
@@ -366,7 +366,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       false
     );
     checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
-    // The interpolation is exponential.
+    // The interpolation was not exponential.
     expect(sprite.getScaleX()).to.be(440);
     expect(sprite.getScaleY()).to.be(660);
     expect(sprite.getX()).to.be(100);
@@ -387,7 +387,7 @@ describe.only('gdjs.TweenRuntimeBehavior', () => {
       true
     );
     checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
-    // The interpolation is exponential.
+    // The interpolation was not exponential.
     expect(sprite.getScaleX()).to.be(440);
     expect(sprite.getScaleY()).to.be(660);
     expect(sprite.getX()).to.be(-7580);

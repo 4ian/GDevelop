@@ -1388,7 +1388,7 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
       return "(" + propertyGetterCode + " ? \"true\" : \"false\")";
     } else {
       // Assume type is String or equivalent.
-      return "(Number(" + propertyGetterCode + ") || 0)";
+      return propertyGetterCode;
     }
   } else if (type == "number") {
     if (property.GetType() == "Number") {
@@ -1420,7 +1420,7 @@ gd::String EventsCodeGenerator::GenerateParameterGetter(
       return "(" + parameterGetterCode + " ? \"true\" : \"false\")";
     } else {
       // Assume type is String or equivalent.
-      return "(Number(" + parameterGetterCode + ") || 0)";
+      return parameterGetterCode;
     }
   } else if (type == "number") {
     if (parameter.GetValueTypeMetadata().IsNumber()) {

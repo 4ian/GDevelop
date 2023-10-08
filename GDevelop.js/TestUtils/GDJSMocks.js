@@ -182,6 +182,18 @@ class Variable {
     return Variable.copy(this, new Variable());
   }
 
+  setString(value) {
+    this._value = value;
+  }
+
+  getAsString() {
+    return this._value || "";
+  }
+
+  concatenateString(str) {
+    this.setString(this.getAsString() + str);
+  }
+
   addChild(childName, childVariable) {
     // Make sure this is a structure
     this.castTo('structure');

@@ -138,6 +138,11 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       .insertNew('MySharedProperty', 0)
       .setValue('4')
       .setType('String');
+    eventsBasedBehavior
+      .getSharedPropertyDescriptors()
+      .insertNew('MySharedProperty2', 0)
+      .setValue('Test')
+      .setType('String');
 
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
@@ -150,6 +155,14 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
               'SuccessVariable',
               '+',
               'MyProperty + MyProperty2 + MySharedProperty',
+            ],
+          },
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: [
+              'SuccessStringVariable',
+              '+',
+              'MyProperty + MyProperty2 + MySharedProperty2',
             ],
           },
         ],
@@ -199,6 +212,11 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(7);
+
+    expect(runtimeScene.getVariables().has('SuccessStringVariable')).toBe(true);
+    expect(
+      runtimeScene.getVariables().get('SuccessStringVariable').getAsString()
+    ).toBe("true2Test");
   });
 });
 

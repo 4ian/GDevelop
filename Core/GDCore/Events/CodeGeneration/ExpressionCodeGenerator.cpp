@@ -191,8 +191,6 @@ void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
     return;
   }
 
-  // ExpressionCodeGenerator generator("string", "", codeGenerator, context);
-  // TODO: this type seems useless. Why?
   ExpressionCodeGenerator generator("number|string", "", codeGenerator, context);
   node.expression->Visit(generator);
   output +=

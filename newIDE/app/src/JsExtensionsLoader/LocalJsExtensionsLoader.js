@@ -79,6 +79,15 @@ module.exports = function makeExtensionsLoader(
                   );
                 }
 
+                // Load any cache clearing methods, if we have somewhere where
+                // to register them.
+                if (
+                  objectsRenderingService &&
+                  extensionModule.registerClearCache
+                ) {
+                  extensionModule.registerClearCache(objectsRenderingService);
+                }
+
                 return {
                   extensionModulePath,
                   result: loadExtension(

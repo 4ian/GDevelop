@@ -157,6 +157,10 @@ const ObjectsRenderingService = {
 
     this.renderers3D[objectType] = renderer;
   },
+  renderersCacheClearingMethods: [],
+  registerClearCache: function(clearCache: (project: gdProject) => void) {
+    this.renderersCacheClearingMethods.push(clearCache);
+  },
   /**
    * Register a module that can be then required using `requireModule`.
    * This is necessary for the web-app, as all files must be bundled.

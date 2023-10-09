@@ -124,6 +124,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.rightHandSide->Visit(*this);
     const Type rightType = childType;
 
+    // The type is decided by the first operand, unless it can (`number|string`)
+    // or should (`unknown`) be refined, in which case we go for the right
+    // operand (which got visited knowing the type of the first operand, so it's
+    // equal or strictly more precise than the left operand).
     childType = (leftType == Type::Unknown || leftType == Type::NumberOrString) ? leftType : rightType;
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {

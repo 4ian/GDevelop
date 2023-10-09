@@ -67,8 +67,11 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   void OnVisitOperatorNode(OperatorNode& node) override {
     node.leftHandSide->Visit(*this);
 
+    // The type is decided by the first operand, unless it can (`number|string`)
+    // or should (`unknown`) be refined, in which case we go for the right
+    // operand (which got visited knowing the type of the first operand, so it's
+    // equal or strictly more precise than the left operand).
     if (type == "unknown" || type == "number|string") {
-      // Continue trying to find the type of the expression.
       node.rightHandSide->Visit(*this);
     }
   }

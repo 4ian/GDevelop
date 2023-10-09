@@ -543,7 +543,6 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Generate the code to get the child of a variable.
    */
   virtual gd::String GenerateVariableAccessor(gd::String childName) {
-    // TODO: use getChildNamed
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
   };
 

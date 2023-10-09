@@ -62,6 +62,7 @@ import MosaicEditorsDisplay from './MosaicEditorsDisplay';
 import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
 import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 
 const gd: libGDevelop = global.gd;
 
@@ -235,6 +236,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
+        ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
+          clear(project)
+        );
         objectNames.forEach(objectName => {
           editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
         });

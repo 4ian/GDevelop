@@ -56,6 +56,7 @@ export type Capabilities = {
   cloudProjects: {
     maximumCount: number,
     canMaximumCountBeIncreased: boolean,
+    maximumGuestCollaboratorsPerProject: number,
   },
   /**
    * leaderboards is marked as optional to prevent bugs at the moment
@@ -176,6 +177,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+      {
+        message: t`Add 1 guest user or unlimited startup team members to collaborate on every project.`,
       },
     ],
   },

@@ -46,7 +46,7 @@ const fakeEditorToolbar = (
 const defaultProps: MainFrameToolbarProps = {
   showProjectButtons: true,
   toggleProjectManager: () => {},
-  exportProject: () => {},
+  openShareDialog: () => {},
 
   onPreviewWithoutHotReload: () => {},
   onOpenDebugger: () => {},

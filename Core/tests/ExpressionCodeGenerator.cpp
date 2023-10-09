@@ -48,6 +48,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   group.AddObject("MyOtherSpriteObject");
   group.AddObject("FakeObjectWithDefaultBehavior");
 
+  auto &spriteGroup = layout1.GetObjectGroups().InsertNew("MySpriteObjects");
+  spriteGroup.AddObject("MySpriteObject");
+  spriteGroup.AddObject("MyOtherSpriteObject");
+
   gd::ExpressionParser2 parser;
 
   unsigned int maxDepth = 0;
@@ -612,6 +616,20 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "getVariableForObject(MySpriteObject, MyVariable).getAsNumber() + getVariableForObject(MySpriteObject, MyVariable2).getAsNumber()");
+    }
+  }
+  SECTION("Object variables (1 level, object group)") {
+    {
+      auto node =
+        parser.ParseExpression("MySpriteObjects.MyVariable + 1");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getVariableForObject(MySpriteObjects, MyVariable).getAsNumber() + 1");
     }
   }
   SECTION("Object variables (conflict with a scene variable)") {

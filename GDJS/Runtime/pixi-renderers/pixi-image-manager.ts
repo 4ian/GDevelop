@@ -95,7 +95,7 @@ namespace gdjs {
     setResources(resourceDataArray: ResourceData[]): void {
       this._resources.clear();
       for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'image') {
+        if (resourceData.kind === 'image' || resourceData.kind === 'video') {
           this._resources.set(resourceData.name, resourceData);
         }
       }
@@ -285,6 +285,7 @@ namespace gdjs {
             crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
               ? 'use-credentials'
               : 'anonymous',
+            autoPlay: false,
           },
         }
       ).on('error', (error) => {
@@ -315,19 +316,52 @@ namespace gdjs {
       await Promise.all(
         [...this._resources.values()].map(async (resource) => {
           try {
-            PIXI.Assets.setPreferences({
-              preferWorkers: false,
-              preferCreateImageBitmap: false,
-              crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
-                resource.file
-              )
-                ? 'use-credentials'
-                : 'anonymous',
-            });
-            const loadedTexture = await PIXI.Assets.load(resource.file);
-            this._loadedTextures.put(resource.name, loadedTexture);
-            // TODO What if 2 assets share the same file with different settings?
-            applyTextureSettings(loadedTexture, resource);
+            if (resource.kind === 'video') {
+              // For videos, we want to preload them so they are available as soon as we want to use them.
+              // We cannot use Pixi.assets.load() as it does not allow passing options (autoplay) to the resource loader.
+              // Pixi.Texture.from() does not return a promise, so we need to ensure we look at the 'loaded' event of the baseTexture,
+              // to continue, otherwise if we try to play the video too soon (at the beginning of scene for instance),
+              // it will fail.
+              await new Promise<void>((resolve, reject) => {
+                const texture = PIXI.Texture.from(
+                  this._resourcesLoader.getFullUrl(resource.file),
+                  {
+                    resourceOptions: {
+                      crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
+                        resource.file
+                      )
+                        ? 'use-credentials'
+                        : 'anonymous',
+                      autoPlay: false,
+                    },
+                  }
+                ).on('error', (error) => {
+                  reject(error);
+                });
+
+                const baseTexture = texture.baseTexture;
+
+                baseTexture.on('loaded', () => {
+                  this._loadedTextures.put(resource.name, texture);
+                  applyTextureSettings(texture, resource);
+                  resolve();
+                });
+              });
+            } else {
+              PIXI.Assets.setPreferences({
+                preferWorkers: false,
+                preferCreateImageBitmap: false,
+                crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
+                  resource.file
+                )
+                  ? 'use-credentials'
+                  : 'anonymous',
+              });
+              const loadedTexture = await PIXI.Assets.load(resource.file);
+              this._loadedTextures.put(resource.name, loadedTexture);
+              // TODO What if 2 assets share the same file with different settings?
+              applyTextureSettings(loadedTexture, resource);
+            }
           } catch (error) {
             logFileLoadingError(resource.file, error);
           }

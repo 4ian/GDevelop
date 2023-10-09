@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
+  type FileMetadata,
   type StorageProvider,
 } from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
@@ -61,6 +62,7 @@ const styles = {
 
 type Props = {|
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
 
   isActive: boolean,
   projectItemName: ?string,
@@ -113,6 +115,7 @@ export const HomePage = React.memo<Props>(
     (
       {
         project,
+        fileMetadata,
         canOpen,
         onChooseProject,
         onOpenRecentFile,
@@ -303,6 +306,7 @@ export const HomePage = React.memo<Props>(
                     <BuildSection
                       ref={buildSectionRef}
                       project={project}
+                      currentFileMetadata={fileMetadata}
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
@@ -315,6 +319,7 @@ export const HomePage = React.memo<Props>(
                       }
                       onOpenRecentFile={onOpenRecentFile}
                       storageProviders={storageProviders}
+                      i18n={i18n}
                     />
                   )}
                   {activeTab === 'learn' && (
@@ -342,6 +347,7 @@ export const HomePage = React.memo<Props>(
                       project={project}
                       onOpenRecentFile={onOpenRecentFile}
                       storageProviders={storageProviders}
+                      currentFileMetadata={fileMetadata}
                     />
                   )}
                 </div>
@@ -369,6 +375,7 @@ export const renderHomePageContainer = (
   <HomePage
     ref={props.ref}
     project={props.project}
+    fileMetadata={props.fileMetadata}
     isActive={props.isActive}
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}

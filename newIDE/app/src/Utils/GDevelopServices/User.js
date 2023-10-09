@@ -47,6 +47,7 @@ export type UserPublicProfile = {|
   description: ?string,
   donateLink: ?string,
   communityLinks: CommunityLinks,
+  iconUrl: string,
 |};
 
 export type UserPublicProfileByIds = {|
@@ -218,16 +219,20 @@ export const updateUserGroup = async (
   return response.data;
 };
 
-export const getUserPublicProfilesByIds = (
+export const getUserPublicProfilesByIds = async (
   ids: Array<string>
 ): Promise<UserPublicProfileByIds> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/user-public-profile`, {
+  // Ensure we don't send an empty list of ids, as the request would fail.
+  if (ids.length === 0) return {};
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/user-public-profile`,
+    {
       params: {
         id: ids.join(','),
       },
-    })
-    .then(response => response.data);
+    }
+  );
+  return response.data;
 };
 
 export const getUserPublicProfile = (

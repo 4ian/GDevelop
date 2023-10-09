@@ -35,6 +35,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
       .SetIcon("res/conditions/toujours24_black.png");
 
+  // This condition is deprecated as this does not bring anything new
+  // and can be confusing or misleading for beginners.
   extension
       .AddCondition("Always",
                     _("Always"),
@@ -46,7 +48,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     "res/conditions/toujours_black.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddCodeOnlyParameter("conditionInverted", "")
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
   // Compatibility with GD <= 5.0.127
   extension
@@ -114,8 +117,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
 
   // Compatibility with GD <= 5.0.127
   extension
-      .AddDuplicatedCondition(
-          "Egal", "BuiltinCommonInstructions::CompareNumbers", {.unscoped = true})
+      .AddDuplicatedCondition("Egal",
+                              "BuiltinCommonInstructions::CompareNumbers",
+                              {.unscoped = true})
       .SetHidden();
   // end of compatibility code
 
@@ -135,8 +139,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
 
   // Compatibility with GD <= 5.0.127
   extension
-      .AddDuplicatedCondition(
-          "StrEqual", "BuiltinCommonInstructions::CompareStrings", {.unscoped = true})
+      .AddDuplicatedCondition("StrEqual",
+                              "BuiltinCommonInstructions::CompareStrings",
+                              {.unscoped = true})
       .SetHidden();
   // end of compatibility code
 

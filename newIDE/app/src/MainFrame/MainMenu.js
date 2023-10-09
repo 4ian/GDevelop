@@ -31,7 +31,8 @@ export type MainMenuCallbacks = {|
   onSaveProjectAs: () => void,
   onCloseProject: () => Promise<boolean>,
   onCloseApp: () => void,
-  onExportProject: (open?: boolean) => void,
+  onExportProject: () => void,
+  onInviteCollaborators: () => void,
   onCreateProject: (open?: boolean) => void,
   onCreateBlank: () => void,
   onOpenProjectManager: (open?: boolean) => void,
@@ -57,6 +58,7 @@ export type MainMenuEvent =
   | 'main-menu-close'
   | 'main-menu-close-app'
   | 'main-menu-export'
+  | 'main-menu-invite-collaborators'
   | 'main-menu-create-template'
   | 'main-menu-create-blank'
   | 'main-menu-open-project-manager'
@@ -81,6 +83,7 @@ const getMainMenuEventCallback = (
     'main-menu-close': callbacks.onCloseProject,
     'main-menu-close-app': callbacks.onCloseApp,
     'main-menu-export': callbacks.onExportProject,
+    'main-menu-invite-collaborators': callbacks.onInviteCollaborators,
     'main-menu-create-template': callbacks.onCreateProject,
     'main-menu-create-blank': callbacks.onCreateBlank,
     'main-menu-open-project-manager': callbacks.onOpenProjectManager,
@@ -156,6 +159,14 @@ export const buildMainMenuDeclarativeTemplate = ({
         enabled: !!project,
       },
       { type: 'separator' },
+      {
+        label: i18n._(t`Invite collaborators`),
+        accelerator: getElectronAccelerator(
+          shortcutMap['INVITE_COLLABORATORS']
+        ),
+        onClickSendEvent: 'main-menu-invite-collaborators',
+        enabled: !!project,
+      },
       {
         label: i18n._(t`Export (web, iOS, Android)...`),
         accelerator: getElectronAccelerator(shortcutMap['EXPORT_GAME']),

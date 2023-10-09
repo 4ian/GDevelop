@@ -14,7 +14,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import {
   type PreviewDebuggerServer,
   type DebuggerId,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 import { type Log, LogsManager } from './DebuggerConsole';
 
 export type ProfilerMeasuresSection = {|

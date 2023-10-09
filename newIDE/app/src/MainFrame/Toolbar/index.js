@@ -2,9 +2,9 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import { Toolbar, ToolbarGroup } from '../../UI/Toolbar';
-import PreviewAndPublishButtons, {
-  type PreviewAndPublishButtonsProps,
-} from './PreviewAndPublishButtons';
+import PreviewAndShareButtons, {
+  type PreviewAndShareButtonsProps,
+} from './PreviewAndShareButtons';
 import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../UI/CustomSvgIcons/Floppy';
 import IconButton from '../../UI/IconButton';
@@ -13,11 +13,11 @@ import { Spacer } from '../../UI/Grid';
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
   toggleProjectManager: () => void,
-  exportProject: () => void,
+  openShareDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
 
-  ...PreviewAndPublishButtonsProps,
+  ...PreviewAndShareButtonsProps,
 |};
 
 export type ToolbarInterface = {|
@@ -76,7 +76,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
             />
             <ToolbarGroup>
               <Spacer />
-              <PreviewAndPublishButtons
+              <PreviewAndShareButtons
                 onPreviewWithoutHotReload={props.onPreviewWithoutHotReload}
                 onOpenDebugger={props.onOpenDebugger}
                 onNetworkPreview={props.onNetworkPreview}
@@ -86,7 +86,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 isPreviewEnabled={props.isPreviewEnabled}
                 previewState={props.previewState}
                 hasPreviewsRunning={props.hasPreviewsRunning}
-                exportProject={props.exportProject}
+                openShareDialog={props.openShareDialog}
               />
               <Spacer />
             </ToolbarGroup>

@@ -169,4 +169,8 @@ export default class InstancesMover {
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
   }
+
+  isMoving() {
+    return !!this._initialSelectionAABB;
+  }
 }

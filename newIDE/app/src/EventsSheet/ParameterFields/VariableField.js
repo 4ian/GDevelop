@@ -207,7 +207,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
             onApply={onApply}
             dataSource={[
               ...autocompletionVariableNames,
-              onOpenDialog
+              onOpenDialog && variablesContainer
                 ? {
                     translatableValue: t`Add or edit variables...`,
                     text: '',

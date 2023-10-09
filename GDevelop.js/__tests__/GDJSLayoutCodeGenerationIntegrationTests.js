@@ -13,7 +13,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     })
   );
 
-  it('does generate code for a link to an external events', function () {
+  it('generates code for a link to an external events', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const serializedLayoutEvents = gd.Serializer.fromJSObject([
@@ -104,7 +104,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     project.delete();
   });
 
-  it('does generate code for nested links to external events', function () {
+  it('generates code for nested links to external events', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const serializedLayoutEvents = gd.Serializer.fromJSObject([
@@ -170,4 +170,110 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
 
     project.delete();
   });
+
+  // TODO: this does not pass because of string variables not understood as strings inside brackets.
+  // it('generates code for scene variables, including structures being accessed by other variables', function () {
+  //   const project = new gd.ProjectHelper.createNewGDJSProject();
+  //   const layout = project.insertNewLayout('Scene', 0);
+  //   layout.insertNewObject(project, '', 'MyObject', 0);
+  //   layout.getVariables().insertNew('MyNumberVariable', 0).setValue(123);
+  //   layout.getVariables().insertNew('MyStringVariable', 1).setString('Test');
+  //   layout
+  //     .getVariables()
+  //     .insertNew('MyOtherStringVariable', 1)
+  //     .setString('SomeChild');
+  //   layout
+  //     .getVariables()
+  //     .insertNew('MyOtherStringVariable2', 1)
+  //     .setString('SomeOtherChild');
+  //   const structureVariable = layout
+  //     .getVariables()
+  //     .insertNew('MyStructureVariable', 2);
+  //   structureVariable.getChild('Test').setValue(1);
+  //   structureVariable.getChild('123').setValue(2);
+  //   structureVariable.getChild('42').setValue(4);
+  //   structureVariable.getChild('MyObject').setValue(8);
+  //   structureVariable.getChild('SomeChild').getChild('Test').setValue(16);
+  //   structureVariable.getChild('SomeChild').getChild('123').setValue(32);
+  //   structureVariable.getChild('SomeChild').getChild('42').setValue(64);
+  //   structureVariable.getChild('SomeChild').getChild('MyObject').setValue(128);
+  //   structureVariable
+  //     .getChild('SomeChild')
+  //     .getChild('SomeOtherChild')
+  //     .getChild('Test')
+  //     .setValue(256);
+  //   structureVariable
+  //     .getChild('SomeChild')
+  //     .getChild('SomeOtherChild')
+  //     .getChild('123')
+  //     .setValue(512);
+  //   structureVariable
+  //     .getChild('SomeChild')
+  //     .getChild('SomeOtherChild')
+  //     .getChild('42')
+  //     .setValue(1024);
+  //   structureVariable
+  //     .getChild('SomeChild')
+  //     .getChild('SomeOtherChild')
+  //     .getChild('MyObject')
+  //     .setValue(2048);
+  //   const serializedLayoutEvents = gd.Serializer.fromJSObject([
+  //     {
+  //       type: 'BuiltinCommonInstructions::Standard',
+  //       conditions: [],
+  //       actions: [
+  //         {
+  //           type: { value: 'ModVarScene' },
+  //           parameters: [
+  //             'Counter',
+  //             '+',
+  //             'MyStructureVariable[MyStringVariable] + MyStructureVariable[MyNumberVariable] + MyStructureVariable[MyObject.X()] + MyStructureVariable[MyObject.ObjectName()]',
+  //           ],
+  //         },
+  //         {
+  //           type: { value: 'ModVarScene' },
+  //           parameters: [
+  //             'Counter',
+  //             '+',
+  //             'MyStructureVariable.SomeChild[MyStringVariable] + MyStructureVariable.SomeChild[MyNumberVariable] + MyStructureVariable.SomeChild[MyObject.X()] + MyStructureVariable.SomeChild[MyObject.ObjectName()]',
+  //           ],
+  //         },
+  //         {
+  //           type: { value: 'ModVarScene' },
+  //           parameters: [
+  //             'Counter',
+  //             '+',
+  //             'MyStructureVariable[MyOtherStringVariable][MyOtherStringVariable2][MyStringVariable] +MyStructureVariable[MyOtherStringVariable][MyOtherStringVariable2][MyNumberVariable] + MyStructureVariable[MyOtherStringVariable][MyOtherStringVariable2][MyObject.X()] + MyStructureVariable[MyOtherStringVariable][MyOtherStringVariable2][MyObject.ObjectName()]',
+  //           ],
+  //         },
+  //       ],
+  //       events: [],
+  //     },
+  //   ]);
+  //   layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+
+  //   const runCompiledEvents = generateCompiledEventsForLayout(
+  //     gd,
+  //     project,
+  //     layout
+  //   );
+
+  //   const serializedSceneElement = new gd.SerializerElement();
+  //   layout.serializeTo(serializedSceneElement);
+
+  //   const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+  //     sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+  //   });
+  //   serializedSceneElement.delete();
+  //   const myObjectInstance = runtimeScene.createObject('MyObject');
+  //   myObjectInstance.setX(42);
+  //   runCompiledEvents(gdjs, runtimeScene);
+
+  //   expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+  //   expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+  //     1 + 2 + 4 + 8 + 16 + 32 + 64 + 128 + 256 + 512 + 1024 + 2048
+  //   );
+
+  //   project.delete();
+  // });
 });

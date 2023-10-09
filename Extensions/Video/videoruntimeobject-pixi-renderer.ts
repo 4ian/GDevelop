@@ -26,12 +26,6 @@ namespace gdjs {
           .getImageManager()
           .getPIXIVideoTexture(this._object._videoResource)
       );
-      this._pixiObject._texture.baseTexture.resource.autoPlay = false;
-
-      // Needed to avoid video not playing/crashing in Chrome/Chromium browsers.
-      // See https://github.com/pixijs/pixi.js/issues/5996
-      this._pixiObject._texture.baseTexture.resource.source.preload = 'auto';
-      this._pixiObject._texture.baseTexture.resource.source.autoload = true;
 
       // Will be set to true when video texture is loaded.
       instanceContainer

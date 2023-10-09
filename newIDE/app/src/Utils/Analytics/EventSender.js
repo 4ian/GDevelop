@@ -326,7 +326,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Build limit reached'
   | 'Leaderboard customization'
   | 'Extend redeemed subscription'
-  | 'Generate project from prompt';
+  | 'Generate project from prompt'
+  | 'Add collaborators on project';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

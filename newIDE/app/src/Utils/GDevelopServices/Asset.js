@@ -127,6 +127,7 @@ export type PrivateGameTemplate = {|
   createdAt: string,
   tag: string,
   longDescription: string,
+  gamePreviewLink: string,
 |};
 
 export type AllPublicAssets = {|

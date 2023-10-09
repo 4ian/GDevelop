@@ -178,6 +178,19 @@ export default class PixiResourcesLoader {
     if (loadedBitmapFonts[resourceName]) {
       delete loadedBitmapFonts[resourceName];
     }
+    if (loadedThreeTextures[resourceName]) {
+      loadedThreeTextures[resourceName].dispose();
+      delete loadedThreeTextures[resourceName];
+    }
+    const matchingMaterials = Object.keys(loadedThreeMaterials).filter(key =>
+      key.startsWith(resourceName)
+    );
+    if (matchingMaterials.length > 0) {
+      matchingMaterials.forEach(key => {
+        loadedThreeMaterials[key].dispose();
+        delete loadedThreeMaterials[key];
+      });
+    }
   }
   /**
    * (Re)load the PIXI texture represented by the given resources.

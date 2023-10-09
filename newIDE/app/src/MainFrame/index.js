@@ -932,7 +932,7 @@ const MainFrame = (props: Props) => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
+      PixiResourcesLoader.burstCache();
 
       const state = await setState(state => ({
         ...state,

@@ -10,13 +10,13 @@ import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 const gd: libGDevelop = global.gd;
 
-const loadedBitmapFonts = {};
-const loadedFontFamilies = {};
+let loadedBitmapFonts = {};
+let loadedFontFamilies = {};
 let loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
-const loadedThreeTextures = {};
-const loadedThreeMaterials = {};
-const loadedOrLoading3DModelPromises: {
+let loadedThreeTextures = {};
+let loadedThreeMaterials = {};
+let loadedOrLoading3DModelPromises: {
   [resourceName: string]: Promise<THREE.THREE_ADDONS.GLTF>,
 } = {};
 
@@ -150,6 +150,15 @@ const traverseToRemoveMetalnessFromMeshes = (
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
+  static burstCache() {
+    loadedBitmapFonts = {};
+    loadedFontFamilies = {};
+    loadedTextures = {};
+    loadedThreeTextures = {};
+    loadedThreeMaterials = {};
+    loadedOrLoading3DModelPromises = {};
+  }
+
   static async reloadTextureForResource(
     project: gdProject,
     resourceName: string

@@ -15,13 +15,12 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadata.h"
-#include "GDCore/Project/Layout.h" // For GetTypeOfObject and GetTypeOfBehavior
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Tools/Localization.h"
 
 namespace gd {
 class Expression;
 class ObjectsContainer;
-class ObjectsContainersList;
 class Platform;
 class ParameterMetadata;
 class ExpressionMetadata;
@@ -51,11 +50,11 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
    * sub-expression that a given node represents.
    */
   static const gd::String GetType(const gd::Platform &platform,
-                      const gd::ObjectsContainersList &objectsContainersList,
+                      const gd::ProjectScopedContainers &projectScopedContainers,
                       const gd::String &rootType,
                       gd::ExpressionNode& node) {
     gd::ExpressionTypeFinder typeFinder(
-        platform, objectsContainersList, rootType);
+        platform, projectScopedContainers, rootType);
     node.Visit(typeFinder);
     return typeFinder.GetType();
   }
@@ -64,10 +63,10 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
 
  protected:
   ExpressionTypeFinder(const gd::Platform &platform_,
-                       const gd::ObjectsContainersList &objectsContainersList_,
+                       const gd::ProjectScopedContainers &projectScopedContainers_,
                        const gd::String &rootType_)
       : platform(platform_),
-        objectsContainersList(objectsContainersList_),
+        projectScopedContainers(projectScopedContainers_),
         rootType(rootType_),
         type(ExpressionTypeFinder::unknownType),
         child(nullptr) {};
@@ -113,8 +112,12 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     }
     auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
         platform,
-        objectsContainersList,
+        projectScopedContainers,
         node);
+
+    // If we can infer a definitive number or string type, use it.
+    // Otherwise, we only know that it's number or string, and this can even
+    // be used as is at runtime.
     if (leftSideType == ExpressionTypeFinder::numberType
      || leftSideType == ExpressionTypeFinder::stringType) {
       type = leftSideType;
@@ -126,7 +129,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (child == nullptr) {
       const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
-          platform, objectsContainersList, node);
+          platform, projectScopedContainers.GetObjectsContainersList(), node);
       if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
         VisitParent(node);
       }
@@ -138,7 +141,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       const gd::ParameterMetadata* parameterMetadata =
           gd::MetadataProvider::GetFunctionCallParameterMetadata(
               platform,
-              objectsContainersList,
+              projectScopedContainers.GetObjectsContainersList(),
               node,
               *child);
       if (parameterMetadata == nullptr || parameterMetadata->GetType().empty()) {
@@ -159,7 +162,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     else if (rootType == ExpressionTypeFinder::numberOrStringType) {
       auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
           platform,
-          objectsContainersList,
+          projectScopedContainers,
           node);
       if (leftSideType == ExpressionTypeFinder::numberType
        || leftSideType == ExpressionTypeFinder::stringType) {
@@ -183,7 +186,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   ExpressionNode *child;
 
   const gd::Platform &platform;
-  const gd::ObjectsContainersList &objectsContainersList;
+  const gd::ProjectScopedContainers &projectScopedContainers;
   const gd::String rootType;
 };
 

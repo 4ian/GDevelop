@@ -81,8 +81,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
-    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
-    auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
 
     if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       // Nothing to do (this can't reference an object)
@@ -115,7 +114,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers.GetObjectsContainersList(), rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
     if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasDoneRenaming = true;
@@ -217,8 +216,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
-    const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
-    auto type = gd::ExpressionTypeFinder::GetType(platform, objectsContainersList, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
 
     if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       // Nothing to do (this can't reference an object)
@@ -250,7 +248,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers.GetObjectsContainersList(), rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
     if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == searchedObjectName) {
       hasObject = true;

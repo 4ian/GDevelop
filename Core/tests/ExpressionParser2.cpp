@@ -22,10 +22,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
-  layout1.GetVariables().InsertNew("MySceneVariable", 0);
-  layout1.GetVariables().InsertNew("MySceneVariable2", 1);
-  layout1.GetVariables().InsertNew("MySceneStructureVariable", 2).GetChild("MyChild");
-  layout1.GetVariables().InsertNew("MySceneStructureVariable2", 2).GetChild("MyChild");
+  layout1.GetVariables().InsertNew("MySceneVariable");
+  layout1.GetVariables().InsertNew("MySceneVariable2");
+  layout1.GetVariables().InsertNew("MySceneStructureVariable").GetChild("MyChild");
+  layout1.GetVariables().InsertNew("MySceneStructureVariable2").GetChild("MyChild");
+  layout1.GetVariables().InsertNew("MySceneNumberVariable").SetValue(123);
+  layout1.GetVariables().InsertNew("MySceneStringVariable").SetString("Test");
+  layout1.GetVariables().InsertNew("MySceneBooleanVariable").SetBool(true);
 
   // Create an instance of BuiltinObject.
   // This is not possible in practice.
@@ -38,9 +41,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   layout1.GetObjectGroups().InsertNew("EmptyGroup");
 
   auto &mySpriteObject = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
-  mySpriteObject.GetVariables().InsertNew("MyVariable", 0);
-  mySpriteObject.GetVariables().InsertNew("MyVariable2", 1);
-  mySpriteObject.GetVariables().InsertNew("MyVariable3", 2);
+  mySpriteObject.GetVariables().InsertNew("MyVariable");
+  mySpriteObject.GetVariables().InsertNew("MyVariable2");
+  mySpriteObject.GetVariables().InsertNew("MyVariable3");
+  mySpriteObject.GetVariables().InsertNew("MyNumberVariable").SetValue(123);
+  mySpriteObject.GetVariables().InsertNew("MyStringVariable").SetString("Test");
   auto &mySpriteObject2 = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject2", 1);
   mySpriteObject2.GetVariables().InsertNew("MyVariable", 0);
   mySpriteObject2.GetVariables().InsertNew("MyVariable2", 1);
@@ -64,7 +69,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "string", emptyNode);
+          platform, projectScopedContainers, "string", emptyNode);
       REQUIRE(type == "string");
       REQUIRE(emptyNode.text == "");
 
@@ -79,7 +84,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", emptyNode);
+          platform, projectScopedContainers, "number", emptyNode);
       REQUIRE(type == "number");
       REQUIRE(emptyNode.text == "");
 
@@ -94,7 +99,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "object", emptyNode);
+          platform, projectScopedContainers, "object", emptyNode);
       REQUIRE(type == "object");
       REQUIRE(emptyNode.text == "");
 
@@ -111,7 +116,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "string", emptyNode);
+          platform, projectScopedContainers, "string", emptyNode);
       REQUIRE(type == "string");
       REQUIRE(emptyNode.text == "");
     }
@@ -120,7 +125,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", emptyNode);
+          platform, projectScopedContainers, "number", emptyNode);
       REQUIRE(type == "number");
       REQUIRE(emptyNode.text == "");
     }
@@ -129,7 +134,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "object", emptyNode);
+          platform, projectScopedContainers, "object", emptyNode);
       REQUIRE(type == "object");
       REQUIRE(emptyNode.text == "");
     }
@@ -485,7 +490,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", operatorNode);
+          platform, projectScopedContainers, "number", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "number");
       auto &leftNumberNode =
@@ -504,7 +509,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "string", operatorNode);
+          platform, projectScopedContainers, "string", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "string");
       auto &leftTextNode =
@@ -526,7 +531,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", operatorNode);
+          platform, projectScopedContainers, "number|string", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "number");
       auto &leftNumberNode =
@@ -545,7 +550,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &operatorNode = dynamic_cast<gd::OperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", operatorNode);
+          platform, projectScopedContainers, "number|string", operatorNode);
       REQUIRE(operatorNode.op == '+');
       REQUIRE(type == "string");
       auto &leftTextNode =
@@ -567,7 +572,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", unaryOperatorNode);
+          platform, projectScopedContainers, "number", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
@@ -583,7 +588,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", unaryOperatorNode);
+          platform, projectScopedContainers, "number", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '+');
       REQUIRE(type == "number");
       auto &numberNode =
@@ -599,7 +604,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", unaryOperatorNode);
+          platform, projectScopedContainers, "number", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
@@ -617,7 +622,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", unaryOperatorNode);
+          platform, projectScopedContainers, "number|string", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
@@ -633,7 +638,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", unaryOperatorNode);
+          platform, projectScopedContainers, "number|string", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '+');
       REQUIRE(type == "number");
       auto &numberNode =
@@ -649,7 +654,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", unaryOperatorNode);
+          platform, projectScopedContainers, "number|string", unaryOperatorNode);
       REQUIRE(unaryOperatorNode.op == '-');
       REQUIRE(type == "number");
       auto &numberNode =
@@ -912,6 +917,242 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "You entered a number, but a text was expected (in quotes).");
       REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 16);
       REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 19);
+    }
+  }
+  SECTION("Numbers and texts mismatches ('number|string' type, with a known variable type first)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneNumberVariable + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 24);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStringVariable + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 24);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneNumberVariable + MySceneBooleanVariable + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 49);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySceneStringVariable + MySceneBooleanVariable + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 49);
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyNumberVariable + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyStringVariable + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+    }
+  }
+  SECTION("Numbers and texts mismatches ('number|string' type, with a parameter first)") {
+    std::vector<gd::ParameterMetadata> parameters;
+    {
+      gd::ParameterMetadata param;
+      param.SetName("MyNumberParameter");
+      param.SetType("number");
+      parameters.push_back(param);
+    }
+    {
+      gd::ParameterMetadata param;
+      param.SetName("MyStringParameter");
+      param.SetType("string");
+      parameters.push_back(param);
+    }
+    {
+      gd::ParameterMetadata param;
+      param.SetName("MyBooleanParameter");
+      param.SetType("yesorno");
+      parameters.push_back(param);
+    }
+
+    auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithParameters.AddParameters(parameters);
+    {
+      auto node =
+          parser.ParseExpression("MyNumberParameter + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyStringParameter + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyNumberParameter + MyBooleanParameter + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyStringParameter + MyBooleanParameter + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+    }
+  }
+  SECTION("Numbers and texts mismatches ('number|string' type, with a property first)") {
+    gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+    auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+    propertiesContainer.InsertNew("MyNumberProperty").SetType("Number");
+    propertiesContainer.InsertNew("MyStringProperty").SetType("String");
+    propertiesContainer.InsertNew("MyBooleanProperty").SetType("Boolean");
+    {
+      auto node =
+          parser.ParseExpression("MyNumberProperty + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyStringProperty + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyNumberProperty + MyBooleanProperty + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyStringProperty + MyBooleanProperty + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+    }
+  }
+  SECTION("Numbers and texts mismatches ('number|string' type, with an unknown variable type first)") {
+    {
+      auto node = parser.ParseExpression("MySceneBooleanVariable + 123 + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneBooleanVariable + \"hello world\" + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + 123 + \"hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a text, but a number was expected.");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + \"hello world\" + 123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You entered a number, but a text was expected (in quotes).");
     }
   }
   SECTION("Numbers and texts mismatches with parenthesis") {
@@ -1451,21 +1692,78 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Valid property") {
+    gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+    auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+    propertiesContainer.InsertNew("MyProperty").SetType("Number");
+    propertiesContainer.InsertNew("MyProperty2").SetType("String");
+    propertiesContainer.InsertNew("MyProperty3").SetType("Boolean");
+
     {
-      gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+      auto node =
+          parser.ParseExpression("MyProperty");
 
-      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
-      projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
 
-      propertiesContainer.InsertNew("MyProperty");
-      propertiesContainer.InsertNew("MyProperty2");
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithProperties, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
 
+    {
+      auto node =
+          parser.ParseExpression("MyProperty2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithProperties, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+
+    {
+      auto node =
+          parser.ParseExpression("MyProperty3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithProperties, "number|string", *node.get());
+      REQUIRE(type == "number|string");
+    }
+
+    {
       auto node =
           parser.ParseExpression("MyProperty + MyProperty2");
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithProperties, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+
+    {
+      auto node =
+          parser.ParseExpression("MyProperty + MyProperty2 + MyProperty3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithProperties, "number|string", *node.get());
+      REQUIRE(type == "number");
     }
   }
 
@@ -1485,7 +1783,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
-      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must wrap your text inside double quotes (example: \"Hello world\").");
     }
   }
 
@@ -1529,7 +1827,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Valid parameter") {
-    {
       std::vector<gd::ParameterMetadata> parameters;
       gd::ParameterMetadata param1;
       param1.SetName("MyParameter1");
@@ -1537,18 +1834,75 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ParameterMetadata param2;
       param2.SetName("MyParameter2");
       param2.SetType("string");
+      gd::ParameterMetadata param3;
+      param3.SetName("MyParameter3");
+      param3.SetType("yesorno");
       parameters.push_back(param1);
       parameters.push_back(param2);
+      parameters.push_back(param3);
 
       auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
       projectScopedContainersWithParameters.AddParameters(parameters);
 
+    {
+      auto node =
+          parser.ParseExpression("MyParameter1");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyParameter2");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyParameter3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "number|string");
+    }
+    {
       auto node =
           parser.ParseExpression("MyParameter1 + MyParameter2");
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node =
+          parser.ParseExpression("MyParameter1 + MyParameter2 + MyParameter3");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "number");
     }
   }
 
@@ -1598,7 +1952,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
-      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You must enter a number.");
     }
   }
 
@@ -1658,7 +2012,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", functionNode);
+          platform, projectScopedContainers, "number|string", functionNode);
       REQUIRE(functionNode.functionName == "MyExtension::GetNumber");
       REQUIRE(type == "number");
       REQUIRE(functionNode.objectName == "");
@@ -1674,7 +2028,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", functionNode);
+          platform, projectScopedContainers, "number|string", functionNode);
       REQUIRE(functionNode.functionName == "MyExtension::ToString");
       REQUIRE(type == "string");
       REQUIRE(functionNode.objectName == "");
@@ -1809,7 +2163,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "string", objectFunctionCall);
+          platform, projectScopedContainers, "string", objectFunctionCall);
     REQUIRE(objectFunctionCall.objectName == "MyObject");
     REQUIRE(objectFunctionCall.functionName == "");
     REQUIRE(type == "string");
@@ -1820,7 +2174,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", objectFunctionCall);
+          platform, projectScopedContainers, "number", objectFunctionCall);
     REQUIRE(objectFunctionCall.objectName == "MyObject");
     REQUIRE(objectFunctionCall.functionName == "");
     REQUIRE(type == "number");
@@ -1833,7 +2187,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", objectFunctionCall);
+          platform, projectScopedContainers, "number|string", objectFunctionCall);
     REQUIRE(objectFunctionCall.objectName == "MyObject");
     REQUIRE(objectFunctionCall.functionName == "");
     REQUIRE(type == "number|string");
@@ -1854,7 +2208,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "string", objectFunctionName);
+          platform, projectScopedContainers, "string", objectFunctionName);
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.functionName == "");
@@ -1866,7 +2220,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", objectFunctionName);
+          platform, projectScopedContainers, "number", objectFunctionName);
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.functionName == "");
@@ -1881,7 +2235,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", objectFunctionName);
+          platform, projectScopedContainers, "number|string", objectFunctionName);
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.functionName == "");
@@ -1893,7 +2247,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "string", freeFunctionCall);
+          platform, projectScopedContainers, "string", freeFunctionCall);
     REQUIRE(freeFunctionCall.objectName == "");
     REQUIRE(freeFunctionCall.functionName == "fun");
     REQUIRE(type == "string");
@@ -1904,7 +2258,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number", freeFunctionCall);
+          platform, projectScopedContainers, "number", freeFunctionCall);
     REQUIRE(freeFunctionCall.objectName == "");
     REQUIRE(freeFunctionCall.functionName == "fun");
     REQUIRE(type == "number");
@@ -1916,7 +2270,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(node != nullptr);
     auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", freeFunctionCall);
+          platform, projectScopedContainers, "number|string", freeFunctionCall);
     REQUIRE(freeFunctionCall.objectName == "");
     REQUIRE(freeFunctionCall.functionName == "fun");
     REQUIRE(type == "number|string");
@@ -2272,21 +2626,21 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("123");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", *node.get());
+          platform, projectScopedContainers, "number|string", *node.get());
       REQUIRE(type == "number");
     }
     {
       auto node = parser.ParseExpression("123 + MyExtension::GetNumber()");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", *node.get());
+          platform, projectScopedContainers, "number|string", *node.get());
       REQUIRE(type == "number");
     }
     {
       auto node = parser.ParseExpression("\"Hello\"");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", *node.get());
+          platform, projectScopedContainers, "number|string", *node.get());
       REQUIRE(type == "string");
     }
     {
@@ -2294,8 +2648,158 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "\"Hello\" + MyExtension::ToString(3)");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
-          platform, objectsContainersList, "number|string", *node.get());
+          platform, projectScopedContainers, "number|string", *node.get());
       REQUIRE(type == "string");
+    }
+  }
+  SECTION("Valid type inferred from expressions with type 'number|string', with an known variable first") {
+    {
+      auto node = parser.ParseExpression("MySceneNumberVariable + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneStringVariable + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneNumberVariable + MySceneBooleanVariable + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneStringVariable + MySceneBooleanVariable + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+  }
+  SECTION("Valid type inferred from expressions with type 'number|string', with an unknown variable first") {
+    {
+      auto node = parser.ParseExpression("MySceneBooleanVariable + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneBooleanVariable + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+  }
+  SECTION("Valid type inferred from expressions with type 'number|string', with a property first") {
+    gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+    auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithProperties.AddPropertiesContainer(propertiesContainer);
+
+    propertiesContainer.InsertNew("MyNumberProperty").SetType("Number");
+    propertiesContainer.InsertNew("MyStringProperty").SetType("String");
+    propertiesContainer.InsertNew("MyBooleanProperty").SetType("Boolean");
+    {
+      auto node = parser.ParseExpression("MyNumberProperty + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("MyStringProperty + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+    {
+      auto node = parser.ParseExpression("MyBooleanProperty + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("MyBooleanProperty + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainers, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+  }
+  SECTION("Valid type inferred from expressions with type 'number|string', with a parameter first") {
+    std::vector<gd::ParameterMetadata> parameters;
+    {
+      gd::ParameterMetadata param;
+      param.SetName("MyNumberParameter");
+      param.SetType("number");
+      parameters.push_back(param);
+    }
+    {
+      gd::ParameterMetadata param;
+      param.SetName("MyStringParameter");
+      param.SetType("string");
+      parameters.push_back(param);
+    }
+    {
+      gd::ParameterMetadata param;
+      param.SetName("MyBooleanParameter");
+      param.SetType("yesorno");
+      parameters.push_back(param);
+    }
+
+    auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithParameters.AddParameters(parameters);
+    {
+      auto node = parser.ParseExpression("MyNumberParameter + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "number");
+    }
+    {
+      auto node = parser.ParseExpression("MyStringParameter + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+    {
+      auto node = parser.ParseExpression("MyBooleanParameter + \"hello world\"");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "string");
+    }
+    {
+      auto node = parser.ParseExpression("MyBooleanParameter + 123");
+      REQUIRE(node != nullptr);
+      auto type = gd::ExpressionTypeFinder::GetType(
+          platform, projectScopedContainersWithParameters, "number|string", *node.get());
+      REQUIRE(type == "number");
     }
   }
 

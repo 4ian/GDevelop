@@ -58,7 +58,7 @@ class GD_CORE_API ExpressionObjectsAnalyzer
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers.GetObjectsContainersList(), rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
 
     if (gd::ParameterMetadata::IsExpression("variable", type)) {
       // Nothing to do (this can't reference an object)
@@ -88,7 +88,7 @@ class GD_CORE_API ExpressionObjectsAnalyzer
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers.GetObjectsContainersList(), rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
     if (gd::ParameterMetadata::IsObject(type)) {
       context.AddObjectName(projectScopedContainers, node.identifierName);
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {

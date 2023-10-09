@@ -273,6 +273,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     const {
       globalObjectsContainer,
       objectsContainer,
+      scope,
       expressionType,
       value,
     } = this.props;
@@ -296,12 +297,14 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionNode,
       cursorPosition + 'fakeIdentifier'.length - 1
     );
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    );
     const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
-      gd.ObjectsContainersList.makeNewObjectsContainersListForContainers(
-        globalObjectsContainer,
-        objectsContainer
-      ),
+      projectScopedContainers,
       expressionType,
       currentNode
     );

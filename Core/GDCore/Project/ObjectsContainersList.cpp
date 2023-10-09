@@ -148,6 +148,55 @@ ObjectsContainersList::GetObjectOrGroupVariablesContainer(
   return nullptr;
 }
 
+gd::Variable::Type ObjectsContainersList::GetTypeOfObjectOrGroupVariable(
+    const gd::String& objectOrGroupName, const gd::String& variableName) const {
+
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectOrGroupName)) {
+      const auto& variables =
+          (*it)->GetObject(objectOrGroupName).GetVariables();
+
+      return variables.Get(variableName).GetType();
+    }
+    if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
+      // This could be adapted if objects groups have variables in the future.
+
+      // Currently, a group is considered as the "intersection" of all of its
+      // objects. Search "groups is the intersection of its objects" in the
+      // codebase. Consider that the first object having the variable will
+      // define its type.
+      const auto& objectGroup = (*it)->GetObjectGroups().Get(objectOrGroupName);
+      const auto& objectNames = objectGroup.GetAllObjectsNames();
+
+      for (const auto& objectName : objectNames) {
+        if (HasObjectWithVariableNamed(objectName, variableName)) {
+          return GetTypeOfObjectVariable(objectName, variableName);
+        }
+      }
+
+      return Variable::Type::Number;
+    }
+  }
+
+  return Variable::Type::Number;
+}
+
+gd::Variable::Type ObjectsContainersList::GetTypeOfObjectVariable(const gd::String& objectName, const gd::String& variableName) const {
+
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectName)) {
+      const auto& variables =
+          (*it)->GetObject(objectName).GetVariables();
+
+      return variables.Get(variableName).GetType();
+    }
+  }
+
+  return Variable::Type::Number;
+}
+
 void ObjectsContainersList::ForEachObjectOrGroupVariableWithPrefix(
     const gd::String& objectOrGroupName,
     const gd::String& prefix,

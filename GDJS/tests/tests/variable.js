@@ -17,6 +17,7 @@ describe('gdjs.Variable', function () {
 
     expect(intVar.getAsNumber()).to.be(526);
     expect(intVar.getAsString()).to.be('526');
+    expect(intVar.getAsNumberOrString()).to.be(526);
     expect(intVar.getAsBoolean()).to.be(true);
     expect(intVar.getType()).to.be('number');
 
@@ -25,11 +26,13 @@ describe('gdjs.Variable', function () {
 
     expect(floatVar.getAsNumber()).to.be(10.568);
     expect(floatVar.getAsString()).to.be('10.568');
+    expect(floatVar.getAsNumberOrString()).to.be(10.568);
     expect(floatVar.getAsBoolean()).to.be(true);
     expect(floatVar.getType()).to.be('number');
 
     expect(strVar.getAsNumber()).to.be(0);
     expect(strVar.getAsString()).to.be('test variable');
+    expect(strVar.getAsNumberOrString()).to.be('test variable');
     expect(strVar.getAsBoolean()).to.be(true);
     expect(strVar.getType()).to.be('string');
 
@@ -45,12 +48,14 @@ describe('gdjs.Variable', function () {
     expect(numStrVar.getAsNumber()).to.be(5);
     expect(numStrVar.getAsString()).to.be('5Apples');
     expect(numStrVar.getAsBoolean()).to.be(true);
+    expect(numStrVar.getAsNumberOrString()).to.be('5Apples');
     expect(numStrVar.getType()).to.be('string');
 
     expect(boolVar.getType()).to.be('boolean');
     expect(boolVar.getAsString()).to.be('true');
     expect(boolVar.getAsNumber()).to.be(1);
     expect(boolVar.getAsBoolean()).to.be(true);
+    expect(boolVar.getAsNumberOrString()).to.be('true');
   });
 
   it('should do some variable arithmetics', function () {
@@ -66,6 +71,7 @@ describe('gdjs.Variable', function () {
     expect(a.getAsNumber()).to.be(3);
     a.concatenateString('Apples');
     expect(a.getAsString()).to.be('3Apples');
+    expect(a.getAsNumberOrString()).to.be('3Apples');
   });
 
   it('should clear a collection', function () {

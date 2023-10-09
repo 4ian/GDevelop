@@ -1397,7 +1397,16 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
                  property.GetName())) +
       "()";
 
-  if (type == "string") {
+  if (type == "number|string") {
+    if (property.GetType() == "Number") {
+      return propertyGetterCode;
+    } else if (property.GetType() == "Boolean") {
+      return "(" + propertyGetterCode + " ? \"true\" : \"false\")";
+    } else {
+      // Assume type is String or equivalent.
+      return propertyGetterCode;
+    }
+  } else if (type == "string") {
     if (property.GetType() == "Number") {
       return "(\"\" + " + propertyGetterCode + ")";
     } else if (property.GetType() == "Boolean") {
@@ -1429,7 +1438,16 @@ gd::String EventsCodeGenerator::GenerateParameterGetter(
   gd::String parameterGetterCode =
       "eventsFunctionContext.getArgument(" + ConvertToStringExplicit(parameter.GetName()) + ")";
 
-  if (type == "string") {
+  if (type == "number|string") {
+    if (parameter.GetValueTypeMetadata().IsNumber()) {
+      return parameterGetterCode;
+    } else if (parameter.GetValueTypeMetadata().IsBoolean()) {
+      return "(" + parameterGetterCode + " ? \"true\" : \"false\")";
+    } else {
+      // Assume type is String or equivalent.
+      return parameterGetterCode;
+    }
+  } else if (type == "string") {
     if (parameter.GetValueTypeMetadata().IsNumber()) {
       return "(\"\" + " + parameterGetterCode + ")";
     } else if (parameter.GetValueTypeMetadata().IsBoolean()) {

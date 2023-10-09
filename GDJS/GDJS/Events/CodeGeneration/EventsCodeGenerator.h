@@ -302,11 +302,17 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& objectName) override;
 
   virtual gd::String GenerateVariableAccessor(gd::String childName) override {
+    // This could be probably optimised by using `getChildNamed`.
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
   };
 
   virtual gd::String GenerateVariableBracketAccessor(
       gd::String expressionCode) override {
+    // This uses `getChild` which allows to access a child
+    // with a number (an index, for an array) or a string (for a structure).
+    // This could be optimised, if the type of the accessed variable AND the type of the index is known,
+    // so that `getChildAt` (for an array, with an index) or `getChildNamed` (for a structure, with a name)
+    // is used instead.
     return ".getChild(" + expressionCode + ")";
   };
 

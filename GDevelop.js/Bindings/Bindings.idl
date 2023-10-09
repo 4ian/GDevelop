@@ -2600,7 +2600,7 @@ interface ExpressionNodeLocationFinder {
 };
 
 interface ExpressionTypeFinder {
-    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainersList objectsContainersList, [Const] DOMString rootType, [Ref] ExpressionNode node);
+    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ProjectScopedContainers projectScopedContainers, [Const] DOMString rootType, [Ref] ExpressionNode node);
 };
 
 interface ExpressionNode {

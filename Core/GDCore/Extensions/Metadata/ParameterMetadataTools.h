@@ -27,9 +27,9 @@ class GD_CORE_API ParameterMetadataTools {
       const std::vector<gd::ParameterMetadata>& parameters,
       gd::ObjectsContainer& outputObjectsContainer);
 
-  static void ForEachParameterWithPrefix(
+  static void ForEachParameterMatchingSearch(
       const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
-      const gd::String& prefix,
+      const gd::String& search,
       std::function<void(const gd::ParameterMetadata&)> cb);
 
   static bool Has(

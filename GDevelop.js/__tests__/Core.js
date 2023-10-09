@@ -3843,6 +3843,27 @@ Array [
 `);
     });
 
+    it('completes an expression with an operator and a case insensitive search string', function () {
+      expect(testCompletions('number', '1 + OBJ| ')).toMatchInlineSnapshot(`
+Array [
+  "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, UnrelatedSpriteObject3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, OBJ, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      expect(testCompletions('number', '1 + VARI| ')).toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, UnrelatedVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, VARI, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
     it('completes an expression with an object function, behavior or object variable', function () {
       // List variables, expressions and behaviors, if all of them are present:
       expect(testCompletions('number', '1 + MySpriteObject.My| '))

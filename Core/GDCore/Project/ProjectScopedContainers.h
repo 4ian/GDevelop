@@ -97,8 +97,8 @@ class ProjectScopedContainers {
     return notFoundCallback();
   };
 
-  void ForEachIdentifierWithPrefix(
-      const gd::String &prefix,
+  void ForEachIdentifierMatchingSearch(
+      const gd::String &search,
       std::function<void(const gd::String &name,
                          const ObjectConfiguration *objectConfiguration)>
           objectCallback,
@@ -110,8 +110,8 @@ class ProjectScopedContainers {
           parameterCallback) const {
     std::set<gd::String> namesAlreadySeen;
 
-    objectsContainersList.ForEachNameWithPrefix(
-        prefix,
+    objectsContainersList.ForEachNameMatchingSearch(
+        search,
         [&](const gd::String &name,
             const ObjectConfiguration *objectConfiguration) {
           if (namesAlreadySeen.count(name) == 0) {
@@ -119,24 +119,24 @@ class ProjectScopedContainers {
             objectCallback(name, objectConfiguration);
           }
         });
-    variablesContainersList.ForEachVariableWithPrefix(
-        prefix, [&](const gd::String &name, const gd::Variable &variable) {
+    variablesContainersList.ForEachVariableMatchingSearch(
+        search, [&](const gd::String &name, const gd::Variable &variable) {
           if (namesAlreadySeen.count(name) == 0) {
             namesAlreadySeen.insert(name);
             variableCallback(name, variable);
           }
         });
-    gd::ParameterMetadataTools::ForEachParameterWithPrefix(
+    gd::ParameterMetadataTools::ForEachParameterMatchingSearch(
         parametersVectorsList,
-        prefix,
+        search,
         [&](const gd::ParameterMetadata &parameter) {
           if (namesAlreadySeen.count(parameter.GetName()) == 0) {
             namesAlreadySeen.insert(parameter.GetName());
             parameterCallback(parameter);
           }
         });
-    propertiesContainersList.ForEachPropertyWithPrefix(
-        prefix, [&](const gd::NamedPropertyDescriptor &property) {
+    propertiesContainersList.ForEachPropertyMatchingSearch(
+        search, [&](const gd::NamedPropertyDescriptor &property) {
           if (namesAlreadySeen.count(property.GetName()) == 0) {
             namesAlreadySeen.insert(property.GetName());
             propertyCallback(property);

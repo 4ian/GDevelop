@@ -213,23 +213,34 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getResourcesManager()
       .getResourceNameWithFile(resourceInfo.path);
     if (resourceName) {
-      await PixiResourcesLoader.reloadTextureForResource(project, resourceName);
-
       const { editorDisplay } = this;
       if (!editorDisplay) return;
+      try {
+        // When reloading textures, there can be a short time during which
+        // the existing texture is removed but the InstancesEditor tries to use it
+        // through the RenderedInstance's, triggering crashes. So the scene rendering
+        // paused during this period.
+        editorDisplay.startSceneRendering(false);
+        await PixiResourcesLoader.reloadTextureForResource(
+          project,
+          resourceName
+        );
 
-      editorDisplay.forceUpdateObjectsList();
+        editorDisplay.forceUpdateObjectsList();
 
-      const objectsCollector = new gd.ObjectsUsingResourceCollector(
-        resourceName
-      );
-      // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
-      gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
-      const objectNames = objectsCollector.getObjectNames().toJSArray();
-      objectsCollector.delete();
-      objectNames.forEach(objectName => {
-        editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
-      });
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(
+          resourceName
+        );
+        // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        objectNames.forEach(objectName => {
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
+        });
+      } finally {
+        editorDisplay.startSceneRendering(true);
+      }
     }
   };
 

@@ -156,15 +156,7 @@ export default class PixiResourcesLoader {
   ) {
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture && loadedTexture.textureCacheIds) {
-      loadedTexture.textureCacheIds.forEach(textureCacheId => {
-        if (
-          PIXI.utils.BaseTextureCache[textureCacheId] &&
-          PIXI.utils.BaseTextureCache[textureCacheId].unload
-        ) {
-          PIXI.utils.BaseTextureCache[textureCacheId].unload();
-        }
-        delete PIXI.utils.BaseTextureCache[textureCacheId];
-      });
+      await PIXI.Assets.unload(loadedTexture.textureCacheIds);
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName], () => {});

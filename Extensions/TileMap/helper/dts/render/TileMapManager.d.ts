@@ -65,5 +65,6 @@ export declare class TileMapManager {
     levelIndex: number,
     callback: (textureCache: TileTextureCache | null) => void
   ): void;
+  clearCaches(): void;
 }
 //# sourceMappingURL=TileMapManager.d.ts.map

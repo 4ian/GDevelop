@@ -177,4 +177,9 @@ export class TileMapManager {
       callback
     );
   }
+
+  clearCaches(): void {
+    this._tileMapCache = new ResourceCache<EditableTileMap>();
+    this._textureCacheCaches = new ResourceCache<TileTextureCache>();
+  }
 }

@@ -68,12 +68,18 @@ describe('KeyboardShortcuts', () => {
       'CmdOrCtrl+Shift+Alt+KeyA'
     );
     expect(getShortcutDisplayName(getShortcutStringFromEvent(keyA))).toBe('A');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlA))).toBe('Ctrl + A');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftA))).toBe('Shift + A');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(altA))).toBe('Alt + A');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltA))).toBe(
-      'Ctrl + Shift + Alt + A'
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlA))).toBe(
+      'Ctrl + A'
     );
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftA))).toBe(
+      'Shift + A'
+    );
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(altA))).toBe(
+      'Alt + A'
+    );
+    expect(
+      getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltA))
+    ).toBe('Ctrl + Shift + Alt + A');
 
     expect(getShortcutStringFromEvent(keyM)).toBe('KeyM');
     expect(getShortcutStringFromEvent(ctrlM)).toBe('CmdOrCtrl+KeyM');
@@ -83,12 +89,18 @@ describe('KeyboardShortcuts', () => {
       'CmdOrCtrl+Shift+Alt+KeyM'
     );
     expect(getShortcutDisplayName(getShortcutStringFromEvent(keyM))).toBe('M');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlM))).toBe('Ctrl + M');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftM))).toBe('Shift + M');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(altM))).toBe('Alt + M');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltM))).toBe(
-      'Ctrl + Shift + Alt + M'
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlM))).toBe(
+      'Ctrl + M'
     );
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftM))).toBe(
+      'Shift + M'
+    );
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(altM))).toBe(
+      'Alt + M'
+    );
+    expect(
+      getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltM))
+    ).toBe('Ctrl + Shift + Alt + M');
 
     expect(getShortcutStringFromEvent(keyComma)).toBe('Comma');
     expect(getShortcutStringFromEvent(ctrlComma)).toBe('CmdOrCtrl+Comma');
@@ -98,14 +110,20 @@ describe('KeyboardShortcuts', () => {
     expect(getShortcutStringFromEvent(ctrlShiftAltComma)).toBe(
       'CmdOrCtrl+Shift+Alt+Comma'
     );
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(keyComma))).toBe(',');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlComma))).toBe('Ctrl + ,');
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(keyComma))).toBe(
+      ','
+    );
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlComma))).toBe(
+      'Ctrl + ,'
+    );
     // TODO: Find a way to handle using Question mark in azerty.
     // expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftComma))).toBe('Shift + ,');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(altComma))).toBe('Alt + ,');
-    expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltComma))).toBe(
-      'Ctrl + Shift + Alt + ,'
+    expect(getShortcutDisplayName(getShortcutStringFromEvent(altComma))).toBe(
+      'Alt + ,'
     );
+    expect(
+      getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltComma))
+    ).toBe('Ctrl + Shift + Alt + ,');
 
     // Partial or incorrect shortcut keypresses
     expect(getShortcutStringFromEvent(ctrlShiftAlt)).toBe(

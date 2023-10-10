@@ -109,6 +109,11 @@ namespace gdjs {
         gameCanvas = this._pixiRenderer.view as HTMLCanvasElement;
       }
 
+      // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
+      // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
+      this._pixiRenderer.plugins.accessibility.destroy();
+      delete this._pixiRenderer.plugins.accessibility;
+
       // Add the renderer view element to the DOM
       parentElement.appendChild(gameCanvas);
       this._gameCanvas = gameCanvas;

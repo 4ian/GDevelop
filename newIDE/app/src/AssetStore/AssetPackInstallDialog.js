@@ -36,6 +36,8 @@ import {
 } from './NewObjectDialog';
 import { type InstallAssetOutput } from './InstallAsset';
 
+// We limit the number of assets that can be installed at once to avoid
+// timeouts especially with premium packs.
 const MAX_ASSETS_TO_INSTALL = 100;
 
 type Props = {|
@@ -325,7 +327,13 @@ const AssetPackInstallDialog = ({
           actionButton: (
             <RaisedButton
               key="continue"
-              label={<Trans>Add the assets</Trans>}
+              label={
+                assetShortHeaders.length > 1 ? (
+                  <Trans>Add the assets</Trans>
+                ) : (
+                  <Trans>Add asset</Trans>
+                )
+              }
               primary
               onClick={() => onInstallAssets(assetShortHeaders)}
             />
@@ -333,9 +341,13 @@ const AssetPackInstallDialog = ({
           onApply: () => onInstallAssets(assetShortHeaders),
           content: (
             <Text>
-              <Trans>
-                You're about to add {assetShortHeaders.length} assets.
-              </Trans>
+              {assetShortHeaders.length > 1 ? (
+                <Trans>
+                  You're about to add {assetShortHeaders.length} assets.
+                </Trans>
+              ) : (
+                <Trans>You're about to add 1 asset.</Trans>
+              )}
             </Text>
           ),
         }

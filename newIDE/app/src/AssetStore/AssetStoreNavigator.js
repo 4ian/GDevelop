@@ -17,6 +17,7 @@ export type AssetStorePageState = {|
   openedAssetShortHeader: ?AssetShortHeader,
   openedPrivateAssetPackListingData: ?PrivateAssetPackListingData,
   openedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  selectedFolders: Array<string>,
   filtersState: FiltersState,
   scrollPosition?: ?number,
   displayAssets: boolean,
@@ -48,6 +49,8 @@ export type NavigationState = {|
     assetShortHeader: AssetShortHeader,
     previousSearchText: string,
   |}) => void,
+  navigateInsideFolder: string => void,
+  goBackToFolderIndex: number => void,
 |};
 
 const noFilter: FiltersState = {
@@ -64,6 +67,7 @@ export const assetStoreHomePageState: AssetStorePageState = {
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   openedPrivateGameTemplateListingData: null,
+  selectedFolders: [],
   filtersState: noFilter,
   displayAssets: false,
 };
@@ -74,6 +78,7 @@ const searchPageState: AssetStorePageState = {
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   openedPrivateGameTemplateListingData: null,
+  selectedFolders: [],
   filtersState: noFilter,
   displayAssets: true,
 };
@@ -193,6 +198,7 @@ export const useShopNavigation = (): NavigationState => {
                 removeFilter: () => {},
                 setChosenCategory: () => {},
               },
+              selectedFolders: [tag],
             },
           ],
         }));
@@ -210,6 +216,7 @@ export const useShopNavigation = (): NavigationState => {
               openedPrivateGameTemplateListingData: null,
               filtersState: noFilter,
               displayAssets: false,
+              selectedFolders: [],
             },
           ],
         }));
@@ -264,6 +271,7 @@ export const useShopNavigation = (): NavigationState => {
                   removeFilter: () => {},
                   setChosenCategory: () => {},
                 },
+                selectedFolders: [assetPack.tag],
               },
             ],
           };
@@ -305,6 +313,7 @@ export const useShopNavigation = (): NavigationState => {
                 openedPrivateGameTemplateListingData: null,
                 filtersState: noFilter,
                 displayAssets: false,
+                selectedFolders: [],
               },
             ],
           };
@@ -346,6 +355,7 @@ export const useShopNavigation = (): NavigationState => {
                 openedPrivateGameTemplateListingData: null,
                 filtersState: noFilter,
                 displayAssets: false,
+                selectedFolders: [],
               },
             ],
           };
@@ -387,8 +397,60 @@ export const useShopNavigation = (): NavigationState => {
                 openedPrivateGameTemplateListingData: privateGameTemplateListingData,
                 filtersState: noFilter,
                 displayAssets: false,
+                selectedFolders: [],
               },
             ],
+          };
+        });
+      },
+      navigateInsideFolder: (folderTag: string) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSelectedFolder = {
+            ...currentPage,
+            selectedFolders: [...currentPage.selectedFolders, folderTag],
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSelectedFolder,
+          ];
+          return {
+            ...previousHistory,
+            previousPages,
+          };
+        });
+      },
+      goBackToFolderIndex: (folderIndex: number) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSelectedFolder = {
+            ...currentPage,
+            selectedFolders: currentPage.selectedFolders.slice(
+              0,
+              folderIndex + 1
+            ),
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSelectedFolder,
+          ];
+          return {
+            ...previousHistory,
+            previousPages,
           };
         });
       },

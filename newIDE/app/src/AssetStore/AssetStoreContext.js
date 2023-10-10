@@ -150,6 +150,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
       privateGameTemplateListingData,
       previousSearchText,
     }) => {},
+    navigateInsideFolder: folder => {},
+    goBackToFolderIndex: index => {},
   },
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>

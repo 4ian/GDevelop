@@ -10,7 +10,7 @@ import RaisedButton from './RaisedButton';
 import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import Text from './Text';
-import { Line, Spacer } from './Grid';
+import { Column, Line, Spacer } from './Grid';
 import { getIDEVersionWithHash } from '../Version';
 import {
   getArch,
@@ -18,6 +18,9 @@ import {
   getSystemVersion,
   getUserAgent,
 } from '../Utils/Platform';
+import { ColumnStackLayout } from './Layout';
+import AlertMessage from './AlertMessage';
+import Link from './Link';
 
 type ErrorBoundaryScope =
   | 'mainframe'
@@ -54,41 +57,62 @@ export const ErrorFallbackComponent = ({
   title: string,
 }) => (
   <PlaceholderMessage>
-    <Line>
-      <BugReport fontSize="large" />
-      <Spacer />
-      <Text size="block-title">{title}</Text>
-    </Line>
-    <Divider />
-    <Text>
-      Something wrong happened :(
-      <br />
-      Please <b>backup your game file</b> and save your game to ensure that you
-      don't lose anything.
-    </Text>
-    <Text>
-      The error was automatically reported.
-      <br />
-      To make sure it's fixed, you may report it on GitHub, the platform where
-      GDevelop is developed:
-    </Text>
-    <RaisedButton
-      label={<Trans>Report the issue on GitHub</Trans>}
-      onClick={() => {
-        const body = `
+    <ColumnStackLayout>
+      <Line>
+        <BugReport fontSize="large" />
+        <Spacer />
+        <Text size="block-title">{title}</Text>
+      </Line>
+      <Divider />
+      <Column>
+        <AlertMessage kind="warning">
+          <Text>
+            <Trans>
+              Please <b>backup your game file</b> and save your game to ensure
+              that you don't lose anything.
+            </Trans>
+          </Text>
+        </AlertMessage>
+      </Column>
+      <Column>
+        <Text size="block-title">
+          <Trans>The error was automatically reported.</Trans>
+        </Text>
+        <Text>
+          <Trans>
+            To make sure it's fixed, you can create a{' '}
+            <Link
+              href="https://github.com"
+              onClick={() => Window.openExternalURL('https://github.com')}
+            >
+              GitHub account
+            </Link>{' '}
+            then report the issue with the button below.
+          </Trans>
+        </Text>
+      </Column>
+      <Line justifyContent="flex-end">
+        <RaisedButton
+          label={<Trans>Report the issue on GitHub</Trans>}
+          primary
+          onClick={() => {
+            const body = `
 => Please write here a short description of when the error occurred and how to reproduce it.
-You also may have to create an account on GitHub before posting.
 
 When you're ready, click on "Submit new issue". Don't change the rest of the message. Thanks!
 
 ## Error stack (don't write anything here)
 \`\`\`
-${error ? error.stack : 'No error found'}
+${error && error.stack ? `${error.stack.slice(0, 600)}...` : 'No error found'}
 \`\`\`
 
 ## Component stack (don't write anything here)
 \`\`\`
-${componentStack || 'No component stack found'}
+${
+              componentStack
+                ? `${componentStack.slice(0, 600)}...`
+                : 'No component stack found'
+            }
 \`\`\`
 
 ## Other details
@@ -98,13 +122,15 @@ ${componentStack || 'No component stack found'}
 * System Version: ${getSystemVersion()},
 * User Agent: ${getUserAgent()},
         `;
-        Window.openExternalURL(
-          `https://github.com/4ian/GDevelop/issues/new?body=${encodeURIComponent(
-            body
-          )}&title=Crash%20while%20using%20an%20editor`
-        );
-      }}
-    />
+            Window.openExternalURL(
+              `https://github.com/4ian/GDevelop/issues/new?body=${encodeURIComponent(
+                body
+              )}&title=Crash%20while%20using%20an%20editor`
+            );
+          }}
+        />
+      </Line>
+    </ColumnStackLayout>
   </PlaceholderMessage>
 );
 

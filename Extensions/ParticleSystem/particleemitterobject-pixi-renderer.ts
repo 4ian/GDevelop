@@ -117,9 +117,13 @@ namespace gdjs {
                 x: objectData.particleGravityX,
                 y: objectData.particleGravityY,
               },
-              minStart: objectData.emitterForceMax,
+              minStart: objectData.emitterForceMin,
               maxStart: objectData.emitterForceMax,
-              rotate: true,
+              rotate:
+                (objectData.particleGravityX !== 0 ||
+                  objectData.particleGravityY !== 0) &&
+                objectData.particleAngle1 === 0 &&
+                objectData.particleAngle2 === 0,
             },
           },
           {
@@ -273,6 +277,23 @@ namespace gdjs {
       const behavior: any = this.emitter.getBehavior('moveAcceleration');
       behavior.accel.x = x;
       behavior.accel.y = y;
+      this._updateRotateFromSpeedFlag();
+    }
+
+    /**
+     * When rotate from `moveAcceleration` is `true` the rotation is set
+     * according to the speed direction. This is overriding the particle
+     * rotation calculated by from `rotation`.
+     */
+    private _updateRotateFromSpeedFlag() {
+      const rotation: any = this.emitter.getBehavior('rotation');
+      const moveAcceleration: any = this.emitter.getBehavior(
+        'moveAcceleration'
+      );
+      moveAcceleration.rotate =
+        (moveAcceleration.accel.x !== 0 || moveAcceleration.accel.y !== 0) &&
+        rotation.minSpeed === 0 &&
+        rotation.maxSpeed === 0;
     }
 
     setColor(
@@ -313,6 +334,7 @@ namespace gdjs {
       const behavior: any = this.emitter.getBehavior('rotation');
       behavior.minSpeed = gdjs.toRad(min);
       behavior.maxSpeed = gdjs.toRad(max);
+      this._updateRotateFromSpeedFlag();
     }
 
     setMaxParticlesCount(count: float): void {

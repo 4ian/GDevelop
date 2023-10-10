@@ -65,6 +65,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setShowDeprecatedInstructionWarning,
     setUse3DEditor,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
@@ -338,6 +339,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               <Trans>
                 Show custom objects in the extension editor (experimental)
               </Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setShowDeprecatedInstructionWarning(check)}
+            toggled={values.showDeprecatedInstructionWarning}
+            labelPosition="right"
+            label={
+              <Trans>Show a warning on deprecated actions and conditions</Trans>
             }
           />
           <Toggle

@@ -280,6 +280,11 @@ namespace gdjs {
       this._updateRotateFromSpeedFlag();
     }
 
+    /**
+     * When rotate from `moveAcceleration` is `true` the rotation is set
+     * according to the speed direction. This is overriding the particle
+     * rotation calculated by from `rotation`.
+     */
     private _updateRotateFromSpeedFlag() {
       const rotation: any = this.emitter.getBehavior('rotation');
       const moveAcceleration: any = this.emitter.getBehavior(

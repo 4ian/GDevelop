@@ -40,7 +40,7 @@ const errorHandler = (
     // $FlowFixMe - Flow does not infer string type possibilities from interpolation.
     `error-boundary_${scope}`,
     {
-      error,
+      error: error ? error.stack : 'No error found',
       componentStack,
     },
     'error-boundary-error'

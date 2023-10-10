@@ -48,8 +48,8 @@ export class ExternalEventsEditorContainer extends React.Component<
     return this.props.isActive || nextProps.isActive;
   }
 
-  onResourceExternallyChanged = () => {
-    if (this.editor) this.editor.onResourceExternallyChanged();
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
+    if (this.editor) this.editor.onResourceExternallyChanged(resourceInfo);
   };
 
   getProject(): ?gdProject {

@@ -119,7 +119,7 @@ namespace gdjs {
               },
               minStart: objectData.emitterForceMax,
               maxStart: objectData.emitterForceMax,
-              rotate: true,
+              rotate: false,
             },
           },
           {

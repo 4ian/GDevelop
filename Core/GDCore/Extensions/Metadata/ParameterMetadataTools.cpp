@@ -60,10 +60,10 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
   }
 }
 
-void ParameterMetadataTools::ForEachParameterWithPrefix(
+void ParameterMetadataTools::ForEachParameterMatchingSearch(
     const std::vector<const std::vector<gd::ParameterMetadata>*>&
         parametersVectorsList,
-    const gd::String& prefix,
+    const gd::String& search,
     std::function<void(const gd::ParameterMetadata&)> cb) {
   for (auto it = parametersVectorsList.rbegin();
        it != parametersVectorsList.rend();
@@ -71,7 +71,7 @@ void ParameterMetadataTools::ForEachParameterWithPrefix(
     const std::vector<gd::ParameterMetadata>* parametersVector = *it;
 
     for (const auto& parameterMetadata: *parametersVector) {
-      if (parameterMetadata.GetName().find(prefix) == 0) cb(parameterMetadata);
+      if (parameterMetadata.GetName().FindCaseInsensitive(search) != gd::String::npos) cb(parameterMetadata);
     }
   }
 }

@@ -31,9 +31,13 @@ class PropertiesContainer
     return *this;
   }
 
-  void ForEachPropertyWithPrefix(const gd::String& prefix, std::function<void(const gd::NamedPropertyDescriptor& property)> fn) const {
-    for (const auto& property: elements) {
-      if (property->GetName().find(prefix) == 0) fn(*property);
+  void ForEachPropertyMatchingSearch(
+      const gd::String& search,
+      std::function<void(const gd::NamedPropertyDescriptor& property)> fn)
+      const {
+    for (const auto& property : elements) {
+      if (property->GetName().FindCaseInsensitive(search) != gd::String::npos)
+        fn(*property);
     }
   }
 

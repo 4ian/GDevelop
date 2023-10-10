@@ -197,9 +197,9 @@ gd::Variable::Type ObjectsContainersList::GetTypeOfObjectVariable(const gd::Stri
   return Variable::Type::Number;
 }
 
-void ObjectsContainersList::ForEachObjectOrGroupVariableWithPrefix(
+void ObjectsContainersList::ForEachObjectOrGroupVariableMatchingSearch(
     const gd::String& objectOrGroupName,
-    const gd::String& prefix,
+    const gd::String& search,
     std::function<void(const gd::String& variableName,
                        const gd::Variable& variable)> fn) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
@@ -207,7 +207,7 @@ void ObjectsContainersList::ForEachObjectOrGroupVariableWithPrefix(
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
       const auto& variables =
           (*it)->GetObject(objectOrGroupName).GetVariables();
-      variables.ForEachVariableWithPrefix(prefix, fn);
+      variables.ForEachVariableMatchingSearch(search, fn);
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
       // This could be adapted if objects groups have variables in the future.
@@ -221,9 +221,9 @@ void ObjectsContainersList::ForEachObjectOrGroupVariableWithPrefix(
 
       if (objectNames.empty()) return;
       const auto& firstObjectName = objectNames.front();
-      ForEachObjectVariableWithPrefix(
+      ForEachObjectVariableMatchingSearch(
           firstObjectName,
-          prefix,
+          search,
           [&](const gd::String& variableName, const gd::Variable& variable) {
             for (const auto& objectName : objectGroup.GetAllObjectsNames()) {
               if (!HasObjectWithVariableNamed(objectName, variableName)) {
@@ -240,9 +240,9 @@ void ObjectsContainersList::ForEachObjectOrGroupVariableWithPrefix(
   }
 }
 
-void ObjectsContainersList::ForEachObjectVariableWithPrefix(
+void ObjectsContainersList::ForEachObjectVariableMatchingSearch(
     const gd::String& objectOrGroupName,
-    const gd::String& prefix,
+    const gd::String& search,
     std::function<void(const gd::String& variableName,
                        const gd::Variable& variable)> fn) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
@@ -250,24 +250,24 @@ void ObjectsContainersList::ForEachObjectVariableWithPrefix(
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
       const auto& variables =
           (*it)->GetObject(objectOrGroupName).GetVariables();
-      variables.ForEachVariableWithPrefix(prefix, fn);
+      variables.ForEachVariableMatchingSearch(search, fn);
     }
   }
 }
 
-void ObjectsContainersList::ForEachNameWithPrefix(
-    const gd::String& prefix,
+void ObjectsContainersList::ForEachNameMatchingSearch(
+    const gd::String& search,
     std::function<void(const gd::String& name,
                        const gd::ObjectConfiguration* objectConfiguration)> fn)
     const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     for (const auto& object : (*it)->GetObjects()) {
-      if (object->GetName().find(prefix) == 0)
+      if (object->GetName().FindCaseInsensitive(search) != gd::String::npos)
         fn(object->GetName(), &object->GetConfiguration());
     }
-    (*it)->GetObjectGroups().ForEachNameWithPrefix(
-        prefix, [&](const gd::String& name) { fn(name, nullptr); });
+    (*it)->GetObjectGroups().ForEachNameMatchingSearch(
+        search, [&](const gd::String& name) { fn(name, nullptr); });
   }
 }
 

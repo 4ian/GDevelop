@@ -56,6 +56,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       // clang-format off
       std::vector<gd::String> expectedCompletions{
           "{ 0, string, 1, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          "{ 3, no type, 1, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("string", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -67,6 +68,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       // clang-format off
       std::vector<gd::String> expectedCompletions{
           "{ 0, number, 1, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          "{ 3, no type, 1, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("number", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -78,6 +80,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       // clang-format off
       std::vector<gd::String> expectedCompletions{
           "{ 0, number|string, 1, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          "{ 3, no type, 1, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("number|string", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -92,6 +95,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       // clang-format off
       std::vector<gd::String> expectedCompletions{
           "{ 0, string, 1, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          "{ 3, no type, 1, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("string", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -112,6 +116,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       // clang-format off
       std::vector<gd::String> expectedCompletions{
           "{ 0, number, 1, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          "{ 3, no type, 1, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("number", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -200,6 +205,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       // clang-format off
       std::vector<gd::String> expectedCompletions{
           "{ 0, unknown, 1, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          "{ 3, no type, 1, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("unknown", "My", 9, 10).ToString()
       };
       // clang-format on

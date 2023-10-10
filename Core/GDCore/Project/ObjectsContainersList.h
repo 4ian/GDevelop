@@ -136,22 +136,22 @@ class GD_CORE_API ObjectsContainersList {
   void ForEachObject(std::function<void(const gd::Object& object)> fn) const;
 
   /**
-   * \brief Call the callback for each object or group name starting with the
-   * prefix passed in parameter.
+   * \brief Call the callback for each object or group name matching the
+   * search passed in parameter.
    */
-  void ForEachNameWithPrefix(
-      const gd::String& prefix,
+  void ForEachNameMatchingSearch(
+      const gd::String& search,
       std::function<void(const gd::String& name,
                          const gd::ObjectConfiguration* objectConfiguration)>
           fn) const;
 
   /**
    * \brief Call the callback for each variable of the object (or group)
-   * starting with the prefix passed in parameter.
+   * matching the search passed in parameter.
    */
-  void ForEachObjectOrGroupVariableWithPrefix(
+  void ForEachObjectOrGroupVariableMatchingSearch(
       const gd::String& objectOrGroupName,
-      const gd::String& prefix,
+      const gd::String& search,
       std::function<void(const gd::String& variableName,
                          const gd::Variable& variable)> fn) const;
 
@@ -167,9 +167,9 @@ class GD_CORE_API ObjectsContainersList {
 
   gd::Variable::Type GetTypeOfObjectVariable(const gd::String& objectName, const gd::String& variableName) const;
 
-  void ForEachObjectVariableWithPrefix(
+  void ForEachObjectVariableMatchingSearch(
       const gd::String& objectOrGroupName,
-      const gd::String& prefix,
+      const gd::String& search,
       std::function<void(const gd::String& variableName,
                          const gd::Variable& variable)> fn) const;
 

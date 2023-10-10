@@ -52,12 +52,12 @@ bool VariablesContainersList::HasVariablesContainer(const gd::VariablesContainer
   return false;
 }
 
-void VariablesContainersList::ForEachVariableWithPrefix(
-    const gd::String& prefix,
+void VariablesContainersList::ForEachVariableMatchingSearch(
+    const gd::String& search,
     std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const {
   for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
        ++it) {
-    (*it)->ForEachVariableWithPrefix(prefix, fn);
+    (*it)->ForEachVariableMatchingSearch(search, fn);
   }
 }
 

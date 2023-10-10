@@ -118,9 +118,9 @@ class GD_CORE_API ObjectGroupsContainer {
   inline void Clear() { objectGroups.clear(); }
 
   /**
-   * \brief Call the callback for each group name starting with the prefix passed in parameter.
+   * \brief Call the callback for each group name matching the specified search.
    */
-  void ForEachNameWithPrefix(const gd::String& prefix, std::function<void(const gd::String& name)> fn) const;
+  void ForEachNameMatchingSearch(const gd::String& search, std::function<void(const gd::String& name)> fn) const;
   ///@}
 
   /** \name Saving and loading

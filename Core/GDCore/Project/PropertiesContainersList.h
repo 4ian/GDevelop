@@ -67,9 +67,9 @@ class GD_CORE_API PropertiesContainersList {
   }
 
   /**
-   * \brief Call the callback for each property having a name starting with the specified prefix.
+   * \brief Call the callback for each property having a name matching the specified search.
    */
-  void ForEachPropertyWithPrefix(const gd::String& prefix, std::function<void(const gd::NamedPropertyDescriptor& property)> fn) const;
+  void ForEachPropertyMatchingSearch(const gd::String& search, std::function<void(const gd::NamedPropertyDescriptor& property)> fn) const;
 
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */

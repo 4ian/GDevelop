@@ -72,12 +72,7 @@ const eventWhichToCode = {
 };
 
 const getCodeFromEvent = (e: KeyboardEvent): string => {
-  if (
-    (e.which >= 65 && e.which <= 90) ||
-    (e.which >= 48 && e.which <= 57) ||
-    (e.which >= 112 && e.which <= 123) ||
-    e.which === 188
-  )
+  if (e.which.toString() in eventWhichToCode)
     return eventWhichToCode[e.which.toString()];
   return e.code || ''; // Somehow `code` was sometimes reported to be undefined.
 };

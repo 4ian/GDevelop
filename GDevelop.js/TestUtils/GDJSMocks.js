@@ -721,7 +721,10 @@ function makeMinimalGDJSMock(options) {
   return {
     gdjs: {
       evtTools: {
-        variable: { getVariableNumber: (variable) => variable.getAsNumber() },
+        variable: {
+          getVariableNumber: (variable) => variable.getAsNumber(),
+          getVariableString: (variable) => variable.getAsString()
+        },
         object: {
           createObjectOnScene,
           getSceneInstancesCount,

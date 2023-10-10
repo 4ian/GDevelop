@@ -15,9 +15,21 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   );
 
   const generateAndRunVariableAffectationWithConditions = (
+    variableValue,
     conditions
   ) => {
     const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['MyVariable', '=', `"${variableValue}"`],
+          },
+        ],
+        events: [],
+      },
       {
         type: 'BuiltinCommonInstructions::Standard',
         conditions,
@@ -34,7 +46,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement,
-      { logCode: false }
+      { logCode: true }
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -42,12 +54,13 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     return runtimeScene;
   };
 
-  it('can generate a string comparison condition that is true', function () {
+  it('can generate a string variable condition that is true', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Same value",
       [
         {
-          type: { inverted: false, value: 'BuiltinCommonInstructions::CompareStrings' },
-          parameters: ['"Same value"', '=', '"Same value"'],
+          type: { inverted: false, value: 'VarSceneTxt' },
+          parameters: ['MyVariable', '=', '"Same value"'],
         },
       ]
     );
@@ -58,12 +71,13 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
-  it('can generate a string comparison condition that is false', function () {
+  it('can generate a string variable condition that is false', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Not the same",
       [
         {
-          type: { inverted: false, value: 'BuiltinCommonInstructions::CompareStrings' },
-          parameters: ['"Not the same"', '=', '"Different"'],
+          type: { inverted: false, value: 'VarSceneTxt' },
+          parameters: ['MyVariable', '=', '"Different"'],
         },
       ]
     );
@@ -71,25 +85,13 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
   });
 
-  it('can generate a string comparison inverted condition that is false', function () {
+  it('can generate a string variable condition that is true with a contains operator', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Hello world!",
       [
         {
-          type: { inverted: true, value: 'BuiltinCommonInstructions::CompareStrings' },
-          parameters: ['"Same value"', '=', '"Same value"'],
-        },
-      ]
-    );
-
-    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
-  });
-
-  it('can generate a string comparison inverted condition that is true', function () {
-    const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      [
-        {
-          type: { inverted: true, value: 'BuiltinCommonInstructions::CompareStrings' },
-          parameters: ['"Not the same"', '=', '"Different"'],
+          type: { inverted: false, value: 'VarSceneTxt' },
+          parameters: ['MyVariable', 'contains', '"world"'],
         },
       ]
     );
@@ -100,28 +102,13 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
-  it('can generate a string comparison condition that is true with a contains operator', function () {
+  it('can generate a string variable condition that is false with a contains operator', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Hello world!",
       [
         {
-          type: { inverted: false, value: 'BuiltinCommonInstructions::CompareStrings' },
-          parameters: ['"Hello world!"', 'contains', '"world"'],
-        },
-      ]
-    );
-
-    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
-    expect(
-      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
-    ).toBe(1);
-  });
-
-  it('can generate a string comparison condition that is false with a contains operator', function () {
-    const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      [
-        {
-          type: { inverted: false, value: 'BuiltinCommonInstructions::CompareStrings' },
-          parameters: ['"Hello world!"', 'contains', '"Hi!"'],
+          type: { inverted: false, value: 'VarSceneTxt' },
+          parameters: ['MyVariable', 'contains', '"Hi!"'],
         },
       ]
     );

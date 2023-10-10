@@ -36,7 +36,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement,
-      { parameterTypes }
+      { parameterTypes, logCode: false }
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();

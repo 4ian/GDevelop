@@ -691,84 +691,108 @@ namespace gdjs {
       };
 
       // Touches:
-      window.addEventListener('touchmove', function (e) {
-        if (isTargetDomElement(e)) {
-          // Bail out if the game canvas is not focused. For example,
-          // an `<input>` element can be focused, and needs to receive
-          // touch events to move the selection (and do other native gestures).
-          return;
-        }
+      window.addEventListener(
+        'touchmove',
+        function (e) {
+          if (isTargetDomElement(e)) {
+            // Bail out if the game canvas is not focused. For example,
+            // an `<input>` element can be focused, and needs to receive
+            // touch events to move the selection (and do other native gestures).
+            return;
+          }
 
-        e.preventDefault();
-        if (e.changedTouches) {
-          for (let i = 0; i < e.changedTouches.length; ++i) {
-            const pos = getEventPosition(e.changedTouches[i]);
-            manager.onTouchMove(e.changedTouches[i].identifier, pos[0], pos[1]);
-            // This works because touch events are sent
-            // when they continue outside of the canvas.
-            if (manager.isSimulatingMouseWithTouch()) {
-              if (isInsideCanvas(e.changedTouches[i])) {
-                manager.onMouseEnter();
-              } else {
-                manager.onMouseLeave();
+          e.preventDefault();
+          if (e.changedTouches) {
+            for (let i = 0; i < e.changedTouches.length; ++i) {
+              const pos = getEventPosition(e.changedTouches[i]);
+              manager.onTouchMove(
+                e.changedTouches[i].identifier,
+                pos[0],
+                pos[1]
+              );
+              // This works because touch events are sent
+              // when they continue outside of the canvas.
+              if (manager.isSimulatingMouseWithTouch()) {
+                if (isInsideCanvas(e.changedTouches[i])) {
+                  manager.onMouseEnter();
+                } else {
+                  manager.onMouseLeave();
+                }
               }
             }
           }
-        }
-      });
-      window.addEventListener('touchstart', function (e) {
-        if (isTargetDomElement(e)) {
-          // Bail out if the game canvas is not focused. For example,
-          // an `<input>` element can be focused, and needs to receive
-          // touch events to move the selection (and do other native gestures).
-          return;
-        }
-
-        e.preventDefault();
-        if (e.changedTouches) {
-          for (let i = 0; i < e.changedTouches.length; ++i) {
-            const pos = getEventPosition(e.changedTouches[i]);
-            manager.onTouchStart(
-              e.changedTouches[i].identifier,
-              pos[0],
-              pos[1]
-            );
+        },
+        // This is important so that we can use e.preventDefault() and block possible following mouse events.
+        { passive: false }
+      );
+      window.addEventListener(
+        'touchstart',
+        function (e) {
+          if (isTargetDomElement(e)) {
+            // Bail out if the game canvas is not focused. For example,
+            // an `<input>` element can be focused, and needs to receive
+            // touch events to move the selection (and do other native gestures).
+            return;
           }
-        }
-        return false;
-      });
-      window.addEventListener('touchend', function (e) {
-        if (isTargetDomElement(e)) {
-          // Bail out if the game canvas is not focused. For example,
-          // an `<input>` element can be focused, and needs to receive
-          // touch events to move the selection (and do other native gestures).
-          return;
-        }
 
-        e.preventDefault();
-        if (e.changedTouches) {
-          for (let i = 0; i < e.changedTouches.length; ++i) {
-            manager.onTouchEnd(e.changedTouches[i].identifier);
+          e.preventDefault();
+          if (e.changedTouches) {
+            for (let i = 0; i < e.changedTouches.length; ++i) {
+              const pos = getEventPosition(e.changedTouches[i]);
+              manager.onTouchStart(
+                e.changedTouches[i].identifier,
+                pos[0],
+                pos[1]
+              );
+            }
           }
-        }
-        return false;
-      });
-      window.addEventListener('touchcancel', function (e) {
-        if (isTargetDomElement(e)) {
-          // Bail out if the game canvas is not focused. For example,
-          // an `<input>` element can be focused, and needs to receive
-          // touch events to move the selection (and do other native gestures).
-          return;
-        }
+          return false;
+        },
+        // This is important so that we can use e.preventDefault() and block possible following mouse events.
+        { passive: false }
+      );
+      window.addEventListener(
+        'touchend',
+        function (e) {
+          if (isTargetDomElement(e)) {
+            // Bail out if the game canvas is not focused. For example,
+            // an `<input>` element can be focused, and needs to receive
+            // touch events to move the selection (and do other native gestures).
+            return;
+          }
 
-        e.preventDefault();
-        if (e.changedTouches) {
-          for (let i = 0; i < e.changedTouches.length; ++i) {
-            manager.onTouchCancel(e.changedTouches[i].identifier);
+          e.preventDefault();
+          if (e.changedTouches) {
+            for (let i = 0; i < e.changedTouches.length; ++i) {
+              manager.onTouchEnd(e.changedTouches[i].identifier);
+            }
           }
-        }
-        return false;
-      });
+          return false;
+        },
+        // This is important so that we can use e.preventDefault() and block possible following mouse events.
+        { passive: false }
+      );
+      window.addEventListener(
+        'touchcancel',
+        function (e) {
+          if (isTargetDomElement(e)) {
+            // Bail out if the game canvas is not focused. For example,
+            // an `<input>` element can be focused, and needs to receive
+            // touch events to move the selection (and do other native gestures).
+            return;
+          }
+
+          e.preventDefault();
+          if (e.changedTouches) {
+            for (let i = 0; i < e.changedTouches.length; ++i) {
+              manager.onTouchCancel(e.changedTouches[i].identifier);
+            }
+          }
+          return false;
+        },
+        // This is important so that we can use e.preventDefault() and block possible following mouse events.
+        { passive: false }
+      );
     }
 
     setWindowTitle(title): void {

@@ -341,7 +341,7 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Report a wrong translation`),
         onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
       },
-      ...(!isMacLike() && isApplicationTopLevelMenu
+      ...(!isMacLike()
         ? [
             { type: 'separator' },
             {

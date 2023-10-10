@@ -10,7 +10,10 @@ const fileWatcher = optionalRequire('chokidar');
 
 export const setupResourcesWatcher =
   fileWatcher && path
-    ? (fileMetadata: FileMetadata, callback: (resourceInfo: any) => void) => {
+    ? (
+        fileMetadata: FileMetadata,
+        callback: ({| identifier: string |}) => void
+      ) => {
         // We can't just debounce the whole callback, it has to be done file-wise,
         // otherwise we would miss all the debounced calls but the last one.
         // See https://stackoverflow.com/questions/28787436/debounce-a-function-with-argument
@@ -20,7 +23,7 @@ export const setupResourcesWatcher =
               filePath => {
                 const relativePath = path.relative(folderPath, filePath);
 
-                callback({ path: relativePath });
+                callback({ identifier: relativePath });
               },
               200,
               { leading: false, trailing: true }

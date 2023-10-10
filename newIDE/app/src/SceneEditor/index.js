@@ -207,12 +207,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     return this.state.instancesEditorSettings;
   }
 
-  onResourceExternallyChanged = async (resourceInfo: any) => {
+  onResourceExternallyChanged = async (resourceInfo: {|
+    identifier: string,
+  |}) => {
     const { project } = this.props;
 
     const resourceName = project
       .getResourcesManager()
-      .getResourceNameWithFile(resourceInfo.path);
+      .getResourceNameWithFile(resourceInfo.identifier);
     if (resourceName) {
       const { editorDisplay } = this;
       if (!editorDisplay) return;

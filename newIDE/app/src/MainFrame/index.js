@@ -762,15 +762,17 @@ const MainFrame = (props: Props) => {
   );
 
   const informEditorsResourceExternallyChanged = React.useCallback(
-    (resourceInfo) => {
+    (resourceInfo: {| identifier: string |}) => {
       ResourcesLoader.burstAllUrlsCache();
-      state.editorTabs.editors.forEach(editor => {
+      state.editorTabs.editors.forEach(editorTab => {
         if (
-          editor.editorRef &&
-          editor.editorRef.editor &&
-          editor.editorRef.editor.onResourceExternallyChanged
+          editorTab.editorRef &&
+          editorTab.editorRef.editor &&
+          editorTab.editorRef.editor.onResourceExternallyChanged
         ) {
-          editor.editorRef.editor.onResourceExternallyChanged(resourceInfo);
+          // Each editor container has an accessible editor property.
+          // $FlowFixMe[not-a-function]
+          editorTab.editorRef.editor.onResourceExternallyChanged(resourceInfo);
         }
       });
     },

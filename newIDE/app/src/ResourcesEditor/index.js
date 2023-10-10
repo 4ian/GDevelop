@@ -205,7 +205,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   };
 
-  onResourceExternallyChanged = () => {
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
     if (this._propertiesEditor) {
       this._propertiesEditor.forceUpdate();
     }

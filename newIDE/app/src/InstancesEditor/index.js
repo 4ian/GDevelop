@@ -216,6 +216,11 @@ export default class InstancesEditor extends Component<Props> {
       gameCanvas = this.pixiRenderer.view;
     }
 
+    // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
+    // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
+    this.pixiRenderer.plugins.accessibility.destroy();
+    delete this.pixiRenderer.plugins.accessibility;
+
     // Add the renderer view element to the DOM
     canvasArea.appendChild(gameCanvas);
 

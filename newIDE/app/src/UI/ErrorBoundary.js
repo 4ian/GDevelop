@@ -98,18 +98,21 @@ export const ErrorFallbackComponent = ({
           onClick={() => {
             const body = `
 => Please write here a short description of when the error occurred and how to reproduce it.
-You also may have to create an account on GitHub before posting.
 
 When you're ready, click on "Submit new issue". Don't change the rest of the message. Thanks!
 
 ## Error stack (don't write anything here)
 \`\`\`
-${error ? error.stack : 'No error found'}
+${error && error.stack ? `${error.stack.slice(0, 600)}...` : 'No error found'}
 \`\`\`
 
 ## Component stack (don't write anything here)
 \`\`\`
-${componentStack || 'No component stack found'}
+${
+              componentStack
+                ? `${componentStack.slice(0, 600)}...`
+                : 'No component stack found'
+            }
 \`\`\`
 
 ## Other details

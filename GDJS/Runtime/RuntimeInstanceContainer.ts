@@ -237,6 +237,7 @@ namespace gdjs {
      * @param data The instances data
      * @param xPos The offset on X axis
      * @param yPos The offset on Y axis
+     * @param zPos The offset on Z axis
      * @param trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
      * to the same as the associated instance. Useful for hot-reloading when instances are changed.
      */
@@ -244,14 +245,30 @@ namespace gdjs {
       data: InstanceData[],
       xPos: float,
       yPos: float,
+      zPos: float,
       trackByPersistentUuid: boolean
-    ) {
+    ): void {
+      let zOffset: number;
+      let shouldTrackByPersistentUuid: boolean;
+
+      if (arguments.length === 5) {
+        zOffset = zPos;
+        shouldTrackByPersistentUuid = trackByPersistentUuid;
+      } else {
+        /**
+         * Support for the previous signature (before 3D was introduced):
+         * createObjectsFrom(data, xPos, yPos, trackByPersistentUuid)
+         */
+        zOffset = 0;
+        shouldTrackByPersistentUuid = arguments[3];
+      }
+
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];
         const objectName = instanceData.name;
         const newObject = this.createObject(objectName);
         if (newObject !== null) {
-          if (trackByPersistentUuid) {
+          if (shouldTrackByPersistentUuid) {
             // Give the object the same persistentUuid as the instance, so that
             // it can be hot-reloaded.
             newObject.persistentUuid = instanceData.persistentUuid || null;
@@ -262,7 +279,8 @@ namespace gdjs {
             gdjs.RuntimeObject3D &&
             newObject instanceof gdjs.RuntimeObject3D
           ) {
-            if (instanceData.z !== undefined) newObject.setZ(instanceData.z);
+            if (instanceData.z !== undefined)
+              newObject.setZ(instanceData.z + zOffset);
             if (instanceData.rotationX !== undefined)
               newObject.setRotationX(instanceData.rotationX);
             if (instanceData.rotationY !== undefined)

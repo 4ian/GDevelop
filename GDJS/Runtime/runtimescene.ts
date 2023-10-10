@@ -165,6 +165,7 @@ namespace gdjs {
         sceneData.instances,
         0,
         0,
+        0,
         /*trackByPersistentUuid=*/
         true
       );

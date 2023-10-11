@@ -7,7 +7,11 @@ namespace gdjs {
         return hslAdjustmentFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
-      updateDoubleParameter(filter: PIXI.Filter, parameterName: string, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const hslAdjustmentFilter = filter as PIXI.filters.HslAdjustmentFilter;
         if (parameterName === 'hue') {
           hslAdjustmentFilter.hue = value;
@@ -15,8 +19,6 @@ namespace gdjs {
           hslAdjustmentFilter.saturation = value;
         } else if (parameterName === 'lightness') {
           hslAdjustmentFilter.lightness = value;
-        } else if (parameterName === 'colorize') {
-          hslAdjustmentFilter.colorize = value;
         } else if (parameterName === 'alpha') {
           hslAdjustmentFilter.alpha = value;
         }
@@ -24,13 +26,18 @@ namespace gdjs {
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
-        value
+        value: string
       ) {}
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,
-        value
-      ) {}
+        value: boolean
+      ) {
+        const hslAdjustmentFilter = filter as PIXI.filters.HslAdjustmentFilter;
+        if (parameterName === 'colorize') {
+          hslAdjustmentFilter.colorize = value;
+        }
+      }
     })()
   );
 }

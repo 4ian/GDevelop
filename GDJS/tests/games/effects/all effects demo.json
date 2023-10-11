@@ -7,7 +7,7 @@
     "revision": 0
   },
   "properties": {
-    "adaptGameResolutionAtRuntime": false,
+    "adaptGameResolutionAtRuntime": true,
     "antialiasingMode": "MSAA",
     "antialisingEnabledOnMobile": false,
     "folderProject": false,
@@ -2744,7 +2744,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.44898130447125173,
+        "zoomFactor": 0.36796788104043004,
         "windowMask": false
       },
       "objectsGroups": [
@@ -2970,26 +2970,6 @@
           "x": 846,
           "y": 156,
           "zOrder": 5,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 15
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": true,
-          "height": 140,
-          "layer": "Bulge Pinch",
-          "name": "Tilebg",
-          "persistentUuid": "ed398094-f998-4a37-8cf6-32a1fc7ae332",
-          "width": 166,
-          "x": 16,
-          "y": 296,
-          "zOrder": 3,
           "numberProperties": [
             {
               "name": "animation",
@@ -3551,9 +3531,41 @@
           "name": "Note",
           "persistentUuid": "9dc71397-3273-4cb0-8420-ae66e1786720",
           "width": 0,
-          "x": -312,
-          "y": -183,
+          "x": -292,
+          "y": -207,
           "zOrder": 5002,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 63,
+          "layer": "Bulge Pinch",
+          "name": "Avatar",
+          "persistentUuid": "5e62fba0-dc8e-4ed5-88c2-e736456332df",
+          "width": 67,
+          "x": -230,
+          "y": -78,
+          "zOrder": 5001,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 63,
+          "layer": "Bulge Pinch",
+          "name": "Avatar",
+          "persistentUuid": "15220f65-0780-405a-aad6-5a6d48833274",
+          "width": 67,
+          "x": 1380,
+          "y": 782,
+          "zOrder": 5001,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -4892,14 +4904,43 @@
           "conditions": [
             {
               "type": {
-                "value": "DepartScene"
+                "value": "BuiltinCommonInstructions::Or"
               },
-              "parameters": [
-                ""
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "ScreenWidth",
+                    "!=",
+                    "CameraWidth()"
+                  ]
+                }
               ]
             }
           ],
-          "actions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "ScreenWidth",
+                "=",
+                "CameraWidth()"
+              ]
+            }
+          ],
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -5014,6 +5055,46 @@
                   "parameters": [
                     "",
                     "\"Zoom blur\"",
+                    "\"Effect\"",
+                    "\"centerY\"",
+                    "Tilebg.CenterY() / CameraHeight()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Layer"
+                  },
+                  "parameters": [
+                    "Tilebg",
+                    "\"Bulge Pinch\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Bulge Pinch\"",
+                    "\"Effect\"",
+                    "\"centerX\"",
+                    "Tilebg.CenterX() / CameraWidth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Bulge Pinch\"",
                     "\"Effect\"",
                     "\"centerY\"",
                     "Tilebg.CenterY() / CameraHeight()"
@@ -5416,7 +5497,7 @@
               "doubleParameters": {
                 "centerX": 0.5,
                 "centerY": 0.5,
-                "radius": 100,
+                "radius": 70,
                 "strength": 1
               },
               "stringParameters": {},

@@ -2,12 +2,17 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'BulgePinch',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const bulgePinchFilter = new PIXI.filters.BulgePinchFilter();
         return bulgePinchFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
+      }
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
         if (parameterName === 'centerX') {
           bulgePinchFilter.center[0] = value;
@@ -23,8 +28,16 @@ namespace gdjs {
           );
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

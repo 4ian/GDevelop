@@ -7,7 +7,11 @@ namespace gdjs {
         return motionBlurFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
-      updateDoubleParameter(filter: PIXI.Filter, parameterName: string, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const motionBlurFilter = filter as PIXI.filters.MotionBlurFilter;
         if (parameterName === 'velocityX') {
           // @ts-ignore Using the private member avoids to instantiate Arrays.
@@ -24,12 +28,12 @@ namespace gdjs {
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
-        value
+        value: string
       ) {}
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,
-        value
+        value: boolean
       ) {}
     })()
   );

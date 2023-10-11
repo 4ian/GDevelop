@@ -2,12 +2,16 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'AdvancedBloom',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const advancedBloomFilter = new PIXI.filters.AdvancedBloomFilter();
         return advancedBloomFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
         if (parameterName === 'threshold') {
           advancedBloomFilter.threshold = value;
@@ -23,8 +27,16 @@ namespace gdjs {
           advancedBloomFilter.padding = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

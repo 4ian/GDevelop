@@ -35,8 +35,8 @@ declare namespace PIXI.filters {
      * Alpha (0-1)
      * @default 1
      */
-    get alpha(): boolean;
-    set alpha(value: boolean);
+    get alpha(): number;
+    set alpha(value: number);
     /**
      * Colorize (render as a single color)
      * @default false
@@ -47,14 +47,14 @@ declare namespace PIXI.filters {
      * Lightness (-1 to 1)
      * @default 0
      */
-    get lightness(): boolean;
-    set lightness(value: boolean);
+    get lightness(): number;
+    set lightness(value: number);
     /**
      * Saturation (-1 to 1)
      * @default 0
      */
-    get saturation(): boolean;
-    set saturation(value: boolean);
+    get saturation(): number;
+    set saturation(value: number);
   }
 }
 declare module '@pixi/filter-hsl-adjustment' {

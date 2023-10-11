@@ -20,7 +20,11 @@ namespace gdjs {
           shockwaveFilter._centerY * target.getHeight()
         );
       }
-      updateDoubleParameter(filter: PIXI.Filter, parameterName: string, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const shockwaveFilter = filter as PIXI.filters.ShockwaveFilter;
         if (parameterName === 'centerX') {
           // @ts-ignore - extra properties are stored on the filter.
@@ -42,8 +46,16 @@ namespace gdjs {
           shockwaveFilter.radius = value;
         }
       }
-      updateStringParameter(filter: PIXI.Filter, parameterName, value) {}
-      updateBooleanParameter(filter: PIXI.Filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

@@ -2,12 +2,16 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Bevel',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const bevelFilter = new PIXI.filters.BevelFilter();
         return bevelFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
         if (parameterName === 'rotation') {
           bevelFilter.rotation = value;
@@ -22,7 +26,11 @@ namespace gdjs {
           bevelFilter.shadowAlpha = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {
         const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
         if (parameterName === 'lightColor') {
           bevelFilter.lightColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
@@ -35,7 +43,11 @@ namespace gdjs {
           );
         }
       }
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

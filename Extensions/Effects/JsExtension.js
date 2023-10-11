@@ -1160,7 +1160,6 @@ module.exports = {
       .setLabel(_('Opacity (between 0 and 1)'))
       .setType('number');
 
-
     const shockwaveEffect = extension
       .addEffect('Shockwave')
       .setFullName(_('Shockwave'))

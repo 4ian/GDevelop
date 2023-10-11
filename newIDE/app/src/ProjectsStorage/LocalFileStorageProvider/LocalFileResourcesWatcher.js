@@ -1,5 +1,4 @@
 // @flow
-import path from 'path-browserify';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '..';
 import debounce from 'lodash/debounce';
@@ -7,6 +6,7 @@ import wrap from 'lodash/wrap';
 import memoize from 'lodash/memoize';
 
 const fileWatcher = optionalRequire('chokidar');
+const path = optionalRequire('path')
 
 export const setupResourcesWatcher =
   fileWatcher && path
@@ -21,7 +21,7 @@ export const setupResourcesWatcher =
           memoize(() =>
             debounce(
               filePath => {
-                const relativePath = path.relative(folderPath, filePath);
+                const relativePath = path.relative(folderPath, filePath).replace(/\\/g, '/');
 
                 callback({ identifier: relativePath });
               },

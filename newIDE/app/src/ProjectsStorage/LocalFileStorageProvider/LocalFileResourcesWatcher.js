@@ -35,9 +35,18 @@ export const setupResourcesWatcher =
         );
         const folderPath = path.dirname(fileMetadata.fileIdentifier);
         const gameFile = path.basename(fileMetadata.fileIdentifier);
+        const autosaveFile = gameFile + '.autosave';
         const watcher = fileWatcher
           .watch(folderPath, {
-            ignored: [`**/.DS_Store`, gameFile],
+            ignored: [
+              `**/.DS_Store`,
+              path.join(folderPath, gameFile),
+              path.join(folderPath, autosaveFile),
+            ],
+            awaitWriteFinish: {
+              stabilityThreshold: 250,
+              pollInterval: 100,
+            },
           })
           .on(
             'change',

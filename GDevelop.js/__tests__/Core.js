@@ -1533,7 +1533,7 @@ describe('libGD.js', function () {
   });
 
   describe('gd.ObjectsUsingResourceCollector', function () {
-    it('should objects that use the given resources', function () {
+    it('lists objects that use the given resources', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);
 

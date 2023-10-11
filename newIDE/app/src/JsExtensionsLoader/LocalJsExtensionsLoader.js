@@ -56,56 +56,45 @@ module.exports = function makeExtensionsLoader(
                 };
               }
 
-              if (extensionModule) {
-                // Load any editor for objects, if we have somewhere where
-                // to register them.
-                if (
-                  objectsEditorService &&
-                  extensionModule.registerEditorConfigurations
-                ) {
-                  extensionModule.registerEditorConfigurations(
-                    objectsEditorService
-                  );
-                }
+              if (!extensionModule) {
+                return {
+                  extensionModulePath,
+                  result: {
+                    error: true,
+                    message:
+                      'Unknown error. Please check for any syntax error or error that would prevent it from being run.',
+                  },
+                };
+              }
 
-                // Load any renderer for objects, if we have somewhere where
-                // to register them.
-                if (
-                  objectsRenderingService &&
-                  extensionModule.registerInstanceRenderers
-                ) {
+              if (
+                objectsEditorService &&
+                extensionModule.registerEditorConfigurations
+              ) {
+                extensionModule.registerEditorConfigurations(
+                  objectsEditorService
+                );
+              }
+
+              if (objectsRenderingService) {
+                if (extensionModule.registerInstanceRenderers) {
                   extensionModule.registerInstanceRenderers(
                     objectsRenderingService
                   );
                 }
-
-                // Load any cache clearing methods, if we have somewhere where
-                // to register them.
-                if (
-                  objectsRenderingService &&
-                  extensionModule.registerClearCache
-                ) {
+                if (extensionModule.registerClearCache) {
                   extensionModule.registerClearCache(objectsRenderingService);
                 }
-
-                return {
-                  extensionModulePath,
-                  result: loadExtension(
-                    _,
-                    gd,
-                    gd.JsPlatform.get(),
-                    extensionModule
-                  ),
-                };
               }
 
               return {
                 extensionModulePath,
-                result: {
-                  error: true,
-                  message:
-                    'Unknown error. Please check for any syntax error or error that would prevent it from being run.',
-                },
+                result: loadExtension(
+                  _,
+                  gd,
+                  gd.JsPlatform.get(),
+                  extensionModule
+                ),
               };
             })
           );

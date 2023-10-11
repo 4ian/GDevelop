@@ -1,27 +1,28 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.mindaworld",
-    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/effects/all effects demo.json",
+    "pixelsRounding": false,
+    "projectUuid": "82368908-2e67-4fb4-98d9-0eefab7cca01",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Minda_Isometric_World",
+    "description": "",
     "author": "Mickael HOARAU",
     "windowWidth": 1280,
     "windowHeight": 720,
@@ -55,69 +56,30 @@
       "ios-icon-80": "ios-icon-80.png"
     },
     "loadingScreen": {
-      "showGDevelopSplash": true
+      "backgroundColor": 0,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0.2,
+      "minDuration": 1.5,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopSplash": true,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
     },
     "authorIds": [],
     "authorUsernames": [],
-    "extensions": [
-      {
-        "name": "BuiltinObject"
-      },
-      {
-        "name": "BuiltinAudio"
-      },
-      {
-        "name": "BuiltinVariables"
-      },
-      {
-        "name": "BuiltinTime"
-      },
-      {
-        "name": "BuiltinMouse"
-      },
-      {
-        "name": "BuiltinKeyboard"
-      },
-      {
-        "name": "BuiltinJoystick"
-      },
-      {
-        "name": "BuiltinCamera"
-      },
-      {
-        "name": "BuiltinWindow"
-      },
-      {
-        "name": "BuiltinFile"
-      },
-      {
-        "name": "BuiltinNetwork"
-      },
-      {
-        "name": "BuiltinScene"
-      },
-      {
-        "name": "BuiltinAdvanced"
-      },
-      {
-        "name": "Sprite"
-      },
-      {
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "name": "BuiltinCommonConversions"
-      },
-      {
-        "name": "BuiltinStringInstructions"
-      },
-      {
-        "name": "BuiltinMathematicalTools"
-      },
-      {
-        "name": "BuiltinExternalLayouts"
-      }
-    ],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
     "platforms": [
       {
         "name": "GDevelop JS platform"
@@ -2767,9 +2729,6 @@
       "disableInputWhenNotFocused": true,
       "mangledName": "MyGame",
       "name": "MyGame",
-      "oglFOV": 90,
-      "oglZFar": 500,
-      "oglZNear": 1,
       "r": 49,
       "standardSortMethod": true,
       "stopSoundsOnStartup": true,
@@ -2777,16 +2736,16 @@
       "v": 49,
       "uiSettings": {
         "grid": false,
-        "gridB": 255,
-        "gridG": 180,
-        "gridHeight": 32,
-        "gridOffsetX": 0,
-        "gridOffsetY": 0,
-        "gridR": 158,
-        "gridWidth": 32,
-        "snap": true,
-        "windowMask": false,
-        "zoomFactor": 0.5854
+        "gridType": "rectangular",
+        "gridWidth": 166,
+        "gridHeight": 140,
+        "gridOffsetX": 16,
+        "gridOffsetY": 16,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 0.44898130447125173,
+        "windowMask": false
       },
       "objectsGroups": [
         {
@@ -2805,10 +2764,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Adjustment",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "6ac1fc5d-1e18-4d4a-899e-5d01e1fc41b6",
           "width": 166,
-          "x": 14,
+          "x": 16,
           "y": 16,
           "zOrder": 3,
           "numberProperties": [
@@ -2825,11 +2784,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Pixelate",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "03851481-ba42-4b50-bf10-6762a06605c2",
           "width": 166,
-          "x": 1008,
-          "y": 15,
+          "x": 1012,
+          "y": 16,
           "zOrder": 4,
           "numberProperties": [
             {
@@ -2845,10 +2804,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Ascii",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "2199cd79-6b0a-4edc-bea4-9ceebfeedb6c",
           "width": 166,
-          "x": 346,
+          "x": 348,
           "y": 16,
           "zOrder": 5,
           "numberProperties": [
@@ -2865,10 +2824,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Beveled edges",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "f5c0e6ee-6b51-40c1-bcab-90eed6517718",
           "width": 166,
-          "x": 512,
+          "x": 514,
           "y": 16,
           "zOrder": 5,
           "numberProperties": [
@@ -2885,10 +2844,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Displacement",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "e29bfdb6-907b-4fb0-a5f0-f3f43e73dc9d",
           "width": 166,
-          "x": 677,
+          "x": 680,
           "y": 16,
           "zOrder": 5,
           "numberProperties": [
@@ -2905,10 +2864,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Dot",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "7e163b80-9581-45cd-95dc-dff5f230da2b",
           "width": 166,
-          "x": 841,
+          "x": 846,
           "y": 16,
           "zOrder": 5,
           "numberProperties": [
@@ -2925,10 +2884,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Black and wight",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "b5b90650-0fd2-4eb0-a916-d8e678c79fbe",
           "width": 166,
-          "x": 14,
+          "x": 16,
           "y": 156,
           "zOrder": 3,
           "numberProperties": [
@@ -2945,11 +2904,11 @@
           "customSize": true,
           "height": 140,
           "layer": "RGB split",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "df940a6f-6d8b-44da-a06d-6a7b64df3736",
           "width": 166,
-          "x": 1008,
-          "y": 155,
+          "x": 1012,
+          "y": 156,
           "zOrder": 4,
           "numberProperties": [
             {
@@ -2965,10 +2924,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Brightness",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "6e916b59-4e79-4b59-ab3e-235ca7e8708e",
           "width": 166,
-          "x": 512,
+          "x": 514,
           "y": 156,
           "zOrder": 5,
           "numberProperties": [
@@ -2985,10 +2944,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Drop shadow",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "fdd1fccc-3211-4110-b123-0f8cde349473",
           "width": 166,
-          "x": 675,
+          "x": 680,
           "y": 156,
           "zOrder": 5,
           "numberProperties": [
@@ -3005,10 +2964,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Glitch",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "be987210-6592-4674-97ef-14438842c57b",
           "width": 166,
-          "x": 841,
+          "x": 846,
           "y": 156,
           "zOrder": 5,
           "numberProperties": [
@@ -3025,10 +2984,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Bulge Pinch",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "ed398094-f998-4a37-8cf6-32a1fc7ae332",
           "width": 166,
-          "x": 14,
+          "x": 16,
           "y": 296,
           "zOrder": 3,
           "numberProperties": [
@@ -3045,11 +3004,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Radial blur",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "fac2104a-5b50-4bfb-ba85-18c1add71901",
           "width": 166,
-          "x": 1008,
-          "y": 295,
+          "x": 1012,
+          "y": 296,
           "zOrder": 4,
           "numberProperties": [
             {
@@ -3065,10 +3024,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Godray",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "3c4dcdb7-cf10-4ade-b278-245fe0f92629",
           "width": 166,
-          "x": 676,
+          "x": 680,
           "y": 296,
           "zOrder": 5,
           "numberProperties": [
@@ -3085,11 +3044,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Glow",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "e9c07a2f-b141-4531-be41-6306daa07c43",
           "width": 166,
-          "x": 841,
-          "y": 294,
+          "x": 846,
+          "y": 296,
           "zOrder": 5,
           "numberProperties": [
             {
@@ -3105,10 +3064,10 @@
           "customSize": true,
           "height": 140,
           "layer": "ColorReplace",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "905d2fcf-dbf2-4869-b3b7-2cf3b59574ad",
           "width": 166,
-          "x": 510,
+          "x": 514,
           "y": 296,
           "zOrder": 5,
           "numberProperties": [
@@ -3125,10 +3084,10 @@
           "customSize": true,
           "height": 140,
           "layer": "ColorMap",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "7db94dfa-e04f-4b0e-b6f1-5361303cac9a",
           "width": 166,
-          "x": 346,
+          "x": 348,
           "y": 296,
           "zOrder": 5,
           "numberProperties": [
@@ -3145,10 +3104,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Sepia",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "2789c152-3c33-41aa-ab55-a825718372c9",
           "width": 166,
-          "x": 1009,
+          "x": 1012,
           "y": 576,
           "zOrder": 4,
           "numberProperties": [
@@ -3165,11 +3124,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Zoom blur",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "ddd37159-1150-4806-87bf-a489f5cd6658",
           "width": 166,
-          "x": 513,
-          "y": 577,
+          "x": 514,
+          "y": 576,
           "zOrder": 5,
           "numberProperties": [
             {
@@ -3185,11 +3144,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Tilt shift",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "0fd12f9e-757e-4e5a-9662-2d3ba0352d33",
           "width": 166,
-          "x": 842,
-          "y": 575,
+          "x": 846,
+          "y": 576,
           "zOrder": 5,
           "numberProperties": [
             {
@@ -3205,8 +3164,8 @@
           "customSize": true,
           "height": 1,
           "layer": "UI",
-          "locked": false,
           "name": "Avatar",
+          "persistentUuid": "660ed27f-fbc7-49d1-b180-4a41fc1b5545",
           "width": 1,
           "x": 27,
           "y": 30,
@@ -3225,11 +3184,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Twist",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "812d78cc-583d-48c9-91c9-ae39e7017ed3",
           "width": 166,
-          "x": 679,
-          "y": 577,
+          "x": 680,
+          "y": 576,
           "zOrder": 5,
           "numberProperties": [
             {
@@ -3245,10 +3204,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Advanced bloom",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "95ecf8b7-088e-4d20-a943-3db8b5957273",
           "width": 166,
-          "x": 180,
+          "x": 182,
           "y": 16,
           "zOrder": 4,
           "numberProperties": [
@@ -3265,10 +3224,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Blending mode",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "6e120d9c-e01c-4b3f-ba95-b00f1c7cbbdc",
           "width": 166,
-          "x": 180,
+          "x": 182,
           "y": 156,
           "zOrder": 4,
           "numberProperties": [
@@ -3285,10 +3244,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Bulge Pinch",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "34ef7ab7-14da-467e-b25a-1fc85670b8aa",
           "width": 166,
-          "x": 180,
+          "x": 182,
           "y": 296,
           "zOrder": 4,
           "numberProperties": [
@@ -3305,10 +3264,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Kawase blur",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "3ffed240-c143-4cf5-aab7-3f2ac7482739",
           "width": 166,
-          "x": 15,
+          "x": 16,
           "y": 436,
           "zOrder": 3,
           "numberProperties": [
@@ -3325,11 +3284,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Reflection",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "fa757d26-7fee-4440-ac7b-4a0a6c26efcc",
           "width": 166,
-          "x": 1009,
-          "y": 435,
+          "x": 1012,
+          "y": 436,
           "zOrder": 4,
           "numberProperties": [
             {
@@ -3345,10 +3304,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Dark Night",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "19e7531a-67fe-4679-961b-746867272fff",
           "width": 166,
-          "x": 347,
+          "x": 348,
           "y": 436,
           "zOrder": 5,
           "numberProperties": [
@@ -3365,10 +3324,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Noise",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "1e497548-931d-4ca5-ae33-0036b28b2ff9",
           "width": 166,
-          "x": 513,
+          "x": 514,
           "y": 436,
           "zOrder": 5,
           "numberProperties": [
@@ -3385,11 +3344,11 @@
           "customSize": true,
           "height": 140,
           "layer": "Outline",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "89cbca41-d71a-465a-b3e9-47dbaccbfbf4",
           "width": 166,
-          "x": 842,
-          "y": 434,
+          "x": 846,
+          "y": 436,
           "zOrder": 5,
           "numberProperties": [
             {
@@ -3405,10 +3364,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Old film",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "b1e9b915-551e-4c05-b1df-ffe2510cb431",
           "width": 166,
-          "x": 679,
+          "x": 680,
           "y": 436,
           "zOrder": 5,
           "numberProperties": [
@@ -3425,10 +3384,10 @@
           "customSize": true,
           "height": 140,
           "layer": "Light Night",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "e0fc1feb-69f2-402a-bcba-f1671c948603",
           "width": 166,
-          "x": 181,
+          "x": 182,
           "y": 436,
           "zOrder": 4,
           "numberProperties": [
@@ -3445,11 +3404,11 @@
           "customSize": true,
           "height": 131,
           "layer": "Blur",
-          "locked": false,
           "name": "Tilebg",
+          "persistentUuid": "80787d1d-e19e-4641-9367-73015168b8bb",
           "width": 165,
-          "x": 343,
-          "y": 162,
+          "x": 348,
+          "y": 156,
           "zOrder": 5,
           "numberProperties": [
             {
@@ -3459,17 +3418,158 @@
           ],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 140,
+          "layer": "HSL adjustment",
+          "name": "Tilebg",
+          "persistentUuid": "bfbff5ee-9e9b-4acb-88b2-714f6edfcf2e",
+          "width": 166,
+          "x": 348,
+          "y": 576,
+          "zOrder": 5,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 15
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 140,
+          "layer": "Motion blur",
+          "name": "Tilebg",
+          "persistentUuid": "4f070619-5d99-4c90-bec6-021ba175f6d1",
+          "width": 166,
+          "x": 182,
+          "y": 576,
+          "zOrder": 5,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 15
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 140,
+          "layer": "Shockwave",
+          "name": "Tilebg",
+          "persistentUuid": "e32a7196-653b-4331-8bf0-78365a533741",
+          "width": 166,
+          "x": 16,
+          "y": 576,
+          "zOrder": 5,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 15
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 63,
+          "layer": "Shockwave",
+          "name": "Avatar",
+          "persistentUuid": "f04a73ee-a756-44ad-a1df-fd21a4a373db",
+          "width": 67,
+          "x": -90,
+          "y": -80,
+          "zOrder": 5001,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 63,
+          "layer": "Radial blur",
+          "name": "Avatar",
+          "persistentUuid": "69ec2244-abea-4676-9ca3-df5c35c9174d",
+          "width": 67,
+          "x": -159,
+          "y": -78,
+          "zOrder": 5001,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 63,
+          "layer": "Twist",
+          "name": "Avatar",
+          "persistentUuid": "e4768e0e-5672-4c8f-bdc6-72f0b7174373",
+          "width": 67,
+          "x": -157,
+          "y": -143,
+          "zOrder": 5001,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 63,
+          "layer": "Zoom blur",
+          "name": "Avatar",
+          "persistentUuid": "28bcd151-ce6e-4532-90fd-85c9e732a0e8",
+          "width": 67,
+          "x": -92,
+          "y": -147,
+          "zOrder": 5001,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Note",
+          "persistentUuid": "9dc71397-3273-4cb0-8420-ae66e1786720",
+          "width": 0,
+          "x": -312,
+          "y": -183,
+          "zOrder": 5002,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
         {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
           "name": "Tilebg",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
-          "behaviors": [],
           "effects": [],
+          "behaviors": [],
           "animations": [
             {
               "name": "t1",
@@ -4722,13 +4822,15 @@
           ]
         },
         {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
           "name": "Avatar",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
-          "behaviors": [],
           "effects": [],
+          "behaviors": [],
           "animations": [
             {
               "name": "",
@@ -4760,69 +4862,278 @@
               ]
             }
           ]
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Note",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "These instances avoid the coordinates to be off for:\n- Radial blur\n- Shockwave\n- Twist\n- Zoom blur",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 20,
+          "color": {
+            "b": 187,
+            "g": 187,
+            "r": 187
+          }
         }
       ],
       "events": [
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "disabled": false,
-          "folded": false,
-          "name": "Collision handling",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [],
           "events": [
             {
-              "disabled": false,
-              "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
-                    "inverted": false,
-                    "value": "DepartScene"
+                    "value": "Layer"
                   },
                   "parameters": [
-                    ""
-                  ],
-                  "subInstructions": []
+                    "Tilebg",
+                    "\"Radial blur\""
+                  ]
                 }
               ],
-              "actions": [],
-              "events": []
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Radial blur\"",
+                    "\"Effect\"",
+                    "\"centerX\"",
+                    "Tilebg.CenterX() / CameraWidth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Radial blur\"",
+                    "\"Effect\"",
+                    "\"centerY\"",
+                    "Tilebg.CenterY() / CameraHeight()"
+                  ]
+                }
+              ]
             },
             {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Handle collision (no conditions is necessary, the actions takes care of handling everything)",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": []
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Layer"
+                  },
+                  "parameters": [
+                    "Tilebg",
+                    "\"Twist\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Twist\"",
+                    "\"Effect\"",
+                    "\"offsetX\"",
+                    "Tilebg.CenterX() / CameraWidth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Twist\"",
+                    "\"Effect\"",
+                    "\"offsetY\"",
+                    "Tilebg.CenterY() / CameraHeight()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Layer"
+                  },
+                  "parameters": [
+                    "Tilebg",
+                    "\"Zoom blur\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Zoom blur\"",
+                    "\"Effect\"",
+                    "\"centerX\"",
+                    "Tilebg.CenterX() / CameraWidth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Zoom blur\"",
+                    "\"Effect\"",
+                    "\"centerY\"",
+                    "Tilebg.CenterY() / CameraHeight()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Layer"
+                  },
+                  "parameters": [
+                    "Tilebg",
+                    "\"Shockwave\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Shockwave\"",
+                    "\"Effect\"",
+                    "\"centerX\"",
+                    "Tilebg.CenterX() / CameraWidth()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetLayerEffectParameter"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Shockwave\"",
+                    "\"Effect\"",
+                    "\"centerY\"",
+                    "Tilebg.CenterY() / CameraHeight()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Shockwave\""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Layer"
+              },
+              "parameters": [
+                "Tilebg",
+                "\"Shockwave\""
+              ]
+            },
+            {
+              "type": {
+                "value": "CompareTimer"
+              },
+              "parameters": [
+                "",
+                "\"Shockwave\"",
+                ">=",
+                "3"
+              ]
             }
           ],
-          "parameters": []
+          "actions": [
+            {
+              "type": {
+                "value": "SetLayerEffectParameter"
+              },
+              "parameters": [
+                "",
+                "\"Shockwave\"",
+                "\"Effect\"",
+                "\"time\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "",
+                "\"Shockwave\""
+              ]
+            }
+          ]
         }
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "",
+          "renderingType": "",
           "visibility": true,
           "cameras": [
             {
@@ -4839,13 +5150,33 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "UI",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Adjustment",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4868,7 +5199,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Advanced bloom",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4888,7 +5229,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Ascii",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4904,7 +5255,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Beveled edges",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4927,7 +5288,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Black and wight",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4943,7 +5314,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Blending mode",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4960,7 +5341,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Blur",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4979,7 +5370,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Brightness",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -4995,7 +5396,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Bulge Pinch",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5014,7 +5425,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "CRT",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5041,7 +5462,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "ColorMap",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5061,7 +5492,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "ColorReplace",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5080,7 +5521,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Displacement",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5099,7 +5550,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Dot",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5116,7 +5577,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Drop shadow",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5140,7 +5611,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Glitch",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5170,7 +5651,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Glow",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5190,7 +5681,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Godray",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5214,7 +5715,48 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "HSL adjustment",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": [
+            {
+              "effectType": "HslAdjustment",
+              "name": "Effect",
+              "doubleParameters": {
+                "alpha": 1,
+                "hue": -90,
+                "lightness": 0.125,
+                "saturation": 0.125
+              },
+              "stringParameters": {},
+              "booleanParameters": {
+                "colorize": false
+              }
+            }
+          ]
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Kawase blur",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5233,7 +5775,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Light Night",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5249,7 +5801,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Dark Night",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5266,7 +5828,46 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "Motion blur",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": [
+            {
+              "effectType": "MotionBlur",
+              "name": "Effect",
+              "doubleParameters": {
+                "kernelSize": 15,
+                "offset": 0,
+                "velocityX": 50,
+                "velocityY": 25
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ]
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Noise",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5282,7 +5883,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Old film",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5307,7 +5918,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Outline",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5325,7 +5946,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Pixelate",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5341,7 +5972,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "RGB split",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5362,7 +6003,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Radial blur",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5374,6 +6025,7 @@
                 "centerX": 0.5,
                 "centerY": 0.5,
                 "kernelSize": 5,
+                "padding": 0,
                 "radius": -1
               },
               "stringParameters": {},
@@ -5382,7 +6034,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Reflection",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5407,7 +6069,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Sepia",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5423,7 +6095,50 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "Shockwave",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": [
+            {
+              "effectType": "Shockwave",
+              "name": "Effect",
+              "doubleParameters": {
+                "amplitude": 20,
+                "brightness": 1,
+                "centerX": 0.5,
+                "centerY": 0.5,
+                "radius": 160,
+                "speed": 50,
+                "time": 0,
+                "wavelength": 40
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ]
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Tilt shift",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5440,7 +6155,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Twist",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5452,7 +6177,7 @@
                 "offsetX": 0.5,
                 "offsetY": 0.5,
                 "padding": 0,
-                "radius": 10
+                "radius": 70
               },
               "stringParameters": {},
               "booleanParameters": {}
@@ -5460,7 +6185,17 @@
           ]
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
           "name": "Zoom blur",
+          "renderingType": "",
           "visibility": true,
           "cameras": [],
           "effects": [
@@ -5470,8 +6205,9 @@
               "doubleParameters": {
                 "centerX": 0.5,
                 "centerY": 0.5,
-                "innerRadius": 200,
-                "strength": 0.3
+                "innerRadius": 20,
+                "padding": 0,
+                "strength": 3
               },
               "stringParameters": {},
               "booleanParameters": {}
@@ -5481,8 +6217,28 @@
       ],
       "behaviorsSharedData": [
         {
-          "name": "TopDownMovement",
-          "type": "TopDownMovementBehavior::TopDownMovementBehavior"
+          "name": "Animation",
+          "type": "AnimatableCapability::AnimatableBehavior"
+        },
+        {
+          "name": "Effect",
+          "type": "EffectCapability::EffectBehavior"
+        },
+        {
+          "name": "Flippable",
+          "type": "FlippableCapability::FlippableBehavior"
+        },
+        {
+          "name": "Opacity",
+          "type": "OpacityCapability::OpacityBehavior"
+        },
+        {
+          "name": "Resizable",
+          "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Scale",
+          "type": "ScalableCapability::ScalableBehavior"
         }
       ]
     }

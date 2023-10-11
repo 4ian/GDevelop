@@ -2,13 +2,13 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'HslAdjustment',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const hslAdjustmentFilter = new PIXI.filters.HslAdjustmentFilter();
         return hslAdjustmentFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
-        const hslAdjustmentFilter = (filter as unknown) as PIXI.filters.HslAdjustmentFilter;
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(filter: PIXI.Filter, parameterName: string, value) {
+        const hslAdjustmentFilter = filter as PIXI.filters.HslAdjustmentFilter;
         if (parameterName === 'hue') {
           hslAdjustmentFilter.hue = value;
         } else if (parameterName === 'saturation') {
@@ -21,8 +21,16 @@ namespace gdjs {
           hslAdjustmentFilter.alpha = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value
+      ) {}
     })()
   );
 }

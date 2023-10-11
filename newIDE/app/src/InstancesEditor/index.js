@@ -1059,6 +1059,12 @@ export default class InstancesEditor extends Component<Props> {
   pauseSceneRendering = () => {
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     this._renderingPaused = true;
+    // Deactivate interactions when the scene is paused.
+    // Useful when the scene is paused to reload textures. The event system
+    // might try to check if pointer is over a PIXI object using the texture
+    // of the object. If there is no texture, it will crash.
+    // The PIXI.EventSystem is not based on the PIXI.Ticker.
+    this.instancesRenderer.getPixiContainer().eventMode = 'none';
 
     stopPIXITicker();
   };
@@ -1066,6 +1072,7 @@ export default class InstancesEditor extends Component<Props> {
   restartSceneRendering = () => {
     this._renderingPaused = false;
     this._renderScene();
+    this.instancesRenderer.getPixiContainer().eventMode = 'auto';
 
     startPIXITicker();
   };

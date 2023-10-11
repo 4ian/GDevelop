@@ -29,15 +29,15 @@ const ResourcePreview = (props: Props) => {
     case 'image':
       return (
         <ImagePreview
-          resourceName={props.resourceName}
+          resourceName={resourceName}
           imageResourceSource={props.resourcesLoader.getResourceFullUrl(
-            props.project,
-            props.resourceName,
+            project,
+            resourceName,
             {}
           )}
           isImageResourceSmooth={isProjectImageResourceSmooth(
-            props.project,
-            props.resourceName
+            project,
+            resourceName
           )}
           onSize={props.onSize}
         />

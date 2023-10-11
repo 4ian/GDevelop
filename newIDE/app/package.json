@@ -154,6 +154,9 @@
       }
     ]
   },
+  "overrides": {
+    "react-refresh": "0.14.0"
+  },
   "flow-coverage-report": {
     "includeGlob": [
       "src/**/*.js"

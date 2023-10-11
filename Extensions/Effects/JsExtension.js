@@ -725,7 +725,6 @@ module.exports = {
       .setType('number')
       .setDescription(_('Padding for the visual effect area'));
 
-
     const hslAdjustmentEffect = extension
       .addEffect('HslAdjustment')
       .setFullName(_('HSL Adjustment'))

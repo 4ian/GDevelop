@@ -1,3 +1,4 @@
+// It probably needs to be blend to be useful.
 /*!
  * @pixi/filter-emboss - v5.1.1
  * Compiled Thu, 31 Aug 2023 09:18:38 UTC

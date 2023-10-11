@@ -1,3 +1,4 @@
+// This filter is probably made useless by advanced-bloom.
 /*!
  * @pixi/filter-bloom - v5.1.1
  * Compiled Thu, 31 Aug 2023 09:18:38 UTC

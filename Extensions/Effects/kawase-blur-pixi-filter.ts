@@ -10,11 +10,9 @@ namespace gdjs {
       updateDoubleParameter(filter, parameterName, value) {
         const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
         if (parameterName === 'pixelizeX') {
-          // @ts-ignore: fix these wrong parameters
-          kawaseBlurFilter.pixelizeX = value;
+          kawaseBlurFilter.pixelSize[0] = value;
         } else if (parameterName === 'pixelizeY') {
-          // @ts-ignore: fix these wrong parameters
-          kawaseBlurFilter.pixelizeY = value;
+          kawaseBlurFilter.pixelSize[1] = value;
         } else if (parameterName === 'blur') {
           kawaseBlurFilter.blur = value;
         } else if (parameterName === 'quality') {

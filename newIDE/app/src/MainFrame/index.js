@@ -181,6 +181,7 @@ import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import useResourcesWatcher from './ResourcesWatcher';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -498,6 +499,11 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
+  useResourcesWatcher(
+    getStorageProvider,
+    currentFileMetadata,
+    state.editorTabs
+  );
 
   /**
    * This reference is useful to get the current opened project,
@@ -759,42 +765,6 @@ const MainFrame = (props: Props) => {
       updateToolbar();
     },
     [updateToolbar]
-  );
-
-  const informEditorsResourceExternallyChanged = React.useCallback(
-    (resourceInfo: {| identifier: string |}) => {
-      ResourcesLoader.burstAllUrlsCache();
-      state.editorTabs.editors.forEach(editorTab => {
-        if (
-          editorTab.editorRef &&
-          editorTab.editorRef.editor &&
-          editorTab.editorRef.editor.onResourceExternallyChanged
-        ) {
-          // Each editor container has an accessible editor property.
-          // $FlowFixMe[not-a-function]
-          editorTab.editorRef.editor.onResourceExternallyChanged(resourceInfo);
-        }
-      });
-    },
-    [state.editorTabs]
-  );
-
-  React.useEffect(
-    () => {
-      const storageProvider = getStorageProvider();
-      if (currentFileMetadata && storageProvider.setupResourcesWatcher) {
-        const unsubscribe = storageProvider.setupResourcesWatcher(
-          currentFileMetadata,
-          informEditorsResourceExternallyChanged
-        );
-        return unsubscribe;
-      }
-    },
-    [
-      currentFileMetadata,
-      informEditorsResourceExternallyChanged,
-      getStorageProvider,
-    ]
   );
 
   const _languageDidChange = () => {

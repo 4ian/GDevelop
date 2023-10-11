@@ -222,7 +222,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         // When reloading textures, there can be a short time during which
         // the existing texture is removed but the InstancesEditor tries to use it
         // through the RenderedInstance's, triggering crashes. So the scene rendering
-        // paused during this period.
+        // is paused during this period.
         editorDisplay.startSceneRendering(false);
         await PixiResourcesLoader.reloadTextureForResource(
           project,

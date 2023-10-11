@@ -32,7 +32,7 @@ import {
   communityLinksConfig,
   type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
-import { PrivateAssetPackTile } from '../AssetStore/AssetPackTiles';
+import { PrivateAssetPackTile } from '../AssetStore/ShopTiles';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 
 const getAssetPackColumnsFromWidth = (width: WidthType) => {

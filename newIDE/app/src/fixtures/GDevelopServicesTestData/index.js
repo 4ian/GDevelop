@@ -28,6 +28,7 @@ import {
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
 import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -48,12 +49,14 @@ export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = 
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
     name: 'Worms 2D',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d35c',
     name: 'Crash Bandicoot',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
 ];
@@ -63,60 +66,70 @@ const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372141',
     name: 'Worms 2D 1',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d352',
     name: 'Crash Bandicoot 2',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
     name: 'Worms 2D 3',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d354',
     name: 'Crash Bandicoot 4',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372145',
     name: 'Worms 2D 5',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d356',
     name: 'Crash Bandicoot 6',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372147',
     name: 'Worms 2D 7',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d358',
     name: 'Crash Bandicoot 8',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372149',
     name: 'Worms 2D 9',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d350',
     name: 'Crash Bandicoot 10',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
 ];
@@ -255,6 +268,14 @@ export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {
   redemptionCodeValidUntil: Date.now() - 1000,
 };
 
+export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  cancelAtPeriodEnd: true,
+};
+
 export const noSubscription: Subscription = {
   planId: null,
   createdAt: 1515084011000,
@@ -274,6 +295,7 @@ export const limitsForNoSubscriptionUser: Limits = {
     cloudProjects: {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: 3,
@@ -309,6 +331,7 @@ export const limitsForSilverUser: Limits = {
     cloudProjects: {
       maximumCount: 50,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -344,6 +367,7 @@ export const limitsForGoldUser: Limits = {
     cloudProjects: {
       maximumCount: 100,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -379,6 +403,7 @@ export const limitsForStartupUser: Limits = {
     cloudProjects: {
       maximumCount: 500,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 1,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -414,6 +439,7 @@ export const limitsForBusinessUser: Limits = {
     cloudProjects: {
       maximumCount: 500,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 1,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -449,6 +475,7 @@ export const limitsReached: Limits = {
     cloudProjects: {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: 3,
@@ -497,6 +524,7 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
       content: {},
     },
   ],
+  receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
   onLogin: () => {},
@@ -531,6 +559,11 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
 export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
+  limits: limitsForSilverUser,
+};
+export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionButCancelAtPeriodEnd,
   limits: limitsForSilverUser,
 };
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
@@ -1542,6 +1575,23 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   ],
   gdevelopVersion: '',
   codeSizeLevel: 'small',
+};
+
+export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData = {
+  name: 'Fake private game template',
+  description: 'This is a fake private game template',
+  id: 'fake-id',
+  sellerId: 'fake-seller-id',
+  isSellerGDevelop: false,
+  productType: 'GAME_TEMPLATE',
+  listing: 'GAME_TEMPLATE',
+  categories: ['adventure'],
+  updatedAt: '2020-01-01',
+  createdAt: '2020-01-01',
+  thumbnailUrls: [],
+  prices: [],
+  appStoreProductId: null,
+  includedListableProductIds: [],
 };
 
 export const fakeAssetPacks: PublicAssetPacks = {

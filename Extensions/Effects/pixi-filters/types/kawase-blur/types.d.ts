@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class KawaseBlurFilter extends PIXI.Filter {
     constructor(blur?: number | number[], quality?: number, clamp?: boolean);
     kernels: number[];

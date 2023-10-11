@@ -243,6 +243,18 @@ class GD_CORE_API Object {
    * \see DoUnserializeFrom
    */
   void UnserializeFrom(gd::Project& project, const SerializerElement& element);
+
+  /**
+   * \brief Reset the persistent UUID, used to recognize
+   * the same object between serialization.
+   */
+  Object& ResetPersistentUuid();
+
+  /**
+   * \brief Remove the persistent UUID - when the object no
+   * longer need to be recognized between serializations.
+   */
+  Object& ClearPersistentUuid();
   ///@}
 
  protected:
@@ -259,6 +271,8 @@ class GD_CORE_API Object {
   gd::String tags;      ///< Comma-separated list of tags
   gd::EffectsContainer
       effectsContainer;  ///< The effects container for the object.
+  mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
+                                      ///< useful for computing changesets.
 
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.

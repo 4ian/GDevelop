@@ -11,6 +11,7 @@ import LeftLoader from '../UI/LeftLoader';
 import { redeemCode } from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import AlertMessage from '../UI/AlertMessage';
+import Form from '../UI/Form';
 
 type Props = {|
   onClose: (hasJustRedeemedCode: boolean) => Promise<void>,
@@ -122,14 +123,7 @@ export default function RedeemCodeDialog({
           maxWidth="sm"
           open
         >
-          <form
-            onSubmit={event => {
-              event.preventDefault();
-              onRedeemCode();
-            }}
-            autoComplete="on"
-            name="redeemSubscriptionCoupon"
-          >
+          <Form onSubmit={onRedeemCode} name="redeemSubscriptionCoupon">
             <ColumnStackLayout noMargin>
               <SemiControlledTextField
                 value={redemptionCode}
@@ -164,7 +158,7 @@ export default function RedeemCodeDialog({
                 </AlertMessage>
               )}
             </ColumnStackLayout>
-          </form>
+          </Form>
         </Dialog>
       )}
     </I18n>

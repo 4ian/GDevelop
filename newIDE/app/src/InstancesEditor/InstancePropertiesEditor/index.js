@@ -377,7 +377,7 @@ const InstancePropertiesEditor = ({
         </Column>
         {object ? (
           <VariablesList
-            commitChangesOnBlur={false}
+            directlyStoreValueChangesWhileEditing
             inheritedVariablesContainer={object.getVariables()}
             variablesContainer={instance.getVariables()}
             size="small"

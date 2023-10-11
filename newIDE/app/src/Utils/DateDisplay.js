@@ -9,7 +9,7 @@ export const getRelativeOrAbsoluteDisplayDate = (
 ): React.Node => {
   const nowAsNumber = Date.now();
   if (nowAsNumber - dateAsNumber < 60 * 1000) {
-    return i18n._(t`Now`);
+    return i18n._(t`Just now`);
   }
   const now = new Date(nowAsNumber);
   const date = new Date(dateAsNumber);
@@ -19,7 +19,13 @@ export const getRelativeOrAbsoluteDisplayDate = (
     now.getMonth() === date.getMonth() &&
     now.getDate() === date.getDate()
   ) {
-    return i18n._(t`Today`);
+    return (
+      i18n._(t`Today`) +
+      ' ' +
+      i18n.date(date, {
+        hour: 'numeric',
+      })
+    );
   }
   const yesterdayAtSameTime = new Date(now);
   yesterdayAtSameTime.setDate(now.getDate() - 1);
@@ -28,7 +34,7 @@ export const getRelativeOrAbsoluteDisplayDate = (
     now.getMonth() === date.getMonth() &&
     yesterdayAtSameTime.getDate() === date.getDate()
   ) {
-    return i18n._(t`Yesterday`);
+    return i18n._(t`Yesterday`) + ' ' + i18n.date(date, { hour: 'numeric' });
   }
 
   const sevenDaysAgoAtFirstHour = new Date(now);

@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import gesture from 'pixi-simple-gesture';
+import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
@@ -193,6 +193,9 @@ export default class InstancesEditor extends Component<Props> {
         preserveDrawingBuffer: true,
         antialias: false,
         backgroundAlpha: 0,
+        // It's the default value, but it's better to make it explicit.
+        // It allows instances composed of several pixi objects to detect hovering.
+        eventMode: 'auto',
         // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
       });
 
@@ -212,6 +215,11 @@ export default class InstancesEditor extends Component<Props> {
 
       gameCanvas = this.pixiRenderer.view;
     }
+
+    // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
+    // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
+    this.pixiRenderer.plugins.accessibility.destroy();
+    delete this.pixiRenderer.plugins.accessibility;
 
     // Add the renderer view element to the DOM
     canvasArea.appendChild(gameCanvas);
@@ -280,11 +288,11 @@ export default class InstancesEditor extends Component<Props> {
       this.props.width,
       this.props.height
     );
-    gesture.panable(this.backgroundArea);
-    this.backgroundArea.on('mousedown', event =>
+    panable(this.backgroundArea);
+    this.backgroundArea.addEventListener('mousedown', event =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
     );
-    this.backgroundArea.on(
+    this.backgroundArea.addEventListener(
       'rightclick',
       (interactionEvent: PIXI.InteractionEvent) => {
         const {
@@ -301,19 +309,19 @@ export default class InstancesEditor extends Component<Props> {
         return false;
       }
     );
-    this.backgroundArea.on('touchstart', event => {
+    this.backgroundArea.addEventListener('touchstart', event => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
         return;
       }
 
       this._onBackgroundClicked(event.data.global.x, event.data.global.y);
     });
-    this.backgroundArea.on('mousemove', event => {
+    this.backgroundArea.addEventListener('globalmousemove', event => {
       const cursorX = event.data.global.x || 0;
       const cursorY = event.data.global.y || 0;
       this._onMouseMove(cursorX, cursorY);
     });
-    this.backgroundArea.on('panmove', event =>
+    this.backgroundArea.addEventListener('panmove', (event: PanMoveEvent) =>
       this._onPanMove(
         event.deltaX,
         event.deltaY,
@@ -321,7 +329,7 @@ export default class InstancesEditor extends Component<Props> {
         event.data.global.y
       )
     );
-    this.backgroundArea.on('panend', event => this._onPanEnd());
+    this.backgroundArea.addEventListener('panend', event => this._onPanEnd());
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
@@ -735,7 +743,8 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onOverInstance = (instance: gdInitialInstance) => {
-    this.highlightedInstance.setInstance(instance);
+    if (!this.instancesMover.isMoving())
+      this.highlightedInstance.setInstance(instance);
   };
 
   _onDownInstance = (

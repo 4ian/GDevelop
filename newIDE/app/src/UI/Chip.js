@@ -57,6 +57,7 @@ const Chip = React.forwardRef<Props, ChipInterface>((props, ref) => {
       classes={useStyles()}
       className={props.disableAutoTranslate ? 'notranslate' : ''}
       ref={chipRef}
+      color={props.color}
     />
   );
 });

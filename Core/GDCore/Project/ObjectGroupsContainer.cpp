@@ -162,4 +162,13 @@ void ObjectGroupsContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
   objectGroups.insert(objectGroups.begin() + newIndex, std::move(objectGroup));
 }
 
+void ObjectGroupsContainer::ForEachNameMatchingSearch(
+    const gd::String& search,
+    std::function<void(const gd::String& name)> fn) const {
+  for (const auto& objectGroup : objectGroups) {
+    if (objectGroup->GetName().FindCaseInsensitive(search) != gd::String::npos)
+      fn(objectGroup->GetName());
+  }
+}
+
 }  // namespace gd

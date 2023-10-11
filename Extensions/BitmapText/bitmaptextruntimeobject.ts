@@ -35,14 +35,17 @@ namespace gdjs {
    * * Glyph Designer (OS X, commercial): http://www.71squared.com/en/glyphdesigner|http://www.71squared.com/en/glyphdesigner
    * * Littera (Web-based, free): http://kvazars.com/littera/|http://kvazars.com/littera/
    */
-  export class BitmapTextRuntimeObject extends gdjs.RuntimeObject {
+  export class BitmapTextRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.OpacityHandler, gdjs.Scalable {
     _opacity: float;
     _text: string;
     /** color in format [r, g, b], where each component is in the range [0, 255] */
     _tint: integer[];
     _bitmapFontResourceName: string;
     _textureAtlasResourceName: string;
-    _scale: number;
+    _scaleX: number;
+    _scaleY: number;
     _wordWrap: boolean;
     _wrappingWidth: float;
     _align: string;
@@ -66,7 +69,8 @@ namespace gdjs {
       this._bitmapFontResourceName = objectData.content.bitmapFontResourceName; // fnt/xml files
       this._textureAtlasResourceName =
         objectData.content.textureAtlasResourceName; // texture file used with fnt/xml (bitmap font file)
-      this._scale = objectData.content.scale;
+      this._scaleX = objectData.content.scale;
+      this._scaleY = objectData.content.scale;
       this._wordWrap = objectData.content.wordWrap;
       this._wrappingWidth = 0;
       this._align = objectData.content.align;
@@ -167,14 +171,45 @@ namespace gdjs {
       return this._tint[0] + ';' + this._tint[1] + ';' + this._tint[2];
     }
 
+    getScale(): number {
+      const scaleX = this.getScaleX();
+      const scaleY = this.getScaleY();
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
+    }
+
+    getScaleX(): float {
+      return this._scaleX;
+    }
+
+    getScaleY(): float {
+      return this._scaleY;
+    }
+
     setScale(scale: float): void {
-      this._scale = scale;
+      this.setScaleX(scale);
+      this.setScaleY(scale);
+    }
+
+    setScaleX(scaleX: float): void {
+      if (scaleX < 0) {
+        scaleX = 0;
+      }
+      if (this._scaleX === scaleX) return;
+
+      this._scaleX = scaleX;
       this._renderer.updateScale();
       this.invalidateHitboxes();
     }
 
-    getScale(): float {
-      return this._scale;
+    setScaleY(scaleY: float): void {
+      if (scaleY < 0) {
+        scaleY = 0;
+      }
+      if (this._scaleY === scaleY) return;
+
+      this._scaleY = scaleY;
+      this._renderer.updateScale();
+      this.invalidateHitboxes();
     }
 
     getFontSize(): float {

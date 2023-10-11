@@ -1,17 +1,15 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'BlackAndWhite',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target, effectData) {
-        const colorMatrix = new PIXI.filters.ColorMatrixFilter();
+        const colorMatrix = new PIXI.ColorMatrixFilter();
         colorMatrix.blackAndWhite(false);
         return colorMatrix;
       }
       updatePreRender(filter, target) {}
       updateDoubleParameter(filter, parameterName, value) {
-        // @ts-ignore - unsure why PIXI.filters is not recognised.
-        const colorMatrix = (filter as unknown) as PIXI.filters.ColorMatrixFilter;
+        const colorMatrix = (filter as unknown) as PIXI.ColorMatrixFilter;
         if (parameterName !== 'opacity') {
           return;
         }

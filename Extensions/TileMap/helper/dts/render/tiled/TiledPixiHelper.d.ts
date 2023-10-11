@@ -1,6 +1,5 @@
 import { TileTextureCache } from '../TileTextureCache';
 import { TiledTileMap } from '../../load/tiled/TiledFormat';
-import PIXI = GlobalPIXIModule.PIXI;
 export declare namespace TiledPixiHelper {
   /**
    * Split an atlas image into Pixi textures.

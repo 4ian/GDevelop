@@ -32,6 +32,10 @@ namespace gdjs {
     _requestedChange: SceneChangeRequest;
     /** Black background by default. */
     _backgroundColor: integer = 0;
+
+    /** Should the canvas be cleared before this scene rendering. */
+    _clearCanvas: boolean = true;
+
     _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
 
@@ -159,6 +163,7 @@ namespace gdjs {
       //Create initial instances of objects
       this.createObjectsFrom(
         sceneData.instances,
+        0,
         0,
         0,
         /*trackByPersistentUuid=*/
@@ -522,6 +527,22 @@ namespace gdjs {
      */
     getBackgroundColor(): number {
       return this._backgroundColor;
+    }
+
+    /**
+     * Set whether the canvas should be cleared before this scene rendering.
+     * This is experimental: if possible, try to avoid relying on this and use
+     * custom objects to build complex scenes.
+     */
+    setClearCanvas(shouldClearCanvas: boolean): void {
+      this._clearCanvas = shouldClearCanvas;
+    }
+
+    /**
+     * Get whether the canvas should be cleared before this scene rendering.
+     */
+    getClearCanvas(): boolean {
+      return this._clearCanvas;
     }
 
     /**

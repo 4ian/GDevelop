@@ -17,6 +17,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import {
   getBrowserLanguageOrLocale,
   setLanguageInDOM,
@@ -112,9 +113,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
-      this
-    ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
@@ -138,6 +136,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
     getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
     setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    getShareDialogDefaultTab: this._getShareDialogDefaultTab.bind(this),
+    setShareDialogDefaultTab: this._setShareDialogDefaultTab.bind(this),
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
@@ -168,6 +168,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAllowUsageOfUnicodeIdentifierNames: this._setAllowUsageOfUnicodeIdentifierNames.bind(
       this
     ),
+    getEditorStateForProject: this._getEditorStateForProject.bind(this),
+    setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
 
   componentDidMount() {
@@ -258,20 +260,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ];
     if (!tutorialProgresses) return undefined;
     return tutorialProgresses[userIdKey];
-  }
-
-  _setUseUndefinedVariablesInAutocompletion(
-    useUndefinedVariablesInAutocompletion: boolean
-  ) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          useUndefinedVariablesInAutocompletion,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
   }
 
   _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {
@@ -761,6 +749,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _getShareDialogDefaultTab() {
+    return this.state.values.shareDialogDefaultTab;
+  }
+
+  _setShareDialogDefaultTab(shareDialogDefaultTab: 'invite' | 'publish') {
+    this.setState(
+      state => ({
+        values: { ...state.values, shareDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getIsMenuBarHiddenInPreview() {
     return this.state.values.isMenuBarHiddenInPreview;
   }
@@ -831,12 +832,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _setAllowUsageOfUnicodeIdentifierNames(enable: boolean) {
     const gd: libGDevelop = global.gd;
     gd.Project.allowUsageOfUnicodeIdentifierNames(enable);
-
     this.setState(
       state => ({
         values: {
           ...state.values,
           allowUsageOfUnicodeIdentifierNames: enable,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getEditorStateForProject(projectId: string) {
+    return this.state.values.editorStateByProject[projectId];
+  }
+
+  _setEditorStateForProject(
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          editorStateByProject: {
+            ...state.values.editorStateByProject,
+            [projectId]: editorState,
+          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

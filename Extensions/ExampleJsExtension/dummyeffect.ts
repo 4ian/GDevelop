@@ -1,7 +1,6 @@
 //A simple PIXI filter doing some color changes
 namespace gdjs {
   const logger = new gdjs.Logger('Dummy effect');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   const DummyPixiFilter = function () {
     var vertexShader = null;
@@ -44,7 +43,7 @@ namespace gdjs {
         // But be careful about the existing member of the filter (consider
         // updating the filter uniforms directly).
 
-        // You can also access to the effect parameters, classified by type:
+        // You can also access to the effect properties, classified by type:
         // `effectData.doubleParameters.opacity`
         // `effectData.stringParameters.someImage`
         // `effectData.stringParameters.someColor`

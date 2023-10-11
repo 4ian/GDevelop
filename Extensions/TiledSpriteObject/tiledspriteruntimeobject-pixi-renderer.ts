@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class TiledSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.TiledSpriteRuntimeObject;
     _tiledSprite: PIXI.TilingSprite;
@@ -99,7 +97,6 @@ namespace gdjs {
       if (colors.length < 3) {
         return;
       }
-      // @ts-expect-error ts-migrate(2322) FIXME: Type 'string' is not assignable to type 'number'.
       this._tiledSprite.tint =
         '0x' +
         gdjs.rgbToHex(
@@ -110,7 +107,7 @@ namespace gdjs {
     }
 
     getColor() {
-      const rgb = PIXI.utils.hex2rgb(this._tiledSprite.tint);
+      const rgb = new PIXI.Color(this._tiledSprite.tint).toRgbArray();
       return (
         Math.floor(rgb[0] * 255) +
         ';' +

@@ -4,8 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
-
   const logger = new gdjs.Logger('Atlas Manager');
   type AtlasManagerOnProgressCallback = (
     loadedCount: integer,
@@ -69,31 +67,29 @@ namespace gdjs {
      * @param onProgress The function called after each texts is loaded.
      * @param onComplete The function called when all texts are loaded.
      */
-    preload(
+    async preload(
       onProgress: AtlasManagerOnProgressCallback,
-      onComplete: AtlasManagerOnCompleteCallback
-    ): void {
+    ): Promise<integer> {
       const textResources = this._resources.filter(
         (resource) => isTextResource(resource) && !resource.disablePreload
       );
-      if (!textResources.length) {
-        return onComplete(0);
-      }
       let loaded = 0;
 
-      const onLoad: AtlasManagerRequestCallback = (error) => {
-        if (error) {
-          logger.error('Error while preloading a text resource:' + error);
-        }
-        if (++loaded === textResources.length) {
-          onComplete(textResources.length);
-        } else {
-          onProgress(loaded, textResources.length);
-        }
-      };
-      for (let i = 0; i < textResources.length; ++i) {
-        this.load(textResources[i].name, onLoad);
-      }
+      await Promise.all(
+        textResources.map((resource, i) => new Promise<void>((resolve) => {
+          const onLoad: AtlasManagerRequestCallback = (error) => {
+            if (error) {
+              logger.error('Error while preloading a text resource:' + error);
+            }
+            onProgress(loaded, textResources.length);
+            resolve();
+          };
+
+          this.load(textResources[i].name, onLoad);
+        }))
+      );
+
+      return Promise.resolve(textResources.length);
     }
 
     /**

@@ -131,30 +131,36 @@ void LinkEvent::SerializeTo(SerializerElement& element) const {
 
 void LinkEvent::UnserializeFrom(gd::Project& project,
                                 const SerializerElement& element) {
-  SerializerElement& includeElement = element.GetChild("include", 0, "Limites");
-
   SetTarget(element.GetChild("target", 0, "Scene").GetValue().GetString());
 
-  if (includeElement.HasAttribute("includeAll")) {
-    // Compatibility with GDevelop <= 4.0.92
-    if (includeElement.GetBoolAttribute("includeAll", true)) {
-      SetIncludeAllEvents();
+  // Compatibility with GD <= 5
+  if (element.HasChild("include", "Limites")) {
+    SerializerElement& includeElement = element.GetChild("include", 0, "Limites");
+    if (includeElement.HasAttribute("includeAll")) {
+      // Compatibility with GDevelop <= 4.0.92
+      if (includeElement.GetBoolAttribute("includeAll", true)) {
+        SetIncludeAllEvents();
+      } else {
+        SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
+                              includeElement.GetIntAttribute("end"));
+      }
     } else {
-      SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
-                            includeElement.GetIntAttribute("end"));
+      // GDevelop > 4.0.92
+      IncludeConfig config = static_cast<IncludeConfig>(
+          includeElement.GetIntAttribute("includeConfig", 0));
+      if (config == INCLUDE_ALL)
+        SetIncludeAllEvents();
+      else if (config == INCLUDE_EVENTS_GROUP)
+        SetIncludeEventsGroup(includeElement.GetStringAttribute("eventsGroup"));
+      else if (config == INCLUDE_BY_INDEX)
+        SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
+                              includeElement.GetIntAttribute("end"));
     }
   } else {
-    // GDevelop > 4.0.92
-    IncludeConfig config = static_cast<IncludeConfig>(
-        includeElement.GetIntAttribute("includeConfig", 0));
-    if (config == INCLUDE_ALL)
-      SetIncludeAllEvents();
-    else if (config == INCLUDE_EVENTS_GROUP)
-      SetIncludeEventsGroup(includeElement.GetStringAttribute("eventsGroup"));
-    else if (config == INCLUDE_BY_INDEX)
-      SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
-                            includeElement.GetIntAttribute("end"));
+    // Since GDevelop 5, links always include all events.
+    SetIncludeAllEvents();
   }
+  // end of compatibility code
 }
 
 bool LinkEvent::AcceptVisitor(gd::EventVisitor &eventVisitor) {

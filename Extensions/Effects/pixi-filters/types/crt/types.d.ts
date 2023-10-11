@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class CRTFilter extends PIXI.Filter {
     constructor(options?: CRTFilterOptions);
     curvature: number;

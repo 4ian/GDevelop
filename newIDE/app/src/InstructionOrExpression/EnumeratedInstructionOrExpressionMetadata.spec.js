@@ -6,11 +6,12 @@ const gd: libGDevelop = global.gd;
 
 describe('EnumeratedInstructionOrExpressionMetadata', () => {
   it('can hide actions that are not relevant to layouts', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = new gd.Layout();
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
       enumerateAllInstructions(false),
-      { layout }
+      { project, layout }
     );
 
     expect(instructions.length).toBeGreaterThan(0);
@@ -29,12 +30,14 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
   });
 
   it('can show actions that are only relevant for functions', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
     const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsFunction = new gd.EventsFunction();
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
       enumerateAllInstructions(false),
       {
+        project,
         eventsFunctionsExtension,
         eventsFunction,
       }

@@ -62,6 +62,210 @@ export const useBehaviorOverridingAlertDialog = () => {
   };
 };
 
+type BehaviorConfigurationEditorInterface = {||};
+type BehaviorConfigurationEditorProps = {|
+  project: gdProject,
+  object: gdObject,
+  behavior: gdBehavior,
+  resourceManagementProps: ResourceManagementProps,
+  onBehaviorsUpdated: () => void,
+  onChangeBehaviorName: (behavior: gdBehavior, newName: string) => void,
+  onRemoveBehavior: (behaviorName: string) => void,
+  copyBehavior: (behaviorName: string) => void,
+  canPasteBehaviors: boolean,
+  pasteBehaviors: () => Promise<void>,
+  openExtension: (behaviorType: string) => void,
+|};
+
+const BehaviorConfigurationEditor = React.forwardRef<
+  BehaviorConfigurationEditorProps,
+  BehaviorConfigurationEditorInterface
+>(
+  (
+    {
+      project,
+      object,
+      behavior,
+      resourceManagementProps,
+      onBehaviorsUpdated,
+      onChangeBehaviorName,
+      onRemoveBehavior,
+      copyBehavior,
+      canPasteBehaviors,
+      pasteBehaviors,
+      openExtension,
+    },
+    ref
+  ) => {
+    const { values } = React.useContext(PreferencesContext);
+    const forceUpdate = useForceUpdate();
+    const behaviorName = behavior.getName();
+    const behaviorTypeName = behavior.getTypeName();
+
+    if (behavior.isDefaultBehavior()) {
+      return null;
+    }
+
+    const expanded = !behavior.isFolded();
+
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      gd.JsPlatform.get(),
+      behaviorTypeName
+    );
+    if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+      return (
+        <Accordion
+          defaultExpanded
+          id={`behavior-parameters-${behaviorName}`}
+          ref={ref}
+        >
+          <AccordionHeader
+            actions={[
+              <IconButton
+                key="delete"
+                onClick={ev => {
+                  ev.stopPropagation();
+                  onRemoveBehavior(behaviorName);
+                }}
+              >
+                <Trash />
+              </IconButton>,
+            ]}
+          >
+            <MiniToolbarText firstChild>
+              <Trans>Unknown behavior</Trans>{' '}
+            </MiniToolbarText>
+            <Column noMargin expand>
+              <TextField margin="none" value={behaviorName} disabled />
+            </Column>
+          </AccordionHeader>
+          <AccordionBody>
+            <EmptyMessage>
+              <Trans>
+                This behavior is unknown. It might be a behavior that was
+                defined in an extension and that was later removed. You should
+                delete it.
+              </Trans>
+            </EmptyMessage>
+          </AccordionBody>
+        </Accordion>
+      );
+    }
+
+    const BehaviorComponent = BehaviorsEditorService.getEditor(
+      behaviorTypeName
+    );
+    const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
+    const enabledTutorialIds = tutorialIds.filter(
+      tutorialId => !values.hiddenTutorialHints[tutorialId]
+    );
+    const iconUrl = behaviorMetadata.getIconFilename();
+
+    return (
+      <Accordion
+        expanded={expanded}
+        onChange={(_, newExpanded) => {
+          behavior.setFolded(!newExpanded);
+          forceUpdate();
+        }}
+        id={`behavior-parameters-${behaviorName}`}
+        ref={ref}
+      >
+        <AccordionHeader
+          actions={[
+            <HelpIcon
+              key="help"
+              size="small"
+              helpPagePath={behaviorMetadata.getHelpPath()}
+            />,
+            <ElementWithMenu
+              key="menu"
+              element={
+                <IconButton size="small">
+                  <ThreeDotsMenu />
+                </IconButton>
+              }
+              buildMenuTemplate={(i18n: I18nType) => [
+                {
+                  label: i18n._(t`Delete`),
+                  click: () => onRemoveBehavior(behaviorName),
+                },
+                {
+                  label: i18n._(t`Copy`),
+                  click: () => copyBehavior(behaviorName),
+                },
+                {
+                  label: i18n._(t`Paste`),
+                  click: pasteBehaviors,
+                  enabled: canPasteBehaviors,
+                },
+                ...(project.hasEventsBasedBehavior(behaviorTypeName)
+                  ? [
+                      { type: 'separator' },
+                      {
+                        label: i18n._(t`Edit this behavior`),
+                        click: () => openExtension(behaviorTypeName),
+                      },
+                    ]
+                  : []),
+              ]}
+            />,
+          ]}
+        >
+          {iconUrl ? (
+            <IconContainer
+              src={iconUrl}
+              alt={behaviorMetadata.getFullName()}
+              size={20}
+            />
+          ) : null}
+          <Column expand>
+            <TextField
+              value={behaviorName}
+              translatableHintText={t`Behavior name`}
+              margin="none"
+              fullWidth
+              disabled
+              onChange={(e, text) => onChangeBehaviorName(behavior, text)}
+              id={`behavior-${behaviorName}-name-text-field`}
+            />
+          </Column>
+        </AccordionHeader>
+        <AccordionBody>
+          <Column
+            expand
+            noMargin
+            // Avoid Physics2 behavior overflow on small screens
+            noOverflowParent
+          >
+            {enabledTutorialIds.length ? (
+              <Line>
+                <ColumnStackLayout expand>
+                  {tutorialIds.map(tutorialId => (
+                    <DismissableTutorialMessage
+                      key={tutorialId}
+                      tutorialId={tutorialId}
+                    />
+                  ))}
+                </ColumnStackLayout>
+              </Line>
+            ) : null}
+            <Line>
+              <BehaviorComponent
+                behavior={behavior}
+                project={project}
+                object={object}
+                resourceManagementProps={resourceManagementProps}
+                onBehaviorUpdated={onBehaviorsUpdated}
+              />
+            </Line>
+          </Column>
+        </AccordionBody>
+      </Accordion>
+    );
+  }
+);
+
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension?: gdEventsFunctionsExtension,
@@ -82,8 +286,8 @@ const BehaviorsEditor = (props: Props) => {
     justAddedBehaviorName,
     setJustAddedBehaviorName,
   ] = React.useState<?string>(null);
-  const justAddedBehaviorAccordionElement = React.useRef(
-    (null: ?React$Component<any, any>)
+  const justAddedBehaviorAccordionElement = React.useRef<?BehaviorConfigurationEditorInterface>(
+    null
   );
 
   React.useEffect(
@@ -116,10 +320,14 @@ const BehaviorsEditor = (props: Props) => {
     onUpdateBehaviorsSharedData,
     openBehaviorEvents,
   } = props;
-  const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
+  // As for now, any default behavior is hidden,
+  // it avoids to get behavior metadata to check the "hidden" flag.
+  const allVisibleBehaviors = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(behaviorName => object.getBehavior(behaviorName))
+    .filter(behavior => !behavior.isDefaultBehavior());
   const forceUpdate = useForceUpdate();
-
-  const { values } = React.useContext(PreferencesContext);
 
   const addBehavior = React.useCallback(
     (type: string, defaultName: string) => {
@@ -217,12 +425,15 @@ const BehaviorsEditor = (props: Props) => {
         BEHAVIORS_CLIPBOARD_KIND,
         mapVector(object.getAllBehaviorNames(), behaviorName => {
           const behavior = object.getBehavior(behaviorName);
+          if (behavior.isDefaultBehavior()) {
+            return null;
+          }
           return {
             name: behaviorName,
             type: behavior.getTypeName(),
             serializedBehavior: serializeToJSObject(behavior),
           };
-        })
+        }).filter(Boolean)
       );
       forceUpdate();
     },
@@ -375,7 +586,7 @@ const BehaviorsEditor = (props: Props) => {
 
   return (
     <Column noMargin expand useFullHeight noOverflowParent>
-      {allBehaviorNames.length === 0 ? (
+      {allVisibleBehaviors.length === 0 ? (
         <Column noMargin expand justifyContent="center">
           <EmptyPlaceholder
             title={<Trans>Add your first behavior</Trans>}
@@ -401,66 +612,8 @@ const BehaviorsEditor = (props: Props) => {
       ) : (
         <React.Fragment>
           <ScrollView ref={scrollView}>
-            {allBehaviorNames.map((behaviorName, index) => {
-              const behavior = object.getBehavior(behaviorName);
-              const behaviorTypeName = behavior.getTypeName();
-
-              const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                gd.JsPlatform.get(),
-                behaviorTypeName
-              );
-              if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
-                return (
-                  <Accordion
-                    key={behaviorName}
-                    defaultExpanded
-                    id={`behavior-parameters-${behaviorName}`}
-                  >
-                    <AccordionHeader
-                      actions={[
-                        <IconButton
-                          key="delete"
-                          onClick={ev => {
-                            ev.stopPropagation();
-                            onRemoveBehavior(behaviorName);
-                          }}
-                        >
-                          <Trash />
-                        </IconButton>,
-                      ]}
-                    >
-                      <MiniToolbarText firstChild>
-                        <Trans>Unknown behavior</Trans>{' '}
-                      </MiniToolbarText>
-                      <Column noMargin expand>
-                        <TextField
-                          margin="none"
-                          value={behaviorName}
-                          disabled
-                        />
-                      </Column>
-                    </AccordionHeader>
-                    <AccordionBody>
-                      <EmptyMessage>
-                        <Trans>
-                          This behavior is unknown. It might be a behavior that
-                          was defined in an extension and that was later
-                          removed. You should delete it.
-                        </Trans>
-                      </EmptyMessage>
-                    </AccordionBody>
-                  </Accordion>
-                );
-              }
-
-              const BehaviorComponent = BehaviorsEditorService.getEditor(
-                behaviorTypeName
-              );
-              const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
-              const enabledTutorialIds = tutorialIds.filter(
-                tutorialId => !values.hiddenTutorialHints[tutorialId]
-              );
-              const iconUrl = behaviorMetadata.getIconFilename();
+            {allVisibleBehaviors.map((behavior, index) => {
+              const behaviorName = behavior.getName();
 
               const ref =
                 justAddedBehaviorName === behaviorName
@@ -468,107 +621,21 @@ const BehaviorsEditor = (props: Props) => {
                   : null;
 
               return (
-                <Accordion
-                  key={behaviorName}
-                  defaultExpanded
-                  id={`behavior-parameters-${behaviorName}`}
+                <BehaviorConfigurationEditor
                   ref={ref}
-                >
-                  <AccordionHeader
-                    actions={[
-                      <HelpIcon
-                        key="help"
-                        size="small"
-                        helpPagePath={behaviorMetadata.getHelpPath()}
-                      />,
-                      <ElementWithMenu
-                        key="menu"
-                        element={
-                          <IconButton size="small">
-                            <ThreeDotsMenu />
-                          </IconButton>
-                        }
-                        buildMenuTemplate={(i18n: I18nType) => [
-                          {
-                            label: i18n._(t`Delete`),
-                            click: () => onRemoveBehavior(behaviorName),
-                          },
-                          {
-                            label: i18n._(t`Copy`),
-                            click: () => copyBehavior(behaviorName),
-                          },
-                          {
-                            label: i18n._(t`Paste`),
-                            click: pasteBehaviors,
-                            enabled: isClipboardContainingBehaviors,
-                          },
-                          ...(project.hasEventsBasedBehavior(behaviorTypeName)
-                            ? [
-                                { type: 'separator' },
-                                {
-                                  label: i18n._(t`Edit this behavior`),
-                                  click: () => openExtension(behaviorTypeName),
-                                },
-                              ]
-                            : []),
-                        ]}
-                      />,
-                    ]}
-                  >
-                    {iconUrl ? (
-                      <IconContainer
-                        src={iconUrl}
-                        alt={behaviorMetadata.getFullName()}
-                        size={20}
-                      />
-                    ) : null}
-                    <Column expand>
-                      <TextField
-                        value={behaviorName}
-                        translatableHintText={t`Behavior name`}
-                        margin="none"
-                        fullWidth
-                        disabled
-                        onChange={(e, text) =>
-                          onChangeBehaviorName(behavior, text)
-                        }
-                        id={`behavior-${behaviorName}-name-text-field`}
-                      />
-                    </Column>
-                  </AccordionHeader>
-                  <AccordionBody>
-                    <Column
-                      expand
-                      noMargin
-                      // Avoid Physics2 behavior overflow on small screens
-                      noOverflowParent
-                    >
-                      {enabledTutorialIds.length ? (
-                        <Line>
-                          <ColumnStackLayout expand>
-                            {tutorialIds.map(tutorialId => (
-                              <DismissableTutorialMessage
-                                key={tutorialId}
-                                tutorialId={tutorialId}
-                              />
-                            ))}
-                          </ColumnStackLayout>
-                        </Line>
-                      ) : null}
-                      <Line>
-                        <BehaviorComponent
-                          behavior={behavior}
-                          project={project}
-                          object={object}
-                          resourceManagementProps={
-                            props.resourceManagementProps
-                          }
-                          onBehaviorUpdated={onBehaviorsUpdated}
-                        />
-                      </Line>
-                    </Column>
-                  </AccordionBody>
-                </Accordion>
+                  key={behaviorName}
+                  project={project}
+                  object={object}
+                  behavior={behavior}
+                  copyBehavior={copyBehavior}
+                  onRemoveBehavior={onRemoveBehavior}
+                  onBehaviorsUpdated={onBehaviorsUpdated}
+                  onChangeBehaviorName={onChangeBehaviorName}
+                  openExtension={openExtension}
+                  canPasteBehaviors={isClipboardContainingBehaviors}
+                  pasteBehaviors={pasteBehaviors}
+                  resourceManagementProps={props.resourceManagementProps}
+                />
               );
             })}
           </ScrollView>

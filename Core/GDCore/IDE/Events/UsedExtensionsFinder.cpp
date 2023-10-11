@@ -108,6 +108,33 @@ void UsedExtensionsFinder::OnVisitUnaryOperatorNode(UnaryOperatorNode& node) {
 // Add variable extension and visit sub-expressions on variable nodes
 void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
   result.GetUsedExtensions().insert("BuiltinVariables");
+
+  auto type = gd::ExpressionTypeFinder::GetType(
+      project.GetCurrentPlatform(), GetProjectScopedContainers(), rootType, node);
+
+  if (gd::ParameterMetadata::IsExpression("variable", type)) {
+    // Nothing to do (this can't reference an object)
+  } else {
+    GetProjectScopedContainers().MatchIdentifierWithName<void>(node.name,
+      [&]() {
+        // This represents an object.
+        auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
+          project.GetCurrentPlatform(), node.name);
+        result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+        for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
+          result.GetUsedIncludeFiles().insert(includeFile);
+        }
+      }, [&]() {
+        // This is a variable.
+      }, [&]() {
+        // This is a property.
+      }, [&]() {
+        // This is a parameter.
+      }, [&]() {
+        // This is something else.
+      });
+  }
+
   if (node.child) node.child->Visit(*this);
 };
 
@@ -127,9 +154,10 @@ void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
 // Add extensions bound to Objects/Behaviors/Functions
 void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode &node) {
   auto type = gd::ExpressionTypeFinder::GetType(
-      project.GetCurrentPlatform(), GetGlobalObjectsContainer(),
-      GetObjectsContainer(), rootType, node);
-  if (gd::ParameterMetadata::IsObject(type)) {
+      project.GetCurrentPlatform(), GetProjectScopedContainers(), rootType, node);
+  if (gd::ParameterMetadata::IsObject(type) ||
+      GetObjectsContainersList().HasObjectOrGroupNamed(node.identifierName)) {
+    // An object or object variable is used.
     auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
         project.GetCurrentPlatform(), node.identifierName);
     result.GetUsedExtensions().insert(metadata.GetExtension().GetName());

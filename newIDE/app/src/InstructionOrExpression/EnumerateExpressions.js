@@ -23,16 +23,8 @@ const enumerateExpressionMetadataMap = (
       return null; // Skip hidden expressions
     }
 
-    if (
-      scope.objectMetadata &&
-      scope.objectMetadata.isUnsupportedBaseObjectCapability(
-        exprMetadata.getRequiredBaseObjectCapability()
-      )
-    )
-      return null; // Skip expressions not supported by the object.
-
-    var parameters = [];
-    for (var i = 0; i < exprMetadata.getParametersCount(); i++) {
+    let parameters = [];
+    for (let i = 0; i < exprMetadata.getParametersCount(); i++) {
       if (scope.objectMetadata && i === 0) continue;
       if (scope.behaviorMetadata && i <= 1) continue; //Skip object and behavior parameters
       if (exprMetadata.getParameter(i).isCodeOnly()) continue;
@@ -109,13 +101,13 @@ export const enumerateObjectExpressions = (
   const scope = { extension, objectMetadata };
 
   let objectsExpressions = [
-    ...(!shouldOnlyBeNumberType(type)
-      ? enumerateExpressionMetadataMap(
+    ...(shouldOnlyBeNumberType(type)
+      ? []
+      : enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForObject(objectType),
           scope
-        )
-      : []),
+        )),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForObject(objectType),
@@ -133,13 +125,13 @@ export const enumerateObjectExpressions = (
 
     objectsExpressions = [
       ...objectsExpressions,
-      ...(!shouldOnlyBeNumberType(type)
-        ? enumerateExpressionMetadataMap(
+      ...(shouldOnlyBeNumberType(type)
+        ? []
+        : enumerateExpressionMetadataMap(
             '',
             extension.getAllStrExpressionsForObject(baseObjectType),
             scope
-          )
-        : []),
+          )),
       ...enumerateExpressionMetadataMap(
         '',
         extension.getAllExpressionsForObject(baseObjectType),
@@ -165,13 +157,13 @@ export const enumerateBehaviorExpressions = (
   const scope = { extension, behaviorMetadata };
 
   return [
-    ...(!shouldOnlyBeNumberType(type)
-      ? enumerateExpressionMetadataMap(
+    ...(shouldOnlyBeNumberType(type)
+      ? []
+      : enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForBehavior(behaviorType),
           scope
-        )
-      : []),
+        )),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForBehavior(behaviorType),

@@ -77,28 +77,28 @@ export const Column = (props: {|
   </div>
 );
 
+type NoProps = {||};
+
+const spacerStyle = {
+  width: marginsSize,
+  height: marginsSize,
+  flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
+};
+
 /**
  * A Spacer in the standard GDevelop grid to position components.
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Spacer = () => (
-  <span
-    style={{
-      width: marginsSize,
-      height: marginsSize,
-      flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
-    }}
-  />
-);
+export const Spacer = React.memo<NoProps>(() => <span style={spacerStyle} />);
+
+const largeSpacerStyle = {
+  width: 24,
+  height: 24,
+  flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
+};
 
 /** A large spacer that is 24px width. */
-export const LargeSpacer = () => (
-  <span
-    style={{
-      width: 24,
-      height: 24,
-      flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
-    }}
-  />
-);
+export const LargeSpacer = React.memo<NoProps>(() => (
+  <span style={largeSpacerStyle} />
+));

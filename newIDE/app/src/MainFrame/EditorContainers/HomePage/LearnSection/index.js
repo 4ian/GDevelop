@@ -12,7 +12,6 @@ import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
 import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
@@ -69,6 +68,7 @@ export const formatTutorialToImageTileComponent = (
   overlayText: tutorial.duration
     ? secondsToMinutesAndSeconds(tutorial.duration)
     : '\u{1F4D8}',
+  overlayTextPosition: 'bottomRight',
 });
 
 const styles = {
@@ -79,14 +79,14 @@ const styles = {
 };
 
 type Props = {|
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const LearnSection = ({
-  onCreateProject,
+  onOpenExampleStore,
   onTabChange,
   onOpenHelpFinder,
   selectInAppTutorial,
@@ -125,7 +125,7 @@ const LearnSection = ({
 
   return !selectedCategory ? (
     <MainPage
-      onCreateProject={onCreateProject}
+      onOpenExampleStore={onOpenExampleStore}
       onOpenHelpFinder={onOpenHelpFinder}
       onStartTutorial={() => onTabChange('get-started')}
       onTabChange={onTabChange}

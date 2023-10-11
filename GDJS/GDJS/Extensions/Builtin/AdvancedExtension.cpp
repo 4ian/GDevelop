@@ -174,7 +174,9 @@ AdvancedExtension::AdvancedExtension() {
         gd::String resultingBoolean =
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") +
+               "((typeof eventsFunctionContext !== 'undefined' ? "
                "Number(eventsFunctionContext.getArgument(" +
                parameterNameCode + ")) || 0 : 0) " + operatorCode + " " +
                operandCode + ");\n";
@@ -200,7 +202,9 @@ AdvancedExtension::AdvancedExtension() {
         gd::String resultingBoolean =
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") +
+               "((typeof eventsFunctionContext !== 'undefined' ? "
                "\"\" + eventsFunctionContext.getArgument(" +
                parameterNameCode + ") : \"\") " + operatorCode + " " +
                operandCode + ");\n";

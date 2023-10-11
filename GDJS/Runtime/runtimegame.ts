@@ -212,20 +212,22 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
       this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
+
+      const resources = this._data.resources.resources;
       this._imageManager = new gdjs.ImageManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._soundManager = new gdjs.SoundManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._fontManager = new gdjs.FontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._jsonManager = new gdjs.JsonManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._atlasManager = new gdjs.AtlasManager(
@@ -234,12 +236,12 @@ namespace gdjs {
         this._imageManager
       );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader,
         this._imageManager
       );
       this._model3DManager = new gdjs.Model3DManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._effectsManager = new gdjs.EffectsManager();
@@ -701,139 +703,48 @@ namespace gdjs {
     /**
      * Load all assets, displaying progress in renderer.
      */
-    loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
+    loadAllAssets(
+      callback: () => void,
+      progressCallback?: (progress: float) => void
+    ) {
+      this.loadAllAssetsAsync(progressCallback).then(callback);
+    }
+
+    /**
+     * Load all assets, displaying progress in renderer.
+     */
+    loadAllAssetsAsync = async (
+      progressCallback?: (progress: float) => void
+    ) => {
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
         this._imageManager,
         this._data.properties.loadingScreen
       );
       const allAssetsTotal = this._data.resources.resources.length;
-      const that = this;
+      let loadedAssets = 0;
 
-      // TODO: All the `loadXXX` (or `preloadXXX`) methods would be
-      // better converted to return promises, for better readability of the code.
-      // See how `loadBitmapFontData` is done.
-      this._imageManager.loadTextures(
-        function (count, total) {
-          const percent = Math.floor((count / allAssetsTotal) * 100);
-          loadingScreen.setPercent(percent);
-          if (progressCallback) {
-            progressCallback(percent);
-          }
-        },
-        function (texturesTotalCount) {
-          that._soundManager.preloadAudio(
-            function (count, total) {
-              const percent = Math.floor(
-                ((texturesTotalCount + count) / allAssetsTotal) * 100
-              );
-              loadingScreen.setPercent(percent);
-              if (progressCallback) {
-                progressCallback(percent);
-              }
-            },
-            function (audioTotalCount) {
-              that._fontManager.loadFonts(
-                function (count, total) {
-                  const percent = Math.floor(
-                    ((texturesTotalCount + audioTotalCount + count) /
-                      allAssetsTotal) *
-                      100
-                  );
-                  loadingScreen.setPercent(percent);
-                  if (progressCallback) {
-                    progressCallback(percent);
-                  }
-                },
-                function (fontTotalCount) {
-                  that._jsonManager.preloadJsons(
-                    function (count, total) {
-                      const percent = Math.floor(
-                        ((texturesTotalCount +
-                          audioTotalCount +
-                          fontTotalCount +
-                          count) /
-                          allAssetsTotal) *
-                          100
-                      );
-                      loadingScreen.setPercent(percent);
-                      if (progressCallback) {
-                        progressCallback(percent);
-                      }
-                    },
-                    function (jsonTotalCount) {
-                      that._model3DManager.loadModels(
-                        function (count, total) {
-                          const percent = Math.floor(
-                            ((texturesTotalCount +
-                              audioTotalCount +
-                              fontTotalCount +
-                              jsonTotalCount +
-                              count) /
-                              allAssetsTotal) *
-                              100
-                          );
-                          loadingScreen.setPercent(percent);
-                          if (progressCallback) {
-                            progressCallback(percent);
-                          }
-                        },
-                        function (model3DTotalCount) {
-                          that._atlasManager.preload(
-                            function (count, total) {
-                              const percent = Math.floor(
-                                ((texturesTotalCount +
-                                  audioTotalCount +
-                                  fontTotalCount +
-                                  jsonTotalCount +
-                                  model3DTotalCount +
-                                  count) /
-                                  allAssetsTotal) *
-                                  100
-                              );
-                              loadingScreen.setPercent(percent);
-                              if (progressCallback) {
-                                progressCallback(percent);
-                              }
-                            },
-                            function (atlasesTotalCount) {
-                              that._bitmapFontManager
-                                .loadBitmapFontData((count) => {
-                                  var percent = Math.floor(
-                                    ((texturesTotalCount +
-                                      audioTotalCount +
-                                      fontTotalCount +
-                                      jsonTotalCount +
-                                      model3DTotalCount +
-                                      atlasesTotalCount +
-                                      count) /
-                                      allAssetsTotal) *
-                                      100
-                                  );
-                                  loadingScreen.setPercent(percent);
-                                  if (progressCallback)
-                                    progressCallback(percent);
-                                })
-                                .then(() => loadingScreen.unload())
-                                .then(() =>
-                                  gdjs.getAllAsynchronouslyLoadingLibraryPromise()
-                                )
-                                .then(() => {
-                                  callback();
-                                });
-                            }
-                          );
-                        }
-                      );
-                    }
-                  );
-                }
-              );
-            }
-          );
+      const onProgress = (count: integer, total: integer) => {
+        const percent = Math.floor(
+          (100 * (loadedAssets + count)) / allAssetsTotal
+        );
+        loadingScreen.setPercent(percent);
+        if (progressCallback) {
+          progressCallback(percent);
         }
-      );
-    }
+      };
+
+      loadedAssets += await this._imageManager.loadTextures(onProgress);
+      loadedAssets += await this._soundManager.preloadAudio(onProgress);
+      loadedAssets += await this._fontManager.loadFonts(onProgress);
+      loadedAssets += await this._jsonManager.preloadJsons(onProgress);
+      loadedAssets += await this._model3DManager.loadModels(onProgress);
+      loadedAssets += await this._atlasManager.preload(onProgress);
+      await this._bitmapFontManager.loadBitmapFontData(onProgress);
+
+      await loadingScreen.unload();
+      await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+    };
 
     /**
      * Start the game loop, to be called once assets are loaded.

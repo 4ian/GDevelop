@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import {
@@ -20,18 +21,15 @@ import SemiControlledAutoComplete, {
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import uniq from 'lodash/uniq';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 type Props = {
   ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
-  onComputeAllVariableNames: () => Array<string>,
   onOpenDialog: ?() => void,
 };
 
-type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3;
+type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4;
 
 export type VariableFieldInterface = {|
   ...ParameterFieldInterface,
@@ -43,17 +41,23 @@ export const VariableNameQuickAnalyzeResults = {
   WRONG_QUOTE: 1,
   WRONG_SPACE: 2,
   WRONG_EXPRESSION: 3,
+  UNDECLARED_VARIABLE: 4,
 };
 
-// TODO As parsed node tree are cached, this may no longer be needed.
+// TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
+// (of type: "variable" or the legacy: "scenevar", "globalvar" or "objectvar"). This will
+// ensure we 100% validate and can autocomplete what is entered (and we can have also a simpler
+// selector that offers the variables in the scope).
 export const quicklyAnalyzeVariableName = (
-  name: string
+  name: string,
+  variablesContainer?: ?gdVariablesContainer
 ): VariableNameQuickAnalyzeResult => {
   for (let i = 0; i < name.length; ++i) {
     const character = name[i];
+
     if (character === '[') {
       // This probably starts an expression, so stop the analysis.
-      return VariableNameQuickAnalyzeResults.OK;
+      break;
     } else if (character === ' ') {
       return VariableNameQuickAnalyzeResults.WRONG_SPACE;
     } else if (character === '"') {
@@ -69,13 +73,29 @@ export const quicklyAnalyzeVariableName = (
     }
   }
 
+  // Check at least the name of the root variable, it's the best we can do.
+  const dotPosition = name.indexOf('.');
+  const squareBracketPosition = name.indexOf('[');
+  const nameToCheck =
+    dotPosition !== -1 || squareBracketPosition !== -1
+      ? name.substring(
+          0,
+          Math.min(
+            dotPosition === -1 ? name.length : dotPosition,
+            squareBracketPosition === -1 ? name.length : squareBracketPosition
+          )
+        )
+      : name;
+
+  if (variablesContainer && !variablesContainer.has(nameToCheck))
+    return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
+
   return VariableNameQuickAnalyzeResults.OK;
 };
 
 export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
-      onComputeAllVariableNames,
       variablesContainer,
       value,
       onChange,
@@ -88,7 +108,6 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
-    const preferences = React.useContext(PreferencesContext);
     const [
       autocompletionVariableNames,
       setAutocompletionVariableNames,
@@ -107,18 +126,14 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 null
           )
           .filter(Boolean);
-        const newAutocompletionVariableNames = preferences.values
-          .useUndefinedVariablesInAutocompletion
-          ? uniq([...definedVariableNames, ...onComputeAllVariableNames()])
-          : definedVariableNames;
         setAutocompletionVariableNames(
-          newAutocompletionVariableNames.map(name => ({
+          definedVariableNames.map(name => ({
             text: name,
             value: name,
           }))
         );
       },
-      [variablesContainer, onComputeAllVariableNames, preferences]
+      [variablesContainer]
     );
 
     const focus: FieldFocusFunction = options => {
@@ -142,7 +157,10 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       ? parameterMetadata.getDescription()
       : undefined;
 
-    const quicklyAnalysisResult = quicklyAnalyzeVariableName(value);
+    const quicklyAnalysisResult = quicklyAnalyzeVariableName(
+      value,
+      variablesContainer
+    );
 
     const errorText =
       quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
@@ -163,6 +181,11 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           formula. You can only use this for structure or arrays. For example:
           Score[3].
         </Trans>
+      ) : quicklyAnalysisResult ===
+        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
+        <Trans>
+          This variable is not declared. Use the variable editor to add it.
+        </Trans>
       ) : null;
 
     return (
@@ -182,7 +205,17 @@ export default React.forwardRef<Props, VariableFieldInterface>(
             onChange={onChange}
             onRequestClose={onRequestClose}
             onApply={onApply}
-            dataSource={autocompletionVariableNames}
+            dataSource={[
+              ...autocompletionVariableNames,
+              onOpenDialog && variablesContainer
+                ? {
+                    translatableValue: t`Add or edit variables...`,
+                    text: '',
+                    value: '',
+                    onClick: onOpenDialog,
+                  }
+                : null,
+            ].filter(Boolean)}
             openOnFocus={!isInline}
             ref={field}
             id={id}

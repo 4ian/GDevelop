@@ -69,13 +69,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           .toJSArray()
           .filter(behaviorName => {
             return (
-              !allowedBehaviorType ||
-              gd.getTypeOfBehavior(
-                globalObjectsContainer,
-                objectsContainer,
-                behaviorName,
-                false
-              ) === allowedBehaviorType
+              (!allowedBehaviorType ||
+                gd.getTypeOfBehavior(
+                  globalObjectsContainer,
+                  objectsContainer,
+                  behaviorName,
+                  false
+                ) === allowedBehaviorType) &&
+              (allowedBehaviorType ||
+                !gd.isDefaultBehavior(
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectName,
+                  behaviorName,
+                  true
+                ))
             );
           });
 

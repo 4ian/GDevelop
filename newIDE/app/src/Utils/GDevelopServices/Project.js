@@ -71,23 +71,52 @@ export type UploadedProjectResourceFiles = Array<{|
 type CloudProject = {|
   id: string,
   name: string,
-  gameId?: string,
   createdAt: string,
-  currentVersion?: string,
   deletedAt?: string,
+  updatedAt: string,
+  currentVersion?: string,
+  committedAt?: string,
+  gameId?: string,
 |};
 
 export type CloudProjectVersion = {|
   projectId: string,
   id: string,
   createdAt: string,
+  /** Was not always recorded so can be undefined. Represents the user who created this version. */
+  userId?: string,
   /** previousVersion is null when the entity represents the initial version of a project. */
   previousVersion: null | string,
 |};
 
 export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
+  /** Represents when the current user last modified the project. */
   lastModifiedAt: string,
+  /** Was not always recorded so can be undefined. Represents the last user who committed. */
+  lastCommittedBy?: string,
+|};
+
+export type Feature = 'ownership' | 'collaboration';
+export type Level = 'owner' | 'writer' | 'reader';
+
+export type ProjectUserAcl = {|
+  projectId: string,
+  userId: string,
+  feature: Feature,
+  level: Level,
+|};
+
+export type ProjectUserAclWithEmail = {|
+  ...ProjectUserAcl,
+  email: string,
+|};
+
+export type ProjectUserAclRequest = {|
+  projectId: string,
+  email: string, // The email of the user to add to the project.
+  feature: Feature,
+  level: Level,
 |};
 
 export const isCloudProjectVersionSane = async (
@@ -146,6 +175,28 @@ const getVersionIdFromPath = (path: string): string => {
   const filenameStartIndex = cleanedPath.lastIndexOf('/') + 1;
   const filenameEndIndex = cleanedPath.indexOf('.zip');
   return path.substring(filenameStartIndex, filenameEndIndex);
+};
+
+export const getProjectVersion = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  versionId: string
+): Promise<?CloudProjectVersion> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(
+    `/project/${cloudProjectId}/version/${versionId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return response.data;
 };
 
 export const getLastVersionsOfProject = async (
@@ -268,17 +319,23 @@ export const commitVersion = async ({
       )
   );
   // Inform backend a new version has been uploaded.
-  const response = await apiClient.post(
-    `/project/${cloudProjectId}/action/commit`,
-    { newVersion, ...(previousVersion ? { previousVersion } : undefined) },
-    {
-      headers: {
-        Authorization: authorizationHeader,
-      },
-      params: { userId },
-    }
-  );
-  return response.data;
+  try {
+    // Backend only returns "OK".
+    await apiClient.post(
+      `/project/${cloudProjectId}/action/commit`,
+      { newVersion, ...(previousVersion ? { previousVersion } : undefined) },
+      {
+        headers: {
+          Authorization: authorizationHeader,
+        },
+        params: { userId },
+      }
+    );
+    return newVersion;
+  } catch (error) {
+    console.error('Error while committing version', error);
+    return null;
+  }
 };
 
 export const uploadProjectResourceFiles = async (
@@ -287,6 +344,8 @@ export const uploadProjectResourceFiles = async (
   resourceFiles: File[],
   onProgress: (number, number) => void
 ): Promise<UploadedProjectResourceFiles> => {
+  if (resourceFiles.length === 0) return [];
+
   // Get the pre-signed urls where to upload the files.
   const resourceFileWithPresignedUrls = await getPresignedUrlForResourcesUpload(
     authenticatedUser,
@@ -348,10 +407,23 @@ export const listUserCloudProjects = async (
   return response.data;
 };
 
+export const listOtherUserCloudProjects = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  otherUserId: string
+): Promise<Array<CloudProjectWithUserAccessInfo>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`user/${otherUserId}/project`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
 export const getCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
-): Promise<?CloudProject> => {
+): Promise<?CloudProjectWithUserAccessInfo> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
@@ -363,6 +435,28 @@ export const getCloudProject = async (
     },
     params: { userId },
   });
+  return response.data;
+};
+
+export const getOtherUserCloudProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  otherUserId: string
+): Promise<?CloudProject> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(
+    `/user/${otherUserId}/project/${cloudProjectId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
   return response.data;
 };
 
@@ -445,6 +539,8 @@ const getPresignedUrlForResourcesUpload = async (
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) throw new Error('User is not authenticated.');
 
+  if (resourceFiles.length === 0) return [];
+
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
 
@@ -483,7 +579,7 @@ const getPresignedUrlForResourcesUpload = async (
 };
 
 export const getProjectFileAsZipBlob = async (
-  cloudProject: CloudProject,
+  cloudProject: CloudProject | CloudProjectWithUserAccessInfo,
   versionId?: ?string
 ): Promise<Blob> => {
   if (!cloudProject.currentVersion) {
@@ -500,9 +596,9 @@ export const getProjectFileAsZipBlob = async (
   return response.data;
 };
 
-function escapeStringForRegExp(string) {
+const escapeStringForRegExp = string => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
+};
 const resourceFilenameRegex = new RegExp(
   `${escapeStringForRegExp(
     GDevelopProjectResourcesStorage.baseUrl
@@ -534,4 +630,62 @@ export const extractProjectUuidFromProjectResourceUrl = (
   }
 
   return null;
+};
+
+export const createProjectUserAcl = async (
+  authenticatedUser: AuthenticatedUser,
+  { projectId, email, feature, level }: ProjectUserAclRequest
+): Promise<?ProjectUserAclWithEmail> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: currentUserId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/project-user-acl`,
+    { userId: currentUserId, projectId, feature, level, email },
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId: currentUserId },
+    }
+  );
+  return response.data;
+};
+
+export const deleteProjectUserAcl = async (
+  authenticatedUser: AuthenticatedUser,
+  { projectId, userId, feature }: ProjectUserAcl
+): Promise<void> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: currentUserId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.delete(`/project-user-acl`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId: currentUserId, projectId, feature, targetUserId: userId },
+  });
+  return response.data;
+};
+
+export const listProjectUserAcls = async (
+  authenticatedUser: AuthenticatedUser,
+  { projectId }: { projectId: string }
+): Promise<Array<ProjectUserAclWithEmail>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return [];
+
+  const { uid: currentUserId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`/project-user-acl`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId: currentUserId, projectId },
+  });
+  return response.data;
 };

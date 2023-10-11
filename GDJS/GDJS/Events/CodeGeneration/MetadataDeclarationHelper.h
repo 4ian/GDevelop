@@ -184,7 +184,8 @@ private:
    * events based behavior.
    */
   static gd::BehaviorMetadata &
-  DeclareBehaviorMetadata(gd::PlatformExtension &extension,
+  DeclareBehaviorMetadata(const gd::Project &project,
+                          gd::PlatformExtension &extension,
                           const gd::EventsBasedBehavior &eventsBasedBehavior);
 
   /**

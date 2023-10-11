@@ -8,7 +8,6 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
-import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -37,16 +36,10 @@ import { MarkdownText } from '../../UI/MarkdownText';
 import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
-import {
-  purchaseAppStoreProduct,
-  shouldUseAppStoreProduct,
-} from '../../Utils/AppStorePurchases';
-import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
+import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
+import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import {
-  PrivateAssetPackTile,
-  PromoBundleAssetPackCard,
-} from '../AssetPackTiles';
+import { PrivateAssetPackTile, PromoBundleAssetPackCard } from '../ShopTiles';
 import { AssetStoreContext } from '../AssetStoreContext';
 
 const cellSpacing = 8;
@@ -93,8 +86,6 @@ const styles = {
   scrollview: { overflowX: 'hidden' },
   grid: {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
-    // Remove the scroll capability of the grid, the scroll view handles it.
-    overflow: 'unset',
   },
 };
 
@@ -104,6 +95,7 @@ type Props = {|
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
   onAssetPackOpen: PrivateAssetPackListingData => void,
+  simulateAppStoreProduct?: boolean,
 |};
 
 const PrivateAssetPackInformationPage = ({
@@ -112,10 +104,13 @@ const PrivateAssetPackInformationPage = ({
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
   onAssetPackOpen,
+  simulateAppStoreProduct,
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
-  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+  const { receivedAssetPacks, authenticated } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
@@ -126,13 +121,12 @@ const PrivateAssetPackInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
-  const [
-    appStoreProductBeingBought,
-    setAppStoreProductBeingBought,
-  ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+
+  const shouldUseOrSimulateAppStoreProduct =
+    shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
   const isAlreadyReceived =
     !!receivedAssetPacks &&
@@ -215,6 +209,7 @@ const PrivateAssetPackInformationPage = ({
               assetPackListingData={bundleContainingPack}
               onSelect={() => onAssetPackOpen(bundleContainingPack)}
               owned
+              key={bundleContainingPack.id}
             />
           );
         })
@@ -225,6 +220,7 @@ const PrivateAssetPackInformationPage = ({
                 assetPackListingData={bundleContainingPack}
                 onSelect={() => onAssetPackOpen(bundleContainingPack)}
                 owned={false}
+                key={bundleContainingPack.id}
               />
             );
           })
@@ -330,18 +326,7 @@ const PrivateAssetPackInformationPage = ({
           assetPackKind: 'private',
         });
 
-        if (shouldUseAppStoreProduct()) {
-          try {
-            setAppStoreProductBeingBought(true);
-            await purchaseAppStoreProduct(
-              privateAssetPackListingData.appStoreProductId
-            );
-          } finally {
-            setAppStoreProductBeingBought(false);
-          }
-        } else {
-          onOpenPurchaseDialog();
-        }
+        onOpenPurchaseDialog();
       } catch (e) {
         console.warn('Unable to send event', e);
       }
@@ -362,27 +347,40 @@ const PrivateAssetPackInformationPage = ({
       <Trans>Loading...</Trans>
     ) : isAlreadyReceived ? (
       <Trans>Explore assets</Trans>
-    ) : isPurchaseDialogOpen || appStoreProductBeingBought ? (
+    ) : isPurchaseDialogOpen ? (
       <Trans>Processing...</Trans>
     ) : (
       <Trans>
         Buy for{' '}
-        {formatPrivateAssetPackPrice({ i18n, privateAssetPackListingData })}
+        {formatProductPrice({
+          i18n,
+          productListingData: privateAssetPackListingData,
+        })}
       </Trans>
     );
 
-    const disabled =
-      !assetPack || isPurchaseDialogOpen || appStoreProductBeingBought;
+    const disabled = !assetPack || isPurchaseDialogOpen;
 
     return (
-      <RaisedButton
-        key="buy-asset-pack"
-        primary
-        label={label}
-        onClick={onClickBuy}
-        disabled={disabled}
-        id="buy-asset-pack"
-      />
+      <Column noMargin alignItems="flex-end">
+        <RaisedButton
+          key="buy-asset-pack"
+          primary
+          label={label}
+          onClick={onClickBuy}
+          disabled={disabled}
+          id="buy-asset-pack"
+        />
+        {shouldUseOrSimulateAppStoreProduct &&
+          !isAlreadyReceived &&
+          !authenticated && (
+            <Text size="body-small">
+              <Link onClick={onClickBuy} disabled={disabled} href="">
+                <Trans>Restore a previous purchase</Trans>
+              </Link>
+            </Text>
+          )}
+      </Column>
     );
   };
 
@@ -390,7 +388,11 @@ const PrivateAssetPackInformationPage = ({
     ? [
         {
           kind: 'image',
-          url: privateAssetPackListingData.thumbnailUrls[0],
+          url:
+            (shouldUseOrSimulateAppStoreProduct &&
+              privateAssetPackListingData.appStoreThumbnailUrls &&
+              privateAssetPackListingData.appStoreThumbnailUrls[0]) ||
+            privateAssetPackListingData.thumbnailUrls[0],
         },
         ...assetPack.previewImageUrls
           .map(url => ({
@@ -466,9 +468,9 @@ const PrivateAssetPackInformationPage = ({
                           alignItems="center"
                         >
                           <Text noMargin size="block-title">
-                            {formatPrivateAssetPackPrice({
+                            {formatProductPrice({
                               i18n,
-                              privateAssetPackListingData,
+                              productListingData: privateAssetPackListingData,
                             })}
                           </Text>
                           {getBuyButton(i18n)}
@@ -581,7 +583,6 @@ const PrivateAssetPackInformationPage = ({
                       >
                         {packsIncludedInBundleTiles}
                       </GridList>
-                      <Grid />
                     </Line>
                   </>
                 )}
@@ -602,7 +603,6 @@ const PrivateAssetPackInformationPage = ({
                         >
                           {otherPacksFromTheSameAuthorTiles}
                         </GridList>
-                        <Grid />
                       </Line>
                     </>
                   )}

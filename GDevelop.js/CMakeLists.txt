@@ -13,7 +13,7 @@ endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
 add_compile_options(-O2) # Optimizations during compilation
-# add_compile_options(-g --profiling) # Uncomment for debugging + profiling support
+#add_compile_options(-g --profiling) # Uncomment for debugging + profiling support
 # add_compile_options(--profiling) # Uncomment for profiling support
 
 # Common directories:

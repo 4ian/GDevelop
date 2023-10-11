@@ -38,7 +38,7 @@ function ConfirmDeleteDialog(props: Props) {
         <Dialog
           title={i18n._(props.title)}
           open={props.open}
-          isDangerous
+          dangerLevel="danger"
           onApply={onConfirm}
           onRequestClose={props.onDismiss}
           maxWidth="sm"

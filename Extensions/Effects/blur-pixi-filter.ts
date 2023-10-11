@@ -1,10 +1,9 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Blur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target, effectData) {
-        const blur = new PIXI.filters.BlurFilter();
+        const blur = new PIXI.BlurFilter();
         return blur;
       }
       updatePreRender(filter, target) {}

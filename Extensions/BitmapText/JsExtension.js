@@ -175,7 +175,10 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('Text'));
+      .setCategoryFullName(_('Text'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior')
+      .addDefaultBehavior('ScalableCapability::ScalableBehavior');
 
     object
       .addExpressionAndConditionAndAction(
@@ -192,6 +195,7 @@ module.exports = {
       .setFunctionName('setText')
       .setGetter('getText');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -210,7 +214,8 @@ module.exports = {
         )
       )
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
     object
       .addExpressionAndCondition(
@@ -226,6 +231,7 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontSize');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -243,6 +249,7 @@ module.exports = {
           _('Scale (1 by default)')
         )
       )
+      .setHidden()
       .setFunctionName('setScale')
       .setGetter('getScale');
 
@@ -730,8 +737,9 @@ module.exports = {
     RenderedBitmapTextInstance.prototype.onRemovedFromScene = function () {
       RenderedInstance.prototype.onRemovedFromScene.call(this);
 
-      releaseBitmapFont(this._pixiObject.fontName);
+      const fontName = this._pixiObject.fontName;
       this._pixiObject.destroy();
+      releaseBitmapFont(fontName);
     };
 
     /**

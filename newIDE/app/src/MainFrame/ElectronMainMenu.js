@@ -154,6 +154,11 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-invite-collaborators',
+    callback: callbacks.onInviteCollaborators,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-create-template',
     callback: callbacks.onCreateProject,
     shouldApply: isFocusedOnMainWindow,

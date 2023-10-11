@@ -197,7 +197,8 @@ module.exports = {
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
-      .setCategoryFullName(_('Visual effect'));
+      .setCategoryFullName(_('Visual effect'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior');
 
     object
       .addAction(

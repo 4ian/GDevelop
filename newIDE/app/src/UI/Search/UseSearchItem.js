@@ -8,13 +8,17 @@ import {
   type PublicAssetPack,
   type Resource,
 } from '../../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../../Utils/GDevelopServices/Shop';
 
 type SearchableItem =
   | AssetShortHeader
   | PublicAssetPack
   | Resource
-  | PrivateAssetPackListingData;
+  | PrivateAssetPackListingData
+  | PrivateGameTemplateListingData;
 
 export interface SearchFilter<SearchItem> {
   getPertinence(searchItem: SearchItem): number;
@@ -160,7 +164,10 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
       return (
         !chosenFilters ||
         chosenFilters.size === 0 ||
-        (searchItem.tags && searchItem.tags.some(tag => chosenFilters.has(tag)))
+        (searchItem.tags &&
+          searchItem.tags.some(tag => chosenFilters.has(tag))) ||
+        (searchItem.categories &&
+          searchItem.categories.some(category => chosenFilters.has(category)))
       );
     });
 

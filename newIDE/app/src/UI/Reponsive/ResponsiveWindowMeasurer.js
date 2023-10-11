@@ -8,6 +8,11 @@ import useOnResize from '../../Utils/UseOnResize';
 // Large corresponds to most laptop and desktop screens.
 // Xlarge corresponds to large desktop screens.
 export type WidthType = 'small' | 'medium' | 'large' | 'xlarge';
+const sizeThresholds = {
+  small: 500,
+  medium: 1150,
+  large: 1500,
+};
 
 type Props = {|
   children: (width: WidthType) => React.Node,
@@ -31,11 +36,12 @@ export const useResponsiveWindowWidth = (): WidthType => {
     return 'medium';
   }
 
-  return window.innerWidth < 500 || window.innerHeight < 500
+  return window.innerWidth < sizeThresholds.small ||
+    window.innerHeight < sizeThresholds.small // Mobile devices can be in landscape mode, so check both width and height.
     ? 'small'
-    : window.innerWidth < 1150
+    : window.innerWidth < sizeThresholds.medium
     ? 'medium'
-    : window.innerWidth < 1500
+    : window.innerWidth < sizeThresholds.large
     ? 'large'
     : 'xlarge';
 };

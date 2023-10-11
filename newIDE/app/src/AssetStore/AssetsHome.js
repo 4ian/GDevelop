@@ -7,7 +7,10 @@ import type {
   PublicAssetPacks,
   PublicAssetPack,
 } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import {
@@ -20,7 +23,8 @@ import {
   CategoryTile,
   PrivateAssetPackTile,
   PublicAssetPackTile,
-} from './AssetPackTiles';
+  PrivateGameTemplateTile,
+} from './ShopTiles';
 
 const cellSpacing = 2;
 
@@ -39,7 +43,7 @@ const getCategoryColumns = (windowWidth: WidthType) => {
   }
 };
 
-const getAssetPacksColumns = (windowWidth: WidthType) => {
+const getShopItemsColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
     case 'small':
       return 1;
@@ -54,46 +58,51 @@ const getAssetPacksColumns = (windowWidth: WidthType) => {
   }
 };
 
-export const assetCategories = {
+export const shopCategories = {
   'full-game-pack': {
     title: <Trans>Full Game Packs</Trans>,
     imageAlt: 'Full game asset packs category',
-    imageSource: 'res/asset-categories/Full_game_pack.jpeg',
+    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
+  },
+  'game-template': {
+    title: <Trans>Game Templates</Trans>,
+    imageAlt: 'Premium game templates category',
+    imageSource: 'res/shop-categories/Game_Templates.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,
     imageAlt: 'Characters asset packs category',
-    imageSource: 'res/asset-categories/Characters.jpeg',
+    imageSource: 'res/shop-categories/Characters.jpeg',
   },
   props: {
     title: <Trans>Props</Trans>,
     imageAlt: 'Props asset packs category',
-    imageSource: 'res/asset-categories/Props.jpeg',
+    imageSource: 'res/shop-categories/Props.jpeg',
   },
   background: {
     title: <Trans>Backgrounds</Trans>,
     imageAlt: 'Backgrounds asset packs category',
-    imageSource: 'res/asset-categories/Backgrounds.jpeg',
+    imageSource: 'res/shop-categories/Backgrounds.jpeg',
   },
   'visual-effect': {
     title: <Trans>Visual Effects</Trans>,
     imageAlt: 'Visual effects asset packs category',
-    imageSource: 'res/asset-categories/Visual_Effects.jpeg',
+    imageSource: 'res/shop-categories/Visual_Effects.jpeg',
   },
   interface: {
     title: <Trans>UI/Interface</Trans>,
     imageAlt: 'User Interface asset packs category',
-    imageSource: 'res/asset-categories/Interface.jpeg',
+    imageSource: 'res/shop-categories/Interface.jpeg',
   },
   prefab: {
     title: <Trans>Prefabs (Ready-to-use Objects)</Trans>,
     imageAlt: 'Prefabs asset packs category',
-    imageSource: 'res/asset-categories/Prefabs.jpeg',
+    imageSource: 'res/shop-categories/Prefabs.jpeg',
   },
   sounds: {
     title: <Trans>Sounds and musics</Trans>,
     imageAlt: 'Sounds and musics asset packs category',
-    imageSource: 'res/asset-categories/Sounds.jpeg',
+    imageSource: 'res/shop-categories/Sounds.jpeg',
   },
 };
 
@@ -113,14 +122,17 @@ export type AssetsHomeInterface = {|
 type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
+  privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
   assetPackRandomOrdering: {|
     starterPacks: Array<number>,
     privateAssetPacks: Array<number>,
   |},
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
+  onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
   onCategorySelection: string => void,
-  openedAssetCategory: string | null,
+  openedShopCategory: string | null,
+  hideGameTemplates?: boolean,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
@@ -128,16 +140,21 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     {
       publicAssetPacks: { starterPacks },
       privateAssetPackListingDatas,
+      privateGameTemplateListingDatas,
       assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
+      onPrivateGameTemplateSelection,
       onCategorySelection,
-      openedAssetCategory,
+      openedShopCategory,
+      hideGameTemplates,
     }: Props,
     ref
   ) => {
     const windowWidth = useResponsiveWindowWidth();
-    const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
+      AuthenticatedUserContext
+    );
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -158,11 +175,39 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       },
     }));
 
+    const categoryTiles = React.useMemo(
+      () =>
+        Object.entries(shopCategories).map(
+          // $FlowExpectedError - Object.entries does not infer well the type of the value.
+          ([id, { title, imageSource, imageAlt }]) =>
+            hideGameTemplates && id === 'game-template' ? null : (
+              <CategoryTile
+                // This id would be more appropriate if it was shop-category-...
+                // but it is kept as is to avoid breaking some guided lessons using this
+                // id to add prefabs for instance.
+                id={`asset-pack-category-${id.replace(/\s/g, '-')}`}
+                key={id}
+                imageSource={imageSource}
+                imageAlt={imageAlt}
+                title={title}
+                onSelect={() => {
+                  onCategorySelection(id);
+                }}
+              />
+            )
+        ),
+      [onCategorySelection, hideGameTemplates]
+    );
+
+    const openedShopCategoryTitle = openedShopCategory
+      ? shopCategories[openedShopCategory].title
+      : null;
+
     const starterPacksTiles: Array<React.Node> = starterPacks
       .filter(
         assetPack =>
-          !openedAssetCategory ||
-          assetPack.categories.includes(openedAssetCategory)
+          !openedShopCategory ||
+          assetPack.categories.includes(openedShopCategory)
       )
       .map((pack, index) => ({
         pos: assetPackRandomOrdering.starterPacks[index],
@@ -188,8 +233,8 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         privateAssetPackListingDatas
           .filter(
             assetPackListingData =>
-              !openedAssetCategory ||
-              assetPackListingData.categories.includes(openedAssetCategory)
+              !openedShopCategory ||
+              assetPackListingData.categories.includes(openedShopCategory)
           )
           .map((listingData, index) => ({
             pos: assetPackRandomOrdering.privateAssetPacks[index],
@@ -251,7 +296,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       },
       [
         privateAssetPackListingDatas,
-        openedAssetCategory,
+        openedShopCategory,
         assetPackRandomOrdering,
         onPrivateAssetPackSelection,
         starterPacksTiles,
@@ -259,37 +304,45 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       ]
     );
 
-    const categoryTiles = React.useMemo(
-      () =>
-        Object.entries(assetCategories).map(
-          // $FlowExpectedError - Object.entries does not infer well the type of the value.
-          ([id, { title, imageSource, imageAlt }]) => (
-            <CategoryTile
-              id={`asset-pack-category-${id.replace(/\s/g, '-')}`}
-              key={id}
-              imageSource={imageSource}
-              imageAlt={imageAlt}
-              title={title}
-              onSelect={() => {
-                onCategorySelection(id);
-              }}
-            />
+    const gameTemplateTiles = React.useMemo(
+      () => {
+        // Only show game templates if the category is not set or is set to "game-template".
+        return privateGameTemplateListingDatas
+          .filter(
+            privateGameTemplateListingData =>
+              !openedShopCategory || openedShopCategory === 'game-template'
           )
-        ),
-      [onCategorySelection]
+          .map((privateGameTemplateListingData, index) => (
+            <PrivateGameTemplateTile
+              privateGameTemplateListingData={privateGameTemplateListingData}
+              onSelect={() => {
+                onPrivateGameTemplateSelection(privateGameTemplateListingData);
+              }}
+              owned={
+                !!receivedGameTemplates &&
+                !!receivedGameTemplates.find(
+                  pack => pack.id === privateGameTemplateListingData.id
+                )
+              }
+              key={privateGameTemplateListingData.id}
+            />
+          ));
+      },
+      [
+        privateGameTemplateListingDatas,
+        openedShopCategory,
+        onPrivateGameTemplateSelection,
+        receivedGameTemplates,
+      ]
     );
-
-    const openedAssetCategoryTitle = openedAssetCategory
-      ? assetCategories[openedAssetCategory].title
-      : null;
 
     return (
       <ScrollView
         ref={scrollView}
         id="asset-store-home"
-        data={{ isFiltered: !!openedAssetCategory ? 'true' : 'false' }}
+        data={{ isFiltered: !!openedShopCategory ? 'true' : 'false' }}
       >
-        {openedAssetCategory ? null : (
+        {openedShopCategory ? null : (
           <>
             <Column>
               <Line>
@@ -318,7 +371,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getAssetPacksColumns(windowWidth)}
+              cols={getShopItemsColumns(windowWidth)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -327,19 +380,45 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </GridList>
           </>
         ) : null}
-        <Column>
-          <Line>
-            <Text size="block-title">
-              {openedAssetCategoryTitle ? (
-                openedAssetCategoryTitle
-              ) : (
+        {openedShopCategoryTitle && (
+          <Column>
+            <Line>
+              <Text size="block-title">{openedShopCategoryTitle}</Text>
+            </Line>
+          </Column>
+        )}
+        {!hideGameTemplates && (
+          <>
+            {!openedShopCategoryTitle && (
+              <Column>
+                <Line>
+                  <Text size="block-title">
+                    <Trans>All game templates</Trans>
+                  </Text>
+                </Line>
+              </Column>
+            )}
+            <GridList
+              cols={getShopItemsColumns(windowWidth)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              {gameTemplateTiles}
+            </GridList>
+          </>
+        )}
+        {!openedShopCategoryTitle && (
+          <Column>
+            <Line>
+              <Text size="block-title">
                 <Trans>All asset packs</Trans>
-              )}
-            </Text>
-          </Line>
-        </Column>
+              </Text>
+            </Line>
+          </Column>
+        )}
         <GridList
-          cols={getAssetPacksColumns(windowWidth)}
+          cols={getShopItemsColumns(windowWidth)}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}

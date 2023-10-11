@@ -23,6 +23,7 @@ class BehaviorMetadata;
 class InstructionMetadata;
 class ExpressionCodeGenerationInformation;
 class EventsCodeGenerationContext;
+class ProjectScopedContainers;
 }  // namespace gd
 
 namespace gdjs {
@@ -301,17 +302,32 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& objectName);
 
   virtual gd::String GenerateVariableAccessor(gd::String childName) {
+    // This could be probably optimised by using `getChildNamed`.
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
   };
 
   virtual gd::String GenerateVariableBracketAccessor(
       gd::String expressionCode) {
+    // This uses `getChild` which allows to access a child
+    // with a number (an index, for an array) or a string (for a structure).
+    // This could be optimised, if the type of the accessed variable AND the type of the index is known,
+    // so that `getChildAt` (for an array, with an index) or `getChildNamed` (for a structure, with a name)
+    // is used instead.
     return ".getChild(" + expressionCode + ")";
   };
 
   virtual gd::String GenerateBadVariable() {
     return "gdjs.VariablesContainer.badVariable";
   }
+
+  virtual gd::String GeneratePropertyGetter(const gd::PropertiesContainer& propertiesContainer,
+                                            const gd::NamedPropertyDescriptor& property,
+                                            const gd::String& type,
+                                            gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String GenerateParameterGetter(const gd::ParameterMetadata& parameter,
+                                             const gd::String& type,
+                                             gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateBadObject() { return "null"; }
 
@@ -415,10 +431,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   EventsCodeGenerator(const gd::Project& project, const gd::Layout& layout);
 
   /**
-   * \brief Construct a code generator for the specified objects and groups.
+   * \brief Construct a code generator for the specified containers.
    */
-  EventsCodeGenerator(gd::ObjectsContainer& globalObjectsAndGroups,
-                      const gd::ObjectsContainer& objectsAndGroups);
+  EventsCodeGenerator(const gd::ProjectScopedContainers& projectScopedContainers);
   virtual ~EventsCodeGenerator();
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,

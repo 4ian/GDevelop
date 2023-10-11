@@ -153,7 +153,7 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject implements EffectsTarget {
+  export class RuntimeObject implements EffectsTarget, gdjs.EffectHandler {
     name: string;
     type: string;
     x: float = 0;
@@ -203,9 +203,19 @@ namespace gdjs {
     _averageForce: gdjs.Force;
 
     /**
-     * Contains the behaviors of the object.
+     * Contains the behaviors of the object, except those not having lifecycle functions.
+     *
+     * This means default, hidden, "capability" behaviors are not included in this array.
+     * This avoids wasting time iterating on them when we know their lifecycle functions
+     * are never used.
      */
     protected _behaviors: gdjs.RuntimeBehavior[] = [];
+    /**
+     * Contains the behaviors of the object by name.
+     *
+     * This includes the default, hidden, "capability" behaviors (those to handle opacity,
+     * effects, scale, size...).
+     */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;
 
@@ -236,13 +246,15 @@ namespace gdjs {
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
         this.updateAllEffectParameters(objectData.effects[i]);
       }
-
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
         const autoData = objectData.behaviors[i];
         const Ctor = gdjs.getBehaviorConstructor(autoData.type);
-        this._behaviors.push(new Ctor(instanceContainer, autoData, this));
-        this._behaviorsTable.put(autoData.name, this._behaviors[i]);
+        const behavior = new Ctor(instanceContainer, autoData, this);
+        if (behavior.usesLifecycleFunction()) {
+          this._behaviors.push(behavior);
+        }
+        this._behaviorsTable.put(autoData.name, behavior);
       }
       this._timers = new Hashtable();
     }
@@ -311,19 +323,28 @@ namespace gdjs {
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
-      let i = 0;
-      for (const len = objectData.behaviors.length; i < len; ++i) {
-        const behaviorData = objectData.behaviors[i];
+      const behaviorsDataCount = objectData.behaviors.length;
+      let behaviorsUsingLifecycleFunctionCount = 0;
+      for (
+        let behaviorDataIndex = 0;
+        behaviorDataIndex < behaviorsDataCount;
+        ++behaviorDataIndex
+      ) {
+        const behaviorData = objectData.behaviors[behaviorDataIndex];
         const Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
-        if (i < this._behaviors.length) {
-          // TODO: Add support for behavior recycling with a `reinitialize` method.
-          this._behaviors[i] = new Ctor(runtimeScene, behaviorData, this);
-        } else {
-          this._behaviors.push(new Ctor(runtimeScene, behaviorData, this));
+        // TODO: Add support for behavior recycling with a `reinitialize` method.
+        const behavior = new Ctor(runtimeScene, behaviorData, this);
+        if (behavior.usesLifecycleFunction()) {
+          if (behaviorsUsingLifecycleFunctionCount < this._behaviors.length) {
+            this._behaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
+          } else {
+            this._behaviors.push(behavior);
+          }
+          behaviorsUsingLifecycleFunctionCount++;
         }
-        this._behaviorsTable.put(behaviorData.name, this._behaviors[i]);
+        this._behaviorsTable.put(behaviorData.name, behavior);
       }
-      this._behaviors.length = i;
+      this._behaviors.length = behaviorsUsingLifecycleFunctionCount;
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
@@ -1057,9 +1078,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are numbers).
+     * Change an effect property value (for properties that are numbers).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (number).
      */
     setEffectDoubleParameter(
@@ -1079,9 +1100,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are strings).
+     * Change an effect property value (for properties that are strings).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (string).
      */
     setEffectStringParameter(
@@ -1101,9 +1122,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are booleans).
+     * Change an effect property value (for properties that are booleans).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (boolean).
      */
     setEffectBooleanParameter(
@@ -1222,7 +1243,7 @@ namespace gdjs {
     }
 
     /**
-     * Return the width of the object.
+     * Return the height of the object.
      * @return The height of the object
      */
     getHeight(): float {
@@ -1831,7 +1852,9 @@ namespace gdjs {
         behaviorData,
         this
       );
-      this._behaviors.push(newRuntimeBehavior);
+      if (newRuntimeBehavior.usesLifecycleFunction()) {
+        this._behaviors.push(newRuntimeBehavior);
+      }
       this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
       return true;
     }

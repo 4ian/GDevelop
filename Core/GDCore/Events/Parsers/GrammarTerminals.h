@@ -75,10 +75,21 @@ inline bool IsZeroDigit(gd::String::value_type character) {
   return character == '0';
 }
 
+inline bool IsAdditionalReservedCharacter(gd::String::value_type character) {
+  // These characters are not part of the grammar - but are often used in programming language
+  // and could become operators or part of the grammar one day.
+  return character == '~' || character == '\'' || character == '%' ||
+         character == '#' || character == '@' || character == '|' ||
+         character == '&' || character == '`' || character == '$' ||
+         character == ';';
+
+}
+
 /**
  * Check if the given character can be used in an identifier. This is
  * any unicode character, except for:
- * `, . " () [] {} + - < > ? ^ = \ : ! / *` and whitespaces (space, line break, carriage return).
+ * `, . " () [] {} + - < > ? ^ = \ : ! / * ~ ' % # @ | & $ ;`
+ * and backtick and whitespaces (space, line break, carriage return).
  *
  * This is loosely based on what is allowed in languages like JavaScript
  * (see https://mathiasbynens.be/notes/javascript-properties), without support
@@ -96,7 +107,7 @@ inline bool IsAllowedInIdentifier(gd::String::value_type character) {
   if (!IsParameterSeparator(character) && !IsDot(character) &&
       !IsQuote(character) && !IsBracket(character) &&
       !IsExpressionOperator(character) && !IsTermOperator(character) &&
-      !IsWhitespace(character)) {
+      !IsWhitespace(character) && !IsAdditionalReservedCharacter(character)) {
     return true;
   }
 

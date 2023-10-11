@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AbstractEventsBasedEntity.h"
+
 #include "EventsFunctionsContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/MakeUnique.h"
@@ -13,7 +14,10 @@ namespace gd {
 AbstractEventsBasedEntity::AbstractEventsBasedEntity(
     const gd::String& _name,
     gd::EventsFunctionsContainer::FunctionOwner functionContainerSource)
-    : name(_name), fullName(""), eventsFunctionsContainer(functionContainerSource) {}
+    : name(_name),
+      fullName(""),
+      eventsFunctionsContainer(functionContainerSource),
+      propertyDescriptors(functionContainerSource) {}
 
 void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
@@ -27,8 +31,8 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
       "propertyDescriptor", element.AddChild("propertyDescriptors"));
 }
 
-void AbstractEventsBasedEntity::UnserializeFrom(gd::Project& project,
-                                          const SerializerElement& element) {
+void AbstractEventsBasedEntity::UnserializeFrom(
+    gd::Project& project, const SerializerElement& element) {
   description = element.GetStringAttribute("description");
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");

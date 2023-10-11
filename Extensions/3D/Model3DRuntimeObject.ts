@@ -48,7 +48,9 @@ namespace gdjs {
   /**
    * A 3D object which displays a 3D model.
    */
-  export class Model3DRuntimeObject extends gdjs.RuntimeObject3D {
+  export class Model3DRuntimeObject
+    extends gdjs.RuntimeObject3D
+    implements gdjs.Animatable {
     _renderer: gdjs.Model3DRuntimeObjectRenderer;
 
     _modelResourceName: string;
@@ -296,6 +298,11 @@ namespace gdjs {
       return this.getHeight() * centerPoint[1];
     }
 
+    getCenterZ(): float {
+      const centerPoint = this._renderer.getCenterPoint();
+      return this.getDepth() * centerPoint[2];
+    }
+
     getDrawableX(): float {
       const originPoint = this._renderer.getOriginPoint();
       return this.getX() - this.getWidth() * originPoint[0];
@@ -304,6 +311,11 @@ namespace gdjs {
     getDrawableY(): float {
       const originPoint = this._renderer.getOriginPoint();
       return this.getY() - this.getHeight() * originPoint[1];
+    }
+
+    getDrawableZ(): float {
+      const originPoint = this._renderer.getOriginPoint();
+      return this.getZ() - this.getDepth() * originPoint[2];
     }
   }
 

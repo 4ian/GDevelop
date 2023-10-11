@@ -1,5 +1,15 @@
 module.exports = {
-  stories: ['../src/stories/index.js', '../src/stories/**/*.stories.js'],
+  framework: {
+    name: '@storybook/react-webpack5',
+  },
+
+  features: {
+    storyStoreV7: false,
+  },
+
+  stories: ['../src/stories/**/*.stories.js'],
+  staticDirs: ['../public'],
+
   addons: [
     {
       name: '@storybook/addon-essentials',
@@ -7,6 +17,7 @@ module.exports = {
         docs: false,
       },
     },
-    'storybook-addon-mock/register',
+    'storybook-addon-mock',
+    '@storybook/preset-create-react-app',
   ],
 };

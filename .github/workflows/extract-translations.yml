@@ -26,7 +26,7 @@ jobs:
         run: sudo apt update && sudo apt install gettext -y
 
       - name: Install newIDE dependencies
-        run: npm install
+        run: npm ci
         working-directory: newIDE/app
 
       - name: Extract translations

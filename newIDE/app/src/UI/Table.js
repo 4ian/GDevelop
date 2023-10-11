@@ -6,6 +6,18 @@ import MUITableCell from '@material-ui/core/TableCell';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
 
+type TableCellCommonProps = {|
+  children?: React.Node, // Content for the cell
+  style?: {|
+    height?: number,
+    width?: number | string,
+    paddingLeft?: number,
+    paddingRight?: number,
+    textAlign?: string,
+    wordBreak?: 'break-word',
+  |},
+|};
+
 type TableProps = {|
   children: React.Node, // Should be TableHeader, TableBody or TableFooter
 |};
@@ -47,14 +59,8 @@ export class TableHeader extends React.Component<TableHeaderProps, {||}> {
 }
 
 type TableHeaderColumnProps = {|
-  children?: React.Node, // Text of the column
+  ...TableCellCommonProps,
   padding?: 'none',
-  style?: {|
-    height?: number,
-    width?: number | string,
-    textAlign?: 'left' | 'right',
-    paddingRight?: number,
-  |},
 |};
 
 /**
@@ -89,16 +95,8 @@ export class TableRow extends React.Component<TableRowProps, {||}> {
 }
 
 type TableRowColumnProps = {|
-  children?: React.Node, // Content for the cell
+  ...TableCellCommonProps,
   padding?: 'none',
-  style?: {|
-    height?: number,
-    width?: number | string,
-    paddingLeft?: number,
-    paddingRight?: number,
-    textAlign?: string,
-    wordBreak?: 'break-word',
-  |},
 |};
 
 /**

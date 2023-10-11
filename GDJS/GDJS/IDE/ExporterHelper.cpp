@@ -170,7 +170,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
-  ExportEffectIncludes(immutableProject, includesFiles);
+  ExportEffectIncludes(exportedProject, includesFiles);
 
   previousTime = LogTimeSpent("Include files export", previousTime);
 
@@ -731,7 +731,7 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
 }
 
 bool ExporterHelper::ExportEffectIncludes(
-    const gd::Project &project, std::vector<gd::String> &includesFiles) {
+    gd::Project &project, std::vector<gd::String> &includesFiles) {
   std::set<gd::String> effectIncludes;
 
   gd::EffectsCodeGenerator::GenerateEffectsIncludeFiles(

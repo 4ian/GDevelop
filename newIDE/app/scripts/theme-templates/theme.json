@@ -563,7 +563,7 @@
       },
       "even": {
         "background-color": {
-          "value": "252525"
+          "value": "#252525"
         }
       },
       "selected": {

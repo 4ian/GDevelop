@@ -226,6 +226,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Horizontal', 'Vertical'],
   ['Acceleration', 'Deceleration'],
   ['Duration', 'Easing'],
+  ['EffectName', 'EffectProperty'],
 ];
 
 const uncapitalize = str => {

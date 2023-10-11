@@ -430,14 +430,19 @@ export const LeaderboardAdmin = ({
 
   const onDeleteLeaderboard = async (i18n: I18nType) => {
     if (!currentLeaderboard) return;
-    const answer = await showDeleteConfirmation({
-      title: t`Delete leaderboard ${currentLeaderboard.name}`,
-      message: t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`,
+    // Extract word translation to ensure it is not wrongly translated in the sentence.
+    const translatedConfirmText = i18n._(t`delete`);
+
+    const deleteAnswer = await showDeleteConfirmation({
+      title: t`Do you really want to permanently delete the leaderboard ${
+        currentLeaderboard.name
+      }?`,
+      message: t`You’re about to permanently delete this leaderboard and all of its entries. This can't be undone.`,
+      fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
+      confirmText: translatedConfirmText,
       confirmButtonLabel: t`Delete Leaderboard`,
-      confirmText: currentLeaderboard.name,
-      fieldMessage: t`Type the name of the leaderboard:`,
     });
-    if (!answer) return;
+    if (!deleteAnswer) return;
 
     setIsLoading(true);
     setApiError(null);

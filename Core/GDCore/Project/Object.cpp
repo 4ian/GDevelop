@@ -15,6 +15,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/UUID/UUID.h"
 
 namespace gd {
 
@@ -35,6 +36,7 @@ Object::Object(const gd::String& name_,
     }
 
 void Object::Init(const gd::Object& object) {
+  persistentUuid = object.persistentUuid;
   name = object.name;
   assetStoreId = object.assetStoreId;
   objectVariables = object.objectVariables;
@@ -127,6 +129,8 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
 
 void Object::UnserializeFrom(gd::Project& project,
                              const SerializerElement& element) {
+  persistentUuid = element.GetStringAttribute("persistentUuid");
+
   SetType(element.GetStringAttribute("type"));
   assetStoreId = element.GetStringAttribute("assetStoreId");
   name = element.GetStringAttribute("name", name, "nom");
@@ -134,7 +138,6 @@ void Object::UnserializeFrom(gd::Project& project,
 
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
-  behaviors.clear();
 
   if (element.HasChild("effects")) {
     const SerializerElement& effectsElement = element.GetChild("effects");
@@ -198,6 +201,9 @@ void Object::UnserializeFrom(gd::Project& project,
 }
 
 void Object::SerializeTo(SerializerElement& element) const {
+  if (!persistentUuid.empty())
+    element.SetStringAttribute("persistentUuid", persistentUuid);
+
   element.SetAttribute("name", GetName());
   element.SetAttribute("assetStoreId", GetAssetStoreId());
   element.SetAttribute("type", GetType());
@@ -210,6 +216,11 @@ void Object::SerializeTo(SerializerElement& element) const {
   std::vector<gd::String> allBehaviors = GetAllBehaviorNames();
   for (std::size_t i = 0; i < allBehaviors.size(); ++i) {
     const gd::Behavior& behavior = GetBehavior(allBehaviors[i]);
+    // Default behaviors are added at the object creation according to metadata.
+    // They don't need to be serialized.
+    if (behavior.IsDefaultBehavior()) {
+      continue;
+    }
     SerializerElement& behaviorElement = behaviorsElement.AddChild("behavior");
 
     behavior.SerializeTo(behaviorElement);
@@ -221,6 +232,20 @@ void Object::SerializeTo(SerializerElement& element) const {
   }
 
   configuration->SerializeTo(element);
+}
+
+Object& Object::ResetPersistentUuid() {
+  persistentUuid = UUID::MakeUuid4();
+  objectVariables.ResetPersistentUuid();
+
+  return *this;
+}
+
+Object& Object::ClearPersistentUuid() {
+  persistentUuid = "";
+  objectVariables.ClearPersistentUuid();
+
+  return *this;
 }
 
 }  // namespace gd

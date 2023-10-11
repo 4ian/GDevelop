@@ -137,6 +137,7 @@ export default class ForEachEvent extends React.Component<
           windowWidth={this.props.windowWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachEvent.getConditions()}
               style={style}
               className={className}
@@ -166,6 +167,7 @@ export default class ForEachEvent extends React.Component<
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachEvent.getActions()}
               style={
                 {

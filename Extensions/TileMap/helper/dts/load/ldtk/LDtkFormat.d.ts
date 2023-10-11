@@ -561,7 +561,7 @@ export declare type LDtkTilesetDef = {
   tagsSourceEnumUid: integer | null;
   /**  */
   tileGridSize: integer;
-  /** Unique Intidentifier */
+  /** Unique Identifier */
   uid: integer;
 };
 /** In a tileset definition, user defined meta-data of a tile. */

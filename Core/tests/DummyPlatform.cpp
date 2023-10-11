@@ -13,6 +13,8 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
+#include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
+#include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ParameterOptions.h"
 #include "catch.hpp"
@@ -103,6 +105,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   commonInstructionsExtension->SetExtensionInformation(
       "BuiltinCommonInstructions", "instruction extension", "", "", "");
   commonInstructionsExtension->AddEvent("Standard", "Standard event", "", "", "", std::make_shared<gd::StandardEvent>());
+  commonInstructionsExtension->AddEvent("ForEachChildVariable", "For each child variable event", "", "", "", std::make_shared<gd::ForEachChildVariableEvent>());
+  commonInstructionsExtension->AddEvent("Repeat", "Repeat event", "", "", "", std::make_shared<gd::RepeatEvent>());
 
   std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
@@ -113,17 +117,6 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   auto& baseObject = baseObjectExtension->AddObject<gd::ObjectConfiguration>(
       "", "Dummy Base Object", "Dummy Base Object", "");
 
-  // Add this expression for all objects. But it requires a "capability".
-  baseObject
-      .AddStrExpression("GetSomethingRequiringEffectCapability",
-                        "Get something, but this requires the effect capability for the object.",
-                        "",
-                        "",
-                        "")
-      .AddParameter("object", _("Object"), "")
-      .AddParameter("expression", _("Number parameter"))
-      .SetRequiresBaseObjectCapability("effect")
-      .SetFunctionName("getSomethingRequiringEffectCapability");
   baseObject
       .AddExpression("GetFromBaseExpression",
                      "This works on any object.",
@@ -133,6 +126,84 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("object", _("Object"), "")
       .SetFunctionName("getFromBaseExpression");
 
+// Declare default behaviors that are used by event-based objects to avoid
+// warnings.
+{
+  std::shared_ptr<gd::PlatformExtension> extension =
+      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+  extension
+      ->SetExtensionInformation("ResizableCapability",
+                               _("Resizable capability"),
+                               _("Change the object dimensions."),
+                               "", "");
+  gd::BehaviorMetadata& aut = extension->AddBehavior(
+      "ResizableBehavior",
+      _("Resizable capability"),
+      "Resizable",
+      _("Change the object dimensions."),
+      "", "", "",
+      std::make_shared<gd::Behavior>(),
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
+  platform.AddExtension(extension);
+}
+{
+  std::shared_ptr<gd::PlatformExtension> extension =
+      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+  extension
+      ->SetExtensionInformation("ScalableCapability",
+                               _("Scalable capability"),
+                               _("Change the object scale."),
+                               "", "");
+  gd::BehaviorMetadata& aut = extension->AddBehavior(
+      "ScalableBehavior",
+      _("Scalable capability"),
+      "Scale",
+      _("Change the object scale."),
+      "", "", "",
+      std::make_shared<gd::Behavior>(),
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
+  platform.AddExtension(extension);
+}
+{
+  std::shared_ptr<gd::PlatformExtension> extension =
+      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+  extension
+      ->SetExtensionInformation("FlippableCapability",
+                               _("Flippable capability"),
+                               _("Flip objects."),
+                               "", "");
+  gd::BehaviorMetadata& aut = extension->AddBehavior(
+      "FlippableBehavior",
+      _("Flippable capability"),
+      "Flippable",
+      _("Flip objects."),
+      "", "", "",
+      std::make_shared<gd::Behavior>(),
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
+  platform.AddExtension(extension);
+}
+{
+  std::shared_ptr<gd::PlatformExtension> extension =
+      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+  extension
+      ->SetExtensionInformation("EffectCapability",
+                               _("Effect capability"),
+                               _("Apply visual effects to objects."),
+                               "", "");
+  gd::BehaviorMetadata& aut = extension->AddBehavior(
+      "EffectBehavior",
+      _("Effect capability"),
+      "Effect",
+      _("Apply visual effects to objects."),
+      "", "", "",
+      std::make_shared<gd::Behavior>(),
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
+  platform.AddExtension(extension);
+}
   // Create an extension with various stuff inside.
   std::shared_ptr<gd::PlatformExtension> extension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
@@ -175,6 +246,20 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("imageResource", "Parameter 2 (an image resource)")
       .AddParameter("soundfile", "Parameter 3 (an audio resource)")
       .SetFunctionName("doSomethingWithResources");
+
+  extension
+      ->AddAction("DoSomethingWithLegacyPreScopedVariables",
+                  "Do something with variables",
+                  "This does something with variables",
+                  "Do something with variables please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("scenevar", "Scene variable")
+      .AddParameter("globalvar", "Global variable")
+      .AddParameter("object", "Some object")
+      .AddParameter("objectvar", "Some variable of the object")
+      .SetFunctionName("doSomethingWithVariables");
 
   extension->AddExpression("GetNumber", "Get me a number", "", "", "")
       .SetFunctionName("getNumber");
@@ -278,7 +363,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("expression", _("Number parameter"))
       .AddParameter("string", _("String parameter"))
-      .AddParameter("", _("Identifier parameter"))
+      .AddParameter("expression", _("Identifier parameter"))
       .SetFunctionName("getObjectStringWith3Param");
   object
       .AddStrExpression("GetObjectStringWith2ObjectParam",
@@ -397,13 +482,52 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   }
 
   {
+    gd::BehaviorMetadata &effectBehavior =
+        extension
+            ->AddBehavior("EffectBehavior",
+                          _("Effect capability"),
+                          "Effect",
+                          _("Apply visual effects to objects."),
+                          "",
+                          "res/actions/effect24.png", "EffectBehavior",
+                          std::make_shared<gd::Behavior>(),
+                          std::make_shared<gd::BehaviorsSharedData>())
+            .SetHidden();
+
+    // Add this expression for the effect capability.
+    effectBehavior
+        .AddStrExpression("GetSomethingRequiringEffectCapability",
+                          "Get something, but this requires the effect "
+                          "capability for the object.",
+                          "",
+                          "",
+                          "")
+        .AddParameter("object", _("Object"), "")
+        .AddParameter("behavior", _("Behavior"), "EffectBehavior")
+        .AddParameter("expression", _("Number parameter"))
+        .SetFunctionName("getSomethingRequiringEffectCapability");
+  }
+  {
     auto& object = extension
                        ->AddObject<gd::ObjectConfiguration>(
-                           "FakeObjectWithUnsupportedCapability",
-                           "FakeObjectWithUnsupportedCapability",
-                           "This is FakeObjectWithUnsupportedCapability",
+                           "FakeObjectWithDefaultBehavior",
+                           "FakeObjectWithDefaultBehavior",
+                           "This is FakeObjectWithDefaultBehavior",
                            "")
-                       .AddUnsupportedBaseObjectCapability("effect");
+                       .AddDefaultBehavior("MyExtension::EffectBehavior");
+  }
+
+  // Declare an event-based behavior to avoid warnings.
+  {
+    extension->AddBehavior("MyEventsBasedBehavior",
+                            "My event-based behavior",
+                            "MyEventsBasedBehavior",
+                            "Avoid warnings",
+                            "Group",
+                            "Icon.png",
+                            "MyEventsBasedBehavior",
+                            gd::make_unique<gd::Behavior>(),
+                            gd::make_unique<gd::BehaviorsSharedData>());
   }
 
   // Actions and expressions with several parameter types.
@@ -454,15 +578,15 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   extension
       ->AddExpression(
           "LayerEffectParameter",
-          _("Effect parameter (number)"),
-          _("Return the value of a parameter of an effect."),
+          _("Effect property (number)"),
+          _("Return the value of a property of an effect."),
           _("Effects"),
           "")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
-      .AddParameter("layerEffectParameterName", _("Parameter name"));
+      .AddParameter("layerEffectParameterName", _("Property name"));
   }
 
   {

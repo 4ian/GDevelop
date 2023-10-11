@@ -42,9 +42,12 @@ const styles = {
   },
 };
 
+// Those names are used internally by GDevelop.
+const PROTECTED_PROPERTY_NAMES = ['name', 'type'];
+
 const getValidatedPropertyName = (
   i18n: I18nType,
-  properties: gdNamedPropertyDescriptorsList,
+  properties: gdPropertiesContainer,
   newName: string
 ): string => {
   const safeAndUniqueNewName = newNameGenerator(
@@ -52,8 +55,7 @@ const getValidatedPropertyName = (
     tentativeNewName => {
       if (
         properties.has(tentativeNewName) ||
-        // The name of a property cannot be "name" or "type", as they are used by GDevelop internally.
-        (tentativeNewName === 'name' || tentativeNewName === 'type')
+        PROTECTED_PROPERTY_NAMES.includes(tentativeNewName)
       ) {
         return true;
       }

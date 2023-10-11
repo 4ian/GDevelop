@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -21,6 +20,7 @@ import LocalEventsFunctionsExtensionWriter from '../../../../EventsFunctionsExte
 import LocalEventsFunctionsExtensionOpener from '../../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 import EventsFunctionsExtensionsContext from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import fakeResourceManagementProps from '../../../FakeResourceManagement';
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
@@ -90,62 +90,61 @@ const fakeEventsFunctionsExtensionsContext = {
   eventsFunctionsExtensionsError: null,
 };
 
-export const LayoutPublicAssetInstallSuccess = () => {
+const Wrapper = ({ children }: { children: React.Node }) => {
+  const navigationState = useShopNavigation();
   return (
     <EventsFunctionsExtensionsContext.Provider
       value={fakeEventsFunctionsExtensionsContext}
     >
-      <AssetStoreStateProvider>
-        <AssetPackInstallDialog
-          assetPack={fakeAssetPacks.starterPacks[0]}
-          assetShortHeaders={[fakeAssetShortHeader1]}
-          addedAssetIds={new Set<string>()}
-          onClose={action('onClose')}
-          onAssetsAdded={action('onAssetsAdded')}
-          project={testProject.project}
-          objectsContainer={testProject.testLayout}
-          onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-          resourceManagementProps={fakeResourceManagementProps}
-          canInstallPrivateAsset={() => true}
-        />
+      <AssetStoreStateProvider shopNavigationState={navigationState}>
+        {children}
       </AssetStoreStateProvider>
     </EventsFunctionsExtensionsContext.Provider>
   );
 };
-LayoutPublicAssetInstallSuccess.decorators = [withMock];
+
+export const LayoutPublicAssetInstallSuccess = () => (
+  <Wrapper>
+    <AssetPackInstallDialog
+      assetPack={fakeAssetPacks.starterPacks[0]}
+      assetShortHeaders={[fakeAssetShortHeader1]}
+      addedAssetIds={new Set<string>()}
+      onClose={action('onClose')}
+      onAssetsAdded={action('onAssetsAdded')}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+      resourceManagementProps={fakeResourceManagementProps}
+      canInstallPrivateAsset={() => true}
+    />
+  </Wrapper>
+);
 LayoutPublicAssetInstallSuccess.parameters = {
   mockData: mockApiDataForPublicAssets,
 };
 
-export const LayoutPublicAssetInstallFailure = () => {
-  return (
-    <EventsFunctionsExtensionsContext.Provider
-      value={fakeEventsFunctionsExtensionsContext}
-    >
-      <AssetStoreStateProvider>
-        <AssetPackInstallDialog
-          assetPack={fakeAssetPacks.starterPacks[0]}
-          assetShortHeaders={[fakeAssetShortHeader1]}
-          addedAssetIds={new Set<string>()}
-          onClose={action('onClose')}
-          onAssetsAdded={action('onAssetsAdded')}
-          project={testProject.project}
-          objectsContainer={testProject.testLayout}
-          onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-          resourceManagementProps={fakeResourceManagementProps}
-          canInstallPrivateAsset={() => true}
-        />
-      </AssetStoreStateProvider>
-    </EventsFunctionsExtensionsContext.Provider>
-  );
-};
-LayoutPublicAssetInstallFailure.decorators = [withMock];
+export const LayoutPublicAssetInstallFailure = () => (
+  <Wrapper>
+    <AssetPackInstallDialog
+      assetPack={fakeAssetPacks.starterPacks[0]}
+      assetShortHeaders={[fakeAssetShortHeader1]}
+      addedAssetIds={new Set<string>()}
+      onClose={action('onClose')}
+      onAssetsAdded={action('onAssetsAdded')}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+      resourceManagementProps={fakeResourceManagementProps}
+      canInstallPrivateAsset={() => true}
+    />
+  </Wrapper>
+);
 LayoutPublicAssetInstallFailure.parameters = {
   mockData: mockFailedApiDataForPublicAsset1,
 };
 
 export const LayoutPublicAssetAllAlreadyInstalled = () => (
-  <AssetStoreStateProvider>
+  <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
       assetShortHeaders={[fakeAssetShortHeader1]}
@@ -158,98 +157,101 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}
     />
-  </AssetStoreStateProvider>
+  </Wrapper>
 );
 
 export const LayoutPublicAssetSomeAlreadyInstalled = () => (
-  <EventsFunctionsExtensionsContext.Provider
-    value={fakeEventsFunctionsExtensionsContext}
-  >
-    <AssetStoreStateProvider>
-      <AssetPackInstallDialog
-        assetPack={fakeAssetPacks.starterPacks[0]}
-        assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
-        addedAssetIds={new Set([fakeAssetShortHeader1.id])}
-        onClose={action('onClose')}
-        onAssetsAdded={action('onAssetsAdded')}
-        project={testProject.project}
-        objectsContainer={testProject.testLayout}
-        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={fakeResourceManagementProps}
-        canInstallPrivateAsset={() => true}
-      />
-    </AssetStoreStateProvider>
-  </EventsFunctionsExtensionsContext.Provider>
+  <Wrapper>
+    <AssetPackInstallDialog
+      assetPack={fakeAssetPacks.starterPacks[0]}
+      assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
+      addedAssetIds={new Set([fakeAssetShortHeader1.id])}
+      onClose={action('onClose')}
+      onAssetsAdded={action('onAssetsAdded')}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+      resourceManagementProps={fakeResourceManagementProps}
+      canInstallPrivateAsset={() => true}
+    />
+  </Wrapper>
 );
-LayoutPublicAssetSomeAlreadyInstalled.decorators = [withMock];
 LayoutPublicAssetSomeAlreadyInstalled.parameters = {
   mockData: mockApiDataForPublicAssets,
 };
 
-export const LayoutPrivateAssetInstallSuccess = () => (
-  <PrivateAssetsAuthorizationContext.Provider
-    value={{
-      authorizationToken: null,
-      updateAuthorizationToken: async () => {},
-      fetchPrivateAsset: async () => fakePrivateAsset1,
-      installPrivateAsset: async () => ({
-        // Mock a successful installation
-        createdObjects: [],
-      }),
-      getPrivateAssetPackAudioArchiveUrl: async () =>
-        'https://resources.gevelop.io/path/to/audio/archive',
-    }}
-  >
-    <AssetStoreStateProvider>
-      <AssetPackInstallDialog
-        assetPack={fakeAssetPacks.starterPacks[0]}
-        assetShortHeaders={[fakePrivateAssetShortHeader1]}
-        addedAssetIds={new Set<string>()}
-        onClose={action('onClose')}
-        onAssetsAdded={action('onAssetsAdded')}
-        project={testProject.project}
-        objectsContainer={testProject.testLayout}
-        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={fakeResourceManagementProps}
-        canInstallPrivateAsset={() => true}
-      />
-    </AssetStoreStateProvider>
-  </PrivateAssetsAuthorizationContext.Provider>
-);
+export const LayoutPrivateAssetInstallSuccess = () => {
+  const navigationState = useShopNavigation();
 
-export const LayoutPrivateAssetInstallFailure = () => (
-  <PrivateAssetsAuthorizationContext.Provider
-    value={{
-      authorizationToken: null,
-      updateAuthorizationToken: async () => {},
-      fetchPrivateAsset: async () => fakePrivateAsset1,
-      // Mock an error
-      installPrivateAsset: async () => {
-        throw new Error('Fake error during installation of a private asset.');
-      },
-      getPrivateAssetPackAudioArchiveUrl: async () =>
-        'https://resources.gevelop.io/path/to/audio/archive',
-    }}
-  >
-    <AssetStoreStateProvider>
-      <AssetPackInstallDialog
-        assetPack={fakeAssetPacks.starterPacks[0]}
-        assetShortHeaders={[fakePrivateAssetShortHeader1]}
-        addedAssetIds={new Set<string>()}
-        onClose={action('onClose')}
-        onAssetsAdded={action('onAssetsAdded')}
-        project={testProject.project}
-        objectsContainer={testProject.testLayout}
-        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={fakeResourceManagementProps}
-        canInstallPrivateAsset={() => true}
-      />
-    </AssetStoreStateProvider>
-  </PrivateAssetsAuthorizationContext.Provider>
-);
+  return (
+    <PrivateAssetsAuthorizationContext.Provider
+      value={{
+        authorizationToken: null,
+        updateAuthorizationToken: async () => {},
+        fetchPrivateAsset: async () => fakePrivateAsset1,
+        installPrivateAsset: async () => ({
+          // Mock a successful installation
+          createdObjects: [],
+        }),
+        getPrivateAssetPackAudioArchiveUrl: async () =>
+          'https://resources.gevelop.io/path/to/audio/archive',
+      }}
+    >
+      <AssetStoreStateProvider shopNavigationState={navigationState}>
+        <AssetPackInstallDialog
+          assetPack={fakeAssetPacks.starterPacks[0]}
+          assetShortHeaders={[fakePrivateAssetShortHeader1]}
+          addedAssetIds={new Set<string>()}
+          onClose={action('onClose')}
+          onAssetsAdded={action('onAssetsAdded')}
+          project={testProject.project}
+          objectsContainer={testProject.testLayout}
+          onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+          resourceManagementProps={fakeResourceManagementProps}
+          canInstallPrivateAsset={() => true}
+        />
+      </AssetStoreStateProvider>
+    </PrivateAssetsAuthorizationContext.Provider>
+  );
+};
+
+export const LayoutPrivateAssetInstallFailure = () => {
+  const navigationState = useShopNavigation();
+
+  return (
+    <PrivateAssetsAuthorizationContext.Provider
+      value={{
+        authorizationToken: null,
+        updateAuthorizationToken: async () => {},
+        fetchPrivateAsset: async () => fakePrivateAsset1,
+        // Mock an error
+        installPrivateAsset: async () => {
+          throw new Error('Fake error during installation of a private asset.');
+        },
+        getPrivateAssetPackAudioArchiveUrl: async () =>
+          'https://resources.gevelop.io/path/to/audio/archive',
+      }}
+    >
+      <AssetStoreStateProvider shopNavigationState={navigationState}>
+        <AssetPackInstallDialog
+          assetPack={fakeAssetPacks.starterPacks[0]}
+          assetShortHeaders={[fakePrivateAssetShortHeader1]}
+          addedAssetIds={new Set<string>()}
+          onClose={action('onClose')}
+          onAssetsAdded={action('onAssetsAdded')}
+          project={testProject.project}
+          objectsContainer={testProject.testLayout}
+          onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+          resourceManagementProps={fakeResourceManagementProps}
+          canInstallPrivateAsset={() => true}
+        />
+      </AssetStoreStateProvider>
+    </PrivateAssetsAuthorizationContext.Provider>
+  );
+};
 
 export const LayoutPrivateAssetButCantInstall = () => (
-  <AssetStoreStateProvider>
+  <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
       assetShortHeaders={[fakePrivateAssetShortHeader1]}
@@ -262,11 +264,11 @@ export const LayoutPrivateAssetButCantInstall = () => (
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => false}
     />
-  </AssetStoreStateProvider>
+  </Wrapper>
 );
 
 export const LayoutPrivateAssetButInstallingTooMany = () => (
-  <AssetStoreStateProvider>
+  <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
       assetShortHeaders={Array.from(
@@ -282,36 +284,31 @@ export const LayoutPrivateAssetButInstallingTooMany = () => (
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}
     />
-  </AssetStoreStateProvider>
+  </Wrapper>
 );
 
 export const NoObjectsContainerPublicAssetInstallSuccess = () => (
-  <EventsFunctionsExtensionsContext.Provider
-    value={fakeEventsFunctionsExtensionsContext}
-  >
-    <AssetStoreStateProvider>
-      <AssetPackInstallDialog
-        assetPack={fakeAssetPacks.starterPacks[0]}
-        assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
-        addedAssetIds={new Set<string>()}
-        onClose={action('onClose')}
-        onAssetsAdded={action('onAssetsAdded')}
-        project={testProject.project}
-        objectsContainer={null}
-        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={fakeResourceManagementProps}
-        canInstallPrivateAsset={() => true}
-      />
-    </AssetStoreStateProvider>
-  </EventsFunctionsExtensionsContext.Provider>
+  <Wrapper>
+    <AssetPackInstallDialog
+      assetPack={fakeAssetPacks.starterPacks[0]}
+      assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
+      addedAssetIds={new Set<string>()}
+      onClose={action('onClose')}
+      onAssetsAdded={action('onAssetsAdded')}
+      project={testProject.project}
+      objectsContainer={null}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+      resourceManagementProps={fakeResourceManagementProps}
+      canInstallPrivateAsset={() => true}
+    />
+  </Wrapper>
 );
-NoObjectsContainerPublicAssetInstallSuccess.decorators = [withMock];
 NoObjectsContainerPublicAssetInstallSuccess.parameters = {
   mockData: mockApiDataForPublicAssets,
 };
 
 export const NoObjectsContainerPrivateAssetButCantInstall = () => (
-  <AssetStoreStateProvider>
+  <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
       assetShortHeaders={[fakePrivateAssetShortHeader1]}
@@ -324,5 +321,5 @@ export const NoObjectsContainerPrivateAssetButCantInstall = () => (
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => false}
     />
-  </AssetStoreStateProvider>
+  </Wrapper>
 );

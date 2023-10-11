@@ -143,6 +143,8 @@ type CopyCutPasteOptions = {|
   pasteInTheForeground?: boolean,
 |};
 
+const editSceneIconReactNode = <EditSceneIcon />;
+
 export default class SceneEditor extends React.Component<Props, State> {
   static defaultProps = {
     setToolbar: () => {},
@@ -211,7 +213,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
         <MosaicEditorsDisplayToolbar
-          instancesSelection={this.instancesSelection}
+          selectedInstancesCount={
+            this.instancesSelection.getSelectedInstances().length
+          }
           toggleObjectsList={this.toggleObjectsList}
           isObjectsListShown={editorDisplay.isEditorVisible('objects-list')}
           toggleObjectGroupsList={this.toggleObjectGroupsList}
@@ -226,11 +230,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           toggleLayersList={this.toggleLayersList}
           isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
           toggleWindowMask={this.toggleWindowMask}
-          isWindowMaskShown={() =>
-            !!this.state.instancesEditorSettings.windowMask
-          }
+          isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
-          isGridShown={() => !!this.state.instancesEditorSettings.grid}
+          isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
           setZoomFactor={this.setZoomFactor}
           getContextMenuZoomItems={this.getContextMenuZoomItems}
@@ -239,7 +241,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           undo={this.undo}
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
-          settingsIcon={<EditSceneIcon />}
+          settingsIcon={editSceneIconReactNode}
           canRenameObject={this.state.selectedObjectsWithContext.length === 1}
           onRenameObject={this._startRenamingSelectedObject}
         />
@@ -247,7 +249,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     } else {
       this.props.setToolbar(
         <SwipeableDrawerEditorsDisplayToolbar
-          instancesSelection={this.instancesSelection}
+          selectedInstancesCount={
+            this.instancesSelection.getSelectedInstances().length
+          }
           toggleObjectsList={this.toggleObjectsList}
           toggleObjectGroupsList={this.toggleObjectGroupsList}
           toggleProperties={this.toggleProperties}
@@ -255,11 +259,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           toggleInstancesList={this.toggleInstancesList}
           toggleLayersList={this.toggleLayersList}
           toggleWindowMask={this.toggleWindowMask}
-          isWindowMaskShown={() =>
-            !!this.state.instancesEditorSettings.windowMask
-          }
+          isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
-          isGridShown={() => !!this.state.instancesEditorSettings.grid}
+          isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
           setZoomFactor={this.setZoomFactor}
           getContextMenuZoomItems={this.getContextMenuZoomItems}
@@ -268,7 +270,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           undo={this.undo}
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
-          settingsIcon={<EditSceneIcon />}
+          settingsIcon={editSceneIconReactNode}
           canRenameObject={this.state.selectedObjectsWithContext.length === 1}
           onRenameObject={this._startRenamingSelectedObject}
         />
@@ -1445,14 +1447,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     PixiResourcesLoader.loadTextures(
       project,
       objectResourceNames,
-      () => {},
-      () => {
-        if (this.editorDisplay)
-          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-            object.getName()
-          );
-      }
-    );
+      () => {}
+    ).then(() => {
+      if (this.editorDisplay)
+        this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          object.getName()
+        );
+    });
   };
 
   render() {
@@ -1697,6 +1698,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               {!!this.state.variablesEditedInstance &&
                 !!variablesEditedAssociatedObject && (
                   <VariablesEditorDialog
+                    project={project}
                     open
                     variablesContainer={this.state.variablesEditedInstance.getVariables()}
                     inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}

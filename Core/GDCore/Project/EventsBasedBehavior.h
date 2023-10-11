@@ -9,7 +9,7 @@
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
 #include "GDCore/Project/NamedPropertyDescriptor.h"
-#include "GDCore/Tools/SerializableWithNameList.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -91,14 +91,14 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   /**
    * \brief Return a reference to the list of shared properties.
    */
-  SerializableWithNameList<NamedPropertyDescriptor>& GetSharedPropertyDescriptors() {
+  gd::PropertiesContainer& GetSharedPropertyDescriptors() {
     return sharedPropertyDescriptors;
   }
 
   /**
    * \brief Return a const reference to the list of shared properties.
    */
-  const SerializableWithNameList<NamedPropertyDescriptor>& GetSharedPropertyDescriptors()
+  const gd::PropertiesContainer& GetSharedPropertyDescriptors()
       const {
     return sharedPropertyDescriptors;
   }
@@ -140,7 +140,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
  private:
   gd::String objectType;
   bool isPrivate = false;
-  SerializableWithNameList<NamedPropertyDescriptor> sharedPropertyDescriptors;
+  gd::PropertiesContainer sharedPropertyDescriptors;
 };
 
 }  // namespace gd

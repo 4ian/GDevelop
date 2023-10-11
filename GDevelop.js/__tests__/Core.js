@@ -57,9 +57,13 @@ describe('libGD.js', function () {
 
     it('can store loading screen setup', function () {
       project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(true);
-      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(true);
+      expect(
+        project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()
+      ).toBe(true);
       project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(false);
-      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(false);
+      expect(
+        project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()
+      ).toBe(false);
     });
 
     it('handles layouts', function () {
@@ -105,10 +109,18 @@ describe('libGD.js', function () {
       expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);
       expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
       expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
-      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe('ThisNameIs_Ok_123');
-      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe('ThisName_IsNot_Ok_123');
-      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe('ThisNameIsNot_Ok_');
-      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe('_1ThisNameIsNot_Ok_123');
+      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe(
+        'ThisNameIs_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe(
+        'ThisName_IsNot_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe(
+        'ThisNameIsNot_Ok_'
+      );
+      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe(
+        '_1ThisNameIsNot_Ok_123'
+      );
       expect(gd.Project.getSafeName('官话 name')).toBe('___name');
       expect(gd.Project.getSafeName('')).toBe('Unnamed');
       expect(gd.Project.getSafeName('9')).toBe('_9');
@@ -122,12 +134,24 @@ describe('libGD.js', function () {
       expect(gd.Project.isNameSafe('ThisName()IsNot_Ok_123')).toBe(false);
       expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
       expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
-      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe('ThisNameIs_Ok_123');
-      expect(gd.Project.getSafeName('ThisNameIs_👍_123')).toBe('ThisNameIs_👍_123');
-      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe('ThisName_IsNot_Ok_123');
-      expect(gd.Project.getSafeName('ThisName()IsNot_Ok_123')).toBe('ThisName__IsNot_Ok_123');
-      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe('ThisNameIsNot_Ok_');
-      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe('_1ThisNameIsNot_Ok_123');
+      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe(
+        'ThisNameIs_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisNameIs_👍_123')).toBe(
+        'ThisNameIs_👍_123'
+      );
+      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe(
+        'ThisName_IsNot_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisName()IsNot_Ok_123')).toBe(
+        'ThisName__IsNot_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe(
+        'ThisNameIsNot_Ok_'
+      );
+      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe(
+        '_1ThisNameIsNot_Ok_123'
+      );
       expect(gd.Project.getSafeName('官话 name')).toBe('官话_name');
       expect(gd.Project.getSafeName('')).toBe('Unnamed');
       expect(gd.Project.getSafeName('9')).toBe('_9');
@@ -148,7 +172,15 @@ describe('libGD.js', function () {
           .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
-      ).toEqual(['Sprite']);
+      ).toEqual([
+        'AnimatableCapability',
+        'EffectCapability',
+        'FlippableCapability',
+        'OpacityCapability',
+        'ResizableCapability',
+        'ScalableCapability',
+        'Sprite',
+      ]);
     });
 
     it('handles events functions extensions', function () {
@@ -409,9 +441,24 @@ describe('libGD.js', function () {
       // Prepare two containers, one with 3 objects and one empty
       const objectsContainer1 = new gd.ObjectsContainer();
       const objectsContainer2 = new gd.ObjectsContainer();
-      const mySpriteObject = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite', 0);
-      const mySprite2Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite2', 1);
-      const mySprite3Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite3', 2);
+      const mySpriteObject = objectsContainer1.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        0
+      );
+      const mySprite2Object = objectsContainer1.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite2',
+        1
+      );
+      const mySprite3Object = objectsContainer1.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite3',
+        2
+      );
 
       // Find the pointer to the objects in memory
       expect(objectsContainer1.getObjectsCount()).toBe(3);
@@ -667,36 +714,36 @@ describe('libGD.js', function () {
     });
     it('can have 3D properties migrated from number properties', function () {
       const element = gd.Serializer.fromJSObject({
-        "angle": 2,
-        "customSize": true,
-        "height": 100,
-        "layer": "",
-        "name": "Walls",
-        "persistentUuid": "1075df65-af84-472d-a431-47d6f7a5cb63",
-        "width": 950,
-        "x": -100,
-        "y": -75,
-        "zOrder": 1,
-        "numberProperties": [
+        angle: 2,
+        customSize: true,
+        height: 100,
+        layer: '',
+        name: 'Walls',
+        persistentUuid: '1075df65-af84-472d-a431-47d6f7a5cb63',
+        width: 950,
+        x: -100,
+        y: -75,
+        zOrder: 1,
+        numberProperties: [
           {
-            "name": "depth", // This indicates there is a custom depth.
-            "value": 300
+            name: 'depth', // This indicates there is a custom depth.
+            value: 300,
           },
           {
-            "name": "z",
-            "value": 12
+            name: 'z',
+            value: 12,
           },
           {
-            "name": "rotationX",
-            "value": 1
+            name: 'rotationX',
+            value: 1,
           },
           {
-            "name": "rotationY",
-            "value": 3
-          }
+            name: 'rotationY',
+            value: 3,
+          },
         ],
-        "stringProperties": [],
-        "initialVariables": []
+        stringProperties: [],
+        initialVariables: [],
       });
 
       const migratedInstance = layout
@@ -719,24 +766,23 @@ describe('libGD.js', function () {
     });
     it('can have depth without a custom size', function () {
       const element = gd.Serializer.fromJSObject({
-        "angle": 2,
-        "customSize": false,
-        "height": 100,
-        "layer": "",
-        "name": "Walls",
-        "persistentUuid": "1075df65-af84-472d-a431-47d6f7a5cb63",
-        "width": 950,
-        "x": -100,
-        "y": -75,
-        "zOrder": 1,
-        "z": 12,
-        "depth": 300, // This indicates there is a custom depth.
-        "rotationX": 1,
-        "rotationY": 3,
-        "numberProperties": [
-        ],
-        "stringProperties": [],
-        "initialVariables": []
+        angle: 2,
+        customSize: false,
+        height: 100,
+        layer: '',
+        name: 'Walls',
+        persistentUuid: '1075df65-af84-472d-a431-47d6f7a5cb63',
+        width: 950,
+        x: -100,
+        y: -75,
+        zOrder: 1,
+        z: 12,
+        depth: 300, // This indicates there is a custom depth.
+        rotationX: 1,
+        rotationY: 3,
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
       });
 
       const instanceWithJustDepth = layout
@@ -758,7 +804,9 @@ describe('libGD.js', function () {
       expect(instanceWithJustDepth.getCustomHeight()).toBe(100);
     });
     it('can have 3D properties', function () {
-      const initialInstanceIn3D = layout.getInitialInstances().insertNewInitialInstance();
+      const initialInstanceIn3D = layout
+        .getInitialInstances()
+        .insertNewInitialInstance();
       initialInstanceIn3D.setX(40);
       initialInstanceIn3D.setY(41);
       initialInstanceIn3D.setZ(42);
@@ -1368,7 +1416,9 @@ describe('libGD.js', function () {
       anim1.setDirectionsCount(1);
       anim1.getDirection(0).addSprite(sprite1);
 
-      gd.castObject(obj.getConfiguration(), gd.SpriteObject).addAnimation(anim1);
+      gd.castObject(obj.getConfiguration(), gd.SpriteObject).addAnimation(
+        anim1
+      );
 
       {
         let allResources = project.getResourcesManager().getAllResourceNames();
@@ -1425,7 +1475,9 @@ describe('libGD.js', function () {
     it('should be called with resources of the project', function (done) {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      const spriteConfiguration = gd.asSpriteConfiguration(obj.getConfiguration());
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        obj.getConfiguration()
+      );
       let sprite1 = new gd.Sprite();
       sprite1.setImageName('Used');
       const animation = new gd.Animation();
@@ -1656,9 +1708,9 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.NamedPropertyDescriptorsList', function () {
+  describe('gd.PropertiesContainer', function () {
     it('can be used to store named properties', function () {
-      const list = new gd.NamedPropertyDescriptorsList();
+      const list = new gd.PropertiesContainer(0);
 
       const property1 = list.insertNew('Property1', 0);
       expect(list.has('Property1')).toBe(true);
@@ -1819,6 +1871,8 @@ describe('libGD.js', function () {
       expect(object.getBehavior('Draggable')).toBe(behavior);
     });
 
+    const spriteDefaultBehaviorCount = 6;
+
     it('can have its behaviors retrieved with gd.getBehaviorsOfObject', function () {
       let behaviors = gd.getBehaviorsOfObject(
         project,
@@ -1826,8 +1880,8 @@ describe('libGD.js', function () {
         'TheObject',
         true
       );
-      expect(behaviors.size()).toBe(1);
-      expect(behaviors.get(0)).toBe('Draggable');
+      expect(behaviors.size()).toBe(1 + spriteDefaultBehaviorCount);
+      expect(behaviors.get(1)).toBe('Draggable');
     });
 
     it('can be un/serialized (basic)', function () {
@@ -1840,13 +1894,13 @@ describe('libGD.js', function () {
 
       //Check that behaviors were persisted and restored
       let behaviors = object2.getAllBehaviorNames();
-      expect(behaviors.size()).toBe(1);
-      expect(behaviors.at(0)).toBe('Draggable');
+      expect(behaviors.size()).toBe(1 + spriteDefaultBehaviorCount);
+      expect(behaviors.at(1)).toBe('Draggable');
     });
 
     it('can be un/serialized (with behavior content)', function () {
       const behaviorContent = object.getBehavior('Draggable');
-      behaviorContent.updateProperty('checkCollisionMask', "true");
+      behaviorContent.updateProperty('checkCollisionMask', 'true');
 
       let serializerElement = new gd.SerializerElement();
       object.serializeTo(serializerElement);
@@ -1857,13 +1911,13 @@ describe('libGD.js', function () {
 
       //Check that behaviors were persisted and restored
       let behaviors = object2.getAllBehaviorNames();
-      expect(behaviors.size()).toBe(1);
-      expect(behaviors.at(0)).toBe('Draggable');
+      expect(behaviors.size()).toBe(1 + spriteDefaultBehaviorCount);
+      expect(behaviors.at(1)).toBe('Draggable');
 
       const behaviorContent2 = object2.getBehavior('Draggable');
-      expect(behaviorContent2.getProperties()
-                             .get('checkCollisionMask')
-                             .getValue()).toBe("true");
+      expect(
+        behaviorContent2.getProperties().get('checkCollisionMask').getValue()
+      ).toBe('true');
     });
 
     afterAll(function () {
@@ -2244,11 +2298,10 @@ describe('libGD.js', function () {
       action.setParametersCount(2);
       action.setParameter(0, 'MyCharacter');
 
-      let formattedTexts =
-        gd.InstructionSentenceFormatter.get().getAsFormattedText(
-          action,
-          gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
-        );
+      let formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+        action,
+        gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
+      );
 
       expect(formattedTexts.size()).toBe(2);
       expect(formattedTexts.getString(0)).toBe('Delete ');
@@ -2708,7 +2761,12 @@ describe('libGD.js', function () {
 
         expect(positionFinder.getPositions().size()).toBe(6);
         expect(positionFinder.getPositions().toJSArray()).toEqual([
-          1, 10, 9, 4, 6, -1,
+          1,
+          10,
+          9,
+          4,
+          6,
+          -1,
         ]);
 
         events.delete();
@@ -3151,10 +3209,12 @@ describe('libGD.js', function () {
       // Check that ResourcesMergingHelper can update the filenames
       const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
-      gd.ResourceExposer.exposeWholeProjectResources(project, resourcesMergingHelper);
+      gd.ResourceExposer.exposeWholeProjectResources(
+        project,
+        resourcesMergingHelper
+      );
 
-      const oldAndNewFilenames =
-        resourcesMergingHelper.getAllResourcesOldAndNewFilename();
+      const oldAndNewFilenames = resourcesMergingHelper.getAllResourcesOldAndNewFilename();
       expect(oldAndNewFilenames.get('/my/project/MyResource.png')).toBe(
         'MyResource.png'
       );
@@ -3467,9 +3527,12 @@ describe('libGD.js', function () {
 
       const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
-        project,
-        layout,
-        type);
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+          project,
+          layout
+        ),
+        type
+      );
       expressionNode.visit(expressionValidator);
       if (expectedError2) {
         expect(expressionValidator.getAllErrors().size()).toBe(2);
@@ -3477,25 +3540,25 @@ describe('libGD.js', function () {
           expectedError
         );
         if (expectedErrorPosition)
-          expect(expressionValidator.getAllErrors().at(0).getStartPosition()).toBe(
-            expectedErrorPosition
-          );
+          expect(
+            expressionValidator.getAllErrors().at(0).getStartPosition()
+          ).toBe(expectedErrorPosition);
         expect(expressionValidator.getAllErrors().at(1).getMessage()).toBe(
           expectedError2
         );
         if (expectedErrorPosition2)
-          expect(expressionValidator.getAllErrors().at(1).getStartPosition()).toBe(
-            expectedErrorPosition2
-          );
+          expect(
+            expressionValidator.getAllErrors().at(1).getStartPosition()
+          ).toBe(expectedErrorPosition2);
       } else if (expectedError) {
         expect(expressionValidator.getAllErrors().size()).toBe(1);
         expect(expressionValidator.getAllErrors().at(0).getMessage()).toBe(
           expectedError
         );
         if (expectedErrorPosition)
-          expect(expressionValidator.getAllErrors().at(0).getStartPosition()).toBe(
-            expectedErrorPosition
-          );
+          expect(
+            expressionValidator.getAllErrors().at(0).getStartPosition()
+          ).toBe(expectedErrorPosition);
       } else {
         expect(expressionValidator.getAllErrors().size()).toBe(0);
       }
@@ -3635,17 +3698,58 @@ describe('libGD.js', function () {
   describe('gd.ExpressionCompletionFinder', function () {
     let project = null;
     let layout = null;
+    let propertiesContainer = null;
+    let sharedPropertiesContainer = null;
     beforeAll(() => {
       project = new gd.ProjectHelper.createNewGDJSProject();
       layout = project.insertNewLayout('Scene', 0);
-      layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+      const object = layout.insertNewObject(
+        project,
+        'Sprite',
+        'MySpriteObject',
+        0
+      );
+      object.getVariables().insertNew('MyObjectVariable', 0);
+      object.getVariables().insertNew('MyObjectGroupVariable1', 0);
+      object.getVariables().insertNew('MyObjectGroupVariable2', 0);
+      object.getVariables().insertNew('MyObjectGroupVariable3', 0);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'MySpriteObject2',
+        1
+      );
+      object2.getVariables().insertNew('MyObjectGroupVariable1', 0);
+      object2.getVariables().insertNew('MyObjectGroupVariable2', 0);
+      const objectGroup = layout
+        .getObjectGroups()
+        .insertNew('MyObjectGroup', 0);
+      objectGroup.addObject('MySpriteObject');
+      objectGroup.addObject('MySpriteObject2');
+      layout.insertNewObject(project, 'Sprite', 'UnrelatedSpriteObject3', 2);
+      layout.getVariables().insertNew('MyVariable', 0);
+      layout.getVariables().insertNew('MyVariable2', 1);
+      layout.getVariables().insertNew('UnrelatedVariable3', 2);
+      project.getVariables().insertNew('MyGlobalVariable', 0);
+      project.getVariables().insertNew('MyVariable2', 1); // Will be "shadowed" by the layout variable.
+
+      // Also create some properties (a bit unusual to have these "floating" properties containers,
+      // but this works well to test the completions).
+      propertiesContainer = new gd.PropertiesContainer(0);
+      propertiesContainer.insertNew('MyProperty1', 0);
+      propertiesContainer.insertNew('UnrelatedProperty2', 1);
+      sharedPropertiesContainer = new gd.PropertiesContainer(0);
+      sharedPropertiesContainer.insertNew('MySharedProperty1', 0);
+      sharedPropertiesContainer.insertNew('UnrelatedProperty2', 1);
     });
 
-    function testCompletions(
-      type,
-      expressionWithCaret,
-      onCompletionDescription
-    ) {
+    afterAll(() => {
+      project.delete();
+      propertiesContainer.delete();
+      sharedPropertiesContainer.delete();
+    });
+
+    function testCompletions(type, expressionWithCaret) {
       const caretPosition = expressionWithCaret.indexOf('|');
       if (caretPosition === -1) {
         throw new Error(
@@ -3653,135 +3757,247 @@ describe('libGD.js', function () {
         );
       }
       const expression = expressionWithCaret.replace('|', '');
+      const parameters = new gd.VectorParameterMetadata();
+      const parameter1 = new gd.ParameterMetadata();
+      parameter1.setType('string');
+      parameter1.setName('MyParameter1');
+      const parameter2 = new gd.ParameterMetadata();
+      parameter2.setType('number');
+      parameter2.setName('MyParameter2');
+      parameters.push_back(parameter1);
+      parameters.push_back(parameter2);
+      parameter1.delete();
+      parameter2.delete();
 
       const parser = new gd.ExpressionParser2();
       const expressionNode = parser.parseExpression(expression).get();
-      const completionDescriptions =
-        gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-          gd.JsPlatform.get(),
+      const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        gd.JsPlatform.get(),
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
           project,
-          layout,
-          type,
-          expressionNode,
-          // We're looking for completion for the character just before the caret.
-          Math.max(0, caretPosition - 1)
-        );
+          layout
+        )
+          .addPropertiesContainer(sharedPropertiesContainer)
+          .addPropertiesContainer(propertiesContainer)
+          .addParameters(parameters),
+        type,
+        expressionNode,
+        // We're looking for completion for the character just before the caret.
+        Math.max(0, caretPosition - 1)
+      );
 
+      const completionDescriptionAsStrings = [];
       for (let i = 0; i < completionDescriptions.size(); i++) {
         const completionDescription = completionDescriptions.at(i);
 
-        onCompletionDescription(completionDescription, i);
+        completionDescriptionAsStrings.push(completionDescription.toString());
       }
 
       parser.delete();
+      parameters.delete();
+      return completionDescriptionAsStrings;
     }
 
     it('completes an empty expression', function () {
-      expect.assertions(6);
-      testCompletions('number', '|', (completionDescription, index) => {
-        if (index === 0) {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Object
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        } else {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        }
-      });
+      // Verify we list everything (objects, variables, properties, expressions).
+      expect(testCompletions('number', '|')).toMatchInlineSnapshot(`
+Array [
+  "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, UnrelatedSpriteObject3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, UnrelatedVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 5, no type, 1, no prefix, UnrelatedProperty2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, no prefix, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
     });
 
     it('does not complete an expression with an operator', function () {
-      expect.assertions(0);
-      testCompletions('number', '1 +| ', (completionDescription, index) => {
-        // No elements returned, so this will not be called.
-        expect(completionDescription).toBe(undefined);
-      });
+      const completions = testCompletions('number', '1 +| ');
+      expect(completions).toHaveLength(0);
     });
 
     it('completes an expression with an operator and a prefix', function () {
-      expect.assertions(6);
-      testCompletions('number', '1 + My| ', (completionDescription, index) => {
-        if (index === 0) {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Object
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('My');
-        } else {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('My');
-        }
-      });
+      expect(testCompletions('number', '1 + My| ')).toMatchInlineSnapshot(`
+Array [
+  "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, My, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
     });
-    it('completes an expression with a partial object function', function () {
-      expect.assertions(8);
-      testCompletions(
-        'number',
-        '1 + MyObject.Func| ',
-        (completionDescription, index) => {
-          if (index == 0) {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Behavior
-            );
-            expect(completionDescription.getType()).toBe('');
-            expect(completionDescription.getPrefix()).toBe('Func');
-            expect(completionDescription.getObjectName()).toBe('MyObject');
-          } else {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Expression
-            );
-            expect(completionDescription.getType()).toBe('number');
-            expect(completionDescription.getPrefix()).toBe('Func');
-            expect(completionDescription.getObjectName()).toBe('MyObject');
-          }
-        }
-      );
+
+    it('completes an expression with an operator and a case insensitive search string', function () {
+      expect(testCompletions('number', '1 + OBJ| ')).toMatchInlineSnapshot(`
+Array [
+  "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, UnrelatedSpriteObject3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, OBJ, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      expect(testCompletions('number', '1 + VARI| ')).toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, UnrelatedVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, VARI, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
     });
+
+    it('completes an expression with an object function, behavior or object variable', function () {
+      // List variables, expressions and behaviors, if all of them are present:
+      expect(testCompletions('number', '1 + MySpriteObject.My| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 1, no type, 1, My, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, My, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      // Only list expressions and behaviors if no matching variables:
+      expect(testCompletions('number', '1 + MySpriteObject.Func| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 1, no type, 1, Func, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, Func, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
+    it('completes an expression with an object group function, behavior or variable', function () {
+      // List variables, expressions and behaviors, if all of them are present:
+      expect(testCompletions('number', '1 + MyObjectGroup.My| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 1, no type, 1, My, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, My, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      // Only list expressions and behaviors if no matching variables:
+      expect(testCompletions('number', '1 + MyObjectGroup.Func| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 1, no type, 1, Func, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, number, 1, Func, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
     it('completes an expression with a partial behavior function', function () {
-      expect.assertions(5);
-      testCompletions(
-        'number',
-        '1 + MyObject.MyBehavior::Func| ',
-        (completionDescription, index) => {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('Func');
-          expect(completionDescription.getObjectName()).toBe('MyObject');
-          expect(completionDescription.getBehaviorName()).toBe('MyBehavior');
-        }
-      );
+      expect(testCompletions('number', '1 + MySpriteObject.MyBehavior::Func| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 2, number, 1, Func, no completion, MySpriteObject, MyBehavior, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
     });
+
     it('completes an expression parameters', function () {
-      expect.assertions(6);
-      testCompletions(
-        'number',
-        '1 + MySpriteObject.PointX(a| ',
-        (completionDescription, index) => {
-          if (index === 0) {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Object
-            );
-            expect(completionDescription.getType()).toBe('string');
-            expect(completionDescription.getPrefix()).toBe('a');
-          } else {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Expression
-            );
-            expect(completionDescription.getType()).toBe('string');
-            expect(completionDescription.getPrefix()).toBe('a');
-          }
-        }
-      );
+      expect(testCompletions('number', '1 + MySpriteObject.PointX(My| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 0, string, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, string, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+  "{ 0, string, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 2, string, 1, My, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
+    it('completes legacy pre-scoped variables ("scenevar" and "globalvar")', function () {
+      expect(testCompletions('number', 'Variable(M|')).toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      expect(testCompletions('string', 'GlobalVariableString(M|'))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
+    it('completes an expression parameters (legacy pre-scoped variable)', function () {
+      // Verify only the object variable is autocompleted:
+      expect(testCompletions('number', '1 + MySpriteObject.Variable(My| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      expect(
+        testCompletions(
+          'string',
+          '"Score:" + MySpriteObject.VariableString(My| '
+        )
+      ).toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+    });
+
+    it('completes an expression parameters (group, legacy pre-scoped variable)', function () {
+      // Verify only the object group variable is autocompleted:
+      expect(testCompletions('number', '1 + MyObjectGroup.Variable(My| '))
+        .toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
+      expect(
+        testCompletions(
+          'string',
+          '"Score:" + MyObjectGroup.VariableString(My| '
+        )
+      ).toMatchInlineSnapshot(`
+Array [
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+]
+`);
     });
 
     // More tests are done in C++ for ExpressionCompletionFinder.

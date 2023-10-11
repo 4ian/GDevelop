@@ -4,8 +4,6 @@ namespace gdjs {
     tileMapCollisionMaskManager: gdjs.TileMap.TileMapRuntimeManager;
   }
   export namespace TileMap {
-    import PIXI = GlobalPIXIModule.PIXI;
-
     const logger = new gdjs.Logger('Tilemap object');
 
     /**

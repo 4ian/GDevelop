@@ -4,7 +4,7 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
   type HotReloaderLog,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 
 /** Represents what should be run when a preview is launched */
 export type PreviewState = {|

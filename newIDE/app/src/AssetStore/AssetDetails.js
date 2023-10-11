@@ -215,9 +215,11 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
 
     React.useEffect(
       () => {
-        loadAsset();
+        if (!asset) {
+          loadAsset();
+        }
       },
-      [loadAsset]
+      [asset, loadAsset]
     );
 
     const loadAuthorPublicProfiles = React.useCallback(

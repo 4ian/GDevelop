@@ -1,5 +1,5 @@
 // @flow
-import gesture from 'pixi-simple-gesture';
+import panable, { type PanMoveEvent } from '../../Utils/PixiSimpleGesture/pan';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import RenderedInstance from '../../ObjectsRendering/Renderers/RenderedInstance';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -154,17 +154,17 @@ export default class LayerRenderer {
         | null = this.getRendererOfInstance(instance);
       if (!renderedInstance) return;
 
-      const pixiObject = renderedInstance.getPixiObject();
+      const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) pixiObject.zOrder = instance.getZOrder();
 
       // "Culling" improves rendering performance of large levels
       const isVisible = this._isInstanceVisible(instance);
       if (pixiObject) {
         pixiObject.visible = isVisible;
-        pixiObject.interactive = !(
-          this.layer.isLocked() ||
-          (instance.isLocked() && instance.isSealed())
-        );
+        pixiObject.eventMode =
+          this.layer.isLocked() || (instance.isLocked() && instance.isSealed())
+            ? 'auto'
+            : 'static';
       }
       if (isVisible) renderedInstance.update();
 
@@ -218,6 +218,17 @@ export default class LayerRenderer {
     );
   };
 
+  getUnrotatedInstanceZMin = (instance: gdInitialInstance) => {
+    return (
+      instance.getZ() -
+      // 3D objects Z position is always the "Z min":
+      // (this.renderedInstances[instance.ptr]
+      //   ? this.renderedInstances[instance.ptr].getOriginZ()
+      //   : 0)
+      0
+    );
+  };
+
   getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
     const renderedInstance = this.renderedInstances[instance.ptr];
     const hasCustomSize = instance.hasCustomSize();
@@ -248,50 +259,13 @@ export default class LayerRenderer {
     const size = this.getUnrotatedInstanceSize(instance);
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
+    const zMin = this.getUnrotatedInstanceZMin(instance);
     const right = left + size[0];
     const bottom = top + size[1];
-    // TODO (3D): add support for zMin/zMax/depth.
-    bounds.set({ left, top, right, bottom });
+    const zMax = zMin + size[2];
+
+    bounds.set({ left, top, right, bottom, zMin, zMax });
     return bounds;
-  }
-
-  _getInstanceRotatedRectangle(instance: gdInitialInstance): Polygon {
-    const size = this.getUnrotatedInstanceSize(instance);
-    const left = this.getUnrotatedInstanceLeft(instance);
-    const top = this.getUnrotatedInstanceTop(instance);
-    const right = left + size[0];
-    const bottom = top + size[1];
-
-    const rectangle = this._temporaryRectanglePath;
-
-    rectangle[0][0] = left;
-    rectangle[0][1] = top;
-
-    rectangle[1][0] = left;
-    rectangle[1][1] = bottom;
-
-    rectangle[2][0] = right;
-    rectangle[2][1] = bottom;
-
-    rectangle[3][0] = right;
-    rectangle[3][1] = top;
-
-    let centerX = undefined;
-    let centerY = undefined;
-
-    if (this.renderedInstances[instance.ptr]) {
-      centerX = left + this.renderedInstances[instance.ptr].getCenterX();
-      centerY = top + this.renderedInstances[instance.ptr].getCenterY();
-    }
-
-    if (centerX === undefined || centerY === undefined) {
-      centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
-      centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
-    }
-
-    const angle = (instance.getAngle() * Math.PI) / 180;
-    rotatePolygon(rectangle, centerX, centerY, angle);
-    return rectangle;
   }
 
   getInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
@@ -300,8 +274,48 @@ export default class LayerRenderer {
       return this.getUnrotatedInstanceAABB(instance, bounds);
     }
 
-    const rotatedRectangle = this._getInstanceRotatedRectangle(instance);
+    const size = this.getUnrotatedInstanceSize(instance);
 
+    // Compute the rotated rectangle of the instance, so we can then
+    // compute the new, unrotated AABB out of it.
+    const rotatedRectangle = this._temporaryRectanglePath;
+    {
+      const unrotatedLeft = this.getUnrotatedInstanceLeft(instance);
+      const unrotatedTop = this.getUnrotatedInstanceTop(instance);
+      const unrotatedRight = unrotatedLeft + size[0];
+      const unrotatedBottom = unrotatedTop + size[1];
+
+      rotatedRectangle[0][0] = unrotatedLeft;
+      rotatedRectangle[0][1] = unrotatedTop;
+
+      rotatedRectangle[1][0] = unrotatedLeft;
+      rotatedRectangle[1][1] = unrotatedBottom;
+
+      rotatedRectangle[2][0] = unrotatedRight;
+      rotatedRectangle[2][1] = unrotatedBottom;
+
+      rotatedRectangle[3][0] = unrotatedRight;
+      rotatedRectangle[3][1] = unrotatedTop;
+
+      let centerX = undefined;
+      let centerY = undefined;
+
+      if (this.renderedInstances[instance.ptr]) {
+        centerX =
+          unrotatedLeft + this.renderedInstances[instance.ptr].getCenterX();
+        centerY =
+          unrotatedTop + this.renderedInstances[instance.ptr].getCenterY();
+      }
+
+      if (centerX === undefined || centerY === undefined) {
+        centerX = (rotatedRectangle[0][0] + rotatedRectangle[2][0]) / 2;
+        centerY = (rotatedRectangle[0][1] + rotatedRectangle[2][1]) / 2;
+      }
+
+      rotatePolygon(rotatedRectangle, centerX, centerY, angle);
+    }
+
+    // Compute the new, unrotated AABB from the rotated rectangle of the instance.
     let left = Number.MAX_VALUE;
     let right = -Number.MAX_VALUE;
     let top = Number.MAX_VALUE;
@@ -312,8 +326,13 @@ export default class LayerRenderer {
       top = Math.min(top, rotatedRectangle[i][1]);
       bottom = Math.max(bottom, rotatedRectangle[i][1]);
     }
-    // TODO (3D): add support for zMin/zMax/depth.
-    bounds.set({ left, top, right, bottom });
+
+    // Add the 3D coordinates, for which rotation is not considered
+    // (but could be if we have a full 3D editor one day).
+    const zMin = this.getUnrotatedInstanceZMin(instance);
+    const zMax = zMin + size[2];
+
+    bounds.set({ left, top, right, bottom, zMin, zMax });
     return bounds;
   }
 
@@ -341,20 +360,20 @@ export default class LayerRenderer {
         this._threeGroup
       );
 
-      renderedInstance._pixiObject.interactive = true;
-      gesture.panable(renderedInstance._pixiObject);
+      renderedInstance._pixiObject.eventMode = 'static';
+      panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
-      renderedInstance._pixiObject.on('click', event => {
+      renderedInstance._pixiObject.addEventListener('click', event => {
         if (event.data.originalEvent.button === 0)
           this.onInstanceClicked(instance);
       });
-      renderedInstance._pixiObject.on('doubleclick', () => {
+      renderedInstance._pixiObject.addEventListener('doubleclick', () => {
         this.onInstanceDoubleClicked(instance);
       });
-      renderedInstance._pixiObject.on('mouseover', () => {
+      renderedInstance._pixiObject.addEventListener('mouseover', () => {
         this.onOverInstance(instance);
       });
-      renderedInstance._pixiObject.on(
+      renderedInstance._pixiObject.addEventListener(
         'mousedown',
         (event: PIXI.InteractionEvent) => {
           if (event.data.originalEvent.button === 0) {
@@ -367,31 +386,34 @@ export default class LayerRenderer {
           }
         }
       );
-      renderedInstance._pixiObject.on('rightclick', interactionEvent => {
-        const {
-          data: { global: viewPoint, originalEvent: event },
-        } = interactionEvent;
+      renderedInstance._pixiObject.addEventListener(
+        'rightclick',
+        interactionEvent => {
+          const {
+            data: { global: viewPoint, originalEvent: event },
+          } = interactionEvent;
 
-        // First select the instance
-        const scenePoint = this.viewPosition.toSceneCoordinates(
-          viewPoint.x,
-          viewPoint.y
-        );
-        this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+          // First select the instance
+          const scenePoint = this.viewPosition.toSceneCoordinates(
+            viewPoint.x,
+            viewPoint.y
+          );
+          this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
 
-        // Then call right click callback
-        if (this.onInstanceRightClicked) {
-          this.onInstanceRightClicked({
-            offsetX: event.offsetX,
-            offsetY: event.offsetY,
-            x: event.clientX,
-            y: event.clientY,
-          });
+          // Then call right click callback
+          if (this.onInstanceRightClicked) {
+            this.onInstanceRightClicked({
+              offsetX: event.offsetX,
+              offsetY: event.offsetY,
+              x: event.clientX,
+              y: event.clientY,
+            });
+          }
+
+          return false;
         }
-
-        return false;
-      });
-      renderedInstance._pixiObject.on('touchstart', event => {
+      );
+      renderedInstance._pixiObject.addEventListener('touchstart', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
@@ -403,17 +425,20 @@ export default class LayerRenderer {
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
-      renderedInstance._pixiObject.on('mouseout', () => {
+      renderedInstance._pixiObject.addEventListener('mouseout', () => {
         this.onOutInstance(instance);
       });
-      renderedInstance._pixiObject.on('panmove', event => {
-        if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
-          return null;
-        }
+      renderedInstance._pixiObject.addEventListener(
+        'panmove',
+        (event: PanMoveEvent) => {
+          if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+            return null;
+          }
 
-        this.onMoveInstance(instance, event.deltaX, event.deltaY);
-      });
-      renderedInstance._pixiObject.on('panend', event => {
+          this.onMoveInstance(instance, event.deltaX, event.deltaY);
+        }
+      );
+      renderedInstance._pixiObject.addEventListener('panend', event => {
         this.onMoveInstanceEnd();
       });
     }
@@ -598,8 +623,9 @@ export default class LayerRenderer {
     const height = this._oldHeight;
     const resolution = pixiRenderer.resolution;
     this._renderTexture = PIXI.RenderTexture.create({
-      width,
-      height,
+      // A size of 0 is forbidden by Pixi.
+      width: width || 100,
+      height: height || 100,
       resolution,
     });
     this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
@@ -618,9 +644,10 @@ export default class LayerRenderer {
       this._oldWidth !== pixiRenderer.screen.width ||
       this._oldHeight !== pixiRenderer.screen.height
     ) {
+      // A size of 0 is forbidden by Pixi.
       this._renderTexture.resize(
-        pixiRenderer.screen.width,
-        pixiRenderer.screen.height
+        pixiRenderer.screen.width || 100,
+        pixiRenderer.screen.height || 100
       );
       this._oldWidth = pixiRenderer.screen.width;
       this._oldHeight = pixiRenderer.screen.height;

@@ -29,7 +29,6 @@ import {
 import {
   type NavigationState,
   type AssetStorePageState,
-  useNavigation,
   assetStoreHomePageState,
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
@@ -37,7 +36,7 @@ import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   getAssetPackFromUserFriendlySlug,
-  getPrivateAssetPackListingData,
+  getPrivateAssetPackListingDataFromUserFriendlySlug,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
@@ -86,7 +85,7 @@ type AssetStoreState = {|
   assetFiltersState: AssetFiltersState,
   assetPackFiltersState: AssetPackFiltersState,
   clearAllFilters: () => void,
-  navigationState: NavigationState,
+  shopNavigationState: NavigationState,
   currentPage: AssetStorePageState,
   useSearchItem: (
     searchText: string,
@@ -132,7 +131,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     setTypeFilter: filter => {},
   },
   clearAllFilters: () => {},
-  navigationState: {
+  shopNavigationState: {
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => assetStoreHomePageState,
     openHome: () => assetStoreHomePageState,
@@ -140,10 +139,19 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     clearPreviousPageFromHistory: () => {},
     openSearchResultPage: () => {},
     openTagPage: tag => {},
-    openAssetCategoryPage: category => {},
-    openPackPage: assetPack => {},
-    openDetailPage: assetShortHeader => {},
-    openPrivateAssetPackInformationPage: privateAssetPackListingData => {},
+    openShopCategoryPage: category => {},
+    openPackPage: ({ assetPack, previousSearchText }) => {},
+    openAssetDetailPage: ({ assetShortHeader, previousSearchText }) => {},
+    openPrivateAssetPackInformationPage: ({
+      privateAssetPackListingData,
+      previousSearchText,
+    }) => {},
+    openPrivateGameTemplateInformationPage: ({
+      privateGameTemplateListingData,
+      previousSearchText,
+    }) => {},
+    navigateInsideFolder: folder => {},
+    goBackToFolderIndex: index => {},
   },
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
@@ -153,6 +161,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
 
 type AssetStoreStateProviderProps = {|
   onlyAppStorePrivateAssetPacks?: ?boolean,
+  shopNavigationState: NavigationState,
   children: React.Node,
 |};
 
@@ -181,6 +190,7 @@ const getAssetPackRandomOrdering = (length: number): Array<number> => {
 
 export const AssetStoreStateProvider = ({
   onlyAppStorePrivateAssetPacks,
+  shopNavigationState,
   children,
 }: AssetStoreStateProviderProps) => {
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
@@ -221,7 +231,6 @@ export const AssetStoreStateProvider = ({
   const { showAlert } = useAlertDialog();
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
-  const navigationState = useNavigation();
 
   const [
     animatedFilter,
@@ -299,13 +308,13 @@ export const AssetStoreStateProvider = ({
 
         try {
           const {
-            publicAssetShortHeaders,
-            publicFilters,
-            publicAssetPacks,
+            publicAssetShortHeaders: fetchedPublicAssetShortHeaders,
+            publicFilters: fetchedPublicFilters,
+            publicAssetPacks: fetchedPublicAssetPacks,
           } = await listAllPublicAssets({ environment });
-          const authors = await listAllAuthors({ environment });
-          const licenses = await listAllLicenses({ environment });
-          const privateAssetPackListingDatas = await listListedPrivateAssetPacks(
+          const fetchedAuthors = await listAllAuthors({ environment });
+          const fetchedLicenses = await listAllLicenses({ environment });
+          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks(
             {
               onlyAppStorePrivateAssetPacks,
             }
@@ -313,15 +322,17 @@ export const AssetStoreStateProvider = ({
 
           console.info(
             `Loaded ${
-              publicAssetShortHeaders ? publicAssetShortHeaders.length : 0
+              fetchedPublicAssetShortHeaders
+                ? fetchedPublicAssetShortHeaders.length
+                : 0
             } assets from the asset store.`
           );
-          setPublicAssetPacks(publicAssetPacks);
-          setPublicAssetShortHeaders(publicAssetShortHeaders);
-          setFilters(publicFilters);
-          setAuthors(authors);
-          setLicenses(licenses);
-          setPrivateAssetPackListingDatas(privateAssetPackListingDatas);
+          setPublicAssetPacks(fetchedPublicAssetPacks);
+          setPublicAssetShortHeaders(fetchedPublicAssetShortHeaders);
+          setFilters(fetchedPublicFilters);
+          setAuthors(fetchedAuthors);
+          setLicenses(fetchedLicenses);
+          setPrivateAssetPackListingDatas(fetchedPrivateAssetPackListingDatas);
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -383,7 +394,7 @@ export const AssetStoreStateProvider = ({
         });
 
         if (assetPack) {
-          navigationState.openPackPage({
+          shopNavigationState.openPackPage({
             assetPack,
             previousSearchText: searchText,
           });
@@ -393,14 +404,16 @@ export const AssetStoreStateProvider = ({
         }
 
         // Otherwise, try to open the information page of a pack not yet bought.
-        const privateAssetPack = getPrivateAssetPackListingData({
-          privateAssetPackListingDatas,
-          userFriendlySlug: initialPackUserFriendlySlug,
-        });
+        const privateAssetPackListingData = getPrivateAssetPackListingDataFromUserFriendlySlug(
+          {
+            privateAssetPackListingDatas,
+            userFriendlySlug: initialPackUserFriendlySlug,
+          }
+        );
 
-        if (privateAssetPack) {
-          navigationState.openPrivateAssetPackInformationPage({
-            assetPack: privateAssetPack,
+        if (privateAssetPackListingData) {
+          shopNavigationState.openPrivateAssetPackInformationPage({
+            privateAssetPackListingData,
             previousSearchText: searchText,
           });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
@@ -418,7 +431,7 @@ export const AssetStoreStateProvider = ({
       publicAssetPacks,
       receivedAssetPacks,
       privateAssetPackListingDatas,
-      navigationState,
+      shopNavigationState,
       showAlert,
       initialPackUserFriendlySlug,
       searchText,
@@ -442,7 +455,10 @@ export const AssetStoreStateProvider = ({
       const publicAssetPacksByTag = {};
       publicAssetPacks.starterPacks.forEach(assetPack => {
         const tag = assetPack.tag;
-        if (publicAssetPacksByTag[tag]) {
+        if (
+          publicAssetPacksByTag[tag] &&
+          !assetPack.externalWebLink // Don't warn for external web links, as they can be used multiple times.
+        ) {
           console.warn(`Multiple public asset packs with the same tag: ${tag}`);
         }
         publicAssetPacksByTag[tag] = assetPack;
@@ -491,7 +507,7 @@ export const AssetStoreStateProvider = ({
     [assetPackCount, privateAssetPackCount]
   );
 
-  const currentPage = navigationState.getCurrentPage();
+  const currentPage = shopNavigationState.getCurrentPage();
   const { chosenCategory, chosenFilters } = currentPage.filtersState;
   const assetShortHeadersSearchResults: ?Array<AssetShortHeader> = useSearchItem(
     assetShortHeadersById,
@@ -595,7 +611,7 @@ export const AssetStoreStateProvider = ({
       environment,
       setEnvironment,
       error,
-      navigationState,
+      shopNavigationState,
       currentPage,
       searchText,
       setSearchText,
@@ -632,7 +648,7 @@ export const AssetStoreStateProvider = ({
       environment,
       setEnvironment,
       error,
-      navigationState,
+      shopNavigationState,
       currentPage,
       searchText,
       assetFiltersState,

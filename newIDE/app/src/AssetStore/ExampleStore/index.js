@@ -5,16 +5,25 @@ import { Column, Line } from '../../UI/Grid';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { ExampleStoreContext } from './ExampleStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
-import { ExampleListItem } from './ExampleListItem';
+import ExampleListItem from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
+import {
+  sendExampleDetailsOpened,
+  sendGameTemplateInformationOpened,
+} from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import PrivateGameTemplatePurchaseDialog from '../PrivateGameTemplates/PrivateGameTemplatePurchaseDialog';
+import PrivateGameTemplateInformationDialog from '../PrivateGameTemplates/PrivateGameTemplateInformationDialog';
+import PrivateGameTemplateListItem from '../PrivateGameTemplates/PrivateGameTemplateListItem';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 // When showing examples, always put the starters first.
-export const prepareExamples = (
+export const prepareExampleShortHeaders = (
   examples: Array<ExampleShortHeader>
 ): Array<ExampleShortHeader> =>
   examples.sort((example1, example2) => {
@@ -44,45 +53,60 @@ export const prepareExamples = (
     return 0;
   });
 
-const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
-  exampleShortHeader.name;
+const getItemUniqueId = (
+  item: ExampleShortHeader | PrivateGameTemplateListingData
+) => item.id;
 
 type Props = {|
   isOpening: boolean,
-  onOpen: ExampleShortHeader => Promise<void>,
+  onOpenNewProjectSetupDialog: () => void,
   focusOnMount?: boolean,
-  initialExampleShortHeader: ?ExampleShortHeader,
+  selectedExampleShortHeader: ?ExampleShortHeader,
+  onSelectExampleShortHeader: (?ExampleShortHeader) => void,
+  selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  onSelectPrivateGameTemplateListingData: (
+    ?PrivateGameTemplateListingData
+  ) => void,
 |};
 
 export const ExampleStore = ({
   isOpening,
-  onOpen,
+  onOpenNewProjectSetupDialog,
   focusOnMount,
-  initialExampleShortHeader,
+  // The example store is "controlled" by the parent. Useful as selected items are
+  // needed in MainFrame, to display them in NewProjectSetupDialog.
+  selectedExampleShortHeader,
+  onSelectExampleShortHeader,
+  selectedPrivateGameTemplateListingData,
+  onSelectPrivateGameTemplateListingData,
 }: Props) => {
+  const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(initialExampleShortHeader);
+    purchasingGameTemplateListingData,
+    setPurchasingGameTemplateListingData,
+  ] = React.useState<?PrivateGameTemplateListingData>(null);
   const {
-    filters,
-    searchResults,
-    error,
+    exampleFilters,
+    exampleShortHeadersSearchResults,
+    error: exampleStoreError,
     fetchExamplesAndFilters,
-    filtersState,
+    filtersState: exampleStoreFiltersState,
     searchText,
-    setSearchText,
+    setSearchText: setExampleStoreSearchText,
   } = React.useContext(ExampleStoreContext);
+  const {
+    gameTemplateFilters,
+    error: gameTemplateStoreError,
+    fetchGameTemplates,
+    exampleStore: {
+      privateGameTemplateListingDatasSearchResults,
+      filtersState: gameTemplateStoreFiltersState,
+      setSearchText: setGameTemplateStoreSearchText,
+    },
+  } = React.useContext(PrivateGameTemplateStoreContext);
 
   const shouldAutofocusSearchbar = useShouldAutofocusInput();
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
-
-  React.useEffect(
-    () => {
-      fetchExamplesAndFilters();
-    },
-    [fetchExamplesAndFilters]
-  );
 
   React.useEffect(
     () => {
@@ -92,24 +116,108 @@ export const ExampleStore = ({
     [shouldAutofocusSearchbar, focusOnMount]
   );
 
+  // Tags are applied to both examples and game templates.
   const tagsHandler = React.useMemo(
     () => ({
-      add: filtersState.addFilter,
-      remove: filtersState.removeFilter,
-      chosenTags: filtersState.chosenFilters,
+      add: (tag: string) => {
+        exampleStoreFiltersState.addFilter(tag);
+        gameTemplateStoreFiltersState.addFilter(tag);
+      },
+      remove: (tag: string) => {
+        exampleStoreFiltersState.removeFilter(tag);
+        gameTemplateStoreFiltersState.removeFilter(tag);
+      },
+      // We use the same tags for both examples and game templates, so we can
+      // use the tags from either store.
+      chosenTags: exampleStoreFiltersState.chosenFilters,
     }),
-    [filtersState]
+    [exampleStoreFiltersState, gameTemplateStoreFiltersState]
   );
 
-  const getExampleMatches = (
+  // We search in both examples and game templates stores.
+  const setSearchText = React.useCallback(
+    (searchText: string) => {
+      setExampleStoreSearchText(searchText);
+      setGameTemplateStoreSearchText(searchText);
+    },
+    [setExampleStoreSearchText, setGameTemplateStoreSearchText]
+  );
+
+  const fetchGameTemplatesAndExamples = React.useCallback(
+    () => {
+      fetchGameTemplates();
+      fetchExamplesAndFilters();
+    },
+    [fetchGameTemplates, fetchExamplesAndFilters]
+  );
+
+  // Load examples and game templates on mount.
+  React.useEffect(
+    () => {
+      fetchGameTemplatesAndExamples();
+    },
+    [fetchGameTemplatesAndExamples]
+  );
+
+  const getExampleShortHeaderMatches = (
     exampleShortHeader: ExampleShortHeader
   ): SearchMatch[] => {
-    if (!searchResults) return [];
-    const exampleMatches = searchResults.find(
+    if (!exampleShortHeadersSearchResults) return [];
+    const exampleMatches = exampleShortHeadersSearchResults.find(
       result => result.item.id === exampleShortHeader.id
     );
     return exampleMatches ? exampleMatches.matches : [];
   };
+
+  const getPrivateAssetPackListingDataMatches = (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ): SearchMatch[] => {
+    if (!privateGameTemplateListingDatasSearchResults) return [];
+    const gameTemplateMatches = privateGameTemplateListingDatasSearchResults.find(
+      result => result.item.id === privateGameTemplateListingData.id
+    );
+    return gameTemplateMatches ? gameTemplateMatches.matches : [];
+  };
+
+  const searchItems: (
+    | ExampleShortHeader
+    | PrivateGameTemplateListingData
+  )[] = React.useMemo(
+    () => {
+      const searchItems = [];
+      const privateGameTemplateItems = privateGameTemplateListingDatasSearchResults
+        ? privateGameTemplateListingDatasSearchResults.map(({ item }) => item)
+        : [];
+      const exampleShortHeaderItems = exampleShortHeadersSearchResults
+        ? exampleShortHeadersSearchResults.map(({ item }) => item)
+        : [];
+
+      for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
+        searchItems.push(exampleShortHeaderItems[i]);
+        if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
+          const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+          if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
+            searchItems.push(
+              privateGameTemplateItems[nextPrivateGameTemplateIndex]
+            );
+        }
+      }
+
+      return searchItems;
+    },
+    [
+      exampleShortHeadersSearchResults,
+      privateGameTemplateListingDatasSearchResults,
+    ]
+  );
+
+  const defaultTags = React.useMemo(
+    () => [
+      ...(exampleFilters ? exampleFilters.defaultTags : []),
+      ...(gameTemplateFilters ? gameTemplateFilters.defaultTags : []),
+    ],
+    [exampleFilters, gameTemplateFilters]
+  );
 
   return (
     <React.Fragment>
@@ -123,7 +231,7 @@ export const ExampleStore = ({
                   onChange={setSearchText}
                   onRequestSearch={() => {}}
                   tagsHandler={tagsHandler}
-                  tags={filters && filters.defaultTags}
+                  tags={defaultTags}
                   ref={searchBarRef}
                   placeholder={t`Search examples`}
                 />
@@ -138,28 +246,54 @@ export const ExampleStore = ({
             >
               <ListSearchResults
                 disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-                onRetry={fetchExamplesAndFilters}
-                error={error}
-                searchItems={
-                  searchResults &&
-                  prepareExamples(searchResults.map(({ item }) => item))
-                }
-                getSearchItemUniqueId={getExampleName}
-                renderSearchItem={(exampleShortHeader, onHeightComputed) => (
-                  <ExampleListItem
-                    isOpening={isOpening}
-                    onHeightComputed={onHeightComputed}
-                    exampleShortHeader={exampleShortHeader}
-                    matches={getExampleMatches(exampleShortHeader)}
-                    onChoose={() => {
-                      sendExampleDetailsOpened(exampleShortHeader.slug);
-                      setSelectedExampleShortHeader(exampleShortHeader);
-                    }}
-                    onOpen={() => {
-                      onOpen(exampleShortHeader);
-                    }}
-                  />
-                )}
+                onRetry={fetchGameTemplatesAndExamples}
+                error={gameTemplateStoreError || exampleStoreError}
+                searchItems={searchItems}
+                getSearchItemUniqueId={getItemUniqueId}
+                renderSearchItem={(item, onHeightComputed) => {
+                  if (item.authorIds) {
+                    // This is an ExampleShortHeader.
+                    return (
+                      <ExampleListItem
+                        isOpening={isOpening}
+                        onHeightComputed={onHeightComputed}
+                        exampleShortHeader={item}
+                        matches={getExampleShortHeaderMatches(item)}
+                        onChoose={() => {
+                          sendExampleDetailsOpened(item.slug);
+                          onSelectExampleShortHeader(item);
+                        }}
+                        onOpen={onOpenNewProjectSetupDialog}
+                      />
+                    );
+                  }
+                  if (item.listing) {
+                    // This is a PrivateGameTemplateListingData.
+                    const isTemplateOwned =
+                      !!receivedGameTemplates &&
+                      !!receivedGameTemplates.find(
+                        template => template.id === item.id
+                      );
+                    return (
+                      <PrivateGameTemplateListItem
+                        isOpening={isOpening}
+                        onHeightComputed={onHeightComputed}
+                        privateGameTemplateListingData={item}
+                        matches={getPrivateAssetPackListingDataMatches(item)}
+                        onChoose={() => {
+                          onSelectPrivateGameTemplateListingData(item);
+                          sendGameTemplateInformationOpened({
+                            gameTemplateName: item.name,
+                            gameTemplateId: item.id,
+                            source: 'examples-list',
+                          });
+                        }}
+                        owned={isTemplateOwned}
+                      />
+                    );
+                  }
+                  return null; // Should not happen.
+                }}
               />
             </Line>
           </Column>
@@ -169,10 +303,29 @@ export const ExampleStore = ({
         <ExampleDialog
           isOpening={isOpening}
           exampleShortHeader={selectedExampleShortHeader}
-          onOpen={() => {
-            onOpen(selectedExampleShortHeader);
+          onOpen={onOpenNewProjectSetupDialog}
+          onClose={() => onSelectExampleShortHeader(null)}
+        />
+      )}
+      {!!selectedPrivateGameTemplateListingData && (
+        <PrivateGameTemplateInformationDialog
+          privateGameTemplateListingData={
+            selectedPrivateGameTemplateListingData
+          }
+          isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
+          onGameTemplateOpen={onOpenNewProjectSetupDialog}
+          onOpenPurchaseDialog={() => {
+            setPurchasingGameTemplateListingData(
+              selectedPrivateGameTemplateListingData
+            );
           }}
-          onClose={() => setSelectedExampleShortHeader(null)}
+          onClose={() => onSelectPrivateGameTemplateListingData(null)}
+        />
+      )}
+      {!!purchasingGameTemplateListingData && (
+        <PrivateGameTemplatePurchaseDialog
+          privateGameTemplateListingData={purchasingGameTemplateListingData}
+          onClose={() => setPurchasingGameTemplateListingData(null)}
         />
       )}
     </React.Fragment>

@@ -11,6 +11,8 @@
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Events/Expression.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/String.h"
 
 using namespace std;
@@ -47,7 +49,14 @@ bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
   for (std::size_t j = 0; j < actionsVectors.size(); ++j)
     VisitInstructionList(*actionsVectors[j], false);
 
-  return false;
+  auto allExpressionsWithMetadata = event.GetAllExpressionsWithMetadata();
+  for (auto& expressionAndMetadata : allExpressionsWithMetadata) {
+    shouldDelete |= VisitEventExpression(
+      *expressionAndMetadata.first, expressionAndMetadata.second);
+  }
+
+
+  return shouldDelete;
 }
 
 bool ArbitraryEventsWorker::VisitLinkEvent(gd::LinkEvent& linkEvent) {
@@ -73,6 +82,11 @@ void ArbitraryEventsWorker::VisitInstructionList(
 bool ArbitraryEventsWorker::VisitInstruction(gd::Instruction& instruction,
                                              bool isCondition) {
   return DoVisitInstruction(instruction, isCondition);
+}
+
+bool ArbitraryEventsWorker::VisitEventExpression(gd::Expression& expression,
+                                                 const gd::ParameterMetadata& metadata) {
+  return DoVisitEventExpression(expression, metadata);
 }
 
 ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
@@ -139,6 +153,12 @@ void ReadOnlyArbitraryEventsWorker::VisitInstructionList(
 void ReadOnlyArbitraryEventsWorker::VisitInstruction(const gd::Instruction& instruction,
                                              bool isCondition) {
   DoVisitInstruction(instruction, isCondition);
+}
+
+
+void ReadOnlyArbitraryEventsWorker::VisitEventExpression(const gd::Expression& expression,
+                                                 const gd::ParameterMetadata& metadata) {
+  DoVisitEventExpression(expression, metadata);
 }
 
 void ReadOnlyArbitraryEventsWorker::StopAnyEventIteration() {

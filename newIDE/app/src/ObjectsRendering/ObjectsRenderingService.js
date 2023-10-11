@@ -28,9 +28,6 @@ const PIXI = { ...PIXI_LEGACY, ...PIXI_SPINE };
 // This can be removed if no more extension PixiJS plugin requires this.
 // global.PIXI = PIXI;
 global.PIXI = PIXI;
-// We also export it as GlobalPIXIModule, which is normally used in GDJS runtime and extensions
-// to allow TypeScript typings of PIXI to work.
-global.GlobalPIXIModule = { PIXI };
 
 const requirableModules = {};
 

@@ -43,6 +43,10 @@ export type BehaviorShortHeader = {|
   description: string,
   extensionName: string,
   objectType: string,
+  /**
+   * All required behaviors including transitive ones.
+   */
+  allRequiredBehaviorTypes: Array<string>,
   /** This attribute is calculated.
    * @see adaptBehaviorHeader
    */

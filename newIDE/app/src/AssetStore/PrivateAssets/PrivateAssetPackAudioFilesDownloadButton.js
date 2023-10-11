@@ -7,12 +7,15 @@ import { Trans } from '@lingui/macro';
 import Music from '../../UI/CustomSvgIcons/Music';
 import Window from '../../Utils/Window';
 import { Column } from '../../UI/Grid';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const PrivateAssetPackAudioFilesDownloadButton = ({
   assetPack,
 }: {|
   assetPack: PrivateAssetPack,
 |}) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
@@ -28,6 +31,8 @@ const PrivateAssetPackAudioFilesDownloadButton = ({
         label={
           isAudioArchiveUrlLoading ? (
             <Trans>Loading...</Trans>
+          ) : isMobileScreen ? (
+            <Trans>Pack sounds</Trans>
           ) : (
             <Trans>Download pack sounds</Trans>
           )

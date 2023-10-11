@@ -245,17 +245,15 @@ const cleanUpProjectFileName = (projectFileName: string) =>
     .replace(consecutiveSpacesRegex, ' ')
     .trim();
 
-export const onRenderNewProjectSaveAsLocationChooser = ({
+export const getProjectLocation = ({
   projectName,
   saveAsLocation,
-  setSaveAsLocation,
   newProjectsDefaultFolder,
 }: {
   projectName: string,
   saveAsLocation: ?SaveAsLocation,
-  setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
-}) => {
+}): SaveAsLocation => {
   const outputPath = saveAsLocation
     ? path.dirname(saveAsLocation.fileIdentifier)
     : newProjectsDefaultFolder
@@ -264,21 +262,46 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
   const projectFileName = projectName
     ? cleanUpProjectFileName(projectName) + '.json'
     : 'game.json';
-  if (!saveAsLocation) {
-    setSaveAsLocation({
-      fileIdentifier: path.join(outputPath, projectFileName),
-    });
-  }
+  return {
+    fileIdentifier: path.join(outputPath, projectFileName),
+  };
+};
 
+export const renderNewProjectSaveAsLocationChooser = ({
+  projectName,
+  saveAsLocation,
+  setSaveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
+|}) => {
+  const projectLocation = getProjectLocation({
+    projectName,
+    saveAsLocation,
+    newProjectsDefaultFolder,
+  });
   return (
     <LocalFolderPicker
       fullWidth
-      value={outputPath}
-      onChange={newOutputPath =>
-        setSaveAsLocation({
-          fileIdentifier: path.join(newOutputPath, projectFileName),
-        })
-      }
+      value={path.dirname(projectLocation.fileIdentifier)}
+      onChange={newOutputPath => {
+        const newOutputFileIdentifier = path.join(
+          newOutputPath,
+          path.basename(projectLocation.fileIdentifier)
+        );
+        setSaveAsLocation(
+          getProjectLocation({
+            projectName,
+            saveAsLocation: {
+              fileIdentifier: newOutputFileIdentifier,
+            },
+            newProjectsDefaultFolder,
+          })
+        );
+      }}
       type="create-game"
     />
   );

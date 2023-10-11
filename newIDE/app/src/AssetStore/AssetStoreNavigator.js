@@ -6,13 +6,18 @@ import {
   type PublicAssetPack,
   type PrivateAssetPack,
 } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 
 export type AssetStorePageState = {|
   openedAssetPack: PublicAssetPack | PrivateAssetPack | null,
-  openedAssetCategory: string | null,
+  openedShopCategory: string | null,
   openedAssetShortHeader: ?AssetShortHeader,
   openedPrivateAssetPackListingData: ?PrivateAssetPackListingData,
+  openedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  selectedFolders: Array<string>,
   filtersState: FiltersState,
   scrollPosition?: ?number,
   displayAssets: boolean,
@@ -27,19 +32,25 @@ export type NavigationState = {|
   clearPreviousPageFromHistory: () => void,
   openSearchResultPage: () => void,
   openTagPage: string => void,
-  openAssetCategoryPage: string => void,
+  openShopCategoryPage: string => void,
   openPackPage: ({|
     assetPack: PublicAssetPack | PrivateAssetPack,
     previousSearchText: string,
   |}) => void,
   openPrivateAssetPackInformationPage: ({|
-    assetPack: PrivateAssetPackListingData,
+    privateAssetPackListingData: PrivateAssetPackListingData,
     previousSearchText: string,
   |}) => void,
-  openDetailPage: ({|
+  openPrivateGameTemplateInformationPage: ({|
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    previousSearchText: string,
+  |}) => void,
+  openAssetDetailPage: ({|
     assetShortHeader: AssetShortHeader,
     previousSearchText: string,
   |}) => void,
+  navigateInsideFolder: string => void,
+  goBackToFolderIndex: number => void,
 |};
 
 const noFilter: FiltersState = {
@@ -52,18 +63,22 @@ const noFilter: FiltersState = {
 
 export const assetStoreHomePageState: AssetStorePageState = {
   openedAssetShortHeader: null,
-  openedAssetCategory: null,
+  openedShopCategory: null,
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
+  openedPrivateGameTemplateListingData: null,
+  selectedFolders: [],
   filtersState: noFilter,
   displayAssets: false,
 };
 
 const searchPageState: AssetStorePageState = {
   openedAssetShortHeader: null,
-  openedAssetCategory: null,
+  openedShopCategory: null,
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
+  openedPrivateGameTemplateListingData: null,
+  selectedFolders: [],
   filtersState: noFilter,
   displayAssets: true,
 };
@@ -73,6 +88,7 @@ export const isHomePage = (pageState: AssetStorePageState) => {
     pageState === assetStoreHomePageState ||
     (!pageState.openedAssetShortHeader &&
       !pageState.openedPrivateAssetPackListingData &&
+      !pageState.openedPrivateGameTemplateListingData &&
       !pageState.openedAssetPack &&
       pageState.filtersState === noFilter &&
       !pageState.displayAssets)
@@ -83,7 +99,8 @@ export const isSearchResultPage = (pageState: AssetStorePageState) => {
   return (
     !isHomePage(pageState) &&
     !pageState.openedAssetShortHeader &&
-    !pageState.openedPrivateAssetPackListingData
+    !pageState.openedPrivateAssetPackListingData &&
+    !pageState.openedPrivateGameTemplateListingData
   );
 };
 
@@ -91,7 +108,7 @@ type AssetStorePageHistory = {|
   previousPages: Array<AssetStorePageState>,
 |};
 
-export const useNavigation = (): NavigationState => {
+export const useShopNavigation = (): NavigationState => {
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],
   });
@@ -166,9 +183,10 @@ export const useNavigation = (): NavigationState => {
             ...previousHistory.previousPages,
             {
               openedAssetShortHeader: null,
-              openedAssetCategory: null,
+              openedShopCategory: null,
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
+              openedPrivateGameTemplateListingData: null,
               displayAssets: true,
               filtersState: {
                 chosenCategory: {
@@ -180,22 +198,25 @@ export const useNavigation = (): NavigationState => {
                 removeFilter: () => {},
                 setChosenCategory: () => {},
               },
+              selectedFolders: [tag],
             },
           ],
         }));
       },
-      openAssetCategoryPage: (category: string) => {
+      openShopCategoryPage: (category: string) => {
         setHistory(previousHistory => ({
           ...previousHistory,
           previousPages: [
             ...previousHistory.previousPages,
             {
               openedAssetShortHeader: null,
-              openedAssetCategory: category,
+              openedShopCategory: category,
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
+              openedPrivateGameTemplateListingData: null,
               filtersState: noFilter,
               displayAssets: false,
+              selectedFolders: [],
             },
           ],
         }));
@@ -230,10 +251,11 @@ export const useNavigation = (): NavigationState => {
               ...previousPages,
               {
                 openedAssetShortHeader: null,
-                openedAssetCategory:
-                  (currentPage && currentPage.openedAssetCategory) || null,
+                openedShopCategory:
+                  (currentPage && currentPage.openedShopCategory) || null,
                 openedAssetPack: assetPack,
                 openedPrivateAssetPackListingData: null,
+                openedPrivateGameTemplateListingData: null,
                 displayAssets: true,
                 filtersState: {
                   chosenCategory: {
@@ -249,16 +271,17 @@ export const useNavigation = (): NavigationState => {
                   removeFilter: () => {},
                   setChosenCategory: () => {},
                 },
+                selectedFolders: [assetPack.tag],
               },
             ],
           };
         });
       },
       openPrivateAssetPackInformationPage: ({
-        assetPack,
+        privateAssetPackListingData,
         previousSearchText,
       }: {|
-        assetPack: PrivateAssetPackListingData,
+        privateAssetPackListingData: PrivateAssetPackListingData,
         previousSearchText: string,
       |}) => {
         setHistory(previousHistory => {
@@ -284,17 +307,19 @@ export const useNavigation = (): NavigationState => {
               ...previousPages,
               {
                 openedAssetShortHeader: null,
-                openedAssetCategory: null,
+                openedShopCategory: null,
                 openedAssetPack: null,
-                openedPrivateAssetPackListingData: assetPack,
+                openedPrivateAssetPackListingData: privateAssetPackListingData,
+                openedPrivateGameTemplateListingData: null,
                 filtersState: noFilter,
                 displayAssets: false,
+                selectedFolders: [],
               },
             ],
           };
         });
       },
-      openDetailPage: ({
+      openAssetDetailPage: ({
         assetShortHeader,
         previousSearchText,
       }: {|
@@ -324,13 +349,108 @@ export const useNavigation = (): NavigationState => {
               ...previousPages,
               {
                 openedAssetShortHeader: assetShortHeader,
-                openedAssetCategory: null,
+                openedShopCategory: null,
                 openedAssetPack: null,
                 openedPrivateAssetPackListingData: null,
+                openedPrivateGameTemplateListingData: null,
                 filtersState: noFilter,
                 displayAssets: false,
+                selectedFolders: [],
               },
             ],
+          };
+        });
+      },
+      openPrivateGameTemplateInformationPage: ({
+        privateGameTemplateListingData,
+        previousSearchText,
+      }: {|
+        privateGameTemplateListingData: PrivateGameTemplateListingData,
+        previousSearchText: string,
+      |}) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSearchText = {
+            ...currentPage,
+            searchText: previousSearchText,
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSearchText,
+          ];
+          return {
+            ...previousHistory,
+            previousPages: [
+              ...previousPages,
+              {
+                openedAssetShortHeader: null,
+                openedShopCategory: null,
+                openedAssetPack: null,
+                openedPrivateAssetPackListingData: null,
+                openedPrivateGameTemplateListingData: privateGameTemplateListingData,
+                filtersState: noFilter,
+                displayAssets: false,
+                selectedFolders: [],
+              },
+            ],
+          };
+        });
+      },
+      navigateInsideFolder: (folderTag: string) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSelectedFolder = {
+            ...currentPage,
+            selectedFolders: [...currentPage.selectedFolders, folderTag],
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSelectedFolder,
+          ];
+          return {
+            ...previousHistory,
+            previousPages,
+          };
+        });
+      },
+      goBackToFolderIndex: (folderIndex: number) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSelectedFolder = {
+            ...currentPage,
+            selectedFolders: currentPage.selectedFolders.slice(
+              0,
+              folderIndex + 1
+            ),
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSelectedFolder,
+          ];
+          return {
+            ...previousHistory,
+            previousPages,
           };
         });
       },

@@ -17,6 +17,7 @@ const defaultShortcuts: ShortcutMap = {
   SAVE_PROJECT_AS: 'CmdOrCtrl+Shift+KeyS',
   CLOSE_PROJECT: 'CmdOrCtrl+KeyW',
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
+  INVITE_COLLABORATORS: 'CmdOrCtrl+Shift+KeyI',
   OPEN_RECENT_PROJECT: '',
   OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyP',
 
@@ -55,6 +56,7 @@ const defaultShortcuts: ShortcutMap = {
   TOGGLE_EVENT_DISABLED: 'KeyD',
   TOGGLE_CONDITION_INVERTED: 'KeyJ',
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',
+  MOVE_EVENTS_IN_NEW_GROUP: 'CmdOrCtrl+KeyG',
   OPEN_EXTENSION_SETTINGS: '',
 };
 

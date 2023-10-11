@@ -31,7 +31,7 @@ class TextObjectJsExtension : public gd::PlatformExtension {
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::Scale"]
         .SetFunctionName("setScale")
-        .SetGetter("getScale");
+        .SetGetter("getScaleMean");
     GetAllActionsForObject("TextObject::Text")["TextObject::ScaleX"]
         .SetFunctionName("setScaleX")
         .SetGetter("getScaleX");

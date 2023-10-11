@@ -15,6 +15,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -25,10 +26,10 @@ type Props = {|
   /** If specified, only this object type should be allowed to be selected. */
   allowedObjectType?: ?string,
   /**
-   * If specified, an object without this required capability won't be selectable.
-   * Note that this does not work with groups - which are assumed to have all capabilities.
+   * If specified, an object without these behaviors won't be selectable.
+   * Note that groups with at least 1 incompatible object won't be shown.
    */
-  requiredObjectCapability?: ?string,
+  requiredBehaviorTypes?: Array<string>,
 
   noGroups?: boolean,
 
@@ -60,6 +61,7 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
+  requiredBehaviorTypes,
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
@@ -67,14 +69,16 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
+  requiredBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
-  const list = enumerateObjectsAndGroups(
+  const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
     globalObjectsContainer,
     objectsContainer,
-    allowedObjectType || undefined
+    allowedObjectType || undefined,
+    requiredBehaviorTypes || []
   );
-  const objects = list.allObjectsList.map(({ object }) => {
+  const objects = allObjectsList.map(({ object }) => {
     return {
       text: object.getName(),
       value: object.getName(),
@@ -93,7 +97,7 @@ const getObjectsAndGroupsDataSource = ({
   });
   const groups = noGroups
     ? []
-    : list.allGroupsList.map(({ group }) => {
+    : allGroupsList.map(({ group }) => {
         return {
           text: group.getName(),
           value: group.getName(),
@@ -113,21 +117,18 @@ const getObjectsAndGroupsDataSource = ({
     : fullList;
 };
 
-const checkHasRequiredCapability = ({
-  project,
+export const checkHasRequiredCapability = ({
   globalObjectsContainer,
   objectsContainer,
-  requiredObjectCapability,
+  requiredBehaviorTypes,
   objectName,
 }: {|
-  project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  requiredObjectCapability: ?string,
   objectName: string,
+  requiredBehaviorTypes?: Array<string>,
 |}) => {
-  if (!requiredObjectCapability) return true;
-  if (!project) return true;
+  if (!requiredBehaviorTypes || requiredBehaviorTypes.length === 0) return true;
 
   const object = getObjectByName(
     globalObjectsContainer,
@@ -141,12 +142,17 @@ const checkHasRequiredCapability = ({
     return true;
   }
 
-  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-    project.getCurrentPlatform(),
-    object.getType()
-  );
-  return !objectMetadata.isUnsupportedBaseObjectCapability(
-    requiredObjectCapability
+  return requiredBehaviorTypes.every(
+    behaviorType =>
+      gd
+        .getBehaviorNamesInObjectOrGroup(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName,
+          behaviorType,
+          false
+        )
+        .size() > 0
   );
 };
 
@@ -171,7 +177,6 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       globalObjectsContainer,
       objectsContainer,
       allowedObjectType,
-      requiredObjectCapability,
       noGroups,
       errorTextIfInvalid,
       margin,
@@ -180,6 +185,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       id,
       excludedObjectOrGroupNames,
       hintText,
+      requiredBehaviorTypes,
       ...otherProps
     } = props;
 
@@ -189,6 +195,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       objectsContainer,
       noGroups,
       allowedObjectType,
+      requiredBehaviorTypes,
       excludedObjectOrGroupNames,
     });
 
@@ -198,13 +205,11 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       ).length !== 0;
 
     const hasObjectWithRequiredCapability = checkHasRequiredCapability({
-      project,
-      requiredObjectCapability,
       globalObjectsContainer,
       objectsContainer,
       objectName: value,
+      requiredBehaviorTypes,
     });
-
     const errorText = !hasObjectWithRequiredCapability ? (
       <Trans>This object exists, but can't be used here.</Trans>
     ) : !hasValidChoice ? (

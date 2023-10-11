@@ -7,12 +7,14 @@ export type Route =
   | 'guided-lesson' // New way of opening a tutorial.
   | 'subscription'
   | 'games-dashboard'
-  | 'asset-store';
+  | 'asset-store' // For compatibility when there was only asset packs.
+  | 'store'; // New way of opening the store.
 type RouteKey =
   | 'initial-dialog'
   | 'game-id'
   | 'games-dashboard-tab'
   | 'asset-pack'
+  | 'game-template'
   | 'tutorial-id';
 export type RouteArguments = { [RouteKey]: string };
 

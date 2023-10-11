@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -12,6 +11,7 @@ import {
   fakeSilverAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore',
@@ -41,26 +41,29 @@ const apiDataFakePacks = {
   ],
 };
 
+const Wrapper = ({ children }: { children: React.Node }) => {
+  const navigationState = useShopNavigation();
+  return (
+    <FixedHeightFlexContainer height={500}>
+      <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+        <AssetStoreStateProvider shopNavigationState={navigationState}>
+          {children}
+        </AssetStoreStateProvider>
+      </AuthenticatedUserContext.Provider>
+    </FixedHeightFlexContainer>
+  );
+};
+
 export const Default = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <AssetStoreStateProvider>
-        <AssetStore />
-      </AssetStoreStateProvider>
-    </AuthenticatedUserContext.Provider>
-  </FixedHeightFlexContainer>
+  <Wrapper>
+    <AssetStore />
+  </Wrapper>
 );
-Default.decorators = [withMock];
 Default.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <AssetStoreStateProvider>
-        <AssetStore />
-      </AssetStoreStateProvider>
-    </AuthenticatedUserContext.Provider>
-  </FixedHeightFlexContainer>
+  <Wrapper>
+    <AssetStore />
+  </Wrapper>
 );
-LoadingError.decorators = [withMock];
 LoadingError.parameters = apiDataServerSideError;

@@ -12,6 +12,7 @@ import {
 import {
   type AssetShortHeader,
   type PrivateAssetPack,
+  type PrivateGameTemplate,
 } from '../Utils/GDevelopServices/Asset';
 
 export type AuthenticatedUser = {|
@@ -24,6 +25,7 @@ export type AuthenticatedUser = {|
   cloudProjectsFetchingErrorLabel: ?React.Node,
   receivedAssetPacks: ?Array<PrivateAssetPack>,
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
+  receivedGameTemplates: ?Array<PrivateGameTemplate>,
   limits: ?Limits,
   usages: ?Usages,
   subscription: ?Subscription,
@@ -58,6 +60,7 @@ export const initialAuthenticatedUser = {
   cloudProjectsFetchingErrorLabel: null,
   receivedAssetPacks: null,
   receivedAssetShortHeaders: null,
+  receivedGameTemplates: null,
   subscription: null,
   usages: null,
   limits: null,
@@ -91,6 +94,7 @@ export const authenticatedUserLoggedOutAttributes = {
   cloudProjectsFetchingErrorLabel: null,
   receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
   receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
+  receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
   subscription: null,
   usages: null,
   limits: null,

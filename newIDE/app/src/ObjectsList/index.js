@@ -743,8 +743,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Edit effects`),
             click: () => onEditObject(object, 'effects'),
-            enabled: !objectMetadata.isUnsupportedBaseObjectCapability(
-              'effect'
+            enabled: objectMetadata.hasDefaultBehavior(
+              'EffectCapacity::EffectBehavior'
             ),
           },
           eventsFunctionsExtensionWriter &&

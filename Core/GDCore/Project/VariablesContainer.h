@@ -137,6 +137,11 @@ class GD_CORE_API VariablesContainer {
    * \brief Clear all variables of the container.
    */
   inline void Clear() { variables.clear(); }
+
+  /**
+   * \brief Call the callback for each variable with a name matching the specified search.
+   */
+  void ForEachVariableMatchingSearch(const gd::String& search, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
   ///@}
 
   /** \name Saving and loading
@@ -152,10 +157,30 @@ class GD_CORE_API VariablesContainer {
    * \brief Unserialize the variable container.
    */
   void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Reset the persistent UUID, used to recognize
+   * the same variables between serialization.
+   */
+  VariablesContainer& ResetPersistentUuid();
+
+  /**
+   * \brief Remove the persistent UUID - when the variables no
+   * longer need to be recognized between serializations.
+   */
+  VariablesContainer& ClearPersistentUuid();
+
+  /**
+   * \brief Get the persistent UUID used to recognize
+   * the same variables between serialization.
+   */
+  const gd::String& GetPersistentUuid() const { return persistentUuid; };
   ///@}
 
  private:
   std::vector<std::pair<gd::String, std::shared_ptr<gd::Variable>>> variables;
+  mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
+                                      ///< useful for computing changesets.
   static gd::Variable badVariable;
   static gd::String badName;
 

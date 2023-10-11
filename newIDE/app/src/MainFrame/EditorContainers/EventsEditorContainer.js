@@ -90,6 +90,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         unsavedChanges={this.props.unsavedChanges}
         project={project}
         scope={{
+          project,
           layout,
         }}
         globalObjectsContainer={project}

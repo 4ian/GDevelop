@@ -304,7 +304,7 @@ export const FileToCloudProjectResourceUploader = ({
       )}
       <LineStackLayout alignItems="center" justifyContent="stretch" expand>
         {isUploading ? (
-          <LinearProgress expand value={uploadProgress} variant="determinate" />
+          <LinearProgress value={uploadProgress} variant="determinate" />
         ) : null}
       </LineStackLayout>
       {error && (

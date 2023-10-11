@@ -53,7 +53,7 @@ import { ShortcutsReminder } from './ShortcutsReminder';
 import Paper from '../UI/Paper';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProjectDialog';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -1156,6 +1156,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             </List>
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog
+                project={project}
                 title={<Trans>Global Variables</Trans>}
                 open
                 variablesContainer={project.getVariables()}

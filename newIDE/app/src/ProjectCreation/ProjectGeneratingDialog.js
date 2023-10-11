@@ -5,7 +5,7 @@ import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { type NewProjectSetup } from './CreateProjectDialog';
+import { type NewProjectSetup } from './NewProjectSetupDialog';
 import { ColumnStackLayout } from '../UI/Layout';
 import { LargeSpacer } from '../UI/Grid';
 import {

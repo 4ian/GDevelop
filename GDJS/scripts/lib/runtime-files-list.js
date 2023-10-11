@@ -47,6 +47,9 @@ const untransformedPaths = [
   'Extensions/Shopify/shopify-buy.umd.polyfilled.min.js',
   'Extensions/TweenBehavior/shifty.js',
   'Extensions/JsExtensionTypes.flow.js',
+  'Extensions/TileMap/pako/dist/pako.min.js',
+  'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js',
+  'Extensions/TileMap/helper/TileMapHelper.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
 
 /**

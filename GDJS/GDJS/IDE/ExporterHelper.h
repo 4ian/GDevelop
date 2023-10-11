@@ -331,7 +331,7 @@ class ExporterHelper {
   /**
    * \brief Add the project effects include files.
    */
-  bool ExportEffectIncludes(const gd::Project &project,
+  bool ExportEffectIncludes(gd::Project &project,
                             std::vector<gd::String> &includesFiles);
 
   /**

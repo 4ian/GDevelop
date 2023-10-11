@@ -116,6 +116,11 @@ class GD_CORE_API ObjectGroupsContainer {
    * \brief Clear all groups of the container.
    */
   inline void Clear() { objectGroups.clear(); }
+
+  /**
+   * \brief Call the callback for each group name matching the specified search.
+   */
+  void ForEachNameMatchingSearch(const gd::String& search, std::function<void(const gd::String& name)> fn) const;
   ///@}
 
   /** \name Saving and loading

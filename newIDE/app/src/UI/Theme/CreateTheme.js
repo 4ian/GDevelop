@@ -13,6 +13,7 @@ export function getRootClassNames(theme: string) {
     eventsSheetRootClassName: theme,
     tableRootClassName: theme,
     markdownRootClassName: theme,
+    uiRootClassName: theme,
   };
 }
 
@@ -298,6 +299,10 @@ export function getMuiOverrides({
     MuiAutocomplete: {
       paper: {
         backgroundColor: alternateCanvasBackgroundColor,
+      },
+      option: {
+        // Avoid the default min-height of 48px, which is too big to display options.
+        minHeight: 35,
       },
     },
   };
@@ -619,6 +624,11 @@ export function createGdevelopTheme({
             : styles['ThemePrimaryColor'],
         textColor: styles['ThemeTextDefaultColor'],
         gridColor: styles['ThemeTextDisabledColor'],
+      },
+      statusIndicator: {
+        success: styles['ThemeSuccessColor'],
+        error: styles['ThemeErrorColor'],
+        warning: styles['ThemeWarningColor'],
       },
     },
     muiThemeOptions: {

@@ -3,29 +3,40 @@ import * as React from 'react';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import ListOutlined from '@material-ui/icons/ListOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import Window from '../Utils/Window';
 import Text from './Text';
-import { Line, Spacer } from './Grid';
+import { Column, Line, Spacer } from './Grid';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import AlertMessage from './AlertMessage';
 import ArrowLeft from './CustomSvgIcons/ArrowLeft';
 import ArrowRight from './CustomSvgIcons/ArrowRight';
+import { Trans } from '@lingui/macro';
+import { CorsAwareImage } from './CorsAwareImage';
+import { useIsMounted } from '../Utils/UseIsMounted';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
-type Thumbnail = {
+type OverlayTextPosition =
+  | 'topLeft'
+  | 'topRight'
+  | 'bottomLeft'
+  | 'bottomRight';
+
+export type CarouselThumbnail = {
   id: string,
   title: string,
   thumbnailUrl: string,
+  overlayText?: string,
+  overlayTextPosition?: OverlayTextPosition,
   +link?: string,
   +onClick?: () => void,
 };
 
 type SkeletonThumbnail = {
-  ...Thumbnail,
+  ...CarouselThumbnail,
   skeleton: boolean,
 };
 
@@ -36,19 +47,22 @@ type Props<ThumbnailType> = {|
   onBrowseAllClick?: () => void,
   browseAllLink?: string,
   browseAllLabel: React.Node,
+  browseAllIcon: React.Node,
   displayItemTitles?: boolean,
   error?: React.Node,
+  roundedImages?: boolean,
+  hideArrows?: boolean,
 |};
 
 const referenceSizesByWindowSize = {
   imageHeight: {
-    small: 120,
+    small: 80,
     medium: 130,
-    large: 140,
-    xlarge: 150,
+    large: 150,
+    xlarge: 170,
   },
   arrowWidth: {
-    small: 24,
+    small: 20,
     medium: 30,
     large: 36,
     xlarge: 42,
@@ -60,7 +74,7 @@ const titleHeight = 24;
 const spacerSize = 4;
 const focusItemBorderWidth = 2;
 const rightArrowMargin = cellSpacing / 2; // Necessary because MUI adds a margin to GridList corresponding to cell spacing
-const skeletonNumber = 4;
+const skeletonNumber = 6;
 const randomNumbers = Array(skeletonNumber)
   .fill(0)
   .map(e => Math.random());
@@ -76,6 +90,12 @@ const styles = {
   image: {
     display: 'block',
     objectFit: 'cover',
+    border: '1px solid lightgrey',
+    boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.
+    // Prevent cumulative layout shift by enforcing
+    // the 16:9 ratio.
+    aspectRatio: '16 / 9',
+    transition: 'opacity 0.3s ease-in-out',
   },
   error: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
   itemTitleContainer: { height: titleHeight },
@@ -84,7 +104,13 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
+  },
+  overlay: {
+    position: 'absolute',
+    borderRadius: 4,
+    padding: '2px 4px',
+    backdropFilter: 'brightness(40%)',
+    color: 'white', // Same color for all themes.
   },
 };
 
@@ -105,11 +131,14 @@ const useStylesForGridListItem = makeStyles(theme =>
   createStyles({
     root: {
       width: 'unset !important',
+      transition: 'transform 0.3s ease-in-out',
+      '&:hover': {
+        transform: 'scale(1.02)',
+      },
       '&:focus': {
-        border: `${focusItemBorderWidth}px solid ${theme.palette.primary.main}`,
+        transform: 'scale(1.02)',
         outline: 'none',
       },
-      '&:focus-visible': { outline: 'unset' },
     },
     tile: {
       display: 'flex',
@@ -118,20 +147,58 @@ const useStylesForGridListItem = makeStyles(theme =>
   })
 );
 
-const Carousel = <ThumbnailType: Thumbnail>({
+const ImageOverlay = ({
+  content,
+  position,
+}: {|
+  content: string,
+  position: OverlayTextPosition,
+|}) => {
+  const positionStyles = {
+    top: position === 'topLeft' || position === 'topRight' ? 8 : undefined,
+    bottom:
+      position === 'bottomLeft' || position === 'bottomRight' ? 8 : undefined,
+    left: position === 'topLeft' || position === 'bottomLeft' ? 8 : undefined,
+    right:
+      position === 'topRight' || position === 'bottomRight' ? 8 : undefined,
+  };
+  return (
+    <div
+      style={{
+        ...styles.overlay,
+        ...positionStyles,
+      }}
+    >
+      <Text noMargin color="inherit" size="sub-title">
+        {content}
+      </Text>
+    </div>
+  );
+};
+
+const Carousel = <ThumbnailType: CarouselThumbnail>({
   title,
   items,
   additionalAction,
   browseAllLink,
   onBrowseAllClick,
   browseAllLabel,
+  browseAllIcon,
   error,
   displayItemTitles = true,
+  roundedImages = false,
+  hideArrows = false,
 }: Props<ThumbnailType>) => {
   const [
     shouldDisplayLeftArrow,
     setShouldDisplayLeftArrow,
   ] = React.useState<boolean>(false);
+  const [
+    shouldDisplayRightArrow,
+    setShouldDisplayRightArrow,
+  ] = React.useState<boolean>(!hideArrows);
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
   const scrollView = React.useRef<?HTMLUListElement>(null);
@@ -150,6 +217,23 @@ const Carousel = <ThumbnailType: Thumbnail>({
           })
           .map((item, index) => ({ ...item, id: `skeleton${index}` }));
 
+  const isMounted = useIsMounted();
+  const forceUpdate = useForceUpdate();
+
+  const loadedImageUrls = React.useRef<Set<string>>(new Set<string>());
+  const setImageLoaded = React.useCallback(
+    (loadedImageUrl: string) => {
+      // Give a bit of time to an image to fully render before revealing it.
+      setTimeout(() => {
+        if (!isMounted) return; // Avoid warnings if the component was removed in the meantime.
+
+        loadedImageUrls.current.add(loadedImageUrl);
+        forceUpdate();
+      }, 50);
+    },
+    [forceUpdate, isMounted]
+  );
+
   const windowSize = useResponsiveWindowWidth();
   const imageHeight = referenceSizesByWindowSize.imageHeight[windowSize];
   const arrowWidth = referenceSizesByWindowSize.arrowWidth[windowSize];
@@ -162,19 +246,23 @@ const Carousel = <ThumbnailType: Thumbnail>({
 
   const renderImage = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): React.Node => (
-      <img
+      <CorsAwareImage
         src={item.thumbnailUrl}
         style={{
           ...styles.image,
+          // Once ready, animate the image display.
+          opacity: loadedImageUrls.current.has(item.thumbnailUrl) ? 1 : 0,
           height: imageHeight,
           minHeight: imageHeight,
           width: cellWidth,
+          borderRadius: roundedImages ? 8 : 0,
         }}
         alt={item.title}
         title={item.title}
+        onLoad={() => setImageLoaded(item.thumbnailUrl)}
       />
     ),
-    [cellWidth, imageHeight]
+    [cellWidth, imageHeight, roundedImages, setImageLoaded]
   );
 
   const openLinkCallback = (link: string): (() => void) => (): void => {
@@ -189,11 +277,18 @@ const Carousel = <ThumbnailType: Thumbnail>({
       }
       if (item.skeleton) {
         return (
-          <Skeleton variant="rect" height={imageHeight} width={cellWidth} />
+          <Skeleton
+            variant="rect"
+            height={imageHeight}
+            width={cellWidth}
+            style={{
+              borderRadius: roundedImages ? 8 : 0,
+            }}
+          />
         );
       }
     },
-    [renderImage, cellWidth, imageHeight]
+    [renderImage, cellWidth, imageHeight, roundedImages]
   );
 
   const renderItemTitle = React.useCallback(
@@ -255,6 +350,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
           itemsToDisplay.length - visibleThumbnailsCount - 1
       )
         return 0;
+
       return roundScroll(
         scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1)
       );
@@ -280,11 +376,22 @@ const Carousel = <ThumbnailType: Thumbnail>({
     (): void => {
       const scrollViewElement = scrollView.current;
       if (!scrollViewElement) return;
+      if (!!hideArrows) return;
 
-      if (!shouldDisplayLeftArrow)
-        setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
+      const isScrollAtStart = scrollViewElement.scrollLeft === 0;
+      const isScrollAtEnd =
+        scrollViewElement.scrollLeft ===
+        scrollViewElement.scrollWidth - scrollViewElement.clientWidth;
+      const shouldToggleLeftArrowVisibility =
+        isScrollAtStart === shouldDisplayLeftArrow;
+      const shouldToggleRightArrowVisibility =
+        isScrollAtEnd === shouldDisplayRightArrow;
+      if (shouldToggleLeftArrowVisibility)
+        setShouldDisplayLeftArrow(!shouldDisplayLeftArrow);
+      if (shouldToggleRightArrowVisibility)
+        setShouldDisplayRightArrow(!shouldDisplayRightArrow);
     },
-    [shouldDisplayLeftArrow]
+    [shouldDisplayLeftArrow, shouldDisplayRightArrow, hideArrows]
   );
 
   const handleScrollEnd = React.useCallback(
@@ -351,97 +458,117 @@ const Carousel = <ThumbnailType: Thumbnail>({
   );
 
   return (
-    <Line noMargin>
-      <div
-        style={{
-          ...styles.arrowContainer,
-          width: arrowWidth,
-        }}
-        onClick={onClickArrow('left')}
-      >
-        {areItemsSet && shouldDisplayLeftArrow && <ArrowLeft />}
-      </div>
-      <div
-        style={{
-          width: `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
-        }}
-      >
-        <Line justifyContent="space-between" alignItems="center">
-          <Text size="bold-title">{title}</Text>
-          <Line>
-            {additionalAction && (
-              <>
-                {additionalAction}
-                <Spacer />
-              </>
-            )}
-            <FlatButton
-              onClick={
-                onBrowseAllClick ||
-                (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
-              }
-              label={browseAllLabel}
-              leftIcon={<ListOutlined />}
-            />
-          </Line>
+    <Column noMargin>
+      <Line justifyContent="space-between" alignItems="center">
+        <Text size="section-title">{title}</Text>
+        <Line>
+          {additionalAction && (
+            <>
+              {additionalAction}
+              <Spacer />
+            </>
+          )}
+          <FlatButton
+            onClick={
+              onBrowseAllClick ||
+              (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
+            }
+            label={
+              isMobileScreen ? (
+                <Trans>Browse</Trans> // Short label on mobile.
+              ) : (
+                browseAllLabel || <Trans>Browse all</Trans>
+              )
+            }
+            leftIcon={browseAllIcon}
+          />
         </Line>
-        {error ? (
-          <div style={{ ...styles.error, height: cellHeight }}>
-            <AlertMessage kind="warning">{error}</AlertMessage>
-          </div>
-        ) : (
-          <GridList
-            classes={classesForGridList}
-            cols={itemsToDisplay.length}
-            cellHeight={cellHeight}
-            spacing={cellSpacing}
-            style={styles.gridList}
-            ref={scrollView}
+      </Line>
+
+      <Line noMargin>
+        {!hideArrows && (
+          <div
+            style={{
+              ...styles.arrowContainer,
+              width: arrowWidth,
+            }}
+            onClick={onClickArrow('left')}
           >
-            {itemsToDisplay.map((item, index) => (
-              <GridListTile
-                classes={classesForGridListItem}
-                key={item.id}
-                tabIndex={0}
-                onFocus={event => onFocusItem(event, index)}
-                onMouseEnter={event => setHoveredElement(event.currentTarget)}
-                onMouseLeave={() => setHoveredElement(null)}
-                onKeyPress={(
-                  event: SyntheticKeyboardEvent<HTMLLIElement>
-                ): void => {
-                  if (shouldValidate(event)) {
-                    if (item.link) openLinkCallback(item.link)();
-                    if (item.onClick) item.onClick();
-                  }
-                }}
-                onClick={
-                  item.link
-                    ? openLinkCallback(item.link)
-                    : item.onClick
-                    ? item.onClick
-                    : null
-                }
-              >
-                {renderThumbnail(item)}
-                {renderItemTitle(item, index)}
-              </GridListTile>
-            ))}
-          </GridList>
+            {shouldDisplayLeftArrow && areItemsSet && <ArrowLeft />}
+          </div>
         )}
-      </div>
-      {areItemsSet && (
         <div
           style={{
-            ...styles.arrowContainer,
-            width: arrowWidth,
-            marginLeft: rightArrowMargin,
+            width: !!hideArrows
+              ? '100%'
+              : `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
           }}
-          onClick={onClickArrow('right')}
         >
-          <ArrowRight />
+          {error ? (
+            <div style={{ ...styles.error, height: cellHeight }}>
+              <AlertMessage kind="warning">{error}</AlertMessage>
+            </div>
+          ) : (
+            <GridList
+              classes={classesForGridList}
+              cols={itemsToDisplay.length}
+              cellHeight={cellHeight}
+              spacing={cellSpacing}
+              style={styles.gridList}
+              ref={scrollView}
+            >
+              {itemsToDisplay.map((item, index) => (
+                <GridListTile
+                  classes={classesForGridListItem}
+                  key={item.id}
+                  tabIndex={0}
+                  onFocus={event => onFocusItem(event, index)}
+                  onMouseEnter={event => setHoveredElement(event.currentTarget)}
+                  onMouseLeave={() => setHoveredElement(null)}
+                  onKeyPress={(
+                    event: SyntheticKeyboardEvent<HTMLLIElement>
+                  ): void => {
+                    if (shouldValidate(event)) {
+                      if (item.link) openLinkCallback(item.link)();
+                      if (item.onClick) item.onClick();
+                    }
+                  }}
+                  onClick={
+                    item.link
+                      ? openLinkCallback(item.link)
+                      : item.onClick
+                      ? item.onClick
+                      : null
+                  }
+                >
+                  {renderThumbnail(item)}
+                  {item.overlayText &&
+                    loadedImageUrls.current.has(item.thumbnailUrl) && (
+                      <ImageOverlay
+                        content={item.overlayText}
+                        position={item.overlayTextPosition || 'bottomRight'}
+                      />
+                    )}
+                  {renderItemTitle(item, index)}
+                </GridListTile>
+              ))}
+            </GridList>
+          )}
         </div>
-      )}
-    </Line>
+        {!hideArrows && (
+          <div
+            style={{
+              ...styles.arrowContainer,
+              width: arrowWidth,
+              marginLeft: rightArrowMargin,
+            }}
+            onClick={onClickArrow('right')}
+          >
+            {shouldDisplayRightArrow && areItemsSet && <ArrowRight />}
+          </div>
+        )}
+      </Line>
+    </Column>
   );
 };
 

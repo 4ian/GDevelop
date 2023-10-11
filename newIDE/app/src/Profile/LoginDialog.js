@@ -20,6 +20,7 @@ import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Form from '../UI/Form';
 
 const styles = {
   formContainer: {
@@ -132,15 +133,7 @@ const LoginDialog = ({
             width: isMobileScreen ? '100%' : '60%',
           }}
         >
-          <form
-            onSubmit={event => {
-              // Prevent browser to navigate on form submission.
-              event.preventDefault();
-              doLogin();
-            }}
-            autoComplete="on"
-            name="login"
-          >
+          <Form onSubmit={doLogin} autoComplete="on" name="login">
             <ColumnStackLayout noMargin>
               <TextField
                 autoFocus="desktop"
@@ -167,13 +160,8 @@ const LoginDialog = ({
                 fullWidth
                 disabled={loginInProgress}
               />
-              {/*
-                This input is needed so that the browser submits the form when
-                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
-              */}
-              <input type="submit" value="Submit" style={{ display: 'none' }} />
             </ColumnStackLayout>
-          </form>
+          </Form>
         </div>
         <Link
           href=""

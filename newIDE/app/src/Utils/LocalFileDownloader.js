@@ -35,7 +35,8 @@ export const downloadUrlsToLocalFiles = async <
 
       try {
         await retryIfFailed({ times: 2 }, async () => {
-          await ipcRenderer.invoke('local-file-download', url, filePath);
+          const encodedUrl = new URL(url).href; // Encode the URL to support special characters in file names.
+          await ipcRenderer.invoke('local-file-download', encodedUrl, filePath);
         });
 
         const result: ItemResult<Item> = {

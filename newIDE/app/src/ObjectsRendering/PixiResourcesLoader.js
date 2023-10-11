@@ -159,66 +159,60 @@ export default class PixiResourcesLoader {
   /**
    * (Re)load the PIXI texture represented by the given resources.
    */
-  static loadTextures(
+  static async loadTextures(
     project: gdProject,
     resourceNames: Array<string>,
-    onProgress: (number, number) => void,
-    onComplete: () => void
-  ) {
+    onProgress: (number, number) => void
+  ): Promise<void> {
     const resourcesManager = project.getResourcesManager();
-    const loader = PIXI.Loader.shared;
-    loader.reset();
 
-    const allResources = {};
-    resourceNames.forEach(resourceName => {
-      if (!resourcesManager.hasResource(resourceName)) return;
-
-      const resource = resourcesManager.getResource(resourceName);
-      if (resource.getKind() !== 'image') return;
-
-      const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
-        isResourceForPixi: true,
-      });
-      loader.add({
-        name: resourceName,
-        url: url,
-        loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
-        crossOrigin: determineCrossOrigin(url),
-      });
-      allResources[resourceName] = resource;
-    });
-
-    const totalCount = Object.keys(allResources).length;
-    if (!totalCount) {
-      onComplete();
-      return;
-    }
-
-    let loadingCount = 0;
-    const progressCallbackId = loader.onProgress.add(function() {
-      loadingCount++;
-      onProgress(loadingCount, totalCount);
-    });
-
-    loader.load((loader, loadedResources) => {
-      loader.onProgress.detach(progressCallbackId);
-
-      //Store the loaded textures so that they are ready to use.
-      for (const resourceName in loadedResources) {
-        if (loadedResources.hasOwnProperty(resourceName)) {
-          const resource = resourcesManager.getResource(resourceName);
-          if (resource.getKind() !== 'image') continue;
-
-          const texture = loadedResources[resourceName].texture;
-          if (texture) {
-            loadedTextures[resourceName] = texture;
-            applyPixiTextureSettings(resource, loadedTextures[resourceName]);
-          }
+    const imageResources = resourceNames
+      .map(resourceName => {
+        if (!resourcesManager.hasResource(resourceName)) {
+          return null;
         }
-      }
+        const resource = resourcesManager.getResource(resourceName);
+        if (resource.getKind() !== 'image') {
+          return null;
+        }
+        return resource;
+      })
+      .filter(Boolean);
 
-      onComplete();
-    });
+    // TODO use a PromisePool to be able to abort the previous reload of resources.
+    let loadedCount = 0;
+    await Promise.all(
+      imageResources.map(async resource => {
+        try {
+          const resourceName = resource.getName();
+          const url = ResourcesLoader.getResourceFullUrl(
+            project,
+            resourceName,
+            {
+              isResourceForPixi: true,
+            }
+          );
+          PIXI.Assets.setPreferences({
+            preferWorkers: false,
+            preferCreateImageBitmap: false,
+            crossOrigin: checkIfCredentialsRequired(url)
+              ? 'use-credentials'
+              : 'anonymous',
+          });
+          const loadedTexture = await PIXI.Assets.load(url);
+          loadedTextures[resourceName] = loadedTexture;
+          // TODO What if 2 assets share the same file with different settings?
+          applyPixiTextureSettings(resource, loadedTexture);
+        } catch (error) {
+          console.error(
+            'Unable to load file ' + resource.getFile() + ' with error:',
+            error ? error : '(unknown error)'
+          );
+        }
+        loadedCount++;
+        onProgress(loadedCount, imageResources.length);
+      })
+    );
   }
 
   /**

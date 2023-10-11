@@ -282,12 +282,10 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Action for an object not having the required capability.
       const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(3);
-      unsupportedCapabilityAction.setParameter(
-        0,
-        'MyFakeObjectWithUnsupportedCapability'
-      );
+      unsupportedCapabilityAction.setType('EffectCapability::EffectBehavior::EnableEffect');
+      unsupportedCapabilityAction.setParametersCount(4);
+      unsupportedCapabilityAction.setParameter(0, 'MyFakeObjectWithUnsupportedCapability');
+      unsupportedCapabilityAction.setParameter(1, 'Effect');
       unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
       unsupportedCapabilityAction.setParameter(2, 'yes');
       gd.asStandardEvent(evt)
@@ -316,8 +314,8 @@ describe('libGD.js - GDJS related tests', function () {
       expect(code).toMatch('/* Unknown instruction - skipped. */');
 
       // Check that the action for an object not having the required capability was not generated.
-      expect(code).toMatch(
-        '/* Object with unsupported capability - skipped. */'
+      expect(code).toEqual(expect.not.stringContaining(
+        'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior(\"Effect\")')
       );
 
       action.delete();
@@ -350,11 +348,12 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Action for an object not having the required capability.
       const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(3);
+      unsupportedCapabilityAction.setType('EffectCapability::EffectBehavior::EnableEffect');
+      unsupportedCapabilityAction.setParametersCount(4);
       unsupportedCapabilityAction.setParameter(0, 'MyGroup');
-      unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
-      unsupportedCapabilityAction.setParameter(2, 'yes');
+      unsupportedCapabilityAction.setParameter(1, 'Effect');
+      unsupportedCapabilityAction.setParameter(2, '"MyEffect"');
+      unsupportedCapabilityAction.setParameter(3, 'yes');
       gd.asStandardEvent(evt)
         .getActions()
         .insert(unsupportedCapabilityAction, 1);
@@ -378,10 +377,10 @@ describe('libGD.js - GDJS related tests', function () {
       // was not generated for this object,
       // but generated for the Sprite supporting this capability.
       expect(code).toMatch(
-        'gdjs.SceneCode.GDMySpriteObjects1[i].enableEffect("MyEffect", true);'
+        'gdjs.SceneCode.GDMySpriteObjects1[i].getBehavior(\"Effect\").enableEffect(\"MyEffect\", true);'
       );
-      expect(code).toMatch(
-        '/* Object with unsupported capability - skipped. */'
+      expect(code).toEqual(expect.not.stringContaining(
+        'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior(\"Effect\")')
       );
 
       action.delete();

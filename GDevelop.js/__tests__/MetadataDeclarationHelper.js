@@ -1356,7 +1356,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(action.getParametersCount()).toBe(3);
     expect(action.getParameter(0).getType()).toBe('object');
-    expect(action.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(action.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
     expect(action.getParameter(1).getType()).toBe('operator');
     expect(action.getParameter(2).getType()).toBe('string');
 
@@ -1379,7 +1379,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(condition.getParametersCount()).toBe(3);
     expect(condition.getParameter(0).getType()).toBe('object');
-    expect(condition.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(condition.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
     expect(condition.getParameter(1).getType()).toBe('relationalOperator');
     expect(condition.getParameter(2).getType()).toBe('string');
 
@@ -1397,7 +1397,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(expression.getParametersCount()).toBe(1);
     expect(expression.getParameter(0).getType()).toBe('object');
-    expect(expression.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(expression.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
 
     extension.delete();
     project.delete();
@@ -1450,7 +1450,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(action.getParametersCount()).toBe(2);
     expect(action.getParameter(0).getType()).toBe('object');
-    expect(action.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(action.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
     expect(action.getParameter(1).getType()).toBe('yesorno');
 
     expect(
@@ -1471,7 +1471,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(condition.getParametersCount()).toBe(1);
     expect(condition.getParameter(0).getType()).toBe('object');
-    expect(condition.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(condition.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
 
     extension.delete();
     project.delete();

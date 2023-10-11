@@ -12,6 +12,7 @@ import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
+  canCancelAtEndOfPeriod,
   businessPlan,
   hasValidSubscriptionPlan,
   EDUCATION_PLAN_MAX_SEATS,
@@ -41,6 +42,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+import AlertMessage from '../../UI/AlertMessage';
 
 const styles = {
   descriptionText: {
@@ -63,9 +65,15 @@ const cancelConfirmationTexts = {
   confirmButtonLabel: t`Cancel my subscription`,
   dismissButtonLabel: t`Go back`,
 };
+const cancelImmediatelyConfirmationTexts = {
+  title: t`Cancel your subscription`,
+  message: t`Are you sure you want to cancel your subscription? Your access to GDevelop premium features will end IMMEDIATELY.`,
+  confirmButtonLabel: t`Cancel my subscription now`,
+  dismissButtonLabel: t`Go back`,
+};
 const seamlesslyChangeConfirmationTexts = {
   title: t`Update your subscription`,
-  message: t`Are you sure you want to subscribe to this new plan? Your next payment will be pro-rated.`,
+  message: t`Are you sure you want to change your plan? Your next payment will be pro-rated.`,
   confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
 };
@@ -154,7 +162,11 @@ export default function SubscriptionDialog({
     const { planId } = plan;
     if (!planId) {
       // Cancelling the existing subscription.
-      const answer = await showConfirmation(cancelConfirmationTexts);
+      const answer = await showConfirmation(
+        canCancelAtEndOfPeriod(subscription)
+          ? cancelConfirmationTexts
+          : cancelImmediatelyConfirmationTexts
+      );
       if (!answer) return;
 
       setIsChangingSubscription(true);
@@ -190,9 +202,7 @@ export default function SubscriptionDialog({
       const hasExpiredRedeemedSubscription =
         !!subscription.redemptionCodeValidUntil &&
         subscription.redemptionCodeValidUntil < Date.now();
-      const shouldShowAlert =
-        (needToCancelSubscription && !hasExpiredRedeemedSubscription) || // we don't show an alert if the redeemed code is expired
-        hasValidRedeemedSubscription;
+      const shouldSkipAlert = hasExpiredRedeemedSubscription; // we don't show an alert if the redeemed code is expired
 
       // Changing the existing subscription.
       const confirmDialogTexts =
@@ -202,7 +212,7 @@ export default function SubscriptionDialog({
           ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
           : cancelAndChangeConfirmationTexts;
 
-      if (shouldShowAlert) {
+      if (!shouldSkipAlert) {
         const answer = await showConfirmation(confirmDialogTexts);
         if (!answer) return;
       }
@@ -270,6 +280,10 @@ export default function SubscriptionDialog({
 
   const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
 
+  const willCancelAtPeriodEnd =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.cancelAtPeriodEnd;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -315,6 +329,14 @@ export default function SubscriptionDialog({
                 }
               />
             </LineStackLayout>
+            {willCancelAtPeriodEnd && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  Your subscription is being cancelled: you will lose the
+                  benefits at the end of the period you already paid for.
+                </Trans>
+              </AlertMessage>
+            )}
             {getSubscriptionPlans()
               .filter(plan => !plan.hideInSubscriptionDialog)
               .map(plan => {
@@ -401,10 +423,16 @@ export default function SubscriptionDialog({
                   actions = [
                     <FlatButton
                       key="cancel"
-                      disabled={isLoading}
+                      disabled={isLoading || willCancelAtPeriodEnd}
                       label={
                         <LeftLoader isLoading={isLoading}>
-                          <Trans>Cancel your subscription</Trans>
+                          {willCancelAtPeriodEnd ? (
+                            <Trans>
+                              Already cancelled - will expire in the future
+                            </Trans>
+                          ) : (
+                            <Trans>Cancel your subscription</Trans>
+                          )}
                         </LeftLoader>
                       }
                       onClick={() =>

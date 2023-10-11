@@ -102,7 +102,6 @@ const styles = {
     display: 'flex',
   },
   titleContainer: {
-    paddingBottom: dialogTitlePadding,
     textAlign: 'left',
     // Ensure the title can break on any character, to ensure it's visible on mobile. Especially useful for long emails.
     overflowWrap: 'anywhere',
@@ -125,19 +124,23 @@ const styles = {
   },
 };
 
-const useDangerousStylesForDialog = makeStyles(theme => ({
-  paper: {
-    '&:before': {
-      content: '""',
-      height: 60,
-      background: `repeating-linear-gradient(110deg, ${
-        theme.palette.error.dark
-      }, ${theme.palette.error.dark} 25px, ${theme.palette.error.main} 25px, ${
-        theme.palette.error.main
-      } 40px)`,
-    },
-  },
-}));
+const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
+  makeStyles(theme => {
+    if (!dangerLevel) return {};
+    const color =
+      dangerLevel === 'warning' ? theme.palette.warning : theme.palette.error;
+    return {
+      paper: {
+        '&:before': {
+          content: '""',
+          height: 60,
+          background: `repeating-linear-gradient(110deg, ${color.dark}, ${
+            color.dark
+          } 25px, ${color.main} 25px, ${color.main} 40px)`,
+        },
+      },
+    };
+  })();
 
 // Customize scrollbar inside Dialog so that it gives a bit of space
 // to the content.
@@ -166,7 +169,7 @@ type DialogProps = {|
   fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
-  isDangerous?: boolean,
+  dangerLevel?: 'warning' | 'danger',
 
   /**
    * Callback called when the dialog is asking to be closed
@@ -223,7 +226,7 @@ export const DialogPrimaryButton = RaisedButton;
 const Dialog = ({
   onApply,
   secondaryActions,
-  isDangerous,
+  dangerLevel,
   actions,
   open,
   onRequestClose,
@@ -249,7 +252,7 @@ const Dialog = ({
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
   const isFullScreen = isMobileScreen && !noMobileFullScreen;
 
-  const classesForDangerousDialog = useDangerousStylesForDialog();
+  const classesForDangerousDialog = useDangerousStylesForDialog(dangerLevel);
   const classesForDialogContent = useStylesForDialogContent();
 
   const dialogActions = React.useMemo(
@@ -335,7 +338,7 @@ const Dialog = ({
 
   return (
     <MuiDialog
-      classes={isDangerous ? classesForDangerousDialog : undefined}
+      classes={classesForDangerousDialog}
       open={open}
       onClose={onCloseDialog}
       fullWidth
@@ -365,28 +368,27 @@ const Dialog = ({
         />
       )}
       <div style={dialogContainerStyle}>
-        {title && (
-          <div style={styles.titleContainer}>
-            <Line
-              noMargin
-              justifyContent="space-between"
-              alignItems="flex-start"
-            >
-              <Text noMargin size="section-title">
-                {title}
-              </Text>
-              {onRequestClose && !cannotBeDismissed && (
-                <IconButton
-                  onClick={onRequestClose}
-                  size="small"
-                  disabled={cannotBeDismissed}
-                >
-                  <Cross />
-                </IconButton>
-              )}
-            </Line>
-          </div>
-        )}
+        <div
+          style={{
+            ...styles.titleContainer,
+            paddingBottom: title ? dialogTitlePadding : 0, // Keep the title container if there is no title, for the close button to be visible, but don't add padding.
+          }}
+        >
+          <Line noMargin justifyContent="space-between" alignItems="flex-start">
+            <Text noMargin size="section-title">
+              {title}
+            </Text>
+            {onRequestClose && !cannotBeDismissed && (
+              <IconButton
+                onClick={onRequestClose}
+                size="small"
+                disabled={cannotBeDismissed}
+              >
+                <Cross />
+              </IconButton>
+            )}
+          </Line>
+        </div>
         {fixedContent && (
           <div style={styles.fixedContentContainer}>{fixedContent}</div>
         )}

@@ -1,4 +1,5 @@
 // @flow
+import PromisePool from '@supercharge/promise-pool';
 import {
   type MoveAllProjectResourcesOptions,
   type MoveAllProjectResourcesResult,
@@ -17,8 +18,14 @@ import {
   type ItemResult,
 } from '../../Utils/BlobDownloader';
 import { isBlobURL, isURL } from '../../ResourcesList/ResourceUtils';
+import {
+  extractFilenameWithExtensionFromProductAuthorizedUrl,
+  fetchTokenForPrivateGameTemplateAuthorizationIfNeeded,
+  isPrivateGameTemplateResourceAuthorizedUrl,
+} from '../../Utils/GDevelopServices/Shop';
 
-export const moveAllCloudProjectResourcesToCloudProject = async ({
+// This mover can be used for both public URLs and Cloud project resources.
+export const moveUrlResourcesToCloudProject = async ({
   project,
   authenticatedUser,
   oldFileMetadata,
@@ -45,59 +52,90 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
    * Find the resources stored on GDevelop Cloud that must be downloaded and
    * uploaded into the new project.
    */
-  const getResourcesToFetchAndUpload = (
+  const getResourcesToFetchAndUpload = async (
     project: gdProject
-  ): Array<ResourceToFetchAndUpload> => {
+  ): Promise<Array<ResourceToFetchAndUpload>> => {
     const resourcesManager = project.getResourcesManager();
     const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
-    return allResourceNames
-      .map(
-        (resourceName: string): ?ResourceToFetchAndUpload => {
+    const resourceToFetchAndUpload: Array<ResourceToFetchAndUpload> = [];
+
+    const tokenForPrivateGameTemplateAuthorization = await fetchTokenForPrivateGameTemplateAuthorizationIfNeeded(
+      {
+        authenticatedUser,
+        allResourcePaths: allResourceNames.map(resourceName => {
           const resource = resourcesManager.getResource(resourceName);
-          const resourceFile = resource.getFile();
+          return resource.getFile();
+        }),
+      }
+    );
 
-          if (isURL(resourceFile)) {
-            if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
-              if (
-                extractProjectUuidFromProjectResourceUrl(resourceFile) ===
-                newCloudProjectId
-              ) {
-                // Somehow the resource is *already* stored in the new project - surely because
-                // the project resources were partially moved (like when you click "Retry" after some failures
-                // when saving a project as a new cloud project).
-                // Just ignore this resource which is already moved then.
-                return null;
-              }
+    await PromisePool.withConcurrency(50)
+      .for(allResourceNames)
+      .process(async (resourceName: string) => {
+        const resource = resourcesManager.getResource(resourceName);
+        const resourceFile = resource.getFile();
 
-              return {
-                resource,
-                url: resourceFile,
-                filename: extractFilenameFromProjectResourceUrl(resourceFile),
-              };
-            } else if (isBlobURL(resourceFile)) {
-              result.erroredResources.push({
-                resourceName: resource.getName(),
-                error: new Error('Unsupported blob URL.'),
-              });
-              return null;
-            } else {
-              // Public URL resource: nothing to do.
-              return null;
+        if (isURL(resourceFile)) {
+          if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
+            if (
+              extractProjectUuidFromProjectResourceUrl(resourceFile) ===
+              newCloudProjectId
+            ) {
+              // Somehow the resource is *already* stored in the new project - surely because
+              // the project resources were partially moved (like when you click "Retry" after some failures
+              // when saving a project as a new cloud project).
+              // Just ignore this resource which is already moved then.
+              return;
             }
-          } else {
-            // Local resource: unsupported.
+
+            resourceToFetchAndUpload.push({
+              resource,
+              url: resourceFile,
+              filename: extractFilenameFromProjectResourceUrl(resourceFile),
+            });
+          } else if (
+            isPrivateGameTemplateResourceAuthorizedUrl(resourceFile) &&
+            tokenForPrivateGameTemplateAuthorization
+          ) {
+            // Resource is coming from a private game template, update the URL to add the token
+            // so it can be downloaded.
+            const resourceUrl = new URL(resourceFile);
+            resourceUrl.searchParams.set(
+              'token',
+              tokenForPrivateGameTemplateAuthorization
+            );
+            const encodedResourceUrl = resourceUrl.href;
+            resourceToFetchAndUpload.push({
+              resource,
+              url: encodedResourceUrl,
+              filename: extractFilenameWithExtensionFromProductAuthorizedUrl(
+                resourceFile
+              ),
+            });
+          } else if (isBlobURL(resourceFile)) {
             result.erroredResources.push({
               resourceName: resource.getName(),
-              error: new Error('Unsupported relative file.'),
+              error: new Error('Unsupported blob URL.'),
             });
-            return null;
+            return;
+          } else {
+            // Public URL resource: nothing to do.
+            return;
           }
+        } else {
+          // Local resource: unsupported.
+          result.erroredResources.push({
+            resourceName: resource.getName(),
+            error: new Error('Unsupported relative file.'),
+          });
+          return;
         }
-      )
-      .filter(Boolean);
+      });
+
+    return resourceToFetchAndUpload;
   };
 
-  const resourcesToFetchAndUpload = getResourcesToFetchAndUpload(project);
+  const resourcesToFetchAndUpload = await getResourcesToFetchAndUpload(project);
 
   // If an error happens here, it will be thrown out of the function.
   if (oldStorageProviderOperations.onEnsureCanAccessResources)
@@ -153,6 +191,49 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
     }
 
     resource.setFile(url);
+  });
+
+  return result;
+};
+
+export const ensureNoCloudProjectResources = async ({
+  project,
+}: MoveAllProjectResourcesOptions): Promise<MoveAllProjectResourcesResult> => {
+  const result: MoveAllProjectResourcesResult = {
+    erroredResources: [],
+  };
+  const resourcesManager = project.getResourcesManager();
+  const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
+  allResourceNames.forEach((resourceName: string) => {
+    const resource = resourcesManager.getResource(resourceName);
+    const resourceFile = resource.getFile();
+
+    if (isURL(resourceFile)) {
+      if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
+        result.erroredResources.push({
+          resourceName: resource.getName(),
+          error: new Error(
+            'Resources uploaded to GDevelop Cloud are not supported on Google Drive.'
+          ),
+        });
+      } else if (isBlobURL(resourceFile)) {
+        result.erroredResources.push({
+          resourceName: resource.getName(),
+          error: new Error('Resources with Blob URLs are not supported.'),
+        });
+        return;
+      } else {
+        // Public URL resource: it works.
+        return;
+      }
+    } else {
+      // Local resource: unsupported.
+      result.erroredResources.push({
+        resourceName: resource.getName(),
+        error: new Error('Relative files in resources are not supported.'),
+      });
+      return;
+    }
   });
 
   return result;

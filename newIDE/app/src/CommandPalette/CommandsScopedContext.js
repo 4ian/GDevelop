@@ -7,7 +7,7 @@ import {
 } from './CommandManager';
 import { type CommandName } from './CommandsList';
 import CommandsContext from './CommandsContext';
-import useRefInit from './UseRefInitHook';
+import useValueWithInit from '../Utils/UseRefInitHook';
 
 class ScopedCommandManager implements CommandManagerInterface {
   _commands: { [CommandName]: Command };
@@ -72,7 +72,7 @@ type Props = {|
 
 const CommandsContextScopedProvider = (props: Props) => {
   const centralManager = React.useContext(CommandsContext);
-  const scopedManager = useRefInit(
+  const scopedManager = useValueWithInit(
     () => new ScopedCommandManager(centralManager)
   );
 

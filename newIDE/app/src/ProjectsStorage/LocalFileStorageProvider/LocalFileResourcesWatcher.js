@@ -6,7 +6,7 @@ import wrap from 'lodash/wrap';
 import memoize from 'lodash/memoize';
 
 const fileWatcher = optionalRequire('chokidar');
-const path = optionalRequire('path')
+const path = optionalRequire('path');
 
 export const setupResourcesWatcher =
   fileWatcher && path
@@ -21,7 +21,9 @@ export const setupResourcesWatcher =
           memoize(() =>
             debounce(
               filePath => {
-                const relativePath = path.relative(folderPath, filePath).replace(/\\/g, '/');
+                const relativePath = path
+                  .relative(folderPath, filePath)
+                  .replace(/\\/g, '/');
 
                 callback({ identifier: relativePath });
               },

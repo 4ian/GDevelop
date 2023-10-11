@@ -72,13 +72,7 @@ bool ObjectsContainer::HasObjectNamed(const gd::String& name) const {
 gd::Object& ObjectsContainer::GetObject(const gd::String& name) {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
-<<<<<<< HEAD
                     [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; }));
-=======
-                    [&name](std::unique_ptr<gd::Object>& object) {
-                      return object->GetName() == name;
-                    }));
->>>>>>> Remove former way to find object where possible
 }
 const gd::Object& ObjectsContainer::GetObject(const gd::String& name) const {
   return *(*find_if(initialObjects.begin(),

@@ -68,6 +68,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setUse3DEditor,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
+    setWatchProjectFolderFilesForLocalProjects,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -340,6 +341,22 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
+          {!!electron && (
+            <Toggle
+              onToggle={(e, check) =>
+                setWatchProjectFolderFilesForLocalProjects(check)
+              }
+              toggled={values.watchProjectFolderFilesForLocalProjects}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Watch the project folder for file changes in order to refresh
+                  the resources used in the editor (images, 3D models, fonts,
+                  etc.)
+                </Trans>
+              }
+            />
+          )}
           <Toggle
             onToggle={(e, check) => setUse3DEditor(check)}
             toggled={values.use3DEditor}

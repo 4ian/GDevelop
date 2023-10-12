@@ -1,7 +1,19 @@
+// @flow
 import * as React from 'react';
 import ResourcesLoader from '../ResourcesLoader';
+import PreferencesContext from './Preferences/PreferencesContext';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
 
-const useResourcesWatcher = (getStorageProvider, fileMetadata, editorTabs) => {
+const useResourcesWatcher = (
+  getStorageProvider: () => StorageProvider,
+  fileMetadata: ?FileMetadata,
+  editorTabs: EditorTabsState
+) => {
+  const {
+    values: { watchProjectFolderFilesForLocalProjects },
+  } = React.useContext(PreferencesContext);
+
   const informEditorsResourceExternallyChanged = React.useCallback(
     (resourceInfo: {| identifier: string |}) => {
       ResourcesLoader.burstAllUrlsCache();
@@ -23,6 +35,12 @@ const useResourcesWatcher = (getStorageProvider, fileMetadata, editorTabs) => {
   React.useEffect(
     () => {
       const storageProvider = getStorageProvider();
+      if (
+        storageProvider.internalName === 'LocalFile' &&
+        !watchProjectFolderFilesForLocalProjects
+      ) {
+        return;
+      }
       if (fileMetadata && storageProvider.setupResourcesWatcher) {
         const unsubscribe = storageProvider.setupResourcesWatcher(
           fileMetadata,
@@ -31,7 +49,12 @@ const useResourcesWatcher = (getStorageProvider, fileMetadata, editorTabs) => {
         return unsubscribe;
       }
     },
-    [fileMetadata, informEditorsResourceExternallyChanged, getStorageProvider]
+    [
+      fileMetadata,
+      informEditorsResourceExternallyChanged,
+      getStorageProvider,
+      watchProjectFolderFilesForLocalProjects,
+    ]
   );
 };
 export default useResourcesWatcher;

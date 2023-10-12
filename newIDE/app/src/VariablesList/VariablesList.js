@@ -1438,11 +1438,6 @@ const VariablesList = (props: Props) => {
         cleanedName = cleanedName.replace(separator, '');
       }
 
-      if (depth === 0) {
-        // A root variable cannot have a space in it.
-        cleanedName = cleanedName.replace(/\s/g, '');
-      }
-
       const safeAndUniqueNewName = newNameGenerator(
         depth === 0
           ? // Root variables always use identifier safe names.

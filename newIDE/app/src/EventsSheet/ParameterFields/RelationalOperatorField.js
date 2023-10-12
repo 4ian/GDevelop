@@ -119,7 +119,9 @@ export const renderInlineRelationalOperator = ({
 
   if (value === '<=') return '\u2264';
   if (value === '>=') return '\u2265';
-  else if (value === '!=') return '\u2260';
+  if (value === '!=') return '\u2260';
+  if (value === 'startsWith') return <Trans>starts with</Trans>;
+  if (value === 'endsWith') return <Trans>ends with</Trans>;
 
   return value;
 };

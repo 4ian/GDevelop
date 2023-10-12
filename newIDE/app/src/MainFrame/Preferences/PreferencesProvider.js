@@ -148,6 +148,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
+      this
+    ),
+    getShowDeprecatedInstructionWarning: this._getShowDeprecatedInstructionWarning.bind(
+      this
+    ),
     setUse3DEditor: this._setUse3DEditor.bind(this),
     getUse3DEditor: this._getUse3DEditor.bind(this),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
@@ -420,6 +426,24 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getShowEventBasedObjectsEditor() {
     return this.state.values.showEventBasedObjectsEditor;
+  }
+
+  _setShowDeprecatedInstructionWarning(
+    showDeprecatedInstructionWarning: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showDeprecatedInstructionWarning,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShowDeprecatedInstructionWarning() {
+    return this.state.values.showDeprecatedInstructionWarning;
   }
 
   _setUse3DEditor(use3DEditor: boolean) {

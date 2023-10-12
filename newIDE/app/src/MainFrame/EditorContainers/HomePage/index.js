@@ -159,6 +159,10 @@ export const HomePage = React.memo<Props>(
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';
 
+      const [activeTab, setActiveTab] = React.useState<HomeTab>('get-started');
+
+      console.log(activeTab);
+
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
         () => {
@@ -185,7 +189,7 @@ export const HomePage = React.memo<Props>(
 
       const updateToolbar = React.useCallback(
         () => {
-          if (setToolbar)
+          if (setToolbar) {
             setToolbar(
               <HomePageHeader
                 hasProject={!!project}
@@ -194,8 +198,10 @@ export const HomePage = React.memo<Props>(
                 onOpenProjectManager={onOpenProjectManager}
                 onSave={onSave}
                 canSave={canSave}
+                showUserChip={activeTab !== 'get-started'}
               />
             );
+          }
         },
         [
           setToolbar,
@@ -205,7 +211,16 @@ export const HomePage = React.memo<Props>(
           project,
           onSave,
           canSave,
+          activeTab,
         ]
+      );
+
+      // Ensure the toolbar is up to date when the active tab changes.
+      React.useEffect(
+        () => {
+          updateToolbar();
+        },
+        [updateToolbar]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -257,10 +272,6 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(
-        showGetStartedSection ? 'get-started' : 'build'
-      );
-
       // If the user logs out and is on the team view section, go back to the build section.
       React.useEffect(
         () => {
@@ -277,17 +288,13 @@ export const HomePage = React.memo<Props>(
             <TeamProvider>
               <div style={isMobile ? styles.mobileContainer : styles.container}>
                 <div style={styles.scrollableContainer}>
-                  {activeTab !== 'community' && !!announcements && (
-                    <AnnouncementsFeed canClose level="urgent" addMargins />
-                  )}
-                  {activeTab === 'get-started' && (
-                    <GetStartedSection
-                      onTabChange={setActiveTab}
-                      selectInAppTutorial={selectInAppTutorial}
-                      showGetStartedSection={showGetStartedSection}
-                      setShowGetStartedSection={setShowGetStartedSection}
-                    />
-                  )}
+                  {activeTab !== 'community' &&
+                    activeTab !== 'get-started' &&
+                    activeTab !== 'build' &&
+                    !!announcements && (
+                      <AnnouncementsFeed canClose level="urgent" addMargins />
+                    )}
+                  {activeTab === 'get-started' && <GetStartedSection />}
                   {activeTab === 'build' && (
                     <BuildSection
                       project={project}

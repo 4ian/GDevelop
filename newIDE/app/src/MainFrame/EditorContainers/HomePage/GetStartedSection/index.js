@@ -1,415 +1,432 @@
 // @flow
 import * as React from 'react';
-import { Trans, t } from '@lingui/macro';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Checkbox from '../../../../UI/Checkbox';
-import { Line, LargeSpacer, Spacer } from '../../../../UI/Grid';
+import { Trans } from '@lingui/macro';
 import Text from '../../../../UI/Text';
 import {
   ColumnStackLayout,
+  LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
-import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import Window from '../../../../Utils/Window';
-
-import { type HomeTab } from '../HomePageMenu';
-import SectionContainer, { SectionRow } from '../SectionContainer';
-import { CardWidget, LARGE_WIDGET_SIZE } from '../CardWidget';
-import InAppTutorialPhaseCard from '../InAppTutorials/InAppTutorialPhaseCard';
-import GuidedLessons from '../InAppTutorials/GuidedLessons';
-import Unboxing from '../InAppTutorials/Icons/Unboxing';
-import Building from '../InAppTutorials/Icons/Building';
-import Podium from '../InAppTutorials/Icons/Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import PreferencesContext from '../../../Preferences/PreferencesContext';
-import PlaceholderError from '../../../../UI/PlaceholderError';
-import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
-import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
+import TreeLeaves from '../../../../UI/CustomSvgIcons/TreeLeaves';
+import SectionContainer from '../SectionContainer';
+import JewelPlatform from '../../../../UI/CustomSvgIcons/JewelPlatform';
+import RaisedButton from '../../../../UI/RaisedButton';
+import FlatButton from '../../../../UI/FlatButton';
+import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import { Column, LargeSpacer, Line, Spacer } from '../../../../UI/Grid';
+import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import CircularProgress from '../../../../UI/CircularProgress';
+import Form from '../../../../UI/Form';
+import TextField from '../../../../UI/TextField';
+import {
+  getEmailErrorText,
+  getPasswordErrorText,
+} from '../../../../Profile/CreateAccountDialog';
+import BackgroundText from '../../../../UI/BackgroundText';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import { UsernameField } from '../../../../Profile/UsernameField';
+import { type UsernameAvailability } from '../../../../Utils/GDevelopServices/User';
+import Checkbox from '../../../../UI/Checkbox';
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 1;
-    case 'medium':
-      return 2;
-    case 'large':
-    case 'xlarge':
-    default:
-      return 3;
-  }
-};
-
-const MAX_COLUMNS = getColumnsFromWidth('xlarge');
-const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
-const ITEMS_SPACING = 5;
 const styles = {
-  grid: {
-    textAlign: 'center',
-    // Avoid tiles taking too much space on large screens.
-    maxWidth: MAX_SECTION_WIDTH,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  cardTextContainer: {
-    flex: 1,
-    display: 'flex',
-  },
-  cardImage: {
-    width: '100%',
-    // Prevent cumulative layout shift by enforcing the 2 ratio.
-    aspectRatio: '2',
-    maxWidth: LARGE_WIDGET_SIZE,
-  },
-  bannerContainer: {
-    width: '100%',
-    maxWidth: MAX_SECTION_WIDTH - 2 * ITEMS_SPACING,
-  },
-  bannerImage: {
-    width: '100%',
-    // Prevent cumulative layout shift by enforcing ratio.
-    aspectRatio: '16 / 9',
-    maxWidth: LARGE_WIDGET_SIZE,
-  },
   icon: {
-    marginRight: 8, // Without this, the icon is too close to the text and space is not enough.
+    width: 80,
+    height: 80,
+    margin: 20,
+  },
+  buttonContainer: {
+    width: '100%',
+    maxWidth: 300, // Make buttons larger but not too much.
+  },
+  navigationDot: {
+    height: 8,
+    width: 8,
+    borderRadius: '50%',
+    margin: 5,
   },
 };
 
-type Props = {|
-  onTabChange: (tab: HomeTab) => void,
-  selectInAppTutorial: (tutorialId: string) => void,
-  showGetStartedSection: boolean,
-  setShowGetStartedSection: (enabled: boolean) => void,
-|};
+const steps = [
+  'goal',
+  'details',
+  'experience',
+  'a',
+  'b',
+  'c',
+  //...
+];
 
-const GetStartedSection = ({
-  onTabChange,
-  selectInAppTutorial,
-  showGetStartedSection,
-  setShowGetStartedSection,
-}: Props) => {
-  const {
-    inAppTutorialShortHeaders,
-    inAppTutorialsFetchingError,
-    fetchInAppTutorials,
-    currentlyRunningInAppTutorial,
-  } = React.useContext(InAppTutorialContext);
-  const { getTutorialProgress } = React.useContext(PreferencesContext);
+type Props = {||};
+
+const GetStartedSection = ({  }: Props) => {
+  const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { profile, loginState } = authenticatedUser;
+  const forceUpdate = useForceUpdate();
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
-  const items: {
-    key: string,
-    title: React.Node,
-    description: React.Node,
-    action: () => void,
-    disabled?: boolean,
-  }[] = [
-    {
-      key: 'tutorial',
-      title: <Trans>Learn Section</Trans>,
-      description: (
-        <Trans>Find all the learning content related to GDevelop.</Trans>
-      ),
-      action: () => onTabChange('learn'),
-    },
-    {
-      key: 'build',
-      title: <Trans>“How do I” forum</Trans>,
-      description: <Trans>Ask your questions.</Trans>,
-      action: () => Window.openExternalURL('https://forum.gdevelop.io/'),
-    },
-    {
-      key: 'games',
-      title: <Trans>Wiki documentation</Trans>,
-      description: <Trans>Get inspired and have fun.</Trans>,
-      action: () =>
-        Window.openExternalURL('https://wiki.gdevelop.io/gdevelop5'),
-    },
-  ];
+  const [showLoginStep, setShowLoginStep] = React.useState(false);
+  const [showCreateAccountStep, setShowCreateAccountStep] = React.useState(
+    false
+  );
+  const [stepIndex, setStepIndex] = React.useState(0);
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [
+    usernameAvailability,
+    setUsernameAvailability,
+  ] = React.useState<?UsernameAvailability>(null);
+  const [
+    isValidatingUsername,
+    setIsValidatingUsername,
+  ] = React.useState<boolean>(false);
+  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
+    false
+  );
 
-  const getTutorialPartProgress = ({
-    tutorialId,
-    part,
-  }: {
-    tutorialId: string,
-    part: number,
-  }) => {
-    const tutorialProgress = getTutorialProgress({
-      tutorialId,
-      userId: authenticatedUser.profile
-        ? authenticatedUser.profile.id
-        : undefined,
-    });
-    if (!tutorialProgress || !tutorialProgress.progress) return 0;
-    return tutorialProgress.progress[part];
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  const isLoading = loginState === 'loggingIn';
+
+  const doLogin = () => {
+    // if (loginInProgress) return;
+    // onLogin({
+    //   email: email.trim(),
+    //   password,
+    // });
   };
+  const doCreateAccount = () => {};
 
-  const isTutorialPartComplete = ({
-    tutorialId,
-    part,
-  }: {
-    tutorialId: string,
-    part: number,
-  }) => {
+  // if (loginState === 'loggingIn') {
+  //   return (
+  //     <SectionContainer
+  //       title={null} // Let the content handle the title.
+  //       flexBody
+  //     >
+  //       <ColumnStackLayout
+  //         noMargin
+  //         expand
+  //         justifyContent="center"
+  //         alignItems="center"
+  //       >
+  //         <CircularProgress size={25} />
+  //       </ColumnStackLayout>
+  //     </SectionContainer>
+  //   );
+  // }
+
+  if (!isOnline) {
     return (
-      getTutorialPartProgress({
-        tutorialId,
-        part,
-      }) === 100
-    );
-  };
-
-  const flingInAppTutorialCards = [
-    {
-      key: 'create',
-      title: t`Start your game`,
-      description: t`Add your first characters to the scene and throw your first objects.`,
-      keyPoints: [
-        t`Game scene size`,
-        t`Objects and characters`,
-        t`Game Scenes`,
-        t`Throwing physics`,
-      ],
-      durationInMinutes: 5,
-      locked: false, // First phase is never locked
-      // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        isTutorialPartComplete({
-          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-          part: 0,
-        }),
-      progress: getTutorialPartProgress({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 0,
-      }),
-      renderImage: props => <Unboxing {...props} />,
-    },
-    {
-      key: 'publish',
-      title: t`Improve and publish your Game`,
-      description: t`Add personality to your game and publish it online.`,
-      keyPoints: [
-        t`Game background`,
-        t`In-game obstacles`,
-        t`“You win” message`,
-        t`Sharing online`,
-      ],
-      durationInMinutes: 10,
-      // Second phase is locked if first phase is not complete
-      locked: !isTutorialPartComplete({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 0,
-      }),
-      // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        isTutorialPartComplete({
-          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-          part: 1,
-        }),
-      progress: getTutorialPartProgress({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 1,
-      }),
-      renderImage: props => <Building {...props} />,
-    },
-    {
-      key: 'leaderboards',
-      title: t`Add leaderboards to your online Game`,
-      description: t`Add player logins to your game and add a leaderboard.`,
-      keyPoints: [
-        t`Game personalisation`,
-        t`“Start” screen`,
-        t`Timers`,
-        t`Leaderboards`,
-      ],
-      durationInMinutes: 15,
-      // Third phase is locked if second phase is not complete
-      locked: !isTutorialPartComplete({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 1,
-      }),
-      // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        isTutorialPartComplete({
-          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-          part: 2,
-        }),
-      progress: getTutorialPartProgress({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 2,
-      }),
-      renderImage: props => <Podium {...props} />,
-    },
-  ];
-
-  const Subtitle = () => (
-    <ResponsiveLineStackLayout
-      justifyContent="space-between"
-      alignItems="center"
-      noColumnMargin
-      noMargin
-    >
-      <Text noMargin>
-        <Trans>Learn the basics of GDevelop and publish a first game.</Trans>
-      </Text>
-      <Checkbox
-        label={<Trans>Don't show this screen on next startup</Trans>}
-        checked={!showGetStartedSection}
-        onCheck={(e, checked) => setShowGetStartedSection(!checked)}
-      />
-    </ResponsiveLineStackLayout>
-  );
-
-  const isFlingTutorialComplete =
-    isTutorialPartComplete({
-      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-      part: 0,
-    }) &&
-    isTutorialPartComplete({
-      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-      part: 1,
-    }) &&
-    isTutorialPartComplete({
-      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-      part: 2,
-    });
-
-  return (
-    <SectionContainer
-      title={<Trans>Guided lessons</Trans>}
-      renderSubtitle={() => <Subtitle />}
-    >
-      <SectionRow>
-        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
-      </SectionRow>
-      <SectionRow>
-        <Text size="title" noMargin>
-          <Trans>Create and Publish a Fling game</Trans>
-        </Text>
-        <Text size="body" color="secondary" noMargin>
-          <Trans>
-            3-part tutorial to creating and publishing a game from scratch.
-          </Trans>
-        </Text>
-        <Spacer />
-        <Line>
-          <div style={styles.bannerContainer}>
-            {inAppTutorialsFetchingError ? (
-              <PlaceholderError onRetry={fetchInAppTutorials}>
-                <Trans>An error occurred when downloading the tutorials.</Trans>{' '}
-                <Trans>
-                  Please check your internet connection or try again later.
-                </Trans>
-              </PlaceholderError>
-            ) : inAppTutorialShortHeaders === null ? (
-              <PlaceholderLoader />
-            ) : (
-              <GridList
-                cols={
-                  isFlingTutorialComplete ? 1 : getColumnsFromWidth(windowWidth)
-                }
-                style={styles.grid}
-                cellHeight="auto"
-                spacing={ITEMS_SPACING * 2}
-              >
-                {isFlingTutorialComplete ? (
-                  <GridListTile>
-                    <InAppTutorialPhaseCard
-                      title={t`Congratulations! You've finished this tutorial!`}
-                      description={t`Find your finished game on the “Build” section. Or restart the tutorial by clicking on the card.`}
-                      size="banner"
-                      locked={false}
-                      disabled={false}
-                      renderImage={props => (
-                        <Line justifyContent="space-around" expand>
-                          <Unboxing {...props} />
-                          <Building {...props} />
-                          <Podium {...props} />
-                        </Line>
-                      )}
-                      onClick={() =>
-                        selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
-                      }
-                    />
-                  </GridListTile>
-                ) : (
-                  flingInAppTutorialCards.map(item => (
-                    <GridListTile key={item.key}>
-                      <InAppTutorialPhaseCard
-                        {...item}
-                        onClick={() =>
-                          selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
-                        }
-                      />
-                    </GridListTile>
-                  ))
-                )}
-              </GridList>
-            )}
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text size="title" align="center">
+            <Trans>You seem to be offline</Trans>
+          </Text>
+          <TreeLeaves style={styles.icon} />
+          <Text size="body2" noMargin align="center">
+            <Trans>
+              Verify your internet connection to access your personalized
+              content.
+            </Trans>
+          </Text>
+          <div style={styles.buttonContainer}>
+            <Line expand>
+              <RaisedButton
+                primary
+                label={<Trans>Refresh</Trans>}
+                onClick={forceUpdate}
+                fullWidth
+              />
+            </Line>
           </div>
-        </Line>
-      </SectionRow>
-      <SectionRow>
-        <Text size="title" noMargin>
-          <Trans>Want to explore further?</Trans>
-        </Text>
-        <Text size="body" color="secondary" noMargin>
-          <Trans>Articles, wiki and much more.</Trans>
-        </Text>
-        <LargeSpacer />
-        <Line noMargin expand>
-          <GridList
-            cols={getColumnsFromWidth(windowWidth)}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={ITEMS_SPACING * 2}
-          >
-            {items.map((item, index) => (
-              <GridListTile key={index}>
-                <CardWidget
-                  onClick={item.action}
-                  key={index}
-                  size="large"
-                  disabled={item.disabled}
-                  useDefaultDisabledStyle
-                >
-                  <div
-                    style={{
-                      ...styles.cardTextContainer,
-                      padding: isMobile ? 10 : 20,
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (showLoginStep) {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <ColumnStackLayout expand alignItems="center" justifyContent="center">
+            <Text size="title" align="center">
+              <Trans>Log in to Gdevelop</Trans>
+            </Text>
+            <BackgroundText>
+              <Trans>
+                This will synchronise your selected content wherever you go.
+              </Trans>
+            </BackgroundText>
+            <div
+              style={{
+                // Take full width on mobile.
+                width: isMobile ? '100%' : 300,
+                marginTop: 20,
+              }}
+            >
+              <Form onSubmit={doLogin} autoComplete="on" name="login">
+                <ColumnStackLayout noMargin>
+                  <TextField
+                    autoFocus="desktop"
+                    value={email}
+                    floatingLabelText={<Trans>Email</Trans>}
+                    // errorText={getEmailErrorText(error)}
+                    onChange={(e, value) => {
+                      setEmail(value);
                     }}
-                  >
-                    <ColumnStackLayout
-                      expand
-                      justifyContent="center"
-                      useFullHeight
-                    >
-                      <Text size="sub-title" noMargin>
-                        {item.title}
-                      </Text>
-                      <Text size="body" color="secondary" noMargin>
-                        {item.description}
-                      </Text>
-                    </ColumnStackLayout>
-                  </div>
-                </CardWidget>
-              </GridListTile>
-            ))}
-          </GridList>
-        </Line>
-      </SectionRow>
-    </SectionContainer>
-  );
+                    onBlur={event => {
+                      setEmail(event.currentTarget.value.trim());
+                    }}
+                    fullWidth
+                    disabled={isLoading}
+                  />
+                  <TextField
+                    value={password}
+                    floatingLabelText={<Trans>Password</Trans>}
+                    // errorText={getPasswordErrorText(error)}
+                    type="password"
+                    onChange={(e, value) => {
+                      setPassword(value);
+                    }}
+                    fullWidth
+                    disabled={isLoading}
+                  />
+                </ColumnStackLayout>
+              </Form>
+            </div>
+          </ColumnStackLayout>
+          <div style={styles.buttonContainer}>
+            <Column>
+              <LineStackLayout expand>
+                <FlatButton
+                  primary
+                  label={<Trans>Back</Trans>}
+                  onClick={() => setShowLoginStep(false)}
+                  fullWidth
+                />
+                <RaisedButton
+                  label={<Trans>Next</Trans>}
+                  primary
+                  // onClick={doLogin}
+                  onClick={() => setStepIndex(stepIndex + 1)}
+                  fullWidth
+                />
+              </LineStackLayout>
+              <Line justifyContent="center">
+                {steps.map((step, index) => {
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        ...styles.navigationDot,
+                        backgroundColor:
+                          index === stepIndex
+                            ? gdevelopTheme.text.color.primary
+                            : gdevelopTheme.text.color.disabled,
+                      }}
+                    />
+                  );
+                })}
+              </Line>
+            </Column>
+          </div>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (showCreateAccountStep) {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <ColumnStackLayout expand alignItems="center" justifyContent="center">
+            <Text size="title" align="center">
+              <Trans>Let's start by creating your GDevelop account</Trans>
+            </Text>
+            <BackgroundText>
+              <Trans>
+                This will synchronise your selected content wherever you go.
+              </Trans>
+            </BackgroundText>
+            <div
+              style={{
+                // Take full width on mobile.
+                width: isMobile ? '100%' : 300,
+                marginTop: 20,
+              }}
+            >
+              <Form
+                onSubmit={doCreateAccount}
+                autoComplete="on"
+                name="createAccount"
+              >
+                <ColumnStackLayout noMargin>
+                  <UsernameField
+                    value={username}
+                    onChange={(e, value) => {
+                      setUsername(value);
+                    }}
+                    allowEmpty
+                    onAvailabilityChecked={setUsernameAvailability}
+                    onAvailabilityCheckLoading={setIsValidatingUsername}
+                    isValidatingUsername={isValidatingUsername}
+                    disabled={isLoading}
+                  />
+                  <TextField
+                    value={email}
+                    floatingLabelText={<Trans>Email</Trans>}
+                    // errorText={getEmailErrorText(error)}
+                    fullWidth
+                    required
+                    onChange={(e, value) => {
+                      setEmail(value);
+                    }}
+                    onBlur={event => {
+                      setEmail(event.currentTarget.value.trim());
+                    }}
+                    disabled={isLoading}
+                  />
+                  <TextField
+                    value={password}
+                    floatingLabelText={<Trans>Password</Trans>}
+                    // errorText={getPasswordErrorText(error)}
+                    type="password"
+                    fullWidth
+                    required
+                    onChange={(e, value) => {
+                      setPassword(value);
+                    }}
+                    disabled={isLoading}
+                  />
+                  <Checkbox
+                    label={
+                      <Trans>I want to receive the GDevelop Newsletter</Trans>
+                    }
+                    checked={getNewsletterEmail}
+                    onCheck={(e, value) => {
+                      setGetNewsletterEmail(value);
+                    }}
+                    disabled={isLoading}
+                  />
+                </ColumnStackLayout>
+              </Form>
+            </div>
+          </ColumnStackLayout>
+          <div style={styles.buttonContainer}>
+            <Column>
+              <LineStackLayout expand>
+                <FlatButton
+                  primary
+                  label={<Trans>Back</Trans>}
+                  onClick={() => setShowCreateAccountStep(false)}
+                  fullWidth
+                />
+                <RaisedButton
+                  label={<Trans>Next</Trans>}
+                  primary
+                  // onClick={doLogin}
+                  onClick={() => setStepIndex(stepIndex + 1)}
+                  fullWidth
+                />
+              </LineStackLayout>
+              <Line justifyContent="center">
+                {steps.map((step, index) => {
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        ...styles.navigationDot,
+                        backgroundColor:
+                          index === stepIndex
+                            ? gdevelopTheme.text.color.primary
+                            : gdevelopTheme.text.color.disabled,
+                      }}
+                    />
+                  );
+                })}
+              </Line>
+            </Column>
+          </div>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text size="title" align="center">
+            <Trans>Welcome to GDevelop!</Trans>
+          </Text>
+          <JewelPlatform style={styles.icon} />
+          <Text size="body2" noMargin align="center">
+            <Trans>
+              We've put together some content to help you on your game creation
+              journey.
+            </Trans>
+          </Text>
+          <LargeSpacer />
+          <Text size="sub-title" align="center">
+            <Trans>Let's start by creating your account.</Trans>
+          </Text>
+          <div style={styles.buttonContainer}>
+            <ColumnStackLayout noMargin>
+              <RaisedButton
+                label={<Trans>Let's go!</Trans>}
+                primary
+                onClick={() => setShowCreateAccountStep(true)}
+                fullWidth
+              />
+              <FlatButton
+                primary
+                label={<Trans>I already have an account</Trans>}
+                onClick={() => setShowLoginStep(true)}
+                fullWidth
+              />
+            </ColumnStackLayout>
+          </div>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  return null;
 };
 
 const GetStartedSectionWithErrorBoundary = (props: Props) => (

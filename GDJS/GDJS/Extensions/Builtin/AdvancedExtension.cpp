@@ -163,8 +163,7 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "string",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String operandCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -176,10 +175,13 @@ AdvancedExtension::AdvancedExtension() {
 
         return resultingBoolean + " = " +
                gd::String(instruction.IsInverted() ? "!" : "") +
-               "((typeof eventsFunctionContext !== 'undefined' ? "
-               "Number(eventsFunctionContext.getArgument(" +
-               parameterNameCode + ")) || 0 : 0) " + operatorCode + " " +
-               operandCode + ");\n";
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString,
+                   "((typeof eventsFunctionContext !== 'undefined' ? "
+                   "Number(eventsFunctionContext.getArgument(" +
+                       parameterNameCode + ")) || 0 : 0)",
+                   operandCode) +
+               ");\n";
       });
 
   GetAllConditions()["CompareArgumentAsString"]
@@ -191,8 +193,7 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "string",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String operandCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -204,10 +205,13 @@ AdvancedExtension::AdvancedExtension() {
 
         return resultingBoolean + " = " +
                gd::String(instruction.IsInverted() ? "!" : "") +
-               "((typeof eventsFunctionContext !== 'undefined' ? "
-               "\"\" + eventsFunctionContext.getArgument(" +
-               parameterNameCode + ") : \"\") " + operatorCode + " " +
-               operandCode + ");\n";
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString,
+                   "((typeof eventsFunctionContext !== 'undefined' ? "
+                   "\"\" + eventsFunctionContext.getArgument(" +
+                       parameterNameCode + ") : \"\")",
+                   operandCode) +
+               ");\n";
       });
 }
 

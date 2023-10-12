@@ -245,9 +245,7 @@ export default class PixiResourcesLoader {
           PIXI.Assets.setPreferences({
             preferWorkers: false,
             preferCreateImageBitmap: false,
-            crossOrigin: checkIfCredentialsRequired(url)
-              ? 'use-credentials'
-              : 'anonymous',
+            crossOrigin: determineCrossOrigin(url),
           });
           const loadedTexture = await PIXI.Assets.load(url);
           loadedTextures[resourceName] = loadedTexture;
@@ -275,6 +273,8 @@ export default class PixiResourcesLoader {
             scaleMode: PIXI.SCALE_MODES.LINEAR,
             resourceOptions: {
               autoPlay: false,
+              // crossorigin does not have a typo (with regards to PIXI.Assets.setPreferences that
+              // uses a crossOrigin parameter). See https://pixijs.download/dev/docs/PIXI.html#autoDetectResource.
               crossorigin: determineCrossOrigin(url),
             },
           });

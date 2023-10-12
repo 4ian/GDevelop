@@ -23,12 +23,12 @@
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
-#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h"
+#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
 
 using namespace std;
@@ -127,7 +127,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       globalObjectsAndGroups,
       objectsAndGroups);
 
-  gd::ProjectScopedContainers projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
+  gd::ProjectScopedContainers projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
+          globalObjectsAndGroups, objectsAndGroups);
   projectScopedContainers.AddParameters(eventsFunction.GetParameters());
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
@@ -171,9 +173,13 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       globalObjectsAndGroups,
       objectsAndGroups);
 
-  gd::ProjectScopedContainers projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetSharedPropertyDescriptors());
-  projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetPropertyDescriptors());
+  gd::ProjectScopedContainers projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
+          globalObjectsAndGroups, objectsAndGroups);
+  projectScopedContainers.AddPropertiesContainer(
+      eventsBasedBehavior.GetSharedPropertyDescriptors());
+  projectScopedContainers.AddPropertiesContainer(
+      eventsBasedBehavior.GetPropertyDescriptors());
   projectScopedContainers.AddParameters(eventsFunction.GetParameters());
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
@@ -244,8 +250,11 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       globalObjectsAndGroups,
       objectsAndGroups);
 
-  gd::ProjectScopedContainers projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddPropertiesContainer(eventsBasedObject.GetPropertyDescriptors());
+  gd::ProjectScopedContainers projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
+          globalObjectsAndGroups, objectsAndGroups);
+  projectScopedContainers.AddPropertiesContainer(
+      eventsBasedObject.GetPropertyDescriptors());
   projectScopedContainers.AddParameters(eventsFunction.GetParameters());
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
@@ -320,8 +329,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
       continue;
     }
 
+    gd::String parameterMangledName =
+        EventsCodeNameMangler::GetMangledName(parameter.GetName());
+
     declaration += (declaration.empty() ? "" : ", ") +
-                   (parameter.GetName().empty() ? "_" : parameter.GetName());
+                   (parameter.GetName().empty() ? "_" : parameterMangledName);
   }
   declaration += gd::String(declaration.empty() ? "" : ", ") +
                  "parentEventsFunctionContext";
@@ -475,6 +487,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
   for (const auto& parameter : parameters) {
     if (parameter.GetName().empty()) continue;
 
+    gd::String parameterMangledName = EventsCodeNameMangler::GetMangledName(parameter.GetName());
+
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
       if (parameter.GetName() == thisObjectName) {
         continue;
@@ -485,9 +499,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
       gd::String comma = objectsGettersMap.empty() ? "" : ", ";
       objectsGettersMap += comma +
                            ConvertToStringExplicit(parameter.GetName()) + ": " +
-                           parameter.GetName() + "\n";
+                           parameterMangledName + "\n";
       objectArraysMap += comma + ConvertToStringExplicit(parameter.GetName()) +
-                         ": gdjs.objectsListsToArray(" + parameter.GetName() +
+                         ": gdjs.objectsListsToArray(" + parameterMangledName +
                          ")\n";
     } else if (gd::ParameterMetadata::IsBehavior(parameter.GetType())) {
       if (parameter.GetName() == thisBehaviorName) {
@@ -498,11 +512,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
       // function to the "real" behavior name from the caller.
       gd::String comma = behaviorNamesMap.empty() ? "" : ", ";
       behaviorNamesMap += comma + ConvertToStringExplicit(parameter.GetName()) +
-                          ": " + parameter.GetName() + "\n";
+                          ": " + parameterMangledName + "\n";
     } else {
       argumentsGetters +=
           "if (argName === " + ConvertToStringExplicit(parameter.GetName()) +
-          ") return " + parameter.GetName() + ";\n";
+          ") return " + parameterMangledName + ";\n";
     }
   }
 
@@ -703,7 +717,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
         instrInfos.codeExtraInformation.functionCallName);
   } else {
     predicate = instrInfos.codeExtraInformation.functionCallName + "(" +
-               GenerateArgumentsList(arguments) + ")";
+                GenerateArgumentsList(arguments) + ")";
   }
 
   // Add logical not if needed
@@ -718,8 +732,8 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
     predicate = GenerateNegatedPredicate(predicate);
 
   // Generate condition code
-  return GenerateBooleanFullName(returnBoolean, context) +
-         " = " + predicate + ";\n";
+  return GenerateBooleanFullName(returnBoolean, context) + " = " + predicate +
+         ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectCondition(
@@ -745,7 +759,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
         instrInfos, arguments, objectFunctionCallNamePart, 1);
   } else {
     predicate = objectFunctionCallNamePart + "(" +
-               GenerateArgumentsList(arguments, 1) + ")";
+                GenerateArgumentsList(arguments, 1) + ")";
   }
   if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
@@ -792,12 +806,13 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
         instrInfos, arguments, objectFunctionCallNamePart, 2);
   } else {
     predicate = objectFunctionCallNamePart + "(" +
-               GenerateArgumentsList(arguments, 2) + ")";
+                GenerateArgumentsList(arguments, 2) + ")";
   }
   if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors = GetObjectsContainersList().GetBehaviorsOfObject(objectName);
+  vector<gd::String> behaviors =
+      GetObjectsContainersList().GetBehaviorsOfObject(objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Error: bad behavior \"" << behaviorName
@@ -939,7 +954,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   }
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors = GetObjectsContainersList().GetBehaviorsOfObject(objectName);
+  vector<gd::String> behaviors =
+      GetObjectsContainersList().GetBehaviorsOfObject(objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Error: bad behavior \"" << behaviorName
@@ -1100,8 +1116,8 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
     gd::EventsCodeGenerationContext& context) {
   gd::String outputCode;
 
-    outputCode += GenerateBooleanInitializationToFalse(
-        "isConditionTrue", context);
+  outputCode +=
+      GenerateBooleanInitializationToFalse("isConditionTrue", context);
 
   for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
     if (cId != 0) {
@@ -1110,9 +1126,7 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
                     ") {\n";
     }
     gd::String conditionCode =
-        GenerateConditionCode(conditions[cId],
-                              "isConditionTrue",
-                              context);
+        GenerateConditionCode(conditions[cId], "isConditionTrue", context);
     if (!conditions[cId].GetType().empty()) {
       outputCode +=
           GenerateBooleanFullName("isConditionTrue", context) + " = false;\n";
@@ -1210,14 +1224,16 @@ gd::String EventsCodeGenerator::GenerateObject(
   gd::String output;
   if (type == "objectList") {
     std::vector<gd::String> realObjects =
-        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+        GetObjectsContainersList().ExpandObjectName(objectName,
+                                                    context.GetCurrentObject());
     for (auto& objectName : realObjects) context.ObjectsListNeeded(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
     output = objectsMapName;
   } else if (type == "objectListOrEmptyIfJustDeclared") {
     std::vector<gd::String> realObjects =
-        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+        GetObjectsContainersList().ExpandObjectName(objectName,
+                                                    context.GetCurrentObject());
     for (auto& objectName : realObjects)
       context.ObjectsListNeededOrEmptyIfJustDeclared(objectName);
 
@@ -1225,7 +1241,8 @@ gd::String EventsCodeGenerator::GenerateObject(
     output = objectsMapName;
   } else if (type == "objectListOrEmptyWithoutPicking") {
     std::vector<gd::String> realObjects =
-        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+        GetObjectsContainersList().ExpandObjectName(objectName,
+                                                    context.GetCurrentObject());
 
     // Find the objects not yet declared, and handle them separately so they are
     // passed as empty object lists.
@@ -1245,7 +1262,8 @@ gd::String EventsCodeGenerator::GenerateObject(
     output = objectsMapName;
   } else if (type == "objectPtr") {
     std::vector<gd::String> realObjects =
-        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+        GetObjectsContainersList().ExpandObjectName(objectName,
+                                                    context.GetCurrentObject());
 
     if (find(realObjects.begin(),
              realObjects.end(),
@@ -1289,7 +1307,8 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     }
   } else {
     std::vector<gd::String> realObjects =
-        GetObjectsContainersList().ExpandObjectName(objectName, context.GetCurrentObject());
+        GetObjectsContainersList().ExpandObjectName(objectName,
+                                                    context.GetCurrentObject());
 
     output = "gdjs.VariablesContainer.badVariablesContainer";
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
@@ -1352,8 +1371,7 @@ gd::String EventsCodeGenerator::GenerateBooleanInitializationToFalse(
 gd::String EventsCodeGenerator::GenerateBooleanFullName(
     const gd::String& boolName,
     const gd::EventsCodeGenerationContext& context) {
-  return boolName + "_" +
-         gd::String::From(context.GetCurrentConditionDepth());
+  return boolName + "_" + gd::String::From(context.GetCurrentConditionDepth());
 }
 
 gd::String EventsCodeGenerator::GenerateProfilerSectionBegin(
@@ -1385,7 +1403,8 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
       propertiesContainer.GetOwner() == gd::EventsFunctionsContainer::Behavior
           ? "eventsFunctionContext.getObjects(\"Object\")[0].getBehavior(" +
                 GenerateGetBehaviorNameCode("Behavior") + ")"
-          : (propertiesContainer.GetOwner() == gd::EventsFunctionsContainer::Object
+          : (propertiesContainer.GetOwner() ==
+                     gd::EventsFunctionsContainer::Object
                  ? "eventsFunctionContext.getObjects(\"Object\")[0]"
                  : "eventsFunctionContext.getProperties()");
   gd::String propertyGetterCode =
@@ -1434,9 +1453,9 @@ gd::String EventsCodeGenerator::GenerateParameterGetter(
     const gd::ParameterMetadata& parameter,
     const gd::String& type,
     gd::EventsCodeGenerationContext& context) {
-
   gd::String parameterGetterCode =
-      "eventsFunctionContext.getArgument(" + ConvertToStringExplicit(parameter.GetName()) + ")";
+      "eventsFunctionContext.getArgument(" +
+      ConvertToStringExplicit(parameter.GetName()) + ")";
 
   if (type == "number|string") {
     if (parameter.GetValueTypeMetadata().IsNumber()) {
@@ -1475,7 +1494,8 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project,
                                          const gd::Layout& layout)
     : gd::EventsCodeGenerator(project, layout, JsPlatform::Get()) {}
 
-EventsCodeGenerator::EventsCodeGenerator(const gd::ProjectScopedContainers& projectScopedContainers)
+EventsCodeGenerator::EventsCodeGenerator(
+    const gd::ProjectScopedContainers& projectScopedContainers)
     : gd::EventsCodeGenerator(JsPlatform::Get(), projectScopedContainers) {}
 
 EventsCodeGenerator::~EventsCodeGenerator() {}

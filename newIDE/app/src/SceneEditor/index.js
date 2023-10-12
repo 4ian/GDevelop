@@ -1488,11 +1488,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .toJSArray();
     resourcesInUse.delete();
 
-    PixiResourcesLoader.loadTextures(
-      project,
-      objectResourceNames,
-      () => {}
-    ).then(() => {
+    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
       if (this.editorDisplay)
         this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
           object.getName()

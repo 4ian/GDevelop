@@ -165,12 +165,13 @@ export default class PixiResourcesLoader {
   ) {
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture && loadedTexture.textureCacheIds) {
+      // The property textureCacheIds indicates that the PIXI.Texture object has some
+      // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
+      // PIXI.Assets.unload will handle the clearing of those caches.
       await PIXI.Assets.unload(loadedTexture.textureCacheIds);
-      // Needed for video objects. Optional for other object types.
-      delete loadedTextures[resourceName];
     }
 
-    await PixiResourcesLoader.loadTextures(project, [resourceName], () => {});
+    await PixiResourcesLoader.loadTextures(project, [resourceName]);
 
     if (loadedOrLoading3DModelPromises[resourceName]) {
       delete loadedOrLoading3DModelPromises[resourceName];
@@ -200,8 +201,7 @@ export default class PixiResourcesLoader {
    */
   static async loadTextures(
     project: gdProject,
-    resourceNames: Array<string>,
-    onProgress: (number, number) => void
+    resourceNames: Array<string>
   ): Promise<void> {
     const resourcesManager = project.getResourcesManager();
 
@@ -217,11 +217,22 @@ export default class PixiResourcesLoader {
         return resource;
       })
       .filter(Boolean);
+    const videoResources = resourceNames
+      .map(resourceName => {
+        if (!resourcesManager.hasResource(resourceName)) {
+          return null;
+        }
+        const resource = resourcesManager.getResource(resourceName);
+        if (resource.getKind() !== 'video') {
+          return null;
+        }
+        return resource;
+      })
+      .filter(Boolean);
 
     // TODO use a PromisePool to be able to abort the previous reload of resources.
-    let loadedCount = 0;
-    await Promise.all(
-      imageResources.map(async resource => {
+    await Promise.all([
+      ...imageResources.map(async resource => {
         try {
           const resourceName = resource.getName();
           const url = ResourcesLoader.getResourceFullUrl(
@@ -248,10 +259,35 @@ export default class PixiResourcesLoader {
             error ? error : '(unknown error)'
           );
         }
-        loadedCount++;
-        onProgress(loadedCount, imageResources.length);
-      })
-    );
+      }),
+      ...videoResources.map(async resource => {
+        try {
+          const resourceName = resource.getName();
+          const url = ResourcesLoader.getResourceFullUrl(
+            project,
+            resourceName,
+            {
+              isResourceForPixi: true,
+            }
+          );
+
+          loadedTextures[resourceName] = PIXI.Texture.from(url, {
+            scaleMode: PIXI.SCALE_MODES.LINEAR,
+            resourceOptions: {
+              autoPlay: false,
+              crossorigin: determineCrossOrigin(url),
+            },
+          });
+
+          return loadedTextures[resourceName];
+        } catch (error) {
+          console.error(
+            'Unable to load file ' + resource.getFile() + ' with error:',
+            error ? error : '(unknown error)'
+          );
+        }
+      }),
+    ]);
   }
 
   /**

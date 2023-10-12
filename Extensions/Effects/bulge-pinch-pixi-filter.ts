@@ -6,8 +6,7 @@ namespace gdjs {
         const bulgePinchFilter = new PIXI.filters.BulgePinchFilter();
         return bulgePinchFilter;
       }
-      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-      }
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
       updateDoubleParameter(
         filter: PIXI.Filter,
         parameterName: string,

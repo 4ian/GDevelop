@@ -140,21 +140,27 @@ namespace gdjs {
 
       logger.log('Loading texture for resource "' + resourceName + '"...');
       const file = resource.file;
-      const texture = PIXI.Texture.from(
-        this._resourcesLoader.getFullUrl(file),
-        {
-          resourceOptions: {
-            // Note that using `false`
-            // to not having `crossorigin` at all would NOT work because the browser would taint the
-            // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-            crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
-              ? 'use-credentials'
-              : 'anonymous',
-          },
-        }
-      ).on('error', (error) => {
+      const url = this._resourcesLoader.getFullUrl(file);
+      const texture = PIXI.Texture.from(url, {
+        resourceOptions: {
+          // Note that using `false`
+          // to not having `crossorigin` at all would NOT work because the browser would taint the
+          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+          crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+            ? 'use-credentials'
+            : 'anonymous',
+        },
+      }).on('error', (error) => {
         logFileLoadingError(file, error);
       });
+      if (!texture) {
+        throw new Error(
+          'Texture loading by PIXI returned nothing for file ' +
+            file +
+            ' behind url ' +
+            url
+        );
+      }
       applyTextureSettings(texture, resource);
 
       this._loadedTextures.put(resourceName, texture);
@@ -358,6 +364,12 @@ namespace gdjs {
                   : 'anonymous',
               });
               const loadedTexture = await PIXI.Assets.load(resource.file);
+              if (!loadedTexture) {
+                throw new Error(
+                  'Texture loading by PIXI returned nothing for file ' +
+                    resource.file
+                );
+              }
               this._loadedTextures.put(resource.name, loadedTexture);
               // TODO What if 2 assets share the same file with different settings?
               applyTextureSettings(loadedTexture, resource);

@@ -401,7 +401,6 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'video') return invalidTexture;
 
     const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
-      disableCacheBurst: true, // Disable cache bursting for video because it prevents the video to be recognized as such (for a local file)
       isResourceForPixi: true,
     });
 

@@ -233,8 +233,8 @@ export default class PixiResourcesLoader {
     // TODO use a PromisePool to be able to abort the previous reload of resources.
     await Promise.all([
       ...imageResources.map(async resource => {
+        const resourceName = resource.getName();
         try {
-          const resourceName = resource.getName();
           const url = ResourcesLoader.getResourceFullUrl(
             project,
             resourceName,
@@ -255,14 +255,14 @@ export default class PixiResourcesLoader {
           applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
           console.error(
-            'Unable to load file ' + resource.getFile() + ' with error:',
+            `Unable to load file ${resource.getFile()} for image resource ${resourceName}:`,
             error ? error : '(unknown error)'
           );
         }
       }),
       ...videoResources.map(async resource => {
+        const resourceName = resource.getName();
         try {
-          const resourceName = resource.getName();
           const url = ResourcesLoader.getResourceFullUrl(
             project,
             resourceName,
@@ -282,7 +282,7 @@ export default class PixiResourcesLoader {
           return loadedTextures[resourceName];
         } catch (error) {
           console.error(
-            'Unable to load file ' + resource.getFile() + ' with error:',
+            `Unable to load file ${resource.getFile()} for video resource ${resourceName}:`,
             error ? error : '(unknown error)'
           );
         }

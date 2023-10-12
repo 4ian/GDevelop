@@ -103,31 +103,7 @@ describe('libGD.js', function () {
       expect(project.hasExternalLayoutNamed('My layout')).toBe(false);
     });
 
-    it('should validate object names (legacy)', function () {
-      gd.Project.allowUsageOfUnicodeIdentifierNames(false);
-      expect(gd.Project.isNameSafe('ThisNameIs_Ok_123')).toBe(true);
-      expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);
-      expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
-      expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
-      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe(
-        'ThisNameIs_Ok_123'
-      );
-      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe(
-        'ThisName_IsNot_Ok_123'
-      );
-      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe(
-        'ThisNameIsNot_Ok_'
-      );
-      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe(
-        '_1ThisNameIsNot_Ok_123'
-      );
-      expect(gd.Project.getSafeName('官话 name')).toBe('___name');
-      expect(gd.Project.getSafeName('')).toBe('Unnamed');
-      expect(gd.Project.getSafeName('9')).toBe('_9');
-    });
-
-    it('should validate object names (unicode)', function () {
-      gd.Project.allowUsageOfUnicodeIdentifierNames(true);
+    it('should validate object names', function () {
       expect(gd.Project.isNameSafe('ThisNameIs_Ok_123')).toBe(true);
       expect(gd.Project.isNameSafe('ThisNameIs_👍_123')).toBe(true);
       expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);

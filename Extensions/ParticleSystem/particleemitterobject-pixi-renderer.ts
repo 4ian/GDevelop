@@ -119,11 +119,14 @@ namespace gdjs {
               },
               minStart: objectData.emitterForceMin,
               maxStart: objectData.emitterForceMax,
+              // See _updateRotateFlagFromSpeed
               rotate:
-                (objectData.particleGravityX !== 0 ||
-                  objectData.particleGravityY !== 0) &&
                 objectData.particleAngle1 === 0 &&
-                objectData.particleAngle2 === 0,
+                objectData.particleAngle2 === 0 &&
+                (objectData.particleGravityX !== 0 ||
+                  objectData.particleGravityY !== 0 ||
+                  objectData.emitterForceMin < 0 ||
+                  objectData.emitterForceMax < 0),
             },
           },
           {
@@ -277,7 +280,7 @@ namespace gdjs {
       const behavior: any = this.emitter.getBehavior('moveAcceleration');
       behavior.accel.x = x;
       behavior.accel.y = y;
-      this._updateRotateFromSpeedFlag();
+      this._updateRotateFlagFromSpeed();
     }
 
     /**
@@ -285,15 +288,21 @@ namespace gdjs {
      * according to the speed direction. This is overriding the particle
      * rotation calculated by from `rotation`.
      */
-    private _updateRotateFromSpeedFlag() {
+    private _updateRotateFlagFromSpeed() {
       const rotation: any = this.emitter.getBehavior('rotation');
       const moveAcceleration: any = this.emitter.getBehavior(
         'moveAcceleration'
       );
       moveAcceleration.rotate =
-        (moveAcceleration.accel.x !== 0 || moveAcceleration.accel.y !== 0) &&
         rotation.minSpeed === 0 &&
-        rotation.maxSpeed === 0;
+        rotation.maxSpeed === 0 &&
+        // This part is to avoid to do `atan` every frame when the object
+        // direction doesn't change.
+        (moveAcceleration.accel.x !== 0 ||
+          moveAcceleration.accel.y !== 0 ||
+          // Negative speeds need a 180° rotation.
+          moveAcceleration.minStart < 0 ||
+          moveAcceleration.maxStart < 0);
     }
 
     setColor(
@@ -334,7 +343,7 @@ namespace gdjs {
       const behavior: any = this.emitter.getBehavior('rotation');
       behavior.minSpeed = gdjs.toRad(min);
       behavior.maxSpeed = gdjs.toRad(max);
-      this._updateRotateFromSpeedFlag();
+      this._updateRotateFlagFromSpeed();
     }
 
     setMaxParticlesCount(count: float): void {

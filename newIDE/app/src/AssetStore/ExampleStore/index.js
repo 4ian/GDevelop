@@ -263,7 +263,10 @@ export const ExampleStore = ({
                           sendExampleDetailsOpened(item.slug);
                           onSelectExampleShortHeader(item);
                         }}
-                        onOpen={onOpenNewProjectSetupDialog}
+                        onOpen={() => {
+                          onSelectExampleShortHeader(item);
+                          onOpenNewProjectSetupDialog();
+                        }}
                       />
                     );
                   }

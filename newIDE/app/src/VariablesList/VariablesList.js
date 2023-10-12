@@ -1419,7 +1419,7 @@ const VariablesList = (props: Props) => {
     (newName: string, additionalContext: any) => {
       const parsedContext = JSON.parse(additionalContext);
       const nodeId: string = parsedContext.nodeId;
-      const depth: number = parsedContext.number;
+      const depth: number = parsedContext.depth;
 
       const { variable, lineage, name } = getVariableContextFromNodeId(
         nodeId,
@@ -1431,10 +1431,16 @@ const VariablesList = (props: Props) => {
 
       // In theory this cleaning is not necessary (a "safe name" is mandatory for root variables,
       // but others should be able to have any name). In practice,
-      // this editor uses specific seperator that we forbid in names.
+      // this editor uses specific separator that we forbid in names.
       let cleanedName = newName.replace(inheritedPrefix, '');
+
       while (cleanedName.includes(separator)) {
-        cleanedName.replace(separator, '');
+        cleanedName = cleanedName.replace(separator, '');
+      }
+
+      if (depth === 0) {
+        // A root variable cannot have a space in it.
+        cleanedName = cleanedName.replace(/\s/g, '');
       }
 
       const safeAndUniqueNewName = newNameGenerator(

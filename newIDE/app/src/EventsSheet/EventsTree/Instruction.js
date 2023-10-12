@@ -48,7 +48,6 @@ import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
 import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
-import IconButton from '../../UI/IconButton';
 import Warning from '../../UI/CustomSvgIcons/Warning';
 
 const gd: libGDevelop = global.gd;

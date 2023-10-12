@@ -10,13 +10,13 @@ import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 const gd: libGDevelop = global.gd;
 
-const loadedBitmapFonts = {};
-const loadedFontFamilies = {};
-const loadedTextures = {};
+let loadedBitmapFonts = {};
+let loadedFontFamilies = {};
+let loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
-const loadedThreeTextures = {};
-const loadedThreeMaterials = {};
-const loadedOrLoading3DModelPromises: {
+let loadedThreeTextures = {};
+let loadedThreeMaterials = {};
+let loadedOrLoading3DModelPromises: {
   [resourceName: string]: Promise<THREE.THREE_ADDONS.GLTF>,
 } = {};
 
@@ -150,13 +150,58 @@ const traverseToRemoveMetalnessFromMeshes = (
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
+  static burstCache() {
+    loadedBitmapFonts = {};
+    loadedFontFamilies = {};
+    loadedTextures = {};
+    loadedThreeTextures = {};
+    loadedThreeMaterials = {};
+    loadedOrLoading3DModelPromises = {};
+  }
+
+  static async reloadTextureForResource(
+    project: gdProject,
+    resourceName: string
+  ) {
+    const loadedTexture = loadedTextures[resourceName];
+    if (loadedTexture && loadedTexture.textureCacheIds) {
+      // The property textureCacheIds indicates that the PIXI.Texture object has some
+      // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
+      // PIXI.Assets.unload will handle the clearing of those caches.
+      await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+    }
+
+    await PixiResourcesLoader.loadTextures(project, [resourceName]);
+
+    if (loadedOrLoading3DModelPromises[resourceName]) {
+      delete loadedOrLoading3DModelPromises[resourceName];
+    }
+    if (loadedFontFamilies[resourceName]) {
+      delete loadedFontFamilies[resourceName];
+    }
+    if (loadedBitmapFonts[resourceName]) {
+      delete loadedBitmapFonts[resourceName];
+    }
+    if (loadedThreeTextures[resourceName]) {
+      loadedThreeTextures[resourceName].dispose();
+      delete loadedThreeTextures[resourceName];
+    }
+    const matchingMaterials = Object.keys(loadedThreeMaterials).filter(key =>
+      key.startsWith(resourceName)
+    );
+    if (matchingMaterials.length > 0) {
+      matchingMaterials.forEach(key => {
+        loadedThreeMaterials[key].dispose();
+        delete loadedThreeMaterials[key];
+      });
+    }
+  }
   /**
    * (Re)load the PIXI texture represented by the given resources.
    */
   static async loadTextures(
     project: gdProject,
-    resourceNames: Array<string>,
-    onProgress: (number, number) => void
+    resourceNames: Array<string>
   ): Promise<void> {
     const resourcesManager = project.getResourcesManager();
 
@@ -172,13 +217,24 @@ export default class PixiResourcesLoader {
         return resource;
       })
       .filter(Boolean);
+    const videoResources = resourceNames
+      .map(resourceName => {
+        if (!resourcesManager.hasResource(resourceName)) {
+          return null;
+        }
+        const resource = resourcesManager.getResource(resourceName);
+        if (resource.getKind() !== 'video') {
+          return null;
+        }
+        return resource;
+      })
+      .filter(Boolean);
 
     // TODO use a PromisePool to be able to abort the previous reload of resources.
-    let loadedCount = 0;
-    await Promise.all(
-      imageResources.map(async resource => {
+    await Promise.all([
+      ...imageResources.map(async resource => {
+        const resourceName = resource.getName();
         try {
-          const resourceName = resource.getName();
           const url = ResourcesLoader.getResourceFullUrl(
             project,
             resourceName,
@@ -189,9 +245,7 @@ export default class PixiResourcesLoader {
           PIXI.Assets.setPreferences({
             preferWorkers: false,
             preferCreateImageBitmap: false,
-            crossOrigin: checkIfCredentialsRequired(url)
-              ? 'use-credentials'
-              : 'anonymous',
+            crossOrigin: determineCrossOrigin(url),
           });
           const loadedTexture = await PIXI.Assets.load(url);
           loadedTextures[resourceName] = loadedTexture;
@@ -199,14 +253,41 @@ export default class PixiResourcesLoader {
           applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
           console.error(
-            'Unable to load file ' + resource.getFile() + ' with error:',
+            `Unable to load file ${resource.getFile()} for image resource ${resourceName}:`,
             error ? error : '(unknown error)'
           );
         }
-        loadedCount++;
-        onProgress(loadedCount, imageResources.length);
-      })
-    );
+      }),
+      ...videoResources.map(async resource => {
+        const resourceName = resource.getName();
+        try {
+          const url = ResourcesLoader.getResourceFullUrl(
+            project,
+            resourceName,
+            {
+              isResourceForPixi: true,
+            }
+          );
+
+          loadedTextures[resourceName] = PIXI.Texture.from(url, {
+            scaleMode: PIXI.SCALE_MODES.LINEAR,
+            resourceOptions: {
+              autoPlay: false,
+              // crossorigin does not have a typo (with regards to PIXI.Assets.setPreferences that
+              // uses a crossOrigin parameter). See https://pixijs.download/dev/docs/PIXI.html#autoDetectResource.
+              crossorigin: determineCrossOrigin(url),
+            },
+          });
+
+          return loadedTextures[resourceName];
+        } catch (error) {
+          console.error(
+            `Unable to load file ${resource.getFile()} for video resource ${resourceName}:`,
+            error ? error : '(unknown error)'
+          );
+        }
+      }),
+    ]);
   }
 
   /**
@@ -358,7 +439,6 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'video') return invalidTexture;
 
     const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
-      disableCacheBurst: true, // Disable cache bursting for video because it prevents the video to be recognized as such (for a local file)
       isResourceForPixi: true,
     });
 

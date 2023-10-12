@@ -62,6 +62,7 @@ import MosaicEditorsDisplay from './MosaicEditorsDisplay';
 import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
 import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 
 const gd: libGDevelop = global.gd;
 
@@ -205,6 +206,49 @@ export default class SceneEditor extends React.Component<Props, State> {
   getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
   }
+
+  onResourceExternallyChanged = async (resourceInfo: {|
+    identifier: string,
+  |}) => {
+    const { project } = this.props;
+
+    const resourceName = project
+      .getResourcesManager()
+      .getResourceNameWithFile(resourceInfo.identifier);
+    if (resourceName) {
+      const { editorDisplay } = this;
+      if (!editorDisplay) return;
+      try {
+        // When reloading textures, there can be a short time during which
+        // the existing texture is removed but the InstancesEditor tries to use it
+        // through the RenderedInstance's, triggering crashes. So the scene rendering
+        // is paused during this period.
+        editorDisplay.startSceneRendering(false);
+        await PixiResourcesLoader.reloadTextureForResource(
+          project,
+          resourceName
+        );
+
+        editorDisplay.forceUpdateObjectsList();
+
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(
+          resourceName
+        );
+        // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
+          clear(project)
+        );
+        objectNames.forEach(objectName => {
+          editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
+        });
+      } finally {
+        editorDisplay.startSceneRendering(true);
+      }
+    }
+  };
 
   updateToolbar = () => {
     const { editorDisplay } = this;
@@ -1444,11 +1488,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .toJSArray();
     resourcesInUse.delete();
 
-    PixiResourcesLoader.loadTextures(
-      project,
-      objectResourceNames,
-      () => {}
-    ).then(() => {
+    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
       if (this.editorDisplay)
         this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
           object.getName()

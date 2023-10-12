@@ -1044,7 +1044,9 @@ module.exports = {
       .setExtensionInformation(
         'TileMap',
         _('Tilemap'),
-        "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc...",
+        _(
+          "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc..."
+        ),
         'Todor Imreorov',
         'Open source (MIT License)'
       )
@@ -1059,6 +1061,25 @@ module.exports = {
     defineCollisionMask(extension, _, gd);
 
     return extension;
+  },
+
+  registerClearCache: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
+    const TilemapHelper = objectsRenderingService.requireModule(
+      __dirname,
+      'helper/TileMapHelper'
+    );
+
+    const clearCaches = (
+      project /* InstanceHolder - gdProject in the editor */
+    ) => {
+      /** @type {TileMapHelper.TileMapManager} */
+      const manager = TilemapHelper.TileMapManager.getManager(project);
+      manager.clearCaches();
+    };
+
+    objectsRenderingService.registerClearCache(clearCaches);
   },
 
   /**

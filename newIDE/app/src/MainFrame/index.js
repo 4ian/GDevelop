@@ -180,7 +180,8 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
-
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import useResourcesWatcher from './ResourcesWatcher';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -498,6 +499,11 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
+  useResourcesWatcher(
+    getStorageProvider,
+    currentFileMetadata,
+    state.editorTabs
+  );
 
   /**
    * This reference is useful to get the current opened project,
@@ -898,7 +904,7 @@ const MainFrame = (props: Props) => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
+      PixiResourcesLoader.burstCache();
 
       const state = await setState(state => ({
         ...state,

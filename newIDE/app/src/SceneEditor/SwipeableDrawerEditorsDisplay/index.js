@@ -137,6 +137,14 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     [selectedEditorId, drawerOpeningState]
   );
 
+  const startSceneRendering = React.useCallback((start: boolean) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    if (start) editor.restartSceneRendering();
+    else editor.pauseSceneRendering();
+  }, []);
+
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
 
@@ -150,6 +158,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView: halfOpenOrCloseDrawerOnEditor,
       isEditorVisible,
+      startSceneRendering,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,

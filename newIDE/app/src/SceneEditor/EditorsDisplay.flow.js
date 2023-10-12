@@ -135,6 +135,7 @@ export type SceneEditorsDisplayInterface = {|
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
   |},
+  startSceneRendering: (start: boolean) => void,
   instancesHandlers: {|
     getSelectionAABB: () => Rectangle,
     addInstances: (

@@ -315,6 +315,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   }
 
+  onResourceExternallyChanged = resourceInfo => {
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+  };
+
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
@@ -1991,6 +1995,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
+  onResourceExternallyChanged: ({| identifier: string |}) => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -1998,11 +2003,16 @@ export type EventsSheetInterface = {|
 const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
+    onResourceExternallyChanged,
   }));
 
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
+  };
+  const onResourceExternallyChanged = resourceInfo => {
+    if (component.current)
+      component.current.onResourceExternallyChanged(resourceInfo);
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

@@ -2294,6 +2294,7 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+    void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
 };
 
 interface ResourceExposer {
@@ -2882,6 +2883,10 @@ interface ArbitraryEventsWorker {
     void Launch([Ref] EventsList events);
 };
 
+interface ArbitraryObjectsWorker {
+    void Launch([Ref] ObjectsContainer container);
+};
+
 interface EventsLeaderboardsLister {
     void EventsLeaderboardsLister([Ref] Project project);
     [Const, Ref] SetString GetLeaderboardIds();
@@ -2976,6 +2981,14 @@ interface ProjectResourcesCopier {
                                  boolean updateOriginalProject,
                                  boolean preserveAbsoluteFilenames,
                                  boolean preserveDirectoryStructure);
+};
+
+interface ObjectsUsingResourceCollector {
+    void ObjectsUsingResourceCollector([Const] DOMString resourceName);
+    [Const, Ref] VectorString GetObjectNames();
+
+    //Inherited from ArbitraryObjectsWorker
+    void Launch([Ref] ObjectsContainer container);
 };
 
 interface ResourcesInUseHelper {

@@ -50,6 +50,7 @@
     "algoliasearch": "3.33.0",
     "axios": "^0.18.1",
     "blueimp-md5": "^2.10.0",
+    "chokidar": "3.5.3",
     "classnames": "2.2.5",
     "date-fns": "2.16.1",
     "element-closest": "2.0.2",

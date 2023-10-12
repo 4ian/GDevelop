@@ -159,6 +159,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
       this
     ),
+    setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(
+      this
+    ),
     getEditorStateForProject: this._getEditorStateForProject.bind(this),
     setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
@@ -814,6 +817,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           newProjectsDefaultStorageProviderName: newStorageProviderName,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setWatchProjectFolderFilesForLocalProjects(enable: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          watchProjectFolderFilesForLocalProjects: enable,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

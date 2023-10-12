@@ -199,8 +199,6 @@ export default function makeExtensionsLoader({
         jsExtensions
           .filter(({ name }) => !filterExamples || !name.includes('Example'))
           .map(({ name, extensionModule, objectsRenderingServiceModules }) => {
-            // Load any editor for objects, if we have somewhere where
-            // to register them.
             if (
               objectsEditorService &&
               extensionModule.registerEditorConfigurations
@@ -210,25 +208,23 @@ export default function makeExtensionsLoader({
               );
             }
 
-            // Register modules for ObjectsRenderingService
-            if (objectsRenderingService && objectsRenderingServiceModules) {
-              for (let requirePath in objectsRenderingServiceModules) {
-                objectsRenderingService.registerModule(
-                  requirePath,
-                  objectsRenderingServiceModules[requirePath]
+            if (objectsRenderingService) {
+              if (objectsRenderingServiceModules) {
+                for (const requirePath in objectsRenderingServiceModules) {
+                  objectsRenderingService.registerModule(
+                    requirePath,
+                    objectsRenderingServiceModules[requirePath]
+                  );
+                }
+              }
+              if (extensionModule.registerInstanceRenderers) {
+                extensionModule.registerInstanceRenderers(
+                  objectsRenderingService
                 );
               }
-            }
-
-            // Load any renderer for objects, if we have somewhere where
-            // to register them.
-            if (
-              objectsRenderingService &&
-              extensionModule.registerInstanceRenderers
-            ) {
-              extensionModule.registerInstanceRenderers(
-                objectsRenderingService
-              );
+              if (extensionModule.registerClearCache) {
+                extensionModule.registerClearCache(objectsRenderingService);
+              }
             }
 
             return {

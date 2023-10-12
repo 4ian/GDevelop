@@ -205,6 +205,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   };
 
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
+    if (this._propertiesEditor) {
+      this._propertiesEditor.forceUpdate();
+    }
+    this.refreshResourcesList();
+  };
+
   render() {
     const {
       project,

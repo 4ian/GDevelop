@@ -14,7 +14,6 @@ import Authentication, {
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
-  type AdditionalUserInfoForm,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
@@ -46,9 +45,6 @@ import {
   listReceivedAssetPacks,
   listReceivedGameTemplates,
 } from '../Utils/GDevelopServices/Asset';
-import AdditionalUserInfoDialog, {
-  shouldAskForAdditionalUserInfo,
-} from './AdditionalUserInfoDialog';
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
@@ -68,7 +64,6 @@ type State = {|
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
   deleteInProgress: boolean,
-  additionalUserInfoDialogOpen: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   emailVerificationDialogOpen: boolean,
@@ -102,7 +97,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     editProfileDialogOpen: false,
     editInProgress: false,
     deleteInProgress: false,
-    additionalUserInfoDialogOpen: false,
     authError: null,
     resetPasswordDialogOpen: false,
     emailVerificationDialogOpen: false,
@@ -116,7 +110,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     userSnackbarMessage: null,
   };
   _automaticallyUpdateUserProfile = true;
-  _hasNotifiedUserAboutAdditionalInfo = false;
   _hasNotifiedUserAboutEmailVerification = false;
 
   // Cloud projects are requested in 2 different places at app opening.
@@ -217,7 +210,6 @@ export default class AuthenticatedUserProvider extends React.Component<
           this.props.authentication.getAuthorizationHeader(),
       },
     }));
-    this._hasNotifiedUserAboutAdditionalInfo = false;
     this._hasNotifiedUserAboutEmailVerification = false;
   }
 
@@ -232,7 +224,6 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...authenticatedUserLoggedOutAttributes,
       },
     }));
-    this._hasNotifiedUserAboutAdditionalInfo = false;
     this._hasNotifiedUserAboutEmailVerification = false;
   }
 
@@ -455,7 +446,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         // We call this function every time the user is fetched, as it will
         // automatically prevent the event to be sent if the user attributes haven't changed.
         identifyUserForAnalytics(this.state.authenticatedUser);
-        this._notifyUserAboutEmailVerificationAndAdditionalInfo();
+        this._notifyUserAboutEmailVerification();
       }
     );
   };
@@ -649,7 +640,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _notifyUserAboutEmailVerificationAndAdditionalInfo = () => {
+  _notifyUserAboutEmailVerification = () => {
     const { profile } = this.state.authenticatedUser;
     if (!profile) return;
     // If the user has not verified their email when logging in we show a dialog to do so.
@@ -661,8 +652,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     const hasJustCreatedAccount = accountAgeInMs < 1000 * 10; // 10 seconds.
     if (
       this.state.authenticatedUser.firebaseUser &&
-      !this.state.authenticatedUser.firebaseUser.emailVerified &&
-      !this._hasNotifiedUserAboutEmailVerification
+      !this.state.authenticatedUser.firebaseUser.emailVerified
     ) {
       setTimeout(
         () =>
@@ -673,24 +663,6 @@ export default class AuthenticatedUserProvider extends React.Component<
           }),
         1000
       );
-    } else {
-      // If the user has not filled additional info, we show a dialog to do so.
-      this._notifyUserAboutAdditionalInfo();
-    }
-  };
-
-  _notifyUserAboutAdditionalInfo = () => {
-    const profile = this.state.authenticatedUser.profile;
-    if (!profile) return;
-    // If the user has not filled their additional information, show
-    // the dialog to fill it, but ensure they have closed the email verification dialog first.
-    // Use a boolean to show the dialog only once.
-    if (
-      profile &&
-      !this._hasNotifiedUserAboutAdditionalInfo &&
-      shouldAskForAdditionalUserInfo(profile)
-    ) {
-      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
     }
   };
 
@@ -845,43 +817,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doSaveAdditionalUserInfo = async (form: AdditionalUserInfoForm) => {
-    const { authentication } = this.props;
-    if (!authentication) return;
-
-    this.setState({
-      editInProgress: true,
-    });
-    this._automaticallyUpdateUserProfile = false;
-    try {
-      await authentication.editUserProfile(
-        authentication.getAuthorizationHeader,
-        {
-          gdevelopUsage: form.gdevelopUsage,
-          teamOrCompanySize: form.teamOrCompanySize,
-          companyName: form.companyName,
-          creationExperience: form.creationExperience,
-          creationGoal: form.creationGoal,
-          hearFrom: form.hearFrom,
-        }
-      );
-      await this._fetchUserProfileWithoutThrowingErrors();
-    } catch (authError) {
-      // Do not throw error, as this is a best effort call.
-      console.error('Error while saving additional user info:', authError);
-    } finally {
-      // Close anyway.
-      this.openAdditionalUserInfoDialog(false);
-      this.showUserSnackbar({
-        message: <Trans>Thank you!</Trans>,
-      });
-    }
-    this.setState({
-      editInProgress: false,
-    });
-    this._automaticallyUpdateUserProfile = true;
-  };
-
   _doForgotPassword = async (form: ForgotPasswordForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -969,7 +904,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     // And we show them the additional info dialog if they haven't seen it yet.
     if (!open) {
       this._hasNotifiedUserAboutEmailVerification = true;
-      this._notifyUserAboutAdditionalInfo();
     }
   };
 
@@ -985,15 +919,6 @@ export default class AuthenticatedUserProvider extends React.Component<
       loginDialogOpen: open,
       createAccountDialogOpen: false,
       authError: null,
-    });
-  };
-
-  openAdditionalUserInfoDialog = (open: boolean = true) => {
-    this._hasNotifiedUserAboutAdditionalInfo = true;
-    this.setState({
-      additionalUserInfoDialogOpen: open,
-      createAccountDialogOpen: false,
-      loginDialogOpen: false,
     });
   };
 
@@ -1082,17 +1007,6 @@ export default class AuthenticatedUserProvider extends React.Component<
                 error={this.state.authError}
               />
             )}
-            {this.state.additionalUserInfoDialogOpen &&
-              this.state.authenticatedUser.profile && (
-                <AdditionalUserInfoDialog
-                  profile={this.state.authenticatedUser.profile}
-                  onClose={() => this.openAdditionalUserInfoDialog(false)}
-                  onSaveAdditionalUserInfo={form =>
-                    this._doSaveAdditionalUserInfo(form)
-                  }
-                  updateInProgress={this.state.editInProgress}
-                />
-              )}
             {this.state.emailVerificationDialogOpen && (
               <EmailVerificationDialog
                 authenticatedUser={this.state.authenticatedUser}

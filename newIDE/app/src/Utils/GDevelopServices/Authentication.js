@@ -59,15 +59,6 @@ export type RegisterForm = {|
   getNewsletterEmail: boolean,
 |};
 
-export type AdditionalUserInfoForm = {|
-  gdevelopUsage?: string,
-  teamOrCompanySize?: string,
-  companyName?: string,
-  creationExperience?: string,
-  creationGoal?: string,
-  hearFrom?: string,
-|};
-
 export type EditForm = {|
   username: string,
   description: string,

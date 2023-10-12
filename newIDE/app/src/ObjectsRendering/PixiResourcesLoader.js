@@ -166,6 +166,8 @@ export default class PixiResourcesLoader {
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture && loadedTexture.textureCacheIds) {
       await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+      // Needed for video objects. Optional for other object types.
+      delete loadedTextures[resourceName];
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName], () => {});

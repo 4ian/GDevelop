@@ -1,3 +1,4 @@
+// This filter doesn't seem useful and need property list.
 /*!
  * @pixi/filter-multi-color-replace - v5.1.1
  * Compiled Thu, 31 Aug 2023 09:18:38 UTC

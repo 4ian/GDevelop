@@ -2,11 +2,11 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'ZoomBlur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const zoomBlurFilter = new PIXI.filters.ZoomBlurFilter();
         return zoomBlurFilter;
       }
-      updatePreRender(filter, target) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
         const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter;
         zoomBlurFilter.center[0] = Math.round(
           // @ts-ignore - extra properties are stored on the filter.
@@ -17,7 +17,11 @@ namespace gdjs {
           zoomBlurFilter._centerY * target.getHeight()
         );
       }
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter;
         if (parameterName === 'centerX') {
           // @ts-ignore - extra properties are stored on the filter.
@@ -37,8 +41,16 @@ namespace gdjs {
           zoomBlurFilter.padding = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

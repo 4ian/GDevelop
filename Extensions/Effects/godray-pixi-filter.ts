@@ -8,13 +8,17 @@ namespace gdjs {
         const godrayFilter = new PIXI.filters.GodrayFilter();
         return godrayFilter;
       }
-      updatePreRender(filter, target) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
         if (filter.animationSpeed !== 0) {
           filter.time +=
             (target.getElapsedTime() / 1000) * filter.animationSpeed;
         }
       }
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         if (parameterName === 'lacunarity') {
           filter.lacunarity = value;
         } else if (parameterName === 'angle') {
@@ -33,8 +37,16 @@ namespace gdjs {
           filter.padding = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {
         if (parameterName === 'parallel') {
           filter.parallel = value;
         }

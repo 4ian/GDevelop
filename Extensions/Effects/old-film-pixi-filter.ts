@@ -9,7 +9,7 @@ namespace gdjs {
         oldFilmFilter._animationTimer = 0;
         return oldFilmFilter;
       }
-      updatePreRender(filter, target) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
         if (filter.animationFrequency !== 0) {
           filter._animationTimer += target.getElapsedTime() / 1000;
           if (filter._animationTimer >= 1 / filter.animationFrequency) {
@@ -18,7 +18,11 @@ namespace gdjs {
           }
         }
       }
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         if (parameterName === 'sepia') {
           filter.sepia = value;
         } else if (parameterName === 'noise') {
@@ -41,8 +45,16 @@ namespace gdjs {
           filter.animationFrequency = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

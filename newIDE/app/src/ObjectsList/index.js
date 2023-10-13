@@ -1030,6 +1030,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               parent,
               position
             );
+            if (treeViewRef.current)
+              treeViewRef.current.animateItem({
+                objectFolderOrObject: parent,
+                global: destinationItem.global,
+              });
           }
         } else {
           return;
@@ -1133,7 +1138,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
         folder: gdObjectFolderOrObject
       ) => {
-        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
+        const {
+          objectFolderOrObject,
+          global,
+        } = objectFolderOrObjectWithContext;
         if (folder === objectFolderOrObject.getParent()) return;
         objectFolderOrObject
           .getParent()
@@ -1142,6 +1150,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             folder,
             0
           );
+        if (treeViewRef.current)
+          treeViewRef.current.animateItem({
+            objectFolderOrObject: folder,
+            global,
+          });
         onObjectModified(true);
       },
       [onObjectModified]

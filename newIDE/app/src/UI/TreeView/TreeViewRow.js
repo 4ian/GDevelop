@@ -408,7 +408,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                               />
                             ) : (
                               <span
-                                className={`item-name${
+                                className={`item-name ${node.extraClass}${
                                   node.item.isRoot
                                     ? ' root-folder'
                                     : node.item.isPlaceholder

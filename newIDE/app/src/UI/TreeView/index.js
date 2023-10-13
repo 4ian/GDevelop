@@ -30,6 +30,7 @@ type FlattenedNode<Item> = {|
   name: string,
   hasChildren: boolean,
   canHaveChildren: boolean,
+  extraClass: string,
   depth: number,
   dataset?: ?HTMLDataset,
   collapsed: boolean,
@@ -106,6 +107,7 @@ export type TreeViewInterface<Item> = {|
   renameItem: Item => void,
   openItems: (string[]) => void,
   closeItems: (string[]) => void,
+  animateItem: Item => void,
 |};
 
 type Props<Item> = {|
@@ -183,6 +185,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   const theme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
   const forceUpdate = useForceUpdate();
+  const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isMobileScreen = windowWidth === 'small';
   const isSearching = !!searchText;
@@ -221,6 +224,8 @@ const TreeView = <Item: ItemBaseAttributes>(
 
       const name = getItemName(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
+      const extraClass =
+        animatedItemId && id === animatedItemId ? 'animate' : '';
 
       /*
        * Append node to result if either:
@@ -250,6 +255,7 @@ const TreeView = <Item: ItemBaseAttributes>(
             thumbnailSrc,
             dataset,
             item,
+            extraClass,
             /*
              * If the user is searching, the node should be opened if either:
              * - it has children that should be displayed
@@ -283,6 +289,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       openedNodeIds,
       selectedNodeIds,
       forceAllOpened,
+      animatedItemId,
     ]
   );
 
@@ -401,6 +408,22 @@ const TreeView = <Item: ItemBaseAttributes>(
     [openedNodeIds]
   );
 
+  const animateItem = React.useCallback(
+    (item: Item) => {
+      setAnimatedItemId(getItemId(item));
+    },
+    [getItemId]
+  );
+
+  React.useEffect(
+    () => {
+      if (animatedItemId) {
+        setTimeout(() => setAnimatedItemId(''), 400);
+      }
+    },
+    [animatedItemId]
+  );
+
   React.useImperativeHandle(
     // $FlowFixMe
     ref,
@@ -410,6 +433,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       renameItem,
       openItems,
       closeItems,
+      animateItem,
     })
   );
 

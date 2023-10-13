@@ -47,6 +47,10 @@
   border-radius: 6px;
   width: 100%;
 }
+.tree-view .item-name.animate {
+  animation-name: wiggle;
+  animation-duration: 0.4s;
+}
 .tree-view:focus-visible {
   /**
    * Remove browser-specific style around focused element when hitting an arrow key.
@@ -123,4 +127,19 @@
 .tree-view .item-name-input-container {
   position: relative;
   flex: 1;
+}
+
+@keyframes wiggle {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  35% {
+    transform: translate(8px, 0px);
+  }
+  80% {
+    transform: translate(-5px, 0px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
 }

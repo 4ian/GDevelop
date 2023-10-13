@@ -278,6 +278,10 @@ export default class PixiResourcesLoader {
             scaleMode: PIXI.SCALE_MODES.LINEAR,
             resourceOptions: {
               autoPlay: false,
+              // If autoLoad is set to false (instinctive choice given that the code
+              // calls the load method on the base texture), the video is displayed
+              // as a black rectangle.
+              autoLoad: true,
               // crossorigin does not have a typo (with regards to PIXI.Assets.setPreferences that
               // uses a crossOrigin parameter). See https://pixijs.download/dev/docs/PIXI.html#autoDetectResource.
               crossorigin: determineCrossOrigin(url),
@@ -473,6 +477,10 @@ export default class PixiResourcesLoader {
       scaleMode: PIXI.SCALE_MODES.LINEAR,
       resourceOptions: {
         autoPlay: false,
+        // If autoLoad is set to false (instinctive choice given that the code
+        // calls the load method on the base texture), the video is displayed
+        // as a black rectangle.
+        autoLoad: true,
         crossorigin: determineCrossOrigin(url),
       },
     });

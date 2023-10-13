@@ -310,20 +310,41 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             project.hasObjectNamed(name)
         );
 
-        const object = objectsContainer.insertNewObject(
-          project,
-          objectType,
-          name,
-          objectsContainer.getObjectsCount()
-        );
-
-        const objectFolderOrObjectWithContext = {
-          // A new object is always added to the scene (layout) by default.
-          objectFolderOrObject: objectsContainer
-            .getRootFolder()
-            .getObjectChild(name),
-          global: false,
-        };
+        let object;
+        let objectFolderOrObjectWithContext;
+        if (
+          selectedObjectFolderOrObjectsWithContext.length === 1 &&
+          !selectedObjectFolderOrObjectsWithContext[0].global &&
+          selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder()
+        ) {
+          // If a scene folder is selected, insert object in the folder.
+          const parentFolder =
+            selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject;
+          object = objectsContainer.insertNewObjectInFolder(
+            project,
+            objectType,
+            name,
+            parentFolder,
+            0
+          );
+          objectFolderOrObjectWithContext = {
+            objectFolderOrObject: parentFolder.getObjectChild(name),
+            global: false,
+          };
+        } else {
+          object = objectsContainer.insertNewObject(
+            project,
+            objectType,
+            name,
+            objectsContainer.getObjectsCount()
+          );
+          objectFolderOrObjectWithContext = {
+            objectFolderOrObject: objectsContainer
+              .getRootFolder()
+              .getObjectChild(name),
+            global: false,
+          };
+        }
 
         if (treeViewRef.current)
           treeViewRef.current.openItems([sceneObjectsRootFolderId]);
@@ -352,6 +373,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onEditObject,
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
+        selectedObjectFolderOrObjectsWithContext,
       ]
     );
 

@@ -169,6 +169,11 @@ export default class PixiResourcesLoader {
       // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
       // PIXI.Assets.unload will handle the clearing of those caches.
       await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+      // The cached texture is also removed. This is to handle cases where an empty texture
+      // has been cached (if file was not found for instance), and a corresponding file has
+      // been added and detected by file watcher. When reloading the texture, the cache must
+      // be cleaned too.
+      delete loadedTextures[resourceName];
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
@@ -318,7 +323,12 @@ export default class PixiResourcesLoader {
     loadedTextures[resourceName] = PIXI.Texture.from(url, {
       resourceOptions: {
         crossorigin: determineCrossOrigin(url),
+        autoLoad: false,
       },
+    });
+    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
+      console.error(`Unable to load texture from url ${url}:`, error);
+      loadedTextures[resourceName] = invalidTexture;
     });
 
     applyPixiTextureSettings(resource, loadedTextures[resourceName]);

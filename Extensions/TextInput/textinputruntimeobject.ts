@@ -50,7 +50,7 @@ namespace gdjs {
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.Resizable, gdjs.OpacityHandler {
     private _string: string;
     private _placeholder: string;
     private opacity: float = 255;
@@ -244,15 +244,25 @@ namespace gdjs {
 
     /**
      * Get the text entered in the text input.
+     * @deprecated use `getText` instead
      */
     getString() {
-      return this._string;
+      return this.getText();
     }
 
     /**
      * Replace the text inside the text input.
+     * @deprecated use `setText` instead
      */
-    setString(newString: string) {
+    setString(text: string) {
+      this.setText(text);
+    }
+
+    getText() {
+      return this._string;
+    }
+
+    setText(newString: string) {
       if (newString === this._string) return;
 
       this._string = newString;

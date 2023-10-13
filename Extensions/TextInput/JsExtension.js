@@ -288,10 +288,13 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
       )
+      .addDefaultBehavior("TextContainerCapability::TextContainerBehavior")
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     // Properties expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -302,13 +305,14 @@ module.exports = {
         '',
         'res/conditions/text24_black.png'
       )
+      .setHidden()
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters(
         'string',
         gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
       )
-      .setFunctionName('setString')
-      .setGetter('getString');
+      .setFunctionName('setText')
+      .setGetter('getText');
 
     object
       .addExpressionAndConditionAndAction(

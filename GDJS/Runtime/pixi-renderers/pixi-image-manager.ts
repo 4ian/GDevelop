@@ -120,51 +120,7 @@ namespace gdjs {
           );
         }
       }
-      if (resourceName === '') {
-        return this._invalidTexture;
-      }
-
-      // Texture is not loaded, load it now from the resources list.
-      const resource = findResourceWithNameAndKind(
-        this._resources,
-        resourceName,
-        'image'
-      );
-
-      if (!resource) {
-        logger.warn(
-          'Unable to find texture for resource "' + resourceName + '".'
-        );
-        return this._invalidTexture;
-      }
-
-      logger.log('Loading texture for resource "' + resourceName + '"...');
-      const file = resource.file;
-      const url = this._resourcesLoader.getFullUrl(file);
-      const texture = PIXI.Texture.from(url, {
-        resourceOptions: {
-          // Note that using `false`
-          // to not having `crossorigin` at all would NOT work because the browser would taint the
-          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
-            ? 'use-credentials'
-            : 'anonymous',
-        },
-      }).on('error', (error) => {
-        logFileLoadingError(file, error);
-      });
-      if (!texture) {
-        throw new Error(
-          'Texture loading by PIXI returned nothing for file ' +
-            file +
-            ' behind url ' +
-            url
-        );
-      }
-      applyTextureSettings(texture, resource);
-
-      this._loadedTextures.put(resourceName, texture);
-      return texture;
+      return this._invalidTexture;
     }
 
     /**
@@ -259,52 +215,7 @@ namespace gdjs {
       if (this._loadedTextures.containsKey(resourceName)) {
         return this._loadedTextures.get(resourceName);
       }
-      if (resourceName === '') {
-        return this._invalidTexture;
-      }
-
-      // Texture is not loaded, load it now from the resources list.
-      const resource = findResourceWithNameAndKind(
-        this._resources,
-        resourceName,
-        'video'
-      );
-
-      if (!resource) {
-        logger.warn(
-          'Unable to find video texture for resource "' + resourceName + '".'
-        );
-        return this._invalidTexture;
-      }
-
-      const file = resource.file;
-      logger.log(
-        'Loading video texture for resource "' + resourceName + '"...'
-      );
-      let texture = PIXI.Texture.from(this._resourcesLoader.getFullUrl(file), {
-        resourceOptions: {
-          // Note that using `false`
-          // to not having `crossorigin` at all would NOT work because the browser would taint the
-          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
-            ? 'use-credentials'
-            : 'anonymous',
-          autoPlay: false,
-        },
-      }).on('error', (error) => {
-        logFileLoadingError(file, error);
-      });
-
-      if (!texture) {
-        logFileLoadingError(
-          file,
-          new Error('Video texture loading by PIXI returned nothing.')
-        );
-        texture = this._invalidTexture;
-      }
-
-      this._loadedTextures.put(resourceName, texture);
-      return texture;
+      return this._invalidTexture;
     }
 
     /**

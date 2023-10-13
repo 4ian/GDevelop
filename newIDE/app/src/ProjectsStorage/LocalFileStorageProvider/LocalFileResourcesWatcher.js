@@ -43,6 +43,7 @@ export const setupResourcesWatcher =
               path.join(folderPath, gameFile),
               path.join(folderPath, autosaveFile),
             ],
+            ignoreInitial: true,
             awaitWriteFinish: {
               stabilityThreshold: 250,
               pollInterval: 100,
@@ -54,7 +55,9 @@ export const setupResourcesWatcher =
             // do never-ending operations on the folder or its children, making the debounce
             // never ending.
             debouncedCallback
-          );
+          )
+          .on('unlink', debouncedCallback)
+          .on('add', debouncedCallback);
         return () => watcher.unwatch(folderPath);
       }
     : undefined;

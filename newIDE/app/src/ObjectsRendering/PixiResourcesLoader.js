@@ -169,6 +169,11 @@ export default class PixiResourcesLoader {
       // items cached in PIXI caches (PIXI.utils.BaseTextureCache and PIXI.utils.TextureCache).
       // PIXI.Assets.unload will handle the clearing of those caches.
       await PIXI.Assets.unload(loadedTexture.textureCacheIds);
+      // The cached texture is also removed. This is to handle cases where an empty texture
+      // has been cached (if file was not found for instance), and a corresponding file has
+      // been added and detected by file watcher. When reloading the texture, the cache must
+      // be cleaned too.
+      delete loadedTextures[resourceName];
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
@@ -273,13 +278,29 @@ export default class PixiResourcesLoader {
             scaleMode: PIXI.SCALE_MODES.LINEAR,
             resourceOptions: {
               autoPlay: false,
+              // If autoLoad is set to false (instinctive choice given that the code
+              // calls the load method on the base texture), the video is displayed
+              // as a black rectangle.
+              autoLoad: true,
               // crossorigin does not have a typo (with regards to PIXI.Assets.setPreferences that
               // uses a crossOrigin parameter). See https://pixijs.download/dev/docs/PIXI.html#autoDetectResource.
               crossorigin: determineCrossOrigin(url),
             },
           });
+          if (!loadedTextures[resourceName]) {
+            console.error(`Texture loading for ${url} returned nothing`);
+            loadedTextures[resourceName] = invalidTexture;
+          }
 
-          return loadedTextures[resourceName];
+          loadedTextures[resourceName].baseTexture.resource
+            .load()
+            .catch(error => {
+              console.error(
+                `Unable to load video texture from url ${url}:`,
+                error
+              );
+              loadedTextures[resourceName] = invalidTexture;
+            });
         } catch (error) {
           console.error(
             `Unable to load file ${resource.getFile()} for video resource ${resourceName}:`,
@@ -318,7 +339,17 @@ export default class PixiResourcesLoader {
     loadedTextures[resourceName] = PIXI.Texture.from(url, {
       resourceOptions: {
         crossorigin: determineCrossOrigin(url),
+        autoLoad: false,
       },
+    });
+    if (!loadedTextures[resourceName]) {
+      console.error(`Texture loading for ${url} returned nothing`);
+      loadedTextures[resourceName] = invalidTexture;
+      return loadedTextures[resourceName];
+    }
+    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
+      console.error(`Unable to load texture from url ${url}:`, error);
+      loadedTextures[resourceName] = invalidTexture;
     });
 
     applyPixiTextureSettings(resource, loadedTextures[resourceName]);
@@ -446,8 +477,22 @@ export default class PixiResourcesLoader {
       scaleMode: PIXI.SCALE_MODES.LINEAR,
       resourceOptions: {
         autoPlay: false,
+        // If autoLoad is set to false (instinctive choice given that the code
+        // calls the load method on the base texture), the video is displayed
+        // as a black rectangle.
+        autoLoad: true,
         crossorigin: determineCrossOrigin(url),
       },
+    });
+    if (!loadedTextures[resourceName]) {
+      console.error(`Texture loading for ${url} returned nothing`);
+      loadedTextures[resourceName] = invalidTexture;
+      return loadedTextures[resourceName];
+    }
+
+    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
+      console.error(`Unable to load video texture from url ${url}:`, error);
+      loadedTextures[resourceName] = invalidTexture;
     });
 
     return loadedTextures[resourceName];

@@ -281,22 +281,27 @@ namespace gdjs {
       logger.log(
         'Loading video texture for resource "' + resourceName + '"...'
       );
-      const texture = PIXI.Texture.from(
-        this._resourcesLoader.getFullUrl(file),
-        {
-          resourceOptions: {
-            // Note that using `false`
-            // to not having `crossorigin` at all would NOT work because the browser would taint the
-            // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-            crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
-              ? 'use-credentials'
-              : 'anonymous',
-            autoPlay: false,
-          },
-        }
-      ).on('error', (error) => {
+      let texture = PIXI.Texture.from(this._resourcesLoader.getFullUrl(file), {
+        resourceOptions: {
+          // Note that using `false`
+          // to not having `crossorigin` at all would NOT work because the browser would taint the
+          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+          crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+            ? 'use-credentials'
+            : 'anonymous',
+          autoPlay: false,
+        },
+      }).on('error', (error) => {
         logFileLoadingError(file, error);
       });
+
+      if (!texture) {
+        logFileLoadingError(
+          file,
+          new Error('Video texture loading by PIXI returned nothing.')
+        );
+        texture = this._invalidTexture;
+      }
 
       this._loadedTextures.put(resourceName, texture);
       return texture;

@@ -99,7 +99,7 @@ module.exports = {
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.ease');
 
-    // Deprecated use value tween instead
+    // Deprecated
     extension
       .addAction(
         'TweenSceneVariableNumber',
@@ -127,7 +127,7 @@ module.exports = {
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber');
 
-    // Deprecated use value tween instead
+    // Deprecated
     extension
       .addAction(
         'TweenSceneVariableNumber2',
@@ -154,15 +154,41 @@ module.exports = {
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber2');
 
+      extension
+        .addAction(
+          'TweenSceneVariableNumber3',
+          _('Tween a number in a scene variable'),
+          _(
+            "Tweens a scene variable's numeric value from its current value to a new one."
+          ),
+          _(
+            'Tween variable _PARAM2_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM1_'
+          ),
+          _('Scene Tweens'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+        .addParameter('scenevar', _('The variable to tween'), '', false)
+        .addParameter('expression', _('Final value'), '', false)
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
+        .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+        .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber3');
+
     extension
       .addAction(
         'AddLayoutValueTween',
-        _('Add scene value tween'),
-        _('Add a tween animation for an scene value.'),
+        _('Tween a scene value'),
+        _('Tweens a scene value that can be use with the expression Tween::Value.'),
         _(
           'Tween the value from _PARAM3_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM1_'
         ),
-        _('Variables'),
+        _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
@@ -183,12 +209,12 @@ module.exports = {
     extension
       .addAction(
         'AddLayerValueTween',
-        _('Add layer value tween'),
-        _('Add a tween animation for a layer value.'),
+        _('Tween a layer value'),
+        _('Tweens a layer value that can be use with the expression Tween::Value.'),
         _(
           'Tween the value of _PARAM7_ from _PARAM3_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM1_'
         ),
-        _('Variables'),
+        _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
@@ -239,7 +265,7 @@ module.exports = {
         _('Tween the camera position'),
         _('Tweens the camera position from the current one to a new one.'),
         _(
-          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ over _PARAM5_ seconds with easing _PARAM6_ as _PARAM1_'
+          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -250,8 +276,9 @@ module.exports = {
       .addParameter('expression', _('Target X position'), '', false)
       .addParameter('expression', _('Target Y position'), '', false)
       .addParameter('layer', _('Layer'), '', true)
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -288,7 +315,7 @@ module.exports = {
         _('Tween the camera zoom'),
         _('Tweens the camera zoom from the current zoom factor to a new one.'),
         _(
-          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM1_'
+          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -298,8 +325,9 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .addParameter('expression', _('Target zoom'), '', false)
       .addParameter('layer', _('Layer'), '', true)
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -336,7 +364,7 @@ module.exports = {
         _('Tween the camera rotation'),
         _('Tweens the camera rotation from the current angle to a new one.'),
         _(
-          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ over _PARAM4_ seconds with easing _PARAM5_ as _PARAM1_'
+          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -346,8 +374,9 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .addParameter('expression', _('Target rotation (in degrees)'), '', false)
       .addParameter('layer', _('Layer'), '', true)
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -542,7 +571,7 @@ module.exports = {
 
     // Behavior related
 
-    // Deprecated use value tween instead
+    // Deprecated
     behavior
       .addAction(
         'AddObjectVariableTween',
@@ -575,7 +604,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addVariableTween');
 
-    // Deprecated use value tween instead
+    // Deprecated
     behavior
       .addAction(
         'AddObjectVariableTween2',
@@ -609,11 +638,43 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addVariableTween2');
 
+    behavior
+      .addScopedAction(
+        'AddObjectVariableTween3',
+        _('Tween a number in an object variable'),
+        _(
+          "Tweens an object variable's numeric value from its current value to a new one."
+        ),
+        _(
+          'Tween the variable _PARAM3_ of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM2_'
+        ),
+        _('Variables'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('objectvar', _('Object variable'), '', false)
+      .addParameter('expression', _('To value'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addVariableTween3');
+
       behavior
         .addScopedAction(
           'AddObjectValueTween',
-          _('Add object value tween'),
-          _('Add a tween animation for an object value.'),
+          _('Tween an object value'),
+          _('Tweens an object value that can be use with the object expression Tween::Value.'),
           _(
             'Tween the value of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
           ),

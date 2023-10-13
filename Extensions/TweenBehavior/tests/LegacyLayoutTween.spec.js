@@ -34,7 +34,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     }
   };
 
-  it('can tween an object variable', () => {
+  it('can tween a scene variable', () => {
     const variable = layout.getVariables().get('MyVariable');
     variable.setNumber(200);
     tween.tweenVariableNumber2(
@@ -49,7 +49,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(variable.getAsNumber()).to.be(440);
   });
 
-  it('can tween an object variable (older action)', () => {
+  it('can tween a scene variable (older action)', () => {
     const variable = layout.getVariables().get('MyVariable');
     variable.setNumber(200);
     tween.tweenVariableNumber(

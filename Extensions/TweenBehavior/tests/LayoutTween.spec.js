@@ -30,7 +30,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can play a tween till the end', () => {
     camera.setCameraRotation(layout, 200, '', 0);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
 
     // Tween actions don't change the value directly.
     expect(camera.getCameraRotation(layout, '', 0)).to.be(200);
@@ -77,7 +77,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can pause and resume a tween', () => {
     camera.setCameraRotation(layout, 200, '', 0);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
 
     // The tween starts
     for (let i = 0; i < 5; i++) {
@@ -117,7 +117,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     camera.setCameraRotation(layout, 200, '', 0);
 
     // Start the tween
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
     for (let i = 0; i < 5; i++) {
       layout.renderAndStep(1000 / 60);
       expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
@@ -152,7 +152,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(true);
 
     // Restart the tween
-    tween.tweenCameraRotation2(layout, 'MyTween', 623, '', 0.25, 'linear');
+    tween.tweenCameraRotation2(layout, 'MyTween', 623, '', 'linear', 0.25);
     for (let i = 0; i < 5; i++) {
       layout.renderAndStep(1000 / 60);
       expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
@@ -166,7 +166,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
     // Start the tween
     expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(false);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
     expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(true);
     for (let i = 0; i < 5; i++) {
       layout.renderAndStep(1000 / 60);
@@ -205,7 +205,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
     // Recreate the tween
     expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(false);
-    tween.tweenCameraRotation2(layout, 'MyTween', 623, '', 0.25, 'linear');
+    tween.tweenCameraRotation2(layout, 'MyTween', 623, '', 'linear', 0.25);
     expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(true);
     for (let i = 0; i < 5; i++) {
       layout.renderAndStep(1000 / 60);
@@ -229,6 +229,21 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       }
     }
   };
+
+  it('can tween a scene variable', () => {
+    const variable = layout.getVariables().get('MyVariable');
+    variable.setNumber(200);
+    tween.tweenVariableNumber3(
+      layout,
+      'MyTween',
+      variable,
+      600,
+      'linear',
+      0.25 / 1.5
+    );
+    checkProgress(6, () => variable.getAsNumber());
+    expect(variable.getAsNumber()).to.be(440);
+  });
 
   it('can tween a layer value', () => {
     tween.addLayerValueTween(
@@ -262,7 +277,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   it('can tween a layer camera position', () => {
     camera.setCameraX(layout, 200, '', 0);
     camera.setCameraY(layout, 300, '', 0);
-    tween.tweenCamera2(layout, 'MyTween', 600, 900, '', 0.25, 'linear');
+    tween.tweenCamera2(layout, 'MyTween', 600, 900, '', 'linear', 0.25);
     checkProgress(6, [
       () => camera.getCameraX(layout, '', 0),
       () => camera.getCameraY(layout, '', 0),
@@ -273,7 +288,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can tween a layer camera zoom', () => {
     camera.setCameraZoom(layout, 200, '', 0);
-    tween.tweenCameraZoom2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    tween.tweenCameraZoom2(layout, 'MyTween', 600, '', 'linear', 0.25);
     checkProgress(6, () => camera.getCameraZoom(layout, '', 0));
     // The interpolation is exponential.
     expect(camera.getCameraZoom(layout, '', 0)).to.be(386.6364089863524);
@@ -281,7 +296,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can tween a layer camera rotation', () => {
     camera.setCameraRotation(layout, 200, '', 0);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 0.25, 'linear');
+    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
     checkProgress(6, () => camera.getCameraRotation(layout, '', 0));
     expect(camera.getCameraRotation(layout, '', 0)).to.be(440);
   });

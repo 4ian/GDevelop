@@ -110,7 +110,7 @@ namespace gdjs {
 
     /**
      * Add an object variable tween.
-     * @deprecated Use addValueTween instead.
+     * @deprecated Use addVariableTween3 instead.
      * This function is misleading since one could think that the tween starts
      * right at the moment this function is called whereas the value of the variable
      * will change at the next frame only. Moreover, the variable will not start from
@@ -149,7 +149,7 @@ namespace gdjs {
 
     /**
      * Tween an object variable.
-     * @deprecated Use addValueTween instead.
+     * @deprecated Use addVariableTween3 instead.
      * @param identifier Unique id to identify the tween
      * @param variable The object variable to store the tweened value
      * @param toValue End value
@@ -165,13 +165,61 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addVariableTween(
+        identifier,
+        variable,
+        toValue,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
+      );
+    }
+
+    /**
+     * Tween an object variable.
+     * @param identifier Unique id to identify the tween
+     * @param variable The object variable to store the tweened value
+     * @param toValue End value
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addVariableTween3(
+      identifier: string,
+      variable: gdjs.Variable,
+      toValue: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._addVariableTween(
+        identifier,
+        variable,
+        toValue,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addVariableTween(
+      identifier: string,
+      variable: gdjs.Variable,
+      toValue: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+    ) {
       if (variable.getType() !== 'number') {
         return;
       }
       this._tweens.addSimpleTween(
         identifier,
-        this.owner.getRuntimeScene(),
-        duration / 1000,
+        timeSource,
+        duration,
         easing,
         linearInterpolation,
         variable.getValue() as number,

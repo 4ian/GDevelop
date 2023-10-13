@@ -376,6 +376,14 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     }
   };
 
+  it('can tween an object variable', () => {
+    const variable = object.getVariables().get('MyVariable');
+    variable.setNumber(200);
+    behavior.addVariableTween3('MyTween', variable, 600, 'linear', 0.25, false);
+    checkProgress(6, () => variable.getAsNumber());
+    expect(variable.getAsNumber()).to.be(440);
+  });
+
   it('can tween an object value', () => {
     behavior.addValueTween('MyTween', 200, 600, 'linear', 0.25, false, false);
     checkProgress(6, () => behavior.getValue('MyTween'));

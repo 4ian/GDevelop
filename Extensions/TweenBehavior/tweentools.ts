@@ -31,6 +31,8 @@ namespace gdjs {
         runtimeScene._tweens ||
         (runtimeScene._tweens = new gdjs.TweenRuntimeBehavior.TweenManager());
 
+      // Layout tweens from event-based objects won't step, but it's fine
+      // because they don't have cameras anyway.
       gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
         gdjs.evtTools.tween.getTweensMap(runtimeScene).step();
       });
@@ -187,7 +189,7 @@ namespace gdjs {
       };
 
       /**
-       * @deprecated Use addLayoutValueTween instead.
+       * @deprecated Use tweenVariableNumber3 instead.
        * This function is misleading since one could think that the tween starts
        * right at the moment this function is called whereas the value of the variable
        * will change at the next frame only. Moreover, the variable will not start from
@@ -217,7 +219,7 @@ namespace gdjs {
       };
 
       /**
-       * @deprecated Use addLayoutValueTween instead.
+       * @deprecated Use tweenVariableNumber3 instead.
        */
       export const tweenVariableNumber2 = (
         runtimeScene: RuntimeScene,
@@ -227,13 +229,40 @@ namespace gdjs {
         duration: number,
         easing: string
       ) => {
+        tweenVariableNumber3(
+          runtimeScene,
+          identifier,
+          variable,
+          toValue,
+          easing,
+          duration / 1000
+        );
+      };
+
+      /**
+       * Tween a scene variable.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param variable The scene variable which is set to the tweened value
+       * @param toValue End value
+       * @param easing Easing function identifier
+       * @param duration Duration in seconds
+       */
+      export const tweenVariableNumber3 = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        variable: Variable,
+        toValue: number,
+        easing: string,
+        duration: number
+      ) => {
         if (variable.getType() !== 'number') {
           return;
         }
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
           runtimeScene,
-          duration / 1000,
+          duration,
           easing,
           linearInterpolation,
           variable.getValue() as number,
@@ -282,8 +311,8 @@ namespace gdjs {
         toX: number,
         toY: number,
         layerName: string,
-        duration: number,
-        easing: string
+        easing: string,
+        duration: number
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         _tweenCamera(
@@ -361,8 +390,8 @@ namespace gdjs {
         identifier: string,
         toZoom: number,
         layerName: string,
-        duration: number,
-        easing: string
+        easing: string,
+        duration: number
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         _tweenCameraZoom(
@@ -433,8 +462,8 @@ namespace gdjs {
         identifier: string,
         toRotation: number,
         layerName: string,
-        duration: number,
-        easing: string
+        easing: string,
+        duration: number
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         _tweenCameraRotation(

@@ -1381,7 +1381,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const arrowKeyNavigationProps = React.useMemo(
       () => ({
-        onArrowRight: item => {
+        onGetItemInside: item => {
           if (item.isPlaceholder || item.isRoot) return null;
           if (!item.objectFolderOrObject.isFolder()) return null;
           else {
@@ -1392,7 +1392,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             };
           }
         },
-        onArrowLeft: item => {
+        onGetItemOutside: item => {
           if (item.isPlaceholder || item.isRoot) return null;
           const parent = item.objectFolderOrObject.getParent();
           if (parent.isRootFolder()) return null;

@@ -186,7 +186,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       // Do not open folder if cannot drop into it. It's implied that if it
       // cannot be dropped in the folder, it cannot be dropped in any subfolders
       // of the folder.
-      if (!canDrop) return;
+      if (!canDrop && active) return;
       if (active !== isStayingOverRef.current) {
         isStayingOverRef.current = active;
         forceUpdate();

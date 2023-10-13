@@ -135,8 +135,8 @@ type Props<Item> = {|
   initiallyOpenedNodeIds?: string[],
   renderHiddenElements?: boolean,
   arrowKeyNavigationProps?: {|
-    onArrowRight: (item: Item) => ?Item,
-    onArrowLeft: (item: Item) => ?Item,
+    onGetItemInside: (item: Item) => ?Item,
+    onGetItemOutside: (item: Item) => ?Item,
   |},
 |};
 
@@ -547,7 +547,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         if (node.canHaveChildren && node.collapsed) {
           openItems([node.id]);
         } else {
-          newFocusedItem = arrowKeyNavigationProps.onArrowRight(item);
+          newFocusedItem = arrowKeyNavigationProps.onGetItemInside(item);
         }
       } else if (event.key === 'ArrowLeft' && arrowKeyNavigationProps) {
         event.preventDefault();
@@ -555,7 +555,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         if (node.canHaveChildren && !node.collapsed) {
           closeItems([node.id]);
         } else {
-          newFocusedItem = arrowKeyNavigationProps.onArrowLeft(item);
+          newFocusedItem = arrowKeyNavigationProps.onGetItemOutside(item);
         }
       }
       if (newFocusedItem) {

@@ -893,6 +893,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           objectFolderOrObject,
           global: true,
         };
+        selectObjectFolderOrObjectWithContext(
+          newObjectFolderOrObjectWithContext
+        );
 
         // Scroll to the moved object.
         // Ideally, we'd wait for the list to be updated to scroll, but
@@ -902,7 +905,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           scrollToItem(newObjectFolderOrObjectWithContext);
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
+      [
+        objectsContainer,
+        onObjectModified,
+        project,
+        beforeSetAsGlobalObject,
+        selectObjectFolderOrObjectWithContext,
+      ]
     );
 
     const moveSelectionTo = React.useCallback(
@@ -930,12 +939,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               i18n,
               objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
             });
-            onObjectModified(true);
-            selectObjectFolderOrObjectWithContext({
-              ...selectedObjectFolderOrObjectWithContext,
-              global: true,
-            });
-            return;
           }
           return;
         }
@@ -972,12 +975,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObjectWithContext: selectedObjectFolderOrObjectWithContext,
             folder: parent,
             index,
-          });
-
-          onObjectModified(true);
-          selectObjectFolderOrObjectWithContext({
-            ...selectedObjectFolderOrObjectWithContext,
-            global: true,
           });
           return;
         }
@@ -1045,7 +1042,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectModified,
         selectedObjectFolderOrObjectsWithContext,
         setAsGlobalObject,
-        selectObjectFolderOrObjectWithContext,
       ]
     );
 

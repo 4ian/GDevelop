@@ -418,7 +418,14 @@ const TreeView = <Item: ItemBaseAttributes>(
   React.useEffect(
     () => {
       if (animatedItemId) {
-        setTimeout(() => setAnimatedItemId(''), 400);
+        setTimeout(
+          // Animated item must be reset to remove the extra class to the node.
+          // Otherwise, if it has to be animated once again, the class is already here
+          // and the animation won't play.
+          () => setAnimatedItemId(''),
+          // Corresponds to the duration of the CSS animation.
+          400
+        );
       }
     },
     [animatedItemId]

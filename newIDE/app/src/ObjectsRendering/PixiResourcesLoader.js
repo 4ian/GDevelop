@@ -283,8 +283,20 @@ export default class PixiResourcesLoader {
               crossorigin: determineCrossOrigin(url),
             },
           });
+          if (!loadedTextures[resourceName]) {
+            console.error(`Texture loading for ${url} returned nothing`);
+            loadedTextures[resourceName] = invalidTexture;
+          }
 
-          return loadedTextures[resourceName];
+          loadedTextures[resourceName].baseTexture.resource
+            .load()
+            .catch(error => {
+              console.error(
+                `Unable to load video texture from url ${url}:`,
+                error
+              );
+              loadedTextures[resourceName] = invalidTexture;
+            });
         } catch (error) {
           console.error(
             `Unable to load file ${resource.getFile()} for video resource ${resourceName}:`,
@@ -326,6 +338,11 @@ export default class PixiResourcesLoader {
         autoLoad: false,
       },
     });
+    if (!loadedTextures[resourceName]) {
+      console.error(`Texture loading for ${url} returned nothing`);
+      loadedTextures[resourceName] = invalidTexture;
+      return loadedTextures[resourceName];
+    }
     loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
       console.error(`Unable to load texture from url ${url}:`, error);
       loadedTextures[resourceName] = invalidTexture;
@@ -458,6 +475,16 @@ export default class PixiResourcesLoader {
         autoPlay: false,
         crossorigin: determineCrossOrigin(url),
       },
+    });
+    if (!loadedTextures[resourceName]) {
+      console.error(`Texture loading for ${url} returned nothing`);
+      loadedTextures[resourceName] = invalidTexture;
+      return loadedTextures[resourceName];
+    }
+
+    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
+      console.error(`Unable to load video texture from url ${url}:`, error);
+      loadedTextures[resourceName] = invalidTexture;
     });
 
     return loadedTextures[resourceName];

@@ -182,7 +182,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 
   const setIsStayingOver = React.useCallback(
-    (active: boolean) => {
+    (active: boolean, canDrop: boolean) => {
+      // Do not open folder if cannot drop into it. It's implied that if it
+      // cannot be dropped in the folder, it cannot be dropped in any subfolders
+      // of the folder.
+      if (!canDrop) return;
       if (active !== isStayingOverRef.current) {
         isStayingOverRef.current = active;
         forceUpdate();
@@ -315,7 +319,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           isOver,
           canDrop,
         }) => {
-          setIsStayingOver(isOver);
+          setIsStayingOver(isOver, canDrop);
           return (
             <div
               style={{ paddingLeft: left }}

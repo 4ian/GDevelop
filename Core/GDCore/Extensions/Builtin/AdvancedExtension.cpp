@@ -115,21 +115,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .AddExpression(
           "GetArgumentAsNumber",
           _("Get function parameter value"),
-          _("Get function parameter (also called \"argument\") value."),
+          _("Get function parameter (also called \"argument\") value. You don't need this most of the time as you can simply write the parameter name in an expression."),
           "",
           "res/function16.png")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddStrExpression(
           "GetArgumentAsString",
           _("Get function parameter text"),
-          _("Get function parameter (also called \"argument\") text."),
+          _("Get function parameter (also called \"argument\") text. You don't need this most of the time as you can simply write the parameter name in an expression."),
           "",
           "res/function16.png")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddCondition(

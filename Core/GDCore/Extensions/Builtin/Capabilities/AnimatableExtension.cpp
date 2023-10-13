@@ -130,6 +130,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
       .MarkAsSimple();
+
+  aut.AddExpressionAndConditionAndAction(
+         "number",
+         "ElapsedTime",
+         _("Animation elapsed time"),
+         _("the elapsed time from the beginning of the animation (in seconds)"),
+         _("the animation elapsed time"),
+         _("Animations and images"),
+         "res/actions/animation24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
+      .UseStandardParameters(
+          "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
+                        _("Elapsed time (in seconds)")))
+      .MarkAsAdvanced();
+
+  aut.AddExpression(
+         "Duration",
+         _("Animation duration"),
+         _("Return the animation duration (in seconds)."),
+         _("Animations and images"),
+         "res/actions/animation24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "AnimatableBehavior");
 }
 
 }  // namespace gd

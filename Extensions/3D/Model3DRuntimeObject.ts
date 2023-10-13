@@ -288,6 +288,20 @@ namespace gdjs {
       this._animationSpeedScale = ratio;
     }
 
+    getAnimationElapsedTime(): float {
+      return this._renderer.getAnimationElapsedTime();
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      this._renderer.setAnimationElapsedTime(time);
+    }
+
+    getAnimationDuration(): float {
+      return this._renderer.getAnimationDuration(
+        this._animations[this._currentAnimationIndex].source
+      );
+    }
+
     getCenterX(): float {
       const centerPoint = this._renderer.getCenterPoint();
       return this.getWidth() * centerPoint[0];

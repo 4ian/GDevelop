@@ -47,6 +47,7 @@ namespace gdjs {
       this.world = new Box2D.b2World(
         new Box2D.b2Vec2(this.gravityX, this.gravityY)
       );
+      this.world.SetAutoClearForces(false);
       this.staticBody = this.world.CreateBody(new Box2D.b2BodyDef());
       this.contactListener = new Box2D.JSContactListener();
       this.contactListener.BeginContact = function (contactPtr) {

@@ -176,10 +176,12 @@ module.exports = {
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
       .setCategoryFullName(_('Text'))
+      .addDefaultBehavior("TextContainerCapability::TextContainerBehavior")
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -190,10 +192,22 @@ module.exports = {
         '',
         'res/conditions/text24_black.png'
       )
+      .setHidden()
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setText')
       .setGetter('getText');
+
+    object
+      .addStrExpression(
+        'Text',
+        _('Text'),
+        _('Return the text.'),
+        '',
+        'res/conditions/text24_black.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .setFunctionName('getText');
 
     // Deprecated
     object

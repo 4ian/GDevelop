@@ -520,7 +520,7 @@ export default class LayerRenderer {
     lightGroup.add(light);
     threeScene.add(lightGroup);
 
-    const threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
+    const threeCamera = new THREE.PerspectiveCamera(45, 1, 3, 2000);
     threeCamera.rotation.order = 'ZYX';
     this._threeCamera = threeCamera;
 

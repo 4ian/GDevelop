@@ -93,7 +93,8 @@ export type AuthError = {
     | 'auth/username-used'
     | 'auth/malformed-username'
     | 'auth/requires-recent-login'
-    | 'auth/too-many-requests',
+    | 'auth/too-many-requests'
+    | 'auth/network-request-failed',
 };
 
 export default class Authentication {

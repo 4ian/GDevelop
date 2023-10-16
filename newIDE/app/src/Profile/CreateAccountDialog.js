@@ -67,6 +67,14 @@ export const getEmailErrorText = (error: ?AuthError) => {
         your email.
       </Trans>
     );
+  if (error.code === 'auth/network-request-failed')
+    return (
+      <Trans>
+        The request could not reach the servers, ensure you are connected to
+        internet.
+      </Trans>
+    );
+
   return undefined;
 };
 

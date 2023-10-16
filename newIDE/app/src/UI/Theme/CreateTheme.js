@@ -11,6 +11,7 @@ export function getRootClassNames(theme: string) {
   return {
     mosaicRootClassName: theme,
     eventsSheetRootClassName: theme,
+    treeViewRootClassName: theme,
     tableRootClassName: theme,
     markdownRootClassName: theme,
     uiRootClassName: theme,

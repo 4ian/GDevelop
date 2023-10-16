@@ -16,6 +16,7 @@ import { type InstancesEditorShortcutsCallbacks } from '../InstancesEditor';
 import { type EditorId } from '.';
 import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
+import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 
 export type SceneEditorsDisplayProps = {|
   project: gdProject,
@@ -31,8 +32,7 @@ export type SceneEditorsDisplayProps = {|
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
   onEditObject: gdObject => void,
-  selectedObjectNames: string[],
-  renamedObjectWithContext: ?ObjectWithContext,
+  selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
   onSelectLayer: (layerName: string) => void,
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
@@ -43,7 +43,9 @@ export type SceneEditorsDisplayProps = {|
     done: (boolean) => void
   ) => void,
   onObjectCreated: gdObject => void,
-  onObjectSelected: (?ObjectWithContext) => void,
+  onObjectFolderOrObjectWithContextSelected: (
+    ?ObjectFolderOrObjectWithContext
+  ) => void,
   onExportObject: (object: ?gdObject) => void,
   onDeleteObject: (
     i18n: I18nType,
@@ -54,9 +56,8 @@ export type SceneEditorsDisplayProps = {|
     objectName: string,
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
-  onRenameObjectStart: (?ObjectWithContext) => void,
-  onRenameObjectFinish: (
-    objectWithContext: ObjectWithContext,
+  onRenameObjectFolderOrObjectWithContextFinish: (
+    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     newName: string,
     done: (boolean) => void
   ) => void,
@@ -121,6 +122,7 @@ export type SceneEditorsDisplayInterface = {|
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
+  renameObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext => void,
   viewControls: {|
     zoomBy: (factor: number) => void,
     setZoomFactor: (factor: number) => void,

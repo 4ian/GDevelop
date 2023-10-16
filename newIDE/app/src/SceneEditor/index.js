@@ -5,7 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import uniq from 'lodash/uniq';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -43,10 +42,8 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
   type ObjectWithContext,
   type GroupWithContext,
-  enumerateObjects,
 } from '../ObjectsList/EnumerateObjects';
 import InfoBar from '../UI/Messages/InfoBar';
-import { type SelectedTags } from '../Utils/TagsHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
@@ -63,6 +60,11 @@ import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
 import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import {
+  getObjectFolderOrObjectUnifiedName,
+  type ObjectFolderOrObjectWithContext,
+} from '../ObjectsList/EnumerateObjectFolderOrObject';
+import uniq from 'lodash/uniq';
 
 const gd: libGDevelop = global.gd;
 
@@ -131,11 +133,7 @@ type State = {|
   showAdditionalWorkInfoBar: boolean,
   additionalWorkInfoBar: InfoBarDetails,
 
-  // State for tags of objects:
-  selectedObjectTags: SelectedTags,
-
-  renamedObjectWithContext: ?ObjectWithContext,
-  selectedObjectsWithContext: Array<ObjectWithContext>,
+  selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   selectedLayer: string,
 |};
 
@@ -188,13 +186,22 @@ export default class SceneEditor extends React.Component<Props, State> {
         touchScreenMessage: '',
       },
 
-      selectedObjectTags: [],
-
-      renamedObjectWithContext: null,
-      selectedObjectsWithContext: [],
+      selectedObjectFolderOrObjectsWithContext: [],
       selectedLayer: BASE_LAYER_NAME,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
     };
+  }
+
+  UNSAFE_componentWillUpdate(prevProps: Props, prevState: State) {
+    if (!prevProps.isActive && this.props.isActive) {
+      // When the scene is refocused, the object selection is cleared
+      // to avoid cases where:
+      // - objects have been deleted when the scene wasn't active
+      // (global objects in a different scene for instance)
+      // - and some components try to access said objects properties
+      // (computing selectedObjectNames for instance)
+      this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
+    }
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
@@ -286,7 +293,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          canRenameObject={this.state.selectedObjectsWithContext.length === 1}
+          canRenameObject={
+            this.state.selectedObjectFolderOrObjectsWithContext.length === 1
+          }
           onRenameObject={this._startRenamingSelectedObject}
         />
       );
@@ -315,7 +324,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          canRenameObject={this.state.selectedObjectsWithContext.length === 1}
+          canRenameObject={
+            this.state.selectedObjectFolderOrObjectsWithContext.length === 1
+          }
           onRenameObject={this._startRenamingSelectedObject}
         />
       );
@@ -510,15 +521,19 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
-    const selectedObjectsWithContext = [];
-    if (objectWithContext) {
-      selectedObjectsWithContext.push(objectWithContext);
+  _onObjectFolderOrObjectWithContextSelected = (
+    objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
+  ) => {
+    const selectedObjectFolderOrObjectsWithContext = [];
+    if (objectFolderOrObjectWithContext) {
+      selectedObjectFolderOrObjectsWithContext.push(
+        objectFolderOrObjectWithContext
+      );
     }
 
     this.setState(
       {
-        selectedObjectsWithContext,
+        selectedObjectFolderOrObjectsWithContext,
       },
       () => {
         // We update the toolbar because we need to update the objects selected
@@ -618,23 +633,38 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
+    if (instances.length === 0) {
+      this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
+      return;
+    }
     const { project, layout } = this.props;
-    const instancesObjectNames = uniq(
-      instances.map(instance => instance.getObjectName())
-    );
-
-    const selectedObjectsWithContext = enumerateObjects(project, layout, {
-      names: instancesObjectNames,
-    }).allObjectsList;
-
-    this.setState(
-      {
-        selectedObjectsWithContext,
-      },
-      () => {
-        this.updateToolbar();
-      }
-    );
+    // TODO: Find a way to select efficiently the ObjectFolderOrObject instances
+    // representing all the instances selected.
+    const lastSelectedInstance = instances[instances.length - 1];
+    const objectName = lastSelectedInstance.getObjectName();
+    if (project.hasObjectNamed(objectName)) {
+      this.setState({
+        selectedObjectFolderOrObjectsWithContext: [
+          {
+            objectFolderOrObject: project
+              .getRootFolder()
+              .getObjectNamed(objectName),
+            global: true,
+          },
+        ],
+      });
+    } else if (layout.hasObjectNamed(objectName)) {
+      this.setState({
+        selectedObjectFolderOrObjectsWithContext: [
+          {
+            objectFolderOrObject: layout
+              .getRootFolder()
+              .getObjectNamed(objectName),
+            global: false,
+          },
+        ],
+      });
+    }
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
@@ -794,25 +824,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onRenameObjectStart = (objectWithContext: ?ObjectWithContext) => {
-    const selectedObjectsWithContext = [];
-    if (objectWithContext) {
-      selectedObjectsWithContext.push(objectWithContext);
-    }
-
-    this.setState(
-      {
-        renamedObjectWithContext: objectWithContext,
-        selectedObjectsWithContext,
-      },
-      () => {
-        this.updateToolbar();
-      }
-    );
-  };
-
   _startRenamingSelectedObject = () => {
-    this._onRenameObjectStart(this.state.selectedObjectsWithContext[0]);
+    const firstSelectedObjectFolderOrObject = this.state
+      .selectedObjectFolderOrObjectsWithContext[0];
+    if (!firstSelectedObjectFolderOrObject) return;
+
+    if (this.editorDisplay)
+      this.editorDisplay.renameObjectFolderOrObjectWithContext(
+        firstSelectedObjectFolderOrObject
+      );
+    this.updateToolbar();
   };
 
   _onRenameLayer = (
@@ -928,42 +949,75 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { editedObjectWithContext } = this.state;
 
     if (editedObjectWithContext) {
-      this._onRenameObjectFinish(editedObjectWithContext, newName, () => {});
+      this._onRenameObjectFinish(editedObjectWithContext, newName);
     }
   };
 
   _onRenameObjectFinish = (
     objectWithContext: ObjectWithContext,
-    newName: string,
-    done: boolean => void
+    newName: string
   ) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
     // newName is supposed to have been already validated.
-
     // Avoid triggering renaming refactoring if name has not really changed
-    if (object.getName() !== newName) {
-      if (global) {
-        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
-          project,
-          object.getName(),
-          newName,
-          /* isObjectGroup=*/ false
-        );
-      } else {
-        gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
-          project,
-          layout,
-          object.getName(),
-          newName,
-          /* isObjectGroup=*/ false
-        );
-      }
+    if (object.getName() === newName) {
+      return;
+    }
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+        project,
+        object.getName(),
+        newName,
+        /* isObjectGroup=*/ false
+      );
+    } else {
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+        project,
+        layout,
+        object.getName(),
+        newName,
+        /* isObjectGroup=*/ false
+      );
     }
 
     object.setName(newName);
-    this._onObjectSelected(objectWithContext);
+  };
+
+  _onRenameObjectFolderOrObjectWithContextFinish = (
+    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+    newName: string,
+    done: boolean => void
+  ) => {
+    const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
+
+    const unifiedName = getObjectFolderOrObjectUnifiedName(
+      objectFolderOrObject
+    );
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (unifiedName === newName) {
+      this._onObjectFolderOrObjectWithContextSelected(
+        objectFolderOrObjectWithContext
+      );
+      done(false);
+      return;
+    }
+    // newName is supposed to have been already validated.
+
+    if (objectFolderOrObject.isFolder()) {
+      objectFolderOrObject.setFolderName(newName);
+      done(true);
+      return;
+    }
+
+    const object = objectFolderOrObject.getObject();
+
+    this._onRenameObjectFinish({ object, global }, newName);
+    this._onObjectFolderOrObjectWithContextSelected(
+      objectFolderOrObjectWithContext
+    );
     done(true);
   };
 
@@ -1120,7 +1174,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.setState(
       {
-        selectedObjectsWithContext: [],
+        selectedObjectFolderOrObjectsWithContext: [],
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
@@ -1180,6 +1234,76 @@ export default class SceneEditor extends React.Component<Props, State> {
     ];
   };
 
+  getContextMenuLayoutItems = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Open scene events`),
+      click: () => this.props.onOpenEvents(this.props.layout.getName()),
+    },
+    {
+      label: i18n._(t`Open scene properties`),
+      click: () => this.openSceneProperties(true),
+    },
+  ];
+
+  getContextMenuInstancesWiseItems = (i18n: I18nType) => {
+    const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
+    return [
+      {
+        label: i18n._(t`Copy`),
+        click: () => this.copySelection(),
+        enabled: hasSelectedInstances,
+        accelerator: 'CmdOrCtrl+C',
+      },
+      {
+        label: i18n._(t`Cut`),
+        click: () => this.cutSelection(),
+        enabled: hasSelectedInstances,
+        accelerator: 'CmdOrCtrl+X',
+      },
+      {
+        label: i18n._(t`Paste`),
+        click: () => this.paste(),
+        enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+        accelerator: 'CmdOrCtrl+V',
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        enabled: hasSelectedInstances,
+        click: () => {
+          this.duplicateSelection();
+        },
+        accelerator: 'CmdOrCtrl+D',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Bring to front`),
+        enabled: hasSelectedInstances,
+        click: () => {
+          this._onMoveInstancesZOrder('front');
+        },
+      },
+      {
+        label: i18n._(t`Send to back`),
+        enabled: hasSelectedInstances,
+        click: () => {
+          this._onMoveInstancesZOrder('back');
+        },
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Show/Hide instance properties`),
+        click: () => this.toggleProperties(),
+        enabled: hasSelectedInstances,
+      },
+      {
+        label: i18n._(t`Delete`),
+        click: () => this.deleteSelection(),
+        enabled: hasSelectedInstances,
+        accelerator: 'Delete',
+      },
+    ];
+  };
+
   setZoomFactor = (zoomFactor: number) => {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.setZoomFactor(zoomFactor);
@@ -1214,13 +1338,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {
-    let contextMenuItems = [];
     if (
       options.ignoreSelectedObjectsForContextMenu ||
-      this.state.selectedObjectsWithContext.length === 0
+      !this.instancesSelection.hasSelectedInstances()
     ) {
-      contextMenuItems = [
-        ...contextMenuItems,
+      return [
         {
           label: i18n._(t`Paste`),
           click: () => this.paste(),
@@ -1234,64 +1356,28 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
         { type: 'separator' },
         ...this.getContextMenuZoomItems(i18n),
+        { type: 'separator' },
+        ...this.getContextMenuLayoutItems(i18n),
       ];
-    } else {
-      const objectName = this.state.selectedObjectsWithContext[0].object.getName();
-      contextMenuItems = [
-        ...contextMenuItems,
-        {
-          label: i18n._(t`Copy`),
-          click: () => this.copySelection(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          accelerator: 'CmdOrCtrl+C',
-        },
-        {
-          label: i18n._(t`Cut`),
-          click: () => this.cutSelection(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          accelerator: 'CmdOrCtrl+X',
-        },
-        {
-          label: i18n._(t`Paste`),
-          click: () => this.paste(),
-          enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
-          accelerator: 'CmdOrCtrl+V',
-        },
-        {
-          label: i18n._(t`Duplicate`),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          click: () => {
-            this.duplicateSelection();
-          },
-          accelerator: 'CmdOrCtrl+D',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Bring to front`),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          click: () => {
-            this._onMoveInstancesZOrder('front');
-          },
-        },
-        {
-          label: i18n._(t`Send to back`),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          click: () => {
-            this._onMoveInstancesZOrder('back');
-          },
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Show/Hide instance properties`),
-          click: () => this.toggleProperties(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-        },
-        {
-          label: i18n._(t`Delete`),
-          click: () => this.deleteSelection(),
-          enabled: this.instancesSelection.hasSelectedInstances(),
-          accelerator: 'Delete',
-        },
+    }
+    const instances = this.instancesSelection.getSelectedInstances();
+    if (
+      instances.length === 1 ||
+      uniq(instances.map(instance => instance.getObjectName())).length === 1
+    ) {
+      const { project, layout } = this.props;
+      const objectName = instances[0].getObjectName();
+      const object = getObjectByName(project, layout, objectName);
+
+      const objectMetadata = object
+        ? gd.MetadataProvider.getObjectMetadata(
+            project.getCurrentPlatform(),
+            object.getType()
+          )
+        : null;
+
+      return [
+        ...this.getContextMenuInstancesWiseItems(i18n),
         { type: 'separator' },
         {
           label: i18n._(t`Edit object ${shortenString(objectName, 14)}`),
@@ -1305,27 +1391,24 @@ export default class SceneEditor extends React.Component<Props, State> {
           label: i18n._(t`Edit behaviors`),
           click: () => this.editObjectByName(objectName, 'behaviors'),
         },
-        {
-          label: i18n._(t`Edit effects`),
-          click: () => this.editObjectByName(objectName, 'effects'),
-        },
-      ];
+        objectMetadata
+          ? {
+              label: i18n._(t`Edit effects`),
+              click: () => this.editObjectByName(objectName, 'effects'),
+              enabled: objectMetadata.hasDefaultBehavior(
+                'EffectCapability::EffectBehavior'
+              ),
+            }
+          : null,
+        { type: 'separator' },
+        ...this.getContextMenuLayoutItems(i18n),
+      ].filter(Boolean);
     }
-
-    contextMenuItems = [
-      ...contextMenuItems,
+    return [
+      ...this.getContextMenuInstancesWiseItems(i18n),
       { type: 'separator' },
-      {
-        label: i18n._(t`Open scene events`),
-        click: () => this.props.onOpenEvents(layout.getName()),
-      },
-      {
-        label: i18n._(t`Open scene properties`),
-        click: () => this.openSceneProperties(true),
-      },
+      ...this.getContextMenuLayoutItems(i18n),
     ];
-
-    return contextMenuItems;
   };
 
   copySelection = ({
@@ -1504,7 +1587,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       resourceManagementProps,
       isActive,
     } = this.props;
-    const { editedObjectWithContext } = this.state;
+    const {
+      editedObjectWithContext,
+      selectedObjectFolderOrObjectsWithContext,
+    } = this.state;
     const variablesEditedAssociatedObjectName = this.state
       .variablesEditedInstance
       ? this.state.variablesEditedInstance.getObjectName()
@@ -1512,9 +1598,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
-    const selectedObjectNames = this.state.selectedObjectsWithContext.map(
-      objWithContext => objWithContext.object.getName()
-    );
+
     // Deactivate prettier on this variable to prevent spaces to be added by
     // line breaks.
     // prettier-ignore
@@ -1567,8 +1651,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 editLayerEffects={this.editLayerEffects}
                 editInstanceVariables={this.editInstanceVariables}
                 editObjectByName={this.editObjectByName}
-                selectedObjectNames={selectedObjectNames}
-                renamedObjectWithContext={this.state.renamedObjectWithContext}
+                selectedObjectFolderOrObjectsWithContext={
+                  selectedObjectFolderOrObjectsWithContext
+                }
                 onRenameLayer={this._onRenameLayer}
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={(layer: string) =>
@@ -1585,10 +1670,13 @@ export default class SceneEditor extends React.Component<Props, State> {
                 canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
                 updateBehaviorsSharedData={this.updateBehaviorsSharedData}
                 onEditObject={this.props.onEditObject || this.editObject}
-                onRenameObjectStart={this._onRenameObjectStart}
-                onRenameObjectFinish={this._onRenameObjectFinish}
+                onRenameObjectFolderOrObjectWithContextFinish={
+                  this._onRenameObjectFolderOrObjectWithContextFinish
+                }
                 onObjectCreated={this._onObjectCreated}
-                onObjectSelected={this._onObjectSelected}
+                onObjectFolderOrObjectWithContextSelected={
+                  this._onObjectFolderOrObjectWithContextSelected
+                }
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 historyHandler={{
                   undo: this.undo,

@@ -23,7 +23,7 @@ const getClientXY = (event: TouchEvent): CallbackEvent => {
   };
 };
 
-const delay = 600; // ms
+const defaultDelay = 600; // ms
 const moveTolerance = 10; // px
 
 const contextLocks: { [string]: true } = {};
@@ -37,13 +37,18 @@ const contextLocks: { [string]: true } = {};
  */
 export const useLongTouch = (
   callback: (e: CallbackEvent) => void,
-  /**
-   * To be set when nested elements with watched touches events are in conflict to run a callback.
-   * Priority will be given to the nested element.
-   */
-  context?: string
+  options?: {
+    /**
+     * To be set when nested elements with watched touches events are in conflict to run a callback.
+     * Priority will be given to the nested element.
+     */
+    context?: string,
+    delay?: number,
+  }
 ) => {
   const timeout = React.useRef<?TimeoutID>(null);
+  const context = options && options.context ? options.context : null;
+  const delay = options && options.delay ? options.delay : defaultDelay;
   const currentTouchCallbackEvent = React.useRef<CallbackEvent>({
     clientX: 0,
     clientY: 0,
@@ -98,7 +103,7 @@ export const useLongTouch = (
         callback(currentTouchCallbackEvent.current);
       }, delay);
     },
-    [callback, context]
+    [callback, context, delay]
   );
 
   const onMove = React.useCallback(

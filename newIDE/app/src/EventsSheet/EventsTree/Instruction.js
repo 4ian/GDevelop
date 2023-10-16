@@ -439,7 +439,7 @@ const Instruction = (props: Props) => {
       },
       [onContextMenu]
     ),
-    'events-tree-event-component'
+    { context: 'events-tree-event-component' }
   );
 
   return (

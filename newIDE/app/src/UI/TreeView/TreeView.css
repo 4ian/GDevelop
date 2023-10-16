@@ -1,0 +1,145 @@
+.tree-view .full-height-flex-container {
+  display: flex;
+  height: 100%;
+}
+.tree-view .full-height-flex-container.with-divider {
+  border-top: 1px solid var(--theme-list-item-separator-color);
+}
+.tree-view .full-space-container {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.tree-view .row-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.tree-view .row-content-side {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+
+.tree-view .row-content-side.row-content-extra-padding {
+  /* Used for a better dragging preview. */
+  padding: 0 6px;
+}
+.tree-view .row-content-side.row-content-side-left {
+  /* Necessary for item-name to be overflown. */
+  width: 80%;
+}
+.tree-view .row-content-side.row-content-side-right {
+  /* Used for a better dragging preview. */
+  position: absolute;
+  right: 0;
+  z-index: 1;
+}
+
+.tree-view .row-container {
+  display: flex;
+  flex: 1;
+  border-radius: 6px;
+  width: 100%;
+}
+.tree-view .item-name.animate {
+  animation-name: wiggle;
+  animation-duration: 0.4s;
+}
+.tree-view:focus-visible {
+  /**
+   * Remove browser-specific style around focused element when hitting an arrow key.
+   */
+  outline: none;
+}
+.tree-view .row-container.with-can-drop-inside-indicator {
+  outline: 1px solid var(--theme-drop-indicator-can-drop-color);
+}
+.tree-view .row-container.with-cannot-drop-inside-indicator {
+  outline: 1px solid var(--theme-drop-indicator-cannot-drop-color);
+}
+.tree-view .row-container.selected {
+  background-color: var(--table-row-selected-background-color);
+}
+
+.tree-view .item-name,
+.tree-view .item-name-input {
+  font-family: var(--gdevelop-modern-font-family) !important;
+  font-size: 14px;
+}
+.tree-view .item-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+.tree-view .item-name.editable {
+  cursor: text;
+}
+
+.tree-view .item-name.placeholder {
+  color: var(--theme-text-secondary-color);
+  font-size: 14px;
+}
+
+.tree-view .item-name.root-folder {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.tree-view .folder-icon {
+  margin-right: 4px;
+  width: 20px;
+}
+.tree-view .thumbnail {
+  margin-right: 6px;
+}
+
+.tree-view .item-name-input {
+  outline: none;
+  border: none;
+  padding: 0;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  color: inherit;
+  width: 100%;
+}
+
+.tree-view .item-name-input-container:before {
+  bottom: -1px;
+  left: 0;
+  content: '\00a0';
+  width: 100%;
+  border-bottom: 1px solid var(--theme-text-default-color);
+  display: block;
+  position: absolute;
+  height: 1px;
+}
+
+.tree-view .item-name-input-container {
+  position: relative;
+  flex: 1;
+}
+
+@keyframes wiggle {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  35% {
+    transform: translate(8px, 0px);
+  }
+  80% {
+    transform: translate(-5px, 0px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}

@@ -11,6 +11,7 @@ import {
   type ConnectDropTarget,
   type ConnectDragPreview,
 } from 'react-dnd';
+import { hapticFeedback } from '../../Utils/Haptic';
 
 type Props<DraggedItemType> = {|
   children: ({|
@@ -26,6 +27,7 @@ type Props<DraggedItemType> = {|
   canDrop: (item: DraggedItemType) => boolean,
   drop: () => void,
   endDrag?: () => void,
+  hover?: (monitor: DropTargetMonitor) => void,
 |};
 
 type DragSourceProps = {|
@@ -47,8 +49,11 @@ type InnerDragSourceAndDropTargetProps<DraggedItemType> = {|
   ...DropTargetProps,
 |};
 
+type Options = {| vibrate?: number |};
+
 export const makeDragSourceAndDropTarget = <DraggedItemType>(
-  reactDndType: string
+  reactDndType: string,
+  options: ?Options
 ): ((Props<DraggedItemType>) => React.Node) => {
   const sourceSpec = {
     canDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
@@ -58,6 +63,9 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
       return true;
     },
     beginDrag(props: InnerDragSourceAndDropTargetProps<DraggedItemType>) {
+      if (hapticFeedback && options && options.vibrate) {
+        hapticFeedback({ durationInMs: options.vibrate });
+      }
       return props.beginDrag();
     },
     endDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
@@ -86,6 +94,9 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         return; // Drop already handled by another target
       }
       props.drop();
+    },
+    hover(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
+      if (props.hover) props.hover(monitor);
     },
   };
 

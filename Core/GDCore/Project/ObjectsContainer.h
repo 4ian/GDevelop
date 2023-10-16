@@ -9,11 +9,12 @@
 #include <vector>
 #include "GDCore/String.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
+#include "GDCore/Project/ObjectFolderOrObject.h"
 namespace gd {
 class Object;
 class Project;
 class SerializerElement;
-}
+}  // namespace gd
 #undef GetObject  // Disable an annoying macro
 
 namespace gd {
@@ -98,6 +99,19 @@ class GD_CORE_API ObjectsContainer {
                               const gd::String& objectType,
                               const gd::String& name,
                               std::size_t position);
+  /**
+   * \brief Add a new empty object of type \a objectType called \a name in the
+   * given folder at the specified position.<br>
+   *
+   * \note The object is created using the project's current platform.
+   * \return A reference to the object in the list.
+   */
+  gd::Object& InsertNewObjectInFolder(
+      const gd::Project& project,
+      const gd::String& objectType,
+      const gd::String& name,
+      gd::ObjectFolderOrObject& objectFolderOrObject,
+      std::size_t position);
 
   /**
    * \brief Add a new object to the list
@@ -125,18 +139,18 @@ class GD_CORE_API ObjectsContainer {
   void MoveObject(std::size_t oldIndex, std::size_t newIndex);
 
   /**
-   * \brief Swap the position of the specified objects.
-   */
-  void SwapObjects(std::size_t firstObjectIndex, std::size_t secondObjectIndex);
-
-  /**
-   * Move the specified object to another container, removing it from the current one
-   * and adding it to the new one at the specified position.
+   * Move the specified object to another container, removing it from the
+   * current one and adding it to the new one at the specified position in the
+   * given folder.
    *
-   * \note This does not invalidate the references to the object (object is not moved in memory,
-   * as referenced by smart pointers internally).
+   * \note This does not invalidate the references to the object (object is not
+   * moved in memory, as referenced by smart pointers internally).
    */
-  void MoveObjectToAnotherContainer(const gd::String& name, gd::ObjectsContainer & newContainer, std::size_t newPosition);
+  void MoveObjectFolderOrObjectToAnotherContainerInFolder(
+      gd::ObjectFolderOrObject& objectFolderOrObject,
+      gd::ObjectsContainer& newContainer,
+      gd::ObjectFolderOrObject& newParentFolder,
+      std::size_t newPosition);
 
   /**
    * Provide a raw access to the vector containing the objects
@@ -153,19 +167,35 @@ class GD_CORE_API ObjectsContainer {
   }
   ///@}
 
+  gd::ObjectFolderOrObject& GetRootFolder() {
+      return *rootFolder;
+  }
+
+  void AddMissingObjectsInRootFolder();
+
   /** \name Saving and loading
    * Members functions related to saving and loading the objects of the class.
    */
   ///@{
   /**
-   * \brief Serialize instances container.
+   * \brief Serialize the objects container.
    */
   void SerializeObjectsTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserialize the instances container.
+   * \brief Unserialize the objects container.
    */
   void UnserializeObjectsFrom(gd::Project& project,
+                              const SerializerElement& element);
+  /**
+   * \brief Serialize folder structure.
+   */
+  void SerializeFoldersTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserialize folder structure.
+   */
+  void UnserializeFoldersFrom(gd::Project& project,
                               const SerializerElement& element);
   ///@}
 
@@ -190,6 +220,9 @@ class GD_CORE_API ObjectsContainer {
   std::vector<std::unique_ptr<gd::Object> >
       initialObjects;  ///< Objects contained.
   gd::ObjectGroupsContainer objectGroups;
+
+ private:
+  std::unique_ptr<gd::ObjectFolderOrObject> rootFolder;
 };
 
 }  // namespace gd

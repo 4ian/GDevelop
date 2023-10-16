@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -14,19 +13,14 @@ import InstancePropertiesEditor, {
 } from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import FullSizeInstancesEditorWithScrollbars from '../../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
-import TagsButton from '../../UI/EditorMosaic/TagsButton';
 import CloseButton from '../../UI/EditorMosaic/CloseButton';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
-import ObjectGroupsList from '../../ObjectGroupsList';
+import ObjectGroupsList, {
+  type ObjectGroupsListInterface,
+} from '../../ObjectGroupsList';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
-import {
-  getTagsFromString,
-  buildTagsMenuTemplate,
-  type SelectedTags,
-} from '../../Utils/TagsHelper';
-import { enumerateObjects } from '../../ObjectsList/EnumerateObjects';
 import Rectangle from '../../Utils/Rectangle';
 import { type EditorId } from '..';
 import {
@@ -95,10 +89,6 @@ const MosaicEditorsDisplay = React.forwardRef<
     setDefaultEditorMosaicNode,
   } = React.useContext(PreferencesContext);
   const selectedInstances = props.instancesSelection.getSelectedInstances();
-  const [
-    selectedObjectTags,
-    setSelectedObjectTags,
-  ] = React.useState<SelectedTags>([]);
 
   const instancesPropertiesEditorRef = React.useRef<?InstancePropertiesEditorInterface>(
     null
@@ -108,7 +98,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const editorMosaicRef = React.useRef<?EditorMosaic>(null);
-  const objectGroupsListRef = React.useRef<?ObjectGroupsList>(null);
+  const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
   const forceUpdateInstancesPropertiesEditor = React.useCallback(() => {
     if (instancesPropertiesEditorRef.current)
@@ -150,6 +140,15 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (!editorMosaicRef.current) return false;
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
+  const renameObjectFolderOrObjectWithContext = React.useCallback(
+    objectWithContext => {
+      if (objectsListRef.current)
+        objectsListRef.current.renameObjectFolderOrObjectWithContext(
+          objectWithContext
+        );
+    },
+    []
+  );
 
   const startSceneRendering = React.useCallback((start: boolean) => {
     const editor = editorRef.current;
@@ -172,6 +171,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       toggleEditorView,
       isEditorVisible,
       startSceneRendering,
+      renameObjectFolderOrObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,
@@ -221,29 +221,13 @@ const MosaicEditorsDisplay = React.forwardRef<
     ]
   );
 
-  const getAllObjectTags = React.useCallback(
-    (): Array<string> => {
-      const tagsSet: Set<string> = new Set();
-      enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
-        getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
-      });
-
-      return Array.from(tagsSet);
-    },
-    [project, layout]
-  );
-
-  const buildObjectTagsMenuTemplate = React.useCallback(
-    (i18n: I18nType): Array<any> => {
-      return buildTagsMenuTemplate({
-        noTagLabel: i18n._(t`No tags - add a tag to an object first`),
-        getAllTags: getAllObjectTags,
-        selectedTags: selectedObjectTags,
-        onChange: setSelectedObjectTags,
-      });
-    },
-    [selectedObjectTags, getAllObjectTags]
-  );
+  const selectedObjectNames = props.selectedObjectFolderOrObjectsWithContext
+    .map(objectFolderOrObjectWithContext => {
+      const { objectFolderOrObject } = objectFolderOrObjectWithContext;
+      if (objectFolderOrObject.isFolder()) return null;
+      return objectFolderOrObject.getObject().getName();
+    })
+    .filter(Boolean);
 
   const editors = {
     properties: {
@@ -321,7 +305,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           onInstancesMoved={props.onInstancesMoved}
           onInstancesResized={props.onInstancesResized}
           onInstancesRotated={props.onInstancesRotated}
-          selectedObjectNames={props.selectedObjectNames}
+          selectedObjectNames={selectedObjectNames}
           onContextMenu={props.onContextMenu}
           isInstanceOf3DObject={props.isInstanceOf3DObject}
           instancesEditorShortcutsCallbacks={
@@ -337,13 +321,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     'objects-list': {
       type: 'secondary',
       title: t`Objects`,
-      toolbarControls: [
-        <TagsButton
-          key="tags"
-          buildMenuTemplate={buildObjectTagsMenuTemplate}
-        />,
-        <CloseButton key="close" />,
-      ],
+      toolbarControls: [<CloseButton key="close" />],
       renderEditor: () => (
         <I18n>
           {({ i18n }) => (
@@ -359,7 +337,9 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.onSelectAllInstancesOfObjectInLayout
               }
               resourceManagementProps={props.resourceManagementProps}
-              selectedObjectNames={props.selectedObjectNames}
+              selectedObjectFolderOrObjectsWithContext={
+                props.selectedObjectFolderOrObjectsWithContext
+              }
               canInstallPrivateAsset={props.canInstallPrivateAsset}
               onEditObject={props.onEditObject}
               onExportObject={props.onExportObject}
@@ -370,18 +350,17 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.getValidatedObjectOrGroupName(newName, global, i18n)
               }
               onObjectCreated={props.onObjectCreated}
-              onObjectSelected={props.onObjectSelected}
-              renamedObjectWithContext={props.renamedObjectWithContext}
-              onRenameObjectStart={props.onRenameObjectStart}
-              onRenameObjectFinish={props.onRenameObjectFinish}
+              onObjectFolderOrObjectWithContextSelected={
+                props.onObjectFolderOrObjectWithContextSelected
+              }
+              onRenameObjectFolderOrObjectWithContextFinish={
+                props.onRenameObjectFolderOrObjectWithContextFinish
+              }
               onAddObjectInstance={props.onAddObjectInstance}
               onObjectPasted={props.updateBehaviorsSharedData}
-              selectedObjectTags={selectedObjectTags}
               beforeSetAsGlobalObject={objectName =>
                 props.canObjectOrGroupBeGlobal(i18n, objectName)
               }
-              onChangeSelectedObjectTags={setSelectedObjectTags}
-              getAllObjectTags={getAllObjectTags}
               ref={objectsListRef}
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}

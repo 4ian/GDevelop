@@ -346,10 +346,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'Draggable'
   );
 
-  // Add some tags
-  tiledSpriteObject.setTags('Tag1');
-  spriteObject.setTags('Tag1, Tag2');
-
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
   group1.addObject('MySpriteObject');

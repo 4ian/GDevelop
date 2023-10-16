@@ -71,6 +71,7 @@ declare class libGDevelop {
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
   Watermark: Class<gdWatermark>;
+  ObjectFolderOrObject: Class<gdObjectFolderOrObject>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
   ObjectsContainersList: Class<gdObjectsContainersList>;

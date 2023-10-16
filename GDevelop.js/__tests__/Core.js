@@ -5,6 +5,18 @@ const {
 } = require('../TestUtils/FakeAbstractFileSystem');
 const extend = require('extend');
 
+const mapFor = /*:: <T> */ (
+  start /*: number */,
+  end /*: number */,
+  func /*: (number) => T */
+) /*: Array<T> */ => {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(func(i));
+  }
+  return result;
+};
+
 describe('libGD.js', function () {
   let gd = null;
   beforeAll((done) =>
@@ -416,7 +428,10 @@ describe('libGD.js', function () {
 
       // Prepare two containers, one with 3 objects and one empty
       const objectsContainer1 = new gd.ObjectsContainer();
+      const rootFolder1 = objectsContainer1.getRootFolder();
       const objectsContainer2 = new gd.ObjectsContainer();
+      const rootFolder2 = objectsContainer2.getRootFolder();
+      const subFolder2 = rootFolder2.insertNewFolder('Folder', 1);
       const mySpriteObject = objectsContainer1.insertNewObject(
         project,
         'Sprite',
@@ -436,9 +451,11 @@ describe('libGD.js', function () {
         2
       );
 
-      // Find the pointer to the objects in memory
       expect(objectsContainer1.getObjectsCount()).toBe(3);
       expect(objectsContainer2.getObjectsCount()).toBe(0);
+      expect(rootFolder1.getChildrenCount()).toBe(3);
+      expect(rootFolder2.getChildrenCount()).toBe(1);
+      // Find the pointer to the objects in memory
       const mySpriteObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(0));
       const mySprite2ObjectPtr = gd.getPointer(
         objectsContainer1.getObjectAt(1)
@@ -446,11 +463,24 @@ describe('libGD.js', function () {
       const mySprite3ObjectPtr = gd.getPointer(
         objectsContainer1.getObjectAt(2)
       );
+      const mySpriteObjectFolderOrObject = rootFolder1.getChildAt(0);
+      const mySprite2ObjectFolderOrObject = rootFolder1.getChildAt(1);
+      const mySprite3ObjectFolderOrObject = rootFolder1.getChildAt(2);
+      const mySpriteObjectFolderOrObjectPtr = gd.getPointer(
+        mySpriteObjectFolderOrObject
+      );
+      const mySprite2ObjectFolderOrObjectPtr = gd.getPointer(
+        mySprite2ObjectFolderOrObject
+      );
+      const mySprite3ObjectFolderOrObjectPtr = gd.getPointer(
+        mySprite3ObjectFolderOrObject
+      );
 
       // Move objects between containers
-      objectsContainer1.moveObjectToAnotherContainer(
-        'MySprite2',
+      objectsContainer1.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite2ObjectFolderOrObject,
         objectsContainer2,
+        rootFolder2,
         0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
@@ -458,17 +488,34 @@ describe('libGD.js', function () {
       expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite3');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
+      expect(rootFolder2.hasObjectNamed('MySprite2')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toBe(2);
+      expect(gd.getPointer(rootFolder2.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(rootFolder2.getObjectChild('MySprite2')).toBe(
+        mySprite2ObjectFolderOrObject
+      );
+      expect(mySprite2ObjectFolderOrObject.getParent()).toBe(rootFolder2);
 
-      objectsContainer1.moveObjectToAnotherContainer(
-        'MySprite3',
+      // Move object in sub folder.
+      objectsContainer1.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite3ObjectFolderOrObject,
         objectsContainer2,
-        1
+        subFolder2,
+        0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(1);
       expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
       expect(objectsContainer2.getObjectsCount()).toBe(2);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
       expect(objectsContainer2.getObjectAt(1).getName()).toBe('MySprite3');
+      expect(subFolder2.hasObjectNamed('MySprite3')).toBe(true);
+      expect(subFolder2.getChildrenCount()).toBe(1);
+      expect(gd.getPointer(subFolder2.getObjectChild('MySprite3'))).toBe(
+        mySprite3ObjectFolderOrObjectPtr
+      );
+      expect(mySprite3ObjectFolderOrObject.getParent()).toBe(subFolder2);
 
       // Check that the object in memory are the same, even if moved to another container
       expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
@@ -481,27 +528,53 @@ describe('libGD.js', function () {
         mySprite3ObjectPtr
       );
 
-      objectsContainer2.moveObjectToAnotherContainer(
-        'MySprite2',
+      expect(gd.getPointer(rootFolder2.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(rootFolder2.getObjectChild('MySprite2')).toBe(
+        mySprite2ObjectFolderOrObject
+      );
+
+      // Move back first object to first container
+      objectsContainer2.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite2ObjectFolderOrObject,
         objectsContainer1,
+        rootFolder1,
         0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
-      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite2');
-      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite');
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite2');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite3');
+      expect(rootFolder2.hasObjectNamed('MySprite2')).toBe(false);
+      expect(rootFolder2.getChildrenCount()).toBe(1);
+      expect(rootFolder1.getChildrenCount()).toBe(2);
+      expect(rootFolder1.getChildAt(0).getObject().getName()).toBe('MySprite2');
+      expect(rootFolder1.getChildAt(1).getObject().getName()).toBe('MySprite');
+      expect(rootFolder1.hasObjectNamed('MySprite2')).toBe(true);
+      expect(mySprite2ObjectFolderOrObject.getParent()).toBe(rootFolder1);
 
       // Check again that the object in memory are the same, even if moved to another container
       expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
-        mySprite2ObjectPtr
+        mySpriteObjectPtr
       );
       expect(gd.getPointer(objectsContainer1.getObjectAt(1))).toBe(
-        mySpriteObjectPtr
+        mySprite2ObjectPtr
       );
       expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(
         mySprite3ObjectPtr
       );
+      expect(gd.getPointer(rootFolder1.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(gd.getPointer(rootFolder1.getObjectChild('MySprite'))).toBe(
+        mySpriteObjectFolderOrObjectPtr
+      );
+      expect(gd.getPointer(subFolder2.getObjectChild('MySprite3'))).toBe(
+        mySprite3ObjectFolderOrObjectPtr
+      );
+
       project.delete();
     });
   });
@@ -2908,13 +2981,11 @@ describe('libGD.js', function () {
   });
 
   describe('gd.SpriteObject', function () {
-    it('is a gd.Object and can have tags', function () {
+    it('is a gd.Object', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
       let object = project.insertNewObject(project, 'Sprite', 'MySpriteObject');
 
       expect(object instanceof gd.Object).toBe(true);
-      object.setTags('tag1, tag2, tag3');
-      expect(object.getTags()).toBe('tag1, tag2, tag3');
       expect(object.getVariables()).toBeTruthy();
       project.delete();
     });
@@ -4669,6 +4740,278 @@ Array [
       expect(
         element2.getChild('anything').getChild('canBeStored').getBoolValue()
       ).toBe(true);
+    });
+  });
+
+  describe('gd.ObjectFolderOrObject (using gd.ObjectsContainer)', () => {
+    let project = null;
+    let layout = null;
+    beforeAll(() => {
+      project = gd.ProjectHelper.createNewGDJSProject();
+    });
+
+    afterEach(() => {
+      project.removeLayout('Scene');
+    });
+
+    beforeEach(() => {
+      layout = project.insertNewLayout('Scene', 0);
+    });
+
+    test('objects container has a root ObjectFolderOrObject', () => {
+      const rootFolder = layout.getRootFolder();
+      expect(rootFolder.isFolder()).toBe(true);
+      expect(rootFolder.isRootFolder()).toBe(true);
+      expect(rootFolder.getParent().isFolder()).toBe(true);
+      expect(rootFolder.getParent().getFolderName()).toEqual('__NULL');
+      expect(rootFolder.getChildrenCount()).toEqual(0);
+    });
+
+    test('an object added to the object container is added to the root ObjectFolderOrObject', () => {
+      let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const rootFolder = layout.getRootFolder();
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.isRootFolder()).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(1);
+      layout.removeObject('MyObject');
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(false);
+      expect(rootFolder.getChildrenCount()).toEqual(0);
+    });
+
+    test('a folder can be added to the root folder', () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      expect(subFolder.getFolderName()).toEqual('Enemies');
+      expect(subFolder.isRootFolder()).toBe(false);
+      subFolder.setFolderName('Players');
+      expect(subFolder.getFolderName()).toEqual('Players');
+      expect(subFolder.getParent()).toBe(rootFolder);
+      expect(rootFolder.getChildrenCount()).toEqual(1);
+    });
+
+    test('an object can be added to a specific folder', () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Enemies', 0);
+      const subSubFolder = subFolder.insertNewFolder('Turtles', 0);
+      layout.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'RedTurtle',
+        subSubFolder,
+        0
+      );
+      expect(layout.hasObjectNamed('RedTurtle')).toBe(true);
+      expect(subSubFolder.hasObjectNamed('RedTurtle')).toBe(true);
+    });
+
+    test('an ObjectFolderOrObject can be serialized and unserialized', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        1
+      );
+      const object3 = layout.insertNewObject(project, 'Sprite', 'SubObject', 2);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('SubObject'),
+        subFolder,
+        0
+      );
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(3);
+      expect(
+        rootFolder.getChildPosition(rootFolder.getObjectChild('MyObject'))
+      ).toEqual(0);
+      expect(rootFolder.getChildPosition(subFolder)).toEqual(1);
+      expect(
+        rootFolder.getChildPosition(rootFolder.getObjectChild('OtherObject'))
+      ).toEqual(2);
+      expect(rootFolder.hasObjectNamed('SubObject')).toBe(true);
+      expect(subFolder.hasObjectNamed('SubObject')).toBe(true);
+
+      const element = new gd.SerializerElement();
+      layout.serializeTo(element);
+
+      project.removeLayout('Scene');
+
+      const layout2 = project.insertNewLayout('Scene2', 0);
+      layout2.unserializeFrom(project, element);
+
+      expect(layout2.hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getRootFolder();
+      expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toEqual(3);
+      const parentEqualities = mapFor(
+        0,
+        rootFolder2.getChildrenCount(),
+        (i) => {
+          const childObjectFolderOrObject = rootFolder2.getChildAt(i);
+          return childObjectFolderOrObject.getParent() === rootFolder2;
+        }
+      );
+      expect(parentEqualities.every((equality) => equality)).toBe(true);
+      const subFolder2 = rootFolder2.getChildAt(1);
+      expect(subFolder2.isFolder()).toBe(true);
+      const subObject = subFolder2.getObjectChild('SubObject');
+      expect(subObject.getParent()).toBe(subFolder2);
+    });
+
+    test('an ObjectFolderOrObject can be serialized and unserialized and missing object folders or objects are added', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        1
+      );
+      const object3 = layout.insertNewObject(project, 'Sprite', 'SubObject', 2);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('SubObject'),
+        subFolder,
+        0
+      );
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(3);
+      expect(rootFolder.hasObjectNamed('SubObject')).toBe(true);
+      expect(subFolder.hasObjectNamed('SubObject')).toBe(true);
+
+      const element = new gd.SerializerElement();
+      layout.serializeTo(element);
+
+      const layoutObject = JSON.parse(gd.Serializer.toJSON(element));
+      delete layoutObject.objectsFolderStructure;
+
+      project.removeLayout('Scene');
+
+      const layout2 = project.insertNewLayout('Scene2', 0);
+      layout2.unserializeFrom(
+        project,
+        gd.Serializer.fromJSObject(layoutObject)
+      );
+
+      expect(layout2.hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getRootFolder();
+      expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toEqual(3);
+      const parentEqualities = mapFor(
+        0,
+        rootFolder2.getChildrenCount(),
+        (i) => {
+          const childObjectFolderOrObject = rootFolder2.getChildAt(i);
+          return childObjectFolderOrObject.getParent() === rootFolder2;
+        }
+      );
+      expect(parentEqualities.every((equality) => equality)).toBe(true);
+    });
+
+    test('a folder can be removed from its parent if empty', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        2
+      );
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('OtherObject'),
+        subFolder,
+        0
+      );
+      rootFolder.removeFolderChild(subFolder);
+
+      // Check subfolder is still here since it was not empty.
+      expect(rootFolder.getChildrenCount()).toEqual(2);
+      subFolder = rootFolder.getChildAt(1);
+      expect(subFolder.isFolder()).toBe(true);
+      expect(subFolder.getChildrenCount()).toEqual(1);
+      expect(subFolder.hasObjectNamed('OtherObject')).toBe(true);
+
+      // Empty subfolder and remove it.
+      subFolder.moveObjectFolderOrObjectToAnotherFolder(
+        subFolder.getObjectChild('OtherObject'),
+        rootFolder,
+        0
+      );
+      rootFolder.removeFolderChild(subFolder);
+
+      expect(rootFolder.getChildrenCount()).toEqual(2);
+      const objectFolderOrObject = rootFolder.getChildAt(1)
+      const otherObjectFolderOrObject = rootFolder.getChildAt(0)
+      expect(otherObjectFolderOrObject.isFolder()).toBe(false);
+      expect(otherObjectFolderOrObject.isRootFolder()).toBe(false);
+      expect(otherObjectFolderOrObject.getObject().getName()).toBe('OtherObject');
+      expect(objectFolderOrObject.isFolder()).toBe(false);
+      expect(objectFolderOrObject.isRootFolder()).toBe(false);
+      expect(objectFolderOrObject.getObject().getName()).toBe('MyObject');
+    });
+
+    test("an ObjectFolderOrObject can test if it's a descendant of another one", () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Depth1', 0);
+      const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('MyObject'),
+        subSubFolder,
+        0
+      );
+      const objectFolderOrObject = subSubFolder.getChildAt(0);
+      expect(objectFolderOrObject.isFolder()).toBe(false);
+      expect(objectFolderOrObject.getObject().getName()).toEqual('MyObject');
+
+      expect(objectFolderOrObject.isADescendantOf(subSubFolder)).toBe(true);
+      expect(objectFolderOrObject.isADescendantOf(subFolder)).toBe(true);
+      expect(objectFolderOrObject.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(subSubFolder.isADescendantOf(subFolder)).toBe(true);
+      expect(subSubFolder.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(subFolder.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(rootFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(rootFolder.isADescendantOf(subSubFolder)).toBe(false);
+      expect(rootFolder.isADescendantOf(subFolder)).toBe(false);
+      expect(rootFolder.isADescendantOf(rootFolder)).toBe(false);
+
+      expect(subFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(subFolder.isADescendantOf(subSubFolder)).toBe(false);
+      expect(subFolder.isADescendantOf(subFolder)).toBe(false);
+
+      expect(subSubFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(subSubFolder.isADescendantOf(subSubFolder)).toBe(false);
+
+      expect(objectFolderOrObject.isADescendantOf(objectFolderOrObject)).toBe(
+        false
+      );
+    });
+    test("an ObjectFolderOrObject representing an object can be retrieved using the object name only", () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Depth1', 0);
+      const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('MyObject'),
+        subSubFolder,
+        0
+      );
+      const objectFolderOrObject = subSubFolder.getChildAt(0);
+      expect(objectFolderOrObject.isRootFolder()).toBe(false);
+      const objectFolderOrObjectFoundByName = rootFolder.getObjectNamed('MyObject');
+      expect(objectFolderOrObjectFoundByName.isRootFolder()).toBe(false);
+      expect(objectFolderOrObjectFoundByName).toBe(objectFolderOrObject);
     });
   });
 });

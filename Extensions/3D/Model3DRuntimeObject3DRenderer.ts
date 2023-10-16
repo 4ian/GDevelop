@@ -327,7 +327,6 @@ namespace gdjs {
     }
 
     playAnimation(animationName: string, shouldLoop: boolean) {
-      const wasPaused = this.animationPaused();
       this._animationMixer.stopAllAction();
       const clip = THREE.AnimationClip.findByName(
         this._originalModel.animations,
@@ -348,9 +347,6 @@ namespace gdjs {
       this._action.play();
       // Make sure the first frame is displayed.
       this._animationMixer.update(0);
-      if (wasPaused) {
-        this.pauseAnimation();
-      }
     }
 
     getAnimationElapsedTime(): float {

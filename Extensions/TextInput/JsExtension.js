@@ -315,6 +315,17 @@ module.exports = {
       .setGetter('getText');
 
     object
+      .addStrExpression(
+        'Text',
+        _('Text'),
+        _('Return the text.'),
+        '',
+        'res/conditions/text24_black.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .setFunctionName('getText');
+
+    object
       .addExpressionAndConditionAndAction(
         'string',
         'Placeholder',

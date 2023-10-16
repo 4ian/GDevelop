@@ -23,7 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTextContainerExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Animations and images"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Text capability"))
       .SetIcon("res/conditions/text24_black.png");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(

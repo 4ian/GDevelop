@@ -198,6 +198,17 @@ module.exports = {
       .setFunctionName('setText')
       .setGetter('getText');
 
+    object
+      .addStrExpression(
+        'Text',
+        _('Text'),
+        _('Return the text.'),
+        '',
+        'res/conditions/text24_black.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .setFunctionName('getText');
+
     // Deprecated
     object
       .addExpressionAndConditionAndAction(

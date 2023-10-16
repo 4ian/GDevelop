@@ -569,10 +569,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddDuplicatedAction("Size", "Text::SetFontSize").SetHidden();
   obj.AddDuplicatedCondition("Size", "Text::FontSize").SetHidden();
 
-  // Deprecated
   obj.AddStrExpression(
          "String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")
-      .SetHidden()
       .AddParameter("object", _("Object"), "Text")
       .SetFunctionName("GetString");
 }

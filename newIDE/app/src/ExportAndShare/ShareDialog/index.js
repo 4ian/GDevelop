@@ -290,7 +290,7 @@ const ShareDialog = ({
     <Dialog
       // Keep ID for backward compatibility with guided lessons.
       id="export-dialog"
-      maxWidth={'sm'}
+      maxWidth={'md'}
       title={<Trans>Share</Trans>}
       actions={mainActions}
       secondaryActions={secondaryActions}

@@ -108,6 +108,7 @@ export type TreeViewInterface<Item> = {|
   openItems: (string[]) => void,
   closeItems: (string[]) => void,
   animateItem: Item => void,
+  areItemsOpen: (Array<Item>) => boolean[],
 |};
 
 type Props<Item> = {|
@@ -170,7 +171,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
-  const selectedNodeIds = selectedItems.map(item => getItemId(item));
+  const selectedNodeIds = selectedItems.map(getItemId);
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>(
     initiallyOpenedNodeIds || []
   );
@@ -415,6 +416,15 @@ const TreeView = <Item: ItemBaseAttributes>(
     [getItemId]
   );
 
+  const areItemsOpen = React.useCallback(
+    (items: Item[]) => {
+      const itemIds = items.map(getItemId);
+      const openedNodeIdsSet = new Set(openedNodeIds);
+      return itemIds.map(id => openedNodeIdsSet.has(id));
+    },
+    [openedNodeIds, getItemId]
+  );
+
   React.useEffect(
     () => {
       if (animatedItemId) {
@@ -441,6 +451,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       openItems,
       closeItems,
       animateItem,
+      areItemsOpen,
     })
   );
 

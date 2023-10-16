@@ -752,6 +752,31 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       }
     };
 
+    const getClosestVisibleParent = (
+      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
+    ): ?ObjectFolderOrObjectWithContext => {
+      const treeView = treeViewRef.current;
+      if (!treeView) return null;
+      const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
+      const topToBottomAscendanceWithContext = getFoldersAscendanceWithoutRootFolder(
+        objectFolderOrObject
+      )
+        .reverse()
+        .map(parent => ({ objectFolderOrObject: parent, global }));
+      const topToBottomAscendanceOpenness = treeView.areItemsOpen(
+        topToBottomAscendanceWithContext
+      );
+      const firstClosedFolderIndex = topToBottomAscendanceOpenness.indexOf(
+        false
+      );
+      if (firstClosedFolderIndex === -1) {
+        // If all parents are open, return the objectFolderOrObject given as input.
+        return objectFolderOrObjectWithContext;
+      }
+      // $FlowFixMe - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
+      return topToBottomAscendanceWithContext[firstClosedFolderIndex];
+    };
+
     const projectRootFolder = project.getRootFolder();
     const containerRootFolder = objectsContainer.getRootFolder();
     const getTreeViewData = React.useCallback(
@@ -1049,11 +1074,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               parent,
               position
             );
-            if (treeViewRef.current)
-              treeViewRef.current.animateItem({
+            const treeView = treeViewRef.current;
+            if (treeView) {
+              const closestVisibleParent = getClosestVisibleParent({
                 objectFolderOrObject: parent,
                 global: destinationItem.global,
               });
+              if (closestVisibleParent) {
+                treeView.animateItem(closestVisibleParent);
+              }
+            }
           }
         } else {
           return;
@@ -1168,11 +1198,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             folder,
             0
           );
-        if (treeViewRef.current)
-          treeViewRef.current.animateItem({
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          const closestVisibleParent = getClosestVisibleParent({
             objectFolderOrObject: folder,
             global,
           });
+          if (closestVisibleParent) {
+            treeView.animateItem(closestVisibleParent);
+          }
+        }
         onObjectModified(true);
       },
       [onObjectModified]

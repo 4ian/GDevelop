@@ -55,6 +55,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Animation index")))
       .MarkAsSimple();
+  aut.GetAllExpressions()["Index"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "string",
@@ -71,6 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "objectAnimationName", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Animation name")))
       .MarkAsSimple();
+  aut.GetAllStrExpressions()["Name"].SetGroup("");
 
   aut.AddScopedAction("PauseAnimation",
                 _("Pause the animation"),
@@ -109,6 +111,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Speed scale")))
       .MarkAsSimple();
+  aut.GetAllExpressions()["SpeedScale"].SetGroup("");
 
   aut.AddScopedCondition("IsAnimationPaused",
                    _("Animation paused"),
@@ -147,6 +150,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Elapsed time (in seconds)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["ElapsedTime"].SetGroup("");
 
   aut.AddExpression(
          "Duration",

@@ -56,6 +56,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
                         _("Opacity (0-255)")))
       .SetFunctionName("setOpacity")
       .SetGetter("getOpacity");
+  aut.GetAllExpressions()["Value"].SetGroup("");
 }
 
 }  // namespace gd

@@ -55,6 +55,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["Value"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "number",
@@ -71,6 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["X"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "number",
@@ -87,6 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["Y"].SetGroup("");
 }
 
 }  // namespace gd

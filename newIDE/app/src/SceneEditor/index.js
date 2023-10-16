@@ -192,18 +192,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     };
   }
 
-  UNSAFE_componentWillUpdate(prevProps: Props, prevState: State) {
-    if (!prevProps.isActive && this.props.isActive) {
-      // When the scene is refocused, the object selection is cleared
-      // to avoid cases where:
-      // - objects have been deleted when the scene wasn't active
-      // (global objects in a different scene for instance)
-      // - and some components try to access said objects properties
-      // (computing selectedObjectNames for instance)
-      this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
-    }
-  }
-
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
@@ -344,6 +332,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.openSetupGrid(false);
       this.editInstanceVariables(null);
       this.openSceneProperties(false);
+    }
+    if (!this.props.isActive && nextProps.isActive) {
+      // When the scene is refocused, the object selection is cleared
+      // to avoid cases where:
+      // - objects have been deleted when the scene wasn't active
+      // (global objects in a different scene for instance)
+      // - and some components try to access said objects properties
+      // (computing selectedObjectNames for instance)
+      this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
     }
   }
 

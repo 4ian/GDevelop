@@ -149,7 +149,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
   aut.AddExpression(
          "Duration",
          _("Animation duration"),
-         _("Return the animation duration (in seconds)."),
+         _("Return the current animation duration (in seconds)."),
          _("Animations and images"),
          "res/actions/animation24.png")
       .AddParameter("object", _("Object"))

@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Scalable capability"))
+      .SetIcon("res/actions/scale24_black.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
       .SetIcon("res/actions/scale24_black.png");
 

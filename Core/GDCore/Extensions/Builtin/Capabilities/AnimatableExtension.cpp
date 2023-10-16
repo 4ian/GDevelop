@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Animatable capability"))
+      .SetIcon("res/actions/animation24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Animations and images"))
       .SetIcon("res/actions/animation24.png");
 

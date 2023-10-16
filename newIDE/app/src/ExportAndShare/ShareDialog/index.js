@@ -302,15 +302,15 @@ const ShareDialog = ({
           onChange={setCurrentTab}
           options={[
             {
-              value: 'invite',
-              label: <Trans>Invite</Trans>,
-              id: 'invite-tab',
-              disabled: isNavigationDisabled,
-            },
-            {
               value: 'publish',
               label: <Trans>Publish</Trans>,
               id: 'publish-tab',
+              disabled: isNavigationDisabled,
+            },
+            {
+              value: 'invite',
+              label: <Trans>Invite</Trans>,
+              id: 'invite-tab',
               disabled: isNavigationDisabled,
             },
           ]}

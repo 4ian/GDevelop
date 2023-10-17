@@ -41,6 +41,9 @@ const errorHandler = (
     `error-boundary_${scope}`,
     {
       error,
+      errorMessage: error.message || '',
+      errorStack: error.stack || '',
+      errorName: error.name || '',
       componentStack,
     },
     'error-boundary-error'

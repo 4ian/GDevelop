@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Scalable capability"))
+      .SetIcon("res/actions/scale24_black.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
       .SetIcon("res/actions/scale24_black.png");
 
@@ -53,6 +55,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["Value"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "number",
@@ -69,6 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["X"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "number",
@@ -85,6 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["Y"].SetGroup("");
 }
 
 }  // namespace gd

@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Opacity capability"))
+      .SetIcon("res/actions/opacity24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Visibility"))
       .SetIcon("res/actions/opacity24.png");
 
@@ -54,6 +56,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
                         _("Opacity (0-255)")))
       .SetFunctionName("setOpacity")
       .SetGetter("getOpacity");
+  aut.GetAllExpressions()["Value"].SetGroup("");
 }
 
 }  // namespace gd

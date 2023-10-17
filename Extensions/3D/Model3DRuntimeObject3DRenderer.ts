@@ -348,6 +348,24 @@ namespace gdjs {
       // Make sure the first frame is displayed.
       this._animationMixer.update(0);
     }
+
+    getAnimationElapsedTime(): float {
+      return this._action ? this._action.time : 0;
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      if (this._action) {
+        this._action.time = time;
+      }
+    }
+
+    getAnimationDuration(animationName: string): float {
+      const clip = THREE.AnimationClip.findByName(
+        this._originalModel.animations,
+        animationName
+      );
+      return clip ? clip.duration : 0;
+    }
   }
 
   export const Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;

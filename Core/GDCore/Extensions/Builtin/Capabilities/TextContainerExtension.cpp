@@ -52,6 +52,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTextContainerExtension(
           "string", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Text")))
       .MarkAsSimple();
+  aut.GetAllStrExpressions()["Value"].SetGroup("");
 }
 
 }  // namespace gd

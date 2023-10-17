@@ -67,6 +67,20 @@ AnimatableExtension::AnimatableExtension() {
   conditions["AnimatableCapability::AnimatableBehavior::HasAnimationEnded"]
       .SetFunctionName("hasAnimationEnded")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
+
+  actions["AnimatableCapability::AnimatableBehavior::SetElapsedTime"]
+      .SetFunctionName("setAnimationElapsedTime")
+      .SetGetter("getAnimationElapsedTime")
+      .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
+  conditions["AnimatableCapability::AnimatableBehavior::ElapsedTime"]
+      .SetFunctionName("getAnimationElapsedTime")
+      .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
+  expressions["ElapsedTime"]
+      .SetFunctionName("getAnimationElapsedTime")
+      .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
+  expressions["Duration"]
+      .SetFunctionName("getAnimationDuration")
+      .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 }
 
 }  // namespace gdjs

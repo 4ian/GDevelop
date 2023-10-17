@@ -4,7 +4,7 @@
  * See README.md for more information.
  */
 
-describe.only('gdjs.RuntimeObject', () => {
+describe('gdjs.RuntimeObject', () => {
   /** @type {gdjs.RuntimeGame} */
   let runtimeGame;
   /** @type {gdjs.TestRuntimeScene} */

@@ -189,24 +189,29 @@ export const listAllPublicAssets = async ({
 
   const { assetShortHeadersUrl, filtersUrl, assetPacksUrl } = response.data;
 
-  const [
-    publicAssetShortHeaders,
-    publicFilters,
-    publicAssetPacks,
-  ] = await Promise.all([
-    client.get(assetShortHeadersUrl).then(response => response.data),
-    client.get(filtersUrl).then(response => response.data),
-    client.get(assetPacksUrl).then(response => response.data),
+  const responsesData = await Promise.all([
+    client
+      .get(assetShortHeadersUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    client
+      .get(filtersUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    client
+      .get(assetPacksUrl)
+      .then(response => response.data)
+      .catch(e => e),
   ]);
 
-  if (!publicAssetShortHeaders || !publicFilters || !publicAssetPacks) {
+  if (responsesData.some(data => !data || data instanceof Error)) {
     throw new Error('Unexpected response from the assets endpoints.');
   }
 
   return {
-    publicAssetShortHeaders,
-    publicFilters,
-    publicAssetPacks,
+    publicAssetShortHeaders: responsesData[0],
+    publicFilters: responsesData[1],
+    publicAssetPacks: responsesData[2],
   };
 };
 

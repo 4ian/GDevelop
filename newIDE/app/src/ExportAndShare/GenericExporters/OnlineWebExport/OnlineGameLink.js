@@ -30,7 +30,10 @@ import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropert
 import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
 import LinearProgress from '../../../UI/LinearProgress';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import CircularProgress from '../../../UI/CircularProgress';
@@ -291,7 +294,7 @@ const OnlineGameLink = ({
           {exportPending && (
             <>
               <Text>
-                <Trans>Just a few seconds while we generate the link...</Trans>
+                <Trans>The game is being exported and the link generated...</Trans>
               </Text>
               <Line expand>
                 <LinearProgress
@@ -313,6 +316,7 @@ const OnlineGameLink = ({
             <Dialog
               title={<Trans>Share your game</Trans>}
               id="export-game-share-dialog"
+              minHeight="sm"
               actions={dialogActions}
               open
               onRequestClose={() => setIsShareDialogOpen(false)}
@@ -323,57 +327,49 @@ const OnlineGameLink = ({
               }}
             >
               {buildUrl && !isGameLoading ? (
-                <Column noMargin>
+                <ColumnStackLayout noMargin>
                   <ShareLink url={buildUrl} />
                   {isBuildPublished && navigator.share && (
                     <ShareButton url={buildUrl} />
                   )}
                   {isBuildPublished && !navigator.share && (
-                    <Line expand>
-                      <ResponsiveLineStackLayout
+                    <ColumnStackLayout noMargin expand>
+                      <Column
                         expand
-                        justifyContent="space-between"
+                        justifyContent="flex-end"
                         noMargin
+                        alignItems="flex-end"
                       >
-                        <Column justifyContent="center" noMargin>
-                          <AlertMessage kind="info">
-                            <Trans>
-                              Your game is published! Share it with the
-                              community!
-                            </Trans>
-                          </AlertMessage>
-                        </Column>
-                        <Column
-                          justifyContent="flex-end"
-                          noMargin
-                          alignItems="center"
-                        >
-                          <SocialShareButtons url={buildUrl} />
-                        </Column>
-                      </ResponsiveLineStackLayout>
-                    </Line>
-                  )}
-                  {!isBuildPublished && game && (
-                    <Line>
+                        <SocialShareButtons url={buildUrl} />
+                      </Column>
                       <AlertMessage kind="info">
                         <Trans>
-                          This link is private so you can share it with friends
-                          and testers. When you're ready you can update your
-                          gd.games game page.
+                          Your game has a page on gd.games. You can administrate
+                          it from the Games Dashboard in GDevelop.
                         </Trans>
                       </AlertMessage>
-                    </Line>
+                    </ColumnStackLayout>
                   )}
-                </Column>
+                  {!isBuildPublished && game && (
+                    <AlertMessage kind="info">
+                      <Trans>
+                        This link is private. You can share it with
+                        collaborators, friends or testers. When you're ready you
+                        can publish it so that your game has its own page on
+                        gd.games - GDevelop gaming platform.
+                      </Trans>
+                    </AlertMessage>
+                  )}
+                </ColumnStackLayout>
               ) : (
-                <Column alignItems="center">
+                <ColumnStackLayout alignItems="center">
                   <Line>
                     <CircularProgress size={40} />
                   </Line>
                   <Text>
                     <Trans>Loading your link...</Trans>
                   </Text>
-                </Column>
+                </ColumnStackLayout>
               )}
               <InfoBar
                 message={<Trans>Copied to clipboard!</Trans>}

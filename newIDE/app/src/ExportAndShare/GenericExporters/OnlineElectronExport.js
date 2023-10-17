@@ -75,6 +75,6 @@ export const SetupExportHeader = ({
 export const onlineElectronExporter = {
   key: 'onlineelectronexport',
   tabName: <Trans>Desktop</Trans>,
-  name: <Trans>Windows/macOS/Linux</Trans>,
+  name: <Trans>Windows, macOS &amp; Linux</Trans>,
   helpPage: '/publishing/windows-macos-linux',
 };

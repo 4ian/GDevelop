@@ -51,9 +51,6 @@ const ExplanationHeader = ({ game }: Props) => {
           </Trans>
         </Text>
       </Line>
-      <Line justifyContent="center">
-        <GdGames color="secondary" style={iconStyle} />
-      </Line>
       {!!isGamePublishedOnGdGames ? (
         <AlertMessage kind="info">
           <Trans>
@@ -77,7 +74,7 @@ const ExplanationHeader = ({ game }: Props) => {
 const onlineWebExporter = {
   key: 'onlinewebexport',
   tabName: 'Web',
-  name: <Trans>Web</Trans>,
+  name: <Trans>gd.games</Trans>,
   helpPage: '/publishing/web',
 };
 

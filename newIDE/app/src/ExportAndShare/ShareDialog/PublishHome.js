@@ -104,7 +104,7 @@ const getSubSectionIcon = (
 };
 
 // Styles to improve the interaction with the button.
-const useStylesForWidget = (highlighted: boolean, small: boolean) =>
+const useStylesForWidget = (highlighted: boolean) =>
   makeStyles(theme => {
     console.log(theme);
     return createStyles({
@@ -152,7 +152,7 @@ const SectionLine = ({
   highlighted?: boolean,
   id: string,
 |}) => {
-  const classes = useStylesForWidget(!!highlighted, small);
+  const classes = useStylesForWidget(!!highlighted);
   return (
     <ButtonBase
       onClick={onClick}
@@ -284,18 +284,18 @@ const PublishHome = ({
             )}
           </Column>
           <Column expand alignItems="center">
-            {!!chosenSection && !selectedExporter && (
+            {!!chosenSection && (
               <LineStackLayout
                 noMargin
                 alignItems="center"
                 justifyContent="center"
               >
-                {getSectionIcon({
+                {selectedExporter ? undefined : getSectionIcon({
                   section: chosenSection,
                   small: true,
                 })}
                 <Text size="block-title" noMargin>
-                  {capitalize(chosenSection)}
+                  {selectedExporter ? selectedExporter.name : capitalize(chosenSection)}
                 </Text>
               </LineStackLayout>
             )}
@@ -371,7 +371,7 @@ const PublishHome = ({
           />
           {!showOnlineWebExporterOnly && (
             <SectionLine
-              label={<Trans>External websites</Trans>}
+              label={<Trans>HTML5 (external websites)</Trans>}
               icon={getSubSectionIcon('browser', 'offline')}
               description={<Trans>Itch.io, Poki, CrazyGames...</Trans>}
               onClick={() => onChooseSubSection('offline')}
@@ -381,9 +381,9 @@ const PublishHome = ({
           )}
           {!showOnlineWebExporterOnly && (
             <SectionLine
-              label={<Trans>Facebook</Trans>}
+              label={<Trans>Facebook Games</Trans>}
               icon={getSubSectionIcon('browser', 'facebook')}
-              description={<Trans>Facebook Instant Games</Trans>}
+              description={<Trans>Instant Games</Trans>}
               onClick={() => onChooseSubSection('facebook')}
               disabled={allExportersRequireOnline && !isOnline}
               id="publish-facebook"

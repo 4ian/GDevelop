@@ -294,7 +294,9 @@ const OnlineGameLink = ({
           {exportPending && (
             <>
               <Text>
-                <Trans>The game is being exported and the link generated...</Trans>
+                <Trans>
+                  The game is being exported and the link generated...
+                </Trans>
               </Text>
               <Line expand>
                 <LinearProgress

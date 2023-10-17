@@ -290,12 +290,16 @@ const PublishHome = ({
                 alignItems="center"
                 justifyContent="center"
               >
-                {selectedExporter ? undefined : getSectionIcon({
-                  section: chosenSection,
-                  small: true,
-                })}
+                {selectedExporter
+                  ? undefined
+                  : getSectionIcon({
+                      section: chosenSection,
+                      small: true,
+                    })}
                 <Text size="block-title" noMargin>
-                  {selectedExporter ? selectedExporter.name : capitalize(chosenSection)}
+                  {selectedExporter
+                    ? selectedExporter.name
+                    : capitalize(chosenSection)}
                 </Text>
               </LineStackLayout>
             )}

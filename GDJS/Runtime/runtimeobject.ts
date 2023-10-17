@@ -200,7 +200,8 @@ namespace gdjs {
 
     //Forces:
     protected _instantForces: gdjs.Force[] = [];
-    _permanentForce: gdjs.Force;
+    _permanentForceX: float = 0;
+    _permanentForceY: float = 0;
     _totalForce: gdjs.Force;
 
     /**
@@ -238,7 +239,6 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(
         objectData ? objectData.variables : undefined
       );
-      this._permanentForce = new gdjs.Force(0, 0, 0);
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
@@ -1347,7 +1347,8 @@ namespace gdjs {
      */
     addForce(x: float, y: float, multiplier: integer): void {
       if (multiplier === 1) {
-        this._permanentForce.add(x, y);
+        this._permanentForceX += x;
+        this._permanentForceY += y;
       } else if (
         multiplier === 0 &&
         this._instantForces.length > 0 &&
@@ -1431,7 +1432,8 @@ namespace gdjs {
         this._instantForces
       );
       this._instantForces.length = 0;
-      this._permanentForce.clear();
+      this._permanentForceX = 0;
+      this._permanentForceY = 0;
     }
 
     /**
@@ -1441,8 +1443,8 @@ namespace gdjs {
     hasNoForces(): boolean {
       return (
         this._instantForces.length === 0 &&
-        this._permanentForce.getX() === 0 &&
-        this._permanentForce.getY() === 0
+        this._permanentForceX === 0 &&
+        this._permanentForceY === 0
       );
     }
 
@@ -1484,7 +1486,7 @@ namespace gdjs {
      */
     getAverageForce(): gdjs.Force {
       this._totalForce.clear();
-      this._totalForce.addForce(this._permanentForce);
+      this._totalForce.add(this._permanentForceX, this._permanentForceY);
       for (let i = 0, len = this._instantForces.length; i < len; ++i) {
         this._totalForce.addForce(this._instantForces[i]);
       }

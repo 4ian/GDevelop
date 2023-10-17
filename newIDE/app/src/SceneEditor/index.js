@@ -65,6 +65,7 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import uniq from 'lodash/uniq';
+import { cleanNonExistingObjectFolderOrObjectWithContexts } from './ObjectFolderOrObjectsSelection';
 
 const gd: libGDevelop = global.gd;
 
@@ -334,13 +335,20 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.openSceneProperties(false);
     }
     if (!this.props.isActive && nextProps.isActive) {
-      // When the scene is refocused, the object selection is cleared
-      // to avoid cases where:
-      // - objects have been deleted when the scene wasn't active
-      // (global objects in a different scene for instance)
-      // - and some components try to access said objects properties
-      // (computing selectedObjectNames for instance)
-      this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
+      // When the scene is refocused, the selections are cleaned
+      // to avoid cases where we hold references to instances or objects
+      // deleted by something outside of the scene (for example,
+      // a global object deleted in another scene).
+      this.instancesSelection.cleanNonExistingInstances(
+        this.props.initialInstances
+      );
+      this.setState(({ selectedObjectFolderOrObjectsWithContext }) => ({
+        selectedObjectFolderOrObjectsWithContext: cleanNonExistingObjectFolderOrObjectWithContexts(
+          this.props.project,
+          this.props.layout,
+          selectedObjectFolderOrObjectsWithContext
+        ),
+      }));
     }
   }
 

@@ -49,6 +49,11 @@ interface VectorVariable {
     [Const] Variable WRAPPED_at(unsigned long index);
 };
 
+interface VectorObjectFolderOrObject {
+    unsigned long size();
+    [Const] ObjectFolderOrObject at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -432,6 +437,7 @@ interface ObjectsContainer {
     void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
     [Ref] ObjectFolderOrObject GetRootFolder();
+    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
@@ -574,6 +580,7 @@ interface Project {
     void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
     [Ref] ObjectFolderOrObject GetRootFolder();
+    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
@@ -818,6 +825,7 @@ interface Layout {
     void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
     [Ref] ObjectFolderOrObject GetRootFolder();
+    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 

@@ -66,6 +66,10 @@ ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) {
   if (index >= children.size()) return badObjectFolderOrObject;
   return *children[index];
 }
+const ObjectFolderOrObject& ObjectFolderOrObject::GetChildAt(std::size_t index) const {
+  if (index >= children.size()) return badObjectFolderOrObject;
+  return *children[index];
+}
 ObjectFolderOrObject& ObjectFolderOrObject::GetObjectChild(
     const gd::String& name) {
   for (std::size_t j = 0; j < children.size(); j++) {

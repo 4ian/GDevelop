@@ -105,24 +105,33 @@ const getSubSectionIcon = (
 
 // Styles to improve the interaction with the button.
 const useStylesForWidget = (highlighted: boolean) =>
-  makeStyles(theme =>
-    createStyles({
+  makeStyles(theme => {
+    console.log(theme);
+    return createStyles({
       root: {
         border: highlighted
-          ? `1px solid ${theme.palette.text.primary}`
+          ? `1px solid ${theme.palette.primary.light}`
           : `1px solid ${theme.palette.text.disabled}`,
+        backgroundColor: highlighted ? theme.palette.primary.light : undefined,
+        color: highlighted ? theme.palette.primary.contrastText : undefined,
         '&:focus': {
-          backgroundColor: theme.palette.action.hover,
+          borderColor: highlighted ? theme.palette.primary.main : undefined,
+          backgroundColor: highlighted
+            ? theme.palette.primary.main
+            : theme.palette.action.hover,
         },
         '&:hover': {
-          backgroundColor: theme.palette.action.hover,
+          borderColor: highlighted ? theme.palette.primary.main : undefined,
+          backgroundColor: highlighted
+            ? theme.palette.primary.main
+            : theme.palette.action.hover,
         },
         '&:disabled': {
           opacity: theme.palette.action.disabledOpacity,
         },
       },
-    })
-  )();
+    });
+  })();
 
 const SectionLine = ({
   icon,
@@ -173,6 +182,7 @@ const SectionLine = ({
               noMargin
               size={small ? 'sub-title' : 'block-title'}
               align="left"
+              color={highlighted ? 'inherit' : 'primary'}
             >
               {label}
             </Text>
@@ -180,10 +190,14 @@ const SectionLine = ({
         </Column>
         <Column noMargin>
           <LineStackLayout expand noMargin alignItems="center">
-            <Text color="secondary" size="body2" align="right">
+            <Text
+              color={highlighted ? 'inherit' : 'secondary'}
+              size="body2"
+              align="right"
+            >
               {description}
             </Text>
-            <ChevronArrowRight color="secondary" />
+            <ChevronArrowRight color={highlighted ? 'inherit' : 'secondary'} />
           </LineStackLayout>
         </Column>
       </LineStackLayout>
@@ -270,18 +284,22 @@ const PublishHome = ({
             )}
           </Column>
           <Column expand alignItems="center">
-            {!!chosenSection && !selectedExporter && (
+            {!!chosenSection && (
               <LineStackLayout
                 noMargin
                 alignItems="center"
                 justifyContent="center"
               >
-                {getSectionIcon({
-                  section: chosenSection,
-                  small: true,
-                })}
+                {selectedExporter
+                  ? undefined
+                  : getSectionIcon({
+                      section: chosenSection,
+                      small: true,
+                    })}
                 <Text size="block-title" noMargin>
-                  {capitalize(chosenSection)}
+                  {selectedExporter
+                    ? selectedExporter.name
+                    : capitalize(chosenSection)}
                 </Text>
               </LineStackLayout>
             )}
@@ -300,7 +318,7 @@ const PublishHome = ({
           <SectionLine
             label={<Trans>gd.games</Trans>}
             icon={getSubSectionIcon('browser', 'online')}
-            description={<Trans>Free link on GDevelop gaming platform</Trans>}
+            description={<Trans>Generate a shareable link to your game.</Trans>}
             onClick={() => {
               setHasSkippedSubSectionSelection(true);
               onChooseSection('browser');
@@ -349,7 +367,7 @@ const PublishHome = ({
           <SectionLine
             label={<Trans>gd.games</Trans>}
             icon={getSubSectionIcon('browser', 'online')}
-            description={<Trans>Free link on GDevelop gaming platform</Trans>}
+            description={<Trans>Generate a shareable link to your game.</Trans>}
             onClick={() => onChooseSubSection('online')}
             highlighted
             disabled={!isOnline}
@@ -357,7 +375,7 @@ const PublishHome = ({
           />
           {!showOnlineWebExporterOnly && (
             <SectionLine
-              label={<Trans>External websites</Trans>}
+              label={<Trans>HTML5 (external websites)</Trans>}
               icon={getSubSectionIcon('browser', 'offline')}
               description={<Trans>Itch.io, Poki, CrazyGames...</Trans>}
               onClick={() => onChooseSubSection('offline')}
@@ -367,9 +385,9 @@ const PublishHome = ({
           )}
           {!showOnlineWebExporterOnly && (
             <SectionLine
-              label={<Trans>Facebook</Trans>}
+              label={<Trans>Facebook Games</Trans>}
               icon={getSubSectionIcon('browser', 'facebook')}
-              description={<Trans>Facebook Instant Games</Trans>}
+              description={<Trans>Instant Games</Trans>}
               onClick={() => onChooseSubSection('facebook')}
               disabled={allExportersRequireOnline && !isOnline}
               id="publish-facebook"
@@ -380,7 +398,7 @@ const PublishHome = ({
       {chosenSection === 'desktop' && !chosenSubSection && (
         <ColumnStackLayout expand noMargin>
           <SectionLine
-            label={<Trans>Cloud build</Trans>}
+            label={<Trans>One-click packaging</Trans>}
             icon={getSubSectionIcon('desktop', 'online')}
             description={<Trans>Windows, MacOS and Linux</Trans>}
             onClick={() => onChooseSubSection('online')}
@@ -391,7 +409,7 @@ const PublishHome = ({
           <SectionLine
             label={<Trans>Manual build</Trans>}
             icon={getSubSectionIcon('desktop', 'offline')}
-            description={<Trans>Advanced usage for manual packaging</Trans>}
+            description={<Trans>Development tools required</Trans>}
             onClick={() => onChooseSubSection('offline')}
             disabled={allExportersRequireOnline && !isOnline}
             small
@@ -402,7 +420,7 @@ const PublishHome = ({
       {chosenSection === 'mobile' && !chosenSubSection && (
         <ColumnStackLayout expand noMargin>
           <SectionLine
-            label={<Trans>Cloud build</Trans>}
+            label={<Trans>One-click packaging</Trans>}
             icon={getSubSectionIcon('mobile', 'online')}
             description={<Trans>Android only</Trans>}
             onClick={() => onChooseSubSection('online')}
@@ -413,7 +431,7 @@ const PublishHome = ({
           <SectionLine
             label={<Trans>Manual build</Trans>}
             icon={getSubSectionIcon('desktop', 'offline')}
-            description={<Trans>Advanced usage for manual packaging</Trans>}
+            description={<Trans>Development tools required</Trans>}
             onClick={() => onChooseSubSection('offline')}
             small
             disabled={allExportersRequireOnline && !isOnline}

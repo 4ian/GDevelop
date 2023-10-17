@@ -290,7 +290,8 @@ const ShareDialog = ({
     <Dialog
       // Keep ID for backward compatibility with guided lessons.
       id="export-dialog"
-      maxWidth={'sm'}
+      maxWidth={'md'}
+      minHeight={'lg'}
       title={<Trans>Share</Trans>}
       actions={mainActions}
       secondaryActions={secondaryActions}
@@ -302,15 +303,15 @@ const ShareDialog = ({
           onChange={setCurrentTab}
           options={[
             {
-              value: 'invite',
-              label: <Trans>Invite</Trans>,
-              id: 'invite-tab',
-              disabled: isNavigationDisabled,
-            },
-            {
               value: 'publish',
               label: <Trans>Publish</Trans>,
               id: 'publish-tab',
+              disabled: isNavigationDisabled,
+            },
+            {
+              value: 'invite',
+              label: <Trans>Invite</Trans>,
+              id: 'invite-tab',
               disabled: isNavigationDisabled,
             },
           ]}

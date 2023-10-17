@@ -11,7 +11,7 @@ import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
-import { getIDEVersionWithHash } from '../Version';
+import { getIDEVersion, getIDEVersionWithHash } from '../Version';
 import {
   getArch,
   getPlatformName,
@@ -44,6 +44,12 @@ const errorHandler = (
       errorMessage: error.message || '',
       errorStack: error.stack || '',
       errorName: error.name || '',
+      IDEVersion: getIDEVersion(),
+      IDEVersionWithHash: getIDEVersionWithHash(),
+      arch: getArch(),
+      platformName: getPlatformName(),
+      systemVersion: getSystemVersion(),
+      userAgent: getUserAgent(),
       componentStack,
     },
     'error-boundary-error'

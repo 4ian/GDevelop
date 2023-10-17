@@ -1520,9 +1520,11 @@ namespace gdjs {
      */
     isTotalForceAngleAround(angle: float, toleranceInDegrees: float): boolean {
       return (
-        gdjs.evtTools.common.angleDifference(
-          this.getAverageForce().getAngle(),
-          angle
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(
+            this.getAverageForce().getAngle(),
+            angle
+          )
         ) <= toleranceInDegrees
       );
     }

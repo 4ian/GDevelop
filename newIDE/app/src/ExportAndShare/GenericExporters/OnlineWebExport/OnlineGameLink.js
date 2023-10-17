@@ -30,10 +30,7 @@ import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropert
 import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
-import {
-  ColumnStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../UI/Layout';
+import { ColumnStackLayout } from '../../../UI/Layout';
 import LinearProgress from '../../../UI/LinearProgress';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import CircularProgress from '../../../UI/CircularProgress';

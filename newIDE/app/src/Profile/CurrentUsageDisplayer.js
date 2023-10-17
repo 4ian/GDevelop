@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import RaisedButton from '../UI/RaisedButton';
 import {
   hasValidSubscriptionPlan,
   type CurrentUsage,
@@ -10,7 +9,6 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Text from '../UI/Text';
-import { SubscriptionSuggestionContext } from './Subscription/SubscriptionSuggestionContext';
 import GetSubscriptionCard from './Subscription/GetSubscriptionCard';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -26,9 +24,6 @@ const CurrentUsageDisplayer = ({
   currentUsage,
   onChangeSubscription,
 }: Props) => {
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
   if (!currentUsage) return <PlaceholderLoader />;
   const hasSubscription = hasValidSubscriptionPlan(subscription);
   const loadedButHasNoSubscription =

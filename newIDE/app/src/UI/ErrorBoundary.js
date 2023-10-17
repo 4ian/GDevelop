@@ -78,12 +78,9 @@ export const ErrorFallbackComponent = ({
         </AlertMessage>
       </Column>
       <Column>
-        <Text size="block-title">
-          <Trans>The error was automatically reported.</Trans>
-        </Text>
         <Text>
           <Trans>
-            To make sure it's fixed, you can create a{' '}
+            To help us fix this issue, you can create a{' '}
             <Link
               href="https://github.com"
               onClick={() => Window.openExternalURL('https://github.com')}

@@ -11,7 +11,7 @@ import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
-import { getIDEVersionWithHash } from '../Version';
+import { getIDEVersion, getIDEVersionWithHash } from '../Version';
 import {
   getArch,
   getPlatformName,
@@ -41,6 +41,15 @@ const errorHandler = (
     `error-boundary_${scope}`,
     {
       error,
+      errorMessage: error.message || '',
+      errorStack: error.stack || '',
+      errorName: error.name || '',
+      IDEVersion: getIDEVersion(),
+      IDEVersionWithHash: getIDEVersionWithHash(),
+      arch: getArch(),
+      platformName: getPlatformName(),
+      systemVersion: getSystemVersion(),
+      userAgent: getUserAgent(),
       componentStack,
     },
     'error-boundary-error'
@@ -75,12 +84,9 @@ export const ErrorFallbackComponent = ({
         </AlertMessage>
       </Column>
       <Column>
-        <Text size="block-title">
-          <Trans>The error was automatically reported.</Trans>
-        </Text>
         <Text>
           <Trans>
-            To make sure it's fixed, you can create a{' '}
+            To help us fix this issue, you can create a{' '}
             <Link
               href="https://github.com"
               onClick={() => Window.openExternalURL('https://github.com')}

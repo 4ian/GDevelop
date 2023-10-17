@@ -637,8 +637,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Angle of movement (using forces)"),
                    _("Compare the angle of movement of an object according to "
                      "the forces applied on it."),
-                   _("Angle of movement of _PARAM0_ is _PARAM1_ ± _PARAM2_ "
-                     "degrees"),
+                   _("Angle of movement of _PARAM0_ is _PARAM1_ ± _PARAM2_°"),
                    _("Movement using forces"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")

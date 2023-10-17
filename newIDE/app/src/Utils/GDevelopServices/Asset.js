@@ -176,39 +176,38 @@ export const isCompatibleWithAsset = (
       })
     : true;
 
-export const listAllPublicAssets = ({
+export const listAllPublicAssets = async ({
   environment,
 }: {|
   environment: Environment,
 |}): Promise<AllPublicAssets> => {
-  return client
-    .get(`/asset`, {
-      params: {
-        environment,
-      },
-    })
-    .then(response => response.data)
-    .then(({ assetShortHeadersUrl, filtersUrl, assetPacksUrl }) => {
-      if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
-        throw new Error('Unexpected response from the resource endpoint.');
-      }
+  const response = await client.get(`/asset`, {
+    params: {
+      environment,
+    },
+  });
 
-      return Promise.all([
-        client.get(assetShortHeadersUrl).then(response => response.data),
-        client.get(filtersUrl).then(response => response.data),
-        client.get(assetPacksUrl).then(response => response.data),
-      ]).then(([publicAssetShortHeaders, publicFilters, publicAssetPacks]) => {
-        if (!publicAssetShortHeaders || !publicFilters || !publicAssetPacks) {
-          throw new Error('Unexpected response from the assets endpoints.');
-        }
+  const { assetShortHeadersUrl, filtersUrl, assetPacksUrl } = response.data;
 
-        return {
-          publicAssetShortHeaders,
-          publicFilters,
-          publicAssetPacks,
-        };
-      });
-    });
+  const [
+    publicAssetShortHeaders,
+    publicFilters,
+    publicAssetPacks,
+  ] = await Promise.all([
+    client.get(assetShortHeadersUrl).then(response => response.data),
+    client.get(filtersUrl).then(response => response.data),
+    client.get(assetPacksUrl).then(response => response.data),
+  ]);
+
+  if (!publicAssetShortHeaders || !publicFilters || !publicAssetPacks) {
+    throw new Error('Unexpected response from the assets endpoints.');
+  }
+
+  return {
+    publicAssetShortHeaders,
+    publicFilters,
+    publicAssetPacks,
+  };
 };
 
 export const getPublicAsset = async (

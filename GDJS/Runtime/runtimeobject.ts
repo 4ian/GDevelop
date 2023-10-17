@@ -1494,6 +1494,7 @@ namespace gdjs {
     /**
      * Return true if the average angle of the forces applied on the object
      * is in a given range.
+     * @deprecated Use isTotalForceAngleAround instead.
      *
      * @param angle The angle to be tested.
      * @param toleranceInDegrees The length of the range :
@@ -1506,6 +1507,24 @@ namespace gdjs {
         averageAngle += 360;
       }
       return Math.abs(angle - averageAngle) < toleranceInDegrees / 2;
+    }
+
+    /**
+     * Return true if the angle of the total force applied on the object
+     * is in a given range.
+     *
+     * @param angle The angle to be tested.
+     * @param toleranceInDegrees The maximum distance from the given angle.
+     * @return true if the difference between the force angle the given `angle`
+     * is less or equals the `toleranceInDegrees`.
+     */
+    isTotalForceAngleAround(angle: float, toleranceInDegrees: float): boolean {
+      return (
+        gdjs.evtTools.common.angleDifference(
+          this.getAverageForce().getAngle(),
+          angle
+        ) <= toleranceInDegrees
+      );
     }
 
     //Hit boxes and collision :

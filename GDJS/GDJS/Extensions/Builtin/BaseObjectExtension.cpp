@@ -83,6 +83,8 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["Vitesse"].SetFunctionName("getAverageForce().getLength");
   objectConditions["AngleOfDisplacement"].SetFunctionName(
       "averageForceAngleIs");
+  objectConditions["IsTotalForceAngleAround"].SetFunctionName(
+      "isTotalForceAngleAround");
   objectActions["SeparateFromObjects"].SetFunctionName(
       "separateFromObjectsList");
   // Deprecated

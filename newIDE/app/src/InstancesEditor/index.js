@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
-import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import KeyboardShortcuts, { MID_MOUSE_BUTTON } from '../UI/KeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -290,7 +290,7 @@ export default class InstancesEditor extends Component<Props> {
     );
     panable(this.backgroundArea);
     this.backgroundArea.addEventListener('mousedown', event =>
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y)
+      this._onBackgroundClicked(event.data.global.x, event.data.global.y, event)
     );
     this.backgroundArea.addEventListener(
       'rightclick',
@@ -636,23 +636,29 @@ export default class InstancesEditor extends Component<Props> {
     this.lastCursorY = y;
   };
 
-  _onBackgroundClicked = (x: number, y: number) => {
+  _onBackgroundClicked = (x: number, y: number, event?: PointerEvent) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
+
+    // KeyboardShortcuts.shouldMoveView cannot be used here because
+    // the click event fires first on the background, then on the pixi
+    // view which KeyboardShortcuts listens to. So KeyboardShortcuts
+    // will always be late.
+    const shouldMoveView = event ? event.button === MID_MOUSE_BUTTON : false;
 
     // Selection rectangle is only drawn in _onPanMove,
     // which can happen a few milliseconds after a background
     // click/touch - enough to have the selection rectangle being
     // offset from the first click - which looks laggy. Set
     // the start position now.
-    if (!this.keyboardShortcuts.shouldMoveView()) {
+    if (!shouldMoveView) {
       this.selectionRectangle.startSelectionRectangle(x, y);
     }
 
     if (
       !this.keyboardShortcuts.shouldMultiSelect() &&
-      !this.keyboardShortcuts.shouldMoveView() &&
+      !shouldMoveView &&
       this.props.instancesSelection.hasSelectedInstances()
     ) {
       this.props.instancesSelection.clearSelection();

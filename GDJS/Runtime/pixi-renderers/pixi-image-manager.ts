@@ -274,22 +274,27 @@ namespace gdjs {
                   });
               });
             } else {
-              PIXI.Assets.setPreferences({
-                preferWorkers: false,
-                preferCreateImageBitmap: false,
-                crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
-                  resource.file
-                )
-                  ? 'use-credentials'
-                  : 'anonymous',
-              });
-              const loadedTexture = await PIXI.Assets.load(resource.file);
-              if (!loadedTexture) {
-                throw new Error(
-                  'Texture loading by PIXI returned nothing for file ' +
-                    resource.file
-                );
-              }
+              // If the file has no extension, PIXI.assets.load cannot find
+              // an adequate load parser and does not load the file although
+              // we would like to force it to load (we are confident it's an image).
+              // TODO: When PIXI v8+ is used, PIXI.Assets.load can be used because
+              // loadParser can be forced in PIXI.Assets.load
+              // (see https://github.com/pixijs/pixijs/blob/71ed56c569ebc6b53da19e3c49258a0a84892101/packages/assets/src/loader/Loader.ts#L68)
+              const loadedTexture = PIXI.Texture.from(
+                this._resourcesLoader.getFullUrl(resource.file),
+                {
+                  resourceOptions: {
+                    autoLoad: false,
+                    crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
+                      resource.file
+                    )
+                      ? 'use-credentials'
+                      : 'anonymous',
+                  },
+                }
+              );
+              await loadedTexture.baseTexture.resource.load();
+
               this._loadedTextures.put(resource.name, loadedTexture);
               // TODO What if 2 assets share the same file with different settings?
               applyTextureSettings(loadedTexture, resource);

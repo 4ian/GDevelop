@@ -14,6 +14,8 @@ import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
+const isDesktop = !!electron;
+
 export type BuildMainMenuProps = {|
   i18n: I18nType,
   project: ?gdProject,
@@ -341,15 +343,15 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Report a wrong translation`),
         onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
       },
-      ...(!isMacLike()
-        ? [
+      ...(isMacLike() && isDesktop
+        ? []
+        : [
             { type: 'separator' },
             {
               label: i18n._(t`About GDevelop`),
               onClickSendEvent: 'main-menu-open-about',
             },
-          ]
-        : []),
+          ]),
     ],
   };
 

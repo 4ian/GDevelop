@@ -115,6 +115,7 @@ type Props = {|
   ) => ?string,
   renderExtraButton?: ({|
     style: Object,
+    onChange: (newValue: string) => void,
   |}) => React.Node,
   ...ParameterFieldProps,
 |};
@@ -232,8 +233,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
-  _handleBlur = (event: { currentTarget: { value: string } }) => {
-    const value = event.currentTarget.value;
+  _handleBlur = (value: string) => {
     if (this.props.onChange) this.props.onChange(value);
     this.setState({ validatedValue: value }, () => {
       this._enqueueValidation.cancel();
@@ -242,6 +242,10 @@ export default class ExpressionField extends React.Component<Props, State> {
         autocompletions: getAutocompletionsInitialState(),
       });
     });
+  };
+
+  _handleBlurEvent = (event: { currentTarget: { value: string } }) => {
+    this._handleBlur(event.currentTarget.value);
   };
 
   _shouldOpenParametersDialog = (
@@ -492,6 +496,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       },
       completionDescriptions
     );
+
     const allNewAutocompletions = onGetAdditionalAutocompletions
       ? onGetAdditionalAutocompletions(expression).concat(newAutocompletions)
       : newAutocompletions;
@@ -571,7 +576,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   hintText={expressionType === 'string' ? '""' : undefined}
                   inputStyle={styles.input}
                   onChange={this._handleChange}
-                  onBlur={this._handleBlur}
+                  onBlur={this._handleBlurEvent}
                   ref={field => (this._field = field)}
                   onFocus={this._handleFocus}
                   errorText={this.state.errorText}
@@ -677,6 +682,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                 this.props.renderExtraButton &&
                 this.props.renderExtraButton({
                   style,
+                  onChange: this._handleBlur,
                 })}
               {!this.props.isInline && (
                 <RaisedButton

@@ -96,10 +96,12 @@ namespace gdjs {
     _runtimegame: gdjs.RuntimeGame;
     _hotReloader: gdjs.HotReloader;
     _originalConsole = originalConsole;
+    _inGameDebugger: gdjs.InGameDebugger;
 
     constructor(runtimeGame: RuntimeGame) {
       this._runtimegame = runtimeGame;
       this._hotReloader = new gdjs.HotReloader(runtimeGame);
+      this._inGameDebugger = new gdjs.InGameDebugger(runtimeGame);
 
       const redirectJsLog = (
         type: 'info' | 'warning' | 'error',
@@ -208,6 +210,12 @@ namespace gdjs {
      * @param message
      */
     protected abstract _sendMessage(message: string): void;
+
+    onUncaughtException(exception: Error): void {
+      logger.error('Uncaught exception: ' + exception);
+
+      this._inGameDebugger.setUncaughtException(exception);
+    }
 
     /**
      * Send a message (a log) to debugger server.

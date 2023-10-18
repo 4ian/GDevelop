@@ -296,6 +296,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setTint');
 
+    // Deprecated
     object
       .addAction(
         'SetBitmapFontAndTextureAtlasResourceName',
@@ -308,6 +309,7 @@ module.exports = {
         'res/actions/font24.png',
         'res/actions/font.png'
       )
+      .setHidden()
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter(
         'bitmapFontResource',
@@ -324,6 +326,34 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
+
+      object
+        .addAction(
+          'SetBitmapFontAndTextureAtlasResourceName2',
+          _('Bitmap files resources'),
+          _('Change the Bitmap Font and/or the atlas image used by the object.'),
+          _(
+            'Set the bitmap font of _PARAM0_ to _PARAM1_ and the atlas to _PARAM2_'
+          ),
+          '',
+          'res/actions/font24.png',
+          'res/actions/font.png'
+        )
+        .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+        .addParameter(
+          'bitmapFontResource',
+          _('Bitmap font resource name'),
+          '',
+          false
+        )
+        .addParameter(
+          'imageResource',
+          _('Texture atlas resource name'),
+          '',
+          false
+        )
+        .getCodeExtraInformation()
+        .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
 
     object
       .addExpressionAndCondition(

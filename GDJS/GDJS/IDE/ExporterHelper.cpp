@@ -674,6 +674,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
     InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
+    InsertUnique(includesFiles, "debugger-client/InGameDebugger.js");
   }
   if (includeWebsocketDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");

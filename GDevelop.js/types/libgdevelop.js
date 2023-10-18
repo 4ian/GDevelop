@@ -44,6 +44,7 @@ declare class libGDevelop {
   VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
   VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
+  VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
   MapStringDouble: Class<gdMapStringDouble>;

@@ -67,17 +67,23 @@ void ObjectsContainer::UnserializeObjectsFrom(
 bool ObjectsContainer::HasObjectNamed(const gd::String& name) const {
   return (find_if(initialObjects.begin(),
                   initialObjects.end(),
-                  [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; }) != initialObjects.end());
+                  [&](const std::unique_ptr<gd::Object>& object) {
+                    return object->GetName() == name;
+                  }) != initialObjects.end());
 }
 gd::Object& ObjectsContainer::GetObject(const gd::String& name) {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
-                    [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; }));
+                    [&](const std::unique_ptr<gd::Object>& object) {
+                      return object->GetName() == name;
+                    }));
 }
 const gd::Object& ObjectsContainer::GetObject(const gd::String& name) const {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
-                    [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; }));
+                    [&](const std::unique_ptr<gd::Object>& object) {
+                      return object->GetName() == name;
+                    }));
 }
 gd::Object& ObjectsContainer::GetObject(std::size_t index) {
   return *initialObjects[index];
@@ -145,7 +151,9 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
   std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
       find_if(initialObjects.begin(),
               initialObjects.end(),
-              [&](const std::unique_ptr<gd::Object>& object) { return object->GetName() == name; });
+              [&](const std::unique_ptr<gd::Object>& object) {
+                return object->GetName() == name;
+              });
   if (objectIt == initialObjects.end()) return;
 
   rootFolder->RemoveRecursivelyObjectNamed(name);
@@ -175,6 +183,27 @@ void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
 
   objectFolderOrObject.GetParent().MoveObjectFolderOrObjectToAnotherFolder(
       objectFolderOrObject, newParentFolder, newPosition);
+}
+
+std::vector<const ObjectFolderOrObject*>
+ObjectsContainer::GetAllObjectFolderOrObjects() const {
+  std::vector<const ObjectFolderOrObject*> results;
+
+  std::function<void(const ObjectFolderOrObject& folder)> addChildrenOfFolder =
+      [&](const ObjectFolderOrObject& folder) {
+        for (size_t i = 0; i < folder.GetChildrenCount(); ++i) {
+          const auto& child = folder.GetChildAt(i);
+          results.push_back(&child);
+
+          if (child.IsFolder()) {
+            addChildrenOfFolder(child);
+          }
+        }
+      };
+
+  addChildrenOfFolder(*rootFolder);
+
+  return results;
 }
 
 }  // namespace gd

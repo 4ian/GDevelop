@@ -462,6 +462,7 @@ typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
 typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
 typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
+typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;

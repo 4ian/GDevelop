@@ -89,6 +89,10 @@ class GD_CORE_API ObjectFolderOrObject {
    */
   ObjectFolderOrObject& GetChildAt(std::size_t index);
   /**
+   * \brief Returns the child ObjectFolderOrObject at the given index.
+   */
+  const ObjectFolderOrObject& GetChildAt(std::size_t index) const;
+  /**
    * \brief Returns the child ObjectFolderOrObject that represents the object
    * with the given name. To use only if sure that the instance holds the object
    * in its direct children (no recursive search).

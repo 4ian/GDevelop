@@ -577,6 +577,66 @@ describe('libGD.js', function () {
 
       project.delete();
     });
+    it('enumerates folders and objects', function () {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+
+      // Prepare two containers, one with 3 objects and one empty
+      const objectsContainer = new gd.ObjectsContainer();
+      const rootFolder = objectsContainer.getRootFolder();
+      const folder = rootFolder.insertNewFolder('Folder 1', 0);
+      const mySpriteObject = objectsContainer.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'MySprite',
+        folder,
+        0
+      );
+      const subFolder = folder.insertNewFolder('Sub Folder 1', 1);
+      const mySprite2Object = objectsContainer.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'MySprite2',
+        subFolder,
+        0
+      );
+      const mySprite3Object = objectsContainer.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'MySprite3',
+        subFolder,
+        1
+      );
+      const subSubFolder = subFolder.insertNewFolder('Sub Sub Folder 1', 2);
+
+      expect(objectsContainer.getObjectsCount()).toBe(3);
+      expect(rootFolder.getChildrenCount()).toBe(1);
+      expect(folder.getChildrenCount()).toBe(2);
+      expect(subFolder.getChildrenCount()).toBe(3);
+
+      const vectorObjectFolderOrObjects = objectsContainer.getAllObjectFolderOrObjects();
+      expect(vectorObjectFolderOrObjects.size()).toBe(6);
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(0))).toBe(
+        gd.getPointer(folder)
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(1))).toBe(
+        gd.getPointer(folder.getChildAt(0))
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(2))).toBe(
+        gd.getPointer(subFolder)
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(3))).toBe(
+        gd.getPointer(subFolder.getChildAt(0))
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(4))).toBe(
+        gd.getPointer(subFolder.getChildAt(1))
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(5))).toBe(
+        gd.getPointer(subSubFolder)
+      );
+
+      objectsContainer.delete();
+      project.delete();
+    });
   });
 
   describe('gd.InitialInstancesContainer', function () {
@@ -4948,11 +5008,13 @@ Array [
       rootFolder.removeFolderChild(subFolder);
 
       expect(rootFolder.getChildrenCount()).toEqual(2);
-      const objectFolderOrObject = rootFolder.getChildAt(1)
-      const otherObjectFolderOrObject = rootFolder.getChildAt(0)
+      const objectFolderOrObject = rootFolder.getChildAt(1);
+      const otherObjectFolderOrObject = rootFolder.getChildAt(0);
       expect(otherObjectFolderOrObject.isFolder()).toBe(false);
       expect(otherObjectFolderOrObject.isRootFolder()).toBe(false);
-      expect(otherObjectFolderOrObject.getObject().getName()).toBe('OtherObject');
+      expect(otherObjectFolderOrObject.getObject().getName()).toBe(
+        'OtherObject'
+      );
       expect(objectFolderOrObject.isFolder()).toBe(false);
       expect(objectFolderOrObject.isRootFolder()).toBe(false);
       expect(objectFolderOrObject.getObject().getName()).toBe('MyObject');
@@ -4997,7 +5059,7 @@ Array [
         false
       );
     });
-    test("an ObjectFolderOrObject representing an object can be retrieved using the object name only", () => {
+    test('an ObjectFolderOrObject representing an object can be retrieved using the object name only', () => {
       const rootFolder = layout.getRootFolder();
       const subFolder = rootFolder.insertNewFolder('Depth1', 0);
       const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
@@ -5009,7 +5071,9 @@ Array [
       );
       const objectFolderOrObject = subSubFolder.getChildAt(0);
       expect(objectFolderOrObject.isRootFolder()).toBe(false);
-      const objectFolderOrObjectFoundByName = rootFolder.getObjectNamed('MyObject');
+      const objectFolderOrObjectFoundByName = rootFolder.getObjectNamed(
+        'MyObject'
+      );
       expect(objectFolderOrObjectFoundByName.isRootFolder()).toBe(false);
       expect(objectFolderOrObjectFoundByName).toBe(objectFolderOrObject);
     });

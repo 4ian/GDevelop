@@ -167,6 +167,13 @@ class GD_CORE_API ObjectsContainer {
   }
   ///@}
 
+  /**
+   * Returns a vector containing all object and folders in this container.
+   * Only use this for checking if you hold a valid `ObjectFolderOrObject` -
+   * don't use this for rendering or anything else.
+   */
+  std::vector<const ObjectFolderOrObject*> GetAllObjectFolderOrObjects() const;
+
   gd::ObjectFolderOrObject& GetRootFolder() {
       return *rootFolder;
   }

@@ -78,7 +78,13 @@ const ElectronMainMenu = ({
   callbacks: MainMenuCallbacks,
   extraCallbacks: MainMenuExtraCallbacks,
 |}) => {
-  const { i18n, project, recentProjectFiles, shortcutMap } = props;
+  const {
+    i18n,
+    project,
+    recentProjectFiles,
+    shortcutMap,
+    isApplicationTopLevelMenu,
+  } = props;
   const { onClosePreview } = extraCallbacks;
   const language = i18n.language;
   const [
@@ -224,12 +230,19 @@ const ElectronMainMenu = ({
             i18n,
             recentProjectFiles,
             shortcutMap,
-            isApplicationTopLevelMenu: true,
+            isApplicationTopLevelMenu,
           })
         );
       }
     },
-    [i18n, language, project, recentProjectFiles, shortcutMap]
+    [
+      i18n,
+      language,
+      project,
+      recentProjectFiles,
+      shortcutMap,
+      isApplicationTopLevelMenu,
+    ]
   );
 
   const { onOpenRecentFile } = callbacks;

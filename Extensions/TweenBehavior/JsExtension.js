@@ -186,7 +186,7 @@ module.exports = {
         _('Tween a scene value'),
         _('Tweens a scene value that can be use with the expression Tween::Value.'),
         _(
-          'Tween the value from _PARAM3_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM1_'
+          'Tween the value from _PARAM2_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -212,7 +212,7 @@ module.exports = {
         _('Tween a layer value'),
         _('Tweens a layer value that can be use with the expression Tween::Value.'),
         _(
-          'Tween the value of _PARAM7_ from _PARAM3_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM1_'
+          'Tween the value of _PARAM7_ from _PARAM2_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -676,7 +676,7 @@ module.exports = {
           _('Tween an object value'),
           _('Tweens an object value that can be use with the object expression Tween::Value.'),
           _(
-            'Tween the value of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+            'Tween the value of _PARAM0_ from _PARAM3_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM2_'
           ),
           _('Variables'),
           'JsPlatform/Extensions/tween_behavior24.png',

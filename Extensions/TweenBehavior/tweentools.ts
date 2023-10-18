@@ -152,7 +152,7 @@ namespace gdjs {
       };
 
       /**
-       * Add a layer value tween. The layer time scale is taken ito account.
+       * Add a layer value tween. The layer time scale is taken into account.
        * @param runtimeScene The scene
        * @param identifier Unique id to identify the tween
        * @param fromValue Start value

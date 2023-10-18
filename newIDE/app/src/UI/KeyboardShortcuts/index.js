@@ -29,7 +29,7 @@ const KEY_2_NUMPAD = 98;
 const KEY_3_NUMPAD = 99;
 const ESC_KEY = 27;
 
-const MID_MOUSE_BUTTON = 1;
+export const MID_MOUSE_BUTTON = 1;
 
 type ShortcutCallbacks = {|
   onDelete?: () => void | Promise<void>,

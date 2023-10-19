@@ -645,7 +645,9 @@ export default class InstancesEditor extends Component<Props> {
     // the click event fires first on the background, then on the pixi
     // view which KeyboardShortcuts listens to. So KeyboardShortcuts
     // will always be late.
-    const shouldMoveView = event ? event.button === MID_MOUSE_BUTTON : false;
+    const shouldMoveView =
+      this.keyboardShortcuts.shouldMoveView() ||
+      (event ? event.button === MID_MOUSE_BUTTON : false);
 
     // Selection rectangle is only drawn in _onPanMove,
     // which can happen a few milliseconds after a background

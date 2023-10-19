@@ -1441,7 +1441,7 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
   }
 }
 
-void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+void WholeProjectRefactorer::RenameObjectOrGroupInLayout(
     gd::Project &project, gd::Layout &layout, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
   if (oldName == newName || newName.empty() || oldName.empty())
@@ -1479,6 +1479,21 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
       auto &externalLayout = project.GetExternalLayout(name);
       externalLayout.GetInitialInstances().RenameInstancesOfObject(oldName,
                                                                    newName);
+    }
+  }
+}
+
+void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+    gd::Project &project,
+    gd::Layout &layout,
+    const gd::String &oldName,
+    const gd::String &newName,
+    bool isObjectGroup) {
+  RenameObjectOrGroupInLayout(project, layout, oldName, newName, isObjectGroup);
+  // Rename object in global groups
+  if (!isObjectGroup) {
+    for (std::size_t g = 0; g < project.GetObjectGroups().size(); ++g) {
+      project.GetObjectGroups()[g].RenameObject(oldName, newName);
     }
   }
 }
@@ -1684,7 +1699,7 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
     if (layout.HasObjectNamed(oldName))
       continue;
 
-    ObjectOrGroupRenamedInLayout(project, layout, oldName, newName,
+    RenameObjectOrGroupInLayout(project, layout, oldName, newName,
                                  isObjectGroup);
   }
 }

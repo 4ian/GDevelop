@@ -157,25 +157,36 @@ export default class LayerRenderer {
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) pixiObject.zOrder = instance.getZOrder();
 
-      // "Culling" improves rendering performance of large levels
-      const isVisible = this._isInstanceVisible(instance);
-      if (pixiObject) {
-        pixiObject.visible = isVisible;
-        pixiObject.eventMode =
-          this.layer.isLocked() || (instance.isLocked() && instance.isSealed())
-            ? 'auto'
-            : 'static';
-      }
-      if (isVisible) renderedInstance.update();
-
-      if (renderedInstance instanceof Rendered3DInstance) {
-        const threeObject = renderedInstance.getThreeObject();
-        if (this._threeGroup && threeObject) {
-          this._threeGroup.add(threeObject);
+      try {
+        // "Culling" improves rendering performance of large levels
+        const isVisible = this._isInstanceVisible(instance);
+        if (pixiObject) {
+          pixiObject.visible = isVisible;
+          pixiObject.eventMode =
+            this.layer.isLocked() ||
+            (instance.isLocked() && instance.isSealed())
+              ? 'auto'
+              : 'static';
         }
-      }
+        if (isVisible) renderedInstance.update();
 
-      renderedInstance.wasUsed = true;
+        if (renderedInstance instanceof Rendered3DInstance) {
+          const threeObject = renderedInstance.getThreeObject();
+          if (this._threeGroup && threeObject) {
+            this._threeGroup.add(threeObject);
+          }
+        }
+      } catch (error) {
+        // When reloading a texture when a resource changed externally, rendering
+        // an instance could crash when trying to access a non-existent PIXI base texture.
+        // The error is not propagated in order to avoid a crash at the SceneEditor level.
+        console.warn(
+          `An error occurred when rendering instance for object ${instance.getObjectName()}:`,
+          error
+        );
+      } finally {
+        renderedInstance.wasUsed = true;
+      }
     };
 
     // TODO (3D) Should it handle preference changes without needing to reopen tabs?

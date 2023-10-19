@@ -77,17 +77,9 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
 
 void ResourceExposer::ExposeProjectResources(gd::Project& project, gd::ArbitraryResourceWorker& worker) {
 
-  project.GetPlatformSpecificAssets().ExposeResources(worker);
-
   // Expose global objects configuration resources
   auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
   objectWorker.Launch(project);
-
-  // Expose loading screen background image if present
-  auto& loadingScreen = project.GetLoadingScreen();
-  if (loadingScreen.GetBackgroundImageResourceName() != "") {
-    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
-  }
 }
 
 void ResourceExposer::ExposeLayoutResources(

@@ -21,8 +21,10 @@ import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
 
 const gd: libGDevelop = global.gd;
 
-const electron = optionalRequire('electron');
-const shell = electron ? electron.shell : null;
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
+const remote = optionalRequire('@electron/remote');
 const path = optionalRequire('path');
 const styles = {
   container: {
@@ -185,7 +187,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   openProjectFolder = () => {
     const project = this.props.project;
-    if (shell) shell.openPath(path.dirname(project.getProjectFile()));
+
+    if (remote) remote.shell.openPath(path.dirname(project.getProjectFile()));
   };
 
   toggleProperties = () => {

@@ -76,7 +76,6 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
 }
 
 void ResourceExposer::ExposeProjectResources(gd::Project& project, gd::ArbitraryResourceWorker& worker) {
-
   // Expose global objects configuration resources
   auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
   objectWorker.Launch(project);

@@ -130,7 +130,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   gd::ProjectScopedContainers projectScopedContainers =
       gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
           globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddParameters(eventsFunction.GetParameters());
+  projectScopedContainers.AddParameters(
+      eventsFunction.GetParametersForEvents(functionsContainer));
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -180,7 +181,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       eventsBasedBehavior.GetSharedPropertyDescriptors());
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedBehavior.GetPropertyDescriptors());
-  projectScopedContainers.AddParameters(eventsFunction.GetParameters());
+  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
+      eventsBasedBehavior.GetEventsFunctions()));
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -255,7 +257,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
           globalObjectsAndGroups, objectsAndGroups);
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedObject.GetPropertyDescriptors());
-  projectScopedContainers.AddParameters(eventsFunction.GetParameters());
+  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
+      eventsBasedObject.GetEventsFunctions()));
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -487,7 +490,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
   for (const auto& parameter : parameters) {
     if (parameter.GetName().empty()) continue;
 
-    gd::String parameterMangledName = EventsCodeNameMangler::GetMangledName(parameter.GetName());
+    gd::String parameterMangledName =
+        EventsCodeNameMangler::GetMangledName(parameter.GetName());
 
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
       if (parameter.GetName() == thisObjectName) {
@@ -851,7 +855,8 @@ gd::String EventsCodeGenerator::GenerateRelationalOperation(
   if (relationalOperator == "contains") {
     return "(" + lhs + ").includes(" + rhs + ")";
   }
-  return gd::EventsCodeGenerator::GenerateRelationalOperation(relationalOperator, lhs, rhs);
+  return gd::EventsCodeGenerator::GenerateRelationalOperation(
+      relationalOperator, lhs, rhs);
 }
 
 gd::String EventsCodeGenerator::GenerateObjectAction(

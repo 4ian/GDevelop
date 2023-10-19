@@ -79,6 +79,14 @@ namespace gdjs {
     },
   };
 
+  const isErrorComingFromJavaScriptCode = (
+    exception: Error | null
+  ): boolean => {
+    if (!exception || !exception.stack) return false;
+
+    return exception.stack.includes('GDJSInlineCode');
+  };
+
   /**
    * Displays uncaught exceptions on top of the game.
    * Could be reworked in the future to support a minimal debugger inside the game.
@@ -112,6 +120,9 @@ namespace gdjs {
       }
 
       if (this._uncaughtException) {
+        const errorIsInJs = isErrorComingFromJavaScriptCode(
+          this._uncaughtException
+        );
         this._uncaughtExceptionElement = h(
           'div',
           {
@@ -130,14 +141,18 @@ namespace gdjs {
             {
               style: styles.errorTitle,
             },
-            'A crash or error happened in the game.'
+            errorIsInJs
+              ? 'An error happened in a JavaScript code event.'
+              : 'A crash or error happened in the game.'
           ),
           h(
             'p',
             {
               style: styles.errorMessage,
             },
-            "If you're using JavaScript, verify your code. Otherwise, this might be an issue with GDevelop - consider reporting a bug. Full error is: " +
+            (errorIsInJs
+              ? 'This error comes from a JavaScript code event. Verify your code to ensure no error is happening. You can use the Developer Tools (menu "View" > "Toggle Developer Tools"). Full error is: '
+              : "If you're using JavaScript, verify your code. Otherwise, this might be an issue with GDevelop - consider reporting a bug. Full error is: ") +
               this._uncaughtException.message
           ),
           h(

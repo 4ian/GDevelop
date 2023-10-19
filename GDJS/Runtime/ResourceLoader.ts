@@ -201,6 +201,8 @@ namespace gdjs {
         this._LayoutNamesToLoad.add(layoutData.name);
         this._layoutNamesToMakeReady.add(layoutData.name);
       }
+      // TODO Clearing the queue doesn't abort the running task, but it should
+      // not matter as resource loading is really fast in preview mode.
       this._layoutToLoadQueue.length = 0;
       for (let index = layoutDataArray.length - 1; index >= 0; index--) {
         const layoutData = layoutDataArray[index];
@@ -230,7 +232,7 @@ namespace gdjs {
     }
 
     /**
-     * Pre-load the resources that are needed to launch the first layout.
+     * Load the resources that are needed to launch the first layout.
      */
     async loadGlobalAndFirstLayoutResources(
       firstSceneName: string,
@@ -264,7 +266,7 @@ namespace gdjs {
     }
 
     /**
-     * Pre-load each layout in order.
+     * Load each layout in order.
      *
      * This is done in background to try to avoid loading screens when changing
      * layouts.
@@ -298,28 +300,51 @@ namespace gdjs {
       console.log('Done loading all layout in background');
     }
 
-    /**
-     * Load a scene that is needed right away.
-     *
-     * The renderer will show a loading screen while its done.
-     */
-    async loadLayoutResources(
+    private async _doLoadLayoutResources(
       layoutName: string,
-      onProgress?: (count: number, total: number) => void
+      onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
-      const task = this._prioritizeLayout(layoutName);
-      return new Promise<void>((resolve, reject) => {
-        if (!task) {
-          console.log('Already downloaded layout: ' + layoutName);
-          resolve();
-          return;
-        }
-        console.log('Register task callback for: ' + layoutName);
-        task.registerCallback(() => {
-          console.log('Downloaded layout: ' + layoutName);
-          resolve();
-        }, onProgress);
-      });
+      console.log('------- Scene: ' + layoutName);
+      const layoutResources = this._layoutResources.get(layoutName);
+      if (!layoutResources) {
+        logger.warn(
+          'Can\'t load resource for unknown layout: "' + layoutName + '".'
+        );
+        return;
+      }
+      let loadedCount = 0;
+      await Promise.all(
+        [...layoutResources.values()].map(async (resourceName) => {
+          const resource = this._resources.get(resourceName);
+          if (!resource) {
+            logger.warn('Unable to find resource "' + resourceName + '".');
+            return;
+          }
+          await this._loadResource(resource);
+          loadedCount++;
+          this.currentLayoutLoadingProgress =
+            loadedCount / this._resources.size;
+          onProgress && (await onProgress(loadedCount, this._resources.size));
+        })
+      );
+      this._setLayoutAssetsLoaded(layoutName);
+      console.log('Done: ' + layoutName);
+    }
+
+    private async _loadResource(resource: ResourceData): Promise<void> {
+      const resourceManager = this._resourceManagersMap.get(resource.kind);
+      if (!resourceManager) {
+        logger.warn(
+          'Unknown resource kind: "' +
+            resource.kind +
+            '" for: "' +
+            resource.name +
+            '".'
+        );
+        return;
+      }
+      console.log('Load: ' + resource.name);
+      await resourceManager.loadResource(resource.name);
     }
 
     /**
@@ -359,10 +384,36 @@ namespace gdjs {
     }
 
     /**
+     * Load a layout resources without parsing them.
+     * 
+     * When another layout resources are loading in background, it waits for
+     * all its resources to be loaded before loading resources of the given
+     * layout.
+     */
+    async loadLayoutResources(
+      layoutName: string,
+      onProgress?: (count: number, total: number) => void
+    ): Promise<void> {
+      const task = this._prioritizeLayout(layoutName);
+      return new Promise<void>((resolve, reject) => {
+        if (!task) {
+          console.log('Already downloaded layout: ' + layoutName);
+          resolve();
+          return;
+        }
+        console.log('Register task callback for: ' + layoutName);
+        task.registerCallback(() => {
+          console.log('Downloaded layout: ' + layoutName);
+          resolve();
+        }, onProgress);
+      });
+    }
+
+    /**
      * Put a given layout at the end of the queue.
      *
-     * When the layout that is currently pre-loading in background is done,
-     * this layout will be the next to be pre-loaded.
+     * When the layout that is currently loading in background is done,
+     * this layout will be the next to be loaded.
      */
     private _prioritizeLayout(layoutName: string): LayoutLoadingTask | null {
       console.log('Prioritize layout: ' + layoutName);
@@ -379,30 +430,19 @@ namespace gdjs {
       return task;
     }
 
-    private async _doLoadLayoutResources(
-      layoutName: string,
-      onProgress?: (count: number, total: number) => Promise<void>
-    ): Promise<void> {
-      console.log('------- Scene: ' + layoutName);
-      const layoutResources = this._layoutResources.get(layoutName);
-      if (!layoutResources) {
+    private async _processResource(resource: ResourceData): Promise<void> {
+      const resourceManager = this._resourceManagersMap.get(resource.kind);
+      if (!resourceManager) {
         logger.warn(
-          'Can\'t load resource for unknown layout: "' + layoutName + '".'
+          'Unknown resource kind: "' +
+            resource.kind +
+            '" for: "' +
+            resource.name +
+            '".'
         );
         return;
       }
-      let loadedCount = 0;
-      await Promise.all(
-        [...layoutResources.values()].map(async (resource) => {
-          await this.loadResource(resource);
-          loadedCount++;
-          this.currentLayoutLoadingProgress =
-            loadedCount / this._resources.size;
-          onProgress && (await onProgress(loadedCount, this._resources.size));
-        })
-      );
-      this._setLayoutAssetsLoaded(layoutName);
-      console.log('Done: ' + layoutName);
+      await resourceManager.processResource(resource.name);
     }
 
     getLayoutLoadingProgress(layoutName: string): float {
@@ -417,6 +457,10 @@ namespace gdjs {
       return !this._LayoutNamesToLoad.has(layoutName);
     }
 
+    /**
+     * @returns true when all the resources of the given layout are loaded and
+     * parsed.
+     */
     areLayoutAssetsReady(layoutName: string): boolean {
       return !this._layoutNamesToMakeReady.has(layoutName);
     }
@@ -427,49 +471,6 @@ namespace gdjs {
 
     private _setLayoutAssetsReady(layoutName: string): void {
       this._layoutNamesToMakeReady.delete(layoutName);
-    }
-
-    /**
-     * Load the specified resources.
-     */
-    async loadResource(resourceName: string): Promise<void> {
-      const resource = this._resources.get(resourceName);
-      if (!resource) {
-        logger.warn('Unable to find resource "' + resourceName + '".');
-        return;
-      }
-      await this._loadResource(resource);
-    }
-
-    private async _loadResource(resource: ResourceData): Promise<void> {
-      const resourceManager = this._resourceManagersMap.get(resource.kind);
-      if (!resourceManager) {
-        logger.warn(
-          'Unknown resource kind: "' +
-            resource.kind +
-            '" for: "' +
-            resource.name +
-            '".'
-        );
-        return;
-      }
-      console.log('Load: ' + resource.name);
-      await resourceManager.loadResource(resource.name);
-    }
-
-    private async _processResource(resource: ResourceData): Promise<void> {
-      const resourceManager = this._resourceManagersMap.get(resource.kind);
-      if (!resourceManager) {
-        logger.warn(
-          'Unknown resource kind: "' +
-            resource.kind +
-            '" for: "' +
-            resource.name +
-            '".'
-        );
-        return;
-      }
-      await resourceManager.processResource(resource.name);
     }
 
     getResource(resourceName: string): ResourceData | null {

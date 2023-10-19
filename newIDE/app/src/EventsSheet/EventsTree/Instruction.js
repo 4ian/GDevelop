@@ -55,7 +55,7 @@ const gd: libGDevelop = global.gd;
 const styles = {
   container: {
     whiteSpace: 'normal',
-    wordWrap: 'break-word',
+    overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices (or for long expressions).
     cursor: 'pointer',
     marginBottom: 1,
   },

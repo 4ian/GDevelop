@@ -511,26 +511,26 @@ module.exports = {
         _('Tween progress'),
         _('the progress of a tween (between 0.0 and 1.0)'),
         _('the progress of a tween'),
-        '',
+        _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('getProgress');
+      .setFunctionName('gdjs.evtTools.tween.getProgress');
 
     extension
       .addExpression(
         'Value',
         _('Tween value'),
         _('Return the value of a tween. It is always 0 for tweens with several values.'),
-        '',
+        _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
-      .setFunctionName('getValue');
+      .setFunctionName('gdjs.evtTools.tween.getValue');
 
     const tweenBehavior = new gd.BehaviorJsImplementation();
 

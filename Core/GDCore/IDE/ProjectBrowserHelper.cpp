@@ -140,7 +140,7 @@ void ProjectBrowserHelper::ExposeProjectEvents(
           globalObjectsAndGroups, objectsAndGroups);
       auto projectScopedContainers =
         gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
-      projectScopedContainers.AddParameters(eventsFunction->GetParameters());
+      projectScopedContainers.AddParameters(eventsFunction->GetParametersForEvents(eventsFunctionsExtension));
 
       worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
     }
@@ -183,7 +183,7 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
       gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
     projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetSharedPropertyDescriptors());
     projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetPropertyDescriptors());
-    projectScopedContainers.AddParameters(eventsFunction->GetParameters());
+    projectScopedContainers.AddParameters(eventsFunction->GetParametersForEvents(eventsBasedBehavior.GetEventsFunctions()));
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }
@@ -202,7 +202,7 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     auto projectScopedContainers =
       gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
     projectScopedContainers.AddPropertiesContainer(eventsBasedObject.GetPropertyDescriptors());
-    projectScopedContainers.AddParameters(eventsFunction->GetParameters());
+    projectScopedContainers.AddParameters(eventsFunction->GetParametersForEvents(eventsBasedObject.GetEventsFunctions()));
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }

@@ -23,6 +23,7 @@ export const getProjectScopedContainersFromScope = (
   const {
     project,
     layout,
+    eventsFunctionsExtension,
     eventsBasedBehavior,
     eventsBasedObject,
     eventsFunction,
@@ -55,7 +56,21 @@ export const getProjectScopedContainersFromScope = (
   }
 
   if (eventsFunction) {
-    projectScopedContainers.addParameters(eventsFunction.getParameters());
+    const eventsFunctionsContainer =
+      (eventsBasedObject && eventsBasedObject.getEventsFunctions()) ||
+      (eventsBasedBehavior && eventsBasedBehavior.getEventsFunctions()) ||
+      eventsFunctionsExtension ||
+      null;
+
+    if (eventsFunctionsContainer) {
+      projectScopedContainers.addParameters(
+        eventsFunction.getParametersForEvents(eventsFunctionsContainer)
+      );
+    } else {
+      throw new Error(
+        'Called `getProjectScopedContainersFromScope` with an eventsFunction but without eventsBasedBehavior, eventsBasedObject or eventsFunctionsExtension'
+      );
+    }
   }
 
   return projectScopedContainers;

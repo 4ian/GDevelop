@@ -849,7 +849,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Generate the function code
         gd::String functionCode;
         functionCode +=
-            functionName + " = function(" + functionParameters + ") {\n";
+            functionName + " = function GDJSInlineCode(" + functionParameters + ") {\n";
         functionCode += event.IsUseStrict() ? "\"use strict\";\n" : "";
         functionCode += event.GetInlineCode();
         functionCode += "\n};\n";

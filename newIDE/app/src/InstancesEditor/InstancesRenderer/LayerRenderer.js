@@ -180,7 +180,7 @@ export default class LayerRenderer {
         // When reloading a texture when a resource changed externally, rendering
         // an instance could crash when trying to access a non-existent PIXI base texture.
         // The error is not propagated in order to avoid a crash at the SceneEditor level.
-        console.warn(
+        console.error(
           `An error occurred when rendering instance for object ${instance.getObjectName()}:`,
           error
         );

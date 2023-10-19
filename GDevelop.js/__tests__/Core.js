@@ -3677,9 +3677,9 @@ describe('libGD.js', function () {
       );
     });
 
-    it('should rename a scene object in scene groups and project groups', function () {
+    it('should rename a scene object in project groups', function () {
       let project = new gd.ProjectHelper.createNewGDJSProject();
-      const group = project.getObjectGroups().insertNew('Group', 0);
+      const globalGroup = project.getObjectGroups().insertNew('Group', 0);
       let layout = project.insertNewLayout('Scene', 0);
       const object = layout.insertNewObject(
         project,
@@ -3688,7 +3688,7 @@ describe('libGD.js', function () {
         0
       );
 
-      group.addObject(object.getName());
+      globalGroup.addObject(object.getName());
 
       gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
         project,
@@ -3698,8 +3698,8 @@ describe('libGD.js', function () {
         /* isObjectGroup=*/ false
       );
 
-      expect(group.find('MySpriteObject')).toBe(false);
-      expect(group.find('Player')).toBe(true);
+      expect(globalGroup.find('MySpriteObject')).toBe(false);
+      expect(globalGroup.find('Player')).toBe(true);
     });
     // See other tests in WholeProjectRefactorer.cpp
   });

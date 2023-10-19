@@ -116,14 +116,19 @@ const ShareDialog = ({
   const [currentTab, setCurrentTab] = React.useState<ShareTab>(
     initialTab || getShareDialogDefaultTab()
   );
+  const showOnlineWebExporterOnly = !automatedExporters && !manualExporters;
   const [
     chosenExporterSection,
     setChosenExporterSection,
-  ] = React.useState<?ExporterSection>(null);
+  ] = React.useState<?ExporterSection>(
+    showOnlineWebExporterOnly ? 'browser' : null
+  );
   const [
     chosenExporterSubSection,
     setChosenExporterSubSection,
-  ] = React.useState<?ExporterSubSection>(null);
+  ] = React.useState<?ExporterSubSection>(
+    showOnlineWebExporterOnly ? 'online' : null
+  );
 
   React.useEffect(() => setShareDialogDefaultTab(currentTab), [
     setShareDialogDefaultTab,
@@ -210,10 +215,6 @@ const ShareDialog = ({
       onlineWebExporter,
     ],
     [automatedExporters, manualExporters, onlineWebExporter]
-  );
-  const showOnlineWebExporterOnly = React.useMemo(
-    () => !automatedExporters && !manualExporters,
-    [automatedExporters, manualExporters]
   );
 
   const exporter: ?Exporter = React.useMemo(
@@ -339,12 +340,8 @@ const ShareDialog = ({
           selectedExporter={exporter}
           onChooseSection={setChosenExporterSection}
           onChooseSubSection={setChosenExporterSubSection}
-          chosenSection={
-            showOnlineWebExporterOnly ? 'browser' : chosenExporterSection
-          }
-          chosenSubSection={
-            showOnlineWebExporterOnly ? 'online' : chosenExporterSubSection
-          }
+          chosenSection={chosenExporterSection}
+          chosenSubSection={chosenExporterSubSection}
           game={game}
           allExportersRequireOnline={allExportersRequireOnline}
           showOnlineWebExporterOnly={showOnlineWebExporterOnly}

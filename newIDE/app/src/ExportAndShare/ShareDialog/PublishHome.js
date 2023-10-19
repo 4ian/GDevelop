@@ -313,7 +313,7 @@ const PublishHome = ({
           <Trans>You must be connected to use online export services.</Trans>
         </AlertMessage>
       )}
-      {!chosenSection && !showOnlineWebExporterOnly && (
+      {!chosenSection && (
         <ColumnStackLayout expand noMargin>
           <SectionLine
             label={<Trans>gd.games</Trans>}
@@ -328,16 +328,18 @@ const PublishHome = ({
             disabled={!isOnline}
             id="publish-gd-games"
           />
-          <SectionLine
-            label={<Trans>Browser</Trans>}
-            icon={getSectionIcon({ section: 'browser' })}
-            description={
-              <Trans>Gaming portals (Itch.io, Poki, Facebook...)</Trans>
-            }
-            onClick={() => onChooseSection('browser')}
-            disabled={allExportersRequireOnline && !isOnline}
-            id="publish-browser"
-          />
+          {!showOnlineWebExporterOnly && (
+            <SectionLine
+              label={<Trans>Browser</Trans>}
+              icon={getSectionIcon({ section: 'browser' })}
+              description={
+                <Trans>Gaming portals (Itch.io, Poki, Facebook...)</Trans>
+              }
+              onClick={() => onChooseSection('browser')}
+              disabled={allExportersRequireOnline && !isOnline}
+              id="publish-browser"
+            />
+          )}
           {!showOnlineWebExporterOnly && (
             <SectionLine
               label={<Trans>Desktop</Trans>}

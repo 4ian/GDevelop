@@ -177,13 +177,18 @@ export default class LayerRenderer {
           }
         }
       } catch (error) {
-        // When reloading a texture when a resource changed externally, rendering
-        // an instance could crash when trying to access a non-existent PIXI base texture.
-        // The error is not propagated in order to avoid a crash at the SceneEditor level.
-        console.error(
-          `An error occurred when rendering instance for object ${instance.getObjectName()}:`,
-          error
-        );
+        if (error instanceof TypeError) {
+          // When reloading a texture when a resource changed externally, rendering
+          // an instance could crash when trying to access a non-existent PIXI base texture.
+          // The error is not propagated in order to avoid a crash at the SceneEditor level.
+          // See https://github.com/4ian/GDevelop/issues/5802.
+          console.error(
+            `An error occurred when rendering instance for object ${instance.getObjectName()}:`,
+            error
+          );
+          return;
+        }
+        throw error;
       } finally {
         renderedInstance.wasUsed = true;
       }

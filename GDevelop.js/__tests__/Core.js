@@ -3676,6 +3676,31 @@ describe('libGD.js', function () {
         false
       );
     });
+
+    it('should rename a scene object in scene groups and project groups', function () {
+      let project = new gd.ProjectHelper.createNewGDJSProject();
+      const group = project.getObjectGroups().insertNew('Group', 0);
+      let layout = project.insertNewLayout('Scene', 0);
+      const object = layout.insertNewObject(
+        project,
+        'Sprite',
+        'MySpriteObject',
+        0
+      );
+
+      group.addObject(object.getName());
+
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+        project,
+        layout,
+        'MySpriteObject',
+        'Player',
+        /* isObjectGroup=*/ false
+      );
+
+      expect(group.find('MySpriteObject')).toBe(false);
+      expect(group.find('Player')).toBe(true);
+    });
     // See other tests in WholeProjectRefactorer.cpp
   });
 

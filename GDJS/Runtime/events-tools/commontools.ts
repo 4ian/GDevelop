@@ -262,7 +262,10 @@ namespace gdjs {
       };
 
       /**
-       * Runs a linear interpolation between a and b.
+       * Return a linear interpolation between a and b.
+       *
+       * For instance, `lerp(2, 8, 0.5)` is `5`.
+       *
        * @param a Start value.
        * @param b End value.
        * @param x The interpolation value between 0 and 1.
@@ -270,6 +273,26 @@ namespace gdjs {
        */
       export const lerp = function (a: number, b: integer, x: float): number {
         return a + (b - a) * x;
+      };
+
+      /**
+       * Return an exponential interpolation between `start` and `end`.
+       *
+       * For instance, `exponentialInterpolation(2, 8, 0.5)` is `4`.
+       *
+       * @param start Start value.
+       * @param end End value.
+       * @param progress The interpolation value between 0 and 1.
+       * @returns The interpolated value.
+       */
+      export const exponentialInterpolation = (
+        start: float,
+        end: float,
+        progress: float
+      ) => {
+        const startLog = Math.log(start);
+        const endLog = Math.log(end);
+        return Math.exp(startLog + (endLog - startLog) * progress);
       };
 
       /**

@@ -17,6 +17,7 @@ namespace gdjs {
      * Map associating a resource name to the loaded Three.js model.
      */
     private _loadedThreeModels = new gdjs.ResourceCache<THREE_ADDONS.GLTF>();
+    private _downloadedArrayBuffers = new gdjs.ResourceCache<ArrayBuffer>();
 
     _resourceLoader: gdjs.ResourceLoader;
 
@@ -68,6 +69,34 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    async processResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return;
+      }
+      const loader = this._loader;
+      if (!loader) {
+        return;
+      }
+      const data = this._downloadedArrayBuffers.get(resource);
+      if (!data) {
+        return;
+      }
+      this._downloadedArrayBuffers.delete(resource);
+      try {
+        const gltf: THREE_ADDONS.GLTF = await loader.parseAsync(data, '');
+        this._loadedThreeModels.set(resource, gltf);
+        console.log('Parsed: ' + resourceName);
+      } catch (error) {
+        logger.error(
+          "Can't fetch the 3D model file " + resource.file + ', error: ' + error
+        );
+      }
+    }
+
     /**
      * Load all the 3D models.
      *
@@ -82,23 +111,22 @@ namespace gdjs {
         );
         return;
       }
-      if (this._loadedThreeModels.get(resource)) {
-        return;
-      }
       const loader = this._loader;
       if (!loader) {
         return;
       }
       const url = this._resourceLoader.getFullUrl(resource.file);
-      loader.withCredentials = this._resourceLoader.checkIfCredentialsRequired(
-        url
-      );
       try {
-        const gltf: THREE_ADDONS.GLTF = await loader.loadAsync(
-          url,
-          (event) => {}
-        );
-        this._loadedThreeModels.set(resource, gltf);
+        const response = await fetch(url, {
+          credentials: this._resourceLoader.checkIfCredentialsRequired(url)
+            ? 'include'
+            : 'omit',
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.arrayBuffer();
+        this._downloadedArrayBuffers.set(resource, data);
       } catch (error) {
         logger.error(
           "Can't fetch the 3D model file " + resource.file + ', error: ' + error

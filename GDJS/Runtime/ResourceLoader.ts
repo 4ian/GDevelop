@@ -96,10 +96,15 @@ namespace gdjs {
      * Resources by layout names.
      */
     private _layoutResources: Map<string, Array<string>>;
+    // TODO empty them instead of filling them.
     /**
      * Keep track of which layout whose resources has already be pre-loaded.
      */
     private _loadedLayoutNames: Set<string> = new Set<string>();
+    /**
+     * Keep track of which layout whose resources has already be loaded.
+     */
+    private _readyLayoutNames: Set<string> = new Set<string>();
     /**
      * A queue of layouts whose resources are still to be pre-loaded.
      */
@@ -207,12 +212,14 @@ namespace gdjs {
       let loadedCount = 0;
       await Promise.all(
         [...this._resources.values()].map(async (resource) => {
-          this._loadResource(resource);
+          await this._loadResource(resource);
+          await this._processResource(resource);
           loadedCount++;
           onProgress(loadedCount, this._resources.size);
         })
       );
       this._loadedLayoutNames = new Set(this._layoutResources.keys());
+      this._readyLayoutNames = new Set(this._layoutResources.keys());
     }
 
     /**
@@ -232,13 +239,20 @@ namespace gdjs {
       let loadedCount = 0;
       const resources = [...this._globalResources, ...layoutResources.values()];
       await Promise.all(
-        resources.map(async (resource) => {
-          await this.loadResource(resource);
+        resources.map(async (resourceName) => {
+          const resource = this._resources.get(resourceName);
+          if (!resource) {
+            logger.warn('Unable to find resource "' + resourceName + '".');
+            return;
+          }
+          await this._loadResource(resource);
+          await this._processResource(resource);
           loadedCount++;
           onProgress(loadedCount, resources.length);
         })
       );
       this._loadedLayoutNames.add(firstSceneName);
+      this._readyLayoutNames.add(firstSceneName);
       console.log('loadGlobalAndFirstLayoutResources done: ' + firstSceneName);
     }
 
@@ -258,8 +272,9 @@ namespace gdjs {
         }
         this.currentLayoutLoadingName = task.layoutName;
         if (!this.isLayoutAssetsLoaded(task.layoutName)) {
-          await this._doLoadLayoutResources(task.layoutName, (count, total) =>
-            task.onProgress(count, total)
+          await this._doLoadLayoutResources(
+            task.layoutName,
+            async (count, total) => task.onProgress(count, total)
           );
           // A layer may have been moved last while awaiting resources to be
           // downloaded (see _prioritizeLayout).
@@ -281,12 +296,12 @@ namespace gdjs {
      *
      * The renderer will show a loading screen while its done.
      */
-    loadLayoutResources(
+    async loadLayoutResources(
       layoutName: string,
       onProgress?: (count: number, total: number) => void
     ): Promise<void> {
       const task = this._prioritizeLayout(layoutName);
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         if (!task) {
           console.log('Already downloaded layout: ' + layoutName);
           resolve();
@@ -298,6 +313,42 @@ namespace gdjs {
           resolve();
         }, onProgress);
       });
+    }
+
+    /**
+     * Load and process a scene that is needed right away.
+     *
+     * The renderer will show a loading screen while its done.
+     */
+    async loadAndProcessLayoutResources(
+      layoutName: string,
+      onProgress?: (count: number, total: number) => Promise<void>
+    ): Promise<void> {
+      if (this._readyLayoutNames.has(layoutName)) {
+        return;
+      }
+      await this.loadLayoutResources(layoutName, onProgress);
+
+      const layoutResources = this._layoutResources.get(layoutName);
+      if (!layoutResources) {
+        logger.warn(
+          'Can\'t load resource for unknown layout: "' + layoutName + '".'
+        );
+        return;
+      }
+
+      let parsedCount = 0;
+      for (const resourceName of layoutResources) {
+        const resource = this._resources.get(resourceName);
+        if (!resource) {
+          logger.warn('Unable to find resource "' + resourceName + '".');
+          continue;
+        }
+        await this._processResource(resource);
+        parsedCount++;
+        onProgress && (await onProgress(parsedCount, layoutResources.length));
+      }
+      this._readyLayoutNames.add(layoutName);
     }
 
     /**
@@ -323,7 +374,7 @@ namespace gdjs {
 
     private async _doLoadLayoutResources(
       layoutName: string,
-      onProgress?: (count: number, total: number) => void
+      onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
       console.log('------- Scene: ' + layoutName);
       const layoutResources = this._layoutResources.get(layoutName);
@@ -340,7 +391,7 @@ namespace gdjs {
           loadedCount++;
           this.currentLayoutLoadingProgress =
             loadedCount / this._resources.size;
-          onProgress && onProgress(loadedCount, this._resources.size);
+          onProgress && (await onProgress(loadedCount, this._resources.size));
         })
       );
       this._loadedLayoutNames.add(layoutName);
@@ -357,6 +408,10 @@ namespace gdjs {
 
     isLayoutAssetsLoaded(layoutName: string): boolean {
       return this._loadedLayoutNames.has(layoutName);
+    }
+
+    areLayoutAssetsReady(layoutName: string): boolean {
+      return this._readyLayoutNames.has(layoutName);
     }
 
     /**
@@ -385,6 +440,21 @@ namespace gdjs {
       }
       console.log('Load: ' + resource.name);
       await resourceManager.loadResource(resource.name);
+    }
+
+    private async _processResource(resource: ResourceData): Promise<void> {
+      const resourceManager = this._resourceManagersMap.get(resource.kind);
+      if (!resourceManager) {
+        logger.warn(
+          'Unknown resource kind: "' +
+            resource.kind +
+            '" for: "' +
+            resource.name +
+            '".'
+        );
+        return;
+      }
+      await resourceManager.processResource(resource.name);
     }
 
     getResource(resourceName: string): ResourceData | null {

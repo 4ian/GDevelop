@@ -756,6 +756,10 @@ namespace gdjs {
       this._pausedSounds.length = 0;
     }
 
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because sounds are light enough to be parsed in background.
+    }
+
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {

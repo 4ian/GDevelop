@@ -6,6 +6,8 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Game manager');
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   /** Identify a script file, with its content hash (useful for hot-reloading). */
   export type RuntimeGameOptionsScriptFile = {
     /** The path for this script file. */
@@ -133,6 +135,7 @@ namespace gdjs {
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
+    private _accumulatedElapsedTime: float = 0;
 
     /**
      * @param data The object (usually stored in data.json) containing the full project data
@@ -609,8 +612,8 @@ namespace gdjs {
     /**
      * Check if scene assets have finished to load in background.
      */
-    isLayoutAssetsLoaded(layoutName: string): boolean {
-      return this._resourcesLoader.isLayoutAssetsLoaded(layoutName);
+    areLayoutAssetsReady(layoutName: string): boolean {
+      return this._resourcesLoader.areLayoutAssetsReady(layoutName);
     }
 
     /**
@@ -664,7 +667,7 @@ namespace gdjs {
         await this.loadAssetsWithLoadingScreen(
           /* isFirstLayout = */ false,
           async (onProgress) => {
-            await this._resourcesLoader.loadLayoutResources(
+            await this._resourcesLoader.loadAndProcessLayoutResources(
               layoutName,
               onProgress
             );
@@ -684,7 +687,7 @@ namespace gdjs {
     async loadAssetsWithLoadingScreen(
       isFirstLayout: boolean,
       loadAssets: (
-        onProgress: (count: integer, total: integer) => void
+        onProgress: (count: integer, total: integer) => Promise<void>
       ) => Promise<void>,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
@@ -696,11 +699,15 @@ namespace gdjs {
         isFirstLayout
       );
 
-      const onProgress = (count: integer, total: integer) => {
+      const onProgress = async (count: integer, total: integer) => {
         const percent = Math.floor((100 * count) / total);
         loadingScreen.setPercent(percent);
         if (progressCallback) {
           progressCallback(percent);
+        }
+        const hasRendered = loadingScreen.renderIfNeeded();
+        if (hasRendered) {
+          await sleep(1);
         }
       };
       await loadAssets(onProgress);

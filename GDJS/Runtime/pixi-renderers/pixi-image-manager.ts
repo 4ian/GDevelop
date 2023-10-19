@@ -308,6 +308,10 @@ namespace gdjs {
       await this._loadTexture(resource);
     }
 
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because images are light enough to be parsed in background.
+    }
+
     /**
      * Load the specified resources, so that textures are loaded and can then be
      * used by calling `getPIXITexture`.

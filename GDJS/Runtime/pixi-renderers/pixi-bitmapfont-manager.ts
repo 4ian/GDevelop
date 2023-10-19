@@ -244,6 +244,10 @@ namespace gdjs {
       }
     }
 
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because fonts are light enough to be parsed in background.
+    }
+
     /**
      * Load the "bitmapFont" resources of the game, so that they are ready
      * to be used when `obtainBitmapFont` is called.

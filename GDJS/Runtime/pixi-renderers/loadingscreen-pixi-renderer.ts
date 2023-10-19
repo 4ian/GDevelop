@@ -138,6 +138,22 @@ namespace gdjs {
         requestAnimationFrame(() => this._render(performance.now()));
       }
 
+      this._renderIfNeeded(timeInMs);
+    }
+
+    renderIfNeeded(): boolean {
+      return this._renderIfNeeded(performance.now());
+    }
+
+    private _renderIfNeeded(timeInMs: float): boolean {
+      if (timeInMs - this._lastFrameTimeInMs < 1000 / 60) {
+        return false;
+      }
+
+      if (!this._pixiRenderer) {
+        return false;
+      }
+
       const deltaTimeInMs = this._lastFrameTimeInMs
         ? timeInMs - this._lastFrameTimeInMs
         : 0;
@@ -227,6 +243,7 @@ namespace gdjs {
       }
 
       this._pixiRenderer.render(this._loadingScreenContainer);
+      return true;
     }
 
     unload(): Promise<void> {

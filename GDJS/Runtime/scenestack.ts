@@ -110,7 +110,7 @@ namespace gdjs {
         currentScene.onPause();
       }
 
-      if (this._runtimeGame.isLayoutAssetsLoaded(newSceneName)) {
+      if (this._runtimeGame.areLayoutAssetsReady(newSceneName)) {
         return this._loadNewLayout(newSceneName, externalLayoutName);
       }
 

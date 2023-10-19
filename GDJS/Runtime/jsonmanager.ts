@@ -84,6 +84,10 @@ namespace gdjs {
         : null;
     };
 
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because json are light enough to be parsed in background.
+    }
+
     /**
      * Request the json file from the given resource name.
      * This method is asynchronous. When loaded, the `callback` is called with the error

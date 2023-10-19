@@ -96,15 +96,14 @@ namespace gdjs {
      * Resources by layout names.
      */
     private _layoutResources: Map<string, Array<string>>;
-    // TODO empty them instead of filling them.
     /**
      * Keep track of which layout whose resources has already be pre-loaded.
      */
-    private _loadedLayoutNames: Set<string> = new Set<string>();
+    private _LayoutNamesToLoad: Set<string>;
     /**
      * Keep track of which layout whose resources has already be loaded.
      */
-    private _readyLayoutNames: Set<string> = new Set<string>();
+    private _layoutNamesToMakeReady: Set<string>;
     /**
      * A queue of layouts whose resources are still to be pre-loaded.
      */
@@ -147,7 +146,11 @@ namespace gdjs {
       this._runtimeGame = runtimeGame;
       this._resources = new Map<string, ResourceData>();
       this._globalResources = globalResources;
+
+      // These 3 attributes are filled by `setResources`.
       this._layoutResources = new Map<string, Array<string>>();
+      this._LayoutNamesToLoad = new Set<string>();
+      this._layoutNamesToMakeReady = new Set<string>();
       this.setResources(resourceDataArray, globalResources, layoutDataArray);
 
       this._imageManager = new gdjs.ImageManager(this);
@@ -188,11 +191,15 @@ namespace gdjs {
       this._globalResources = globalResources;
 
       this._layoutResources.clear();
+      this._LayoutNamesToLoad.clear();
+      this._layoutNamesToMakeReady.clear();
       for (const layoutData of layoutDataArray) {
         this._layoutResources.set(
           layoutData.name,
           layoutData.usedResources.map((resource) => resource.name)
         );
+        this._LayoutNamesToLoad.add(layoutData.name);
+        this._layoutNamesToMakeReady.add(layoutData.name);
       }
       this._layoutToLoadQueue.length = 0;
       for (let index = layoutDataArray.length - 1; index >= 0; index--) {
@@ -218,8 +225,8 @@ namespace gdjs {
           onProgress(loadedCount, this._resources.size);
         })
       );
-      this._loadedLayoutNames = new Set(this._layoutResources.keys());
-      this._readyLayoutNames = new Set(this._layoutResources.keys());
+      this._LayoutNamesToLoad.clear();
+      this._layoutNamesToMakeReady.clear();
     }
 
     /**
@@ -251,8 +258,8 @@ namespace gdjs {
           onProgress(loadedCount, resources.length);
         })
       );
-      this._loadedLayoutNames.add(firstSceneName);
-      this._readyLayoutNames.add(firstSceneName);
+      this._setLayoutAssetsLoaded(firstSceneName);
+      this._setLayoutAssetsReady(firstSceneName);
       console.log('loadGlobalAndFirstLayoutResources done: ' + firstSceneName);
     }
 
@@ -271,7 +278,7 @@ namespace gdjs {
           continue;
         }
         this.currentLayoutLoadingName = task.layoutName;
-        if (!this.isLayoutAssetsLoaded(task.layoutName)) {
+        if (!this._isLayoutAssetsLoaded(task.layoutName)) {
           await this._doLoadLayoutResources(
             task.layoutName,
             async (count, total) => task.onProgress(count, total)
@@ -324,7 +331,7 @@ namespace gdjs {
       layoutName: string,
       onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
-      if (this._readyLayoutNames.has(layoutName)) {
+      if (this.areLayoutAssetsReady(layoutName)) {
         return;
       }
       await this.loadLayoutResources(layoutName, onProgress);
@@ -348,7 +355,7 @@ namespace gdjs {
         parsedCount++;
         onProgress && (await onProgress(parsedCount, layoutResources.length));
       }
-      this._readyLayoutNames.add(layoutName);
+      this._setLayoutAssetsReady(layoutName);
     }
 
     /**
@@ -394,24 +401,32 @@ namespace gdjs {
           onProgress && (await onProgress(loadedCount, this._resources.size));
         })
       );
-      this._loadedLayoutNames.add(layoutName);
+      this._setLayoutAssetsLoaded(layoutName);
       console.log('Done: ' + layoutName);
     }
 
     getLayoutLoadingProgress(layoutName: string): float {
       return layoutName === this.currentLayoutLoadingName
         ? this.currentLayoutLoadingProgress
-        : this.isLayoutAssetsLoaded(layoutName)
+        : this._isLayoutAssetsLoaded(layoutName)
         ? 1
         : 0;
     }
 
-    isLayoutAssetsLoaded(layoutName: string): boolean {
-      return this._loadedLayoutNames.has(layoutName);
+    private _isLayoutAssetsLoaded(layoutName: string): boolean {
+      return !this._LayoutNamesToLoad.has(layoutName);
     }
 
     areLayoutAssetsReady(layoutName: string): boolean {
-      return this._readyLayoutNames.has(layoutName);
+      return !this._layoutNamesToMakeReady.has(layoutName);
+    }
+
+    private _setLayoutAssetsLoaded(layoutName: string): void {
+      this._LayoutNamesToLoad.delete(layoutName);
+    }
+
+    private _setLayoutAssetsReady(layoutName: string): void {
+      this._layoutNamesToMakeReady.delete(layoutName);
     }
 
     /**

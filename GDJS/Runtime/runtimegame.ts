@@ -707,6 +707,7 @@ namespace gdjs {
         }
         const hasRendered = loadingScreen.renderIfNeeded();
         if (hasRendered) {
+          // Give a change to draw calls from the renderer to be handled.
           await sleep(1);
         }
       };

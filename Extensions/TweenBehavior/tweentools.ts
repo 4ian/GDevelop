@@ -22,7 +22,7 @@ namespace gdjs {
         weighting: float
       ) => {
         // This local declaration is needed because otherwise the transpiled
-        // code don't know it.
+        // code doesn't know it.
         const easingFunctions = gdjs.evtTools.tween.easingFunctions;
 
         const easingFunction = easingFunctions.hasOwnProperty(easingValue)

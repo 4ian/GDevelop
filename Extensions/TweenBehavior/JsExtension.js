@@ -541,7 +541,6 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')

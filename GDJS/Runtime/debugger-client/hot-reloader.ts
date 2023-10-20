@@ -311,77 +311,79 @@ namespace gdjs {
       return Promise.all(reloadPromises);
     }
 
-    _hotReloadRuntimeGame(
+    async _hotReloadRuntimeGame(
       oldProjectData: ProjectData,
       newProjectData: ProjectData,
       changedRuntimeBehaviors: ChangedRuntimeBehavior[],
       runtimeGame: gdjs.RuntimeGame
     ): Promise<void> {
-      return new Promise((resolve) => {
-        // Update project data and re-load assets (sound/image/font/json managers
-        // will take care of reloading only what is needed).
-        runtimeGame.setProjectData(newProjectData);
-        runtimeGame.loadAllAssets(() => {
-          this._hotReloadVariablesContainer(
-            oldProjectData.variables,
-            newProjectData.variables,
-            runtimeGame.getVariables()
-          );
-
-          // Reload runtime scenes
-          const sceneStack = runtimeGame.getSceneStack();
-          sceneStack._stack.forEach((runtimeScene) => {
-            const oldLayoutData = oldProjectData.layouts.filter(
-              (layoutData) => layoutData.name === runtimeScene.getName()
-            )[0];
-            const newLayoutData = newProjectData.layouts.filter(
-              (layoutData) => layoutData.name === runtimeScene.getName()
-            )[0];
-            if (oldLayoutData && newLayoutData) {
-              this._hotReloadRuntimeScene(
-                oldLayoutData,
-                newLayoutData,
-                changedRuntimeBehaviors,
-                runtimeScene
-              );
-            } else {
-              // A scene was removed. Not hot-reloading this.
-              this._logs.push({
-                kind: 'error',
-                message:
-                  'Scene ' +
-                  oldLayoutData.name +
-                  ' was removed. A fresh preview should be launched.',
-              });
-            }
-          });
-
-          // Reload changes in external layouts
-          newProjectData.externalLayouts.forEach((newExternalLayoutData) => {
-            const oldExternalLayoutData = oldProjectData.externalLayouts.filter(
-              (externalLayoutData) =>
-                externalLayoutData.name === newExternalLayoutData.name
-            )[0];
-            if (
-              oldExternalLayoutData &&
-              // Check if there are actual changes, to avoid useless work trying to
-              // hot-reload all the scenes.
-              !HotReloader.deepEqual(
-                oldExternalLayoutData,
-                newExternalLayoutData
-              )
-            ) {
-              sceneStack._stack.forEach((runtimeScene) => {
-                this._hotReloadRuntimeSceneInstances(
-                  oldExternalLayoutData.instances,
-                  newExternalLayoutData.instances,
-                  runtimeScene
-                );
-              });
-            }
-          });
-          resolve();
+      const sceneStack = runtimeGame.getSceneStack();
+      const currentScene = sceneStack.getCurrentScene();
+      if (!currentScene) {
+        // It can't actually happen.
+        this._logs.push({
+          kind: 'error',
+          message: "Can't hot-reload as no scene are opened.",
         });
+        return;
+      }
+      // Update project data and re-load assets (sound/image/font/json managers
+      // will take care of reloading only what is needed).
+      runtimeGame.setProjectData(newProjectData);
+      await runtimeGame.loadFirstAssets(currentScene.getName(), () => {});
+      this._hotReloadVariablesContainer(
+        oldProjectData.variables,
+        newProjectData.variables,
+        runtimeGame.getVariables()
+      );
+
+      // Reload runtime scenes
+      sceneStack._stack.forEach((runtimeScene) => {
+        const oldLayoutData = oldProjectData.layouts.filter(
+          (layoutData) => layoutData.name === runtimeScene.getName()
+        )[0];
+        const newLayoutData = newProjectData.layouts.filter(
+          (layoutData) => layoutData.name === runtimeScene.getName()
+        )[0];
+        if (oldLayoutData && newLayoutData) {
+          this._hotReloadRuntimeScene(
+            oldLayoutData,
+            newLayoutData,
+            changedRuntimeBehaviors,
+            runtimeScene
+          );
+        } else {
+          // A scene was removed. Not hot-reloading this.
+          this._logs.push({
+            kind: 'error',
+            message:
+              'Scene ' +
+              oldLayoutData.name +
+              ' was removed. A fresh preview should be launched.',
+          });
+        }
+      });
+
+      // Reload changes in external layouts
+      newProjectData.externalLayouts.forEach((newExternalLayoutData) => {
+        const oldExternalLayoutData = oldProjectData.externalLayouts.filter(
+          (externalLayoutData) =>
+            externalLayoutData.name === newExternalLayoutData.name
+        )[0];
+        if (
+          oldExternalLayoutData &&
+          // Check if there are actual changes, to avoid useless work trying to
+          // hot-reload all the scenes.
+          !HotReloader.deepEqual(oldExternalLayoutData, newExternalLayoutData)
+        ) {
+          sceneStack._stack.forEach((runtimeScene) => {
+            this._hotReloadRuntimeSceneInstances(
+              oldExternalLayoutData.instances,
+              newExternalLayoutData.instances,
+              runtimeScene
+            );
+          });
+        }
       });
     }
 

@@ -280,7 +280,7 @@ namespace gdjs {
           continue;
         }
         this.currentLayoutLoadingName = task.layoutName;
-        if (!this._isLayoutAssetsLoaded(task.layoutName)) {
+        if (!this.isLayoutAssetsLoaded(task.layoutName)) {
           await this._doLoadLayoutResources(
             task.layoutName,
             async (count, total) => task.onProgress(count, total)
@@ -385,7 +385,7 @@ namespace gdjs {
 
     /**
      * Load a layout resources without parsing them.
-     * 
+     *
      * When another layout resources are loading in background, it waits for
      * all its resources to be loaded before loading resources of the given
      * layout.
@@ -448,12 +448,16 @@ namespace gdjs {
     getLayoutLoadingProgress(layoutName: string): float {
       return layoutName === this.currentLayoutLoadingName
         ? this.currentLayoutLoadingProgress
-        : this._isLayoutAssetsLoaded(layoutName)
+        : this.isLayoutAssetsLoaded(layoutName)
         ? 1
         : 0;
     }
 
-    private _isLayoutAssetsLoaded(layoutName: string): boolean {
+    /**
+     * @returns true when all the resources of the given layout are loaded
+     * (but maybe not parsed).
+     */
+    isLayoutAssetsLoaded(layoutName: string): boolean {
       return !this._LayoutNamesToLoad.has(layoutName);
     }
 

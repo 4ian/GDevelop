@@ -6,7 +6,8 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Game manager');
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const sleep = (ms: float) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
   /** Identify a script file, with its content hash (useful for hot-reloading). */
   export type RuntimeGameOptionsScriptFile = {
@@ -610,26 +611,43 @@ namespace gdjs {
     }
 
     /**
-     * Check if scene assets have finished to load in background.
+     * @returns true when all the resources of the given layout are loaded
+     * (but maybe not parsed).
+     */
+    isLayoutAssetsLoaded(layoutName: string): boolean {
+      return this._resourcesLoader.isLayoutAssetsLoaded(layoutName);
+    }
+
+    /**
+     * @returns true when all the resources of the given layout are loaded and
+     * parsed.
      */
     areLayoutAssetsReady(layoutName: string): boolean {
       return this._resourcesLoader.areLayoutAssetsReady(layoutName);
     }
 
     /**
-     * Load all assets, displaying progress in renderer.
+     * Load all assets needed to display the 1st layout, displaying progress in
+     * renderer.
      */
     loadAllAssets(
       callback: () => void,
       progressCallback?: (progress: float) => void
     ) {
-      this.loadFirstAssetsAsync(progressCallback).then(callback);
+      this.loadFirstAssets(this.getFirstSceneName(), progressCallback).then(
+        callback
+      );
     }
 
     /**
-     * Load all assets, displaying progress in renderer.
+     * Load all assets needed to display the 1st layout, displaying progress in
+     * renderer.
+     *
+     * When a game is hot-reload, this method can be called with the current
+     * layer.
      */
-    async loadFirstAssetsAsync(
+    async loadFirstAssets(
+      firstSceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       await this.loadAssetsWithLoadingScreen(
@@ -639,7 +657,6 @@ namespace gdjs {
           if (false) {
             await this._resourcesLoader.loadAllResources(onProgress);
           } else {
-            const firstSceneName = this.getFirstSceneName();
             await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
               firstSceneName,
               onProgress
@@ -650,13 +667,14 @@ namespace gdjs {
         },
         progressCallback
       );
+      // TODO This is probably not necessary in case of hot reload.
       await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
     }
 
     /**
-     * Load all assets, displaying progress in renderer.
+     * Load all assets for a given layout, displaying progress in renderer.
      */
-    async loadLayoutAssetsAsync(
+    async loadLayoutAssets(
       layoutName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {

@@ -117,7 +117,7 @@ namespace gdjs {
       console.log('Wait downloading to load layout: ' + newSceneName);
       this._nextLayout = newSceneName;
       this._isNextLayoutLoading = true;
-      this._runtimeGame.loadLayoutAssetsAsync(newSceneName).then(() => {
+      this._runtimeGame.loadLayoutAssets(newSceneName).then(() => {
         console.log('Next layout assets are loaded: ' + newSceneName);
         this._isNextLayoutLoading = false;
       });

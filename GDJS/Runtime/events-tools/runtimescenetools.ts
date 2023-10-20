@@ -354,7 +354,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         sceneName: string
       ): boolean => {
-        return runtimeScene.getGame().areLayoutAssetsReady(sceneName);
+        return runtimeScene.getGame().isLayoutAssetsLoaded(sceneName);
       };
     }
   }

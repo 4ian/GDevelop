@@ -1553,8 +1553,7 @@ namespace gdjs {
   gdjs.registerBehavior('Tween::TweenBehavior', gdjs.TweenRuntimeBehavior);
 
   export namespace TweenRuntimeBehavior {
-    const easingFunctions: Record<string, gdjs.evtTools.tween.EasingFunction> =
-      gdjs.evtTools.tween.easingFunctions;
+    const easingFunctions = gdjs.evtTools.tween.easingFunctions;
 
     /**
      * A tween manager that is used for layout tweens or object tweens.

@@ -539,7 +539,7 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
@@ -558,7 +558,7 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')

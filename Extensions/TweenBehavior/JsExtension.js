@@ -1213,7 +1213,7 @@ module.exports = {
         'AddObjectScaleTween2',
         _('Tween object scale'),
         _(
-          'Tweens an object scale from its current scale to a new one (note: the scale can never be less than 0).'
+          'Tweens an object scale from its current scale to a new one (note: the scale can never be 0 or less).'
         ),
         _(
           'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ seconds as _PARAM2_'

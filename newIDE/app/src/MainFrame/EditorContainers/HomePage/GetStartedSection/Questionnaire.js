@@ -1,46 +1,31 @@
 // @flow
 import { t } from '@lingui/macro';
-import Learning from '../../../../UI/CustomSvgIcons/Learning';
-import Teaching from '../../../../UI/CustomSvgIcons/Teaching';
-import LearningOrTeaching from '../../../../UI/CustomSvgIcons/LearningOrTeaching';
-import BuildingVideoGameOrApp from '../../../../UI/CustomSvgIcons/BuildingVideoGameOrApp';
-import ThroughATeacher from '../../../../UI/CustomSvgIcons/ThroughATeacher';
-import OnMyOwn from '../../../../UI/CustomSvgIcons/OnMyOwn';
-import GameToPublish from '../../../../UI/CustomSvgIcons/GameToPublish';
-import InteractiveServiceForClients from '../../../../UI/CustomSvgIcons/InteractiveServiceForClients';
-import SeriousGame from '../../../../UI/CustomSvgIcons/SeriousGame';
-import Other from '../../../../UI/CustomSvgIcons/Other';
-import VideoGame from '../../../../UI/CustomSvgIcons/VideoGame';
-import InteractiveContent from '../../../../UI/CustomSvgIcons/InteractiveContent';
-import AppOrTool from '../../../../UI/CustomSvgIcons/AppOrTool';
-import LackOfGraphics from '../../../../UI/CustomSvgIcons/LackOfGraphics';
-import LackOfMusic from '../../../../UI/CustomSvgIcons/LackOfMusic';
-import LackOfMarketing from '../../../../UI/CustomSvgIcons/LackOfMarketing';
-import InAppPurchase from '../../../../UI/CustomSvgIcons/InAppPurchase';
-import DealingWithExternalTools from '../../../../UI/CustomSvgIcons/DealingWithExternalTools';
-import DelayLessThanAMonth from '../../../../UI/CustomSvgIcons/DelayLessThanAMonth';
-import Delay1To2Months from '../../../../UI/CustomSvgIcons/Delay1To2Months';
-import Delay3To5Months from '../../../../UI/CustomSvgIcons/Delay3To5Months';
-import DelayMoreThan6Months from '../../../../UI/CustomSvgIcons/DelayMoreThan6Months';
-import DelayAroundAYear from '../../../../UI/CustomSvgIcons/DelayAroundAYear';
-import DelayNoSpecificDeadline from '../../../../UI/CustomSvgIcons/DelayNoSpecificDeadline';
-import WorkingAlone from '../../../../UI/CustomSvgIcons/WorkingAlone';
-import WorkingWithAnotherPerson from '../../../../UI/CustomSvgIcons/WorkingWithAnotherPerson';
-import WorkingInACompany from '../../../../UI/CustomSvgIcons/WorkingInACompany';
-import NoCodingExperience from '../../../../UI/CustomSvgIcons/NoCodingExperience';
-import NoCodeExperience from '../../../../UI/CustomSvgIcons/NoCodeExperience';
-import CodingExperience from '../../../../UI/CustomSvgIcons/CodingExperience';
-import TargetSteam from '../../../../UI/CustomSvgIcons/TargetSteam';
-import TargetItch from '../../../../UI/CustomSvgIcons/TargetItch';
-import TargetPoki from '../../../../UI/CustomSvgIcons/TargetPoki';
-import TargetPlayStore from '../../../../UI/CustomSvgIcons/TargetPlayStore';
-import TargetAppStore from '../../../../UI/CustomSvgIcons/TargetAppStore';
-import TargetClient from '../../../../UI/CustomSvgIcons/TargetClient';
-import TargetPersonal from '../../../../UI/CustomSvgIcons/TargetPersonal';
-import TargetConsole from '../../../../UI/CustomSvgIcons/TargetConsole';
+import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 
-const questionnaire = {
-  creationGoal: {
+export const firstQuestion = 'creationGoal';
+
+export type AnswerData = {|
+  answer: MessageDescriptor,
+  code: string,
+  nextQuestion?: string,
+  imageSource: string,
+|};
+
+export type QuestionData = {|
+  question: MessageDescriptor,
+  nextQuestion?: string,
+  getNextQuestion?: any => string,
+  showOther?: boolean,
+  multi?: boolean,
+  answers: Array<AnswerData>,
+|};
+
+export type Questionnaire = {|
+  [questionId: string]: QuestionData,
+|};
+
+const questionnaire: Questionnaire = {
+  [firstQuestion]: {
     question: t`What is your goal with GDevelop?`,
     // TODO: Add coding experience question if Other was chosen.
     showOther: true,
@@ -49,13 +34,13 @@ const questionnaire = {
         answer: t`I'm learning or teaching game development`,
         code: 'learningOrTeaching',
         nextQuestion: 'teachOrStudy',
-        Image: LearningOrTeaching,
+        imageSource: 'res/questionnaire/learning-or-teaching.svg',
       },
       {
         answer: t`I'm building a video game or app`,
         code: 'building',
         nextQuestion: 'buildingKindOfProjects',
-        Image: BuildingVideoGameOrApp,
+        imageSource: 'res/questionnaire/building-video-game-or-app.svg',
       },
     ],
   },
@@ -66,13 +51,13 @@ const questionnaire = {
         answer: t`I am teaching game development`,
         code: 'teaching',
         nextQuestion: 'gameDevelopmentExperience',
-        Image: Teaching,
+        imageSource: 'res/questionnaire/learning.svg',
       },
       {
         answer: t`I am learning game development`,
         code: 'learning',
         nextQuestion: 'learnHow',
-        Image: Learning,
+        imageSource: 'res/questionnaire/teaching.svg',
       },
     ],
   },
@@ -82,13 +67,13 @@ const questionnaire = {
       {
         answer: t`Through a teacher`,
         code: 'withTeacher',
-        Image: ThroughATeacher,
+        imageSource: 'res/questionnaire/through-a-teacher.svg',
       },
       {
         answer: t`On my own`,
         code: 'alone',
         nextQuestion: 'learningKindOfProjects',
-        Image: OnMyOwn,
+        imageSource: 'res/questionnaire/on-my-own.svg',
       },
     ],
   },
@@ -99,24 +84,24 @@ const questionnaire = {
         answer: t`A game to publish`,
         code: 'gameToPublish',
         nextQuestion: 'gameDevelopmentExperience',
-        Image: GameToPublish,
+        imageSource: 'res/questionnaire/game-to-publish.svg',
       },
       {
         answer: t`New interactive services for existent clients`,
         code: 'interactiveService',
         nextQuestion: 'gameDevelopmentExperience',
-        Image: InteractiveServiceForClients,
+        imageSource: 'res/questionnaire/interactive-services-for-clients.svg',
       },
       {
         answer: t`Games to learn or teach something`,
         code: 'seriousGame',
-        Image: SeriousGame,
+        imageSource: 'res/questionnaire/serious-game.svg',
       },
       {
         answer: t`Other`,
         code: 'other',
         nextQuestion: 'gameDevelopmentExperience',
-        Image: Other,
+        imageSource: 'res/questionnaire/other.svg',
       },
     ],
   },
@@ -124,17 +109,25 @@ const questionnaire = {
     question: t`What kind of projects do you want to build with GDevelop?`,
     nextQuestion: 'workingTeam',
     answers: [
-      { answer: t`Video game`, code: 'videoGame', Image: VideoGame },
+      {
+        answer: t`Video game`,
+        code: 'videoGame',
+        imageSource: 'res/questionnaire/video-game.svg',
+      },
       {
         answer: t`Interactive content`,
         code: 'interactiveContent',
-        Image: InteractiveContent,
+        imageSource: 'res/questionnaire/interactive-content.svg',
       },
-      { answer: t`App or tool`, code: 'appOrTool', Image: AppOrTool },
+      {
+        answer: t`App or tool`,
+        code: 'appOrTool',
+        imageSource: 'res/questionnaire/app-or-tool.svg',
+      },
       {
         answer: t`Game for teaching or learning`,
         code: 'seriousGame',
-        Image: SeriousGame,
+        imageSource: 'res/questionnaire/serious-game.svg',
       },
     ],
   },
@@ -142,16 +135,20 @@ const questionnaire = {
     question: t`How are you working on your projects?`,
     nextQuestion: 'painPoints',
     answers: [
-      { answer: t`Completely alone`, code: 'alone', Image: WorkingAlone },
+      {
+        answer: t`Completely alone`,
+        code: 'alone',
+        imageSource: 'res/questionnaire/completely-alone.svg',
+      },
       {
         answer: t`With at least one other person`,
         code: 'onePlus',
-        Image: WorkingWithAnotherPerson,
+        imageSource: 'res/questionnaire/with-at-least-one-other-person.svg',
       },
       {
         answer: t`With an established team of people during the whole project`,
         code: 'team',
-        Image: WorkingInACompany,
+        imageSource: 'res/questionnaire/with-a-team.svg',
       },
     ],
   },
@@ -164,27 +161,27 @@ const questionnaire = {
       {
         answer: t`Lack of Graphics & Animation`,
         code: 'lackGraphics',
-        Image: LackOfGraphics,
+        imageSource: 'res/questionnaire/lack-of-graphics.svg',
       },
       {
         answer: t`Lack of Music & Sound`,
         code: 'lackSound',
-        Image: LackOfMusic,
+        imageSource: 'res/questionnaire/lack-of-sounds.svg',
       },
       {
         answer: t`Lack of Marketing & Publicity`,
         code: 'lackMarketing',
-        Image: LackOfMarketing,
+        imageSource: 'res/questionnaire/lack-of-marketing.svg',
       },
       {
         answer: t`Implementing in-project monetization`,
         code: 'inAppPurchases',
-        Image: InAppPurchase,
+        imageSource: 'res/questionnaire/in-app-monetization.svg',
       },
       {
         answer: t` Dealing with data integration from external sources`,
         code: 'externalIntegration',
-        Image: DealingWithExternalTools,
+        imageSource: 'res/questionnaire/integration-of-external-services.svg',
       },
     ],
   },
@@ -195,28 +192,32 @@ const questionnaire = {
       {
         answer: t`Less than a month`,
         code: '1MonthOrLess',
-        Image: DelayLessThanAMonth,
+        imageSource: 'res/questionnaire/delay-less-than-1-month.svg',
       },
       {
         answer: t`Around 1 or 2 months`,
         code: '1To2Months',
-        Image: Delay1To2Months,
+        imageSource: 'res/questionnaire/delay-1-to-2-months.svg',
       },
       {
         answer: t`Around 3 to 5 months`,
         code: '3To5Months',
-        Image: Delay3To5Months,
+        imageSource: 'res/questionnaire/delay-3-to-5-months.svg',
       },
       {
         answer: t`More than 6 months`,
         code: '6MonthsPlus',
-        Image: DelayMoreThan6Months,
+        imageSource: 'res/questionnaire/delay-6-months-plus.svg',
       },
-      { answer: t`In around a year`, code: '1Year', Image: DelayAroundAYear },
+      {
+        answer: t`In around a year`,
+        code: '1Year',
+        imageSource: 'res/questionnaire/delay-1-year.svg',
+      },
       {
         answer: t`I don’t have a specific deadline`,
-        code: 'Undecided',
-        Image: DelayNoSpecificDeadline,
+        code: 'NoDeadline',
+        imageSource: 'res/questionnaire/delay-no-deadline.svg',
       },
     ],
   },
@@ -228,17 +229,17 @@ const questionnaire = {
       {
         answer: t`No experience at all`,
         code: 'none',
-        Image: NoCodingExperience,
+        imageSource: 'res/questionnaire/zero-coding-experience.svg',
       },
       {
         answer: t`Some no-code experience`,
         code: 'someNoCode',
-        Image: NoCodeExperience,
+        imageSource: 'res/questionnaire/no-code-experience.svg',
       },
       {
         answer: t`Some code experience`,
         code: 'someCode',
-        Image: CodingExperience,
+        imageSource: 'res/questionnaire/coding-experience.svg',
       },
     ],
   },
@@ -249,32 +250,48 @@ const questionnaire = {
       {
         answer: t`On Steam and/or Epic Games`,
         code: 'Steam',
-        Image: TargetSteam,
+        imageSource: 'res/questionnaire/target-steam.svg',
       },
-      { answer: t`On Itch and/or Newgrounds`, code: 'Itch', Image: TargetItch },
-      { answer: t`On Poki and/or CrazyGames`, code: 'Poki', Image: TargetPoki },
+      {
+        answer: t`On Itch and/or Newgrounds`,
+        code: 'Itch',
+        imageSource: 'res/questionnaire/target-itch.svg',
+      },
+      {
+        answer: t`On Poki and/or CrazyGames`,
+        code: 'Poki',
+        imageSource: 'res/questionnaire/target-poki.svg',
+      },
       {
         answer: t`Android mobile devices (Google Play, Amazon)`,
         code: 'PlayStore',
-        Image: TargetPlayStore,
+        imageSource: 'res/questionnaire/target-play-store.svg',
       },
       {
         answer: t`Apple mobile devices (App Store)`,
         code: 'AppStore',
-        Image: TargetAppStore,
+        imageSource: 'res/questionnaire/target-app-store.svg',
       },
       {
         answer: t`Sharing the final file with the client`,
         code: 'Export',
-        Image: TargetClient,
+        imageSource: 'res/questionnaire/target-client.svg',
       },
       {
         answer: t`Personal or company website`,
         code: 'Personal',
-        Image: TargetPersonal,
+        imageSource: 'res/questionnaire/target-personal.svg',
       },
-      { answer: t`Consoles`, code: 'Console', Image: TargetConsole },
-      { answer: t`Other`, code: 'Other', Image: Other },
+      {
+        answer: t`Consoles`,
+        code: 'Console',
+        imageSource: 'res/questionnaire/target-console.svg',
+      },
+      {
+        answer: t`Other`,
+        code: 'Other',
+        imageSource: 'res/questionnaire/other.svg',
+      },
     ],
   },
 };

@@ -650,25 +650,31 @@ namespace gdjs {
       firstSceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
-      await this.loadAssetsWithLoadingScreen(
-        /* isFirstLayout = */ true,
-        async (onProgress) => {
-          // TODO Is a setting needed?
-          if (false) {
-            await this._resourcesLoader.loadAllResources(onProgress);
-          } else {
-            await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
-              firstSceneName,
-              onProgress
-            );
-            // Don't await as it must not block the first layout from starting.
-            this._resourcesLoader.loadAllLayoutInBackground();
-          }
-        },
-        progressCallback
-      );
-      // TODO This is probably not necessary in case of hot reload.
-      await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+      try {
+        await this.loadAssetsWithLoadingScreen(
+          /* isFirstLayout = */ true,
+          async (onProgress) => {
+            // TODO Is a setting needed?
+            if (false) {
+              await this._resourcesLoader.loadAllResources(onProgress);
+            } else {
+              await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
+                firstSceneName,
+                onProgress
+              );
+              // Don't await as it must not block the first layout from starting.
+              this._resourcesLoader.loadAllLayoutInBackground();
+            }
+          },
+          progressCallback
+        );
+        // TODO This is probably not necessary in case of hot reload.
+        await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+      } catch (e) {
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+
+        throw e;
+      }
     }
 
     /**
@@ -678,25 +684,16 @@ namespace gdjs {
       layoutName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
-      try {
-        if (false) {
-          return;
-        }
-        await this.loadAssetsWithLoadingScreen(
-          /* isFirstLayout = */ false,
-          async (onProgress) => {
-            await this._resourcesLoader.loadAndProcessLayoutResources(
-              layoutName,
-              onProgress
-            );
-          },
-          progressCallback
-        );
-      } catch (e) {
-        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
-
-        throw e;
-      }
+      await this.loadAssetsWithLoadingScreen(
+        /* isFirstLayout = */ false,
+        async (onProgress) => {
+          await this._resourcesLoader.loadAndProcessLayoutResources(
+            layoutName,
+            onProgress
+          );
+        },
+        progressCallback
+      );
     }
 
     /**

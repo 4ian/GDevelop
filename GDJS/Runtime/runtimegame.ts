@@ -136,7 +136,6 @@ namespace gdjs {
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
-    private _accumulatedElapsedTime: float = 0;
 
     /**
      * @param data The object (usually stored in data.json) containing the full project data

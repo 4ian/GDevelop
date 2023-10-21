@@ -222,7 +222,7 @@ describe('gdjs.SceneStack', () => {
 
     // The test do not await because test test will unblock
     // `loadFirstAssetsAsync` with `markPendingResourcesAsLoaded`.
-    runtimeGame.loadFirstAssets();
+    runtimeGame.loadFirstAssets('Scene 1');
     expect(
       mockedResourceManager.isResourceDownloadPending(
         'fake-heavy-resource1.png'
@@ -319,7 +319,7 @@ describe('gdjs.SceneStack', () => {
 
     // The test do not await because test test will unblock
     // `loadFirstAssetsAsync` with `markPendingResourcesAsLoaded`.
-    runtimeGame.loadFirstAssets();
+    runtimeGame.loadFirstAssets('Scene 1');
     expect(
       mockedResourceManager.isResourceDownloadPending(
         'fake-heavy-resource1.png'
@@ -425,7 +425,7 @@ describe('gdjs.SceneStack', () => {
 
     // The test do not await because test test will unblock
     // `loadFirstAssetsAsync` with `markPendingResourcesAsLoaded`.
-    runtimeGame.loadFirstAssets();
+    runtimeGame.loadFirstAssets('Scene 1');
     expect(
       mockedResourceManager.isResourceDownloadPending(
         'fake-heavy-resource1.png'

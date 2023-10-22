@@ -111,19 +111,19 @@ AdvancedExtension::AdvancedExtension() {
           const gd::String& objectNameString = codeGenerator.ConvertToStringExplicit(objectName);
           const gd::String& objectList = codeGenerator.GetObjectListName(objectName, context);
           objectsPickingCode += 
-            "{"
-            "const lists = eventsFunctionContext.getObjectsLists("+objectNameString+");"
+            "{\n"
+            "const lists = eventsFunctionContext.getObjectsLists(" + objectNameString + ");\n"
             // Clear picked objects list...
-            "for (const listName in lists.items) lists.items[listName].length = 0;"
+            "for (const listName in lists.items) lists.items[listName].length = 0;\n"
             // ...and pick one by one each objects that need to be picked.
-            "for(const o of "+objectList+") lists.get(o.getName()).push(o);"
-            "}";
+            "for (const o of " + objectList + ") lists.get(o.getName()).push(o);\n"
+            "}\n";
         }
 
-        return "if (typeof eventsFunctionContext !== 'undefined') {"
-               "  eventsFunctionContext.returnValue = true;"
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "  eventsFunctionContext.returnValue = true;\n"
                + objectsPickingCode +
-               "}";
+               "}\n";
       });
 
   GetAllConditions()["GetArgumentAsBoolean"]

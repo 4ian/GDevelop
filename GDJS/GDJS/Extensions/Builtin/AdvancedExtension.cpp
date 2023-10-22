@@ -106,8 +106,8 @@ AdvancedExtension::AdvancedExtension() {
                                  gd::EventsCodeGenerationContext& context) {
         gd::String objectsPickingCode;
 
-        for (const auto& objectName : codeGenerator.ExpandObjectsName(
-                 instruction.GetParameter(0).GetPlainString(), context)) {
+        for (const auto& objectName : codeGenerator.GetObjectsContainersList().ExpandObjectName(
+                 instruction.GetParameter(0).GetPlainString(), context.GetCurrentObject())) {
           const gd::String& objectNameString = codeGenerator.ConvertToStringExplicit(objectName);
           const gd::String& objectList = codeGenerator.GetObjectListName(objectName, context);
           objectsPickingCode += 

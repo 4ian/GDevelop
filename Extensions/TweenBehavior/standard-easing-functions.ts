@@ -18,6 +18,29 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace tween {
+      /**
+       * Tween between 2 values according to an easing function.
+       * @param fromValue Start value
+       * @param toValue End value
+       * @param easingValue Type of easing
+       * @param weighting from 0 to 1
+       */
+      export const ease = (
+        easingValue: string,
+        fromValue: float,
+        toValue: float,
+        weighting: float
+      ) => {
+        // This local declaration is needed because otherwise the transpiled
+        // code doesn't know it.
+        const easingFunctions = gdjs.evtTools.tween.easingFunctions;
+
+        const easingFunction = easingFunctions.hasOwnProperty(easingValue)
+          ? easingFunctions[easingValue]
+          : easingFunctions.linear;
+        return fromValue + (toValue - fromValue) * easingFunction(weighting);
+      };
+
       export type EasingFunction = (progress: float) => float;
 
       export const easingFunctions: Record<string, EasingFunction> = {

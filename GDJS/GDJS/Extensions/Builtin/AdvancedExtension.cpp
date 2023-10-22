@@ -110,14 +110,9 @@ AdvancedExtension::AdvancedExtension() {
                  instruction.GetParameter(0).GetPlainString(), context.GetCurrentObject())) {
           const gd::String& objectNameString = codeGenerator.ConvertToStringExplicit(objectName);
           const gd::String& objectList = codeGenerator.GetObjectListName(objectName, context);
-          objectsPickingCode += 
-            "{\n"
-            "const lists = eventsFunctionContext.getObjectsLists(" + objectNameString + ");\n"
-            // Clear picked objects list...
-            "for (const listName in lists.items) lists.items[listName].length = 0;\n"
-            // ...and pick one by one each objects that need to be picked.
-            "for (const o of " + objectList + ") lists.get(o.getName()).push(o);\n"
-            "}\n";
+          objectsPickingCode += "gdjs.evtTools.object.pickObjects("
+                                "eventsFunctionContext.getObjectsLists(" +
+                                objectNameString + "), " + objectList + ");\n";
         }
 
         return "if (typeof eventsFunctionContext !== 'undefined') {\n"

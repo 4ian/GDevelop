@@ -218,6 +218,32 @@ namespace gdjs {
         arr.length = finalSize;
       };
 
+      /**
+       * Pick the objects from a given `Array`.
+       * @param objectsLists the picking list to filter
+       * @param objects the objects to pick
+       */
+      export const pickObjects = (objectsLists: ObjectsLists, objects: gdjs.RuntimeObject[]) => {
+        // Clear the `pick` flag on every objects.
+        for (const objectsName in objectsLists.items) {
+          if (objectsLists.items.hasOwnProperty(objectsName)) {
+            for (const object of objectsLists.items[objectsName]) {
+              object.pick = false;
+            }
+          }
+        }
+        // Mark objects that need to be picked.
+        for (const object of objects) {
+          object.pick = true;
+        }
+        // Trim not picked objects from lists.
+        for (const objectsName in objectsLists.items) {
+          if (objectsLists.items.hasOwnProperty(objectsName)) {
+            gdjs.evtTools.object.filterPickedObjectsList(objectsLists.items[objectsName]);
+          }
+        }
+      }
+
       export const hitBoxesCollisionTest = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,

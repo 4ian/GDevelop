@@ -59,7 +59,20 @@ const PersonalizationFlow = (props: Props) => {
         } else {
           const newUserAnswers = [...userAnswers];
           newUserAnswers[existingUserAnswerIndex].answers = [answer];
+          const doesAnswerChangesFollowingQuestion = !questionData.nextQuestion;
+          if (doesAnswerChangesFollowingQuestion) {
+            newUserAnswers.splice(
+              existingUserAnswerIndex + 1,
+              userAnswers.length - existingUserAnswerIndex
+            );
+          }
           setUserAnswers(newUserAnswers);
+          if (doesAnswerChangesFollowingQuestion) {
+            const answerData = questionData.answers.find(
+              answerData => answerData.code === answer
+            );
+            goToNextQuestion(questionData, answerData);
+          }
         }
       } else {
         setUserAnswers([...userAnswers, { stepName: step, answers: [answer] }]);

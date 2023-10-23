@@ -108,6 +108,7 @@ const questionnaire: Questionnaire = {
   buildingKindOfProjects: {
     text: t`What kind of projects do you want to build with GDevelop?`,
     nextQuestion: 'workingTeam',
+    multi: true,
     answers: [
       {
         text: t`Video game`,

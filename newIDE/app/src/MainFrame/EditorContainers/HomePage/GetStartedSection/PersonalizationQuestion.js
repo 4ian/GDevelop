@@ -55,10 +55,24 @@ const Answer = ({
           }}
           alt={`Illustration for option ${i18n._(text)}`}
         />
-        <Line justifyContent="center">
-          {showCheckbox ? <InlineCheckbox checked={selected} /> : null}
-          <Column justifyContent="center">
-            <Text noMargin>{i18n._(text)}</Text>
+        <Line justifyContent={showCheckbox ? 'flex-start' : 'center'}>
+          {showCheckbox ? (
+            <div style={{ position: 'relative' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 5,
+                  top: 'calc(50% - 9px)',
+                }}
+              >
+                <InlineCheckbox checked={selected} paddingSize="small" />
+              </div>
+            </div>
+          ) : null}
+          <Column justifyContent="center" alignItems="center" expand>
+            <div style={{ marginLeft: 25, marginRight: 25 }}>
+              <Text noMargin>{i18n._(text)}</Text>
+            </div>
           </Column>
         </Line>
       </Paper>

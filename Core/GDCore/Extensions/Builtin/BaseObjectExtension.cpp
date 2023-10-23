@@ -1624,7 +1624,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Cast a ray from _PARAM1_;_PARAM2_, angle: _PARAM3_ and max "
             "distance: _PARAM4_px, against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
-          "",
+          _("Collision"),
           "res/conditions/raycast24.png",
           "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))
@@ -1655,7 +1655,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Cast a ray from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
             "against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
-          "",
+          _("Collision"),
           "res/conditions/raycast24.png",
           "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))

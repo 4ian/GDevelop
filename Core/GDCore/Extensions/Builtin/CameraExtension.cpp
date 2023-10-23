@@ -327,7 +327,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
 
-  // TODO Deprecated: hide this action in a future release.
   extension
       .AddAction(
           "FixCamera",
@@ -339,6 +338,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/actions/camera24.png",
           "res/actions/camera.png")
+      .SetHidden()
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectPtr", _("Object"))
       .AddParameter("expression",
@@ -386,7 +386,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  _("Center the camera on an object"),
                  _("Center the camera on the specified object."),
                  _("Center camera on _PARAM1_ (layer: _PARAM3_)"),
-                 "",
+                 _("Layers and cameras"),
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")

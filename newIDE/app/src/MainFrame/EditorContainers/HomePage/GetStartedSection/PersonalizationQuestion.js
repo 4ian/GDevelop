@@ -8,7 +8,7 @@ import { type AnswerData, type QuestionData } from './Questionnaire';
 import { Column, Line } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Paper from '../../../../UI/Paper';
-import { ButtonBase, Grid } from '@material-ui/core';
+import { ButtonBase, GridList, GridListTile } from '@material-ui/core';
 import InlineCheckbox from '../../../../UI/InlineCheckbox';
 import { t } from '@lingui/macro';
 import { LineStackLayout } from '../../../../UI/Layout';
@@ -31,35 +31,38 @@ const Answer = ({
 }: AnswerProps) => {
   const { imageSource, text, code } = answerData;
   return (
-    <Grid item>
-      <ButtonBase
-        style={{
-          border: `1px solid ${selected ? 'white' : 'grey'}`,
-          borderRadius: 10,
-          width: '100%',
-          display: 'flex',
-        }}
-        onClick={() => onSelect(code)}
+    <ButtonBase
+      style={{
+        border: `1px solid ${selected ? 'white' : 'grey'}`,
+        borderRadius: 10,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+      }}
+      onClick={() => onSelect(code)}
+    >
+      <Paper
+        square={false}
+        background="light"
+        style={{ width: '100%', height: '100%' }}
       >
-        <Paper square={false} background="light" style={{ width: '100%' }}>
-          <img
-            src={imageSource}
-            style={{
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
-              width: '100%',
-            }}
-            alt={`Illustration for option ${i18n._(text)}`}
-          />
-          <Line justifyContent="center">
-            {showCheckbox ? <InlineCheckbox checked={selected} /> : null}
-            <Column justifyContent="center">
-              <Text noMargin>{i18n._(text)}</Text>
-            </Column>
-          </Line>
-        </Paper>
-      </ButtonBase>
-    </Grid>
+        <img
+          src={imageSource}
+          style={{
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
+            width: '100%',
+          }}
+          alt={`Illustration for option ${i18n._(text)}`}
+        />
+        <Line justifyContent="center">
+          {showCheckbox ? <InlineCheckbox checked={selected} /> : null}
+          <Column justifyContent="center">
+            <Text noMargin>{i18n._(text)}</Text>
+          </Column>
+        </Line>
+      </Paper>
+    </ButtonBase>
   );
 };
 
@@ -88,18 +91,20 @@ const PersonalizationQuestion = ({
           {multi ? (
             <Text>{i18n._(t`You can select more than one.`)}</Text>
           ) : null}
-          <Grid container spacing={3}>
+          <GridList cols={3} spacing={15} cellHeight="auto">
             {answers.map(answerData => (
-              <Answer
-                answerData={answerData}
-                i18n={i18n}
-                key={answerData.code}
-                onSelect={onSelectAnswer}
-                selected={selectedAnswers.includes(answerData.code)}
-                showCheckbox={!!multi}
-              />
+              <GridListTile>
+                <Answer
+                  answerData={answerData}
+                  i18n={i18n}
+                  key={answerData.code}
+                  onSelect={onSelectAnswer}
+                  selected={selectedAnswers.includes(answerData.code)}
+                  showCheckbox={!!multi}
+                />
+              </GridListTile>
             ))}
-          </Grid>
+          </GridList>
           {showNextButton && (
             <LineStackLayout justifyContent="flex-end">
               <RaisedButton

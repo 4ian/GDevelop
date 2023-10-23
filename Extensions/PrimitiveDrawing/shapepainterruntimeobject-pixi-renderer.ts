@@ -154,7 +154,7 @@ namespace gdjs {
         y1, 
         x2-x1,
         y2-y1,
-        chamfer ? chamfer : 1
+        chamfer
       );
       this._graphics.closePath();
       this._graphics.endFill();

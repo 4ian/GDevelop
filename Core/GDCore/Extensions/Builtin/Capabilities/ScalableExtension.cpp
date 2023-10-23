@@ -46,7 +46,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
          _("Scale"),
          _("the scale of the object (default scale is 1)"),
          _("the scale"),
-         _("Scale"),
+         _("Size"),
          "res/actions/scale24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")
@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
          _("Scale on X axis"),
          _("the scale on X axis of the object (default scale is 1)"),
          _("the scale on X axis"),
-         _("Scale"),
+         _("Size"),
          "res/actions/scaleWidth24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")
@@ -80,7 +80,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
          _("Scale on Y axis"),
          _("the scale on Y axis of the object (default scale is 1)"),
          _("the scale on Y axis"),
-         _("Scale"),
+         _("Size"),
          "res/actions/scaleHeight24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")

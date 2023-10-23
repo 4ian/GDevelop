@@ -28,9 +28,16 @@ const PersonalizationFlow = (props: Props) => {
         setStep(questionData.nextQuestion);
         return;
       }
+      if (questionData.getNextQuestion) {
+        const nextStep = questionData.getNextQuestion(userAnswers);
+        if (nextStep) {
+          setStep(nextStep);
+          return;
+        }
+      }
       setStep('over');
     },
-    []
+    [userAnswers]
   );
 
   const onSelectAnswer = React.useCallback(

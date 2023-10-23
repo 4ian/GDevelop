@@ -14,7 +14,7 @@ export type AnswerData = {|
 export type QuestionData = {|
   text: MessageDescriptor,
   nextQuestion?: string,
-  getNextQuestion?: any => string,
+  getNextQuestion?: any => string | null,
   showOther?: boolean,
   multi?: boolean,
   answers: Array<AnswerData>,
@@ -224,8 +224,17 @@ const questionnaire: Questionnaire = {
   },
   gameDevelopmentExperience: {
     text: t`What kind of projects do you want to build with GDevelop?`,
-    // TODO: Add logic to either return nothing (end of path) or return 'targetPlatform'
-    getNextQuestion: (results: any) => 'targetPlatform',
+    getNextQuestion: (
+      userAnswers: Array<{| stepName: string, answers: string[] |}>
+    ) =>
+      userAnswers.some(
+        answer =>
+          answer.stepName === 'targetDate' ||
+          (answer.stepName === 'learningKindOfProjects' &&
+            answer.answers.includes('interactiveService'))
+      )
+        ? 'targetPlatform'
+        : null,
     answers: [
       {
         text: t`No experience at all`,

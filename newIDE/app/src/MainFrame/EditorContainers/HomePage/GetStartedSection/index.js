@@ -29,6 +29,7 @@ import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { UsernameField } from '../../../../Profile/UsernameField';
 import { type UsernameAvailability } from '../../../../Utils/GDevelopServices/User';
 import Checkbox from '../../../../UI/Checkbox';
+import PersonalizationFlow from './PersonalizationFlow';
 
 const styles = {
   icon: {
@@ -48,15 +49,27 @@ const styles = {
   },
 };
 
-const steps = [
-  'goal',
-  'details',
-  'experience',
-  'a',
-  'b',
-  'c',
-  //...
-];
+// const NavigationStep = () => {
+//   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+//   return (
+//     <Line justifyContent="center">
+//       {steps.map((step, index) => {
+//         return (
+//           <div
+//             key={index}
+//             style={{
+//               ...styles.navigationDot,
+//               backgroundColor:
+//                 index === stepIndex
+//                   ? gdevelopTheme.text.color.primary
+//                   : gdevelopTheme.text.color.disabled,
+//             }}
+//           />
+//         );
+//       })}
+//     </Line>
+//   );
+// };
 
 type Props = {||};
 
@@ -86,8 +99,6 @@ const GetStartedSection = ({  }: Props) => {
   const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
     false
   );
-
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const isLoading = loginState === 'loggingIn';
 
@@ -231,22 +242,6 @@ const GetStartedSection = ({  }: Props) => {
                   fullWidth
                 />
               </LineStackLayout>
-              <Line justifyContent="center">
-                {steps.map((step, index) => {
-                  return (
-                    <div
-                      key={index}
-                      style={{
-                        ...styles.navigationDot,
-                        backgroundColor:
-                          index === stepIndex
-                            ? gdevelopTheme.text.color.primary
-                            : gdevelopTheme.text.color.disabled,
-                      }}
-                    />
-                  );
-                })}
-              </Line>
             </Column>
           </div>
         </ColumnStackLayout>
@@ -356,22 +351,6 @@ const GetStartedSection = ({  }: Props) => {
                   fullWidth
                 />
               </LineStackLayout>
-              <Line justifyContent="center">
-                {steps.map((step, index) => {
-                  return (
-                    <div
-                      key={index}
-                      style={{
-                        ...styles.navigationDot,
-                        backgroundColor:
-                          index === stepIndex
-                            ? gdevelopTheme.text.color.primary
-                            : gdevelopTheme.text.color.disabled,
-                      }}
-                    />
-                  );
-                })}
-              </Line>
             </Column>
           </div>
         </ColumnStackLayout>
@@ -426,7 +405,14 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  return null;
+  return (
+    <SectionContainer
+      title={null} // Let the content handle the title.
+      flexBody
+    >
+      <PersonalizationFlow />
+    </SectionContainer>
+  );
 };
 
 const GetStartedSectionWithErrorBoundary = (props: Props) => (

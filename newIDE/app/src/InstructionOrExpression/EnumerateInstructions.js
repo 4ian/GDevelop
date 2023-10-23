@@ -72,7 +72,7 @@ const freeInstructionsToRemove = {
  * @returns `true` if the instruction in shown as an object instruction.
  */
 export const isObjectInstruction = (
-  platform: gdPlatformExtension,
+  platform: gdPlatform,
   instruction: gdInstruction,
   isCondition: boolean
 ) => {

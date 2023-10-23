@@ -68,6 +68,44 @@ const freeInstructionsToRemove = {
   ],
 };
 
+/**
+ * @returns `true` if the instruction in shown as an object instruction.
+ */
+export const isObjectInstruction = (
+  platform: gdPlatformExtension,
+  instruction: gdInstruction,
+  isCondition: boolean
+) => {
+  const instructionType: string = instruction.getType();
+  const extensionAndInstructionMetadata = isCondition
+    ? gd.MetadataProvider.getExtensionAndConditionMetadata(
+        platform,
+        instructionType
+      )
+    : gd.MetadataProvider.getExtensionAndActionMetadata(
+        platform,
+        instructionType
+      );
+  const extension = extensionAndInstructionMetadata.getExtension();
+  const instructionMetadata = extensionAndInstructionMetadata.getMetadata();
+  for (const extensionName in freeInstructionsToRemove) {
+    if (extensionName !== extension.getName()) {
+      continue;
+    }
+    for (const instructionToRemoveName of freeInstructionsToRemove[
+      extensionName
+    ]) {
+      if (instructionType === instructionToRemoveName) {
+        return true;
+      }
+    }
+  }
+  return (
+    instructionMetadata.getParametersCount() >= 1 &&
+    gd.ParameterMetadata.isObject(instructionMetadata.getParameter(0).getType())
+  );
+};
+
 export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
   return extension.getCategory() + GROUP_DELIMITER + extension.getFullName();
 };

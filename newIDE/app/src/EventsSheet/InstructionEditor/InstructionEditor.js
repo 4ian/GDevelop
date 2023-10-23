@@ -2,7 +2,7 @@
 import * as React from 'react';
 import {
   enumerateObjectAndBehaviorsInstructions,
-  enumerateAllInstructions,
+  isObjectInstruction,
   getObjectParameterIndex,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
@@ -139,12 +139,22 @@ export const useInstructionEditor = ({
             project.getCurrentPlatform(),
             instructionType
           );
-      const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
-      if (objectParameterIndex !== -1) {
-        return getChosenObjectState(
-          instruction.getParameter(objectParameterIndex).getPlainString(),
-          false /* Even if the instruction is invalid for the object, show it as it's what we have already */
+      if (
+        isObjectInstruction(
+          project.getCurrentPlatform(),
+          instruction,
+          isCondition
+        )
+      ) {
+        const objectParameterIndex = getObjectParameterIndex(
+          instructionMetadata
         );
+        if (objectParameterIndex !== -1) {
+          return getChosenObjectState(
+            instruction.getParameter(objectParameterIndex).getPlainString(),
+            false /* Even if the instruction is invalid for the object, show it as it's what we have already */
+          );
+        }
       }
     }
 

@@ -9,7 +9,7 @@ import { Column, Line } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Paper from '../../../../UI/Paper';
 import { ButtonBase, Grid } from '@material-ui/core';
-import Checkbox from '../../../../UI/Checkbox';
+import InlineCheckbox from '../../../../UI/InlineCheckbox';
 import { t } from '@lingui/macro';
 import { LineStackLayout } from '../../../../UI/Layout';
 import RaisedButton from '../../../../UI/RaisedButton';
@@ -52,9 +52,9 @@ const Answer = ({
             alt={`Illustration for option ${i18n._(text)}`}
           />
           <Line justifyContent="center">
-            {showCheckbox ? <Checkbox checked={selected} /> : null}
+            {showCheckbox ? <InlineCheckbox checked={selected} /> : null}
             <Column justifyContent="center">
-              <Text>{i18n._(text)}</Text>
+              <Text noMargin>{i18n._(text)}</Text>
             </Column>
           </Line>
         </Paper>

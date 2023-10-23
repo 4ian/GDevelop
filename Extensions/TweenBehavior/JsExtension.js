@@ -96,7 +96,6 @@ module.exports = {
       .setParameterLongDescription(_('From 0 to 1.'))
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.ease');
 
     // Deprecated

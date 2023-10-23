@@ -87,14 +87,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ClosePath"]
         .SetFunctionName("closePath");
 
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Ellipse"]
-        .SetFunctionName("drawEllipse");
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RoundedRectangle"]
-        .SetFunctionName("drawRoundedRectangle");
-    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
-        .SetFunctionName("drawStar");
+
     // These actions are not exposed yet as the way they work is unsure. See
     // https://github.com/4ian/GDevelop/pull/1256
     /*GetAllActionsForObject(

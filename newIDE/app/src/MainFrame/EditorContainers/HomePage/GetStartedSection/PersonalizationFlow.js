@@ -37,7 +37,6 @@ const PersonalizationFlow = (props: Props) => {
     (step: string, answer: string) => {
       const questionData = questionnaire[step];
       const { multi } = questionData;
-      console.log(questionData);
       const existingUserAnswerIndex = userAnswers.findIndex(
         userAnswer => userAnswer.stepName === step
       );
@@ -86,10 +85,6 @@ const PersonalizationFlow = (props: Props) => {
     },
     [userAnswers, goToNextQuestion]
   );
-
-  userAnswers.forEach(answer => {
-    console.log(answer.stepName, answer.answers);
-  });
 
   const questionsToRender: React.Node[] = userAnswers.map(
     (userAnswer, index) => {

@@ -408,6 +408,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .SetHidden()
       .MarkAsSimple();
 
+  // Deprecated
   obj.AddCondition("ScaleWidth",
                    _("Scale on X axis"),
                    _("Compare the scale of the width of an object."),
@@ -415,7 +416,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Size"),
                    "res/conditions/scaleWidth24_black.png",
                    "res/conditions/scaleWidth_black.png")
-
+      .SetHidden()
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters(
           "number",
@@ -423,6 +424,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddCondition("ScaleHeight",
                    _("Scale on Y axis"),
                    _("Compare the scale of the height of an object."),
@@ -430,7 +432,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Size"),
                    "res/conditions/scaleHeight24_black.png",
                    "res/conditions/scaleHeight_black.png")
-
+      .SetHidden()
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters(
           "number",

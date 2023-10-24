@@ -158,7 +158,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   // All the instructions, to be used when searching, so that the search is done
   // across all the instructions (including object and behaviors instructions).
   allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllInstructions(this.props.isCondition),
+    enumerateAllInstructions(this.props.isCondition, this.props.i18n),
     this.props.scope
   );
 

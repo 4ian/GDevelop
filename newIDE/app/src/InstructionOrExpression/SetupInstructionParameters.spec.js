@@ -1,7 +1,5 @@
 // @flow
 import {
-  enumerateAllInstructions,
-  getObjectParameterIndex,
   enumerateObjectAndBehaviorsInstructions,
   enumerateFreeInstructions,
 } from './EnumerateInstructions';
@@ -16,7 +14,11 @@ describe('setupInstructionParameters', () => {
     layout.insertNewObject(project, 'Sprite', objectName, 0);
 
     // Simulate that we select an instruction
-    const enumeratedInstructions = enumerateFreeInstructions(false);
+    const enumeratedInstructions = enumerateFreeInstructions(
+      false,
+      // $FlowFixMe
+      null
+    );
     const playMusicInstruction = enumeratedInstructions.find(
       enumeratedInstruction => enumeratedInstruction.type === 'PlayMusic'
     );
@@ -54,7 +56,9 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      // $FlowFixMe
+      null
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -101,7 +105,9 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      // $FlowFixMe
+      null
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -152,7 +158,9 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      // $FlowFixMe
+      null
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -201,7 +209,9 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      // $FlowFixMe
+      null
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -253,7 +263,9 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      // $FlowFixMe
+      null
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>

@@ -10,8 +10,14 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     const layout = new gd.Layout();
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateAllInstructions(false),
-      { project, layout }
+      enumerateAllInstructions(
+        false,
+        // $FlowFixMe
+        null
+      ),
+      { project, layout },
+      // $FlowFixMe
+      null
     );
 
     expect(instructions.length).toBeGreaterThan(0);
@@ -35,12 +41,18 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     const eventsFunction = new gd.EventsFunction();
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateAllInstructions(false),
+      enumerateAllInstructions(
+        false,
+        // $FlowFixMe
+        null
+      ),
       {
         project,
         eventsFunctionsExtension,
         eventsFunction,
-      }
+      },
+      // $FlowFixMe
+      null
     );
 
     expect(instructions.length).toBeGreaterThan(0);

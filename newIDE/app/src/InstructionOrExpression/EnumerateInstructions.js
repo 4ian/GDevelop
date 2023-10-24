@@ -5,6 +5,7 @@ import {
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories.js';
+import { translateInstructionGroup } from '../Utils/Extension/InstructionGroups';
 
 const gd: libGDevelop = global.gd;
 
@@ -115,7 +116,8 @@ const enumerateExtraBehaviorInstructions = (
   extension: gdPlatformExtension,
   behaviorType: string,
   prefix: string,
-  scope: InstructionOrExpressionScope
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   const instructions = isCondition
     ? extension.getAllConditions()
@@ -134,7 +136,7 @@ const enumerateExtraBehaviorInstructions = (
       isBehaviorInstruction(instrMetadata, behaviorType)
     ) {
       allInstructions.push(
-        enumerateInstruction(prefix, type, instrMetadata, scope)
+        enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
       );
     }
   }
@@ -145,7 +147,8 @@ const enumerateExtraObjectInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
   objectType: string,
-  scope: InstructionOrExpressionScope
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   const instructions = isCondition
     ? extension.getAllConditions()
@@ -164,7 +167,7 @@ const enumerateExtraObjectInstructions = (
       isObjectInstruction(instrMetadata, objectType)
     ) {
       allInstructions.push(
-        enumerateInstruction('', type, instrMetadata, scope)
+        enumerateInstruction('', type, instrMetadata, scope, i18n)
       );
     }
   }
@@ -175,7 +178,8 @@ const enumerateFreeInstructionsWithoutExtra = (
   isCondition: boolean,
   extension: gdPlatformExtension,
   prefix: string,
-  scope: InstructionOrExpressionScope
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   const instructions = isCondition
     ? extension.getAllConditions()
@@ -209,6 +213,7 @@ const enumerateFreeInstructionsWithoutExtra = (
           type,
           instrMetadata,
           scope,
+          i18n,
           /* ignoresGroups */ isWhiteListed
         )
       );
@@ -222,10 +227,11 @@ const enumerateInstruction = (
   type: string,
   instrMetadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
+  i18n: I18nType,
   ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
-  const groupName = instrMetadata.getGroup();
+  const groupName = translateInstructionGroup(instrMetadata.getGroup(), i18n);
   const iconFilename = instrMetadata.getIconFilename();
   const fullGroupName = ignoresGroups
     ? prefix
@@ -249,7 +255,8 @@ const enumerateInstruction = (
 const enumerateExtensionInstructions = (
   prefix: string,
   instructions: gdMapStringInstructionMetadata,
-  scope: InstructionOrExpressionScope
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
@@ -262,7 +269,7 @@ const enumerateExtensionInstructions = (
     if (instrMetadata.isHidden()) continue;
 
     allInstructions.push(
-      enumerateInstruction(prefix, type, instrMetadata, scope)
+      enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
     );
   }
 
@@ -273,7 +280,8 @@ const enumerateExtensionInstructions = (
  * List all the instructions available.
  */
 export const enumerateAllInstructions = (
-  isCondition: boolean
+  isCondition: boolean,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   let allInstructions = [];
 
@@ -294,7 +302,8 @@ export const enumerateAllInstructions = (
         extension,
         objectMetadata: undefined,
         behaviorMetadata: undefined,
-      }
+      },
+      i18n
     );
     allInstructions = [...allInstructions, ...extensionFreeInstructions];
 
@@ -310,7 +319,8 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
-          scope
+          scope,
+          i18n
         ),
       ];
     }
@@ -328,7 +338,8 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          scope
+          scope,
+          i18n
         ),
       ];
     }
@@ -359,7 +370,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
   isCondition: boolean,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  objectName: string
+  objectName: string,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   let allInstructions: Array<EnumeratedInstructionMetadata> = [];
 
@@ -405,7 +417,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
       isCondition
         ? extension.getAllConditionsForObject(objectType)
         : extension.getAllActionsForObject(objectType),
-      scope
+      scope,
+      i18n
     ),
   ];
 
@@ -422,7 +435,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition,
         extension,
         objectType,
-        scope
+        scope,
+        i18n
       ),
     ];
   }
@@ -443,13 +457,15 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition
           ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
           : baseObjectExtension.getAllActionsForObject(baseObjectType),
-        scope
+        scope,
+        i18n
       ),
       ...enumerateExtraObjectInstructions(
         isCondition,
         baseObjectExtension,
         baseObjectType,
-        scope
+        scope,
+        i18n
       ),
     ];
   }
@@ -479,7 +495,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
             extension,
             behaviorType,
             prefix,
-            scope
+            scope,
+            i18n
           )
         );
       }
@@ -491,7 +508,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          scope
+          scope,
+          i18n
         ),
         ...freeBehaviorInstructions,
         ...allInstructions,
@@ -517,9 +535,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
  * to an object.
  */
 export const enumerateFreeInstructions = (
-  isCondition: boolean
+  isCondition: boolean,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  return doEnumerateFreeInstructions(isCondition, getExtensionPrefix);
+  return doEnumerateFreeInstructions(isCondition, getExtensionPrefix, i18n);
 };
 
 /**
@@ -530,8 +549,10 @@ export const enumerateFreeInstructionsWithTranslatedCategories = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  return doEnumerateFreeInstructions(isCondition, extension =>
-    getExtensionTranslatedPrefix(extension, i18n)
+  return doEnumerateFreeInstructions(
+    isCondition,
+    extension => getExtensionTranslatedPrefix(extension, i18n),
+    i18n
   );
 };
 
@@ -541,7 +562,8 @@ export const enumerateFreeInstructionsWithTranslatedCategories = (
  */
 const doEnumerateFreeInstructions = (
   isCondition: boolean,
-  getExtensionPrefix: (extension: gdPlatformExtension) => string
+  getExtensionPrefix: (extension: gdPlatformExtension) => string,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   let allFreeInstructions = [];
 
@@ -554,11 +576,17 @@ const doEnumerateFreeInstructions = (
 
     allFreeInstructions.push.apply(
       allFreeInstructions,
-      enumerateFreeInstructionsWithoutExtra(isCondition, extension, prefix, {
+      enumerateFreeInstructionsWithoutExtra(
+        isCondition,
         extension,
-        objectMetadata: undefined,
-        behaviorMetadata: undefined,
-      })
+        prefix,
+        {
+          extension,
+          objectMetadata: undefined,
+          behaviorMetadata: undefined,
+        },
+        i18n
+      )
     );
   }
   return allFreeInstructions;

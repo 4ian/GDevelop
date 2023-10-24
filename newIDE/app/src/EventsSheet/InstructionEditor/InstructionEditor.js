@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import {
   enumerateObjectAndBehaviorsInstructions,
   getObjectParameterIndex,
@@ -46,6 +47,7 @@ type Parameters = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  i18n: I18nType,
 |};
 
 type InstructionEditorState = {|
@@ -85,6 +87,7 @@ export const useInstructionEditor = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
+  i18n,
 }: Parameters): [InstructionEditorState, InstructionEditorSetters] => {
   const getChosenObjectState = (
     objectName: string,
@@ -95,7 +98,8 @@ export const useInstructionEditor = ({
         isCondition,
         globalObjectsContainer,
         objectsContainer,
-        objectName
+        objectName,
+        i18n
       ),
       scope
     );

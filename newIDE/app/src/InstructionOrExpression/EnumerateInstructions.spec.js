@@ -10,7 +10,11 @@ const gd: libGDevelop = global.gd;
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
-    const instructions = enumerateAllInstructions(true);
+    const instructions = enumerateAllInstructions(
+      true,
+      // $FlowFixMe
+      null
+    );
 
     // Test for the proper presence of a few conditions
     expect(
@@ -58,7 +62,11 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can enumerate instructions being actions', () => {
-    const instructions = enumerateAllInstructions(false);
+    const instructions = enumerateAllInstructions(
+      false,
+      // $FlowFixMe
+      null
+    );
 
     // Test for the proper presence of a few actions
     expect(instructions).toEqual(
@@ -78,7 +86,11 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can create the tree of instructions', () => {
-    const instructions = enumerateAllInstructions(true);
+    const instructions = enumerateAllInstructions(
+      true,
+      // $FlowFixMe
+      null
+    );
     const tree = createTree(instructions);
     expect(tree).toHaveProperty('Advanced');
     expect(tree).toHaveProperty('Audio');
@@ -105,8 +117,16 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can find the object parameter, if any', () => {
-    const actions = enumerateAllInstructions(false);
-    const conditions = enumerateAllInstructions(true);
+    const actions = enumerateAllInstructions(
+      false,
+      // $FlowFixMe
+      null
+    );
+    const conditions = enumerateAllInstructions(
+      true,
+      // $FlowFixMe
+      null
+    );
 
     const createInstruction = actions.filter(
       ({ type }) => type === 'Create'
@@ -147,7 +167,9 @@ describe('EnumerateInstructions', () => {
       true,
       project,
       layout,
-      'MySpriteObject'
+      'MySpriteObject',
+      // $FlowFixMe
+      null
     );
     expect(spriteInstructions).toEqual(
       expect.arrayContaining([

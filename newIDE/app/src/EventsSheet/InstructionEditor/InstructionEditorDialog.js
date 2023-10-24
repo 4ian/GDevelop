@@ -67,6 +67,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  i18n: I18nType,
   anchorEl?: any, // Unused
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
@@ -102,6 +103,7 @@ const InstructionEditorDialog = ({
   onSubmit,
   resourceManagementProps,
   openInstructionOrExpression,
+  i18n,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -115,6 +117,7 @@ const InstructionEditorDialog = ({
     scope,
     globalObjectsContainer,
     objectsContainer,
+    i18n,
   });
   const {
     chosenObjectName,

@@ -2214,22 +2214,32 @@ storiesOf('InstructionSelector', module)
   .addDecorator(muiDecorator)
   .add('conditions (no scope)', () => (
     <FixedHeightFlexContainer height={400}>
-      <InstructionSelector
-        selectedType=""
-        onChoose={action('Instruction chosen')}
-        isCondition
-        scope={{ project: testProject.project }}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <InstructionSelector
+            i18n={i18n}
+            selectedType=""
+            onChoose={action('Instruction chosen')}
+            isCondition
+            scope={{ project: testProject.project }}
+          />
+        )}
+      </I18n>
     </FixedHeightFlexContainer>
   ))
   .add('actions (no scope)', () => (
     <FixedHeightFlexContainer height={400}>
-      <InstructionSelector
-        selectedType=""
-        onChoose={action('Instruction chosen')}
-        isCondition={false}
-        scope={{ project: testProject.project }}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <InstructionSelector
+            i18n={i18n}
+            selectedType=""
+            onChoose={action('Instruction chosen')}
+            isCondition={false}
+            scope={{ project: testProject.project }}
+          />
+        )}
+      </I18n>
     </FixedHeightFlexContainer>
   ));
 
@@ -2307,40 +2317,53 @@ storiesOf('InstructionEditorDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('Existing condition (scope: in a layout)', () => (
-    <InstructionEditorDialog
-      open
-      project={testProject.project}
-      scope={{ project: testProject.project, layout: testProject.testLayout }}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
-      isCondition
-      isNewInstruction={false}
-      instruction={testProject.testInstruction}
-      resourceManagementProps={fakeResourceManagementProps}
-      openInstructionOrExpression={action('open instruction or expression')}
-      onCancel={action('cancel')}
-      onSubmit={action('submit')}
-      canPasteInstructions={true}
-      onPasteInstructions={action('paste instructions')}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <InstructionEditorDialog
+          i18n={i18n}
+          open
+          project={testProject.project}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          isCondition
+          isNewInstruction={false}
+          instruction={testProject.testInstruction}
+          resourceManagementProps={fakeResourceManagementProps}
+          openInstructionOrExpression={action('open instruction or expression')}
+          onCancel={action('cancel')}
+          onSubmit={action('submit')}
+          canPasteInstructions={true}
+          onPasteInstructions={action('paste instructions')}
+        />
+      )}
+    </I18n>
   ))
   .add('Existing condition (scope: without layout)', () => (
-    <InstructionEditorDialog
-      open
-      project={testProject.project}
-      scope={{ project: testProject.project, layout: null }}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
-      isCondition
-      isNewInstruction={false}
-      instruction={testProject.testInstruction}
-      resourceManagementProps={fakeResourceManagementProps}
-      openInstructionOrExpression={action('open instruction or expression')}
-      onCancel={action('cancel')}
-      onSubmit={action('submit')}
-      canPasteInstructions={true}
-      onPasteInstructions={action('paste instructions')}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <InstructionEditorDialog
+          i18n={i18n}
+          open
+          project={testProject.project}
+          scope={{ project: testProject.project, layout: null }}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          isCondition
+          isNewInstruction={false}
+          instruction={testProject.testInstruction}
+          resourceManagementProps={fakeResourceManagementProps}
+          openInstructionOrExpression={action('open instruction or expression')}
+          onCancel={action('cancel')}
+          onSubmit={action('submit')}
+          canPasteInstructions={true}
+          onPasteInstructions={action('paste instructions')}
+        />
+      )}
+    </I18n>
   ))
   .add('New condition (scope: without layout)', () => (
     <Column>
@@ -2350,22 +2373,29 @@ storiesOf('InstructionEditorDialog', module)
         instructions can be created either by selecting an object first or by
         searching for it).
       </Text>
-      <InstructionEditorDialog
-        open
-        project={testProject.project}
-        scope={{ project: testProject.project, layout: null }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
-        isCondition
-        isNewInstruction={true}
-        instruction={testProject.testInstruction}
-        resourceManagementProps={fakeResourceManagementProps}
-        openInstructionOrExpression={action('open instruction or expression')}
-        onCancel={action('cancel')}
-        onSubmit={action('submit')}
-        canPasteInstructions={true}
-        onPasteInstructions={action('paste instructions')}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <InstructionEditorDialog
+            i18n={i18n}
+            open
+            project={testProject.project}
+            scope={{ project: testProject.project, layout: null }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            isCondition
+            isNewInstruction={true}
+            instruction={testProject.testInstruction}
+            resourceManagementProps={fakeResourceManagementProps}
+            openInstructionOrExpression={action(
+              'open instruction or expression'
+            )}
+            onCancel={action('cancel')}
+            onSubmit={action('submit')}
+            canPasteInstructions={true}
+            onPasteInstructions={action('paste instructions')}
+          />
+        )}
+      </I18n>
     </Column>
   ));
 
@@ -2382,28 +2412,33 @@ storiesOf('InstructionEditorMenu', module)
       </Text>
       <PopoverButton>
         {({ buttonElement, onClose }) => (
-          <InstructionEditorMenu
-            open
-            project={testProject.project}
-            scope={{
-              project: testProject.project,
-              layout: testProject.testLayout,
-            }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            isCondition
-            isNewInstruction={false}
-            instruction={testProject.testInstruction}
-            resourceManagementProps={fakeResourceManagementProps}
-            openInstructionOrExpression={action(
-              'open instruction or expression'
+          <I18n>
+            {({ i18n }) => (
+              <InstructionEditorMenu
+                i18n={i18n}
+                open
+                project={testProject.project}
+                scope={{
+                  project: testProject.project,
+                  layout: testProject.testLayout,
+                }}
+                globalObjectsContainer={testProject.project}
+                objectsContainer={testProject.testLayout}
+                isCondition
+                isNewInstruction={false}
+                instruction={testProject.testInstruction}
+                resourceManagementProps={fakeResourceManagementProps}
+                openInstructionOrExpression={action(
+                  'open instruction or expression'
+                )}
+                onCancel={onClose}
+                onSubmit={onClose}
+                anchorEl={buttonElement}
+                canPasteInstructions={true}
+                onPasteInstructions={action('paste instructions')}
+              />
             )}
-            onCancel={onClose}
-            onSubmit={onClose}
-            anchorEl={buttonElement}
-            canPasteInstructions={true}
-            onPasteInstructions={action('paste instructions')}
-          />
+          </I18n>
         )}
       </PopoverButton>
     </Column>

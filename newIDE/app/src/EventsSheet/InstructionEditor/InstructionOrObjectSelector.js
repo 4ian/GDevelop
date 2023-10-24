@@ -13,7 +13,6 @@ import {
 } from '../../InstructionOrExpression/CreateTree';
 import {
   enumerateAllInstructions,
-  deduplicateInstructionsList,
   enumerateFreeInstructionsWithTranslatedCategories,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
@@ -182,7 +181,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     ];
 
     this.instructionSearchApi = new Fuse(
-      deduplicateInstructionsList(this.allInstructionsInfo),
+      this.allInstructionsInfo,
       {
         ...sharedFuseConfiguration,
         keys: [

@@ -118,28 +118,6 @@ const getExtensionTranslatedPrefix = (
   );
 };
 
-/**
- * When all instructions are searched, some can be duplicated
- * (on purpose, so that it's easier to find them for users)
- * in both the object instructions and in the free instructions.
- *
- * This removes the duplication, useful for showing results in a list.
- */
-export const deduplicateInstructionsList = (
-  list: Array<EnumeratedInstructionMetadata>
-): Array<EnumeratedInstructionMetadata> => {
-  let createFound = false;
-  return list.filter(enumerateInstruction => {
-    if (enumerateInstruction.type === 'Create') {
-      if (createFound) return false;
-
-      createFound = true;
-    }
-
-    return true;
-  });
-};
-
 const filterInstructionsToRemove = (
   list: Array<EnumeratedInstructionMetadata>,
   typesToRemove: ?$ReadOnlyArray<string>

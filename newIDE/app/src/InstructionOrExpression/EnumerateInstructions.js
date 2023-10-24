@@ -201,11 +201,8 @@ const enumerateFreeInstructionsWithoutExtra = (
         (!isObjectInstruction(instrMetadata) &&
           !isBehaviorInstruction(instrMetadata)))
     ) {
-      const shortenPrefix = prefix.endsWith(instrMetadata.getGroup())
-        ? prefix.substring(0, prefix.length - instrMetadata.getGroup().length)
-        : prefix;
       allInstructions.push(
-        enumerateInstruction(shortenPrefix, type, instrMetadata, scope)
+        enumerateInstruction(prefix, type, instrMetadata, scope, true)
       );
     }
   }
@@ -216,14 +213,15 @@ const enumerateInstruction = (
   prefix: string,
   type: string,
   instrMetadata: gdInstructionMetadata,
-  scope: InstructionOrExpressionScope
+  scope: InstructionOrExpressionScope,
+  ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
   const groupName = instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
-  const fullGroupName = [prefix, groupName]
-    .filter(Boolean)
-    .join(GROUP_DELIMITER);
+  const fullGroupName = ignoresGroups
+    ? prefix
+    : [prefix, groupName].filter(Boolean).join(GROUP_DELIMITER);
 
   return {
     type,

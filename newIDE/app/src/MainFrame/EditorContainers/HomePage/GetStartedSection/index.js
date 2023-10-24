@@ -41,35 +41,7 @@ const styles = {
     width: '100%',
     maxWidth: 300, // Make buttons larger but not too much.
   },
-  navigationDot: {
-    height: 8,
-    width: 8,
-    borderRadius: '50%',
-    margin: 5,
-  },
 };
-
-// const NavigationStep = () => {
-//   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-//   return (
-//     <Line justifyContent="center">
-//       {steps.map((step, index) => {
-//         return (
-//           <div
-//             key={index}
-//             style={{
-//               ...styles.navigationDot,
-//               backgroundColor:
-//                 index === stepIndex
-//                   ? gdevelopTheme.text.color.primary
-//                   : gdevelopTheme.text.color.disabled,
-//             }}
-//           />
-//         );
-//       })}
-//     </Line>
-//   );
-// };
 
 type Props = {||};
 

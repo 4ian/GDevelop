@@ -4,23 +4,21 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import { darken, lighten, useTheme } from '@material-ui/core/styles';
 
 import { type AnswerData, type QuestionData } from './Questionnaire';
 import { Column, Line } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Paper from '../../../../UI/Paper';
 import InlineCheckbox from '../../../../UI/InlineCheckbox';
-import { LineStackLayout } from '../../../../UI/Layout';
 import RaisedButton from '../../../../UI/RaisedButton';
 import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-
-import ButtonBase from '@material-ui/core/ButtonBase';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import { darken, lighten, useTheme } from '@material-ui/core/styles';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -116,6 +114,7 @@ type Props = {|
   selectedAnswers: string[],
   showNextButton?: boolean,
   onClickNext: () => void,
+  showQuestionText: boolean,
 |};
 
 const PersonalizationQuestion = ({
@@ -124,6 +123,7 @@ const PersonalizationQuestion = ({
   selectedAnswers,
   showNextButton,
   onClickNext,
+  showQuestionText,
 }: Props) => {
   const { text, answers, multi } = questionData;
   const windowWidth = useResponsiveWindowWidth();
@@ -132,9 +132,13 @@ const PersonalizationQuestion = ({
     <I18n>
       {({ i18n }) => (
         <Column>
-          <Text size="block-title">{i18n._(text)}</Text>
-          {multi ? (
-            <Text>{i18n._(t`You can select more than one.`)}</Text>
+          {showQuestionText ? (
+            <>
+              <Text size="block-title">{i18n._(text)}</Text>
+              {multi ? (
+                <Text>{i18n._(t`You can select more than one.`)}</Text>
+              ) : null}
+            </>
           ) : null}
           <GridList
             cols={getColumnsFromWidth(windowWidth)}
@@ -155,14 +159,14 @@ const PersonalizationQuestion = ({
             ))}
           </GridList>
           {showNextButton && (
-            <LineStackLayout justifyContent="flex-end">
+            <Line justifyContent="flex-end">
               <RaisedButton
                 primary
                 label={i18n._(t`Next`)}
                 onClick={onClickNext}
                 disabled={selectedAnswers.length === 0}
               />
-            </LineStackLayout>
+            </Line>
           )}
         </Column>
       )}

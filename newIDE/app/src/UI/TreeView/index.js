@@ -136,7 +136,6 @@ type Props<Item> = {|
   reactDndType: string,
   forceAllOpened?: boolean,
   initiallyOpenedNodeIds?: string[],
-  renderHiddenElements?: boolean,
   arrowKeyNavigationProps?: {|
     onGetItemInside: (item: Item) => ?Item,
     onGetItemOutside: (item: Item) => ?Item,
@@ -166,7 +165,6 @@ const TreeView = <Item: ItemBaseAttributes>(
     reactDndType,
     forceAllOpened,
     initiallyOpenedNodeIds,
-    renderHiddenElements,
     arrowKeyNavigationProps,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
@@ -637,7 +635,13 @@ const TreeView = <Item: ItemBaseAttributes>(
           // $FlowFixMe
           itemData={itemData}
           ref={listRef}
-          overscanCount={renderHiddenElements ? 20 : 2}
+          // Keep overscanCount relatively high so that:
+          // - during in-app tutorials we make sure the tooltip displayer finds
+          //   the elements to highlight
+          // - on mobile it avoids jumping screens. This can happen when an item
+          //   name is edited, the keyboard opens and reduces the window height
+          //   making the item disappear (because or virtualization).
+          overscanCount={20}
         >
           {TreeViewRow}
         </FixedSizeList>

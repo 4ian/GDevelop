@@ -1543,15 +1543,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       canMoveSelectionToItem={canMoveSelectionTo}
                       reactDndType={objectWithContextReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                      renderHiddenElements={
-                        // More elements are rendered:
-                        // - during in-app tutorials to make sure the tooltip displayer finds
-                        //   the elements to highlight
-                        // - on mobile to avoid jumping screens. This can happen when an item
-                        //   name is edited, the keyboard opens and reduces the window height
-                        //   making the item disappear (because or virtualization).
-                        !!currentlyRunningInAppTutorial || isMobileScreen
-                      }
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
                     />
                   )}

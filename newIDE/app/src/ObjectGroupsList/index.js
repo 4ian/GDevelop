@@ -592,13 +592,6 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         canMoveSelectionToItem={canMoveSelectionTo}
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                        renderHiddenElements={
-                          // More elements are rendered:
-                          // - on mobile to avoid jumping screens. This can happen when an item
-                          //   name is edited, the keyboard opens and reduces the window height
-                          //   making the item disappear (because or virtualization).
-                          isMobileScreen
-                        }
                       />
                     )}
                   </AutoSizer>

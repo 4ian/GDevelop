@@ -49,6 +49,7 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import Link from '../UI/Link';
 import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -264,6 +265,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const { showDeleteConfirmation } = useAlertDialog();
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
+    const windowWidth = useResponsiveWindowWidth();
+    const isMobileScreen = windowWidth === 'small';
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -1533,7 +1536,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       canMoveSelectionToItem={canMoveSelectionTo}
                       reactDndType={objectWithContextReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                      renderHiddenElements={!!currentlyRunningInAppTutorial}
+                      renderHiddenElements={
+                        // More elements are rendered:
+                        // - during in-app tutorials to make sure the tooltip displayer finds
+                        //   the elements to highlight
+                        // - on mobile to avoid jumping screens. This can happen when an item
+                        //   name is edited, the keyboard opens and reduces the window height
+                        //   making the item disappear (because or virtualization).
+                        !!currentlyRunningInAppTutorial || isMobileScreen
+                      }
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
                     />
                   )}

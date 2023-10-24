@@ -656,10 +656,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const editName = React.useCallback(
       (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
         if (!objectFolderOrObjectWithContext) return;
-        if (treeViewRef.current)
-          treeViewRef.current.renameItem(objectFolderOrObjectWithContext);
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          if (isMobileScreen) {
+            // Position item at top of the screen to make sure it will be visible
+            // once the keyboard is open.
+            treeView.scrollToItem(objectFolderOrObjectWithContext, 'start');
+          }
+          treeView.renameItem(objectFolderOrObjectWithContext);
+        }
       },
-      []
+      [isMobileScreen]
     );
 
     const duplicateObject = React.useCallback(

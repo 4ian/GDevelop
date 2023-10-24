@@ -103,7 +103,7 @@ const getItemProps = memoizeOne(
 
 export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
-  scrollToItem: Item => void,
+  scrollToItem: (Item, placement?: 'smart' | 'start') => void,
   renameItem: Item => void,
   openItems: (string[]) => void,
   closeItems: (string[]) => void,
@@ -365,7 +365,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   );
 
   const scrollToItem = React.useCallback(
-    (item: Item) => {
+    (item: Item, placement?: 'smart' | 'start' = 'smart') => {
       const list = listRef.current;
       if (list) {
         const itemId = getItemId(item);
@@ -374,7 +374,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         // $FlowFixMe - Method introduced in 2022.
         const index = flattenedData.findLastIndex(node => node.id === itemId);
         if (index >= 0) {
-          list.scrollToItem(index, 'smart');
+          list.scrollToItem(index, placement);
         }
       }
     },

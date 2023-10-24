@@ -498,7 +498,9 @@ export const enumerateObjectAndBehaviorsInstructions = (
     !globalObjectsContainer.getObjectGroups().has(objectName) &&
     !objectsContainer.getObjectGroups().has(objectName)
   ) {
-    allInstructions = allInstructions.filter(instruction => instruction.type !== 'CreateByName');
+    allInstructions = allInstructions.filter(
+      instruction => instruction.type !== 'CreateByName'
+    );
   }
 
   return orderFirstInstructionsWithoutGroup(allInstructions);

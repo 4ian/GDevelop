@@ -160,6 +160,7 @@ const PersonalizationQuestion = ({
                 primary
                 label={i18n._(t`Next`)}
                 onClick={onClickNext}
+                disabled={selectedAnswers.length === 0}
               />
             </LineStackLayout>
           )}

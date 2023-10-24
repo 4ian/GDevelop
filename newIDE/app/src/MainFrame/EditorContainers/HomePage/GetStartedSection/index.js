@@ -405,14 +405,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  return (
-    <SectionContainer
-      title={null} // Let the content handle the title.
-      flexBody
-    >
-      <PersonalizationFlow />
-    </SectionContainer>
-  );
+  return <PersonalizationFlow />;
 };
 
 const GetStartedSectionWithErrorBoundary = (props: Props) => (

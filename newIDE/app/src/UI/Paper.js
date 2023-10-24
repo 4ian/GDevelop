@@ -27,31 +27,43 @@ export const getBackgroundColor = (
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-const Paper = ({
-  id,
-  children,
-  background,
-  elevation,
-  variant,
-  style,
-  square,
-}: Props) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const backgroundColor = getBackgroundColor(gdevelopTheme, background);
-  return (
-    <MuiPaper
-      id={id}
-      variant={variant}
-      elevation={elevation || 0}
-      style={{
-        backgroundColor,
-        ...style,
-      }}
-      square={!!square}
-    >
-      {children}
-    </MuiPaper>
-  );
-};
+export type PaperInterface = {|
+  scrollToBottom: (options: ?{| smooth?: boolean |}) => void,
+|};
+
+const Paper = React.forwardRef<Props, PaperInterface>(
+  ({ id, children, background, elevation, variant, style, square }, ref) => {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const backgroundColor = getBackgroundColor(gdevelopTheme, background);
+    const paperRef = React.useRef<?MuiPaper>(null);
+
+    const scrollToBottom = React.useCallback(options => {
+      if (paperRef.current) {
+        paperRef.current.scroll({
+          top: 1000000,
+          behavior: options && options.smooth ? 'smooth' : 'auto',
+        });
+      }
+    }, []);
+
+    React.useImperativeHandle(ref, () => ({ scrollToBottom }));
+
+    return (
+      <MuiPaper
+        id={id}
+        ref={paperRef}
+        variant={variant}
+        elevation={elevation || 0}
+        style={{
+          backgroundColor,
+          ...style,
+        }}
+        square={!!square}
+      >
+        {children}
+      </MuiPaper>
+    );
+  }
+);
 
 export default Paper;

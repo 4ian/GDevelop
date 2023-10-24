@@ -8,6 +8,9 @@ import questionnaire, {
 } from './Questionnaire';
 import PersonalizationQuestion from './PersonalizationQuestion';
 import { ColumnStackLayout } from '../../../../UI/Layout';
+import SectionContainer, {
+  type SectionContainerInterface,
+} from '../SectionContainer';
 
 type Props = {||};
 
@@ -17,27 +20,39 @@ const PersonalizationFlow = (props: Props) => {
     Array<{| stepName: string, answers: string[] |}>
   >([]);
   const questionData = questionnaire[step];
+  const sectionContainerRef = React.useRef<?SectionContainerInterface>(null);
+
+  const scrollToBottom = React.useCallback(() => {
+    setTimeout(() => {
+      if (sectionContainerRef.current) {
+        sectionContainerRef.current.scrollToBottom({ smooth: true });
+      }
+    }, 100);
+  }, []);
 
   const goToNextQuestion = React.useCallback(
     (questionData: QuestionData, answerData?: AnswerData) => {
       if (answerData && answerData.nextQuestion) {
         setStep(answerData.nextQuestion);
+        scrollToBottom();
         return;
       }
       if (questionData.nextQuestion) {
         setStep(questionData.nextQuestion);
+        scrollToBottom();
         return;
       }
       if (questionData.getNextQuestion) {
         const nextStep = questionData.getNextQuestion(userAnswers);
         if (nextStep) {
           setStep(nextStep);
+          scrollToBottom();
           return;
         }
       }
       setStep('over');
     },
-    [userAnswers]
+    [userAnswers, scrollToBottom]
   );
 
   const onSelectAnswer = React.useCallback(
@@ -130,10 +145,19 @@ const PersonalizationFlow = (props: Props) => {
         selectedAnswers={[]}
         onSelectAnswer={answer => onSelectAnswer(step, answer)}
         onClickNext={() => goToNextQuestion(questionData)}
+        showNextButton={questionData.multi}
       />
     );
   }
-  return <ColumnStackLayout noMargin>{questionsToRender}</ColumnStackLayout>;
+  return (
+    <SectionContainer
+      title={null} // Let the content handle the title.
+      flexBody
+      ref={sectionContainerRef}
+    >
+      <ColumnStackLayout noMargin>{questionsToRender}</ColumnStackLayout>
+    </SectionContainer>
+  );
 };
 
 export default PersonalizationFlow;

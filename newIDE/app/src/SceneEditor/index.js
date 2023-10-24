@@ -639,7 +639,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
     if (instances.length === 0) {
-      this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
+      this.setState(
+        { selectedObjectFolderOrObjectsWithContext: [] },
+        this.updateToolbar
+      );
       return;
     }
     const { project, layout } = this.props;
@@ -648,27 +651,33 @@ export default class SceneEditor extends React.Component<Props, State> {
     const lastSelectedInstance = instances[instances.length - 1];
     const objectName = lastSelectedInstance.getObjectName();
     if (project.hasObjectNamed(objectName)) {
-      this.setState({
-        selectedObjectFolderOrObjectsWithContext: [
-          {
-            objectFolderOrObject: project
-              .getRootFolder()
-              .getObjectNamed(objectName),
-            global: true,
-          },
-        ],
-      });
+      this.setState(
+        {
+          selectedObjectFolderOrObjectsWithContext: [
+            {
+              objectFolderOrObject: project
+                .getRootFolder()
+                .getObjectNamed(objectName),
+              global: true,
+            },
+          ],
+        },
+        this.updateToolbar
+      );
     } else if (layout.hasObjectNamed(objectName)) {
-      this.setState({
-        selectedObjectFolderOrObjectsWithContext: [
-          {
-            objectFolderOrObject: layout
-              .getRootFolder()
-              .getObjectNamed(objectName),
-            global: false,
-          },
-        ],
-      });
+      this.setState(
+        {
+          selectedObjectFolderOrObjectsWithContext: [
+            {
+              objectFolderOrObject: layout
+                .getRootFolder()
+                .getObjectNamed(objectName),
+              global: false,
+            },
+          ],
+        },
+        this.updateToolbar
+      );
     }
   };
 

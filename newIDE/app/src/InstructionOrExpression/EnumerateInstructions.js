@@ -401,12 +401,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
         : extension.getAllActionsForObject(objectType),
       scope
     ),
-    ...enumerateExtraObjectInstructions(
-      isCondition,
-      extension,
-      objectType,
-      scope
-    ),
   ];
 
   // Free object instructions:
@@ -497,6 +491,14 @@ export const enumerateObjectAndBehaviorsInstructions = (
         ...allInstructions,
       ];
     });
+  }
+
+  // 'CreateByName' action only makes sense for groups.
+  if (
+    !globalObjectsContainer.getObjectGroups().has(objectName) &&
+    !objectsContainer.getObjectGroups().has(objectName)
+  ) {
+    allInstructions = allInstructions.filter(instruction => instruction.type !== 'CreateByName');
   }
 
   return orderFirstInstructionsWithoutGroup(allInstructions);

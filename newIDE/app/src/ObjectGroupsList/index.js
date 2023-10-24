@@ -25,6 +25,7 @@ import { type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -126,6 +127,8 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       showConfirmation,
       showAlert,
     } = useAlertDialog();
+    const windowWidth = useResponsiveWindowWidth();
+    const isMobileScreen = windowWidth === 'small';
 
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
@@ -589,6 +592,13 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         canMoveSelectionToItem={canMoveSelectionTo}
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                        renderHiddenElements={
+                          // More elements are rendered:
+                          // - on mobile to avoid jumping screens. This can happen when an item
+                          //   name is edited, the keyboard opens and reduces the window height
+                          //   making the item disappear (because or virtualization).
+                          isMobileScreen
+                        }
                       />
                     )}
                   </AutoSizer>

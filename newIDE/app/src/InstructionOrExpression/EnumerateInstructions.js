@@ -10,31 +10,20 @@ const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
 
-const freeInstructionsToRemove = {
+const freeInstructionsToKeep = {
   BuiltinObject: [
     // Note: even if "Create" was added to the object actions for convenience,
     // we also keep it in the list of free actions.
-    'AjoutHasard',
-    'AjoutObjConcern',
-    'CollisionNP',
-    'SceneInstancesCount',
-    'PickedInstancesCount',
-    'PickNearest',
-    'Distance',
-    'SeDirige',
-    'EstTourne',
-    'SourisSurObjet',
+    'Create',
+    'CreateByName',
   ],
-  Physics2: [
-    'Physics2::Collision',
-    'Physics2::CollisionStarted',
-    'Physics2::CollisionStopped',
-  ],
+  BuiltinCamera: ['CentreCamera'],
+  Scene3D: ['Scene3D::TurnCameraTowardObject'],
 };
 
 const isObjectInstruction = (
   instructionMetadata: gdInstructionMetadata,
-  objectType: string
+  objectType?: string
 ): boolean => {
   let firstParameterIndex = -1;
   for (
@@ -52,10 +41,13 @@ const isObjectInstruction = (
     return false;
   }
   const firstParameter = instructionMetadata.getParameter(firstParameterIndex);
+  if (!gd.ParameterMetadata.isObject(firstParameter.getType())) {
+    return false;
+  }
   if (
-    !gd.ParameterMetadata.isObject(firstParameter.getType()) ||
-    (firstParameter.getExtraInfo() !== '' &&
-      firstParameter.getExtraInfo() !== objectType)
+    objectType &&
+    firstParameter.getExtraInfo() !== '' &&
+    firstParameter.getExtraInfo() !== objectType
   ) {
     return false;
   }
@@ -99,7 +91,7 @@ const isBehaviorInstruction = (
   );
   return (
     gd.ParameterMetadata.isBehavior(secondParameter.getType()) &&
-    secondParameter.getExtraInfo() === behaviorType
+    (!behaviorType || secondParameter.getExtraInfo() === behaviorType)
   );
 };
 
@@ -116,16 +108,6 @@ const getExtensionTranslatedPrefix = (
     GROUP_DELIMITER +
     extension.getFullName()
   );
-};
-
-const filterInstructionsToRemove = (
-  list: Array<EnumeratedInstructionMetadata>,
-  typesToRemove: ?$ReadOnlyArray<string>
-) => {
-  const types = typesToRemove; // Make Flow happy
-  if (!types) return list;
-
-  return list.filter(metadata => types.indexOf(metadata.type) === -1);
 };
 
 const enumerateExtraBehaviorInstructions = (
@@ -148,15 +130,13 @@ const enumerateExtraBehaviorInstructions = (
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
     if (
-      instrMetadata.isHidden() ||
-      !isBehaviorInstruction(instrMetadata, behaviorType)
+      !instrMetadata.isHidden() &&
+      isBehaviorInstruction(instrMetadata, behaviorType)
     ) {
-      continue;
+      allInstructions.push(
+        enumerateInstruction(prefix, type, instrMetadata, scope)
+      );
     }
-
-    allInstructions.push(
-      enumerateInstruction(prefix, type, instrMetadata, scope)
-    );
   }
   return allInstructions;
 };
@@ -180,12 +160,54 @@ const enumerateExtraObjectInstructions = (
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
     if (
-      instrMetadata.isHidden() ||
-      !isObjectInstruction(instrMetadata, objectType)
+      !instrMetadata.isHidden() &&
+      isObjectInstruction(instrMetadata, objectType)
     ) {
-      continue;
+      allInstructions.push(
+        enumerateInstruction('', type, instrMetadata, scope)
+      );
     }
-    allInstructions.push(enumerateInstruction('', type, instrMetadata, scope));
+  }
+  return allInstructions;
+};
+
+const enumerateFreeInstructionsWithoutExtra = (
+  isCondition: boolean,
+  extension: gdPlatformExtension,
+  prefix: string,
+  scope: InstructionOrExpressionScope
+): Array<EnumeratedInstructionMetadata> => {
+  const instructions = isCondition
+    ? extension.getAllConditions()
+    : extension.getAllActions();
+
+  const extensionInstructionsToKeep =
+    freeInstructionsToKeep[extension.getName()];
+
+  // Get the map containing the metadata of the instructions provided by the extension...
+  const instructionsTypes = instructions.keys();
+  const allInstructions = [];
+
+  //... and add each instruction
+  for (let j = 0; j < instructionsTypes.size(); ++j) {
+    const type = instructionsTypes.at(j);
+    const instrMetadata = instructions.get(type);
+
+    if (
+      !instrMetadata.isHidden() &&
+      ((extensionInstructionsToKeep &&
+        extensionInstructionsToKeep.indexOf(type) !== -1) ||
+        // Exclude instructions that are moved to the object instructions list.
+        (!isObjectInstruction(instrMetadata) &&
+          !isBehaviorInstruction(instrMetadata)))
+    ) {
+      const shortenPrefix = prefix.endsWith(instrMetadata.getGroup())
+        ? prefix.substring(0, prefix.length - instrMetadata.getGroup().length)
+        : prefix;
+      allInstructions.push(
+        enumerateInstruction(shortenPrefix, type, instrMetadata, scope)
+      );
+    }
   }
   return allInstructions;
 };
@@ -522,28 +544,17 @@ const doEnumerateFreeInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
-    const extensionName: string = extension.getName();
     const prefix = getExtensionPrefix(extension);
 
-    //Free instructions
-    const extensionFreeInstructions = enumerateExtensionInstructions(
-      prefix,
-      isCondition ? extension.getAllConditions() : extension.getAllActions(),
-      {
+    allFreeInstructions.push.apply(
+      allFreeInstructions,
+      enumerateFreeInstructionsWithoutExtra(isCondition, extension, prefix, {
         extension,
         objectMetadata: undefined,
         behaviorMetadata: undefined,
-      }
+      })
     );
-    allFreeInstructions = [
-      ...allFreeInstructions,
-      ...filterInstructionsToRemove(
-        extensionFreeInstructions,
-        freeInstructionsToRemove[extensionName]
-      ),
-    ];
   }
-
   return allFreeInstructions;
 };
 

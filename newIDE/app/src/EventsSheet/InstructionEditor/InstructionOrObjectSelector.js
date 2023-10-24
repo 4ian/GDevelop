@@ -180,16 +180,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       ),
     ];
 
-    this.instructionSearchApi = new Fuse(
-      this.allInstructionsInfo,
-      {
-        ...sharedFuseConfiguration,
-        keys: [
-          { name: 'displayedName', weight: 5 },
-          { name: 'fullGroupName', weight: 1 },
-        ],
-      }
-    );
+    this.instructionSearchApi = new Fuse(this.allInstructionsInfo, {
+      ...sharedFuseConfiguration,
+      keys: [
+        { name: 'displayedName', weight: 5 },
+        { name: 'fullGroupName', weight: 1 },
+      ],
+    });
     this.objectSearchApi = new Fuse(allObjectsList, {
       ...sharedFuseConfiguration,
       getFn: (item, property) => item.object.getName(),

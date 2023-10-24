@@ -193,16 +193,24 @@ const enumerateFreeInstructionsWithoutExtra = (
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
 
+    const isWhiteListed =
+      extensionInstructionsToKeep &&
+      extensionInstructionsToKeep.indexOf(type) !== -1;
     if (
       !instrMetadata.isHidden() &&
-      ((extensionInstructionsToKeep &&
-        extensionInstructionsToKeep.indexOf(type) !== -1) ||
+      (isWhiteListed ||
         // Exclude instructions that are moved to the object instructions list.
         (!isObjectInstruction(instrMetadata) &&
           !isBehaviorInstruction(instrMetadata)))
     ) {
       allInstructions.push(
-        enumerateInstruction(prefix, type, instrMetadata, scope, true)
+        enumerateInstruction(
+          prefix,
+          type,
+          instrMetadata,
+          scope,
+          /* ignoresGroups */ isWhiteListed
+        )
       );
     }
   }

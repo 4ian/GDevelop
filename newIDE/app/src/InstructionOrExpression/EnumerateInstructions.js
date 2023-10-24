@@ -62,7 +62,7 @@ const isObjectInstruction = (
 
 const isBehaviorInstruction = (
   instructionMetadata: gdInstructionMetadata,
-  behaviorType: string
+  behaviorType?: string
 ): boolean => {
   let firstParameterIndex = -1;
   for (

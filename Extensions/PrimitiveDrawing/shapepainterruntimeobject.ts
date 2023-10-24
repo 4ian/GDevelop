@@ -221,7 +221,7 @@ namespace gdjs {
       );
     }
 
-    drawChamferRect(
+    drawChamferRectangle(
       startX1: float,
       startY1: float,
       endX2: float,

@@ -103,7 +103,7 @@ const getItemProps = memoizeOne(
 
 export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
-  scrollToItem: Item => void,
+  scrollToItem: (Item, placement?: 'smart' | 'start') => void,
   renameItem: Item => void,
   openItems: (string[]) => void,
   closeItems: (string[]) => void,
@@ -136,7 +136,6 @@ type Props<Item> = {|
   reactDndType: string,
   forceAllOpened?: boolean,
   initiallyOpenedNodeIds?: string[],
-  renderHiddenElements?: boolean,
   arrowKeyNavigationProps?: {|
     onGetItemInside: (item: Item) => ?Item,
     onGetItemOutside: (item: Item) => ?Item,
@@ -166,7 +165,6 @@ const TreeView = <Item: ItemBaseAttributes>(
     reactDndType,
     forceAllOpened,
     initiallyOpenedNodeIds,
-    renderHiddenElements,
     arrowKeyNavigationProps,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
@@ -365,7 +363,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   );
 
   const scrollToItem = React.useCallback(
-    (item: Item) => {
+    (item: Item, placement?: 'smart' | 'start' = 'smart') => {
       const list = listRef.current;
       if (list) {
         const itemId = getItemId(item);
@@ -374,7 +372,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         // $FlowFixMe - Method introduced in 2022.
         const index = flattenedData.findLastIndex(node => node.id === itemId);
         if (index >= 0) {
-          list.scrollToItem(index, 'smart');
+          list.scrollToItem(index, placement);
         }
       }
     },
@@ -637,7 +635,13 @@ const TreeView = <Item: ItemBaseAttributes>(
           // $FlowFixMe
           itemData={itemData}
           ref={listRef}
-          overscanCount={renderHiddenElements ? 20 : 2}
+          // Keep overscanCount relatively high so that:
+          // - during in-app tutorials we make sure the tooltip displayer finds
+          //   the elements to highlight
+          // - on mobile it avoids jumping screens. This can happen when an item
+          //   name is edited, the keyboard opens and reduces the window height
+          //   making the item disappear (because or virtualization).
+          overscanCount={20}
         >
           {TreeViewRow}
         </FixedSizeList>

@@ -176,7 +176,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression",
               _("Number of sides of the polygon (minimum: 3)"))
         .AddParameter("expression", _("Rotation (in degrees)"))
-        .setFunctionName("DrawRegularPolygon");
+        .SetFunctionName("DrawRegularPolygon");
   
 
   obj.AddAction(

@@ -144,12 +144,18 @@ const DesktopDisplay = ({
   );
 };
 
+type MobileDisplayProps = {|
+  ...DisplayProps,
+  goToPreviousQuestion: () => void,
+|};
+
 const MobileDisplay = ({
   userAnswers,
   onSelectAnswer,
   goToNextQuestion,
+  goToPreviousQuestion,
   step,
-}: DisplayProps) => {
+}: MobileDisplayProps) => {
   const questionData = questionnaire[step];
   if (!questionData) return null;
 
@@ -197,7 +203,7 @@ const MobileDisplay = ({
                 <FlatButton
                   fullWidth
                   label={i18n._(t`Back`)}
-                  onClick={() => console.log('back')}
+                  onClick={goToPreviousQuestion}
                 />
                 {questionData.multi && (
                   <RaisedButton
@@ -268,7 +274,9 @@ const PersonalizationFlow = (props: Props) => {
         userAnswer => userAnswer.stepName === step
       );
       if (existingUserAnswerIndex >= 0) {
+        // User is coming back to a previous question
         if (multi) {
+          // Add or remove answer to multi-choice question
           const newUserAnswers = [...userAnswers];
           const answerIndex = newUserAnswers[
             existingUserAnswerIndex
@@ -283,10 +291,13 @@ const PersonalizationFlow = (props: Props) => {
           }
           setUserAnswers(newUserAnswers);
         } else {
+          // Handle new answer (that could be the same as before).
+          const hasAnswerChanged =
+            userAnswers[existingUserAnswerIndex].answers[0] !== answer;
           const newUserAnswers = [...userAnswers];
           newUserAnswers[existingUserAnswerIndex].answers = [answer];
           const doesAnswerChangesFollowingQuestion = !questionData.nextQuestion;
-          if (doesAnswerChangesFollowingQuestion) {
+          if (doesAnswerChangesFollowingQuestion && hasAnswerChanged) {
             newUserAnswers.splice(
               existingUserAnswerIndex + 1,
               userAnswers.length - existingUserAnswerIndex
@@ -298,6 +309,8 @@ const PersonalizationFlow = (props: Props) => {
               answerData => answerData.code === answer
             );
             goToNextQuestion(questionData, answerData);
+          } else {
+            goToNextQuestion(questionData);
           }
         }
       } else {
@@ -313,11 +326,26 @@ const PersonalizationFlow = (props: Props) => {
     [userAnswers, goToNextQuestion]
   );
 
+  const goToPreviousQuestion = React.useCallback(
+    () => {
+      const currentAnswerIndex = userAnswers.findIndex(
+        userAnswer => userAnswer.stepName === step
+      );
+      if (currentAnswerIndex === -1) {
+        setStep(userAnswers[userAnswers.length - 1].stepName);
+      } else if (currentAnswerIndex >= 1) {
+        setStep(userAnswers[currentAnswerIndex - 1].stepName);
+      }
+    },
+    [userAnswers, step]
+  );
+
   if (windowWidth === 'small') {
     return (
       <MobileDisplay
         step={step}
         goToNextQuestion={goToNextQuestion}
+        goToPreviousQuestion={goToPreviousQuestion}
         onSelectAnswer={onSelectAnswer}
         userAnswers={userAnswers}
       />

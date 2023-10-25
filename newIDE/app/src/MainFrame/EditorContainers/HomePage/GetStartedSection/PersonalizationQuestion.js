@@ -78,7 +78,6 @@ const FreeAnswer = ({
   const { text, imageSource, code } = answerData;
   const [inputValue, setInputValue] = React.useState<string>('');
   const muiTheme = useTheme();
-  console.log(muiTheme);
   const borderColor = (muiTheme.palette.type === 'dark' ? darken : lighten)(
     muiTheme.palette.text.primary,
     selected ? 0 : 0.7

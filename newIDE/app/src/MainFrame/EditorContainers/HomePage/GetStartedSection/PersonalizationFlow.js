@@ -226,11 +226,13 @@ const MobileDisplay = ({
             </ScrollView>
             <Column noMargin>
               <LineStackLayout justifyContent="stretch" expand>
-                <FlatButton
-                  fullWidth
-                  label={i18n._(t`Back`)}
-                  onClick={goToPreviousQuestion}
-                />
+                {step !== firstQuestion && (
+                  <FlatButton
+                    fullWidth
+                    label={i18n._(t`Back`)}
+                    onClick={goToPreviousQuestion}
+                  />
+                )}
                 {questionData.multi && (
                   <RaisedButton
                     primary

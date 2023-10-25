@@ -25,6 +25,7 @@ namespace gdjs {
   class LoadingScreenPixiRenderer {
     _pixiRenderer: PIXI.Renderer | null;
     _loadingScreenData: LoadingScreenData;
+    _isFirstLayout: boolean;
 
     _loadingScreenContainer: PIXI.Container;
     _backgroundSprite: PIXI.Sprite | null = null;
@@ -44,6 +45,7 @@ namespace gdjs {
       isFirstLayout: boolean
     ) {
       this._loadingScreenData = loadingScreenData;
+      this._isFirstLayout = isFirstLayout;
       this._loadingScreenContainer = new PIXI.Container();
       this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
       if (!this._pixiRenderer) {
@@ -56,7 +58,10 @@ namespace gdjs {
       const backgroundTexture = imageManager.getOrLoadPIXITexture(
         loadingScreenData.backgroundImageResourceName
       );
-      if (backgroundTexture !== imageManager.getInvalidPIXITexture()) {
+      if (
+        backgroundTexture !== imageManager.getInvalidPIXITexture() &&
+        isFirstLayout
+      ) {
         this._backgroundSprite = PIXI.Sprite.from(backgroundTexture);
         this._backgroundSprite.alpha = 0;
         this._backgroundSprite.anchor.x = 0.5;
@@ -249,7 +254,8 @@ namespace gdjs {
     unload(): Promise<void> {
       const totalElapsedTime = (performance.now() - this._startTimeInMs) / 1000;
       const remainingTime =
-        this._loadingScreenData.minDuration - totalElapsedTime;
+        (this._isFirstLayout ? this._loadingScreenData.minDuration : 0) -
+        totalElapsedTime;
       this.setPercent(100);
 
       // Ensure we have shown the loading screen for at least minDuration.

@@ -227,7 +227,7 @@ namespace gdjs {
       endX2: float,
       endY2: float,
       chamfer: float
-    ){
+    ) {
       this._renderer.drawChamferRectangle(
         startX1,
         startY1,

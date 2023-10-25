@@ -137,25 +137,19 @@ namespace gdjs {
     }
 
     drawChamferRectangle(
-      x1: float, 
-      y1: float, 
-      x2: float, 
-      y2: float, 
+      x1: float,
+      y1: float,
+      x2: float,
+      y2: float,
       chamfer: float
-    ){
+    ) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
         this._object._fillOpacity / 255
       );
       //@ts-ignore from @pixi/graphics-extras
-      this._graphics.drawChamferRect(
-        x1, 
-        y1, 
-        x2-x1,
-        y2-y1,
-        chamfer
-      );
+      this._graphics.drawChamferRect(x1, y1, x2 - x1, y2 - y1, chamfer);
       this._graphics.closePath();
       this._graphics.endFill();
       this.invalidateBounds();

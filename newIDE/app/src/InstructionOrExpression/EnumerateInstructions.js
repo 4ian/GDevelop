@@ -96,11 +96,7 @@ const isBehaviorInstruction = (
   );
 };
 
-export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
-  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName();
-};
-
-const getExtensionTranslatedPrefix = (
+export const getExtensionPrefix = (
   extension: gdPlatformExtension,
   i18n: I18nType
 ): string => {
@@ -177,14 +173,13 @@ const enumerateExtraObjectInstructions = (
 const enumerateFreeInstructionsWithoutExtra = (
   isCondition: boolean,
   extension: gdPlatformExtension,
-  prefix: string,
   scope: InstructionOrExpressionScope,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   const instructions = isCondition
     ? extension.getAllConditions()
     : extension.getAllActions();
-
+  const prefix = getExtensionPrefix(extension, i18n);
   const extensionInstructionsToKeep =
     freeInstructionsToKeep[extension.getName()];
 
@@ -292,7 +287,7 @@ export const enumerateAllInstructions = (
     const extension = allExtensions.at(i);
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
-    const prefix = getExtensionPrefix(extension);
+    const prefix = getExtensionPrefix(extension, i18n);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(
@@ -538,33 +533,6 @@ export const enumerateFreeInstructions = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  return doEnumerateFreeInstructions(isCondition, getExtensionPrefix, i18n);
-};
-
-/**
- * Enumerate all the instructions that are not directly tied
- * to an object.
- */
-export const enumerateFreeInstructionsWithTranslatedCategories = (
-  isCondition: boolean,
-  i18n: I18nType
-): Array<EnumeratedInstructionMetadata> => {
-  return doEnumerateFreeInstructions(
-    isCondition,
-    extension => getExtensionTranslatedPrefix(extension, i18n),
-    i18n
-  );
-};
-
-/**
- * Enumerate all the instructions that are not directly tied
- * to an object.
- */
-const doEnumerateFreeInstructions = (
-  isCondition: boolean,
-  getExtensionPrefix: (extension: gdPlatformExtension) => string,
-  i18n: I18nType
-): Array<EnumeratedInstructionMetadata> => {
   let allFreeInstructions = [];
 
   const allExtensions = gd
@@ -572,14 +540,12 @@ const doEnumerateFreeInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
-    const prefix = getExtensionPrefix(extension);
 
     allFreeInstructions.push.apply(
       allFreeInstructions,
       enumerateFreeInstructionsWithoutExtra(
         isCondition,
         extension,
-        prefix,
         {
           extension,
           objectMetadata: undefined,

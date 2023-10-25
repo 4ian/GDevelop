@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import { mapFor, mapVector } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
@@ -122,13 +123,14 @@ const getAutocompletionsForExpressions = (
 
 const getAutocompletionsForFreeExpressions = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
-  completionDescription: gdExpressionCompletionDescription
+  completionDescription: gdExpressionCompletionDescription,
+  i18n: I18nType
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
   const type: string = completionDescription.getType();
   const isExact: boolean = completionDescription.isExact();
 
-  const freeExpressions = enumerateFreeExpressions(type);
+  const freeExpressions = enumerateFreeExpressions(type, i18n);
 
   const filteredFreeExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(freeExpressions, prefix),
@@ -391,7 +393,8 @@ const getAutocompletionsForBehavior = function(
 
 export const getAutocompletionsFromDescriptions = (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
-  expressionCompletionDescriptions: gdVectorExpressionCompletionDescription
+  expressionCompletionDescriptions: gdVectorExpressionCompletionDescription,
+  i18n: I18nType
 ): Array<ExpressionAutocompletion> => {
   const { gd } = expressionAutocompletionContext;
 
@@ -419,7 +422,8 @@ export const getAutocompletionsFromDescriptions = (
         } else {
           return getAutocompletionsForFreeExpressions(
             expressionAutocompletionContext,
-            completionDescription
+            completionDescription,
+            i18n
           );
         }
       } else if (completionKind === gd.ExpressionCompletionDescription.Object) {

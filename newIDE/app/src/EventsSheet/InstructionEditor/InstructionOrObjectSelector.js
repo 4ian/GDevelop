@@ -13,7 +13,7 @@ import {
 } from '../../InstructionOrExpression/CreateTree';
 import {
   enumerateAllInstructions,
-  enumerateFreeInstructionsWithTranslatedCategories,
+  enumerateFreeInstructions,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
   type EnumeratedInstructionMetadata,
@@ -124,10 +124,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
   // Free instructions, to be displayed in a tab next to the objects.
   freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateFreeInstructionsWithTranslatedCategories(
-      this.props.isCondition,
-      this.props.i18n
-    ),
+    enumerateFreeInstructions(this.props.isCondition, this.props.i18n),
     this.props.scope
   );
   freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
@@ -145,10 +142,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
   reEnumerateInstructions = (i18n: I18nType) => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateFreeInstructionsWithTranslatedCategories(
-        this.props.isCondition,
-        i18n
-      ),
+      enumerateFreeInstructions(this.props.isCondition, i18n),
       this.props.scope
     );
     this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);

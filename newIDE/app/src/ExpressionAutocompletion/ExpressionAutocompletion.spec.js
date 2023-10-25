@@ -83,7 +83,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toHaveLength(2);
       expect(autocompletions).toEqual(
@@ -116,7 +118,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions2
+        completionDescriptions2,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions2).toHaveLength(1);
       expect(autocompletions2).toEqual(
@@ -153,7 +157,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -208,7 +214,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -243,7 +251,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -282,7 +292,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -331,7 +343,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -368,7 +382,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -406,7 +422,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -449,7 +467,9 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        // $FlowFixMe
+        null
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([

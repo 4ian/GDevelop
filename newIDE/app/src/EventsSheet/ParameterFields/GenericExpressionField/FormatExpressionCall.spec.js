@@ -12,7 +12,11 @@ import {
 
 describe('FormatExpressionCall', () => {
   it('properly formats a free function, with one or more arguments', () => {
-    const freeExpressions = enumerateFreeExpressions('number|string');
+    const freeExpressions = enumerateFreeExpressions(
+      'number|string',
+      // $FlowFixMe
+      null
+    );
     const countExpression = filterExpressions(
       freeExpressions,
       'PickedInstancesCount'
@@ -32,7 +36,11 @@ describe('FormatExpressionCall', () => {
   });
 
   it('properly formats a free function, with "code-only" parameters', () => {
-    const freeExpressions = enumerateFreeExpressions('number|string');
+    const freeExpressions = enumerateFreeExpressions(
+      'number|string',
+      // $FlowFixMe
+      null
+    );
     const cameraHeightExpression = filterExpressions(
       freeExpressions,
       'CameraHeight'
@@ -45,7 +53,11 @@ describe('FormatExpressionCall', () => {
   });
 
   it('properly formats a free function, with "code-only" and optional parameters', () => {
-    const freeExpressions = enumerateFreeExpressions('number|string');
+    const freeExpressions = enumerateFreeExpressions(
+      'number|string',
+      // $FlowFixMe
+      null
+    );
     const touchExpression = filterExpressions(freeExpressions, 'TouchX')[0];
     expect(
       formatExpressionCall(touchExpression, ['', '1'], {

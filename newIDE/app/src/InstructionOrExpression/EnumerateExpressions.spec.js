@@ -13,7 +13,11 @@ const gd: libGDevelop = global.gd;
 
 describe('EnumerateExpressions', () => {
   it('can enumerate and filter free expressions (number only)', () => {
-    const freeExpressions = enumerateFreeExpressions('number');
+    const freeExpressions = enumerateFreeExpressions(
+      'number',
+      // $FlowFixMe
+      null
+    );
 
     // Should find atan, atan2, atanh math function
     expect(filterExpressions(freeExpressions, 'atan')).toHaveLength(3);
@@ -26,7 +30,11 @@ describe('EnumerateExpressions', () => {
   });
 
   it('can enumerate and filter free expressions', () => {
-    const freeExpressions = enumerateFreeExpressions('string');
+    const freeExpressions = enumerateFreeExpressions(
+      'string',
+      // $FlowFixMe
+      null
+    );
 
     // Should find ToString and LargeNumberToString:
     expect(filterExpressions(freeExpressions, 'ToString')).toHaveLength(2);
@@ -151,7 +159,9 @@ describe('EnumerateExpressions', () => {
   it('can enumerate all expressions (number only)', () => {
     makeTestExtensions(gd);
     const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number'
+      'number',
+      // $FlowFixMe
+      null
     );
     // Check a free expression:
     expect(allNumberExpressions).toContainEqual(
@@ -179,7 +189,9 @@ describe('EnumerateExpressions', () => {
   it('can enumerate all expressions', () => {
     makeTestExtensions(gd);
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'string'
+      'string',
+      // $FlowFixMe
+      null
     );
     // Check a free expression:
     expect(allExpressions).toContainEqual(
@@ -207,7 +219,9 @@ describe('EnumerateExpressions', () => {
 
   it('can create the tree of all expressions', () => {
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number'
+      'number',
+      // $FlowFixMe
+      null
     );
     const allExpressionsTree = createTree(allExpressions);
 

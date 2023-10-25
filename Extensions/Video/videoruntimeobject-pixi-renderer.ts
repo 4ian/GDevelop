@@ -76,8 +76,7 @@ namespace gdjs {
     }
 
     updateLoop(): void {
-      this._pixiObject._texture.baseTexture.resource.source.loop =
-        this._object._loop;
+      this._pixiObject._texture.baseTexture.resource.source.loop = this._object._loop;
     }
 
     updateVolume(): void {

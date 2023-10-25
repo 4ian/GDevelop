@@ -17,7 +17,9 @@ import SectionContainer, {
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { Column, Line } from '../../../../UI/Grid';
-import ScrollView from '../../../../UI/ScrollView';
+import ScrollView, {
+  type ScrollViewInterface,
+} from '../../../../UI/ScrollView';
 import Text from '../../../../UI/Text';
 import FlatButton from '../../../../UI/FlatButton';
 import RaisedButton from '../../../../UI/RaisedButton';
@@ -179,6 +181,17 @@ const MobileDisplay = ({
   step,
   onChangeOtherValue,
 }: MobileDisplayProps) => {
+  const scrollViewRef = React.useRef<?ScrollViewInterface>();
+
+  React.useEffect(
+    () => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToPosition(0);
+      }
+    },
+    [step]
+  );
+
   const questionData = questionnaire[step];
   if (!questionData) return null;
 
@@ -210,7 +223,7 @@ const MobileDisplay = ({
                 </Text>
               ) : null}
             </Column>
-            <ScrollView>
+            <ScrollView ref={scrollViewRef}>
               <PersonalizationQuestion
                 key={step}
                 questionData={questionData}

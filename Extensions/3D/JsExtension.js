@@ -107,7 +107,7 @@ module.exports = {
           _('Scale on Z axis'),
           _("the scale on Z axis of an object (default scale is 1)"),
           _("the scale on Z axis scale"),
-          _('Scale'),
+          _('Size'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))

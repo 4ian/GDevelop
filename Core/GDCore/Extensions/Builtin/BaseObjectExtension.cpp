@@ -396,7 +396,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Z order"),
                 _("Modify the Z-order of an object"),
                 _("the z-order"),
-                _("Z order"),
+                _("Layers and cameras"),
                 "res/actions/planicon24.png",
                 "res/actions/planicon.png")
 
@@ -550,7 +550,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Z-order"),
                    _("Compare the Z-order of the specified object."),
                    _("the Z-order"),
-                   _("Z-order"),
+                   _("Layer"),
                    "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
 
@@ -1151,7 +1151,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddExpression("ZOrder",
                     _("Z-order"),
                     _("Z-order of an object"),
-                    _("Visibility"),
+                    "",
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"));
 

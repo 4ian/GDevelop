@@ -33,7 +33,12 @@ const styles = {
   },
 };
 
-type UserAnswers = Array<{| stepName: string, answers: string[] |}>;
+type UserAnswers = Array<{|
+  stepName: string,
+  answers: string[],
+  /** Used to store user input in question with showOther */
+  other?: string,
+|}>;
 
 const NavigationStep = ({ stepIndex }: {| stepIndex: number |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -61,6 +66,8 @@ type DisplayProps = {|
   userAnswers: UserAnswers,
   onSelectAnswer: (string, string) => void,
   goToNextQuestion: QuestionData => void,
+  onClickSend: string => void,
+  onChangeOtherValue: (string, string) => void,
   step: string,
 |};
 
@@ -68,6 +75,8 @@ const DesktopDisplay = ({
   userAnswers,
   onSelectAnswer,
   goToNextQuestion,
+  onClickSend,
+  onChangeOtherValue,
   step,
 }: DisplayProps) => {
   const questionData = questionnaire[step];
@@ -106,6 +115,13 @@ const DesktopDisplay = ({
           }
           onClickNext={() => goToNextQuestion(relatedQuestionData)}
           showQuestionText={true}
+          onClickSend={
+            userAnswer.stepName === firstQuestion ? onClickSend : undefined
+          }
+          otherValue={userAnswer.other || ''}
+          onChangeOtherValue={value =>
+            onChangeOtherValue(userAnswer.stepName, value)
+          }
         />
       );
     }
@@ -117,7 +133,12 @@ const DesktopDisplay = ({
   const shouldDisplayStep =
     questionData &&
     (!questionData.multi ||
-      userAnswers[userAnswers.length - 1].stepName !== step);
+      userAnswers[userAnswers.length - 1].stepName !== step) &&
+    !(
+      userAnswers[userAnswers.length - 1] &&
+      userAnswers[userAnswers.length - 1].stepName === firstQuestion &&
+      userAnswers[userAnswers.length - 1].answers[0] === 'otherWithInput'
+    );
 
   if (shouldDisplayStep) {
     const questionData = questionnaire[step];
@@ -154,7 +175,9 @@ const MobileDisplay = ({
   onSelectAnswer,
   goToNextQuestion,
   goToPreviousQuestion,
+  onClickSend,
   step,
+  onChangeOtherValue,
 }: MobileDisplayProps) => {
   const questionData = questionnaire[step];
   if (!questionData) return null;
@@ -196,6 +219,9 @@ const MobileDisplay = ({
                 onClickNext={() => goToNextQuestion(questionData)}
                 showNextButton={false}
                 showQuestionText={false}
+                onClickSend={step === firstQuestion ? onClickSend : undefined}
+                onChangeOtherValue={value => onChangeOtherValue(step, value)}
+                otherValue={userAnswer ? userAnswer.other || '' : undefined}
               />
             </ScrollView>
             <Column noMargin>
@@ -235,14 +261,12 @@ const MobileDisplay = ({
   );
 };
 
-type Props = {||};
+type Props = {| onQuestionnaireFinished: () => void |};
 
-const PersonalizationFlow = (props: Props) => {
+const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
   const [step, setStep] = React.useState<string>(firstQuestion);
   const windowWidth = useResponsiveWindowWidth();
-  const [userAnswers, setUserAnswers] = React.useState<
-    Array<{| stepName: string, answers: string[] |}>
-  >([]);
+  const [userAnswers, setUserAnswers] = React.useState<UserAnswers>([]);
 
   const goToNextQuestion = React.useCallback(
     (questionData: QuestionData, answerData?: AnswerData) => {
@@ -261,7 +285,20 @@ const PersonalizationFlow = (props: Props) => {
           return;
         }
       }
-      setStep('over');
+      onQuestionnaireFinished();
+    },
+    [userAnswers, onQuestionnaireFinished]
+  );
+
+  const onChangeOtherValue = React.useCallback(
+    (step: string, content: string) => {
+      const matchingUserAnswerIndex = userAnswers.findIndex(
+        userAnswer => userAnswer.stepName === step
+      );
+      if (matchingUserAnswerIndex < 0) return;
+      const newUserAnswers = [...userAnswers];
+      newUserAnswers[matchingUserAnswerIndex].other = content;
+      setUserAnswers(newUserAnswers);
     },
     [userAnswers]
   );
@@ -273,6 +310,7 @@ const PersonalizationFlow = (props: Props) => {
       const existingUserAnswerIndex = userAnswers.findIndex(
         userAnswer => userAnswer.stepName === step
       );
+      const shouldGoToNextQuestion = answer !== 'otherWithInput';
       if (existingUserAnswerIndex >= 0) {
         // User is coming back to a previous question
         if (multi) {
@@ -296,7 +334,9 @@ const PersonalizationFlow = (props: Props) => {
             userAnswers[existingUserAnswerIndex].answers[0] !== answer;
           const newUserAnswers = [...userAnswers];
           newUserAnswers[existingUserAnswerIndex].answers = [answer];
-          const doesAnswerChangesFollowingQuestion = !questionData.nextQuestion;
+          const doesAnswerChangesFollowingQuestion =
+            !questionData.nextQuestion ||
+            (step === firstQuestion && answer === 'otherWithInput');
           if (doesAnswerChangesFollowingQuestion && hasAnswerChanged) {
             newUserAnswers.splice(
               existingUserAnswerIndex + 1,
@@ -308,9 +348,13 @@ const PersonalizationFlow = (props: Props) => {
             const answerData = questionData.answers.find(
               answerData => answerData.code === answer
             );
-            goToNextQuestion(questionData, answerData);
+            if (shouldGoToNextQuestion) {
+              goToNextQuestion(questionData, answerData);
+            }
           } else {
-            goToNextQuestion(questionData);
+            if (shouldGoToNextQuestion) {
+              goToNextQuestion(questionData);
+            }
           }
         }
       } else {
@@ -318,7 +362,7 @@ const PersonalizationFlow = (props: Props) => {
         const answerData = questionData.answers.find(
           answerData => answerData.code === answer
         );
-        if (!multi) {
+        if (!multi && shouldGoToNextQuestion) {
           goToNextQuestion(questionData, answerData);
         }
       }
@@ -348,6 +392,8 @@ const PersonalizationFlow = (props: Props) => {
         goToPreviousQuestion={goToPreviousQuestion}
         onSelectAnswer={onSelectAnswer}
         userAnswers={userAnswers}
+        onClickSend={content => console.log(content)}
+        onChangeOtherValue={onChangeOtherValue}
       />
     );
   }
@@ -358,6 +404,8 @@ const PersonalizationFlow = (props: Props) => {
       goToNextQuestion={goToNextQuestion}
       onSelectAnswer={onSelectAnswer}
       userAnswers={userAnswers}
+      onClickSend={content => console.log(content)}
+      onChangeOtherValue={onChangeOtherValue}
     />
   );
 };

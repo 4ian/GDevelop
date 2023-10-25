@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import ButtonBase from '@material-ui/core/ButtonBase';
@@ -58,6 +58,18 @@ const styles = {
     top: 'calc(50% - 9px)',
   },
   answerTextContainer: { marginLeft: 25, marginRight: 25 },
+  freeAnswerContent: {
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+  },
+  freeAnswerInputOutline: {
+    border: 'solid',
+    borderWidth: 1,
+    borderRadius: 4,
+    flex: 1,
+    padding: 8,
+  },
 };
 
 type FreeAnswerProps = {|
@@ -66,6 +78,9 @@ type FreeAnswerProps = {|
   selected: boolean,
   i18n: I18nType,
   showCheckbox: boolean,
+  onClickSend?: string => void,
+  value: string,
+  onChange: string => void,
 |};
 
 const FreeAnswer = ({
@@ -74,21 +89,49 @@ const FreeAnswer = ({
   onSelect,
   selected,
   showCheckbox,
+  onClickSend,
+  value,
+  onChange,
 }: FreeAnswerProps) => {
   const { text, imageSource, code } = answerData;
-  const [inputValue, setInputValue] = React.useState<string>('');
+  const [errorText, setErrorText] = React.useState<React.Node>(null);
   const muiTheme = useTheme();
   const borderColor = (muiTheme.palette.type === 'dark' ? darken : lighten)(
     muiTheme.palette.text.primary,
     selected ? 0 : 0.7
   );
+
+  const clickSend = onClickSend
+    ? () => {
+        setErrorText(null);
+        const cleanedInputValue = value.trim();
+        if (!cleanedInputValue) {
+          setErrorText(<Trans>Please explain your use of GDevelop.</Trans>);
+          return;
+        }
+        onClickSend(cleanedInputValue);
+      }
+    : null;
+
   return (
     <ButtonBase
       style={{
         ...styles.answerButton,
         borderColor,
       }}
-      onClick={() => onSelect(code)}
+      onClick={e => {
+        if (e.nativeEvent && e.nativeEvent.x === 0 && e.nativeEvent.y === 0) {
+          // Material UI buttons are clicked when focused and space key is pressed.
+          // Here, it's an issue since the input is inside the button and each key press
+          // in the input is interpreted as a click.
+          // Even if it's a key press, a click event is simulated, and it's hard to
+          // discriminate true pointer events and click via space key press.
+          // It is supposed that if the coordinated of the event are at 0;0, it's
+          // because it comes from a key press.
+          return;
+        }
+        onSelect(code);
+      }}
       disableRipple={selected}
     >
       <Paper
@@ -96,9 +139,7 @@ const FreeAnswer = ({
         background="medium"
         style={styles.answerButtonBackground}
       >
-        <div
-          style={{ display: 'flex', height: '100%', flexDirection: 'column' }}
-        >
+        <div style={styles.freeAnswerContent}>
           {selected ? (
             <>
               <Line justifyContent="center">
@@ -108,35 +149,35 @@ const FreeAnswer = ({
                 <ColumnStackLayout expand>
                   <div
                     style={{
-                      border: 'solid',
-                      borderWidth: 1,
-                      borderRadius: 4,
+                      ...styles.freeAnswerInputOutline,
                       borderColor: muiTheme.palette.text.disabled,
-                      flex: 1,
-                      padding: 8,
                     }}
                   >
                     <TextField
                       multiline
                       fullWidth
-                      rows={2}
-                      rowsMax={4}
+                      errorText={errorText}
+                      rows={5}
+                      rowsMax={5}
                       style={{ fontSize: 14 }}
                       underlineShow={false}
                       margin="none"
                       translatableHintText={t`Tell us more!...`}
                       type="text"
-                      value={inputValue}
-                      onChange={(_, newValue) => setInputValue(newValue)}
+                      value={value}
+                      onChange={(_, newValue) => onChange(newValue)}
                       autoFocus="desktop"
+                      onClick={e => e.stopPropagation()}
                     />
                   </div>
-                  <RaisedButton
-                    primary
-                    label={i18n._(t`Send`)}
-                    fullWidth
-                    onClick={() => console.log('send')}
-                  />
+                  {clickSend && (
+                    <RaisedButton
+                      primary
+                      label={i18n._(t`Send`)}
+                      fullWidth
+                      onClick={clickSend}
+                    />
+                  )}
                 </ColumnStackLayout>
               </Line>
               <Spacer />
@@ -235,6 +276,9 @@ type Props = {|
   showNextButton?: boolean,
   onClickNext: () => void,
   showQuestionText: boolean,
+  onClickSend?: string => void,
+  otherValue?: string,
+  onChangeOtherValue?: string => void,
 |};
 
 const PersonalizationQuestion = ({
@@ -244,6 +288,9 @@ const PersonalizationQuestion = ({
   showNextButton,
   onClickNext,
   showQuestionText,
+  onClickSend,
+  otherValue,
+  onChangeOtherValue,
 }: Props) => {
   const { text, answers, multi, showOther } = questionData;
   const windowWidth = useResponsiveWindowWidth();
@@ -278,7 +325,9 @@ const PersonalizationQuestion = ({
           >
             {answersToDisplay.map(answerData => (
               <GridListTile>
-                {answerData.code === 'otherWithInput' ? (
+                {answerData.code === 'otherWithInput' &&
+                otherValue !== undefined &&
+                onChangeOtherValue ? (
                   <FreeAnswer
                     answerData={answerData}
                     i18n={i18n}
@@ -286,6 +335,9 @@ const PersonalizationQuestion = ({
                     onSelect={onSelectAnswer}
                     selected={selectedAnswers.includes(answerData.code)}
                     showCheckbox={!!multi}
+                    onClickSend={onClickSend}
+                    value={otherValue}
+                    onChange={onChangeOtherValue}
                   />
                 ) : (
                   <Answer

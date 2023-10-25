@@ -30,6 +30,7 @@ import { UsernameField } from '../../../../Profile/UsernameField';
 import { type UsernameAvailability } from '../../../../Utils/GDevelopServices/User';
 import Checkbox from '../../../../UI/Checkbox';
 import PersonalizationFlow from './PersonalizationFlow';
+import LinearProgress from '../../../../UI/LinearProgress';
 
 const styles = {
   icon: {
@@ -41,7 +42,10 @@ const styles = {
     width: '100%',
     maxWidth: 300, // Make buttons larger but not too much.
   },
+  linearProgress: { width: 200 },
 };
+
+const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
 
 type Props = {||};
 
@@ -56,6 +60,10 @@ const GetStartedSection = ({  }: Props) => {
   const [showCreateAccountStep, setShowCreateAccountStep] = React.useState(
     false
   );
+  const [
+    showQuestionnaireFinished,
+    setShowQuestionnaireFinished,
+  ] = React.useState<boolean>(false);
   const [stepIndex, setStepIndex] = React.useState(0);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -377,7 +385,44 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  return <PersonalizationFlow />;
+  if (showQuestionnaireFinished) {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text size="title" align="center">
+            <Trans>Alright let's see what we have for you...</Trans>
+          </Text>
+          <img
+            src={questionnaireFinishedImageSource}
+            alt="You as the red hero coming back to life"
+          />
+          <Text size="body2" noMargin align="center">
+            <Trans>Just one second please...</Trans>
+          </Text>
+          <Line>
+            <LinearProgress
+              variant="indeterminate"
+              style={styles.linearProgress}
+            />
+          </Line>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  return (
+    <PersonalizationFlow
+      onQuestionnaireFinished={() => setShowQuestionnaireFinished(true)}
+    />
+  );
 };
 
 const GetStartedSectionWithErrorBoundary = (props: Props) => (

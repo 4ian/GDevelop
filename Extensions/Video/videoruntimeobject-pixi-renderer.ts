@@ -52,7 +52,7 @@ namespace gdjs {
      * To be called when the object is removed from the scene: will pause the video.
      */
     onDestroy() {
-      this.pause();
+      this.stop();
     }
 
     ensureUpToDate() {
@@ -75,7 +75,8 @@ namespace gdjs {
     }
 
     updateLoop(): void {
-      this._pixiObject._texture.baseTexture.resource.source.loop = this._object._loop;
+      this._pixiObject._texture.baseTexture.resource.source.loop =
+        this._object._loop;
     }
 
     updateVolume(): void {
@@ -170,6 +171,18 @@ namespace gdjs {
         return;
       }
       source.pause();
+    }
+
+    /**
+     * Stops the video and comes back to first frame.
+     */
+    stop() {
+      const source = this._getHTMLVideoElementSource();
+      if (!source) {
+        return;
+      }
+      source.pause();
+      source.currentTime = 0;
     }
 
     // Autoplay was prevented.

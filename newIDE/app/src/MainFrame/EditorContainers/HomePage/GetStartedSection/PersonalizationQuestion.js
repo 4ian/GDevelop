@@ -10,8 +10,9 @@ import GridListTile from '@material-ui/core/GridListTile';
 import { darken, lighten, useTheme } from '@material-ui/core/styles';
 
 import { type AnswerData, type QuestionData } from './Questionnaire';
-import { Column, Line } from '../../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
+import TextField from '../../../../UI/TextField';
 import Paper from '../../../../UI/Paper';
 import InlineCheckbox from '../../../../UI/InlineCheckbox';
 import RaisedButton from '../../../../UI/RaisedButton';
@@ -19,6 +20,7 @@ import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ColumnStackLayout } from '../../../../UI/Layout';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -32,6 +34,141 @@ const getColumnsFromWidth = (width: WidthType) => {
     default:
       return 4;
   }
+};
+
+const styles = {
+  answerButton: {
+    border: 'solid',
+    borderWidth: 1,
+    borderRadius: 8,
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+  },
+  answerButtonBackground: { width: '100%', height: '100%' },
+  answerCoverImage: {
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    width: '100%',
+  },
+  answerCheckboxAnchor: { position: 'relative' },
+  answerCheckboxContainer: {
+    position: 'absolute',
+    left: 5,
+    top: 'calc(50% - 9px)',
+  },
+  answerTextContainer: { marginLeft: 25, marginRight: 25 },
+};
+
+type FreeAnswerProps = {|
+  answerData: AnswerData,
+  onSelect: string => void,
+  selected: boolean,
+  i18n: I18nType,
+  showCheckbox: boolean,
+|};
+
+const FreeAnswer = ({
+  answerData,
+  i18n,
+  onSelect,
+  selected,
+  showCheckbox,
+}: FreeAnswerProps) => {
+  const { text, imageSource, code } = answerData;
+  const [inputValue, setInputValue] = React.useState<string>('');
+  const muiTheme = useTheme();
+  console.log(muiTheme);
+  const borderColor = (muiTheme.palette.type === 'dark' ? darken : lighten)(
+    muiTheme.palette.text.primary,
+    selected ? 0 : 0.7
+  );
+  return (
+    <ButtonBase
+      style={{
+        ...styles.answerButton,
+        borderColor,
+      }}
+      onClick={() => onSelect(code)}
+      disableRipple={selected}
+    >
+      <Paper
+        square={false}
+        background="medium"
+        style={styles.answerButtonBackground}
+      >
+        <div
+          style={{ display: 'flex', height: '100%', flexDirection: 'column' }}
+        >
+          {selected ? (
+            <>
+              <Line justifyContent="center">
+                <Text size="sub-title">{i18n._(text)}</Text>
+              </Line>
+              <Line justifyContent="center" useFullHeight expand noMargin>
+                <ColumnStackLayout expand>
+                  <div
+                    style={{
+                      border: 'solid',
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      borderColor: muiTheme.palette.text.disabled,
+                      flex: 1,
+                      padding: 8,
+                    }}
+                  >
+                    <TextField
+                      multiline
+                      fullWidth
+                      rows={2}
+                      rowsMax={4}
+                      style={{ fontSize: 14 }}
+                      underlineShow={false}
+                      margin="none"
+                      translatableHintText={t`Tell us more!...`}
+                      type="text"
+                      value={inputValue}
+                      onChange={(_, newValue) => setInputValue(newValue)}
+                      autoFocus="desktop"
+                    />
+                  </div>
+                  <RaisedButton
+                    primary
+                    label={i18n._(t`Send`)}
+                    fullWidth
+                    onClick={() => console.log('send')}
+                  />
+                </ColumnStackLayout>
+              </Line>
+              <Spacer />
+            </>
+          ) : (
+            <>
+              <img
+                src={imageSource}
+                style={styles.answerCoverImage}
+                alt={`Other`}
+              />
+              <Line justifyContent={showCheckbox ? 'flex-start' : 'center'}>
+                {showCheckbox ? (
+                  <div style={styles.answerCheckboxAnchor}>
+                    <div style={styles.answerCheckboxContainer}>
+                      <InlineCheckbox checked={selected} paddingSize="small" />
+                    </div>
+                  </div>
+                ) : null}
+                <Column justifyContent="center" alignItems="center" expand>
+                  <div style={styles.answerTextContainer}>
+                    <Text noMargin>{i18n._(text)}</Text>
+                  </div>
+                </Column>
+              </Line>
+            </>
+          )}
+        </div>
+      </Paper>
+    </ButtonBase>
+  );
 };
 
 type AnswerProps = {|
@@ -51,54 +188,38 @@ const Answer = ({
 }: AnswerProps) => {
   const { imageSource, text, code } = answerData;
   const muiTheme = useTheme();
-  const unselectedModifier =
-    muiTheme.palette.type === 'dark' ? darken : lighten;
+  const borderColor = (muiTheme.palette.type === 'dark' ? darken : lighten)(
+    muiTheme.palette.text.primary,
+    selected ? 0 : 0.7
+  );
   return (
     <ButtonBase
       style={{
-        border: 'solid',
-        borderWidth: 1,
-        borderColor: unselectedModifier(
-          muiTheme.palette.text.primary,
-          selected ? 0 : 0.7
-        ),
-        borderRadius: 8,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
+        ...styles.answerButton,
+        borderColor,
       }}
       onClick={() => onSelect(code)}
     >
       <Paper
         square={false}
-        background="light"
-        style={{ width: '100%', height: '100%' }}
+        background="medium"
+        style={styles.answerButtonBackground}
       >
         <img
           src={imageSource}
-          style={{
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            width: '100%',
-          }}
+          style={styles.answerCoverImage}
           alt={`Illustration for option ${i18n._(text)}`}
         />
         <Line justifyContent={showCheckbox ? 'flex-start' : 'center'}>
           {showCheckbox ? (
-            <div style={{ position: 'relative' }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 5,
-                  top: 'calc(50% - 9px)',
-                }}
-              >
+            <div style={styles.answerCheckboxAnchor}>
+              <div style={styles.answerCheckboxContainer}>
                 <InlineCheckbox checked={selected} paddingSize="small" />
               </div>
             </div>
           ) : null}
           <Column justifyContent="center" alignItems="center" expand>
-            <div style={{ marginLeft: 25, marginRight: 25 }}>
+            <div style={styles.answerTextContainer}>
               <Text noMargin>{i18n._(text)}</Text>
             </div>
           </Column>
@@ -125,8 +246,19 @@ const PersonalizationQuestion = ({
   onClickNext,
   showQuestionText,
 }: Props) => {
-  const { text, answers, multi } = questionData;
+  const { text, answers, multi, showOther } = questionData;
   const windowWidth = useResponsiveWindowWidth();
+
+  const answersToDisplay: AnswerData[] = [
+    ...answers,
+    showOther
+      ? {
+          code: 'otherWithInput',
+          text: t`Other`,
+          imageSource: 'res/questionnaire/other.svg',
+        }
+      : null,
+  ].filter(Boolean);
 
   return (
     <I18n>
@@ -145,16 +277,27 @@ const PersonalizationQuestion = ({
             spacing={15}
             cellHeight="auto"
           >
-            {answers.map(answerData => (
+            {answersToDisplay.map(answerData => (
               <GridListTile>
-                <Answer
-                  answerData={answerData}
-                  i18n={i18n}
-                  key={answerData.code}
-                  onSelect={onSelectAnswer}
-                  selected={selectedAnswers.includes(answerData.code)}
-                  showCheckbox={!!multi}
-                />
+                {answerData.code === 'otherWithInput' ? (
+                  <FreeAnswer
+                    answerData={answerData}
+                    i18n={i18n}
+                    key={answerData.code}
+                    onSelect={onSelectAnswer}
+                    selected={selectedAnswers.includes(answerData.code)}
+                    showCheckbox={!!multi}
+                  />
+                ) : (
+                  <Answer
+                    answerData={answerData}
+                    i18n={i18n}
+                    key={answerData.code}
+                    onSelect={onSelectAnswer}
+                    selected={selectedAnswers.includes(answerData.code)}
+                    showCheckbox={!!multi}
+                  />
+                )}
               </GridListTile>
             ))}
           </GridList>

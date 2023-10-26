@@ -33,7 +33,7 @@ const questionnaire: Questionnaire = {
       {
         text: t`I'm learning or teaching game development`,
         code: 'learningOrTeaching',
-        nextQuestion: 'teachOrStudy',
+        nextQuestion: 'learningOrTeaching',
         imageSource: 'res/questionnaire/learning-or-teaching.svg',
       },
       {
@@ -44,7 +44,7 @@ const questionnaire: Questionnaire = {
       },
     ],
   },
-  teachOrStudy: {
+  learningOrTeaching: {
     text: t`Are you teaching or studying game development?`,
     answers: [
       {
@@ -56,12 +56,12 @@ const questionnaire: Questionnaire = {
       {
         text: t`I am learning game development`,
         code: 'learning',
-        nextQuestion: 'learnHow',
+        nextQuestion: 'learningHow',
         imageSource: 'res/questionnaire/teaching.svg',
       },
     ],
   },
-  learnHow: {
+  learningHow: {
     text: t`How are you learning game dev?`,
     answers: [
       {
@@ -176,7 +176,7 @@ const questionnaire: Questionnaire = {
       },
       {
         text: t`Implementing in-project monetization`,
-        code: 'inAppPurchases',
+        code: 'inAppMonetization',
         imageSource: 'res/questionnaire/in-app-monetization.svg',
       },
       {
@@ -217,7 +217,7 @@ const questionnaire: Questionnaire = {
       },
       {
         text: t`I don’t have a specific deadline`,
-        code: 'NoDeadline',
+        code: 'noDeadline',
         imageSource: 'res/questionnaire/delay-no-deadline.svg',
       },
     ],
@@ -259,47 +259,47 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`On Steam and/or Epic Games`,
-        code: 'Steam',
+        code: 'steamEpic',
         imageSource: 'res/questionnaire/target-steam.svg',
       },
       {
         text: t`On Itch and/or Newgrounds`,
-        code: 'Itch',
+        code: 'itchNewgrounds',
         imageSource: 'res/questionnaire/target-itch.svg',
       },
       {
         text: t`On Poki and/or CrazyGames`,
-        code: 'Poki',
+        code: 'pokiCrazyGames',
         imageSource: 'res/questionnaire/target-poki.svg',
       },
       {
         text: t`Android mobile devices (Google Play, Amazon)`,
-        code: 'PlayStore',
+        code: 'androidApp',
         imageSource: 'res/questionnaire/target-play-store.svg',
       },
       {
         text: t`Apple mobile devices (App Store)`,
-        code: 'AppStore',
+        code: 'iosApp',
         imageSource: 'res/questionnaire/target-app-store.svg',
       },
       {
         text: t`Sharing the final file with the client`,
-        code: 'Export',
+        code: 'client',
         imageSource: 'res/questionnaire/target-client.svg',
       },
       {
         text: t`Personal or company website`,
-        code: 'Personal',
+        code: 'personal',
         imageSource: 'res/questionnaire/target-personal.svg',
       },
       {
         text: t`Consoles`,
-        code: 'Console',
+        code: 'console',
         imageSource: 'res/questionnaire/target-console.svg',
       },
       {
         text: t`Other`,
-        code: 'Other',
+        code: 'other',
         imageSource: 'res/questionnaire/other.svg',
       },
     ],

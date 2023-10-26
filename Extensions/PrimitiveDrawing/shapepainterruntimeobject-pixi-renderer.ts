@@ -155,6 +155,31 @@ namespace gdjs {
       this.invalidateBounds();
     }
 
+    drawRegularPolygon(
+      x1: float,
+      y1: float,
+      radius: float,
+      sides: float,
+      rotation: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawRegularPolygon(
+        x1,
+        y1,
+        radius,
+        sides,
+        rotation ? gdjs.toRad(rotation) : 0
+      );
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
     drawStar(
       x1: float,
       y1: float,

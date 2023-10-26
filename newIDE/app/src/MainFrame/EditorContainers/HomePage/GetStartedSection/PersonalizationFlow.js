@@ -9,7 +9,9 @@ import questionnaire, {
   type QuestionData,
   type AnswerData,
 } from './Questionnaire';
-import PersonalizationQuestion from './PersonalizationQuestion';
+import PersonalizationQuestion, {
+  TitleAndSubtitle,
+} from './PersonalizationQuestion';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import SectionContainer, {
   type SectionContainerInterface,
@@ -20,7 +22,6 @@ import { Column, Line } from '../../../../UI/Grid';
 import ScrollView, {
   type ScrollViewInterface,
 } from '../../../../UI/ScrollView';
-import Text from '../../../../UI/Text';
 import FlatButton from '../../../../UI/FlatButton';
 import RaisedButton from '../../../../UI/RaisedButton';
 
@@ -221,20 +222,13 @@ const MobileDisplay = ({
             }}
           >
             <Column noMargin alignItems="center">
-              <Text align="center" size="block-title">
-                {i18n._(questionData.text)}
-              </Text>
-              {questionData.multi ? (
-                <Text align="center" style={styles.subTitle}>
-                  {i18n._(t`You can select more than one.`)}
-                </Text>
-              ) : isOnlyOneFreeAnswerPossible(questionData.answers) ? (
-                <Text align="center" style={styles.subTitle}>
-                  {i18n._(
-                    t`The more descriptive you are, the better we can match the content we’ll recommend.`
-                  )}
-                </Text>
-              ) : null}
+              <TitleAndSubtitle
+                i18n={i18n}
+                multi={questionData.multi}
+                answers={questionData.answers}
+                text={questionData.text}
+                textAlign="center"
+              />
             </Column>
             <ScrollView ref={scrollViewRef}>
               <PersonalizationQuestion

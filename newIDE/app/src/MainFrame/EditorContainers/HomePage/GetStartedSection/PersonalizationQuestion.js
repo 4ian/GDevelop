@@ -9,10 +9,7 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { darken, lighten, useTheme } from '@material-ui/core/styles';
 
-import {
-  type AnswerData,
-  type QuestionData,
-} from './Questionnaire';
+import { type AnswerData, type QuestionData } from './Questionnaire';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import TextField from '../../../../UI/TextField';
@@ -25,6 +22,7 @@ import {
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout } from '../../../../UI/Layout';
 import { isOnlyOneFreeAnswerPossible } from './PersonalizationFlow';
+import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -39,6 +37,38 @@ const getColumnsFromWidth = (width: WidthType) => {
       return 4;
   }
 };
+
+export const TitleAndSubtitle = ({
+  i18n,
+  text,
+  multi,
+  answers,
+  textAlign,
+}: {
+  i18n: I18nType,
+  text: MessageDescriptor,
+  multi: ?boolean,
+  answers: AnswerData[],
+  textAlign: 'center' | 'left',
+}) => (
+  <>
+    <Text size="block-title" align={textAlign}>
+      {i18n._(text)}
+    </Text>
+    {multi ? (
+      <Text style={styles.subTitle} align={textAlign}>
+        {i18n._(t`You can select more than one.`)}
+      </Text>
+    ) : isOnlyOneFreeAnswerPossible(answers) ? (
+      <Text style={styles.subTitle} align={textAlign}>
+        {i18n._(
+          t`The more descriptive you are, the better we can match the content we’ll recommend.`
+        )}
+      </Text>
+    ) : null}
+    <Spacer />
+  </>
+);
 
 const styles = {
   answerButton: {
@@ -306,20 +336,13 @@ const PersonalizationQuestion = ({
       {({ i18n }) => (
         <Column>
           {showQuestionText ? (
-            <>
-              <Text size="block-title">{i18n._(text)}</Text>
-              {multi ? (
-                <Text style={styles.subTitle}>
-                  {i18n._(t`You can select more than one.`)}
-                </Text>
-              ) : isOnlyOneFreeAnswerPossible(questionData.answers) ? (
-                <Text style={styles.subTitle}>
-                  {i18n._(
-                    t`The more descriptive you are, the better we can match the content we’ll recommend.`
-                  )}
-                </Text>
-              ) : null}
-            </>
+            <TitleAndSubtitle
+              i18n={i18n}
+              multi={multi}
+              answers={questionData.answers}
+              text={text}
+              textAlign="left"
+            />
           ) : null}
           <GridList
             cols={getColumnsFromWidth(windowWidth)}

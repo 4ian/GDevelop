@@ -6,13 +6,13 @@ export const firstQuestion = 'creationGoal';
 
 export type FreeAnswerData = {|
   text: MessageDescriptor,
-  code: string,
+  id: string,
   isFree: true,
 |};
 
 export type ChoiceAnswerData = {|
   text: MessageDescriptor,
-  code: string,
+  id: string,
   nextQuestion?: string,
   imageSource: string,
 |};
@@ -35,18 +35,17 @@ export type Questionnaire = {|
 const questionnaire: Questionnaire = {
   [firstQuestion]: {
     text: t`What is your goal with GDevelop?`,
-    // TODO: Add coding experience question if Other was chosen.
     showOther: true,
     answers: [
       {
         text: t`I'm learning or teaching game development`,
-        code: 'learningOrTeaching',
+        id: 'learningOrTeaching',
         nextQuestion: 'learningOrTeaching',
         imageSource: 'res/questionnaire/learning-or-teaching.svg',
       },
       {
         text: t`I'm building a video game or app`,
-        code: 'building',
+        id: 'building',
         nextQuestion: 'buildingKindOfProjects',
         imageSource: 'res/questionnaire/building-video-game-or-app.svg',
       },
@@ -57,13 +56,13 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`I am teaching game development`,
-        code: 'teaching',
+        id: 'teaching',
         nextQuestion: 'gameDevelopmentExperience',
         imageSource: 'res/questionnaire/learning.svg',
       },
       {
         text: t`I am learning game development`,
-        code: 'learning',
+        id: 'learning',
         nextQuestion: 'learningHow',
         imageSource: 'res/questionnaire/teaching.svg',
       },
@@ -74,12 +73,12 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`Through a teacher`,
-        code: 'withTeacher',
+        id: 'withTeacher',
         imageSource: 'res/questionnaire/through-a-teacher.svg',
       },
       {
         text: t`On my own`,
-        code: 'alone',
+        id: 'alone',
         nextQuestion: 'learningKindOfProjects',
         imageSource: 'res/questionnaire/on-my-own.svg',
       },
@@ -90,24 +89,24 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`A game to publish`,
-        code: 'gameToPublish',
+        id: 'gameToPublish',
         nextQuestion: 'gameDevelopmentExperience',
         imageSource: 'res/questionnaire/game-to-publish.svg',
       },
       {
         text: t`New interactive services for existent clients`,
-        code: 'interactiveService',
+        id: 'interactiveService',
         nextQuestion: 'gameDevelopmentExperience',
         imageSource: 'res/questionnaire/interactive-services-for-clients.svg',
       },
       {
         text: t`Games to learn or teach something`,
-        code: 'seriousGame',
+        id: 'seriousGame',
         imageSource: 'res/questionnaire/serious-game.svg',
       },
       {
         text: t`Other`,
-        code: 'other',
+        id: 'other',
         nextQuestion: 'gameDevelopmentExperience',
         imageSource: 'res/questionnaire/other.svg',
       },
@@ -120,22 +119,22 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`Video game`,
-        code: 'videoGame',
+        id: 'videoGame',
         imageSource: 'res/questionnaire/video-game.svg',
       },
       {
         text: t`Interactive content`,
-        code: 'interactiveContent',
+        id: 'interactiveContent',
         imageSource: 'res/questionnaire/interactive-content.svg',
       },
       {
         text: t`App or tool`,
-        code: 'appOrTool',
+        id: 'appOrTool',
         imageSource: 'res/questionnaire/app-or-tool.svg',
       },
       {
         text: t`Game for teaching or learning`,
-        code: 'seriousGame',
+        id: 'seriousGame',
         imageSource: 'res/questionnaire/serious-game.svg',
       },
     ],
@@ -146,7 +145,7 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`What kind of projects are you building?`,
-        code: 'input',
+        id: 'input',
         isFree: true,
       },
     ],
@@ -157,17 +156,17 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`Completely alone`,
-        code: 'alone',
+        id: 'alone',
         imageSource: 'res/questionnaire/completely-alone.svg',
       },
       {
         text: t`With at least one other person`,
-        code: 'onePlus',
+        id: 'onePlus',
         imageSource: 'res/questionnaire/with-at-least-one-other-person.svg',
       },
       {
         text: t`With an established team of people during the whole project`,
-        code: 'team',
+        id: 'team',
         imageSource: 'res/questionnaire/with-a-team.svg',
       },
     ],
@@ -180,27 +179,27 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`Lack of Graphics & Animation`,
-        code: 'lackGraphics',
+        id: 'lackGraphics',
         imageSource: 'res/questionnaire/lack-of-graphics.svg',
       },
       {
         text: t`Lack of Music & Sound`,
-        code: 'lackSound',
+        id: 'lackSound',
         imageSource: 'res/questionnaire/lack-of-sounds.svg',
       },
       {
         text: t`Lack of Marketing & Publicity`,
-        code: 'lackMarketing',
+        id: 'lackMarketing',
         imageSource: 'res/questionnaire/lack-of-marketing.svg',
       },
       {
         text: t`Implementing in-project monetization`,
-        code: 'inAppMonetization',
+        id: 'inAppMonetization',
         imageSource: 'res/questionnaire/in-app-monetization.svg',
       },
       {
         text: t` Dealing with data integration from external sources`,
-        code: 'externalIntegration',
+        id: 'externalIntegration',
         imageSource: 'res/questionnaire/integration-of-external-services.svg',
       },
     ],
@@ -211,32 +210,32 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`Less than a month`,
-        code: '1MonthOrLess',
+        id: '1MonthOrLess',
         imageSource: 'res/questionnaire/delay-less-than-1-month.svg',
       },
       {
         text: t`Around 1 or 2 months`,
-        code: '1To2Months',
+        id: '1To2Months',
         imageSource: 'res/questionnaire/delay-1-to-2-months.svg',
       },
       {
         text: t`Around 3 to 5 months`,
-        code: '3To5Months',
+        id: '3To5Months',
         imageSource: 'res/questionnaire/delay-3-to-5-months.svg',
       },
       {
         text: t`More than 6 months`,
-        code: '6MonthsPlus',
+        id: '6MonthsPlus',
         imageSource: 'res/questionnaire/delay-6-months-plus.svg',
       },
       {
         text: t`In around a year`,
-        code: '1Year',
+        id: '1Year',
         imageSource: 'res/questionnaire/delay-1-year.svg',
       },
       {
         text: t`I don’t have a specific deadline`,
-        code: 'noDeadline',
+        id: 'noDeadline',
         imageSource: 'res/questionnaire/delay-no-deadline.svg',
       },
     ],
@@ -257,17 +256,17 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`No experience at all`,
-        code: 'none',
+        id: 'none',
         imageSource: 'res/questionnaire/zero-coding-experience.svg',
       },
       {
         text: t`Some no-code experience`,
-        code: 'someNoCode',
+        id: 'someNoCode',
         imageSource: 'res/questionnaire/no-code-experience.svg',
       },
       {
         text: t`Some code experience`,
-        code: 'someCode',
+        id: 'someCode',
         imageSource: 'res/questionnaire/coding-experience.svg',
       },
     ],
@@ -278,47 +277,47 @@ const questionnaire: Questionnaire = {
     answers: [
       {
         text: t`On Steam and/or Epic Games`,
-        code: 'steamEpic',
+        id: 'steamEpic',
         imageSource: 'res/questionnaire/target-steam.svg',
       },
       {
         text: t`On Itch and/or Newgrounds`,
-        code: 'itchNewgrounds',
+        id: 'itchNewgrounds',
         imageSource: 'res/questionnaire/target-itch.svg',
       },
       {
         text: t`On Poki and/or CrazyGames`,
-        code: 'pokiCrazyGames',
+        id: 'pokiCrazyGames',
         imageSource: 'res/questionnaire/target-poki.svg',
       },
       {
         text: t`Android mobile devices (Google Play, Amazon)`,
-        code: 'androidApp',
+        id: 'androidApp',
         imageSource: 'res/questionnaire/target-play-store.svg',
       },
       {
         text: t`Apple mobile devices (App Store)`,
-        code: 'iosApp',
+        id: 'iosApp',
         imageSource: 'res/questionnaire/target-app-store.svg',
       },
       {
         text: t`Sharing the final file with the client`,
-        code: 'client',
+        id: 'client',
         imageSource: 'res/questionnaire/target-client.svg',
       },
       {
         text: t`Personal or company website`,
-        code: 'personal',
+        id: 'personal',
         imageSource: 'res/questionnaire/target-personal.svg',
       },
       {
         text: t`Consoles`,
-        code: 'console',
+        id: 'console',
         imageSource: 'res/questionnaire/target-console.svg',
       },
       {
         text: t`Other`,
-        code: 'other',
+        id: 'other',
         imageSource: 'res/questionnaire/other.svg',
       },
     ],

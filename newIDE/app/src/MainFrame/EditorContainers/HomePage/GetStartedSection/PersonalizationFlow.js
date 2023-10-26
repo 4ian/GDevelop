@@ -26,8 +26,9 @@ import RaisedButton from '../../../../UI/RaisedButton';
 
 const STEP_MAX_COUNT = 7;
 
-export const isOnlyOneFreeAnswerPossible = (answers: Array<AnswerData>): boolean =>
-  answers.length === 1 && 'isFree' in answers[0];
+export const isOnlyOneFreeAnswerPossible = (
+  answers: Array<AnswerData>
+): boolean => answers.length === 1 && 'isFree' in answers[0];
 
 const styles = {
   navigationDot: {
@@ -43,7 +44,7 @@ type UserAnswers = Array<{|
   stepName: string,
   answers: string[],
   /** Used to store user input in question with showOther */
-  other?: string,
+  userInput?: string,
 |}>;
 
 const NavigationStep = ({ stepIndex }: {| stepIndex: number |}) => {
@@ -73,7 +74,7 @@ type DisplayProps = {|
   onSelectAnswer: (string, string) => void,
   goToNextQuestion: QuestionData => void,
   onClickSend: string => void,
-  onChangeOtherValue: (string, string) => void,
+  onChangeUserInputValue: (string, string) => void,
   step: string,
 |};
 
@@ -82,7 +83,7 @@ const DesktopDisplay = ({
   onSelectAnswer,
   goToNextQuestion,
   onClickSend,
-  onChangeOtherValue,
+  onChangeUserInputValue,
   step,
 }: DisplayProps) => {
   const questionData = questionnaire[step];
@@ -125,9 +126,9 @@ const DesktopDisplay = ({
           onClickSend={
             userAnswer.stepName === firstQuestion ? onClickSend : undefined
           }
-          otherValue={userAnswer.other || ''}
-          onChangeOtherValue={value =>
-            onChangeOtherValue(userAnswer.stepName, value)
+          userInputValue={userAnswer.userInput || ''}
+          onChangeUserInputValue={value =>
+            onChangeUserInputValue(userAnswer.stepName, value)
           }
         />
       );
@@ -185,7 +186,7 @@ const MobileDisplay = ({
   goToPreviousQuestion,
   onClickSend,
   step,
-  onChangeOtherValue,
+  onChangeUserInputValue,
 }: MobileDisplayProps) => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>();
 
@@ -245,8 +246,12 @@ const MobileDisplay = ({
                 showNextButton={false}
                 showQuestionText={false}
                 onClickSend={step === firstQuestion ? onClickSend : undefined}
-                onChangeOtherValue={value => onChangeOtherValue(step, value)}
-                otherValue={userAnswer ? userAnswer.other || '' : undefined}
+                userInputValue={
+                  userAnswer ? userAnswer.userInput || '' : undefined
+                }
+                onChangeUserInputValue={value =>
+                  onChangeUserInputValue(step, value)
+                }
               />
             </ScrollView>
             <Column noMargin>
@@ -318,14 +323,14 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
     [userAnswers, onQuestionnaireFinished]
   );
 
-  const onChangeOtherValue = React.useCallback(
-    (step: string, content: string) => {
+  const onChangeUserInputValue = React.useCallback(
+    (step: string, value: string) => {
       const matchingUserAnswerIndex = userAnswers.findIndex(
         userAnswer => userAnswer.stepName === step
       );
       if (matchingUserAnswerIndex < 0) return;
       const newUserAnswers = [...userAnswers];
-      newUserAnswers[matchingUserAnswerIndex].other = content;
+      newUserAnswers[matchingUserAnswerIndex].userInput = value;
       setUserAnswers(newUserAnswers);
     },
     [userAnswers]
@@ -344,7 +349,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
       ) {
         setUserAnswers([
           ...userAnswers,
-          { stepName: step, other: '', answers: [answers[0].code] },
+          { stepName: step, userInput: '', answers: [answers[0].id] },
         ]);
       }
     },
@@ -352,13 +357,13 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
   );
 
   const onSelectAnswer = React.useCallback(
-    (step: string, answer: string) => {
+    (step: string, answerId: string) => {
       const questionData = questionnaire[step];
       const { multi } = questionData;
       const existingUserAnswerIndex = userAnswers.findIndex(
         userAnswer => userAnswer.stepName === step
       );
-      const shouldGoToNextQuestion = answer !== 'otherWithInput';
+      const shouldGoToNextQuestion = answerId !== 'otherWithInput';
       if (existingUserAnswerIndex >= 0) {
         // User is coming back to a previous question
         if (multi) {
@@ -366,25 +371,25 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           const newUserAnswers = [...userAnswers];
           const answerIndex = newUserAnswers[
             existingUserAnswerIndex
-          ].answers.indexOf(answer);
+          ].answers.indexOf(answerId);
           if (answerIndex >= 0) {
             newUserAnswers[existingUserAnswerIndex].answers.splice(
               answerIndex,
               1
             );
           } else {
-            newUserAnswers[existingUserAnswerIndex].answers.push(answer);
+            newUserAnswers[existingUserAnswerIndex].answers.push(answerId);
           }
           setUserAnswers(newUserAnswers);
         } else {
           // Handle new answer (that could be the same as before).
           const hasAnswerChanged =
-            userAnswers[existingUserAnswerIndex].answers[0] !== answer;
+            userAnswers[existingUserAnswerIndex].answers[0] !== answerId;
           const newUserAnswers = [...userAnswers];
-          newUserAnswers[existingUserAnswerIndex].answers = [answer];
+          newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           const doesAnswerChangesFollowingQuestion =
             !questionData.nextQuestion ||
-            (step === firstQuestion && answer === 'otherWithInput');
+            (step === firstQuestion && answerId === 'otherWithInput');
           if (doesAnswerChangesFollowingQuestion && hasAnswerChanged) {
             newUserAnswers.splice(
               existingUserAnswerIndex + 1,
@@ -394,7 +399,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           setUserAnswers(newUserAnswers);
           if (doesAnswerChangesFollowingQuestion) {
             const answerData = questionData.answers.find(
-              answerData => answerData.code === answer
+              answerData => answerData.id === answerId
             );
             if (shouldGoToNextQuestion) {
               goToNextQuestion(questionData, answerData);
@@ -406,9 +411,12 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           }
         }
       } else {
-        setUserAnswers([...userAnswers, { stepName: step, answers: [answer] }]);
+        setUserAnswers([
+          ...userAnswers,
+          { stepName: step, answers: [answerId] },
+        ]);
         const answerData = questionData.answers.find(
-          answerData => answerData.code === answer
+          answerData => answerData.id === answerId
         );
         if (!multi && shouldGoToNextQuestion) {
           goToNextQuestion(questionData, answerData);
@@ -441,7 +449,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
         onSelectAnswer={onSelectAnswer}
         userAnswers={userAnswers}
         onClickSend={content => console.log(content)}
-        onChangeOtherValue={onChangeOtherValue}
+        onChangeUserInputValue={onChangeUserInputValue}
       />
     );
   }
@@ -453,7 +461,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
       onSelectAnswer={onSelectAnswer}
       userAnswers={userAnswers}
       onClickSend={content => console.log(content)}
-      onChangeOtherValue={onChangeOtherValue}
+      onChangeUserInputValue={onChangeUserInputValue}
     />
   );
 };

@@ -99,7 +99,7 @@ const FreeAnswer = ({
   value,
   onChange,
 }: FreeAnswerProps) => {
-  const { text, code } = answerData;
+  const { text, id } = answerData;
   const imageSource = answerData.isFree ? null : answerData.imageSource;
   const [errorText, setErrorText] = React.useState<React.Node>(null);
   const muiTheme = useTheme();
@@ -137,7 +137,7 @@ const FreeAnswer = ({
           // because it comes from a key press.
           return;
         }
-        onSelect(code);
+        onSelect(id);
       }}
       disableRipple={selected}
     >
@@ -234,7 +234,7 @@ const Answer = ({
   selected,
   showCheckbox,
 }: AnswerProps) => {
-  const { imageSource, text, code } = answerData;
+  const { imageSource, text, id } = answerData;
   const muiTheme = useTheme();
   const borderColor = (muiTheme.palette.type === 'dark' ? darken : lighten)(
     muiTheme.palette.text.primary,
@@ -246,7 +246,7 @@ const Answer = ({
         ...styles.answerButton,
         borderColor,
       }}
-      onClick={() => onSelect(code)}
+      onClick={() => onSelect(id)}
     >
       <Paper
         square={false}
@@ -285,8 +285,8 @@ type Props = {|
   onClickNext: () => void,
   showQuestionText: boolean,
   onClickSend?: string => void,
-  otherValue?: string,
-  onChangeOtherValue?: string => void,
+  userInputValue?: string,
+  onChangeUserInputValue?: string => void,
 |};
 
 const PersonalizationQuestion = ({
@@ -297,8 +297,8 @@ const PersonalizationQuestion = ({
   onClickNext,
   showQuestionText,
   onClickSend,
-  otherValue,
-  onChangeOtherValue,
+  userInputValue,
+  onChangeUserInputValue,
 }: Props) => {
   const { text, answers, multi, showOther } = questionData;
   const windowWidth = useResponsiveWindowWidth();
@@ -307,7 +307,7 @@ const PersonalizationQuestion = ({
     ...answers,
     showOther
       ? {
-          code: 'otherWithInput',
+          id: 'otherWithInput',
           text: t`Other`,
           imageSource: 'res/questionnaire/other.svg',
         }
@@ -341,47 +341,46 @@ const PersonalizationQuestion = ({
           >
             {// Case where only one free answer is possible.
             isOnlyOneFreeAnswerPossible(answersToDisplay) &&
-            otherValue !== undefined &&
-            onChangeOtherValue ? (
+            userInputValue !== undefined &&
+            onChangeUserInputValue ? (
               <GridListTile>
                 <FreeAnswer
                   answerData={answersToDisplay[0]}
                   i18n={i18n}
-                  key={answersToDisplay[0].code}
+                  key={answersToDisplay[0].id}
                   // Do not leave possibility to unselect answer.
                   onSelect={() => {}}
-                  selected={selectedAnswers.includes(answersToDisplay[0].code)}
+                  selected={selectedAnswers.includes(answersToDisplay[0].id)}
                   showCheckbox={false}
                   onClickSend={onClickSend}
-                  // Answer is stored in other field.
-                  value={otherValue}
-                  onChange={onChangeOtherValue}
+                  value={userInputValue}
+                  onChange={onChangeUserInputValue}
                 />
               </GridListTile>
             ) : (
               answersToDisplay.map(answerData => (
                 <GridListTile>
-                  {answerData.code === 'otherWithInput' &&
-                  otherValue !== undefined &&
-                  onChangeOtherValue ? (
+                  {answerData.id === 'otherWithInput' &&
+                  userInputValue !== undefined &&
+                  onChangeUserInputValue ? (
                     <FreeAnswer
                       answerData={answerData}
                       i18n={i18n}
-                      key={answerData.code}
+                      key={answerData.id}
                       onSelect={onSelectAnswer}
-                      selected={selectedAnswers.includes(answerData.code)}
+                      selected={selectedAnswers.includes(answerData.id)}
                       showCheckbox={!!multi}
                       onClickSend={onClickSend}
-                      value={otherValue}
-                      onChange={onChangeOtherValue}
+                      value={userInputValue}
+                      onChange={onChangeUserInputValue}
                     />
                   ) : answerData.isFree ? null : (
                     <Answer
                       answerData={answerData}
                       i18n={i18n}
-                      key={answerData.code}
+                      key={answerData.id}
                       onSelect={onSelectAnswer}
-                      selected={selectedAnswers.includes(answerData.code)}
+                      selected={selectedAnswers.includes(answerData.id)}
                       showCheckbox={!!multi}
                     />
                   )}

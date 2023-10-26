@@ -385,12 +385,13 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           // Handle new answer (that could be the same as before).
           const hasAnswerChanged =
             userAnswers[existingUserAnswerIndex].answers[0] !== answerId;
+          if (!hasAnswerChanged) return;
           const newUserAnswers = [...userAnswers];
           newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           const doesAnswerChangesFollowingQuestion =
             !questionData.nextQuestion ||
             (step === firstQuestion && answerId === 'otherWithInput');
-          if (doesAnswerChangesFollowingQuestion && hasAnswerChanged) {
+          if (doesAnswerChangesFollowingQuestion) {
             newUserAnswers.splice(
               existingUserAnswerIndex + 1,
               userAnswers.length - existingUserAnswerIndex

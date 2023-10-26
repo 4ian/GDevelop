@@ -4,12 +4,20 @@ import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor
 
 export const firstQuestion = 'creationGoal';
 
-export type AnswerData = {|
+export type FreeAnswerData = {|
+  text: MessageDescriptor,
+  code: string,
+  isFree: true,
+|};
+
+export type ChoiceAnswerData = {|
   text: MessageDescriptor,
   code: string,
   nextQuestion?: string,
   imageSource: string,
 |};
+
+export type AnswerData = ChoiceAnswerData | FreeAnswerData;
 
 export type QuestionData = {|
   text: MessageDescriptor,
@@ -107,7 +115,7 @@ const questionnaire: Questionnaire = {
   },
   buildingKindOfProjects: {
     text: t`What kind of projects do you want to build with GDevelop?`,
-    nextQuestion: 'workingTeam',
+    nextQuestion: 'projectDescription',
     multi: true,
     answers: [
       {
@@ -129,6 +137,17 @@ const questionnaire: Questionnaire = {
         text: t`Game for teaching or learning`,
         code: 'seriousGame',
         imageSource: 'res/questionnaire/serious-game.svg',
+      },
+    ],
+  },
+  projectDescription: {
+    text: t`Would you like to describe your projects?`,
+    nextQuestion: 'workingTeam',
+    answers: [
+      {
+        text: t`What kind of projects are you building?`,
+        code: 'input',
+        isFree: true,
       },
     ],
   },

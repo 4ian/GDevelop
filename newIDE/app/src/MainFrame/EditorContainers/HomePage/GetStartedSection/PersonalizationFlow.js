@@ -26,6 +26,9 @@ import RaisedButton from '../../../../UI/RaisedButton';
 
 const STEP_MAX_COUNT = 7;
 
+export const isOnlyOneFreeAnswerPossible = (answers: Array<AnswerData>): boolean =>
+  answers.length === 1 && 'isFree' in answers[0];
+
 const styles = {
   navigationDot: {
     height: 8,
@@ -33,6 +36,7 @@ const styles = {
     borderRadius: '50%',
     margin: 5,
   },
+  subTitle: { opacity: 0.6 },
 };
 
 type UserAnswers = Array<{|
@@ -111,7 +115,8 @@ const DesktopDisplay = ({
           selectedAnswers={userAnswer.answers}
           onSelectAnswer={answer => onSelectAnswer(userAnswer.stepName, answer)}
           showNextButton={
-            relatedQuestionData.multi &&
+            (relatedQuestionData.multi ||
+              isOnlyOneFreeAnswerPossible(relatedQuestionData.answers)) &&
             index === userAnswers.length - 1 &&
             step === userAnswer.stepName
           }
@@ -130,8 +135,8 @@ const DesktopDisplay = ({
   );
 
   // When answering a multi answer question, the first click on an answer adds an item to
-  // user answers. The question is then displayed through questionsToRender and should not
-  // be rendered a second time.
+  // user answers. The question is then displayed through userAnswers and should not
+  // be rendered a second time as a question.
   const shouldDisplayStep =
     questionData &&
     (!questionData.multi ||
@@ -140,7 +145,8 @@ const DesktopDisplay = ({
       userAnswers[userAnswers.length - 1] &&
       userAnswers[userAnswers.length - 1].stepName === firstQuestion &&
       userAnswers[userAnswers.length - 1].answers[0] === 'otherWithInput'
-    );
+    ) &&
+    !isOnlyOneFreeAnswerPossible(questionData.answers);
 
   if (shouldDisplayStep) {
     const questionData = questionnaire[step];
@@ -218,8 +224,14 @@ const MobileDisplay = ({
                 {i18n._(questionData.text)}
               </Text>
               {questionData.multi ? (
-                <Text align="center">
+                <Text align="center" style={styles.subTitle}>
                   {i18n._(t`You can select more than one.`)}
+                </Text>
+              ) : isOnlyOneFreeAnswerPossible(questionData.answers) ? (
+                <Text align="center" style={styles.subTitle}>
+                  {i18n._(
+                    t`The more descriptive you are, the better we can match the content we’ll recommend.`
+                  )}
                 </Text>
               ) : null}
             </Column>
@@ -246,7 +258,8 @@ const MobileDisplay = ({
                     onClick={goToPreviousQuestion}
                   />
                 )}
-                {questionData.multi && (
+                {(questionData.multi ||
+                  isOnlyOneFreeAnswerPossible(questionData.answers)) && (
                   <RaisedButton
                     primary
                     fullWidth
@@ -316,6 +329,26 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
       setUserAnswers(newUserAnswers);
     },
     [userAnswers]
+  );
+
+  React.useEffect(
+    () => {
+      // On each step change, check if new question only has one free answer possible.
+      // If that's the case, automatically add an answer to user answers.
+      const questionData = questionnaire[step];
+      if (!questionData) return;
+      const { answers } = questionData;
+      if (
+        isOnlyOneFreeAnswerPossible(answers) &&
+        userAnswers.every(userAnswer => userAnswer.stepName !== step)
+      ) {
+        setUserAnswers([
+          ...userAnswers,
+          { stepName: step, other: '', answers: [answers[0].code] },
+        ]);
+      }
+    },
+    [step, userAnswers]
   );
 
   const onSelectAnswer = React.useCallback(

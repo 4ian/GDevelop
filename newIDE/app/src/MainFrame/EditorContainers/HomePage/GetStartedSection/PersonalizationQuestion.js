@@ -9,7 +9,11 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { darken, lighten, useTheme } from '@material-ui/core/styles';
 
-import { type AnswerData, type QuestionData } from './Questionnaire';
+import {
+  type AnswerData,
+  type ChoiceAnswerData,
+  type QuestionData,
+} from './Questionnaire';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import TextField from '../../../../UI/TextField';
@@ -21,6 +25,7 @@ import {
   type WidthType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout } from '../../../../UI/Layout';
+import { isOnlyOneFreeAnswerPossible } from './PersonalizationFlow';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -70,6 +75,7 @@ const styles = {
     flex: 1,
     padding: 8,
   },
+  subTitle: { opacity: 0.6 },
 };
 
 type FreeAnswerProps = {|
@@ -93,7 +99,8 @@ const FreeAnswer = ({
   value,
   onChange,
 }: FreeAnswerProps) => {
-  const { text, imageSource, code } = answerData;
+  const { text, code } = answerData;
+  const imageSource = answerData.isFree ? null : answerData.imageSource;
   const [errorText, setErrorText] = React.useState<React.Node>(null);
   const muiTheme = useTheme();
   const borderColor = (muiTheme.palette.type === 'dark' ? darken : lighten)(
@@ -140,7 +147,7 @@ const FreeAnswer = ({
         style={styles.answerButtonBackground}
       >
         <div style={styles.freeAnswerContent}>
-          {selected ? (
+          {selected || !imageSource ? (
             <>
               <Line justifyContent="center">
                 <Text size="sub-title">{i18n._(text)}</Text>
@@ -159,6 +166,7 @@ const FreeAnswer = ({
                       errorText={errorText}
                       rows={5}
                       rowsMax={5}
+                      maxLength={200}
                       style={{ fontSize: 14 }}
                       underlineShow={false}
                       margin="none"
@@ -212,7 +220,7 @@ const FreeAnswer = ({
 };
 
 type AnswerProps = {|
-  answerData: AnswerData,
+  answerData: ChoiceAnswerData,
   onSelect: string => void,
   selected: boolean,
   i18n: I18nType,
@@ -314,7 +322,15 @@ const PersonalizationQuestion = ({
             <>
               <Text size="block-title">{i18n._(text)}</Text>
               {multi ? (
-                <Text>{i18n._(t`You can select more than one.`)}</Text>
+                <Text style={styles.subTitle}>
+                  {i18n._(t`You can select more than one.`)}
+                </Text>
+              ) : isOnlyOneFreeAnswerPossible(questionData.answers) ? (
+                <Text style={styles.subTitle}>
+                  {i18n._(
+                    t`The more descriptive you are, the better we can match the content we’ll recommend.`
+                  )}
+                </Text>
               ) : null}
             </>
           ) : null}
@@ -323,34 +339,55 @@ const PersonalizationQuestion = ({
             spacing={15}
             cellHeight="auto"
           >
-            {answersToDisplay.map(answerData => (
+            {// Case where only one free answer is possible.
+            isOnlyOneFreeAnswerPossible(answersToDisplay) &&
+            otherValue !== undefined &&
+            onChangeOtherValue ? (
               <GridListTile>
-                {answerData.code === 'otherWithInput' &&
-                otherValue !== undefined &&
-                onChangeOtherValue ? (
-                  <FreeAnswer
-                    answerData={answerData}
-                    i18n={i18n}
-                    key={answerData.code}
-                    onSelect={onSelectAnswer}
-                    selected={selectedAnswers.includes(answerData.code)}
-                    showCheckbox={!!multi}
-                    onClickSend={onClickSend}
-                    value={otherValue}
-                    onChange={onChangeOtherValue}
-                  />
-                ) : (
-                  <Answer
-                    answerData={answerData}
-                    i18n={i18n}
-                    key={answerData.code}
-                    onSelect={onSelectAnswer}
-                    selected={selectedAnswers.includes(answerData.code)}
-                    showCheckbox={!!multi}
-                  />
-                )}
+                <FreeAnswer
+                  answerData={answersToDisplay[0]}
+                  i18n={i18n}
+                  key={answersToDisplay[0].code}
+                  // Do not leave possibility to unselect answer.
+                  onSelect={() => {}}
+                  selected={selectedAnswers.includes(answersToDisplay[0].code)}
+                  showCheckbox={false}
+                  onClickSend={onClickSend}
+                  // Answer is stored in other field.
+                  value={otherValue}
+                  onChange={onChangeOtherValue}
+                />
               </GridListTile>
-            ))}
+            ) : (
+              answersToDisplay.map(answerData => (
+                <GridListTile>
+                  {answerData.code === 'otherWithInput' &&
+                  otherValue !== undefined &&
+                  onChangeOtherValue ? (
+                    <FreeAnswer
+                      answerData={answerData}
+                      i18n={i18n}
+                      key={answerData.code}
+                      onSelect={onSelectAnswer}
+                      selected={selectedAnswers.includes(answerData.code)}
+                      showCheckbox={!!multi}
+                      onClickSend={onClickSend}
+                      value={otherValue}
+                      onChange={onChangeOtherValue}
+                    />
+                  ) : answerData.isFree ? null : (
+                    <Answer
+                      answerData={answerData}
+                      i18n={i18n}
+                      key={answerData.code}
+                      onSelect={onSelectAnswer}
+                      selected={selectedAnswers.includes(answerData.code)}
+                      showCheckbox={!!multi}
+                    />
+                  )}
+                </GridListTile>
+              ))
+            )}
           </GridList>
           {showNextButton && (
             <Line justifyContent="flex-end">

@@ -162,8 +162,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("RegularPolygon",
                 _("Regular Polygon"),
                 _("Draw a regular polygon on screen"),
-                _("Draw at _PARAM1_;_PARAM2_ a regular polygon with _PARAM4_ sides and radius: "
-                  "_PARAM3_ (rotation: _PARAM5_) "
+                _("Draw at _PARAM1_;_PARAM2_ a regular polygon with _PARAM3_ sides and radius: "
+                  "_PARAM4_ (rotation: _PARAM5_) "
                   "with _PARAM0_"),
                   _("Drawing"),
                   "res/actions/regularPolygon24.png",
@@ -172,12 +172,11 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("expression", _("X position of center"))
         .AddParameter("expression", _("Y position of center"))
-        .AddParameter("expression", _("Radius (in pixels)"))
         .AddParameter("expression",
               _("Number of sides of the polygon (minimum: 3)"))
+        .AddParameter("expression", _("Radius (in pixels)"))
         .AddParameter("expression", _("Rotation (in degrees)"))
         .SetFunctionName("DrawRegularPolygon");
-  
 
   obj.AddAction(
          "Star",

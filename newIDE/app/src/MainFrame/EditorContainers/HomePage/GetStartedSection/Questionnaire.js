@@ -7,6 +7,7 @@ export const firstQuestion = 'creationGoal';
 export type FreeAnswerData = {|
   text: MessageDescriptor,
   id: string,
+  imageSource?: string,
   isFree: true,
 |};
 
@@ -23,7 +24,6 @@ export type QuestionData = {|
   text: MessageDescriptor,
   nextQuestion?: string,
   getNextQuestion?: any => string | null,
-  showOther?: boolean,
   multi?: boolean,
   answers: Array<AnswerData>,
 |};
@@ -35,7 +35,6 @@ export type Questionnaire = {|
 const questionnaire: Questionnaire = {
   [firstQuestion]: {
     text: t`What is your goal with GDevelop?`,
-    showOther: true,
     answers: [
       {
         text: t`I'm learning or teaching game development`,
@@ -48,6 +47,12 @@ const questionnaire: Questionnaire = {
         id: 'building',
         nextQuestion: 'buildingKindOfProjects',
         imageSource: 'res/questionnaire/building-video-game-or-app.svg',
+      },
+      {
+        text: t`Other`,
+        id: 'input',
+        imageSource: 'res/questionnaire/other.svg',
+        isFree: true,
       },
     ],
   },
@@ -174,7 +179,6 @@ const questionnaire: Questionnaire = {
   painPoints: {
     text: t`Is there anything that you struggle with while working on your projects?`,
     multi: true,
-    showOther: true,
     nextQuestion: 'targetDate',
     answers: [
       {
@@ -198,9 +202,15 @@ const questionnaire: Questionnaire = {
         imageSource: 'res/questionnaire/in-app-monetization.svg',
       },
       {
-        text: t` Dealing with data integration from external sources`,
+        text: t`Dealing with data integration from external sources`,
         id: 'externalIntegration',
         imageSource: 'res/questionnaire/integration-of-external-services.svg',
+      },
+      {
+        text: t`Other`,
+        id: 'input',
+        imageSource: 'res/questionnaire/other.svg',
+        isFree: true,
       },
     ],
   },

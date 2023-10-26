@@ -11,7 +11,6 @@ import { darken, lighten, useTheme } from '@material-ui/core/styles';
 
 import {
   type AnswerData,
-  type ChoiceAnswerData,
   type QuestionData,
 } from './Questionnaire';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
@@ -99,8 +98,7 @@ const FreeAnswer = ({
   value,
   onChange,
 }: FreeAnswerProps) => {
-  const { text, id } = answerData;
-  const imageSource = answerData.isFree ? null : answerData.imageSource;
+  const { text, imageSource, id } = answerData;
   const [errorText, setErrorText] = React.useState<React.Node>(null);
   const muiTheme = useTheme();
   const borderColor = (muiTheme.palette.type === 'dark' ? darken : lighten)(
@@ -220,7 +218,7 @@ const FreeAnswer = ({
 };
 
 type AnswerProps = {|
-  answerData: ChoiceAnswerData,
+  answerData: AnswerData,
   onSelect: string => void,
   selected: boolean,
   i18n: I18nType,
@@ -300,19 +298,8 @@ const PersonalizationQuestion = ({
   userInputValue,
   onChangeUserInputValue,
 }: Props) => {
-  const { text, answers, multi, showOther } = questionData;
+  const { text, answers, multi } = questionData;
   const windowWidth = useResponsiveWindowWidth();
-
-  const answersToDisplay: AnswerData[] = [
-    ...answers,
-    showOther
-      ? {
-          id: 'otherWithInput',
-          text: t`Other`,
-          imageSource: 'res/questionnaire/other.svg',
-        }
-      : null,
-  ].filter(Boolean);
 
   return (
     <I18n>
@@ -340,17 +327,17 @@ const PersonalizationQuestion = ({
             cellHeight="auto"
           >
             {// Case where only one free answer is possible.
-            isOnlyOneFreeAnswerPossible(answersToDisplay) &&
+            isOnlyOneFreeAnswerPossible(answers) &&
             userInputValue !== undefined &&
             onChangeUserInputValue ? (
               <GridListTile>
                 <FreeAnswer
-                  answerData={answersToDisplay[0]}
+                  answerData={answers[0]}
                   i18n={i18n}
-                  key={answersToDisplay[0].id}
+                  key={answers[0].id}
                   // Do not leave possibility to unselect answer.
                   onSelect={() => {}}
-                  selected={selectedAnswers.includes(answersToDisplay[0].id)}
+                  selected={selectedAnswers.includes(answers[0].id)}
                   showCheckbox={false}
                   onClickSend={onClickSend}
                   value={userInputValue}
@@ -358,9 +345,9 @@ const PersonalizationQuestion = ({
                 />
               </GridListTile>
             ) : (
-              answersToDisplay.map(answerData => (
+              answers.map(answerData => (
                 <GridListTile>
-                  {answerData.id === 'otherWithInput' &&
+                  {answerData.id === 'input' &&
                   userInputValue !== undefined &&
                   onChangeUserInputValue ? (
                     <FreeAnswer
@@ -374,7 +361,7 @@ const PersonalizationQuestion = ({
                       value={userInputValue}
                       onChange={onChangeUserInputValue}
                     />
-                  ) : answerData.isFree ? null : (
+                  ) : (
                     <Answer
                       answerData={answerData}
                       i18n={i18n}

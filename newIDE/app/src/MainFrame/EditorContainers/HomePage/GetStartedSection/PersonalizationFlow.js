@@ -145,7 +145,7 @@ const DesktopDisplay = ({
     !(
       userAnswers[userAnswers.length - 1] &&
       userAnswers[userAnswers.length - 1].stepName === firstQuestion &&
-      userAnswers[userAnswers.length - 1].answers[0] === 'otherWithInput'
+      userAnswers[userAnswers.length - 1].answers[0] === 'input'
     ) &&
     !isOnlyOneFreeAnswerPossible(questionData.answers);
 
@@ -363,7 +363,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
       const existingUserAnswerIndex = userAnswers.findIndex(
         userAnswer => userAnswer.stepName === step
       );
-      const shouldGoToNextQuestion = answerId !== 'otherWithInput';
+      const shouldGoToNextQuestion = answerId !== 'input';
       if (existingUserAnswerIndex >= 0) {
         // User is coming back to a previous question
         if (multi) {
@@ -390,7 +390,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           const doesAnswerChangesFollowingQuestion =
             !questionData.nextQuestion ||
-            (step === firstQuestion && answerId === 'otherWithInput');
+            (step === firstQuestion && answerId === 'input');
           if (doesAnswerChangesFollowingQuestion) {
             newUserAnswers.splice(
               existingUserAnswerIndex + 1,

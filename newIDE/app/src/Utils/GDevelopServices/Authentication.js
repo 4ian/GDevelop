@@ -15,7 +15,7 @@ import {
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { type CommunityLinks } from './User';
+import { type CommunityLinks, type UserSurvey } from './User';
 
 export type Profile = {|
   id: string,
@@ -308,6 +308,7 @@ export default class Authentication {
       isCreator,
       donateLink,
       communityLinks,
+      userSurvey,
       gdevelopUsage,
       teamOrCompanySize,
       companyName,
@@ -323,6 +324,7 @@ export default class Authentication {
       isCreator?: boolean,
       donateLink?: string,
       communityLinks?: CommunityLinks,
+      userSurvey?: UserSurvey,
       gdevelopUsage?: string,
       teamOrCompanySize?: string,
       companyName?: string,

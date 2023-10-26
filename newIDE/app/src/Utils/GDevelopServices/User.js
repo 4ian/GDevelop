@@ -41,6 +41,52 @@ export type CommunityLinks = {|
   discordServerLink?: string,
 |};
 
+export type UserSurvey = {|
+  creationGoal?: Array<'learningOrTeaching' | 'building'>,
+  creationGoalInput?: string,
+  learningOrTeaching?: Array<'learning' | 'teaching'>,
+  learningHow?: Array<'alone' | 'withTeacher'>,
+  projectDescription?: string,
+  kindOfProjects?: Array<
+    | 'gameToPublish'
+    | 'interactiveService'
+    | 'other'
+    | 'videoGame'
+    | 'interactiveContent'
+    | 'appOrTool'
+    | 'seriousGame'
+  >,
+  workingTeam?: Array<'alone' | 'onePlus' | 'team'>,
+  painPoints?: Array<
+    | 'lackGraphics'
+    | 'lackSound'
+    | 'lackMarketing'
+    | 'inAppMonetization'
+    | 'externalIntegration'
+  >,
+  painPointsInput?: string,
+  targetDate?: Array<
+    | '1MonthOrLess'
+    | '1To2Months'
+    | '3To5Months'
+    | '6MonthsPlus'
+    | '1Year'
+    | 'noDeadline'
+  >,
+  gameDevelopmentExperience?: Array<'none' | 'someNoCode' | 'someCode'>,
+  targetPlatform?: Array<
+    | 'steamEpic'
+    | 'itchNewgrounds'
+    | 'pokiCrazyGames'
+    | 'androidApp'
+    | 'iosApp'
+    | 'client'
+    | 'personal'
+    | 'console'
+    | 'other'
+  >,
+|};
+
 export type UserPublicProfile = {|
   id: string,
   username: ?string,

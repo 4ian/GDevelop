@@ -26,6 +26,8 @@ declare class gdObjectMetadata {
   addDefaultBehavior(behaviorType: string): gdObjectMetadata;
   setHidden(): gdObjectMetadata;
   isHidden(): boolean;
+  markAsRenderedIn3D(): gdObjectMetadata;
+  isRenderedIn3D(): boolean;
   delete(): void;
   ptr: number;
 };

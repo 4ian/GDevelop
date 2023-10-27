@@ -1716,6 +1716,9 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata SetHidden();
     boolean IsHidden();
+
+    [Ref] ObjectMetadata MarkAsRenderedIn3D();
+    boolean IsRenderedIn3D();
 };
 
 interface BehaviorMetadata {
@@ -2767,6 +2770,9 @@ interface EventsBasedObject {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
     [Const, Ref] DOMString GetDefaultName();
+
+    [Ref] EventsBasedObject MarkAsRenderedIn3D(boolean isRenderedIn3D);
+    boolean IsRenderedIn3D();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);

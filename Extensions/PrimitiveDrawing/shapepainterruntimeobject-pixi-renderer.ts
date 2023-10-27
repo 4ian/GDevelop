@@ -158,8 +158,8 @@ namespace gdjs {
     drawRegularPolygon(
       x1: float,
       y1: float,
-      radius: float,
       sides: float,
+      radius: float,
       rotation: float
     ) {
       this.updateOutline();

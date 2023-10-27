@@ -237,6 +237,22 @@ namespace gdjs {
       );
     }
 
+    drawRegularPolygon(
+      centerX: float,
+      centerY: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this._renderer.drawRegularPolygon(
+        centerX,
+        centerY,
+        sides,
+        radius,
+        rotation
+      );
+    }
+
     drawStar(
       centerX: float,
       centerY: float,

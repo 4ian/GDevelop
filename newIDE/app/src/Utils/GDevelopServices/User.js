@@ -289,12 +289,13 @@ export const getUserPublicProfile = (
     .then(response => response.data);
 };
 
-export const getUsernameAvailability = (
+export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/username-availability/${username}`)
-    .then(response => response.data);
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/username-availability/${username}`
+  );
+  return response.data;
 };
 
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;

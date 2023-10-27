@@ -1126,7 +1126,7 @@ module.exports = {
       .addObject(
         'Cube3DObject',
         _('3D Box'),
-        _('A box with an image on each face'),
+        _('A box with images for each face'),
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )

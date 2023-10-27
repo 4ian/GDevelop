@@ -59,14 +59,9 @@ const GetStartedSection = ({  }: Props) => {
   const forceUpdate = useForceUpdate();
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
-  const [showLoginStep, setShowLoginStep] = React.useState(false);
-  const [showCreateAccountStep, setShowCreateAccountStep] = React.useState(
-    false
-  );
-  const [
-    showQuestionnaireFinished,
-    setShowQuestionnaireFinished,
-  ] = React.useState<boolean>(false);
+  const [step, setStep] = React.useState<
+    'welcome' | 'login' | 'register' | 'questionnaire' | 'questionnaireFinished'
+  >('welcome');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
@@ -105,13 +100,13 @@ const GetStartedSection = ({  }: Props) => {
 
   React.useEffect(
     () => {
-      if (showLoginStep && profile) {
-        setShowLoginStep(false);
-      } else if (showCreateAccountStep && profile) {
-        setShowCreateAccountStep(false);
+      if ((step === 'login' || step === 'register') && profile) {
+        setStep('questionnaire');
+      } else if (!(step === 'login' || step === 'register') && !profile) {
+        setStep('welcome');
       }
     },
-    [profile, showLoginStep, showCreateAccountStep]
+    [profile, step]
   );
 
   if (creatingOrLoggingInAccount) {
@@ -126,7 +121,7 @@ const GetStartedSection = ({  }: Props) => {
           justifyContent="center"
           alignItems="center"
         >
-          <CircularProgress size={25} />
+          <CircularProgress size={50} />
         </ColumnStackLayout>
       </SectionContainer>
     );
@@ -169,7 +164,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  if (showLoginStep) {
+  if (step === 'login') {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -209,7 +204,7 @@ const GetStartedSection = ({  }: Props) => {
                 <FlatButton
                   primary
                   label={<Trans>Back</Trans>}
-                  onClick={() => setShowLoginStep(false)}
+                  onClick={() => setStep('welcome')}
                   fullWidth
                 />
                 <RaisedButton
@@ -226,7 +221,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  if (showCreateAccountStep) {
+  if (step === 'register') {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -273,7 +268,7 @@ const GetStartedSection = ({  }: Props) => {
                 <FlatButton
                   primary
                   label={<Trans>Back</Trans>}
-                  onClick={() => setShowCreateAccountStep(false)}
+                  onClick={() => setStep('welcome')}
                   fullWidth
                 />
                 <RaisedButton
@@ -290,7 +285,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  if (!profile) {
+  if (step === 'welcome') {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -321,13 +316,13 @@ const GetStartedSection = ({  }: Props) => {
               <RaisedButton
                 label={<Trans>Let's go!</Trans>}
                 primary
-                onClick={() => setShowCreateAccountStep(true)}
+                onClick={() => setStep('register')}
                 fullWidth
               />
               <FlatButton
                 primary
                 label={<Trans>I already have an account</Trans>}
-                onClick={() => setShowLoginStep(true)}
+                onClick={() => setStep('login')}
                 fullWidth
               />
             </ColumnStackLayout>
@@ -337,7 +332,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  if (showQuestionnaireFinished) {
+  if (step === 'questionnaireFinished') {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -372,7 +367,7 @@ const GetStartedSection = ({  }: Props) => {
 
   return (
     <PersonalizationFlow
-      onQuestionnaireFinished={() => setShowQuestionnaireFinished(true)}
+      onQuestionnaireFinished={() => setStep('questionnaireFinished')}
     />
   );
 };

@@ -1,6 +1,12 @@
 // @flow
 import * as React from 'react';
-import { type Profile } from '../Utils/GDevelopServices/Authentication';
+import {
+  type Profile,
+  type LoginForm,
+  type RegisterForm,
+  type EditForm,
+} from '../Utils/GDevelopServices/Authentication';
+import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
@@ -20,6 +26,7 @@ export type AuthenticatedUser = {|
   firebaseUser: ?FirebaseUser,
   profile: ?Profile,
   loginState: null | 'loggingIn' | 'done',
+  creatingOrLoggingInAccount: boolean,
   badges: ?Array<Badge>,
   cloudProjects: ?Array<CloudProjectWithUserAccessInfo>,
   cloudProjectsFetchingErrorLabel: ?React.Node,
@@ -29,7 +36,16 @@ export type AuthenticatedUser = {|
   limits: ?Limits,
   usages: ?Usages,
   subscription: ?Subscription,
+  onLogin: (form: LoginForm) => Promise<void>,
   onLogout: () => Promise<void>,
+  onCreateAccount: (
+    form: RegisterForm,
+    preferences: PreferencesValues
+  ) => Promise<void>,
+  onEditProfile: (
+    form: EditForm,
+    preferences: PreferencesValues
+  ) => Promise<void>,
   onOpenLoginDialog: () => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
@@ -54,6 +70,7 @@ export const initialAuthenticatedUser = {
   firebaseUser: null,
   profile: null,
   loginState: null,
+  creatingOrLoggingInAccount: false,
   badges: null,
   cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
@@ -63,7 +80,10 @@ export const initialAuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
+  onLogin: async () => {},
   onLogout: async () => {},
+  onCreateAccount: async () => {},
+  onEditProfile: async () => {},
   onOpenLoginDialog: () => {},
   onOpenEditProfileDialog: () => {},
   onOpenChangeEmailDialog: () => {},

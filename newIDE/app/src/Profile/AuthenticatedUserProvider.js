@@ -179,7 +179,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...initialAuthenticatedUser,
+        creatingOrLoggingInAccount:
+          this.state.createAccountInProgress || this.state.loginInProgress,
+        onLogin: this._doLogin,
         onLogout: this._doLogout,
+        onCreateAccount: this._doCreateAccount,
+        onEditProfile: this._doEdit,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
         onOpenLoginDialog: () => this.openLoginDialog(true),

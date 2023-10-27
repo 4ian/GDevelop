@@ -71,39 +71,28 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         fullWidth
         rows={3}
       />
-      <I18n>
-        {({ i18n }) => (
-          <React.Fragment>
-            <SemiControlledTextField
-              commitOnBlur
-              floatingLabelText={
-                <Trans>Default name for created objects</Trans>
-              }
-              value={
-                eventsBasedObject.getDefaultName() ||
-                eventsBasedObject.getName()
-              }
-              onChange={newName => {
-                eventsBasedObject.setDefaultName(
-                  gd.Project.getSafeName(newName)
-                );
-                forceUpdate();
-              }}
-              fullWidth
-            />
-            <Line>
-              <Checkbox
-                label={<Trans>Use 3D rendering</Trans>}
-                checked={eventsBasedObject.isRenderedIn3D()}
-                onCheck={(e, checked) => {
-                  eventsBasedObject.markAsRenderedIn3D(checked);
-                  forceUpdate();
-                }}
-              />
-            </Line>
-          </React.Fragment>
-        )}
-      </I18n>
+      <SemiControlledTextField
+        commitOnBlur
+        floatingLabelText={<Trans>Default name for created objects</Trans>}
+        value={
+          eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
+        }
+        onChange={newName => {
+          eventsBasedObject.setDefaultName(gd.Project.getSafeName(newName));
+          forceUpdate();
+        }}
+        fullWidth
+      />
+      <Line>
+        <Checkbox
+          label={<Trans>Use 3D rendering</Trans>}
+          checked={eventsBasedObject.isRenderedIn3D()}
+          onCheck={(e, checked) => {
+            eventsBasedObject.markAsRenderedIn3D(checked);
+            forceUpdate();
+          }}
+        />
+      </Line>
       {eventsBasedObject.getEventsFunctions().getEventsFunctionsCount() ===
         0 && (
         <DismissableAlertMessage

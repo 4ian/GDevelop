@@ -15,6 +15,8 @@ gdjs.MockedResourceManager = class MockedResourceManager {
     });
   }
 
+  async processResource(resourceName) {}
+
   /**
    * @param {string} resourceName 
    * @returns {boolean}

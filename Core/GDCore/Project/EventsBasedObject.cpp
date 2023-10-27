@@ -27,6 +27,9 @@ EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObj
 
 void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
+  if (isRenderedIn3D) {
+    element.SetBoolAttribute("is3D", true);
+  }
 
   AbstractEventsBasedEntity::SerializeTo(element);
   SerializeObjectsTo(element.AddChild("objects"));
@@ -36,6 +39,7 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                         const SerializerElement& element) {
   defaultName = element.GetStringAttribute("defaultName");
+  isRenderedIn3D = element.GetBoolAttribute("is3D", false);
 
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   UnserializeObjectsFrom(project, element.GetChild("objects"));

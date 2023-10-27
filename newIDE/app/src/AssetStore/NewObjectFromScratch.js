@@ -139,6 +139,12 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       {
         name: 'PanelSpriteObject::PanelSprite',
       },
+      {
+        name: 'Scene3D::Cube3DObject',
+      },
+      {
+        name: 'Scene3D::Model3DObject',
+      },
     ],
     [translateExtensionCategory('Input', i18n)]: [
       {
@@ -257,6 +263,24 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       },
       {
         name: 'ParticleSystem::ParticleEmitter',
+        assetStorePackTag: 'particles emitter',
+        requiredExtensions: [],
+      },
+      {
+        name: 'ParticleEmitter3D::ParticleEmitter3D',
+        fullName: i18n._(t`3D particle emitter`),
+        description: i18n._(
+          t`Displays a large number of particles to create visual effects.`
+        ),
+        iconFilename:
+          'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZpcmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcuNjYgMTEuMkMxNy40MyAxMC45IDE3LjE1IDEwLjY0IDE2Ljg5IDEwLjM4QzE2LjIyIDkuNzggMTUuNDYgOS4zNSAxNC44MiA4LjcyQzEzLjMzIDcuMjYgMTMgNC44NSAxMy45NSAzQzEzIDMuMjMgMTIuMTcgMy43NSAxMS40NiA0LjMyQzguODcgNi40IDcuODUgMTAuMDcgOS4wNyAxMy4yMkM5LjExIDEzLjMyIDkuMTUgMTMuNDIgOS4xNSAxMy41NUM5LjE1IDEzLjc3IDkgMTMuOTcgOC44IDE0LjA1QzguNTcgMTQuMTUgOC4zMyAxNC4wOSA4LjE0IDEzLjkzQzguMDggMTMuODggOC4wNCAxMy44MyA4IDEzLjc2QzYuODcgMTIuMzMgNi42OSAxMC4yOCA3LjQ1IDguNjRDNS43OCAxMCA0Ljg3IDEyLjMgNSAxNC40N0M1LjA2IDE0Ljk3IDUuMTIgMTUuNDcgNS4yOSAxNS45N0M1LjQzIDE2LjU3IDUuNyAxNy4xNyA2IDE3LjdDNy4wOCAxOS40MyA4Ljk1IDIwLjY3IDEwLjk2IDIwLjkyQzEzLjEgMjEuMTkgMTUuMzkgMjAuOCAxNy4wMyAxOS4zMkMxOC44NiAxNy42NiAxOS41IDE1IDE4LjU2IDEyLjcyTDE4LjQzIDEyLjQ2QzE4LjIyIDEyIDE3LjY2IDExLjIgMTcuNjYgMTEuMk0xNC41IDE3LjVDMTQuMjIgMTcuNzQgMTMuNzYgMTggMTMuNCAxOC4xQzEyLjI4IDE4LjUgMTEuMTYgMTcuOTQgMTAuNSAxNy4yOEMxMS42OSAxNyAxMi40IDE2LjEyIDEyLjYxIDE1LjIzQzEyLjc4IDE0LjQzIDEyLjQ2IDEzLjc3IDEyLjMzIDEzQzEyLjIxIDEyLjI2IDEyLjIzIDExLjYzIDEyLjUgMTAuOTRDMTIuNjkgMTEuMzIgMTIuODkgMTEuNyAxMy4xMyAxMkMxMy45IDEzIDE1LjExIDEzLjQ0IDE1LjM3IDE0LjhDMTUuNDEgMTQuOTQgMTUuNDMgMTUuMDggMTUuNDMgMTUuMjNDMTUuNDYgMTYuMDUgMTUuMSAxNi45NSAxNC41IDE3LjVIMTQuNVoiIC8+PC9zdmc+',
+        assetStorePackTag: '3d particles',
+        requiredExtensions: [
+          {
+            extensionName: 'ParticleEmitter3D',
+            extensionVersion: '1.0.0',
+          },
+        ],
       },
     ],
     [translateExtensionCategory('Advanced', i18n)]: [

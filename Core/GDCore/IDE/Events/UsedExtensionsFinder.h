@@ -45,6 +45,13 @@ public:
   }
 
   /**
+   * \brief Return true when at least 1 object uses the 3D renderer.
+   */
+  bool Has3DObjects() const {
+    return has3DObjects;
+  }
+
+  /**
    * The extensions used by the project (or part of it).
    */
   std::set<gd::String> &GetUsedExtensions() { return usedExtensions; }
@@ -59,10 +66,15 @@ public:
    */
   std::set<gd::String> &GetUsedRequiredFiles() { return usedRequiredFiles; }
 
+  void MarkAsHaving3DObjects() {
+    has3DObjects = true;
+  }
+
 private:
   std::set<gd::String> usedExtensions;
   std::set<gd::String> usedIncludeFiles;
   std::set<gd::String> usedRequiredFiles;
+  bool has3DObjects = false;
 };
 
 class GD_CORE_API UsedExtensionsFinder

@@ -244,17 +244,18 @@ module.exports = {
         .addObject(
           'Model3DObject',
           _('3D Model'),
-          _('A 3D model.'),
+          _('An animated 3D model.'),
           'JsPlatform/Extensions/3d_box.svg',
           new gd.Model3DObjectConfiguration()
         )
-        .setCategoryFullName(_('3D'))
+        .setCategoryFullName(_('General'))
          // Effects are unsupported because the object is not rendered with PIXI.
         .addDefaultBehavior('ResizableCapability::ResizableBehavior')
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
         .addDefaultBehavior('FlippableCapability::FlippableBehavior')
         .addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
         .addDefaultBehavior('Scene3D::Base3DBehavior')
+        .markAsRenderedIn3D()
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
@@ -1125,16 +1126,17 @@ module.exports = {
       .addObject(
         'Cube3DObject',
         _('3D Box'),
-        _('A 3D box.'),
+        _('A box with images for each face'),
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )
-      .setCategoryFullName(_('3D'))
+      .setCategoryFullName(_('General'))
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')
       .addDefaultBehavior('FlippableCapability::FlippableBehavior')
       .addDefaultBehavior('Scene3D::Base3DBehavior')
+      .markAsRenderedIn3D()
       .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
       .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
       .addIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')

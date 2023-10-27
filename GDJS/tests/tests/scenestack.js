@@ -3,7 +3,7 @@
 /**
  * Tests for gdjs.SceneStack.
  */
-describe.only('gdjs.SceneStack', () => {
+describe('gdjs.SceneStack', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   const createSene = (name, usedResources) => {

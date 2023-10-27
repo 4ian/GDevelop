@@ -83,16 +83,14 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         }}
         fullWidth
       />
-      <Line>
-        <Checkbox
-          label={<Trans>Use 3D rendering</Trans>}
-          checked={eventsBasedObject.isRenderedIn3D()}
-          onCheck={(e, checked) => {
-            eventsBasedObject.markAsRenderedIn3D(checked);
-            forceUpdate();
-          }}
-        />
-      </Line>
+      <Checkbox
+        label={<Trans>Use 3D rendering</Trans>}
+        checked={eventsBasedObject.isRenderedIn3D()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsRenderedIn3D(checked);
+          forceUpdate();
+        }}
+      />
       {eventsBasedObject.getEventsFunctions().getEventsFunctionsCount() ===
         0 && (
         <DismissableAlertMessage

@@ -81,8 +81,8 @@ const PrivateGameTemplatePurchaseDialog = ({
   const {
     profile,
     getAuthorizationHeader,
-    onLogin,
-    onCreateAccount,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
     receivedGameTemplates,
     onPurchaseSuccessful,
   } = React.useContext(AuthenticatedUserContext);
@@ -256,8 +256,8 @@ const PrivateGameTemplatePurchaseDialog = ({
         subtitle: <Trans>Log-in to purchase this item</Trans>,
         content: (
           <CreateProfile
-            onLogin={onLogin}
-            onCreateAccount={onCreateAccount}
+            onLogin={onOpenLoginDialog}
+            onCreateAccount={onOpenCreateAccountDialog}
             message={
               <Trans>
                 Game templates will be linked to your user account and available

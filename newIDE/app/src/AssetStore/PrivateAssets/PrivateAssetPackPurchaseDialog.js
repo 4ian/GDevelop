@@ -81,8 +81,8 @@ const PrivateAssetPackPurchaseDialog = ({
   const {
     profile,
     getAuthorizationHeader,
-    onLogin,
-    onCreateAccount,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
     receivedAssetPacks,
     onPurchaseSuccessful,
   } = React.useContext(AuthenticatedUserContext);
@@ -256,8 +256,8 @@ const PrivateAssetPackPurchaseDialog = ({
         subtitle: <Trans>Log-in to purchase this item</Trans>,
         content: (
           <CreateProfile
-            onLogin={onLogin}
-            onCreateAccount={onCreateAccount}
+            onLogin={onOpenLoginDialog}
+            onCreateAccount={onOpenCreateAccountDialog}
             message={
               <Trans>
                 Asset packs will be linked to your user account and available

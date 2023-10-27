@@ -182,10 +182,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         onLogout: this._doLogout,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
-        onLogin: () => this.openLoginDialog(true),
-        onEdit: () => this.openEditProfileDialog(true),
-        onChangeEmail: () => this.openChangeEmailDialog(true),
-        onCreateAccount: () => this.openCreateAccountDialog(true),
+        onOpenLoginDialog: () => this.openLoginDialog(true),
+        onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
+        onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
+        onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();

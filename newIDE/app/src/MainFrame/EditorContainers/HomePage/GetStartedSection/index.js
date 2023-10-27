@@ -2,11 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../../../../UI/Text';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 import TreeLeaves from '../../../../UI/CustomSvgIcons/TreeLeaves';
@@ -15,22 +11,16 @@ import JewelPlatform from '../../../../UI/CustomSvgIcons/JewelPlatform';
 import RaisedButton from '../../../../UI/RaisedButton';
 import FlatButton from '../../../../UI/FlatButton';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
-import { Column, LargeSpacer, Line, Spacer } from '../../../../UI/Grid';
+import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import CircularProgress from '../../../../UI/CircularProgress';
-import Form from '../../../../UI/Form';
-import TextField from '../../../../UI/TextField';
-import {
-  getEmailErrorText,
-  getPasswordErrorText,
-} from '../../../../Profile/CreateAccountDialog';
 import BackgroundText from '../../../../UI/BackgroundText';
-import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import { UsernameField } from '../../../../Profile/UsernameField';
 import { type UsernameAvailability } from '../../../../Utils/GDevelopServices/User';
-import Checkbox from '../../../../UI/Checkbox';
 import PersonalizationFlow from './PersonalizationFlow';
 import LinearProgress from '../../../../UI/LinearProgress';
+import CreateAccountForm from '../../../../Profile/CreateAccountForm';
+import LoginForm from '../../../../Profile/LoginForm';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
 
 const styles = {
   icon: {
@@ -43,6 +33,11 @@ const styles = {
     maxWidth: 300, // Make buttons larger but not too much.
   },
   linearProgress: { width: 200 },
+  getFormContainerStyle: (isMobile: boolean) => ({
+    marginTop: 20,
+    // Take full width on mobile.
+    width: isMobile ? '95%' : 300,
+  }),
 };
 
 const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
@@ -51,8 +46,16 @@ type Props = {||};
 
 const GetStartedSection = ({  }: Props) => {
   const isOnline = useOnlineStatus();
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile, loginState } = authenticatedUser;
+  const {
+    profile,
+    onResetPassword,
+    creatingOrLoggingInAccount,
+    onLogin,
+    onCreateAccount,
+    authenticationError,
+  } = React.useContext(AuthenticatedUserContext);
+  const { values: preferences } = React.useContext(PreferencesContext);
+
   const forceUpdate = useForceUpdate();
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
@@ -64,7 +67,6 @@ const GetStartedSection = ({  }: Props) => {
     showQuestionnaireFinished,
     setShowQuestionnaireFinished,
   ] = React.useState<boolean>(false);
-  const [stepIndex, setStepIndex] = React.useState(0);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
@@ -80,34 +82,55 @@ const GetStartedSection = ({  }: Props) => {
     false
   );
 
-  const isLoading = loginState === 'loggingIn';
-
   const doLogin = () => {
-    // if (loginInProgress) return;
-    // onLogin({
-    //   email: email.trim(),
-    //   password,
-    // });
+    if (creatingOrLoggingInAccount) return;
+    onLogin({
+      email: email.trim(),
+      password,
+    });
   };
-  const doCreateAccount = () => {};
 
-  // if (loginState === 'loggingIn') {
-  //   return (
-  //     <SectionContainer
-  //       title={null} // Let the content handle the title.
-  //       flexBody
-  //     >
-  //       <ColumnStackLayout
-  //         noMargin
-  //         expand
-  //         justifyContent="center"
-  //         alignItems="center"
-  //       >
-  //         <CircularProgress size={25} />
-  //       </ColumnStackLayout>
-  //     </SectionContainer>
-  //   );
-  // }
+  const doCreateAccount = async () => {
+    if (creatingOrLoggingInAccount) return;
+    onCreateAccount(
+      {
+        email: email.trim(),
+        password,
+        getNewsletterEmail,
+        username,
+      },
+      preferences
+    );
+  };
+
+  React.useEffect(
+    () => {
+      if (showLoginStep && profile) {
+        setShowLoginStep(false);
+      } else if (showCreateAccountStep && profile) {
+        setShowCreateAccountStep(false);
+      }
+    },
+    [profile, showLoginStep, showCreateAccountStep]
+  );
+
+  if (creatingOrLoggingInAccount) {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <CircularProgress size={25} />
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
 
   if (!isOnline) {
     return (
@@ -167,42 +190,17 @@ const GetStartedSection = ({  }: Props) => {
                 This will synchronise your selected content wherever you go.
               </Trans>
             </BackgroundText>
-            <div
-              style={{
-                // Take full width on mobile.
-                width: isMobile ? '100%' : 300,
-                marginTop: 20,
-              }}
-            >
-              <Form onSubmit={doLogin} autoComplete="on" name="login">
-                <ColumnStackLayout noMargin>
-                  <TextField
-                    autoFocus="desktop"
-                    value={email}
-                    floatingLabelText={<Trans>Email</Trans>}
-                    // errorText={getEmailErrorText(error)}
-                    onChange={(e, value) => {
-                      setEmail(value);
-                    }}
-                    onBlur={event => {
-                      setEmail(event.currentTarget.value.trim());
-                    }}
-                    fullWidth
-                    disabled={isLoading}
-                  />
-                  <TextField
-                    value={password}
-                    floatingLabelText={<Trans>Password</Trans>}
-                    // errorText={getPasswordErrorText(error)}
-                    type="password"
-                    onChange={(e, value) => {
-                      setPassword(value);
-                    }}
-                    fullWidth
-                    disabled={isLoading}
-                  />
-                </ColumnStackLayout>
-              </Form>
+            <div style={styles.getFormContainerStyle(isMobile)}>
+              <LoginForm
+                email={email}
+                onChangeEmail={setEmail}
+                password={password}
+                onChangePassword={setPassword}
+                onLogin={doLogin}
+                loginInProgress={creatingOrLoggingInAccount}
+                onForgotPassword={onResetPassword}
+                error={authenticationError}
+              />
             </div>
           </ColumnStackLayout>
           <div style={styles.buttonContainer}>
@@ -217,8 +215,7 @@ const GetStartedSection = ({  }: Props) => {
                 <RaisedButton
                   label={<Trans>Next</Trans>}
                   primary
-                  // onClick={doLogin}
-                  onClick={() => setStepIndex(stepIndex + 1)}
+                  onClick={doLogin}
                   fullWidth
                 />
               </LineStackLayout>
@@ -250,68 +247,24 @@ const GetStartedSection = ({  }: Props) => {
                 This will synchronise your selected content wherever you go.
               </Trans>
             </BackgroundText>
-            <div
-              style={{
-                // Take full width on mobile.
-                width: isMobile ? '100%' : 300,
-                marginTop: 20,
-              }}
-            >
-              <Form
-                onSubmit={doCreateAccount}
-                autoComplete="on"
-                name="createAccount"
-              >
-                <ColumnStackLayout noMargin>
-                  <UsernameField
-                    value={username}
-                    onChange={(e, value) => {
-                      setUsername(value);
-                    }}
-                    allowEmpty
-                    onAvailabilityChecked={setUsernameAvailability}
-                    onAvailabilityCheckLoading={setIsValidatingUsername}
-                    isValidatingUsername={isValidatingUsername}
-                    disabled={isLoading}
-                  />
-                  <TextField
-                    value={email}
-                    floatingLabelText={<Trans>Email</Trans>}
-                    // errorText={getEmailErrorText(error)}
-                    fullWidth
-                    required
-                    onChange={(e, value) => {
-                      setEmail(value);
-                    }}
-                    onBlur={event => {
-                      setEmail(event.currentTarget.value.trim());
-                    }}
-                    disabled={isLoading}
-                  />
-                  <TextField
-                    value={password}
-                    floatingLabelText={<Trans>Password</Trans>}
-                    // errorText={getPasswordErrorText(error)}
-                    type="password"
-                    fullWidth
-                    required
-                    onChange={(e, value) => {
-                      setPassword(value);
-                    }}
-                    disabled={isLoading}
-                  />
-                  <Checkbox
-                    label={
-                      <Trans>I want to receive the GDevelop Newsletter</Trans>
-                    }
-                    checked={getNewsletterEmail}
-                    onCheck={(e, value) => {
-                      setGetNewsletterEmail(value);
-                    }}
-                    disabled={isLoading}
-                  />
-                </ColumnStackLayout>
-              </Form>
+            <div style={styles.getFormContainerStyle(isMobile)}>
+              <CreateAccountForm
+                email={email}
+                onChangeEmail={setEmail}
+                password={password}
+                onChangePassword={setPassword}
+                username={username}
+                onChangeUsername={setUsername}
+                optInNewsletterEmail={getNewsletterEmail}
+                onChangeOptInNewsletterEmail={setGetNewsletterEmail}
+                isValidatingUsername={isValidatingUsername}
+                onChangeIsValidatingUsername={setIsValidatingUsername}
+                usernameAvailability={usernameAvailability}
+                onChangeUsernameAvailability={setUsernameAvailability}
+                onCreateAccount={doCreateAccount}
+                createAccountInProgress={creatingOrLoggingInAccount}
+                error={authenticationError}
+              />
             </div>
           </ColumnStackLayout>
           <div style={styles.buttonContainer}>
@@ -326,8 +279,7 @@ const GetStartedSection = ({  }: Props) => {
                 <RaisedButton
                   label={<Trans>Next</Trans>}
                   primary
-                  // onClick={doLogin}
-                  onClick={() => setStepIndex(stepIndex + 1)}
+                  onClick={doLogin}
                   fullWidth
                 />
               </LineStackLayout>

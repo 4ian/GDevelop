@@ -161,8 +161,6 @@ export const HomePage = React.memo<Props>(
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>('get-started');
 
-      console.log(activeTab);
-
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
         () => {

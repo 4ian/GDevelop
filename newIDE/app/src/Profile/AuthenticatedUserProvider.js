@@ -179,12 +179,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...initialAuthenticatedUser,
-        creatingOrLoggingInAccount:
-          this.state.createAccountInProgress || this.state.loginInProgress,
+        authenticationError: this.state.authError,
         onLogin: this._doLogin,
         onLogout: this._doLogout,
         onCreateAccount: this._doCreateAccount,
         onEditProfile: this._doEdit,
+        onResetPassword: this._doForgotPassword,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
         onOpenLoginDialog: () => this.openLoginDialog(true),
@@ -689,6 +689,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       loginInProgress: true,
       authError: null,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: true,
+        authenticationError: null,
+      },
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -705,10 +710,20 @@ export default class AuthenticatedUserProvider extends React.Component<
         ),
       });
     } catch (authError) {
-      this.setState({ authError });
+      this.setState({
+        authError,
+        authenticatedUser: {
+          ...this.state.authenticatedUser,
+          authenticationError: authError,
+        },
+      });
     }
     this.setState({
       loginInProgress: false,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: false,
+      },
     });
     this._automaticallyUpdateUserProfile = true;
   };
@@ -756,6 +771,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       createAccountInProgress: true,
       authError: null,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: true,
+        authenticationError: null,
+      },
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -788,10 +808,20 @@ export default class AuthenticatedUserProvider extends React.Component<
         ),
       });
     } catch (authError) {
-      this.setState({ authError });
+      this.setState({
+        authError,
+        authenticatedUser: {
+          ...this.state.authenticatedUser,
+          authenticationError: authError,
+        },
+      });
     }
     this.setState({
       createAccountInProgress: false,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: false,
+      },
     });
     this._automaticallyUpdateUserProfile = true;
   };

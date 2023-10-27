@@ -5,6 +5,8 @@ import {
   type LoginForm,
   type RegisterForm,
   type EditForm,
+  type ForgotPasswordForm,
+  type AuthError,
 } from '../Utils/GDevelopServices/Authentication';
 import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
@@ -34,6 +36,7 @@ export type AuthenticatedUser = {|
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
   limits: ?Limits,
+  authenticationError: ?AuthError,
   usages: ?Usages,
   subscription: ?Subscription,
   onLogin: (form: LoginForm) => Promise<void>,
@@ -46,6 +49,7 @@ export type AuthenticatedUser = {|
     form: EditForm,
     preferences: PreferencesValues
   ) => Promise<void>,
+  onResetPassword: ForgotPasswordForm => Promise<void>,
   onOpenLoginDialog: () => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
@@ -80,10 +84,12 @@ export const initialAuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
+  authenticationError: null,
   onLogin: async () => {},
   onLogout: async () => {},
   onCreateAccount: async () => {},
   onEditProfile: async () => {},
+  onResetPassword: async () => {},
   onOpenLoginDialog: () => {},
   onOpenEditProfileDialog: () => {},
   onOpenChangeEmailDialog: () => {},

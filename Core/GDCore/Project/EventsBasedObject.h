@@ -72,6 +72,19 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
     return *this;
   }
 
+  /**
+   * \brief Declare a usage of the 3D renderer.
+   */
+  EventsBasedObject& MarkAsRenderedIn3D(bool isRenderedIn3D_) {
+    isRenderedIn3D = isRenderedIn3D_;
+    return *this;
+  }
+
+  /**
+   * \brief Return true if the object uses the 3D renderer.
+   */
+  bool IsRenderedIn3D() const { return isRenderedIn3D; }
+
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(gd::Project& project,
@@ -79,6 +92,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
 
  private:
   gd::String defaultName;
+  bool isRenderedIn3D;
 };
 
 }  // namespace gd

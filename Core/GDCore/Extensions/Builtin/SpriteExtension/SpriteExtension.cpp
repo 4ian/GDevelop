@@ -30,7 +30,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           .AddObject<SpriteObject>("Sprite",
                                    _("Sprite"),
                                    _("Animated object which can be used for "
-                                     "most elements of a game"),
+                                     "most elements of a game."),
                                    "CppPlatform/Extensions/spriteicon.png")
           .SetCategoryFullName(_("General"))
           .AddDefaultBehavior("EffectCapability::EffectBehavior")

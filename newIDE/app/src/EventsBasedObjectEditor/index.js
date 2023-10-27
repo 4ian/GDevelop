@@ -10,6 +10,8 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import Checkbox from '../UI/Checkbox';
+import { Line } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,18 +73,35 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
       />
       <I18n>
         {({ i18n }) => (
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelText={<Trans>Default name for created objects</Trans>}
-            value={
-              eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
-            }
-            onChange={newName => {
-              eventsBasedObject.setDefaultName(gd.Project.getSafeName(newName));
-              forceUpdate();
-            }}
-            fullWidth
-          />
+          <React.Fragment>
+            <SemiControlledTextField
+              commitOnBlur
+              floatingLabelText={
+                <Trans>Default name for created objects</Trans>
+              }
+              value={
+                eventsBasedObject.getDefaultName() ||
+                eventsBasedObject.getName()
+              }
+              onChange={newName => {
+                eventsBasedObject.setDefaultName(
+                  gd.Project.getSafeName(newName)
+                );
+                forceUpdate();
+              }}
+              fullWidth
+            />
+            <Line>
+              <Checkbox
+                label={<Trans>Use 3D rendering</Trans>}
+                checked={eventsBasedObject.isRenderedIn3D()}
+                onCheck={(e, checked) => {
+                  eventsBasedObject.markAsRenderedIn3D(checked);
+                  forceUpdate();
+                }}
+              />
+            </Line>
+          </React.Fragment>
         )}
       </I18n>
       {eventsBasedObject.getEventsFunctions().getEventsFunctionsCount() ===

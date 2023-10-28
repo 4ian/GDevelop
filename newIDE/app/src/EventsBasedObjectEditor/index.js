@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import TextField from '../UI/TextField';
@@ -11,7 +10,6 @@ import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Checkbox from '../UI/Checkbox';
-import { Line } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 

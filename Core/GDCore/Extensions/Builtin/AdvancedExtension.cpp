@@ -67,6 +67,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddAction("SetReturnObject",
+                 _("Set returned objects"),
+                 _("Set currently picked instances as the ones returned for the object. These instances will be picked for actions, conditions and sub-events that follow this function call."),
+                 _("Set currently picked instances of _PARAM0_ to be returned"),
+                 _("Functions"),
+                 "res/function24.png",
+                 "res/function16.png")
+      .SetHelpPath("/events/functions/return")
+      .AddParameter("object", "Picked instances object")
+      .SetRelevantForFunctionEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
       .AddAction("CopyArgumentToVariable",
                  _("Copy function parameter to variable"),
                  _("Copy a function parameter (also called \"argument\") to a variable. "
@@ -93,19 +106,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .SetHelpPath("/events/functions/return")
       .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
-      .SetRelevantForFunctionEventsOnly()
-      .MarkAsAdvanced();
-
-  extension
-      .AddAction("SetReturnObject",
-                 _("Set returned objects"),
-                 _("Set currently picked instances as the ones returned for the object. These instances will be picked for actions, conditions and sub-events that follow this function call."),
-                 _("Set currently picked instances of _PARAM0_ to be returned"),
-                 _("Functions"),
-                 "res/function24.png",
-                 "res/function16.png")
-      .SetHelpPath("/events/functions/return")
-      .AddParameter("object", "Picked instances object")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 

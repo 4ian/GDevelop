@@ -86,7 +86,7 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 	});
 });
 
-describe.only('gdjs.evtTools.object.pickObjects', function() {
+describe('gdjs.evtTools.object.pickObjects', function() {
 	it('should properly pick objects', function(){
 		const runtimeScene = new gdjs.RuntimeScene(null);
 		const objectA1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: [], effects: []});

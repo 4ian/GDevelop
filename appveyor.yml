@@ -19,6 +19,8 @@ init:
 install:
   # Build GDevelop.js (and run tests to ensure it works).
   # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
+  # Also install setuptools as our old version of Emscripten uses distutils which was removed in Python 3.12.
+  # setuptools will make distutils available again (but we should migrate to a newer Emscripten version).
   - cmd: >-
       cd GDevelop.js
 
@@ -30,7 +32,9 @@ install:
 
       emsdk install 1.39.6
 
-      CMD /C "emsdk activate 1.39.6 && cd .. && npm run build"
+      CMD /C "emsdk activate 1.39.6 && pip install setuptools && cd .. && npm run build"
+
+
 
       cd ..\..
 

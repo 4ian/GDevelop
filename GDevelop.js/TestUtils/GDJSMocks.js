@@ -290,6 +290,22 @@ class VariablesContainer {
   has(variableName) {
     return this._variables.containsKey(variableName);
   }
+
+  /**
+   * @param {string} name
+   * @param {Variable} newVariable
+   */
+  add(name, newVariable) {
+    const oldVariable = this._variables.get(name);
+
+    this._variables.put(name, newVariable);
+    if (oldVariable) {
+      const variableIndex = this._variablesArray.indexOf(oldVariable);
+      if (variableIndex !== -1) {
+        this._variablesArray[variableIndex] = newVariable;
+      }
+    }
+  }
 }
 
 class RuntimeObject {
@@ -565,6 +581,54 @@ const getPickedInstancesCount = (objectsLists) => {
   return count;
 };
 
+/**
+ * @param {RuntimeObject[]} arr 
+ */
+const filterPickedObjectsList = function (
+  arr
+) {
+  let finalSize = 0;
+  for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+    const obj = arr[k];
+    if (obj.pick) {
+      arr[finalSize] = obj;
+      finalSize++;
+    }
+  }
+  arr.length = finalSize;
+};
+
+/**
+ * @param {Hashtable<RuntimeObject[]>} objectsLists 
+ * @param {RuntimeObject[]} objects 
+ */
+ const pickObjects = (
+  objectsLists,
+  objects
+) => {
+  // Clear the `pick` flag on every objects.
+  for (const objectsName in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(objectsName)) {
+      for (const object of objectsLists.items[objectsName]) {
+        object.pick = false;
+      }
+    }
+  }
+  // Mark objects that need to be picked.
+  for (const object of objects) {
+    object.pick = true;
+  }
+  // Trim not picked objects from lists.
+  for (const objectsName in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(objectsName)) {
+      filterPickedObjectsList(
+        objectsLists.items[objectsName]
+      );
+    }
+  }
+};
+
+
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
   constructor(sceneData) {
@@ -729,6 +793,7 @@ function makeMinimalGDJSMock(options) {
           createObjectOnScene,
           getSceneInstancesCount,
           getPickedInstancesCount,
+          pickObjects,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),

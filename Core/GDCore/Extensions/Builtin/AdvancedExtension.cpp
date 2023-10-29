@@ -106,6 +106,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "res/function16.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("object", "The objects to pick")
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension

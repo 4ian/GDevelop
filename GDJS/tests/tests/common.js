@@ -86,6 +86,28 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 	});
 });
 
+describe.only('gdjs.evtTools.object.pickObjects', function() {
+	it('should properly pick objects', function(){
+		const runtimeScene = new gdjs.RuntimeScene(null);
+		const objectA1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: [], effects: []});
+		const objectA2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: [], effects: []});
+		const objectA3 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectA", type: "", behaviors: [], effects: []});
+		const objectB1 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: [], effects: []});
+		const objectB2 = new gdjs.RuntimeObject(runtimeScene, {name: "ObjectB", type: "", behaviors: [], effects: []});
+
+		const pickedObjectMap = Hashtable.newFrom({
+			ObjectA: [objectA1, objectA2, objectA3],
+			ObjectB: [objectB1, objectB2]
+		});
+
+		gdjs.evtTools.object.pickObjects(pickedObjectMap, [objectA3, objectB2, objectA1]);
+		expect(pickedObjectMap.get("ObjectA")).to.have.length(2);
+		expect(pickedObjectMap.get("ObjectB")).to.have.length(1);
+		expect(pickedObjectMap.get("ObjectA")).to.eql([objectA1, objectA3]);
+		expect(pickedObjectMap.get("ObjectB")).to.eql([objectB2]);
+	});
+});
+
 describe('gdjs.evtTools.object.pickRandomObject', function() {
 	it('should pick only one object', function(){
 		var runtimeScene = new gdjs.RuntimeScene(null);

@@ -98,14 +98,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
 
   extension
       .AddAction("SetReturnObject",
-                 _("Set object return value"),
-                 _("Returns the currently selected objects. Those objects will be the ones selected for the next actions, conditions, subevents etc."),
-                 _("Set objects to return to _PARAM0_"),
+                 _("Set returned objects"),
+                 _("Set currently picked instances as the ones returned for the object. These instances will be picked for actions, conditions and sub-events that follow this function call."),
+                 _("Set currently picked instances of _PARAM0_ to be returned"),
                  _("Functions"),
                  "res/function24.png",
                  "res/function16.png")
       .SetHelpPath("/events/functions/return")
-      .AddParameter("object", "The objects to pick")
+      .AddParameter("object", "Picked instances object")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 

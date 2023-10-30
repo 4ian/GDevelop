@@ -579,7 +579,6 @@ module.exports = {
         pixiResourcesLoader
       ) {
         super(
-          this,
           project,
           layout,
           instance,

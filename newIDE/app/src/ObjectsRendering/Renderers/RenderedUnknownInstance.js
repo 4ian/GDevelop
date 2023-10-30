@@ -30,6 +30,11 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     this._pixiContainer.addChild(this._pixiObject);
   }
 
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    this._pixiObject.destroy();
+  }
+
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,

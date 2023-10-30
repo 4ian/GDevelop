@@ -2098,6 +2098,12 @@ module.exports = {
         this.updateTexture();
       }
 
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        // Keep textures because they are shared by all sprites.
+        this._pixiObject.destroy({ children: true });
+      }
+
       static _getResourceNameToDisplay(objectConfiguration) {
         return getFirstVisibleFaceResourceName(objectConfiguration);
       }
@@ -2679,6 +2685,11 @@ module.exports = {
               keepAspectRatio
             );
           });
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy({ children: true });
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {

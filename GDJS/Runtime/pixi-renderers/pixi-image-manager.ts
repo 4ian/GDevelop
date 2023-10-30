@@ -249,7 +249,7 @@ namespace gdjs {
                   this._resourcesLoader.getFullUrl(resource.file),
                   {
                     resourceOptions: {
-                      crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
+                      crossorigin: this._resourcesLoader.checkIfCredentialsRequired(
                         resource.file
                       )
                         ? 'use-credentials'
@@ -285,7 +285,7 @@ namespace gdjs {
                 {
                   resourceOptions: {
                     autoLoad: false,
-                    crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
+                    crossorigin: this._resourcesLoader.checkIfCredentialsRequired(
                       resource.file
                     )
                       ? 'use-credentials'

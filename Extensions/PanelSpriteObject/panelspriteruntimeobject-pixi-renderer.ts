@@ -396,10 +396,10 @@ namespace gdjs {
 
     destroy() {
       for (const borderSprite of this._borderSprites) {
-        borderSprite.destroy(true);
+        borderSprite.destroy({ texture: true });
       }
-      this._centerSprite.destroy(true);
-      this._wrapperContainer.destroy(true);
+      this._centerSprite.destroy({ texture: true });
+      this._wrapperContainer.destroy({ children: true });
     }
   }
 

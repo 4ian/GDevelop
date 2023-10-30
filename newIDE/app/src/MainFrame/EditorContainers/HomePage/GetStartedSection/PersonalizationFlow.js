@@ -48,7 +48,7 @@ type UserAnswers = Array<{|
   userInput?: string,
 |}>;
 
-const formatUserAnswers = (userAnswers: UserAnswers): UserSurvey => {
+export const formatUserAnswers = (userAnswers: UserAnswers): UserSurvey => {
   const userSurvey = {};
   userAnswers.forEach(({ questionId, answers, userInput }) => {
     // Remove `input` choice from answers since input content should be handled differently.

@@ -45,7 +45,6 @@ export type ItemData<Item> = {|
   onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
   onBlurField: () => void,
   flattenedData: FlattenedNode<Item>[],
-  onStartRenaming: (nodeId: ?string) => void,
   onEndRenaming: (item: Item, newName: string) => void,
   onContextMenu: ({|
     item: Item,
@@ -68,7 +67,6 @@ const getItemProps = memoizeOne(
     onOpen: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
     onBlurField: () => void,
-    onStartRenaming: (nodeId: ?string) => void,
     onEndRenaming: (item: Item, newName: string) => void,
     renamedItemId: ?string,
     onContextMenu: ({|
@@ -88,7 +86,6 @@ const getItemProps = memoizeOne(
     onSelect,
     onBlurField,
     flattenedData,
-    onStartRenaming,
     onEndRenaming,
     renamedItemId,
     onContextMenu,
@@ -492,7 +489,6 @@ const TreeView = <Item: ItemBaseAttributes>(
     onOpen,
     onSelect,
     onBlurField,
-    setRenamedItemId,
     onEndRenaming,
     renamedItemId,
     openContextMenu,

@@ -78,9 +78,6 @@
   text-overflow: ellipsis;
   user-select: none;
 }
-.tree-view .item-name.editable {
-  cursor: text;
-}
 
 .tree-view .item-name.placeholder {
   color: var(--theme-text-secondary-color);

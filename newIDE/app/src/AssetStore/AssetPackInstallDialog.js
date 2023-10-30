@@ -38,7 +38,7 @@ import { type InstallAssetOutput } from './InstallAsset';
 
 // We limit the number of assets that can be installed at once to avoid
 // timeouts especially with premium packs.
-const MAX_ASSETS_TO_INSTALL = 100;
+const MAX_ASSETS_TO_INSTALL = 200;
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack | null,

@@ -23,7 +23,6 @@ import { dataObjectToProps } from '../../Utils/HTMLDataset';
 const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
-const DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION_ON_DESKTOP = 1000;
 const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
 
 const onInputKeyDown = (event: KeyboardEvent) => {
@@ -121,7 +120,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     onOpen,
     onSelect,
     onBlurField,
-    onStartRenaming,
     onEndRenaming,
     renamedItemId,
     onContextMenu,
@@ -136,10 +134,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const left = node.depth * 15;
   const forceUpdate = useForceUpdate();
   const isStayingOverRef = React.useRef<boolean>(false);
-  const [
-    hasDelayPassedBeforeEditingName,
-    setHasDelayPassedBeforeEditingName,
-  ] = React.useState<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
   const [whereToDrop, setWhereToDrop] = React.useState<
     'before' | 'after' | 'inside'
@@ -221,30 +215,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onOpen, node, forceUpdate, isStayingOverRef.current]
   );
 
-  /**
-   * Effect allows editing the name of the node after a delay has passed
-   * after its selection by the user.
-   */
-  React.useEffect(
-    () => {
-      if (isMobileScreen) return;
-      if (node.selected) {
-        if (!hasDelayPassedBeforeEditingName) {
-          const timeoutId = setTimeout(() => {
-            setHasDelayPassedBeforeEditingName(true);
-          }, DELAY_BEFORE_ENABLING_NAME_EDITION_AFTER_SELECTION_ON_DESKTOP);
-          return () => clearTimeout(timeoutId);
-        }
-      } else {
-        setHasDelayPassedBeforeEditingName(false);
-      }
-    },
-    [node.selected, isMobileScreen, hasDelayPassedBeforeEditingName]
-  );
-
   const endRenaming = React.useCallback(
     (newValue: string) => {
-      setHasDelayPassedBeforeEditingName(false);
       onEndRenaming(node.item, newValue);
     },
     [onEndRenaming, node.item]
@@ -414,26 +386,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                                     : node.item.isPlaceholder
                                     ? ' placeholder'
                                     : ''
-                                }${
-                                  node.item.isRoot || node.item.isPlaceholder
-                                    ? ''
-                                    : hasDelayPassedBeforeEditingName
-                                    ? ' editable'
-                                    : ''
                                 }`}
-                                onClick={
-                                  node.item.isRoot ||
-                                  node.item.isPlaceholder ||
-                                  isMobileScreen ||
-                                  !hasDelayPassedBeforeEditingName
-                                    ? null
-                                    : e => {
-                                        if (!e.metaKey && !e.shiftKey) {
-                                          e.stopPropagation();
-                                          onStartRenaming(node.id);
-                                        }
-                                      }
-                                }
                               >
                                 {node.name}
                               </span>

@@ -61,12 +61,10 @@ export const formatUserAnswers = (userAnswers: UserAnswers): UserSurvey => {
     } else {
       userSurvey[questionId] = cleanedAnswers;
     }
-    if (userInput) {
-      if (isOnlyOneFreeAnswerPossible(questionnaire[questionId].answers)) {
-        userSurvey[questionId] = userInput;
-      } else {
-        userSurvey[`${questionId}Input`] = userInput;
-      }
+    if (isOnlyOneFreeAnswerPossible(questionnaire[questionId].answers)) {
+      userSurvey[questionId] = userInput || '';
+    } else if (userInput) {
+      userSurvey[`${questionId}Input`] = userInput;
     }
   });
   // We are confident the keys used in the questionnaire correspond

@@ -3,6 +3,20 @@
 import { formatUserAnswers } from './PersonalizationFlow';
 
 describe('formatUserAnswers', () => {
+  test('it sets projectDescription as string even if user answer is empty', () => {
+    const userAnswers = [
+      {
+        questionId: 'projectDescription',
+        userInput: '',
+        answers: ['input'],
+      },
+    ]
+
+    expect(formatUserAnswers(userAnswers)).toEqual({
+      projectDescription: ''
+    })
+  })
+
   test('it formats a complex user answers', () => {
     const userAnswers = [
       {

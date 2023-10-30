@@ -60,12 +60,13 @@ export type RegisterForm = {|
 |};
 
 export type EditForm = {|
-  username: string,
-  description: string,
-  getGameStatsEmail: boolean,
-  getNewsletterEmail: boolean,
-  donateLink: string,
-  communityLinks: CommunityLinks,
+  username?: string,
+  description?: string,
+  getGameStatsEmail?: boolean,
+  getNewsletterEmail?: boolean,
+  donateLink?: string,
+  communityLinks?: CommunityLinks,
+  userSurvey?: UserSurvey,
 |};
 
 export type ChangeEmailForm = {|
@@ -350,6 +351,7 @@ export default class Authentication {
             isCreator,
             donateLink,
             communityLinks,
+            userSurvey,
             gdevelopUsage,
             teamOrCompanySize,
             companyName,

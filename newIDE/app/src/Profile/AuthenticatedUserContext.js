@@ -47,7 +47,8 @@ export type AuthenticatedUser = {|
   ) => Promise<void>,
   onEditProfile: (
     form: EditForm,
-    preferences: PreferencesValues
+    preferences: PreferencesValues,
+    options: {| throwError: boolean |}
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
   onOpenLoginDialog: () => void,

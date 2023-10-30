@@ -728,7 +728,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doEdit = async (form: EditForm, preferences: PreferencesValues) => {
+  _doEdit = async (
+    form: EditForm,
+    preferences: PreferencesValues,
+    { throwError }: {| throwError: boolean |}
+  ) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
@@ -748,17 +752,22 @@ export default class AuthenticatedUserProvider extends React.Component<
           appLanguage: preferences.language,
           donateLink: form.donateLink,
           communityLinks: form.communityLinks,
+          userSurvey: form.userSurvey,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);
     } catch (authError) {
       this.setState({ authError });
+      if (throwError) {
+        throw authError;
+      }
+    } finally {
+      this.setState({
+        editInProgress: false,
+      });
+      this._automaticallyUpdateUserProfile = true;
     }
-    this.setState({
-      editInProgress: false,
-    });
-    this._automaticallyUpdateUserProfile = true;
   };
 
   _doCreateAccount = async (
@@ -1013,7 +1022,9 @@ export default class AuthenticatedUserProvider extends React.Component<
                   profile={this.state.authenticatedUser.profile}
                   subscription={this.state.authenticatedUser.subscription}
                   onClose={() => this.openEditProfileDialog(false)}
-                  onEdit={form => this._doEdit(form, preferences)}
+                  onEdit={form =>
+                    this._doEdit(form, preferences, { throwError: false })
+                  }
                   onDelete={this._doDeleteAccount}
                   actionInProgress={
                     this.state.editInProgress || this.state.deleteInProgress

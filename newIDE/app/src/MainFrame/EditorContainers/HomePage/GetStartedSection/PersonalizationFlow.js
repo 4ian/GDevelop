@@ -42,9 +42,8 @@ const styles = {
 };
 
 type UserAnswers = Array<{|
-  stepName: string,
+  questionId: string,
   answers: string[],
-  /** Used to store user input in question with showOther */
   userInput?: string,
 |}>;
 
@@ -76,7 +75,7 @@ type DisplayProps = {|
   goToNextQuestion: QuestionData => void,
   onClickSend: string => void,
   onChangeUserInputValue: (string, string) => void,
-  step: string,
+  questionId: string,
 |};
 
 const DesktopDisplay = ({
@@ -85,9 +84,9 @@ const DesktopDisplay = ({
   goToNextQuestion,
   onClickSend,
   onChangeUserInputValue,
-  step,
+  questionId,
 }: DisplayProps) => {
-  const questionData = questionnaire[step];
+  const questionData = questionnaire[questionId];
   const sectionContainerRef = React.useRef<?SectionContainerInterface>(null);
 
   const scrollToBottom = React.useCallback(() => {
@@ -104,32 +103,34 @@ const DesktopDisplay = ({
     () => {
       scrollToBottom();
     },
-    [step, scrollToBottom]
+    [questionId, scrollToBottom]
   );
 
   const questionsToRender: React.Node[] = userAnswers.map(
     (userAnswer, index) => {
-      const relatedQuestionData = questionnaire[userAnswer.stepName];
+      const relatedQuestionData = questionnaire[userAnswer.questionId];
       return (
         <PersonalizationQuestion
-          key={userAnswer.stepName}
+          key={userAnswer.questionId}
           questionData={relatedQuestionData}
           selectedAnswers={userAnswer.answers}
-          onSelectAnswer={answer => onSelectAnswer(userAnswer.stepName, answer)}
+          onSelectAnswer={answer =>
+            onSelectAnswer(userAnswer.questionId, answer)
+          }
           showNextButton={
             (relatedQuestionData.multi ||
               isOnlyOneFreeAnswerPossible(relatedQuestionData.answers)) &&
             index === userAnswers.length - 1 &&
-            step === userAnswer.stepName
+            questionId === userAnswer.questionId
           }
           onClickNext={() => goToNextQuestion(relatedQuestionData)}
           showQuestionText={true}
           onClickSend={
-            userAnswer.stepName === firstQuestion ? onClickSend : undefined
+            userAnswer.questionId === firstQuestion ? onClickSend : undefined
           }
           userInputValue={userAnswer.userInput || ''}
           onChangeUserInputValue={value =>
-            onChangeUserInputValue(userAnswer.stepName, value)
+            onChangeUserInputValue(userAnswer.questionId, value)
           }
         />
       );
@@ -139,25 +140,25 @@ const DesktopDisplay = ({
   // When answering a multi answer question, the first click on an answer adds an item to
   // user answers. The question is then displayed through userAnswers and should not
   // be rendered a second time as a question.
-  const shouldDisplayStep =
+  const shouldDisplayQuestion =
     questionData &&
     (!questionData.multi ||
-      userAnswers[userAnswers.length - 1].stepName !== step) &&
+      userAnswers[userAnswers.length - 1].questionId !== questionId) &&
     !(
       userAnswers[userAnswers.length - 1] &&
-      userAnswers[userAnswers.length - 1].stepName === firstQuestion &&
+      userAnswers[userAnswers.length - 1].questionId === firstQuestion &&
       userAnswers[userAnswers.length - 1].answers[0] === 'input'
     ) &&
     !isOnlyOneFreeAnswerPossible(questionData.answers);
 
-  if (shouldDisplayStep) {
-    const questionData = questionnaire[step];
+  if (shouldDisplayQuestion) {
+    const questionData = questionnaire[questionId];
     questionsToRender.push(
       <PersonalizationQuestion
-        key={step}
+        key={questionId}
         questionData={questionData}
         selectedAnswers={[]}
-        onSelectAnswer={answer => onSelectAnswer(step, answer)}
+        onSelectAnswer={answer => onSelectAnswer(questionId, answer)}
         onClickNext={() => goToNextQuestion(questionData)}
         showNextButton={questionData.multi}
         showQuestionText={true}
@@ -186,7 +187,7 @@ const MobileDisplay = ({
   goToNextQuestion,
   goToPreviousQuestion,
   onClickSend,
-  step,
+  questionId,
   onChangeUserInputValue,
 }: MobileDisplayProps) => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>();
@@ -197,13 +198,15 @@ const MobileDisplay = ({
         scrollViewRef.current.scrollToPosition(0);
       }
     },
-    [step]
+    [questionId]
   );
 
-  const questionData = questionnaire[step];
+  const questionData = questionnaire[questionId];
   if (!questionData) return null;
 
-  const userAnswer = userAnswers.find(answer => answer.stepName === step);
+  const userAnswer = userAnswers.find(
+    answer => answer.questionId === questionId
+  );
 
   return (
     <I18n>
@@ -232,25 +235,27 @@ const MobileDisplay = ({
             </Column>
             <ScrollView ref={scrollViewRef}>
               <PersonalizationQuestion
-                key={step}
+                key={questionId}
                 questionData={questionData}
                 selectedAnswers={userAnswer ? userAnswer.answers : []}
-                onSelectAnswer={answer => onSelectAnswer(step, answer)}
+                onSelectAnswer={answer => onSelectAnswer(questionId, answer)}
                 onClickNext={() => goToNextQuestion(questionData)}
                 showNextButton={false}
                 showQuestionText={false}
-                onClickSend={step === firstQuestion ? onClickSend : undefined}
+                onClickSend={
+                  questionId === firstQuestion ? onClickSend : undefined
+                }
                 userInputValue={
                   userAnswer ? userAnswer.userInput || '' : undefined
                 }
                 onChangeUserInputValue={value =>
-                  onChangeUserInputValue(step, value)
+                  onChangeUserInputValue(questionId, value)
                 }
               />
             </ScrollView>
             <Column noMargin>
               <LineStackLayout justifyContent="stretch" expand>
-                {step !== firstQuestion && (
+                {questionId !== firstQuestion && (
                   <FlatButton
                     fullWidth
                     label={i18n._(t`Back`)}
@@ -275,7 +280,7 @@ const MobileDisplay = ({
                 stepIndex={
                   userAnswers.length +
                   (questionData.multi &&
-                  userAnswers[userAnswers.length - 1].stepName === step
+                  userAnswers[userAnswers.length - 1].questionId === questionId
                     ? -1
                     : 0)
                 }
@@ -291,24 +296,24 @@ const MobileDisplay = ({
 type Props = {| onQuestionnaireFinished: () => void |};
 
 const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
-  const [step, setStep] = React.useState<string>(firstQuestion);
+  const [questionId, setQuestionId] = React.useState<string>(firstQuestion);
   const windowWidth = useResponsiveWindowWidth();
   const [userAnswers, setUserAnswers] = React.useState<UserAnswers>([]);
 
   const goToNextQuestion = React.useCallback(
     (questionData: QuestionData, answerData?: AnswerData) => {
       if (answerData && answerData.nextQuestion) {
-        setStep(answerData.nextQuestion);
+        setQuestionId(answerData.nextQuestion);
         return;
       }
       if (questionData.nextQuestion) {
-        setStep(questionData.nextQuestion);
+        setQuestionId(questionData.nextQuestion);
         return;
       }
       if (questionData.getNextQuestion) {
-        const nextStep = questionData.getNextQuestion(userAnswers);
-        if (nextStep) {
-          setStep(nextStep);
+        const nextQuestionId = questionData.getNextQuestion(userAnswers);
+        if (nextQuestionId) {
+          setQuestionId(nextQuestionId);
           return;
         }
       }
@@ -318,9 +323,9 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
   );
 
   const onChangeUserInputValue = React.useCallback(
-    (step: string, value: string) => {
+    (questionId: string, value: string) => {
       const matchingUserAnswerIndex = userAnswers.findIndex(
-        userAnswer => userAnswer.stepName === step
+        userAnswer => userAnswer.questionId === questionId
       );
       if (matchingUserAnswerIndex < 0) return;
       const newUserAnswers = [...userAnswers];
@@ -332,30 +337,30 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
 
   React.useEffect(
     () => {
-      // On each step change, check if new question only has one free answer possible.
+      // On each questionId change, check if new question only has one free answer possible.
       // If that's the case, automatically add an answer to user answers.
-      const questionData = questionnaire[step];
+      const questionData = questionnaire[questionId];
       if (!questionData) return;
       const { answers } = questionData;
       if (
         isOnlyOneFreeAnswerPossible(answers) &&
-        userAnswers.every(userAnswer => userAnswer.stepName !== step)
+        userAnswers.every(userAnswer => userAnswer.questionId !== questionId)
       ) {
         setUserAnswers([
           ...userAnswers,
-          { stepName: step, userInput: '', answers: [answers[0].id] },
+          { questionId, userInput: '', answers: [answers[0].id] },
         ]);
       }
     },
-    [step, userAnswers]
+    [questionId, userAnswers]
   );
 
   const onSelectAnswer = React.useCallback(
-    (step: string, answerId: string) => {
-      const questionData = questionnaire[step];
+    (questionId: string, answerId: string) => {
+      const questionData = questionnaire[questionId];
       const { multi } = questionData;
       const existingUserAnswerIndex = userAnswers.findIndex(
-        userAnswer => userAnswer.stepName === step
+        userAnswer => userAnswer.questionId === questionId
       );
       const shouldGoToNextQuestion = answerId !== 'input';
       if (existingUserAnswerIndex >= 0) {
@@ -384,7 +389,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           const doesAnswerChangesFollowingQuestion =
             !questionData.nextQuestion ||
-            (step === firstQuestion && answerId === 'input');
+            (questionId === firstQuestion && answerId === 'input');
           if (doesAnswerChangesFollowingQuestion) {
             newUserAnswers.splice(
               existingUserAnswerIndex + 1,
@@ -406,10 +411,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           }
         }
       } else {
-        setUserAnswers([
-          ...userAnswers,
-          { stepName: step, answers: [answerId] },
-        ]);
+        setUserAnswers([...userAnswers, { questionId, answers: [answerId] }]);
         const answerData = questionData.answers.find(
           answerData => answerData.id === answerId
         );
@@ -424,21 +426,21 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
   const goToPreviousQuestion = React.useCallback(
     () => {
       const currentAnswerIndex = userAnswers.findIndex(
-        userAnswer => userAnswer.stepName === step
+        userAnswer => userAnswer.questionId === questionId
       );
       if (currentAnswerIndex === -1) {
-        setStep(userAnswers[userAnswers.length - 1].stepName);
+        setQuestionId(userAnswers[userAnswers.length - 1].questionId);
       } else if (currentAnswerIndex >= 1) {
-        setStep(userAnswers[currentAnswerIndex - 1].stepName);
+        setQuestionId(userAnswers[currentAnswerIndex - 1].questionId);
       }
     },
-    [userAnswers, step]
+    [userAnswers, questionId]
   );
 
   if (windowWidth === 'small') {
     return (
       <MobileDisplay
-        step={step}
+        questionId={questionId}
         goToNextQuestion={goToNextQuestion}
         goToPreviousQuestion={goToPreviousQuestion}
         onSelectAnswer={onSelectAnswer}
@@ -451,7 +453,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
 
   return (
     <DesktopDisplay
-      step={step}
+      questionId={questionId}
       goToNextQuestion={goToNextQuestion}
       onSelectAnswer={onSelectAnswer}
       userAnswers={userAnswers}

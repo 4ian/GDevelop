@@ -253,12 +253,12 @@ const questionnaire: Questionnaire = {
   gameDevelopmentExperience: {
     text: t`What kind of projects do you want to build with GDevelop?`,
     getNextQuestion: (
-      userAnswers: Array<{| stepName: string, answers: string[] |}>
+      userAnswers: Array<{| questionId: string, answers: string[] |}>
     ) =>
       userAnswers.some(
         answer =>
-          answer.stepName === 'targetDate' ||
-          (answer.stepName === 'learningKindOfProjects' &&
+          answer.questionId === 'targetDate' ||
+          (answer.questionId === 'learningKindOfProjects' &&
             answer.answers.includes('interactiveService'))
       )
         ? 'targetPlatform'

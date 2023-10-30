@@ -195,11 +195,6 @@ namespace gdjs {
     static getAnimationFrameHeight(pixiTexture) {
       return pixiTexture.height;
     }
-
-    destroy(): void {
-      // Keep textures because they are shared by all sprites.
-      this._sprite.destroy(false);
-    }
   }
 
   // Register the class to let the engine use it.

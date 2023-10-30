@@ -10,7 +10,7 @@ import RaisedButton from './RaisedButton';
 import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import Text from './Text';
-import { Column, Line, Spacer } from './Grid';
+import { Line, Spacer } from './Grid';
 import { getIDEVersion, getIDEVersionWithHash } from '../Version';
 import {
   getArch,
@@ -21,6 +21,14 @@ import {
 import { ColumnStackLayout } from './Layout';
 import AlertMessage from './AlertMessage';
 import Link from './Link';
+import BackgroundText from './BackgroundText';
+
+const styles = {
+  errorMessage: {
+    maxWidth: 600,
+    textAlign: 'left',
+  },
+};
 
 type ErrorBoundaryScope =
   | 'mainframe'
@@ -73,7 +81,7 @@ export const ErrorFallbackComponent = ({
         <Text size="block-title">{title}</Text>
       </Line>
       <Divider />
-      <Column>
+      <ColumnStackLayout>
         <AlertMessage kind="warning">
           <Text>
             <Trans>
@@ -82,8 +90,6 @@ export const ErrorFallbackComponent = ({
             </Trans>
           </Text>
         </AlertMessage>
-      </Column>
-      <Column>
         <Text>
           <Trans>
             To help us fix this issue, you can create a{' '}
@@ -96,7 +102,17 @@ export const ErrorFallbackComponent = ({
             then report the issue with the button below.
           </Trans>
         </Text>
-      </Column>
+        {error && error.stack && (
+          <BackgroundText style={styles.errorMessage}>
+            {error.stack.slice(0, 200)}...
+          </BackgroundText>
+        )}
+        {componentStack && (
+          <BackgroundText style={styles.errorMessage}>
+            {componentStack.slice(0, 200)}...
+          </BackgroundText>
+        )}
+      </ColumnStackLayout>
       <Line justifyContent="flex-end">
         <RaisedButton
           label={<Trans>Report the issue on GitHub</Trans>}

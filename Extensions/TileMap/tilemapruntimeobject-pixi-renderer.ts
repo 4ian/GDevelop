@@ -124,6 +124,7 @@ namespace gdjs {
     }
 
     destroy(): void {
+      // Keep textures because they are shared by all tile maps.
       this._pixiObject.destroy(false);
     }
   }

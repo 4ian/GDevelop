@@ -548,6 +548,11 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
+      this._renderer.destroy();
+    }
+
     /**
      * Update the hit boxes for the object.
      * Fallback to the default implementation (rotated bounding box) if there is no custom

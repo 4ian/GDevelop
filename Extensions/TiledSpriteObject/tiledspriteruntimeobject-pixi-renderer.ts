@@ -126,6 +126,7 @@ namespace gdjs {
     }
 
     destroy(): void {
+      // Keep textures because they are shared by all sprites.
       this._tiledSprite.destroy(false);
     }
   }

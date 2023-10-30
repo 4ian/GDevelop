@@ -395,11 +395,15 @@ namespace gdjs {
     }
 
     destroy() {
+      // Destroy textures because they are instantiated by this class.
       for (const borderSprite of this._borderSprites) {
         borderSprite.destroy({ texture: true });
       }
       this._centerSprite.destroy({ texture: true });
-      this._wrapperContainer.destroy({ children: true });
+      // Destroy the containers without handling children because they are
+      // already handled above.
+      this._wrapperContainer.destroy(false);
+      this._spritesContainer.destroy(false);
     }
   }
 

@@ -1157,7 +1157,7 @@ module.exports = {
     /**
      * Renderer for instances of TileMap inside the IDE.
      */
-    class RenderedTileMapInstance extends RenderedTileMapInstance {
+    class RenderedTileMapInstance extends RenderedInstance {
       constructor(
         project,
         layout,

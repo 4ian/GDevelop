@@ -568,127 +568,128 @@ module.exports = {
 
     /**
      * Renderer for instances of VideoObject inside the IDE.
-     *
-     * @extends RenderedInstance
-     * @class RenderedVideoObjectInstance
-     * @constructor
      */
-    function RenderedVideoObjectInstance(
-      project,
-      layout,
-      instance,
-      associatedObjectConfiguration,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedVideoObjectInstance extends RenderedInstance {
+      constructor (
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
+      ) {
+        super(
+          this,
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
 
-      this._videoResource = undefined;
+        this._videoResource = undefined;
 
-      //Setup the PIXI object:
-      this._pixiObject = new PIXI.Sprite(this._getVideoTexture());
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
-    }
-    RenderedVideoObjectInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
+        //Setup the PIXI object:
+        this._pixiObject = new PIXI.Sprite(this._getVideoTexture());
+        this._pixiObject.anchor.x = 0.5;
+        this._pixiObject.anchor.y = 0.5;
+        this._pixiContainer.addChild(this._pixiObject);
+        this.update();
+      }
 
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedVideoObjectInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      objectConfiguration
-    ) {
-      return 'JsPlatform/Extensions/videoicon24.png';
-    };
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        // Keep textures because they are shared by all sprites.
+        this._pixiObject.destroy(false);
+      }
 
-    RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
-      // Get the video resource to use
-      const videoResource = this._associatedObjectConfiguration
-        .getProperties()
-        .get('videoResource')
-        .getValue();
+      /**
+       * Return the path to the thumbnail of the specified object.
+       */
+      getThumbnail(
+        project,
+        resourcesLoader,
+        objectConfiguration
+      ) {
+        return 'JsPlatform/Extensions/videoicon24.png';
+      }
 
-      // This returns a VideoTexture with autoPlay set to false
-      return this._pixiResourcesLoader.getPIXIVideoTexture(
-        this._project,
-        videoResource
-      );
-    };
+      _getVideoTexture() {
+        // Get the video resource to use
+        const videoResource = this._associatedObjectConfiguration
+          .getProperties()
+          .get('videoResource')
+          .getValue();
 
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
-    RenderedVideoObjectInstance.prototype.update = function () {
-      // Check if the video resource has changed
-      const videoResource = this._associatedObjectConfiguration
-        .getProperties()
-        .get('videoResource')
-        .getValue();
-      if (videoResource !== this._videoResource) {
-        this._videoResource = videoResource;
-        this._pixiObject.texture = this._getVideoTexture();
+        // This returns a VideoTexture with autoPlay set to false
+        return this._pixiResourcesLoader.getPIXIVideoTexture(
+          this._project,
+          videoResource
+        );
+      }
 
-        if (!this._pixiObject.texture.baseTexture.valid) {
-          var that = this;
+      /**
+       * This is called to update the PIXI object on the scene editor
+       */
+      update() {
+        // Check if the video resource has changed
+        const videoResource = this._associatedObjectConfiguration
+          .getProperties()
+          .get('videoResource')
+          .getValue();
+        if (videoResource !== this._videoResource) {
+          this._videoResource = videoResource;
+          this._pixiObject.texture = this._getVideoTexture();
 
-          that._pixiObject.texture.on('error', function () {
-            that._pixiObject.texture.off('error', this);
+          if (!this._pixiObject.texture.baseTexture.valid) {
+            var that = this;
 
-            that._pixiObject.texture =
-              that._pixiResourcesLoader.getInvalidPIXITexture();
-          });
+            that._pixiObject.texture.on('error', function () {
+              that._pixiObject.texture.off('error', this);
+
+              that._pixiObject.texture =
+                that._pixiResourcesLoader.getInvalidPIXITexture();
+            });
+          }
+        }
+
+        // Update opacity
+        const opacity = this._associatedObjectConfiguration
+          .getProperties()
+          .get('Opacity')
+          .getValue();
+        this._pixiObject.alpha = opacity / 255;
+
+        // Read position and angle from the instance
+        this._pixiObject.position.x =
+          this._instance.getX() + this._pixiObject.width / 2;
+        this._pixiObject.position.y =
+          this._instance.getY() + this._pixiObject.height / 2;
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
+
+        if (this._instance.hasCustomSize()) {
+          this._pixiObject.width = this.getCustomWidth();
+          this._pixiObject.height = this.getCustomHeight();
         }
       }
 
-      // Update opacity
-      const opacity = this._associatedObjectConfiguration
-        .getProperties()
-        .get('Opacity')
-        .getValue();
-      this._pixiObject.alpha = opacity / 255;
-
-      // Read position and angle from the instance
-      this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-
-      if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this.getCustomWidth();
-        this._pixiObject.height = this.getCustomHeight();
+      /**
+       * Return the width of the instance, when it's not resized.
+       */
+      getDefaultWidth() {
+        return this._pixiObject.width;
       }
-    };
 
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedVideoObjectInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width;
-    };
-
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedVideoObjectInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height;
-    };
+      /**
+       * Return the height of the instance, when it's not resized.
+       */
+      getDefaultHeight() {
+        return this._pixiObject.height;
+      }
+    }
 
     // We don't do anything special when instance is removed from the scene,
     // because the video is never really played.

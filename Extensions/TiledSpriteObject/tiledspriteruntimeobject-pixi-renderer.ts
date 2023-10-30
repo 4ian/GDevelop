@@ -124,6 +124,10 @@ namespace gdjs {
     getTextureHeight() {
       return this._tiledSprite.texture.height;
     }
+
+    destroy(): void {
+      this._tiledSprite.destroy(false);
+    }
   }
 
   export const TiledSpriteRuntimeObjectRenderer = TiledSpriteRuntimeObjectPixiRenderer;

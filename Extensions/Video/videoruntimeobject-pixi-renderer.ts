@@ -54,6 +54,7 @@ namespace gdjs {
      */
     onDestroy() {
       this.stop();
+      this._pixiObject.destroy(false);
     }
 
     ensureUpToDate() {

@@ -158,6 +158,11 @@ namespace gdjs {
       );
     }
 
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
+      this._renderer.destroy();
+    }
+
     /**
      * Set the Tilemap file to display.
      */

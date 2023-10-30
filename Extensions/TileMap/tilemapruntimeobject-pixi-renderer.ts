@@ -122,6 +122,10 @@ namespace gdjs {
     getScaleY(): float {
       return this._pixiObject.scale.y;
     }
+
+    destroy(): void {
+      this._pixiObject.destroy(false);
+    }
   }
   export const TileMapRuntimeObjectRenderer =
     gdjs.TileMapRuntimeObjectPixiRenderer;

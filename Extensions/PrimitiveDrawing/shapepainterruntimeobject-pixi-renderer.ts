@@ -539,6 +539,10 @@ namespace gdjs {
         }
       }
     }
+
+    destroy(): void {
+      this._graphics.destroy();
+    }
   }
 
   export const ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;

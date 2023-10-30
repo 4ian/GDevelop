@@ -174,6 +174,11 @@ namespace gdjs {
       super.stepBehaviorsPreEvents(instanceContainer);
     }
 
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
+      this._renderer.destroy();
+    }
+
     /**
      * Clear the graphics.
      */

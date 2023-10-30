@@ -393,6 +393,14 @@ namespace gdjs {
     getTextureHeight() {
       return this._textureHeight;
     }
+
+    destroy() {
+      for (const borderSprite of this._borderSprites) {
+        borderSprite.destroy(true);
+      }
+      this._centerSprite.destroy(true);
+      this._wrapperContainer.destroy(true);
+    }
   }
 
   export const PanelSpriteRuntimeObjectRenderer = PanelSpriteRuntimeObjectPixiRenderer;

@@ -15,7 +15,10 @@ import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import CircularProgress from '../../../../UI/CircularProgress';
 import BackgroundText from '../../../../UI/BackgroundText';
-import { type UsernameAvailability } from '../../../../Utils/GDevelopServices/User';
+import {
+  type UsernameAvailability,
+  type UserSurvey,
+} from '../../../../Utils/GDevelopServices/User';
 import PersonalizationFlow from './PersonalizationFlow';
 import LinearProgress from '../../../../UI/LinearProgress';
 import CreateAccountForm from '../../../../Profile/CreateAccountForm';
@@ -51,6 +54,7 @@ const GetStartedSection = ({  }: Props) => {
     onResetPassword,
     creatingOrLoggingInAccount,
     onLogin,
+    onEditProfile,
     onCreateAccount,
     authenticationError,
   } = React.useContext(AuthenticatedUserContext);
@@ -65,6 +69,9 @@ const GetStartedSection = ({  }: Props) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
+  const [errorSendingSurvey, setErrorSendingSurvey] = React.useState<boolean>(
+    false
+  );
   const [
     usernameAvailability,
     setUsernameAvailability,
@@ -98,6 +105,18 @@ const GetStartedSection = ({  }: Props) => {
     );
   };
 
+  const onQuestionnaireFinished = async (userSurvey: UserSurvey) => {
+    try {
+      setStep('questionnaireFinished');
+      await onEditProfile({ userSurvey }, preferences, { throwError: true });
+    } catch (error) {
+      console.error('An error occurred when sending survey:');
+      console.error(error);
+      setErrorSendingSurvey(true);
+      setStep('welcome');
+    }
+  };
+
   React.useEffect(
     () => {
       if ((step === 'login' || step === 'register') && profile) {
@@ -127,7 +146,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  if (!isOnline) {
+  if (!isOnline || errorSendingSurvey) {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -139,26 +158,42 @@ const GetStartedSection = ({  }: Props) => {
           justifyContent="center"
           alignItems="center"
         >
-          <Text size="title" align="center">
-            <Trans>You seem to be offline</Trans>
-          </Text>
-          <TreeLeaves style={styles.icon} />
-          <Text size="body2" noMargin align="center">
-            <Trans>
-              Verify your internet connection to access your personalized
-              content.
-            </Trans>
-          </Text>
-          <div style={styles.buttonContainer}>
-            <Line expand>
-              <RaisedButton
-                primary
-                label={<Trans>Refresh</Trans>}
-                onClick={forceUpdate}
-                fullWidth
-              />
-            </Line>
-          </div>
+          {errorSendingSurvey ? (
+            <>
+              <Text size="title" align="center">
+                <Trans>Error when sending survey.</Trans>
+              </Text>
+              <TreeLeaves style={styles.icon} />
+              <Text size="body2" noMargin align="center">
+                <Trans>
+                  Verify your internet connection and try again later.
+                </Trans>
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text size="title" align="center">
+                <Trans>You seem to be offline</Trans>
+              </Text>
+              <TreeLeaves style={styles.icon} />
+              <Text size="body2" noMargin align="center">
+                <Trans>
+                  Verify your internet connection to access your personalized
+                  content.
+                </Trans>
+              </Text>
+              <div style={styles.buttonContainer}>
+                <Line expand>
+                  <RaisedButton
+                    primary
+                    label={<Trans>Refresh</Trans>}
+                    onClick={forceUpdate}
+                    fullWidth
+                  />
+                </Line>
+              </div>
+            </>
+          )}
         </ColumnStackLayout>
       </SectionContainer>
     );
@@ -366,9 +401,7 @@ const GetStartedSection = ({  }: Props) => {
   }
 
   return (
-    <PersonalizationFlow
-      onQuestionnaireFinished={() => setStep('questionnaireFinished')}
-    />
+    <PersonalizationFlow onQuestionnaireFinished={onQuestionnaireFinished} />
   );
 };
 

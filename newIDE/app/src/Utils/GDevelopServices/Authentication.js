@@ -351,7 +351,7 @@ export default class Authentication {
             isCreator,
             donateLink,
             communityLinks,
-            userSurvey,
+            survey: userSurvey,
             gdevelopUsage,
             teamOrCompanySize,
             companyName,

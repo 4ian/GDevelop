@@ -16,6 +16,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import SectionContainer, {
   type SectionContainerInterface,
 } from '../SectionContainer';
+import { type UserSurvey } from '../../../../Utils/GDevelopServices/User';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { Column, Line } from '../../../../UI/Grid';
@@ -25,7 +26,7 @@ import ScrollView, {
 import FlatButton from '../../../../UI/FlatButton';
 import RaisedButton from '../../../../UI/RaisedButton';
 
-const STEP_MAX_COUNT = 7;
+const STEP_MAX_COUNT = 8;
 
 export const isOnlyOneFreeAnswerPossible = (
   answers: Array<AnswerData>
@@ -46,6 +47,33 @@ type UserAnswers = Array<{|
   answers: string[],
   userInput?: string,
 |}>;
+
+const formatUserAnswers = (userAnswers: UserAnswers): UserSurvey => {
+  const userSurvey = {};
+  userAnswers.forEach(({ questionId, answers, userInput }) => {
+    // Remove `input` choice from answers since input content should be handled differently.
+    let cleanedAnswers = answers.filter(answer => answer !== 'input');
+    if (
+      questionId === 'buildingKindOfProjects' ||
+      questionId === 'learningKindOfProjects'
+    ) {
+      userSurvey.kindOfProjects = cleanedAnswers;
+    } else {
+      userSurvey[questionId] = cleanedAnswers;
+    }
+    if (userInput) {
+      if (isOnlyOneFreeAnswerPossible(questionnaire[questionId].answers)) {
+        userSurvey[questionId] = userInput;
+      } else {
+        userSurvey[`${questionId}Input`] = userInput;
+      }
+    }
+  });
+  // We are confident the keys used in the questionnaire correspond
+  // to the answers step names
+  // $FlowIgnore
+  return userSurvey;
+};
 
 const NavigationStep = ({ stepIndex }: {| stepIndex: number |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -293,7 +321,7 @@ const MobileDisplay = ({
   );
 };
 
-type Props = {| onQuestionnaireFinished: () => void |};
+type Props = {| onQuestionnaireFinished: UserSurvey => Promise<void> |};
 
 const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
   const [questionId, setQuestionId] = React.useState<string>(firstQuestion);
@@ -317,7 +345,7 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
           return;
         }
       }
-      onQuestionnaireFinished();
+      onQuestionnaireFinished(formatUserAnswers(userAnswers));
     },
     [userAnswers, onQuestionnaireFinished]
   );

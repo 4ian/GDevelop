@@ -145,6 +145,11 @@ namespace gdjs {
       this._renderer.ensureUpToDate();
     }
 
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
+      this._renderer.destroy();
+    }
+
     /**
      * Initialize the extra parameters that could be set for an instance.
      */

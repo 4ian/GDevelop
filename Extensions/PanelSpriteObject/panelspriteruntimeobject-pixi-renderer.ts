@@ -393,6 +393,18 @@ namespace gdjs {
     getTextureHeight() {
       return this._textureHeight;
     }
+
+    destroy() {
+      // Destroy textures because they are instantiated by this class.
+      for (const borderSprite of this._borderSprites) {
+        borderSprite.destroy({ texture: true });
+      }
+      this._centerSprite.destroy({ texture: true });
+      // Destroy the containers without handling children because they are
+      // already handled above.
+      this._wrapperContainer.destroy(false);
+      this._spritesContainer.destroy(false);
+    }
   }
 
   export const PanelSpriteRuntimeObjectRenderer = PanelSpriteRuntimeObjectPixiRenderer;

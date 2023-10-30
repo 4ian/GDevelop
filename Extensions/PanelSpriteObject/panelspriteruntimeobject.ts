@@ -116,11 +116,7 @@ namespace gdjs {
 
     onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       super.onDestroyFromScene(instanceContainer);
-      // @ts-ignore
-      if (this._renderer.onDestroy) {
-        // @ts-ignore
-        this._renderer.onDestroy();
-      }
+      this._renderer.destroy();
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {

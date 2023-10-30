@@ -124,6 +124,11 @@ namespace gdjs {
     getTextureHeight() {
       return this._tiledSprite.texture.height;
     }
+
+    destroy(): void {
+      // Keep textures because they are shared by all sprites.
+      this._tiledSprite.destroy(false);
+    }
   }
 
   export const TiledSpriteRuntimeObjectRenderer = TiledSpriteRuntimeObjectPixiRenderer;

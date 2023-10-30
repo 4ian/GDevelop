@@ -144,7 +144,7 @@ namespace gdjs {
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
-    
+
     onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       super.onDestroyFromScene(instanceContainer);
       this._renderer.destroy();

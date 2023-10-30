@@ -296,7 +296,12 @@ const MobileDisplay = ({
                     label={i18n._(t`Next`)}
                     onClick={() => goToNextQuestion(questionData)}
                     disabled={
-                      userAnswer ? userAnswer.answers.length === 0 : true
+                      userAnswer
+                        ? userAnswer.answers.length === 0 ||
+                          (userAnswer.answers.length === 1 &&
+                            userAnswer.answers[0] === 'input' &&
+                            !userAnswer.userInput)
+                        : true
                     }
                   />
                 )}

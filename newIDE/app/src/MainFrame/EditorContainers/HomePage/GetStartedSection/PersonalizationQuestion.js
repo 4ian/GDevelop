@@ -212,6 +212,7 @@ const FreeAnswer = ({
                       label={i18n._(t`Send`)}
                       fullWidth
                       onClick={clickSend}
+                      disabled={!value}
                     />
                   )}
                 </ColumnStackLayout>
@@ -402,7 +403,12 @@ const PersonalizationQuestion = ({
                 primary
                 label={i18n._(t`Next`)}
                 onClick={onClickNext}
-                disabled={selectedAnswers.length === 0}
+                disabled={
+                  selectedAnswers.length === 0 ||
+                  (selectedAnswers.length === 1 &&
+                    selectedAnswers[0] === 'input' &&
+                    !userInputValue)
+                }
               />
             </Line>
           )}

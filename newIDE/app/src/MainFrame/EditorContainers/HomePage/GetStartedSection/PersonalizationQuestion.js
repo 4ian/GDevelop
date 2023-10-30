@@ -369,14 +369,13 @@ const PersonalizationQuestion = ({
               </GridListTile>
             ) : (
               answers.map(answerData => (
-                <GridListTile>
+                <GridListTile key={answerData.id}>
                   {answerData.id === 'input' &&
                   userInputValue !== undefined &&
                   onChangeUserInputValue ? (
                     <FreeAnswer
                       answerData={answerData}
                       i18n={i18n}
-                      key={answerData.id}
                       onSelect={onSelectAnswer}
                       selected={selectedAnswers.includes(answerData.id)}
                       showCheckbox={!!multi}
@@ -388,7 +387,6 @@ const PersonalizationQuestion = ({
                     <Answer
                       answerData={answerData}
                       i18n={i18n}
-                      key={answerData.id}
                       onSelect={onSelectAnswer}
                       selected={selectedAnswers.includes(answerData.id)}
                       showCheckbox={!!multi}

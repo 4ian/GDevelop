@@ -152,6 +152,7 @@ export const HomePage = React.memo<Props>(
         fetchGameTemplates,
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
+      const [showUserChip, setShowUserChip] = React.useState<boolean>(false);
       const {
         values: { showGetStartedSection },
         setShowGetStartedSection,
@@ -196,7 +197,7 @@ export const HomePage = React.memo<Props>(
                 onOpenProjectManager={onOpenProjectManager}
                 onSave={onSave}
                 canSave={canSave}
-                showUserChip={activeTab !== 'get-started'}
+                showUserChip={showUserChip}
               />
             );
           }
@@ -209,7 +210,7 @@ export const HomePage = React.memo<Props>(
           project,
           onSave,
           canSave,
-          activeTab,
+          showUserChip,
         ]
       );
 
@@ -220,6 +221,13 @@ export const HomePage = React.memo<Props>(
         },
         [updateToolbar]
       );
+
+      React.useEffect(() => {
+        // Let the GetStarted page handle if the user chip should be shown.
+        if (activeTab !== 'get-started') {
+          setShowUserChip(true);
+        }
+      }, [activeTab]);
 
       const forceUpdateEditor = React.useCallback(() => {
         // No updates to be done
@@ -292,7 +300,9 @@ export const HomePage = React.memo<Props>(
                     !!announcements && (
                       <AnnouncementsFeed canClose level="urgent" addMargins />
                     )}
-                  {activeTab === 'get-started' && <GetStartedSection />}
+                  {activeTab === 'get-started' && (
+                    <GetStartedSection showUserChip={setShowUserChip} />
+                  )}
                   {activeTab === 'build' && (
                     <BuildSection
                       project={project}

@@ -45,9 +45,9 @@ const styles = {
 
 const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
 
-type Props = {||};
+type Props = {| showUserChip: boolean => void |};
 
-const GetStartedSection = ({  }: Props) => {
+const GetStartedSection = ({ showUserChip }: Props) => {
   const isOnline = useOnlineStatus();
   const {
     profile,
@@ -57,6 +57,7 @@ const GetStartedSection = ({  }: Props) => {
     onEditProfile,
     onCreateAccount,
     authenticationError,
+    loginState,
   } = React.useContext(AuthenticatedUserContext);
   const { values: preferences } = React.useContext(PreferencesContext);
 
@@ -64,7 +65,12 @@ const GetStartedSection = ({  }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
   const [step, setStep] = React.useState<
-    'welcome' | 'login' | 'register' | 'questionnaire' | 'questionnaireFinished'
+    | 'welcome'
+    | 'login'
+    | 'register'
+    | 'questionnaire'
+    | 'questionnaireFinished'
+    | 'recommendations'
   >('welcome');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -109,6 +115,7 @@ const GetStartedSection = ({  }: Props) => {
     try {
       setStep('questionnaireFinished');
       await onEditProfile({ survey }, preferences, { throwError: true });
+      setStep('recommendations');
     } catch (error) {
       console.error('An error occurred when sending survey:');
       console.error(error);
@@ -119,16 +126,21 @@ const GetStartedSection = ({  }: Props) => {
 
   React.useEffect(
     () => {
-      if ((step === 'login' || step === 'register') && profile) {
-        setStep('questionnaire');
+      if (step === 'welcome' && profile && profile.survey) {
+        setStep('recommendations');
+      } else if ((step === 'login' || step === 'register') && profile) {
+        setStep(profile.survey ? 'recommendations' : 'questionnaire');
       } else if (!(step === 'login' || step === 'register') && !profile) {
         setStep('welcome');
       }
+      // Only show user chip when the user is logged in and can see the recommendations.
+      // In any other case, we don't want to distract them from completing the survey.
+      showUserChip(step === 'recommendations' && !!profile && !!profile.survey);
     },
-    [profile, step]
+    [profile, step, showUserChip]
   );
 
-  if (creatingOrLoggingInAccount) {
+  if (creatingOrLoggingInAccount || loginState === 'loggingIn') {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -395,6 +407,26 @@ const GetStartedSection = ({  }: Props) => {
               style={styles.linearProgress}
             />
           </Line>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (step === 'recommendations') {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text size="title" align="center">
+            <Trans>Recommendations</Trans>
+          </Text>
         </ColumnStackLayout>
       </SectionContainer>
     );

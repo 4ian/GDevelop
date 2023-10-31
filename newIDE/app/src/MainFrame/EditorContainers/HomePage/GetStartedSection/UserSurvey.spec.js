@@ -10,12 +10,26 @@ describe('formatUserAnswers', () => {
         userInput: '',
         answers: ['input'],
       },
-    ]
+    ];
 
     expect(formatUserAnswers(userAnswers)).toEqual({
-      projectDescription: ''
-    })
-  })
+      projectDescription: '',
+    });
+  });
+
+  test('it removes creationGoal answer when choosing other at first question', () => {
+    const userAnswers = [
+      {
+        questionId: 'creationGoal',
+        answers: ['input'],
+        userInput: 'Bonjour  ',
+      },
+    ];
+
+    expect(formatUserAnswers(userAnswers)).toEqual({
+      creationGoalInput: 'Bonjour',
+    });
+  });
 
   test('it formats a complex user answers', () => {
     const userAnswers = [

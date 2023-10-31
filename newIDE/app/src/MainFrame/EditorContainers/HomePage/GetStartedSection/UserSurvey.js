@@ -61,10 +61,14 @@ export const formatUserAnswers = (userAnswers: UserAnswers): UserSurveyType => {
     } else {
       userSurvey[questionId] = cleanedAnswers;
     }
+
     if (isOnlyOneFreeAnswerPossible(questionnaire[questionId].answers)) {
       userSurvey[questionId] = userInput || '';
     } else if (userInput) {
-      userSurvey[`${questionId}Input`] = userInput;
+      userSurvey[`${questionId}Input`] = userInput.trim();
+      if (questionId === firstQuestion) {
+        delete userSurvey[questionId];
+      }
     }
   });
   // We are confident the keys used in the questionnaire correspond
@@ -99,7 +103,7 @@ type DisplayProps = {|
   userAnswers: UserAnswers,
   onSelectAnswer: (string, string) => void,
   goToNextQuestion: QuestionData => void,
-  onClickSend: string => void,
+  onClickSend: () => void,
   onChangeUserInputValue: (string, string) => void,
   questionId: string,
 |};
@@ -500,6 +504,17 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
     [userAnswers, questionId]
   );
 
+  const endQuestionnaireEarly = React.useCallback(
+    () => {
+      const questionData = questionnaire[questionId];
+      goToNextQuestion(
+        questionData,
+        questionData.answers.find(answer => answer.id === 'input')
+      );
+    },
+    [goToNextQuestion, questionId]
+  );
+
   if (isMobile) {
     return (
       <MobileDisplay
@@ -508,7 +523,7 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
         goToPreviousQuestion={goToPreviousQuestion}
         onSelectAnswer={onSelectAnswer}
         userAnswers={userAnswers}
-        onClickSend={content => console.log(content)}
+        onClickSend={endQuestionnaireEarly}
         onChangeUserInputValue={onChangeUserInputValue}
       />
     );
@@ -520,7 +535,7 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
       goToNextQuestion={goToNextQuestion}
       onSelectAnswer={onSelectAnswer}
       userAnswers={userAnswers}
-      onClickSend={content => console.log(content)}
+      onClickSend={endQuestionnaireEarly}
       onChangeUserInputValue={onChangeUserInputValue}
     />
   );

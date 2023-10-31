@@ -356,22 +356,37 @@ const GetStartedSection = ({ showUserChip }: Props) => {
           </Text>
           <LargeSpacer />
           <Text size="sub-title" align="center">
-            <Trans>Let's start by creating your account.</Trans>
+            {profile ? (
+              <Trans>Let's get to know you better.</Trans>
+            ) : (
+              <Trans>Let's start by creating your account.</Trans>
+            )}
           </Text>
           <div style={styles.buttonContainer}>
             <ColumnStackLayout noMargin>
-              <RaisedButton
-                label={<Trans>Let's go!</Trans>}
-                primary
-                onClick={() => setStep('register')}
-                fullWidth
-              />
-              <FlatButton
-                primary
-                label={<Trans>I already have an account</Trans>}
-                onClick={() => setStep('login')}
-                fullWidth
-              />
+              {profile ? (
+                <RaisedButton
+                  label={<Trans>Let's go!</Trans>}
+                  primary
+                  onClick={() => setStep('questionnaire')}
+                  fullWidth
+                />
+              ) : (
+                <>
+                  <RaisedButton
+                    label={<Trans>Let's go!</Trans>}
+                    primary
+                    onClick={() => setStep('register')}
+                    fullWidth
+                  />
+                  <FlatButton
+                    primary
+                    label={<Trans>I already have an account</Trans>}
+                    onClick={() => setStep('login')}
+                    fullWidth
+                  />
+                </>
+              )}
             </ColumnStackLayout>
           </div>
         </ColumnStackLayout>

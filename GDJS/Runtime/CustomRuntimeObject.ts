@@ -140,6 +140,10 @@ namespace gdjs {
       this.getRenderer().ensureUpToDate();
     }
 
+    isNeedingToBeAwake(): boolean {
+      return true;
+    }
+
     getRendererObject() {
       return this.getRenderer().getRendererObject();
     }

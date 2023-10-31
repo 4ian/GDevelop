@@ -164,6 +164,7 @@ namespace gdjs {
     layer: string = '';
     protected _nameId: integer;
     protected _livingOnScene: boolean = true;
+    private _lastActivityFrameIndex: integer;
 
     readonly id: integer;
     private destroyCallbacks = new Set<() => void>();
@@ -229,10 +230,11 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: ObjectData & any
     ) {
+      const scene = instanceContainer.getScene();
       this.name = objectData.name || '';
       this.type = objectData.type || '';
       this._nameId = RuntimeObject.getNameIdentifier(this.name);
-      this.id = instanceContainer.getScene().createNewUniqueId();
+      this.id = scene.createNewUniqueId();
       this._runtimeScene = instanceContainer;
       this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0, 0));
       this.hitBoxes = this._defaultHitBoxes;
@@ -242,7 +244,7 @@ namespace gdjs {
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
-        this._runtimeScene
+        scene
           .getGame()
           .getEffectsManager()
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
@@ -255,10 +257,13 @@ namespace gdjs {
         const behavior = new Ctor(instanceContainer, autoData, this);
         if (behavior.usesLifecycleFunction()) {
           this._behaviors.push(behavior);
+          this.wakeUp();
         }
         this._behaviorsTable.put(autoData.name, behavior);
       }
       this._timers = new Hashtable();
+
+      this._lastActivityFrameIndex = Number.MIN_SAFE_INTEGER;
     }
 
     //Common members functions related to the object and its runtimeScene :
@@ -439,6 +444,44 @@ namespace gdjs {
       return false;
     }
 
+    _forceToSleep(): void {
+      if (!this.isAwake()) {
+        return;
+      }
+      this._lastActivityFrameIndex = Number.NEGATIVE_INFINITY;
+    }
+
+    wakeUp() {
+      const wasAwake = this.isAwake();
+      this._lastActivityFrameIndex = this.getRuntimeScene().getFrameIndex();
+      if (!wasAwake) {
+        this._runtimeScene._activeInstances.push(this);
+        console.log('Wake up.');
+      }
+    }
+
+    isNeedingToBeAwake(): boolean {
+      return (
+        this._lastActivityFrameIndex != Number.NEGATIVE_INFINITY &&
+        (this._behaviors.length > 0 ||
+          !this.hasNoForces() ||
+          !this._timers.firstKey())
+      );
+    }
+
+    isAwake(): boolean {
+      return (
+        this.getRuntimeScene().getFrameIndex() - this._lastActivityFrameIndex <
+        60
+      );
+    }
+
+    tryToSleep(): void {
+      if (this.isNeedingToBeAwake()) {
+        this._lastActivityFrameIndex = this.getRuntimeScene().getFrameIndex();
+      }
+    }
+
     /**
      * Remove an object from a scene.
      *
@@ -449,6 +492,7 @@ namespace gdjs {
       if (this._livingOnScene) {
         instanceContainer.markObjectForDeletion(this);
         this._livingOnScene = false;
+        this._forceToSleep();
       }
     }
 
@@ -1363,6 +1407,7 @@ namespace gdjs {
         // (or the 1st instant force).
         this._instantForces.push(this._getRecycledForce(x, y, multiplier));
       }
+      this.wakeUp();
     }
 
     /**
@@ -1926,6 +1971,7 @@ namespace gdjs {
     timerElapsedTime(timerName: string, timeInSeconds: float): boolean {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this.wakeUp();
         return false;
       }
       return this.getTimerElapsedTimeInSeconds(timerName) >= timeInSeconds;
@@ -1950,6 +1996,7 @@ namespace gdjs {
     resetTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this.wakeUp();
       }
       this._timers.get(timerName).reset();
     }
@@ -1961,6 +2008,7 @@ namespace gdjs {
     pauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this.wakeUp();
       }
       this._timers.get(timerName).setPaused(true);
     }
@@ -1972,6 +2020,7 @@ namespace gdjs {
     unpauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this.wakeUp();
       }
       this._timers.get(timerName).setPaused(false);
     }

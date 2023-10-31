@@ -15,6 +15,8 @@ namespace gdjs {
     /** Contains the instances living on the container */
     _instances: Hashtable<RuntimeObject[]>;
 
+    _activeInstances: Array<RuntimeObject> = [];
+
     /**
      * An array used to create a list of all instance when necessary.
      * @see gdjs.RuntimeInstanceContainer#_constructListOfAllInstances}
@@ -485,13 +487,33 @@ namespace gdjs {
       return this._allInstancesList;
     }
 
+    getActiveInstances(): gdjs.RuntimeObject[] {
+      let writeIndex = 0;
+      for (
+        let readIndex = 0;
+        readIndex < this._activeInstances.length;
+        readIndex++
+      ) {
+        const instance = this._activeInstances[readIndex];
+        this._activeInstances[writeIndex] = instance;
+        instance.tryToSleep();
+        if (instance.isAwake()) {
+          writeIndex++;
+        } else {
+          console.log('Go to sleep.');
+        }
+      }
+      this._activeInstances.length = writeIndex;
+      return this._activeInstances;
+    }
+
     /**
      * Update the objects before launching the events.
      */
     _updateObjectsPreEvents() {
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       // may delete the objects.
-      const allInstancesList = this.getAdhocListOfAllInstances();
+      const allInstancesList = this.getActiveInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const obj = allInstancesList[i];
         const elapsedTime = obj.getElapsedTime();
@@ -521,7 +543,7 @@ namespace gdjs {
 
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       // may delete the objects.
-      const allInstancesList = this.getAdhocListOfAllInstances();
+      const allInstancesList = this.getActiveInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         allInstancesList[i].stepBehaviorsPostEvents(this);
       }

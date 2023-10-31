@@ -45,6 +45,8 @@ namespace gdjs {
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
 
+    _frameIndex: integer = 0;
+
     /**
      * @param runtimeGame The game associated to this scene.
      */
@@ -427,6 +429,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.endFrame();
       }
+      this._frameIndex++;
       return !!this.getRequestedChange();
     }
 
@@ -733,6 +736,10 @@ namespace gdjs {
      */
     sceneJustResumed(): boolean {
       return this._isJustResumed;
+    }
+
+    getFrameIndex(): integer {
+      return this._frameIndex;
     }
   }
 

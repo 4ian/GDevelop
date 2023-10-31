@@ -105,10 +105,10 @@ const GetStartedSection = ({  }: Props) => {
     );
   };
 
-  const onQuestionnaireFinished = async (userSurvey: UserSurveyType) => {
+  const onQuestionnaireFinished = async (survey: UserSurveyType) => {
     try {
       setStep('questionnaireFinished');
-      await onEditProfile({ userSurvey }, preferences, { throwError: true });
+      await onEditProfile({ survey }, preferences, { throwError: true });
     } catch (error) {
       console.error('An error occurred when sending survey:');
       console.error(error);

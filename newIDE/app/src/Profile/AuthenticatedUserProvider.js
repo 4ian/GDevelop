@@ -752,7 +752,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           appLanguage: preferences.language,
           donateLink: form.donateLink,
           communityLinks: form.communityLinks,
-          userSurvey: form.userSurvey,
+          survey: form.survey,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();

@@ -1,6 +1,6 @@
 // @flow
 
-import { formatUserAnswers } from './PersonalizationFlow';
+import { formatUserAnswers } from './UserSurvey';
 
 describe('formatUserAnswers', () => {
   test('it sets projectDescription as string even if user answer is empty', () => {

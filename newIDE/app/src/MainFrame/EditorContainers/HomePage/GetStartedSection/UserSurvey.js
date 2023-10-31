@@ -11,12 +11,12 @@ import questionnaire, {
 } from './Questionnaire';
 import PersonalizationQuestion, {
   TitleAndSubtitle,
-} from './PersonalizationQuestion';
+} from './UserSurveyQuestion';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import SectionContainer, {
   type SectionContainerInterface,
 } from '../SectionContainer';
-import { type UserSurvey } from '../../../../Utils/GDevelopServices/User';
+import { type UserSurvey as UserSurveyType } from '../../../../Utils/GDevelopServices/User';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { Column, Line } from '../../../../UI/Grid';
@@ -48,7 +48,7 @@ type UserAnswers = Array<{|
   userInput?: string,
 |}>;
 
-export const formatUserAnswers = (userAnswers: UserAnswers): UserSurvey => {
+export const formatUserAnswers = (userAnswers: UserAnswers): UserSurveyType => {
   const userSurvey = {};
   userAnswers.forEach(({ questionId, answers, userInput }) => {
     // Remove `input` choice from answers since input content should be handled differently.
@@ -324,9 +324,9 @@ const MobileDisplay = ({
   );
 };
 
-type Props = {| onQuestionnaireFinished: UserSurvey => Promise<void> |};
+type Props = {| onQuestionnaireFinished: UserSurveyType => Promise<void> |};
 
-const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
+const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
   const [questionId, setQuestionId] = React.useState<string>(firstQuestion);
   const windowWidth = useResponsiveWindowWidth();
   const [userAnswers, setUserAnswers] = React.useState<UserAnswers>([]);
@@ -494,4 +494,4 @@ const PersonalizationFlow = ({ onQuestionnaireFinished }: Props) => {
   );
 };
 
-export default PersonalizationFlow;
+export default UserSurvey;

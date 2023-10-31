@@ -21,7 +21,7 @@ import {
   type WidthType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout } from '../../../../UI/Layout';
-import { isOnlyOneFreeAnswerPossible } from './PersonalizationFlow';
+import { isOnlyOneFreeAnswerPossible } from './UserSurvey';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 
 const getColumnsFromWidth = (width: WidthType) => {
@@ -318,7 +318,7 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-const PersonalizationQuestion = ({
+const UserSurveyQuestion = ({
   questionData,
   onSelectAnswer,
   selectedAnswers,
@@ -418,4 +418,4 @@ const PersonalizationQuestion = ({
   );
 };
 
-export default PersonalizationQuestion;
+export default UserSurveyQuestion;

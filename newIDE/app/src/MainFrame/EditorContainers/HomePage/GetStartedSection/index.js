@@ -17,9 +17,9 @@ import CircularProgress from '../../../../UI/CircularProgress';
 import BackgroundText from '../../../../UI/BackgroundText';
 import {
   type UsernameAvailability,
-  type UserSurvey,
+  type UserSurvey as UserSurveyType,
 } from '../../../../Utils/GDevelopServices/User';
-import PersonalizationFlow from './PersonalizationFlow';
+import UserSurvey from './UserSurvey';
 import LinearProgress from '../../../../UI/LinearProgress';
 import CreateAccountForm from '../../../../Profile/CreateAccountForm';
 import LoginForm from '../../../../Profile/LoginForm';
@@ -105,7 +105,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   };
 
-  const onQuestionnaireFinished = async (userSurvey: UserSurvey) => {
+  const onQuestionnaireFinished = async (userSurvey: UserSurveyType) => {
     try {
       setStep('questionnaireFinished');
       await onEditProfile({ userSurvey }, preferences, { throwError: true });
@@ -400,9 +400,7 @@ const GetStartedSection = ({  }: Props) => {
     );
   }
 
-  return (
-    <PersonalizationFlow onQuestionnaireFinished={onQuestionnaireFinished} />
-  );
+  return <UserSurvey onQuestionnaireFinished={onQuestionnaireFinished} />;
 };
 
 const GetStartedSectionWithErrorBoundary = (props: Props) => (

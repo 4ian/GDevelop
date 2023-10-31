@@ -329,6 +329,7 @@ type Props = {| onQuestionnaireFinished: UserSurveyType => Promise<void> |};
 const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
   const [questionId, setQuestionId] = React.useState<string>(firstQuestion);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
   const [userAnswers, setUserAnswers] = React.useState<UserAnswers>([]);
 
   const goToNextQuestion = React.useCallback(
@@ -348,9 +349,9 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
           return;
         }
       }
-      onQuestionnaireFinished(formatUserAnswers(userAnswers));
+      setQuestionId('QUESTIONNAIRE_FINISHED');
     },
-    [userAnswers, onQuestionnaireFinished]
+    [userAnswers]
   );
 
   const onChangeUserInputValue = React.useCallback(
@@ -386,6 +387,21 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
     [questionId, userAnswers]
   );
 
+  React.useEffect(
+    () => {
+      // Call onQuestionnaireFinished in effect instead of directly in goToNextQuestion
+      // to avoid cases where userAnswers is not up to date and does not contain the
+      // last selected answer.
+      // This effect should be called only once when questionId is set to this specific
+      // value. After that, the whole component should be unmounted and the effect would
+      // not be called a second time.
+      if (questionId === 'QUESTIONNAIRE_FINISHED') {
+        onQuestionnaireFinished(formatUserAnswers(userAnswers));
+      }
+    },
+    [questionId, onQuestionnaireFinished, userAnswers]
+  );
+
   const onSelectAnswer = React.useCallback(
     (questionId: string, answerId: string) => {
       const questionData = questionnaire[questionId];
@@ -415,12 +431,28 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
           // Handle new answer (that could be the same as before).
           const hasAnswerChanged =
             userAnswers[existingUserAnswerIndex].answers[0] !== answerId;
-          if (!hasAnswerChanged) return;
-          const newUserAnswers = [...userAnswers];
-          newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           const doesAnswerChangesFollowingQuestion =
             !questionData.nextQuestion ||
             (questionId === firstQuestion && answerId === 'input');
+
+          if (!hasAnswerChanged) {
+            if (isMobile) {
+              if (doesAnswerChangesFollowingQuestion) {
+                const answerData = questionData.answers.find(
+                  answerData => answerData.id === answerId
+                );
+                if (shouldGoToNextQuestion) {
+                  goToNextQuestion(questionData, answerData);
+                }
+              } else {
+                if (shouldGoToNextQuestion) {
+                  goToNextQuestion(questionData);
+                }
+              }
+            }
+          }
+          const newUserAnswers = [...userAnswers];
+          newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           if (doesAnswerChangesFollowingQuestion) {
             newUserAnswers.splice(
               existingUserAnswerIndex + 1,
@@ -451,7 +483,7 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
         }
       }
     },
-    [userAnswers, goToNextQuestion]
+    [userAnswers, goToNextQuestion, isMobile]
   );
 
   const goToPreviousQuestion = React.useCallback(
@@ -468,7 +500,7 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
     [userAnswers, questionId]
   );
 
-  if (windowWidth === 'small') {
+  if (isMobile) {
     return (
       <MobileDisplay
         questionId={questionId}

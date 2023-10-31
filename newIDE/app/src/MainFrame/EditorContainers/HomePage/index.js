@@ -17,7 +17,6 @@ import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
-import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
@@ -153,10 +152,7 @@ export const HomePage = React.memo<Props>(
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
       const [showUserChip, setShowUserChip] = React.useState<boolean>(false);
-      const {
-        values: { showGetStartedSection },
-        setShowGetStartedSection,
-      } = React.useContext(PreferencesContext);
+
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';
 

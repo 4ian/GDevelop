@@ -372,7 +372,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                                 />
                               </div>
                             ) : null}
-                            {renamedItemId === node.id ? (
+                            {renamedItemId === node.id &&
+                            typeof node.name === 'string' ? (
                               <SemiControlledRowInput
                                 initialValue={node.name}
                                 onEndRenaming={endRenaming}

@@ -27,7 +27,7 @@ export type ItemBaseAttributes = {
 
 type FlattenedNode<Item> = {|
   id: string,
-  name: string,
+  name: string | React.Node,
   hasChildren: boolean,
   canHaveChildren: boolean,
   extraClass: string,
@@ -112,7 +112,7 @@ type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
-  getItemName: Item => string,
+  getItemName: Item => string | React.Node,
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
@@ -235,7 +235,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         !searchText ||
         forceAllOpened ||
         forceOpen ||
-        name.toLowerCase().includes(searchText) ||
+        (typeof name === 'string' && name.toLowerCase().includes(searchText)) ||
         flattenedChildren.length > 0
       ) {
         const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;

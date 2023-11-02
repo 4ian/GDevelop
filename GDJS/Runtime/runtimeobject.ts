@@ -467,7 +467,7 @@ namespace gdjs {
      *
      * @param instanceContainer The container owning the object.
      */
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       const theLayer = instanceContainer.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
@@ -483,6 +483,8 @@ namespace gdjs {
       this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
     }
+
+    onDestroyed(): void {}
 
     /**
      * Called whenever the scene owning the object is paused.

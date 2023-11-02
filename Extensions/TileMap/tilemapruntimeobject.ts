@@ -158,8 +158,8 @@ namespace gdjs {
       );
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(instanceContainer);
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.destroy();
     }
 

@@ -3125,6 +3125,7 @@ const MainFrame = (props: Props) => {
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
                     fileMetadata: currentFileMetadata,
+                    storageProvider: getStorageProvider(),
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),

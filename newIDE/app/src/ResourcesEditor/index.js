@@ -18,6 +18,7 @@ import {
 } from '../ResourcesList/ResourceSource';
 import { type FileMetadata } from '../ProjectsStorage';
 import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
+import type { StorageProvider } from '../ProjectsStorage';
 
 const gd: libGDevelop = global.gd;
 
@@ -50,6 +51,7 @@ type Props = {|
   ) => void,
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
 |};
 
 const initialMosaicEditorNodes = {
@@ -84,6 +86,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.props.setToolbar(
       <Toolbar
         onOpenProjectFolder={this.openProjectFolder}
+        canOpenProjectFolder={
+          !!remote &&
+          !!this.props.fileMetadata &&
+          this.props.storageProvider.internalName === 'LocalFile'
+        }
         onToggleProperties={this.toggleProperties}
         isPropertiesShown={openedEditorNames.includes('properties')}
         canDelete={!!this.state.selectedResource}
@@ -186,9 +193,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   openProjectFolder = () => {
-    const project = this.props.project;
-
-    if (remote) remote.shell.openPath(path.dirname(project.getProjectFile()));
+    if (remote)
+      remote.shell.openPath(path.dirname(this.props.project.getProjectFile()));
   };
 
   toggleProperties = () => {

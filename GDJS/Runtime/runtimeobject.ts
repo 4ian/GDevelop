@@ -467,7 +467,7 @@ namespace gdjs {
      *
      * @param instanceContainer The container owning the object.
      */
-    onRemovedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       const theLayer = instanceContainer.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {

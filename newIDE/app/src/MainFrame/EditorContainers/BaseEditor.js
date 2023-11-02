@@ -27,6 +27,7 @@ export type RenderEditorContainerProps = {|
   projectItemName: ?string,
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
   setToolbar: (?React.Node) => void,
 
   // Some optional extra props to pass to the rendered editor

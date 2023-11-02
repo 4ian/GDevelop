@@ -177,7 +177,7 @@ namespace gdjs {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
-        object.onDestroyFromScene(this);
+        object.onRemovedFromScene(this);
       }
 
       this._destroy();

@@ -71,8 +71,8 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    onActuallyDestroyed(): void {
-      super.onActuallyDestroyed();
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.destroy();
     }
 

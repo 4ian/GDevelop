@@ -428,15 +428,13 @@ namespace gdjs {
         const instance = this._instancesRemoved[k];
         // Cache the instance to recycle it into a new instance later.
         // If the object does not support recycling, the cache won't be defined.
-        const cache = this._instancesCache.get(
-          instance.getName()
-        );
+        const cache = this._instancesCache.get(instance.getName());
         if (cache) {
           if (cache.length < 128) {
             cache.push(instance);
           }
         }
-        instance.onActuallyDestroyed();
+        instance.onDestroyed();
       }
       this._instancesRemoved.length = 0;
     }
@@ -618,7 +616,7 @@ namespace gdjs {
       }
 
       // Notify the object it was removed from the container
-      obj.onDestroyFromScene(this);
+      obj.onRemovedFromScene(this);
 
       // Notify the global callbacks
       for (let j = 0; j < gdjs.callbacksObjectDeletedFromScene.length; ++j) {

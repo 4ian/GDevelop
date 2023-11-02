@@ -405,9 +405,9 @@ namespace gdjs {
       }
     }
 
-    onActuallyDestroyed(): void {
+    onDestroyed(): void {
       this._renderer.destroy();
-      super.onActuallyDestroyed();
+      super.onDestroyed();
     }
 
     getEmitterForceMin(): number {

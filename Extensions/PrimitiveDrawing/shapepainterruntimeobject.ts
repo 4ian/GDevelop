@@ -174,8 +174,8 @@ namespace gdjs {
       super.stepBehaviorsPreEvents(instanceContainer);
     }
 
-    onActuallyDestroyed(): void {
-      super.onActuallyDestroyed();
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.destroy();
     }
 

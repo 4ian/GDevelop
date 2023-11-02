@@ -145,8 +145,8 @@ namespace gdjs {
       this._renderer.ensureUpToDate();
     }
 
-    onActuallyDestroyed(): void {
-      super.onActuallyDestroyed();
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.destroy();
     }
 

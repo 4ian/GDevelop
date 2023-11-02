@@ -124,6 +124,72 @@ namespace gdjs {
     }
 
     /**
+     * Return the PIXI texture associated to the specified resource name.
+     * If not found in the loaded textures, this method will try to load it.
+     * Warning: this method should only be used in specific cases that cannot rely on
+     * the initial resources loading of the game, such as the splashscreen.
+     * @param resourceName The name of the resource
+     * @returns The requested texture, or a placeholder if not valid.
+     */
+    getOrLoadPIXITexture(resourceName: string): PIXI.Texture {
+      if (this._loadedTextures.containsKey(resourceName)) {
+        const texture = this._loadedTextures.get(resourceName);
+        if (texture.valid) {
+          return texture;
+        } else {
+          logger.error(
+            'Texture for ' +
+              resourceName +
+              ' is not valid anymore (or never was).'
+          );
+          return this._invalidTexture;
+        }
+      }
+
+      // Texture is not loaded, load it now from the resources list.
+      const resource = findResourceWithNameAndKind(
+        this._resources,
+        resourceName,
+        'image'
+      );
+
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return this._invalidTexture;
+      }
+
+      logger.log('Loading texture for resource "' + resourceName + '"...');
+      const file = resource.file;
+      const url = this._resourcesLoader.getFullUrl(file);
+      const texture = PIXI.Texture.from(url, {
+        resourceOptions: {
+          // Note that using `false`
+          // to not having `crossorigin` at all would NOT work because the browser would taint the
+          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+          crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+            ? 'use-credentials'
+            : 'anonymous',
+        },
+      }).on('error', (error) => {
+        logFileLoadingError(file, error);
+      });
+      if (!texture) {
+        throw new Error(
+          'Texture loading by PIXI returned nothing for file ' +
+            file +
+            ' behind url ' +
+            url
+        );
+      }
+      applyTextureSettings(texture, resource);
+
+      this._loadedTextures.put(resourceName, texture);
+      return texture;
+    }
+
+    /**
      * Return the three.js texture associated to the specified resource name.
      * Returns a placeholder texture if not found.
      * @param resourceName The name of the resource

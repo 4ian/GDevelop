@@ -147,6 +147,8 @@ namespace gdjs {
     return true;
   };
 
+  type RuntimeObjectCallback = (object: gdjs.RuntimeObject) => void;
+
   /**
    * RuntimeObject represents an object being used on a RuntimeScene.
    *
@@ -168,6 +170,8 @@ namespace gdjs {
 
     readonly id: integer;
     private destroyCallbacks = new Set<() => void>();
+    // HitboxChanges happen a lot, an Array is faster to iterate.
+    private hitBoxChangedCallbacks: Array<RuntimeObjectCallback> = [];
     _runtimeScene: gdjs.RuntimeInstanceContainer;
 
     /**
@@ -213,6 +217,7 @@ namespace gdjs {
      * are never used.
      */
     protected _behaviors: gdjs.RuntimeBehavior[] = [];
+    protected _activeBehaviors: gdjs.RuntimeBehavior[] = [];
     /**
      * Contains the behaviors of the object by name.
      *
@@ -255,8 +260,9 @@ namespace gdjs {
         const autoData = objectData.behaviors[i];
         const Ctor = gdjs.getBehaviorConstructor(autoData.type);
         const behavior = new Ctor(instanceContainer, autoData, this);
+        this._behaviors.push(behavior);
         if (behavior.usesLifecycleFunction()) {
-          this._behaviors.push(behavior);
+          this._activeBehaviors.push(behavior);
           this.wakeUp();
         }
         this._behaviorsTable.put(autoData.name, behavior);
@@ -331,6 +337,7 @@ namespace gdjs {
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
       const behaviorsDataCount = objectData.behaviors.length;
+      let behaviorsCount = 0;
       let behaviorsUsingLifecycleFunctionCount = 0;
       for (
         let behaviorDataIndex = 0;
@@ -341,17 +348,24 @@ namespace gdjs {
         const Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
         // TODO: Add support for behavior recycling with a `reinitialize` method.
         const behavior = new Ctor(runtimeScene, behaviorData, this);
+        if (behaviorsCount < this._behaviors.length) {
+          this._behaviors[behaviorsCount] = behavior;
+        } else {
+          this._behaviors.push(behavior);
+        }
+        behaviorsCount++;
         if (behavior.usesLifecycleFunction()) {
-          if (behaviorsUsingLifecycleFunctionCount < this._behaviors.length) {
-            this._behaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
+          if (behaviorsUsingLifecycleFunctionCount < this._activeBehaviors.length) {
+            this._activeBehaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
           } else {
-            this._behaviors.push(behavior);
+            this._activeBehaviors.push(behavior);
           }
           behaviorsUsingLifecycleFunctionCount++;
         }
         this._behaviorsTable.put(behaviorData.name, behavior);
       }
-      this._behaviors.length = behaviorsUsingLifecycleFunctionCount;
+      this._behaviors.length = behaviorsCount;
+      this._activeBehaviors.length = behaviorsUsingLifecycleFunctionCount;
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
@@ -463,7 +477,7 @@ namespace gdjs {
     isNeedingToBeAwake(): boolean {
       return (
         this._lastActivityFrameIndex != Number.NEGATIVE_INFINITY &&
-        (this._behaviors.length > 0 ||
+        (this._activeBehaviors.length > 0 ||
           !this.hasNoForces() ||
           !this._timers.firstKey())
       );
@@ -480,6 +494,10 @@ namespace gdjs {
       if (this.isNeedingToBeAwake()) {
         this._lastActivityFrameIndex = this.getRuntimeScene().getFrameIndex();
       }
+    }
+
+    isAlive(): boolean {
+      return this._livingOnScene;
     }
 
     /**
@@ -529,6 +547,30 @@ namespace gdjs {
     }
 
     onDestroyed(): void {}
+
+    registerHitboxChangedCallback(callback: RuntimeObjectCallback) {
+      if (this.hitBoxChangedCallbacks.includes(callback)) {
+        return;
+      }
+      this.hitBoxChangedCallbacks.push(callback);
+    }
+
+    /**
+     * Send a signal that the object hitboxes are no longer up to date.
+     *
+     * The signal is propagated to parents so
+     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
+     * directly.
+     */
+    invalidateHitboxes(): void {
+      // TODO EBO Check that no community extension set hitBoxesDirty to true
+      // directly.
+      this.hitBoxesDirty = true;
+      this._runtimeScene.onChildrenLocationChanged();
+      for (const callback of this.hitBoxChangedCallbacks) {
+        callback(this);
+      }
+    }
 
     /**
      * Called whenever the scene owning the object is paused.
@@ -612,20 +654,6 @@ namespace gdjs {
       }
       this.x = x;
       this.invalidateHitboxes();
-    }
-
-    /**
-     * Send a signal that the object hitboxes are no longer up to date.
-     *
-     * The signal is propagated to parents so
-     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
-     * directly.
-     */
-    invalidateHitboxes(): void {
-      // TODO EBO Check that no community extension set hitBoxesDirty to true
-      // directly.
-      this.hitBoxesDirty = true;
-      this._runtimeScene.onChildrenLocationChanged();
     }
 
     /**
@@ -1826,8 +1854,8 @@ namespace gdjs {
     stepBehaviorsPreEvents(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPreEvents(instanceContainer);
+      for (let i = 0, len = this._activeBehaviors.length; i < len; ++i) {
+        this._activeBehaviors[i].stepPreEvents(instanceContainer);
       }
     }
 
@@ -1837,8 +1865,8 @@ namespace gdjs {
     stepBehaviorsPostEvents(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPostEvents(instanceContainer);
+      for (let i = 0, len = this._activeBehaviors.length; i < len; ++i) {
+        this._activeBehaviors[i].stepPostEvents(instanceContainer);
       }
     }
 
@@ -1915,9 +1943,17 @@ namespace gdjs {
         return false;
       }
       behavior.onDestroy();
-      const behaviorIndex = this._behaviors.indexOf(behavior);
-      if (behaviorIndex !== -1) {
-        this._behaviors.splice(behaviorIndex, 1);
+      {
+        const behaviorIndex = this._behaviors.indexOf(behavior);
+        if (behaviorIndex !== -1) {
+          this._behaviors.splice(behaviorIndex, 1);
+        }
+      }
+      {
+        const behaviorIndex = this._activeBehaviors.indexOf(behavior);
+        if (behaviorIndex !== -1) {
+          this._activeBehaviors.splice(behaviorIndex, 1);
+        }
       }
       this._behaviorsTable.remove(name);
       return true;

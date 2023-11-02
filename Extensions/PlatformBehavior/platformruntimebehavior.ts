@@ -14,9 +14,12 @@ namespace gdjs {
    */
   export class PlatformObjectsManager {
     private _platformRBush: any;
+    private movedPlatforms: Array<gdjs.PlatformRuntimeBehavior>;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
       this._platformRBush = new rbush();
+      this.movedPlatforms = [];
+      gdjs.registerRuntimeScenePreEventsCallback(() => this.doStepPreEvents());
     }
 
     /**
@@ -27,9 +30,8 @@ namespace gdjs {
       if (!instanceContainer.platformsObjectsManager) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        instanceContainer.platformsObjectsManager = new gdjs.PlatformObjectsManager(
-          instanceContainer
-        );
+        instanceContainer.platformsObjectsManager =
+          new gdjs.PlatformObjectsManager(instanceContainer);
       }
       // @ts-ignore
       return instanceContainer.platformsObjectsManager;
@@ -56,6 +58,21 @@ namespace gdjs {
       this._platformRBush.remove(platformBehavior.currentRBushAABB);
     }
 
+    invalidatePlatformHitbox(platformBehavior: gdjs.PlatformRuntimeBehavior) {
+      this.movedPlatforms.push(platformBehavior);
+    }
+
+    doStepPreEvents() {
+      for (const platformBehavior of this.movedPlatforms) {
+        this.removePlatform(platformBehavior);
+        if (platformBehavior.activated() && platformBehavior.owner.isAlive()) {
+          this.addPlatform(platformBehavior);
+        }
+        platformBehavior.onHitboxUpdatedInTree();
+      }
+      this.movedPlatforms.length = 0;
+    }
+
     /**
      * Returns all the platforms around the specified object.
      * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
@@ -79,9 +96,8 @@ namespace gdjs {
       searchArea.minY = y - oh / 2 - maxMovementLength;
       searchArea.maxX = x + ow / 2 + maxMovementLength;
       searchArea.maxY = y + oh / 2 + maxMovementLength;
-      const nearbyPlatforms: gdjs.BehaviorRBushAABB<
-        PlatformRuntimeBehavior
-      >[] = this._platformRBush.search(searchArea);
+      const nearbyPlatforms: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior>[] =
+        this._platformRBush.search(searchArea);
 
       result.length = 0;
 
@@ -122,11 +138,11 @@ namespace gdjs {
     _oldWidth: float = 0;
     _oldHeight: float = 0;
     _oldAngle: float = 0;
-    currentRBushAABB: gdjs.BehaviorRBushAABB<
-      PlatformRuntimeBehavior
-    > | null = null;
+    currentRBushAABB: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior> | null =
+      null;
     _manager: gdjs.PlatformObjectsManager;
     _registeredInManager: boolean = false;
+    _isAABBInvalidated = false;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -145,6 +161,10 @@ namespace gdjs {
       this._canBeGrabbed = behaviorData.canBeGrabbed || false;
       this._yGrabOffset = behaviorData.yGrabOffset || 0;
       this._manager = PlatformObjectsManager.getManager(instanceContainer);
+      this.owner.registerHitboxChangedCallback((object) =>
+        this.onHitboxChanged()
+      );
+      this.onHitboxChanged();
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -161,9 +181,11 @@ namespace gdjs {
     }
 
     onDestroy() {
-      if (this._manager && this._registeredInManager) {
-        this._manager.removePlatform(this);
-      }
+      this.onHitboxChanged();
+    }
+
+    usesLifecycleFunction(): boolean {
+      return false;
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
@@ -176,54 +198,28 @@ namespace gdjs {
                 sceneManager = parentScene ? &ScenePlatformObjectsManager::managers[&scene] : NULL;
                 registeredInManager = false;
             }*/
-
-      //Make sure the platform is or is not in the platforms manager.
-      if (!this.activated() && this._registeredInManager) {
-        this._manager.removePlatform(this);
-        this._registeredInManager = false;
-      } else {
-        if (this.activated() && !this._registeredInManager) {
-          this._manager.addPlatform(this);
-          this._registeredInManager = true;
-        }
-      }
-
-      //Track changes in size or position
-      if (
-        this._oldX !== this.owner.getX() ||
-        this._oldY !== this.owner.getY() ||
-        this._oldWidth !== this.owner.getWidth() ||
-        this._oldHeight !== this.owner.getHeight() ||
-        this._oldAngle !== this.owner.getAngle()
-      ) {
-        if (this._registeredInManager) {
-          this._manager.removePlatform(this);
-          this._manager.addPlatform(this);
-        }
-        this._oldX = this.owner.getX();
-        this._oldY = this.owner.getY();
-        this._oldWidth = this.owner.getWidth();
-        this._oldHeight = this.owner.getHeight();
-        this._oldAngle = this.owner.getAngle();
-      }
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     onActivate() {
-      if (this._registeredInManager) {
-        return;
-      }
-      this._manager.addPlatform(this);
-      this._registeredInManager = true;
+      this.onHitboxChanged();
     }
 
     onDeActivate() {
-      if (!this._registeredInManager) {
+      this.onHitboxChanged();
+    }
+
+    onHitboxChanged() {
+      if (this._isAABBInvalidated) {
         return;
       }
-      this._manager.removePlatform(this);
-      this._registeredInManager = false;
+      this._isAABBInvalidated = true;
+      this._manager.invalidatePlatformHitbox(this);
+    }
+
+    onHitboxUpdatedInTree() {
+      this._isAABBInvalidated = false;
     }
 
     changePlatformType(platformType: string) {

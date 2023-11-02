@@ -427,10 +427,21 @@ const GetStartedSection = ({ showUserChip }: Props) => {
     );
   }
 
-  if (step === 'recommendations') {
+  if (step === 'recommendations' && profile) {
     return (
       <SectionContainer
-        title={null} // Let the content handle the title.
+        title={
+          profile.username ? (
+            <Trans>Hello {profile.username}!</Trans>
+          ) : (
+            <Trans>Hello!</Trans>
+          )
+        }
+        subtitleText={
+          <Trans>
+            Here’s some content to get you started on your GDevelop journey!
+          </Trans>
+        }
         flexBody
       >
         <ColumnStackLayout
@@ -438,11 +449,7 @@ const GetStartedSection = ({ showUserChip }: Props) => {
           expand
           justifyContent="center"
           alignItems="center"
-        >
-          <Text size="title" align="center">
-            <Trans>Recommendations</Trans>
-          </Text>
-        </ColumnStackLayout>
+        />
       </SectionContainer>
     );
   }

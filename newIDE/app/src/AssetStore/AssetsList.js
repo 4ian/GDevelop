@@ -49,7 +49,7 @@ import { getFolderTagsFromAssetShortHeaders } from './TagsHelper';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { type AssetStorePageState } from './AssetStoreNavigator';
 
-const ASSETS_DISPLAY_LIMIT = 200;
+const ASSETS_DISPLAY_LIMIT = 250;
 
 const getAssetSize = (windowWidth: WidthType) => {
   switch (windowWidth) {

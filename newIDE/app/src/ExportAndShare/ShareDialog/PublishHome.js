@@ -106,7 +106,6 @@ const getSubSectionIcon = (
 // Styles to improve the interaction with the button.
 const useStylesForWidget = (highlighted: boolean) =>
   makeStyles(theme => {
-    console.log(theme);
     return createStyles({
       root: {
         border: highlighted

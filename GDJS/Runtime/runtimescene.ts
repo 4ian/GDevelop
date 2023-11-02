@@ -264,6 +264,7 @@ namespace gdjs {
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
         object.onDestroyFromScene(this);
+        object.onActuallyDestroyed();
       }
 
       // Notify the renderer

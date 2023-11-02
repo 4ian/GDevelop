@@ -425,16 +425,18 @@ namespace gdjs {
      */
     _cacheOrClearRemovedInstances() {
       for (let k = 0, lenk = this._instancesRemoved.length; k < lenk; ++k) {
+        const instance = this._instancesRemoved[k];
         // Cache the instance to recycle it into a new instance later.
         // If the object does not support recycling, the cache won't be defined.
         const cache = this._instancesCache.get(
-          this._instancesRemoved[k].getName()
+          instance.getName()
         );
         if (cache) {
           if (cache.length < 128) {
-            cache.push(this._instancesRemoved[k]);
+            cache.push(instance);
           }
         }
+        instance.onActuallyDestroyed();
       }
       this._instancesRemoved.length = 0;
     }

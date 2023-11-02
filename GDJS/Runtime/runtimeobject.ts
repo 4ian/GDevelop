@@ -484,6 +484,8 @@ namespace gdjs {
       this.clearEffects();
     }
 
+    onActuallyDestroyed(): void { }
+
     /**
      * Called whenever the scene owning the object is paused.
      * This should *not* impact objects, but some may need to inform their renderer.

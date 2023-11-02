@@ -2,9 +2,7 @@
 import * as React from 'react';
 
 // Keep first as it creates the `global.gd` object:
-import GDevelopJsInitializerDecorator, {
-  testProject,
-} from './GDevelopJsInitializerDecorator';
+import { testProject } from './GDevelopJsInitializerDecorator';
 
 import { storiesOf } from '@storybook/react';
 import { action, configureActions } from '@storybook/addon-actions';
@@ -2474,6 +2472,7 @@ storiesOf('ErrorBoundary', module)
       componentStack="Fake stack"
       error={fakeError}
       title="Error customizable title"
+      uniqueErrorId="unique-error-id"
     />
   ));
 

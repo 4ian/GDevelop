@@ -5,19 +5,12 @@ body:
     id: description
     attributes:
       label: Describe what you were doing when the crash happened
-      description: Add more details to the crash report if you can.
-  - type: textarea
-    id: reproduction_steps
-    attributes:
-      label: Steps to reproduce
-      description: |
-        * Please include a link to a game if possible!
-        * If applicable, add screenshots to help explain your problem.
+      description: If applicable, add screenshots to help explain your problem.
       placeholder: |
-        1. Go to '...'
-        2. Click on '...'
-        3. Scroll down to '...'
-        4. See error
+        1. Went to '...'
+        2. Clicked on '...'
+        3. Scrolled down to '...'
+        4. Saw error
   - type: input
     id: gdevelop_version
     attributes:
@@ -35,7 +28,7 @@ body:
   - type: textarea
     id: error_stack
     attributes:
-      label: Additional component context
+      label: Additional error context
       description: Additonal context about the problem. Leave the prefilled value.
   - type: textarea
     id: component_stack

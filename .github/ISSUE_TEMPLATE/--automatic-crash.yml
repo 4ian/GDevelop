@@ -1,4 +1,4 @@
-name: ⚠️ Automatic crash report
+name: 💥 Automatic crash report
 description: Do not use this template for bug reports. This template is only for automatic crash reports.
 body:
   - type: textarea

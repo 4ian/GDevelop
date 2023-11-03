@@ -17,10 +17,6 @@ import {
   getPlatformName,
   getSystemVersion,
   getUserAgent,
-  isMacLike,
-  isMobile,
-  isNativeMobileApp,
-  isWindows,
 } from '../Utils/Platform';
 import { ColumnStackLayout } from './Layout';
 import AlertMessage from './AlertMessage';

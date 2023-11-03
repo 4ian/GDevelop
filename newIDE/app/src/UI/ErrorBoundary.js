@@ -10,7 +10,7 @@ import RaisedButton from './RaisedButton';
 import { sendErrorMessage } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import Text from './Text';
-import { Column, Line, Spacer } from './Grid';
+import { Line, Spacer } from './Grid';
 import { getIDEVersion, getIDEVersionWithHash } from '../Version';
 import {
   getArch,
@@ -21,6 +21,15 @@ import {
 import { ColumnStackLayout } from './Layout';
 import AlertMessage from './AlertMessage';
 import Link from './Link';
+import BackgroundText from './BackgroundText';
+import { generateUUID } from 'three/src/math/MathUtils';
+
+const styles = {
+  errorMessage: {
+    maxWidth: 600,
+    textAlign: 'left',
+  },
+};
 
 type ErrorBoundaryScope =
   | 'mainframe'
@@ -31,16 +40,22 @@ type ErrorBoundaryScope =
 
 const errorHandler = (
   error: Error,
+  uniqueErrorId: string,
   componentStack: string,
   scope: ErrorBoundaryScope
 ) => {
-  console.error('Error caught by Boundary:', error, componentStack);
+  console.error(
+    `Error ${uniqueErrorId} caught by Boundary:`,
+    error,
+    componentStack
+  );
   sendErrorMessage(
     'Error caught by error boundary',
     // $FlowFixMe - Flow does not infer string type possibilities from interpolation.
     `error-boundary_${scope}`,
     {
       error,
+      uniqueErrorId,
       errorMessage: error.message || '',
       errorStack: error.stack || '',
       errorName: error.name || '',
@@ -60,11 +75,13 @@ export const ErrorFallbackComponent = ({
   componentStack,
   error,
   title,
-}: {
+  uniqueErrorId,
+}: {|
   componentStack: string,
   error: Error,
   title: string,
-}) => (
+  uniqueErrorId: string,
+|}) => (
   <PlaceholderMessage>
     <ColumnStackLayout>
       <Line>
@@ -73,7 +90,7 @@ export const ErrorFallbackComponent = ({
         <Text size="block-title">{title}</Text>
       </Line>
       <Divider />
-      <Column>
+      <ColumnStackLayout>
         <AlertMessage kind="warning">
           <Text>
             <Trans>
@@ -82,8 +99,6 @@ export const ErrorFallbackComponent = ({
             </Trans>
           </Text>
         </AlertMessage>
-      </Column>
-      <Column>
         <Text>
           <Trans>
             To help us fix this issue, you can create a{' '}
@@ -93,10 +108,20 @@ export const ErrorFallbackComponent = ({
             >
               GitHub account
             </Link>{' '}
-            then report the issue with the button below.
+            then report the issue with the button below. (ID: {uniqueErrorId})
           </Trans>
         </Text>
-      </Column>
+        {error && error.stack && (
+          <BackgroundText style={styles.errorMessage}>
+            {error.stack.slice(0, 200)}...
+          </BackgroundText>
+        )}
+        {componentStack && (
+          <BackgroundText style={styles.errorMessage}>
+            {componentStack.slice(0, 200)}...
+          </BackgroundText>
+        )}
+      </ColumnStackLayout>
       <Line justifyContent="flex-end">
         <RaisedButton
           label={<Trans>Report the issue on GitHub</Trans>}
@@ -146,17 +171,32 @@ type Props = {|
   scope: ErrorBoundaryScope,
 |};
 
-const ErrorBoundary = (props: Props) => (
-  <ReactErrorBoundary
-    FallbackComponent={fallbackComponentProps => (
-      <ErrorFallbackComponent {...fallbackComponentProps} title={props.title} />
-    )}
-    onError={(error, componentStack) =>
-      errorHandler(error, componentStack, props.scope)
-    }
-  >
-    {props.children}
-  </ReactErrorBoundary>
-);
+const ErrorBoundary = (props: Props) => {
+  const uniqueErrorIdRef = React.useRef(generateUUID());
+  return (
+    <ReactErrorBoundary
+      FallbackComponent={fallbackComponentProps => (
+        <ErrorFallbackComponent
+          {...fallbackComponentProps}
+          title={props.title}
+          uniqueErrorId={uniqueErrorIdRef.current}
+        />
+      )}
+      onError={(error, componentStack) => {
+        // Generate a new unique error id which will be displayed by the
+        // fallback component.
+        uniqueErrorIdRef.current = generateUUID();
+        errorHandler(
+          error,
+          uniqueErrorIdRef.current,
+          componentStack,
+          props.scope
+        );
+      }}
+    >
+      {props.children}
+    </ReactErrorBoundary>
+  );
+};
 
 export default ErrorBoundary;

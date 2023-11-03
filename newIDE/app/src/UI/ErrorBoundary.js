@@ -106,19 +106,12 @@ export const ErrorFallbackComponent = ({
           label={<Trans>Report the issue on GitHub</Trans>}
           primary
           onClick={() => {
-            const templateFile = '--bug-report.yml';
+            const templateFile = '--automatic-crash.yml';
             const title = 'Crash while using an editor';
-            const description =
+            const errorStack =
               error && error.stack
                 ? `${error.stack.slice(0, 600)}...`
                 : 'No error found';
-            const reproductionSteps = 'Fill me with the steps to reproduce';
-            const platform =
-              isWindows() || isMacLike()
-                ? 'Desktop'
-                : isMobile() || isNativeMobileApp()
-                ? 'Mobile'
-                : 'Web';
             const gdevelopVersion = getIDEVersionWithHash();
             const platformInfo = `System Version: ${getSystemVersion()}, Arch: ${getArch()}, User Agent: ${getUserAgent()}, Platform: ${getPlatformName()}`;
             const additionalContext = componentStack
@@ -131,13 +124,10 @@ export const ErrorFallbackComponent = ({
             baseUrl.searchParams.set('template', templateFile);
             baseUrl.searchParams.set('title', title);
             baseUrl.searchParams.set('labels', 'bug');
-            baseUrl.searchParams.set('searched_issues', 'true');
-            baseUrl.searchParams.set('description', description);
-            baseUrl.searchParams.set('reproduction_steps', reproductionSteps);
-            baseUrl.searchParams.set('platform', platform);
             baseUrl.searchParams.set('gdevelop_version', gdevelopVersion);
             baseUrl.searchParams.set('platform_info', platformInfo);
-            baseUrl.searchParams.set('additional_context', additionalContext);
+            baseUrl.searchParams.set('error_stack', errorStack);
+            baseUrl.searchParams.set('component_stack', additionalContext);
 
             Window.openExternalURL(baseUrl.href);
           }}

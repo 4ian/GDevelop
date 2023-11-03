@@ -4,7 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  const logger = new gdjs.Logger('JSON Manager');
+  const logger = new gdjs.Logger('Json Manager');
+
 
   /** The callback called when a json that was requested is loaded (or an error occurred). */
   export type JsonManagerRequestCallback = (
@@ -26,6 +27,8 @@ namespace gdjs {
 
     _loadedJsons: { [key: string]: Object } = {};
     _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
+    _spineManager: SpineManager;
+    _atlasManager: AtlasManager;
 
     /**
      * @param resourceDataArray The resources data of the game.
@@ -33,11 +36,15 @@ namespace gdjs {
      */
     constructor(
       resourceDataArray: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader
+      resourcesLoader: RuntimeGameResourcesLoader,
+      spineManager: SpineManager,
+      atlasManager: AtlasManager,
     ) {
       this._resources = new Map<string, ResourceData>();
       this.setResources(resourceDataArray);
       this._resourcesLoader = resourcesLoader;
+      this._spineManager = spineManager;
+      this._atlasManager = atlasManager;
     }
 
     /**
@@ -58,40 +65,50 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Request all the json resources to be preloaded (unless they are marked as not preloaded).
-     *
-     * Note that even if a JSON is already loaded, it will be reloaded (useful for hot-reloading,
-     * as JSON files can have been modified without the editor knowing).
-     *
-     * @param onProgress The function called after each json is loaded.
-     */
-    async preloadJsons(
-      onProgress: (loadedCount: integer, totalCount: integer) => void
+    async preloadAll(
+      onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<integer> {
-      const preloadedResources = [...this._resources.values()].filter(
-        (resource) => !resource.disablePreload
-      );
-
-      let loadedCount = 0;
-      await Promise.all(
-        preloadedResources.map(async (resource) => {
+      let loadedNumber = 0;
+      const getPreferences = (file: string) => ({
+        preferWorkers: false,
+        crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+          ? 'use-credentials'
+          : 'anonymous',
+      } as Partial<PIXI.AssetsPreferences>);
+      const jsonPromises = Array.from(this._resources.values(), async (resource) => {
           try {
-            await this.loadJsonAsync(resource.name);
+            if (resource.kind === 'json') {
+              const metadata = resource.metadata ? JSON.parse(resource.metadata) : { };
+              const atlasInDependencies = !!metadata.atlas && this._atlasManager.isLoaded(metadata.atlas);
+
+              PIXI.Assets.setPreferences(getPreferences(resource.file));
+              PIXI.Assets.add(resource.name, resource.file, atlasInDependencies ? { spineAtlas: this._atlasManager.getAtlasTexture(metadata.atlas) } : undefined)
+              let loadedJson = await PIXI.Assets.load(resource.name);
+  
+              if (loadedJson.spineData) {
+                this._spineManager.setSpine(resource.name, loadedJson.spineData)
+              } else {
+                this._loadedJsons[resource.name] = loadedJson;
+              }
+            } else {
+              await this.loadJsonAsync(resource.name);
+            }
           } catch (error) {
-            logger.error('Error while preloading a json resource:' + error);
+            console.log('spine loading error', error)
           }
-          loadedCount++;
-          onProgress(loadedCount, this._resources.size);
-        })
-      );
-      return loadedCount;
+
+          onProgress(loadedNumber++, this._resources.size);
+      });
+
+      await Promise.all(jsonPromises);
+
+      return loadedNumber;
     }
 
     loadJsonAsync(resourceName: string): Promise<Object | null> {
       const that = this;
       return new Promise((resolve, reject) => {
-        that.loadJson(resourceName, (error, content) => {
+        that.load(resourceName, (error, content) => {
           if (error) {
             reject(error.message);
           }
@@ -100,32 +117,15 @@ namespace gdjs {
       });
     }
 
-    /**
-     * Request the json file from the given resource name.
-     * This method is asynchronous. When loaded, the `callback` is called with the error
-     * (null if none) and the loaded json (a JS Object).
-     *
-     * @param resourceName The resource pointing to the json file to load.
-     * @param callback The callback function called when json is loaded (or an error occurred).
-     */
-    loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
+    load(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.get(resourceName);
       if (!resource) {
-        callback(
-          new Error(
-            'Can\'t find resource with name: "' +
-              resourceName +
-              '" (or is not a json resource).'
-          ),
-          null
-        );
-        return;
+        return callback(new Error(`Can't find resource with name: "${resourceName}" (or is not a json resource).`), null);
       }
 
       // Don't fetch again an object that is already in memory
       if (this._loadedJsons[resourceName]) {
-        callback(null, this._loadedJsons[resourceName]);
-        return;
+        return callback(null, this._loadedJsons[resourceName]);
       }
       // Don't fetch again an object that is already being fetched.
       {

@@ -50,6 +50,24 @@ const SpineEditor = ({
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
+  const getResource = (name) => {
+    const resourcesManager = project.getResourcesManager();
+
+    return resourcesManager.hasResource(name) ?
+      resourcesManager.getResource(name) :
+      null;
+  };
+  const getMetadata = (resource) => {
+    const metadataString = resource.getMetadata();
+
+   return !!metadataString ? JSON.parse(metadataString) : { };
+  };
+  const setMetadata = (resource, metadata) => resource?.setMetadata(JSON.stringify(metadata));
+  const extendMetadata = (resourceName, metadata) => {
+    const resource = getResource(resourceName);
+    
+    setMetadata(resource, Object.assign(getMetadata(resource), metadata));
+  }
   const [
     justAddedAnimationName,
     setJustAddedAnimationName,
@@ -118,29 +136,51 @@ const SpineEditor = ({
 
   const onChangeJsonResourceName = React.useCallback(
     (jsonResourceName: string) => {
+      const atlasResourceName = properties.get('atlasResourceName').getValue();
+
+      if (atlasResourceName) {
+        extendMetadata(jsonResourceName, { atlas: atlasResourceName });
+      }
+
       getSkeleton(
         jsonResourceName,
         properties.get('imageResourceName').getValue(),
-        properties.get('atlasResourceName').getValue()
-      );
-    },
-    [getSkeleton]
-  );
-  const onChangeImageResourceName = React.useCallback(
-    (imageResourceName: string) => {
-      getSkeleton(
-        properties.get('jsonResourceName').getValue(),
-        imageResourceName,
-        properties.get('atlasResourceName').getValue()
+        atlasResourceName
       );
     },
     [getSkeleton]
   );
   const onChangeAtlasResourceName = React.useCallback(
     (atlasResourceName: string) => {
+      const jsonResourceName = properties.get('jsonResourceName').getValue();
+      const imageResourceName = properties.get('imageResourceName').getValue();
+
+      if (jsonResourceName) {
+        extendMetadata(jsonResourceName, { atlas: atlasResourceName });
+      }
+      if (imageResourceName) {
+        extendMetadata(atlasResourceName, { image: imageResourceName });
+      }
+
       getSkeleton(
         properties.get('jsonResourceName').getValue(),
-        properties.get('imageResourceName').getValue(),
+        imageResourceName,
+        atlasResourceName
+      );
+    },
+    [getSkeleton]
+  );
+  const onChangeImageResourceName = React.useCallback(
+    (imageResourceName: string) => {
+      const atlasResourceName = properties.get('atlasResourceName').getValue();
+
+      if (atlasResourceName) {
+        extendMetadata(atlasResourceName, { image: imageResourceName });
+      }
+
+      getSkeleton(
+        properties.get('jsonResourceName').getValue(),
+        imageResourceName,
         atlasResourceName
       );
     },
@@ -334,17 +374,17 @@ const SpineEditor = ({
           />
           <PropertyResourceSelector
             objectConfiguration={objectConfiguration}
-            propertyName="imageResourceName"
-            project={project}
-            resourceManagementProps={resourceManagementProps}
-            onChange={onChangeImageResourceName}
-          />
-          <PropertyResourceSelector
-            objectConfiguration={objectConfiguration}
             propertyName="atlasResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
             onChange={onChangeAtlasResourceName}
+          />
+          <PropertyResourceSelector
+            objectConfiguration={objectConfiguration}
+            propertyName="imageResourceName"
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            onChange={onChangeImageResourceName}
           />
           <Text size="block-title" noMargin>
             <Trans>Appearance</Trans>

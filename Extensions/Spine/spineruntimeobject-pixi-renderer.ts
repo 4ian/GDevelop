@@ -1,16 +1,12 @@
 namespace gdjs {
-  import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
 
-  function assert(value: any, message?: string): asserts value {
-    if (!value) {
-      throw new Error(message);
-    }
-  }
+  const isSpine = (obj: any): obj is pixi_spine.Spine => obj instanceof pixi_spine.Spine;
 
   export class SpineRuntimeObjectPixiRenderer {
-    _object: gdjs.SpineRuntimeObject;
-    _spine!: PIXI_SPINE.Spine;
+    private _object: gdjs.SpineRuntimeObject;
+    private _rendererObject!: pixi_spine.Spine | PIXI.Container;
     private _isAnimationComplete = true;
+    private _spinePropertiesReplacer: Record<string, any> = { };
 
     /**
      * @param runtimeObject The object to render
@@ -32,23 +28,25 @@ namespace gdjs {
       instanceContainer
         .getLayer('')
         .getRenderer()
-        .addRendererObject(this._spine, runtimeObject.getZOrder());
+        .addRendererObject(this._rendererObject, runtimeObject.getZOrder());
     }
 
-    getRendererObject(): PIXI_SPINE.Spine {
-      return this._spine;
+    getRendererObject(): pixi_spine.Spine | PIXI.Container {
+      return this._rendererObject;
     }
 
     onDestroy(): void {
-      this._spine.destroy();
+      this._rendererObject.destroy();
     }
 
     updateTimeScale(): void {
-      this._spine.state.timeScale = this._object.getTimeScale();
+      if (!isSpine(this._rendererObject)) return;
+
+      this._rendererObject.state.timeScale = this._object.getTimeScale();
     }
 
     updateScale(): void {
-      this._spine.scale.set(Math.max(this._object.getScale(), 0));
+      this._rendererObject.scale.set(Math.max(this._object.getScale(), 0));
       this.updateBounds();
     }
 
@@ -57,45 +55,49 @@ namespace gdjs {
     }
 
     updateAngle(): void {
-      this._spine.rotation = gdjs.toRad(this._object.angle);
+      this._rendererObject.rotation = gdjs.toRad(this._object.angle);
     }
 
     updateOpacity(): void {
-      this._spine.alpha = this._object.getOpacity() / 255;
+      this._rendererObject.alpha = this._object.getOpacity() / 255;
     }
 
     getWidth(): float {
-      return this._spine.width;
+      return this._rendererObject.width;
     }
 
     getHeight(): float {
-      return this._spine.height;
+      return this._rendererObject.height;
     }
 
     setWidth(width: float): void {
-      this._spine.width = width;
+      this._rendererObject.width = width;
       this.updateBounds();
     }
 
     setHeight(height: float): void {
-      this._spine.height = height;
+      this._rendererObject.height = height;
       this.updateBounds();
     }
 
     setSize(width: float, height: float): void {
-      this._spine.width = width;
-      this._spine.height = height;
+      this._rendererObject.width = width;
+      this._rendererObject.height = height;
       this.updateBounds();
     }
 
     setAnimation(animation: string, loop: boolean): void {
-      this._isAnimationComplete = false;
-      this._spine.state.addListener({
-        complete: () => (this._isAnimationComplete = true),
-      });
-      this._spine.state.setAnimation(0, animation, loop);
-      this._spine.update(0);
-      this.updateBounds();
+      if (isSpine(this._rendererObject)) {
+        this._isAnimationComplete = false;
+        this._rendererObject.state.addListener({
+          complete: () => (this._isAnimationComplete = true),
+        });
+        this._rendererObject.state.setAnimation(0, animation, loop);
+        this._rendererObject.update(0);
+        this.updateBounds();
+      } else {
+        this._isAnimationComplete = true;
+      }
     }
 
     isAnimationCompelete(): boolean {
@@ -103,53 +105,36 @@ namespace gdjs {
     }
 
     isUpdatable(): boolean {
-      return this._spine.autoUpdate;
+      if (isSpine(this._rendererObject)) {
+        return this._rendererObject.autoUpdate;
+      }
+
+      return !!this._spinePropertiesReplacer.autoUpdate;
     }
 
     setIsUpdatable(isUpdatable: boolean): void {
-      this._spine.autoUpdate = isUpdatable;
+      if (isSpine(this._rendererObject)) {
+        this._rendererObject.autoUpdate = isUpdatable;
+      } else {
+        this._spinePropertiesReplacer.autoUpdate = isUpdatable;
+      }
     }
 
     private constructSpine(): void {
       const game = this.instanceContainer.getGame();
-      const spineJson = game
-        .getJsonManager()
-        .getLoadedJson(this._object.jsonResourceName);
-      assert(
-        spineJson,
-        `Unavailable ${this._object.jsonResourceName} spine json!`
-      );
-      const atlas = game
-        .getAtlasManager()
-        .getAtlasTexture(this._object.atlasResourceName);
-      assert(
-        atlas,
-        `Unavailable ${this._object.atlasResourceName} spine atlas!`
-      );
+      const spineData = game.getSpineManager().getSpine(this._object.jsonResourceName);
 
-      const resourceMoc = {};
-      const spineParser = new PIXI_SPINE.SpineParser();
-      spineParser.parseData(
-        resourceMoc as any,
-        spineParser.createJsonParser(),
-        atlas,
-        spineJson
-      );
-      this._spine = new PIXI_SPINE.Spine(
-        ((resourceMoc as unknown) as {
-          spineData: PIXI_SPINE.ISkeletonData;
-        }).spineData
-      );
+      this._rendererObject = spineData ? new pixi_spine.Spine(spineData) : new PIXI.Container();
     }
 
     private updateBounds(): void {
-      this._spine.position.x = this._object.x;
-      this._spine.position.y = this._object.y;
+      this._rendererObject.position.x = this._object.x;
+      this._rendererObject.position.y = this._object.y;
 
-      const localBounds = this._spine.getLocalBounds(undefined, true);
+      const localBounds = this._rendererObject.getLocalBounds(undefined, true);
 
-      this._spine.position.x -= localBounds.x * this._spine.scale.x;
-      this._spine.position.y -= localBounds.y * this._spine.scale.y;
+      this._rendererObject.position.x -= localBounds.x * this._rendererObject.scale.x;
+      this._rendererObject.position.y -= localBounds.y * this._rendererObject.scale.y;
     }
   }
   export const SpineRuntimeObjectRenderer = SpineRuntimeObjectPixiRenderer;

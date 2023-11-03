@@ -252,6 +252,8 @@ module.exports = {
         this._pixiResourcesLoader
           .getSpineData(this._project, jsonResourceName, imageResourceName, atlasResourceName)
           .then((spineData) => {
+            if (!spineData) return;
+
             this._spine = new PIXI.Spine(spineData);
             this._pixiObject.addChild(this._spine);
             this.update();

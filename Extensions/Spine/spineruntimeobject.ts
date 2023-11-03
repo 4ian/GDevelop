@@ -1,6 +1,5 @@
-namespace gdjs {
-  import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
 
+namespace gdjs {
   type SpineAnimation = { name: string; source: string; loop: boolean };
 
   export type SpineObjectDataType = {
@@ -54,7 +53,7 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject(): PIXI_SPINE.Spine {
+    getRendererObject(): pixi_spine.Spine | PIXI.Container {
       return this._renderer.getRendererObject();
     }
 

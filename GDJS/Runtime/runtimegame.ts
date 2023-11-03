@@ -140,6 +140,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _spineManager: SpineManager;
     _atlasManager: AtlasManager;
     _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
@@ -226,14 +227,17 @@ namespace gdjs {
         resources,
         this._resourcesLoader
       );
-      this._jsonManager = new gdjs.JsonManager(
-        resources,
-        this._resourcesLoader
-      );
+      this._spineManager = new gdjs.SpineManager();
       this._atlasManager = new gdjs.AtlasManager(
         this._data.resources.resources,
         this._resourcesLoader,
         this._imageManager
+      );
+      this._jsonManager = new gdjs.JsonManager(
+        resources,
+        this._resourcesLoader,
+        this._spineManager,
+        this._atlasManager
       );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         resources,
@@ -403,6 +407,10 @@ namespace gdjs {
      */
     getJsonManager(): gdjs.JsonManager {
       return this._jsonManager;
+    }
+
+    getSpineManager(): gdjs.SpineManager {
+      return this._spineManager;
     }
 
     /**
@@ -737,9 +745,10 @@ namespace gdjs {
       loadedAssets += await this._imageManager.loadTextures(onProgress);
       loadedAssets += await this._soundManager.preloadAudio(onProgress);
       loadedAssets += await this._fontManager.loadFonts(onProgress);
-      loadedAssets += await this._jsonManager.preloadJsons(onProgress);
       loadedAssets += await this._model3DManager.loadModels(onProgress);
-      loadedAssets += await this._atlasManager.preload(onProgress);
+      loadedAssets += await this._atlasManager.preloadAll(onProgress);
+      loadedAssets += await this._jsonManager.preloadAll(onProgress);
+
       await this._bitmapFontManager.loadBitmapFontData(onProgress);
 
       await loadingScreen.unload();

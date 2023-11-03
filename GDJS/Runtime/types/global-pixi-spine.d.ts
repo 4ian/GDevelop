@@ -1,4 +1,5 @@
-import * as PIXI_SPINE from 'pixi-spine';
+import 'pixi-spine';
+import * as pixi_spine from 'pixi-spine';
 
-export = PIXI_SPINE;
-export as namespace PIXI_SPINE;
+export = pixi_spine;
+export as namespace pixi_spine;

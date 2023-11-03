@@ -1,18 +1,17 @@
 // @flow
+import 'pixi-spine';
 import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import * as PIXI_SPINE from 'pixi-spine';
+import { ISkeleton } from 'pixi-spine';
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
-import { ISkeleton } from 'pixi-spine';
 const gd: libGDevelop = global.gd;
-
-PIXI.Loader.registerPlugin(PIXI_SPINE.SpineParser);
 
 type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 
@@ -355,7 +354,7 @@ export default class PixiResourcesLoader {
     atlasImageName: string,
     atlasTextName: string
   ): Promise<PIXI_SPINE.ISkeleton> {
-    const loader = PIXI.Loader.shared;
+    const loader = PIXI.Assets.loader;
     const resourceManager = project.getResourcesManager();
     const resourcesData = [
       [spineName, 'json'],
@@ -376,36 +375,39 @@ export default class PixiResourcesLoader {
 
     // https://github.com/pixijs/spine/blob/master/examples/preload_atlas_text.md
     if (!atlasPromises[atlasTextName]) {
-      atlasPromises[atlasTextName] = new Promise(resolve =>
-        loader
-          .add(
-            atlasTextName,
-            ResourcesLoader.getResourceFullUrl(project, atlasTextName, {
-              isResourceForPixi: true,
-            }),
-            { xhrType: 'text' }
-          )
-          .load((_, atlasData) => resolve(atlasData[atlasTextName].data))
-      );
+      atlasPromises[atlasTextName] = new Promise(resolve => {
+        const atlasUrl = ResourcesLoader.getResourceFullUrl(project, atlasTextName, {
+          isResourceForPixi: true,
+        });
+        PIXI.Assets.setPreferences({
+          preferWorkers: false,
+          crossOrigin: checkIfCredentialsRequired(atlasUrl)
+            ? 'use-credentials'
+            : 'anonymous',
+        });
+        PIXI.Assets.add(atlasTextName, atlasUrl, { image: this.getPIXITexture(project, atlasImageName) });
+        PIXI.Assets.load(atlasTextName).then((atlas) => {
+          resolve(atlas);
+        });
+      });
     }
 
     if (!spineDataPromises[spineName]) {
       spineDataPromises[spineName] = new Promise(resolve => {
-        atlasPromises[atlasTextName].then(atlasRawData => {
-          const metadata = {
-            image: this.getPIXITexture(project, atlasImageName),
-            atlasRawData,
-          };
-
-          loader
-            .add(
-              spineName,
-              ResourcesLoader.getResourceFullUrl(project, spineName, {
-                isResourceForPixi: true,
-              }),
-              { metadata }
-            )
-            .load((_, jsonData) => resolve(jsonData[spineName].spineData));
+        atlasPromises[atlasTextName].then(spineAtlas => {
+          const jsonUrl = ResourcesLoader.getResourceFullUrl(project, spineName, {
+            isResourceForPixi: true,
+          });
+          PIXI.Assets.setPreferences({
+            preferWorkers: false,
+            crossOrigin: checkIfCredentialsRequired(jsonUrl)
+              ? 'use-credentials'
+              : 'anonymous',
+          });
+          PIXI.Assets.add(spineName, jsonUrl, { spineAtlas })
+          PIXI.Assets.load(jsonUrl).then((jsonData) => {
+            resolve(jsonData.spineData)
+          });
         });
       });
     }

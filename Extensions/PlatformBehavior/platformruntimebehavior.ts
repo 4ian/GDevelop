@@ -65,6 +65,7 @@ namespace gdjs {
     doStepPreEvents() {
       for (const platformBehavior of this.movedPlatforms) {
         this.removePlatform(platformBehavior);
+        // TODO What if the object is recycled before it can be removed from the tree?
         if (platformBehavior.activated() && platformBehavior.owner.isAlive()) {
           this.addPlatform(platformBehavior);
         }

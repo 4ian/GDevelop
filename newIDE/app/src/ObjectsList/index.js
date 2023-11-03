@@ -445,8 +445,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObject
               .getParent()
               .removeFolderChild(objectFolderOrObject);
-            forceUpdateList();
             selectObjectFolderOrObjectWithContext(null);
+            forceUpdateList();
           }
           return;
         }

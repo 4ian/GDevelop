@@ -17,6 +17,10 @@ import {
   getPlatformName,
   getSystemVersion,
   getUserAgent,
+  isMacLike,
+  isMobile,
+  isNativeMobileApp,
+  isWindows,
 } from '../Utils/Platform';
 import { ColumnStackLayout } from './Layout';
 import AlertMessage from './AlertMessage';
@@ -108,9 +112,15 @@ export const ErrorFallbackComponent = ({
               error && error.stack
                 ? `${error.stack.slice(0, 600)}...`
                 : 'No error found';
-            const platform = getPlatformName();
+            const reproductionSteps = 'Fill me with the steps to reproduce';
+            const platform =
+              isWindows() || isMacLike()
+                ? 'Desktop'
+                : isMobile() || isNativeMobileApp()
+                ? 'Mobile'
+                : 'Web';
             const gdevelopVersion = getIDEVersionWithHash();
-            const platformInfo = `System Version: ${getSystemVersion()}, Arch: ${getArch()}, User Agent: ${getUserAgent()}`;
+            const platformInfo = `System Version: ${getSystemVersion()}, Arch: ${getArch()}, User Agent: ${getUserAgent()}, Platform: ${getPlatformName()}`;
             const additionalContext = componentStack
               ? `${componentStack.slice(0, 600)}...`
               : 'No component stack found';
@@ -120,7 +130,10 @@ export const ErrorFallbackComponent = ({
             );
             baseUrl.searchParams.set('template', templateFile);
             baseUrl.searchParams.set('title', title);
+            baseUrl.searchParams.set('labels', 'bug');
+            baseUrl.searchParams.set('searched_issues', 'true');
             baseUrl.searchParams.set('description', description);
+            baseUrl.searchParams.set('reproduction_steps', reproductionSteps);
             baseUrl.searchParams.set('platform', platform);
             baseUrl.searchParams.set('gdevelop_version', gdevelopVersion);
             baseUrl.searchParams.set('platform_info', platformInfo);

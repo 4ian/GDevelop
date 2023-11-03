@@ -2,6 +2,7 @@ name: 🐛Bug report
 description: Create a bug report about GDevelop or the game engine
 body:
   - type: checkboxes
+    id: searched_issues
     attributes:
       label: Is there an existing issue for this?
       options:

@@ -442,11 +442,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         } = objectFolderOrObjectWithContext;
         if (objectFolderOrObject.isFolder()) {
           if (objectFolderOrObject.getChildrenCount() === 0) {
+            selectObjectFolderOrObjectWithContext(null);
             objectFolderOrObject
               .getParent()
               .removeFolderChild(objectFolderOrObject);
             forceUpdateList();
-            selectObjectFolderOrObjectWithContext(null);
           }
           return;
         }

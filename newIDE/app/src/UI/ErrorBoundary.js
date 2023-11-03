@@ -123,7 +123,7 @@ export const ErrorFallbackComponent = ({
             );
             baseUrl.searchParams.set('template', templateFile);
             baseUrl.searchParams.set('title', title);
-            baseUrl.searchParams.set('labels', 'bug');
+            baseUrl.searchParams.set('labels', '💥crash');
             baseUrl.searchParams.set('gdevelop_version', gdevelopVersion);
             baseUrl.searchParams.set('platform_info', platformInfo);
             baseUrl.searchParams.set('error_stack', errorStack);

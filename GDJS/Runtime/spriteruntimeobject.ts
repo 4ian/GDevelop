@@ -512,9 +512,9 @@ namespace gdjs {
       this._renderer.ensureUpToDate();
     }
 
-    isNeedingToBeAwake(): boolean {
+    isNeedingLifecycleFunctions(): boolean {
       return (
-        super.isNeedingToBeAwake() ||
+        super.isNeedingLifecycleFunctions() ||
         (!this.isAnimationPaused() && !this.hasAnimationEnded())
       );
     }
@@ -624,7 +624,7 @@ namespace gdjs {
         this._currentAnimation = newAnimation;
         this._currentFrame = 0;
         this._animationElapsedTime = 0;
-        this.wakeUp();
+        this.getLifecycleSleepState().wakeUp();
 
         //TODO: This may be unnecessary.
         this._renderer.update();
@@ -876,7 +876,7 @@ namespace gdjs {
 
     resumeAnimation(): void {
       this._animationPaused = false;
-      this.wakeUp();
+      this.getLifecycleSleepState().wakeUp();
     }
 
     getAnimationSpeedScale() {

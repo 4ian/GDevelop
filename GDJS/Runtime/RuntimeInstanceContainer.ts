@@ -13,7 +13,7 @@ namespace gdjs {
     _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
 
     /** Contains the instances living on the container */
-    _instances: Hashtable<RuntimeObject[]>;
+    _instances: Hashtable<ObjectManager>;
 
     _activeInstances: Array<RuntimeObject> = [];
 
@@ -43,6 +43,8 @@ namespace gdjs {
     _debugDrawShowHiddenInstances: boolean = false;
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
+
+    _nextPickingId = 1;
 
     constructor() {
       this._initialBehaviorSharedData = new Hashtable();
@@ -180,7 +182,7 @@ namespace gdjs {
      */
     registerObject(objectData: ObjectData) {
       this._objects.put(objectData.name, objectData);
-      this._instances.put(objectData.name, []);
+      this._instances.put(objectData.name, new ObjectManager());
 
       // Cache the constructor
       const Ctor = gdjs.getObjectConstructor(objectData.type);
@@ -214,7 +216,7 @@ namespace gdjs {
      * @param objectName The name of the object to unregister.
      */
     unregisterObject(objectName: string) {
-      const instances = this._instances.get(objectName);
+      const instances = this._instances.get(objectName).getAllInstances();
       if (instances) {
         // This is sub-optimal: markObjectForDeletion will search the instance to
         // remove in instances, so cost is O(n^2), n being the number of instances.
@@ -448,7 +450,7 @@ namespace gdjs {
       let currentListSize = 0;
       for (const name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
-          const list = this._instances.items[name];
+          const list = this._instances.items[name].getAllInstances();
           const oldSize = currentListSize;
           currentListSize += list.length;
           for (let j = 0, lenj = list.length; j < lenj; ++j) {
@@ -469,6 +471,14 @@ namespace gdjs {
      * @returns the instances of a given object in the container.
      */
     getInstancesOf(objectName: string): gdjs.RuntimeObject[] {
+      return this._instances.items[objectName].getAllInstances();
+    }
+
+    /**
+     * @param objectName The name of the object
+     * @returns the manager of a given object in the container.
+     */
+    getObjectManager(objectName: string): gdjs.ObjectManager {
       return this._instances.items[objectName];
     }
 
@@ -488,22 +498,11 @@ namespace gdjs {
     }
 
     getActiveInstances(): gdjs.RuntimeObject[] {
-      let writeIndex = 0;
-      for (
-        let readIndex = 0;
-        readIndex < this._activeInstances.length;
-        readIndex++
-      ) {
-        const instance = this._activeInstances[readIndex];
-        this._activeInstances[writeIndex] = instance;
-        instance.tryToSleep();
-        if (instance.isAwake()) {
-          writeIndex++;
-        } else {
-          console.log('Go to sleep.');
-        }
-      }
-      this._activeInstances.length = writeIndex;
+      gdjs.ObjectSleepState.updateAwakeObjects(
+        this._activeInstances,
+        (object: RuntimeObject) => object.getLifecycleSleepState(),
+        (object: RuntimeObject) => {}
+      );
       return this._activeInstances;
     }
 
@@ -511,6 +510,13 @@ namespace gdjs {
      * Update the objects before launching the events.
      */
     _updateObjectsPreEvents() {
+      // Check awake objects only once every 64 frames.
+      if ((this.getScene().getFrameIndex() | 63) === 0) {
+        for (const name in this._instances.items) {
+          const objectManager = this._instances.items[name];
+          objectManager.updateAwakeObjects();
+        }
+      }
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       // may delete the objects.
       const allInstancesList = this.getActiveInstances();
@@ -557,11 +563,16 @@ namespace gdjs {
      * @param obj The object to be added.
      */
     addObject(obj: gdjs.RuntimeObject) {
-      if (!this._instances.containsKey(obj.name)) {
-        this._instances.put(obj.name, []);
+      let objectManager = this._instances.get(obj.name);
+      if (!objectManager) {
+        objectManager = new ObjectManager();
+        this._instances.put(obj.name, objectManager);
       }
-      this._instances.get(obj.name).push(obj);
-      this._allInstancesListIsUpToDate = false;
+      objectManager.addObject(obj);
+      this._allInstancesList.push(obj);
+      obj
+        .getLifecycleSleepState()
+        .registerOnWakingUp((object) => this._activeInstances.push(object));
     }
 
     /**
@@ -576,9 +587,9 @@ namespace gdjs {
             name +
             '"! Adding it.'
         );
-        this._instances.put(name, []);
+        this._instances.put(name, new ObjectManager());
       }
-      return this._instances.get(name);
+      return this._instances.get(name).getAllInstances();
     }
 
     /**
@@ -625,15 +636,11 @@ namespace gdjs {
       }
 
       // Delete from the living instances.
-      if (this._instances.containsKey(obj.getName())) {
-        const objId = obj.id;
-        const allInstances = this._instances.get(obj.getName());
-        for (let i = 0, len = allInstances.length; i < len; ++i) {
-          if (allInstances[i].id == objId) {
-            allInstances.splice(i, 1);
-            this._allInstancesListIsUpToDate = false;
-            break;
-          }
+      const objectManager = this._instances.get(obj.getName());
+      if (objectManager) {
+        const hasDeleted = objectManager.deleteObject(obj);
+        if (hasDeleted) {
+          this._allInstancesListIsUpToDate = false;
         }
       }
 
@@ -729,7 +736,7 @@ namespace gdjs {
     getInstancesCountOnScene(objectName: string): integer {
       const instances = this._instances.get(objectName);
       if (instances) {
-        return instances.length;
+        return instances.getAllInstances().length;
       }
 
       return 0;
@@ -741,7 +748,7 @@ namespace gdjs {
     updateObjectsForces(): void {
       for (const name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
-          const list = this._instances.items[name];
+          const list = this._instances.items[name].getAwakeInstances();
           for (let j = 0, listLen = list.length; j < listLen; ++j) {
             const obj = list[j];
             if (!obj.hasNoForces()) {
@@ -771,6 +778,15 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._allInstancesList = [];
       this._instancesRemoved = [];
+    }
+
+    getNewPickingId(): integer {
+      const newPickingId = this._nextPickingId;
+      if (this._nextPickingId === Number.MAX_SAFE_INTEGER) {
+        this._nextPickingId = 0;
+      }
+      this._nextPickingId++;
+      return newPickingId;
     }
   }
 }

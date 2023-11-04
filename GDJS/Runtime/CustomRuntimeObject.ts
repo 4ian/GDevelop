@@ -140,7 +140,7 @@ namespace gdjs {
       this.getRenderer().ensureUpToDate();
     }
 
-    isNeedingToBeAwake(): boolean {
+    isNeedingLifecycleFunctions(): boolean {
       return true;
     }
 

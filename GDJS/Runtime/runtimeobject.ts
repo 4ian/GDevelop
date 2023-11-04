@@ -166,7 +166,8 @@ namespace gdjs {
     layer: string = '';
     protected _nameId: integer;
     protected _livingOnScene: boolean = true;
-    private _lastActivityFrameIndex: integer;
+    protected _lifecycleSleepState: ObjectSleepState;
+    protected _spatialSearchSleepState: ObjectSleepState;
 
     readonly id: integer;
     private destroyCallbacks = new Set<() => void>();
@@ -186,6 +187,7 @@ namespace gdjs {
      * not "thread safe" or "re-entrant algorithm" safe.
      */
     pick: boolean = false;
+    pickingId: integer = 0;
 
     //Hit boxes:
     protected _defaultHitBoxes: gdjs.Polygon[] = [];
@@ -248,6 +250,13 @@ namespace gdjs {
       );
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
+      this._lifecycleSleepState = new gdjs.ObjectSleepState(this, () =>
+        this.isNeedingLifecycleFunctions()
+      );
+      this._spatialSearchSleepState = new gdjs.ObjectSleepState(
+        this,
+        () => false
+      );
       for (let i = 0; i < objectData.effects.length; ++i) {
         scene
           .getGame()
@@ -263,13 +272,11 @@ namespace gdjs {
         this._behaviors.push(behavior);
         if (behavior.usesLifecycleFunction()) {
           this._activeBehaviors.push(behavior);
-          this.wakeUp();
+          this._lifecycleSleepState.wakeUp();
         }
         this._behaviorsTable.put(autoData.name, behavior);
       }
       this._timers = new Hashtable();
-
-      this._lastActivityFrameIndex = Number.MIN_SAFE_INTEGER;
     }
 
     //Common members functions related to the object and its runtimeScene :
@@ -355,8 +362,12 @@ namespace gdjs {
         }
         behaviorsCount++;
         if (behavior.usesLifecycleFunction()) {
-          if (behaviorsUsingLifecycleFunctionCount < this._activeBehaviors.length) {
-            this._activeBehaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
+          if (
+            behaviorsUsingLifecycleFunctionCount < this._activeBehaviors.length
+          ) {
+            this._activeBehaviors[
+              behaviorsUsingLifecycleFunctionCount
+            ] = behavior;
           } else {
             this._activeBehaviors.push(behavior);
           }
@@ -458,42 +469,20 @@ namespace gdjs {
       return false;
     }
 
-    _forceToSleep(): void {
-      if (!this.isAwake()) {
-        return;
-      }
-      this._lastActivityFrameIndex = Number.NEGATIVE_INFINITY;
-    }
-
-    wakeUp() {
-      const wasAwake = this.isAwake();
-      this._lastActivityFrameIndex = this.getRuntimeScene().getFrameIndex();
-      if (!wasAwake) {
-        this._runtimeScene._activeInstances.push(this);
-        console.log('Wake up.');
-      }
-    }
-
-    isNeedingToBeAwake(): boolean {
+    isNeedingLifecycleFunctions(): boolean {
       return (
-        this._lastActivityFrameIndex != Number.NEGATIVE_INFINITY &&
-        (this._activeBehaviors.length > 0 ||
-          !this.hasNoForces() ||
-          !this._timers.firstKey())
+        this._activeBehaviors.length > 0 ||
+        !this.hasNoForces() ||
+        !this._timers.firstKey()
       );
     }
 
-    isAwake(): boolean {
-      return (
-        this.getRuntimeScene().getFrameIndex() - this._lastActivityFrameIndex <
-        60
-      );
+    getLifecycleSleepState(): ObjectSleepState {
+      return this._lifecycleSleepState;
     }
 
-    tryToSleep(): void {
-      if (this.isNeedingToBeAwake()) {
-        this._lastActivityFrameIndex = this.getRuntimeScene().getFrameIndex();
-      }
+    getSpatialSearchSleepState(): ObjectSleepState {
+      return this._spatialSearchSleepState;
     }
 
     isAlive(): boolean {
@@ -510,7 +499,7 @@ namespace gdjs {
       if (this._livingOnScene) {
         instanceContainer.markObjectForDeletion(this);
         this._livingOnScene = false;
-        this._forceToSleep();
+        this._lifecycleSleepState._forceToSleep();
       }
     }
 
@@ -566,6 +555,7 @@ namespace gdjs {
       // TODO EBO Check that no community extension set hitBoxesDirty to true
       // directly.
       this.hitBoxesDirty = true;
+      this._spatialSearchSleepState.wakeUp();
       this._runtimeScene.onChildrenLocationChanged();
       for (const callback of this.hitBoxChangedCallbacks) {
         callback(this);
@@ -1435,7 +1425,7 @@ namespace gdjs {
         // (or the 1st instant force).
         this._instantForces.push(this._getRecycledForce(x, y, multiplier));
       }
-      this.wakeUp();
+      this._lifecycleSleepState.wakeUp();
     }
 
     /**
@@ -2007,7 +1997,7 @@ namespace gdjs {
     timerElapsedTime(timerName: string, timeInSeconds: float): boolean {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
-        this.wakeUp();
+        this._lifecycleSleepState.wakeUp();
         return false;
       }
       return this.getTimerElapsedTimeInSeconds(timerName) >= timeInSeconds;
@@ -2032,7 +2022,7 @@ namespace gdjs {
     resetTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
-        this.wakeUp();
+        this._lifecycleSleepState.wakeUp();
       }
       this._timers.get(timerName).reset();
     }
@@ -2044,7 +2034,7 @@ namespace gdjs {
     pauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
-        this.wakeUp();
+        this._lifecycleSleepState.wakeUp();
       }
       this._timers.get(timerName).setPaused(true);
     }
@@ -2056,7 +2046,7 @@ namespace gdjs {
     unpauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
-        this.wakeUp();
+        this._lifecycleSleepState.wakeUp();
       }
       this._timers.get(timerName).setPaused(false);
     }

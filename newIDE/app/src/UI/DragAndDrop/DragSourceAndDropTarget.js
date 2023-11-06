@@ -49,6 +49,13 @@ type InnerDragSourceAndDropTargetProps<DraggedItemType> = {|
   ...DropTargetProps,
 |};
 
+// For some reason, defining this type in the `CustomDragLayer` component
+// creates a circular dependency, so we define it here instead.
+export type DraggedItem = {|
+  name: string,
+  thumbnail?: string,
+|};
+
 type Options = {| vibrate?: number |};
 
 export const makeDragSourceAndDropTarget = <DraggedItemType>(

@@ -29,6 +29,8 @@ import {
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
 
+export const swipeableDrawerContainerId = 'swipeable-drawer-container';
+
 const editorTitleById = {
   'objects-list': <Trans>Objects</Trans>,
   properties: <Trans>Instance properties</Trans>,
@@ -249,7 +251,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
             pauseRendering={!props.isActive}
             showObjectInstancesIn3D={values.use3DEditor}
           />
-          <div style={styles.bottomContainer}>
+          <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
             <SwipeableDrawer
               maxHeight={height}
               title={

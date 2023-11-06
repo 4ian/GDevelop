@@ -19,7 +19,7 @@ import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
-import { type DraggedItem } from '../DragAndDrop/CustomDragLayer';
+import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 
 const stopPropagation = e => e.stopPropagation();
 
@@ -256,7 +256,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             return draggedItem;
           }
 
-          // Otherwise, we don't let the default drag preview be displayed.
+          // Otherwise, we let the default drag preview be displayed.
           return {};
         }}
         canDrag={() =>

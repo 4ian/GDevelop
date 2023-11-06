@@ -19,6 +19,7 @@ import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
+import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 
 const stopPropagation = e => e.stopPropagation();
 
@@ -230,11 +231,28 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
   const displayAsFolder = node.canHaveChildren;
 
+  // Create an empty pixel image once to override the default drag preview of all items.
+  const emptyImage = new Image();
+  emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
   return (
     <div style={style} ref={containerRef}>
       <DragSourceAndDropTarget
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
+
+          // We return the item name and thumbnail to be used by the
+          // drag preview if this is not a folder.
+          // We can't use the item itself because it's not serializable.
+          if (typeof node.name === 'string' && !displayAsFolder) {
+            const draggedItem: DraggedItem = {
+              name: node.name,
+              thumbnail: node.thumbnailSrc || undefined,
+            };
+            return draggedItem;
+          }
+
+          // Otherwise, we let the default drag preview be displayed.
           return {};
         }}
         canDrag={() =>
@@ -292,6 +310,132 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           canDrop,
         }) => {
           setIsStayingOver(isOver, canDrop);
+
+          let itemRow = (
+            <div
+              className={`row-content-side${
+                node.item.isRoot ? '' : ' row-content-side-left'
+              }${displayAsFolder ? '' : ' row-content-extra-padding'}`}
+            >
+              {displayAsFolder ? (
+                <>
+                  <IconButton
+                    size="small"
+                    onClick={e => {
+                      e.stopPropagation();
+                      onOpen(node);
+                    }}
+                    disabled={node.disableCollapse}
+                  >
+                    {node.collapsed ? (
+                      <ArrowHeadRight fontSize="small" />
+                    ) : (
+                      <ArrowHeadBottom fontSize="small" />
+                    )}
+                  </IconButton>
+                  {!node.item.isRoot && <Folder className="folder-icon" />}
+                </>
+              ) : node.thumbnailSrc ? (
+                <div className="thumbnail">
+                  <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                </div>
+              ) : null}
+              {renamedItemId === node.id && typeof node.name === 'string' ? (
+                <SemiControlledRowInput
+                  initialValue={node.name}
+                  onEndRenaming={endRenaming}
+                  onBlur={onBlurField}
+                />
+              ) : (
+                <span
+                  className={`item-name ${node.extraClass}${
+                    node.item.isRoot
+                      ? ' root-folder'
+                      : node.item.isPlaceholder
+                      ? ' placeholder'
+                      : ''
+                  }`}
+                >
+                  {node.name}
+                </span>
+              )}
+            </div>
+          );
+
+          // If this is an object, connect the drag preview with an empty image
+          // to override the default drag preview.
+          if (typeof node.name === 'string' && !displayAsFolder) {
+            connectDragPreview(emptyImage);
+          } else {
+            // If not (folder for instance), just use the item row as drag preview.
+            itemRow = connectDragPreview(itemRow);
+          }
+
+          const dragSource = connectDragSource(
+            <div className="full-space-container">
+              {isOver && whereToDrop === 'before' && (
+                <DropIndicator canDrop={canDrop} />
+              )}
+              <div
+                className="row-content"
+                onDoubleClick={
+                  onEditItem ? () => onEditItem(node.item) : undefined
+                }
+                onContextMenu={selectAndOpenContextMenu}
+                {...longTouchForContextMenuProps}
+              >
+                {itemRow}
+                {!isMobileScreen &&
+                  !node.item.isRoot &&
+                  !node.item.isPlaceholder && (
+                    <div className="row-content-side row-content-side-right">
+                      <IconButton
+                        size="small"
+                        onClick={e => {
+                          e.stopPropagation();
+                          onContextMenu({
+                            item: node.item,
+                            index,
+                            x: e.clientX,
+                            y: e.clientY,
+                          });
+                        }}
+                      >
+                        <ThreeDotsMenu />
+                      </IconButton>
+                    </div>
+                  )}
+              </div>
+              {isOver && whereToDrop === 'after' && (
+                <DropIndicator canDrop={canDrop} />
+              )}
+            </div>
+          );
+
+          const dropTarget = connectDropTarget(
+            <div
+              id={getItemHtmlId ? getItemHtmlId(node.item, index) : undefined}
+              onClick={onClick}
+              className={
+                'row-container' +
+                (node.selected ? ' selected' : '') +
+                (isOver &&
+                whereToDrop === 'inside' &&
+                displayAsFolder &&
+                !node.item.isRoot
+                  ? canDrop
+                    ? ' with-can-drop-inside-indicator'
+                    : ' with-cannot-drop-inside-indicator'
+                  : '')
+              }
+              aria-selected={node.selected}
+              aria-expanded={displayAsFolder ? !node.collapsed : false}
+              {...dataObjectToProps(node.dataset)}
+            >
+              {dragSource}
+            </div>
+          );
+
           return (
             <div
               style={{ paddingLeft: left }}
@@ -299,129 +443,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 node.item.isRoot && index > 0 ? ' with-divider' : ''
               }`}
             >
-              {connectDropTarget(
-                <div
-                  id={
-                    getItemHtmlId ? getItemHtmlId(node.item, index) : undefined
-                  }
-                  onClick={onClick}
-                  className={
-                    'row-container' +
-                    (node.selected ? ' selected' : '') +
-                    (isOver &&
-                    whereToDrop === 'inside' &&
-                    displayAsFolder &&
-                    !node.item.isRoot
-                      ? canDrop
-                        ? ' with-can-drop-inside-indicator'
-                        : ' with-cannot-drop-inside-indicator'
-                      : '')
-                  }
-                  aria-selected={node.selected}
-                  aria-expanded={displayAsFolder ? !node.collapsed : false}
-                  {...dataObjectToProps(node.dataset)}
-                >
-                  {connectDragSource(
-                    <div className="full-space-container">
-                      {isOver && whereToDrop === 'before' && (
-                        <DropIndicator canDrop={canDrop} />
-                      )}
-                      <div
-                        className="row-content"
-                        onDoubleClick={
-                          onEditItem ? () => onEditItem(node.item) : undefined
-                        }
-                        onContextMenu={selectAndOpenContextMenu}
-                        {...longTouchForContextMenuProps}
-                      >
-                        {connectDragPreview(
-                          <div
-                            className={`row-content-side${
-                              node.item.isRoot ? '' : ' row-content-side-left'
-                            }${
-                              displayAsFolder
-                                ? ''
-                                : ' row-content-extra-padding'
-                            }`}
-                          >
-                            {displayAsFolder ? (
-                              <>
-                                <IconButton
-                                  size="small"
-                                  onClick={e => {
-                                    e.stopPropagation();
-                                    onOpen(node);
-                                  }}
-                                  disabled={node.disableCollapse}
-                                >
-                                  {node.collapsed ? (
-                                    <ArrowHeadRight fontSize="small" />
-                                  ) : (
-                                    <ArrowHeadBottom fontSize="small" />
-                                  )}
-                                </IconButton>
-                                {!node.item.isRoot && (
-                                  <Folder className="folder-icon" />
-                                )}
-                              </>
-                            ) : node.thumbnailSrc ? (
-                              <div className="thumbnail">
-                                <ListIcon
-                                  iconSize={20}
-                                  src={node.thumbnailSrc}
-                                />
-                              </div>
-                            ) : null}
-                            {renamedItemId === node.id &&
-                            typeof node.name === 'string' ? (
-                              <SemiControlledRowInput
-                                initialValue={node.name}
-                                onEndRenaming={endRenaming}
-                                onBlur={onBlurField}
-                              />
-                            ) : (
-                              <span
-                                className={`item-name ${node.extraClass}${
-                                  node.item.isRoot
-                                    ? ' root-folder'
-                                    : node.item.isPlaceholder
-                                    ? ' placeholder'
-                                    : ''
-                                }`}
-                              >
-                                {node.name}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                        {!isMobileScreen &&
-                          !node.item.isRoot &&
-                          !node.item.isPlaceholder && (
-                            <div className="row-content-side row-content-side-right">
-                              <IconButton
-                                size="small"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  onContextMenu({
-                                    item: node.item,
-                                    index,
-                                    x: e.clientX,
-                                    y: e.clientY,
-                                  });
-                                }}
-                              >
-                                <ThreeDotsMenu />
-                              </IconButton>
-                            </div>
-                          )}
-                      </div>
-                      {isOver && whereToDrop === 'after' && (
-                        <DropIndicator canDrop={canDrop} />
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+              {dropTarget}
             </div>
           );
         }}

@@ -2,6 +2,8 @@ namespace gdjs {
   declare var rbush: any;
   type SearchArea = { minX: float; minY: float; maxX: float; maxY: float };
 
+  // TODO Do something like BehaviorRBushAABB
+  // TODO Allow to use getVisibilityAABB or getAABB
   export class ObjectManager {
     private _allInstances: Array<RuntimeObject> = [];
     private _awakeInstances: Array<RuntimeObject> = [];
@@ -11,12 +13,22 @@ namespace gdjs {
       this._rbush = new rbush();
     }
 
-    search(searchArea: SearchArea) {
+    _destroy(): void {
+      this._allInstances = [];
+      this._awakeInstances = [];
+      this._rbush = null;
+    }
+
+    search(
+      searchArea: SearchArea,
+      results: Array<RuntimeObject>
+    ): Array<RuntimeObject> {
       if (this._allInstances.length < 8) {
         return this._allInstances;
       }
       const nearbyObjects: Array<RuntimeObject> = this._rbush.search(
-        searchArea
+        searchArea,
+        results
       );
       nearbyObjects.push.apply(nearbyObjects, this._awakeInstances);
       return nearbyObjects;
@@ -31,7 +43,14 @@ namespace gdjs {
       gdjs.ObjectSleepState.updateAwakeObjects(
         this._awakeInstances,
         (object: RuntimeObject) => object.getSpatialSearchSleepState(),
-        (object: RuntimeObject) => this._rbush.add(object)
+        (object: RuntimeObject) => {
+          const objectAABB = object.getAABB();
+          object.minX = objectAABB.min[0];
+          object.minY = objectAABB.min[1];
+          object.maxX = objectAABB.max[0];
+          object.maxY = objectAABB.max[1];
+          this._rbush.insert(object);
+        }
       );
     }
 
@@ -47,7 +66,7 @@ namespace gdjs {
      * Add an object to the instances living in the container.
      * @param obj The object to be added.
      */
-    addObject(object: gdjs.RuntimeObject) {
+    addObject(object: gdjs.RuntimeObject): void {
       object
         .getSpatialSearchSleepState()
         .registerOnWakingUp((object) => this._onWakingUp(object));
@@ -59,7 +78,7 @@ namespace gdjs {
      * Must be called whenever an object must be removed from the container.
      * @param object The object to be removed.
      */
-    deleteObject(object: gdjs.RuntimeObject) {
+    deleteObject(object: gdjs.RuntimeObject): boolean {
       const objId = object.id;
       let isObjectDeleted = false;
       for (let i = 0, len = this._allInstances.length; i < len; ++i) {
@@ -81,7 +100,7 @@ namespace gdjs {
       if (!isAwake) {
         this._rbush.remove(object);
       }
-      return false;
+      return isObjectDeleted;
     }
   }
 }

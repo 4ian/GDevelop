@@ -21,6 +21,7 @@ namespace gdjs {
         };
 
         const searchArea = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+        const nearbyObjects: Array<RuntimeObject> = [];
 
         export const twoListsSpacialCheck = (
           instanceContainer: RuntimeInstanceContainer,
@@ -111,8 +112,9 @@ namespace gdjs {
                 objectName
               );
               for (const object of iteratedObjects) {
-                const nearbyObjects = objectManager.search(
-                  getSearchArea(object, searchArea, areaExtraArg)
+                objectManager.search(
+                  getSearchArea(object, searchArea, areaExtraArg),
+                  nearbyObjects
                 );
                 for (const nearbyObject of nearbyObjects) {
                   if (predicate(object, nearbyObject, predicateExtraArg)) {

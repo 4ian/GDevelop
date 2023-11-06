@@ -36,6 +36,9 @@ namespace gdjs {
 
     registerOnWakingUp(onWakingUp: (object: RuntimeObject) => void) {
       this._onWakingUpCallbacks.push(onWakingUp);
+      if (this.isAwake()) {
+        onWakingUp(this._object);
+      }
     }
 
     isAwake(): boolean {

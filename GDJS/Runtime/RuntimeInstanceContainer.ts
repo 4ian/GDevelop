@@ -36,7 +36,6 @@ namespace gdjs {
 
     _layers: Hashtable<RuntimeLayer>;
     _orderedLayers: RuntimeLayer[]; // TODO: should this be a single structure with _layers, to enforce its usage?
-    _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};
 
     // Options for the debug draw:
     _debugDrawEnabled: boolean = false;
@@ -182,7 +181,7 @@ namespace gdjs {
      */
     registerObject(objectData: ObjectData) {
       this._objects.put(objectData.name, objectData);
-      this._instances.put(objectData.name, new ObjectManager());
+      this._instances.put(objectData.name, new gdjs.ObjectManager());
 
       // Cache the constructor
       const Ctor = gdjs.getObjectConstructor(objectData.type);
@@ -355,26 +354,6 @@ namespace gdjs {
       }
     }
 
-    _updateLayersCameraCoordinates(scale: float) {
-      this._layersCameraCoordinates = this._layersCameraCoordinates || {};
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          const theLayer = this._layers.items[name];
-          this._layersCameraCoordinates[name] = this._layersCameraCoordinates[
-            name
-          ] || [0, 0, 0, 0];
-          this._layersCameraCoordinates[name][0] =
-            theLayer.getCameraX() - (theLayer.getCameraWidth() / 2) * scale;
-          this._layersCameraCoordinates[name][1] =
-            theLayer.getCameraY() - (theLayer.getCameraHeight() / 2) * scale;
-          this._layersCameraCoordinates[name][2] =
-            theLayer.getCameraX() + (theLayer.getCameraWidth() / 2) * scale;
-          this._layersCameraCoordinates[name][3] =
-            theLayer.getCameraY() + (theLayer.getCameraHeight() / 2) * scale;
-        }
-      }
-    }
-
     /**
      * Called to update effects of layers before rendering.
      */
@@ -511,7 +490,7 @@ namespace gdjs {
      */
     _updateObjectsPreEvents() {
       // Check awake objects only once every 64 frames.
-      if ((this.getScene().getFrameIndex() | 63) === 0) {
+      if ((this.getScene().getFrameIndex() & 63) === 0) {
         for (const name in this._instances.items) {
           const objectManager = this._instances.items[name];
           objectManager.updateAwakeObjects();
@@ -565,7 +544,7 @@ namespace gdjs {
     addObject(obj: gdjs.RuntimeObject) {
       let objectManager = this._instances.get(obj.name);
       if (!objectManager) {
-        objectManager = new ObjectManager();
+        objectManager = new gdjs.ObjectManager();
         this._instances.put(obj.name, objectManager);
       }
       objectManager.addObject(obj);
@@ -587,7 +566,7 @@ namespace gdjs {
             name +
             '"! Adding it.'
         );
-        this._instances.put(name, new ObjectManager());
+        this._instances.put(name, new gdjs.ObjectManager());
       }
       return this._instances.get(name).getAllInstances();
     }
@@ -653,6 +632,8 @@ namespace gdjs {
       }
       return;
     }
+
+    onObjectChangedOfLayer(object: RuntimeObject, oldLayer: RuntimeLayer) {}
 
     /**
      * Get the layer with the given name

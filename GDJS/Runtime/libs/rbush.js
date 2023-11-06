@@ -25,10 +25,9 @@ rbush.prototype = {
         return this._all(this.data, []);
     },
 
-    search: function (bbox) {
+    search: function (bbox, result = []) {
 
         var node = this.data,
-            result = [],
             toBBox = this.toBBox;
 
         if (!intersects(bbox, node)) return result;

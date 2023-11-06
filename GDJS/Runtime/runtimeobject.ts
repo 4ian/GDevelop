@@ -193,7 +193,15 @@ namespace gdjs {
     protected _defaultHitBoxes: gdjs.Polygon[] = [];
     protected hitBoxes: gdjs.Polygon[];
     protected hitBoxesDirty: boolean = true;
+    // TODO use a different AABB for collision mask and rendered image.
     protected aabb: AABB = { min: [0, 0], max: [0, 0] };
+
+    // TODO
+    minX = 0;
+    minY = 0;
+    maxX = 0;
+    maxY = 0;
+
     protected _isIncludedInParentCollisionMask = true;
 
     //Variables:
@@ -820,6 +828,7 @@ namespace gdjs {
         oldLayer.getRenderer().remove3DRendererObject(rendererObject3D);
         newLayer.getRenderer().add3DRendererObject(rendererObject3D);
       }
+      this._runtimeScene.onObjectChangedOfLayer(this, oldLayer);
     }
 
     /**

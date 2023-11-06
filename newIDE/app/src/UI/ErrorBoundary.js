@@ -36,7 +36,8 @@ type ErrorBoundaryScope =
   | 'list-search-result'
   | 'box-search-result'
   | 'variables-list'
-  | 'app';
+  | 'app'
+  | 'instance-properties-editor';
 
 const errorHandler = (
   error: Error,

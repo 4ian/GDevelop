@@ -244,14 +244,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           // We return the item name and thumbnail to be used by the
           // drag preview if this is not a folder.
           // We can't use the item itself because it's not serializable.
-          if (
-            typeof node.name === 'string' &&
-            node.thumbnailSrc &&
-            !displayAsFolder
-          ) {
+          if (typeof node.name === 'string' && !displayAsFolder) {
             const draggedItem: DraggedItem = {
               name: node.name,
-              thumbnail: node.thumbnailSrc,
+              thumbnail: node.thumbnailSrc || undefined,
             };
             return draggedItem;
           }
@@ -368,11 +364,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
           // If this is an object, connect the drag preview with an empty image
           // to override the default drag preview.
-          if (
-            typeof node.name === 'string' &&
-            node.thumbnailSrc &&
-            !displayAsFolder
-          ) {
+          if (typeof node.name === 'string' && !displayAsFolder) {
             connectDragPreview(emptyImage);
           } else {
             // If not (folder for instance), just use the item row as drag preview.

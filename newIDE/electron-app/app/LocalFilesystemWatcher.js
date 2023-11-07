@@ -2,19 +2,29 @@
 const watcher = require('@parcel/watcher');
 
 let subscriptions = {};
+let newSubscriptionId = 1
 
 const getNewSubscriptionId = () => {
-  const id = Math.round((Math.random() + 1) * 10000).toString();
-  if (subscriptions[id]) return getNewSubscriptionId();
-  return id;
+  const id = newSubscriptionId++;
+  return id.toString();
 };
 
-const setupWatcher = (folderPath, callback, serializedOptions) => {
+const setupWatcher = (folderPath, fileWiseCallback, serializedOptions) => {
   const options = JSON.parse(serializedOptions);
   const newSubscriptionId = getNewSubscriptionId();
-  watcher.subscribe(folderPath, callback, options).then(subscription => {
-    subscriptions[newSubscriptionId] = subscription;
-  });
+  watcher
+    .subscribe(
+      folderPath,
+      (err, fileChangeEvents) => {
+        fileChangeEvents.forEach(fileChangeEvent =>
+          fileWiseCallback(fileChangeEvent.path)
+        );
+      },
+      options
+    )
+    .then(subscription => {
+      subscriptions[newSubscriptionId] = subscription;
+    });
   return newSubscriptionId;
 };
 

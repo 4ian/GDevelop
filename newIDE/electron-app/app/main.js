@@ -275,10 +275,8 @@ app.on('ready', function() {
     (event, folderPath, options) => {
       const subscriptionId = setupWatcher(
         folderPath,
-        (err, fileChangeEvents) => {
-          fileChangeEvents.forEach(fileChangeEvent =>
-            event.sender.send('project-file-changed', fileChangeEvent.path)
-          );
+        changedFilePath => {
+          event.sender.send('project-file-changed', changedFilePath);
         },
         options
       );

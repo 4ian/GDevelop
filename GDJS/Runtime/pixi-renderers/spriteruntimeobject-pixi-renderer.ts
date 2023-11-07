@@ -54,21 +54,22 @@ namespace gdjs {
      * Update the internal PIXI.Sprite position, angle...
      */
     _updatePIXISprite() {
-      const spriteTextureFrame = this._sprite.texture.frame;
-      const objectAnimationFrame = this._object._animationFrame;
-
-      if (objectAnimationFrame !== null && !!spriteTextureFrame) {
+      if (this._object._animationFrame !== null) {
         this._sprite.anchor.x =
-          objectAnimationFrame.center.x / spriteTextureFrame.width;
+          this._object._animationFrame.center.x /
+          this._sprite.texture.frame.width;
         this._sprite.anchor.y =
-          objectAnimationFrame.center.y / spriteTextureFrame.height;
+          this._object._animationFrame.center.y /
+          this._sprite.texture.frame.height;
         this._sprite.position.x =
           this._object.x +
-          (objectAnimationFrame.center.x - objectAnimationFrame.origin.x) *
+          (this._object._animationFrame.center.x -
+            this._object._animationFrame.origin.x) *
             Math.abs(this._object._scaleX);
         this._sprite.position.y =
           this._object.y +
-          (objectAnimationFrame.center.y - objectAnimationFrame.origin.y) *
+          (this._object._animationFrame.center.y -
+            this._object._animationFrame.origin.y) *
             Math.abs(this._object._scaleY);
         this._sprite.rotation = gdjs.toRad(this._object.angle);
         this._sprite.visible = !this._object.hidden;
@@ -176,19 +177,11 @@ namespace gdjs {
     }
 
     getUnscaledWidth(): float {
-      const spriteTextureFrame = this._sprite.texture.frame;
-      if (!spriteTextureFrame) {
-        return 32;
-      }
-      return spriteTextureFrame.width;
+      return this._sprite.texture.frame.width;
     }
 
     getUnscaledHeight(): float {
-      const spriteTextureFrame = this._sprite.texture.frame;
-      if (!spriteTextureFrame) {
-        return 32;
-      }
-      return spriteTextureFrame.height;
+      return this._sprite.texture.frame.height;
     }
 
     static getAnimationFrame(imageManager, imageName) {

@@ -87,6 +87,30 @@ export type UserSurvey = {|
   >,
 |};
 
+/**
+ * Official tutorial registered in the tutorial database.
+ * Can be a youtube video, wiki page or blog article.
+ */
+export type GDevelopTutorialRecommendation = {|
+  type: 'gdevelop-tutorial',
+  /**
+   * Id of the tutorial in the database.
+   */
+  id: string,
+|};
+export type PlanRecommendation = {|
+  type: 'plan',
+  id: 'silver' | 'gold' | 'startup' | 'business' | 'education',
+|};
+export type GuidedLessonsRecommendation = {|
+  type: 'guided-lessons',
+  filter?: string[],
+|};
+export type Recommendation =
+  | GDevelopTutorialRecommendation
+  | GuidedLessonsRecommendation
+  | PlanRecommendation;
+
 export type UserPublicProfile = {|
   id: string,
   username: ?string,
@@ -238,6 +262,21 @@ export const deleteGroup = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.delete(
     `${GDevelopUserApi.baseUrl}/team/${teamId}/group/${groupId}`,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
+export const listRecommendations = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId }: {| userId: string |}
+): Promise<Array<Recommendation>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/recommendation`,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },

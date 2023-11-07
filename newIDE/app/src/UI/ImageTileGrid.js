@@ -43,7 +43,7 @@ const styles = {
     marginTop: 0,
     marginBottom: 0,
   },
-  titleContainer: {
+  titleContainerWithMinHeight: {
     // Fix min height to ensure the content stays aligned.
     // 2 line heights (20) + 2 text paddings (6)
     minHeight: 2 * 20 + 2 * 6,
@@ -166,11 +166,13 @@ const ImageTileGrid = ({
     [forceUpdate, isMounted]
   );
 
+  const columns = getColumnsFromWidth(windowWidth)
+
   return (
     <div style={styles.container}>
       <Line noMargin>
         <GridList
-          cols={getColumnsFromWidth(windowWidth)}
+          cols={columns}
           style={{
             flex: 1,
             maxWidth: (MAX_TILE_SIZE + 2 * SPACING) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
@@ -179,7 +181,7 @@ const ImageTileGrid = ({
           spacing={SPACING * 2}
         >
           {isLoading
-            ? new Array(getColumnsFromWidth(windowWidth))
+            ? new Array(columns)
                 .fill(0)
                 .map((_, index) => (
                   // Display tiles but with skeletons while the data is loading.
@@ -231,7 +233,13 @@ const ImageTileGrid = ({
                         )}
                       </div>
                       {item.title && (
-                        <div style={styles.titleContainer}>
+                        <div
+                          style={
+                            columns === 1
+                              ? undefined
+                              : styles.titleContainerWithMinHeight
+                          }
+                        >
                           <Text size="sub-title">{item.title}</Text>
                         </div>
                       )}

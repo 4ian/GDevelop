@@ -16,8 +16,8 @@ type ImageTileRowProps = {|
   isLoading?: boolean,
   description?: React.Node,
   items: Array<ImageTileComponent>,
-  onShowAll: () => void,
-  showAllIcon: React.Node,
+  onShowAll?: () => void,
+  showAllIcon?: React.Node,
   getLimitFromWidth: (width: WidthType) => number,
   getColumnsFromWidth: (width: WidthType) => number,
   seeAllLabel?: React.Node,
@@ -47,19 +47,21 @@ const ImageTileRow = ({
         <Column noMargin>
           <Text size="section-title">{title}</Text>
         </Column>
-        <Column noMargin>
-          <FlatButton
-            onClick={onShowAll}
-            label={
-              isMobileScreen ? (
-                <Trans>Browse</Trans> // Short label on mobile.
-              ) : (
-                seeAllLabel || <Trans>See all</Trans>
-              )
-            }
-            rightIcon={showAllIcon}
-          />
-        </Column>
+        {showAllIcon && onShowAll && (
+          <Column noMargin>
+            <FlatButton
+              onClick={onShowAll}
+              label={
+                isMobileScreen ? (
+                  <Trans>Browse</Trans> // Short label on mobile.
+                ) : (
+                  seeAllLabel || <Trans>See all</Trans>
+                )
+              }
+              rightIcon={showAllIcon}
+            />
+          </Column>
+        )}
       </LineStackLayout>
       {description && (
         <Line noMargin>

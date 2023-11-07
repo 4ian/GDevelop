@@ -24,6 +24,7 @@ import LinearProgress from '../../../../UI/LinearProgress';
 import CreateAccountForm from '../../../../Profile/CreateAccountForm';
 import LoginForm from '../../../../Profile/LoginForm';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
+import RecommendationList from './RecommendationList';
 
 const styles = {
   icon: {
@@ -45,10 +46,14 @@ const styles = {
 
 const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
 
-type Props = {| showUserChip: boolean => void |};
+type Props = {|
+  showUserChip: boolean => void,
+  selectInAppTutorial: (tutorialId: string) => void,
+|};
 
-const GetStartedSection = ({ showUserChip }: Props) => {
+const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
   const isOnline = useOnlineStatus();
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,
     onResetPassword,
@@ -58,7 +63,7 @@ const GetStartedSection = ({ showUserChip }: Props) => {
     onCreateAccount,
     authenticationError,
     loginState,
-  } = React.useContext(AuthenticatedUserContext);
+  } = authenticatedUser;
   const { values: preferences } = React.useContext(PreferencesContext);
 
   const forceUpdate = useForceUpdate();
@@ -71,7 +76,7 @@ const GetStartedSection = ({ showUserChip }: Props) => {
     | 'questionnaire'
     | 'questionnaireFinished'
     | 'recommendations'
-  >('welcome');
+  >(profile && profile.survey ? 'recommendations' : 'welcome');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
@@ -443,11 +448,9 @@ const GetStartedSection = ({ showUserChip }: Props) => {
         }
         flexBody
       >
-        <ColumnStackLayout
-          noMargin
-          expand
-          justifyContent="center"
-          alignItems="center"
+        <RecommendationList
+          authenticatedUser={authenticatedUser}
+          selectInAppTutorial={selectInAppTutorial}
         />
       </SectionContainer>
     );

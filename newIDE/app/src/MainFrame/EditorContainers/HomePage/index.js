@@ -300,7 +300,10 @@ export const HomePage = React.memo<Props>(
                       <AnnouncementsFeed canClose level="urgent" addMargins />
                     )}
                   {activeTab === 'get-started' && (
-                    <GetStartedSection showUserChip={setShowUserChip} />
+                    <GetStartedSection
+                      showUserChip={setShowUserChip}
+                      selectInAppTutorial={selectInAppTutorial}
+                    />
                   )}
                   {activeTab === 'build' && (
                     <BuildSection

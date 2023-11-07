@@ -12,6 +12,7 @@ import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesCont
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import { type Recommendation } from '../Utils/GDevelopServices/User';
 import {
   type Limits,
   type Usages,
@@ -35,6 +36,7 @@ export type AuthenticatedUser = {|
   receivedAssetPacks: ?Array<PrivateAssetPack>,
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
+  recommendations: ?Array<Recommendation>,
   limits: ?Limits,
   authenticationError: ?AuthError,
   usages: ?Usages,
@@ -82,6 +84,7 @@ export const initialAuthenticatedUser = {
   receivedAssetPacks: null,
   receivedAssetShortHeaders: null,
   receivedGameTemplates: null,
+  recommendations: null,
   subscription: null,
   usages: null,
   limits: null,

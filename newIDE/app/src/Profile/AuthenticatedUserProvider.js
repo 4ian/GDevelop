@@ -6,7 +6,10 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
-import { getUserBadges } from '../Utils/GDevelopServices/User';
+import {
+  getUserBadges,
+  listRecommendations,
+} from '../Utils/GDevelopServices/User';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
@@ -401,6 +404,26 @@ export default class AuthenticatedUserProvider extends React.Component<
           'Error while loading received asset short headers:',
           error
         );
+      }
+    );
+    listRecommendations(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      recommendations =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            recommendations,
+          },
+        })),
+      error => {
+        if (error.response.status === 404) {
+          console.warn(
+            'List recommendations endpoint returned 404, user might not have completed survey.'
+          );
+        } else {
+          console.error('Error while loading recommendations:', error);
+        }
       }
     );
     listReceivedGameTemplates(authentication.getAuthorizationHeader, {

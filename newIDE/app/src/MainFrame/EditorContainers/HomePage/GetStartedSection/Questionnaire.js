@@ -107,6 +107,7 @@ const questionnaire: Questionnaire = {
       {
         text: t`Games to learn or teach something`,
         id: 'seriousGame',
+        nextQuestion: 'gameDevelopmentExperience',
         imageSource: 'res/questionnaire/serious-game.svg',
       },
       {

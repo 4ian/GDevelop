@@ -509,8 +509,8 @@ const NewProjectSetupDialog = ({
               <Paper background="dark" variant="outlined">
                 <Line justifyContent="center">
                   <CreateProfile
-                    onLogin={authenticatedUser.onOpenLoginDialog}
-                    onCreateAccount={
+                    onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+                    onOpenCreateAccountDialog={
                       authenticatedUser.onOpenCreateAccountDialog
                     }
                     message={

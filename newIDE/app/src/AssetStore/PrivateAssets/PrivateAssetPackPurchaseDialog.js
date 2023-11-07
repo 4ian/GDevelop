@@ -256,8 +256,8 @@ const PrivateAssetPackPurchaseDialog = ({
         subtitle: <Trans>Log-in to purchase this item</Trans>,
         content: (
           <CreateProfile
-            onLogin={onOpenLoginDialog}
-            onCreateAccount={onOpenCreateAccountDialog}
+            onOpenLoginDialog={onOpenLoginDialog}
+            onOpenCreateAccountDialog={onOpenCreateAccountDialog}
             message={
               <Trans>
                 Asset packs will be linked to your user account and available

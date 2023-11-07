@@ -256,8 +256,8 @@ const PrivateGameTemplatePurchaseDialog = ({
         subtitle: <Trans>Log-in to purchase this item</Trans>,
         content: (
           <CreateProfile
-            onLogin={onOpenLoginDialog}
-            onCreateAccount={onOpenCreateAccountDialog}
+            onOpenLoginDialog={onOpenLoginDialog}
+            onOpenCreateAccountDialog={onOpenCreateAccountDialog}
             message={
               <Trans>
                 Game templates will be linked to your user account and available

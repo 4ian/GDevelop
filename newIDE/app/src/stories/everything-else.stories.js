@@ -2531,8 +2531,8 @@ storiesOf('Profile/CreateProfile', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <CreateProfile
-      onLogin={action('onLogin')}
-      onCreateAccount={action('onCreateAccount')}
+      onOpenLoginDialog={action('onOpenLoginDialog')}
+      onOpenCreateAccountDialog={action('onOpenCreateAccountDialog')}
     />
   ));
 

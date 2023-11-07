@@ -206,8 +206,12 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
               <Column expand noMargin>
                 <AuthenticatedUserProfileDetails
                   authenticatedUser={authenticatedUser}
-                  onEditProfile={authenticatedUser.onOpenEditProfileDialog}
-                  onChangeEmail={authenticatedUser.onOpenChangeEmailDialog}
+                  onOpenEditProfileDialog={
+                    authenticatedUser.onOpenEditProfileDialog
+                  }
+                  onOpenChangeEmailDialog={
+                    authenticatedUser.onOpenChangeEmailDialog
+                  }
                 />
                 <SubscriptionDetails
                   subscription={authenticatedUser.subscription}
@@ -234,8 +238,10 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
       ) : (
         <Column noMargin expand justifyContent="center">
           <CreateProfile
-            onLogin={authenticatedUser.onOpenLoginDialog}
-            onCreateAccount={authenticatedUser.onOpenCreateAccountDialog}
+            onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+            onOpenCreateAccountDialog={
+              authenticatedUser.onOpenCreateAccountDialog
+            }
             message={
               <Trans>
                 Create an account to register your games and to get access to

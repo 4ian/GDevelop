@@ -154,8 +154,8 @@ export const GameRegistration = ({
   if (!authenticated || !profile) {
     return (
       <CreateProfile
-        onLogin={onOpenLoginDialog}
-        onCreateAccount={onOpenCreateAccountDialog}
+        onOpenLoginDialog={onOpenLoginDialog}
+        onOpenCreateAccountDialog={onOpenCreateAccountDialog}
       />
     );
   }

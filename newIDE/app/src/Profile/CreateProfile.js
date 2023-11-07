@@ -17,15 +17,15 @@ const styles = {
 
 type Props = {
   message?: React.Node,
-  onLogin: () => void,
-  onCreateAccount: () => void,
+  onOpenLoginDialog: () => void,
+  onOpenCreateAccountDialog: () => void,
   justifyContent?: 'center',
 };
 
 const CreateProfile = ({
   message,
-  onLogin,
-  onCreateAccount,
+  onOpenLoginDialog,
+  onOpenCreateAccountDialog,
   justifyContent,
 }: Props) => (
   <Column alignItems="center">
@@ -44,10 +44,10 @@ const CreateProfile = ({
           <RaisedButton
             id="create-account-button"
             label={<Trans>Create my account</Trans>}
-            onClick={onCreateAccount}
+            onClick={onOpenCreateAccountDialog}
             primary
           />
-          <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
+          <FlatButton label={<Trans>Login</Trans>} onClick={onOpenLoginDialog} />
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
     </div>

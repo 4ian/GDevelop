@@ -27,6 +27,7 @@ import FlatButton from '../../../../UI/FlatButton';
 import RaisedButton from '../../../../UI/RaisedButton';
 
 const STEP_MAX_COUNT = 8;
+const QUESTIONNAIRE_FINISHED_STEP = 'QUESTIONNAIRE_FINISHED';
 
 export const isOnlyOneFreeAnswerPossible = (
   answers: Array<AnswerData>
@@ -353,7 +354,7 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
           return;
         }
       }
-      setQuestionId('QUESTIONNAIRE_FINISHED');
+      setQuestionId(QUESTIONNAIRE_FINISHED_STEP);
     },
     [userAnswers]
   );
@@ -399,7 +400,7 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
       // This effect should be called only once when questionId is set to this specific
       // value. After that, the whole component should be unmounted and the effect would
       // not be called a second time.
-      if (questionId === 'QUESTIONNAIRE_FINISHED') {
+      if (questionId === QUESTIONNAIRE_FINISHED_STEP) {
         onQuestionnaireFinished(formatUserAnswers(userAnswers));
       }
     },

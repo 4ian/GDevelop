@@ -38,9 +38,6 @@ export const HomePageHeader = ({
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
-
-  console.log(showUserChip);
-
   return (
     <I18n>
       {({ i18n }) => (

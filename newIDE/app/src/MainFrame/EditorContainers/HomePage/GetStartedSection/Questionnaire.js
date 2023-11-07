@@ -57,7 +57,7 @@ const questionnaire: Questionnaire = {
     ],
   },
   learningOrTeaching: {
-    text: t`Are you teaching or studying game development?`,
+    text: t`Are you teaching or learning game development?`,
     answers: [
       {
         text: t`I am teaching game development`,
@@ -99,7 +99,7 @@ const questionnaire: Questionnaire = {
         imageSource: 'res/questionnaire/game-to-publish.svg',
       },
       {
-        text: t`New interactive services for existent clients`,
+        text: t`New interactive services for clients`,
         id: 'interactiveService',
         nextQuestion: 'gameDevelopmentExperience',
         imageSource: 'res/questionnaire/interactive-services-for-clients.svg',
@@ -251,7 +251,7 @@ const questionnaire: Questionnaire = {
     ],
   },
   gameDevelopmentExperience: {
-    text: t`What kind of projects do you want to build with GDevelop?`,
+    text: t`Do you have game development experience?`,
     getNextQuestion: (
       userAnswers: Array<{| questionId: string, answers: string[] |}>
     ) =>

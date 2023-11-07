@@ -117,8 +117,7 @@ const GetStartedSection = ({ showUserChip }: Props) => {
       await onEditProfile({ survey }, preferences, { throwError: true });
       setStep('recommendations');
     } catch (error) {
-      console.error('An error occurred when sending survey:');
-      console.error(error);
+      console.error('An error occurred when sending survey:', error);
       setErrorSendingSurvey(true);
       setStep('welcome');
     }

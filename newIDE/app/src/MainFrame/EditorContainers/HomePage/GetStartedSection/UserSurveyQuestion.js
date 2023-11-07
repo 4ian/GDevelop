@@ -161,7 +161,7 @@ const FreeAnswer = ({
           // in the input is interpreted as a click.
           // Even if it's a key press, a click event is simulated, and it's hard to
           // discriminate true pointer events and click via space key press.
-          // It is supposed that if the coordinated of the event are at 0;0, it's
+          // It is supposed that if the coordinates of the event are at 0;0, it's
           // because it comes from a key press.
           return;
         }

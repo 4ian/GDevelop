@@ -220,7 +220,7 @@ export const HomePage = React.memo<Props>(
 
       React.useEffect(
         () => {
-          // Let the GetStarted page handle if the user chip should be shown.
+          // Always show the user chip, apart on the GetStarted page which handles it on its own.
           if (activeTab !== 'get-started') {
             setShowUserChip(true);
           }

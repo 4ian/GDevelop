@@ -49,8 +49,8 @@ export const setupResourcesWatcher =
           folderPath,
           JSON.stringify({
             ignore: [
-              '**/.DS_Store',
-              '**/.git/**',
+              '**/.DS_Store', // macOS folder attributes file
+              '**/.git/**', // For projects using git as a versioning tool.
               path.join(folderPath, gameFile),
               path.join(folderPath, autosaveFile),
             ],

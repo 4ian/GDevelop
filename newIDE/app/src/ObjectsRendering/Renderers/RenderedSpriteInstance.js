@@ -80,18 +80,20 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   updatePIXISprite(): void {
-    this._pixiObject.anchor.x =
-      this._centerX / this._pixiObject.texture.frame.width;
-    this._pixiObject.anchor.y =
-      this._centerY / this._pixiObject.texture.frame.height;
+    const objectTextureFrame = this._pixiObject.texture.frame;
+    // In case the texture is not loaded yet, we don't want to crash.
+    if (!objectTextureFrame) return;
+
+    this._pixiObject.anchor.x = this._centerX / objectTextureFrame.width;
+    this._pixiObject.anchor.y = this._centerY / objectTextureFrame.height;
     this._pixiObject.rotation = this._shouldNotRotate
       ? 0
       : RenderedInstance.toRad(this._instance.getAngle());
     if (this._instance.hasCustomSize()) {
       this._pixiObject.scale.x =
-        this.getCustomWidth() / this._pixiObject.texture.frame.width;
+        this.getCustomWidth() / objectTextureFrame.width;
       this._pixiObject.scale.y =
-        this.getCustomHeight() / this._pixiObject.texture.frame.height;
+        this.getCustomHeight() / objectTextureFrame.height;
     } else {
       this._pixiObject.scale.x = 1;
       this._pixiObject.scale.y = 1;
@@ -195,11 +197,19 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   getDefaultWidth(): number {
-    return Math.abs(this._pixiObject.texture.frame.width);
+    const objectTextureFrame = this._pixiObject.texture.frame;
+    // In case the texture is not loaded yet, we don't want to crash.
+    if (!objectTextureFrame) return 32;
+
+    return Math.abs(objectTextureFrame.width);
   }
 
   getDefaultHeight(): number {
-    return Math.abs(this._pixiObject.texture.frame.height);
+    const objectTextureFrame = this._pixiObject.texture.frame;
+    // In case the texture is not loaded yet, we don't want to crash.
+    if (!objectTextureFrame) return 32;
+
+    return Math.abs(objectTextureFrame.height);
   }
 
   getCenterX(): number {

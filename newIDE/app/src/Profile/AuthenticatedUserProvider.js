@@ -179,7 +179,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...initialAuthenticatedUser,
-        authenticationError: this.state.authError,
         onLogin: this._doLogin,
         onLogout: this._doLogout,
         onCreateAccount: this._doCreateAccount,

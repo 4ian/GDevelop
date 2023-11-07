@@ -61,10 +61,13 @@ const ExampleListItem = ({
   const { showAlert } = useAlertDialog();
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
-  React.useLayoutEffect(() => {
-    if (containerRef.current)
-      onHeightComputed(containerRef.current.getBoundingClientRect().height);
-  });
+  React.useLayoutEffect(
+    () => {
+      if (containerRef.current)
+        onHeightComputed(containerRef.current.getBoundingClientRect().height);
+    },
+    [onHeightComputed]
+  );
 
   const isCompatible = isCompatibleWithAsset(
     getIDEVersion(),

@@ -74,10 +74,13 @@ const PrivateGameTemplateListItem = ({
   const isMobileScreen = windowWidth === 'small';
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
-  React.useLayoutEffect(() => {
-    if (containerRef.current)
-      onHeightComputed(containerRef.current.getBoundingClientRect().height);
-  });
+  React.useLayoutEffect(
+    () => {
+      if (containerRef.current)
+        onHeightComputed(containerRef.current.getBoundingClientRect().height);
+    },
+    [onHeightComputed]
+  );
 
   const renderGameTemplateField = (field: 'description' | 'name') => {
     const originalField = privateGameTemplateListingData[field];

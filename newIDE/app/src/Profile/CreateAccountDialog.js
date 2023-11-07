@@ -14,7 +14,7 @@ import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { MarkdownText } from '../UI/MarkdownText';
-import {  isUsernameValid } from './UsernameField';
+import { isUsernameValid } from './UsernameField';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';

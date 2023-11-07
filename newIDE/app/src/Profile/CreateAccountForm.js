@@ -3,9 +3,7 @@ import React from 'react';
 import { Trans } from '@lingui/macro';
 
 import TextField from '../UI/TextField';
-import {
-  type AuthError,
-} from '../Utils/GDevelopServices/Authentication';
+import { type AuthError } from '../Utils/GDevelopServices/Authentication';
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import { ColumnStackLayout } from '../UI/Layout';
 import { UsernameField } from './UsernameField';

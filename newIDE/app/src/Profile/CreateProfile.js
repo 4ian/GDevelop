@@ -47,7 +47,10 @@ const CreateProfile = ({
             onClick={onOpenCreateAccountDialog}
             primary
           />
-          <FlatButton label={<Trans>Login</Trans>} onClick={onOpenLoginDialog} />
+          <FlatButton
+            label={<Trans>Login</Trans>}
+            onClick={onOpenLoginDialog}
+          />
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
     </div>

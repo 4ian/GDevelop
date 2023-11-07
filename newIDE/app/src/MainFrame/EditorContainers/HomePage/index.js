@@ -218,12 +218,15 @@ export const HomePage = React.memo<Props>(
         [updateToolbar]
       );
 
-      React.useEffect(() => {
-        // Let the GetStarted page handle if the user chip should be shown.
-        if (activeTab !== 'get-started') {
-          setShowUserChip(true);
-        }
-      }, [activeTab]);
+      React.useEffect(
+        () => {
+          // Let the GetStarted page handle if the user chip should be shown.
+          if (activeTab !== 'get-started') {
+            setShowUserChip(true);
+          }
+        },
+        [activeTab]
+      );
 
       const forceUpdateEditor = React.useCallback(() => {
         // No updates to be done

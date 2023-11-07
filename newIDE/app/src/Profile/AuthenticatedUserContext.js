@@ -4,7 +4,7 @@ import {
   type Profile,
   type LoginForm,
   type RegisterForm,
-  type EditForm,
+  type PatchUserPayload,
   type ForgotPasswordForm,
   type AuthError,
 } from '../Utils/GDevelopServices/Authentication';
@@ -46,7 +46,7 @@ export type AuthenticatedUser = {|
     preferences: PreferencesValues
   ) => Promise<void>,
   onEditProfile: (
-    form: EditForm,
+    payload: PatchUserPayload,
     preferences: PreferencesValues,
     options: {| throwError: boolean |}
   ) => Promise<void>,

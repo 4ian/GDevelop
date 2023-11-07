@@ -2582,15 +2582,15 @@ storiesOf('AuthenticatedUserProfileDetails', module)
   .add('profile', () => (
     <AuthenticatedUserProfileDetails
       authenticatedUser={fakeSilverAuthenticatedUser}
-      onEditProfile={action('edit profile')}
-      onChangeEmail={action('change email')}
+      onOpenEditProfileDialog={action('edit profile')}
+      onOpenChangeEmailDialog={action('change email')}
     />
   ))
   .add('loading', () => (
     <AuthenticatedUserProfileDetails
       authenticatedUser={fakeAuthenticatedUserLoggingIn}
-      onEditProfile={action('edit profile')}
-      onChangeEmail={action('change email')}
+      onOpenEditProfileDialog={action('edit profile')}
+      onOpenChangeEmailDialog={action('change email')}
     />
   ));
 

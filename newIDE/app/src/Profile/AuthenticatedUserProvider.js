@@ -10,7 +10,7 @@ import { getUserBadges } from '../Utils/GDevelopServices/User';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
-  type EditForm,
+  type PatchUserPayload,
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
@@ -729,7 +729,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
 
   _doEdit = async (
-    form: EditForm,
+    payload: PatchUserPayload,
     preferences: PreferencesValues,
     { throwError }: {| throwError: boolean |}
   ) => {
@@ -745,14 +745,14 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
         {
-          username: form.username,
-          description: form.description,
-          getGameStatsEmail: form.getGameStatsEmail,
-          getNewsletterEmail: form.getNewsletterEmail,
+          username: payload.username,
+          description: payload.description,
+          getGameStatsEmail: payload.getGameStatsEmail,
+          getNewsletterEmail: payload.getNewsletterEmail,
           appLanguage: preferences.language,
-          donateLink: form.donateLink,
-          communityLinks: form.communityLinks,
-          survey: form.survey,
+          donateLink: payload.donateLink,
+          communityLinks: payload.communityLinks,
+          survey: payload.survey,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();

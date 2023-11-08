@@ -104,7 +104,7 @@ const translateAndInterpolateText = ({
   }
 
   // Something went wrong with the translation, let's hide the text.
-  if (typeof translatedText !== 'string') return undefined;
+  if (typeof translatedText !== 'string') return '';
 
   return interpolateText(translatedText, data, project);
 };

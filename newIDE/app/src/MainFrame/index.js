@@ -502,7 +502,8 @@ const MainFrame = (props: Props) => {
   useResourcesWatcher(
     getStorageProvider,
     currentFileMetadata,
-    state.editorTabs
+    state.editorTabs,
+    currentProject ? currentProject.isFolderProject() : false,
   );
 
   /**

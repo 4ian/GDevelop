@@ -8,7 +8,8 @@ import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
 const useResourcesWatcher = (
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
-  editorTabs: EditorTabsState
+  editorTabs: EditorTabsState,
+  isProjectSplitInMultipleFiles: boolean,
 ) => {
   const {
     values: { watchProjectFolderFilesForLocalProjects },

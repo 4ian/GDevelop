@@ -19,19 +19,16 @@ const useRefocusField = (fieldRefs: {|
     fieldToFocus.current = options;
   }, []);
 
-  React.useLayoutEffect(
-    () => {
-      if (fieldToFocus.current) {
-        const fieldRef = fieldRefs.current[fieldToFocus.current.identifier];
-        if (fieldRef) {
-          fieldRef.focus({ caretPosition: fieldToFocus.current.caretPosition });
-        }
+  React.useLayoutEffect(() => {
+    if (fieldToFocus.current) {
+      const fieldRef = fieldRefs.current[fieldToFocus.current.identifier];
+      if (fieldRef) {
+        fieldRef.focus({ caretPosition: fieldToFocus.current.caretPosition });
       }
+    }
 
-      fieldToFocus.current = null;
-    },
-    [fieldRefs]
-  );
+    fieldToFocus.current = null;
+  });
 
   return setFieldToFocus;
 };

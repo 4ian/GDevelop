@@ -194,8 +194,9 @@ export type StorageProvider = {|
     authenticatedUser: AuthenticatedUser,
   |}) => ResourcesActionsMenuBuilder,
   /** Resources external changes */
-  setupResourcesWatcher?: (
+  setupResourcesWatcher?: ({|
     fileMetadata: FileMetadata,
-    callback: ({| identifier: string |}) => void
-  ) => () => void,
+    callback: ({| identifier: string |}) => void,
+    options?: any,
+  |}) => () => void,
 |};

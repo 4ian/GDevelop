@@ -79,7 +79,6 @@ const writeProjectFiles = (
           '/layouts/*',
           '/externalLayouts/*',
           '/externalEvents/*',
-          '/layouts/*',
           '/eventsFunctionsExtensions/*',
         ])
       ),

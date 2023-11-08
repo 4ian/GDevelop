@@ -11,10 +11,15 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 export const setupResourcesWatcher =
   ipcRenderer && path
-    ? (
+    ? ({
+        fileMetadata,
+        callback,
+        options,
+      }: {
         fileMetadata: FileMetadata,
-        callback: ({| identifier: string |}) => void
-      ) => {
+        callback: ({| identifier: string |}) => void,
+        options?: {| isProjectSplitInMultipleFiles: boolean |},
+      }) => {
         // We can't just debounce the whole callback, it has to be done file-wise,
         // otherwise we would miss all the debounced calls but the last one.
         // See https://stackoverflow.com/questions/28787436/debounce-a-function-with-argument
@@ -41,19 +46,27 @@ export const setupResourcesWatcher =
           // TODO: Is it safe to let it like that since the OS could for some reason
           // do never-ending operations on the folder or its children, making the debounce
           // never ending.
+          console.log('CHANGE', path);
           debouncedCallback(path);
         });
+        const ignore = [
+          '**/.DS_Store', // macOS folder attributes file
+          '**/.git/**', // For projects using git as a versioning tool.
+          path.join(folderPath, gameFile),
+          path.join(folderPath, autosaveFile),
+        ];
+        if (options && options.isProjectSplitInMultipleFiles) {
+          console.log('IGNORE');
+          ignore.push(
+            `${folderPath}/(layouts|externalLayouts|externalEvents|eventsFunctionsExtensions)/*json`
+          );
+          console.log(ignore);
+        }
         const subscriptionIdPromise = ipcRenderer.invoke(
           'local-filesystem-watcher-setup',
-
           folderPath,
           JSON.stringify({
-            ignore: [
-              '**/.DS_Store', // macOS folder attributes file
-              '**/.git/**', // For projects using git as a versioning tool.
-              path.join(folderPath, gameFile),
-              path.join(folderPath, autosaveFile),
-            ],
+            ignore,
           })
         );
 

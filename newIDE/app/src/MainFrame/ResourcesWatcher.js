@@ -5,12 +5,17 @@ import PreferencesContext from './Preferences/PreferencesContext';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
 
-const useResourcesWatcher = (
+const useResourcesWatcher = ({
+  getStorageProvider,
+  fileMetadata,
+  editorTabs,
+  isProjectSplitInMultipleFiles,
+}: {|
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
   editorTabs: EditorTabsState,
   isProjectSplitInMultipleFiles: boolean,
-) => {
+|}) => {
   const {
     values: { watchProjectFolderFilesForLocalProjects },
   } = React.useContext(PreferencesContext);
@@ -43,10 +48,13 @@ const useResourcesWatcher = (
         return;
       }
       if (fileMetadata && storageProvider.setupResourcesWatcher) {
-        const unsubscribe = storageProvider.setupResourcesWatcher(
+        const unsubscribe = storageProvider.setupResourcesWatcher({
           fileMetadata,
-          informEditorsResourceExternallyChanged
-        );
+          callback: informEditorsResourceExternallyChanged,
+          options: {
+            isProjectSplitInMultipleFiles,
+          },
+        });
         return unsubscribe;
       }
     },
@@ -55,6 +63,7 @@ const useResourcesWatcher = (
       informEditorsResourceExternallyChanged,
       getStorageProvider,
       watchProjectFolderFilesForLocalProjects,
+      isProjectSplitInMultipleFiles,
     ]
   );
 };

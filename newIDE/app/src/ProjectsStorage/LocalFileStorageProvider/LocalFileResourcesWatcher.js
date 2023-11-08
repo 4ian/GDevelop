@@ -5,11 +5,12 @@ import debounce from 'lodash/debounce';
 import wrap from 'lodash/wrap';
 import memoize from 'lodash/memoize';
 
-const fileWatcher = optionalRequire('chokidar');
 const path = optionalRequire('path');
+const electron = optionalRequire('electron');
+const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 export const setupResourcesWatcher =
-  fileWatcher && path
+  ipcRenderer && path
     ? (
         fileMetadata: FileMetadata,
         callback: ({| identifier: string |}) => void
@@ -36,28 +37,34 @@ export const setupResourcesWatcher =
         const folderPath = path.dirname(fileMetadata.fileIdentifier);
         const gameFile = path.basename(fileMetadata.fileIdentifier);
         const autosaveFile = gameFile + '.autosave';
-        const watcher = fileWatcher
-          .watch(folderPath, {
-            ignored: [
-              `**/.DS_Store`,
+        ipcRenderer.on('project-file-changed', (event, path) => {
+          // TODO: Is it safe to let it like that since the OS could for some reason
+          // do never-ending operations on the folder or its children, making the debounce
+          // never ending.
+          debouncedCallback(path);
+        });
+        const subscriptionIdPromise = ipcRenderer.invoke(
+          'local-filesystem-watcher-setup',
+
+          folderPath,
+          JSON.stringify({
+            ignore: [
+              '**/.DS_Store', // macOS folder attributes file
+              '**/.git/**', // For projects using git as a versioning tool.
               path.join(folderPath, gameFile),
               path.join(folderPath, autosaveFile),
             ],
-            ignoreInitial: true,
-            awaitWriteFinish: {
-              stabilityThreshold: 250,
-              pollInterval: 100,
-            },
           })
-          .on(
-            'change',
-            // TODO: Is it safe to let it like that since the OS could for some reason
-            // do never-ending operations on the folder or its children, making the debounce
-            // never ending.
-            debouncedCallback
-          )
-          .on('unlink', debouncedCallback)
-          .on('add', debouncedCallback);
-        return () => watcher.unwatch(folderPath);
+        );
+
+        return () => {
+          ipcRenderer.removeAllListeners('project-file-changed');
+          subscriptionIdPromise.then(subscriptionId => {
+            ipcRenderer.invoke(
+              'local-filesystem-watcher-disable',
+              subscriptionId
+            );
+          });
+        };
       }
     : undefined;

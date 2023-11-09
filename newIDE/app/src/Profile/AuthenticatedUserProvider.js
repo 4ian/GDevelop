@@ -67,7 +67,7 @@ type State = {|
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
   deleteInProgress: boolean,
-  authError: ?AuthError,
+  apiCallError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   emailVerificationDialogOpen: boolean,
   emailVerificationDialogProps: {|
@@ -100,7 +100,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     editProfileDialogOpen: false,
     editInProgress: false,
     deleteInProgress: false,
-    authError: null,
+    apiCallError: null,
     resetPasswordDialogOpen: false,
     emailVerificationDialogOpen: false,
     emailVerificationDialogProps: {
@@ -710,7 +710,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       loginInProgress: true,
-      authError: null,
+      apiCallError: null,
       authenticatedUser: {
         ...this.state.authenticatedUser,
         creatingOrLoggingInAccount: true,
@@ -731,12 +731,12 @@ export default class AuthenticatedUserProvider extends React.Component<
           <Trans>👋 Good to see you!</Trans>
         ),
       });
-    } catch (authError) {
+    } catch (apiCallError) {
       this.setState({
-        authError,
+        apiCallError,
         authenticatedUser: {
           ...this.state.authenticatedUser,
-          authenticationError: authError,
+          authenticationError: apiCallError,
         },
       });
     }
@@ -760,7 +760,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -779,10 +779,10 @@ export default class AuthenticatedUserProvider extends React.Component<
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
       if (throwError) {
-        throw authError;
+        throw apiCallError;
       }
     } finally {
       this.setState({
@@ -801,7 +801,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       createAccountInProgress: true,
-      authError: null,
+      apiCallError: null,
       authenticatedUser: {
         ...this.state.authenticatedUser,
         creatingOrLoggingInAccount: true,
@@ -838,12 +838,12 @@ export default class AuthenticatedUserProvider extends React.Component<
           <Trans>👋 Welcome to GDevelop!</Trans>
         ),
       });
-    } catch (authError) {
+    } catch (apiCallError) {
       this.setState({
-        authError,
+        apiCallError,
         authenticatedUser: {
           ...this.state.authenticatedUser,
-          authenticationError: authError,
+          authenticationError: apiCallError,
         },
       });
     }
@@ -863,7 +863,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       deleteInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -874,8 +874,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       this.showUserSnackbar({
         message: <Trans>Your account has been deleted!</Trans>,
       });
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
     }
     this.setState({
       deleteInProgress: false,
@@ -889,7 +889,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     try {
       await authentication.forgotPassword(form);
-    } catch (authError) {
+    } catch (apiCallError) {
       // Do not throw error if the email is not found, as we don't want to
       // give information to the user about which email is registered.
     }
@@ -908,7 +908,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -916,8 +916,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         authentication.getAuthorizationHeader
       );
       await this._fetchUserProfileWithoutThrowingErrors();
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
     }
     this.setState({
       editInProgress: false,
@@ -931,7 +931,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       changeEmailInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -941,8 +941,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openChangeEmailDialog(false);
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
     }
     this.setState({
       changeEmailInProgress: false,
@@ -976,7 +976,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   openResetPassword = (open: boolean = true) => {
     this.setState({
       resetPasswordDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
@@ -984,7 +984,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       loginDialogOpen: open,
       createAccountDialogOpen: false,
-      authError: null,
+      apiCallError: null,
     });
   };
 
@@ -999,7 +999,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   openEditProfileDialog = (open: boolean = true) => {
     this.setState({
       editProfileDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
@@ -1007,14 +1007,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       loginDialogOpen: false,
       createAccountDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
   openChangeEmailDialog = (open: boolean = true) => {
     this.setState({
       changeEmailDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
@@ -1034,7 +1034,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
                 loginInProgress={this.state.loginInProgress}
-                error={this.state.authError}
+                error={this.state.apiCallError}
                 onForgotPassword={this._doForgotPassword}
               />
             )}
@@ -1051,7 +1051,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   actionInProgress={
                     this.state.editInProgress || this.state.deleteInProgress
                   }
-                  error={this.state.authError}
+                  error={this.state.apiCallError}
                 />
               )}
             {this.state.authenticatedUser.firebaseUser &&
@@ -1061,7 +1061,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   onClose={() => this.openChangeEmailDialog(false)}
                   onChangeEmail={this._doChangeEmail}
                   changeEmailInProgress={this.state.changeEmailInProgress}
-                  error={this.state.authError}
+                  error={this.state.apiCallError}
                 />
               )}
             {this.state.createAccountDialogOpen && (
@@ -1072,7 +1072,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   this._doCreateAccount(form, preferences)
                 }
                 createAccountInProgress={this.state.createAccountInProgress}
-                error={this.state.authError}
+                error={this.state.apiCallError}
               />
             )}
             {this.state.emailVerificationDialogOpen && (

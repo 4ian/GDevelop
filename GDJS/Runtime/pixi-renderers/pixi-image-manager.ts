@@ -116,10 +116,18 @@ namespace gdjs {
      * @returns The requested texture, or a placeholder if not valid.
      */
     getOrLoadPIXITexture(resourceName: string): PIXI.Texture {
-      if (this._loadedTextures.containsKey(resourceName)) {
-        const texture = this._loadedTextures.get(resourceName);
-        if (texture.valid) {
-          return texture;
+      const resource = this._getImageResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return this._invalidTexture;
+      }
+
+      const existingTexture = this._loadedTextures.get(resource);
+      if (existingTexture) {
+        if (existingTexture.valid) {
+          return existingTexture;
         } else {
           logger.error(
             'Texture for ' +
@@ -128,20 +136,6 @@ namespace gdjs {
           );
           return this._invalidTexture;
         }
-      }
-
-      // Texture is not loaded, load it now from the resources list.
-      const resource = findResourceWithNameAndKind(
-        this._resources,
-        resourceName,
-        'image'
-      );
-
-      if (!resource) {
-        logger.warn(
-          'Unable to find texture for resource "' + resourceName + '".'
-        );
-        return this._invalidTexture;
       }
 
       logger.log('Loading texture for resource "' + resourceName + '"...');
@@ -169,7 +163,7 @@ namespace gdjs {
       }
       applyTextureSettings(texture, resource);
 
-      this._loadedTextures.put(resourceName, texture);
+      this._loadedTextures.set(resource, texture);
       return texture;
     }
 

@@ -535,7 +535,7 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
     {
       type: 'plan',
       id: 'gold',
-    }
+    },
   ],
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,

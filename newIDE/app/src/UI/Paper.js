@@ -38,12 +38,9 @@ const Paper = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = getBackgroundColor(gdevelopTheme, background);
-  const paperRef = React.useRef<?MuiPaper>(null);
-
   return (
     <MuiPaper
       id={id}
-      ref={paperRef}
       variant={variant}
       elevation={elevation || 0}
       style={{

@@ -166,7 +166,7 @@ const ImageTileGrid = ({
     [forceUpdate, isMounted]
   );
 
-  const columns = getColumnsFromWidth(windowWidth)
+  const columns = getColumnsFromWidth(windowWidth);
 
   return (
     <div style={styles.container}>
@@ -181,19 +181,17 @@ const ImageTileGrid = ({
           spacing={SPACING * 2}
         >
           {isLoading
-            ? new Array(columns)
-                .fill(0)
-                .map((_, index) => (
-                  // Display tiles but with skeletons while the data is loading.
-                  <GridListTile key={index} classes={tileClasses}>
-                    <Skeleton
-                      variant="rect"
-                      width="100%"
-                      height="100%"
-                      style={styles.dataLoadingSkeleton}
-                    />
-                  </GridListTile>
-                ))
+            ? new Array(columns).fill(0).map((_, index) => (
+                // Display tiles but with skeletons while the data is loading.
+                <GridListTile key={index} classes={tileClasses}>
+                  <Skeleton
+                    variant="rect"
+                    width="100%"
+                    height="100%"
+                    style={styles.dataLoadingSkeleton}
+                  />
+                </GridListTile>
+              ))
             : itemsToDisplay.map((item, index) => (
                 <GridListTile key={index} classes={tileClasses}>
                   <ButtonBase

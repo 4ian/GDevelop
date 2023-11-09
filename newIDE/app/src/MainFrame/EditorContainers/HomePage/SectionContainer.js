@@ -58,10 +58,6 @@ type Props = {|
   noScroll?: boolean,
 |};
 
-export type SectionContainerInterface = {|
-  scrollTo: (options: {| top: number, smooth?: boolean |}) => void,
-|};
-
 const SectionContainer = ({
   children,
   title,
@@ -80,10 +76,9 @@ const SectionContainer = ({
     paddingLeft: number,
     paddingRight: number,
   |} = isMobileScreen ? styles.mobileContainer : styles.desktopContainer;
-  const scrollStyle: {|
-    overflowY: string,
-    scrollbarWidth?: string,
-  |} = noScroll ? styles.noScrollContainer : styles.scrollContainer;
+  const scrollStyle: {| overflowY: string, scrollbarWidth?: string |} = noScroll
+    ? styles.noScrollContainer
+    : styles.scrollContainer;
   const paperStyle = {
     ...styles.container,
     display: flexBody ? 'flex' : 'block',

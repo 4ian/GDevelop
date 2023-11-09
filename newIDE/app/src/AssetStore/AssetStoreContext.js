@@ -449,7 +449,7 @@ export const AssetStoreStateProvider = ({
 
   const publicAssetPacksByTag = React.useMemo(
     () => {
-      if (!publicAssetPacks) {
+      if (!publicAssetPacks || !publicAssetPacks.starterPacks) {
         return null;
       }
       const publicAssetPacksByTag = {};

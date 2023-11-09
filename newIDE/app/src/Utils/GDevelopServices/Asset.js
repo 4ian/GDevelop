@@ -208,10 +208,20 @@ export const listAllPublicAssets = async ({
     throw new Error('Unexpected response from the assets endpoints.');
   }
 
+  const publicAssetShortHeaders = responsesData[0];
+  const publicFilters = responsesData[1];
+  const publicAssetPacks = responsesData[2];
+
+  if (!publicAssetPacks.starterPacks) {
+    throw new Error(
+      'Unexpected response from the public asset packs endpoint.'
+    );
+  }
+
   return {
-    publicAssetShortHeaders: responsesData[0],
-    publicFilters: responsesData[1],
-    publicAssetPacks: responsesData[2],
+    publicAssetShortHeaders,
+    publicFilters,
+    publicAssetPacks,
   };
 };
 

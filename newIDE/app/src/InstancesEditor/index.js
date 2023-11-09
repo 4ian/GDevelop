@@ -484,11 +484,21 @@ export default class InstancesEditor extends Component<Props> {
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
-    this.selectionRectangle.delete();
-    this.instancesRenderer.delete();
-    this._instancesAdder.unmount();
-    this.pinchHandler.unmount();
-    this.longTouchHandler.unmount();
+    if (this.selectionRectangle) {
+      this.selectionRectangle.delete();
+    }
+    if (this.instancesRenderer) {
+      this.instancesRenderer.delete();
+    }
+    if (this._instancesAdder) {
+      this._instancesAdder.unmount();
+    }
+    if (this.pinchHandler) {
+      this.pinchHandler.unmount();
+    }
+    if (this.longTouchHandler) {
+      this.longTouchHandler.unmount();
+    }
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
     this.pixiContainer.destroy();

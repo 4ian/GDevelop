@@ -102,6 +102,10 @@ const translateAndInterpolateText = ({
   } else {
     translatedText = i18n._(text.messageDescriptor, data);
   }
+
+  // Something went wrong with the translation, let's hide the text.
+  if (typeof translatedText !== 'string') return '';
+
   return interpolateText(translatedText, data, project);
 };
 

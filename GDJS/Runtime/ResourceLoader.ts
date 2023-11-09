@@ -28,21 +28,21 @@ namespace gdjs {
   };
 
   /**
-   * A task of pre-loading resources used by a layout.
+   * A task of pre-loading resources used by a scene.
    *
    * A Promise can't be used instead of this class because a Promise will start
    * as soon as possible. It would flood the server with downloading requests
-   * and make impossible to finely tune in which order layouts are actually
+   * and make impossible to finely tune in which order scenes are actually
    * downloaded.
    */
-  class LayoutLoadingTask {
-    layoutName: string;
+  class SceneLoadingTask {
+    sceneName: string;
     private onProgressCallbacks: Array<(count: number, total: number) => void>;
     private onFinishCallbacks: Array<() => void>;
     private isFinished = false;
 
-    constructor(layoutName: string) {
-      this.layoutName = layoutName;
+    constructor(sceneName: string) {
+      this.sceneName = sceneName;
       this.onProgressCallbacks = new Array<
         (count: number, total: number) => void
       >();
@@ -70,7 +70,7 @@ namespace gdjs {
     }
 
     onFinish() {
-      console.log('onFinish: ' + this.layoutName);
+      console.log('onFinish: ' + this.sceneName);
       this.isFinished = true;
       for (const onFinish of this.onFinishCallbacks) {
         onFinish();
@@ -79,7 +79,7 @@ namespace gdjs {
   }
 
   /**
-   * Pre-load resources of any kind needed for a game or a layout.
+   * Pre-load resources of any kind needed for a game or a scene.
    */
   export class ResourceLoader {
     _runtimeGame: RuntimeGame;
@@ -88,27 +88,27 @@ namespace gdjs {
      */
     private _resources: Map<string, ResourceData>;
     /**
-     * Resources needed for any layout. Typically, they are resources from
+     * Resources needed for any scene. Typically, they are resources from
      * global objects.
      */
     private _globalResources: Array<string>;
     /**
-     * Resources by layout names.
+     * Resources by scene names.
      */
-    private _layoutResources: Map<string, Array<string>>;
+    private _sceneResources: Map<string, Array<string>>;
     /**
-     * Keep track of which layout whose resources has already be pre-loaded.
+     * Keep track of which scene whose resources has already be pre-loaded.
      */
-    private _LayoutNamesToLoad: Set<string>;
+    private _sceneNamesToLoad: Set<string>;
     /**
-     * Keep track of which layout whose resources has already be loaded.
+     * Keep track of which scene whose resources has already be loaded.
      */
-    private _layoutNamesToMakeReady: Set<string>;
+    private _sceneNamesToMakeReady: Set<string>;
     /**
-     * A queue of layouts whose resources are still to be pre-loaded.
+     * A queue of scenes whose resources are still to be pre-loaded.
      */
-    private _layoutToLoadQueue: Array<LayoutLoadingTask> = new Array<
-      LayoutLoadingTask
+    private _sceneToLoadQueue: Array<SceneLoadingTask> = new Array<
+      SceneLoadingTask
     >();
     /**
      * The resource managers that actually download and remember downloaded
@@ -125,11 +125,11 @@ namespace gdjs {
     /**
      * Only used by events.
      */
-    private currentLayoutLoadingName: string = '';
+    private currentLoadingSceneName: string = '';
     /**
      * Only used by events.
      */
-    private currentLayoutLoadingProgress: float = 0;
+    private currentSceneLoadingProgress: float = 0;
 
     /**
      * @param runtimeGame The game.
@@ -148,9 +148,9 @@ namespace gdjs {
       this._globalResources = globalResources;
 
       // These 3 attributes are filled by `setResources`.
-      this._layoutResources = new Map<string, Array<string>>();
-      this._LayoutNamesToLoad = new Set<string>();
-      this._layoutNamesToMakeReady = new Set<string>();
+      this._sceneResources = new Map<string, Array<string>>();
+      this._sceneNamesToLoad = new Set<string>();
+      this._sceneNamesToMakeReady = new Set<string>();
       this.setResources(resourceDataArray, globalResources, layoutDataArray);
 
       this._imageManager = new gdjs.ImageManager(this);
@@ -190,23 +190,23 @@ namespace gdjs {
     ): void {
       this._globalResources = globalResources;
 
-      this._layoutResources.clear();
-      this._LayoutNamesToLoad.clear();
-      this._layoutNamesToMakeReady.clear();
+      this._sceneResources.clear();
+      this._sceneNamesToLoad.clear();
+      this._sceneNamesToMakeReady.clear();
       for (const layoutData of layoutDataArray) {
-        this._layoutResources.set(
+        this._sceneResources.set(
           layoutData.name,
           layoutData.usedResources.map((resource) => resource.name)
         );
-        this._LayoutNamesToLoad.add(layoutData.name);
-        this._layoutNamesToMakeReady.add(layoutData.name);
+        this._sceneNamesToLoad.add(layoutData.name);
+        this._sceneNamesToMakeReady.add(layoutData.name);
       }
       // TODO Clearing the queue doesn't abort the running task, but it should
       // not matter as resource loading is really fast in preview mode.
-      this._layoutToLoadQueue.length = 0;
+      this._sceneToLoadQueue.length = 0;
       for (let index = layoutDataArray.length - 1; index >= 0; index--) {
         const layoutData = layoutDataArray[index];
-        this._layoutToLoadQueue.push(new LayoutLoadingTask(layoutData.name));
+        this._sceneToLoadQueue.push(new SceneLoadingTask(layoutData.name));
       }
 
       this._resources.clear();
@@ -227,26 +227,26 @@ namespace gdjs {
           onProgress(loadedCount, this._resources.size);
         })
       );
-      this._LayoutNamesToLoad.clear();
-      this._layoutNamesToMakeReady.clear();
+      this._sceneNamesToLoad.clear();
+      this._sceneNamesToMakeReady.clear();
     }
 
     /**
-     * Load the resources that are needed to launch the first layout.
+     * Load the resources that are needed to launch the first scene.
      */
-    async loadGlobalAndFirstLayoutResources(
+    async loadGlobalAndFirstSceneResources(
       firstSceneName: string,
       onProgress: (count: number, total: number) => void
     ): Promise<void> {
-      const layoutResources = this._layoutResources.get(firstSceneName);
-      if (!layoutResources) {
+      const sceneResources = this._sceneResources.get(firstSceneName);
+      if (!sceneResources) {
         logger.warn(
-          'Can\'t load resource for unknown layout: "' + firstSceneName + '".'
+          'Can\'t load resource for unknown scene: "' + firstSceneName + '".'
         );
         return;
       }
       let loadedCount = 0;
-      const resources = [...this._globalResources, ...layoutResources.values()];
+      const resources = [...this._globalResources, ...sceneResources.values()];
       await Promise.all(
         resources.map(async (resourceName) => {
           const resource = this._resources.get(resourceName);
@@ -260,61 +260,59 @@ namespace gdjs {
           onProgress(loadedCount, resources.length);
         })
       );
-      this._setLayoutAssetsLoaded(firstSceneName);
-      this._setLayoutAssetsReady(firstSceneName);
-      console.log('loadGlobalAndFirstLayoutResources done: ' + firstSceneName);
+      this._setSceneAssetsLoaded(firstSceneName);
+      this._setSceneAssetsReady(firstSceneName);
+      console.log('loadGlobalAndFirstSceneResources done: ' + firstSceneName);
     }
 
     /**
-     * Load each layout in order.
+     * Load each scene in order.
      *
      * This is done in background to try to avoid loading screens when changing
-     * layouts.
+     * scenes.
      */
-    async loadAllLayoutInBackground(): Promise<void> {
-      while (this._layoutToLoadQueue.length > 0) {
-        const task = this._layoutToLoadQueue[
-          this._layoutToLoadQueue.length - 1
-        ];
+    async loadAllSceneInBackground(): Promise<void> {
+      while (this._sceneToLoadQueue.length > 0) {
+        const task = this._sceneToLoadQueue[this._sceneToLoadQueue.length - 1];
         if (task === undefined) {
           continue;
         }
-        this.currentLayoutLoadingName = task.layoutName;
-        if (!this.isLayoutAssetsLoaded(task.layoutName)) {
-          await this._doLoadLayoutResources(
-            task.layoutName,
+        this.currentLoadingSceneName = task.sceneName;
+        if (!this.areSceneAssetsLoaded(task.sceneName)) {
+          await this._doLoadSceneResources(
+            task.sceneName,
             async (count, total) => task.onProgress(count, total)
           );
           // A layer may have been moved last while awaiting resources to be
-          // downloaded (see _prioritizeLayout).
-          this._layoutToLoadQueue.splice(
-            this._layoutToLoadQueue.findIndex((element) => element === task),
+          // downloaded (see _prioritizeScene).
+          this._sceneToLoadQueue.splice(
+            this._sceneToLoadQueue.findIndex((element) => element === task),
             1
           );
           task.onFinish();
         } else {
-          this._layoutToLoadQueue.pop();
+          this._sceneToLoadQueue.pop();
         }
       }
-      this.currentLayoutLoadingName = '';
-      console.log('Done loading all layout in background');
+      this.currentLoadingSceneName = '';
+      console.log('Done loading all scene in background');
     }
 
-    private async _doLoadLayoutResources(
-      layoutName: string,
+    private async _doLoadSceneResources(
+      sceneName: string,
       onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
-      console.log('------- Scene: ' + layoutName);
-      const layoutResources = this._layoutResources.get(layoutName);
-      if (!layoutResources) {
+      console.log('------- Scene: ' + sceneName);
+      const sceneResources = this._sceneResources.get(sceneName);
+      if (!sceneResources) {
         logger.warn(
-          'Can\'t load resource for unknown layout: "' + layoutName + '".'
+          'Can\'t load resource for unknown scene: "' + sceneName + '".'
         );
         return;
       }
       let loadedCount = 0;
       await Promise.all(
-        [...layoutResources.values()].map(async (resourceName) => {
+        [...sceneResources.values()].map(async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
             logger.warn('Unable to find resource "' + resourceName + '".');
@@ -322,13 +320,12 @@ namespace gdjs {
           }
           await this._loadResource(resource);
           loadedCount++;
-          this.currentLayoutLoadingProgress =
-            loadedCount / this._resources.size;
+          this.currentSceneLoadingProgress = loadedCount / this._resources.size;
           onProgress && (await onProgress(loadedCount, this._resources.size));
         })
       );
-      this._setLayoutAssetsLoaded(layoutName);
-      console.log('Done: ' + layoutName);
+      this._setSceneAssetsLoaded(sceneName);
+      console.log('Done: ' + sceneName);
     }
 
     private async _loadResource(resource: ResourceData): Promise<void> {
@@ -352,25 +349,25 @@ namespace gdjs {
      *
      * The renderer will show a loading screen while its done.
      */
-    async loadAndProcessLayoutResources(
-      layoutName: string,
+    async loadAndProcessSceneResources(
+      sceneName: string,
       onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
-      if (this.areLayoutAssetsReady(layoutName)) {
+      if (this.areSceneAssetsReady(sceneName)) {
         return;
       }
-      await this.loadLayoutResources(layoutName, onProgress);
+      await this.loadSceneResources(sceneName, onProgress);
 
-      const layoutResources = this._layoutResources.get(layoutName);
-      if (!layoutResources) {
+      const sceneResources = this._sceneResources.get(sceneName);
+      if (!sceneResources) {
         logger.warn(
-          'Can\'t load resource for unknown layout: "' + layoutName + '".'
+          'Can\'t load resource for unknown scene: "' + sceneName + '".'
         );
         return;
       }
 
       let parsedCount = 0;
-      for (const resourceName of layoutResources) {
+      for (const resourceName of sceneResources) {
         const resource = this._resources.get(resourceName);
         if (!resource) {
           logger.warn('Unable to find resource "' + resourceName + '".');
@@ -378,55 +375,55 @@ namespace gdjs {
         }
         await this._processResource(resource);
         parsedCount++;
-        onProgress && (await onProgress(parsedCount, layoutResources.length));
+        onProgress && (await onProgress(parsedCount, sceneResources.length));
       }
-      this._setLayoutAssetsReady(layoutName);
+      this._setSceneAssetsReady(sceneName);
     }
 
     /**
-     * Load a layout resources without parsing them.
+     * Load a scene resources without parsing them.
      *
-     * When another layout resources are loading in background, it waits for
+     * When another scene resources are loading in background, it waits for
      * all its resources to be loaded before loading resources of the given
-     * layout.
+     * scene.
      */
-    async loadLayoutResources(
-      layoutName: string,
+    async loadSceneResources(
+      sceneName: string,
       onProgress?: (count: number, total: number) => void
     ): Promise<void> {
-      const task = this._prioritizeLayout(layoutName);
+      const task = this._prioritizeScene(sceneName);
       return new Promise<void>((resolve, reject) => {
         if (!task) {
-          console.log('Already downloaded layout: ' + layoutName);
+          console.log('Already downloaded scene: ' + sceneName);
           resolve();
           return;
         }
-        console.log('Register task callback for: ' + layoutName);
+        console.log('Register task callback for: ' + sceneName);
         task.registerCallback(() => {
-          console.log('Downloaded layout: ' + layoutName);
+          console.log('Downloaded scene: ' + sceneName);
           resolve();
         }, onProgress);
       });
     }
 
     /**
-     * Put a given layout at the end of the queue.
+     * Put a given scene at the end of the queue.
      *
-     * When the layout that is currently loading in background is done,
-     * this layout will be the next to be loaded.
+     * When the scene that is currently loading in background is done,
+     * this scene will be the next to be loaded.
      */
-    private _prioritizeLayout(layoutName: string): LayoutLoadingTask | null {
-      console.log('Prioritize layout: ' + layoutName);
-      const taskIndex = this._layoutToLoadQueue.findIndex(
-        (task) => task.layoutName === layoutName
+    private _prioritizeScene(sceneName: string): SceneLoadingTask | null {
+      console.log('Prioritize scene: ' + sceneName);
+      const taskIndex = this._sceneToLoadQueue.findIndex(
+        (task) => task.sceneName === sceneName
       );
       if (taskIndex < 0) {
-        // The layout is already loaded.
+        // The scene is already loaded.
         return null;
       }
-      const task = this._layoutToLoadQueue[taskIndex];
-      this._layoutToLoadQueue.splice(taskIndex, 1);
-      this._layoutToLoadQueue.push(task);
+      const task = this._sceneToLoadQueue[taskIndex];
+      this._sceneToLoadQueue.splice(taskIndex, 1);
+      this._sceneToLoadQueue.push(task);
       return task;
     }
 
@@ -445,36 +442,36 @@ namespace gdjs {
       await resourceManager.processResource(resource.name);
     }
 
-    getLayoutLoadingProgress(layoutName: string): float {
-      return layoutName === this.currentLayoutLoadingName
-        ? this.currentLayoutLoadingProgress
-        : this.isLayoutAssetsLoaded(layoutName)
+    getSceneLoadingProgress(sceneName: string): float {
+      return sceneName === this.currentLoadingSceneName
+        ? this.currentSceneLoadingProgress
+        : this.areSceneAssetsLoaded(sceneName)
         ? 1
         : 0;
     }
 
     /**
-     * @returns true when all the resources of the given layout are loaded
+     * @returns true when all the resources of the given scene are loaded
      * (but maybe not parsed).
      */
-    isLayoutAssetsLoaded(layoutName: string): boolean {
-      return !this._LayoutNamesToLoad.has(layoutName);
+    areSceneAssetsLoaded(sceneName: string): boolean {
+      return !this._sceneNamesToLoad.has(sceneName);
     }
 
     /**
-     * @returns true when all the resources of the given layout are loaded and
+     * @returns true when all the resources of the given scene are loaded and
      * parsed.
      */
-    areLayoutAssetsReady(layoutName: string): boolean {
-      return !this._layoutNamesToMakeReady.has(layoutName);
+    areSceneAssetsReady(sceneName: string): boolean {
+      return !this._sceneNamesToMakeReady.has(sceneName);
     }
 
-    private _setLayoutAssetsLoaded(layoutName: string): void {
-      this._LayoutNamesToLoad.delete(layoutName);
+    private _setSceneAssetsLoaded(sceneName: string): void {
+      this._sceneNamesToLoad.delete(sceneName);
     }
 
-    private _setLayoutAssetsReady(layoutName: string): void {
-      this._layoutNamesToMakeReady.delete(layoutName);
+    private _setSceneAssetsReady(sceneName: string): void {
+      this._sceneNamesToMakeReady.delete(sceneName);
     }
 
     getResource(resourceName: string): ResourceData | null {

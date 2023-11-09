@@ -42,10 +42,10 @@ namespace gdjs {
       runtimeGamePixiRenderer: gdjs.RuntimeGamePixiRenderer,
       imageManager: gdjs.PixiImageManager,
       loadingScreenData: LoadingScreenData,
-      isFirstLayout: boolean
+      isFirstScene: boolean
     ) {
       this._loadingScreenData = loadingScreenData;
-      this._isFirstLayout = isFirstLayout;
+      this._isFirstLayout = isFirstScene;
       this._loadingScreenContainer = new PIXI.Container();
       this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
       if (!this._pixiRenderer) {
@@ -60,7 +60,7 @@ namespace gdjs {
       );
       if (
         backgroundTexture !== imageManager.getInvalidPIXITexture() &&
-        isFirstLayout
+        isFirstScene
       ) {
         this._backgroundSprite = PIXI.Sprite.from(backgroundTexture);
         this._backgroundSprite.alpha = 0;
@@ -69,7 +69,7 @@ namespace gdjs {
         this._loadingScreenContainer.addChild(this._backgroundSprite);
       }
 
-      if (loadingScreenData.showGDevelopSplash && isFirstLayout) {
+      if (loadingScreenData.showGDevelopSplash && isFirstScene) {
         this._gdevelopLogoSprite = PIXI.Sprite.from(gdjs.gdevelopLogo);
         this._gdevelopLogoSprite.alpha = 0;
         this._gdevelopLogoSprite.anchor.x = 0.5;

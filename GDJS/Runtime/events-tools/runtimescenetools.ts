@@ -330,31 +330,31 @@ namespace gdjs {
       /**
        * Preload a scene assets as soon as possible in background.
        */
-      export const prioritizeLoadingOfLayout = (
+      export const prioritizeLoadingOfScene = (
         runtimeScene: gdjs.RuntimeScene,
         sceneName: string
       ): void => {
-        runtimeScene.getGame().prioritizeLoadingOfLayout(sceneName);
+        runtimeScene.getGame().prioritizeLoadingOfScene(sceneName);
       };
 
       /**
        * @return The progress of assets loading in background for a scene (between 0 and 1).
        */
-      export const getLayoutLoadingProgress = (
+      export const getSceneLoadingProgress = (
         runtimeScene: gdjs.RuntimeScene,
         sceneName: string
       ): float => {
-        return runtimeScene.getGame().getLayoutLoadingProgress(sceneName);
+        return runtimeScene.getGame().getSceneLoadingProgress(sceneName);
       };
 
       /**
        * Check if scene assets have finished to load in background.
        */
-      export const isLayoutAssetsLoaded = (
+      export const areSceneAssetsLoaded = (
         runtimeScene: gdjs.RuntimeScene,
         sceneName: string
       ): boolean => {
-        return runtimeScene.getGame().isLayoutAssetsLoaded(sceneName);
+        return runtimeScene.getGame().areSceneAssetsLoaded(sceneName);
       };
     }
   }

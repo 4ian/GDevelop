@@ -3,7 +3,7 @@
  * Copyright 2008-2023 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "UsedResourcesDeclarer.h"
+#include "UsedResourcesFinder.h"
 
 #include "GDCore/IDE/ResourceExposer.h"
 #include "GDCore/Project/Layout.h"

@@ -596,37 +596,37 @@ namespace gdjs {
     /**
      * Preload a scene assets as soon as possible in background.
      */
-    prioritizeLoadingOfLayout(layoutName: string) {
-      // Don't await the layout assets to be loaded.
-      this._resourcesLoader.loadLayoutResources(layoutName);
+    prioritizeLoadingOfScene(sceneName: string) {
+      // Don't await the scene assets to be loaded.
+      this._resourcesLoader.loadSceneResources(sceneName);
     }
 
     /**
      * @return The progress of assets loading in background for a scene
      * (between 0 and 1).
      */
-    getLayoutLoadingProgress(layoutName: string): number {
-      return this._resourcesLoader.getLayoutLoadingProgress(layoutName);
+    getSceneLoadingProgress(sceneName: string): number {
+      return this._resourcesLoader.getSceneLoadingProgress(sceneName);
     }
 
     /**
-     * @returns true when all the resources of the given layout are loaded
+     * @returns true when all the resources of the given scene are loaded
      * (but maybe not parsed).
      */
-    isLayoutAssetsLoaded(layoutName: string): boolean {
-      return this._resourcesLoader.isLayoutAssetsLoaded(layoutName);
+    areSceneAssetsLoaded(sceneName: string): boolean {
+      return this._resourcesLoader.areSceneAssetsLoaded(sceneName);
     }
 
     /**
-     * @returns true when all the resources of the given layout are loaded and
+     * @returns true when all the resources of the given scene are loaded and
      * parsed.
      */
-    areLayoutAssetsReady(layoutName: string): boolean {
-      return this._resourcesLoader.areLayoutAssetsReady(layoutName);
+    areLayoutAssetsReady(sceneName: string): boolean {
+      return this._resourcesLoader.areSceneAssetsReady(sceneName);
     }
 
     /**
-     * Load all assets needed to display the 1st layout, displaying progress in
+     * Load all assets needed to display the 1st scene, displaying progress in
      * renderer.
      */
     loadAllAssets(
@@ -639,30 +639,30 @@ namespace gdjs {
     }
 
     /**
-     * Load all assets needed to display the 1st layout, displaying progress in
+     * Load all assets needed to display the 1st scene, displaying progress in
      * renderer.
      *
      * When a game is hot-reload, this method can be called with the current
-     * layer.
+     * scene.
      */
     async loadFirstAssets(
       firstSceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       try {
-        await this.loadAssetsWithLoadingScreen(
-          /* isFirstLayout = */ true,
+        await this._loadAssetsWithLoadingScreen(
+          /* isFirstScene = */ true,
           async (onProgress) => {
             // TODO Is a setting needed?
             if (false) {
               await this._resourcesLoader.loadAllResources(onProgress);
             } else {
-              await this._resourcesLoader.loadGlobalAndFirstLayoutResources(
+              await this._resourcesLoader.loadGlobalAndFirstSceneResources(
                 firstSceneName,
                 onProgress
               );
-              // Don't await as it must not block the first layout from starting.
-              this._resourcesLoader.loadAllLayoutInBackground();
+              // Don't await as it must not block the first scene from starting.
+              this._resourcesLoader.loadAllSceneInBackground();
             }
           },
           progressCallback
@@ -677,17 +677,17 @@ namespace gdjs {
     }
 
     /**
-     * Load all assets for a given layout, displaying progress in renderer.
+     * Load all assets for a given scene, displaying progress in renderer.
      */
-    async loadLayoutAssets(
-      layoutName: string,
+    async loadSceneAssets(
+      sceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
-      await this.loadAssetsWithLoadingScreen(
+      await this._loadAssetsWithLoadingScreen(
         /* isFirstLayout = */ false,
         async (onProgress) => {
-          await this._resourcesLoader.loadAndProcessLayoutResources(
-            layoutName,
+          await this._resourcesLoader.loadAndProcessSceneResources(
+            sceneName,
             onProgress
           );
         },
@@ -698,8 +698,8 @@ namespace gdjs {
     /**
      * Load assets, displaying progress in renderer.
      */
-    async loadAssetsWithLoadingScreen(
-      isFirstLayout: boolean,
+    private async _loadAssetsWithLoadingScreen(
+      isFirstScene: boolean,
       loadAssets: (
         onProgress: (count: integer, total: integer) => Promise<void>
       ) => Promise<void>,
@@ -710,7 +710,7 @@ namespace gdjs {
         this.getRenderer(),
         this._resourcesLoader.getImageManager(),
         this._data.properties.loadingScreen,
-        isFirstLayout
+        isFirstScene
       );
 
       const onProgress = async (count: integer, total: integer) => {
@@ -721,7 +721,7 @@ namespace gdjs {
         }
         const hasRendered = loadingScreen.renderIfNeeded();
         if (hasRendered) {
-          // Give a change to draw calls from the renderer to be handled.
+          // Give a chane to draw calls from the renderer to be handled.
           await sleep(1);
         }
       };

@@ -27,7 +27,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/IDE/ExporterHelper.h"
-#include "GDJS/IDE/UsedResourcesDeclarer.h"
+#include "GDJS/IDE/UsedResourcesFinder.h"
 
 #undef CopyFile  // Disable an annoying macro
 

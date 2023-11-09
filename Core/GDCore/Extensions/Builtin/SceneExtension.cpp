@@ -166,40 +166,40 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
-      .AddAction("PrioritizeLoadingOfLayout",
+      .AddAction("PrioritizeLoadingOfScene",
                  _("Preload scene"),
                  _("Preload a scene assets as soon as possible in background."),
                  _("Preload scene _PARAM1_ in background"),
                  "",
                  "res/actions/replaceScene24.png",
                  "res/actions/replaceScene.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
       .MarkAsAdvanced();
 
   extension.AddExpressionAndCondition("number",
-                                "LayoutLoadingProgress",
+                                "SceneLoadingProgress",
                                 _("Scene loading progress"),
                                 _("The progress of assets loading in background for a scene (between 0 and 1)."),
                                 _("_PARAM0_ loading progress"),
                                 _(""),
                                 "res/actions/replaceScene24.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("IsLayoutAssetsLoaded",
+      .AddCondition("AreSceneAssetsLoaded",
                     _("Scene preloaded"),
                     _("Check if scene assets have finished to load in background."),
                     _("Scene _PARAM1_ was preloaded in background"),
                     "",
                     "res/actions/replaceScene24.png",
                     "res/actions/replaceScene.png")
-      .SetHelpPath("/interface/scene-editor/events")
+      .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))
       .MarkAsAdvanced();

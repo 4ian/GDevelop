@@ -30,6 +30,7 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -411,4 +412,13 @@ const GetStartedSection = ({
   );
 };
 
-export default GetStartedSection;
+const GetStartedSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Get started section</Trans>}
+    scope="start-page-get-started"
+  >
+    <GetStartedSection {...props} />
+  </ErrorBoundary>
+);
+
+export default GetStartedSectionWithErrorBoundary;

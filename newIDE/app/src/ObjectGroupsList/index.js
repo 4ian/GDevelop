@@ -25,6 +25,7 @@ import { type EmptyPlaceholder } from '../ObjectsList';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -623,7 +624,21 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.globalObjectGroups === nextProps.globalObjectGroups ||
   prevProps.objectGroups === nextProps.objectGroups;
 
-export default React.memo<Props, ObjectGroupsListInterface>(
+const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
   ObjectGroupsList,
   arePropsEqual
 );
+
+const ObjectGroupsListWithErrorBoundary = React.forwardRef<
+  Props,
+  ObjectGroupsListInterface
+>((props, ref) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Object groups list</Trans>}
+    scope="scene-editor-object-groups-list"
+  >
+    <MemoizedObjectGroupsList ref={ref} {...props} />
+  </ErrorBoundary>
+));
+
+export default ObjectGroupsListWithErrorBoundary;

@@ -35,6 +35,7 @@ import Paper from '../../../../UI/Paper';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../../../UI/RaisedButton';
 import { groupMembersByGroupId } from './utils';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 const PADDING = 16;
 
@@ -377,4 +378,13 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   }
 );
 
-export default TeamSection;
+const TeamSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Team section</Trans>}
+    scope="start-page-team"
+  >
+    <TeamSection {...props} />
+  </ErrorBoundary>
+);
+
+export default TeamSectionWithErrorBoundary;

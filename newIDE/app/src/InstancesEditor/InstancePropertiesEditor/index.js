@@ -349,8 +349,8 @@ const InstancePropertiesEditor = ({
 
   return (
     <ErrorBoundary
-      title="An error occurred when displaying instance properties"
-      scope="instance-properties-editor"
+      componentTitle={<Trans>Instance properties</Trans>}
+      scope="scene-editor-instance-properties"
     >
       <ScrollView
         autoHideScrollbar

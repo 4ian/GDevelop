@@ -49,6 +49,7 @@ import {
   getProjectLineHeight,
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from './utils';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 const styles = {
   listItem: {
@@ -398,4 +399,13 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
   }
 );
 
-export default BuildSection;
+const BuildSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Build section</Trans>}
+    scope="start-page-build"
+  >
+    <BuildSection {...props} />
+  </ErrorBoundary>
+);
+
+export default BuildSectionWithErrorBoundary;

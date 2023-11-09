@@ -1659,7 +1659,7 @@ const VariablesList = (props: Props) => {
 
   return (
     <ErrorBoundary
-      title="An error occurred when displaying variables"
+      componentTitle={<Trans>Variables list</Trans>}
       scope="variables-list"
     >
       <I18n>

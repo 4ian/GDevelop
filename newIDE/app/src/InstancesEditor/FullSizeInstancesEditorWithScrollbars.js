@@ -12,6 +12,8 @@ import { useDebounce } from '../Utils/UseDebounce';
 import Rectangle from '../Utils/Rectangle';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
+import ErrorBoundary from '../UI/ErrorBoundary';
+import { Trans } from '@lingui/macro';
 
 const SCROLLBAR_DETECTION_WIDTH = 50;
 // Those scrollbar dimensions should be the same as in the CSS file Scrollbar.css
@@ -378,38 +380,45 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       {({ width, height }) => (
         <div style={styles.container}>
           {width !== undefined && height !== undefined && (
-            <InstancesEditor
-              onViewPositionChanged={
-                screenType !== 'touch' ? handleViewPositionChange : noop
-              }
-              ref={(editor: ?InstancesEditor) => {
-                wrappedEditorRef && wrappedEditorRef(editor);
-                editorRef.current = editor;
-              }}
-              width={width}
-              height={height}
-              screenType={screenType}
-              onMouseMove={onMouseMoveOverInstanceEditor}
-              onMouseLeave={(event: MouseEvent) => {
-                const { relatedTarget } = event;
-                if (!isDragging.current && relatedTarget) {
-                  if (
-                    // Flow says className is not present in ElementTarget but this piece
-                    // of code cannot break.
-                    // $FlowFixMe
-                    relatedTarget.className &&
-                    typeof relatedTarget.className === 'string' &&
-                    // Hide only if the mouse is not leaving to go on one of the scrollbars' thumb.
-                    // $FlowFixMe
-                    !relatedTarget.className.includes('canvas-scrollbar-thumb')
-                  ) {
-                    hideScrollbarsAfterDelay();
-                  }
+            <ErrorBoundary
+              componentTitle={<Trans>Instances editor</Trans>}
+              scope="scene-editor-canvas"
+            >
+              <InstancesEditor
+                onViewPositionChanged={
+                  screenType !== 'touch' ? handleViewPositionChange : noop
                 }
-              }}
-              showObjectInstancesIn3D={values.use3DEditor}
-              {...otherProps}
-            />
+                ref={(editor: ?InstancesEditor) => {
+                  wrappedEditorRef && wrappedEditorRef(editor);
+                  editorRef.current = editor;
+                }}
+                width={width}
+                height={height}
+                screenType={screenType}
+                onMouseMove={onMouseMoveOverInstanceEditor}
+                onMouseLeave={(event: MouseEvent) => {
+                  const { relatedTarget } = event;
+                  if (!isDragging.current && relatedTarget) {
+                    if (
+                      // Flow says className is not present in ElementTarget but this piece
+                      // of code cannot break.
+                      // $FlowFixMe
+                      relatedTarget.className &&
+                      typeof relatedTarget.className === 'string' &&
+                      // Hide only if the mouse is not leaving to go on one of the scrollbars' thumb.
+                      // $FlowFixMe
+                      !relatedTarget.className.includes(
+                        'canvas-scrollbar-thumb'
+                      )
+                    ) {
+                      hideScrollbarsAfterDelay();
+                    }
+                  }
+                }}
+                showObjectInstancesIn3D={values.use3DEditor}
+                {...otherProps}
+              />
+            </ErrorBoundary>
           )}
           {screenType !== 'touch' && (
             <div

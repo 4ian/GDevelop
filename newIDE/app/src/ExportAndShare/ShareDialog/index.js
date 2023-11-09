@@ -18,6 +18,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 
 export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'mobile';
@@ -360,4 +361,14 @@ const ShareDialog = ({
   );
 };
 
-export default ShareDialog;
+const ShareDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Share dialog</Trans>}
+    scope="export-and-share"
+    onClose={props.onClose}
+  >
+    <ShareDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ShareDialogWithErrorBoundary;

@@ -37,7 +37,6 @@ import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
-import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import CreateProfile from '../Profile/CreateProfile';
 import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfileDetails';
 import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
@@ -65,7 +64,6 @@ import BuildStepsProgress from '../ExportAndShare/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
-import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -978,18 +976,6 @@ storiesOf('UI Building Blocks/Accordion', module)
         </Accordion>
       ))}
     </React.Fragment>
-  ));
-
-storiesOf('UI Building Blocks/PlaceholderMessage', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <PlaceholderMessage>
-      <p>
-        Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,
-        consectetur, adipisci velit
-      </p>
-    </PlaceholderMessage>
   ));
 
 storiesOf('UI Building Blocks/PlaceholderLoader', module)
@@ -2460,19 +2446,6 @@ storiesOf('ObjectSelector', module)
           openOnFocus
         />
       )}
-    />
-  ));
-
-const fakeError = new Error('Fake error for storybook');
-storiesOf('ErrorBoundary', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ErrorFallbackComponent
-      componentStack="Fake stack"
-      error={fakeError}
-      title="Error customizable title"
-      uniqueErrorId="unique-error-id"
     />
   ));
 

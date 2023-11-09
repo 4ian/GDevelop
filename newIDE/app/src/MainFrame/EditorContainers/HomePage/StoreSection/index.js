@@ -10,6 +10,7 @@ import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 type Props = {|
   project: ?gdProject,
@@ -123,4 +124,13 @@ const StoreSection = ({
   );
 };
 
-export default StoreSection;
+const StoreSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Shop section</Trans>}
+    scope="start-page-shop"
+  >
+    <StoreSection {...props} />
+  </ErrorBoundary>
+);
+
+export default StoreSectionWithErrorBoundary;

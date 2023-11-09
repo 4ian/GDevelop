@@ -50,6 +50,7 @@ import Link from '../UI/Link';
 import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
 const sceneObjectsRootFolderId = 'scene-objects';
@@ -1591,7 +1592,21 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.project === nextProps.project &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
-export default React.memo<Props, ObjectsListInterface>(
+const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
   ObjectsList,
   arePropsEqual
 );
+
+const ObjectsListWithErrorBoundary = React.forwardRef<
+  Props,
+  ObjectsListInterface
+>((props, ref) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Objects list</Trans>}
+    scope="scene-editor-objects-list"
+  >
+    <MemoizedObjectsList ref={ref} {...props} />
+  </ErrorBoundary>
+));
+
+export default ObjectsListWithErrorBoundary;

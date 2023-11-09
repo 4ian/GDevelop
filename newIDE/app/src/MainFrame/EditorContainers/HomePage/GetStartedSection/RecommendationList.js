@@ -152,7 +152,6 @@ const RecommendationList = ({
   const { getTutorialProgress } = React.useContext(PreferencesContext);
 
   if (!recommendations) return null;
-  console.log(recommendations);
 
   const recommendedTutorials = tutorials
     ? recommendations

@@ -109,7 +109,6 @@ const PlanRecommendationRow = ({
       ? 'gdevelop_startup'
       : null;
   if (!planToUse) return null;
-  console.log(gdevelopTheme.text.color.secondary);
 
   const plan = getSubscriptionPlans().find(plan => plan.planId === planToUse);
   if (!plan) return null;

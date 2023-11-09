@@ -9,13 +9,9 @@ import questionnaire, {
   type QuestionData,
   type AnswerData,
 } from './Questionnaire';
-import PersonalizationQuestion, {
-  TitleAndSubtitle,
-} from './UserSurveyQuestion';
+import UserSurveyQuestion, { TitleAndSubtitle } from './UserSurveyQuestion';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
-import SectionContainer, {
-  type SectionContainerInterface,
-} from '../SectionContainer';
+import SectionContainer from '../SectionContainer';
 import { type UserSurvey as UserSurveyType } from '../../../../Utils/GDevelopServices/User';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
@@ -118,55 +114,46 @@ const DesktopDisplay = ({
   questionId,
 }: DisplayProps) => {
   const questionData = questionnaire[questionId];
-  const sectionContainerRef = React.useRef<?SectionContainerInterface>(null);
+  const userSurveyQuestionRef = React.useRef<?HTMLDivElement>(null);
 
-  const scrollToBottom = React.useCallback(() => {
+  const scrollToLastQuestion = React.useCallback(() => {
     // If no timeout, the container does not scroll to the very bottom, even
     // if called by layout effect.
     setTimeout(() => {
-      if (sectionContainerRef.current) {
-        sectionContainerRef.current.scrollToBottom({ smooth: true });
+      if (userSurveyQuestionRef.current) {
+        userSurveyQuestionRef.current.scrollIntoView({ behavior: 'smooth' });
       }
     }, 100);
   }, []);
 
   React.useEffect(
     () => {
-      scrollToBottom();
+      scrollToLastQuestion();
     },
-    [questionId, scrollToBottom]
+    [questionId, scrollToLastQuestion]
   );
 
-  const questionsToRender: React.Node[] = userAnswers.map(
-    (userAnswer, index) => {
-      const relatedQuestionData = questionnaire[userAnswer.questionId];
-      return (
-        <PersonalizationQuestion
-          key={userAnswer.questionId}
-          questionData={relatedQuestionData}
-          selectedAnswers={userAnswer.answers}
-          onSelectAnswer={answer =>
-            onSelectAnswer(userAnswer.questionId, answer)
-          }
-          showNextButton={
-            (relatedQuestionData.multi ||
-              isOnlyOneFreeAnswerPossible(relatedQuestionData.answers)) &&
-            index === userAnswers.length - 1 &&
-            questionId === userAnswer.questionId
-          }
-          onClickNext={() => goToNextQuestion(relatedQuestionData)}
-          showQuestionText={true}
-          onClickSend={
-            userAnswer.questionId === firstQuestion ? onClickSend : undefined
-          }
-          userInputValue={userAnswer.userInput || ''}
-          onChangeUserInputValue={value =>
-            onChangeUserInputValue(userAnswer.questionId, value)
-          }
-        />
-      );
-    }
-  );
+  const questionsPropsToRender = userAnswers.map((userAnswer, index) => {
+    const relatedQuestionData = questionnaire[userAnswer.questionId];
+    return {
+      key: userAnswer.questionId,
+      questionData: relatedQuestionData,
+      selectedAnswers: userAnswer.answers,
+      onSelectAnswer: answer => onSelectAnswer(userAnswer.questionId, answer),
+      showNextButton:
+        (relatedQuestionData.multi ||
+          isOnlyOneFreeAnswerPossible(relatedQuestionData.answers)) &&
+        index === userAnswers.length - 1 &&
+        questionId === userAnswer.questionId,
+      onClickNext: () => goToNextQuestion(relatedQuestionData),
+      showQuestionText: true,
+      onClickSend:
+        userAnswer.questionId === firstQuestion ? onClickSend : undefined,
+      userInputValue: userAnswer.userInput || '',
+      onChangeUserInputValue: value =>
+        onChangeUserInputValue(userAnswer.questionId, value),
+    };
+  });
 
   // When answering a multi answer question, the first click on an answer adds an item to
   // user answers. The question is then displayed through userAnswers and should not
@@ -184,25 +171,33 @@ const DesktopDisplay = ({
 
   if (shouldDisplayQuestion) {
     const questionData = questionnaire[questionId];
-    questionsToRender.push(
-      <PersonalizationQuestion
-        key={questionId}
-        questionData={questionData}
-        selectedAnswers={[]}
-        onSelectAnswer={answer => onSelectAnswer(questionId, answer)}
-        onClickNext={() => goToNextQuestion(questionData)}
-        showNextButton={questionData.multi}
-        showQuestionText={true}
-      />
-    );
+    questionsPropsToRender.push({
+      key: questionId,
+      questionData: questionData,
+      selectedAnswers: [],
+      onSelectAnswer: answer => onSelectAnswer(questionId, answer),
+      onClickNext: () => goToNextQuestion(questionData),
+      showNextButton: questionData.multi,
+      showQuestionText: true,
+    });
   }
   return (
     <SectionContainer
       title={null} // Let the content handle the title.
       flexBody
-      ref={sectionContainerRef}
     >
-      <ColumnStackLayout noMargin>{questionsToRender}</ColumnStackLayout>
+      <ColumnStackLayout noMargin>
+        {questionsPropsToRender.map((props, index) => (
+          <UserSurveyQuestion
+            {...props}
+            ref={
+              index === questionsPropsToRender.length - 1
+                ? userSurveyQuestionRef
+                : null
+            }
+          />
+        ))}
+      </ColumnStackLayout>
     </SectionContainer>
   );
 };
@@ -265,7 +260,7 @@ const MobileDisplay = ({
               />
             </Column>
             <ScrollView ref={scrollViewRef}>
-              <PersonalizationQuestion
+              <UserSurveyQuestion
                 key={questionId}
                 questionData={questionData}
                 selectedAnswers={userAnswer ? userAnswer.answers : []}

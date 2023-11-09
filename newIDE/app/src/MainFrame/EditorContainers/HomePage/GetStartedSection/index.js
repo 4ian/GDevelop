@@ -367,31 +367,31 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
             )}
           </Text>
           <div style={styles.buttonContainer}>
-            <ColumnStackLayout noMargin>
-              {profile ? (
+            {profile ? (
+              <Column noMargin>
                 <RaisedButton
                   label={<Trans>Let's go!</Trans>}
                   primary
                   onClick={() => setStep('questionnaire')}
                   fullWidth
                 />
-              ) : (
-                <>
-                  <RaisedButton
-                    label={<Trans>Let's go!</Trans>}
-                    primary
-                    onClick={() => setStep('register')}
-                    fullWidth
-                  />
-                  <FlatButton
-                    primary
-                    label={<Trans>I already have an account</Trans>}
-                    onClick={() => setStep('login')}
-                    fullWidth
-                  />
-                </>
-              )}
-            </ColumnStackLayout>
+              </Column>
+            ) : (
+              <ColumnStackLayout noMargin>
+                <RaisedButton
+                  label={<Trans>Let's go!</Trans>}
+                  primary
+                  onClick={() => setStep('register')}
+                  fullWidth
+                />
+                <FlatButton
+                  primary
+                  label={<Trans>I already have an account</Trans>}
+                  onClick={() => setStep('login')}
+                  fullWidth
+                />
+              </ColumnStackLayout>
+            )}
           </div>
         </ColumnStackLayout>
       </SectionContainer>

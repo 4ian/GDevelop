@@ -79,6 +79,11 @@ const styles = {
     height: '100%',
     display: 'flex',
   },
+  questionContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
   answerButtonBackground: { width: '100%', height: '100%' },
   answerCoverImage: {
     borderTopLeftRadius: 8,
@@ -318,104 +323,109 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-const UserSurveyQuestion = ({
-  questionData,
-  onSelectAnswer,
-  selectedAnswers,
-  showNextButton,
-  onClickNext,
-  showQuestionText,
-  onClickSend,
-  userInputValue,
-  onChangeUserInputValue,
-}: Props) => {
-  const { text, answers, multi } = questionData;
-  const windowWidth = useResponsiveWindowWidth();
+const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
+  (
+    {
+      questionData,
+      onSelectAnswer,
+      selectedAnswers,
+      showNextButton,
+      onClickNext,
+      showQuestionText,
+      onClickSend,
+      userInputValue,
+      onChangeUserInputValue,
+    },
+    ref
+  ) => {
+    const { text, answers, multi } = questionData;
+    const windowWidth = useResponsiveWindowWidth();
 
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <Column>
-          {showQuestionText ? (
-            <TitleAndSubtitle
-              i18n={i18n}
-              multi={multi}
-              answers={questionData.answers}
-              text={text}
-              textAlign="left"
-            />
-          ) : null}
-          <GridList
-            cols={getColumnsFromWidth(windowWidth)}
-            spacing={15}
-            cellHeight="auto"
-          >
-            {// Case where only one free answer is possible.
-            isOnlyOneFreeAnswerPossible(answers) &&
-            userInputValue !== undefined &&
-            onChangeUserInputValue ? (
-              <GridListTile>
-                <FreeAnswer
-                  answerData={answers[0]}
-                  i18n={i18n}
-                  key={answers[0].id}
-                  // Do not leave possibility to unselect answer.
-                  onSelect={() => {}}
-                  selected={selectedAnswers.includes(answers[0].id)}
-                  showCheckbox={false}
-                  onClickSend={onClickSend}
-                  value={userInputValue}
-                  onChange={onChangeUserInputValue}
-                />
-              </GridListTile>
-            ) : (
-              answers.map(answerData => (
-                <GridListTile key={answerData.id}>
-                  {answerData.id === 'input' &&
-                  userInputValue !== undefined &&
-                  onChangeUserInputValue ? (
-                    <FreeAnswer
-                      answerData={answerData}
-                      i18n={i18n}
-                      onSelect={onSelectAnswer}
-                      selected={selectedAnswers.includes(answerData.id)}
-                      showCheckbox={!!multi}
-                      onClickSend={onClickSend}
-                      value={userInputValue}
-                      onChange={onChangeUserInputValue}
-                    />
-                  ) : (
-                    <Answer
-                      answerData={answerData}
-                      i18n={i18n}
-                      onSelect={onSelectAnswer}
-                      selected={selectedAnswers.includes(answerData.id)}
-                      showCheckbox={!!multi}
-                    />
-                  )}
-                </GridListTile>
-              ))
-            )}
-          </GridList>
-          {showNextButton && (
-            <Line justifyContent="flex-end">
-              <RaisedButton
-                primary
-                label={i18n._(t`Next`)}
-                onClick={onClickNext}
-                disabled={
-                  selectedAnswers.length === 0 ||
-                  (selectedAnswers.length === 1 &&
-                    selectedAnswers[0] === 'input' &&
-                    !userInputValue)
-                }
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <div ref={ref} style={styles.questionContainer}>
+            {showQuestionText ? (
+              <TitleAndSubtitle
+                i18n={i18n}
+                multi={multi}
+                answers={questionData.answers}
+                text={text}
+                textAlign="left"
               />
-            </Line>
-          )}
-        </Column>
-      )}
-    </I18n>
-  );
-};
+            ) : null}
+            <GridList
+              cols={getColumnsFromWidth(windowWidth)}
+              spacing={15}
+              cellHeight="auto"
+            >
+              {// Case where only one free answer is possible.
+              isOnlyOneFreeAnswerPossible(answers) &&
+              userInputValue !== undefined &&
+              onChangeUserInputValue ? (
+                <GridListTile>
+                  <FreeAnswer
+                    answerData={answers[0]}
+                    i18n={i18n}
+                    key={answers[0].id}
+                    // Do not leave possibility to unselect answer.
+                    onSelect={() => {}}
+                    selected={selectedAnswers.includes(answers[0].id)}
+                    showCheckbox={false}
+                    onClickSend={onClickSend}
+                    value={userInputValue}
+                    onChange={onChangeUserInputValue}
+                  />
+                </GridListTile>
+              ) : (
+                answers.map(answerData => (
+                  <GridListTile key={answerData.id}>
+                    {answerData.id === 'input' &&
+                    userInputValue !== undefined &&
+                    onChangeUserInputValue ? (
+                      <FreeAnswer
+                        answerData={answerData}
+                        i18n={i18n}
+                        onSelect={onSelectAnswer}
+                        selected={selectedAnswers.includes(answerData.id)}
+                        showCheckbox={!!multi}
+                        onClickSend={onClickSend}
+                        value={userInputValue}
+                        onChange={onChangeUserInputValue}
+                      />
+                    ) : (
+                      <Answer
+                        answerData={answerData}
+                        i18n={i18n}
+                        onSelect={onSelectAnswer}
+                        selected={selectedAnswers.includes(answerData.id)}
+                        showCheckbox={!!multi}
+                      />
+                    )}
+                  </GridListTile>
+                ))
+              )}
+            </GridList>
+            {showNextButton && (
+              <Line justifyContent="flex-end">
+                <RaisedButton
+                  primary
+                  label={i18n._(t`Next`)}
+                  onClick={onClickNext}
+                  disabled={
+                    selectedAnswers.length === 0 ||
+                    (selectedAnswers.length === 1 &&
+                      selectedAnswers[0] === 'input' &&
+                      !userInputValue)
+                  }
+                />
+              </Line>
+            )}
+          </div>
+        )}
+      </I18n>
+    );
+  }
+);
 
 export default UserSurveyQuestion;

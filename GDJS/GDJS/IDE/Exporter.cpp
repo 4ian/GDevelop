@@ -132,11 +132,11 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     auto projectUsedResources =
         gd::UsedResourcesFinder::FindProjectUsedResources(exportedProject);
-    std::vector<std::set<gd::String>> layersUsedResources;
+    std::vector<std::set<gd::String>> scenesUsedResources;
     for (std::size_t layoutIndex = 0;
          layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
       auto &layout = exportedProject.GetLayout(layoutIndex);
-      layersUsedResources.push_back(
+      scenesUsedResources.push_back(
           gd::UsedResourcesFinder::FindLayoutUsedResources(exportedProject,
                                                             layout));
     }
@@ -149,7 +149,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     gd::SerializerElement noRuntimeGameOptions;
     helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
                              noRuntimeGameOptions, projectUsedResources,
-                             layersUsedResources);
+                             scenesUsedResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     // Export a WebManifest with project metadata

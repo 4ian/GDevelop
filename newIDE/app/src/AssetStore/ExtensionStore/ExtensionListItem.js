@@ -53,13 +53,10 @@ export const ExtensionListItem = ({
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
-  React.useLayoutEffect(
-    () => {
-      if (containerRef.current)
-        onHeightComputed(containerRef.current.getBoundingClientRect().height);
-    },
-    [onHeightComputed]
-  );
+  React.useLayoutEffect(() => {
+    if (containerRef.current)
+      onHeightComputed(containerRef.current.getBoundingClientRect().height);
+  });
 
   const renderExtensionField = (field: 'shortDescription' | 'fullName') => {
     const originalField = extensionShortHeader[field];

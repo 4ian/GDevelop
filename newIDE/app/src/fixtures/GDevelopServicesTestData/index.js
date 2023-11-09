@@ -507,6 +507,36 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticationError: null,
   badges: null,
   cloudProjects: null,
+  recommendations: [
+    {
+      type: 'gdevelop-tutorial',
+      id: 'playlist-get-started',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'gdevelop-teaching-kids',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'tween-behavior',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'wiki-play-music-and-sounds',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'wiki-prefabs',
+    },
+    {
+      type: 'guided-lessons',
+      filter: ['healthBar', 'timer', 'plinkoMultiplier'],
+    },
+    {
+      type: 'plan',
+      id: 'gold',
+    }
+  ],
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,

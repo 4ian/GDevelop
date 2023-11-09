@@ -1,22 +1,19 @@
 namespace gdjs {
-  declare var rbush: any;
-  type SearchArea = { minX: float; minY: float; maxX: float; maxY: float };
-
   // TODO Do something like BehaviorRBushAABB
   // TODO Allow to use getVisibilityAABB or getAABB
   export class ObjectManager {
     private _allInstances: Array<RuntimeObject> = [];
     private _awakeInstances: Array<RuntimeObject> = [];
-    private _rbush: any;
+    private _rbush: RBush<RuntimeObject>;
 
     constructor() {
-      this._rbush = new rbush();
+      this._rbush = new RBush<RuntimeObject>();
     }
 
     _destroy(): void {
       this._allInstances = [];
       this._awakeInstances = [];
-      this._rbush = null;
+      this._rbush.clear();
     }
 
     search(
@@ -35,7 +32,7 @@ namespace gdjs {
     }
 
     private _onWakingUp(object: RuntimeObject): void {
-      this._rbush.remove(object);
+      this._rbush.remove(object._rtreeAABB);
       this._awakeInstances.push(object);
     }
 
@@ -45,11 +42,11 @@ namespace gdjs {
         (object: RuntimeObject) => object.getSpatialSearchSleepState(),
         (object: RuntimeObject) => {
           const objectAABB = object.getAABB();
-          object.minX = objectAABB.min[0];
-          object.minY = objectAABB.min[1];
-          object.maxX = objectAABB.max[0];
-          object.maxY = objectAABB.max[1];
-          this._rbush.insert(object);
+          object._rtreeAABB.minX = objectAABB.min[0];
+          object._rtreeAABB.minY = objectAABB.min[1];
+          object._rtreeAABB.maxX = objectAABB.max[0];
+          object._rtreeAABB.maxY = objectAABB.max[1];
+          this._rbush.insert(object._rtreeAABB);
         }
       );
     }
@@ -98,7 +95,7 @@ namespace gdjs {
         }
       }
       if (!isAwake) {
-        this._rbush.remove(object);
+        this._rbush.remove(object._rtreeAABB);
       }
       return isObjectDeleted;
     }

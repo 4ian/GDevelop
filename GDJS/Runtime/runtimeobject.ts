@@ -195,12 +195,7 @@ namespace gdjs {
     protected hitBoxesDirty: boolean = true;
     // TODO use a different AABB for collision mask and rendered image.
     protected aabb: AABB = { min: [0, 0], max: [0, 0] };
-
-    // TODO
-    minX = 0;
-    minY = 0;
-    maxX = 0;
-    maxY = 0;
+    _rtreeAABB: SearchedItem<RuntimeObject>;
 
     protected _isIncludedInParentCollisionMask = true;
 
@@ -261,6 +256,13 @@ namespace gdjs {
       this._lifecycleSleepState = new gdjs.ObjectSleepState(this, () =>
         this.isNeedingLifecycleFunctions()
       );
+      this._rtreeAABB = {
+        source: this,
+        minX: 0,
+        minY: 0,
+        maxX: 0,
+        maxY: 0,
+      };
       this._spatialSearchSleepState = new gdjs.ObjectSleepState(
         this,
         () => false

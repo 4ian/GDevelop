@@ -3,7 +3,7 @@
  * Copyright 2008-2023 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "UsedResourcesFinder.h"
+#include "SceneResourcesFinder.h"
 
 #include "GDCore/IDE/ResourceExposer.h"
 #include "GDCore/Project/Layout.h"
@@ -12,20 +12,20 @@
 
 namespace gd {
 
-std::set<gd::String> UsedResourcesFinder::FindProjectUsedResources(gd::Project &project) {
-  gd::UsedResourcesFinder resourceWorker;
+std::set<gd::String> SceneResourcesFinder::FindProjectResources(gd::Project &project) {
+  gd::SceneResourcesFinder resourceWorker;
   gd::ResourceExposer::ExposeProjectResources(project, resourceWorker);
   return resourceWorker.resourceNames;
 }
 
-std::set<gd::String> UsedResourcesFinder::FindLayoutUsedResources(gd::Project &project,
+std::set<gd::String> SceneResourcesFinder::FindSceneResources(gd::Project &project,
     gd::Layout &layout) {
-  gd::UsedResourcesFinder resourceWorker;
+  gd::SceneResourcesFinder resourceWorker;
   gd::ResourceExposer::ExposeLayoutResources(project, layout, resourceWorker);
   return resourceWorker.resourceNames;
 }
 
-void UsedResourcesFinder::AddUsedResource(gd::String &resourceName) {
+void SceneResourcesFinder::AddUsedResource(gd::String &resourceName) {
   if (resourceName.empty()) {
     return;
   }

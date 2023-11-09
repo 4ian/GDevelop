@@ -15,6 +15,7 @@
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
+#include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -27,7 +28,6 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/IDE/ExporterHelper.h"
-#include "GDJS/IDE/UsedResourcesFinder.h"
 
 #undef CopyFile  // Disable an annoying macro
 
@@ -131,13 +131,13 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     }
 
     auto projectUsedResources =
-        gd::UsedResourcesFinder::FindProjectUsedResources(exportedProject);
+        gd::SceneResourcesFinder::FindProjectResources(exportedProject);
     std::vector<std::set<gd::String>> scenesUsedResources;
     for (std::size_t layoutIndex = 0;
          layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
       auto &layout = exportedProject.GetLayout(layoutIndex);
       scenesUsedResources.push_back(
-          gd::UsedResourcesFinder::FindLayoutUsedResources(exportedProject,
+          gd::SceneResourcesFinder::FindSceneResources(exportedProject,
                                                             layout));
     }
 

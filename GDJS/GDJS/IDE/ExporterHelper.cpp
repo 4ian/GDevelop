@@ -26,6 +26,7 @@
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
+#include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/EventsBasedObject.h"
@@ -42,7 +43,6 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
-#include "GDJS/IDE/UsedResourcesFinder.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
@@ -189,13 +189,13 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   auto projectUsedResources =
-      gd::UsedResourcesFinder::FindProjectUsedResources(exportedProject);
+      gd::SceneResourcesFinder::FindProjectResources(exportedProject);
   std::vector<std::set<gd::String>> scenesUsedResources;
   for (std::size_t layoutIndex = 0;
        layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
     auto &layout = exportedProject.GetLayout(layoutIndex);
     scenesUsedResources.push_back(
-        gd::UsedResourcesFinder::FindLayoutUsedResources(exportedProject,
+        gd::SceneResourcesFinder::FindSceneResources(exportedProject,
                                                           layout));
   }
 
@@ -302,9 +302,9 @@ void ExporterHelper::SerializeUsedResources(
       [](gd::SerializerElement &element,
          std::set<gd::String> &usedResources) -> void {
     auto &resourcesElement = element.AddChild("usedResources");
-    resourcesElement.ConsiderAsArrayOf("resource");
+    resourcesElement.ConsiderAsArrayOf("resourceReference");
     for (auto &resourceName : usedResources) {
-      auto &resourceElement = resourcesElement.AddChild("resource");
+      auto &resourceElement = resourcesElement.AddChild("resourceReference");
       resourceElement.SetAttribute("name", resourceName);
     }
   };

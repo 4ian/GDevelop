@@ -24,27 +24,27 @@ namespace gd {
  *
  * \ingroup IDE
  */
-class UsedResourcesFinder : private gd::ArbitraryResourceWorker {
+class SceneResourcesFinder : private gd::ArbitraryResourceWorker {
 public:
   /**
-   * @brief Find resource usages in a given layout.
+   * @brief Find resource usages in a given scenes.
    *
    * It doesn't include resources used globally.
    */
-  static std::set<gd::String> FindLayoutUsedResources(gd::Project &project,
+  static std::set<gd::String> FindSceneResources(gd::Project &project,
                                                       gd::Layout &layout);
 
   /**
    * @brief Find resource that are used globally in the project.
    *
-   * It doesn't include resources used in layouts.
+   * It doesn't include resources used in scenes.
    */
-  static std::set<gd::String> FindProjectUsedResources(gd::Project &project);
+  static std::set<gd::String> FindProjectResources(gd::Project &project);
 
-  virtual ~UsedResourcesFinder(){};
+  virtual ~SceneResourcesFinder(){};
 
 private:
-  UsedResourcesFinder() : gd::ArbitraryResourceWorker(){};
+  SceneResourcesFinder() : gd::ArbitraryResourceWorker(){};
 
   void AddUsedResource(gd::String &resourceName);
 

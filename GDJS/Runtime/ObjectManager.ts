@@ -20,15 +20,23 @@ namespace gdjs {
       searchArea: SearchArea,
       results: Array<RuntimeObject>
     ): Array<RuntimeObject> {
-      if (this._allInstances.length < 8) {
-        return this._allInstances;
+      let instances = this._allInstances;
+      if (instances.length >= 8) {
+        this._rbush.search(searchArea, results);
+        instances = this._awakeInstances;
       }
-      const nearbyObjects: Array<RuntimeObject> = this._rbush.search(
-        searchArea,
-        results
-      );
-      nearbyObjects.push.apply(nearbyObjects, this._awakeInstances);
-      return nearbyObjects;
+      for (const instance of instances) {
+        const aabb = instance.getAABB();
+        if (
+          aabb.min[0] <= searchArea.maxX &&
+          aabb.max[0] >= searchArea.minX &&
+          aabb.min[1] <= searchArea.maxY &&
+          aabb.max[1] >= searchArea.minY
+        ) {
+          results.push(instance);
+        }
+      }
+      return results;
     }
 
     private _onWakingUp(object: RuntimeObject): void {
@@ -68,7 +76,6 @@ namespace gdjs {
         .getSpatialSearchSleepState()
         .registerOnWakingUp((object) => this._onWakingUp(object));
       this._allInstances.push(object);
-      this._awakeInstances.push(object);
     }
 
     /**

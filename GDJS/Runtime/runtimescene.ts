@@ -518,66 +518,84 @@ namespace gdjs {
         }
       }
       if (this._timeManager.isFirstFrame()) {
-        super._updateObjectsPreRender();
-        return;
-      } else {
-        // After first frame, optimise rendering by setting only objects
-        // near camera as visible.
-        // TODO: For compatibility, pass a scale of `2`,
-        // meaning that size of cameras will be multiplied by 2 and so objects
-        // will be hidden if they are outside of this *larger* camera area.
-        // This is useful for:
-        // - objects not properly reporting their visibility AABB,
-        // (so we have a "safety margin") but these objects should be fixed
-        // instead.
-        // - objects having effects rendering outside of their visibility AABB.
-
-        // TODO (3D) culling - add support for 3D object culling?
         this._updateLayersCameraCoordinates(2);
-        for (const layerName in this._cameraObjects) {
-          for (const object of this._cameraObjects[layerName]) {
+        if (this._frameIndex === 2) {
+          const allInstancesList = this.getAdhocListOfAllInstances();
+          for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+            const object = allInstancesList[i];
             const rendererObject = object.getRendererObject();
             if (rendererObject) {
               rendererObject.visible = false;
             }
           }
         }
-        for (const layerName in this._layers.items) {
-          const cameraAABB = this._layersCameraCoordinates[layerName];
-          let cameraObjects = this._cameraObjects[layerName];
-          if (cameraObjects === undefined) {
-            cameraObjects = [];
-            this._cameraObjects[layerName] = cameraObjects;
-          }
-          if (!cameraAABB) {
-            continue;
-          }
-          const layerObjectManager = this._layerObjectManagers.get(layerName);
-          if (!layerObjectManager) {
-            continue;
-          }
-          cameraObjects.length = 0;
-          layerObjectManager.search(cameraAABB, cameraObjects);
-          for (const object of cameraObjects) {
-            const rendererObject = object.getRendererObject();
-            if (rendererObject) {
-              rendererObject.visible = !object.isHidden();
+      }
+      // After first frame, optimise rendering by setting only objects
+      // near camera as visible.
+      // TODO: For compatibility, pass a scale of `2`,
+      // meaning that size of cameras will be multiplied by 2 and so objects
+      // will be hidden if they are outside of this *larger* camera area.
+      // This is useful for:
+      // - objects not properly reporting their visibility AABB,
+      // (so we have a "safety margin") but these objects should be fixed
+      // instead.
+      // - objects having effects rendering outside of their visibility AABB.
 
-              // Update effects, only for visible objects.
-              if (rendererObject.visible) {
-                this._runtimeGame
-                  .getEffectsManager()
-                  .updatePreRender(object.getRendererEffects(), object);
+      // TODO (3D) culling - add support for 3D object culling?
+      this._updateLayersCameraCoordinates(2);
+      if (this._frameIndex === 2) {
+        const allInstancesList = this.getAdhocListOfAllInstances();
+        for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+          const object = allInstancesList[i];
+          const rendererObject = object.getRendererObject();
+          if (rendererObject) {
+            rendererObject.visible = false;
+          }
+        }
+      }
+      for (const layerName in this._cameraObjects) {
+        for (const object of this._cameraObjects[layerName]) {
+          const rendererObject = object.getRendererObject();
+          if (rendererObject) {
+            rendererObject.visible = false;
+          }
+        }
+      }
+      for (const layerName in this._layers.items) {
+        const cameraAABB = this._layersCameraCoordinates[layerName];
+        let cameraObjects = this._cameraObjects[layerName];
+        if (cameraObjects === undefined) {
+          cameraObjects = [];
+          this._cameraObjects[layerName] = cameraObjects;
+        }
+        if (!cameraAABB) {
+          continue;
+        }
+        const layerObjectManager = this._layerObjectManagers.get(layerName);
+        if (!layerObjectManager) {
+          continue;
+        }
+        cameraObjects.length = 0;
+        layerObjectManager.search(cameraAABB, cameraObjects);
+        for (const object of cameraObjects) {
+          const rendererObject = object.getRendererObject();
+          if (rendererObject) {
+            rendererObject.visible = !object.isHidden();
 
-                // Perform pre-render update only if the object is visible
-                // (including if there is no visibility AABB returned previously).
-                object.updatePreRender(this);
-              }
-            } else {
-              // Perform pre-render update, always for objects not having an
-              // associated renderer object (so it must handle visibility on its own).
+            // Update effects, only for visible objects.
+            if (rendererObject.visible) {
+              this._runtimeGame
+                .getEffectsManager()
+                .updatePreRender(object.getRendererEffects(), object);
+
+              // Perform pre-render update only if the object is visible
+              // (including if there is no visibility AABB returned previously).
               object.updatePreRender(this);
             }
+          } else {
+            // Perform pre-render update, always for objects not having an
+            // associated renderer object (so it must handle visibility on its own).
+            object.updatePreRender(this);
           }
         }
       }

@@ -45,7 +45,6 @@ export const setupResourcesWatcher =
           // TODO: Is it safe to let it like that since the OS could for some reason
           // do never-ending operations on the folder or its children, making the debounce
           // never ending.
-          console.log('CHANGE', path);
           debouncedCallback(path);
         });
         const ignore = [
@@ -55,11 +54,9 @@ export const setupResourcesWatcher =
           path.join(folderPath, autosaveFile),
         ];
         if (options && options.isProjectSplitInMultipleFiles) {
-          console.log('IGNORE');
           ignore.push(
-            `${folderPath}/(layouts|externalLayouts|externalEvents|eventsFunctionsExtensions)/*json`
+            `**/{layouts,externalLayouts,externalEvents,eventsFunctionsExtensions}/*.json`
           );
-          console.log(ignore);
         }
         const subscriptionIdPromise = ipcRenderer.invoke(
           'local-filesystem-watcher-setup',

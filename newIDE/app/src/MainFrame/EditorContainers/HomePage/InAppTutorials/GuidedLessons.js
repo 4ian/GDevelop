@@ -70,10 +70,11 @@ const styles = {
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
-  filter?: ?Array<string>,
+  /** To use to restrict the lessons that are displayed. */
+  lessonsIds?: ?Array<string>,
 |};
 
-const GuidedLessons = ({ selectInAppTutorial, filter }: Props) => {
+const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
   const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,
@@ -174,7 +175,7 @@ const GuidedLessons = ({ selectInAppTutorial, filter }: Props) => {
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
     },
-  ].filter(item => (filter ? filter.includes(item.id) : true));
+  ].filter(item => (lessonsIds ? lessonsIds.includes(item.id) : true));
 
   return (
     <Line>
@@ -190,7 +191,7 @@ const GuidedLessons = ({ selectInAppTutorial, filter }: Props) => {
           <PlaceholderLoader />
         ) : (
           <ColumnStackLayout noMargin>
-            {!filter && (
+            {!lessonsIds && (
               <Column>
                 <LineStackLayout alignItems="center">
                   {lessonsProgress !== 100 ? (

@@ -45,7 +45,7 @@ const planDetailsById = {
       <Trans>Unlock GDevelop's features to build more and faster.</Trans>
     ),
     image: planImages.individual,
-    link: 'https://gdevelop.io/fr-fr/pricing/individual',
+    link: 'https://gdevelop.io/pricing/individual',
   },
   gold: {
     title: <Trans>GDevelop's Gold plan</Trans>,
@@ -53,7 +53,7 @@ const planDetailsById = {
       <Trans>Unlock GDevelop's features to build more and faster.</Trans>
     ),
     image: planImages.individual,
-    link: 'https://gdevelop.io/fr-fr/pricing/individual',
+    link: 'https://gdevelop.io/pricing/individual',
   },
   education: {
     title: <Trans>GDevelop's Education plan</Trans>,
@@ -63,7 +63,7 @@ const planDetailsById = {
       </Trans>
     ),
     image: planImages.education,
-    link: 'https://gdevelop.io/fr-fr/pricing/education',
+    link: 'https://gdevelop.io/pricing/education',
   },
   startup: {
     title: <Trans>GDevelop's Startup plan</Trans>,
@@ -73,7 +73,7 @@ const planDetailsById = {
       </Trans>
     ),
     image: planImages.professional,
-    link: 'https://gdevelop.io/fr-fr/pricing/business',
+    link: 'https://gdevelop.io/pricing/business',
   },
   business: {
     title: <Trans>GDevelop's Business plan</Trans>,
@@ -83,7 +83,7 @@ const planDetailsById = {
       </Trans>
     ),
     image: planImages.professional,
-    link: 'https://gdevelop.io/fr-fr/pricing/business',
+    link: 'https://gdevelop.io/pricing/business',
   },
 };
 

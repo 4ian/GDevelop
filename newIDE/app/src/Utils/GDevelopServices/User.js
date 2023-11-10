@@ -104,7 +104,7 @@ export type PlanRecommendation = {|
 |};
 export type GuidedLessonsRecommendation = {|
   type: 'guided-lessons',
-  filter?: string[],
+  lessonsIds?: string[],
 |};
 export type Recommendation =
   | GDevelopTutorialRecommendation

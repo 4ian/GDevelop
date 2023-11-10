@@ -110,7 +110,6 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
       </Column>
       <GridList
         cols={getTextTutorialsColumnsFromWidth(windowWidth)}
-        // style={styles.grid}
         cellHeight="auto"
         spacing={10}
       >
@@ -174,8 +173,8 @@ const RecommendationList = ({
   const guidedLessonsRecommendation: ?GuidedLessonsRecommendation = recommendations.find(
     recommendation => recommendation.type === 'guided-lessons'
   );
-  const guidedLessonsFilter = guidedLessonsRecommendation
-    ? guidedLessonsRecommendation.filter
+  const guidedLessonsIds = guidedLessonsRecommendation
+    ? guidedLessonsRecommendation.lessonsIds
     : null;
 
   // $FlowIgnore
@@ -214,8 +213,8 @@ const RecommendationList = ({
           );
         }
         if (guidedLessonsRecommendation) {
-          const displayTextAfterGuidedLessons = guidedLessonsFilter
-            ? guidedLessonsFilter
+          const displayTextAfterGuidedLessons = guidedLessonsIds
+            ? guidedLessonsIds
                 .map(tutorialId => getTutorialPartProgress({ tutorialId }))
                 .every(progress => progress === 100)
             : false;
@@ -232,7 +231,7 @@ const RecommendationList = ({
               </Text>
               <GuidedLessons
                 selectInAppTutorial={selectInAppTutorial}
-                filter={guidedLessonsFilter}
+                lessonsIds={guidedLessonsIds}
               />
               {displayTextAfterGuidedLessons && (
                 <Text>

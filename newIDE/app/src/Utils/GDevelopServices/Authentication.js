@@ -79,12 +79,6 @@ export type PatchUserPayload = {
   +donateLink?: string,
   +communityLinks?: CommunityLinks,
   +survey?: UserSurvey,
-  +gdevelopUsage?: string,
-  +teamOrCompanySize?: string,
-  +companyName?: string,
-  +creationExperience?: string,
-  +creationGoal?: string,
-  +hearFrom?: string,
 };
 
 export type ChangeEmailForm = {|
@@ -328,12 +322,6 @@ export default class Authentication {
       donateLink,
       communityLinks,
       survey,
-      gdevelopUsage,
-      teamOrCompanySize,
-      companyName,
-      creationExperience,
-      creationGoal,
-      hearFrom,
     }: PatchUserPayload
   ) => {
     const { currentUser } = this.auth;
@@ -354,12 +342,6 @@ export default class Authentication {
             donateLink,
             communityLinks,
             survey,
-            gdevelopUsage,
-            teamOrCompanySize,
-            companyName,
-            creationExperience,
-            creationGoal,
-            hearFrom,
           },
           {
             params: {

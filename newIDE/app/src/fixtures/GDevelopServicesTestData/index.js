@@ -530,7 +530,7 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
     },
     {
       type: 'guided-lessons',
-      filter: ['healthBar', 'timer', 'plinkoMultiplier'],
+      lessonsIds: ['healthBar', 'timer', 'plinkoMultiplier'],
     },
     {
       type: 'plan',

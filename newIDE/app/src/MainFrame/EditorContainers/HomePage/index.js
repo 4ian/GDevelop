@@ -287,18 +287,21 @@ export const HomePage = React.memo<Props>(
         [authenticated, activeTab]
       );
 
+      const shouldDisplayAnnouncements =
+        activeTab !== 'community' &&
+        activeTab !== 'get-started' &&
+        activeTab !== 'build' &&
+        !!announcements;
+
       return (
         <I18n>
           {({ i18n }) => (
             <TeamProvider>
               <div style={isMobile ? styles.mobileContainer : styles.container}>
                 <div style={styles.scrollableContainer}>
-                  {activeTab !== 'community' &&
-                    activeTab !== 'get-started' &&
-                    activeTab !== 'build' &&
-                    !!announcements && (
-                      <AnnouncementsFeed canClose level="urgent" addMargins />
-                    )}
+                  {shouldDisplayAnnouncements && (
+                    <AnnouncementsFeed canClose level="urgent" addMargins />
+                  )}
                   {activeTab === 'get-started' && (
                     <GetStartedSection
                       showUserChip={setShowUserChip}

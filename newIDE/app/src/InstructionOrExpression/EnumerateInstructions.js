@@ -225,7 +225,7 @@ const enumerateInstruction = (
   ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
-  const groupName = i18n._(instrMetadata.getGroup());
+  const groupName = i18n ? i18n._(instrMetadata.getGroup()) : instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
   const fullGroupName = ignoresGroups
     ? prefix

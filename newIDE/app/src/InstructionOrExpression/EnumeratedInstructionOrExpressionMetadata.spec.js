@@ -17,8 +17,7 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
       enumerateAllInstructions(false, makeFakeI18n()),
-      { project, layout },
-      makeFakeI18n()
+      { project, layout }
     );
 
     expect(instructions.length).toBeGreaterThan(0);
@@ -48,7 +47,6 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
         eventsFunctionsExtension,
         eventsFunction,
       },
-      makeFakeI18n()
     );
 
     expect(instructions.length).toBeGreaterThan(0);

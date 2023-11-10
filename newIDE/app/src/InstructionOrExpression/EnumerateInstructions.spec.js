@@ -16,7 +16,11 @@ const makeFakeI18n = (fakeI18n): I18nType => ({
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
-    const instructions = enumerateAllInstructions(true, makeFakeI18n());
+    const instructions = enumerateAllInstructions(
+      true,
+      // $FlowFixMe The fake I18n translates groups to empty strings.
+      null
+    );
 
     // Test for the proper presence of a few conditions
     expect(
@@ -64,7 +68,11 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can enumerate instructions being actions', () => {
-    const instructions = enumerateAllInstructions(false, makeFakeI18n());
+    const instructions = enumerateAllInstructions(
+      false,
+      // $FlowFixMe The fake I18n translates groups to empty strings.
+      null
+    );
 
     // Test for the proper presence of a few actions
     expect(instructions).toEqual(

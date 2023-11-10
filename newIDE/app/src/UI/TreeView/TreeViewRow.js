@@ -79,6 +79,7 @@ const SemiControlledRowInput = ({
         type="text"
         className="item-name-input"
         value={value}
+        spellCheck={false}
         onChange={e => {
           setValue(e.currentTarget.value);
         }}

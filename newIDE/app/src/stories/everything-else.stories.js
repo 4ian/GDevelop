@@ -37,8 +37,6 @@ import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
-import CreateProfile from '../Profile/CreateProfile';
-import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfileDetails';
 import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import {
   subscriptionForIndieUser,
@@ -47,8 +45,6 @@ import {
   limitsForSilverUser,
   limitsReached,
   noSubscription,
-  fakeSilverAuthenticatedUser,
-  fakeAuthenticatedUserLoggingIn,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -2526,16 +2522,6 @@ storiesOf('Changelog', module)
     <ChangelogDialog open onClose={action('close dialog')} />
   ));
 
-storiesOf('Profile/CreateProfile', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <CreateProfile
-      onOpenLoginDialog={action('onOpenLoginDialog')}
-      onOpenCreateAccountDialog={action('onOpenCreateAccountDialog')}
-    />
-  ));
-
 storiesOf('CurrentUsageDisplayer', module)
   .addDecorator(subscriptionSuggestionDecorator)
   .addDecorator(paperDecorator)
@@ -2573,24 +2559,6 @@ storiesOf('CurrentUsageDisplayer', module)
       subscription={noSubscription}
       currentUsage={limitsReached.limits['cordova-build']}
       onChangeSubscription={action('on change subscription callback')}
-    />
-  ));
-
-storiesOf('AuthenticatedUserProfileDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('profile', () => (
-    <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onOpenEditProfileDialog={action('edit profile')}
-      onOpenChangeEmailDialog={action('change email')}
-    />
-  ))
-  .add('loading', () => (
-    <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeAuthenticatedUserLoggingIn}
-      onOpenEditProfileDialog={action('edit profile')}
-      onOpenChangeEmailDialog={action('change email')}
     />
   ));
 

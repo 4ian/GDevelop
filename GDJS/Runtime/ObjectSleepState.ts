@@ -13,7 +13,8 @@ namespace gdjs {
     constructor(object: RuntimeObject, isNeedingToBeAwake: () => boolean) {
       this._object = object;
       this._isNeedingToBeAwake = isNeedingToBeAwake;
-      this._lastActivityFrameIndex = Number.MIN_SAFE_INTEGER;
+      // TODO Objects should have a chance to sleep at the 1st frame.
+      this._lastActivityFrameIndex = 0;
     }
 
     _forceToSleep(): void {

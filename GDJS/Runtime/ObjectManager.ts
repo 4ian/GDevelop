@@ -72,10 +72,10 @@ namespace gdjs {
      * @param obj The object to be added.
      */
     addObject(object: gdjs.RuntimeObject): void {
+      this._allInstances.push(object);
       object
         .getSpatialSearchSleepState()
         .registerOnWakingUp((object) => this._onWakingUp(object));
-      this._allInstances.push(object);
     }
 
     /**

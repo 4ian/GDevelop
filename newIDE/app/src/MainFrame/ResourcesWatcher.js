@@ -19,23 +19,33 @@ const useResourcesWatcher = ({
   const {
     values: { watchProjectFolderFilesForLocalProjects },
   } = React.useContext(PreferencesContext);
+  // Whole fileMetadata object is not used because lastModifiedDate changes on save
+  // thus triggering the effect.
+  const fileIdentifier = fileMetadata ? fileMetadata.fileIdentifier : null;
+
+  // Callbacks are extracted from editorTabs to avoid redefining informEditorsResourceExternallyChanged
+  // thus triggering the effect on each active tab change (stored in editorTabs).
+  const callbacks = React.useMemo(
+    () =>
+      editorTabs.editors
+        .map(
+          editorTab =>
+            editorTab.editorRef &&
+            editorTab.editorRef.editor &&
+            // Each editor container has an accessible editor property.
+            // $FlowFixMe[prop-missing]
+            editorTab.editorRef.editor.onResourceExternallyChanged
+        )
+        .filter(Boolean),
+    [editorTabs.editors]
+  );
 
   const informEditorsResourceExternallyChanged = React.useCallback(
     (resourceInfo: {| identifier: string |}) => {
       ResourcesLoader.burstAllUrlsCache();
-      editorTabs.editors.forEach(editorTab => {
-        if (
-          editorTab.editorRef &&
-          editorTab.editorRef.editor &&
-          editorTab.editorRef.editor.onResourceExternallyChanged
-        ) {
-          // Each editor container has an accessible editor property.
-          // $FlowFixMe[not-a-function]
-          editorTab.editorRef.editor.onResourceExternallyChanged(resourceInfo);
-        }
-      });
+      callbacks.forEach(callback => callback(resourceInfo));
     },
-    [editorTabs]
+    [callbacks]
   );
 
   React.useEffect(
@@ -47,9 +57,9 @@ const useResourcesWatcher = ({
       ) {
         return;
       }
-      if (fileMetadata && storageProvider.setupResourcesWatcher) {
+      if (fileIdentifier && storageProvider.setupResourcesWatcher) {
         const unsubscribe = storageProvider.setupResourcesWatcher({
-          fileMetadata,
+          fileIdentifier,
           callback: informEditorsResourceExternallyChanged,
           options: {
             isProjectSplitInMultipleFiles,
@@ -59,7 +69,7 @@ const useResourcesWatcher = ({
       }
     },
     [
-      fileMetadata,
+      fileIdentifier,
       informEditorsResourceExternallyChanged,
       getStorageProvider,
       watchProjectFolderFilesForLocalProjects,

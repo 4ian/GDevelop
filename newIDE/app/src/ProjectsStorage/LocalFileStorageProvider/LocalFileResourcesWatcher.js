@@ -1,6 +1,5 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
-import { type FileMetadata } from '..';
 import debounce from 'lodash/debounce';
 import wrap from 'lodash/wrap';
 import memoize from 'lodash/memoize';
@@ -12,11 +11,11 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 export const setupResourcesWatcher =
   ipcRenderer && path
     ? ({
-        fileMetadata,
+        fileIdentifier,
         callback,
         options,
       }: {
-        fileMetadata: FileMetadata,
+        fileIdentifier: string,
         callback: ({| identifier: string |}) => void,
         options?: {| isProjectSplitInMultipleFiles: boolean |},
       }) => {
@@ -39,8 +38,8 @@ export const setupResourcesWatcher =
           ),
           (getMemoizedFunc, obj) => getMemoizedFunc(obj)(obj)
         );
-        const folderPath = path.dirname(fileMetadata.fileIdentifier);
-        const gameFile = path.basename(fileMetadata.fileIdentifier);
+        const folderPath = path.dirname(fileIdentifier);
+        const gameFile = path.basename(fileIdentifier);
         const autosaveFile = gameFile + '.autosave';
         ipcRenderer.on('project-file-changed', (event, path) => {
           // TODO: Is it safe to let it like that since the OS could for some reason

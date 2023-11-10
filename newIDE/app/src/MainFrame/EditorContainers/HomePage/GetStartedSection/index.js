@@ -25,6 +25,7 @@ import CreateAccountForm from '../../../../Profile/CreateAccountForm';
 import LoginForm from '../../../../Profile/LoginForm';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RecommendationList from './RecommendationList';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 const styles = {
   icon: {

@@ -263,107 +263,107 @@ module.exports = {
 
     /**
      * Renderer for instances of LightObject inside the IDE.
-     *
-     * @extends RenderedInstance
-     * @class RenderedLightObjectInstance
-     * @constructor
      */
-    function RenderedLightObjectInstance(
-      project,
-      layout,
-      instance,
-      associatedObjectConfiguration,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedLightObjectInstance extends RenderedInstance {
+      constructor(
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
-      this._radius = parseFloat(
-        this._associatedObjectConfiguration
-          .getProperties(this.project)
-          .get('radius')
-          .getValue()
-      );
-      if (this._radius <= 0) this._radius = 1;
-      const color = objectsRenderingService.rgbOrHexToHexNumber(
-        this._associatedObjectConfiguration
-          .getProperties(this.project)
-          .get('color')
-          .getValue()
-      );
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
+        this._radius = parseFloat(
+          this._associatedObjectConfiguration
+            .getProperties(this.project)
+            .get('radius')
+            .getValue()
+        );
+        if (this._radius <= 0) this._radius = 1;
+        const color = objectsRenderingService.rgbOrHexToHexNumber(
+          this._associatedObjectConfiguration
+            .getProperties(this.project)
+            .get('color')
+            .getValue()
+        );
 
-      // The icon in the middle.
-      const lightIconSprite = new PIXI.Sprite(PIXI.Texture.from('CppPlatform/Extensions/lightIcon32.png'));
-      lightIconSprite.anchor.x = 0.5;
-      lightIconSprite.anchor.y = 0.5;
+        // The icon in the middle.
+        const lightIconSprite = new PIXI.Sprite(PIXI.Texture.from('CppPlatform/Extensions/lightIcon32.png'));
+        lightIconSprite.anchor.x = 0.5;
+        lightIconSprite.anchor.y = 0.5;
 
-      // The circle to show the radius of the light.
-      const radiusBorderWidth = 2;
-      const radiusGraphics = new PIXI.Graphics();
-      radiusGraphics.lineStyle(
-        radiusBorderWidth,
-        color,
-        0.8
-      );
-      radiusGraphics.drawCircle(0, 0, Math.max(1, this._radius - radiusBorderWidth));
+        // The circle to show the radius of the light.
+        const radiusBorderWidth = 2;
+        const radiusGraphics = new PIXI.Graphics();
+        radiusGraphics.lineStyle(
+          radiusBorderWidth,
+          color,
+          0.8
+        );
+        radiusGraphics.drawCircle(0, 0, Math.max(1, this._radius - radiusBorderWidth));
 
-      this._pixiObject = new PIXI.Container();
-      this._pixiObject.addChild(lightIconSprite);
-      this._pixiObject.addChild(radiusGraphics);
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
+        this._pixiObject = new PIXI.Container();
+        this._pixiObject.addChild(lightIconSprite);
+        this._pixiObject.addChild(radiusGraphics);
+        this._pixiContainer.addChild(this._pixiObject);
+        this.update();
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        // Keep textures because they are shared by all sprites.
+        this._pixiObject.destroy({ children: true });
+      }
+
+      /**
+       * Return the path to the thumbnail of the specified object.
+       */
+      getThumbnail(
+        project,
+        resourcesLoader,
+        objectConfiguration
+      ) {
+        return 'CppPlatform/Extensions/lightIcon32.png';
+      }
+
+      /**
+       * This is called to update the PIXI object on the scene editor
+       */
+      update() {
+        this._pixiObject.position.x = this._instance.getX();
+        this._pixiObject.position.y = this._instance.getY();
+      }
+
+      /**
+       * Return the width of the instance, when it's not resized.
+       */
+      getDefaultWidth() {
+        return this._radius * 2;
+      }
+
+      /**
+       * Return the height of the instance, when it's not resized.
+       */
+      getDefaultHeight() {
+        return this._radius * 2;
+      }
+
+      getOriginX() {
+        return this._radius;
+      }
+
+      getOriginY() {
+        return this._radius;
+      }
     }
-    RenderedLightObjectInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
-
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedLightObjectInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      objectConfiguration
-    ) {
-      return 'CppPlatform/Extensions/lightIcon32.png';
-    };
-
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
-    RenderedLightObjectInstance.prototype.update = function () {
-      this._pixiObject.position.x = this._instance.getX();
-      this._pixiObject.position.y = this._instance.getY();
-    };
-
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedLightObjectInstance.prototype.getDefaultWidth = function () {
-      return this._radius * 2;
-    };
-
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedLightObjectInstance.prototype.getDefaultHeight = function () {
-      return this._radius * 2;
-    };
-
-    RenderedLightObjectInstance.prototype.getOriginX = function () {
-      return this._radius;
-    };
-
-    RenderedLightObjectInstance.prototype.getOriginY = function () {
-      return this._radius;
-    };
 
     objectsRenderingService.registerInstanceRenderer(
       'Lighting::LightObject',

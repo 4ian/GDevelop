@@ -50,6 +50,12 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     this.updatePIXITextureAndSprite();
   }
 
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    // Keep textures because they are shared by all sprites.
+    this._pixiObject.destroy(false);
+  }
+
   /**
    * Return a URL for thumbnail of the specified object.
    */

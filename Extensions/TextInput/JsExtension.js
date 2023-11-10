@@ -678,6 +678,12 @@ module.exports = {
         this.update();
       }
 
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiText.destroy(true);
+        this._pixiObject.destroy({ children: true });
+      }
+
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/text_input.svg';
       }

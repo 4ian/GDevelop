@@ -5,7 +5,6 @@ import {
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories.js';
-import { translateInstructionGroup } from '../Utils/Extension/InstructionGroups';
 
 const gd: libGDevelop = global.gd;
 
@@ -226,7 +225,7 @@ const enumerateInstruction = (
   ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
-  const groupName = translateInstructionGroup(instrMetadata.getGroup(), i18n);
+  const groupName = i18n._(instrMetadata.getGroup());
   const iconFilename = instrMetadata.getIconFilename();
   const fullGroupName = ignoresGroups
     ? prefix

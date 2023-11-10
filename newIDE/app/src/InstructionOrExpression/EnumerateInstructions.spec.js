@@ -8,13 +8,15 @@ import {
 } from './EnumerateInstructions';
 const gd: libGDevelop = global.gd;
 
+// $FlowExpectedError
+const makeFakeI18n = (fakeI18n): I18nType => ({
+  ...fakeI18n,
+  _: message => message.id,
+});
+
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
-    const instructions = enumerateAllInstructions(
-      true,
-      // $FlowFixMe
-      null
-    );
+    const instructions = enumerateAllInstructions(true, makeFakeI18n());
 
     // Test for the proper presence of a few conditions
     expect(
@@ -62,11 +64,7 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can enumerate instructions being actions', () => {
-    const instructions = enumerateAllInstructions(
-      false,
-      // $FlowFixMe
-      null
-    );
+    const instructions = enumerateAllInstructions(false, makeFakeI18n());
 
     // Test for the proper presence of a few actions
     expect(instructions).toEqual(
@@ -86,11 +84,7 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can create the tree of instructions', () => {
-    const instructions = enumerateAllInstructions(
-      true,
-      // $FlowFixMe
-      null
-    );
+    const instructions = enumerateAllInstructions(true, makeFakeI18n());
     const tree = createTree(instructions);
     expect(tree).toHaveProperty('Advanced');
     expect(tree).toHaveProperty('Audio');
@@ -117,16 +111,8 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can find the object parameter, if any', () => {
-    const actions = enumerateAllInstructions(
-      false,
-      // $FlowFixMe
-      null
-    );
-    const conditions = enumerateAllInstructions(
-      true,
-      // $FlowFixMe
-      null
-    );
+    const actions = enumerateAllInstructions(false, makeFakeI18n());
+    const conditions = enumerateAllInstructions(true, makeFakeI18n());
 
     const createInstruction = actions.filter(
       ({ type }) => type === 'Create'
@@ -168,8 +154,7 @@ describe('EnumerateInstructions', () => {
       project,
       layout,
       'MySpriteObject',
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     expect(spriteInstructions).toEqual(
       expect.arrayContaining([

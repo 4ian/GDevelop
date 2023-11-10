@@ -11,13 +11,15 @@ import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata';
 const gd: libGDevelop = global.gd;
 
+// $FlowExpectedError
+const makeFakeI18n = (fakeI18n): I18nType => ({
+  ...fakeI18n,
+  _: message => message.id,
+});
+
 describe('EnumerateExpressions', () => {
   it('can enumerate and filter free expressions (number only)', () => {
-    const freeExpressions = enumerateFreeExpressions(
-      'number',
-      // $FlowFixMe
-      null
-    );
+    const freeExpressions = enumerateFreeExpressions('number', makeFakeI18n());
 
     // Should find atan, atan2, atanh math function
     expect(filterExpressions(freeExpressions, 'atan')).toHaveLength(3);
@@ -30,11 +32,7 @@ describe('EnumerateExpressions', () => {
   });
 
   it('can enumerate and filter free expressions', () => {
-    const freeExpressions = enumerateFreeExpressions(
-      'string',
-      // $FlowFixMe
-      null
-    );
+    const freeExpressions = enumerateFreeExpressions('string', makeFakeI18n());
 
     // Should find ToString and LargeNumberToString:
     expect(filterExpressions(freeExpressions, 'ToString')).toHaveLength(2);
@@ -160,8 +158,7 @@ describe('EnumerateExpressions', () => {
     makeTestExtensions(gd);
     const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'number',
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     // Check a free expression:
     expect(allNumberExpressions).toContainEqual(
@@ -190,8 +187,7 @@ describe('EnumerateExpressions', () => {
     makeTestExtensions(gd);
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'string',
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     // Check a free expression:
     expect(allExpressions).toContainEqual(
@@ -220,8 +216,7 @@ describe('EnumerateExpressions', () => {
   it('can create the tree of all expressions', () => {
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'number',
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     const allExpressionsTree = createTree(allExpressions);
 

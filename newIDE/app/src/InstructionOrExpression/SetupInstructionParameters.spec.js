@@ -6,6 +6,12 @@ import {
 import { setupInstructionParameters } from './SetupInstructionParameters';
 const gd: libGDevelop = global.gd;
 
+// $FlowExpectedError
+const makeFakeI18n = (fakeI18n): I18nType => ({
+  ...fakeI18n,
+  _: message => message.id,
+});
+
 describe('setupInstructionParameters', () => {
   it('sets the proper number of parameters', () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -16,8 +22,7 @@ describe('setupInstructionParameters', () => {
     // Simulate that we select an instruction
     const enumeratedInstructions = enumerateFreeInstructions(
       false,
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     const playMusicInstruction = enumeratedInstructions.find(
       enumeratedInstruction => enumeratedInstruction.type === 'PlayMusic'
@@ -57,8 +62,7 @@ describe('setupInstructionParameters', () => {
       project,
       layout,
       objectName,
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -106,8 +110,7 @@ describe('setupInstructionParameters', () => {
       project,
       layout,
       objectName,
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -159,8 +162,7 @@ describe('setupInstructionParameters', () => {
       project,
       layout,
       objectName,
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -210,8 +212,7 @@ describe('setupInstructionParameters', () => {
       project,
       layout,
       objectName,
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -264,8 +265,7 @@ describe('setupInstructionParameters', () => {
       project,
       layout,
       objectName,
-      // $FlowFixMe
-      null
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>

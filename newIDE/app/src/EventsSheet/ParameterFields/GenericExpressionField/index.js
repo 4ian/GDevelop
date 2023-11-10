@@ -496,7 +496,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         scope,
       },
       completionDescriptions,
-      // $FlowFixMe
+      // $FlowFixMe The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
       null
     );
 

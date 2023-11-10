@@ -95,6 +95,10 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
   const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
     false
   );
+  const [
+    lastVisitedAuthenticationStep,
+    setLastVisitedAuthenticationStep,
+  ] = React.useState<'login' | 'register'>('login');
 
   const doLogin = () => {
     if (creatingOrLoggingInAccount) return;
@@ -143,6 +147,27 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
       showUserChip(step === 'recommendations' && !!profile && !!profile.survey);
     },
     [profile, step, showUserChip]
+  );
+
+  // Logic to store the last visited authentication step.
+  React.useEffect(
+    () => {
+      if (step === 'login') {
+        setLastVisitedAuthenticationStep('login');
+      } else if (step === 'register') {
+        setLastVisitedAuthenticationStep('register');
+      }
+    },
+    [step]
+  );
+
+  // Reset form when user changes authentication step.
+  React.useEffect(
+    () => {
+      setEmail('');
+      setPassword('');
+    },
+    [lastVisitedAuthenticationStep]
   );
 
   if (creatingOrLoggingInAccount || loginState === 'loggingIn') {
@@ -326,7 +351,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
                 <RaisedButton
                   label={<Trans>Next</Trans>}
                   primary
-                  onClick={doLogin}
+                  onClick={doCreateAccount}
                   fullWidth
                 />
               </LineStackLayout>

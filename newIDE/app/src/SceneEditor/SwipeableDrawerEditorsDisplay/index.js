@@ -13,7 +13,9 @@ import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
 import ObjectGroupsList, {
   type ObjectGroupsListInterface,
 } from '../../ObjectGroupsList';
-import InstancesList from '../../InstancesEditor/InstancesList';
+import InstancesList, {
+  type InstancesListInterface,
+} from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
 import Rectangle from '../../Utils/Rectangle';
@@ -28,6 +30,7 @@ import {
   type SceneEditorsDisplayInterface,
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -67,7 +70,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
-  const instancesListRef = React.useRef<?InstancesList>(null);
+  const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
@@ -225,35 +228,40 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     <FullSizeMeasurer>
       {({ width, height }) => (
         <div style={styles.container}>
-          <InstancesEditor
-            ref={editorRef}
-            height={height}
-            width={width}
-            project={project}
-            layout={layout}
-            selectedLayer={selectedLayer}
-            screenType={screenType}
-            initialInstances={initialInstances}
-            instancesEditorSettings={props.instancesEditorSettings}
-            onInstancesEditorSettingsMutated={
-              props.onInstancesEditorSettingsMutated
-            }
-            instancesSelection={props.instancesSelection}
-            onInstancesAdded={props.onInstancesAdded}
-            onInstancesSelected={props.onInstancesSelected}
-            onInstanceDoubleClicked={props.onInstanceDoubleClicked}
-            onInstancesMoved={props.onInstancesMoved}
-            onInstancesResized={props.onInstancesResized}
-            onInstancesRotated={props.onInstancesRotated}
-            selectedObjectNames={selectedObjectNames}
-            onContextMenu={props.onContextMenu}
-            isInstanceOf3DObject={props.isInstanceOf3DObject}
-            instancesEditorShortcutsCallbacks={
-              props.instancesEditorShortcutsCallbacks
-            }
-            pauseRendering={!props.isActive}
-            showObjectInstancesIn3D={values.use3DEditor}
-          />
+          <ErrorBoundary
+            componentTitle={<Trans>Instances editor.</Trans>}
+            scope="scene-editor-canvas"
+          >
+            <InstancesEditor
+              ref={editorRef}
+              height={height}
+              width={width}
+              project={project}
+              layout={layout}
+              selectedLayer={selectedLayer}
+              screenType={screenType}
+              initialInstances={initialInstances}
+              instancesEditorSettings={props.instancesEditorSettings}
+              onInstancesEditorSettingsMutated={
+                props.onInstancesEditorSettingsMutated
+              }
+              instancesSelection={props.instancesSelection}
+              onInstancesAdded={props.onInstancesAdded}
+              onInstancesSelected={props.onInstancesSelected}
+              onInstanceDoubleClicked={props.onInstanceDoubleClicked}
+              onInstancesMoved={props.onInstancesMoved}
+              onInstancesResized={props.onInstancesResized}
+              onInstancesRotated={props.onInstancesRotated}
+              selectedObjectNames={selectedObjectNames}
+              onContextMenu={props.onContextMenu}
+              isInstanceOf3DObject={props.isInstanceOf3DObject}
+              instancesEditorShortcutsCallbacks={
+                props.instancesEditorShortcutsCallbacks
+              }
+              pauseRendering={!props.isActive}
+              showObjectInstancesIn3D={values.use3DEditor}
+            />
+          </ErrorBoundary>
           <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
             <SwipeableDrawer
               maxHeight={height}

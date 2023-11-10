@@ -36,6 +36,7 @@ import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import PromisePool from '@supercharge/promise-pool';
 import NewObjectFromScratch from './NewObjectFromScratch';
 import { getAssetShortHeadersToDisplay } from './AssetsList';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const isDev = Window.isDev();
 
@@ -104,7 +105,7 @@ type Props = {|
   canInstallPrivateAsset: () => boolean,
 |};
 
-export default function NewObjectDialog({
+function NewObjectDialog({
   project,
   layout,
   objectsContainer,
@@ -501,3 +502,15 @@ export default function NewObjectDialog({
     </I18n>
   );
 }
+
+const NewObjectDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>New Object dialog</Trans>}
+    scope="new-object-dialog"
+    onClose={props.onClose}
+  >
+    <NewObjectDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default NewObjectDialogWithErrorBoundary;

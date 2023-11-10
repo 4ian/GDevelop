@@ -18,7 +18,9 @@ import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
 import ObjectGroupsList, {
   type ObjectGroupsListInterface,
 } from '../../ObjectGroupsList';
-import InstancesList from '../../InstancesEditor/InstancesList';
+import InstancesList, {
+  type InstancesListInterface,
+} from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
 import Rectangle from '../../Utils/Rectangle';
@@ -94,7 +96,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
-  const instancesListRef = React.useRef<?InstancesList>(null);
+  const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const editorMosaicRef = React.useRef<?EditorMosaic>(null);

@@ -51,7 +51,9 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
-import ErrorBoundary from '../UI/ErrorBoundary';
+import ErrorBoundary, {
+  getEditorErrorBoundaryProps,
+} from '../UI/ErrorBoundary';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -3112,13 +3114,14 @@ const MainFrame = (props: Props) => {
       >
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+          const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
-                  title="This editor encountered a problem"
-                  scope="mainframe"
+                  componentTitle={errorBoundaryProps.componentTitle}
+                  scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
@@ -3357,18 +3360,18 @@ const MainFrame = (props: Props) => {
       {preferencesDialogOpen && (
         <PreferencesDialog
           i18n={props.i18n}
-          onClose={languageChanged => {
+          onClose={options => {
             openPreferencesDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}
       {languageDialogOpen && (
         <LanguageDialog
           open
-          onClose={languageChanged => {
+          onClose={options => {
             openLanguageDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}

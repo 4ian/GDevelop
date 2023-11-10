@@ -18,6 +18,7 @@ import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
 import Paper from '../../../../UI/Paper';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -142,4 +143,13 @@ const LearnSection = ({
   );
 };
 
-export default LearnSection;
+const LearnSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Learn section</Trans>}
+    scope="start-page-learn"
+  >
+    <LearnSection {...props} />
+  </ErrorBoundary>
+);
+
+export default LearnSectionWithErrorBoundary;

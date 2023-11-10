@@ -27,11 +27,12 @@ import { adaptAcceleratorString } from '../../UI/AcceleratorString';
 import { getElectronAccelerator } from '../../KeyboardShortcuts';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 const electron = optionalRequire('electron');
 
 type Props = {|
   i18n: I18n,
-  onClose: (languageDidChange: boolean) => void,
+  onClose: (options: {| languageDidChange: boolean |}) => void,
 |};
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
@@ -82,10 +83,10 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           key="close"
           label={<Trans>Close</Trans>}
           primary={false}
-          onClick={() => onClose(languageDidChange)}
+          onClick={() => onClose({ languageDidChange })}
         />,
       ]}
-      onRequestClose={() => onClose(languageDidChange)}
+      onRequestClose={() => onClose({ languageDidChange })}
       open
       maxWidth="sm"
       fixedContent={
@@ -462,4 +463,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
   );
 };
 
-export default PreferencesDialog;
+const PreferencesDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Preferences</Trans>}
+    scope="preferences"
+    onClose={() => props.onClose({ languageDidChange: false })}
+  >
+    <PreferencesDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default PreferencesDialogWithErrorBoundary;

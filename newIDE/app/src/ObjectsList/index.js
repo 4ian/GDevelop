@@ -1192,6 +1192,29 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
+    const onCollapseItem = React.useCallback(
+      (item: TreeViewItem) => {
+        if (
+          !selectedObjectFolderOrObjectsWithContext ||
+          selectedObjectFolderOrObjectsWithContext.length !== 1 ||
+          item.isPlaceholder
+        )
+          return;
+        const { objectFolderOrObject: potentialParent } = item;
+        const {
+          objectFolderOrObject: selectedObjectFolderOrObject,
+        } = selectedObjectFolderOrObjectsWithContext[0];
+        if (!potentialParent || !selectedObjectFolderOrObject) return;
+        if (selectedObjectFolderOrObject.isADescendantOf(potentialParent)) {
+          selectObjectFolderOrObjectWithContext(null);
+        }
+      },
+      [
+        selectObjectFolderOrObjectWithContext,
+        selectedObjectFolderOrObjectsWithContext,
+      ]
+    );
+
     const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
       (
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
@@ -1527,6 +1550,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemHtmlId={getTreeViewItemHtmlId}
                       getItemDataset={getTreeViewItemData}
                       onEditItem={editItem}
+                      onCollapseItem={onCollapseItem}
                       selectedItems={selectedObjectFolderOrObjectsWithContext}
                       onSelectItems={items => {
                         if (!items) selectObjectFolderOrObjectWithContext(null);

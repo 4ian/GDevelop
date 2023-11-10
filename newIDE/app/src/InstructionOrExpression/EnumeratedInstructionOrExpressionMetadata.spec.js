@@ -46,7 +46,7 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
         project,
         eventsFunctionsExtension,
         eventsFunction,
-      },
+      }
     );
 
     expect(instructions.length).toBeGreaterThan(0);

@@ -83,6 +83,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
+    overflow: 'hidden',
   },
   answerButtonBackground: { width: '100%', height: '100%' },
   answerCoverImage: {

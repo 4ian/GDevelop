@@ -519,14 +519,12 @@ namespace gdjs {
       }
       if (this._timeManager.isFirstFrame()) {
         this._updateLayersCameraCoordinates(2);
-        if (this._frameIndex === 2) {
-          const allInstancesList = this.getAdhocListOfAllInstances();
-          for (let i = 0, len = allInstancesList.length; i < len; ++i) {
-            const object = allInstancesList[i];
-            const rendererObject = object.getRendererObject();
-            if (rendererObject) {
-              rendererObject.visible = false;
-            }
+        const allInstancesList = this.getAdhocListOfAllInstances();
+        for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+          const object = allInstancesList[i];
+          const rendererObject = object.getRendererObject();
+          if (rendererObject) {
+            rendererObject.visible = false;
           }
         }
       }

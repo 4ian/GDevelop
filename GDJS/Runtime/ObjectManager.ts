@@ -73,9 +73,8 @@ namespace gdjs {
      */
     addObject(object: gdjs.RuntimeObject): void {
       this._allInstances.push(object);
-      object
-        .getSpatialSearchSleepState()
-        .registerOnWakingUp((object) => this._onWakingUp(object));
+      const sleepState = object.getSpatialSearchSleepState();
+      sleepState.registerOnWakingUp((object) => this._onWakingUp(object));
     }
 
     /**

@@ -253,8 +253,10 @@ namespace gdjs {
       );
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
-      this._lifecycleSleepState = new gdjs.ObjectSleepState(this, () =>
-        this.isNeedingLifecycleFunctions()
+      this._lifecycleSleepState = new gdjs.ObjectSleepState(
+        this,
+        () => this.isNeedingLifecycleFunctions(),
+        gdjs.ObjectSleepState.State.ASleep
       );
       this._rtreeAABB = {
         source: this,
@@ -265,7 +267,8 @@ namespace gdjs {
       };
       this._spatialSearchSleepState = new gdjs.ObjectSleepState(
         this,
-        () => false
+        () => false,
+        gdjs.ObjectSleepState.State.CanSleepThisFrame
       );
       for (let i = 0; i < objectData.effects.length; ++i) {
         scene

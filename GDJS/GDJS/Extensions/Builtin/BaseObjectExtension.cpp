@@ -211,7 +211,7 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["RaycastToPosition"].SetFunctionName(
       "gdjs.evtTools.object.raycastObjectToPosition");
   GetAllConditions()["Distance"].SetFunctionName(
-      "gdjs.evtTools.object.distanceTest");
+      "gdjs.evtTools.object.position.distanceCheck");
   GetAllConditions()["SeDirige"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
   GetAllConditions()["EstTourne"].SetFunctionName(

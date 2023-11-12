@@ -11,8 +11,8 @@ namespace gdjs {
         // TODO Use a flag instead of this because an object can have no
         // instance picked because of a condition on a group.
         const isObjectsListsEmpty = (objectsLists: ObjectsLists) => {
-          for (const objectName in objectsLists) {
-            const objects = objectsLists[objectName];
+          for (const objectName in objectsLists.items) {
+            const objects = objectsLists.items[objectName];
             if (objects.length > 0) {
               return false;
             }
@@ -45,7 +45,7 @@ namespace gdjs {
           const isList1Empty = isObjectsListsEmpty(objectsLists1);
           const isList2Empty = isObjectsListsEmpty(objectsLists2);
 
-          if (!isList1Empty && !isList2Empty) {
+          if (inverted || (!isList1Empty && !isList2Empty)) {
             // Both are already filtered fallback on the naïve check
             return gdjs.evtTools.object.twoListsTest(
               predicate,
@@ -59,10 +59,11 @@ namespace gdjs {
 
           let iteratedLists = isList1Empty ? objectsLists2 : objectsLists1;
           let treeLists = isList1Empty ? objectsLists1 : objectsLists2;
+          let isIteratedListsEmpty = isList1Empty ? isList2Empty : isList1Empty;
 
           let objectsMaxCount1 = 0;
           if (isList1Empty) {
-            for (const objectName in objectsLists1) {
+            for (const objectName in objectsLists1.items) {
               const objectManager = instanceContainer.getObjectManager(
                 objectName
               );
@@ -74,7 +75,7 @@ namespace gdjs {
           }
           let objectsMaxCount2 = 0;
           if (isList1Empty && isList2Empty) {
-            for (const objectName in objectsLists2) {
+            for (const objectName in objectsLists2.items) {
               const objectManager = instanceContainer.getObjectManager(
                 objectName
               );
@@ -84,7 +85,7 @@ namespace gdjs {
               );
             }
           }
-          if (objectsMaxCount1 < 8 && objectsMaxCount2 < 8) {
+          if (objectsMaxCount1 <= 8 && objectsMaxCount2 <= 8) {
             // Not enough instance for a R-Tree to be useful.
             return gdjs.evtTools.object.twoListsTest(
               predicate,
@@ -102,16 +103,19 @@ namespace gdjs {
           }
 
           const pickingId = instanceContainer.getNewPickingId();
-          for (const iteratedObjectName in iteratedLists) {
-            const iteratedObjects = iteratedLists.items[iteratedObjectName];
+          for (const iteratedObjectName in iteratedLists.items) {
+            const iteratedObjects = isIteratedListsEmpty
+              ? instanceContainer.getInstancesOf(iteratedObjectName)
+              : iteratedLists.items[iteratedObjectName];
 
             let isAnyIteratedObjectPicked = false;
-            for (const objectName in treeLists) {
+            for (const objectName in treeLists.items) {
               const treeObjects = treeLists.items[objectName];
               const objectManager = instanceContainer.getObjectManager(
                 objectName
               );
               for (const object of iteratedObjects) {
+                nearbyObjects.length = 0;
                 objectManager.search(
                   getSearchArea(object, searchArea, areaExtraArg),
                   nearbyObjects
@@ -134,7 +138,7 @@ namespace gdjs {
                 iteratedObjects,
                 pickingId
               );
-            } else {
+            } else if (!isIteratedListsEmpty) {
               iteratedObjects.length = 0;
             }
           }
@@ -148,7 +152,7 @@ namespace gdjs {
           distance: float
         ): SearchArea => {
           const centerX = object.getX();
-          const centerY = object.getX();
+          const centerY = object.getY();
           searchArea.minX = centerX - distance;
           searchArea.maxX = centerX + distance;
           searchArea.minY = centerY - distance;
@@ -156,12 +160,12 @@ namespace gdjs {
           return searchArea;
         };
 
-        export const distanceTest = (
-          instanceContainer: gdjs.RuntimeInstanceContainer,
+        export const distanceCheck = (
           objectsLists1: ObjectsLists,
           objectsLists2: ObjectsLists,
           distance: float,
-          inverted: boolean
+          inverted: boolean,
+          instanceContainer: gdjs.RuntimeInstanceContainer
         ): boolean => {
           return twoListsSpacialCheck(
             instanceContainer,

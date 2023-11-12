@@ -1475,10 +1475,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Position"),
                     "res/conditions/distance24.png",
                     "res/conditions/distance.png")
-      .AddParameter("objectList", _("Object"))
-      .AddParameter("objectList", _("Object 2"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object 2"))
       .AddParameter("expression", _("Distance"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
   extension

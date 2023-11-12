@@ -80,6 +80,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/events-tools/inputtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/networktools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/objecttools.js',
+      './newIDE/app/resources/GDJS/Runtime/events-tools/ObjectPositionTools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/cameratools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/soundtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/storagetools.js',

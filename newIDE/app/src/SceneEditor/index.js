@@ -378,22 +378,28 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   toggleWindowMask = () => {
-    this.setState({
-      instancesEditorSettings: {
-        ...this.state.instancesEditorSettings,
-        windowMask: !this.state.instancesEditorSettings.windowMask,
+    this.setState(
+      {
+        instancesEditorSettings: {
+          ...this.state.instancesEditorSettings,
+          windowMask: !this.state.instancesEditorSettings.windowMask,
+        },
       },
-    });
+      () => this.updateToolbar()
+    );
   };
 
   toggleGrid = () => {
-    this.setState({
-      instancesEditorSettings: {
-        ...this.state.instancesEditorSettings,
-        grid: !this.state.instancesEditorSettings.grid,
-        snap: !this.state.instancesEditorSettings.grid,
+    this.setState(
+      {
+        instancesEditorSettings: {
+          ...this.state.instancesEditorSettings,
+          grid: !this.state.instancesEditorSettings.grid,
+          snap: !this.state.instancesEditorSettings.grid,
+        },
       },
-    });
+      () => this.updateToolbar()
+    );
   };
 
   openSetupGrid = (open: boolean = true) => {

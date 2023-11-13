@@ -7,7 +7,13 @@ import { type I18n as I18nType } from '@lingui/core';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import { darken, lighten, useTheme } from '@material-ui/core/styles';
+import {
+  createStyles,
+  darken,
+  lighten,
+  makeStyles,
+  useTheme,
+} from '@material-ui/core/styles';
 
 import { type AnswerData, type QuestionData } from './Questionnaire';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
@@ -37,6 +43,21 @@ const getColumnsFromWidth = (width: WidthType) => {
       return 4;
   }
 };
+
+const useStylesForAnswer = (isSelected?: boolean) =>
+  makeStyles(theme =>
+    createStyles({
+      root: {
+        '&:hover': {
+          filter: isSelected
+            ? undefined
+            : theme.palette.type === 'dark'
+            ? 'brightness(120%)'
+            : 'brightness(85%)',
+        },
+      },
+    })
+  )();
 
 export const TitleAndSubtitle = ({
   i18n,
@@ -141,6 +162,7 @@ const FreeAnswer = ({
     muiTheme.palette.text.primary,
     selected ? 0 : 0.7
   );
+  const classes = useStylesForAnswer(selected);
 
   const clickSend = onClickSend
     ? () => {
@@ -160,6 +182,7 @@ const FreeAnswer = ({
         ...styles.answerButton,
         borderColor,
       }}
+      classes={classes}
       onClick={e => {
         if (e.nativeEvent && e.nativeEvent.x === 0 && e.nativeEvent.y === 0) {
           // Material UI buttons are clicked when focused and space key is pressed.
@@ -275,12 +298,15 @@ const Answer = ({
     muiTheme.palette.text.primary,
     selected ? 0 : 0.7
   );
+  const classes = useStylesForAnswer();
+
   return (
     <ButtonBase
       style={{
         ...styles.answerButton,
         borderColor,
       }}
+      classes={classes}
       onClick={() => onSelect(id)}
     >
       <Paper

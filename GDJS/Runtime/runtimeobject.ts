@@ -17,21 +17,6 @@ namespace gdjs {
   };
 
   /**
-   * Return the squared bounding radius of an object given its width/height and its center of rotation
-   * (relative to the top-left of the object). The radius is relative to the center of rotation.
-   */
-  const computeSqBoundingRadius = (
-    width: float,
-    height: float,
-    centerX: float,
-    centerY: float
-  ) => {
-    const radiusX = Math.max(centerX, width - centerX);
-    const radiusY = Math.max(centerY, height - centerY);
-    return Math.pow(radiusX, 2) + Math.pow(radiusY, 2);
-  };
-
-  /**
    * Arrays and data structure that are (re)used by
    * {@link RuntimeObject.separateFromObjects} to avoid any allocation.
    */
@@ -1637,6 +1622,18 @@ namespace gdjs {
     }
 
     /**
+     * Return the squared bounding radius of an object given its width/height and its center of rotation
+     * (relative to the top-left of the object). The radius is relative to the center of rotation.
+     */
+    getSqBoundingRadius() {
+      const centerX = this.getCenterX();
+      const centerY = this.getCenterY();
+      const radiusX = Math.max(centerX, this.getWidth() - centerX);
+      const radiusY = Math.max(centerY, this.getHeight() - centerY);
+      return radiusX * radiusX + radiusY * radiusY;
+    }
+
+    /**
      * Return at least all the hit boxes that overlap a given area.
      *
      * The hit boxes don't need to actually overlap the area,
@@ -2481,25 +2478,11 @@ namespace gdjs {
       //First check if bounding circle are too far.
       const o1centerX = obj1.getCenterX();
       const o1centerY = obj1.getCenterY();
-      const obj1BoundingRadius = Math.sqrt(
-        computeSqBoundingRadius(
-          obj1.getWidth(),
-          obj1.getHeight(),
-          o1centerX,
-          o1centerY
-        )
-      );
+      const obj1BoundingRadius = Math.sqrt(obj1.getSqBoundingRadius());
 
       const o2centerX = obj2.getCenterX();
       const o2centerY = obj2.getCenterY();
-      const obj2BoundingRadius = Math.sqrt(
-        computeSqBoundingRadius(
-          obj2.getWidth(),
-          obj2.getHeight(),
-          o2centerX,
-          o2centerY
-        )
-      );
+      const obj2BoundingRadius = Math.sqrt(obj2.getSqBoundingRadius());
 
       const o1AbsoluteCenterX = obj1.getDrawableX() + o1centerX;
       const o1AbsoluteCenterY = obj1.getDrawableY() + o1centerY;
@@ -2560,12 +2543,7 @@ namespace gdjs {
       // First check if bounding circles are too far
       const objCenterX = this.getCenterX();
       const objCenterY = this.getCenterY();
-      const objSqBoundingRadius = computeSqBoundingRadius(
-        this.getWidth(),
-        this.getHeight(),
-        objCenterX,
-        objCenterY
-      );
+      const objSqBoundingRadius = this.getSqBoundingRadius();
 
       const rayCenterWorldX = (x + endX) / 2;
       const rayCenterWorldY = (y + endY) / 2;

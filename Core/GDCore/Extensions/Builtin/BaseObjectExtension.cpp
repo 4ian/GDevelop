@@ -1586,8 +1586,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Collision"),
           "res/conditions/collision24.png",
           "res/conditions/collision.png")
-      .AddParameter("objectList", _("Object"))
-      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("yesorno",

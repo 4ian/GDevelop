@@ -38,8 +38,8 @@ namespace gdjs {
           objectsLists1: ObjectsLists,
           objectsLists2: ObjectsLists,
           inverted: boolean,
-          predicateExtraArg: any,
-          areaExtraArg: any
+          predicateExtraArg?: any,
+          areaExtraArg?: any
         ): boolean => {
           // Check if the list empty because it was not filtered yet.
           const isList1Empty = isObjectsListsEmpty(objectsLists1);
@@ -176,6 +176,38 @@ namespace gdjs {
             inverted,
             distance * distance,
             distance
+          );
+        };
+
+        const getSearchAreaForCollisionCheck = (
+          object: gdjs.RuntimeObject,
+          searchArea: SearchArea
+        ): SearchArea => {
+          const centerX = object.getCenterXInScene();
+          const centerY = object.getCenterYInScene();
+          const boundingRadius = Math.sqrt(object.getSqBoundingRadius());
+          searchArea.minX = centerX - boundingRadius;
+          searchArea.maxX = centerX + boundingRadius;
+          searchArea.minY = centerY - boundingRadius;
+          searchArea.maxY = centerY + boundingRadius;
+          return searchArea;
+        };
+
+        export const hitBoxesCollisionCheck = (
+          objectsLists1: ObjectsLists,
+          objectsLists2: ObjectsLists,
+          inverted: boolean,
+          instanceContainer: gdjs.RuntimeInstanceContainer,
+          ignoreTouchingEdges: boolean
+        ): boolean => {
+          return twoListsSpacialCheck(
+            instanceContainer,
+            gdjs.RuntimeObject.collisionTest,
+            getSearchAreaForCollisionCheck,
+            objectsLists1,
+            objectsLists2,
+            inverted,
+            ignoreTouchingEdges
           );
         };
       }

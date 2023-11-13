@@ -205,7 +205,7 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.getPickedInstancesCount");
 
   GetAllConditions()["CollisionNP"].SetFunctionName(
-      "gdjs.evtTools.object.hitBoxesCollisionTest");
+      "gdjs.evtTools.object.position.hitBoxesCollisionCheck");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");
   GetAllConditions()["RaycastToPosition"].SetFunctionName(

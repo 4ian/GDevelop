@@ -21,11 +21,15 @@ namespace gdjs {
        * @param items The content of the Hashtable.
        * @returns The new picked objects lists.
        */
-      export const newFrom = (items: {
-        [key: string]: Array<gdjs.RuntimeObject>;
-      }): ObjectsLists => {
+      export const newFrom = (
+        items: {
+          [key: string]: Array<gdjs.RuntimeObject>;
+        },
+        isPicked: boolean
+      ): ObjectsLists => {
         const hashtable = new ObjectsLists();
         hashtable.items = items;
+        hashtable.isPicked = isPicked;
         return hashtable;
       };
 

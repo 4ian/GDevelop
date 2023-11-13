@@ -538,7 +538,8 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
-      eventsFunction
+      eventsFunction,
+      false
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();

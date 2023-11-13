@@ -779,6 +779,27 @@ class LongLivedObjectsList {
   }
 }
 
+const clearObjectsLists = (objectsLists) => {
+  for (const k in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(k)) {
+      objectsLists.items[k].length = 0;
+    }
+  }
+};
+
+const addObject = (
+  objectsLists,
+  objectName,
+  object
+) => {
+  if (!objectsLists.isPicked) {
+    // A picking starts from empty lists.
+    clearObjectsLists(objectsLists);
+    objectsLists.isPicked = true;
+  }
+  objectsLists.get(objectName).push(object);
+};
+
 /**
  * Create a minimal mock of GDJS with a RuntimeScene (`gdjs.RuntimeScene`),
  * supporting setting a variable, using "Trigger Once" conditions
@@ -812,6 +833,9 @@ function makeMinimalGDJSMock(options) {
         common: {
           resolveAsyncEventsFunction: ({ task }) => task.resolve(),
         },
+        objectsLists: {
+          addObject,
+        }
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;

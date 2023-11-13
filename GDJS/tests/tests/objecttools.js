@@ -1,19 +1,5 @@
 // @ts-check
 
-/**
- * @param {{ [key: string]: Array<gdjs.RuntimeObject> }} items
- * @param {boolean} isPicked
- * @return {ObjectsLists}
- */
-const createObjectsListsFrom = (items, isPicked) => {
-  /** @type {ObjectsLists} */
-  //@ts-ignore
-  const hashtable = new Hashtable();
-  hashtable.items = items;
-  hashtable.isPicked = isPicked;
-  return hashtable;
-};
-
 describe('gdjs.evtTools.object', function () {
   it('can count picked instances of objects', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
@@ -27,7 +13,7 @@ describe('gdjs.evtTools.object', function () {
 
     expect(
       gdjs.evtTools.object.getPickedInstancesCount(
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectA: [objectA1, objectA2],
             MyObjectB: [objectB1],
@@ -38,7 +24,7 @@ describe('gdjs.evtTools.object', function () {
     ).to.be(3);
     expect(
       gdjs.evtTools.object.getPickedInstancesCount(
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectA: [],
             MyObjectB: [],
@@ -51,7 +37,7 @@ describe('gdjs.evtTools.object', function () {
     // Also test the deprecated name for this function:
     expect(
       gdjs.evtTools.object.pickedObjectsCount(
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectA: [objectA1, objectA2],
             MyObjectB: [objectB1],
@@ -75,7 +61,7 @@ describe('gdjs.evtTools.object', function () {
     expect(
       gdjs.evtTools.object.getSceneInstancesCount(
         runtimeScene,
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectA: [objectA1],
             MyObjectB: [objectB1],
@@ -87,7 +73,7 @@ describe('gdjs.evtTools.object', function () {
     expect(
       gdjs.evtTools.object.getSceneInstancesCount(
         runtimeScene,
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectA: [objectA1],
             MyObjectB: [],
@@ -99,7 +85,7 @@ describe('gdjs.evtTools.object', function () {
     expect(
       gdjs.evtTools.object.getSceneInstancesCount(
         runtimeScene,
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectA: [objectA1],
           },
@@ -110,7 +96,7 @@ describe('gdjs.evtTools.object', function () {
     expect(
       gdjs.evtTools.object.getSceneInstancesCount(
         runtimeScene,
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectA: [],
           },
@@ -121,7 +107,7 @@ describe('gdjs.evtTools.object', function () {
     expect(
       gdjs.evtTools.object.getSceneInstancesCount(
         runtimeScene,
-        createObjectsListsFrom(
+        gdjs.evtTools.objectsLists.newFrom(
           {
             MyObjectC: [],
           },
@@ -144,7 +130,7 @@ describe('gdjs.evtTools.object', function () {
     runtimeScene.createObject('MyObjectA');
 
     // 1 of 2 instances are picked.
-    const pickedObjectList = createObjectsListsFrom(
+    const pickedObjectList = gdjs.evtTools.objectsLists.newFrom(
       {
         MyObjectA: [objectA1],
       },
@@ -175,7 +161,7 @@ describe('gdjs.evtTools.object', function () {
     runtimeScene.createObject('MyObjectA');
 
     // 0 of 2 instances are picked.
-    const pickedObjectList = createObjectsListsFrom(
+    const pickedObjectList = gdjs.evtTools.objectsLists.newFrom(
       {
         MyObjectA: [],
       },
@@ -205,7 +191,7 @@ describe('gdjs.evtTools.object', function () {
     const objectA2 = runtimeScene.createObject('MyObjectA');
 
     // All instances are picked.
-    const pickedObjectList = createObjectsListsFrom(
+    const pickedObjectList = gdjs.evtTools.objectsLists.newFrom(
       {
         MyObjectA: [objectA1, objectA2],
       },
@@ -238,7 +224,7 @@ describe('gdjs.evtTools.object', function () {
     runtimeScene.createObject('MyObjectB');
 
     // 2 of 3 instances are picked.
-    const pickedObjectList = createObjectsListsFrom(
+    const pickedObjectList = gdjs.evtTools.objectsLists.newFrom(
       {
         MyObjectA: [objectA1],
         MyObjectB: [objectB1],
@@ -275,7 +261,7 @@ describe('gdjs.evtTools.object', function () {
 
     // All instances are picked.
     /** @type {ObjectsLists} */
-    const pickedObjectList = createObjectsListsFrom(
+    const pickedObjectList = gdjs.evtTools.objectsLists.newFrom(
       {
         MyObjectA: [objectA1, objectA2],
         MyObjectB: [objectB1],

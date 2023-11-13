@@ -26,6 +26,7 @@ import LoginForm from '../../../../Profile/LoginForm';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RecommendationList from './RecommendationList';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import { delay } from '../../../../Utils/Delay';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 
@@ -74,6 +75,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     loginState,
   } = authenticatedUser;
   const { values: preferences } = React.useContext(PreferencesContext);
+  const recommendationsGettingDelayPromise = React.useRef<?Promise>(null);
 
   const forceUpdate = useForceUpdate();
   const windowWidth = useResponsiveWindowWidth();
@@ -132,12 +134,19 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
   const onQuestionnaireFinished = async (survey: UserSurveyType) => {
     try {
       setStep('questionnaireFinished');
-      await onEditProfile({ survey }, preferences, { throwError: true });
+      // Artificial delay to build up expectations.
+      recommendationsGettingDelayPromise.current = delay(5000);
+      await Promise.all([
+        onEditProfile({ survey }, preferences, { throwError: true }),
+        recommendationsGettingDelayPromise.current,
+      ]);
       setStep('recommendations');
     } catch (error) {
       console.error('An error occurred when sending survey:', error);
       setErrorSendingSurvey(true);
       setStep('welcome');
+    } finally {
+      recommendationsGettingDelayPromise.current = null;
     }
   };
 
@@ -183,7 +192,8 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     // Do not display loader if the user is already seeing the recommendations.
     // It can happen when the user profile is refreshed while the recommendations
     // are displayed. This way, the loader is not displayed unnecessarily.
-    step !== 'recommendations'
+    step !== 'recommendations' &&
+    !recommendationsGettingDelayPromise.current
   ) {
     return (
       <SectionContainer

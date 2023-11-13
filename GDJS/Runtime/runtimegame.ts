@@ -575,7 +575,6 @@ namespace gdjs {
      * @param enable true to pause the game, false to unpause
      */
     pause(enable: boolean) {
-      console.log('Pause game: ' + enable);
       if (this._paused === enable) return;
 
       this._paused = enable;

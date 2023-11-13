@@ -70,7 +70,6 @@ namespace gdjs {
     }
 
     onFinish() {
-      console.log('onFinish: ' + this.sceneName);
       this.isFinished = true;
       for (const onFinish of this.onFinishCallbacks) {
         onFinish();
@@ -262,7 +261,6 @@ namespace gdjs {
       );
       this._setSceneAssetsLoaded(firstSceneName);
       this._setSceneAssetsReady(firstSceneName);
-      console.log('loadGlobalAndFirstSceneResources done: ' + firstSceneName);
     }
 
     /**
@@ -295,14 +293,12 @@ namespace gdjs {
         }
       }
       this.currentLoadingSceneName = '';
-      console.log('Done loading all scene in background');
     }
 
     private async _doLoadSceneResources(
       sceneName: string,
       onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
-      console.log('------- Scene: ' + sceneName);
       const sceneResources = this._sceneResources.get(sceneName);
       if (!sceneResources) {
         logger.warn(
@@ -325,7 +321,6 @@ namespace gdjs {
         })
       );
       this._setSceneAssetsLoaded(sceneName);
-      console.log('Done: ' + sceneName);
     }
 
     private async _loadResource(resource: ResourceData): Promise<void> {
@@ -340,7 +335,6 @@ namespace gdjs {
         );
         return;
       }
-      console.log('Load: ' + resource.name);
       await resourceManager.loadResource(resource.name);
     }
 
@@ -394,13 +388,10 @@ namespace gdjs {
       const task = this._prioritizeScene(sceneName);
       return new Promise<void>((resolve, reject) => {
         if (!task) {
-          console.log('Already downloaded scene: ' + sceneName);
           resolve();
           return;
         }
-        console.log('Register task callback for: ' + sceneName);
         task.registerCallback(() => {
-          console.log('Downloaded scene: ' + sceneName);
           resolve();
         }, onProgress);
       });
@@ -413,7 +404,6 @@ namespace gdjs {
      * this scene will be the next to be loaded.
      */
     private _prioritizeScene(sceneName: string): SceneLoadingTask | null {
-      console.log('Prioritize scene: ' + sceneName);
       const taskIndex = this._sceneToLoadQueue.findIndex(
         (task) => task.sceneName === sceneName
       );

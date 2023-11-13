@@ -89,7 +89,6 @@ namespace gdjs {
       try {
         const gltf: THREE_ADDONS.GLTF = await loader.parseAsync(data, '');
         this._loadedThreeModels.set(resource, gltf);
-        console.log('Parsed: ' + resourceName);
       } catch (error) {
         logger.error(
           "Can't fetch the 3D model file " + resource.file + ', error: ' + error

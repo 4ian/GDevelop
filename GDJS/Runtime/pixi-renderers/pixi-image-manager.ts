@@ -370,7 +370,6 @@ namespace gdjs {
           await loadedTexture.baseTexture.resource.load();
 
           this._loadedTextures.set(resource, loadedTexture);
-          console.log('Loaded: ' + resource.name);
           // TODO What if 2 assets share the same file with different settings?
           applyTextureSettings(loadedTexture, resource);
         }

@@ -209,7 +209,7 @@ describe('gdjs.evtTools.object', function () {
       {
         MyObjectA: [objectA1, objectA2],
       },
-      true
+      false
     );
 
     const newObjectA = gdjs.evtTools.object.createObjectOnScene(
@@ -280,7 +280,7 @@ describe('gdjs.evtTools.object', function () {
         MyObjectA: [objectA1, objectA2],
         MyObjectB: [objectB1],
       },
-      true
+      false
     );
 
     const newObjectA = gdjs.evtTools.object.createObjectOnScene(

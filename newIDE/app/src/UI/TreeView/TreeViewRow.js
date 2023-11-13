@@ -256,8 +256,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           return {};
         }}
         canDrag={() =>
-          // Prevent dragging of root folder.
+          // Prevent dragging of root folder or placeholder.
           !node.item.isRoot &&
+          !node.item.isPlaceholder &&
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
           renamedItemId !== node.id
         }

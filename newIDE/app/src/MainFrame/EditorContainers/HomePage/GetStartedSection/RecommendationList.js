@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
+import { type Subscription } from '../../../../Utils/GDevelopServices/Usage';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import { SectionRow } from '../SectionContainer';
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
@@ -88,6 +89,26 @@ const getTutorialsLimitsFromWidth = (width: WidthType) => {
   }
 };
 
+const isPlanRecommendationRelevant = (
+  subscription: Subscription,
+  planRecommendation: PlanRecommendation
+): boolean => {
+  // Don't recommend plans to holders of education plan.
+  if (subscription.planId === 'gdevelop_education') return false;
+
+  const relevantPlans =
+    subscription.planId === 'gdevelop_silver' ||
+    subscription.planId === 'gdevelop_indie'
+      ? ['gold', 'startup', 'business', 'education']
+      : subscription.planId === 'gdevelop_gold' ||
+        subscription.planId === 'gdevelop_pro'
+      ? ['startup', 'business', 'education']
+      : subscription.planId === 'gdevelop_startup'
+      ? ['business']
+      : [];
+  return relevantPlans.includes(planRecommendation.id);
+};
+
 type TextTutorialsRowProps = {|
   tutorials: Array<Tutorial>,
 |};
@@ -146,7 +167,7 @@ const RecommendationList = ({
   authenticatedUser,
   selectInAppTutorial,
 }: Props) => {
-  const { recommendations } = authenticatedUser;
+  const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
 
@@ -252,14 +273,21 @@ const RecommendationList = ({
           );
         }
         if (planRecommendation) {
-          items.push(
-            <SectionRow key="plan">
-              <PlanRecommendationRow
-                recommendationPlanId={planRecommendation.id}
-                i18n={i18n}
-              />
-            </SectionRow>
-          );
+          const shouldDisplayPlanRecommendation =
+            profile &&
+            !profile.isStudent &&
+            (!subscription ||
+              isPlanRecommendationRelevant(subscription, planRecommendation));
+          if (shouldDisplayPlanRecommendation) {
+            items.push(
+              <SectionRow key="plan">
+                <PlanRecommendationRow
+                  recommendationPlanId={planRecommendation.id}
+                  i18n={i18n}
+                />
+              </SectionRow>
+            );
+          }
         }
         return items;
       }}

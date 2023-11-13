@@ -27,7 +27,6 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
-import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
@@ -79,325 +78,308 @@ type Props = {|
   i18n: I18nType,
 |};
 
-export type BuildSectionInterface = {|
-  forceUpdate: () => void,
-|};
+const BuildSection = ({
+  project,
+  currentFileMetadata,
+  canOpen,
+  onChooseProject,
+  onOpenNewProjectSetupDialog,
+  onShowAllExamples,
+  onSelectExampleShortHeader,
+  onSelectPrivateGameTemplateListingData,
+  onOpenRecentFile,
+  storageProviders,
+  i18n,
+}: Props) => {
+  const { getRecentProjectFiles } = React.useContext(PreferencesContext);
+  const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const { privateGameTemplateListingDatas } = React.useContext(
+    PrivateGameTemplateStoreContext
+  );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
+  const {
+    profile,
+    cloudProjects,
+    limits,
+    cloudProjectsFetchingErrorLabel,
+    onCloudProjectsChanged,
+  } = authenticatedUser;
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
+  const [
+    lastModifiedInfoByProjectId,
+    setLastModifiedInfoByProjectId,
+  ] = React.useState({});
 
-const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
-  (
-    {
-      project,
-      currentFileMetadata,
-      canOpen,
-      onChooseProject,
-      onOpenNewProjectSetupDialog,
-      onShowAllExamples,
-      onSelectExampleShortHeader,
-      onSelectPrivateGameTemplateListingData,
-      onOpenRecentFile,
-      storageProviders,
-      i18n,
-    },
-    ref
-  ) => {
-    const { getRecentProjectFiles } = React.useContext(PreferencesContext);
-    const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
-    const { privateGameTemplateListingDatas } = React.useContext(
-      PrivateGameTemplateStoreContext
-    );
-    const authenticatedUser = React.useContext(AuthenticatedUserContext);
-    const { openSubscriptionDialog } = React.useContext(
-      SubscriptionSuggestionContext
-    );
-    const {
-      profile,
-      cloudProjects,
-      limits,
-      cloudProjectsFetchingErrorLabel,
-      onCloudProjectsChanged,
-    } = authenticatedUser;
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobile = windowWidth === 'small';
-    const forceUpdate = useForceUpdate();
-    const [
-      lastModifiedInfoByProjectId,
-      setLastModifiedInfoByProjectId,
-    ] = React.useState({});
+  let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
+    file => file.fileMetadata
+  );
 
-    React.useImperativeHandle(ref, () => ({
-      forceUpdate,
-    }));
-
-    let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
-      file => file.fileMetadata
-    );
-
-    if (cloudProjects) {
-      projectFiles = projectFiles.concat(
-        transformCloudProjectsIntoFileMetadataWithStorageProviderName(
-          cloudProjects
-        )
-      );
-    }
-
-    // Look at projects where lastCommittedBy is not the current user, and fetch
-    // public profiles of the users that have modified them.
-    React.useEffect(
-      () => {
-        const updateModificationInfoByProjectId = async () => {
-          if (!cloudProjects || !profile) return;
-
-          const _lastModifiedInfoByProjectId = await getLastModifiedInfoByProjectId(
-            {
-              cloudProjects,
-              profile,
-            }
-          );
-          setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
-        };
-
-        updateModificationInfoByProjectId();
-      },
-      [cloudProjects, profile]
-    );
-
-    const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
-      authenticatedUser
-    );
-
-    const [isRefreshing, setIsRefreshing] = React.useState(false);
-    const refreshCloudProjects = React.useCallback(
-      async () => {
-        if (isRefreshing) return;
-        try {
-          setIsRefreshing(true);
-          await onCloudProjectsChanged();
-        } finally {
-          // Wait a bit to avoid spam as we don't have a "loading" state.
-          setTimeout(() => setIsRefreshing(false), 2000);
-        }
-      },
-      [onCloudProjectsChanged, isRefreshing]
-    );
-
-    projectFiles.sort((a, b) => {
-      if (!a.fileMetadata.lastModifiedDate) return 1;
-      if (!b.fileMetadata.lastModifiedDate) return -1;
-      return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
-    });
-
-    const skeletonLineHeight = getProjectLineHeight(windowWidth);
-
-    // Show a premium game template every 3 examples.
-    const examplesAndTemplatesToDisplay = React.useMemo(
-      () =>
-        getExampleAndTemplateItemsForCarousel({
-          authenticatedUser,
-          privateGameTemplateListingDatas,
-          exampleShortHeaders,
-          onSelectPrivateGameTemplateListingData,
-          onSelectExampleShortHeader,
-          i18n,
-        }),
-      [
-        authenticatedUser,
-        exampleShortHeaders,
-        onSelectExampleShortHeader,
-        onSelectPrivateGameTemplateListingData,
-        privateGameTemplateListingDatas,
-        i18n,
-      ]
-    );
-
-    return (
-      <>
-        <SectionContainer
-          title={<Trans>My projects</Trans>}
-          renderFooter={
-            limits && hasTooManyCloudProjects
-              ? () => (
-                  <Line>
-                    <Column expand>
-                      <MaxProjectCountAlertMessage
-                        limits={limits}
-                        onUpgrade={() =>
-                          openSubscriptionDialog({
-                            reason: 'Cloud Project limit reached',
-                          })
-                        }
-                      />
-                    </Column>
-                  </Line>
-                )
-              : undefined
-          }
-        >
-          <SectionRow>
-            <Carousel
-              title={<Trans>Game templates</Trans>}
-              displayItemTitles={false}
-              browseAllLabel={<Trans>Browse all templates</Trans>}
-              onBrowseAllClick={onShowAllExamples}
-              items={examplesAndTemplatesToDisplay}
-              browseAllIcon={<ChevronArrowRight fontSize="small" />}
-              roundedImages
-              hideArrows
-            />
-          </SectionRow>
-          <SectionRow>
-            <ResponsiveLineStackLayout
-              justifyContent="space-between"
-              alignItems="center"
-              noMargin
-              expand
-            >
-              <Column noMargin>
-                <LineStackLayout noMargin alignItems="center">
-                  <Text size="section-title">
-                    <Trans>My projects</Trans>
-                  </Text>
-                  <IconButton
-                    size="small"
-                    onClick={refreshCloudProjects}
-                    disabled={isRefreshing}
-                  >
-                    <Refresh />
-                  </IconButton>
-                </LineStackLayout>
-              </Column>
-              <Column noMargin>
-                <LineStackLayout noMargin>
-                  <RaisedButton
-                    primary
-                    fullWidth={!canOpen}
-                    label={
-                      isMobile ? (
-                        <Trans>Create</Trans>
-                      ) : (
-                        <Trans>Create a project</Trans>
-                      )
-                    }
-                    onClick={onOpenNewProjectSetupDialog}
-                    icon={<Add fontSize="small" />}
-                    id="home-create-project-button"
-                  />
-                  {canOpen && (
-                    <>
-                      <Text>
-                        <Trans>or</Trans>
-                      </Text>
-                      <Spacer />
-                      <TextButton
-                        primary
-                        label={
-                          isMobile ? (
-                            <Trans>Open</Trans>
-                          ) : (
-                            <Trans>Open a project</Trans>
-                          )
-                        }
-                        onClick={onChooseProject}
-                      />
-                    </>
-                  )}
-                </LineStackLayout>
-              </Column>
-            </ResponsiveLineStackLayout>
-            {cloudProjectsFetchingErrorLabel && (
-              <Line>
-                <PlaceholderError onRetry={onCloudProjectsChanged}>
-                  <AlertMessage kind="warning">
-                    {cloudProjectsFetchingErrorLabel}
-                  </AlertMessage>
-                </PlaceholderError>
-              </Line>
-            )}
-            <Line>
-              <Column noMargin expand>
-                {!isMobile && (
-                  <Line justifyContent="space-between">
-                    <Column expand>
-                      <Text color="secondary">
-                        <Trans>File name</Trans>
-                      </Text>
-                    </Column>
-                    <Column expand>
-                      <Text color="secondary">
-                        <Trans>Location</Trans>
-                      </Text>
-                    </Column>
-                    <Column expand>
-                      <Text color="secondary">
-                        <Trans>Last edited</Trans>
-                      </Text>
-                    </Column>
-                  </Line>
-                )}
-                <List>
-                  {authenticatedUser.loginState === 'loggingIn' &&
-                  projectFiles.length === 0 ? ( // Only show skeleton on first load
-                    new Array(10).fill(0).map((_, index) => (
-                      <ListItem
-                        style={styles.listItem}
-                        key={`skeleton-${index}`}
-                      >
-                        <Line expand>
-                          <Column expand>
-                            <Skeleton
-                              variant="rect"
-                              height={skeletonLineHeight}
-                              style={styles.projectSkeleton}
-                            />
-                          </Column>
-                        </Line>
-                      </ListItem>
-                    ))
-                  ) : projectFiles.length > 0 ? (
-                    projectFiles.map(file => (
-                      <ProjectFileListItem
-                        key={file.fileMetadata.fileIdentifier}
-                        file={file}
-                        currentFileMetadata={currentFileMetadata}
-                        storageProviders={storageProviders}
-                        isWindowWidthMediumOrLarger={!isMobile}
-                        onOpenRecentFile={onOpenRecentFile}
-                        lastModifiedInfo={
-                          lastModifiedInfoByProjectId[
-                            file.fileMetadata.fileIdentifier
-                          ]
-                        }
-                      />
-                    ))
-                  ) : (
-                    <ListItem style={styles.listItem}>
-                      <Column expand>
-                        <Paper
-                          variant="outlined"
-                          background="dark"
-                          style={styles.noProjectsContainer}
-                        >
-                          <BackgroundText>
-                            <Trans>No projects yet.</Trans>
-                          </BackgroundText>
-                          <BackgroundText>
-                            <Trans>
-                              Create your first project using one of our
-                              templates or start from scratch.
-                            </Trans>
-                          </BackgroundText>
-                        </Paper>
-                      </Column>
-                    </ListItem>
-                  )}
-                </List>
-              </Column>
-            </Line>
-          </SectionRow>
-        </SectionContainer>
-      </>
+  if (cloudProjects) {
+    projectFiles = projectFiles.concat(
+      transformCloudProjectsIntoFileMetadataWithStorageProviderName(
+        cloudProjects
+      )
     );
   }
-);
+
+  // Look at projects where lastCommittedBy is not the current user, and fetch
+  // public profiles of the users that have modified them.
+  React.useEffect(
+    () => {
+      const updateModificationInfoByProjectId = async () => {
+        if (!cloudProjects || !profile) return;
+
+        const _lastModifiedInfoByProjectId = await getLastModifiedInfoByProjectId(
+          {
+            cloudProjects,
+            profile,
+          }
+        );
+        setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
+      };
+
+      updateModificationInfoByProjectId();
+    },
+    [cloudProjects, profile]
+  );
+
+  const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
+    authenticatedUser
+  );
+
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const refreshCloudProjects = React.useCallback(
+    async () => {
+      if (isRefreshing) return;
+      try {
+        setIsRefreshing(true);
+        await onCloudProjectsChanged();
+      } finally {
+        // Wait a bit to avoid spam as we don't have a "loading" state.
+        setTimeout(() => setIsRefreshing(false), 2000);
+      }
+    },
+    [onCloudProjectsChanged, isRefreshing]
+  );
+
+  projectFiles.sort((a, b) => {
+    if (!a.fileMetadata.lastModifiedDate) return 1;
+    if (!b.fileMetadata.lastModifiedDate) return -1;
+    return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
+  });
+
+  const skeletonLineHeight = getProjectLineHeight(windowWidth);
+
+  // Show a premium game template every 3 examples.
+  const examplesAndTemplatesToDisplay = React.useMemo(
+    () =>
+      getExampleAndTemplateItemsForCarousel({
+        authenticatedUser,
+        privateGameTemplateListingDatas,
+        exampleShortHeaders,
+        onSelectPrivateGameTemplateListingData,
+        onSelectExampleShortHeader,
+        i18n,
+      }),
+    [
+      authenticatedUser,
+      exampleShortHeaders,
+      onSelectExampleShortHeader,
+      onSelectPrivateGameTemplateListingData,
+      privateGameTemplateListingDatas,
+      i18n,
+    ]
+  );
+
+  return (
+    <>
+      <SectionContainer
+        title={<Trans>My projects</Trans>}
+        renderFooter={
+          limits && hasTooManyCloudProjects
+            ? () => (
+                <Line>
+                  <Column expand>
+                    <MaxProjectCountAlertMessage
+                      limits={limits}
+                      onUpgrade={() =>
+                        openSubscriptionDialog({
+                          reason: 'Cloud Project limit reached',
+                        })
+                      }
+                    />
+                  </Column>
+                </Line>
+              )
+            : undefined
+        }
+      >
+        <SectionRow>
+          <Carousel
+            title={<Trans>Game templates</Trans>}
+            displayItemTitles={false}
+            browseAllLabel={<Trans>Browse all templates</Trans>}
+            onBrowseAllClick={onShowAllExamples}
+            items={examplesAndTemplatesToDisplay}
+            browseAllIcon={<ChevronArrowRight fontSize="small" />}
+            roundedImages
+            hideArrows
+          />
+        </SectionRow>
+        <SectionRow>
+          <ResponsiveLineStackLayout
+            justifyContent="space-between"
+            alignItems="center"
+            noMargin
+            expand
+          >
+            <Column noMargin>
+              <LineStackLayout noMargin alignItems="center">
+                <Text size="section-title">
+                  <Trans>My projects</Trans>
+                </Text>
+                <IconButton
+                  size="small"
+                  onClick={refreshCloudProjects}
+                  disabled={isRefreshing}
+                >
+                  <Refresh />
+                </IconButton>
+              </LineStackLayout>
+            </Column>
+            <Column noMargin>
+              <LineStackLayout noMargin>
+                <RaisedButton
+                  primary
+                  fullWidth={!canOpen}
+                  label={
+                    isMobile ? (
+                      <Trans>Create</Trans>
+                    ) : (
+                      <Trans>Create a project</Trans>
+                    )
+                  }
+                  onClick={onOpenNewProjectSetupDialog}
+                  icon={<Add fontSize="small" />}
+                  id="home-create-project-button"
+                />
+                {canOpen && (
+                  <>
+                    <Text>
+                      <Trans>or</Trans>
+                    </Text>
+                    <Spacer />
+                    <TextButton
+                      primary
+                      label={
+                        isMobile ? (
+                          <Trans>Open</Trans>
+                        ) : (
+                          <Trans>Open a project</Trans>
+                        )
+                      }
+                      onClick={onChooseProject}
+                    />
+                  </>
+                )}
+              </LineStackLayout>
+            </Column>
+          </ResponsiveLineStackLayout>
+          {cloudProjectsFetchingErrorLabel && (
+            <Line>
+              <PlaceholderError onRetry={onCloudProjectsChanged}>
+                <AlertMessage kind="warning">
+                  {cloudProjectsFetchingErrorLabel}
+                </AlertMessage>
+              </PlaceholderError>
+            </Line>
+          )}
+          <Line>
+            <Column noMargin expand>
+              {!isMobile && (
+                <Line justifyContent="space-between">
+                  <Column expand>
+                    <Text color="secondary">
+                      <Trans>File name</Trans>
+                    </Text>
+                  </Column>
+                  <Column expand>
+                    <Text color="secondary">
+                      <Trans>Location</Trans>
+                    </Text>
+                  </Column>
+                  <Column expand>
+                    <Text color="secondary">
+                      <Trans>Last edited</Trans>
+                    </Text>
+                  </Column>
+                </Line>
+              )}
+              <List>
+                {authenticatedUser.loginState === 'loggingIn' &&
+                projectFiles.length === 0 ? ( // Only show skeleton on first load
+                  new Array(10).fill(0).map((_, index) => (
+                    <ListItem style={styles.listItem} key={`skeleton-${index}`}>
+                      <Line expand>
+                        <Column expand>
+                          <Skeleton
+                            variant="rect"
+                            height={skeletonLineHeight}
+                            style={styles.projectSkeleton}
+                          />
+                        </Column>
+                      </Line>
+                    </ListItem>
+                  ))
+                ) : projectFiles.length > 0 ? (
+                  projectFiles.map(file => (
+                    <ProjectFileListItem
+                      key={file.fileMetadata.fileIdentifier}
+                      file={file}
+                      currentFileMetadata={currentFileMetadata}
+                      storageProviders={storageProviders}
+                      isWindowWidthMediumOrLarger={!isMobile}
+                      onOpenRecentFile={onOpenRecentFile}
+                      lastModifiedInfo={
+                        lastModifiedInfoByProjectId[
+                          file.fileMetadata.fileIdentifier
+                        ]
+                      }
+                    />
+                  ))
+                ) : (
+                  <ListItem style={styles.listItem}>
+                    <Column expand>
+                      <Paper
+                        variant="outlined"
+                        background="dark"
+                        style={styles.noProjectsContainer}
+                      >
+                        <BackgroundText>
+                          <Trans>No projects yet.</Trans>
+                        </BackgroundText>
+                        <BackgroundText>
+                          <Trans>
+                            Create your first project using one of our templates
+                            or start from scratch.
+                          </Trans>
+                        </BackgroundText>
+                      </Paper>
+                    </Column>
+                  </ListItem>
+                )}
+              </List>
+            </Column>
+          </Line>
+        </SectionRow>
+      </SectionContainer>
+    </>
+  );
+};
 
 const BuildSectionWithErrorBoundary = (props: Props) => (
   <ErrorBoundary

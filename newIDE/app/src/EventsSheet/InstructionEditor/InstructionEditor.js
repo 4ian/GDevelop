@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import {
   enumerateObjectAndBehaviorsInstructions,
-  isObjectInstruction,
   getObjectParameterIndex,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
@@ -47,6 +47,7 @@ type Parameters = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  i18n: I18nType,
 |};
 
 type InstructionEditorState = {|
@@ -86,6 +87,7 @@ export const useInstructionEditor = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
+  i18n,
 }: Parameters): [InstructionEditorState, InstructionEditorSetters] => {
   const getChosenObjectState = (
     objectName: string,
@@ -96,7 +98,8 @@ export const useInstructionEditor = ({
         isCondition,
         globalObjectsContainer,
         objectsContainer,
-        objectName
+        objectName,
+        i18n
       ),
       scope
     );
@@ -139,22 +142,12 @@ export const useInstructionEditor = ({
             project.getCurrentPlatform(),
             instructionType
           );
-      if (
-        isObjectInstruction(
-          project.getCurrentPlatform(),
-          instruction,
-          isCondition
-        )
-      ) {
-        const objectParameterIndex = getObjectParameterIndex(
-          instructionMetadata
+      const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
+      if (objectParameterIndex !== -1) {
+        return getChosenObjectState(
+          instruction.getParameter(objectParameterIndex).getPlainString(),
+          false /* Even if the instruction is invalid for the object, show it as it's what we have already */
         );
-        if (objectParameterIndex !== -1) {
-          return getChosenObjectState(
-            instruction.getParameter(objectParameterIndex).getPlainString(),
-            false /* Even if the instruction is invalid for the object, show it as it's what we have already */
-          );
-        }
       }
     }
 

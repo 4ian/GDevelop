@@ -553,7 +553,7 @@ module.exports = {
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
         _('Set the world time scale of _PARAM0_ to _PARAM2_'),
-        '',
+        _('Global'),
         'res/physics32.png',
         'res/physics32.png'
       )

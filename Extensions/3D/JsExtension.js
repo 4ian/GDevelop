@@ -1665,7 +1665,7 @@ module.exports = {
           'Change the camera rotation to look at an object. The camera top always face the screen.'
         ),
         _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
-        '',
+        _("Layers and cameras"),
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )

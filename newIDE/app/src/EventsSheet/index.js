@@ -1,5 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
@@ -1631,65 +1632,71 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       ? InstructionEditorMenu
       : InstructionEditorDialog;
 
-    return this.state.editedInstruction.instruction ? (
-      <Dialog
-        project={project}
-        scope={scope}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        instruction={this.state.editedInstruction.instruction}
-        isCondition={this.state.editedInstruction.isCondition}
-        isNewInstruction={
-          this.state.editedInstruction.indexInList === undefined
-        }
-        anchorEl={this.state.inlineInstructionEditorAnchorEl}
-        open={true}
-        onCancel={() => this.closeInstructionEditor()}
-        onSubmit={() => {
-          const {
-            instrsList,
-            instruction,
-            indexInList,
-          } = this.state.editedInstruction;
-          if (!instrsList || !instruction) return;
+    const instruction = this.state.editedInstruction.instruction;
+    return instruction ? (
+      <I18n>
+        {({ i18n }) => (
+          <Dialog
+            i18n={i18n}
+            project={project}
+            scope={scope}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            instruction={instruction}
+            isCondition={this.state.editedInstruction.isCondition}
+            isNewInstruction={
+              this.state.editedInstruction.indexInList === undefined
+            }
+            anchorEl={this.state.inlineInstructionEditorAnchorEl}
+            open={true}
+            onCancel={() => this.closeInstructionEditor()}
+            onSubmit={() => {
+              const {
+                instrsList,
+                instruction,
+                indexInList,
+              } = this.state.editedInstruction;
+              if (!instrsList || !instruction) return;
 
-          if (indexInList !== undefined && indexInList !== null) {
-            // Replace an existing instruction
-            instrsList.set(indexInList, instruction);
-          } else {
-            // Add a new instruction
-            instrsList.insert(instruction, instrsList.size());
-          }
+              if (indexInList !== undefined && indexInList !== null) {
+                // Replace an existing instruction
+                instrsList.set(indexInList, instruction);
+              } else {
+                // Add a new instruction
+                instrsList.insert(instruction, instrsList.size());
+              }
 
-          this.closeInstructionEditor(true);
-          ensureSingleOnceInstructions(instrsList);
-          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-        }}
-        resourceManagementProps={this.props.resourceManagementProps}
-        openInstructionOrExpression={(extension, type) => {
-          this.closeInstructionEditor();
-          this.props.openInstructionOrExpression(extension, type);
-        }}
-        canPasteInstructions={
-          this.state.editedInstruction.isCondition
-            ? hasClipboardConditions()
-            : hasClipboardActions()
-        }
-        onPasteInstructions={() => {
-          const {
-            instrsList,
-            isCondition,
-            eventContext,
-          } = this.state.editedInstruction;
-          if (!instrsList) return;
+              this.closeInstructionEditor(true);
+              ensureSingleOnceInstructions(instrsList);
+              if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+            }}
+            resourceManagementProps={this.props.resourceManagementProps}
+            openInstructionOrExpression={(extension, type) => {
+              this.closeInstructionEditor();
+              this.props.openInstructionOrExpression(extension, type);
+            }}
+            canPasteInstructions={
+              this.state.editedInstruction.isCondition
+                ? hasClipboardConditions()
+                : hasClipboardActions()
+            }
+            onPasteInstructions={() => {
+              const {
+                instrsList,
+                isCondition,
+                eventContext,
+              } = this.state.editedInstruction;
+              if (!instrsList) return;
 
-          eventContext &&
-            this.pasteInstructionsInInstructionsList(eventContext, {
-              instrsList,
-              isCondition,
-            });
-        }}
-      />
+              eventContext &&
+                this.pasteInstructionsInInstructionsList(eventContext, {
+                  instrsList,
+                  isCondition,
+                });
+            }}
+          />
+        )}
+      </I18n>
     ) : (
       undefined
     );

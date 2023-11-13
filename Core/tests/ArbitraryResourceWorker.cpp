@@ -234,7 +234,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       ArbitraryResourceWorkerTest worker;
 
-      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& function = extension.InsertNewEventsFunction("MyFreeFunction", 0);
       
       gd::StandardEvent standardEvent;
@@ -247,7 +247,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       standardEvent.GetActions().Insert(instruction);
       function.GetEvents().InsertEvent(standardEvent);
 
-      // MyEventExtention::MyFreeFunction doesn't need to be actually used in events.
+      // MyEventExtension::MyFreeFunction doesn't need to be actually used in events.
 
       gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
       REQUIRE(worker.bitmapFonts.size() == 1);
@@ -271,7 +271,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       ArbitraryResourceWorkerTest worker;
 
-      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& behavior = extension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
       auto& function = behavior.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
       
@@ -285,7 +285,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       standardEvent.GetActions().Insert(instruction);
       function.GetEvents().InsertEvent(standardEvent);
 
-      // MyEventExtention::MyBehavior::MyFunction doesn't need to be actually used in events.
+      // MyEventExtension::MyBehavior::MyFunction doesn't need to be actually used in events.
 
       gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
       REQUIRE(worker.bitmapFonts.size() == 1);
@@ -309,7 +309,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       ArbitraryResourceWorkerTest worker;
 
-      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& object = extension.GetEventsBasedObjects().InsertNew("MyObject", 0);
       auto& function = object.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
       
@@ -323,7 +323,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       standardEvent.GetActions().Insert(instruction);
       function.GetEvents().InsertEvent(standardEvent);
 
-      // MyEventExtention::MyObject::MyFunction doesn't need to be actually used in events.
+      // MyEventExtension::MyObject::MyFunction doesn't need to be actually used in events.
 
       gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
       REQUIRE(worker.bitmapFonts.size() == 1);
@@ -742,7 +742,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       ArbitraryResourceWorkerTest worker;
 
-      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& function = extension.InsertNewEventsFunction("MyFreeFunction", 0);
       
       gd::StandardEvent standardEvent;
@@ -757,7 +757,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
 
-      // MyEventExtention::MyFreeFunction doesn't need to be actually used in
+      // MyEventExtension::MyFreeFunction doesn't need to be actually used in
       // events because the implementation is naive.
 
       gd::ResourceExposer::ExposeLayoutResources(project, layout, worker);
@@ -782,7 +782,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       ArbitraryResourceWorkerTest worker;
 
-      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& behavior = extension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
       auto& function = behavior.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
       
@@ -798,7 +798,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
 
-      // MyEventExtention::MyBehavior::MyFunction doesn't need to be actually used in
+      // MyEventExtension::MyBehavior::MyFunction doesn't need to be actually used in
       // events because the implementation is naive.
 
       gd::ResourceExposer::ExposeLayoutResources(project, layout, worker);
@@ -823,7 +823,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       ArbitraryResourceWorkerTest worker;
 
-      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtention", 0);
+      auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& object = extension.GetEventsBasedObjects().InsertNew("MyObject", 0);
       auto& function = object.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
       
@@ -839,7 +839,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
 
-      // MyEventExtention::MyObject::MyFunction doesn't need to be actually used in
+      // MyEventExtension::MyObject::MyFunction doesn't need to be actually used in
       // events because the implementation is naive.
 
       gd::ResourceExposer::ExposeLayoutResources(project, layout, worker);

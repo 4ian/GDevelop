@@ -283,7 +283,7 @@ namespace gdjs {
             task.sceneName,
             async (count, total) => task.onProgress(count, total)
           );
-          // A layer may have been moved last while awaiting resources to be
+          // A scene may have been moved last while awaiting resources to be
           // downloaded (see _prioritizeScene).
           this._sceneToLoadQueue.splice(
             this._sceneToLoadQueue.findIndex((element) => element === task),

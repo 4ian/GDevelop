@@ -37,7 +37,7 @@ namespace gdjs {
         if (this._isNextLayoutLoading) {
           return false;
         } else {
-          this._loadNewLayout(this._nextLayout);
+          this._loadNewScene(this._nextLayout);
         }
       }
       if (this._stack.length === 0) {
@@ -111,7 +111,7 @@ namespace gdjs {
       }
 
       if (this._runtimeGame.areLayoutAssetsReady(newSceneName)) {
-        return this._loadNewLayout(newSceneName, externalLayoutName);
+        return this._loadNewScene(newSceneName, externalLayoutName);
       }
 
       console.log('Wait downloading to load layout: ' + newSceneName);
@@ -124,7 +124,7 @@ namespace gdjs {
       return null;
     }
 
-    private _loadNewLayout(
+    private _loadNewScene(
       newSceneName: string,
       externalLayoutName?: string
     ): gdjs.RuntimeScene {

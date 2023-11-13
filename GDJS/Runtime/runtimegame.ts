@@ -17,7 +17,7 @@ namespace gdjs {
     hash: number;
   };
 
-  const getGlobalResources = (projectData: ProjectData): Array<string> =>
+  const getGlobalResourceNames = (projectData: ProjectData): Array<string> =>
     projectData.usedResources.map((resource) => resource.name);
 
   /** Options given to the game at startup. */
@@ -149,7 +149,7 @@ namespace gdjs {
       this._resourcesLoader = new gdjs.ResourceLoader(
         this,
         data.resources.resources,
-        getGlobalResources(data),
+        getGlobalResourceNames(data),
         data.layouts
       );
       this._effectsManager = new gdjs.EffectsManager();
@@ -231,7 +231,7 @@ namespace gdjs {
       this._data = projectData;
       this._resourcesLoader.setResources(
         projectData.resources.resources,
-        getGlobalResources(projectData),
+        getGlobalResourceNames(projectData),
         projectData.layouts
       );
     }

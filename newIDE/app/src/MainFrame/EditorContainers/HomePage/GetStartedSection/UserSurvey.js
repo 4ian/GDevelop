@@ -58,11 +58,11 @@ export const formatUserAnswers = (userAnswers: UserAnswers): UserSurveyType => {
     } else {
       userSurvey[questionId] = cleanedAnswers;
     }
-
+    const trimmedUserInput = userInput ? userInput.trim() : null;
     if (isOnlyOneFreeAnswerPossible(questionnaire[questionId].answers)) {
-      userSurvey[questionId] = userInput || '';
-    } else if (userInput) {
-      userSurvey[`${questionId}Input`] = userInput.trim();
+      userSurvey[questionId] = trimmedUserInput || '';
+    } else if (trimmedUserInput) {
+      userSurvey[`${questionId}Input`] = trimmedUserInput;
       if (questionId === firstQuestion) {
         delete userSurvey[questionId];
       }

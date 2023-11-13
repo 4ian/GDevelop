@@ -30,6 +30,19 @@ describe('formatUserAnswers', () => {
       creationGoalInput: 'Bonjour',
     });
   });
+  test('it does not set input if value is spaces only', () => {
+    const userAnswers = [
+      {
+        questionId: 'painPoints',
+        answers: ['lackGraphics', 'lackSound', 'input'],
+        userInput: '    ',
+      },
+    ];
+
+    expect(formatUserAnswers(userAnswers)).toEqual({
+      painPoints: ['lackGraphics', 'lackSound'],
+    });
+  });
 
   test('it formats a complex user answers', () => {
     const userAnswers = [

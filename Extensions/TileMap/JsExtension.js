@@ -1228,7 +1228,7 @@ module.exports = {
       /**
        * Return the path to the thumbnail of the specified object.
        */
-      getThumbnail(project, resourcesLoader, objectConfiguration) {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/tile_map.svg';
       }
 
@@ -1513,7 +1513,7 @@ module.exports = {
       /**
        * Return the path to the thumbnail of the specified object.
        */
-      getThumbnail(project, resourcesLoader, objectConfiguration) {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/tile_map_collision_mask24.svg';
       }
 

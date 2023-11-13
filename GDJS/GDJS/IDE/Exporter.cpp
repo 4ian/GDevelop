@@ -132,13 +132,13 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     auto projectUsedResources =
         gd::SceneResourcesFinder::FindProjectResources(exportedProject);
-    std::vector<std::set<gd::String>> scenesUsedResources;
+    std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
     for (std::size_t layoutIndex = 0;
          layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
       auto &layout = exportedProject.GetLayout(layoutIndex);
-      scenesUsedResources.push_back(
+      scenesUsedResources[layout.GetName()] =
           gd::SceneResourcesFinder::FindSceneResources(exportedProject,
-                                                            layout));
+                                                            layout);
     }
 
     // Strip the project (*after* generating events as the events may use

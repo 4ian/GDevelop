@@ -9,6 +9,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "GDCore/String.h"
 namespace gd {
@@ -269,7 +270,7 @@ class ExporterHelper {
                     gd::String filename,
                     const gd::SerializerElement &runtimeGameOptions,
                     std::set<gd::String> &projectUsedResources,
-                    std::vector<std::set<gd::String>> &layersUsedResources);
+                    std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -480,7 +481,7 @@ private:
   static void SerializeUsedResources(
       gd::SerializerElement &rootElement,
       std::set<gd::String> &projectUsedResources,
-      std::vector<std::set<gd::String>> &layersUsedResources);
+      std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
 };
 
 }  // namespace gdjs

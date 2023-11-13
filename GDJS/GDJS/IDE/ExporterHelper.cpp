@@ -190,13 +190,13 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   auto projectUsedResources =
       gd::SceneResourcesFinder::FindProjectResources(exportedProject);
-  std::vector<std::set<gd::String>> scenesUsedResources;
+  std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
   for (std::size_t layoutIndex = 0;
        layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
     auto &layout = exportedProject.GetLayout(layoutIndex);
-    scenesUsedResources.push_back(
+    scenesUsedResources[layout.GetName()] = 
         gd::SceneResourcesFinder::FindSceneResources(exportedProject,
-                                                          layout));
+                                                          layout);
   }
 
   // Strip the project (*after* generating events as the events may use stripped
@@ -276,7 +276,7 @@ gd::String ExporterHelper::ExportProjectData(
     gd::String filename,
     const gd::SerializerElement &runtimeGameOptions,
     std::set<gd::String> &projectUsedResources,
-    std::vector<std::set<gd::String>> &scenesUsedResources) {
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
@@ -296,7 +296,7 @@ gd::String ExporterHelper::ExportProjectData(
 void ExporterHelper::SerializeUsedResources(
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
-    std::vector<std::set<gd::String>> &scenesUsedResources) {
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
 
   auto serializeUsedResources =
       [](gd::SerializerElement &element,
@@ -312,13 +312,12 @@ void ExporterHelper::SerializeUsedResources(
   serializeUsedResources(rootElement, projectUsedResources);
 
   auto &layoutsElement = rootElement.GetChild("layouts");
-  std::size_t layoutCount =
-      std::min(scenesUsedResources.size(), layoutsElement.GetChildrenCount());
-  for (std::size_t layoutIndex = 0; layoutIndex < layoutCount; layoutIndex++) {
-    // Both lists should have the same order.
+  for (std::size_t layoutIndex = 0;
+       layoutIndex < layoutsElement.GetChildrenCount(); layoutIndex++) {
     auto &layoutElement = layoutsElement.GetChild(layoutIndex);
-    auto &layoutUsedResources = scenesUsedResources[layoutIndex];
+    const auto layoutName = layoutElement.GetStringAttribute("name");
 
+    auto &layoutUsedResources = scenesUsedResources[layoutName];
     serializeUsedResources(layoutElement, layoutUsedResources);
   }
 }

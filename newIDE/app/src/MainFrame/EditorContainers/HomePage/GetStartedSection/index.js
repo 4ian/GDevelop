@@ -170,7 +170,13 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     [lastVisitedAuthenticationStep]
   );
 
-  if (creatingOrLoggingInAccount || loginState === 'loggingIn') {
+  if (
+    (creatingOrLoggingInAccount || loginState === 'loggingIn') &&
+    // Do not display loader if the user is already seeing the recommendations.
+    // It can happen when the user profile is refreshed while the recommendations
+    // are displayed. This way, the loader is not displayed unnecessarily.
+    step !== 'recommendations'
+  ) {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.

@@ -534,7 +534,7 @@ module.exports = {
       /**
        * Return the path to the thumbnail of the specified object.
        */
-      getThumbnail(project, resourcesLoader, objectConfiguration) {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'CppPlatform/Extensions/texticon24.png';
       }
 

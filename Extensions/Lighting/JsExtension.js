@@ -326,7 +326,7 @@ module.exports = {
       /**
        * Return the path to the thumbnail of the specified object.
        */
-      getThumbnail(
+      static getThumbnail(
         project,
         resourcesLoader,
         objectConfiguration

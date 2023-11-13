@@ -1198,23 +1198,23 @@ gd::String EventsCodeGenerator::GetObjectMapName(
     const gd::String& objectName,
     gd::EventsCodeGenerationContext& context) {
 
-    // TODO Why can't it just use objectName directly?
-    std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
+  // TODO Why can't it just use objectName directly?
+  std::vector<gd::String> realObjects =
+      GetObjectsContainersList().ExpandObjectName(objectName,
+                                                  context.GetCurrentObject());
 
-        // The map name must be unique for each set of objects lists.
-        // We generate it from the objects lists names.
-        gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
+  // The map name must be unique for each set of objects lists.
+  // We generate it from the objects lists names.
+  gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
 
-        // Map each declared object to its list.
-        for (auto& objectName : realObjects) {
-          objectsMapName +=
-              ManObjListName(GetObjectListName(objectName, context));
-        }
-        // TODO Handle objectListOrEmptyWithoutPicking?
+  // Map each declared object to its list.
+  for (auto &objectName : realObjects) {
+    objectsMapName += ManObjListName(GetObjectListName(objectName, context));
+  }
+  // TODO Handle objectListOrEmptyWithoutPicking?
 
-        return objectsMapName;
-    }
+  return objectsMapName;
+}
 
 gd::String EventsCodeGenerator::GenerateObject(
     const gd::String& objectName,

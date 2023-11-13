@@ -336,7 +336,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
                                     gd::EventsCodeGenerationContext& context) override;
 
   virtual gd::String GetObjectMapName(const gd::String &objectName,
-                                      gd::EventsCodeGenerationContext &context);
+                                      gd::EventsCodeGenerationContext &context) override;
 
   virtual gd::String GenerateNegatedPredicate(const gd::String& predicate) const override {
     return "!(" + predicate + ")";

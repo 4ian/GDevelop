@@ -27,6 +27,8 @@ import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RecommendationList from './RecommendationList';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
+const ONE_WEEK = 7 * 24 * 3600 * 1000;
+
 const styles = {
   icon: {
     width: 80,
@@ -369,6 +371,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
   }
 
   if (step === 'welcome') {
+    const isNewUser = profile && Date.now() - profile.createdAt < ONE_WEEK;
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -381,7 +384,11 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
           alignItems="center"
         >
           <Text size="title" align="center">
-            <Trans>Welcome to GDevelop!</Trans>
+            {!profile || isNewUser ? (
+              <Trans>Welcome to GDevelop!</Trans>
+            ) : (
+              <Trans>We have something new for you!</Trans>
+            )}
           </Text>
           <JewelPlatform style={styles.icon} />
           <Text size="body2" noMargin align="center">

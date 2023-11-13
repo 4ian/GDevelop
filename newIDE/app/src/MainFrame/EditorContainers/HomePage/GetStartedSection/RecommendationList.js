@@ -120,7 +120,7 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
   return (
     <>
       <Column noMargin>
-        <Text size="section-title">
+        <Text size="section-title" noMargin>
           <Trans>Read</Trans>
         </Text>
         <Text>
@@ -224,6 +224,7 @@ const RecommendationList = ({
             <SectionRow key="videos">
               <ImageTileRow
                 title={<Trans>Watch</Trans>}
+                margin="dense"
                 items={recommendedVideoTutorials.map(tutorial =>
                   formatTutorialToImageTileComponent(i18n, tutorial)
                 )}
@@ -242,7 +243,7 @@ const RecommendationList = ({
 
           items.push(
             <SectionRow key="guided-lessons">
-              <Text size="section-title">
+              <Text size="section-title" noMargin>
                 <Trans>Do</Trans>
               </Text>
               <Text>

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Column, Line } from './Grid';
+import { Column, LargeSpacer, Line } from './Grid';
 import Text from './Text';
 import { LineStackLayout } from './Layout';
 import FlatButton from './FlatButton';
@@ -21,6 +21,7 @@ type ImageTileRowProps = {|
   getLimitFromWidth: (width: WidthType) => number,
   getColumnsFromWidth: (width: WidthType) => number,
   seeAllLabel?: React.Node,
+  margin?: 'dense',
 |};
 
 const ImageTileRow = ({
@@ -33,6 +34,7 @@ const ImageTileRow = ({
   getLimitFromWidth,
   getColumnsFromWidth,
   seeAllLabel,
+  margin,
 }: ImageTileRowProps) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
@@ -68,6 +70,7 @@ const ImageTileRow = ({
           <Text noMargin>{description}</Text>
         </Line>
       )}
+      {margin === 'dense' ? null : <LargeSpacer />}
       <ImageTileGrid
         items={items}
         isLoading={isLoading}

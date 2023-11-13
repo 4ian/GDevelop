@@ -72,23 +72,23 @@ export const TitleAndSubtitle = ({
   answers: AnswerData[],
   textAlign: 'center' | 'left',
 }) => (
-  <>
-    <Text size="block-title" align={textAlign}>
+  <ColumnStackLayout noMargin>
+    <Text size="block-title" align={textAlign} noMargin>
       {i18n._(text)}
     </Text>
     {multi ? (
-      <Text style={styles.subTitle} align={textAlign}>
+      <Text style={styles.subTitle} align={textAlign} noMargin>
         {i18n._(t`You can select more than one.`)}
       </Text>
     ) : isOnlyOneFreeAnswerPossible(answers) ? (
-      <Text style={styles.subTitle} align={textAlign}>
+      <Text style={styles.subTitle} align={textAlign} noMargin>
         {i18n._(
           t`The more descriptive you are, the better we can match the content we’ll recommend.`
         )}
       </Text>
     ) : null}
     <Spacer />
-  </>
+  </ColumnStackLayout>
 );
 
 const styles = {
@@ -105,6 +105,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     overflow: 'hidden',
+    marginBottom: 30,
   },
   answerButtonBackground: { width: '100%', height: '100%' },
   answerCoverImage: {
@@ -367,7 +368,7 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
   ) => {
     const { text, answers, multi } = questionData;
     const windowWidth = useResponsiveWindowWidth();
-
+    const onlyOneFreeAnswerPossible = isOnlyOneFreeAnswerPossible(answers);
     return (
       <I18n>
         {({ i18n }) => (
@@ -382,12 +383,14 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
               />
             ) : null}
             <GridList
-              cols={getColumnsFromWidth(windowWidth)}
+              cols={
+                onlyOneFreeAnswerPossible ? 1 : getColumnsFromWidth(windowWidth)
+              }
               spacing={15}
               cellHeight="auto"
             >
               {// Case where only one free answer is possible.
-              isOnlyOneFreeAnswerPossible(answers) &&
+              onlyOneFreeAnswerPossible &&
               userInputValue !== undefined &&
               onChangeUserInputValue ? (
                 <GridListTile>

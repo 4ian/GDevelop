@@ -35,9 +35,15 @@ const styles = {
     height: 80,
     margin: 20,
   },
-  buttonContainer: {
+  middlePageButtonContainer: {
     width: '100%',
     maxWidth: 300, // Make buttons larger but not too much.
+    marginBottom: '15%', // Used to display the content of the section higher than at the center.
+  },
+  bottomPageButtonContainer: {
+    width: '100%',
+    maxWidth: 300, // Make buttons larger but not too much.
+    marginBottom: 30, // Used to giver some space between the buttons and the screen bottom border.
   },
   linearProgress: { width: 200 },
   getFormContainerStyle: (isMobile: boolean) => ({
@@ -232,7 +238,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
                   content.
                 </Trans>
               </Text>
-              <div style={styles.buttonContainer}>
+              <div style={styles.middlePageButtonContainer}>
                 <Line expand>
                   <RaisedButton
                     primary
@@ -261,7 +267,12 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
           justifyContent="center"
           alignItems="center"
         >
-          <ColumnStackLayout expand alignItems="center" justifyContent="center">
+          <ColumnStackLayout
+            expand
+            noMargin
+            alignItems="center"
+            justifyContent="center"
+          >
             <Text size="title" align="center">
               <Trans>Log in to Gdevelop</Trans>
             </Text>
@@ -283,7 +294,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
               />
             </div>
           </ColumnStackLayout>
-          <div style={styles.buttonContainer}>
+          <div style={styles.bottomPageButtonContainer}>
             <Column>
               <LineStackLayout expand>
                 <FlatButton
@@ -318,7 +329,12 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
           justifyContent="center"
           alignItems="center"
         >
-          <ColumnStackLayout expand alignItems="center" justifyContent="center">
+          <ColumnStackLayout
+            expand
+            noMargin
+            alignItems="center"
+            justifyContent="center"
+          >
             <Text size="title" align="center">
               <Trans>Let's start by creating your GDevelop account</Trans>
             </Text>
@@ -347,7 +363,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
               />
             </div>
           </ColumnStackLayout>
-          <div style={styles.buttonContainer}>
+          <div style={styles.bottomPageButtonContainer}>
             <Column>
               <LineStackLayout expand>
                 <FlatButton
@@ -386,6 +402,8 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
           <Text size="title" align="center">
             {!profile || isNewUser ? (
               <Trans>Welcome to GDevelop!</Trans>
+            ) : profile && profile.username ? (
+              <Trans>Good to see you {profile.username}!</Trans>
             ) : (
               <Trans>We have something new for you!</Trans>
             )}
@@ -393,19 +411,22 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
           <JewelPlatform style={styles.icon} />
           <Text size="body2" noMargin align="center">
             <Trans>
-              We've put together some content to help you on your game creation
-              journey.
+              We've made a selection of GDevelop content to help you on your
+              game development journey.
             </Trans>
           </Text>
           <LargeSpacer />
           <Text size="sub-title" align="center">
             {profile ? (
-              <Trans>Let's get to know you better.</Trans>
+              <Trans>
+                Answer our questionnaire and get recommendations according to
+                your current objectives.
+              </Trans>
             ) : (
               <Trans>Let's start by creating your account.</Trans>
             )}
           </Text>
-          <div style={styles.buttonContainer}>
+          <div style={styles.middlePageButtonContainer}>
             {profile ? (
               <Column noMargin>
                 <RaisedButton

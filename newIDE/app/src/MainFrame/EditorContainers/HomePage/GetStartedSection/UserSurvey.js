@@ -197,6 +197,13 @@ const DesktopDisplay = ({
             }
           />
         ))}
+        <div
+          style={{
+            // Used to make it possible to scroll to the next question so that the
+            // question is (sometime almost) at the top of the screen.
+            marginBottom: 400,
+          }}
+        />
       </ColumnStackLayout>
     </SectionContainer>
   );

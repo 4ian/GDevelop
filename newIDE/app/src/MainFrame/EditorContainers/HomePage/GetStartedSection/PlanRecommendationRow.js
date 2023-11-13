@@ -116,7 +116,7 @@ const PlanRecommendationRow = ({
   const planDetails = planDetailsById[recommendationPlanId];
 
   return (
-    <Line justifyContent="center">
+    <Line justifyContent="flex-start">
       <Paper
         background="dark"
         style={{
@@ -135,7 +135,7 @@ const PlanRecommendationRow = ({
               <Text
                 noMargin
                 align={isMobile ? 'center' : 'left'}
-                size="sub-title"
+                size="section-title"
               >
                 {planDetails.title}
               </Text>

@@ -26,11 +26,12 @@ namespace gdjs {
     );
   };
 
-  class TextInputRuntimeObjectPixiRenderer {
+  class TextInputRuntimeObjectPixiRenderer implements RendererObjectInterface {
     private _object: gdjs.TextInputRuntimeObject;
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
     private _instanceContainer: gdjs.RuntimeInstanceContainer;
     private _runtimeGame: gdjs.RuntimeGame;
+    private _isVisible = false;
 
     constructor(
       runtimeObject: gdjs.TextInputRuntimeObject,
@@ -113,14 +114,23 @@ namespace gdjs {
       this._destroyElement();
     }
 
+    set visible(isVisible: boolean) {
+      this._isVisible = isVisible;
+      if (!this._input) return;
+      this._input.style.display = isVisible ? 'initial' : 'none';
+    }
+
+    get visible(): boolean {
+      return this._isVisible;
+    }
+
     updatePreRender() {
       if (!this._input) return;
 
       // Hide the input entirely if the object is hidden.
       // Because this object is rendered as a DOM element (and not part of the PixiJS
       // scene graph), we have to do this manually.
-      if (this._object.isHidden()) {
-        this._input.style.display = 'none';
+      if (!this._isVisible) {
         return;
       }
 

@@ -72,16 +72,19 @@ namespace gdjs {
               );
             }
           }
-          if (objectsMaxCount1 <= 8 && objectsMaxCount2 <= 8) {
-            // Not enough instance for a R-Tree to be useful.
-            return gdjs.evtTools.object.twoListsTest(
-              predicate,
-              objectsLists1,
-              objectsLists2,
-              inverted,
-              predicateExtraArg
-            );
-          }
+          // TODO Check if it's really useful.
+          // It would need to fill the unpicked lists.
+
+          // if (objectsMaxCount1 <= 8 && objectsMaxCount2 <= 8) {
+          //   // Not enough instance for a R-Tree to be useful.
+          //   return gdjs.evtTools.object.twoListsTest(
+          //     predicate,
+          //     objectsLists1,
+          //     objectsLists2,
+          //     inverted,
+          //     predicateExtraArg
+          //   );
+          // }
           if (!isPicked1 && !isPicked2) {
             if (objectsMaxCount1 < objectsMaxCount2) {
               iteratedLists = objectsLists1;

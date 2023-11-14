@@ -3,7 +3,7 @@
   // and extension), we use esbuild to compile from TypeScript to JavaScript almost instantly.
   // See `GDJS/scripts/build.js`.
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES6",
     "noEmit": true,
     "allowJs": true,
     "noImplicitReturns": true,

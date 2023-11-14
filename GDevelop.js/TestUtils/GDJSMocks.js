@@ -565,6 +565,37 @@ const getPickedInstancesCount = (objectsLists) => {
   return count;
 };
 
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const getVisibleInstancesCount = (objectsContext, objectsLists) => {
+  let count = 0;
+
+  const objectNames = [];
+  objectsLists.keys(objectNames);
+
+  const uniqueObjectNames = new Set(objectNames);
+  for (const objectName of uniqueObjectNames) {
+    const visibleObjects = objectsContext.getObjects(objectName);
+    if (visibleObjects) {
+      count += visibleObjects.length;
+    }
+  }
+  return count;
+};
+
+/**
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const clearObjectLists = (objectsLists) => {
+  const lists = [];
+  objectsLists.values(lists);
+  for (let i = 0, len = lists.length; i < len; ++i) {
+    lists[i].length = 0;
+  }
+};
+
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
   constructor(sceneData) {
@@ -706,6 +737,27 @@ class LongLivedObjectsList {
   }
 }
 
+const clearObjectsLists = (objectsLists) => {
+  for (const k in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(k)) {
+      objectsLists.items[k].length = 0;
+    }
+  }
+};
+
+const addObject = (
+  objectsLists,
+  objectName,
+  object
+) => {
+  if (!objectsLists.isPicked) {
+    // A picking starts from empty lists.
+    clearObjectsLists(objectsLists);
+    objectsLists.isPicked = true;
+  }
+  objectsLists.get(objectName).push(object);
+};
+
 /**
  * Create a minimal mock of GDJS with a RuntimeScene (`gdjs.RuntimeScene`),
  * supporting setting a variable, using "Trigger Once" conditions
@@ -729,6 +781,8 @@ function makeMinimalGDJSMock(options) {
           createObjectOnScene,
           getSceneInstancesCount,
           getPickedInstancesCount,
+          getVisibleInstancesCount,
+          clearObjectLists,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
@@ -737,6 +791,9 @@ function makeMinimalGDJSMock(options) {
         common: {
           resolveAsyncEventsFunction: ({ task }) => task.resolve(),
         },
+        objectsLists: {
+          addObject,
+        }
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;

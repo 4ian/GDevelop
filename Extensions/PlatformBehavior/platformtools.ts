@@ -2,9 +2,9 @@ namespace gdjs {
   export namespace evtTools {
     export namespace platform {
       export const isOnPlatform = function (
-        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists1: ObjectsLists,
         behaviorName: string,
-        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists2: ObjectsLists,
         inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(

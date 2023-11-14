@@ -80,6 +80,7 @@ type Props = {|
 
   // String text field:
   maxLength?: number,
+  disableAutocapitalize?: boolean,
 
   // Number text field:
   precision?: number,
@@ -376,6 +377,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           onBlur={props.onBlur}
           inputRef={inputRef}
           spellCheck="false"
+          autocapitalize={props.disableAutocapitalize ? 'off' : 'on'}
         />
       )}
     </I18n>

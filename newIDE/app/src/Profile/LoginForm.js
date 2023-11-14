@@ -63,6 +63,7 @@ const LoginForm = ({
                 onChangeEmail(event.currentTarget.value.trim());
               }}
               fullWidth
+              disableAutocapitalize
               disabled={loginInProgress}
             />
             <TextField

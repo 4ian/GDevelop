@@ -67,6 +67,7 @@ const CreateAccountForm = ({
             floatingLabelText={<Trans>Email</Trans>}
             errorText={getEmailErrorText(error)}
             fullWidth
+            disableAutocapitalize
             required
             onChange={(e, value) => {
               onChangeEmail(value);

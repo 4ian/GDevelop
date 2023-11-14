@@ -513,7 +513,7 @@ namespace gdjs {
           obj.update(this);
         }
         obj.updateTimers(elapsedTime);
-        allInstancesList[i].stepBehaviorsPreEvents(this);
+        obj.stepBehaviorsPreEvents(this);
       }
 
       // Some behaviors may have request objects to be deleted.

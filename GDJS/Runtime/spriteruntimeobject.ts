@@ -348,6 +348,10 @@ namespace gdjs {
       );
       this._updateAnimationFrame();
 
+      if (this.isNeedingLifecycleFunctions()) {
+        this.getLifecycleSleepState().wakeUp();
+      }
+
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
@@ -452,6 +456,13 @@ namespace gdjs {
       }
     }
 
+    isNeedingLifecycleFunctions(): boolean {
+      return (
+        super.isNeedingLifecycleFunctions() ||
+        (!this.isAnimationPaused() && !this.hasAnimationEnded())
+      );
+    }
+
     /**
      * Update the current frame of the object according to the elapsed time on the scene.
      */
@@ -510,13 +521,6 @@ namespace gdjs {
         this._updateAnimationFrame();
       }
       this._renderer.ensureUpToDate();
-    }
-
-    isNeedingLifecycleFunctions(): boolean {
-      return (
-        super.isNeedingLifecycleFunctions() ||
-        (!this.isAnimationPaused() && !this.hasAnimationEnded())
-      );
     }
 
     /**

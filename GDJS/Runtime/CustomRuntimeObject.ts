@@ -60,6 +60,10 @@ namespace gdjs {
       this._instanceContainer.loadFrom(objectData);
       this.getRenderer().reinitialize(this, parent);
 
+      if (this.isNeedingLifecycleFunctions()) {
+        this.getLifecycleSleepState().wakeUp();
+      }
+
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
     }
@@ -120,6 +124,10 @@ namespace gdjs {
      */
     onHotReloading(parent: gdjs.RuntimeInstanceContainer) {}
 
+    isNeedingLifecycleFunctions(): boolean {
+      return true;
+    }
+
     // This is only to handle trigger once.
     doStepPreEvents(parent: gdjs.RuntimeInstanceContainer) {}
 
@@ -138,10 +146,6 @@ namespace gdjs {
     updatePreRender(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
-    }
-
-    isNeedingLifecycleFunctions(): boolean {
-      return true;
     }
 
     getRendererObject() {

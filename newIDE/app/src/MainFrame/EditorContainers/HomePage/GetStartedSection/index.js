@@ -75,7 +75,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     loginState,
   } = authenticatedUser;
   const { values: preferences } = React.useContext(PreferencesContext);
-  const recommendationsGettingDelayPromise = React.useRef<?Promise>(null);
+  const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
 
   const forceUpdate = useForceUpdate();
   const windowWidth = useResponsiveWindowWidth();

@@ -36,7 +36,7 @@
     }
   },
   "scripts": {
-    "postinstall": "patch-package && cp node_modules/pixi-spine/dist/pixi-spine.js Runtime/pixi-renderers",
+    "postinstall": "patch-package && node scripts/install-spine.js",
     "check-types": "tsc",
     "build": "node scripts/build.js",
     "test": "cd tests && npm run test-benchmark",

@@ -128,6 +128,6 @@ export const DoneFooter = ({
 export const html5Exporter = {
   key: 'webexport',
   tabName: <Trans>Web</Trans>,
-  name: <Trans>Web</Trans>,
+  name: <Trans>HTML5</Trans>,
   helpPage: '/publishing/html5_game_in_a_local_folder',
 };

@@ -508,6 +508,12 @@
         "value": "1px solid {event-sheet.sub-instructions.border-color.value}"
       }
     },
+    "warning-instruction": {
+      "background-color": {
+        "value": "rgba(255, 188, 87, 0.125)",
+        "comment": "Palette/Yellow/40 and alpha"
+      }
+    },
     "instruction-parameter": {
       "base": {
         "color": {
@@ -611,7 +617,7 @@
     },
     "toolbar": {
       "background-color": {
-        "value": "#2799b9"
+        "value": "#2750B9"
       },
       "border-color-hover": {
         "value": "rgb(92, 118, 126)"

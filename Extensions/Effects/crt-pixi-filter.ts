@@ -9,7 +9,7 @@ namespace gdjs {
         crtFilter._animationTimer = 0;
         return crtFilter;
       }
-      updatePreRender(filter, target) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
         if (filter.animationSpeed !== 0) {
           // Multiply by 10 so that the default value is a sensible speed
           filter.time +=
@@ -23,7 +23,11 @@ namespace gdjs {
           }
         }
       }
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         if (parameterName === 'lineWidth') {
           filter.lineWidth = value;
         } else if (parameterName === 'lineContrast') {
@@ -48,8 +52,16 @@ namespace gdjs {
           filter.padding = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {
         if (parameterName === 'verticalLine') {
           filter.verticalLine = value;
         }

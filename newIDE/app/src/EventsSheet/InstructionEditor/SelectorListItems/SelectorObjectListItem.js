@@ -9,6 +9,7 @@ import {
   getObjectListItemKey,
 } from './Keys';
 import HighlightedText from '../../../UI/Search/HighlightedText';
+import { styles } from '../InstructionOrObjectSelector';
 import { type HTMLDataset } from '../../../Utils/HTMLDataset';
 
 type Props = {|
@@ -20,6 +21,8 @@ type Props = {|
   matchesCoordinates: number[][],
   id?: ?string,
   data?: HTMLDataset,
+  withIndent?: boolean,
+  keyPrefix?: string,
 |};
 
 export const renderObjectListItem = ({
@@ -31,16 +34,19 @@ export const renderObjectListItem = ({
   matchesCoordinates,
   id,
   data,
+  withIndent,
+  keyPrefix,
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
       id={id}
       data={data}
-      key={getObjectListItemKey(objectWithContext)}
+      key={(keyPrefix || '') + getObjectListItemKey(objectWithContext)}
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)
       }
+      style={withIndent ? styles.indentedListItem : undefined}
       primaryText={
         <HighlightedText
           text={objectName}

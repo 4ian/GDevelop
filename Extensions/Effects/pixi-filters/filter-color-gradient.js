@@ -1,3 +1,5 @@
+// TODO This filter can be interesting to make a gradient shadow over sprites.
+// It can work with only 2 colors but maybe it would be better to wait that property list are handled.
 /*!
  * @pixi/filter-color-gradient - v5.2.0
  * Compiled Thu, 31 Aug 2023 09:18:38 UTC

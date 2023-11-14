@@ -47,9 +47,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       "gdjs.evtTools.common.logicalNegation");
 
   GetAllConditions()["Egal"].SetCustomCodeGenerator(
-      [](gd::Instruction& instruction,
-         gd::EventsCodeGenerator& codeGenerator,
-         gd::EventsCodeGenerationContext& context) {
+      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
         gd::String value1Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
@@ -57,8 +56,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 "number",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String value2Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -72,7 +70,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         return resultingBoolean + " = " +
                gd::String(instruction.IsInverted() ? "!" : "") + "(" +
-               value1Code + " " + operatorCode + " " + value2Code + ");\n";
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString, value1Code, value2Code) +
+               ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"]
       .codeExtraInformation = GetAllConditions()["Egal"].codeExtraInformation;
@@ -88,8 +88,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 "string",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String value2Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -103,7 +102,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         return resultingBoolean + " = " +
                gd::String(instruction.IsInverted() ? "!" : "") + "(" +
-               value1Code + " " + operatorCode + " " + value2Code + ");\n";
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString, value1Code, value2Code) +
+               ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareStrings"]
       .codeExtraInformation =
@@ -848,7 +849,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Generate the function code
         gd::String functionCode;
         functionCode +=
-            functionName + " = function(" + functionParameters + ") {\n";
+            functionName + " = function GDJSInlineCode(" + functionParameters + ") {\n";
         functionCode += event.IsUseStrict() ? "\"use strict\";\n" : "";
         functionCode += event.GetInlineCode();
         functionCode += "\n};\n";

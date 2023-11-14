@@ -37,7 +37,7 @@
   // Exclude pre-built js code
   "exclude": [
     "GDJS/Runtime/pixi-renderers/pixi.js",
-    "GDJS/Runtime/pixi-renderers/pixi-spine.umd.js",
+    "GDJS/Runtime/pixi-renderers/pixi-spine.js",
     "GDJS/Runtime/Cordova",
     "GDJS/Runtime/Electron",
     "GDJS/Runtime/FacebookInstantGames",

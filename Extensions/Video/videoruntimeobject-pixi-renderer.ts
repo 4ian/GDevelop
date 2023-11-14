@@ -49,10 +49,12 @@ namespace gdjs {
     }
 
     /**
-     * To be called when the object is removed from the scene: will pause the video.
+     * To be called when the object is removed from the scene: will stop the video
+     * (goes back to beginning).
      */
     onDestroy() {
-      this.pause();
+      this.stop();
+      this._pixiObject.destroy(false);
     }
 
     ensureUpToDate() {
@@ -170,6 +172,18 @@ namespace gdjs {
         return;
       }
       source.pause();
+    }
+
+    /**
+     * Stops the video and comes back to first frame.
+     */
+    stop() {
+      const source = this._getHTMLVideoElementSource();
+      if (!source) {
+        return;
+      }
+      source.pause();
+      source.currentTime = 0;
     }
 
     // Autoplay was prevented.

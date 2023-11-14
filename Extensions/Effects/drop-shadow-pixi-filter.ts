@@ -2,12 +2,16 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'DropShadow',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const dropShadowFilter = new PIXI.filters.DropShadowFilter();
         return dropShadowFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
         if (parameterName === 'blur') {
           dropShadowFilter.blur = value;
@@ -23,7 +27,11 @@ namespace gdjs {
           dropShadowFilter.padding = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {
         const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
         if (parameterName === 'color') {
           dropShadowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
@@ -31,7 +39,11 @@ namespace gdjs {
           );
         }
       }
-      updateBooleanParameter(filter, parameterName, value) {
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {
         const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
         if (parameterName === 'shadowOnly') {
           dropShadowFilter.shadowOnly = value;

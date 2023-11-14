@@ -4,13 +4,15 @@ import { List } from 'react-virtualized';
 import ItemRow from './ItemRow';
 import { AddListItem } from '../ListCommonItem';
 import { listItemWith32PxIconHeight, listItemWithoutIconHeight } from '../List';
-import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
+import {
+  makeDragSourceAndDropTarget,
+  type DraggedItem,
+} from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from './DropIndicator';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
 import type { WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
-import { type DraggedItem } from '../../UI/DragAndDrop/CustomDragLayer';
 
 const OVERSCAN_CELLS_COUNT = 20;
 

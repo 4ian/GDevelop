@@ -158,6 +158,11 @@ namespace gdjs {
       );
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Set the Tilemap file to display.
      */

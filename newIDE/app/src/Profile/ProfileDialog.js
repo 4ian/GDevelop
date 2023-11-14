@@ -21,6 +21,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RouterContext from '../MainFrame/RouterContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -249,4 +250,14 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   );
 };
 
-export default ProfileDialog;
+const ProfileDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Profile</Trans>}
+    scope="profile"
+    onClose={props.onClose}
+  >
+    <ProfileDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ProfileDialogWithErrorBoundary;

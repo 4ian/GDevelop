@@ -237,8 +237,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            "MovementAngleIsAround",
            _("Angle of movement on its path"),
            _("Compare the angle of movement of an object on its path."),
-           _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
-             ": _PARAM3_ degrees)"),
+           _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
            _("Movement on the path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")

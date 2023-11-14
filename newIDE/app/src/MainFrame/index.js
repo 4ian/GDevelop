@@ -51,7 +51,9 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
-import ErrorBoundary from '../UI/ErrorBoundary';
+import ErrorBoundary, {
+  getEditorErrorBoundaryProps,
+} from '../UI/ErrorBoundary';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -180,7 +182,8 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
-
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import useResourcesWatcher from './ResourcesWatcher';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -498,6 +501,11 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
+  useResourcesWatcher(
+    getStorageProvider,
+    currentFileMetadata,
+    state.editorTabs
+  );
 
   /**
    * This reference is useful to get the current opened project,
@@ -898,7 +906,7 @@ const MainFrame = (props: Props) => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
+      PixiResourcesLoader.burstCache();
 
       const state = await setState(state => ({
         ...state,
@@ -3106,19 +3114,21 @@ const MainFrame = (props: Props) => {
       >
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+          const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
-                  title="This editor encountered a problem"
-                  scope="mainframe"
+                  componentTitle={errorBoundaryProps.componentTitle}
+                  scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
                     fileMetadata: currentFileMetadata,
+                    storageProvider: getStorageProvider(),
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
@@ -3350,18 +3360,18 @@ const MainFrame = (props: Props) => {
       {preferencesDialogOpen && (
         <PreferencesDialog
           i18n={props.i18n}
-          onClose={languageChanged => {
+          onClose={options => {
             openPreferencesDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}
       {languageDialogOpen && (
         <LanguageDialog
           open
-          onClose={languageChanged => {
+          onClose={options => {
             openLanguageDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}

@@ -306,8 +306,8 @@ void ResourceWorkerInObjectsWorker::DoVisitBehavior(gd::Behavior &behavior){
 gd::ResourceWorkerInObjectsWorker
 GetResourceWorkerOnObjects(const gd::Project &project,
                            gd::ArbitraryResourceWorker &worker) {
-  gd::ResourceWorkerInObjectsWorker eventsWorker(project, worker);
-  return eventsWorker;
+  gd::ResourceWorkerInObjectsWorker resourcesWorker(project, worker);
+  return resourcesWorker;
 }
 
 }  // namespace gd

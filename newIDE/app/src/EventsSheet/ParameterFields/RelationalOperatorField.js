@@ -18,13 +18,16 @@ const operatorLabels = {
   '<=': t`≤ (less or equal to)`,
   '>=': t`≥ (greater or equal to)`,
   '!=': t`≠ (not equal to)`,
+  startsWith: t`starts with`,
+  endsWith: t`ends with`,
+  contains: t`contains`,
 };
 
 const mapTypeToOperators: { [string]: Array<string> } = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '<', '>', '<=', '>=', '!='],
   time: ['<', '>', '<=', '>='],
-  string: ['=', '!='],
+  string: ['=', '!=', 'startsWith', 'endsWith', 'contains'],
   color: ['=', '!='],
 };
 
@@ -106,14 +109,20 @@ export const renderInlineRelationalOperator = ({
     value !== '>' &&
     value !== '<=' &&
     value !== '>=' &&
-    value !== '!='
+    value !== '!=' &&
+    value !== 'startsWith' &&
+    value !== 'endsWith' &&
+    value !== 'contains'
   ) {
     return <InvalidParameterValue>{value}</InvalidParameterValue>;
   }
 
   if (value === '<=') return '\u2264';
   if (value === '>=') return '\u2265';
-  else if (value === '!=') return '\u2260';
+  if (value === '!=') return '\u2260';
+  if (value === 'startsWith') return <Trans>starts with</Trans>;
+  if (value === 'endsWith') return <Trans>ends with</Trans>;
+  if (value === 'contains') return <Trans>contains</Trans>;
 
   return value;
 };

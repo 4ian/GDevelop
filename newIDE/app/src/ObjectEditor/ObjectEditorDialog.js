@@ -23,6 +23,7 @@ import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
 
@@ -344,7 +345,7 @@ type State = {|
   objectName: string,
 |};
 
-export default class ObjectEditorDialog extends React.Component<Props, State> {
+class ObjectEditorDialog extends React.Component<Props, State> {
   state = {
     editorComponent: null,
     castToObjectType: null,
@@ -408,3 +409,16 @@ export default class ObjectEditorDialog extends React.Component<Props, State> {
     );
   }
 }
+
+const ObjectEditorWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Object editor</Trans>}
+    scope="object-details"
+    onClose={props.onCancel}
+    showOnTop
+  >
+    <ObjectEditorDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ObjectEditorWithErrorBoundary;

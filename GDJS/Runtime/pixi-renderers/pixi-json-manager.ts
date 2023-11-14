@@ -94,7 +94,10 @@ namespace gdjs {
               await this.loadJsonAsync(resource.name);
             }
           } catch (error) {
-            console.log('spine loading error', error)
+            logger.error(
+              `Error while preloading json resource ${resource.name}:`,
+              error
+            );
           }
 
           onProgress(loadedNumber++, this._resources.size);

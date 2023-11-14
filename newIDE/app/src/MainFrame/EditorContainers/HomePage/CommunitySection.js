@@ -15,6 +15,7 @@ import SectionContainer, { SectionRow } from './SectionContainer';
 import { ListItem } from '../../../UI/List';
 import List from '@material-ui/core/List';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import ErrorBoundary from '../../../UI/ErrorBoundary';
 
 const styles = {
   list: {
@@ -94,4 +95,13 @@ const CommunitySection = () => {
   );
 };
 
-export default CommunitySection;
+const CommunitySectionWithErrorBoundary = () => (
+  <ErrorBoundary
+    componentTitle={<Trans>Community section</Trans>}
+    scope="start-page-community"
+  >
+    <CommunitySection />
+  </ErrorBoundary>
+);
+
+export default CommunitySectionWithErrorBoundary;

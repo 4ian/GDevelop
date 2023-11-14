@@ -18,6 +18,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 
 export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'mobile';
@@ -116,14 +117,19 @@ const ShareDialog = ({
   const [currentTab, setCurrentTab] = React.useState<ShareTab>(
     initialTab || getShareDialogDefaultTab()
   );
+  const showOnlineWebExporterOnly = !automatedExporters && !manualExporters;
   const [
     chosenExporterSection,
     setChosenExporterSection,
-  ] = React.useState<?ExporterSection>(null);
+  ] = React.useState<?ExporterSection>(
+    showOnlineWebExporterOnly ? 'browser' : null
+  );
   const [
     chosenExporterSubSection,
     setChosenExporterSubSection,
-  ] = React.useState<?ExporterSubSection>(null);
+  ] = React.useState<?ExporterSubSection>(
+    showOnlineWebExporterOnly ? 'online' : null
+  );
 
   React.useEffect(() => setShareDialogDefaultTab(currentTab), [
     setShareDialogDefaultTab,
@@ -211,10 +217,6 @@ const ShareDialog = ({
     ],
     [automatedExporters, manualExporters, onlineWebExporter]
   );
-  const showOnlineWebExporterOnly = React.useMemo(
-    () => !automatedExporters && !manualExporters,
-    [automatedExporters, manualExporters]
-  );
 
   const exporter: ?Exporter = React.useMemo(
     () => {
@@ -290,7 +292,8 @@ const ShareDialog = ({
     <Dialog
       // Keep ID for backward compatibility with guided lessons.
       id="export-dialog"
-      maxWidth={'sm'}
+      maxWidth={'md'}
+      minHeight={'lg'}
       title={<Trans>Share</Trans>}
       actions={mainActions}
       secondaryActions={secondaryActions}
@@ -302,15 +305,15 @@ const ShareDialog = ({
           onChange={setCurrentTab}
           options={[
             {
-              value: 'invite',
-              label: <Trans>Invite</Trans>,
-              id: 'invite-tab',
-              disabled: isNavigationDisabled,
-            },
-            {
               value: 'publish',
               label: <Trans>Publish</Trans>,
               id: 'publish-tab',
+              disabled: isNavigationDisabled,
+            },
+            {
+              value: 'invite',
+              label: <Trans>Invite</Trans>,
+              id: 'invite-tab',
               disabled: isNavigationDisabled,
             },
           ]}
@@ -338,12 +341,8 @@ const ShareDialog = ({
           selectedExporter={exporter}
           onChooseSection={setChosenExporterSection}
           onChooseSubSection={setChosenExporterSubSection}
-          chosenSection={
-            showOnlineWebExporterOnly ? 'browser' : chosenExporterSection
-          }
-          chosenSubSection={
-            showOnlineWebExporterOnly ? 'online' : chosenExporterSubSection
-          }
+          chosenSection={chosenExporterSection}
+          chosenSubSection={chosenExporterSubSection}
           game={game}
           allExportersRequireOnline={allExportersRequireOnline}
           showOnlineWebExporterOnly={showOnlineWebExporterOnly}
@@ -362,4 +361,14 @@ const ShareDialog = ({
   );
 };
 
-export default ShareDialog;
+const ShareDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Share dialog</Trans>}
+    scope="export-and-share"
+    onClose={props.onClose}
+  >
+    <ShareDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ShareDialogWithErrorBoundary;

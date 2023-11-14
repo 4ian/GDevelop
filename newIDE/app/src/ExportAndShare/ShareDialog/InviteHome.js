@@ -377,7 +377,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
             <GetSubscriptionCard subscriptionDialogOpeningReason="Add collaborators on project">
               <Text>
                 <Trans>
-                  Get a startup subscription to invite collaborators on your
+                  Get a startup subscription to invite collaborators into your
                   project.
                 </Trans>
               </Text>

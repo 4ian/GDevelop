@@ -25,6 +25,9 @@ const UsedExtensionsResult UsedExtensionsFinder::ScanProject(gd::Project& projec
 void UsedExtensionsFinder::DoVisitObject(gd::Object &object) {
   auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
       project.GetCurrentPlatform(), object.GetType());
+  if (metadata.GetMetadata().IsRenderedIn3D()) {
+    result.MarkAsHaving3DObjects();
+  }
   result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
   for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
     result.GetUsedIncludeFiles().insert(includeFile);

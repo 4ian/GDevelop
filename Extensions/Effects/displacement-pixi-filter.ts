@@ -2,7 +2,7 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Displacement',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const displacementMapTexture = target
           .getRuntimeScene()
           .getGame()
@@ -15,8 +15,12 @@ namespace gdjs {
         );
         return displacementFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
         if (parameterName === 'scaleX') {
           displacementFilter.scale.x = value;
@@ -25,8 +29,16 @@ namespace gdjs {
           displacementFilter.scale.y = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

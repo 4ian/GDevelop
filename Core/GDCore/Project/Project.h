@@ -11,12 +11,12 @@
 
 #include "GDCore/Project/ExtensionProperties.h"
 #include "GDCore/Project/LoadingScreen.h"
-#include "GDCore/Project/Watermark.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/Watermark.h"
 #include "GDCore/String.h"
 namespace gd {
 class Platform;
@@ -82,7 +82,9 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * \brief Change the project description
    */
-  void SetDescription(const gd::String& description_) { description = description_; };
+  void SetDescription(const gd::String& description_) {
+    description = description_;
+  };
 
   /**
    * \brief Get the project description
@@ -124,7 +126,9 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * \brief Get the author usernames of the project.
    */
-  const std::vector<gd::String>& GetAuthorUsernames() const { return authorUsernames; };
+  const std::vector<gd::String>& GetAuthorUsernames() const {
+    return authorUsernames;
+  };
 
   /**
    * \brief Get the author usernames of the project, to modify them (non-const).
@@ -135,7 +139,9 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Define the project as playable with a keyboard.
    * \param enable True to define the project as playable with a keyboard.
    */
-  void SetPlayableWithKeyboard(bool playable = true) { isPlayableWithKeyboard = playable; }
+  void SetPlayableWithKeyboard(bool playable = true) {
+    isPlayableWithKeyboard = playable;
+  }
 
   /**
    * Check if the project is defined as playable with a keyboard.
@@ -146,7 +152,9 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Define the project as playable with a gamepad.
    * \param enable True to define the project as playable with a gamepad.
    */
-  void SetPlayableWithGamepad(bool playable = true) { isPlayableWithGamepad = playable; }
+  void SetPlayableWithGamepad(bool playable = true) {
+    isPlayableWithGamepad = playable;
+  }
 
   /**
    * Check if the project is defined as playable with a gamepad.
@@ -157,7 +165,9 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Define the project as playable on a mobile.
    * \param enable True to define the project as playable on a mobile.
    */
-  void SetPlayableWithMobile(bool playable = true) { isPlayableWithMobile = playable; }
+  void SetPlayableWithMobile(bool playable = true) {
+    isPlayableWithMobile = playable;
+  }
 
   /**
    * Check if the project is defined as playable on a mobile.
@@ -391,17 +401,23 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * Set the antialiasing mode used by the game ("none" or "MSAA").
    */
-  void SetAntialiasingMode(const gd::String& antialiasingMode_) { antialiasingMode = antialiasingMode_; }
+  void SetAntialiasingMode(const gd::String& antialiasingMode_) {
+    antialiasingMode = antialiasingMode_;
+  }
 
   /**
    * Return true if antialising is enabled on mobiles.
    */
-  bool IsAntialisingEnabledOnMobile() const { return isAntialisingEnabledOnMobile; }
+  bool IsAntialisingEnabledOnMobile() const {
+    return isAntialisingEnabledOnMobile;
+  }
 
   /**
    * Set whether antialising is enabled on mobiles or not.
    */
-  void SetAntialisingEnabledOnMobile(bool enable) { isAntialisingEnabledOnMobile = enable; }
+  void SetAntialisingEnabledOnMobile(bool enable) {
+    isAntialisingEnabledOnMobile = enable;
+  }
 
   /**
    * \brief Return if the project should set 0 as Z-order for objects created
@@ -905,7 +921,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * \brief Return the events based object with a given type.
    */
-  const gd::EventsBasedObject& GetEventsBasedObject(const gd::String& type) const;
+  const gd::EventsBasedObject& GetEventsBasedObject(
+      const gd::String& type) const;
 
   /**
    * \brief  Check if events based behavior with a given type exists.
@@ -920,7 +937,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * \brief Return the events based behavior with a given type.
    */
-  const gd::EventsBasedBehavior& GetEventsBasedBehavior(const gd::String& type) const;
+  const gd::EventsBasedBehavior& GetEventsBasedBehavior(
+      const gd::String& type) const;
 
   ///@}
 
@@ -970,28 +988,14 @@ class GD_CORE_API Project : public ObjectsContainer {
   ///@{
 
   /**
-   * Check if unicode names are allowed in identifier names.
-   * \see IsNameSafe
-   * \see GetSafeName
-   */
-  static bool IsUsageOfUnicodeIdentifierNamesAllowed() { return allowUsageOfUnicodeIdentifierNames; };
-
-  /**
-   * Set if unicode names are allowed in identifier names.
-   * \see IsNameSafe
-   * \see GetSafeName
-   */
-  static void AllowUsageOfUnicodeIdentifierNames(bool enable);
-
-  /**
    * Return true if \a name is valid (can be used safely for an object,
    * behavior, events function name, etc...).
    */
   static bool IsNameSafe(const gd::String& name);
 
   /**
-   * Return a name, based on the one passed in parameter, that can be safely used
-   * for an object, behavior, events function name, etc...
+   * Return a name, based on the one passed in parameter, that can be safely
+   * used for an object, behavior, events function name, etc...
    */
   static gd::String GetSafeName(const gd::String& name);
   ///@}
@@ -1068,8 +1072,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   bool adaptGameResolutionAtRuntime;  ///< Should the game resolution be adapted
                                       ///< to the window size at runtime
   gd::String
-      sizeOnStartupMode;   ///< How to adapt the game size to the screen. Can be
-                           ///< "adaptWidth", "adaptHeight" or empty
+      sizeOnStartupMode;  ///< How to adapt the game size to the screen. Can be
+                          ///< "adaptWidth", "adaptHeight" or empty
   gd::String antialiasingMode;
   bool isAntialisingEnabledOnMobile;
   gd::String projectUuid;  ///< UUID useful to identify the game in online
@@ -1095,19 +1099,18 @@ class GD_CORE_API Project : public ObjectsContainer {
       externalSourceFiles;  ///< List of external source files used.
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
-      authorIds;           ///< Game author ids, from GDevelop users DB.
+      authorIds;  ///< Game author ids, from GDevelop users DB.
   std::vector<gd::String>
-      authorUsernames;     ///< Game author usernames, from GDevelop users DB.
-  std::vector<gd::String>
-      categories;           ///< Game categories
-  bool isPlayableWithKeyboard; ///< The project is playable with a keyboard.
-  bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
-  bool isPlayableWithMobile;   ///< The project is playable on a mobile.
-  gd::String packageName;  ///< Game package name
-  gd::String templateSlug; ///< The slug of the template from which the game is
-                           ///< created.
-  gd::String orientation;  ///< Lock game orientation (on mobile devices).
-                           ///< "default", "landscape" or "portrait".
+      authorUsernames;  ///< Game author usernames, from GDevelop users DB.
+  std::vector<gd::String> categories;  ///< Game categories
+  bool isPlayableWithKeyboard;  ///< The project is playable with a keyboard.
+  bool isPlayableWithGamepad;   ///< The project is playable with a gamepad.
+  bool isPlayableWithMobile;    ///< The project is playable on a mobile.
+  gd::String packageName;       ///< Game package name
+  gd::String templateSlug;  ///< The slug of the template from which the game is
+                            ///< created.
+  gd::String orientation;   ///< Lock game orientation (on mobile devices).
+                            ///< "default", "landscape" or "portrait".
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String
@@ -1128,8 +1131,6 @@ class GD_CORE_API Project : public ObjectsContainer {
                                         ///< time the project was saved.
   mutable unsigned int gdBuildVersion;  ///< The GD build version used the last
                                         ///< time the project was saved.
-
-  static bool allowUsageOfUnicodeIdentifierNames;
 };
 
 }  // namespace gd

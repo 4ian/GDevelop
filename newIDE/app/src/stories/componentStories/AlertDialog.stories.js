@@ -16,6 +16,7 @@ export const Default = () => {
     showAlert,
     showConfirmation,
     showDeleteConfirmation,
+    showYesNoCancel,
   } = useAlertDialog();
 
   const onOpenAlertDialog = async () => {
@@ -24,6 +25,20 @@ export const Default = () => {
       message: t`You cannot do this.`,
     });
     action('Dismissed')();
+  };
+
+  const onOpenYesNoCancelDialog = async () => {
+    const answer = await showYesNoCancel({
+      title: t`Warning`,
+      message: t`Do you want to refactor your project?`,
+    });
+    if (answer === 0) {
+      action('Yes')();
+    } else if (answer === 1) {
+      action('No')();
+    } else {
+      action('Cancel')();
+    }
   };
 
   const onOpenConfirmDialog = async () => {
@@ -48,6 +63,16 @@ export const Default = () => {
     else action('Delete Dismissed')();
   };
 
+  const onOpenConfirmDeleteWithoutConfirmTextDialog = async () => {
+    const answer = await showDeleteConfirmation({
+      title: t`Do you really want to permanently delete your account?`,
+      message: t`You’re about to permanently delete your GDevelop account username@mail.com. You will no longer be able to log into the app with this email address.`,
+      confirmButtonLabel: t`Delete my account`,
+    });
+    if (answer) action('Delete Confirmed')();
+    else action('Delete Dismissed')();
+  };
+
   return (
     <Column alignItems="flex-start">
       <RaisedButton label="Open alert dialog" onClick={onOpenAlertDialog} />
@@ -57,6 +82,16 @@ export const Default = () => {
       <RaisedButton
         label="Open confirm delete dialog"
         onClick={onOpenConfirmDeleteDialog}
+      />
+      <LargeSpacer />
+      <RaisedButton
+        label="Open confirm delete dialog without confirm text"
+        onClick={onOpenConfirmDeleteWithoutConfirmTextDialog}
+      />
+      <LargeSpacer />
+      <RaisedButton
+        label="Open yes no cancel dialog"
+        onClick={onOpenYesNoCancelDialog}
       />
     </Column>
   );

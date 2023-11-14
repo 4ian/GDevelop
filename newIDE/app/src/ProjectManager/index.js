@@ -54,6 +54,7 @@ import Paper from '../UI/Paper';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -147,7 +148,7 @@ type State = {|
   layoutVariablesDialogOpen: boolean,
 |};
 
-export default class ProjectManager extends React.Component<Props, State> {
+class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBarInterface;
   _draggedLayoutIndex: number | null = null;
   _draggedExternalLayoutIndex: number | null = null;
@@ -1276,3 +1277,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
   }
 }
+
+const ProjectManagerWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Project manager</Trans>}
+    scope="project-manager"
+  >
+    <ProjectManager {...props} />
+  </ErrorBoundary>
+);
+
+export default ProjectManagerWithErrorBoundary;

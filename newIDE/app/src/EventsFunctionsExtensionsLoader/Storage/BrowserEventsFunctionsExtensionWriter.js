@@ -55,7 +55,6 @@ export default class BrowserEventsFunctionsExtensionWriter {
     filename: string
   ): Promise<void> => {
     const exportedObject = customObject.clone().get();
-    exportedObject.setTags('');
     exportedObject.getVariables().clear();
     exportedObject.getEffects().clear();
     exportedObject

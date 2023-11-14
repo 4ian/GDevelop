@@ -9,6 +9,7 @@ const styles = {
     marginTop: '-1px',
     marginBottom: '-1px',
     width: '100%',
+    pointerEvents: 'none',
     boxSizing: 'border-box',
   },
 };

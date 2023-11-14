@@ -119,9 +119,9 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
   },
-  fullHeightModal: {
-    minHeight: 'calc(100% - 64px)',
-  },
+  minHeightForFullHeightModal: 'calc(100% - 64px)',
+  minHeightForSmallHeightModal: 'min(100% - 64px, 350px)',
+  minHeightForLargeHeightModal: 'min(100% - 64px, 800px)',
 };
 
 const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
@@ -211,6 +211,7 @@ type DialogProps = {|
 
   // Size
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
+  minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
   noMobileFullScreen?: boolean,
 
@@ -231,6 +232,7 @@ const Dialog = ({
   open,
   onRequestClose,
   maxWidth,
+  minHeight,
   title,
   fixedContent,
   children,
@@ -351,7 +353,13 @@ const Dialog = ({
         id,
         style: {
           backgroundColor: gdevelopTheme.dialog.backgroundColor,
-          ...(fullHeight ? styles.fullHeightModal : {}),
+          minHeight: fullHeight
+            ? styles.minHeightForFullHeightModal
+            : minHeight === 'lg'
+            ? styles.minHeightForLargeHeightModal
+            : minHeight === 'sm'
+            ? styles.minHeightForSmallHeightModal
+            : undefined,
         },
       }}
       maxWidth={

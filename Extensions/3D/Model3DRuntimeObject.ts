@@ -221,6 +221,9 @@ namespace gdjs {
         const animation = this._animations[animationIndex];
         this._currentAnimationIndex = animationIndex;
         this._renderer.playAnimation(animation.source, animation.loop);
+        if (this._animationPaused) {
+          this._renderer.pauseAnimation();
+        }
       }
     }
 
@@ -272,12 +275,12 @@ namespace gdjs {
 
     pauseAnimation() {
       this._animationPaused = true;
-      return this._renderer.pauseAnimation();
+      this._renderer.pauseAnimation();
     }
 
     resumeAnimation() {
       this._animationPaused = false;
-      return this._renderer.resumeAnimation();
+      this._renderer.resumeAnimation();
     }
 
     getAnimationSpeedScale() {
@@ -286,6 +289,20 @@ namespace gdjs {
 
     setAnimationSpeedScale(ratio: float): void {
       this._animationSpeedScale = ratio;
+    }
+
+    getAnimationElapsedTime(): float {
+      return this._renderer.getAnimationElapsedTime();
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      this._renderer.setAnimationElapsedTime(time);
+    }
+
+    getAnimationDuration(): float {
+      return this._renderer.getAnimationDuration(
+        this._animations[this._currentAnimationIndex].source
+      );
     }
 
     getCenterX(): float {

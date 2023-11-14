@@ -288,10 +288,13 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
       )
+      .addDefaultBehavior("TextContainerCapability::TextContainerBehavior")
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     // Properties expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -302,13 +305,25 @@ module.exports = {
         '',
         'res/conditions/text24_black.png'
       )
+      .setHidden()
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters(
         'string',
         gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
       )
-      .setFunctionName('setString')
-      .setGetter('getString');
+      .setFunctionName('setText')
+      .setGetter('getText');
+
+    object
+      .addStrExpression(
+        'Text',
+        _('Text'),
+        _('Return the text.'),
+        '',
+        'res/conditions/text24_black.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .setFunctionName('getText');
 
     object
       .addExpressionAndConditionAndAction(
@@ -661,6 +676,12 @@ module.exports = {
         this._pixiObject.addChild(this._pixiTextMask);
         this._pixiContainer.addChild(this._pixiObject);
         this.update();
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiText.destroy(true);
+        this._pixiObject.destroy({ children: true });
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {

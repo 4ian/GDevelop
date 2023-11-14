@@ -83,7 +83,12 @@ export const listListedPrivateGameTemplates = async ({
       withAppStoreProductId: !!onlyAppStorePrivateGameTemplates,
     },
   });
-  return response.data;
+  const gameTemplates = response.data;
+  if (!Array.isArray(gameTemplates)) {
+    throw new Error('Invalid game templates');
+  }
+
+  return gameTemplates;
 };
 
 export const listSellerAssetPacks = async ({

@@ -22,6 +22,7 @@ import VariablesList, {
 } from '../../VariablesList/VariablesList';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 
 type Props = {|
   project: gdProject,
@@ -347,55 +348,60 @@ const InstancePropertiesEditor = ({
   if (!object || !instance || !instanceSchema) return null;
 
   return (
-    <ScrollView
-      autoHideScrollbar
-      key={instances
-        .map((instance: gdInitialInstance) => '' + instance.ptr)
-        .join(';')}
+    <ErrorBoundary
+      componentTitle={<Trans>Instance properties</Trans>}
+      scope="scene-editor-instance-properties"
     >
-      <Column expand noMargin id="instance-properties-editor">
-        <Column>
-          <PropertiesEditor
-            unsavedChanges={unsavedChanges}
-            schema={instanceSchema}
-            instances={instances}
-            onInstancesModified={onInstancesModified}
-          />
-          <Line alignItems="center" justifyContent="space-between">
-            <Text>
-              <Trans>Instance Variables</Trans>
-            </Text>
-            <IconButton
+      <ScrollView
+        autoHideScrollbar
+        key={instances
+          .map((instance: gdInitialInstance) => '' + instance.ptr)
+          .join(';')}
+      >
+        <Column expand noMargin id="instance-properties-editor">
+          <Column>
+            <PropertiesEditor
+              unsavedChanges={unsavedChanges}
+              schema={instanceSchema}
+              instances={instances}
+              onInstancesModified={onInstancesModified}
+            />
+            <Line alignItems="center" justifyContent="space-between">
+              <Text>
+                <Trans>Instance Variables</Trans>
+              </Text>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  editInstanceVariables(instance);
+                }}
+              >
+                <ShareExternal />
+              </IconButton>
+            </Line>
+          </Column>
+          {object ? (
+            <VariablesList
+              directlyStoreValueChangesWhileEditing
+              inheritedVariablesContainer={object.getVariables()}
+              variablesContainer={instance.getVariables()}
               size="small"
-              onClick={() => {
-                editInstanceVariables(instance);
-              }}
-            >
-              <ShareExternal />
-            </IconButton>
-          </Line>
+              onComputeAllVariableNames={() =>
+                object
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      object
+                    )
+                  : []
+              }
+              historyHandler={historyHandler}
+            />
+          ) : null}
         </Column>
-        {object ? (
-          <VariablesList
-            directlyStoreValueChangesWhileEditing
-            inheritedVariablesContainer={object.getVariables()}
-            variablesContainer={instance.getVariables()}
-            size="small"
-            onComputeAllVariableNames={() =>
-              object
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    object
-                  )
-                : []
-            }
-            historyHandler={historyHandler}
-          />
-        ) : null}
-      </Column>
-    </ScrollView>
+      </ScrollView>
+    </ErrorBoundary>
   );
 };
 

@@ -71,11 +71,9 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(instanceContainer);
-      if ((this._renderer as any).onDestroy) {
-        (this._renderer as any).onDestroy();
-      }
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
     }
 
     /**

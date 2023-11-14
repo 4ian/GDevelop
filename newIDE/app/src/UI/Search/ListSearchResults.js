@@ -114,7 +114,7 @@ export const ListSearchResults = <SearchItem>({
 
   return (
     <ErrorBoundary
-      title="An error occurred when displaying search results"
+      componentTitle={<Trans>Search results</Trans>}
       scope="list-search-result"
     >
       <div

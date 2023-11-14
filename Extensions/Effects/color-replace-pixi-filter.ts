@@ -2,18 +2,26 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'ColorReplace',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const colorReplaceFilter = new PIXI.filters.ColorReplaceFilter();
         return colorReplaceFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
         if (parameterName === 'epsilon') {
           colorReplaceFilter.epsilon = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {
         const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
         if (parameterName === 'originalColor') {
           colorReplaceFilter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
@@ -25,7 +33,11 @@ namespace gdjs {
           );
         }
       }
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

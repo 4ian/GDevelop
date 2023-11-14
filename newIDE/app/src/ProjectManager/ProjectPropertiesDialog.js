@@ -32,6 +32,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 type Props = {|
   project: gdProject,
@@ -759,4 +760,15 @@ const ProjectPropertiesDialog = (props: Props) => {
   );
 };
 
-export default ProjectPropertiesDialog;
+const ProjectPropertiesDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Project properties</Trans>}
+    scope="project-properties"
+    onClose={props.onClose}
+    showOnTop
+  >
+    <ProjectPropertiesDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ProjectPropertiesDialogWithErrorBoundary;

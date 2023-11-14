@@ -5,17 +5,10 @@ import Text from '../../../UI/Text';
 import { Column, Line } from '../../../UI/Grid';
 import OnlineGameLink from './OnlineGameLink';
 import DismissableTutorialMessage from '../../../Hints/DismissableTutorialMessage';
-import GdGames from '../../../UI/CustomSvgIcons/GdGames';
 import { type Game } from '../../../Utils/GDevelopServices/Game';
 import { getBuilds } from '../../../Utils/GDevelopServices/Build';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import AlertMessage from '../../../UI/AlertMessage';
-
-const iconStyle = {
-  height: 48,
-  width: 48,
-  margin: 10,
-};
 
 type Props = {|
   game: ?Game,
@@ -51,9 +44,6 @@ const ExplanationHeader = ({ game }: Props) => {
           </Trans>
         </Text>
       </Line>
-      <Line justifyContent="center">
-        <GdGames color="secondary" style={iconStyle} />
-      </Line>
       {!!isGamePublishedOnGdGames ? (
         <AlertMessage kind="info">
           <Trans>
@@ -77,7 +67,7 @@ const ExplanationHeader = ({ game }: Props) => {
 const onlineWebExporter = {
   key: 'onlinewebexport',
   tabName: 'Web',
-  name: <Trans>Web</Trans>,
+  name: <Trans>gd.games</Trans>,
   helpPage: '/publishing/web',
 };
 

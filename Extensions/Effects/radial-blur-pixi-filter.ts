@@ -2,11 +2,11 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'RadialBlur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const radialBlurFilter = new PIXI.filters.RadialBlurFilter();
         return radialBlurFilter;
       }
-      updatePreRender(filter, target) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
         const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter;
         radialBlurFilter.center[0] = Math.round(
           // @ts-ignore - extra properties are stored on the filter.
@@ -17,7 +17,11 @@ namespace gdjs {
           radialBlurFilter._centerY * target.getHeight()
         );
       }
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter;
         if (parameterName === 'radius') {
           radialBlurFilter.radius = value < 0 ? -1 : value;
@@ -39,8 +43,16 @@ namespace gdjs {
           radialBlurFilter.padding = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import {
   enumerateObjectAndBehaviorsInstructions,
-  enumerateAllInstructions,
+  isObjectInstruction,
   getObjectParameterIndex,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
@@ -129,19 +129,25 @@ export const useInstructionEditor = ({
     if (!isNewInstruction) {
       // Check if the instruction is an object/behavior instruction. If yes
       // select the object, which is the first parameter of the instruction.
-      const allInstructions = enumerateAllInstructions(isCondition);
       const instructionType: string = instruction.getType();
-      const enumeratedInstructionMetadata = findInstruction(
-        allInstructions,
-        instructionType
-      );
+      const instructionMetadata = isCondition
+        ? gd.MetadataProvider.getConditionMetadata(
+            project.getCurrentPlatform(),
+            instructionType
+          )
+        : gd.MetadataProvider.getActionMetadata(
+            project.getCurrentPlatform(),
+            instructionType
+          );
       if (
-        enumeratedInstructionMetadata &&
-        (enumeratedInstructionMetadata.scope.objectMetadata ||
-          enumeratedInstructionMetadata.scope.behaviorMetadata)
+        isObjectInstruction(
+          project.getCurrentPlatform(),
+          instruction,
+          isCondition
+        )
       ) {
         const objectParameterIndex = getObjectParameterIndex(
-          enumeratedInstructionMetadata.metadata
+          instructionMetadata
         );
         if (objectParameterIndex !== -1) {
           return getChosenObjectState(

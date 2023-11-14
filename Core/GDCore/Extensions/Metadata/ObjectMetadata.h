@@ -303,11 +303,23 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
     return *this;
   }
 
-
   /**
-   * \brief Return true if the instruction must be hidden in the IDE.
+   * \brief Return true if the object must be hidden in the IDE.
    */
   bool IsHidden() const { return hidden; }
+
+  /**
+   * \brief Declare a usage of the 3D renderer.
+   */
+  ObjectMetadata &MarkAsRenderedIn3D() {
+    isRenderedIn3D = true;
+    return *this;
+  }
+
+  /**
+   * \brief Return true if the object uses the 3D renderer.
+   */
+  bool IsRenderedIn3D() const { return isRenderedIn3D; }
 
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
@@ -329,6 +341,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String categoryFullName;
   std::set<gd::String> defaultBehaviorTypes;
   bool hidden = false;
+  bool isRenderedIn3D = false;
 
   std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

@@ -78,13 +78,11 @@ const GuidedLessons = ({ selectInAppTutorial }: Props) => {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,
     fetchInAppTutorials,
+    currentlyRunningInAppTutorial,
   } = React.useContext(InAppTutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
 
   const getTutorialPartProgress = ({ tutorialId }: { tutorialId: string }) => {
     const tutorialProgress = getTutorialProgress({

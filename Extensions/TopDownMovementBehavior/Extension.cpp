@@ -366,8 +366,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
            "IsMovementAngleAround",
            _("Angle of movement"),
            _("Compare the angle of the top-down movement of the object."),
-           _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
-             ": _PARAM3_ degrees)"),
+           _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
          _("Movement"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")

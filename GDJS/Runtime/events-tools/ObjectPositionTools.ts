@@ -8,17 +8,6 @@ namespace gdjs {
           maxX: float;
           maxY: float;
         };
-        // TODO Use a flag instead of this because an object can have no
-        // instance picked because of a condition on a group.
-        const isObjectsListsEmpty = (objectsLists: ObjectsLists) => {
-          for (const objectName in objectsLists.items) {
-            const objects = objectsLists.items[objectName];
-            if (objects.length > 0) {
-              return false;
-            }
-          }
-          return true;
-        };
 
         const searchArea = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
         const nearbyObjects: Array<RuntimeObject> = [];
@@ -41,11 +30,10 @@ namespace gdjs {
           predicateExtraArg?: any,
           areaExtraArg?: any
         ): boolean => {
-          // Check if the list empty because it was not filtered yet.
-          const isList1Empty = isObjectsListsEmpty(objectsLists1);
-          const isList2Empty = isObjectsListsEmpty(objectsLists2);
+          const isPicked1 = objectsLists1.isPicked;
+          const isPicked2 = objectsLists2.isPicked;
 
-          if (inverted || (!isList1Empty && !isList2Empty)) {
+          if (inverted || (isPicked1 && isPicked2)) {
             // Both are already filtered fallback on the naïve check
             return gdjs.evtTools.object.twoListsTest(
               predicate,
@@ -57,12 +45,11 @@ namespace gdjs {
           }
           let isAnyObjectPicked = false;
 
-          let iteratedLists = isList1Empty ? objectsLists2 : objectsLists1;
-          let treeLists = isList1Empty ? objectsLists1 : objectsLists2;
-          let isIteratedListsEmpty = isList1Empty ? isList2Empty : isList1Empty;
+          let iteratedLists = isPicked1 ? objectsLists1 : objectsLists2;
+          let treeLists = isPicked1 ? objectsLists2 : objectsLists1;
 
           let objectsMaxCount1 = 0;
-          if (isList1Empty) {
+          if (!isPicked1) {
             for (const objectName in objectsLists1.items) {
               const objectManager = instanceContainer.getObjectManager(
                 objectName
@@ -74,7 +61,7 @@ namespace gdjs {
             }
           }
           let objectsMaxCount2 = 0;
-          if (isList1Empty && isList2Empty) {
+          if (!isPicked1 && !isPicked2) {
             for (const objectName in objectsLists2.items) {
               const objectManager = instanceContainer.getObjectManager(
                 objectName
@@ -95,7 +82,7 @@ namespace gdjs {
               predicateExtraArg
             );
           }
-          if (isList1Empty && isList2Empty) {
+          if (!isPicked1 && !isPicked2) {
             if (objectsMaxCount1 < objectsMaxCount2) {
               iteratedLists = objectsLists1;
               treeLists = objectsLists2;
@@ -104,9 +91,9 @@ namespace gdjs {
 
           const pickingId = instanceContainer.getNewPickingId();
           for (const iteratedObjectName in iteratedLists.items) {
-            const iteratedObjects = isIteratedListsEmpty
-              ? instanceContainer.getInstancesOf(iteratedObjectName)
-              : iteratedLists.items[iteratedObjectName];
+            const iteratedObjects = iteratedLists.isPicked
+              ? iteratedLists.items[iteratedObjectName]
+              : instanceContainer.getInstancesOf(iteratedObjectName);
 
             let isAnyIteratedObjectPicked = false;
             for (const objectName in treeLists.items) {
@@ -138,7 +125,7 @@ namespace gdjs {
                 iteratedObjects,
                 pickingId
               );
-            } else if (!isIteratedListsEmpty) {
+            } else if (iteratedLists.isPicked) {
               iteratedObjects.length = 0;
             }
           }

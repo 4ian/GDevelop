@@ -27,6 +27,7 @@ import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RecommendationList from './RecommendationList';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
+import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 
@@ -503,26 +504,29 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
 
   if (step === 'recommendations' && profile) {
     return (
-      <SectionContainer
-        title={
-          profile.username ? (
-            <Trans>Hello {profile.username}!</Trans>
-          ) : (
-            <Trans>Hello!</Trans>
-          )
-        }
-        subtitleText={
-          <Trans>
-            Here’s some content to get you started on your GDevelop journey!
-          </Trans>
-        }
-        flexBody
-      >
-        <RecommendationList
-          authenticatedUser={authenticatedUser}
-          selectInAppTutorial={selectInAppTutorial}
-        />
-      </SectionContainer>
+      <>
+        <AnnouncementsFeed canClose level="urgent" addMargins />
+        <SectionContainer
+          title={
+            profile.username ? (
+              <Trans>Hello {profile.username}!</Trans>
+            ) : (
+              <Trans>Hello!</Trans>
+            )
+          }
+          subtitleText={
+            <Trans>
+              Here’s some content to get you started on your GDevelop journey!
+            </Trans>
+          }
+          flexBody
+        >
+          <RecommendationList
+            authenticatedUser={authenticatedUser}
+            selectInAppTutorial={selectInAppTutorial}
+          />
+        </SectionContainer>
+      </>
     );
   }
 

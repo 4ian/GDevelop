@@ -289,8 +289,8 @@ export const HomePage = React.memo<Props>(
 
       const shouldDisplayAnnouncements =
         activeTab !== 'community' &&
+        // Get started page displays announcements itself.
         activeTab !== 'get-started' &&
-        activeTab !== 'build' &&
         !!announcements;
 
       return (

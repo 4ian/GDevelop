@@ -281,6 +281,11 @@
       }
     },
     "list-item": {
+      "hover": {
+        "background-color": {
+          "value": "#443a50"
+        }
+      },
       "group": {
         "text": {
           "color": {

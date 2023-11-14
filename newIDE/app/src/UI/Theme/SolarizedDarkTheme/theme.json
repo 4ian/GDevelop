@@ -282,6 +282,11 @@
       }
     },
     "list-item": {
+      "hover": {
+        "background-color": {
+          "value": "#01445c"
+        }
+      },
       "group": {
         "text": {
           "color": {

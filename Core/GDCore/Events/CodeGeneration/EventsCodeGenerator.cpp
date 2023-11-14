@@ -300,22 +300,6 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   maxConditionsListsSize =
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
-  // Flag the ObjectsLists as modified.
-  gd::ParameterMetadataTools::IterateOverParameters(
-      condition.GetParameters(), instrInfos.parameters,
-      [this, &context,
-       &conditionCode](const gd::ParameterMetadata &parameterMetadata,
-                       const gd::Expression &parameterValue,
-                       const gd::String &lastObjectName) {
-        if (parameterMetadata.GetType() == "objectList" ||
-            parameterMetadata.GetType() == "objectListOrEmptyIfJustDeclared") {
-          // objectListOrEmptyWithoutPicking are never picked.
-          conditionCode +=
-              GetObjectMapName(parameterValue.GetPlainString(), context) +
-              ".isPicked = true;\n";
-        }
-      });
-
   if (instrInfos.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
     conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(
@@ -423,6 +407,22 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     conditionCode += GenerateFreeCondition(
         arguments, instrInfos, returnBoolean, condition.IsInverted(), context);
   }
+
+  // Flag the ObjectsLists as modified.
+  gd::ParameterMetadataTools::IterateOverParameters(
+      condition.GetParameters(), instrInfos.parameters,
+      [this, &context,
+       &conditionCode](const gd::ParameterMetadata &parameterMetadata,
+                       const gd::Expression &parameterValue,
+                       const gd::String &lastObjectName) {
+        if (parameterMetadata.GetType() == "objectList" ||
+            parameterMetadata.GetType() == "objectListOrEmptyIfJustDeclared") {
+          // objectListOrEmptyWithoutPicking are never picked.
+          conditionCode +=
+              GetObjectMapName(parameterValue.GetPlainString(), context) +
+              ".isPicked = true;\n";
+        }
+      });
 
   return conditionCode;
 }

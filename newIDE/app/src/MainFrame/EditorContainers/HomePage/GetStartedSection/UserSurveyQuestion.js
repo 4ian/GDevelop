@@ -112,6 +112,7 @@ const styles = {
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
     width: '100%',
+    aspectRatio: '292 / 103',
   },
   answerCheckboxAnchor: { position: 'relative' },
   answerCheckboxContainer: {

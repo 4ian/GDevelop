@@ -202,7 +202,7 @@
     },
     "selection": {
       "background-color": {
-        "value": "{gdevelop.color.selection.value}"
+        "value": "#24457a"
       },
       "color": {
         "value": "#FFFFFF"
@@ -659,7 +659,7 @@
       },
       "selected": {
         "background-color": {
-          "value": "#4c92ff"
+          "value": "#24457a"
         },
         "color": {
           "value": "#FFFFFF"

@@ -747,7 +747,7 @@ namespace gdjs {
         loadedAssets += await this._soundManager.preloadAudio(onProgress);
         loadedAssets += await this._fontManager.loadFonts(onProgress);
         loadedAssets += await this._atlasManager.preloadAll(onProgress);
-        loadedAssets += await this._jsonManager.preloadJsons(onProgress);
+        loadedAssets += await this._jsonManager.preloadAll(onProgress);
         loadedAssets += await this._model3DManager.loadModels(onProgress);
         await this._bitmapFontManager.loadBitmapFontData(onProgress);
         await loadingScreen.unload();

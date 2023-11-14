@@ -114,16 +114,18 @@ const SpineEditor = ({
           resName => !resName
         )
       ) {
-        return;
+        return Promise.resolve(undefined);
       }
 
-      PixiResourcesLoader.getSpineData(
+      return PixiResourcesLoader.getSpineData(
         project,
         jsonResourceName,
         imageResourceName,
         atlasResourceName
       ).then(newSkeleton => {
         setSkeleton(newSkeleton);
+
+        return newSkeleton;
       });
     },
     [project]
@@ -146,7 +148,9 @@ const SpineEditor = ({
         jsonResourceName,
         properties.get('imageResourceName').getValue(),
         atlasResourceName
-      );
+      ).then(newSkeleton => {
+        spineConfiguration.removeAllAnimations();
+      });
     },
     [getSkeleton]
   );
@@ -166,7 +170,9 @@ const SpineEditor = ({
         properties.get('jsonResourceName').getValue(),
         imageResourceName,
         atlasResourceName
-      );
+      ).then(newSkeleton => {
+        spineConfiguration.removeAllAnimations();
+      });
     },
     [getSkeleton]
   );
@@ -182,7 +188,9 @@ const SpineEditor = ({
         properties.get('jsonResourceName').getValue(),
         imageResourceName,
         atlasResourceName
-      );
+      ).then(newSkeleton => {
+        spineConfiguration.removeAllAnimations();
+      });
     },
     [getSkeleton]
   );

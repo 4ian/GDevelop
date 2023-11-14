@@ -87,6 +87,9 @@ const cleanUserTracesOnDevice = async () => {
   ]);
 };
 
+const TEN_SECONDS = 10 * 1000;
+const THIRTY_MINUTES = 30 * 60 * 1000;
+
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
   State
@@ -114,6 +117,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
+  _lastEmailVerificationDialogDisplayDate = null;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -668,28 +672,31 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
 
   _notifyUserAboutEmailVerification = () => {
-    const { profile } = this.state.authenticatedUser;
+    const { profile, firebaseUser } = this.state.authenticatedUser;
     if (!profile) return;
+    if (firebaseUser && firebaseUser.emailVerified) return;
+
+    const now = Date.now();
     // If the user has not verified their email when logging in we show a dialog to do so.
     // - If they just registered, we don't send the email again as it will be sent automatically,
     // nor do we show a button to send again.
     // - If they are just logging in, we don't send the email but we show a button to send again.
     // Use a boolean to show the dialog only once.
-    const accountAgeInMs = Date.now() - profile.createdAt;
-    const hasJustCreatedAccount = accountAgeInMs < 1000 * 10; // 10 seconds.
-    if (
-      this.state.authenticatedUser.firebaseUser &&
-      !this.state.authenticatedUser.firebaseUser.emailVerified
-    ) {
-      setTimeout(
-        () =>
-          this.openEmailVerificationDialog({
-            open: true,
-            sendEmailAutomatically: false,
-            showSendEmailButton: !hasJustCreatedAccount,
-          }),
-        1000
-      );
+    const accountAgeInMs = now - profile.createdAt;
+    const hasJustCreatedAccount = accountAgeInMs < TEN_SECONDS;
+    const hasAlreadyBeenDisplayedInTheLast30Minutes = this
+      ._lastEmailVerificationDialogDisplayDate
+      ? now - this._lastEmailVerificationDialogDisplayDate < THIRTY_MINUTES
+      : false;
+    if (!hasAlreadyBeenDisplayedInTheLast30Minutes) {
+      setTimeout(() => {
+        this.openEmailVerificationDialog({
+          open: true,
+          sendEmailAutomatically: false,
+          showSendEmailButton: !hasJustCreatedAccount,
+        });
+        this._lastEmailVerificationDialogDisplayDate = now;
+      }, 1000);
     }
   };
 

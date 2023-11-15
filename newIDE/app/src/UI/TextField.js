@@ -12,9 +12,10 @@ import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 type ValueProps =
-  // Support "text" and "password" type:
+  // Support "text", "password" and "email" type:
+  // "email" type is used to display appropriate keyboard on mobile.
   | {|
-      type?: 'text' | 'password' | 'search',
+      type?: 'text' | 'password' | 'email',
       value: string,
       onChange?: (
         event: {| target: {| value: string |} |},
@@ -80,7 +81,6 @@ type Props = {|
 
   // String text field:
   maxLength?: number,
-  disableAutocapitalize?: boolean,
 
   // Number text field:
   precision?: number,
@@ -377,7 +377,6 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           onBlur={props.onBlur}
           inputRef={inputRef}
           spellCheck="false"
-          autocapitalize={props.disableAutocapitalize ? 'off' : 'on'}
         />
       )}
     </I18n>

@@ -95,7 +95,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
                   undefined
                 )
               }
-              disableAutocapitalize
+              type="email"
               fullWidth
               onBlur={event => {
                 const trimmedEmail = event.currentTarget.value.trim();

@@ -106,7 +106,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     };
 
     const animationNames = getAnimationNames();
-    console.log('newIDE ObjectAnimationNameField ', animationNames);
 
     const isCurrentValueInAnimationNamesList = !!animationNames.find(
       animationName => `"${animationName}"` === props.value

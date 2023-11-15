@@ -182,10 +182,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const addFrom = React.useCallback(
       async (source: ResourceSource) => {
         try {
-          if (!source) {
-            console.log('source is undef');
-            return;
-          }
+          if (!source) return;
 
           const resources = await resourceManagementProps.onChooseResource({
             initialSourceName: source.name,

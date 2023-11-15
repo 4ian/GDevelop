@@ -50,24 +50,25 @@ const SpineEditor = ({
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
-  const getResource = (name) => {
+  const getResource = name => {
     const resourcesManager = project.getResourcesManager();
 
-    return resourcesManager.hasResource(name) ?
-      resourcesManager.getResource(name) :
-      null;
+    return resourcesManager.hasResource(name)
+      ? resourcesManager.getResource(name)
+      : null;
   };
-  const getMetadata = (resource) => {
+  const getMetadata = resource => {
     const metadataString = resource.getMetadata();
 
-   return !!metadataString ? JSON.parse(metadataString) : { };
+    return !!metadataString ? JSON.parse(metadataString) : {};
   };
-  const setMetadata = (resource, metadata) => resource?.setMetadata(JSON.stringify(metadata));
+  const setMetadata = (resource, metadata) =>
+    resource?.setMetadata(JSON.stringify(metadata));
   const extendMetadata = (resourceName, metadata) => {
     const resource = getResource(resourceName);
-    
+
     setMetadata(resource, Object.assign(getMetadata(resource), metadata));
-  }
+  };
   const [
     justAddedAnimationName,
     setJustAddedAnimationName,
@@ -412,141 +413,148 @@ const SpineEditor = ({
             objectConfiguration={objectConfiguration}
             propertyName="timeScale"
           />
-          {sourceSelectOptions.length && 
+          {sourceSelectOptions.length && (
             <>
               <Text size="block-title">Animations</Text>
               <Column noMargin expand useFullHeight>
-              {spineConfiguration.getAnimationsCount() === 0 ? (
-                <Column noMargin expand justifyContent="center">
-                  <EmptyPlaceholder
-                    title={<Trans>Add your first animation</Trans>}
-                    description={
-                      <Trans>Animations are a sequence of images.</Trans>
-                    }
-                    actionLabel={<Trans>Add an animation</Trans>}
-                    helpPagePath="/objects/sprite"
-                    tutorialId="intermediate-changing-animations"
-                    onAction={addAnimation}
-                  />
-                </Column>
-              ) : (
-                <React.Fragment>
-                  {mapFor(
-                    0,
-                    spineConfiguration.getAnimationsCount(),
-                    animationIndex => {
-                      const animation = spineConfiguration.getAnimation(
-                        animationIndex
-                      );
+                {spineConfiguration.getAnimationsCount() === 0 ? (
+                  <Column noMargin expand justifyContent="center">
+                    <EmptyPlaceholder
+                      title={<Trans>Add your first animation</Trans>}
+                      description={
+                        <Trans>Animations are a sequence of images.</Trans>
+                      }
+                      actionLabel={<Trans>Add an animation</Trans>}
+                      helpPagePath="/objects/sprite"
+                      tutorialId="intermediate-changing-animations"
+                      onAction={addAnimation}
+                    />
+                  </Column>
+                ) : (
+                  <React.Fragment>
+                    {mapFor(
+                      0,
+                      spineConfiguration.getAnimationsCount(),
+                      animationIndex => {
+                        const animation = spineConfiguration.getAnimation(
+                          animationIndex
+                        );
 
-                      const animationRef =
-                        justAddedAnimationName === animation.getName()
-                          ? justAddedAnimationElement
-                          : null;
+                        const animationRef =
+                          justAddedAnimationName === animation.getName()
+                            ? justAddedAnimationElement
+                            : null;
 
-                      return (
-                        <DragSourceAndDropTarget
-                          key={animationIndex}
-                          beginDrag={() => {
-                            draggedAnimationIndex.current = animationIndex;
-                            return {};
-                          }}
-                          canDrag={() => true}
-                          canDrop={() => true}
-                          drop={() => {
-                            moveAnimation(animationIndex);
-                          }}
-                        >
-                          {({
-                            connectDragSource,
-                            connectDropTarget,
-                            isOver,
-                            canDrop,
-                          }) =>
-                            connectDropTarget(
-                              <div
-                                key={animationIndex}
-                                style={styles.rowContainer}
-                              >
-                                {isOver && <DropIndicator canDrop={canDrop} />}
+                        return (
+                          <DragSourceAndDropTarget
+                            key={animationIndex}
+                            beginDrag={() => {
+                              draggedAnimationIndex.current = animationIndex;
+                              return {};
+                            }}
+                            canDrag={() => true}
+                            canDrop={() => true}
+                            drop={() => {
+                              moveAnimation(animationIndex);
+                            }}
+                          >
+                            {({
+                              connectDragSource,
+                              connectDropTarget,
+                              isOver,
+                              canDrop,
+                            }) =>
+                              connectDropTarget(
                                 <div
-                                  ref={animationRef}
-                                  style={{
-                                    ...styles.rowContent,
-                                    backgroundColor:
-                                      gdevelopTheme.list.itemsBackgroundColor,
-                                  }}
+                                  key={animationIndex}
+                                  style={styles.rowContainer}
                                 >
-                                  <Line noMargin expand alignItems="center">
-                                    {connectDragSource(
-                                      <span>
-                                        <Column>
-                                          <DragHandleIcon />
-                                        </Column>
-                                      </span>
-                                    )}
-                                    <Text noMargin noShrink>
-                                      <Trans>Animation #{animationIndex}</Trans>
-                                    </Text>
-                                    <Spacer />
-                                    <SemiControlledTextField
-                                      margin="none"
-                                      commitOnBlur
-                                      errorText={nameErrors[animationIndex]}
-                                      translatableHintText={t`Optional animation name`}
-                                      value={animation.getName()}
-                                      onChange={text =>
-                                        changeAnimationName(animationIndex, text)
-                                      }
-                                      fullWidth
-                                    />
-                                    <IconButton
-                                      size="small"
-                                      onClick={() =>
-                                        removeAnimation(animationIndex)
-                                      }
-                                    >
-                                      <Trash />
-                                    </IconButton>
-                                  </Line>
-                                  <Spacer />
-                                </div>
-                                <Spacer />
-                                <ColumnStackLayout expand>
-                                  <SelectField
-                                    id="animation-source-field"
-                                    value={animation.getSource()}
-                                    onChange={(event, value) => {
-                                      animation.setSource(event.target.value);
-                                      forceUpdate();
+                                  {isOver && (
+                                    <DropIndicator canDrop={canDrop} />
+                                  )}
+                                  <div
+                                    ref={animationRef}
+                                    style={{
+                                      ...styles.rowContent,
+                                      backgroundColor:
+                                        gdevelopTheme.list.itemsBackgroundColor,
                                     }}
-                                    margin="dense"
-                                    fullWidth
-                                    floatingLabelText={
-                                      <Trans>Spine animation name</Trans>
-                                    }
-                                    translatableHintText={t`Choose an animation`}
                                   >
-                                    {sourceSelectOptions}
-                                  </SelectField>
-                                  <Checkbox
-                                    label={<Trans>Loop</Trans>}
-                                    checked={animation.shouldLoop()}
-                                    onCheck={(e, checked) => {
-                                      animation.setShouldLoop(checked);
-                                      forceUpdate();
-                                    }}
-                                  />
-                                </ColumnStackLayout>
-                              </div>
-                            )
-                          }
-                        </DragSourceAndDropTarget>
-                      );
-                    }
-                  )}
-                </React.Fragment>
-              )}
+                                    <Line noMargin expand alignItems="center">
+                                      {connectDragSource(
+                                        <span>
+                                          <Column>
+                                            <DragHandleIcon />
+                                          </Column>
+                                        </span>
+                                      )}
+                                      <Text noMargin noShrink>
+                                        <Trans>
+                                          Animation #{animationIndex}
+                                        </Trans>
+                                      </Text>
+                                      <Spacer />
+                                      <SemiControlledTextField
+                                        margin="none"
+                                        commitOnBlur
+                                        errorText={nameErrors[animationIndex]}
+                                        translatableHintText={t`Optional animation name`}
+                                        value={animation.getName()}
+                                        onChange={text =>
+                                          changeAnimationName(
+                                            animationIndex,
+                                            text
+                                          )
+                                        }
+                                        fullWidth
+                                      />
+                                      <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                          removeAnimation(animationIndex)
+                                        }
+                                      >
+                                        <Trash />
+                                      </IconButton>
+                                    </Line>
+                                    <Spacer />
+                                  </div>
+                                  <Spacer />
+                                  <ColumnStackLayout expand>
+                                    <SelectField
+                                      id="animation-source-field"
+                                      value={animation.getSource()}
+                                      onChange={(event, value) => {
+                                        animation.setSource(event.target.value);
+                                        forceUpdate();
+                                      }}
+                                      margin="dense"
+                                      fullWidth
+                                      floatingLabelText={
+                                        <Trans>Spine animation name</Trans>
+                                      }
+                                      translatableHintText={t`Choose an animation`}
+                                    >
+                                      {sourceSelectOptions}
+                                    </SelectField>
+                                    <Checkbox
+                                      label={<Trans>Loop</Trans>}
+                                      checked={animation.shouldLoop()}
+                                      onCheck={(e, checked) => {
+                                        animation.setShouldLoop(checked);
+                                        forceUpdate();
+                                      }}
+                                    />
+                                  </ColumnStackLayout>
+                                </div>
+                              )
+                            }
+                          </DragSourceAndDropTarget>
+                        );
+                      }
+                    )}
+                  </React.Fragment>
+                )}
               </Column>
               <Column noMargin>
                 <ResponsiveLineStackLayout
@@ -566,7 +574,7 @@ const SpineEditor = ({
                 </ResponsiveLineStackLayout>
               </Column>
             </>
-          }
+          )}
         </ColumnStackLayout>
       </ScrollView>
     </>

@@ -1,5 +1,5 @@
 // @flow
-import 'pixi-spine'
+import 'pixi-spine';
 import RenderedUnknownInstance from './Renderers/RenderedUnknownInstance';
 import RenderedSpriteInstance from './Renderers/RenderedSpriteInstance';
 import RenderedTiledSpriteInstance from './Renderers/RenderedTiledSpriteInstance';

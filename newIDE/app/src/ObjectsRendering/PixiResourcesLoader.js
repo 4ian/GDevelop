@@ -489,15 +489,21 @@ export default class PixiResourcesLoader {
     // https://github.com/pixijs/spine/blob/master/examples/preload_atlas_text.md
     if (!atlasPromises[atlasTextName]) {
       atlasPromises[atlasTextName] = new Promise(resolve => {
-        const onError = (err) => {
-          console.error(`Error during ${atlasTextName} atlas loading: ${err}.\nCheck if you selected correct pair of atlas and image files.`);
+        const onError = err => {
+          console.error(
+            `Error during ${atlasTextName} atlas loading: ${err}.\nCheck if you selected correct pair of atlas and image files.`
+          );
           resolve(undefined);
         };
 
         try {
-          const atlasUrl = ResourcesLoader.getResourceFullUrl(project, atlasTextName, {
-            isResourceForPixi: true,
-          });
+          const atlasUrl = ResourcesLoader.getResourceFullUrl(
+            project,
+            atlasTextName,
+            {
+              isResourceForPixi: true,
+            }
+          );
           const atlasImage = this.getPIXITexture(project, atlasImageName);
           PIXI.Assets.setPreferences({
             preferWorkers: false,
@@ -507,9 +513,13 @@ export default class PixiResourcesLoader {
           });
           PIXI.Assets.add(atlasTextName, atlasUrl, { image: atlasImage });
           PIXI.Assets.load(atlasTextName)
-            .then((atlas) => {
+            .then(atlas => {
               if (typeof atlas === 'string') {
-                new PIXI_SPINE.TextureAtlas(atlas, (_, textureCb) => textureCb(atlasImage.baseTexture), resolve);
+                new PIXI_SPINE.TextureAtlas(
+                  atlas,
+                  (_, textureCb) => textureCb(atlasImage.baseTexture),
+                  resolve
+                );
               } else {
                 resolve(atlas);
               }
@@ -525,32 +535,40 @@ export default class PixiResourcesLoader {
       spineDataPromises[spineName] = new Promise(resolve => {
         atlasPromises[atlasTextName].then(spineAtlas => {
           if (!spineAtlas) {
-            console.error(`Cannot load ${spineName} spine. Atlas ${atlasTextName} is undefined. Check if you selected correct files.`);
+            console.error(
+              `Cannot load ${spineName} spine. Atlas ${atlasTextName} is undefined. Check if you selected correct files.`
+            );
             return resolve(undefined);
           }
 
-          const onError = (err) => {
-            console.error(`Error during ${spineName} spine loading: ${err}.\nCheck if you selected correct files.`);
+          const onError = err => {
+            console.error(
+              `Error during ${spineName} spine loading: ${err}.\nCheck if you selected correct files.`
+            );
             resolve(undefined);
           };
 
           try {
-            const jsonUrl = ResourcesLoader.getResourceFullUrl(project, spineName, {
-              isResourceForPixi: true,
-            });
+            const jsonUrl = ResourcesLoader.getResourceFullUrl(
+              project,
+              spineName,
+              {
+                isResourceForPixi: true,
+              }
+            );
             PIXI.Assets.setPreferences({
               preferWorkers: false,
               crossOrigin: checkIfCredentialsRequired(jsonUrl)
                 ? 'use-credentials'
                 : 'anonymous',
             });
-            PIXI.Assets.add(spineName, jsonUrl, { spineAtlas })
+            PIXI.Assets.add(spineName, jsonUrl, { spineAtlas });
 
             PIXI.Assets.load(spineName)
-              .then((jsonData) => {
-                resolve(jsonData.spineData)
+              .then(jsonData => {
+                resolve(jsonData.spineData);
               })
-              .catch(onError);   
+              .catch(onError);
           } catch (err) {
             onError(err);
           }

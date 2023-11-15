@@ -431,11 +431,12 @@ const SpineEditor = ({
                     <EmptyPlaceholder
                       title={<Trans>Add your first animation</Trans>}
                       description={
-                        <Trans>Animations are a sequence of images.</Trans>
+                        <Trans>
+                          Import one or more animations that available in spine
+                          file.
+                        </Trans>
                       }
                       actionLabel={<Trans>Add an animation</Trans>}
-                      helpPagePath="/objects/sprite"
-                      tutorialId="intermediate-changing-animations"
                       onAction={addAnimation}
                     />
                   </Column>

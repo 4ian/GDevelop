@@ -620,7 +620,7 @@ namespace gdjs {
      * @returns true when all the resources of the given scene are loaded and
      * parsed.
      */
-    areLayoutAssetsReady(sceneName: string): boolean {
+    areSceneAssetsReady(sceneName: string): boolean {
       return this._resourcesLoader.areSceneAssetsReady(sceneName);
     }
 
@@ -632,9 +632,10 @@ namespace gdjs {
       callback: () => void,
       progressCallback?: (progress: float) => void
     ) {
-      this.loadFirstAssets(this.getFirstSceneName(), progressCallback).then(
-        callback
-      );
+      this.loadFirstAssetsAndStartBackgroundLoading(
+        this._getFirstSceneName(),
+        progressCallback
+      ).then(callback);
     }
 
     /**
@@ -644,7 +645,7 @@ namespace gdjs {
      * When a game is hot-reload, this method can be called with the current
      * scene.
      */
-    async loadFirstAssets(
+    async loadFirstAssetsAndStartBackgroundLoading(
       firstSceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
@@ -720,7 +721,7 @@ namespace gdjs {
         }
         const hasRendered = loadingScreen.renderIfNeeded();
         if (hasRendered) {
-          // Give a chane to draw calls from the renderer to be handled.
+          // Give a chance to draw calls from the renderer to be handled.
           await sleep(1);
         }
       };
@@ -730,7 +731,7 @@ namespace gdjs {
       this.pause(false);
     }
 
-    private getFirstSceneName(): string {
+    private _getFirstSceneName(): string {
       const firstSceneName = this._data.firstLayout;
       return this.hasScene(firstSceneName)
         ? firstSceneName
@@ -751,7 +752,7 @@ namespace gdjs {
 
         // Load the first scene
         this._sceneStack.push(
-          this.getFirstSceneName(),
+          this._getFirstSceneName(),
           this._injectExternalLayout
         );
         this._watermark.displayAtStartup();

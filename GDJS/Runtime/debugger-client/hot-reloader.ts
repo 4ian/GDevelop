@@ -330,7 +330,10 @@ namespace gdjs {
       // Update project data and re-load assets (sound/image/font/json managers
       // will take care of reloading only what is needed).
       runtimeGame.setProjectData(newProjectData);
-      await runtimeGame.loadFirstAssets(currentScene.getName(), () => {});
+      await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+        currentScene.getName(),
+        () => {}
+      );
       this._hotReloadVariablesContainer(
         oldProjectData.variables,
         newProjectData.variables,

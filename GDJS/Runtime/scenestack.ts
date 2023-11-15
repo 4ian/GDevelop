@@ -8,7 +8,6 @@ namespace gdjs {
     _runtimeGame: gdjs.RuntimeGame;
     _stack: gdjs.RuntimeScene[] = [];
     _wasFirstSceneLoaded: boolean = false;
-    _nextLayout: string | null = null;
     _isNextLayoutLoading: boolean = false;
 
     /**
@@ -33,14 +32,7 @@ namespace gdjs {
     }
 
     step(elapsedTime: float): boolean {
-      if (this._nextLayout) {
-        if (this._isNextLayoutLoading) {
-          return false;
-        } else {
-          this._loadNewScene(this._nextLayout);
-        }
-      }
-      if (this._stack.length === 0) {
+      if (this._isNextLayoutLoading || this._stack.length === 0) {
         return false;
       }
       const currentScene = this._stack[this._stack.length - 1];
@@ -110,13 +102,15 @@ namespace gdjs {
         currentScene.onPause();
       }
 
-      if (this._runtimeGame.areLayoutAssetsReady(newSceneName)) {
+      // Avoid a risk of displaying an intermediate loading screen
+      // during 1 frame.
+      if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
         return this._loadNewScene(newSceneName, externalLayoutName);
       }
 
-      this._nextLayout = newSceneName;
       this._isNextLayoutLoading = true;
       this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
+        this._loadNewScene(newSceneName);
         this._isNextLayoutLoading = false;
       });
       return null;
@@ -126,7 +120,6 @@ namespace gdjs {
       newSceneName: string,
       externalLayoutName?: string
     ): gdjs.RuntimeScene {
-      this._nextLayout = null;
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));

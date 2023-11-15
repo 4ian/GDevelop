@@ -34,8 +34,24 @@ import { delay } from '../../../../Utils/Delay';
 import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
+import { getGetStartedSectionViewCount } from './Utils';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
+const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
+
+const shouldDisplayOptionToHideGetStartedSection = ({
+  isAuthenticated,
+}: {
+  isAuthenticated: boolean,
+}): boolean => {
+  if (!isAuthenticated) return false;
+
+  const getStartedSectionViewCount = getGetStartedSectionViewCount();
+  return (
+    getStartedSectionViewCount >
+    THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION
+  );
+};
 
 const styles = {
   icon: {
@@ -432,60 +448,78 @@ const GetStartedSection = ({
           justifyContent="center"
           alignItems="center"
         >
-          <Text size="title" align="center">
-            {!profile || isNewUser ? (
-              <Trans>Welcome to GDevelop!</Trans>
-            ) : profile && profile.username ? (
-              <Trans>Good to see you {profile.username}!</Trans>
-            ) : (
-              <Trans>We have something new for you!</Trans>
-            )}
-          </Text>
-          <JewelPlatform style={styles.icon} />
-          <Text size="body2" noMargin align="center">
-            <Trans>
-              We've made a selection of GDevelop content to help you on your
-              game development journey.
-            </Trans>
-          </Text>
-          <LargeSpacer />
-          <Text size="sub-title" align="center">
-            {profile ? (
+          <ColumnStackLayout
+            noMargin
+            expand
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Text size="title" align="center">
+              {!profile || isNewUser ? (
+                <Trans>Welcome to GDevelop!</Trans>
+              ) : profile && profile.username ? (
+                <Trans>Good to see you {profile.username}!</Trans>
+              ) : (
+                <Trans>We have something new for you!</Trans>
+              )}
+            </Text>
+            <JewelPlatform style={styles.icon} />
+            <Text size="body2" noMargin align="center">
               <Trans>
-                Answer our questionnaire and get recommendations according to
-                your current objectives.
+                We've made a selection of GDevelop content to help you on your
+                game development journey.
               </Trans>
-            ) : (
-              <Trans>Let's start by creating your account.</Trans>
-            )}
-          </Text>
-          <div style={styles.middlePageButtonContainer}>
-            {profile ? (
-              <Column noMargin>
-                <RaisedButton
-                  label={<Trans>Let's go!</Trans>}
-                  primary
-                  onClick={() => setStep('questionnaire')}
-                  fullWidth
-                />
-              </Column>
-            ) : (
-              <ColumnStackLayout noMargin>
-                <RaisedButton
-                  label={<Trans>Let's go!</Trans>}
-                  primary
-                  onClick={() => setStep('register')}
-                  fullWidth
-                />
-                <FlatButton
-                  primary
-                  label={<Trans>I already have an account</Trans>}
-                  onClick={() => setStep('login')}
-                  fullWidth
-                />
-              </ColumnStackLayout>
-            )}
-          </div>
+            </Text>
+            <LargeSpacer />
+            <Text size="sub-title" align="center">
+              {profile ? (
+                <Trans>
+                  Answer our questionnaire and get recommendations according to
+                  your current objectives.
+                </Trans>
+              ) : (
+                <Trans>Let's start by creating your account.</Trans>
+              )}
+            </Text>
+            <div style={styles.middlePageButtonContainer}>
+              {profile ? (
+                <Column noMargin>
+                  <RaisedButton
+                    label={<Trans>Let's go!</Trans>}
+                    primary
+                    onClick={() => setStep('questionnaire')}
+                    fullWidth
+                  />
+                </Column>
+              ) : (
+                <ColumnStackLayout noMargin>
+                  <RaisedButton
+                    label={<Trans>Let's go!</Trans>}
+                    primary
+                    onClick={() => setStep('register')}
+                    fullWidth
+                  />
+                  <FlatButton
+                    primary
+                    label={<Trans>I already have an account</Trans>}
+                    onClick={() => setStep('login')}
+                    fullWidth
+                  />
+                </ColumnStackLayout>
+              )}
+            </div>
+          </ColumnStackLayout>
+          {shouldDisplayOptionToHideGetStartedSection({
+            isAuthenticated: authenticatedUser.authenticated,
+          }) && (
+            <div style={styles.bottomPageButtonContainer}>
+              <Checkbox
+                label={<Trans>Don't show this screen on next startup</Trans>}
+                checked={!showGetStartedSection}
+                onCheck={(e, checked) => setShowGetStartedSection(!checked)}
+              />
+            </div>
+          )}
         </ColumnStackLayout>
       </SectionContainer>
     );

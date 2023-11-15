@@ -30,6 +30,7 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
+import { incrementGetStartedSectionViewCount } from './GetStartedSection/Utils';
 
 const styles = {
   container: {
@@ -69,7 +70,6 @@ type Props = {|
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
   storageProviders: Array<StorageProvider>,
-  initialTab?: ?string,
 
   // Project opening
   canOpen: boolean,
@@ -134,7 +134,6 @@ export const HomePage = React.memo<Props>(
         onOpenAbout,
         isActive,
         storageProviders,
-        initialTab,
         onSave,
         canSave,
         resourceManagementProps,
@@ -142,11 +141,9 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
-      const {
-        authenticated,
-        onCloudProjectsChanged,
-        recommendations,
-      } = React.useContext(AuthenticatedUserContext);
+      const { authenticated, onCloudProjectsChanged } = React.useContext(
+        AuthenticatedUserContext
+      );
       const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
@@ -162,11 +159,30 @@ export const HomePage = React.memo<Props>(
         values: { showGetStartedSectionByDefault },
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
+      const initialTab = showGetStartedSectionByDefault
+        ? 'get-started'
+        : 'build';
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(
-        !recommendations || showGetStartedSectionByDefault
-          ? 'get-started'
-          : 'build'
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+
+      React.useEffect(
+        () => {
+          if (initialTab === 'get-started') {
+            incrementGetStartedSectionViewCount();
+          }
+        },
+        [initialTab]
+      );
+
+      // If the user is not authenticated, the GetStarted section is displayed.
+      React.useEffect(
+        () => {
+          setActiveTab(authenticated ? initialTab : 'get-started');
+        },
+        // Only the initialTab at component mounting is interesting
+        // and we don't want to change the active tab if initialTab changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [authenticated]
       );
 
       // Load everything when the user opens the home page, to avoid future loading times.
@@ -420,9 +436,6 @@ export const renderHomePageContainer = (
     onOpenAbout={props.onOpenAbout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
-    }
-    initialTab={
-      (props.extraEditorProps && props.extraEditorProps.initialTab) || null
     }
     onSave={props.onSave}
     canSave={props.canSave}

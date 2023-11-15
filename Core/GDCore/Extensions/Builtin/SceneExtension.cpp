@@ -168,7 +168,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
   extension
       .AddAction("PrioritizeLoadingOfScene",
                  _("Preload scene"),
-                 _("Preload a scene assets as soon as possible in background."),
+                 _("Preload a scene resources as soon as possible in background."),
                  _("Preload scene _PARAM1_ in background"),
                  "",
                  "res/actions/replaceScene24.png",
@@ -181,7 +181,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
   extension.AddExpressionAndCondition("number",
                                 "SceneLoadingProgress",
                                 _("Scene loading progress"),
-                                _("The progress of assets loading in background for a scene (between 0 and 1)."),
+                                _("The progress of resources loading in background for a scene (between 0 and 1)."),
                                 _("_PARAM0_ loading progress"),
                                 _(""),
                                 "res/actions/replaceScene24.png")
@@ -194,7 +194,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
   extension
       .AddCondition("AreSceneAssetsLoaded",
                     _("Scene preloaded"),
-                    _("Check if scene assets have finished to load in background."),
+                    _("Check if scene resources have finished to load in background."),
                     _("Scene _PARAM1_ was preloaded in background"),
                     "",
                     "res/actions/replaceScene24.png",

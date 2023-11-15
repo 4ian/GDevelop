@@ -1,4 +1,3 @@
-import 'pixi-spine';
 import * as pixi_spine from 'pixi-spine';
 
 export = pixi_spine;

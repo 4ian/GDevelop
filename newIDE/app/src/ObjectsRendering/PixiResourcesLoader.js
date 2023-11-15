@@ -22,7 +22,9 @@ let invalidTexture = PIXI.Texture.from('res/error48.png');
 let loadedThreeTextures = {};
 let loadedThreeMaterials = {};
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
-let atlasPromises: ResourcePromise<PIXI_SPINE.TextureAtlas | typeof undefined> = {};
+let atlasPromises: ResourcePromise<
+  PIXI_SPINE.TextureAtlas | typeof undefined
+> = {};
 let spineDataPromises: ResourcePromise<ISkeleton> = {};
 
 const createInvalidModel = (): GLTF => {

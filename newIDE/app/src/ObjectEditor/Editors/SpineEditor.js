@@ -50,13 +50,16 @@ const SpineEditor = ({
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
-  const getResource = React.useCallback((name) => {
-    const resourcesManager = project.getResourcesManager();
+  const getResource = React.useCallback(
+    name => {
+      const resourcesManager = project.getResourcesManager();
 
-    return resourcesManager.hasResource(name)
-      ? resourcesManager.getResource(name)
-      : null;
-  }, [project]);
+      return resourcesManager.hasResource(name)
+        ? resourcesManager.getResource(name)
+        : null;
+    },
+    [project]
+  );
   const getMetadata = resource => {
     const metadataString = resource ? resource.getMetadata() : '';
 
@@ -67,11 +70,14 @@ const SpineEditor = ({
       resource.setMetadata(JSON.stringify(metadata));
     }
   };
-  const extendMetadata = React.useCallback((resourceName, metadata) => {
-    const resource = getResource(resourceName);
+  const extendMetadata = React.useCallback(
+    (resourceName, metadata) => {
+      const resource = getResource(resourceName);
 
-    setMetadata(resource, Object.assign(getMetadata(resource), metadata));
-  }, [getResource]);
+      setMetadata(resource, Object.assign(getMetadata(resource), metadata));
+    },
+    [getResource]
+  );
   const [
     justAddedAnimationName,
     setJustAddedAnimationName,

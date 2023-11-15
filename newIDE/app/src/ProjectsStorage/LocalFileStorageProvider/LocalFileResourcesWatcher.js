@@ -3,6 +3,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import debounce from 'lodash/debounce';
 import wrap from 'lodash/wrap';
 import memoize from 'lodash/memoize';
+import { splittedProjectFolderNames } from './LocalProjectWriter';
 
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
@@ -54,9 +55,7 @@ export const setupResourcesWatcher =
           path.join(folderPath, autosaveFile),
         ];
         if (options && options.isProjectSplitInMultipleFiles) {
-          ignore.push(
-            `{layouts,externalLayouts,externalEvents,eventsFunctionsExtensions}/*.json`
-          );
+          ignore.push(`{${splittedProjectFolderNames.join(',')}}/*.json`);
         }
         const subscriptionIdPromise = ipcRenderer.invoke(
           'local-filesystem-watcher-setup',

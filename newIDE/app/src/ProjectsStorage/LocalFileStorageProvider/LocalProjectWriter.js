@@ -17,6 +17,13 @@ const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 
+export const splittedProjectFolderNames = [
+  'layouts',
+  'externalLayouts',
+  'externalEvents',
+  'eventsFunctionsExtensions',
+];
+
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();
   return new Promise((resolve, reject) => {
@@ -75,12 +82,9 @@ const writeProjectFiles = (
       pathSeparator: '/',
       getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
       shouldSplit: splitPaths(
-        new Set([
-          '/layouts/*',
-          '/externalLayouts/*',
-          '/externalEvents/*',
-          '/eventsFunctionsExtensions/*',
-        ])
+        new Set(
+          splittedProjectFolderNames.map(folderName => `/${folderName}/*`)
+        )
       ),
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
     });

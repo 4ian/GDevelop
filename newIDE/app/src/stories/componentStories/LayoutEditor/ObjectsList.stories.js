@@ -36,7 +36,7 @@ export const Default = () => (
         onObjectCreated={action('On object created')}
         selectedObjectFolderOrObjectsWithContext={[]}
         getValidatedObjectOrGroupName={newName => newName}
-        onDeleteObject={(objectWithContext, cb) => cb(true)}
+        onDeleteObjects={(objectsWithContext, cb) => cb(true)}
         onRenameObjectFolderOrObjectWithContextFinish={(
           objectWithContext,
           newName,
@@ -66,7 +66,7 @@ export const WithSerializedObjectView = () => (
           onObjectCreated={action('On object created')}
           selectedObjectFolderOrObjectsWithContext={[]}
           getValidatedObjectOrGroupName={newName => newName}
-          onDeleteObject={(objectWithContext, cb) => cb(true)}
+          onDeleteObjects={(objectsWithContext, cb) => cb(true)}
           onRenameObjectFolderOrObjectWithContextFinish={(
             objectWithContext,
             newName,

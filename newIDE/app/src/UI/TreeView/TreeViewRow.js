@@ -79,6 +79,7 @@ const SemiControlledRowInput = ({
         type="text"
         className="item-name-input"
         value={value}
+        spellCheck={false}
         onChange={e => {
           setValue(e.currentTarget.value);
         }}
@@ -132,7 +133,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     getItemHtmlId,
   } = data;
   const node = flattenedData[index];
-  const left = node.depth * 15;
+  const left = node.depth * 16;
   const forceUpdate = useForceUpdate();
   const isStayingOverRef = React.useRef<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);

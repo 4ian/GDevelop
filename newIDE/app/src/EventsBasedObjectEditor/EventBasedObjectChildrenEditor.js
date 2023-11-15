@@ -45,32 +45,35 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     selectedObjectFolderOrObjectsWithContext: [],
   };
 
-  _onDeleteObject = (i18n: I18nType) => (
-    objectWithContext: ObjectWithContext,
+  _onDeleteObjects = (i18n: I18nType) => (
+    objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { object } = objectWithContext;
-    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
+    const message =
+      objectsWithContext.length === 1
+        ? t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
+        : t`Do you want to remove all references to these objects in groups and events (actions and conditions using the objects)?`;
 
-    const answer = Window.showYesNoCancelDialog(
-      i18n._(
-        t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
-      )
-    );
+    const answer = Window.showYesNoCancelDialog(i18n._(message));
 
     if (answer === 'cancel') return;
     const shouldRemoveReferences = answer === 'yes';
 
-    gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsBasedObject(
-      project,
-      eventsBasedObject,
-      globalObjectsContainer,
-      // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
-      eventsBasedObject,
-      object.getName(),
-      /* isObjectGroup=*/ false,
-      shouldRemoveReferences
-    );
+    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
+
+    objectsWithContext.forEach(objectWithContext => {
+      const { object } = objectWithContext;
+      gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsBasedObject(
+        project,
+        eventsBasedObject,
+        globalObjectsContainer,
+        // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
+        eventsBasedObject,
+        object.getName(),
+        /* isObjectGroup=*/ false,
+        shouldRemoveReferences
+      );
+    });
     done(true);
   };
 
@@ -251,7 +254,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onEditObject={this.editObject}
                 // Don't allow export as there is no assets.
                 onExportObject={() => {}}
-                onDeleteObject={this._onDeleteObject(i18n)}
+                onDeleteObjects={this._onDeleteObjects(i18n)}
                 getValidatedObjectOrGroupName={
                   this._getValidatedObjectOrGroupName
                 }

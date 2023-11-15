@@ -19,6 +19,7 @@ import {
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
@@ -37,6 +38,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
   enumerateFoldersInContainer,
   enumerateFoldersInFolder,
+  enumerateObjectsInFolder,
   getFoldersAscendanceWithoutRootFolder,
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
@@ -195,8 +197,8 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
-  onDeleteObject: (
-    objectWithContext: ObjectWithContext,
+  onDeleteObjects: (
+    objectWithContext: ObjectWithContext[],
     cb: (boolean) => void
   ) => void,
   onRenameObjectFolderOrObjectWithContextFinish: (
@@ -237,7 +239,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
-      onDeleteObject,
+      onDeleteObjects,
       onRenameObjectFolderOrObjectWithContextFinish,
       selectedObjectFolderOrObjectsWithContext,
       canInstallPrivateAsset,
@@ -441,47 +443,68 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           objectFolderOrObject,
           global,
         } = objectFolderOrObjectWithContext;
+
+        let objectsToDelete: gdObject[];
+        let folderToDelete: ?gdObjectFolderOrObject = null;
+        let message: MessageDescriptor;
+        let title: MessageDescriptor;
+
         if (objectFolderOrObject.isFolder()) {
-          if (objectFolderOrObject.getChildrenCount() === 0) {
+          objectsToDelete = enumerateObjectsInFolder(objectFolderOrObject);
+          if (objectsToDelete.length === 0) {
+            // Folder is empty or contains only empty folders.
             selectObjectFolderOrObjectWithContext(null);
             objectFolderOrObject
               .getParent()
               .removeFolderChild(objectFolderOrObject);
             forceUpdateList();
+            return;
           }
-          return;
+
+          folderToDelete = objectFolderOrObject;
+          if (objectsToDelete.length === 1) {
+            message = t`Are you sure you want to remove this folder and with it the object ${objectsToDelete[0].getName()}? This can't be undone.`;
+            title = t`Remove folder and object`;
+          } else {
+            message = t`Are you sure you want to remove this folder and all its content (objects ${objectsToDelete
+              .map(object => object.getName())
+              .join(', ')})? This can't be undone.`;
+            title = t`Remove folder and objects`;
+          }
+        } else {
+          objectsToDelete = [objectFolderOrObject.getObject()];
+          message = t`Are you sure you want to remove this object? This can't be undone.`;
+          title = t`Remove object`;
         }
 
-        const answer = await showDeleteConfirmation({
-          message: t`Are you sure you want to remove this object? This can't be undone.`,
-          title: t`Remove object`,
-        });
+        const answer = await showDeleteConfirmation({ message, title });
         if (!answer) return;
 
-        const object = objectFolderOrObject.getObject();
-
-        const objectWithContext = {
+        const objectsWithContext = objectsToDelete.map(object => ({
           object,
           global,
-        };
+        }));
 
         // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
         // to remove an item using keyboard only and to navigate with the arrow
         // keys right after deleting it.
         selectObjectFolderOrObjectWithContext(null);
 
-        // It's important to call onDeleteObject, because the parent might
+        // It's important to call onDeleteObjects, because the parent might
         // have to do some refactoring/clean up work before the object is deleted
         // (typically, the SceneEditor will remove instances referring to the object,
         // leading to the removal of their renderer - which can keep a reference to
         // the object).
-        onDeleteObject(objectWithContext, doRemove => {
+        onDeleteObjects(objectsWithContext, doRemove => {
           if (!doRemove) return;
+          const container = global ? project : objectsContainer;
+          objectsToDelete.forEach(object => {
+            container.removeObject(object.getName());
+          });
 
-          if (global) {
-            project.removeObject(object.getName());
-          } else {
-            objectsContainer.removeObject(object.getName());
+          if (folderToDelete) {
+            folderToDelete.getParent().removeFolderChild(folderToDelete);
+            forceUpdateList();
           }
 
           onObjectModified(false);
@@ -489,7 +512,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [
         objectsContainer,
-        onDeleteObject,
+        onDeleteObjects,
         onObjectModified,
         project,
         forceUpdateList,
@@ -1192,6 +1215,33 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
+    /**
+     * Unselect item if one of the parent is collapsed (folded) so that the item
+     * does not stay selected and not visible to the user.
+     */
+    const onCollapseItem = React.useCallback(
+      (item: TreeViewItem) => {
+        if (
+          !selectedObjectFolderOrObjectsWithContext ||
+          selectedObjectFolderOrObjectsWithContext.length !== 1 ||
+          item.isPlaceholder
+        )
+          return;
+        const { objectFolderOrObject: potentialParent } = item;
+        const {
+          objectFolderOrObject: selectedObjectFolderOrObject,
+        } = selectedObjectFolderOrObjectsWithContext[0];
+        if (!potentialParent || !selectedObjectFolderOrObject) return;
+        if (selectedObjectFolderOrObject.isADescendantOf(potentialParent)) {
+          selectObjectFolderOrObjectWithContext(null);
+        }
+      },
+      [
+        selectObjectFolderOrObjectWithContext,
+        selectedObjectFolderOrObjectsWithContext,
+      ]
+    );
+
     const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
       (
         objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
@@ -1263,7 +1313,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             {
               label: i18n._(t`Delete`),
               click: () => deleteObjectFolderOrObjectWithContext(item),
-              enabled: objectFolderOrObject.getChildrenCount() === 0,
               accelerator: 'Backspace',
             },
             {
@@ -1527,6 +1576,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemHtmlId={getTreeViewItemHtmlId}
                       getItemDataset={getTreeViewItemData}
                       onEditItem={editItem}
+                      onCollapseItem={onCollapseItem}
                       selectedItems={selectedObjectFolderOrObjectsWithContext}
                       onSelectItems={items => {
                         if (!items) selectObjectFolderOrObjectWithContext(null);

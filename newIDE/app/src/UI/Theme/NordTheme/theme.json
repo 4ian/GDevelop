@@ -196,7 +196,7 @@
     },
     "selection": {
       "background-color": {
-        "value": "#88C0D0"
+        "value": "#4d6e96"
       },
       "color": {
         "value": "#FFFFFF"
@@ -280,6 +280,11 @@
       }
     },
     "list-item": {
+      "hover": {
+        "background-color": {
+          "value": "#39516f"
+        }
+      },
       "group": {
         "text": {
           "color": {

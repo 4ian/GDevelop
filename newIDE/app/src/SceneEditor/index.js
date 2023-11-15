@@ -866,44 +866,47 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  _onDeleteObject = (
+  _onDeleteObjects = (
     i18n: I18nType,
-    objectWithContext: ObjectWithContext,
+    objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { object, global } = objectWithContext;
-    const { project, layout } = this.props;
+    const message =
+      objectsWithContext.length === 1
+        ? t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
+        : t`Do you want to remove all references to these objects in groups and events (actions and conditions using the objects)?`;
 
-    const answer = Window.showYesNoCancelDialog(
-      i18n._(
-        t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
-      )
-    );
+    const answer = Window.showYesNoCancelDialog(i18n._(message));
 
     if (answer === 'cancel') return;
     const shouldRemoveReferences = answer === 'yes';
+    const { project, layout } = this.props;
 
-    // Unselect instances of the deleted object because these instances
-    // will be deleted by gd.WholeProjectRefactorer (and after that, they will
-    // be invalid references, as pointing to deleted objects).
-    this.instancesSelection.unselectInstancesOfObject(object.getName());
+    objectsWithContext.forEach(objectWithContext => {
+      const { object, global } = objectWithContext;
 
-    if (global) {
-      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
-        project,
-        object.getName(),
-        /* isObjectGroup=*/ false,
-        shouldRemoveReferences
-      );
-    } else {
-      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
-        project,
-        layout,
-        object.getName(),
-        /* isObjectGroup=*/ false,
-        shouldRemoveReferences
-      );
-    }
+      // Unselect instances of the deleted object because these instances
+      // will be deleted by gd.WholeProjectRefactorer (and after that, they will
+      // be invalid references, as pointing to deleted objects).
+      this.instancesSelection.unselectInstancesOfObject(object.getName());
+
+      if (global) {
+        gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
+          project,
+          object.getName(),
+          /* isObjectGroup=*/ false,
+          shouldRemoveReferences
+        );
+      } else {
+        gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+          project,
+          layout,
+          object.getName(),
+          /* isObjectGroup=*/ false,
+          shouldRemoveReferences
+        );
+      }
+    });
 
     done(true);
 
@@ -1680,7 +1683,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this.setState({ selectedLayer: layer })
                 }
                 onExportObject={this.openObjectExporterDialog}
-                onDeleteObject={this._onDeleteObject}
+                onDeleteObjects={this._onDeleteObjects}
                 getValidatedObjectOrGroupName={
                   this._getValidatedObjectOrGroupName
                 }

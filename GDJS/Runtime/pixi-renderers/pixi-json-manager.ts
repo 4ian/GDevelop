@@ -14,7 +14,7 @@ namespace gdjs {
   ) => void;
 
   /**
-   * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
+   * JsonManager loads json files with pixi loader, using the "json" resources
    * registered in the game resources.
    *
    * Contrary to audio/fonts, json files are loaded asynchronously, when requested.
@@ -65,6 +65,14 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Request all the json resources to be preloaded (unless they are marked as not preloaded).
+     *
+     * Note that even if a JSON is already loaded, it will be reloaded (useful for hot-reloading,
+     * as JSON files can have been modified without the editor knowing).
+     *
+     * @param onProgress The function called after each json is loaded.
+     */
     async preloadAll(
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<integer> {
@@ -108,6 +116,12 @@ namespace gdjs {
       return loadedNumber;
     }
 
+    /**
+     * Request the json file from the given resource name.
+     * Returns the promise of loading atlas.
+     *
+     * @param resourceName The resource pointing to the json file to load.
+     */
     loadJsonAsync(resourceName: string): Promise<Object | null> {
       const that = this;
       return new Promise((resolve, reject) => {
@@ -120,6 +134,14 @@ namespace gdjs {
       });
     }
 
+    /**
+     * Request the json file from the given resource name.
+     * This method is asynchronous. When loaded, the `callback` is called with the error
+     * (null if none) and the loaded json (a JS Object).
+     *
+     * @param resourceName The resource pointing to the json file to load.
+     * @param callback The callback function called when json is loaded (or an error occurred).
+     */
     load(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.get(resourceName);
       if (!resource) {
@@ -198,7 +220,7 @@ namespace gdjs {
     /**
      * Check if the given json resource was loaded (preloaded or loaded with `loadJson`).
      * @param resourceName The name of the json resource.
-     * @returns true if the content of the json resource is loaded. false otherwise.
+     * @returns true if the content of the json resource is loaded, false otherwise.
      */
     isJsonLoaded(resourceName: string): boolean {
       return !!this._loadedJsons[resourceName];
@@ -209,7 +231,7 @@ namespace gdjs {
      * If the resource is not loaded, `null` will be returned.
      *
      * @param resourceName The name of the json resource.
-     * @returns the content of the json resource, if loaded. `null` otherwise.
+     * @returns the content of the json resource if loaded, `null` otherwise.
      */
     getLoadedJson(resourceName: string): Object | null {
       return this._loadedJsons[resourceName] || null;

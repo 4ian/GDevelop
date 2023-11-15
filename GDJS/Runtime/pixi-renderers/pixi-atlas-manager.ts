@@ -20,7 +20,7 @@ namespace gdjs {
     atlasKinds.includes(resource.kind);
 
   /**
-   * AtlasManager loads text files (using `XMLHttpRequest`), using the "atlas" resources
+   * AtlasManager loads atlas files with pixi loader, using the "atlas" resources
    * registered in the game resources and process them to Pixi TextureAtlas.
    *
    * Contrary to audio/fonts, text files are loaded asynchronously, when requested.
@@ -58,11 +58,11 @@ namespace gdjs {
     /**
      * Request all the text resources to be preloaded (unless they are marked as not preloaded).
      *
-     * Note that even if a text is already loaded, it will be reloaded (useful for hot-reloading,
-     * as text files can have been modified without the editor knowing).
+     * Note that even if a atlas is already loaded, it will be reloaded (useful for hot-reloading,
+     * as atlas files can have been modified without the editor knowing).
      *
-     * @param onProgress The function called after each texts is loaded.
-     * @param onComplete The function called when all texts are loaded.
+     * @param onProgress The function called after each atlas is loaded.
+     * @param onComplete The function called when all atlases are loaded.
      */
     async preloadAll(
       onProgress: AtlasManagerOnProgressCallback,
@@ -89,6 +89,12 @@ namespace gdjs {
       return Promise.resolve(atlasResources.length);
     }
 
+    /**
+     * Load specified atlas resource and pass it to callback once it is loaded.
+     *
+     * @param resources The data of resource to load.
+     * @param callback The callback to pass atlas to it once it is loaded.
+     */
     load(resource: ResourceData, callback: AtlasManagerRequestCallback): void {
       if (!isAtlasResource(resource)) callback(new Error(`${resource.name} is on atlas!`));
 
@@ -122,9 +128,9 @@ namespace gdjs {
     }
 
     /**
-     * Check if the given text resource was loaded (preloaded or loaded with `loadText`).
-     * @param resourceName The name of the text resource.
-     * @returns true if the content of the text resource is loaded. false otherwise.
+     * Check if the given atlas resource was loaded (preloaded or loaded with `load`).
+     * @param resourceName The name of the atlas resource.
+     * @returns true if the content of the atlas resource is loaded, false otherwise.
      */
     isLoaded(resourceName: string): boolean {
       return resourceName in this._loadedAtlases;
@@ -133,8 +139,8 @@ namespace gdjs {
     /**
      * Get the Pixi TextureAtlas for the given resource that is already loaded (preloaded or loaded with `load`).
      * If the resource is not loaded, `null` will be returned.
-     * @param resourceName The name of the text resource.
-     * @returns the TextureAtlas of the atlas, if loaded. `null` otherwise.
+     * @param resourceName The name of the atlas resource.
+     * @returns the TextureAtlas of the atlas if loaded, `null` otherwise.
      */
     getAtlasTexture(resourceName: string): pixi_spine.TextureAtlas | null {
       return this._loadedAtlases[resourceName] || null;

@@ -7,12 +7,10 @@ namespace gdjs {
     const logger = new gdjs.Logger('Spine Manager');
 
     /**
-     * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
-     * registered in the game resources.
+     * SpineManager manages pixi spine skeleton data.
      *
-     * Contrary to audio/fonts, json files are loaded asynchronously, when requested.
-     * You should properly handle errors, and give the developer/player a way to know
-     * that loading failed.
+     * It doesn`t load data by itself but it is designed to store data that was loaded by some other managers.
+     * E.g. spine skeleton can be loaded in JsonManager as we don`t know real meaning of json file.
      */
     export class SpineManager {
       _spineData: { [key: string]: pixi_spine.ISkeletonData } = {};
@@ -25,17 +23,17 @@ namespace gdjs {
        * Get the object for the given resource that is already loaded (preloaded or loaded with `loadJson`).
        * If the resource is not loaded, `null` will be returned.
        *
-       * @param resourceName The name of the json resource.
-       * @returns the content of the json resource, if loaded. `null` otherwise.
+       * @param resourceName The name of the spine skeleton.
+       * @returns the spine skeleton if loaded, `null` otherwise.
        */
       getSpine(resourceName: string): pixi_spine.ISkeletonData {
         return this._spineData[resourceName] || null;
       }
    
       /**
-       * Check if the given json resource was loaded (preloaded or loaded with `loadJson`).
-       * @param resourceName The name of the json resource.
-       * @returns true if the content of the json resource is loaded. false otherwise.
+       * Check if the given spine skeleton was loaded.
+       * @param resourceName The name of the spine skeleton.
+       * @returns true if the content of the spine skeleton is loaded, false otherwise.
        */
       isSpineLoaded(resourceName: string): boolean {
         return !!this._spineData[resourceName];

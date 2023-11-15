@@ -27,6 +27,7 @@ import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RecommendationList from './RecommendationList';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
+import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
@@ -77,7 +78,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
   } = authenticatedUser;
   const { values: preferences } = React.useContext(PreferencesContext);
   const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
-
+  const [error, setError] = React.useState<?AuthError>(null);
   const forceUpdate = useForceUpdate();
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
@@ -179,9 +180,18 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     [step]
   );
 
+  // Set the error when the authentication error changes.
+  React.useEffect(
+    () => {
+      setError(authenticationError);
+    },
+    [authenticationError]
+  );
+
   // Reset form when user changes authentication step.
   React.useEffect(
     () => {
+      setError(null);
       setEmail('');
       setPassword('');
     },
@@ -301,7 +311,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
                 onLogin={doLogin}
                 loginInProgress={creatingOrLoggingInAccount}
                 onForgotPassword={onResetPassword}
-                error={authenticationError}
+                error={error}
               />
             </div>
           </ColumnStackLayout>
@@ -370,7 +380,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
                 onChangeUsernameAvailability={setUsernameAvailability}
                 onCreateAccount={doCreateAccount}
                 createAccountInProgress={creatingOrLoggingInAccount}
-                error={authenticationError}
+                error={error}
               />
             </div>
           </ColumnStackLayout>

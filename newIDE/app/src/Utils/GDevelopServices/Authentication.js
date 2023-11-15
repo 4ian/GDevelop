@@ -88,6 +88,7 @@ export type ChangeEmailForm = {|
 export type AuthError = {
   code:
     | 'auth/invalid-email'
+    | 'auth/missing-email'
     | 'auth/user-disabled'
     | 'auth/user-not-found'
     | 'auth/wrong-password'
@@ -98,6 +99,7 @@ export type AuthError = {
     | 'auth/malformed-username'
     | 'auth/requires-recent-login'
     | 'auth/too-many-requests'
+    | 'auth/internal-error'
     | 'auth/network-request-failed',
 };
 

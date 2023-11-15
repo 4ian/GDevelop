@@ -46,6 +46,8 @@ export const getEmailErrorText = (error: ?AuthError) => {
 
   if (error.code === 'auth/invalid-email')
     return <Trans>This email is invalid.</Trans>;
+  if (error.code === 'auth/missing-email')
+    return <Trans>Please enter an email address.</Trans>;
   if (error.code === 'auth/user-disabled')
     return <Trans>This account has been deactivated or deleted.</Trans>;
   if (error.code === 'auth/user-not-found')
@@ -94,6 +96,14 @@ export const getPasswordErrorText = (error: ?AuthError) => {
         This password is too weak: please use more letters and digits.
       </Trans>
     );
+  if (error.code === 'auth/internal-error')
+    // Error raised when trying to create an account with an empty password.
+    return (
+      <Trans>
+        An unknown error happened, ensure your password is entered correctly.
+      </Trans>
+    );
+
   return undefined;
 };
 

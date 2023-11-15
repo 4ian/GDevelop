@@ -114,12 +114,14 @@ namespace gdjs {
       this._destroyElement();
     }
 
+    //@ts-ignore
     set visible(isVisible: boolean) {
       this._isVisible = isVisible;
       if (!this._input) return;
       this._input.style.display = isVisible ? 'initial' : 'none';
     }
 
+    //@ts-ignore
     get visible(): boolean {
       return this._isVisible;
     }

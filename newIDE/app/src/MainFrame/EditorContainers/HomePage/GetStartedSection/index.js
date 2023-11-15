@@ -2,7 +2,11 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../../../../UI/Text';
-import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../../UI/Layout';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 import TreeLeaves from '../../../../UI/CustomSvgIcons/TreeLeaves';
@@ -29,6 +33,7 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
 import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
+import Checkbox from '../../../../UI/Checkbox';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 
@@ -61,9 +66,16 @@ const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
 type Props = {|
   showUserChip: boolean => void,
   selectInAppTutorial: (tutorialId: string) => void,
+  showGetStartedSection: boolean,
+  setShowGetStartedSection: boolean => void,
 |};
 
-const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
+const GetStartedSection = ({
+  showUserChip,
+  selectInAppTutorial,
+  showGetStartedSection,
+  setShowGetStartedSection,
+}: Props) => {
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -512,6 +524,26 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     );
   }
 
+  const renderSubtitle = () => (
+    <ResponsiveLineStackLayout
+      justifyContent="space-between"
+      alignItems="center"
+      noColumnMargin
+      noMargin
+    >
+      <Text noMargin>
+        <Trans>
+          Here’s some content to get you started on your GDevelop journey!
+        </Trans>
+      </Text>
+      <Checkbox
+        label={<Trans>Don't show this screen on next startup</Trans>}
+        checked={!showGetStartedSection}
+        onCheck={(e, checked) => setShowGetStartedSection(!checked)}
+      />
+    </ResponsiveLineStackLayout>
+  );
+
   if (step === 'recommendations' && profile) {
     return (
       <>
@@ -524,11 +556,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
               <Trans>Hello!</Trans>
             )
           }
-          subtitleText={
-            <Trans>
-              Here’s some content to get you started on your GDevelop journey!
-            </Trans>
-          }
+          renderSubtitle={renderSubtitle}
           flexBody
         >
           <RecommendationList

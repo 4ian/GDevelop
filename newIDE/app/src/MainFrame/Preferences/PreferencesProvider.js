@@ -312,12 +312,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setShowGetStartedSection(showGetStartedSection: boolean) {
+  _setShowGetStartedSection(showGetStartedSectionByDefault: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          showGetStartedSection,
+          showGetStartedSectionByDefault,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

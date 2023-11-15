@@ -29,6 +29,7 @@ import TeamProvider from '../../../Profile/Team/TeamProvider';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import PreferencesContext from '../../Preferences/PreferencesContext';
 
 const styles = {
   container: {
@@ -141,9 +142,11 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
-      const { authenticated, onCloudProjectsChanged } = React.useContext(
-        AuthenticatedUserContext
-      );
+      const {
+        authenticated,
+        onCloudProjectsChanged,
+        recommendations,
+      } = React.useContext(AuthenticatedUserContext);
       const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
@@ -155,8 +158,16 @@ export const HomePage = React.memo<Props>(
 
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';
+      const {
+        values: { showGetStartedSectionByDefault },
+        setShowGetStartedSection,
+      } = React.useContext(PreferencesContext);
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>('get-started');
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(
+        !recommendations || showGetStartedSectionByDefault
+          ? 'get-started'
+          : 'build'
+      );
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
@@ -306,6 +317,8 @@ export const HomePage = React.memo<Props>(
                     <GetStartedSection
                       showUserChip={setShowUserChip}
                       selectInAppTutorial={selectInAppTutorial}
+                      showGetStartedSection={showGetStartedSectionByDefault}
+                      setShowGetStartedSection={setShowGetStartedSection}
                     />
                   )}
                   {activeTab === 'build' && (

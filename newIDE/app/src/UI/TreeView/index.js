@@ -120,6 +120,9 @@ type Props<Item> = {|
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
+  /**
+   * Callback called when a folder is collapsed (folded).
+   */
   onCollapseItem?: (Item: Item) => void,
   searchText?: string,
   selectedItems: $ReadOnlyArray<Item>,

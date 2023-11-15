@@ -1215,6 +1215,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
+    /**
+     * Unselect item if one of the parent is collapsed (folded) so that the item
+     * does not stay selected and not visible to the user.
+     */
     const onCollapseItem = React.useCallback(
       (item: TreeViewItem) => {
         if (

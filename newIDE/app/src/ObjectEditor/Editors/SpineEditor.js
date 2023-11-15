@@ -50,13 +50,13 @@ const SpineEditor = ({
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
-  const getResource = name => {
+  const getResource = React.useCallback((name) => {
     const resourcesManager = project.getResourcesManager();
 
     return resourcesManager.hasResource(name)
       ? resourcesManager.getResource(name)
       : null;
-  };
+  }, [project]);
   const getMetadata = resource => {
     const metadataString = resource ? resource.getMetadata() : '';
 
@@ -66,12 +66,12 @@ const SpineEditor = ({
     if (resource) {
       resource.setMetadata(JSON.stringify(metadata));
     }
-  }
-  const extendMetadata = (resourceName, metadata) => {
+  };
+  const extendMetadata = React.useCallback((resourceName, metadata) => {
     const resource = getResource(resourceName);
 
     setMetadata(resource, Object.assign(getMetadata(resource), metadata));
-  };
+  }, [getResource]);
   const [
     justAddedAnimationName,
     setJustAddedAnimationName,
@@ -156,7 +156,7 @@ const SpineEditor = ({
         spineConfiguration.removeAllAnimations();
       });
     },
-    [getSkeleton]
+    [getSkeleton, extendMetadata, properties, spineConfiguration]
   );
   const onChangeAtlasResourceName = React.useCallback(
     (atlasResourceName: string) => {
@@ -178,7 +178,7 @@ const SpineEditor = ({
         spineConfiguration.removeAllAnimations();
       });
     },
-    [getSkeleton]
+    [getSkeleton, extendMetadata, properties, spineConfiguration]
   );
   const onChangeImageResourceName = React.useCallback(
     (imageResourceName: string) => {
@@ -196,7 +196,7 @@ const SpineEditor = ({
         spineConfiguration.removeAllAnimations();
       });
     },
-    [getSkeleton]
+    [getSkeleton, extendMetadata, properties, spineConfiguration]
   );
 
   const scanNewAnimations = React.useCallback(

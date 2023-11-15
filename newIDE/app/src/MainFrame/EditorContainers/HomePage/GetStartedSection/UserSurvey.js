@@ -416,8 +416,8 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
       const existingUserAnswerIndex = userAnswers.findIndex(
         userAnswer => userAnswer.questionId === questionId
       );
-      const shouldGoToNextQuestion = answerId !== 'input';
       if (existingUserAnswerIndex >= 0) {
+        const isLastAnswer = existingUserAnswerIndex === userAnswers.length - 1;
         // User is coming back to a previous question
         if (multi) {
           // Add or remove answer to multi-choice question
@@ -435,29 +435,11 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
           }
           setUserAnswers(newUserAnswers);
         } else {
-          // Handle new answer (that could be the same as before).
-          const hasAnswerChanged =
-            userAnswers[existingUserAnswerIndex].answers[0] !== answerId;
+          // Handle new answer in a previous question (that could be the same as before).
           const doesAnswerChangesFollowingQuestion =
             !questionData.nextQuestion ||
             (questionId === firstQuestion && answerId === 'input');
 
-          if (!hasAnswerChanged) {
-            if (isMobile) {
-              if (doesAnswerChangesFollowingQuestion) {
-                const answerData = questionData.answers.find(
-                  answerData => answerData.id === answerId
-                );
-                if (shouldGoToNextQuestion) {
-                  goToNextQuestion(questionData, answerData);
-                }
-              } else {
-                if (shouldGoToNextQuestion) {
-                  goToNextQuestion(questionData);
-                }
-              }
-            }
-          }
           const newUserAnswers = [...userAnswers];
           newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           if (doesAnswerChangesFollowingQuestion) {
@@ -471,16 +453,18 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
             const answerData = questionData.answers.find(
               answerData => answerData.id === answerId
             );
-            if (shouldGoToNextQuestion) {
-              goToNextQuestion(questionData, answerData);
-            }
+            goToNextQuestion(questionData, answerData);
           } else {
-            if (shouldGoToNextQuestion) {
-              goToNextQuestion(questionData);
-            }
+            // Display next question if:
+            // - On desktop, it's the last question.
+            //   If it's not the last question displayed, it's still displayed so no need
+            //   to display it, the user can scroll to the next question
+            // - On mobile to go forward in the survey (there is no next button in this case)
+            if (isLastAnswer || isMobile) goToNextQuestion(questionData);
           }
         }
       } else {
+        const shouldGoToNextQuestion = answerId !== 'input';
         setUserAnswers([...userAnswers, { questionId, answers: [answerId] }]);
         const answerData = questionData.answers.find(
           answerData => answerData.id === answerId

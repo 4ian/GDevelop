@@ -55,7 +55,7 @@ export const setupResourcesWatcher =
         ];
         if (options && options.isProjectSplitInMultipleFiles) {
           ignore.push(
-            `**/{layouts,externalLayouts,externalEvents,eventsFunctionsExtensions}/*.json`
+            `{layouts,externalLayouts,externalEvents,eventsFunctionsExtensions}/*.json`
           );
         }
         const subscriptionIdPromise = ipcRenderer.invoke(

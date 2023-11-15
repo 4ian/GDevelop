@@ -58,12 +58,15 @@ const SpineEditor = ({
       : null;
   };
   const getMetadata = resource => {
-    const metadataString = resource.getMetadata();
+    const metadataString = resource ? resource.getMetadata() : '';
 
     return !!metadataString ? JSON.parse(metadataString) : {};
   };
-  const setMetadata = (resource, metadata) =>
-    resource?.setMetadata(JSON.stringify(metadata));
+  const setMetadata = (resource, metadata) => {
+    if (resource) {
+      resource.setMetadata(JSON.stringify(metadata));
+    }
+  }
   const extendMetadata = (resourceName, metadata) => {
     const resource = getResource(resourceName);
 

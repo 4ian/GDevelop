@@ -188,7 +188,10 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <AtlasResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{
+              project: testProject.project,
+              layout: testProject.testLayout,
+            }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}

@@ -33,36 +33,63 @@ export const isOnlyOneFreeAnswerPossible = (
 ): boolean => answers.length === 1 && 'isFree' in answers[0];
 
 const getRecentPersistedState = () => {
-  const serializedState = localStorage.getItem(localStoreUserSurveyKey);
-  if (!serializedState) return null;
-  const state = JSON.parse(serializedState);
-  if (
-    !state.lastModifiedAt ||
-    Date.now() - state.lastModifiedAt > TEN_MINUTES
-  ) {
-    // After a delay, the user will have forgotten what they were doing
-    // or the previous questions.
+  try {
+    const serializedState = localStorage.getItem(localStoreUserSurveyKey);
+    if (!serializedState) return null;
+    const state = JSON.parse(serializedState);
+    if (
+      !state.lastModifiedAt ||
+      Date.now() - state.lastModifiedAt > TEN_MINUTES
+    ) {
+      // After a delay, the user will have forgotten what they were doing
+      // or the previous questions.
+      return null;
+    }
+    return state;
+  } catch (error) {
+    console.log('An error occurred when reading local storage:', error);
     return null;
   }
-  return state;
 };
 
 const persistState = state => {
-  localStorage.setItem(
-    localStoreUserSurveyKey,
-    JSON.stringify({
-      ...state,
-      lastModifiedAt: Date.now(),
-    })
-  );
+  try {
+    localStorage.setItem(
+      localStoreUserSurveyKey,
+      JSON.stringify({
+        ...state,
+        lastModifiedAt: Date.now(),
+      })
+    );
+  } catch (error) {
+    console.log(
+      'An error occurred when storing user survey in local storage:',
+      error
+    );
+  }
 };
 
 export const clearUserSurveyPersistedState = () => {
-  localStorage.removeItem(localStoreUserSurveyKey);
+  try {
+    localStorage.removeItem(localStoreUserSurveyKey);
+  } catch (error) {
+    console.log(
+      'An error occurred when clearing user survey in local storage:',
+      error
+    );
+  }
 };
 
-export const hasStartedUserSurvey = () =>
-  localStorage.hasOwnProperty(localStoreUserSurveyKey);
+export const hasStartedUserSurvey = () => {
+  try {
+    return localStorage.hasOwnProperty(localStoreUserSurveyKey);
+  } catch (error) {
+    console.log(
+      'An error occurred when checking for user survey persisted state in local storage:',
+      error
+    );
+  }
+};
 
 const styles = {
   navigationDot: {

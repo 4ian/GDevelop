@@ -117,7 +117,6 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
-  _lastEmailVerificationDialogDisplayDate = null;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -684,18 +683,13 @@ export default class AuthenticatedUserProvider extends React.Component<
     // Use a boolean to show the dialog only once.
     const accountAgeInMs = now - profile.createdAt;
     const hasJustCreatedAccount = accountAgeInMs < TEN_SECONDS;
-    const hasAlreadyBeenDisplayedInTheLast30Minutes = this
-      ._lastEmailVerificationDialogDisplayDate
-      ? now - this._lastEmailVerificationDialogDisplayDate < THIRTY_MINUTES
-      : false;
-    if (!hasAlreadyBeenDisplayedInTheLast30Minutes) {
+    if (!this._hasNotifiedUserAboutEmailVerification) {
       setTimeout(() => {
         this.openEmailVerificationDialog({
           open: true,
           sendEmailAutomatically: false,
           showSendEmailButton: !hasJustCreatedAccount,
         });
-        this._lastEmailVerificationDialogDisplayDate = now;
       }, 1000);
     }
   };

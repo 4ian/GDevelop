@@ -75,6 +75,7 @@ const styles = {
     // Take full width on mobile.
     width: isMobile ? '95%' : 300,
   }),
+  questionnaireFinishedImage: { aspectRatio: '263 / 154' },
 };
 
 const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
@@ -541,6 +542,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
           <img
             src={questionnaireFinishedImageSource}
             alt="You as the red hero coming back to life"
+            style={styles.questionnaireFinishedImage}
           />
           <Text size="body2" noMargin align="center">
             <Trans>Just one second please...</Trans>

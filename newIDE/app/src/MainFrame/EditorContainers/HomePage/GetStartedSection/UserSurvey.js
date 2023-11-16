@@ -436,10 +436,10 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
           setUserAnswers(newUserAnswers);
         } else {
           // Handle new answer in a previous question (that could be the same as before).
+          const isAnsweringOtherToFirstQuestion =
+            questionId === firstQuestion && answerId === 'input';
           const doesAnswerChangesFollowingQuestion =
-            !questionData.nextQuestion ||
-            (questionId === firstQuestion && answerId === 'input');
-
+            !questionData.nextQuestion || isAnsweringOtherToFirstQuestion;
           const newUserAnswers = [...userAnswers];
           newUserAnswers[existingUserAnswerIndex].answers = [answerId];
           if (doesAnswerChangesFollowingQuestion) {
@@ -449,6 +449,13 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
             );
           }
           setUserAnswers(newUserAnswers);
+
+          if (isAnsweringOtherToFirstQuestion) {
+            // The user is coming back to first question, they selected the "Other" answer
+            // so they must fill it out now.
+            return;
+          }
+
           if (doesAnswerChangesFollowingQuestion) {
             const answerData = questionData.answers.find(
               answerData => answerData.id === answerId
@@ -491,16 +498,9 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
     [userAnswers, questionId]
   );
 
-  const endQuestionnaireEarly = React.useCallback(
-    () => {
-      const questionData = questionnaire[questionId];
-      goToNextQuestion(
-        questionData,
-        questionData.answers.find(answer => answer.id === 'input')
-      );
-    },
-    [goToNextQuestion, questionId]
-  );
+  const endQuestionnaireEarly = React.useCallback(() => {
+    setQuestionId(QUESTIONNAIRE_FINISHED_STEP);
+  }, []);
 
   if (isMobile) {
     return (

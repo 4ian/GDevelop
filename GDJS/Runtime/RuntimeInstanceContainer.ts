@@ -479,8 +479,9 @@ namespace gdjs {
     getActiveInstances(): gdjs.RuntimeObject[] {
       gdjs.ObjectSleepState.updateAwakeObjects(
         this._activeInstances,
-        (object: RuntimeObject) => object.getLifecycleSleepState(),
-        (object: RuntimeObject) => {}
+        (object) => object.getLifecycleSleepState(),
+        (object) => {},
+        (object) => this._activeInstances.push(object)
       );
       return this._activeInstances;
     }
@@ -549,9 +550,13 @@ namespace gdjs {
       }
       objectManager.addObject(obj);
       this._allInstancesList.push(obj);
-      obj
-        .getLifecycleSleepState()
-        .registerOnWakingUp((object) => this._activeInstances.push(object));
+      if (obj.getLifecycleSleepState().isAwake()) {
+        this._activeInstances.push(obj);
+      } else {
+        obj
+          .getLifecycleSleepState()
+          .registerOnWakingUp((object) => this._activeInstances.push(object));
+      }
     }
 
     /**

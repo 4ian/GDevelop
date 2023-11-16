@@ -48,19 +48,17 @@ namespace gdjs {
     wakeUp() {
       const object = this._object;
       this._lastActivityFrameIndex = object.getRuntimeScene().getFrameIndex();
-      if (!this.isAwake()) {
-        this._state = gdjs.ObjectSleepState.State.AWake;
-        for (const onWakingUp of this._onWakingUpCallbacks) {
-          onWakingUp(object);
-        }
+      if (this.isAwake()) {
+        return;
+      }
+      this._state = gdjs.ObjectSleepState.State.AWake;
+      for (const onWakingUp of this._onWakingUpCallbacks) {
+        onWakingUp(object);
       }
     }
 
     registerOnWakingUp(onWakingUp: (object: RuntimeObject) => void) {
       this._onWakingUpCallbacks.push(onWakingUp);
-      if (this.isAwake()) {
-        onWakingUp(this._object);
-      }
     }
 
     tryToSleep(): void {
@@ -77,18 +75,25 @@ namespace gdjs {
     static updateAwakeObjects(
       awakeObjects: Array<RuntimeObject>,
       getSleepState: (object: RuntimeObject) => ObjectSleepState,
-      onFallenAsleep: (object: RuntimeObject) => void
+      onFallenAsleep: (object: RuntimeObject) => void,
+      onWakingUp: (object: RuntimeObject) => void
     ) {
       let writeIndex = 0;
       for (let readIndex = 0; readIndex < awakeObjects.length; readIndex++) {
         const object = awakeObjects[readIndex];
-        awakeObjects[writeIndex] = object;
-        const lifecycleSleepState = getSleepState(object);
-        lifecycleSleepState.tryToSleep();
-        if (lifecycleSleepState.canSleep()) {
-          lifecycleSleepState._state = gdjs.ObjectSleepState.State.ASleep;
+        const sleepState = getSleepState(object);
+        sleepState.tryToSleep();
+        if (sleepState.canSleep() || !sleepState.isAwake()) {
+          if (sleepState.isAwake()) {
+            // Avoid onWakingUp to be called if some managers didn't have time
+            // to update their awake object list.
+            sleepState._onWakingUpCallbacks.length = 0;
+          }
+          sleepState._state = gdjs.ObjectSleepState.State.ASleep;
           onFallenAsleep(object);
+          sleepState._onWakingUpCallbacks.push(onWakingUp);
         } else {
+          awakeObjects[writeIndex] = object;
           writeIndex++;
         }
       }

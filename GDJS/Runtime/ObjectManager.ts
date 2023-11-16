@@ -44,18 +44,22 @@ namespace gdjs {
       this._awakeInstances.push(object);
     }
 
+    private _onFallenAsleep(object: RuntimeObject): void {
+      const objectAABB = object.getAABB();
+      this._rbush.remove(object._rtreeAABB);
+      object._rtreeAABB.minX = objectAABB.min[0];
+      object._rtreeAABB.minY = objectAABB.min[1];
+      object._rtreeAABB.maxX = objectAABB.max[0];
+      object._rtreeAABB.maxY = objectAABB.max[1];
+      this._rbush.insert(object._rtreeAABB);
+    }
+
     updateAwakeObjects(): void {
       gdjs.ObjectSleepState.updateAwakeObjects(
         this._awakeInstances,
-        (object: RuntimeObject) => object.getSpatialSearchSleepState(),
-        (object: RuntimeObject) => {
-          const objectAABB = object.getAABB();
-          object._rtreeAABB.minX = objectAABB.min[0];
-          object._rtreeAABB.minY = objectAABB.min[1];
-          object._rtreeAABB.maxX = objectAABB.max[0];
-          object._rtreeAABB.maxY = objectAABB.max[1];
-          this._rbush.insert(object._rtreeAABB);
-        }
+        (object) => object.getSpatialSearchSleepState(),
+        (object) => this._onFallenAsleep(object),
+        (object) => this._onWakingUp(object)
       );
     }
 
@@ -73,8 +77,7 @@ namespace gdjs {
      */
     addObject(object: gdjs.RuntimeObject): void {
       this._allInstances.push(object);
-      const sleepState = object.getSpatialSearchSleepState();
-      sleepState.registerOnWakingUp((object) => this._onWakingUp(object));
+      this._awakeInstances.push(object);
     }
 
     /**

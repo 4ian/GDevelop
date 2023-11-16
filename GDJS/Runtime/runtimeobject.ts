@@ -471,7 +471,7 @@ namespace gdjs {
       return (
         this._activeBehaviors.length > 0 ||
         !this.hasNoForces() ||
-        !this._timers.firstKey()
+        !!this._timers.firstKey()
       );
     }
 

@@ -459,7 +459,11 @@ namespace gdjs {
     isNeedingLifecycleFunctions(): boolean {
       return (
         super.isNeedingLifecycleFunctions() ||
-        (!this.isAnimationPaused() && !this.hasAnimationEnded())
+        (!this.isAnimationPaused() &&
+          this._animations[this._currentAnimation].directions[
+            this._currentDirection
+          ].frames.length > 1 &&
+          !this.hasAnimationEnded())
       );
     }
 

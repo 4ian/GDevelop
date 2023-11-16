@@ -141,9 +141,12 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
-      const { authenticated, onCloudProjectsChanged } = React.useContext(
-        AuthenticatedUserContext
-      );
+      const {
+        authenticated,
+        onCloudProjectsChanged,
+        loginState,
+      } = React.useContext(AuthenticatedUserContext);
+      const shouldChangeTabAfterUserLoggedIn = React.useRef<boolean>(true);
       const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
@@ -176,12 +179,24 @@ export const HomePage = React.memo<Props>(
       // If the user is not authenticated, the GetStarted section is displayed.
       React.useEffect(
         () => {
-          setActiveTab(authenticated ? initialTab : 'get-started');
+          if (shouldChangeTabAfterUserLoggedIn.current) {
+            setActiveTab(authenticated ? initialTab : 'get-started');
+          }
         },
         // Only the initialTab at component mounting is interesting
         // and we don't want to change the active tab if initialTab changes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [authenticated]
+      );
+
+      // Once the home page is mounted, do not automatically change tab unless
+      // the user is logging in (this should only happen when the editor is opening).
+      React.useEffect(
+        () => {
+          if (loginState === 'loggingIn') return;
+          shouldChangeTabAfterUserLoggedIn.current = false;
+        },
+        [loginState]
       );
 
       // Load everything when the user opens the home page, to avoid future loading times.

@@ -18,7 +18,6 @@ namespace gdjs {
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
       this._platformRBush = new RBush<PlatformRuntimeBehavior>();
       this.movedPlatforms = [];
-      gdjs.registerRuntimeScenePreEventsCallback(() => this.doStepPreEvents());
     }
 
     /**

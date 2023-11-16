@@ -119,8 +119,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // Remove the platform
       platform.deleteFromScene(runtimeScene);
       runtimeScene.renderAndStep(1000 / 60);
-      // TODO FIXME The platformer must be updated the next frame directly.
-      runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
     });

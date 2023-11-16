@@ -155,7 +155,7 @@ module.exports = [
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.9837637432881616
+    "translationRatio": 0.9841472769112759
   },
   {
     "languageCode": "ka_GE",
@@ -317,7 +317,7 @@ module.exports = [
     "languageCode": "uk_UA",
     "languageName": "Ukrainian",
     "languageNativeName": "Українська",
-    "translationRatio": 0.9909230375862951
+    "translationRatio": 0.9913065712094093
   },
   {
     "languageCode": "ur_PK",

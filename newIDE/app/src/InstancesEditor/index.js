@@ -484,6 +484,8 @@ export default class InstancesEditor extends Component<Props> {
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
+    // We've seen all those elements being undefined in some cases, so
+    // by security, check that they are defined before deleting them.
     if (this.selectionRectangle) {
       this.selectionRectangle.delete();
     }
@@ -501,8 +503,12 @@ export default class InstancesEditor extends Component<Props> {
     }
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
-    this.pixiContainer.destroy();
-    this.pixiRenderer.destroy();
+    if (this.pixiContainer) {
+      this.pixiContainer.destroy();
+    }
+    if (this.pixiRenderer) {
+      this.pixiRenderer.destroy();
+    }
   }
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.

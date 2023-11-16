@@ -97,8 +97,8 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(instanceContainer);
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.onDestroy();
     }
 
@@ -137,7 +137,7 @@ namespace gdjs {
     }
 
     setOpacity(opacity: float): void {
-      this._opacity = PixiFiltersTools.clampValue(opacity, 0, 255);
+      this._opacity = gdjs.PixiFiltersTools.clampValue(opacity, 0, 255);
       this._renderer.updateOpacity();
     }
 

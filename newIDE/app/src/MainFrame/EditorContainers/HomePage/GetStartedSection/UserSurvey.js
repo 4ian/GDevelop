@@ -21,75 +21,14 @@ import ScrollView, {
 } from '../../../../UI/ScrollView';
 import FlatButton from '../../../../UI/FlatButton';
 import RaisedButton from '../../../../UI/RaisedButton';
+import { getRecentPersistedState, persistState } from './UserSurveyStorage';
 
 const STEP_MAX_COUNT = 8;
 const QUESTIONNAIRE_FINISHED_STEP = 'QUESTIONNAIRE_FINISHED';
-const TEN_MINUTES = 10 * 60 * 1000;
-
-const localStoreUserSurveyKey = 'gd-user-survey';
 
 export const isOnlyOneFreeAnswerPossible = (
   answers: Array<AnswerData>
 ): boolean => answers.length === 1 && 'isFree' in answers[0];
-
-const getRecentPersistedState = () => {
-  try {
-    const serializedState = localStorage.getItem(localStoreUserSurveyKey);
-    if (!serializedState) return null;
-    const state = JSON.parse(serializedState);
-    if (
-      !state.lastModifiedAt ||
-      Date.now() - state.lastModifiedAt > TEN_MINUTES
-    ) {
-      // After a delay, the user will have forgotten what they were doing
-      // or the previous questions.
-      return null;
-    }
-    return state;
-  } catch (error) {
-    console.log('An error occurred when reading local storage:', error);
-    return null;
-  }
-};
-
-const persistState = state => {
-  try {
-    localStorage.setItem(
-      localStoreUserSurveyKey,
-      JSON.stringify({
-        ...state,
-        lastModifiedAt: Date.now(),
-      })
-    );
-  } catch (error) {
-    console.log(
-      'An error occurred when storing user survey in local storage:',
-      error
-    );
-  }
-};
-
-export const clearUserSurveyPersistedState = () => {
-  try {
-    localStorage.removeItem(localStoreUserSurveyKey);
-  } catch (error) {
-    console.log(
-      'An error occurred when clearing user survey in local storage:',
-      error
-    );
-  }
-};
-
-export const hasStartedUserSurvey = () => {
-  try {
-    return localStorage.hasOwnProperty(localStoreUserSurveyKey);
-  } catch (error) {
-    console.log(
-      'An error occurred when checking for user survey persisted state in local storage:',
-      error
-    );
-  }
-};
 
 const styles = {
   navigationDot: {
@@ -101,7 +40,7 @@ const styles = {
   subTitle: { opacity: 0.6 },
 };
 
-type UserAnswers = Array<{|
+export type UserAnswers = Array<{|
   questionId: string,
   answers: string[],
   userInput?: string,

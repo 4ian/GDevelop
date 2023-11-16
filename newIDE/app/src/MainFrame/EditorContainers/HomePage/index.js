@@ -195,8 +195,13 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
-      // Once the home page is mounted, do not automatically change tab unless
-      // the user is logging in (this should only happen when the editor is opening).
+      // This effect makes sure that the tab changing cannot happen once the editor is up
+      // and running (shouldChangeTabAfterUserLoggedIn is never set back to true).
+      // At the time the HomePage is mounting, if there is any firebase data on the device
+      // the authentication is ongoing, with loginState having the value 'loggingIn'.
+      // So once the authentication is over (loginState with value 'done'), the above effect
+      // (that changes the tab) is run prior to this one, the tab is changed
+      // and shouldChangeTabAfterUserLoggedIn is set to false.
       React.useEffect(
         () => {
           if (loginState === 'loggingIn') return;

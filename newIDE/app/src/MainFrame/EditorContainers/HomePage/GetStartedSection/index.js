@@ -23,10 +23,11 @@ import {
   type UsernameAvailability,
   type UserSurvey as UserSurveyType,
 } from '../../../../Utils/GDevelopServices/User';
-import UserSurvey, {
+import UserSurvey from './UserSurvey';
+import {
   clearUserSurveyPersistedState,
   hasStartedUserSurvey,
-} from './UserSurvey';
+} from './UserSurveyStorage';
 import LinearProgress from '../../../../UI/LinearProgress';
 import CreateAccountForm from '../../../../Profile/CreateAccountForm';
 import LoginForm from '../../../../Profile/LoginForm';

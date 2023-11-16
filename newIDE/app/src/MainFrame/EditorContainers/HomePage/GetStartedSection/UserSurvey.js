@@ -24,12 +24,43 @@ import RaisedButton from '../../../../UI/RaisedButton';
 
 const STEP_MAX_COUNT = 8;
 const QUESTIONNAIRE_FINISHED_STEP = 'QUESTIONNAIRE_FINISHED';
+const TEN_MINUTES = 10 * 60 * 1000;
 
-export const localStoreUserSurveyKey = 'gd-user-survey';
+const localStoreUserSurveyKey = 'gd-user-survey';
 
 export const isOnlyOneFreeAnswerPossible = (
   answers: Array<AnswerData>
 ): boolean => answers.length === 1 && 'isFree' in answers[0];
+
+const getRecentPersistedState = () => {
+  const serializedState = localStorage.getItem(localStoreUserSurveyKey);
+  if (!serializedState) return null;
+  const state = JSON.parse(serializedState);
+  if (
+    !state.lastModifiedAt ||
+    Date.now() - state.lastModifiedAt > TEN_MINUTES
+  ) {
+    return null;
+  }
+  return state;
+};
+
+const persistState = state => {
+  localStorage.setItem(
+    localStoreUserSurveyKey,
+    JSON.stringify({
+      ...state,
+      lastModifiedAt: Date.now(),
+    })
+  );
+};
+
+export const clearUserSurveyPersistedState = () => {
+  localStorage.removeItem(localStoreUserSurveyKey);
+};
+
+export const hasStartedUserSurvey = () =>
+  localStorage.hasOwnProperty(localStoreUserSurveyKey);
 
 const styles = {
   navigationDot: {
@@ -339,24 +370,20 @@ type Props = {|
 |};
 
 const UserSurvey = ({ onCompleted, onStarted }: Props) => {
-  const serializedState = localStorage.getItem(localStoreUserSurveyKey);
-  const state = serializedState ? JSON.parse(serializedState) : null;
+  const persistedState = getRecentPersistedState();
   const [questionId, setQuestionId] = React.useState<string>(
-    state ? state.questionId : firstQuestion
+    persistedState ? persistedState.questionId : firstQuestion
   );
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
   const [userAnswers, setUserAnswers] = React.useState<UserAnswers>(
-    state ? state.userAnswers : []
+    persistedState ? persistedState.userAnswers : []
   );
 
   React.useEffect(
     () => {
       if (userAnswers.length > 0) {
-        localStorage.setItem(
-          localStoreUserSurveyKey,
-          JSON.stringify({ userAnswers, questionId })
-        );
+        persistState({ userAnswers, questionId });
       }
     },
     // Store component state on each survey change.

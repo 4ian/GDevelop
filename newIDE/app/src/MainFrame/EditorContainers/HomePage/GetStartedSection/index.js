@@ -23,7 +23,10 @@ import {
   type UsernameAvailability,
   type UserSurvey as UserSurveyType,
 } from '../../../../Utils/GDevelopServices/User';
-import UserSurvey, { localStoreUserSurveyKey } from './UserSurvey';
+import UserSurvey, {
+  clearUserSurveyPersistedState,
+  hasStartedUserSurvey,
+} from './UserSurvey';
 import LinearProgress from '../../../../UI/LinearProgress';
 import CreateAccountForm from '../../../../Profile/CreateAccountForm';
 import LoginForm from '../../../../Profile/LoginForm';
@@ -94,9 +97,7 @@ const GetStartedSection = ({
   onUserSurveyStarted,
   onUserSurveyHidden,
 }: Props) => {
-  const isFillingOutSurvey = localStorage.hasOwnProperty(
-    localStoreUserSurveyKey
-  );
+  const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -180,12 +181,16 @@ const GetStartedSection = ({
       setStep('surveyFinished');
       // Artificial delay to build up expectations.
       recommendationsGettingDelayPromise.current = delay(5000);
+      console.log(survey);
       await Promise.all([
-        onEditProfile({ survey }, preferences, { throwError: true }),
+        async () => {
+          // onEditProfile({ survey }, preferences, { throwError: true });
+          return;
+        },
         recommendationsGettingDelayPromise.current,
       ]);
       sendUserSurveyCompleted();
-      localStorage.removeItem(localStoreUserSurveyKey);
+      clearUserSurveyPersistedState();
       setStep('recommendations');
     } catch (error) {
       console.error('An error occurred when sending survey:', error);
@@ -222,6 +227,13 @@ const GetStartedSection = ({
       }
     },
     [step]
+  );
+
+  React.useEffect(
+    () => {
+      if (!authenticatedUser.authenticated) clearUserSurveyPersistedState();
+    },
+    [authenticatedUser.authenticated]
   );
 
   // Set the error when the authentication error changes.

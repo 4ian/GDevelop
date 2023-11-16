@@ -40,6 +40,8 @@ const getRecentPersistedState = () => {
     !state.lastModifiedAt ||
     Date.now() - state.lastModifiedAt > TEN_MINUTES
   ) {
+    // After a delay, the user will have forgotten what they were doing
+    // or the previous questions.
     return null;
   }
   return state;

@@ -341,7 +341,6 @@ export const HomePage = React.memo<Props>(
       }, []);
       const onUserSurveyHidden = React.useCallback(() => {
         if (userSurveyHiddenRef.current) return;
-        console.log("HIDE")
         sendUserSurveyHidden();
         userSurveyHiddenRef.current = true;
       }, []);

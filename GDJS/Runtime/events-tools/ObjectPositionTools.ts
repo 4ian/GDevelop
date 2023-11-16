@@ -12,8 +12,8 @@ namespace gdjs {
         const searchArea = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
         const nearbyObjects: Array<RuntimeObject> = [];
 
-        export const twoListsSpacialCheck = (
-          instanceContainer: RuntimeInstanceContainer,
+        export const twoListsSpatialCheck = (
+          instanceContainer: RuntimeInstanceContainer | EventsFunctionContext,
           predicate: (
             object1: gdjs.RuntimeObject,
             object2: gdjs.RuntimeObject,
@@ -33,7 +33,28 @@ namespace gdjs {
           const isPicked1 = objectsLists1.isPicked;
           const isPicked2 = objectsLists2.isPicked;
 
-          if (inverted || (isPicked1 && isPicked2)) {
+          if (isPicked1 && isPicked2) {
+            // Both are already filtered fallback on the naïve check
+            return gdjs.evtTools.object.twoListsTest(
+              predicate,
+              objectsLists1,
+              objectsLists2,
+              inverted,
+              predicateExtraArg
+            );
+          }
+          if (
+            inverted ||
+            !(instanceContainer instanceof gdjs.RuntimeInstanceContainer)
+          ) {
+            // Fast spatial conditions are using objectListOrEmptyIfJustDeclared
+            // where naive spatial implementation is expecting objectList.
+            if (!isPicked1) {
+              fillPickedLists(instanceContainer, objectsLists1);
+            }
+            if (!isPicked2) {
+              fillPickedLists(instanceContainer, objectsLists2);
+            }
             // Both are already filtered fallback on the naïve check
             return gdjs.evtTools.object.twoListsTest(
               predicate,
@@ -51,40 +72,23 @@ namespace gdjs {
           let objectsMaxCount1 = 0;
           if (!isPicked1) {
             for (const objectName in objectsLists1.items) {
-              const objectManager = instanceContainer.getObjectManager(
-                objectName
-              );
+              const objects = instanceContainer.getObjects(objectName);
               objectsMaxCount1 = Math.max(
                 objectsMaxCount1,
-                objectManager.getAllInstances().length
+                objects ? objects.length : 0
               );
             }
           }
           let objectsMaxCount2 = 0;
-          if (!isPicked1 && !isPicked2) {
+          if (!isPicked2) {
             for (const objectName in objectsLists2.items) {
-              const objectManager = instanceContainer.getObjectManager(
-                objectName
-              );
+              const objects = instanceContainer.getObjects(objectName);
               objectsMaxCount2 = Math.max(
                 objectsMaxCount1,
-                objectManager.getAllInstances().length
+                objects ? objects.length : 0
               );
             }
           }
-          // TODO Check if it's really useful.
-          // It would need to fill the unpicked lists.
-
-          // if (objectsMaxCount1 <= 8 && objectsMaxCount2 <= 8) {
-          //   // Not enough instance for a R-Tree to be useful.
-          //   return gdjs.evtTools.object.twoListsTest(
-          //     predicate,
-          //     objectsLists1,
-          //     objectsLists2,
-          //     inverted,
-          //     predicateExtraArg
-          //   );
-          // }
           if (!isPicked1 && !isPicked2) {
             if (objectsMaxCount1 < objectsMaxCount2) {
               iteratedLists = objectsLists1;
@@ -96,7 +100,7 @@ namespace gdjs {
           for (const iteratedObjectName in iteratedLists.items) {
             const iteratedObjects = iteratedLists.isPicked
               ? iteratedLists.items[iteratedObjectName]
-              : instanceContainer.getInstancesOf(iteratedObjectName);
+              : instanceContainer.getObjects(iteratedObjectName) || [];
 
             let isAnyIteratedObjectPicked = false;
             for (const objectName in treeLists.items) {
@@ -136,6 +140,17 @@ namespace gdjs {
           return isAnyObjectPicked;
         };
 
+        const fillPickedLists = (
+          instanceContainer: RuntimeInstanceContainer | EventsFunctionContext,
+          objectsLists: ObjectsLists
+        ) => {
+          for (const objectName in objectsLists.items) {
+            const pickedObjects = objectsLists.items[objectName];
+            const allObjects = instanceContainer.getObjects(objectName);
+            pickedObjects.push.apply(pickedObjects, allObjects);
+          }
+        };
+
         const getSearchAreaForDistanceCheck = (
           object: gdjs.RuntimeObject,
           searchArea: SearchArea,
@@ -155,9 +170,11 @@ namespace gdjs {
           objectsLists2: ObjectsLists,
           distance: float,
           inverted: boolean,
-          instanceContainer: gdjs.RuntimeInstanceContainer
+          instanceContainer:
+            | gdjs.RuntimeInstanceContainer
+            | EventsFunctionContext
         ): boolean => {
-          return twoListsSpacialCheck(
+          return twoListsSpatialCheck(
             instanceContainer,
             gdjs.evtTools.object._distanceBetweenObjects,
             getSearchAreaForDistanceCheck,
@@ -187,10 +204,12 @@ namespace gdjs {
           objectsLists1: ObjectsLists,
           objectsLists2: ObjectsLists,
           inverted: boolean,
-          instanceContainer: gdjs.RuntimeInstanceContainer,
+          instanceContainer:
+            | gdjs.RuntimeInstanceContainer
+            | EventsFunctionContext,
           ignoreTouchingEdges: boolean
         ): boolean => {
-          return twoListsSpacialCheck(
+          return twoListsSpatialCheck(
             instanceContainer,
             gdjs.RuntimeObject.collisionTest,
             getSearchAreaForCollisionCheck,

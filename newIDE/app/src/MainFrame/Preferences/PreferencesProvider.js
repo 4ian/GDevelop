@@ -141,7 +141,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
-    setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(this),
+    setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(
+      this
+    ),
     setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
       this
     ),

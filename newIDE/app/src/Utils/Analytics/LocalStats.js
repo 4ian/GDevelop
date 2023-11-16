@@ -1,5 +1,5 @@
 // @flow
-export const localStorageLocalStatsPrefix = 'gd-local-stats';
+const localStorageLocalStatsPrefix = 'gd-local-stats';
 
 export const getProgramOpeningCount = (): number => {
   try {

@@ -88,7 +88,6 @@ const cleanUserTracesOnDevice = async () => {
 };
 
 const TEN_SECONDS = 10 * 1000;
-const THIRTY_MINUTES = 30 * 60 * 1000;
 
 export default class AuthenticatedUserProvider extends React.Component<
   Props,

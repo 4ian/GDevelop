@@ -23,7 +23,7 @@ import {
   type UsernameAvailability,
   type UserSurvey as UserSurveyType,
 } from '../../../../Utils/GDevelopServices/User';
-import UserSurvey from './UserSurvey';
+import UserSurvey, { localStoreUserSurveyKey } from './UserSurvey';
 import LinearProgress from '../../../../UI/LinearProgress';
 import CreateAccountForm from '../../../../Profile/CreateAccountForm';
 import LoginForm from '../../../../Profile/LoginForm';
@@ -86,6 +86,9 @@ type Props = {|
 |};
 
 const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
+  const isFillingOutSurvey = localStorage.hasOwnProperty(
+    localStoreUserSurveyKey
+  );
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -111,10 +114,16 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     | 'welcome'
     | 'login'
     | 'register'
-    | 'questionnaire'
-    | 'questionnaireFinished'
+    | 'survey'
+    | 'surveyFinished'
     | 'recommendations'
-  >(profile && profile.survey ? 'recommendations' : 'welcome');
+  >(
+    profile && profile.survey
+      ? 'recommendations'
+      : isFillingOutSurvey
+      ? 'survey'
+      : 'welcome'
+  );
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
@@ -158,15 +167,16 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     );
   };
 
-  const onQuestionnaireFinished = async (survey: UserSurveyType) => {
+  const onSurveyFinished = async (survey: UserSurveyType) => {
     try {
-      setStep('questionnaireFinished');
+      setStep('surveyFinished');
       // Artificial delay to build up expectations.
       recommendationsGettingDelayPromise.current = delay(5000);
       await Promise.all([
         onEditProfile({ survey }, preferences, { throwError: true }),
         recommendationsGettingDelayPromise.current,
       ]);
+      localStorage.removeItem(localStoreUserSurveyKey);
       setStep('recommendations');
     } catch (error) {
       console.error('An error occurred when sending survey:', error);
@@ -182,7 +192,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
       if (step === 'welcome' && profile && profile.survey) {
         setStep('recommendations');
       } else if ((step === 'login' || step === 'register') && profile) {
-        setStep(profile.survey ? 'recommendations' : 'questionnaire');
+        setStep(profile.survey ? 'recommendations' : 'survey');
       } else if (!(step === 'login' || step === 'register') && !profile) {
         setStep('welcome');
       }
@@ -484,7 +494,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
                   <RaisedButton
                     label={<Trans>Let's go!</Trans>}
                     primary
-                    onClick={() => setStep('questionnaire')}
+                    onClick={() => setStep('survey')}
                     fullWidth
                   />
                 </Column>
@@ -524,7 +534,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     );
   }
 
-  if (step === 'questionnaireFinished') {
+  if (step === 'surveyFinished') {
     return (
       <SectionContainer
         title={null} // Let the content handle the title.
@@ -602,7 +612,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     );
   }
 
-  return <UserSurvey onQuestionnaireFinished={onQuestionnaireFinished} />;
+  return <UserSurvey onCompleted={onSurveyFinished} />;
 };
 
 const GetStartedSectionWithErrorBoundary = (props: Props) => (

@@ -25,6 +25,8 @@ import RaisedButton from '../../../../UI/RaisedButton';
 const STEP_MAX_COUNT = 8;
 const QUESTIONNAIRE_FINISHED_STEP = 'QUESTIONNAIRE_FINISHED';
 
+export const localStoreUserSurveyKey = 'gd-user-survey';
+
 export const isOnlyOneFreeAnswerPossible = (
   answers: Array<AnswerData>
 ): boolean => answers.length === 1 && 'isFree' in answers[0];
@@ -331,13 +333,29 @@ const MobileDisplay = ({
   );
 };
 
-type Props = {| onQuestionnaireFinished: UserSurveyType => Promise<void> |};
+type Props = {| onCompleted: UserSurveyType => Promise<void> |};
 
-const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
-  const [questionId, setQuestionId] = React.useState<string>(firstQuestion);
+const UserSurvey = ({ onCompleted }: Props) => {
+  const serializedState = localStorage.getItem(localStoreUserSurveyKey);
+  const state = serializedState ? JSON.parse(serializedState) : null;
+  const [questionId, setQuestionId] = React.useState<string>(
+    state ? state.questionId : firstQuestion
+  );
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
-  const [userAnswers, setUserAnswers] = React.useState<UserAnswers>([]);
+  const [userAnswers, setUserAnswers] = React.useState<UserAnswers>(
+    state ? state.userAnswers : []
+  );
+
+  React.useEffect(
+    () => {
+      localStorage.setItem(
+        localStoreUserSurveyKey,
+        JSON.stringify({ userAnswers, questionId })
+      );
+    },
+    [questionId, userAnswers]
+  );
 
   const goToNextQuestion = React.useCallback(
     (questionData: QuestionData, answerData?: AnswerData) => {
@@ -396,17 +414,17 @@ const UserSurvey = ({ onQuestionnaireFinished }: Props) => {
 
   React.useEffect(
     () => {
-      // Call onQuestionnaireFinished in effect instead of directly in goToNextQuestion
+      // Call onCompleted in effect instead of directly in goToNextQuestion
       // to avoid cases where userAnswers is not up to date and does not contain the
       // last selected answer.
       // This effect should be called only once when questionId is set to this specific
       // value. After that, the whole component should be unmounted and the effect would
       // not be called a second time.
       if (questionId === QUESTIONNAIRE_FINISHED_STEP) {
-        onQuestionnaireFinished(formatUserAnswers(userAnswers));
+        onCompleted(formatUserAnswers(userAnswers));
       }
     },
-    [questionId, onQuestionnaireFinished, userAnswers]
+    [questionId, onCompleted, userAnswers]
   );
 
   const onSelectAnswer = React.useCallback(

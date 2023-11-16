@@ -247,6 +247,7 @@ export const ErrorFallbackComponent = ({
                 error && error.stack
                   ? `${error.stack.slice(0, 600)}...`
                   : 'No error found';
+              const errorStackAndId = `uniqueErrorId: ${uniqueErrorId}\n\n${errorStack}`;
               const gdevelopVersion = getIDEVersionWithHash();
               const platformInfo = `System Version: ${getSystemVersion()}, Arch: ${getArch()}, User Agent: ${getUserAgent()}, Platform: ${getPlatformName()}`;
               const additionalContext = componentStack
@@ -261,7 +262,7 @@ export const ErrorFallbackComponent = ({
               baseUrl.searchParams.set('labels', '💥crash');
               baseUrl.searchParams.set('gdevelop_version', gdevelopVersion);
               baseUrl.searchParams.set('platform_info', platformInfo);
-              baseUrl.searchParams.set('error_stack', errorStack);
+              baseUrl.searchParams.set('error_stack', errorStackAndId);
               baseUrl.searchParams.set('component_stack', additionalContext);
 
               Window.openExternalURL(baseUrl.href);

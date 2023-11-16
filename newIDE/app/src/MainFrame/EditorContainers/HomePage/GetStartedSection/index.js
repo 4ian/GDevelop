@@ -35,6 +35,7 @@ import { type AuthError } from '../../../../Utils/GDevelopServices/Authenticatio
 import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
 import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
+import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
@@ -82,10 +83,17 @@ const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
 
 type Props = {|
   showUserChip: boolean => void,
+  onUserSurveyStarted: () => void,
+  onUserSurveyHidden: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
-const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
+const GetStartedSection = ({
+  showUserChip,
+  selectInAppTutorial,
+  onUserSurveyStarted,
+  onUserSurveyHidden,
+}: Props) => {
   const isFillingOutSurvey = localStorage.hasOwnProperty(
     localStoreUserSurveyKey
   );
@@ -176,6 +184,7 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
         onEditProfile({ survey }, preferences, { throwError: true }),
         recommendationsGettingDelayPromise.current,
       ]);
+      sendUserSurveyCompleted();
       localStorage.removeItem(localStoreUserSurveyKey);
       setStep('recommendations');
     } catch (error) {
@@ -523,9 +532,10 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
               <Checkbox
                 label={<Trans>Don't show this screen on next startup</Trans>}
                 checked={!preferences.showGetStartedSectionByDefault}
-                onCheck={(e, checked) =>
-                  setShowGetStartedSectionByDefault(!checked)
-                }
+                onCheck={(e, checked) => {
+                  if (checked) onUserSurveyHidden();
+                  setShowGetStartedSectionByDefault(!checked);
+                }}
               />
             </div>
           )}
@@ -612,7 +622,12 @@ const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
     );
   }
 
-  return <UserSurvey onCompleted={onSurveyFinished} />;
+  return (
+    <UserSurvey
+      onCompleted={onSurveyFinished}
+      onStarted={onUserSurveyStarted}
+    />
+  );
 };
 
 const GetStartedSectionWithErrorBoundary = (props: Props) => (

@@ -31,6 +31,10 @@ import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServ
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
+import {
+  sendUserSurveyHidden,
+  sendUserSurveyStarted,
+} from '../../../Utils/Analytics/EventSender';
 
 const styles = {
   container: {
@@ -146,6 +150,8 @@ export const HomePage = React.memo<Props>(
         onCloudProjectsChanged,
         loginState,
       } = React.useContext(AuthenticatedUserContext);
+      const userSurveyStartedRef = React.useRef<boolean>(false);
+      const userSurveyHiddenRef = React.useRef<boolean>(false);
       const shouldChangeTabAfterUserLoggedIn = React.useRef<boolean>(true);
       const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
@@ -328,6 +334,29 @@ export const HomePage = React.memo<Props>(
         [authenticated, activeTab]
       );
 
+      const onUserSurveyStarted = React.useCallback(() => {
+        if (userSurveyStartedRef.current) return;
+        sendUserSurveyStarted();
+        userSurveyStartedRef.current = true;
+      }, []);
+      const onUserSurveyHidden = React.useCallback(() => {
+        if (userSurveyHiddenRef.current) return;
+        console.log("HIDE")
+        sendUserSurveyHidden();
+        userSurveyHiddenRef.current = true;
+      }, []);
+
+      React.useEffect(
+        () => {
+          if (!authenticated) {
+            userSurveyStartedRef.current = false;
+            userSurveyHiddenRef.current = false;
+          }
+        },
+        // Reset flag that prevents multiple send of the same event on user change.
+        [authenticated]
+      );
+
       const shouldDisplayAnnouncements =
         activeTab !== 'community' &&
         // Get started page displays announcements itself.
@@ -347,6 +376,8 @@ export const HomePage = React.memo<Props>(
                     <GetStartedSection
                       showUserChip={setShowUserChip}
                       selectInAppTutorial={selectInAppTutorial}
+                      onUserSurveyStarted={onUserSurveyStarted}
+                      onUserSurveyHidden={onUserSurveyHidden}
                     />
                   )}
                   {activeTab === 'build' && (

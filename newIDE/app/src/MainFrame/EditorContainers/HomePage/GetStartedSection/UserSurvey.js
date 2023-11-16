@@ -333,9 +333,12 @@ const MobileDisplay = ({
   );
 };
 
-type Props = {| onCompleted: UserSurveyType => Promise<void> |};
+type Props = {|
+  onCompleted: UserSurveyType => Promise<void>,
+  onStarted: () => void,
+|};
 
-const UserSurvey = ({ onCompleted }: Props) => {
+const UserSurvey = ({ onCompleted, onStarted }: Props) => {
   const serializedState = localStorage.getItem(localStoreUserSurveyKey);
   const state = serializedState ? JSON.parse(serializedState) : null;
   const [questionId, setQuestionId] = React.useState<string>(
@@ -349,12 +352,30 @@ const UserSurvey = ({ onCompleted }: Props) => {
 
   React.useEffect(
     () => {
-      localStorage.setItem(
-        localStoreUserSurveyKey,
-        JSON.stringify({ userAnswers, questionId })
-      );
+      if (userAnswers.length > 0) {
+        localStorage.setItem(
+          localStoreUserSurveyKey,
+          JSON.stringify({ userAnswers, questionId })
+        );
+      }
     },
+    // Store component state on each survey change.
     [questionId, userAnswers]
+  );
+
+  const hasUserStartedSurvey =
+    userAnswers.length >= 2 ||
+    (userAnswers.length === 1 &&
+      userAnswers[0].questionId === firstQuestion &&
+      userAnswers[0].answers.length === 1 &&
+      userAnswers[0].answers[0] === 'input');
+  React.useEffect(
+    () => {
+      if (hasUserStartedSurvey) {
+        onStarted();
+      }
+    },
+    [hasUserStartedSurvey, onStarted]
   );
 
   const goToNextQuestion = React.useCallback(

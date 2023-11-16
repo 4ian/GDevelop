@@ -30,7 +30,7 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
-import { incrementGetStartedSectionViewCount } from './GetStartedSection/Utils';
+import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
 
 const styles = {
   container: {
@@ -157,7 +157,6 @@ export const HomePage = React.memo<Props>(
       const isMobile = windowWidth === 'small';
       const {
         values: { showGetStartedSectionByDefault },
-        setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
       const initialTab = showGetStartedSectionByDefault
         ? 'get-started'
@@ -333,8 +332,6 @@ export const HomePage = React.memo<Props>(
                     <GetStartedSection
                       showUserChip={setShowUserChip}
                       selectInAppTutorial={selectInAppTutorial}
-                      showGetStartedSection={showGetStartedSectionByDefault}
-                      setShowGetStartedSection={setShowGetStartedSection}
                     />
                   )}
                   {activeTab === 'build' && (

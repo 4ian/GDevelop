@@ -34,7 +34,7 @@ import { delay } from '../../../../Utils/Delay';
 import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
-import { getGetStartedSectionViewCount } from './Utils';
+import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
@@ -82,16 +82,9 @@ const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
 type Props = {|
   showUserChip: boolean => void,
   selectInAppTutorial: (tutorialId: string) => void,
-  showGetStartedSection: boolean,
-  setShowGetStartedSection: boolean => void,
 |};
 
-const GetStartedSection = ({
-  showUserChip,
-  selectInAppTutorial,
-  showGetStartedSection,
-  setShowGetStartedSection,
-}: Props) => {
+const GetStartedSection = ({ showUserChip, selectInAppTutorial }: Props) => {
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -104,7 +97,10 @@ const GetStartedSection = ({
     authenticationError,
     loginState,
   } = authenticatedUser;
-  const { values: preferences } = React.useContext(PreferencesContext);
+  const {
+    values: preferences,
+    setShowGetStartedSectionByDefault,
+  } = React.useContext(PreferencesContext);
   const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
   const [error, setError] = React.useState<?AuthError>(null);
   const forceUpdate = useForceUpdate();
@@ -515,8 +511,10 @@ const GetStartedSection = ({
             <div style={styles.bottomPageButtonContainer}>
               <Checkbox
                 label={<Trans>Don't show this screen on next startup</Trans>}
-                checked={!showGetStartedSection}
-                onCheck={(e, checked) => setShowGetStartedSection(!checked)}
+                checked={!preferences.showGetStartedSectionByDefault}
+                onCheck={(e, checked) =>
+                  setShowGetStartedSectionByDefault(!checked)
+                }
               />
             </div>
           )}
@@ -572,8 +570,8 @@ const GetStartedSection = ({
       </Text>
       <Checkbox
         label={<Trans>Don't show this screen on next startup</Trans>}
-        checked={!showGetStartedSection}
-        onCheck={(e, checked) => setShowGetStartedSection(!checked)}
+        checked={!preferences.showGetStartedSectionByDefault}
+        onCheck={(e, checked) => setShowGetStartedSectionByDefault(!checked)}
       />
     </ResponsiveLineStackLayout>
   );

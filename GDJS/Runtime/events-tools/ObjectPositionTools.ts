@@ -96,11 +96,13 @@ namespace gdjs {
             }
           }
 
+          if (!iteratedLists.isPicked) {
+            fillPickedLists(instanceContainer, iteratedLists);
+          }
+
           const pickingId = instanceContainer.getNewPickingId();
           for (const iteratedObjectName in iteratedLists.items) {
-            const iteratedObjects = iteratedLists.isPicked
-              ? iteratedLists.items[iteratedObjectName]
-              : instanceContainer.getObjects(iteratedObjectName) || [];
+            const iteratedObjects = iteratedLists.items[iteratedObjectName];
 
             let isAnyIteratedObjectPicked = false;
             for (const objectName in treeLists.items) {

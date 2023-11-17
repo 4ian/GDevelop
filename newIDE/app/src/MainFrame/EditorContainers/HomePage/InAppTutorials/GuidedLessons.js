@@ -60,7 +60,7 @@ const styles = {
     // Avoid tiles taking too much space on large screens.
     maxWidth: MAX_SECTION_WIDTH,
     overflow: 'hidden',
-    width: '100%',
+    width: `calc(100% + ${2 * ITEMS_SPACING}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
   },
   bannerContainer: {
     width: '100%',
@@ -70,9 +70,11 @@ const styles = {
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
+  /** To use to restrict the lessons that are displayed. */
+  lessonsIds?: ?Array<string>,
 |};
 
-const GuidedLessons = ({ selectInAppTutorial }: Props) => {
+const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
   const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,
@@ -173,7 +175,7 @@ const GuidedLessons = ({ selectInAppTutorial }: Props) => {
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
     },
-  ];
+  ].filter(item => (lessonsIds ? lessonsIds.includes(item.id) : true));
 
   return (
     <Line>
@@ -189,18 +191,20 @@ const GuidedLessons = ({ selectInAppTutorial }: Props) => {
           <PlaceholderLoader />
         ) : (
           <ColumnStackLayout noMargin>
-            <Column>
-              <LineStackLayout alignItems="center">
-                {lessonsProgress !== 100 ? (
-                  <Text displayInlineAsSpan noMargin size="body2">
-                    {lessonsProgress}%
-                  </Text>
-                ) : (
-                  <Trophy />
-                )}
-                <ColoredLinearProgress value={lessonsProgress} />
-              </LineStackLayout>
-            </Column>
+            {!lessonsIds && (
+              <Column>
+                <LineStackLayout alignItems="center">
+                  {lessonsProgress !== 100 ? (
+                    <Text displayInlineAsSpan noMargin size="body2">
+                      {lessonsProgress}%
+                    </Text>
+                  ) : (
+                    <Trophy />
+                  )}
+                  <ColoredLinearProgress value={lessonsProgress} />
+                </LineStackLayout>
+              </Column>
+            )}
             <GridList
               cols={getColumnsFromWidth(windowWidth)}
               style={styles.grid}

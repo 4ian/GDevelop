@@ -141,7 +141,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
-    setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
+    setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(
+      this
+    ),
     setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
       this
     ),
@@ -312,12 +314,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setShowGetStartedSection(showGetStartedSection: boolean) {
+  _setShowGetStartedSection(showGetStartedSectionByDefault: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          showGetStartedSection,
+          showGetStartedSectionByDefault,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

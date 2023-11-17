@@ -1,11 +1,10 @@
 // @flow
+import React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
-import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import TextField from '../UI/TextField';
 import {
   type RegisterForm,
   type AuthError,
@@ -15,15 +14,14 @@ import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { MarkdownText } from '../UI/MarkdownText';
-import { UsernameField, isUsernameValid } from './UsernameField';
-import Checkbox from '../UI/Checkbox';
+import { isUsernameValid } from './UsernameField';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import Form from '../UI/Form';
+import CreateAccountForm from './CreateAccountForm';
 
 const getStyles = ({ windowWidth }) => {
   const isMobileScreen = windowWidth === 'small';
@@ -48,6 +46,8 @@ export const getEmailErrorText = (error: ?AuthError) => {
 
   if (error.code === 'auth/invalid-email')
     return <Trans>This email is invalid.</Trans>;
+  if (error.code === 'auth/missing-email')
+    return <Trans>Please enter an email address.</Trans>;
   if (error.code === 'auth/user-disabled')
     return <Trans>This account has been deactivated or deleted.</Trans>;
   if (error.code === 'auth/user-not-found')
@@ -96,6 +96,14 @@ export const getPasswordErrorText = (error: ?AuthError) => {
         This password is too weak: please use more letters and digits.
       </Trans>
     );
+  if (error.code === 'auth/internal-error')
+    // Error raised when trying to create an account with an empty password.
+    return (
+      <Trans>
+        An unknown error happened, ensure your password is entered correctly.
+      </Trans>
+    );
+
   return undefined;
 };
 
@@ -207,55 +215,23 @@ const CreateAccountDialog = ({
           </LineStackLayout>
         </Column>
         <div style={styles.formContainer}>
-          <Form onSubmit={createAccount} autoComplete="on" name="createAccount">
-            <ColumnStackLayout noMargin>
-              <UsernameField
-                value={username}
-                onChange={(e, value) => {
-                  setUsername(value);
-                }}
-                allowEmpty
-                onAvailabilityChecked={setUsernameAvailability}
-                onAvailabilityCheckLoading={setIsValidatingUsername}
-                isValidatingUsername={isValidatingUsername}
-                disabled={createAccountInProgress}
-              />
-              <TextField
-                value={email}
-                floatingLabelText={<Trans>Email</Trans>}
-                errorText={getEmailErrorText(error)}
-                fullWidth
-                required
-                onChange={(e, value) => {
-                  setEmail(value);
-                }}
-                onBlur={event => {
-                  setEmail(event.currentTarget.value.trim());
-                }}
-                disabled={createAccountInProgress}
-              />
-              <TextField
-                value={password}
-                floatingLabelText={<Trans>Password</Trans>}
-                errorText={getPasswordErrorText(error)}
-                type="password"
-                fullWidth
-                required
-                onChange={(e, value) => {
-                  setPassword(value);
-                }}
-                disabled={createAccountInProgress}
-              />
-              <Checkbox
-                label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
-                checked={getNewsletterEmail}
-                onCheck={(e, value) => {
-                  setGetNewsletterEmail(value);
-                }}
-                disabled={createAccountInProgress}
-              />
-            </ColumnStackLayout>
-          </Form>
+          <CreateAccountForm
+            onCreateAccount={createAccount}
+            email={email}
+            onChangeEmail={setEmail}
+            password={password}
+            onChangePassword={setPassword}
+            username={username}
+            onChangeUsername={setUsername}
+            optInNewsletterEmail={getNewsletterEmail}
+            onChangeOptInNewsletterEmail={setGetNewsletterEmail}
+            createAccountInProgress={createAccountInProgress}
+            error={error}
+            usernameAvailability={usernameAvailability}
+            onChangeUsernameAvailability={setUsernameAvailability}
+            isValidatingUsername={isValidatingUsername}
+            onChangeIsValidatingUsername={setIsValidatingUsername}
+          />
         </div>
         <BackgroundText>
           <MarkdownText

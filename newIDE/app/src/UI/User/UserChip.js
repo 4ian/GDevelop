@@ -28,7 +28,12 @@ type Props = {|
 
 const UserChip = ({ onOpenProfile }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile, onLogin, onCreateAccount, loginState } = authenticatedUser;
+  const {
+    profile,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
+    loginState,
+  } = authenticatedUser;
   const displayNotificationBadge = hasPendingNotifications(authenticatedUser);
   return loginState === 'loggingIn' ? (
     <CircularProgress size={25} />
@@ -55,7 +60,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
               <Trans>Log in</Trans>
             </span>
           }
-          onClick={onLogin}
+          onClick={onOpenLoginDialog}
           leftIcon={<User fontSize="small" />}
         />
         <RaisedButton
@@ -64,7 +69,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
               <Trans>Create account</Trans>
             </span>
           }
-          onClick={onCreateAccount}
+          onClick={onOpenCreateAccountDialog}
           primary
           icon={<User fontSize="small" />}
         />

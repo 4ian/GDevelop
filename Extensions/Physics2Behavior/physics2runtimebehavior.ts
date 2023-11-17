@@ -172,9 +172,9 @@ namespace gdjs {
       // a lot more late.
       let numberOfSteps = Math.max(
         0,
-        Math.round(this.frameTime / this.timeStep)
+        Math.round(this.frameTime / (this.timeStep * this.timeScale))
       );
-      this.frameTime -= numberOfSteps * this.timeStep;
+      this.frameTime -= numberOfSteps * (this.timeStep * this.timeScale);
       if (numberOfSteps > 5) {
         numberOfSteps = 5;
       }

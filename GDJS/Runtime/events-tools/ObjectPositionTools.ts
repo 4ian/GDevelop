@@ -84,7 +84,7 @@ namespace gdjs {
             for (const objectName in objectsLists2.items) {
               const objects = instanceContainer.getObjects(objectName);
               objectsMaxCount2 = Math.max(
-                objectsMaxCount1,
+                objectsMaxCount2,
                 objects ? objects.length : 0
               );
             }

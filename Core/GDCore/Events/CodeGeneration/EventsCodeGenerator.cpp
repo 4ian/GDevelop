@@ -420,6 +420,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         // condition to another.
         if (parameterMetadata.GetType() == "objectList" ||
             parameterMetadata.GetType() == "objectListOrEmptyIfJustDeclared") {
+          // TODO FIXME What about groups using the object?
           conditionCode +=
               GetObjectMapName(parameterValue.GetPlainString(), context) +
               ".isPicked = true;\n";

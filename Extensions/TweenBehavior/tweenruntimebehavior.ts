@@ -1587,7 +1587,7 @@ namespace gdjs {
 
           tween.step();
           if (!tween.hasFinished()) {
-            this._activeTweens[readIndex] = tween;
+            this._activeTweens[writeIndex] = tween;
             writeIndex++;
           }
         }

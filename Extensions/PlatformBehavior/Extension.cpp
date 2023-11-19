@@ -850,7 +850,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the platform type of the object: Platform, "
                     "Jump-Through, or Ladder."),
                   _("Set platform type of _PARAM0_ to _PARAM2_"),
-                  "",
+                  _("Platform"),
                   "CppPlatform/Extensions/platformicon.png",
                   "CppPlatform/Extensions/platformicon.png")
         .AddParameter("object", _("Object"))

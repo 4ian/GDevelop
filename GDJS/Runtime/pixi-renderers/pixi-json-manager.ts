@@ -6,7 +6,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Json Manager');
 
-
   /** The callback called when a json that was requested is loaded (or an error occurred). */
   export type JsonManagerRequestCallback = (
     error: Error | null,
@@ -22,13 +21,14 @@ namespace gdjs {
    * that loading failed.
    */
   export class JsonManager {
-    _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: Map<string, ResourceData>;
-
-    _loadedJsons: { [key: string]: Object } = {};
-    _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
-    _spineManager: SpineManager;
-    _atlasManager: AtlasManager;
+    private _resourcesLoader: RuntimeGameResourcesLoader;
+    private _resources: Map<string, ResourceData>;
+    private _loadedJsons: { [key: string]: Object } = {};
+    private _callbacks: {
+      [key: string]: Array<JsonManagerRequestCallback>;
+    } = {};
+    private _spineManager: SpineManager;
+    private _atlasManager: AtlasManager;
 
     /**
      * @param resourceDataArray The resources data of the game.
@@ -38,7 +38,7 @@ namespace gdjs {
       resourceDataArray: ResourceData[],
       resourcesLoader: RuntimeGameResourcesLoader,
       spineManager: SpineManager,
-      atlasManager: AtlasManager,
+      atlasManager: AtlasManager
     ) {
       this._resources = new Map<string, ResourceData>();
       this.setResources(resourceDataArray);
@@ -72,29 +72,49 @@ namespace gdjs {
      * as JSON files can have been modified without the editor knowing).
      *
      * @param onProgress The function called after each json is loaded.
+     * @returns the promise of loaded jsons count.
      */
     async preloadAll(
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<integer> {
       let loadedNumber = 0;
-      const getPreferences = (file: string) => ({
-        preferWorkers: false,
-        crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(file)
-          ? 'use-credentials'
-          : 'anonymous',
-      } as Partial<PIXI.AssetsPreferences>);
-      const jsonPromises = Array.from(this._resources.values(), async (resource) => {
+      const getPreferences = (file: string) =>
+        ({
+          preferWorkers: false,
+          crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+            ? 'use-credentials'
+            : 'anonymous',
+        } as Partial<PIXI.AssetsPreferences>);
+      const jsonPromises = Array.from(
+        this._resources.values(),
+        async (resource) => {
           try {
             if (resource.kind === 'json') {
-              const metadata = resource.metadata ? JSON.parse(resource.metadata) : { };
-              const atlasInDependencies = !!metadata.atlas && this._atlasManager.isLoaded(metadata.atlas);
+              const metadata = resource.metadata
+                ? JSON.parse(resource.metadata)
+                : {};
+              const atlasInDependencies =
+                !!metadata.atlas && this._atlasManager.isLoaded(metadata.atlas);
 
               PIXI.Assets.setPreferences(getPreferences(resource.file));
-              PIXI.Assets.add(resource.name, resource.file, atlasInDependencies ? { spineAtlas: this._atlasManager.getAtlasTexture(metadata.atlas) } : undefined)
-              let loadedJson = await PIXI.Assets.load(resource.name);
-  
+              PIXI.Assets.add(
+                resource.name,
+                resource.file,
+                atlasInDependencies
+                  ? {
+                      spineAtlas: this._atlasManager.getAtlasTexture(
+                        metadata.atlas
+                      ),
+                    }
+                  : undefined
+              );
+              const loadedJson = await PIXI.Assets.load(resource.name);
+
               if (loadedJson.spineData) {
-                this._spineManager.setSpine(resource.name, loadedJson.spineData)
+                this._spineManager.setSpine(
+                  resource.name,
+                  loadedJson.spineData
+                );
               } else {
                 this._loadedJsons[resource.name] = loadedJson;
               }
@@ -109,7 +129,8 @@ namespace gdjs {
           }
 
           onProgress(loadedNumber++, this._resources.size);
-      });
+        }
+      );
 
       await Promise.all(jsonPromises);
 
@@ -118,9 +139,9 @@ namespace gdjs {
 
     /**
      * Request the json file from the given resource name.
-     * Returns the promise of loading atlas.
      *
      * @param resourceName The resource pointing to the json file to load.
+     * @returns the promise of loaded json or promise of null if loading is failed.
      */
     loadJsonAsync(resourceName: string): Promise<Object | null> {
       const that = this;
@@ -145,23 +166,28 @@ namespace gdjs {
     load(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.get(resourceName);
       if (!resource) {
-        return callback(new Error(`Can't find resource with name: "${resourceName}" (or is not a json resource).`), null);
+        return callback(
+          new Error(
+            `Can't find resource with name: "${resourceName}" (or is not a json resource).`
+          ),
+          null
+        );
       }
 
       // Don't fetch again an object that is already in memory
       if (this._loadedJsons[resourceName]) {
         return callback(null, this._loadedJsons[resourceName]);
       }
+
       // Don't fetch again an object that is already being fetched.
-      {
-        const callbacks = this._callbacks[resourceName];
-        if (callbacks) {
-          callbacks.push(callback);
-          return;
-        } else {
-          this._callbacks[resourceName] = [callback];
-        }
+      const resourceCallbacks = this._callbacks[resourceName];
+      if (resourceCallbacks) {
+        resourceCallbacks.push(callback);
+        return;
+      } else {
+        this._callbacks[resourceName] = [callback];
       }
+
       const that = this;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
@@ -171,9 +197,8 @@ namespace gdjs {
       xhr.open('GET', this._resourcesLoader.getFullUrl(resource.file));
       xhr.onload = function () {
         const callbacks = that._callbacks[resourceName];
-        if (!callbacks) {
-          return;
-        }
+
+        if (!callbacks) return;
         if (xhr.status !== 200) {
           for (const callback of callbacks) {
             callback(

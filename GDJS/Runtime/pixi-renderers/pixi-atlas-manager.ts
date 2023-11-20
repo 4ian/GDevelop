@@ -28,10 +28,9 @@ namespace gdjs {
    * that loading failed.
    */
   export class AtlasManager {
-    _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: ResourceData[];
-    _loadedAtlases: { [key: string]: pixi_spine.TextureAtlas } = {};
-    _callbacks: { [key: string]: Array<AtlasManagerRequestCallback> } = {};
+    private _resourcesLoader: RuntimeGameResourcesLoader;
+    private _resources: ResourceData[];
+    private _loadedAtlases: { [key: string]: pixi_spine.TextureAtlas } = {};
 
     /**
      * @param resources The resources data of the game.
@@ -65,7 +64,7 @@ namespace gdjs {
      * @param onComplete The function called when all atlases are loaded.
      */
     async preloadAll(
-      onProgress: AtlasManagerOnProgressCallback,
+      onProgress: AtlasManagerOnProgressCallback
     ): Promise<integer> {
       const atlasResources = this._resources.filter(
         (resource) => isAtlasResource(resource) && !resource.disablePreload
@@ -73,17 +72,22 @@ namespace gdjs {
       let loaded = 0;
 
       await Promise.all(
-        atlasResources.map((resource, i) => new Promise<void>((resolve) => {
-          const onLoad: AtlasManagerRequestCallback = (error) => {
-            if (error) {
-              logger.error('Error while preloading a text resource:' + error);
-            }
-            onProgress(loaded, atlasResources.length);
-            resolve();
-          };
+        atlasResources.map(
+          (resource, i) =>
+            new Promise<void>((resolve) => {
+              const onLoad: AtlasManagerRequestCallback = (error) => {
+                if (error) {
+                  logger.error(
+                    'Error while preloading a text resource:' + error
+                  );
+                }
+                onProgress(loaded, atlasResources.length);
+                resolve();
+              };
 
-          this.load(atlasResources[i], onLoad);
-        }))
+              this.load(atlasResources[i], onLoad);
+            })
+        )
       );
 
       return Promise.resolve(atlasResources.length);
@@ -96,18 +100,19 @@ namespace gdjs {
      * @param callback The callback to pass atlas to it once it is loaded.
      */
     load(resource: ResourceData, callback: AtlasManagerRequestCallback): void {
-      if (!isAtlasResource(resource)) callback(new Error(`${resource.name} is on atlas!`));
+      if (!isAtlasResource(resource))
+        callback(new Error(`${resource.name} is on atlas!`));
 
-      const metadata = resource.metadata ? JSON.parse(resource.metadata) : { };
+      const metadata = resource.metadata ? JSON.parse(resource.metadata) : {};
 
-      if (!metadata.image) callback(new Error(`${resource.name} do not have image metadata!`));
+      if (!metadata.image)
+        callback(new Error(`${resource.name} do not have image metadata!`));
 
       const image = this._imageManager.getPIXITexture(metadata.image);
       const onLoad = (atlas: pixi_spine.TextureAtlas) => {
         this._loadedAtlases[resource.name] = atlas;
         callback(null, atlas);
       };
-
 
       PIXI.Assets.setPreferences({
         preferWorkers: false,
@@ -118,13 +123,19 @@ namespace gdjs {
           : 'anonymous',
       });
       PIXI.Assets.add(resource.name, resource.file, { image });
-      PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then((atlas) => {
-        if (typeof atlas === 'string') {
-          new pixi_spine.TextureAtlas(atlas, (_, textureCb) => textureCb(image.baseTexture), onLoad);
-        } else {
-          onLoad(atlas);
+      PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
+        (atlas) => {
+          if (typeof atlas === 'string') {
+            new pixi_spine.TextureAtlas(
+              atlas,
+              (_, textureCb) => textureCb(image.baseTexture),
+              onLoad
+            );
+          } else {
+            onLoad(atlas);
+          }
         }
-      });
+      );
     }
 
     /**

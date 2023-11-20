@@ -45,7 +45,9 @@ module.exports = {
       .addObject(
         'SpineObject',
         _('Spine'),
-        _('Display and animate Spine skeleton. Select Spine files (json, atlas, image).'),
+        _(
+          'Display and animate Spine skeleton. Select Spine files (json, atlas, image).'
+        ),
         'CppPlatform/Extensions/spriteicon.png',
         new gd.SpineObjectConfiguration()
       )
@@ -93,74 +95,73 @@ module.exports = {
       .setFunctionName('setScale')
       .setGetter('getScale');
 
-      object
-        .addCondition(
-          'isAnimationComplete',
-          _('Animation complete'),
-          _('Check if the animation being played by the Spine object is complete.'),
-          _('The animation of _PARAM0_ is complete'),
-          _('Animations and images'),
-          'res/conditions/animation24.png',
-          'res/conditions/animation.png'
-        )
-        .addParameter('object', _('Spine'), 'SpineObject')
-        .markAsSimple()
-        .setFunctionName('isAnimationComplete');
-    
-      object
-        .addExpressionAndConditionAndAction(
-          'boolean',
-          'Updatable',
-          _('Updatable'),
-          _('an animation is updatable'),
-          _('Updatable'),
-          '',
-          'res/conditions/animation.png'
-        )
-        .addParameter('object', _('Spine'), 'SpineObject')
-        .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
-        .setFunctionName('setIsUpdatable')
-        .setGetter('isUpdatable');
-    
-      object
-        .addExpressionAndConditionAndAction(
-          'number',
-          'Animation',
-          _('Animation (by number)'),
-          _(
-            'the number of the animation played by the object (the number from the animations list)'
-          ),
-          _('the number of the animation'),
-          _('Animations and images'),
-          'res/actions/animation24.png'
-        )
-        .addParameter('object', _('Spine'), 'SpineObject')
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-        .markAsSimple()
-        .setFunctionName('setAnimationIndex')
-        .setGetter('getCurrentAnimationIndex');
+    object
+      .addCondition(
+        'isAnimationComplete',
+        _('Animation complete'),
+        _(
+          'Check if the animation being played by the Spine object is complete.'
+        ),
+        _('The animation of _PARAM0_ is complete'),
+        _('Animations and images'),
+        'res/conditions/animation24.png',
+        'res/conditions/animation.png'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .markAsSimple()
+      .setFunctionName('isAnimationComplete');
 
-      object
-        .addExpressionAndConditionAndAction(
-          'string',
-          'AnimationName',
-          _('Animation (by name)'),
-          _('the animation played by the object'),
-          _('the animation'),
-          _('Animations and images'),
-          'res/actions/animation24.png'
-        )
-        .addParameter('object', _('Spine'), 'SpineObject')
-        .useStandardParameters(
-          'objectAnimationName',
-          gd.ParameterOptions.makeNewOptions().setDescription(
-            _('Animation name')
-          )
-        )
-        .markAsAdvanced()
-        .setFunctionName('setAnimationName')
-        .setGetter('getAnimationName');
+    object
+      .addExpressionAndConditionAndAction(
+        'boolean',
+        'Updatable',
+        _('Updatable'),
+        _('an animation is updatable'),
+        _('Updatable'),
+        '',
+        'res/conditions/animation.png'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setIsUpdatable')
+      .setGetter('isUpdatable');
 
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Animation',
+        _('Animation (by number)'),
+        _(
+          'the number of the animation played by the object (the number from the animations list)'
+        ),
+        _('the number of the animation'),
+        _('Animations and images'),
+        'res/actions/animation24.png'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .markAsSimple()
+      .setFunctionName('setAnimationIndex')
+      .setGetter('getCurrentAnimationIndex');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'string',
+        'AnimationName',
+        _('Animation (by name)'),
+        _('the animation played by the object'),
+        _('the animation'),
+        _('Animations and images'),
+        'res/actions/animation24.png'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .useStandardParameters(
+        'objectAnimationName',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Animation name'))
+      )
+      .markAsAdvanced()
+      .setFunctionName('setAnimationName')
+      .setGetter('getAnimationName');
 
     return extension;
   },
@@ -245,12 +246,23 @@ module.exports = {
       }
 
       loadSpine() {
-        const jsonResourceName = this.properties.get('jsonResourceName').getValue();
-        const imageResourceName = this.properties.get('imageResourceName').getValue();
-        const atlasResourceName = this.properties.get('atlasResourceName').getValue();
+        const jsonResourceName = this.properties
+          .get('jsonResourceName')
+          .getValue();
+        const imageResourceName = this.properties
+          .get('imageResourceName')
+          .getValue();
+        const atlasResourceName = this.properties
+          .get('atlasResourceName')
+          .getValue();
 
         this._pixiResourcesLoader
-          .getSpineData(this._project, jsonResourceName, imageResourceName, atlasResourceName)
+          .getSpineData(
+            this._project,
+            jsonResourceName,
+            imageResourceName,
+            atlasResourceName
+          )
           .then((spineData) => {
             if (!spineData) return;
 
@@ -261,7 +273,10 @@ module.exports = {
       }
 
       update() {
-        this._pixiObject.position.set(this._instance.getX(), this._instance.getY());
+        this._pixiObject.position.set(
+          this._instance.getX(),
+          this._instance.getY()
+        );
 
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
@@ -269,8 +284,8 @@ module.exports = {
         const height = this.getHeight();
 
         this._rect.clear();
-        this._rect.beginFill(0xFFFFFF);
-        this._rect.lineStyle(0, 0xFFFFFF);
+        this._rect.beginFill(0xffffff);
+        this._rect.lineStyle(0, 0xffffff);
         this._rect.drawRect(0, 0, width, height);
 
         const s = this._spine;
@@ -279,19 +294,26 @@ module.exports = {
           s.height = height;
           s.alpha = this.properties.get('opacity').getValue() / 255;
           const localBounds = s.getLocalBounds(undefined, true);
-          s.position.set(-localBounds.x * s.scale.x, -localBounds.y * s.scale.y);
+          s.position.set(
+            -localBounds.x * s.scale.x,
+            -localBounds.y * s.scale.y
+          );
         }
 
         this._pixiObject.calculateBounds();
       }
 
       /**
-       * @param {number} animation index
+       * @param {number} index - animation index
        */
       setAnimation(index) {
-        const {configuration, _spine:s} = this;
+        const { configuration, _spine: s } = this;
 
-        if (!s || configuration.hasNoAnimations() || index === this._animationIndex) {
+        if (
+          !s ||
+          configuration.hasNoAnimations() ||
+          index === this._animationIndex
+        ) {
           return;
         }
 
@@ -303,7 +325,6 @@ module.exports = {
 
         this._animationIndex = index;
         const animation = configuration.getAnimation(index);
-        const name = animation.getName();
         const source = animation.getSource();
         const shouldLoop = animation.shouldLoop();
 
@@ -324,7 +345,9 @@ module.exports = {
       getDefaultWidth() {
         const scale = Number(this.properties.get('scale').getValue()) || 1;
 
-        return typeof this._initialWidth === 'number' ? this._initialWidth * scale : 256;
+        return typeof this._initialWidth === 'number'
+          ? this._initialWidth * scale
+          : 256;
       }
 
       /**
@@ -333,7 +356,9 @@ module.exports = {
       getDefaultHeight() {
         const scale = Number(this.properties.get('scale').getValue()) || 1;
 
-        return typeof this._initialHeight === 'number' ? this._initialHeight * scale : 256;
+        return typeof this._initialHeight === 'number'
+          ? this._initialHeight * scale
+          : 256;
       }
 
       get configuration() {

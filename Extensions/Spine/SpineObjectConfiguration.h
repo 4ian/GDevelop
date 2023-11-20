@@ -1,6 +1,5 @@
 /**
-
-GDevelop - Particle System Extension
+GDevelop - Spine Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
@@ -55,7 +54,7 @@ private:
 };
 
 /**
- * \brief Particle Emitter object used for storage and for the IDE.
+ * \brief Spine object configuration is used for storage and for the IDE.
  */
 class GD_EXTENSION_API SpineObjectConfiguration : public gd::ObjectConfiguration {
 public:

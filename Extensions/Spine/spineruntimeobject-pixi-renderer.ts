@@ -1,12 +1,12 @@
 namespace gdjs {
-
-  const isSpine = (obj: any): obj is pixi_spine.Spine => obj instanceof pixi_spine.Spine;
+  const isSpine = (obj: any): obj is pixi_spine.Spine =>
+    obj instanceof pixi_spine.Spine;
 
   export class SpineRuntimeObjectPixiRenderer {
     private _object: gdjs.SpineRuntimeObject;
-    private _rendererObject!: pixi_spine.Spine | PIXI.Container;
+    private _rendererObject: pixi_spine.Spine | PIXI.Container;
     private _isAnimationComplete = true;
-    private _spinePropertiesReplacer: Record<string, any> = { };
+    private _autoUpdateReplacer: boolean = true;
 
     /**
      * @param runtimeObject The object to render
@@ -17,8 +17,8 @@ namespace gdjs {
       private instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
+      this._rendererObject = this.constructrendererObject();
 
-      this.constructSpine();
       this.updateTimeScale();
       this.updatePosition();
       this.updateAngle();
@@ -88,10 +88,21 @@ namespace gdjs {
 
     setAnimation(animation: string, loop: boolean): void {
       if (isSpine(this._rendererObject)) {
+        const onCompleteListener: pixi_spine.IAnimationStateListener = {
+          complete: () => {
+            this._isAnimationComplete = true;
+            setTimeout(
+              () =>
+                (this._rendererObject as pixi_spine.Spine).state.removeListener(
+                  onCompleteListener
+                ),
+              0
+            );
+          },
+        };
+
         this._isAnimationComplete = false;
-        this._rendererObject.state.addListener({
-          complete: () => (this._isAnimationComplete = true),
-        });
+        this._rendererObject.state.addListener(onCompleteListener);
         this._rendererObject.state.setAnimation(0, animation, loop);
         this._rendererObject.update(0);
         this.updateBounds();
@@ -100,7 +111,7 @@ namespace gdjs {
       }
     }
 
-    isAnimationCompelete(): boolean {
+    isAnimationComplete(): boolean {
       return this._isAnimationComplete;
     }
 
@@ -109,22 +120,27 @@ namespace gdjs {
         return this._rendererObject.autoUpdate;
       }
 
-      return !!this._spinePropertiesReplacer.autoUpdate;
+      return !!this._autoUpdateReplacer;
     }
 
     setIsUpdatable(isUpdatable: boolean): void {
       if (isSpine(this._rendererObject)) {
         this._rendererObject.autoUpdate = isUpdatable;
       } else {
-        this._spinePropertiesReplacer.autoUpdate = isUpdatable;
+        this._autoUpdateReplacer = isUpdatable;
       }
     }
 
-    private constructSpine(): void {
+    private constructrendererObject(): pixi_spine.Spine | PIXI.Container {
       const game = this.instanceContainer.getGame();
-      const spineData = game.getSpineManager().getSpine(this._object.jsonResourceName);
+      const spineData = game
+        .getSpineManager()
+        .getSpine(this._object.jsonResourceName);
+      const rendererObject = spineData
+        ? new pixi_spine.Spine(spineData)
+        : new PIXI.Container();
 
-      this._rendererObject = spineData ? new pixi_spine.Spine(spineData) : new PIXI.Container();
+      return rendererObject;
     }
 
     private updateBounds(): void {
@@ -133,8 +149,10 @@ namespace gdjs {
 
       const localBounds = this._rendererObject.getLocalBounds(undefined, true);
 
-      this._rendererObject.position.x -= localBounds.x * this._rendererObject.scale.x;
-      this._rendererObject.position.y -= localBounds.y * this._rendererObject.scale.y;
+      this._rendererObject.position.x -=
+        localBounds.x * this._rendererObject.scale.x;
+      this._rendererObject.position.y -=
+        localBounds.y * this._rendererObject.scale.y;
     }
   }
   export const SpineRuntimeObjectRenderer = SpineRuntimeObjectPixiRenderer;

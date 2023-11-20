@@ -1,10 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const originalSpinePath = path.join('node_modules/pixi-spine/dist', 'pixi-spine.js');
-const originalPixiSpine = fs.readFileSync(originalSpinePath);
+const format = 'utf8';
+
+const originalSpineDir = path.resolve('node_modules/pixi-spine');
+const originalSpinePackage = JSON.parse(fs.readFileSync(path.join(originalSpineDir, 'package.json'), format));
+const originalSpinePath = path.join(originalSpineDir, originalSpinePackage.extensionConfig.bundle);
+const originalSpine = fs.readFileSync(originalSpinePath, format);
 
 const varSpineExport = '\nvar pixi_spine = this.PIXI.spine;\n';
-const runtimeSpinePath = path.join('Runtime/pixi-renderers', 'pixi-spine.js');
+const runtimeSpinePath = 'Runtime/pixi-renderers/pixi-spine.js';
 
-fs.writeFileSync(runtimeSpinePath, originalPixiSpine + varSpineExport);
+fs.writeFileSync(runtimeSpinePath, originalSpine + varSpineExport, format);

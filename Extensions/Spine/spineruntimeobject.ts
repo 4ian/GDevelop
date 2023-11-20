@@ -1,4 +1,3 @@
-
 namespace gdjs {
   type SpineAnimation = { name: string; source: string; loop: boolean };
 
@@ -79,12 +78,13 @@ namespace gdjs {
     extraInitializationFromInitialInstance(
       initialInstanceData: InstanceData
     ): void {
-      let animationIndex = this._currentAnimationIndex;
-      for (const extraData of initialInstanceData.numberProperties || []) {
-        if (extraData.name === 'animation') {
-          animationIndex = extraData.value;
-        }
-      }
+      const animationData = initialInstanceData.numberProperties?.find(
+        (data) => data.name === 'animation'
+      );
+      const animationIndex = animationData
+        ? animationData.value
+        : this._currentAnimationIndex;
+
       this.setAnimationIndex(animationIndex);
 
       if (initialInstanceData.customSize) {
@@ -202,7 +202,7 @@ namespace gdjs {
     }
 
     isAnimationComplete(): boolean {
-      return this._renderer.isAnimationCompelete();
+      return this._renderer.isAnimationComplete();
     }
 
     isCurrentAnimationName(name: string): boolean {

@@ -228,7 +228,7 @@ const enumerateInstruction = (
   let description = instrMetadata.getDescription();
   if (description.length > 140) {
     const spaceIndex = description.indexOf(' ', 140);
-    if (spaceIndex > 0) {
+    if (spaceIndex >= 0) {
       description = description.substring(0, spaceIndex);
     }
   }

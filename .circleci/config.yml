@@ -53,6 +53,10 @@ jobs:
           name: Install GDevelop IDE dependencies
           command: cd newIDE/app && npm install && cd ../electron-app && npm install
 
+      - run:
+          name: Force install parcel watcher
+          command: cd newIDE/electron-app/app && npm install @parcel/watcher-darwin-arm64@2.3.0
+
       - save_cache:
           paths:
             - newIDE/electron-app/node_modules

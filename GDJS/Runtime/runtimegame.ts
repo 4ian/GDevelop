@@ -140,6 +140,8 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _spineManager: SpineManager;
+    _atlasManager: AtlasManager;
     _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
@@ -225,9 +227,17 @@ namespace gdjs {
         resources,
         this._resourcesLoader
       );
+      this._spineManager = new gdjs.SpineManager();
+      this._atlasManager = new gdjs.AtlasManager(
+        this._data.resources.resources,
+        this._resourcesLoader,
+        this._imageManager
+      );
       this._jsonManager = new gdjs.JsonManager(
         resources,
-        this._resourcesLoader
+        this._resourcesLoader,
+        this._spineManager,
+        this._atlasManager
       );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         resources,
@@ -314,13 +324,18 @@ namespace gdjs {
      * @param projectData The object (usually stored in data.json) containing the full project data
      */
     setProjectData(projectData: ProjectData): void {
+      const { resources } = projectData.resources;
+
       this._data = projectData;
-      this._imageManager.setResources(this._data.resources.resources);
-      this._soundManager.setResources(this._data.resources.resources);
-      this._fontManager.setResources(this._data.resources.resources);
-      this._jsonManager.setResources(this._data.resources.resources);
-      this._bitmapFontManager.setResources(this._data.resources.resources);
-      this._model3DManager.setResources(this._data.resources.resources);
+      [
+        this._imageManager,
+        this._soundManager,
+        this._fontManager,
+        this._jsonManager,
+        this._atlasManager,
+        this._bitmapFontManager,
+        this._model3DManager,
+      ].forEach((manager) => manager.setResources(resources));
     }
 
     /**
@@ -392,6 +407,19 @@ namespace gdjs {
      */
     getJsonManager(): gdjs.JsonManager {
       return this._jsonManager;
+    }
+
+    getSpineManager(): gdjs.SpineManager {
+      return this._spineManager;
+    }
+
+    /**
+     * Get the atlas manager of the game, used to load atlases from game
+     * resources.
+     * @return The atlas manager for the game
+     */
+    getAtlasManager(): gdjs.AtlasManager {
+      return this._atlasManager;
     }
 
     /**
@@ -718,7 +746,8 @@ namespace gdjs {
         loadedAssets += await this._imageManager.loadTextures(onProgress);
         loadedAssets += await this._soundManager.preloadAudio(onProgress);
         loadedAssets += await this._fontManager.loadFonts(onProgress);
-        loadedAssets += await this._jsonManager.preloadJsons(onProgress);
+        loadedAssets += await this._atlasManager.preloadAll(onProgress);
+        loadedAssets += await this._jsonManager.preloadAll(onProgress);
         loadedAssets += await this._model3DManager.loadModels(onProgress);
         await this._bitmapFontManager.loadBitmapFontData(onProgress);
         await loadingScreen.unload();

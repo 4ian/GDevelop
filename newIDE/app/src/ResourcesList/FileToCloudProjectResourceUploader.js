@@ -46,6 +46,7 @@ const resourceKindToInputAcceptedMimes = {
     // after the files have been picked.
     // 'model/gltf-binary'
   ],
+  atlas: [],
 };
 
 const getAcceptedExtensions = (

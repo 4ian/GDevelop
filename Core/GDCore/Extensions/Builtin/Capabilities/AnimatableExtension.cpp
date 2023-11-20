@@ -44,7 +44,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
          "number",
          "Index",
          _("Animation (by number)"),
-         _("the number of the animation played by the object (the number from "
+         _("the animation played by the object using the animation number (from "
            "the animations list)"),
          _("the number of the animation"),
          _("Animations and images"),

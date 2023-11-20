@@ -10,6 +10,7 @@
   "dependencies": {
     "@electron/remote": "^2.0.8",
     "@parcel/watcher": "2.3.0",
+    "@parcel/watcher-darwin-arm64": "^2.3.0",
     "archiver": "^2.1.1",
     "async": "^2.6.0",
     "axios": "^0.19.1",
@@ -28,8 +29,5 @@
     "minimist": "^1.2.3",
     "steamworks.js": "0.3.1",
     "ws": "^5.1.1"
-  },
-  "optionalDependencies": {
-    "@parcel/watcher-darwin-arm64": "2.3.0"
   }
 }

@@ -266,6 +266,16 @@ export const sendGameTemplateInformationOpened = (options: {|
   recordEvent('game_template_information_opened', options);
 };
 
+export const sendUserSurveyStarted = () => {
+  recordEvent('user_survey_started');
+};
+export const sendUserSurveyCompleted = () => {
+  recordEvent('user_survey_completed');
+};
+export const sendUserSurveyHidden = () => {
+  recordEvent('user_survey_hidden');
+};
+
 export const sendHelpSearch = (searchText: string) => {
   recordEvent('help_search', {
     searchText,

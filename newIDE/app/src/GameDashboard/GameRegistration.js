@@ -31,8 +31,8 @@ export const GameRegistration = ({
 }: GameRegistrationProps) => {
   const {
     authenticated,
-    onLogin,
-    onCreateAccount,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
     getAuthorizationHeader,
     profile,
     onAcceptGameStatsEmail,
@@ -153,7 +153,10 @@ export const GameRegistration = ({
 
   if (!authenticated || !profile) {
     return (
-      <CreateProfile onLogin={onLogin} onCreateAccount={onCreateAccount} />
+      <CreateProfile
+        onOpenLoginDialog={onOpenLoginDialog}
+        onOpenCreateAccountDialog={onOpenCreateAccountDialog}
+      />
     );
   }
 

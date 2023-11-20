@@ -501,11 +501,14 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
-  useResourcesWatcher(
+  useResourcesWatcher({
     getStorageProvider,
-    currentFileMetadata,
-    state.editorTabs
-  );
+    fileMetadata: currentFileMetadata,
+    editorTabs: state.editorTabs,
+    isProjectSplitInMultipleFiles: currentProject
+      ? currentProject.isFolderProject()
+      : false,
+  });
 
   /**
    * This reference is useful to get the current opened project,

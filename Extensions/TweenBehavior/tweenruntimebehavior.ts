@@ -1577,9 +1577,21 @@ namespace gdjs {
        * @param layoutTimeDelta the duration from the previous step ignoring layer time scale in seconds
        */
       step(): void {
-        for (const tween of this._activeTweens) {
+        let writeIndex = 0;
+        for (
+          let readIndex = 0;
+          readIndex < this._activeTweens.length;
+          readIndex++
+        ) {
+          const tween = this._activeTweens[readIndex];
+
           tween.step();
+          if (!tween.hasFinished()) {
+            this._activeTweens[writeIndex] = tween;
+            writeIndex++;
+          }
         }
+        this._activeTweens.length = writeIndex;
       }
 
       /**

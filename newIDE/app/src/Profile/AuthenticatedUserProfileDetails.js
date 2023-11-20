@@ -10,14 +10,14 @@ import ProfileDetails from './ProfileDetails';
 import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
-  onEditProfile: () => void,
-  onChangeEmail: () => void,
+  onOpenEditProfileDialog: () => void,
+  onOpenChangeEmailDialog: () => void,
   authenticatedUser: AuthenticatedUser,
 |};
 
 const AuthenticatedUserProfileDetails = ({
-  onEditProfile,
-  onChangeEmail,
+  onOpenEditProfileDialog,
+  onOpenChangeEmailDialog,
   authenticatedUser,
 }: Props) => {
   const profile = authenticatedUser.profile;
@@ -59,8 +59,8 @@ const AuthenticatedUserProfileDetails = ({
             : null
         }
         isAuthenticatedUserProfile
-        onChangeEmail={onChangeEmail}
-        onEditProfile={onEditProfile}
+        onOpenChangeEmailDialog={onOpenChangeEmailDialog}
+        onOpenEditProfileDialog={onOpenEditProfileDialog}
       />
     </ColumnStackLayout>
   ) : (

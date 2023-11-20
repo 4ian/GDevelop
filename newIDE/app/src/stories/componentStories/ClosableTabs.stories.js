@@ -270,7 +270,7 @@ export const WithObjectsList = () => (
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}
                   getValidatedObjectOrGroupName={newName => newName}
-                  onDeleteObject={(objectWithContext, cb) => cb(true)}
+                  onDeleteObjects={(objectsWithContext, cb) => cb(true)}
                   onRenameObjectFolderOrObjectWithContextFinish={(
                     objectFolderOrObjectWithContext,
                     newName,

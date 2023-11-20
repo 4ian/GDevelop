@@ -120,6 +120,10 @@ type Props<Item> = {|
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
+  /**
+   * Callback called when a folder is collapsed (folded).
+   */
+  onCollapseItem?: (Item: Item) => void,
   searchText?: string,
   selectedItems: $ReadOnlyArray<Item>,
   onSelectItems: (Item[]) => void,
@@ -157,6 +161,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     onSelectItems,
     multiSelect,
     onRenameItem,
+    onCollapseItem,
     onMoveSelectionToItem,
     canMoveSelectionToItem,
     reactDndType,
@@ -311,12 +316,20 @@ const TreeView = <Item: ItemBaseAttributes>(
         if (node.collapsed) {
           setOpenedNodeIds([...openedNodeIds, node.id]);
         } else {
-          if (!forceAllOpened)
+          if (!forceAllOpened) {
+            if (onCollapseItem) onCollapseItem(node.item);
             setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
+          }
         }
       }
     },
-    [openedDuringSearchNodeIds, openedNodeIds, isSearching, forceAllOpened]
+    [
+      openedDuringSearchNodeIds,
+      openedNodeIds,
+      isSearching,
+      forceAllOpened,
+      onCollapseItem,
+    ]
   );
 
   const onSelect = React.useCallback(

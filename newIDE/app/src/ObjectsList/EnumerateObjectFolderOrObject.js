@@ -34,7 +34,32 @@ const recursivelyEnumerateFoldersInFolder = (
   });
 };
 
-export const enumerateFoldersInFolder = (folder: gdObjectFolderOrObject) => {
+const recursivelyEnumerateObjectsInFolder = (
+  folder: gdObjectFolderOrObject,
+  result: gdObject[]
+) => {
+  mapFor(0, folder.getChildrenCount(), i => {
+    const child = folder.getChildAt(i);
+    if (!child.isFolder()) {
+      result.push(child.getObject());
+    } else {
+      recursivelyEnumerateObjectsInFolder(child, result);
+    }
+  });
+};
+
+export const enumerateObjectsInFolder = (
+  folder: gdObjectFolderOrObject
+): gdObject[] => {
+  if (!folder.isFolder()) return [];
+  const result = [];
+  recursivelyEnumerateObjectsInFolder(folder, result);
+  return result;
+};
+
+export const enumerateFoldersInFolder = (
+  folder: gdObjectFolderOrObject
+): {| path: string, folder: gdObjectFolderOrObject |}[] => {
   if (!folder.isFolder()) return [];
   const result = [];
   recursivelyEnumerateFoldersInFolder(folder, '', result);

@@ -64,7 +64,10 @@
   outline: 1px solid var(--theme-drop-indicator-cannot-drop-color);
 }
 .tree-view .row-container.selected {
-  background-color: var(--table-row-selected-background-color);
+  background-color: var(--theme-selection-background-color);
+}
+.tree-view .row-container:hover:not(.selected) {
+  background-color: var(--theme-list-item-hover-background-color);
 }
 
 .tree-view .item-name,

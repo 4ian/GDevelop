@@ -41,6 +41,76 @@ export type CommunityLinks = {|
   discordServerLink?: string,
 |};
 
+export type UserSurvey = {|
+  creationGoal?: Array<'learningOrTeaching' | 'building'>,
+  creationGoalInput?: string,
+  learningOrTeaching?: Array<'learning' | 'teaching'>,
+  learningHow?: Array<'alone' | 'withTeacher'>,
+  projectDescription?: string,
+  kindOfProjects?: Array<
+    | 'gameToPublish'
+    | 'interactiveService'
+    | 'other'
+    | 'videoGame'
+    | 'interactiveContent'
+    | 'appOrTool'
+    | 'seriousGame'
+  >,
+  workingTeam?: Array<'alone' | 'onePlus' | 'team'>,
+  painPoints?: Array<
+    | 'lackGraphics'
+    | 'lackSound'
+    | 'lackMarketing'
+    | 'inAppMonetization'
+    | 'externalIntegration'
+  >,
+  painPointsInput?: string,
+  targetDate?: Array<
+    | '1MonthOrLess'
+    | '1To2Months'
+    | '3To5Months'
+    | '6MonthsPlus'
+    | '1Year'
+    | 'noDeadline'
+  >,
+  gameDevelopmentExperience?: Array<'none' | 'someNoCode' | 'someCode'>,
+  targetPlatform?: Array<
+    | 'steamEpic'
+    | 'itchNewgrounds'
+    | 'pokiCrazyGames'
+    | 'androidApp'
+    | 'iosApp'
+    | 'client'
+    | 'personal'
+    | 'console'
+    | 'other'
+  >,
+|};
+
+/**
+ * Official tutorial registered in the tutorial database.
+ * Can be a youtube video, wiki page or blog article.
+ */
+export type GDevelopTutorialRecommendation = {|
+  type: 'gdevelop-tutorial',
+  /**
+   * Id of the tutorial in the database.
+   */
+  id: string,
+|};
+export type PlanRecommendation = {|
+  type: 'plan',
+  id: 'silver' | 'gold' | 'startup' | 'business' | 'education',
+|};
+export type GuidedLessonsRecommendation = {|
+  type: 'guided-lessons',
+  lessonsIds?: string[],
+|};
+export type Recommendation =
+  | GDevelopTutorialRecommendation
+  | GuidedLessonsRecommendation
+  | PlanRecommendation;
+
 export type UserPublicProfile = {|
   id: string,
   username: ?string,
@@ -200,6 +270,21 @@ export const deleteGroup = async (
   return response.data;
 };
 
+export const listRecommendations = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId }: {| userId: string |}
+): Promise<Array<Recommendation>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/recommendation`,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
 export const updateUserGroup = async (
   getAuthorizationHeader: () => Promise<string>,
   adminUserId: string,
@@ -243,12 +328,13 @@ export const getUserPublicProfile = (
     .then(response => response.data);
 };
 
-export const getUsernameAvailability = (
+export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/username-availability/${username}`)
-    .then(response => response.data);
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/username-availability/${username}`
+  );
+  return response.data;
 };
 
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;

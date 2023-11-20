@@ -13,8 +13,7 @@ import {
 } from '../../InstructionOrExpression/CreateTree';
 import {
   enumerateAllInstructions,
-  deduplicateInstructionsList,
-  enumerateFreeInstructionsWithTranslatedCategories,
+  enumerateFreeInstructions,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
   type EnumeratedInstructionMetadata,
@@ -125,10 +124,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
   // Free instructions, to be displayed in a tab next to the objects.
   freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateFreeInstructionsWithTranslatedCategories(
-      this.props.isCondition,
-      this.props.i18n
-    ),
+    enumerateFreeInstructions(this.props.isCondition, this.props.i18n),
     this.props.scope
   );
   freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
@@ -146,10 +142,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
   reEnumerateInstructions = (i18n: I18nType) => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateFreeInstructionsWithTranslatedCategories(
-        this.props.isCondition,
-        i18n
-      ),
+      enumerateFreeInstructions(this.props.isCondition, i18n),
       this.props.scope
     );
     this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);
@@ -159,7 +152,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   // All the instructions, to be used when searching, so that the search is done
   // across all the instructions (including object and behaviors instructions).
   allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllInstructions(this.props.isCondition),
+    enumerateAllInstructions(this.props.isCondition, this.props.i18n),
     this.props.scope
   );
 
@@ -181,16 +174,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       ),
     ];
 
-    this.instructionSearchApi = new Fuse(
-      deduplicateInstructionsList(this.allInstructionsInfo),
-      {
-        ...sharedFuseConfiguration,
-        keys: [
-          { name: 'displayedName', weight: 5 },
-          { name: 'fullGroupName', weight: 1 },
-        ],
-      }
-    );
+    this.instructionSearchApi = new Fuse(this.allInstructionsInfo, {
+      ...sharedFuseConfiguration,
+      keys: [
+        { name: 'displayedName', weight: 5 },
+        { name: 'fullGroupName', weight: 1 },
+      ],
+    });
     this.objectSearchApi = new Fuse(allObjectsList, {
       ...sharedFuseConfiguration,
       getFn: (item, property) => item.object.getName(),

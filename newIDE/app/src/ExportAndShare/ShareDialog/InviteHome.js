@@ -473,6 +473,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
                 autoFocus="desktop"
                 value={collaboratorEmail}
                 floatingLabelText={<Trans>Email</Trans>}
+                type="email"
                 onChange={(e, value) => {
                   if (!isEmailValid) setIsEmailValid(true);
                   if (addError) setAddError(null);

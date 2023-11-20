@@ -462,8 +462,10 @@ export default class ExportLauncher extends Component<Props, State> {
             {!!exportPipeline.onlineBuildType &&
               !authenticatedUser.authenticated && (
                 <CreateProfile
-                  onLogin={authenticatedUser.onLogin}
-                  onCreateAccount={authenticatedUser.onCreateAccount}
+                  onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+                  onOpenCreateAccountDialog={
+                    authenticatedUser.onOpenCreateAccountDialog
+                  }
                   message={
                     <Trans>
                       Create an account or login first to publish your game.

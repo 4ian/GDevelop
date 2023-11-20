@@ -512,13 +512,13 @@ export default function SubscriptionDialog({
                     <FlatButton
                       key="login"
                       label={<Trans>Login</Trans>}
-                      onClick={authenticatedUser.onLogin}
+                      onClick={authenticatedUser.onOpenLoginDialog}
                     />,
                     <DialogPrimaryButton
                       key="create-account"
                       label={<Trans>Create my account</Trans>}
                       primary
-                      onClick={authenticatedUser.onCreateAccount}
+                      onClick={authenticatedUser.onOpenCreateAccountDialog}
                     />,
                   ]}
                 >

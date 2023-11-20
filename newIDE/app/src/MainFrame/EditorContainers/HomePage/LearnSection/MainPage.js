@@ -79,6 +79,34 @@ const styles = {
   },
 };
 
+type TutorialsRowProps = {|
+  tutorials: Tutorial[],
+  category: TutorialCategory,
+  onSelectCategory: TutorialCategory => void,
+|};
+
+export const TutorialsRow = ({
+  tutorials,
+  category,
+  onSelectCategory,
+}: TutorialsRowProps) => (
+  <I18n>
+    {({ i18n }) => (
+      <ImageTileRow
+        title={TUTORIAL_CATEGORY_TEXTS[category].title}
+        description={TUTORIAL_CATEGORY_TEXTS[category].description}
+        items={tutorials
+          .filter(tutorial => tutorial.category === category)
+          .map(tutorial => formatTutorialToImageTileComponent(i18n, tutorial))}
+        onShowAll={() => onSelectCategory(category)}
+        showAllIcon={<ChevronArrowRight fontSize="small" />}
+        getColumnsFromWidth={getTutorialsColumnsFromWidth}
+        getLimitFromWidth={getTutorialsColumnsFromWidth}
+      />
+    )}
+  </I18n>
+);
+
 type Props = {|
   onStartTutorial: () => void,
   onOpenExampleStore: () => void,
@@ -140,26 +168,6 @@ const MainPage = ({
       action: () => onTabChange('community'),
     },
   ].filter(Boolean);
-
-  const renderTutorialsRow = (category: TutorialCategory) => (
-    <I18n>
-      {({ i18n }) => (
-        <ImageTileRow
-          title={TUTORIAL_CATEGORY_TEXTS[category].title}
-          description={TUTORIAL_CATEGORY_TEXTS[category].description}
-          items={tutorials
-            .filter(tutorial => tutorial.category === category)
-            .map(tutorial =>
-              formatTutorialToImageTileComponent(i18n, tutorial)
-            )}
-          onShowAll={() => onSelectCategory(category)}
-          showAllIcon={<ChevronArrowRight fontSize="small" />}
-          getColumnsFromWidth={getTutorialsColumnsFromWidth}
-          getLimitFromWidth={getTutorialsColumnsFromWidth}
-        />
-      )}
-    </I18n>
-  );
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
@@ -225,9 +233,27 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>{renderTutorialsRow('official-beginner')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('official-intermediate')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('official-advanced')}</SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="official-beginner"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="official-intermediate"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="official-advanced"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
         <SectionRow>
           <LineStackLayout
             justifyContent="space-between"
@@ -287,8 +313,20 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>{renderTutorialsRow('full-game')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('game-mechanic')}</SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="full-game"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="game-mechanic"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
       </>
     </SectionContainer>
   );

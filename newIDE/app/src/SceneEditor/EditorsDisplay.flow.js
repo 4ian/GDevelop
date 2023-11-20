@@ -47,9 +47,9 @@ export type SceneEditorsDisplayProps = {|
     ?ObjectFolderOrObjectWithContext
   ) => void,
   onExportObject: (object: ?gdObject) => void,
-  onDeleteObject: (
+  onDeleteObjects: (
     i18n: I18nType,
-    objectWithContext: ObjectWithContext,
+    objectsWithContext: ObjectWithContext[],
     cb: (boolean) => void
   ) => void,
   onAddObjectInstance: (

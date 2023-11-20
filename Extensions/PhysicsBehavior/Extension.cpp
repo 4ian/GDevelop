@@ -24,7 +24,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
       .SetCategory("Movement")
       .SetExtensionHelpPath("/behaviors/physics");
   extension.AddInstructionOrExpressionGroupMetadata(_("Physics Engine (deprecated)"))
-      .SetIcon("res/physics16.png");
+      .SetIcon("res/physics-deprecated16.png");
 
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(
@@ -34,7 +34,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         _("Make objects move as if they are subject to the laws of physics. If "
           "you're creating a new game, prefer Physics Engine 2.0"),
         "",
-        "res/physics32.png",
+        "res/physics-deprecated32.png",
         "PhysicsBehavior",
         std::make_shared<PhysicsBehavior>(),
         std::make_shared<ScenePhysicsDatas>());
@@ -44,8 +44,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Make the object immovable."),
                   _("Make _PARAM0_ static"),
                   _("Movement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -57,8 +57,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                     "objects )."),
                   _("Make _PARAM0_ dynamic"),
                   _("Movement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -70,8 +70,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                        "other objects )."),
                      _("_PARAM0_ is dynamic"),
                      _("Movement"),
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
@@ -82,8 +82,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Prevent the object from rotating"),
                   _("Fix rotation of _PARAM0_"),
                   _("Rotation"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -96,8 +96,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
              "between the hinge and the object will remain identical."),
            _("Add a hinge to _PARAM0_ at _PARAM2_;_PARAM3_"),
            _("Joints"),
-           "res/physics24.png",
-           "res/physics16.png")
+           "res/physics-deprecated24.png",
+           "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Hinge X position"))
@@ -110,8 +110,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Add a hinge that the object will rotate around."),
                   _("Add a hinge between _PARAM0_ and _PARAM2_"),
                   _("Joints"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("objectPtr", _("Object"))
@@ -135,8 +135,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Add a virtual gear between two objects."),
                   _("Add a gear between _PARAM0_ and _PARAM2_"),
                   _("Joints"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("objectPtr", _("Object"))
@@ -150,8 +150,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Allows the object to rotate."),
                   _("Allow _PARAM0_ to rotate"),
                   _("Rotation"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -162,8 +162,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Test if the object's rotation is fixed."),
                      _("The rotation of _PARAM0_ is fixed."),
                      _("Rotation"),
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -175,8 +175,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                     "collision handling."),
                   _("Consider _PARAM0_ as a bullet"),
                   _("Other"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -188,8 +188,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                     "standard collision handling."),
                   _("Do not consider _PARAM0_ as a bullet."),
                   _("Other"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -200,8 +200,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Test if the object is treated like a bullet"),
                      _("_PARAM0_ is considered as a bullet"),
                      _("Other"),
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -212,8 +212,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Apply an impulse to the object."),
                   _("Apply to _PARAM0_ impulse _PARAM2_;_PARAM3_"),
                   _("Displacement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("X component ( Newtons/Seconds )"))
@@ -228,8 +228,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Apply to _PARAM0_ impulse _PARAM3_ with angle: "
                     "_PARAM2_\302\260"),  //\302\260 <=> DEGREE SIGN
                   _("Displacement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Angle"))
@@ -244,8 +244,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            _("Apply to _PARAM0_ impulse _PARAM4_ toward position "
              "_PARAM2_;_PARAM3_"),
            _("Displacement"),
-           "res/physics24.png",
-           "res/physics16.png")
+           "res/physics-deprecated24.png",
+           "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("X position"))
@@ -259,8 +259,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Add a force to the object"),
                   _("Apply to _PARAM0_ force _PARAM2_;_PARAM3_"),
                   _("Displacement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("X component ( Newtons )"))
@@ -274,8 +274,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                     "as coordinates."),
                   _("Apply to _PARAM0_ force _PARAM3_ at angle _PARAM2_"),
                   _("Displacement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Angle"))
@@ -290,8 +290,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            _("Add to _PARAM0_ force _PARAM4_ toward position "
              "_PARAM2_;_PARAM3_"),
            _("Displacement"),
-           "res/physics24.png",
-           "res/physics16.png")
+           "res/physics-deprecated24.png",
+           "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("X position"))
@@ -305,8 +305,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Add a torque (a rotation) to the object."),
                   _("Add to _PARAM0_ torque _PARAM2_"),
                   _("Rotation"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Torque value"))
@@ -318,8 +318,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Modify the velocity of an object."),
                   _("Set linear velocity of _PARAM0_ to _PARAM2_;_PARAM3_"),
                   _("Displacement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("X Coordinate"))
@@ -333,8 +333,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            _("Compare the linear velocity on the X axis of the object."),
            _("the linear velocity on X axis"),
            _("Displacement"),
-           "res/physics24.png",
-           "res/physics16.png")
+           "res/physics-deprecated24.png",
+           "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -348,8 +348,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            _("Compare the linear velocity on the Y axis of the object."),
            _("the linear velocity on Y axis"),
            _("Displacement"),
-           "res/physics24.png",
-           "res/physics16.png")
+           "res/physics-deprecated24.png",
+           "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -362,8 +362,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the linear velocity of the object."),
                      _("the linear velocity"),
                      _("Displacement"),
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -376,8 +376,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Modify the angular velocity of the object."),
                   _("Set angular speed of _PARAM0_ to _PARAM2_"),
                   _("Rotation"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("New value"))
@@ -389,8 +389,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the angular speed of the object."),
                      _("the angular speed"),
                      _("Rotation"),
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -403,8 +403,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the linear damping of the object."),
                      _("the linear damping"),
                      _("Displacement"),
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -420,8 +420,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                        "they are colliding with the other objects."),
                      _("_PARAM0_ is in collision with a _PARAM2_"),
                      "",
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("objectList", _("Object"))
@@ -433,8 +433,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Modify the linear damping of the object."),
                   _("Set linear damping of _PARAM0_ to _PARAM2_"),
                   _("Displacement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Value"))
@@ -446,8 +446,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Test the object's angular damping"),
                      _("the angular damping"),
                      _("Displacement"),
-                     "res/physics24.png",
-                     "res/physics16.png")
+                     "res/physics-deprecated24.png",
+                     "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -460,8 +460,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Modify the angular damping of the object."),
                   _("Set angular damping of _PARAM0_ to _PARAM2_"),
                   _("Displacement"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Value"))
@@ -473,8 +473,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Modify the gravity"),
                   _("Set gravity force to _PARAM2_;_PARAM3_"),
                   _("Global options"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("X Coordinate"))
@@ -489,8 +489,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the X scale of the collision polygon of _PARAM0_ "
                     "to _PARAM2_"),
                   _("Collision polygon"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Scale"))
@@ -504,8 +504,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the Y scale of the collision polygon of _PARAM0_ Y "
                     "to _PARAM2_"),
                   _("Collision polygon"),
-                  "res/physics24.png",
-                  "res/physics16.png")
+                  "res/physics-deprecated24.png",
+                  "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddParameter("expression", _("Scale"))
@@ -518,8 +518,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            _("Test the value of the X scale of the collision polygon."),
            _("the X scale of the collision polygon"),
            _("Collision polygon"),
-           "res/physics24.png",
-           "res/physics16.png")
+           "res/physics-deprecated24.png",
+           "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -533,8 +533,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            _("Test the value of the Y scale of the collision polygon."),
            _("the Y scale of the collision polygon"),
            _("Collision polygon"),
-           "res/physics24.png",
-           "res/physics16.png")
+           "res/physics-deprecated24.png",
+           "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .UseStandardRelationalOperatorParameters(
@@ -546,7 +546,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Collision polygon X scale"),
                       _("Collision polygon X scale"),
                       _("Collision polygon"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -556,7 +556,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Collision polygon Y scale"),
                       _("Collision polygon Y scale"),
                       _("Collision polygon"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -566,7 +566,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Linear speed"),
                       _("Linear speed"),
                       _("Displacement"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -576,7 +576,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("X component"),
                       _("X component"),
                       _("Displacement"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -586,7 +586,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Y component"),
                       _("Y component"),
                       _("Displacement"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -596,7 +596,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Angular speed"),
                       _("Angular speed"),
                       _("Rotation"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -606,7 +606,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Linear damping"),
                       _("Linear damping"),
                       _("Displacement"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -616,7 +616,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Angular damping"),
                       _("Angular damping"),
                       _("Rotation"),
-                      "res/physics16.png")
+                      "res/physics-deprecated16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
         .AddCodeOnlyParameter("currentScene", "")

@@ -351,6 +351,7 @@ namespace gdjs {
         '_renderer',
         '_gameRenderer',
         '_imageManager',
+        '_rendererEffects',
         // Exclude PIXI textures:
         'baseTexture',
         '_baseTexture',

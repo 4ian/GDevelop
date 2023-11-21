@@ -46,7 +46,7 @@ const isObjectInstruction = (
   }
   if (
     objectType &&
-    firstParameter.getExtraInfo() !== '' &&
+    // The type '' is not allowed because it would duplicate base object instructions.
     firstParameter.getExtraInfo() !== objectType
   ) {
     return false;
@@ -138,6 +138,9 @@ const enumerateExtraBehaviorInstructions = (
   return allInstructions;
 };
 
+/**
+ * Enumerate free instructions that start with an object parameter.
+ */
 const enumerateExtraObjectInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
@@ -169,6 +172,10 @@ const enumerateExtraObjectInstructions = (
   return allInstructions;
 };
 
+/**
+ * Enumerate free instructions excluding the instructions that have been moved to
+ * the object instructions list unless they are in `freeInstructionsToKeep`.
+ */
 const enumerateFreeInstructionsWithoutExtra = (
   isCondition: boolean,
   extension: gdPlatformExtension,
@@ -414,6 +421,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
   const scope = { extension, objectMetadata };
   const prefix = '';
 
+  // Free instructions
   allInstructions = [
     ...allInstructions,
     ...enumerateExtensionInstructions(
@@ -426,7 +434,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     ),
   ];
 
-  // Free object instructions:
+  // Free object instructions
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();

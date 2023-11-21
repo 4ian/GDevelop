@@ -14,7 +14,7 @@ tasks:
     init: |
           sudo apt-get update 
           sudo apt install cmake python-is-python3 python3-distutils -y
-          git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
           cd GDevelop.js
           npm install
           source ../emsdk/emsdk_env.sh && npm run build -- --dev

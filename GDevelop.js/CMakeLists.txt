@@ -12,8 +12,17 @@ if(NOT EMSCRIPTEN)
 endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
-add_compile_options(-O2) # Optimizations during compilation
-#add_compile_options(-g --profiling) # Uncomment for debugging + profiling support
+add_compile_options(-O3 -flto) # Optimizations during compilation
+# add_compile_options(-fwasm-exceptions) # Enable exceptions
+if(NOT DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS)
+	add_compile_options(-flto) # The compiler needs to know if there will be link time optimisations
+endif()
+
+# Compiler debugging options
+#
+# add_compile_options(-fsanitize=address) # Uncomment to auto-detect occurences of memory bugs (memory leak, use after free, overflows, ...) - also enable linking below!
+# add_compile_options(-fsanitize=undefined) # Uncomment to auto-detect occurences of undefined behavior - also enable linking below!
+# add_compile_options(-g) # Uncomment for debugging support
 # add_compile_options(--profiling) # Uncomment for profiling support
 
 # Common directories:
@@ -64,7 +73,7 @@ if(DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS)
 	message(STATUS "Disabling optimization at link time for (slightly) faster build")
 	target_link_libraries(GD "-O0")
 else()
-	target_link_libraries(GD "-O2")
+	target_link_libraries(GD "-O3 -flto")
 endif()
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/glue.js")
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/postjs.js")
@@ -73,7 +82,17 @@ target_link_libraries(GD "-s EXPORT_NAME=\"initializeGDevelopJs\"") # Global fun
 target_link_libraries(GD "-s TOTAL_MEMORY=48MB") # Get some initial memory size that is a bit bigger than the default.
 target_link_libraries(GD "-s ALLOW_MEMORY_GROWTH=1")
 target_link_libraries(GD "-s ERROR_ON_UNDEFINED_SYMBOLS=0")
-target_link_libraries(GD "-s \"EXTRA_EXPORTED_RUNTIME_METHODS=['addOnPreMain', 'calledRun', 'UTF8ToString']\"")
+target_link_libraries(GD "-s \"EXPORTED_FUNCTIONS=['_free']\"")
+
+# Linker debugging options
+#
+# target_link_libraries(GD "-s DEMANGLE_SUPPORT=1") # Demangle stack traces
+# target_link_libraries(GD "-s ASSERTIONS=1") # Basic runtime memory allocation checks (necessary for wasm exceptions stack traces)
+# target_link_libraries(GD "-s ASSERTIONS=2 -s SAFE_HEAP=1") # Uncomment to do runtime checks for memory allocations and access errors
+# target_link_libraries(GD "-fsanitize=address") # Uncomment to auto-detect occurences of memory bugs (memory leak, use after free, overflows, ...) - also enable compiling above!
+# target_link_libraries(GD "-fsanitize=undefined") # Uncomment to auto-detect occurences of undefined behavior - also enable compiling above!
+# target_link_libraries(--cpuprofiler) # Uncomment for interactive performance profiling
+# target_link_libraries(--memoryprofiler) # Uncomment for interactive memory profiling
 
 # Even if we're building an "executable", prefix it by lib as it's used as a library.
 set_target_properties(GD PROPERTIES PREFIX "lib")

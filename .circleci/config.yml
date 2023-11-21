@@ -16,7 +16,7 @@ jobs:
   build-macos:
     macos:
       xcode: 14.2.0
-    resource_class: macos.m1.medium.gen1
+    # resource_class: macos.m1.medium.gen1
     steps:
       - checkout
 
@@ -24,6 +24,10 @@ jobs:
       - run:
           name: Install dependencies for Emscripten
           command: brew install cmake
+
+      - run:
+          name: Install dependencies for AWS S3 upload
+          command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -48,7 +52,7 @@ jobs:
       # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
       - run:
           name: Install GDevelop IDE dependencies
-          command: cd newIDE/app && npm install && cd ../electron-app && npm install
+          command: cd newIDE/app && npm install && cd ../electron-app && npm install && cd app && npm install --arch=arm64 --force @parcel/watcher-darwin-arm64
 
       - save_cache:
           paths:

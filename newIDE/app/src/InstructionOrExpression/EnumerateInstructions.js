@@ -138,6 +138,9 @@ const enumerateExtraBehaviorInstructions = (
   return allInstructions;
 };
 
+/**
+ * Enumerate free instructions that start with an object parameter.
+ */
 const enumerateExtraObjectInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
@@ -169,6 +172,10 @@ const enumerateExtraObjectInstructions = (
   return allInstructions;
 };
 
+/**
+ * Enumerate free instructions excluding the instructions that have been moved to
+ * the object instructions list unless they are in `freeInstructionsToKeep`.
+ */
 const enumerateFreeInstructionsWithoutExtra = (
   isCondition: boolean,
   extension: gdPlatformExtension,
@@ -414,6 +421,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
   const scope = { extension, objectMetadata };
   const prefix = '';
 
+  // Free instructions
   allInstructions = [
     ...allInstructions,
     ...enumerateExtensionInstructions(
@@ -426,7 +434,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     ),
   ];
 
-  // Free object instructions:
+  // Free object instructions
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
@@ -461,13 +469,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition
           ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
           : baseObjectExtension.getAllActionsForObject(baseObjectType),
-        scope,
-        i18n
-      ),
-      ...enumerateExtraObjectInstructions(
-        isCondition,
-        baseObjectExtension,
-        baseObjectType,
         scope,
         i18n
       ),

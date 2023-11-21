@@ -86,7 +86,7 @@ module.exports = {
     extension
       .addAction(
         'AnalyticsSetUID',
-        _('Change user UID'),
+        _('User UID'),
         _(
           "Changes the current user's analytics identifier. " +
             'This is what let Analytics differentiate user, ' +
@@ -400,7 +400,7 @@ module.exports = {
     extension
       .addStrExpression(
         'GetAuthToken',
-        _('Get the user authentication token'),
+        _('User authentication token'),
         _(
           'Get the user authentication token. The token is the proof of authentication.'
         ),
@@ -438,8 +438,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetUserEmail',
-        _('Get the user email address'),
-        _('Gets the user email address.'),
+        _('User email address'),
+        _('Return the user email address.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -455,8 +455,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetAccountCreationTime',
-        _('Get the accounts creation time'),
-        _('Gets the accounts creation time.'),
+        _('Accounts creation time'),
+        _('Return the accounts creation time.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -472,8 +472,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetLastLoginTime',
-        _('Get the user last login time'),
-        _('Gets the user last login time.'),
+        _('User last login time'),
+        _('Return the user last login time.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -489,8 +489,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetUserDisplayName',
-        _('Get the user display name'),
-        _('Gets the user display name.'),
+        _('User display name'),
+        _('Return the user display name.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -506,8 +506,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetPhoneNumber',
-        _('Get the user phone number'),
-        _('Gets the user phone number.'),
+        _('User phone number'),
+        _('Return the user phone number.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -523,9 +523,9 @@ module.exports = {
     extension
       .addStrExpression(
         'GetUserUID',
-        _('Get the user UID'),
+        _('User UID'),
         _(
-          'Gets the user Unique IDentifier. Use that to link data to an ' +
+          'Return the user Unique IDentifier. Use that to link data to an ' +
             'user instead of the name or email.'
         ),
         _('Authentication/User Management'),
@@ -543,8 +543,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetTenantID',
-        _('Get the user tenant ID'),
-        _('Gets the user tenant ID. For advanced usage only.'),
+        _('User tenant ID'),
+        _('Return the user tenant ID. For advanced usage only.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -560,8 +560,8 @@ module.exports = {
     extension
       .addStrExpression(
         'GetRefreshToken',
-        _('Get the user refresh token'),
-        _('Gets the user refresh token. For advanced usage only.'),
+        _('User refresh token'),
+        _('Return the user refresh token. For advanced usage only.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
@@ -577,7 +577,7 @@ module.exports = {
     extension
       .addStrExpression(
         'GetPhotoURL',
-        _('Get the user profile picture URL'),
+        _('Profile picture URL'),
         _('Gets an URL to the user profile picture.'),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
@@ -635,7 +635,7 @@ module.exports = {
     extension
       .addAction(
         'SetDisplayName',
-        _('Set display name'),
+        _('Display name'),
         _('Sets the user display name.'),
         _("Set the user's display name to _PARAM0_"),
         _('Authentication/User Management'),
@@ -655,9 +655,9 @@ module.exports = {
     extension
       .addAction(
         'SetPhotoURL',
-        _('Set the user profile picture'),
-        _('Sets the user profile picture URL to a new one.'),
-        _("Set the user's profile picture URL to _PARAM0_"),
+        _('Profile picture'),
+        _('Change the user profile picture URL to a new one.'),
+        _("Change the user's profile picture URL to _PARAM0_"),
         _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -1782,7 +1782,7 @@ module.exports = {
       .addAction(
         'FirestoreGetField',
         _('Get a field of a document'),
-        _('Gets the value of a field in a firestore document.'),
+        _('Return the value of a field in a firestore document.'),
         _(
           'Load field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ into _PARAM3_ (store result state in _PARAM4_)'
         ),
@@ -2213,7 +2213,7 @@ module.exports = {
         'DatabaseGetField',
         _('Get a field of a variable'),
         _(
-          'Gets the value of a field in a variable from the database and store it in a scene variable.'
+          'Return the value of a field in a variable from the database and store it in a scene variable.'
         ),
         _(
           'Load field _PARAM1_ of database variable _PARAM0_ into _PARAM2_ (store result state in _PARAM3_)'

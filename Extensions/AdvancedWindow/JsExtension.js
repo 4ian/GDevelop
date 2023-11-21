@@ -624,7 +624,7 @@ module.exports = {
     extension
       .addAction(
         'SetOpacity',
-        _('Set window opacity'),
+        _('Window opacity'),
         _('Changes the window opacity.'),
         _('Set the window opacity to _PARAM0_'),
         _('Windows, Linux, macOS'),
@@ -645,7 +645,7 @@ module.exports = {
     extension
       .addAction(
         'SetWindowPosition',
-        _('Set window position'),
+        _('Window position'),
         _('Changes the window position.'),
         _('Set the window position to _PARAM0_;_PARAM1_'),
         _('Windows, Linux, macOS'),

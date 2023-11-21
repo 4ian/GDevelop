@@ -21,6 +21,9 @@ const freeInstructionsToKeep = {
   Scene3D: ['Scene3D::TurnCameraTowardObject'],
 };
 
+/**
+ * `objectType` is strictly checked and doesn't match base object parameters.
+ */
 const isObjectInstruction = (
   instructionMetadata: gdInstructionMetadata,
   objectType?: string

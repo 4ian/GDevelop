@@ -676,7 +676,7 @@ module.exports = {
     extension
       .addAction(
         'ChangeEmail',
-        _('Change the user email'),
+        _('User email'),
         _(
           'This action is dangerous so it requires reauthentication.\n' +
             "Changes the user's email address."
@@ -716,7 +716,7 @@ module.exports = {
     extension
       .addAction(
         'ChangeEmailProvider',
-        _('Change the user email (Provider)'),
+        _('User email (Provider)'),
         _(
           'This action is dangerous so it requires reauthentication.\n' +
             "Changes the user's email address.\n" +
@@ -755,7 +755,7 @@ module.exports = {
     extension
       .addAction(
         'ChangePassword',
-        _('Change the user password'),
+        _('User password'),
         _(
           'This action is dangerous so it requires reauthentication.\n' +
             'Changes the user password.'
@@ -796,7 +796,7 @@ module.exports = {
     extension
       .addAction(
         'ChangePasswordProvider',
-        _('Change the user password (Provider)'),
+        _('User password (Provider)'),
         _(
           'This action is dangerous so it requires reauthentication.\n' +
             'Changes the user password.\n' +

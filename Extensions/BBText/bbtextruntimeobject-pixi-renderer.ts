@@ -1,12 +1,10 @@
-declare var MultiStyleText: any;
-
 namespace gdjs {
   /**
    * The PIXI.js renderer for the BBCode Text runtime object.
    */
   export class BBTextRuntimeObjectPixiRenderer {
     _object: gdjs.BBTextRuntimeObject;
-    _pixiObject: any;
+    _pixiObject: MultiStyleText;
 
     /**
      * @param runtimeObject The object to render
@@ -18,32 +16,24 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
 
-      // Load (or reset) the text
-      if (this._pixiObject === undefined) {
-        this._pixiObject = new MultiStyleText(runtimeObject._text, {
-          default: {
-            fontFamily: instanceContainer
-              .getGame()
-              .getFontManager()
-              .getFontFamily(runtimeObject._fontFamily),
-            fontSize: runtimeObject._fontSize + 'px',
-            fill: gdjs.rgbToHexNumber(
-              runtimeObject._color[0],
-              runtimeObject._color[1],
-              runtimeObject._color[2]
-            ),
-            tagStyle: 'bbcode',
-            wordWrap: runtimeObject._wordWrap,
-            wordWrapWidth: runtimeObject._wrappingWidth,
-            align: runtimeObject._align,
-          },
-        });
-      } else {
-        this.updateColor();
-        this.updateAlignment();
-        this.updateFontFamily();
-        this.updateFontSize();
-      }
+      this._pixiObject = new MultiStyleText(runtimeObject._text, {
+        default: {
+          fontFamily: instanceContainer
+            .getGame()
+            .getFontManager()
+            .getFontFamily(runtimeObject._fontFamily),
+          fontSize: runtimeObject._fontSize + 'px',
+          fill: gdjs.rgbToHexNumber(
+            runtimeObject._color[0],
+            runtimeObject._color[1],
+            runtimeObject._color[2]
+          ),
+          tagStyle: 'bbcode',
+          wordWrap: runtimeObject._wordWrap,
+          wordWrapWidth: runtimeObject._wrappingWidth,
+          align: runtimeObject._align as PIXI.TextStyleAlign | undefined,
+        },
+      });
       instanceContainer
         .getLayer('')
         .getRenderer()
@@ -64,12 +54,14 @@ namespace gdjs {
     }
 
     updateWordWrap(): void {
+      //@ts-ignore Private member usage.
       this._pixiObject._style.wordWrap = this._object._wordWrap;
       this._pixiObject.dirty = true;
       this.updatePosition();
     }
 
     updateWrappingWidth(): void {
+      //@ts-ignore Private member usage.
       this._pixiObject._style.wordWrapWidth = this._object._wrappingWidth;
       this._pixiObject.dirty = true;
       this.updatePosition();
@@ -81,6 +73,7 @@ namespace gdjs {
     }
 
     updateColor(): void {
+      //@ts-ignore Private member usage.
       this._pixiObject.textStyles.default.fill = gdjs.rgbToHexNumber(
         this._object._color[0],
         this._object._color[1],
@@ -90,11 +83,13 @@ namespace gdjs {
     }
 
     updateAlignment(): void {
+      //@ts-ignore Private member usage.
       this._pixiObject._style.align = this._object._align;
       this._pixiObject.dirty = true;
     }
 
     updateFontFamily(): void {
+      //@ts-ignore Private member usage.
       this._pixiObject.textStyles.default.fontFamily = this._object
         .getInstanceContainer()
         .getGame()
@@ -104,6 +99,7 @@ namespace gdjs {
     }
 
     updateFontSize(): void {
+      //@ts-ignore Private member usage.
       this._pixiObject.textStyles.default.fontSize =
         this._object._fontSize + 'px';
       this._pixiObject.dirty = true;
@@ -129,6 +125,10 @@ namespace gdjs {
 
     getHeight(): float {
       return this._pixiObject.height;
+    }
+
+    destroy(): void {
+      this._pixiObject.destroy(true);
     }
   }
 

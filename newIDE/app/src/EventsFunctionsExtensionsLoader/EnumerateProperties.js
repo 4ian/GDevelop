@@ -1,5 +1,4 @@
 // @flow
-import { mapVector } from '../Utils/MapFor';
 
 /** The JS equivalent of gdPropertyDescriptor */
 type EnumeratedProperty = {|
@@ -12,29 +11,6 @@ type EnumeratedProperty = {|
   extraInfo: Array<string>,
   isHidden: boolean,
 |};
-
-// TODO Remove this function as it seems to be a dead code.
-/**
- * Transform a gdNamedPropertyDescriptorsList into a JS object.
- * **Don't use this** unless you explicitly need to deal with JS objects.
- * Otherwise, prefer just iterating and using gdNamedPropertyDescriptorsList functions.
- */
-export const enumerateNamedPropertyDescriptorsList = (
-  namedProperties: gdNamedPropertyDescriptorsList
-): Array<EnumeratedProperty> => {
-  return mapVector(namedProperties, namedProperty => {
-    return {
-      name: namedProperty.getName(),
-      type: namedProperty.getType(),
-      description: namedProperty.getDescription(),
-      group: namedProperty.getGroup(),
-      label: namedProperty.getLabel(),
-      value: namedProperty.getValue(),
-      extraInfo: namedProperty.getExtraInfo().toJSArray(),
-      isHidden: namedProperty.isHidden(),
-    };
-  });
-};
 
 export const toGdPropertyDescriptor = (
   enumeratedProperty: EnumeratedProperty,

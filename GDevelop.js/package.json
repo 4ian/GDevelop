@@ -45,5 +45,7 @@
       "<rootDir>/node_modules/"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "prettier": "^2.1.2"
+  }
 }

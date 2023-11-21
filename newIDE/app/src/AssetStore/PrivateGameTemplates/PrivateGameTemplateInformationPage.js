@@ -36,6 +36,7 @@ import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { capitalize } from 'lodash';
+import FlatButton from '../../UI/FlatButton';
 
 const styles = {
   disabledText: { opacity: 0.6 },
@@ -304,7 +305,22 @@ const PrivateGameTemplateInformationPage = ({
                             allowParagraphs
                           />
                         </Text>
-                        <ResponsiveLineStackLayout noMargin noColumnMargin>
+                        {!isAlreadyReceived && (
+                          <Line expand>
+                            <Column noMargin expand>
+                              <FlatButton
+                                primary
+                                label={<Trans>Try it online</Trans>}
+                                onClick={() =>
+                                  Window.openExternalURL(
+                                    gameTemplate.gamePreviewLink
+                                  )
+                                }
+                              />
+                            </Column>
+                          </Line>
+                        )}
+                        <ResponsiveLineStackLayout noColumnMargin>
                           <Column noMargin expand>
                             <Text size="sub-title">
                               <Trans>Licensing</Trans>
@@ -348,21 +364,25 @@ const PrivateGameTemplateInformationPage = ({
                                 </Link>
                               </Text>
                             </Line>
-                            <Text size="sub-title">
-                              <Trans>What you get</Trans>
-                            </Text>
-                            {whatYouGetItems.map((item, index) => (
-                              <LineStackLayout
-                                noMargin
-                                alignItems="center"
-                                key={index}
-                              >
-                                <Mark fontSize="small" />
-                                <Text displayInlineAsSpan noMargin>
-                                  {item}
+                            {!!privateGameTemplateListingData.isSellerGDevelop && (
+                              <>
+                                <Text size="sub-title">
+                                  <Trans>What you get</Trans>
                                 </Text>
-                              </LineStackLayout>
-                            ))}
+                                {whatYouGetItems.map((item, index) => (
+                                  <LineStackLayout
+                                    noMargin
+                                    alignItems="center"
+                                    key={index}
+                                  >
+                                    <Mark fontSize="small" />
+                                    <Text displayInlineAsSpan noMargin>
+                                      {item}
+                                    </Text>
+                                  </LineStackLayout>
+                                ))}
+                              </>
+                            )}
                             <Text size="sub-title">
                               <Trans>How to use</Trans>
                             </Text>

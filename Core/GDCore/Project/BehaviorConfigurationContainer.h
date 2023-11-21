@@ -31,10 +31,10 @@ namespace gd {
  */
 class GD_CORE_API BehaviorConfigurationContainer {
  public:
-
-  BehaviorConfigurationContainer(){};
-  BehaviorConfigurationContainer(const gd::String& name_, const gd::String& type_)
-      : name(name_), type(type_){};
+  BehaviorConfigurationContainer() : folded(false){};
+  BehaviorConfigurationContainer(const gd::String& name_,
+                                 const gd::String& type_)
+      : name(name_), type(type_), folded(false){};
   virtual ~BehaviorConfigurationContainer();
   virtual BehaviorConfigurationContainer* Clone() const { return new BehaviorConfigurationContainer(*this); }
 
@@ -61,7 +61,7 @@ class GD_CORE_API BehaviorConfigurationContainer {
   /**
    * \brief Called when the IDE wants to know about the custom properties of the
    * behavior.
-   * 
+   *
    * \return a std::map with properties names as key.
    * \see gd::PropertyDescriptor
    */
@@ -103,6 +103,17 @@ class GD_CORE_API BehaviorConfigurationContainer {
 
   const gd::SerializerElement& GetContent() const { return content; };
   gd::SerializerElement& GetContent() { return content; };
+
+  /**
+   * \brief Set if the behavior configuration panel should be folded in the UI.
+   */
+  void SetFolded(bool fold = true) { folded = fold; }
+
+  /**
+   * \brief True if the behavior configuration panel should be folded in the UI.
+   */
+  bool IsFolded() const { return folded; }
+
 
 protected:
   /**
@@ -148,6 +159,7 @@ protected:
                     ///< in the form "ExtensionName::BehaviorTypeName"
 
   gd::SerializerElement content;  // Storage for the behavior properties
+  bool folded;
 };
 
 }  // namespace gd

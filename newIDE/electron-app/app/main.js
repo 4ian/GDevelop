@@ -31,6 +31,7 @@ const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
 } = require('./LocalGDJSDevelopmentWatcher');
+const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -265,6 +266,27 @@ app.on('ready', function() {
         outputPath
       );
       return result;
+    }
+  );
+
+  // LocalFilesystemWatcher events:
+  ipcMain.handle(
+    'local-filesystem-watcher-setup',
+    (event, folderPath, options) => {
+      const subscriptionId = setupWatcher(
+        folderPath,
+        changedFilePath => {
+          event.sender.send('project-file-changed', changedFilePath);
+        },
+        options
+      );
+      return subscriptionId;
+    }
+  );
+  ipcMain.handle(
+    'local-filesystem-watcher-disable',
+    (event, subscriptionId) => {
+      disableWatcher(subscriptionId);
     }
   );
 

@@ -7,13 +7,11 @@ import { Column, Line } from '../../../../UI/Grid';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import AlertMessage from '../../../../UI/AlertMessage';
 import { List } from '../../../../UI/List';
-import {
-  ProjectFileListItem,
-  getProjectLineHeight,
-  transformCloudProjectsIntoFileMetadataWithStorageProviderName,
-} from '../BuildSection';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { type FileMetadataAndStorageProviderName } from '../../../../ProjectsStorage';
+import {
+  type FileMetadataAndStorageProviderName,
+  type FileMetadata,
+} from '../../../../ProjectsStorage';
 import { type StorageProvider } from '../../../../ProjectsStorage';
 import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
 import { type User } from '../../../../Utils/GDevelopServices/User';
@@ -22,6 +20,11 @@ import FlatButton from '../../../../UI/FlatButton';
 import Skeleton from '@material-ui/lab/Skeleton';
 import ListItem from '@material-ui/core/ListItem';
 import Text from '../../../../UI/Text';
+import {
+  getProjectLineHeight,
+  transformCloudProjectsIntoFileMetadataWithStorageProviderName,
+} from '../BuildSection/utils';
+import ProjectFileListItem from '../BuildSection/ProjectFileListItem';
 
 const styles = {
   listItem: {
@@ -36,6 +39,7 @@ const styles = {
 
 type Props = {|
   user: User,
+  currentFileMetadata: ?FileMetadata,
   onClickBack: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   storageProviders: Array<StorageProvider>,
@@ -46,6 +50,7 @@ type Props = {|
 
 const TeamMemberProjectsView = ({
   user,
+  currentFileMetadata,
   onClickBack,
   onOpenRecentFile,
   storageProviders,
@@ -136,6 +141,7 @@ const TeamMemberProjectsView = ({
                 {fileMetadataAndStorageProviderNames.map(file => (
                   <ProjectFileListItem
                     file={file}
+                    currentFileMetadata={currentFileMetadata}
                     key={file.fileMetadata.fileIdentifier}
                     onOpenRecentFile={onOpenRecentFile}
                     storageProviders={storageProviders}

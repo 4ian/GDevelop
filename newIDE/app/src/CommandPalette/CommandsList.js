@@ -16,6 +16,7 @@ export type CommandName =
   | 'SAVE_PROJECT_AS'
   | 'CLOSE_PROJECT'
   | 'EXPORT_GAME'
+  | 'INVITE_COLLABORATORS'
   | 'OPEN_RECENT_PROJECT'
   | 'OPEN_COMMAND_PALETTE'
   | 'OPEN_PROJECT_PROPERTIES'
@@ -145,6 +146,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   EXPORT_GAME: {
     area: 'PROJECT',
     displayText: t`Export game`,
+    handledByElectron: true,
+  },
+  INVITE_COLLABORATORS: {
+    area: 'PROJECT',
+    displayText: t`Invite collaborators`,
     handledByElectron: true,
   },
   OPEN_RECENT_PROJECT: {

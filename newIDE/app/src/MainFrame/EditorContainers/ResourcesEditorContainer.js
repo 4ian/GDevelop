@@ -54,6 +54,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
         ref={editor => (this.editor = editor)}
         fileMetadata={this.props.fileMetadata}
         project={project}
+        storageProvider={this.props.storageProvider}
       />
     );
   }

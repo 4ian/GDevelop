@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
    */
@@ -154,7 +152,7 @@ namespace gdjs {
     }
 
     getColor() {
-      const rgb = PIXI.utils.hex2rgb(this._sprite.tint);
+      const rgb = new PIXI.Color(this._sprite.tint).toRgbArray();
       return (
         Math.floor(rgb[0] * 255) +
         ';' +

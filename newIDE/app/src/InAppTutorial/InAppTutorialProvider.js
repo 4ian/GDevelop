@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import InAppTutorialContext from './InAppTutorialContext';
-import legacyOnboardingTutorial from './Tutorials/OnboardingTutorial';
 import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
 import {
   fetchInAppTutorial,
@@ -44,14 +43,6 @@ const InAppTutorialProvider = (props: Props) => {
     initialStepIndex: number,
     initialProjectData: { [key: string]: string },
   |}) => {
-    if (tutorialId === legacyOnboardingTutorial.id) {
-      setStartStepIndex(initialStepIndex);
-      setStartProjectData(initialProjectData);
-      setTutorial(legacyOnboardingTutorial);
-      setCurrentlyRunningInAppTutorial(tutorialId);
-      return;
-    }
-
     if (!inAppTutorialShortHeaders) return;
 
     const inAppTutorialShortHeader = getInAppTutorialShortHeader(tutorialId);

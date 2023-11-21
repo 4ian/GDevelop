@@ -10,6 +10,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
   label?: React.Node,
   primary?: boolean,
   disabled?: boolean,
+  keyboardFocused?: boolean,
   fullWidth?: boolean,
   icon?: React.Node,
   style?: {|
@@ -33,7 +34,15 @@ export type RaisedButtonProps = {|
  */
 const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
   (
-    { label, primary, icon, disabled, style, ...otherProps }: RaisedButtonProps,
+    {
+      label,
+      primary,
+      icon,
+      disabled,
+      keyboardFocused,
+      style,
+      ...otherProps
+    }: RaisedButtonProps,
     ref
   ) => {
     // In theory, focus ripple is only shown after a keyboard interaction
@@ -48,6 +57,7 @@ const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
         size="small"
         disableElevation
         color={primary ? 'primary' : 'default'}
+        autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}
         style={

@@ -23,6 +23,7 @@ import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
 
@@ -69,6 +70,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
+  const { showConfirmation } = useAlertDialog();
   const { openBehaviorEvents } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
@@ -79,10 +81,12 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancelChanges,
     notifyOfChange,
     hasUnsavedChanges,
+    getOriginalContentSerializedElement,
   } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
+    resetThenClearPersistentUuid: true,
   });
 
   // Don't use a memo for this because metadata from custom objects are built
@@ -96,8 +100,29 @@ const InnerDialog = (props: InnerDialogProps) => {
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
 
-  const onApply = () => {
+  const onApply = async () => {
     props.onApply();
+
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      props.project,
+      getOriginalContentSerializedElement().getChild('variables'),
+      props.object.getVariables()
+    );
+    if (changeset.hasRemovedVariables()) {
+      // While we support refactoring that would remove all references (actions, conditions...)
+      // it's both a bit dangerous for the user and we would need to show the user what
+      // will be removed before doing so. For now, just clear the removed variables so they don't
+      // trigger any refactoring.
+      changeset.clearRemovedVariables();
+    }
+
+    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+      props.project,
+      props.object.getVariables(),
+      changeset
+    );
+    props.object.clearPersistentUuid();
+
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will
     // override the name.
@@ -116,8 +141,6 @@ const InnerDialog = (props: InnerDialogProps) => {
     },
     [currentTab]
   );
-
-  const { showConfirmation } = useAlertDialog();
 
   const askConfirmationAndOpenBehaviorEvents = React.useCallback(
     async (extensionName, behaviorName) => {
@@ -269,7 +292,6 @@ const InnerDialog = (props: InnerDialogProps) => {
               </Line>
             )}
           <VariablesList
-            commitChangesOnBlur
             variablesContainer={props.object.getVariables()}
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>
@@ -323,7 +345,7 @@ type State = {|
   objectName: string,
 |};
 
-export default class ObjectEditorDialog extends React.Component<Props, State> {
+class ObjectEditorDialog extends React.Component<Props, State> {
   state = {
     editorComponent: null,
     castToObjectType: null,
@@ -387,3 +409,16 @@ export default class ObjectEditorDialog extends React.Component<Props, State> {
     );
   }
 }
+
+const ObjectEditorWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Object editor</Trans>}
+    scope="object-details"
+    onClose={props.onCancel}
+    showOnTop
+  >
+    <ObjectEditorDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ObjectEditorWithErrorBoundary;

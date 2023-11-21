@@ -48,11 +48,6 @@ using namespace std;
 
 namespace gd {
 
-// By default, disallow unicode in identifiers, but this can be set to true
-// by the IDE. In the future, this will be set to true by default, keeping backward compatibility.
-// We keep it disabled by default to progressively ask users to test it in real projects.
-bool Project::allowUsageOfUnicodeIdentifierNames = false;
-
 Project::Project()
     : name(_("Project")),
       version("1.0.0"),
@@ -86,26 +81,24 @@ Project::~Project() {}
 
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
-std::unique_ptr<gd::Object>
-Project::CreateObject(const gd::String &objectType, const gd::String &name) const {
-  std::unique_ptr<gd::Object> object =
-      gd::make_unique<Object>(name, objectType, CreateObjectConfiguration(objectType));
+std::unique_ptr<gd::Object> Project::CreateObject(
+    const gd::String& objectType, const gd::String& name) const {
+  std::unique_ptr<gd::Object> object = gd::make_unique<Object>(
+      name, objectType, CreateObjectConfiguration(objectType));
 
-  auto &platform = GetCurrentPlatform();
-  auto &project = *this;
-  auto addDefaultBehavior =
-      [&platform,
-       &project,
-       &object,
-       &objectType](const gd::String& behaviorType) {
-    auto &behaviorMetadata =
+  auto& platform = GetCurrentPlatform();
+  auto& project = *this;
+  auto addDefaultBehavior = [&platform, &project, &object, &objectType](
+                                const gd::String& behaviorType) {
+    auto& behaviorMetadata =
         gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
     if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-      gd::LogWarning("Object: " + objectType + " has an unknown default behavior: " + behaviorType);
+      gd::LogWarning("Object: " + objectType +
+                     " has an unknown default behavior: " + behaviorType);
       return;
     }
-    auto* behavior = object->AddNewBehavior(project, behaviorType,
-                          behaviorMetadata.GetDefaultName());
+    auto* behavior = object->AddNewBehavior(
+        project, behaviorType, behaviorMetadata.GetDefaultName());
     behavior->SetDefaultBehavior(true);
   };
 
@@ -114,18 +107,17 @@ Project::CreateObject(const gd::String &objectType, const gd::String &name) cons
     addDefaultBehavior("ResizableCapability::ResizableBehavior");
     addDefaultBehavior("ScalableCapability::ScalableBehavior");
     addDefaultBehavior("FlippableCapability::FlippableBehavior");
-  }
-  else {
-    auto &objectMetadata = gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+  } else {
+    auto& objectMetadata =
+        gd::MetadataProvider::GetObjectMetadata(platform, objectType);
     if (MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
       gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
     }
-    for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+    for (auto& behaviorType : objectMetadata.GetDefaultBehaviors()) {
       addDefaultBehavior(behaviorType);
     }
   }
 
-  
   return std::move(object);
 }
 
@@ -849,6 +841,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   resourcesManager.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
   UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
+  if (element.HasChild("objectsFolderStructure")) {
+    UnserializeFoldersFrom(*this, element.GetChild("objectsFolderStructure", 0));
+  }
+  AddMissingObjectsInRootFolder();
+
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
   scenes.clear();
@@ -1000,6 +997,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   resourcesManager.SerializeTo(element.AddChild("resources"));
   SerializeObjectsTo(element.AddChild("objects"));
+  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
 
@@ -1038,28 +1036,18 @@ void Project::SerializeTo(SerializerElement& element) const {
         externalSourceFilesElement.AddChild("sourceFile"));
 }
 
-void Project::AllowUsageOfUnicodeIdentifierNames(bool enable) {
-  allowUsageOfUnicodeIdentifierNames = enable;
-}
-
 bool Project::IsNameSafe(const gd::String& name) {
   if (name.empty()) return false;
 
   if (isdigit(name[0])) return false;
 
-  if (!allowUsageOfUnicodeIdentifierNames) {
-    gd::String legacyAllowedCharacters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    return !(name.find_first_not_of(legacyAllowedCharacters) != gd::String::npos);
-  } else {
-    for (auto character : name) {
-      if (!GrammarTerminals::IsAllowedInIdentifier(character)) {
-        return false;
-      }
+  for (auto character : name) {
+    if (!GrammarTerminals::IsAllowedInIdentifier(character)) {
+      return false;
     }
-
-    return true;
   }
+
+  return true;
 }
 
 gd::String Project::GetSafeName(const gd::String& name) {
@@ -1069,18 +1057,13 @@ gd::String Project::GetSafeName(const gd::String& name) {
 
   if (isdigit(name[0])) newName = "_" + newName;
 
-  gd::String legacyAllowedCharacters =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-
-  for (size_t i = 0;i < newName.size();++i) {
-    // Note that iterating on the characters is not super efficient (O(n^2), which
-    // could be avoided with an iterator), but this function is not critical for performance
-    // (only used to generate a name when a user creates a new entity or rename one).
+  for (size_t i = 0; i < newName.size(); ++i) {
+    // Note that iterating on the characters is not super efficient (O(n^2),
+    // which could be avoided with an iterator), but this function is not
+    // critical for performance (only used to generate a name when a user
+    // creates a new entity or rename one).
     auto character = newName[i];
-    bool isAllowed =
-        allowUsageOfUnicodeIdentifierNames
-            ? GrammarTerminals::IsAllowedInIdentifier(character)
-            : legacyAllowedCharacters.find(character) != gd::String::npos;
+    bool isAllowed = GrammarTerminals::IsAllowedInIdentifier(character);
 
     // Replace all unallowed letters by an underscore.
     if (!isAllowed) {

@@ -281,7 +281,8 @@ namespace gdjs {
         scene: gdjs.RuntimeInstanceContainer,
         externalLayout: string,
         xPos: float,
-        yPos: float
+        yPos: float,
+        zPos: float
       ) {
         const externalLayoutData = scene
           .getGame()
@@ -296,6 +297,12 @@ namespace gdjs {
           externalLayoutData.instances,
           xPos,
           yPos,
+          /**
+           * When 3D was introduced, zPos argument was added to the signature.
+           * Existing calls (in JS events) to createObjectsFromExternalLayout will
+           * have zPos undefined. So it is set to 0 in that case.
+           */
+          zPos || 0,
           /*trackByPersistentUuid=*/
           false
         );

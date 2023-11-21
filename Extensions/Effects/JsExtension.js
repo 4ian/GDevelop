@@ -725,6 +725,44 @@ module.exports = {
       .setType('number')
       .setDescription(_('Padding for the visual effect area'));
 
+    const hslAdjustmentEffect = extension
+      .addEffect('HslAdjustment')
+      .setFullName(_('HSL Adjustment'))
+      .setDescription(
+        _(
+          'Adjust hue, saturation and lightness.'
+        )
+      )
+      .markAsOnlyWorkingFor2D()
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-hsl-adjustment.js')
+      .addIncludeFile('Extensions/Effects/hsl-adjustment-pixi-filter.js');
+    const hslAdjustmentProperties = hslAdjustmentEffect.getProperties();
+    hslAdjustmentProperties
+      .getOrCreate('hue')
+      .setValue('0')
+      .setLabel(_('Hue in degrees (between -180 and 180)'))
+      .setType('number');
+    hslAdjustmentProperties
+      .getOrCreate('saturation')
+      .setValue('0')
+      .setLabel(_('Saturation (between -1 and 1)'))
+      .setType('number');
+    hslAdjustmentProperties
+      .getOrCreate('lightness')
+      .setValue('0')
+      .setLabel(_('Lightness (between -1 and 1)'))
+      .setType('number');
+    hslAdjustmentProperties
+      .getOrCreate('colorize')
+      .setValue('false')
+      .setLabel(_('Colorize from the grayscale image'))
+      .setType('boolean');
+    hslAdjustmentProperties
+      .getOrCreate('alpha')
+      .setValue('1')
+      .setLabel(_('Alpha (between 0 and 1, 0 is transparent)'))
+      .setType('number');
+
     const kawaseBlurEffect = extension
       .addEffect('KawaseBlur')
       .setFullName(_('Blur (Kawase, fast)'))
@@ -773,6 +811,38 @@ module.exports = {
       .getOrCreate('opacity')
       .setValue('1')
       .setLabel(_('Opacity (between 0 and 1)'))
+      .setType('number');
+
+    const motionBlurEffect = extension
+      .addEffect('MotionBlur')
+      .setFullName(_('Motion Blur'))
+      .setDescription(
+        _('Blur the rendered image to give a feeling of speed.')
+      )
+      .markAsOnlyWorkingFor2D()
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-motion-blur.js')
+      .addIncludeFile('Extensions/Effects/motion-blur-pixi-filter.js');
+    const motionBlurProperties = motionBlurEffect.getProperties();
+    motionBlurProperties
+      .getOrCreate('velocityX')
+      .setValue('0')
+      .setLabel(_('Velocity on X axis'))
+      .setType('number');
+    motionBlurProperties
+      .getOrCreate('velocityY')
+      .setValue('0')
+      .setLabel(_('Velocity on Y axis'))
+      .setType('number');
+    motionBlurProperties
+      .getOrCreate('kernelSize')
+      .setValue('5')
+      .setLabel(_('Kernel size (odd number between 3 and 25)'))
+      .setType('number')
+      .setDescription(_('Quality of the blur.'));
+    motionBlurProperties
+      .getOrCreate('offset')
+      .setValue('0')
+      .setLabel(_('Offset'))
       .setType('number');
 
     const nightEffect = extension
@@ -1088,6 +1158,59 @@ module.exports = {
       .setValue('1')
       .setLabel(_('Opacity (between 0 and 1)'))
       .setType('number');
+
+    const shockwaveEffect = extension
+      .addEffect('Shockwave')
+      .setFullName(_('Shockwave'))
+      .setDescription(
+        _('Deform the image the way a drop deforms a water surface.')
+      )
+      .markAsOnlyWorkingFor2D()
+      .addIncludeFile('Extensions/Effects/pixi-filters/filter-shockwave.js')
+      .addIncludeFile('Extensions/Effects/shockwave-pixi-filter.js');
+    const shockwaveEffectProperties = shockwaveEffect.getProperties();
+    shockwaveEffectProperties
+      .getOrCreate('time')
+      .setValue('0')
+      .setLabel(_('Elapsed time'))
+      .setType('number')
+      .setDescription('It can be set back to 0 to play the shockwave animation again.');
+    shockwaveEffectProperties
+      .getOrCreate('speed')
+      .setValue('500')
+      .setLabel(_('Spreading speed (in pixels per second)'))
+      .setType('number');
+    shockwaveEffectProperties
+      .getOrCreate('amplitude')
+      .setValue('50')
+      .setLabel(_('Amplitude'))
+      .setType('number');
+    shockwaveEffectProperties
+      .getOrCreate('wavelength')
+      .setValue('200')
+      .setLabel(_('Wavelength'))
+      .setType('number');
+    shockwaveEffectProperties
+      .getOrCreate('brightness')
+      .setValue('1')
+      .setLabel(_('Brightness'))
+      .setType('number');
+    shockwaveEffectProperties
+      .getOrCreate('radius')
+      .setValue('0')
+      .setLabel(_('Maximum radius (0 for infinity)'))
+      .setType('number');
+    shockwaveEffectProperties
+      .getOrCreate('centerX')
+      .setValue('0.5')
+      .setLabel(_('Center on X axis'))
+      .setType('number');
+    shockwaveEffectProperties
+      .getOrCreate('centerY')
+      .setValue('0.5')
+      .setLabel(_('Center on Y axis'))
+      .setType('number')
+      .setDescription('(0,0) is the top-left and (1,1) is the bottom right.');
 
     const tiltShiftEffect = extension
       .addEffect('TiltShift')

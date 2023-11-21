@@ -497,89 +497,84 @@ module.exports = {
 
     /**
      * Renderer for instances of DummyObject inside the IDE.
-     *
-     * @extends RenderedInstance
-     * @class RenderedDummyObjectInstance
-     * @constructor
      */
-    function RenderedDummyObjectInstance(
-      project,
-      layout,
-      instance,
-      associatedObjectConfiguration,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedDummyObjectInstance extends RenderedInstance {
+      constructor(
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
 
-      //Setup the PIXI object:
-      this._pixiObject = new PIXI.Text('This is a dummy object', {
-        align: 'left',
-      });
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
+        //Setup the PIXI object:
+        this._pixiObject = new PIXI.Text('This is a dummy object', {
+          align: 'left',
+        });
+        this._pixiObject.anchor.x = 0.5;
+        this._pixiObject.anchor.y = 0.5;
+        this._pixiContainer.addChild(this._pixiObject);
+        this.update();
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy(true);
+      }
+
+      /**
+       * Return the path to the thumbnail of the specified object.
+       */
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'CppPlatform/Extensions/texticon24.png';
+      }
+
+      /**
+       * This is called to update the PIXI object on the scene editor
+       */
+      update() {
+        // Read a property from the object
+        const property1Value = this._associatedObjectConfiguration
+          .getProperties()
+          .get('My first property')
+          .getValue();
+        this._pixiObject.text = property1Value;
+
+        // Read position and angle from the instance
+        this._pixiObject.position.x =
+          this._instance.getX() + this._pixiObject.width / 2;
+        this._pixiObject.position.y =
+          this._instance.getY() + this._pixiObject.height / 2;
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
+        // Custom size can be read in this.getCustomWidth() and
+        // this.getCustomHeight()
+      }
+
+      /**
+       * Return the width of the instance, when it's not resized.
+       */
+      getDefaultWidth() {
+        return this._pixiObject.width;
+      }
+
+      /**
+       * Return the height of the instance, when it's not resized.
+       */
+      getDefaultHeight() {
+        return this._pixiObject.height;
+      }
     }
-    RenderedDummyObjectInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
-
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedDummyObjectInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      objectConfiguration
-    ) {
-      return 'CppPlatform/Extensions/texticon24.png';
-    };
-
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
-    RenderedDummyObjectInstance.prototype.update = function () {
-      // Read a property from the object
-      const property1Value = this._associatedObjectConfiguration
-        .getProperties()
-        .get('My first property')
-        .getValue();
-      this._pixiObject.text = property1Value;
-
-      // Read position and angle from the instance
-      this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-      // Custom size can be read in this.getCustomWidth() and
-      // this.getCustomHeight()
-    };
-
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedDummyObjectInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width;
-    };
-
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedDummyObjectInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height;
-    };
 
     objectsRenderingService.registerInstanceRenderer(
       'MyDummyExtension::DummyObject',

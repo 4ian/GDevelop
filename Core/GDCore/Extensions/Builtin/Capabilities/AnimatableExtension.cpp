@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Animatable capability"))
+      .SetIcon("res/actions/animation24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Animations and images"))
       .SetIcon("res/actions/animation24.png");
 
@@ -42,7 +44,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
          "number",
          "Index",
          _("Animation (by number)"),
-         _("the number of the animation played by the object (the number from "
+         _("the animation played by the object using the animation number (from "
            "the animations list)"),
          _("the number of the animation"),
          _("Animations and images"),
@@ -53,13 +55,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Animation index")))
       .MarkAsSimple();
+  aut.GetAllExpressions()["Index"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "string",
          "Name",
          _("Animation (by name)"),
          _("the animation played by the object using the name of the "
-           "animation."),
+           "animation"),
          _("the animation"),
          _("Animations and images"),
          "res/actions/animation24.png")
@@ -69,10 +72,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "objectAnimationName", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Animation name")))
       .MarkAsSimple();
+  aut.GetAllStrExpressions()["Name"].SetGroup("");
 
   aut.AddScopedAction("PauseAnimation",
                 _("Pause the animation"),
-                _("Pause the animation of the object"),
+                _("Pause the animation of the object."),
                 _("Pause the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
@@ -83,7 +87,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
 
   aut.AddScopedAction("PlayAnimation",
                 _("Resume the animation"),
-                _("Resume the animation of the object"),
+                _("Resume the animation of the object."),
                 _("Resume the animation of _PARAM0_"),
                 _("Animations and images"),
                 "res/actions/animation24.png",
@@ -107,6 +111,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Speed scale")))
       .MarkAsSimple();
+  aut.GetAllExpressions()["SpeedScale"].SetGroup("");
 
   aut.AddScopedCondition("IsAnimationPaused",
                    _("Animation paused"),
@@ -130,6 +135,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
       .MarkAsSimple();
+
+  aut.AddExpressionAndConditionAndAction(
+         "number",
+         "ElapsedTime",
+         _("Animation elapsed time"),
+         _("the elapsed time from the beginning of the animation (in seconds)"),
+         _("the animation elapsed time"),
+         _("Animations and images"),
+         "res/actions/animation24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
+      .UseStandardParameters(
+          "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
+                        _("Elapsed time (in seconds)")))
+      .MarkAsAdvanced();
+  aut.GetAllExpressions()["ElapsedTime"].SetGroup("");
+
+  aut.AddExpression(
+         "Duration",
+         _("Animation duration"),
+         _("Return the current animation duration (in seconds)."),
+         _("Animations and images"),
+         "res/actions/animation24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "AnimatableBehavior");
 }
 
 }  // namespace gd

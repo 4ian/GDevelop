@@ -146,13 +146,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   auto usedExtensionsResult =
       gd::UsedExtensionsFinder::ScanProject(exportedProject);
 
-  bool isUsingScene3DExtension =
-      usedExtensionsResult.GetUsedExtensions().find("Scene3D") !=
-      usedExtensionsResult.GetUsedExtensions().end();
-
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
-                 /*pixiInThreeRenderers=*/isUsingScene3DExtension,
+                 usedExtensionsResult.Has3DObjects(),
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
@@ -674,6 +670,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
     InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
+    InsertUnique(includesFiles, "debugger-client/InGameDebugger.js");
   }
   if (includeWebsocketDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");

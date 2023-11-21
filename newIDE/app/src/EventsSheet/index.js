@@ -1,5 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
@@ -76,7 +77,10 @@ import PreferencesContext, {
 } from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
-import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+import {
+  getProjectScopedContainersFromScope,
+  type EventsScope,
+} from '../InstructionOrExpression/EventsScope.flow';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -103,6 +107,7 @@ import { TutorialContext } from '../Tutorial/TutorialContext';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../UI/AlertMessage';
 import { Column, Line } from '../UI/Grid';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
 
@@ -311,6 +316,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this._ensureFocused();
     }
   }
+
+  onResourceExternallyChanged = resourceInfo => {
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+  };
 
   updateToolbar() {
     if (!this.props.setToolbar) return;
@@ -1448,11 +1457,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _openEventsContextAnalyzer = () => {
-    const { globalObjectsContainer, objectsContainer } = this.props;
-    const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
-      gd.JsPlatform.get(),
+    const { scope, globalObjectsContainer, objectsContainer } = this.props;
+
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
       globalObjectsContainer,
       objectsContainer
+    );
+    const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
+      gd.JsPlatform.get()
     );
 
     const eventsList = new gd.EventsList();
@@ -1460,7 +1473,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
-    eventsContextAnalyzer.launch(eventsList);
+    eventsContextAnalyzer.launch(eventsList, projectScopedContainers);
     eventsList.delete();
 
     this.setState({
@@ -1619,65 +1632,71 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       ? InstructionEditorMenu
       : InstructionEditorDialog;
 
-    return this.state.editedInstruction.instruction ? (
-      <Dialog
-        project={project}
-        scope={scope}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        instruction={this.state.editedInstruction.instruction}
-        isCondition={this.state.editedInstruction.isCondition}
-        isNewInstruction={
-          this.state.editedInstruction.indexInList === undefined
-        }
-        anchorEl={this.state.inlineInstructionEditorAnchorEl}
-        open={true}
-        onCancel={() => this.closeInstructionEditor()}
-        onSubmit={() => {
-          const {
-            instrsList,
-            instruction,
-            indexInList,
-          } = this.state.editedInstruction;
-          if (!instrsList || !instruction) return;
+    const instruction = this.state.editedInstruction.instruction;
+    return instruction ? (
+      <I18n>
+        {({ i18n }) => (
+          <Dialog
+            i18n={i18n}
+            project={project}
+            scope={scope}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            instruction={instruction}
+            isCondition={this.state.editedInstruction.isCondition}
+            isNewInstruction={
+              this.state.editedInstruction.indexInList === undefined
+            }
+            anchorEl={this.state.inlineInstructionEditorAnchorEl}
+            open={true}
+            onCancel={() => this.closeInstructionEditor()}
+            onSubmit={() => {
+              const {
+                instrsList,
+                instruction,
+                indexInList,
+              } = this.state.editedInstruction;
+              if (!instrsList || !instruction) return;
 
-          if (indexInList !== undefined && indexInList !== null) {
-            // Replace an existing instruction
-            instrsList.set(indexInList, instruction);
-          } else {
-            // Add a new instruction
-            instrsList.insert(instruction, instrsList.size());
-          }
+              if (indexInList !== undefined && indexInList !== null) {
+                // Replace an existing instruction
+                instrsList.set(indexInList, instruction);
+              } else {
+                // Add a new instruction
+                instrsList.insert(instruction, instrsList.size());
+              }
 
-          this.closeInstructionEditor(true);
-          ensureSingleOnceInstructions(instrsList);
-          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-        }}
-        resourceManagementProps={this.props.resourceManagementProps}
-        openInstructionOrExpression={(extension, type) => {
-          this.closeInstructionEditor();
-          this.props.openInstructionOrExpression(extension, type);
-        }}
-        canPasteInstructions={
-          this.state.editedInstruction.isCondition
-            ? hasClipboardConditions()
-            : hasClipboardActions()
-        }
-        onPasteInstructions={() => {
-          const {
-            instrsList,
-            isCondition,
-            eventContext,
-          } = this.state.editedInstruction;
-          if (!instrsList) return;
+              this.closeInstructionEditor(true);
+              ensureSingleOnceInstructions(instrsList);
+              if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+            }}
+            resourceManagementProps={this.props.resourceManagementProps}
+            openInstructionOrExpression={(extension, type) => {
+              this.closeInstructionEditor();
+              this.props.openInstructionOrExpression(extension, type);
+            }}
+            canPasteInstructions={
+              this.state.editedInstruction.isCondition
+                ? hasClipboardConditions()
+                : hasClipboardActions()
+            }
+            onPasteInstructions={() => {
+              const {
+                instrsList,
+                isCondition,
+                eventContext,
+              } = this.state.editedInstruction;
+              if (!instrsList) return;
 
-          eventContext &&
-            this.pasteInstructionsInInstructionsList(eventContext, {
-              instrsList,
-              isCondition,
-            });
-        }}
-      />
+              eventContext &&
+                this.pasteInstructionsInInstructionsList(eventContext, {
+                  instrsList,
+                  isCondition,
+                });
+            }}
+          />
+        )}
+      </I18n>
     ) : (
       undefined
     );
@@ -1855,31 +1874,37 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   tutorials={tutorials}
                 />
                 {this.state.showSearchPanel && (
-                  <SearchPanel
-                    ref={searchPanel => (this._searchPanel = searchPanel)}
-                    onSearchInEvents={inputs =>
-                      this._searchInEvents(searchInEvents, inputs)
-                    }
-                    onReplaceInEvents={inputs => {
-                      this._replaceInEvents(replaceInEvents, inputs);
-                    }}
-                    resultsCount={
-                      eventsSearchResultEvents
-                        ? eventsSearchResultEvents.length
-                        : null
-                    }
-                    hasEventSelected={hasEventSelected(this.state.selection)}
-                    onGoToPreviousSearchResult={() =>
-                      this._ensureEventUnfolded(goToPreviousSearchResult)
-                    }
-                    onCloseSearchPanel={() => {
-                      this._closeSearchPanel();
-                    }}
-                    onGoToNextSearchResult={() =>
-                      this._ensureEventUnfolded(goToNextSearchResult)
-                    }
-                    searchFocusOffset={searchFocusOffset}
-                  />
+                  <ErrorBoundary
+                    componentTitle={<Trans>Search panel</Trans>}
+                    scope="scene-events-search"
+                    onClose={() => this._closeSearchPanel()}
+                  >
+                    <SearchPanel
+                      ref={searchPanel => (this._searchPanel = searchPanel)}
+                      onSearchInEvents={inputs =>
+                        this._searchInEvents(searchInEvents, inputs)
+                      }
+                      onReplaceInEvents={inputs => {
+                        this._replaceInEvents(replaceInEvents, inputs);
+                      }}
+                      resultsCount={
+                        eventsSearchResultEvents
+                          ? eventsSearchResultEvents.length
+                          : null
+                      }
+                      hasEventSelected={hasEventSelected(this.state.selection)}
+                      onGoToPreviousSearchResult={() =>
+                        this._ensureEventUnfolded(goToPreviousSearchResult)
+                      }
+                      onCloseSearchPanel={() => {
+                        this._closeSearchPanel();
+                      }}
+                      onGoToNextSearchResult={() =>
+                        this._ensureEventUnfolded(goToNextSearchResult)
+                      }
+                      searchFocusOffset={searchFocusOffset}
+                    />
+                  </ErrorBoundary>
                 )}
                 <InlineParameterEditor
                   open={this.state.inlineEditing}
@@ -1943,6 +1968,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 {this.state.serializedEventsToExtract && (
                   <EventsFunctionExtractorDialog
                     project={project}
+                    scope={scope}
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     onClose={() =>
@@ -1983,6 +2009,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
+  onResourceExternallyChanged: ({| identifier: string |}) => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -1990,11 +2017,16 @@ export type EventsSheetInterface = {|
 const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
+    onResourceExternallyChanged,
   }));
 
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
+  };
+  const onResourceExternallyChanged = resourceInfo => {
+    if (component.current)
+      component.current.onResourceExternallyChanged(resourceInfo);
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

@@ -35,6 +35,7 @@ import {
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 
 const styles = {
   fullHeightSelector: {
@@ -66,6 +67,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  i18n: I18nType,
   anchorEl?: any, // Unused
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
@@ -88,7 +90,7 @@ const getInitialTab = (
  * A responsive instruction editor in a dialog, showing InstructionParametersEditor
  * at the end.
  */
-export default function InstructionEditorDialog({
+const InstructionEditorDialog = ({
   project,
   globalObjectsContainer,
   objectsContainer,
@@ -101,7 +103,8 @@ export default function InstructionEditorDialog({
   onSubmit,
   resourceManagementProps,
   openInstructionOrExpression,
-}: Props) {
+  i18n,
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [
     instructionEditorState,
@@ -114,6 +117,7 @@ export default function InstructionEditorDialog({
     scope,
     globalObjectsContainer,
     objectsContainer,
+    i18n,
   });
   const {
     chosenObjectName,
@@ -438,4 +442,16 @@ export default function InstructionEditorDialog({
       )}
     </>
   );
-}
+};
+
+const InstructionEditorDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Instruction editor</Trans>}
+    scope="scene-events-instruction-editor"
+    onClose={props.onCancel}
+  >
+    <InstructionEditorDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default InstructionEditorDialogWithErrorBoundary;

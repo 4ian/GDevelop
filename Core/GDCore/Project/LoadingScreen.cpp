@@ -5,7 +5,6 @@
  */
 
 #include "LoadingScreen.h"
-
 #include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {

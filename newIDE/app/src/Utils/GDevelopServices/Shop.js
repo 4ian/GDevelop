@@ -18,6 +18,7 @@ type StripePrice = {|
 type ProductListingData = {|
   id: string,
   sellerId: string,
+  isSellerGDevelop: boolean,
   productType: 'ASSET_PACK' | 'GAME_TEMPLATE',
   listing: 'ASSET_PACK' | 'GAME_TEMPLATE',
   name: string,
@@ -82,7 +83,12 @@ export const listListedPrivateGameTemplates = async ({
       withAppStoreProductId: !!onlyAppStorePrivateGameTemplates,
     },
   });
-  return response.data;
+  const gameTemplates = response.data;
+  if (!Array.isArray(gameTemplates)) {
+    throw new Error('Invalid game templates');
+  }
+
+  return gameTemplates;
 };
 
 export const listSellerAssetPacks = async ({

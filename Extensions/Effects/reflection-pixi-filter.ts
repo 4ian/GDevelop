@@ -25,13 +25,17 @@ namespace gdjs {
         );
         return reflectionFilter;
       }
-      updatePreRender(filter, target) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
         if (filter.animationSpeed !== 0) {
           filter.time +=
             (target.getElapsedTime() / 1000) * filter.animationSpeed;
         }
       }
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         if (parameterName === 'boundary') {
           filter.boundary = value;
         }
@@ -57,8 +61,16 @@ namespace gdjs {
           filter.animationSpeed = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {
         if (parameterName === 'mirror') {
           filter.mirror = value;
         }

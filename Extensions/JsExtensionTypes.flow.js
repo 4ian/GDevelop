@@ -26,6 +26,7 @@ export type ObjectsRenderingService = {
   requireModule: (dirname: string, moduleName: string) => any,
   getThumbnail: (project: gdProject, objectConfiguration: gdObjectConfiguration) => string,
   rgbOrHexToHexNumber: (value: string) => number,
+  registerClearCache: (clearCache: any => void) => void,
 };
 export type ObjectsEditorService = {
   registerEditorConfiguration: (objectType: string, editorConfiguration: any) => void,

@@ -2,7 +2,6 @@ import { integer, float } from '../model/CommonTypes';
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileMapFileContent } from '../load/TileMapFileContent';
 import { TileTextureCache } from './TileTextureCache';
-import PIXI = GlobalPIXIModule.PIXI;
 export declare namespace PixiTileMapHelper {
   /**
    * Split an atlas image into Pixi textures.

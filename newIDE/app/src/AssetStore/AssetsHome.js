@@ -182,7 +182,10 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           ([id, { title, imageSource, imageAlt }]) =>
             hideGameTemplates && id === 'game-template' ? null : (
               <CategoryTile
-                id={`shop-category-${id.replace(/\s/g, '-')}`}
+                // This id would be more appropriate if it was shop-category-...
+                // but it is kept as is to avoid breaking some guided lessons using this
+                // id to add prefabs for instance.
+                id={`asset-pack-category-${id.replace(/\s/g, '-')}`}
                 key={id}
                 imageSource={imageSource}
                 imageAlt={imageAlt}

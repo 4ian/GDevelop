@@ -150,6 +150,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
       privateGameTemplateListingData,
       previousSearchText,
     }) => {},
+    navigateInsideFolder: folder => {},
+    goBackToFolderIndex: index => {},
   },
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
@@ -447,13 +449,16 @@ export const AssetStoreStateProvider = ({
 
   const publicAssetPacksByTag = React.useMemo(
     () => {
-      if (!publicAssetPacks) {
+      if (!publicAssetPacks || !publicAssetPacks.starterPacks) {
         return null;
       }
       const publicAssetPacksByTag = {};
       publicAssetPacks.starterPacks.forEach(assetPack => {
         const tag = assetPack.tag;
-        if (publicAssetPacksByTag[tag]) {
+        if (
+          publicAssetPacksByTag[tag] &&
+          !assetPack.externalWebLink // Don't warn for external web links, as they can be used multiple times.
+        ) {
           console.warn(`Multiple public asset packs with the same tag: ${tag}`);
         }
         publicAssetPacksByTag[tag] = assetPack;

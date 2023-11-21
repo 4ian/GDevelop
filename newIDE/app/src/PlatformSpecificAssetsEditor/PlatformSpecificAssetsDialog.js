@@ -17,6 +17,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
@@ -68,10 +69,7 @@ const iosSizes = [
   20,
 ];
 
-export default class PlatformSpecificAssetsDialog extends React.Component<
-  Props,
-  State
-> {
+class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = this._loadFrom(props.project);
@@ -448,3 +446,16 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     );
   }
 }
+
+const PlatformSpecificAssetsDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Project icons</Trans>}
+    scope="project-icons"
+    onClose={props.onClose}
+    showOnTop
+  >
+    <PlatformSpecificAssetsDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default PlatformSpecificAssetsDialogWithErrorBoundary;

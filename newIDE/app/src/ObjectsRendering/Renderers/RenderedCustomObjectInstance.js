@@ -159,6 +159,14 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
   }
 
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    for (const childrenInstance of this.childrenRenderedInstances) {
+      childrenInstance.onRemovedFromScene();
+    }
+    this._pixiObject.destroy(false);
+  }
+
   /**
    * Return a URL for thumbnail of the specified object.
    */

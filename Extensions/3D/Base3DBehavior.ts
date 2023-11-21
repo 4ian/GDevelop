@@ -16,6 +16,17 @@ namespace gdjs {
     getZ(): float;
 
     /**
+     * Return the Z position of the object center, **relative to the scene origin**.
+     */
+    getCenterZInScene(): float;
+
+    /**
+     * Change the object center Z position in the scene.
+     * @param z The new Z position of the center in the scene.
+     */
+    setCenterZInScene(z: float): void;
+
+    /**
      * Set the object rotation on the X axis.
      *
      * This is an Euler angle. Objects use the `ZYX` order.
@@ -130,6 +141,14 @@ namespace gdjs {
 
     getZ(): float {
       return this.object.getZ();
+    }
+
+    getCenterZInScene(): number {
+      return this.object.getCenterZInScene();
+    }
+
+    setCenterZInScene(z: number): void {
+      this.object.setCenterZInScene(z);
     }
 
     setRotationX(angle: float): void {

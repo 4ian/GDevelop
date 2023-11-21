@@ -64,12 +64,6 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element);
 
-  std::vector<gd::Expression*> GetAllObjectExpressions() {
-    std::vector<gd::Expression*> allObjectExpressions;
-    allObjectExpressions.push_back(&objectsToPick);
-    return allObjectExpressions;
-  }
-
  private:
   gd::Expression objectsToPick;
   gd::InstructionsList conditions;

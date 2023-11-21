@@ -9,6 +9,8 @@ import {
   type ScreenType,
 } from '../Reponsive/ScreenTypeMeasurer';
 import { CorsAwareImage } from '../CorsAwareImage';
+import { type DraggedItem } from './DragSourceAndDropTarget';
+import { swipeableDrawerContainerId } from '../../SceneEditor/SwipeableDrawerEditorsDisplay';
 
 const layerStyles = {
   position: 'fixed',
@@ -61,11 +63,6 @@ type XYCoord = {|
   y: number,
 |};
 
-export type DraggedItem = {|
-  name: string,
-  thumbnail?: string,
-|};
-
 type InternalCustomDragLayerProps = {|
   item?: DraggedItem,
   itemType?: Identifier | null,
@@ -79,6 +76,27 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
   x,
   y,
 }: XYCoord) => {
+  const swipeableDrawerContainer = document.querySelector(
+    `#${swipeableDrawerContainerId}`
+  );
+  // If the swipeable drawer exists, we are on mobile, and we want to show the preview
+  // only when the user is dragging in the drawer, otherwise they are on the canvas.
+  // (the drawer is on top of the canvas)
+  if (swipeableDrawerContainer) {
+    const drawerRect = swipeableDrawerContainer.getBoundingClientRect();
+    if (
+      x >= drawerRect.left &&
+      x <= drawerRect.right &&
+      y >= drawerRect.top &&
+      y <= drawerRect.bottom
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  // Otherwise, we are on desktop, and we want to hide the preview when the user
+  // is dragging on the canvas.
   const activeCanvas = document.querySelector(
     `#scene-editor[data-active=true] #${instancesEditorId}`
   );

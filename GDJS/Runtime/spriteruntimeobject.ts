@@ -300,7 +300,7 @@ namespace gdjs {
     _currentDirection: number = 0;
     _currentFrame: number = 0;
     /** In seconds */
-    _frameElapsedTime: float = 0;
+    _animationElapsedTime: float = 0;
     _animationSpeedScale: number = 1;
     _animationPaused: boolean = false;
     _scaleX: number = 1;
@@ -358,7 +358,7 @@ namespace gdjs {
       this._currentAnimation = 0;
       this._currentDirection = 0;
       this._currentFrame = 0;
-      this._frameElapsedTime = 0;
+      this._animationElapsedTime = 0;
       this._animationSpeedScale = 1;
       this._animationPaused = false;
       this._scaleX = 1;
@@ -475,48 +475,28 @@ namespace gdjs {
       const direction = this._animations[this._currentAnimation].directions[
         this._currentDirection
       ];
-      const oldFrame = this._currentFrame;
-
-      const elapsedTime = this.getElapsedTime() / 1000;
-      this._frameElapsedTime += this._animationPaused
-        ? 0
-        : elapsedTime * this._animationSpeedScale;
-
+      const animationDuration = this.getAnimationDuration();
       if (
-        !direction.loop &&
-        this._currentFrame >= direction.frames.length - 1 &&
-        this._frameElapsedTime > direction.timeBetweenFrames
+        !this._animationPaused &&
+        (direction.loop || this._animationElapsedTime !== animationDuration) &&
+        direction.timeBetweenFrames
       ) {
-        // *Optimization*: Animation is finished, don't change the current frame
-        // and compute nothing more.
-      } else {
-        if (this._frameElapsedTime > direction.timeBetweenFrames) {
-          const count = Math.floor(
-            this._frameElapsedTime / direction.timeBetweenFrames
-          );
-          this._currentFrame += count;
-          this._frameElapsedTime =
-            this._frameElapsedTime - count * direction.timeBetweenFrames;
-          if (this._frameElapsedTime < 0) {
-            this._frameElapsedTime = 0;
-          }
-        }
-        if (this._currentFrame >= direction.frames.length) {
-          this._currentFrame = direction.loop
-            ? this._currentFrame % direction.frames.length
-            : direction.frames.length - 1;
-        }
-        if (this._currentFrame < 0) {
-          this._currentFrame = 0;
-        }
+        const animationElapsedTime =
+          this._animationElapsedTime +
+          (this.getElapsedTime() / 1000) * this._animationSpeedScale;
+        this.setAnimationElapsedTime(
+          direction.loop
+            ? gdjs.evtTools.common.mod(animationElapsedTime, animationDuration)
+            : gdjs.evtTools.common.clamp(
+                animationElapsedTime,
+                0,
+                animationDuration
+              )
+        );
       }
 
-      //May happen if there is no frame.
-      if (oldFrame !== this._currentFrame || this._animationFrameDirty) {
+      if (this._animationFrameDirty) {
         this._updateAnimationFrame();
-      }
-      if (oldFrame !== this._currentFrame) {
-        this.invalidateHitboxes();
       }
       this._renderer.ensureUpToDate();
     }
@@ -636,7 +616,7 @@ namespace gdjs {
       ) {
         this._currentAnimation = newAnimation;
         this._currentFrame = 0;
-        this._frameElapsedTime = 0;
+        this._animationElapsedTime = 0;
 
         //TODO: This may be unnecessary.
         this._renderer.update();
@@ -708,7 +688,7 @@ namespace gdjs {
         }
         this._currentDirection = newValue;
         this._currentFrame = 0;
-        this._frameElapsedTime = 0;
+        this._animationElapsedTime = 0;
         this.angle = 0;
 
         //TODO: This may be unnecessary.
@@ -750,7 +730,7 @@ namespace gdjs {
         newFrame !== this._currentFrame
       ) {
         this._currentFrame = newFrame;
-        this._frameElapsedTime = 0;
+        this._animationElapsedTime = newFrame * direction.timeBetweenFrames;
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
       }
@@ -762,6 +742,38 @@ namespace gdjs {
      */
     getAnimationFrame(): number {
       return this._currentFrame;
+    }
+
+    getAnimationElapsedTime(): float {
+      return this._animationElapsedTime;
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      const direction = this._animations[this._currentAnimation].directions[
+        this._currentDirection
+      ];
+      this._animationElapsedTime = gdjs.evtTools.common.clamp(
+        time,
+        0,
+        this.getAnimationDuration()
+      );
+
+      const oldFrame = this._currentFrame;
+      this._currentFrame = Math.min(
+        Math.floor(this._animationElapsedTime / direction.timeBetweenFrames),
+        direction.frames.length - 1
+      );
+      if (oldFrame !== this._currentFrame) {
+        this._updateAnimationFrame();
+        this.invalidateHitboxes();
+      }
+    }
+
+    getAnimationDuration(): number {
+      const direction = this._animations[this._currentAnimation].directions[
+        this._currentDirection
+      ];
+      return direction.frames.length * direction.timeBetweenFrames;
     }
 
     getAnimationFrameCount(): number {
@@ -827,7 +839,8 @@ namespace gdjs {
       }
       return (
         this._currentFrame === direction.frames.length - 1 &&
-        this._frameElapsedTime > direction.timeBetweenFrames
+        this._animationElapsedTime ===
+          direction.frames.length * direction.timeBetweenFrames
       );
     }
 

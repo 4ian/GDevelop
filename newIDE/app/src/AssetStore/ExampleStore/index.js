@@ -9,7 +9,10 @@ import ExampleListItem from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
+import {
+  sendExampleDetailsOpened,
+  sendGameTemplateInformationOpened,
+} from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
@@ -52,7 +55,7 @@ export const prepareExampleShortHeaders = (
 
 const getItemUniqueId = (
   item: ExampleShortHeader | PrivateGameTemplateListingData
-) => item.name;
+) => item.id;
 
 type Props = {|
   isOpening: boolean,
@@ -260,7 +263,10 @@ export const ExampleStore = ({
                           sendExampleDetailsOpened(item.slug);
                           onSelectExampleShortHeader(item);
                         }}
-                        onOpen={onOpenNewProjectSetupDialog}
+                        onOpen={() => {
+                          onSelectExampleShortHeader(item);
+                          onOpenNewProjectSetupDialog();
+                        }}
                       />
                     );
                   }
@@ -279,6 +285,11 @@ export const ExampleStore = ({
                         matches={getPrivateAssetPackListingDataMatches(item)}
                         onChoose={() => {
                           onSelectPrivateGameTemplateListingData(item);
+                          sendGameTemplateInformationOpened({
+                            gameTemplateName: item.name,
+                            gameTemplateId: item.id,
+                            source: 'examples-list',
+                          });
                         }}
                         owned={isTemplateOwned}
                       />

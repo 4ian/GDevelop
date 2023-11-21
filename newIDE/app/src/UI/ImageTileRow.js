@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Column, Line } from './Grid';
+import { Column, LargeSpacer, Line } from './Grid';
 import Text from './Text';
 import { LineStackLayout } from './Layout';
 import FlatButton from './FlatButton';
@@ -16,11 +16,12 @@ type ImageTileRowProps = {|
   isLoading?: boolean,
   description?: React.Node,
   items: Array<ImageTileComponent>,
-  onShowAll: () => void,
-  showAllIcon: React.Node,
+  onShowAll?: () => void,
+  showAllIcon?: React.Node,
   getLimitFromWidth: (width: WidthType) => number,
   getColumnsFromWidth: (width: WidthType) => number,
   seeAllLabel?: React.Node,
+  margin?: 'dense',
 |};
 
 const ImageTileRow = ({
@@ -33,6 +34,7 @@ const ImageTileRow = ({
   getLimitFromWidth,
   getColumnsFromWidth,
   seeAllLabel,
+  margin,
 }: ImageTileRowProps) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
@@ -47,25 +49,28 @@ const ImageTileRow = ({
         <Column noMargin>
           <Text size="section-title">{title}</Text>
         </Column>
-        <Column noMargin>
-          <FlatButton
-            onClick={onShowAll}
-            label={
-              isMobileScreen ? (
-                <Trans>Browse</Trans> // Short label on mobile.
-              ) : (
-                seeAllLabel || <Trans>See all</Trans>
-              )
-            }
-            rightIcon={showAllIcon}
-          />
-        </Column>
+        {showAllIcon && onShowAll && (
+          <Column noMargin>
+            <FlatButton
+              onClick={onShowAll}
+              label={
+                isMobileScreen ? (
+                  <Trans>Browse</Trans> // Short label on mobile.
+                ) : (
+                  seeAllLabel || <Trans>See all</Trans>
+                )
+              }
+              rightIcon={showAllIcon}
+            />
+          </Column>
+        )}
       </LineStackLayout>
       {description && (
         <Line noMargin>
           <Text noMargin>{description}</Text>
         </Line>
       )}
+      {margin === 'dense' ? null : <LargeSpacer />}
       <ImageTileGrid
         items={items}
         isLoading={isLoading}

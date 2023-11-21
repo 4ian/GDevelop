@@ -127,6 +127,7 @@ export type PrivateGameTemplate = {|
   createdAt: string,
   tag: string,
   longDescription: string,
+  gamePreviewLink: string,
 |};
 
 export type AllPublicAssets = {|
@@ -175,39 +176,53 @@ export const isCompatibleWithAsset = (
       })
     : true;
 
-export const listAllPublicAssets = ({
+export const listAllPublicAssets = async ({
   environment,
 }: {|
   environment: Environment,
 |}): Promise<AllPublicAssets> => {
-  return client
-    .get(`/asset`, {
-      params: {
-        environment,
-      },
-    })
-    .then(response => response.data)
-    .then(({ assetShortHeadersUrl, filtersUrl, assetPacksUrl }) => {
-      if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
-        throw new Error('Unexpected response from the resource endpoint.');
-      }
+  const response = await client.get(`/asset`, {
+    params: {
+      environment,
+    },
+  });
 
-      return Promise.all([
-        client.get(assetShortHeadersUrl).then(response => response.data),
-        client.get(filtersUrl).then(response => response.data),
-        client.get(assetPacksUrl).then(response => response.data),
-      ]).then(([publicAssetShortHeaders, publicFilters, publicAssetPacks]) => {
-        if (!publicAssetShortHeaders || !publicFilters || !publicAssetPacks) {
-          throw new Error('Unexpected response from the assets endpoints.');
-        }
+  const { assetShortHeadersUrl, filtersUrl, assetPacksUrl } = response.data;
 
-        return {
-          publicAssetShortHeaders,
-          publicFilters,
-          publicAssetPacks,
-        };
-      });
-    });
+  const responsesData = await Promise.all([
+    client
+      .get(assetShortHeadersUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    client
+      .get(filtersUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    client
+      .get(assetPacksUrl)
+      .then(response => response.data)
+      .catch(e => e),
+  ]);
+
+  if (responsesData.some(data => !data || data instanceof Error)) {
+    throw new Error('Unexpected response from the assets endpoints.');
+  }
+
+  const publicAssetShortHeaders = responsesData[0];
+  const publicFilters = responsesData[1];
+  const publicAssetPacks = responsesData[2];
+
+  if (!publicAssetPacks.starterPacks) {
+    throw new Error(
+      'Unexpected response from the public asset packs endpoint.'
+    );
+  }
+
+  return {
+    publicAssetShortHeaders,
+    publicFilters,
+    publicAssetPacks,
+  };
 };
 
 export const getPublicAsset = async (

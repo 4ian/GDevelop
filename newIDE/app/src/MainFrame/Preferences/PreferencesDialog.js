@@ -27,11 +27,12 @@ import { adaptAcceleratorString } from '../../UI/AcceleratorString';
 import { getElectronAccelerator } from '../../KeyboardShortcuts';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 const electron = optionalRequire('electron');
 
 type Props = {|
   i18n: I18n,
-  onClose: (languageDidChange: boolean) => void,
+  onClose: (options: {| languageDidChange: boolean |}) => void,
 |};
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
@@ -52,7 +53,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
-    setUseUndefinedVariablesInAutocompletion,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
@@ -66,10 +66,11 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setShowDeprecatedInstructionWarning,
     setUse3DEditor,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
-    setAllowUsageOfUnicodeIdentifierNames,
+    setWatchProjectFolderFilesForLocalProjects,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -82,10 +83,10 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           key="close"
           label={<Trans>Close</Trans>}
           primary={false}
-          onClick={() => onClose(languageDidChange)}
+          onClick={() => onClose({ languageDidChange })}
         />,
       ]}
-      onRequestClose={() => onClose(languageDidChange)}
+      onRequestClose={() => onClose({ languageDidChange })}
       open
       maxWidth="sm"
       fixedContent={
@@ -261,19 +262,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             labelPosition="right"
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
           />
-          <Toggle
-            onToggle={(e, check) =>
-              setUseUndefinedVariablesInAutocompletion(check)
-            }
-            toggled={values.useUndefinedVariablesInAutocompletion}
-            labelPosition="right"
-            label={
-              <Trans>
-                Suggest names of variables used in events but not declared in
-                the list of variables
-              </Trans>
-            }
-          />
           <SelectField
             floatingLabelText={
               <Trans>
@@ -355,17 +343,28 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
+          {!!electron && (
+            <Toggle
+              onToggle={(e, check) =>
+                setWatchProjectFolderFilesForLocalProjects(check)
+              }
+              toggled={values.watchProjectFolderFilesForLocalProjects}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Watch the project folder for file changes in order to refresh
+                  the resources used in the editor (images, 3D models, fonts,
+                  etc.)
+                </Trans>
+              }
+            />
+          )}
           <Toggle
-            onToggle={(e, check) =>
-              setAllowUsageOfUnicodeIdentifierNames(check)
-            }
-            toggled={values.allowUsageOfUnicodeIdentifierNames}
+            onToggle={(e, check) => setShowDeprecatedInstructionWarning(check)}
+            toggled={values.showDeprecatedInstructionWarning}
             labelPosition="right"
             label={
-              <Trans>
-                Allow unicode characters (non English languages and emojis) in
-                object, behavior and other names (experimental)
-              </Trans>
+              <Trans>Show a warning on deprecated actions and conditions</Trans>
             }
           />
           <Toggle
@@ -464,4 +463,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
   );
 };
 
-export default PreferencesDialog;
+const PreferencesDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Preferences</Trans>}
+    scope="preferences"
+    onClose={() => props.onClose({ languageDidChange: false })}
+  >
+    <PreferencesDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default PreferencesDialogWithErrorBoundary;

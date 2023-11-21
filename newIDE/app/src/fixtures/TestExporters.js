@@ -5,18 +5,18 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
-} from '../Export/ExportPipeline.flow';
+} from '../ExportAndShare/ExportPipeline.flow';
 import {
   type UrlFileDescriptor,
   type TextFileDescriptor,
   type BlobFileDescriptor,
 } from '../Utils/BrowserArchiver';
-import BrowserFileSystem from '../Export/BrowserExporters/BrowserFileSystem';
+import BrowserFileSystem from '../ExportAndShare/BrowserExporters/BrowserFileSystem';
 import { completeWebBuild } from '../fixtures/GDevelopServicesTestData';
 import {
   ExplanationHeader,
   OnlineGameLink,
-} from '../Export/GenericExporters/OnlineWebExport';
+} from '../ExportAndShare/GenericExporters/OnlineWebExport';
 import { delay } from '../Utils/Delay';
 import assignIn from 'lodash/assignIn';
 const gd: libGDevelop = global.gd;
@@ -60,7 +60,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ game }) => <ExplanationHeader game={game} />,
 
   renderLaunchButtonLabel: () => 'Generate link',
 
@@ -68,6 +68,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
     build,
     project,
     onSaveProject,
+    isSavingProject,
     errored,
     exportStep,
   }) => (
@@ -75,6 +76,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
       build={build}
       project={project}
       onSaveProject={onSaveProject}
+      isSavingProject={isSavingProject}
       errored={errored}
       exportStep={exportStep}
     />

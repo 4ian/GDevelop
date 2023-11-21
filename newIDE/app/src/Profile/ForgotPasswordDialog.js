@@ -9,6 +9,7 @@ import TextField from '../UI/TextField';
 import { type ForgotPasswordForm } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
+import Form from '../UI/Form';
 
 export const emailRegex = /^(.+)@(.+)$/;
 
@@ -77,15 +78,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
           </Text>
         </Column>
       ) : (
-        <form
-          onSubmit={event => {
-            // Prevent browser to navigate on form submission.
-            event.preventDefault();
-            doResetPassword();
-          }}
-          autoComplete="on"
-          name="resetPassword"
-        >
+        <Form onSubmit={doResetPassword} autoComplete="on" name="resetPassword">
           <Column noMargin>
             <TextField
               autoFocus="desktop"
@@ -102,6 +95,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
                   undefined
                 )
               }
+              type="email"
               fullWidth
               onBlur={event => {
                 const trimmedEmail = event.currentTarget.value.trim();
@@ -110,7 +104,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
               }}
             />
           </Column>
-        </form>
+        </Form>
       )}
     </Dialog>
   );

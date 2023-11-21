@@ -11,6 +11,7 @@ export type InstructionOrExpressionScope = {|
 export type EnumeratedInstructionMetadata = {|
   type: string,
   displayedName: string,
+  description: string,
   fullGroupName: string,
   iconFilename: string,
   metadata: gdInstructionMetadata,

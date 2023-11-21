@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import {
   enumerateObjectAndBehaviorsInstructions,
-  enumerateAllInstructions,
   getObjectParameterIndex,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
@@ -47,6 +47,7 @@ type Parameters = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  i18n: I18nType,
 |};
 
 type InstructionEditorState = {|
@@ -86,6 +87,7 @@ export const useInstructionEditor = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
+  i18n,
 }: Parameters): [InstructionEditorState, InstructionEditorSetters] => {
   const getChosenObjectState = (
     objectName: string,
@@ -96,7 +98,8 @@ export const useInstructionEditor = ({
         isCondition,
         globalObjectsContainer,
         objectsContainer,
-        objectName
+        objectName,
+        i18n
       ),
       scope
     );
@@ -129,26 +132,22 @@ export const useInstructionEditor = ({
     if (!isNewInstruction) {
       // Check if the instruction is an object/behavior instruction. If yes
       // select the object, which is the first parameter of the instruction.
-      const allInstructions = enumerateAllInstructions(isCondition);
       const instructionType: string = instruction.getType();
-      const enumeratedInstructionMetadata = findInstruction(
-        allInstructions,
-        instructionType
-      );
-      if (
-        enumeratedInstructionMetadata &&
-        (enumeratedInstructionMetadata.scope.objectMetadata ||
-          enumeratedInstructionMetadata.scope.behaviorMetadata)
-      ) {
-        const objectParameterIndex = getObjectParameterIndex(
-          enumeratedInstructionMetadata.metadata
-        );
-        if (objectParameterIndex !== -1) {
-          return getChosenObjectState(
-            instruction.getParameter(objectParameterIndex).getPlainString(),
-            false /* Even if the instruction is invalid for the object, show it as it's what we have already */
+      const instructionMetadata = isCondition
+        ? gd.MetadataProvider.getConditionMetadata(
+            project.getCurrentPlatform(),
+            instructionType
+          )
+        : gd.MetadataProvider.getActionMetadata(
+            project.getCurrentPlatform(),
+            instructionType
           );
-        }
+      const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
+      if (objectParameterIndex !== -1) {
+        return getChosenObjectState(
+          instruction.getParameter(objectParameterIndex).getPlainString(),
+          false /* Even if the instruction is invalid for the object, show it as it's what we have already */
+        );
       }
     }
 

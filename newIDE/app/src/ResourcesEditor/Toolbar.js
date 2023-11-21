@@ -10,6 +10,7 @@ import IconButton from '../UI/IconButton';
 
 type Props = {|
   onOpenProjectFolder: () => void,
+  canOpenProjectFolder: boolean,
   onDeleteSelection: () => void,
   canDelete: boolean,
   onToggleProperties: () => void,
@@ -24,15 +25,19 @@ export class Toolbar extends PureComponent<Props, State> {
 
     return (
       <ToolbarGroup lastChild>
-        <IconButton
-          size="small"
-          color="default"
-          onClick={this.props.onOpenProjectFolder}
-          tooltip={t`Open the project folder`}
-        >
-          <FolderIcon />
-        </IconButton>
-        <ToolbarSeparator />
+        {this.props.canOpenProjectFolder && (
+          <>
+            <IconButton
+              size="small"
+              color="default"
+              onClick={this.props.onOpenProjectFolder}
+              tooltip={t`Open the project folder`}
+            >
+              <FolderIcon />
+            </IconButton>
+            <ToolbarSeparator />
+          </>
+        )}
         <IconButton
           size="small"
           color="default"

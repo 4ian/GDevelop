@@ -1,6 +1,5 @@
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
-import PIXI = GlobalPIXIModule.PIXI;
 import { TileMapFileContent } from '../load/TileMapFileContent';
 /**
  * A holder to share tile maps across the 2 extension objects.
@@ -66,5 +65,6 @@ export declare class TileMapManager {
     levelIndex: number,
     callback: (textureCache: TileTextureCache | null) => void
   ): void;
+  clearCaches(): void;
 }
 //# sourceMappingURL=TileMapManager.d.ts.map

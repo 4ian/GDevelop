@@ -250,15 +250,6 @@ export const sendAssetPackInformationOpened = (options: {|
   recordEvent('asset_pack_information_opened', options);
 };
 
-export const sendGameTemplateOpened = (options: {|
-  gameTemplateId: string | null,
-  gameTemplateName: string,
-  gameTemplateTag: string | null,
-  source: 'store-home' | 'examples-list',
-|}) => {
-  recordEvent('game_template_opened', options);
-};
-
 export const sendGameTemplateBuyClicked = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
@@ -270,8 +261,19 @@ export const sendGameTemplateBuyClicked = (options: {|
 export const sendGameTemplateInformationOpened = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
+  source: 'store' | 'examples-list' | 'homepage' | 'web-link',
 |}) => {
   recordEvent('game_template_information_opened', options);
+};
+
+export const sendUserSurveyStarted = () => {
+  recordEvent('user_survey_started');
+};
+export const sendUserSurveyCompleted = () => {
+  recordEvent('user_survey_completed');
+};
+export const sendUserSurveyHidden = () => {
+  recordEvent('user_survey_hidden');
 };
 
 export const sendHelpSearch = (searchText: string) => {
@@ -334,7 +336,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Build limit reached'
   | 'Leaderboard customization'
   | 'Extend redeemed subscription'
-  | 'Generate project from prompt';
+  | 'Generate project from prompt'
+  | 'Add collaborators on project';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

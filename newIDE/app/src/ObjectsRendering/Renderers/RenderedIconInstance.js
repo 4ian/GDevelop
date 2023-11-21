@@ -30,6 +30,11 @@ export default function makeRenderer(iconPath: string) {
       this._pixiContainer.addChild(this._pixiObject);
     }
 
+    onRemovedFromScene(): void {
+      super.onRemovedFromScene();
+      this._pixiObject.destroy(false);
+    }
+
     update() {
       this._pixiObject.position.x = this._instance.getX();
       this._pixiObject.position.y = this._instance.getY();

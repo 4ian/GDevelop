@@ -13,7 +13,7 @@ export default class RenderedInstance {
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
-  _pixiObject: any;
+  _pixiObject: PIXI.DisplayObject;
   wasUsed: boolean;
 
   constructor(
@@ -48,11 +48,11 @@ export default class RenderedInstance {
     //Nothing to do.
   }
 
-  getPixiObject() {
+  getPixiObject(): PIXI.DisplayObject | null {
     return this._pixiObject;
   }
 
-  getInstance() {
+  getInstance(): gdInitialInstance {
     return this._instance;
   }
 
@@ -61,24 +61,24 @@ export default class RenderedInstance {
    * the scene. The PIXI object should probably be removed from the container: This is what
    * the default implementation of the method does.
    */
-  onRemovedFromScene() {
+  onRemovedFromScene(): void {
     if (this._pixiObject !== null)
       this._pixiContainer.removeChild(this._pixiObject);
   }
 
-  getOriginX() {
+  getOriginX(): number {
     return 0;
   }
 
-  getOriginY() {
+  getOriginY(): number {
     return 0;
   }
 
-  getCenterX() {
+  getCenterX(): number {
     return this.getWidth() / 2;
   }
 
-  getCenterY() {
+  getCenterY(): number {
     return this.getHeight() / 2;
   }
 
@@ -109,18 +109,18 @@ export default class RenderedInstance {
   /**
    * Return the width of the instance when the instance doesn't have a custom size.
    */
-  getDefaultWidth() {
+  getDefaultWidth(): number {
     return 32;
   }
 
   /**
    * Return the height of the instance when the instance doesn't have a custom size.
    */
-  getDefaultHeight() {
+  getDefaultHeight(): number {
     return 32;
   }
 
-  getDefaultDepth() {
+  getDefaultDepth(): number {
     return 0;
   }
 }

@@ -14,6 +14,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import TextField from '../UI/TextField';
 import { getEmailErrorText } from './CreateAccountDialog';
 import { emailRegex } from './ForgotPasswordDialog';
+import Form from '../UI/Form';
 
 type Props = {|
   firebaseUser: FirebaseUser,
@@ -71,15 +72,7 @@ const ChangeEmailDialog = ({
       onApply={doChangeEmail}
       open
     >
-      <form
-        onSubmit={event => {
-          // Prevent browser to navigate on form submission.
-          event.preventDefault();
-          doChangeEmail();
-        }}
-        autoComplete="on"
-        name="changeEmail"
-      >
+      <Form onSubmit={doChangeEmail} autoComplete="on" name="changeEmail">
         <ColumnStackLayout noMargin>
           <TextField
             value={email}
@@ -89,6 +82,7 @@ const ChangeEmailDialog = ({
               (!isEmailValid ? <Trans>Invalid email address</Trans> : null)
             }
             fullWidth
+            type="email"
             disabled={changeEmailInProgress}
             required
             onChange={(e, value) => {
@@ -102,7 +96,7 @@ const ChangeEmailDialog = ({
             }}
           />
         </ColumnStackLayout>
-      </form>
+      </Form>
     </Dialog>
   );
 };

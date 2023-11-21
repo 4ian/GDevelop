@@ -73,9 +73,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             .getAnimation(index)
             .getName();
           return animationName.length > 0 ? animationName : null;
-        })
-          .filter(Boolean)
-          .sort();
+        }).filter(Boolean);
       } else if (object.getType() === 'Scene3D::Model3DObject') {
         const model3DConfiguration = gd.asModel3DConfiguration(
           object.getConfiguration()

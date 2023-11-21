@@ -1,12 +1,16 @@
 // @flow
 import {
-  enumerateAllInstructions,
-  getObjectParameterIndex,
   enumerateObjectAndBehaviorsInstructions,
   enumerateFreeInstructions,
 } from './EnumerateInstructions';
 import { setupInstructionParameters } from './SetupInstructionParameters';
 const gd: libGDevelop = global.gd;
+
+// $FlowExpectedError
+const makeFakeI18n = (fakeI18n): I18nType => ({
+  ...fakeI18n,
+  _: message => message.id,
+});
 
 describe('setupInstructionParameters', () => {
   it('sets the proper number of parameters', () => {
@@ -16,7 +20,10 @@ describe('setupInstructionParameters', () => {
     layout.insertNewObject(project, 'Sprite', objectName, 0);
 
     // Simulate that we select an instruction
-    const enumeratedInstructions = enumerateFreeInstructions(false);
+    const enumeratedInstructions = enumerateFreeInstructions(
+      false,
+      makeFakeI18n()
+    );
     const playMusicInstruction = enumeratedInstructions.find(
       enumeratedInstruction => enumeratedInstruction.type === 'PlayMusic'
     );
@@ -54,7 +61,8 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      makeFakeI18n()
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -101,7 +109,8 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -152,7 +161,8 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -201,7 +211,8 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>
@@ -253,7 +264,8 @@ describe('setupInstructionParameters', () => {
       false,
       project,
       layout,
-      objectName
+      objectName,
+      makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
       enumeratedInstruction =>

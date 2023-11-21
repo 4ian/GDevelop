@@ -399,11 +399,26 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       ]
     );
 
+    const selectFolder = React.useCallback(
+      (folderTag: string) => {
+        shopNavigationState.navigateInsideFolder(folderTag);
+      },
+      [shopNavigationState]
+    );
+
+    const goBackToFolderIndex = React.useCallback(
+      (folderIndex: number) => {
+        shopNavigationState.goBackToFolderIndex(folderIndex);
+      },
+      [shopNavigationState]
+    );
+
     const selectPrivateGameTemplate = React.useCallback(
       (privateGameTemplateListingData: PrivateGameTemplateListingData) => {
         sendGameTemplateInformationOpened({
           gameTemplateName: privateGameTemplateListingData.name,
           gameTemplateId: privateGameTemplateListingData.id,
+          source: 'store',
         });
         saveScrollPosition();
         const previousSearchText = searchText;
@@ -709,6 +724,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onPrivateAssetPackSelection={selectPrivateAssetPack}
               onPublicAssetPackSelection={selectPublicAssetPack}
               onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+              onFolderSelection={selectFolder}
+              onGoBackToFolderIndex={goBackToFolderIndex}
+              currentPage={shopNavigationState.getCurrentPage()}
             />
           ) : openedAssetShortHeader ? (
             <AssetDetails

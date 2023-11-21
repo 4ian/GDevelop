@@ -86,11 +86,13 @@ namespace gdjs {
 
       export const turnCameraTowardObject = (
         runtimeScene: RuntimeScene,
-        object: gdjs.RuntimeObject,
+        object: gdjs.RuntimeObject | null,
         layerName: string,
         cameraIndex: integer,
         isStandingOnY: boolean
       ) => {
+        if (!object) return;
+
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 

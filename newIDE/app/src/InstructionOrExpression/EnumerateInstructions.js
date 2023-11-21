@@ -21,9 +21,6 @@ const freeInstructionsToKeep = {
   Scene3D: ['Scene3D::TurnCameraTowardObject'],
 };
 
-/**
- * `objectType` is strictly checked and doesn't match base object parameters.
- */
 const isObjectInstruction = (
   instructionMetadata: gdInstructionMetadata,
   objectType?: string
@@ -49,7 +46,7 @@ const isObjectInstruction = (
   }
   if (
     objectType &&
-    // The type '' is not allowed because it would duplicate base object instructions.
+    firstParameter.getExtraInfo() !== '' &&
     firstParameter.getExtraInfo() !== objectType
   ) {
     return false;
@@ -472,13 +469,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition
           ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
           : baseObjectExtension.getAllActionsForObject(baseObjectType),
-        scope,
-        i18n
-      ),
-      ...enumerateExtraObjectInstructions(
-        isCondition,
-        baseObjectExtension,
-        baseObjectType,
         scope,
         i18n
       ),

@@ -289,10 +289,10 @@ describe('EnumerateExpressions', () => {
     expect(movementTreeNode).toHaveProperty('Platform behavior');
     // $FlowFixMe
     expect(movementTreeNode['Platform behavior']).toMatchObject({
-      Options: {
+      'Platformer configuration': {
         MaxSpeed: {
           displayedName: 'Maximum horizontal speed',
-          fullGroupName: 'Movement/Platform behavior/Options',
+          fullGroupName: 'Movement/Platform behavior/Platformer configuration',
           iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',
           isPrivate: false,
           name: 'MaxSpeed',

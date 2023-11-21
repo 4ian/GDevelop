@@ -225,6 +225,13 @@ const enumerateInstruction = (
   ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
+  let description = instrMetadata.getDescription();
+  if (description.length > 140) {
+    const spaceIndex = description.indexOf(' ', 140);
+    if (spaceIndex >= 0) {
+      description = description.substring(0, spaceIndex);
+    }
+  }
   const groupName = i18n
     ? i18n._(instrMetadata.getGroup())
     : instrMetadata.getGroup();
@@ -238,6 +245,7 @@ const enumerateInstruction = (
     metadata: instrMetadata,
     iconFilename,
     displayedName,
+    description,
     fullGroupName,
     scope,
     isPrivate: instrMetadata.isPrivate(),

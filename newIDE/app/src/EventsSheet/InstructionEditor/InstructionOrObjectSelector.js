@@ -179,6 +179,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       keys: [
         { name: 'displayedName', weight: 5 },
         { name: 'fullGroupName', weight: 1 },
+        { name: 'description', weight: 3 },
       ],
     });
     this.objectSearchApi = new Fuse(allObjectsList, {
@@ -229,6 +230,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                 getFuseSearchQueryForMultipleKeys(searchText, [
                   'displayedName',
                   'fullGroupName',
+                  'description',
                 ])
               )
               .map(result => ({

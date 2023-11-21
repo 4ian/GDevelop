@@ -94,17 +94,19 @@ namespace gdjs {
       this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
       this._antialiasing = shapePainterObjectData.antialiasing;
-      this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      if (gdjs.ShapePainterRuntimeObjectRenderer) {
+        this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     updateFromObjectData(
@@ -152,11 +154,13 @@ namespace gdjs {
         oldObjectData.absoluteCoordinates !== newObjectData.absoluteCoordinates
       ) {
         this._useAbsoluteCoordinates = newObjectData.absoluteCoordinates;
-        this._renderer.updatePositionX();
-        this._renderer.updatePositionY();
-        this._renderer.updateAngle();
-        this._renderer.updateScaleX();
-        this._renderer.updateScaleY();
+        if (this._renderer) {
+          this._renderer.updatePositionX();
+          this._renderer.updatePositionY();
+          this._renderer.updateAngle();
+          this._renderer.updateScaleX();
+          this._renderer.updateScaleY();
+        }
       }
       if (
         oldObjectData.clearBetweenFrames !== newObjectData.clearBetweenFrames
@@ -183,7 +187,7 @@ namespace gdjs {
      * Clear the graphics.
      */
     clear() {
-      this._renderer.clear();
+      if (this._renderer) this._renderer.clear();
     }
 
     getVisibilityAABB() {
@@ -191,23 +195,24 @@ namespace gdjs {
     }
 
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
-      this._renderer.drawRectangle(x1, y1, x2, y2);
+      if (this._renderer) this._renderer.drawRectangle(x1, y1, x2, y2);
     }
 
     drawCircle(x: float, y: float, radius: float) {
-      this._renderer.drawCircle(x, y, radius);
+      if (this._renderer) this._renderer.drawCircle(x, y, radius);
     }
 
     drawLine(x1: float, y1: float, x2: float, y2: float, thickness: float) {
-      this._renderer.drawLine(x1, y1, x2, y2, thickness);
+      if (this._renderer) this._renderer.drawLine(x1, y1, x2, y2, thickness);
     }
 
     drawLineV2(x1: float, y1: float, x2: float, y2: float, thickness: float) {
-      this._renderer.drawLineV2(x1, y1, x2, y2, thickness);
+      if (this._renderer) this._renderer.drawLineV2(x1, y1, x2, y2, thickness);
     }
 
     drawEllipse(centerX: float, centerY: float, width: float, height: float) {
-      this._renderer.drawEllipse(centerX, centerY, width, height);
+      if (this._renderer)
+        this._renderer.drawEllipse(centerX, centerY, width, height);
     }
 
     drawRoundedRectangle(
@@ -217,13 +222,14 @@ namespace gdjs {
       endY2: float,
       radius: float
     ) {
-      this._renderer.drawRoundedRectangle(
-        startX1,
-        startY1,
-        endX2,
-        endY2,
-        radius
-      );
+      if (this._renderer)
+        this._renderer.drawRoundedRectangle(
+          startX1,
+          startY1,
+          endX2,
+          endY2,
+          radius
+        );
     }
 
     drawChamferRectangle(
@@ -266,14 +272,15 @@ namespace gdjs {
       innerRadius: float,
       rotation: float
     ) {
-      this._renderer.drawStar(
-        centerX,
-        centerY,
-        points,
-        radius,
-        innerRadius,
-        rotation
-      );
+      if (this._renderer)
+        this._renderer.drawStar(
+          centerX,
+          centerY,
+          points,
+          radius,
+          innerRadius,
+          rotation
+        );
     }
 
     drawArc(
@@ -285,15 +292,16 @@ namespace gdjs {
       anticlockwise: boolean,
       closePath: boolean
     ) {
-      this._renderer.drawArc(
-        centerX,
-        centerY,
-        radius,
-        startAngle,
-        endAngle,
-        anticlockwise,
-        closePath
-      );
+      if (this._renderer)
+        this._renderer.drawArc(
+          centerX,
+          centerY,
+          radius,
+          startAngle,
+          endAngle,
+          anticlockwise,
+          closePath
+        );
     }
 
     drawBezierCurve(
@@ -306,7 +314,8 @@ namespace gdjs {
       x2: float,
       y2: float
     ) {
-      this._renderer.drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2);
+      if (this._renderer)
+        this._renderer.drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2);
     }
 
     drawQuadraticCurve(
@@ -317,24 +326,25 @@ namespace gdjs {
       x2: float,
       y2: float
     ) {
-      this._renderer.drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2);
+      if (this._renderer)
+        this._renderer.drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2);
     }
 
     beginFillPath(x1: float, y1: float) {
-      this._renderer.beginFillPath();
-      this._renderer.drawPathMoveTo(x1, y1);
+      if (this._renderer) this._renderer.beginFillPath();
+      if (this._renderer) this._renderer.drawPathMoveTo(x1, y1);
     }
 
     endFillPath() {
-      this._renderer.endFillPath();
+      if (this._renderer) this._renderer.endFillPath();
     }
 
     drawPathMoveTo(x1: float, y1: float) {
-      this._renderer.drawPathMoveTo(x1, y1);
+      if (this._renderer) this._renderer.drawPathMoveTo(x1, y1);
     }
 
     drawPathLineTo(x1: float, y1: float) {
-      this._renderer.drawPathLineTo(x1, y1);
+      if (this._renderer) this._renderer.drawPathLineTo(x1, y1);
     }
 
     drawPathBezierCurveTo(
@@ -345,7 +355,8 @@ namespace gdjs {
       toX: float,
       toY: float
     ) {
-      this._renderer.drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
+      if (this._renderer)
+        this._renderer.drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
     }
 
     drawPathArc(
@@ -356,22 +367,24 @@ namespace gdjs {
       endAngle: float,
       anticlockwise: boolean
     ) {
-      this._renderer.drawPathArc(
-        cx,
-        cy,
-        radius,
-        startAngle,
-        endAngle,
-        anticlockwise
-      );
+      if (this._renderer)
+        this._renderer.drawPathArc(
+          cx,
+          cy,
+          radius,
+          startAngle,
+          endAngle,
+          anticlockwise
+        );
     }
 
     drawPathQuadraticCurveTo(cpX: float, cpY: float, toX: float, toY: float) {
-      this._renderer.drawPathQuadraticCurveTo(cpX, cpY, toX, toY);
+      if (this._renderer)
+        this._renderer.drawPathQuadraticCurveTo(cpX, cpY, toX, toY);
     }
 
     closePath() {
-      this._renderer.closePath();
+      if (this._renderer) this._renderer.closePath();
     }
 
     setClearBetweenFrames(value: boolean): void {
@@ -384,7 +397,7 @@ namespace gdjs {
 
     setAntialiasing(value: Antialiasing): void {
       this._antialiasing = value;
-      this._renderer.updateAntialiasing();
+      if (this._renderer) this._renderer.updateAntialiasing();
     }
 
     getAntialiasing(): Antialiasing {
@@ -449,7 +462,7 @@ namespace gdjs {
         ),
         16
       );
-      this._renderer.updateOutline();
+      if (this._renderer) this._renderer.updateOutline();
     }
 
     getOutlineColorR(): integer {
@@ -464,7 +477,7 @@ namespace gdjs {
 
     setOutlineSize(size: float): void {
       this._outlineSize = size;
-      this._renderer.updateOutline();
+      if (this._renderer) this._renderer.updateOutline();
     }
 
     getOutlineSize() {
@@ -493,7 +506,7 @@ namespace gdjs {
      */
     setOutlineOpacity(opacity: float): void {
       this._outlineOpacity = opacity;
-      this._renderer.updateOutline();
+      if (this._renderer) this._renderer.updateOutline();
     }
 
     /**
@@ -509,7 +522,7 @@ namespace gdjs {
         return;
       }
       super.setX(x);
-      this._renderer.updatePositionX();
+      if (this._renderer) this._renderer.updatePositionX();
     }
 
     setY(y: float): void {
@@ -517,7 +530,7 @@ namespace gdjs {
         return;
       }
       super.setY(y);
-      this._renderer.updatePositionY();
+      if (this._renderer) this._renderer.updatePositionY();
     }
 
     setAngle(angle: float): void {
@@ -525,7 +538,7 @@ namespace gdjs {
         return;
       }
       super.setAngle(angle);
-      this._renderer.updateAngle();
+      if (this._renderer) this._renderer.updateAngle();
       this.invalidateHitboxes();
     }
 
@@ -547,7 +560,7 @@ namespace gdjs {
       }
       this._customCenter[0] = x;
       this._customCenter[1] = y;
-      this._renderer.updateRotationCenter();
+      if (this._renderer) this._renderer.updateRotationCenter();
     }
 
     /**
@@ -555,6 +568,7 @@ namespace gdjs {
      * (whereas `getCenterX()` is relative to the top left drawable bound and scaled).
      */
     getRotationCenterX(): float {
+      if (!this._renderer) return 0;
       return this._customCenter
         ? this._customCenter[0]
         : this._renderer.getUnscaledWidth() / 2 -
@@ -566,6 +580,7 @@ namespace gdjs {
      * (whereas `getCenterY()` is relative to the top left drawable bound and scaled).
      */
     getRotationCenterY(): float {
+      if (!this._renderer) return 0;
       return this._customCenter
         ? this._customCenter[1]
         : this._renderer.getUnscaledHeight() / 2 -
@@ -595,14 +610,18 @@ namespace gdjs {
     }
 
     setWidth(newWidth: float): void {
-      const unscaledWidth = this._renderer.getUnscaledWidth();
+      const unscaledWidth = this._renderer
+        ? this._renderer.getUnscaledWidth()
+        : 1;
       if (unscaledWidth !== 0) {
         this.setScaleX(newWidth / unscaledWidth);
       }
     }
 
     setHeight(newHeight: float): void {
-      const unscaledHeight = this._renderer.getUnscaledHeight();
+      const unscaledHeight = this._renderer
+        ? this._renderer.getUnscaledHeight()
+        : 1;
       if (unscaledHeight !== 0) {
         this.setScaleY(newHeight / unscaledHeight);
       }
@@ -636,7 +655,7 @@ namespace gdjs {
         return;
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
-      this._renderer.updateScaleX();
+      if (this._renderer) this._renderer.updateScaleX();
       this.invalidateHitboxes();
     }
 
@@ -653,7 +672,7 @@ namespace gdjs {
         return;
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this._renderer.updateScaleY();
+      if (this._renderer) this._renderer.updateScaleY();
       this.invalidateHitboxes();
     }
 
@@ -661,7 +680,7 @@ namespace gdjs {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this._renderer.updateScaleX();
+        if (this._renderer) this._renderer.updateScaleX();
         this.invalidateHitboxes();
       }
     }
@@ -670,7 +689,7 @@ namespace gdjs {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this._renderer.updateScaleY();
+        if (this._renderer) this._renderer.updateScaleY();
         this.invalidateHitboxes();
       }
     }
@@ -717,26 +736,31 @@ namespace gdjs {
     }
 
     getDrawableX(): float {
+      if (!this._renderer) return 0;
       return this._renderer.getDrawableX();
     }
 
     getDrawableY(): float {
+      if (!this._renderer) return 0;
       return this._renderer.getDrawableY();
     }
 
     getWidth(): float {
+      if (!this._renderer) return 0;
       return this._renderer.getWidth();
     }
 
     getHeight(): float {
+      if (!this._renderer) return 0;
       return this._renderer.getHeight();
     }
 
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      this._renderer.updatePreRender();
+      if (this._renderer) this._renderer.updatePreRender();
     }
 
     transformToDrawing(x: float, y: float) {
+      if (!this._renderer) return [0, 0];
       const point = ShapePainterRuntimeObject._pointForTransformation;
       point[0] = x;
       point[1] = y;
@@ -744,6 +768,7 @@ namespace gdjs {
     }
 
     transformToScene(x: float, y: float) {
+      if (!this._renderer) return [0, 0];
       const point = ShapePainterRuntimeObject._pointForTransformation;
       point[0] = x;
       point[1] = y;

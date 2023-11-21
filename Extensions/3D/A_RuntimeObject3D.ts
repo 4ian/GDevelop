@@ -89,7 +89,7 @@ namespace gdjs {
     }
 
     get3DRendererObject() {
-      return this.getRenderer().get3DRendererObject();
+      return this.getRenderer()?.get3DRendererObject();
     }
 
     updateFromObjectData(
@@ -120,12 +120,12 @@ namespace gdjs {
 
     setX(x: float): void {
       super.setX(x);
-      this.getRenderer().updatePosition();
+      this.getRenderer()?.updatePosition();
     }
 
     setY(y: float): void {
       super.setY(y);
-      this.getRenderer().updatePosition();
+      this.getRenderer()?.updatePosition();
     }
 
     /**
@@ -134,7 +134,7 @@ namespace gdjs {
     setZ(z: float): void {
       if (z === this._z) return;
       this._z = z;
-      this.getRenderer().updatePosition();
+      this.getRenderer()?.updatePosition();
     }
 
     /**
@@ -180,7 +180,7 @@ namespace gdjs {
 
     setAngle(angle: float): void {
       super.setAngle(angle);
-      this.getRenderer().updateRotation();
+      this.getRenderer()?.updateRotation();
     }
 
     /**
@@ -190,7 +190,7 @@ namespace gdjs {
      */
     setRotationX(angle: float): void {
       this._rotationX = angle;
-      this.getRenderer().updateRotation();
+      this.getRenderer()?.updateRotation();
     }
 
     /**
@@ -200,7 +200,7 @@ namespace gdjs {
      */
     setRotationY(angle: float): void {
       this._rotationY = angle;
-      this.getRenderer().updateRotation();
+      this.getRenderer()?.updateRotation();
     }
 
     /**
@@ -229,11 +229,14 @@ namespace gdjs {
       const axisX = gdjs.RuntimeObject3D._temporaryVector;
       axisX.set(1, 0, 0);
 
-      const mesh = this.getRenderer().get3DRendererObject();
-      mesh.rotateOnWorldAxis(axisX, gdjs.toRad(deltaAngle));
-      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
-      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
-      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      const mesh = this.getRenderer()?.get3DRendererObject();
+      if (mesh) {
+        // TODO: Do the rotation logic ourselves, dont rely on the renderer
+        mesh.rotateOnWorldAxis(axisX, gdjs.toRad(deltaAngle));
+        this._rotationX = gdjs.toDegrees(mesh.rotation.x);
+        this._rotationY = gdjs.toDegrees(mesh.rotation.y);
+        this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      }
     }
 
     /**
@@ -244,11 +247,14 @@ namespace gdjs {
       const axisY = gdjs.RuntimeObject3D._temporaryVector;
       axisY.set(0, 1, 0);
 
-      const mesh = this.getRenderer().get3DRendererObject();
-      mesh.rotateOnWorldAxis(axisY, gdjs.toRad(deltaAngle));
-      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
-      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
-      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      const mesh = this.getRenderer()?.get3DRendererObject();
+      if (mesh) {
+        // TODO: Do the rotation logic ourselves, dont rely on the renderer
+        mesh.rotateOnWorldAxis(axisY, gdjs.toRad(deltaAngle));
+        this._rotationX = gdjs.toDegrees(mesh.rotation.x);
+        this._rotationY = gdjs.toDegrees(mesh.rotation.y);
+        this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      }
     }
 
     /**
@@ -259,11 +265,14 @@ namespace gdjs {
       const axisZ = gdjs.RuntimeObject3D._temporaryVector;
       axisZ.set(0, 0, 1);
 
-      const mesh = this.getRenderer().get3DRendererObject();
-      mesh.rotateOnWorldAxis(axisZ, gdjs.toRad(deltaAngle));
-      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
-      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
-      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      const mesh = this.getRenderer()?.get3DRendererObject();
+      if (mesh) {
+        // TODO: Do the rotation logic ourselves, dont rely on the renderer
+        mesh.rotateOnWorldAxis(axisZ, gdjs.toRad(deltaAngle));
+        this._rotationX = gdjs.toDegrees(mesh.rotation.x);
+        this._rotationY = gdjs.toDegrees(mesh.rotation.y);
+        this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      }
     }
 
     getWidth(): float {
@@ -285,7 +294,7 @@ namespace gdjs {
       if (this._width === width) return;
 
       this._width = width;
-      this.getRenderer().updateSize();
+      this.getRenderer()?.updateSize();
       this.invalidateHitboxes();
     }
 
@@ -293,7 +302,7 @@ namespace gdjs {
       if (this._height === height) return;
 
       this._height = height;
-      this.getRenderer().updateSize();
+      this.getRenderer()?.updateSize();
       this.invalidateHitboxes();
     }
 
@@ -309,7 +318,7 @@ namespace gdjs {
       if (this._depth === depth) return;
 
       this._depth = depth;
-      this.getRenderer().updateSize();
+      this.getRenderer()?.updateSize();
     }
 
     /**
@@ -470,21 +479,21 @@ namespace gdjs {
     flipX(enable: boolean) {
       if (enable !== this._flippedX) {
         this._flippedX = enable;
-        this.getRenderer().updateSize();
+        this.getRenderer()?.updateSize();
       }
     }
 
     flipY(enable: boolean) {
       if (enable !== this._flippedY) {
         this._flippedY = enable;
-        this.getRenderer().updateSize();
+        this.getRenderer()?.updateSize();
       }
     }
 
     flipZ(enable: boolean) {
       if (enable !== this._flippedZ) {
         this._flippedZ = enable;
-        this.getRenderer().updateSize();
+        this.getRenderer()?.updateSize();
       }
     }
 
@@ -502,7 +511,7 @@ namespace gdjs {
 
     hide(enable: boolean): void {
       super.hide(enable);
-      this.getRenderer().updateVisibility();
+      this.getRenderer()?.updateVisibility();
     }
   }
 }

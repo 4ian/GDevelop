@@ -20,12 +20,12 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
       this._sprite = new PIXI.Sprite(
-        instanceContainer.getGame().getImageManager().getInvalidPIXITexture()
+        instanceContainer.getGame().getImageManager()!.getInvalidPIXITexture()
       );
       const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(this._sprite, runtimeObject.getZOrder());
       }
     }
@@ -41,7 +41,7 @@ namespace gdjs {
       const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
-          .getRenderer()
+          .getRenderer()!
           .addRendererObject(this._sprite, runtimeObject.getZOrder());
       }
     }
@@ -198,6 +198,11 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export const SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
-  export type SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
+  export type SpriteRuntimeObjectRenderer =
+    | SpriteRuntimeObjectPixiRenderer
+    | undefined;
+  type SpriteRuntimeObjectRendererClass =
+    | typeof SpriteRuntimeObjectPixiRenderer
+    | undefined;
+  export const SpriteRuntimeObjectRenderer: SpriteRuntimeObjectRendererClass = SpriteRuntimeObjectPixiRenderer;
 }

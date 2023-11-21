@@ -58,7 +58,7 @@ namespace gdjs {
       );
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, parent);
+      this.getRenderer()?.reinitialize(this, parent);
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
@@ -68,7 +68,7 @@ namespace gdjs {
       super.reinitialize(objectData);
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, this.getParent());
+      this.getRenderer()?.reinitialize(this, this.getParent());
 
       // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
@@ -137,11 +137,11 @@ namespace gdjs {
 
     updatePreRender(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreRender();
-      this.getRenderer().ensureUpToDate();
+      this.getRenderer()?.ensureUpToDate();
     }
 
     getRendererObject() {
-      return this.getRenderer().getRendererObject();
+      return this.getRenderer()?.getRendererObject();
     }
 
     getRenderer() {
@@ -151,7 +151,7 @@ namespace gdjs {
     onChildrenLocationChanged() {
       this._isUntransformedHitBoxesDirty = true;
       this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.getRenderer()?.update();
     }
 
     updateHitBoxes(): void {
@@ -474,7 +474,7 @@ namespace gdjs {
       this.x = x;
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
-      this.getRenderer().updateX();
+      this.getRenderer()?.updateX();
     }
 
     setY(y: float): void {
@@ -484,7 +484,7 @@ namespace gdjs {
       this.y = y;
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
-      this.getRenderer().updateY();
+      this.getRenderer()?.updateY();
     }
 
     setAngle(angle: float): void {
@@ -494,7 +494,7 @@ namespace gdjs {
       this.angle = angle;
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
-      this.getRenderer().updateAngle();
+      this.getRenderer()?.updateAngle();
     }
 
     /**
@@ -516,7 +516,7 @@ namespace gdjs {
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.getRenderer()?.update();
     }
 
     /**
@@ -534,7 +534,7 @@ namespace gdjs {
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.getRenderer()?.update();
     }
 
     /**
@@ -551,7 +551,7 @@ namespace gdjs {
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.getRenderer()?.update();
     }
 
     /**
@@ -603,7 +603,7 @@ namespace gdjs {
         opacity = 255;
       }
       this.opacity = opacity;
-      this.getRenderer().updateOpacity();
+      this.getRenderer()?.updateOpacity();
     }
 
     getOpacity(): number {
@@ -619,7 +619,7 @@ namespace gdjs {
         enable = true;
       }
       this.hidden = enable;
-      this.getRenderer().updateVisibility();
+      this.getRenderer()?.updateVisibility();
     }
 
     flipX(enable: boolean) {
@@ -627,7 +627,7 @@ namespace gdjs {
         this._scaleX *= -1;
         this._flippedX = enable;
         this.invalidateHitboxes();
-        this.getRenderer().update();
+        this.getRenderer()?.update();
       }
     }
 
@@ -636,7 +636,7 @@ namespace gdjs {
         this._scaleY *= -1;
         this._flippedY = enable;
         this.invalidateHitboxes();
-        this.getRenderer().update();
+        this.getRenderer()?.update();
       }
     }
 

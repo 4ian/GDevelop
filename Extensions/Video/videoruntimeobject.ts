@@ -31,6 +31,12 @@ namespace gdjs {
     _loop: boolean;
     _volume: float;
     _videoResource: string;
+    private _width: number;
+    private _height: number;
+
+    private _playing: boolean = true;
+    private _muted: boolean = false;
+    private _currentTime: number = 0;
 
     // Use a boolean to track if the video was paused because we
     // navigated to another scene, and so should resume if we're back.
@@ -51,17 +57,26 @@ namespace gdjs {
       this._loop = videoObjectData.content.loop;
       this._volume = videoObjectData.content.volume;
       this._videoResource = videoObjectData.content.videoResource;
-      this._renderer = new gdjs.VideoRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+
+      const dimensions = instanceContainer
+        .getGame()
+        .getResourceBaseDimensions(this._videoResource);
+      this._width = dimensions.width;
+      this._height = dimensions.height;
+
+      if (gdjs.VideoRuntimeObjectRenderer) {
+        this._renderer = new gdjs.VideoRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     updateFromObjectData(
@@ -99,11 +114,11 @@ namespace gdjs {
 
     onDestroyed(): void {
       super.onDestroyed();
-      this._renderer.onDestroy();
+      if (this._renderer) this._renderer.onDestroy();
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      this._renderer.ensureUpToDate();
+      if (this._renderer) this._renderer.ensureUpToDate();
     }
 
     /**
@@ -112,7 +127,7 @@ namespace gdjs {
      */
     setX(x: float): void {
       super.setX(x);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -121,7 +136,7 @@ namespace gdjs {
      */
     setY(y: float): void {
       super.setY(y);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -130,7 +145,7 @@ namespace gdjs {
      */
     setAngle(angle: float): void {
       super.setAngle(angle);
-      this._renderer.updateAngle();
+      if (this._renderer) this._renderer.updateAngle();
     }
 
     /**
@@ -139,7 +154,7 @@ namespace gdjs {
      */
     setOpacity(opacity: float): void {
       this._opacity = opacity;
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     /**
@@ -155,9 +170,9 @@ namespace gdjs {
      * @param width The new width in pixels.
      */
     setWidth(width: float): void {
-      if (this._renderer.getWidth() === width) return;
-
-      this._renderer.setWidth(width);
+      if (this._width === width) return;
+      this._width = width;
+      if (this._renderer) this._renderer.setWidth(width);
       this.invalidateHitboxes();
     }
 
@@ -166,9 +181,9 @@ namespace gdjs {
      * @param height The new height in pixels.
      */
     setHeight(height: float): void {
-      if (this._renderer.getHeight() === height) return;
-
-      this._renderer.setHeight(height);
+      if (this._height === height) return;
+      this._height = height;
+      if (this._renderer) this._renderer.setHeight(height);
       this.invalidateHitboxes();
     }
 
@@ -177,7 +192,7 @@ namespace gdjs {
      * @returns The current width of the object
      */
     getWidth(): float {
-      return this._renderer.getWidth();
+      return this._width;
     }
 
     /**
@@ -185,21 +200,21 @@ namespace gdjs {
      * @returns The current height of the object
      */
     getHeight(): float {
-      return this._renderer.getHeight();
+      return this._height;
     }
 
     /**
      * Play the video.
      */
     play(): void {
-      this._renderer.play();
+      if (this._renderer) this._renderer.play();
     }
 
     /**
      * Pause the video.
      */
     pause(): void {
-      this._renderer.pause();
+      if (this._renderer) this._renderer.pause();
     }
 
     /**
@@ -207,7 +222,8 @@ namespace gdjs {
      * @param enable true to loop the video
      */
     setLoop(enable: boolean): void {
-      this._renderer.setLoop(enable);
+      this._loop = enable;
+      if (this._renderer) this._renderer.setLoop(enable);
     }
 
     /**
@@ -215,7 +231,8 @@ namespace gdjs {
      * @param enable The new state.
      */
     mute(enable: boolean) {
-      this._renderer.setMute(enable);
+      this._muted = enable;
+      if (this._renderer) this._renderer.setMute(enable);
     }
 
     /**
@@ -223,7 +240,7 @@ namespace gdjs {
      * @returns Is the video muted?
      */
     isMuted(): boolean {
-      return this._renderer.isMuted();
+      return this._muted;
     }
 
     /**
@@ -237,7 +254,7 @@ namespace gdjs {
           0,
           1
         ) * 100;
-      this._renderer.updateVolume();
+      if (this._renderer) this._renderer.updateVolume();
     }
 
     /**
@@ -245,9 +262,7 @@ namespace gdjs {
      * @returns The current video's volume, between 0 and 100.
      */
     getVolume(): number {
-      return (
-        gdjs.evtTools.common.normalize(this._renderer.getVolume(), 0, 1) * 100
-      );
+      return gdjs.evtTools.common.normalize(this._volume, 0, 1) * 100;
     }
 
     /**
@@ -255,7 +270,7 @@ namespace gdjs {
      * @returns Is the video being played?
      */
     isPlayed(): boolean {
-      return this._renderer.isPlayed();
+      return this._renderer ? this._renderer.isPlayed() : this._playing;
     }
 
     /**
@@ -263,7 +278,7 @@ namespace gdjs {
      * @returns Is the video being paused?
      */
     isPaused(): boolean {
-      return !this._renderer.isPlayed();
+      return !this.isPlayed();
     }
 
     /**
@@ -271,7 +286,7 @@ namespace gdjs {
      * @returns Is the video looping?
      */
     isLooped(): boolean {
-      return this._renderer.isLooped();
+      return this._loop;
     }
 
     /**
@@ -279,7 +294,7 @@ namespace gdjs {
      * @returns The duration of the video
      */
     getDuration(): number {
-      return this._renderer.getDuration();
+      return this._renderer ? this._renderer.getDuration() : 0;
     }
 
     /**
@@ -287,7 +302,7 @@ namespace gdjs {
      * @returns Has the video ended?
      */
     isEnded(): boolean {
-      return this._renderer.isEnded();
+      return this._renderer ? this._renderer.isEnded() : false;
     }
 
     /**
@@ -295,7 +310,8 @@ namespace gdjs {
      * @param time The new time.
      */
     setCurrentTime(time: float): void {
-      this._renderer.setCurrentTime(time);
+      this._currentTime = time;
+      if (this._renderer) this._renderer.setCurrentTime(time);
     }
 
     /**
@@ -303,7 +319,9 @@ namespace gdjs {
      * @returns The current time of the video
      */
     getCurrentTime(): float {
-      return this._renderer.getCurrentTime();
+      return this._renderer
+        ? this._renderer.getCurrentTime()
+        : this._currentTime;
     }
 
     /**
@@ -312,7 +330,7 @@ namespace gdjs {
      */
     setPlaybackSpeed(playbackSpeed: number): void {
       this._playbackSpeed = gdjs.evtTools.common.clamp(playbackSpeed, 0.5, 2);
-      this._renderer.setPlaybackSpeed(this._playbackSpeed);
+      if (this._renderer) this._renderer.setPlaybackSpeed(this._playbackSpeed);
     }
 
     /**
@@ -320,7 +338,7 @@ namespace gdjs {
      * @returns The current playback speed of the video.
      */
     getPlaybackSpeed(): number {
-      return this._renderer.getPlaybackSpeed();
+      return this._playbackSpeed;
     }
   }
   gdjs.registerObject('Video::VideoObject', gdjs.VideoRuntimeObject);

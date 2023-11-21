@@ -85,7 +85,7 @@ namespace gdjs {
       this.updateReadOnly();
 
       this._runtimeGame
-        .getRenderer()
+        .getRenderer()!
         .getDomElementContainer()!
         .appendChild(this._input);
     }
@@ -138,7 +138,7 @@ namespace gdjs {
       ) as FloatPoint;
 
       const runtimeGame = this._instanceContainer.getGame();
-      const runtimeGameRenderer = runtimeGame.getRenderer();
+      const runtimeGameRenderer = runtimeGame.getRenderer()!;
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
         this._object.x,
         this._object.y,
@@ -221,7 +221,7 @@ namespace gdjs {
       if (!this._input) return;
       this._input.style.fontFamily = this._instanceContainer
         .getGame()
-        .getFontManager()
+        .getFontManager()!
         .getFontFamily(this._object.getFontResourceName());
     }
 
@@ -298,6 +298,11 @@ namespace gdjs {
     }
   }
 
-  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer =
+    | TextInputRuntimeObjectPixiRenderer
+    | undefined;
+  type TextInputRuntimeObjectRendererClass =
+    | typeof TextInputRuntimeObjectPixiRenderer
+    | undefined;
+  export const TextInputRuntimeObjectRenderer: TextInputRuntimeObjectRendererClass = TextInputRuntimeObjectPixiRenderer;
 }

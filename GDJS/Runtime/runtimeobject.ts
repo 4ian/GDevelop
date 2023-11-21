@@ -241,12 +241,16 @@ namespace gdjs {
       );
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
-      for (let i = 0; i < objectData.effects.length; ++i) {
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          .initializeEffect(objectData.effects[i], this._rendererEffects, this);
-        this.updateAllEffectParameters(objectData.effects[i]);
+      const effectsManager = this._runtimeScene.getGame().getEffectsManager();
+      if (effectsManager) {
+        for (let i = 0; i < objectData.effects.length; ++i) {
+          effectsManager.initializeEffect(
+            objectData.effects[i],
+            this._rendererEffects,
+            this
+          );
+          this.updateAllEffectParameters(objectData.effects[i]);
+        }
       }
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
@@ -349,12 +353,16 @@ namespace gdjs {
       this._behaviors.length = behaviorsUsingLifecycleFunctionCount;
 
       // Reinitialize effects.
-      for (let i = 0; i < objectData.effects.length; ++i) {
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          .initializeEffect(objectData.effects[i], this._rendererEffects, this);
-        this.updateAllEffectParameters(objectData.effects[i]);
+      const effectsManager = this._runtimeScene.getGame().getEffectsManager();
+      if (effectsManager) {
+        for (let i = 0; i < objectData.effects.length; ++i) {
+          effectsManager.initializeEffect(
+            objectData.effects[i],
+            this._rendererEffects,
+            this
+          );
+          this.updateAllEffectParameters(objectData.effects[i]);
+        }
       }
 
       // Make sure to delete existing timers.
@@ -471,11 +479,11 @@ namespace gdjs {
       const theLayer = instanceContainer.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
-        theLayer.getRenderer().removeRendererObject(rendererObject);
+        theLayer.getRenderer()?.removeRendererObject(rendererObject);
       }
       const rendererObject3D = this.get3DRendererObject();
       if (rendererObject3D) {
-        theLayer.getRenderer().remove3DRendererObject(rendererObject3D);
+        theLayer.getRenderer()?.remove3DRendererObject(rendererObject3D);
       }
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
@@ -750,13 +758,13 @@ namespace gdjs {
       const newLayer = this._runtimeScene.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
-        oldLayer.getRenderer().removeRendererObject(rendererObject);
-        newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
+        oldLayer.getRenderer()?.removeRendererObject(rendererObject);
+        newLayer.getRenderer()?.addRendererObject(rendererObject, this.zOrder);
       }
       const rendererObject3D = this.get3DRendererObject();
       if (rendererObject3D) {
-        oldLayer.getRenderer().remove3DRendererObject(rendererObject3D);
-        newLayer.getRenderer().add3DRendererObject(rendererObject3D);
+        oldLayer.getRenderer()?.remove3DRendererObject(rendererObject3D);
+        newLayer.getRenderer()?.add3DRendererObject(rendererObject3D);
       }
     }
 
@@ -792,7 +800,7 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
         const theLayer = this._runtimeScene.getLayer(this.layer);
-        theLayer.getRenderer().changeRendererObjectZOrder(rendererObject, z);
+        theLayer.getRenderer()?.changeRendererObjectZOrder(rendererObject, z);
       }
     }
 
@@ -1044,10 +1052,10 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .addEffect(effectData, this._rendererEffects, this);
+        ?.addEffect(effectData, this._rendererEffects, this);
     }
 
     /**
@@ -1058,10 +1066,10 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .removeEffect(this._rendererEffects, this, effectName);
+        ?.removeEffect(this._rendererEffects, this, effectName);
     }
 
     /**
@@ -1072,13 +1080,11 @@ namespace gdjs {
       if (!rendererObject) return false;
 
       this._rendererEffects = {};
-      return (
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          // @ts-expect-error - the effects manager is typed with the PIXI object.
-          .clearEffects(rendererObject)
-      );
+      return !!this._runtimeScene
+        .getGame()
+        .getEffectsManager()
+        // @ts-expect-error - the effects manager is typed with the PIXI object.
+        ?.clearEffects(rendererObject);
     }
 
     /**
@@ -1092,10 +1098,10 @@ namespace gdjs {
       parameterName: string,
       value: float
     ): boolean {
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .setEffectDoubleParameter(
+        ?.setEffectDoubleParameter(
           this._rendererEffects,
           name,
           parameterName,
@@ -1114,10 +1120,10 @@ namespace gdjs {
       parameterName: string,
       value: string
     ): boolean {
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .setEffectStringParameter(
+        ?.setEffectStringParameter(
           this._rendererEffects,
           name,
           parameterName,
@@ -1136,10 +1142,10 @@ namespace gdjs {
       parameterName: string,
       value: boolean
     ): boolean {
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .setEffectBooleanParameter(
+        ?.setEffectBooleanParameter(
           this._rendererEffects,
           name,
           parameterName,
@@ -1152,10 +1158,10 @@ namespace gdjs {
      * @param effectData The data describing the effect
      */
     updateAllEffectParameters(effectData: EffectData): boolean {
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .updateAllEffectParameters(this._rendererEffects, effectData);
+        ?.updateAllEffectParameters(this._rendererEffects, effectData);
     }
 
     /**
@@ -1167,7 +1173,7 @@ namespace gdjs {
       this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .enableEffect(this._rendererEffects, this, name, enable);
+        ?.enableEffect(this._rendererEffects, this, name, enable);
     }
 
     /**
@@ -1176,10 +1182,10 @@ namespace gdjs {
      * @return true if the effect is enabled, false otherwise.
      */
     isEffectEnabled(name: string): boolean {
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .isEffectEnabled(this._rendererEffects, this, name);
+        ?.isEffectEnabled(this._rendererEffects, this, name);
     }
 
     /**
@@ -1188,10 +1194,10 @@ namespace gdjs {
      * @return true if the effect exists, false otherwise.
      */
     hasEffect(name: string): boolean {
-      return this._runtimeScene
+      return !!this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .hasEffect(this._rendererEffects, name);
+        ?.hasEffect(this._rendererEffects, name);
     }
 
     /**

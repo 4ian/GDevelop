@@ -67,10 +67,12 @@ namespace gdjs {
       this._fontSize = parseFloat(objectData.content.fontSize);
       this._wordWrap = objectData.content.wordWrap;
       this._align = objectData.content.align;
-      this._renderer = new gdjs.BBTextRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      if (gdjs.BBTextRuntimeObjectRenderer) {
+        this._renderer = new gdjs.BBTextRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
       this.hidden = !objectData.content.visible;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -78,7 +80,7 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     // @ts-ignore
@@ -97,7 +99,7 @@ namespace gdjs {
       }
       if (oldObjectData.content.color !== newObjectData.content.color) {
         this._color = gdjs.rgbOrHexToRGBColor(newObjectData.content.color);
-        this._renderer.updateColor();
+        if (this._renderer) this._renderer.updateColor();
       }
       if (
         oldObjectData.content.fontFamily !== newObjectData.content.fontFamily
@@ -140,7 +142,7 @@ namespace gdjs {
      */
     setBBText(text): void {
       this._text = text;
-      this._renderer.updateText();
+      if (this._renderer) this._renderer.updateText();
     }
 
     /**
@@ -152,7 +154,7 @@ namespace gdjs {
 
     setColor(rgbColorString): void {
       this._color = gdjs.rgbOrHexToRGBColor(rgbColorString);
-      this._renderer.updateColor();
+      if (this._renderer) this._renderer.updateColor();
     }
 
     /**
@@ -165,7 +167,7 @@ namespace gdjs {
 
     setFontSize(fontSize): void {
       this._fontSize = fontSize;
-      this._renderer.updateFontSize();
+      if (this._renderer) this._renderer.updateFontSize();
     }
 
     getFontSize() {
@@ -174,7 +176,7 @@ namespace gdjs {
 
     setFontFamily(fontFamily): void {
       this._fontFamily = fontFamily;
-      this._renderer.updateFontFamily();
+      if (this._renderer) this._renderer.updateFontFamily();
     }
 
     getFontFamily() {
@@ -183,7 +185,7 @@ namespace gdjs {
 
     setAlignment(align): void {
       this._align = align;
-      this._renderer.updateAlignment();
+      if (this._renderer) this._renderer.updateAlignment();
     }
 
     getAlignment() {
@@ -196,7 +198,7 @@ namespace gdjs {
      */
     setX(x: float): void {
       super.setX(x);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -205,7 +207,7 @@ namespace gdjs {
      */
     setY(y: float): void {
       super.setY(y);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -214,7 +216,7 @@ namespace gdjs {
      */
     setAngle(angle: float): void {
       super.setAngle(angle);
-      this._renderer.updateAngle();
+      if (this._renderer) this._renderer.updateAngle();
     }
 
     /**
@@ -229,7 +231,7 @@ namespace gdjs {
         opacity = 255;
       }
       this._opacity = opacity;
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     /**
@@ -247,7 +249,7 @@ namespace gdjs {
       if (this._wrappingWidth === width) return;
 
       this._wrappingWidth = width;
-      this._renderer.updateWrappingWidth();
+      if (this._renderer) this._renderer.updateWrappingWidth();
       this.invalidateHitboxes();
     }
 
@@ -262,7 +264,7 @@ namespace gdjs {
       if (this._wordWrap === wordWrap) return;
 
       this._wordWrap = wordWrap;
-      this._renderer.updateWordWrap();
+      if (this._renderer) this._renderer.updateWordWrap();
       this.invalidateHitboxes();
     }
 
@@ -274,14 +276,33 @@ namespace gdjs {
      * Get the width of the object.
      */
     getWidth(): float {
-      return this._renderer.getWidth();
+      if (this._renderer) return this._renderer.getWidth();
+      // When there is no renderer, we make a very rough assumption about the text size to not break game logic
+      // that might depend on changes of the text size, this is very much an edge case though so we won't
+      // implement a more complex text measuring system.
+      // We get the longest line, and multiply its length by the character size.
+      else
+        return (
+          this._text
+            .split('\n')
+            .reduce(
+              (biggestLength, line) =>
+                line.length > biggestLength ? line.length : biggestLength,
+              0
+            ) * this._fontSize
+        );
     }
 
     /**
      * Get the height of the object.
      */
     getHeight(): float {
-      return this._renderer.getHeight();
+      if (this._renderer) return this._renderer.getHeight();
+      // When there is no renderer, we make a very rough assumption about the text size to not break game logic
+      // that might depend on changes of the text size, this is very much an edge case though so we won't
+      // implement a more complex text measuring system.
+      // We get the amount of lines, and multiply it by the character size.
+      else return this._text.split('\n').length * this._fontSize;
     }
   }
   // @ts-ignore

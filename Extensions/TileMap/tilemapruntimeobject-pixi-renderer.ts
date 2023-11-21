@@ -31,7 +31,7 @@ namespace gdjs {
 
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
       this.updateAngle();
       this.updateOpacity();

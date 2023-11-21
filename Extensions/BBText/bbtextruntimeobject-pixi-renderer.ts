@@ -20,7 +20,7 @@ namespace gdjs {
         default: {
           fontFamily: instanceContainer
             .getGame()
-            .getFontManager()
+            .getFontManager()!
             .getFontFamily(runtimeObject._fontFamily),
           fontSize: runtimeObject._fontSize + 'px',
           fill: gdjs.rgbToHexNumber(
@@ -36,7 +36,7 @@ namespace gdjs {
       });
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
       // Set the anchor in the center, so that the object rotates around
@@ -93,7 +93,7 @@ namespace gdjs {
       this._pixiObject.textStyles.default.fontFamily = this._object
         .getInstanceContainer()
         .getGame()
-        .getFontManager()
+        .getFontManager()!
         .getFontFamily(this._object._fontFamily);
       this._pixiObject.dirty = true;
     }
@@ -132,6 +132,11 @@ namespace gdjs {
     }
   }
 
-  export const BBTextRuntimeObjectRenderer = BBTextRuntimeObjectPixiRenderer;
-  export type BBTextRuntimeObjectRenderer = BBTextRuntimeObjectPixiRenderer;
+  export type BBTextRuntimeObjectRenderer =
+    | BBTextRuntimeObjectPixiRenderer
+    | undefined;
+  type BBTextRuntimeObjectRendererClass =
+    | typeof BBTextRuntimeObjectPixiRenderer
+    | undefined;
+  export const BBTextRuntimeObjectRenderer: BBTextRuntimeObjectRendererClass = BBTextRuntimeObjectPixiRenderer;
 }

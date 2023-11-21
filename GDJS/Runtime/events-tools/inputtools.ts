@@ -247,13 +247,13 @@ namespace gdjs {
       export const hideCursor = function (
         instanceContainer: gdjs.RuntimeScene
       ) {
-        instanceContainer.getScene().getRenderer().hideCursor();
+        instanceContainer.getScene().getRenderer()?.hideCursor();
       };
 
       export const showCursor = function (
         instanceContainer: gdjs.RuntimeScene
       ) {
-        instanceContainer.getScene().getRenderer().showCursor();
+        instanceContainer.getScene().getRenderer()?.showCursor();
       };
 
       export const getMouseWheelDelta = function (

@@ -11,7 +11,7 @@ namespace gdjs {
    * Load GLB files (using `Three.js`), using the "model3D" resources
    * registered in the game resources.
    */
-  export class Model3DManager {
+  export class Model3DThreeManager {
     /**
      * Map associating a resource name to the loaded Three.js model.
      */
@@ -138,4 +138,8 @@ namespace gdjs {
       return this._loadedThreeModels.get(resourceName) || this._invalidModel;
     }
   }
+
+  export type Model3DManager = Model3DThreeManager | undefined;
+  type Model3DManagerClass = typeof Model3DThreeManager | undefined;
+  export const Model3DManager: Model3DManagerClass = Model3DThreeManager;
 }

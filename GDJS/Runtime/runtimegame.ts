@@ -161,7 +161,7 @@ namespace gdjs {
     _renderer: RuntimeGameRenderer;
     _sessionId: string | null;
     _playerId: string | null;
-    _watermark: watermark.RuntimeWatermark;
+    _watermark: RuntimeWatermark;
 
     _sceneStack: SceneStack;
     /**
@@ -213,32 +213,7 @@ namespace gdjs {
       this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
 
       const resources = this._data.resources.resources;
-      this._imageManager = new gdjs.ImageManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._soundManager = new gdjs.SoundManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._fontManager = new gdjs.FontManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._jsonManager = new gdjs.JsonManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._bitmapFontManager = new gdjs.BitmapFontManager(
-        resources,
-        this._resourcesLoader,
-        this._imageManager
-      );
-      this._model3DManager = new gdjs.Model3DManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._effectsManager = new gdjs.EffectsManager();
+
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -251,15 +226,72 @@ namespace gdjs {
       this._pixelsRounding = this._data.properties.pixelsRounding;
       this._antialiasingMode = this._data.properties.antialiasingMode;
       this._isAntialisingEnabledOnMobile = this._data.properties.antialisingEnabledOnMobile;
-      this._renderer = new gdjs.RuntimeGameRenderer(
-        this,
-        this._options.forceFullscreen || false
+
+      // The JSON manager, unlike other managers, is always guaranteed to be present,
+      // since it does not manage purely presentational aspects of the game but actual
+      // game logic that is always needed for the game to run correctly.
+      this._jsonManager = new gdjs.JsonManager(
+        resources,
+        this._resourcesLoader
       );
-      this._watermark = new gdjs.watermark.RuntimeWatermark(
-        this,
-        data.properties.authorUsernames,
-        this._data.properties.watermark
-      );
+
+      // Presentational managers and the renderer are provided by the "renderer extension" of gdjs,
+      // and might not be present in server builds that do not include any renderer.
+      if (gdjs.ImageManager) {
+        this._imageManager = new gdjs.ImageManager(
+          resources,
+          this._resourcesLoader
+        );
+      }
+
+      if (gdjs.SoundManager) {
+        this._soundManager = new gdjs.SoundManager(
+          resources,
+          this._resourcesLoader
+        );
+      }
+
+      if (gdjs.FontManager) {
+        this._fontManager = new gdjs.FontManager(
+          resources,
+          this._resourcesLoader
+        );
+      }
+
+      if (gdjs.BitmapFontManager) {
+        this._bitmapFontManager = new gdjs.BitmapFontManager(
+          resources,
+          this._resourcesLoader,
+          this._imageManager!
+        );
+      }
+
+      if (gdjs.Model3DManager) {
+        this._model3DManager = new gdjs.Model3DManager(
+          resources,
+          this._resourcesLoader
+        );
+      }
+
+      if (gdjs.EffectsManager) {
+        this._effectsManager = new gdjs.EffectsManager();
+      }
+
+      if (gdjs.RuntimeGameRenderer) {
+        this._renderer = new gdjs.RuntimeGameRenderer(
+          this,
+          this._options.forceFullscreen || false
+        );
+      }
+
+      if (gdjs.RuntimeWatermark) {
+        this._watermark = new gdjs.RuntimeWatermark(
+          this,
+          data.properties.authorUsernames,
+          this._data.properties.watermark
+        );
+      }
+
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
       this._injectExternalLayout = this._options.injectExternalLayout || '';
@@ -315,12 +347,20 @@ namespace gdjs {
      */
     setProjectData(projectData: ProjectData): void {
       this._data = projectData;
-      this._imageManager.setResources(this._data.resources.resources);
-      this._soundManager.setResources(this._data.resources.resources);
-      this._fontManager.setResources(this._data.resources.resources);
+      if (
+        this._imageManager &&
+        this._soundManager &&
+        this._fontManager &&
+        this._bitmapFontManager &&
+        this._model3DManager
+      ) {
+        this._imageManager.setResources(this._data.resources.resources);
+        this._soundManager.setResources(this._data.resources.resources);
+        this._fontManager.setResources(this._data.resources.resources);
+        this._bitmapFontManager.setResources(this._data.resources.resources);
+        this._model3DManager.setResources(this._data.resources.resources);
+      }
       this._jsonManager.setResources(this._data.resources.resources);
-      this._bitmapFontManager.setResources(this._data.resources.resources);
-      this._model3DManager.setResources(this._data.resources.resources);
     }
 
     /**
@@ -347,7 +387,7 @@ namespace gdjs {
      * Get the gdjs.SoundManager of the RuntimeGame.
      * @return The sound manager.
      */
-    getSoundManager(): gdjs.HowlerSoundManager {
+    getSoundManager(): gdjs.HowlerSoundManager | undefined {
       return this._soundManager;
     }
 
@@ -355,7 +395,7 @@ namespace gdjs {
      * Get the gdjs.ImageManager of the RuntimeGame.
      * @return The image manager.
      */
-    getImageManager(): gdjs.PixiImageManager {
+    getImageManager(): gdjs.PixiImageManager | undefined {
       return this._imageManager;
     }
 
@@ -363,7 +403,7 @@ namespace gdjs {
      * Get the gdjs.FontManager of the RuntimeGame.
      * @return The font manager.
      */
-    getFontManager(): gdjs.FontFaceObserverFontManager {
+    getFontManager(): gdjs.FontFaceObserverFontManager | undefined {
       return this._fontManager;
     }
 
@@ -371,7 +411,7 @@ namespace gdjs {
      * Get the gdjs.BitmapFontManager of the RuntimeGame.
      * @return The bitmap font manager.
      */
-    getBitmapFontManager(): gdjs.BitmapFontManager {
+    getBitmapFontManager(): gdjs.BitmapFontManager | undefined {
       // @ts-ignore
       return this._bitmapFontManager;
     }
@@ -399,7 +439,7 @@ namespace gdjs {
      * resources.
      * @return The 3D model manager for the game
      */
-    getModel3DManager(): gdjs.Model3DManager {
+    getModel3DManager(): gdjs.Model3DManager | undefined {
       return this._model3DManager;
     }
 
@@ -408,7 +448,7 @@ namespace gdjs {
      * effects on runtime objects or runtime layers.
      * @return The effects manager for the game
      */
-    getEffectsManager(): gdjs.EffectsManager {
+    getEffectsManager(): gdjs.EffectsManager | undefined {
       return this._effectsManager;
     }
 
@@ -571,7 +611,7 @@ namespace gdjs {
       // Notify the renderer that game resolution changed (so that the renderer size
       // can be updated, and maybe other things like the canvas size), and let the
       // scenes know too.
-      this._renderer.updateRendererSize();
+      this._renderer?.updateRendererSize();
       this._notifyScenesForGameResolutionResize = true;
     }
 
@@ -697,11 +737,13 @@ namespace gdjs {
       progressCallback?: (progress: float) => void
     ) => {
       try {
-        const loadingScreen = new gdjs.LoadingScreenRenderer(
-          this.getRenderer(),
-          this._imageManager,
-          this._data.properties.loadingScreen
-        );
+        const loadingScreen = gdjs.LoadingScreenRenderer
+          ? new gdjs.LoadingScreenRenderer(
+              this.getRenderer()!,
+              this._imageManager!,
+              this._data.properties.loadingScreen
+            )
+          : null;
         const allAssetsTotal = this._data.resources.resources.length;
         let loadedAssets = 0;
 
@@ -709,18 +751,18 @@ namespace gdjs {
           const percent = Math.floor(
             (100 * (loadedAssets + count)) / allAssetsTotal
           );
-          loadingScreen.setPercent(percent);
+          if (loadingScreen) loadingScreen.setPercent(percent);
           if (progressCallback) {
             progressCallback(percent);
           }
         };
 
-        loadedAssets += await this._imageManager.loadTextures(onProgress);
-        loadedAssets += await this._soundManager.preloadAudio(onProgress);
-        loadedAssets += await this._fontManager.loadFonts(onProgress);
+        if (this._imageManager) loadedAssets += await this._imageManager.loadTextures(onProgress);
+        if (this._soundManager) loadedAssets += await this._soundManager.preloadAudio(onProgress);
+        if (this._fontManager) loadedAssets += await this._fontManager.loadFonts(onProgress);
         loadedAssets += await this._jsonManager.preloadJsons(onProgress);
-        loadedAssets += await this._model3DManager.loadModels(onProgress);
-        await this._bitmapFontManager.loadBitmapFontData(onProgress);
+        if (this._model3DManager) loadedAssets += await this._model3DManager.loadModels(onProgress);
+        if (this._bitmapFontManager) await this._bitmapFontManager.loadBitmapFontData(onProgress);
         await loadingScreen.unload();
         await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
       } catch (e) {
@@ -729,6 +771,40 @@ namespace gdjs {
         throw e;
       }
     };
+
+    /**
+     * It is up to the RuntimeGameRenderer to tell the RuntimeGame when to step;
+     * However, it is not guaranteed that a renderer is present, this function is used
+     * as a fallback for that case and uses the most likely correct way of doing things.
+     *
+     * JavaScript runtimes will not work correctly when running an unbreakable while loop,
+     * they expect that we give them back control every now and then to run timers,
+     * microtasks, promises, necessary system calls for calls to APIs like fetch or Node fs,
+     * ...
+     *
+     * The most widely supported way to stop running code, thus yielding back to the runtime,
+     * but then call back into our code again, is the timers API. Thus, this fallback being intended
+     * to work in any JS environement, it uses Timers, although they might not be ideal.
+     *
+     * If the game runs in an anvironement like a browser, a renderer for that platform should be
+     * in-use, providing a more pertinent API like `requestAnimationFrame`.
+     */
+    static fallbackGameLoopStarter(
+      requestFrameRun: (deltaTime: number) => boolean
+    ) {
+      const yieldToRuntime = setImmediate ?? setTimeout;
+      let oldTime = 0;
+      const gameLoop = () => {
+        const now = Date.now();
+        const dt = oldTime ? now - oldTime : 0;
+        oldTime = now;
+        if (requestFrameRun(dt)) {
+          // As long as RuntimeGame does not request the game to stop, continue running the loop.
+          yieldToRuntime(gameLoop);
+        }
+      };
+      gameLoop();
+    }
 
     /**
      * Start the game loop, to be called once assets are loaded.
@@ -750,7 +826,7 @@ namespace gdjs {
               this.getSceneData().name,
           this._injectExternalLayout
         );
-        this._watermark.displayAtStartup();
+        if (this._watermark) this._watermark.displayAtStartup();
 
         //Uncomment to profile the first x frames of the game.
         // var x = 500;
@@ -769,7 +845,12 @@ namespace gdjs {
         // The standard game loop
         let accumulatedElapsedTime = 0;
         this._hasJustResumed = false;
-        this._renderer.startGameLoop((lastCallElapsedTime) => {
+
+        const startGameLoop = this._renderer
+          ? this._renderer.startGameLoop.bind(this._renderer)
+          : gdjs.RuntimeGame.fallbackGameLoopStarter;
+
+        startGameLoop((lastCallElapsedTime) => {
           try {
             if (this._paused) {
               return true;
@@ -1134,6 +1215,49 @@ namespace gdjs {
       return mapping && mapping[embeddedResourceName]
         ? mapping[embeddedResourceName]
         : embeddedResourceName;
+    }
+
+    /**
+     * Gets the base dimensions, height and width, of any resource.
+     *
+     * TODO:
+     * This is part of RuntimeGame because, in the future, we should have the dimensions
+     * pre-computed by the IDE and stored in the {@link ProjectData}, since dimensions are *very*
+     * important for the game logic, and thus we want them to be ultra-consistent, there should not
+     * be any discrepancy between a build with different renderers (or none at all)!
+     *
+     * This is out of scope for the PR implementing this function, and will need to be done in a follow-up PR.
+     */
+    getResourceBaseDimensions(
+      resourceName: string
+    ): { height: number; width: number } {
+      // TODO: This is *NOT VALID*, and must be fixed before introducing builds of games without a renderer.
+      if (!this._renderer) return { height: 1, width: 1 };
+      // TODO: This function couples RuntimeGame with the PIXI Renderer, since this is a "temporary fix".
+      //       The function will work regardless of renderers once the resource dimensions are pre-computed
+      //       and stored onto the resource by the IDE.
+      const resource = this._data.resources.resources.find(
+        (resource) => resource.name === resourceName
+      );
+      if (!resource) {
+        logger.warn(
+          'Tried to find dimensions of a resource that does not exist!'
+        );
+        return { height: 1, width: 1 };
+      }
+      if (resource.kind === 'image') {
+        const texture = this.getImageManager()!.getPIXITexture(resource.name);
+        return { height: texture.height, width: texture.width };
+      }
+      if (resource.kind === 'video') {
+        const texture = this.getImageManager()!.getPIXIVideoTexture(
+          resource.name
+        );
+        return { height: texture.height, width: texture.width };
+      }
+      throw new Error(
+        `Tried to get the dimensions of unsupported resource kind '${resource.kind}' - please implement support for this resource kind in RuntimeGame#getResourceBaseDimensions!`
+      );
     }
   }
 }

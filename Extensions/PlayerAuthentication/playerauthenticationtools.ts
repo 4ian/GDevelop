@@ -104,7 +104,7 @@ namespace gdjs {
       runtimeScene: RuntimeScene
     ): 'electron' | 'cordova' | 'web' => {
       const runtimeGame = runtimeScene.getGame();
-      const electron = runtimeGame.getRenderer().getElectron();
+      const electron = runtimeGame.getRenderer()?.getElectron();
       if (electron) {
         return 'electron';
       }
@@ -229,7 +229,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -351,7 +351,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -432,7 +432,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -517,7 +517,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -542,7 +542,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -615,7 +615,7 @@ namespace gdjs {
               const electron = runtimeScene
                 .getGame()
                 .getRenderer()
-                .getElectron();
+                ?.getElectron();
               const openWindow = () => electron.shell.openExternal(targetUrl);
 
               openWindow();
@@ -759,7 +759,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         handleAuthenticationError(
           runtimeScene,
@@ -806,7 +806,10 @@ namespace gdjs {
       checkIfGameIsRegistered(runtimeScene.getGame(), _gameId)
         .then((isGameRegistered) => {
           if (_authenticationLoaderContainer) {
-            const electron = runtimeScene.getGame().getRenderer().getElectron();
+            const electron = runtimeScene
+              .getGame()
+              .getRenderer()
+              ?.getElectron();
             const wikiOpenAction = electron
               ? () =>
                   electron.shell.openExternal(
@@ -870,7 +873,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         logger.info(
           "The div element covering the game couldn't be found, the authentication must be already closed."
@@ -921,7 +924,7 @@ namespace gdjs {
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
-        .getDomElementContainer();
+        ?.getDomElementContainer();
       if (!domElementContainer) {
         logger.info(
           "The div element covering the game couldn't be found, the authentication must be already closed."
@@ -937,7 +940,7 @@ namespace gdjs {
      * Focus on game canvas to allow user to interact with it.
      */
     const focusOnGame = function (runtimeScene: gdjs.RuntimeScene) {
-      const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
+      const gameCanvas = runtimeScene.getGame().getRenderer()?.getCanvas();
       if (gameCanvas) gameCanvas.focus();
     };
   }

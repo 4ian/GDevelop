@@ -56,7 +56,7 @@ namespace gdjs {
     return runtimeObject
       .getInstanceContainer()
       .getGame()
-      .getImageManager()
+      .getImageManager()!
       .getThreeMaterial(runtimeObject.getFaceAtIndexResourceName(faceIndex), {
         useTransparentTexture: runtimeObject.shouldUseTransparentTexture(),
         forceBasicMaterial:
@@ -65,7 +65,7 @@ namespace gdjs {
       });
   };
 
-  class Cube3DRuntimeObjectPixiRenderer extends gdjs.RuntimeObject3DRenderer {
+  class Cube3DRuntimeObjectPixiRenderer extends gdjs.RuntimeObject3DThreeRenderer {
     private _cube3DRuntimeObject: gdjs.Cube3DRuntimeObject;
     private _boxMesh: THREE.Mesh;
 

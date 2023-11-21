@@ -131,6 +131,9 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
+  if (eventsBasedObject.IsRenderedIn3D()) {
+    objectMetadata.MarkAsRenderedIn3D();
+  }
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.

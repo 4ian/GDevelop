@@ -2,19 +2,19 @@
 import React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
-import ExportDialog from './Export/ExportDialog';
+import ShareDialog from './ExportAndShare/ShareDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for Electron powered IDE.
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
-import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
+import LocalPreviewLauncher from './ExportAndShare/LocalExporters/LocalPreviewLauncher';
 import {
   localAutomatedExporters,
   localManualExporters,
   localOnlineWebExporter,
-} from './Export/LocalExporters';
+} from './ExportAndShare/LocalExporters';
 import ElectronMainMenu from './MainFrame/ElectronMainMenu';
 import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 import { makeLocalEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/LocalEventsFunctionCodeWriter';
@@ -76,15 +76,19 @@ export const create = (authentication: Authentication) => {
               renderPreviewLauncher={(props, ref) => (
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
-              renderExportDialog={props => (
-                <ExportDialog
+              renderShareDialog={props => (
+                <ShareDialog
                   project={props.project}
                   onSaveProject={props.onSaveProject}
+                  isSavingProject={props.isSavingProject}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
                   automatedExporters={localAutomatedExporters}
                   manualExporters={localManualExporters}
                   onlineWebExporter={localOnlineWebExporter}
+                  fileMetadata={props.fileMetadata}
+                  storageProvider={props.storageProvider}
+                  initialTab={props.initialTab}
                 />
               )}
               renderGDJSDevelopmentWatcher={

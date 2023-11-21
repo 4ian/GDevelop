@@ -39,16 +39,18 @@ module.exports = {
       .setIcon('res/conditions/3d_box.svg');
 
     {
-      const base3D = extension.addBehavior(
-          "Base3DBehavior",
-          _("3D capability"),
-          "Object3D",
-          _("Move the object in 3D space."),
-          "",
-          "res/conditions/3d_box.svg",
-          "Base3DBehavior",
+      const base3D = extension
+        .addBehavior(
+          'Base3DBehavior',
+          _('3D capability'),
+          'Object3D',
+          _('Move the object in 3D space.'),
+          '',
+          'res/conditions/3d_box.svg',
+          'Base3DBehavior',
           new gd.Behavior(),
-          new gd.BehaviorsSharedData())
+          new gd.BehaviorsSharedData()
+        )
         .setHidden()
         .setIncludeFile('Extensions/3D/Base3DBehavior.js');
 
@@ -63,10 +65,26 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setZ')
         .setGetter('getZ');
+
+      base3D
+        .addExpressionAndConditionAndAction(
+          'number',
+          'CenterZ',
+          _('Center Z position'),
+          _('the Z position of the center of rotation'),
+          _('the Z position of the center'),
+          _('Position/Center'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setCenterZInScene')
+        .setGetter('getCenterZInScene');
 
       base3D
         .addExpressionAndConditionAndAction(
@@ -79,23 +97,23 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setDepth')
         .setGetter('getDepth');
 
-        base3D
+      base3D
         .addExpressionAndConditionAndAction(
           'number',
           'ScaleZ',
           _('Scale on Z axis'),
-          _("the scale on Z axis of an object (default scale is 1)"),
-          _("the scale on Z axis scale"),
-          _('Scale'),
+          _('the scale on Z axis of an object (default scale is 1)'),
+          _('the scale on Z axis scale'),
+          _('Size'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(
@@ -106,7 +124,7 @@ module.exports = {
         .setFunctionName('setScaleZ')
         .setGetter('getScaleZ');
 
-        base3D
+      base3D
         .addScopedAction(
           'FlipZ',
           _('Flip the object on Z'),
@@ -117,12 +135,12 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('yesorno', _('Activate flipping'))
         .markAsSimple()
         .setFunctionName('flipZ');
 
-        base3D
+      base3D
         .addScopedCondition(
           'FlippedZ',
           _('Flipped on Z'),
@@ -133,10 +151,10 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .setFunctionName('isFlippedZ');
 
-        base3D
+      base3D
         .addExpressionAndConditionAndAction(
           'number',
           'RotationX',
@@ -147,12 +165,12 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setRotationX')
         .setGetter('getRotationX');
 
-        base3D
+      base3D
         .addExpressionAndConditionAndAction(
           'number',
           'RotationY',
@@ -163,12 +181,12 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setRotationY')
         .setGetter('getRotationY');
 
-        base3D
+      base3D
         .addScopedAction(
           'TurnAroundX',
           _('Turn around X axis'),
@@ -181,12 +199,12 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundX');
 
-        base3D
+      base3D
         .addScopedAction(
           'TurnAroundY',
           _('Turn around Y axis'),
@@ -199,12 +217,12 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundY');
 
-        base3D
+      base3D
         .addScopedAction(
           'TurnAroundZ',
           _('Turn around Z axis'),
@@ -217,7 +235,7 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'))
-        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundZ');
@@ -228,17 +246,18 @@ module.exports = {
         .addObject(
           'Model3DObject',
           _('3D Model'),
-          _('A 3D model.'),
+          _('An animated 3D model.'),
           'JsPlatform/Extensions/3d_box.svg',
           new gd.Model3DObjectConfiguration()
         )
-        .setCategoryFullName(_('3D'))
-         // Effects are unsupported because the object is not rendered with PIXI.
+        .setCategoryFullName(_('General'))
+        // Effects are unsupported because the object is not rendered with PIXI.
         .addDefaultBehavior('ResizableCapability::ResizableBehavior')
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
         .addDefaultBehavior('FlippableCapability::FlippableBehavior')
         .addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
         .addDefaultBehavior('Scene3D::Base3DBehavior')
+        .markAsRenderedIn3D()
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
@@ -263,7 +282,6 @@ module.exports = {
         .setFunctionName('setZ')
         .setGetter('getZ');
 
-      
       // Deprecated
       object
         .addExpressionAndConditionAndAction(
@@ -1109,16 +1127,17 @@ module.exports = {
       .addObject(
         'Cube3DObject',
         _('3D Box'),
-        _('A 3D box.'),
+        _('A box with images for each face'),
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )
-      .setCategoryFullName(_('3D'))
+      .setCategoryFullName(_('General'))
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')
       .addDefaultBehavior('FlippableCapability::FlippableBehavior')
       .addDefaultBehavior('Scene3D::Base3DBehavior')
+      .markAsRenderedIn3D()
       .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
       .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
       .addIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')
@@ -1143,7 +1162,7 @@ module.exports = {
       .setFunctionName('setZ')
       .setGetter('getZ');
 
-      // Deprecated
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -1288,7 +1307,7 @@ module.exports = {
       .setFunctionName('setScaleX')
       .setGetter('getScaleX');
 
-      // Deprecated
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -1646,7 +1665,7 @@ module.exports = {
           'Change the camera rotation to look at an object. The camera top always face the screen.'
         ),
         _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
-        '',
+        _("Layers and cameras"),
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
@@ -2080,6 +2099,12 @@ module.exports = {
         this.updateTexture();
       }
 
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        // Keep textures because they are shared by all sprites.
+        this._pixiObject.destroy({ children: true });
+      }
+
       static _getResourceNameToDisplay(objectConfiguration) {
         return getFirstVisibleFaceResourceName(objectConfiguration);
       }
@@ -2144,17 +2169,18 @@ module.exports = {
       updatePIXISprite() {
         const width = this.getWidth();
         const height = this.getHeight();
+        const objectTextureFrame = this._pixiTexturedObject.texture.frame;
+        // In case the texture is not loaded yet, we don't want to crash.
+        if (!objectTextureFrame) return;
 
         this._pixiTexturedObject.anchor.x =
-          this._centerX / this._pixiTexturedObject.texture.frame.width;
+          this._centerX / objectTextureFrame.width;
         this._pixiTexturedObject.anchor.y =
-          this._centerY / this._pixiTexturedObject.texture.frame.height;
+          this._centerY / objectTextureFrame.height;
 
         this._pixiTexturedObject.angle = this._instance.getAngle();
-        this._pixiTexturedObject.scale.x =
-          width / this._pixiTexturedObject.texture.frame.width;
-        this._pixiTexturedObject.scale.y =
-          height / this._pixiTexturedObject.texture.frame.height;
+        this._pixiTexturedObject.scale.x = width / objectTextureFrame.width;
+        this._pixiTexturedObject.scale.y = height / objectTextureFrame.height;
 
         this._pixiTexturedObject.position.x =
           this._instance.getX() +
@@ -2661,6 +2687,11 @@ module.exports = {
               keepAspectRatio
             );
           });
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy({ children: true });
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {

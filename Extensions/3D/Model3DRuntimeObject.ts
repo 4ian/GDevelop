@@ -224,8 +224,12 @@ namespace gdjs {
       ) {
         const animation = this._animations[animationIndex];
         this._currentAnimationIndex = animationIndex;
-        if (this._renderer)
+        if (this._renderer) {
           this._renderer.playAnimation(animation.source, animation.loop);
+          if (this._animationPaused) {
+            this._renderer.pauseAnimation();
+          }
+        }
       }
     }
 
@@ -293,6 +297,21 @@ namespace gdjs {
       this._animationSpeedScale = ratio;
     }
 
+    // TODO: Before merging this PR, the next 3 methods should be refactored to work without renderer.
+    getAnimationElapsedTime(): float {
+      return this._renderer!.getAnimationElapsedTime();
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      this._renderer!.setAnimationElapsedTime(time);
+    }
+
+    getAnimationDuration(): float {
+      return this._renderer!.getAnimationDuration(
+        this._animations[this._currentAnimationIndex].source
+      );
+    }
+
     // TODO: The non-null type assertions done on the next 4 methods here are INVALID!!
     //       the renderer may *not* be present at this point, and this code WILL BREAK
     //       without a renderer!
@@ -310,6 +329,11 @@ namespace gdjs {
       return this.getHeight() * centerPoint[1];
     }
 
+    getCenterZ(): float {
+      const centerPoint = this._renderer.getCenterPoint();
+      return this.getDepth() * centerPoint[2];
+    }
+
     getDrawableX(): float {
       const originPoint = this._renderer!.getOriginPoint();
       return this.getX() - this.getWidth() * originPoint[0];
@@ -318,6 +342,11 @@ namespace gdjs {
     getDrawableY(): float {
       const originPoint = this._renderer!.getOriginPoint();
       return this.getY() - this.getHeight() * originPoint[1];
+    }
+
+    getDrawableZ(): float {
+      const originPoint = this._renderer.getOriginPoint();
+      return this.getZ() - this.getDepth() * originPoint[2];
     }
   }
 

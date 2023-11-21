@@ -2,13 +2,17 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Brightness',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const brightness = new PIXI.ColorMatrixFilter();
         brightness.brightness(1, false);
         return brightness;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
         if (parameterName !== 'brightness') {
           return;
@@ -18,8 +22,16 @@ namespace gdjs {
           false
         );
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

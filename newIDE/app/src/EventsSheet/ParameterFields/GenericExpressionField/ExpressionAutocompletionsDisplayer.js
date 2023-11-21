@@ -304,7 +304,17 @@ export default function ExpressionAutocompletionsDisplayer({
                         ]
                       : expressionAutocompletion.kind === 'Property'
                       ? getTypeToIcon(
-                          expressionAutocompletion.propertyType.toLowerCase()
+                          gd.ValueTypeMetadata.getPrimitiveValueType(
+                            gd.ValueTypeMetadata.convertPropertyTypeToValueType(
+                              expressionAutocompletion.propertyType
+                            )
+                          )
+                        )
+                      : expressionAutocompletion.kind === 'Parameter'
+                      ? getTypeToIcon(
+                          gd.ValueTypeMetadata.getPrimitiveValueType(
+                            expressionAutocompletion.parameterType
+                          )
                         )
                       : null;
                   const icon = IconComponent ? (

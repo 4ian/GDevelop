@@ -40,7 +40,6 @@ void Object::Init(const gd::Object& object) {
   name = object.name;
   assetStoreId = object.assetStoreId;
   objectVariables = object.objectVariables;
-  tags = object.tags;
   effectsContainer = object.effectsContainer;
 
   behaviors.clear();
@@ -134,7 +133,6 @@ void Object::UnserializeFrom(gd::Project& project,
   SetType(element.GetStringAttribute("type"));
   assetStoreId = element.GetStringAttribute("assetStoreId");
   name = element.GetStringAttribute("name", name, "nom");
-  tags = element.GetStringAttribute("tags");
 
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
@@ -207,7 +205,6 @@ void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("assetStoreId", GetAssetStoreId());
   element.SetAttribute("type", GetType());
-  element.SetAttribute("tags", GetTags());
   objectVariables.SerializeTo(element.AddChild("variables"));
   effectsContainer.SerializeTo(element.AddChild("effects"));
 

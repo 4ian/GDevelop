@@ -203,6 +203,10 @@ namespace gdjs {
     setScaleY(newScale: float): void {
       this._text.scale.y = newScale;
     }
+
+    destroy() {
+      this._text.destroy(true);
+    }
   }
 
   // Register the class to let the engine use it.

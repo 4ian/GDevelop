@@ -25,6 +25,8 @@ const styles = {
   },
 };
 
+const editSceneIconReactNode = <EditSceneIcon />;
+
 type State = {|
   externalPropertiesDialogOpen: boolean,
 |};
@@ -45,6 +47,10 @@ export class ExternalEventsEditorContainer extends React.Component<
     // Especially important to note that when becoming inactive, a "last" update is allowed.
     return this.props.isActive || nextProps.isActive;
   }
+
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
+    if (this.editor) this.editor.onResourceExternallyChanged(resourceInfo);
+  };
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -159,7 +165,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             objectsContainer={layout}
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
-            settingsIcon={<EditSceneIcon />}
+            settingsIcon={editSceneIconReactNode}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             isActive={this.props.isActive}
           />

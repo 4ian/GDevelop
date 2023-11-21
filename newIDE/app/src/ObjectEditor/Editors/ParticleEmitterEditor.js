@@ -282,7 +282,7 @@ export default class ParticleEmitterEditor extends React.Component<
             type="number"
             value={particleEmitterConfiguration.getFlow()}
             onChange={value => {
-              particleEmitterConfiguration.setFlow(parseInt(value, 10) || 0);
+              particleEmitterConfiguration.setFlow(parseFloat(value) || 0);
               this.forceUpdate();
             }}
           />
@@ -298,7 +298,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getEmitterForceMin()}
             onChange={value => {
               particleEmitterConfiguration.setEmitterForceMin(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}
@@ -313,7 +313,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getEmitterForceMax()}
             onChange={value => {
               particleEmitterConfiguration.setEmitterForceMax(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}
@@ -328,7 +328,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getConeSprayAngle()}
             onChange={value => {
               particleEmitterConfiguration.setConeSprayAngle(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}
@@ -341,7 +341,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getZoneRadius()}
             onChange={value => {
               particleEmitterConfiguration.setZoneRadius(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}

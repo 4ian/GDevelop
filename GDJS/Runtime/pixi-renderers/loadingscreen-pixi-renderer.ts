@@ -52,7 +52,7 @@ namespace gdjs {
       }
       this._pixiRenderer.background.color = this._loadingScreenData.backgroundColor;
 
-      const backgroundTexture = imageManager.getPIXITexture(
+      const backgroundTexture = imageManager.getOrLoadPIXITexture(
         loadingScreenData.backgroundImageResourceName
       );
       if (backgroundTexture !== imageManager.getInvalidPIXITexture()) {

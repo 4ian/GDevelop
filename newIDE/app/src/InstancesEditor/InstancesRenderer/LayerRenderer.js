@@ -157,25 +157,41 @@ export default class LayerRenderer {
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) pixiObject.zOrder = instance.getZOrder();
 
-      // "Culling" improves rendering performance of large levels
-      const isVisible = this._isInstanceVisible(instance);
-      if (pixiObject) {
-        pixiObject.visible = isVisible;
-        pixiObject.eventMode =
-          this.layer.isLocked() || (instance.isLocked() && instance.isSealed())
-            ? 'auto'
-            : 'static';
-      }
-      if (isVisible) renderedInstance.update();
-
-      if (renderedInstance instanceof Rendered3DInstance) {
-        const threeObject = renderedInstance.getThreeObject();
-        if (this._threeGroup && threeObject) {
-          this._threeGroup.add(threeObject);
+      try {
+        // "Culling" improves rendering performance of large levels
+        const isVisible = this._isInstanceVisible(instance);
+        if (pixiObject) {
+          pixiObject.visible = isVisible;
+          pixiObject.eventMode =
+            this.layer.isLocked() ||
+            (instance.isLocked() && instance.isSealed())
+              ? 'auto'
+              : 'static';
         }
-      }
+        if (isVisible) renderedInstance.update();
 
-      renderedInstance.wasUsed = true;
+        if (renderedInstance instanceof Rendered3DInstance) {
+          const threeObject = renderedInstance.getThreeObject();
+          if (this._threeGroup && threeObject) {
+            this._threeGroup.add(threeObject);
+          }
+        }
+      } catch (error) {
+        if (error instanceof TypeError) {
+          // When reloading a texture when a resource changed externally, rendering
+          // an instance could crash when trying to access a non-existent PIXI base texture.
+          // The error is not propagated in order to avoid a crash at the SceneEditor level.
+          // See https://github.com/4ian/GDevelop/issues/5802.
+          console.error(
+            `An error occurred when rendering instance for object ${instance.getObjectName()}:`,
+            error
+          );
+          return;
+        }
+        throw error;
+      } finally {
+        renderedInstance.wasUsed = true;
+      }
     };
 
     // TODO (3D) Should it handle preference changes without needing to reopen tabs?
@@ -520,7 +536,7 @@ export default class LayerRenderer {
     lightGroup.add(light);
     threeScene.add(lightGroup);
 
-    const threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
+    const threeCamera = new THREE.PerspectiveCamera(45, 1, 3, 2000);
     threeCamera.rotation.order = 'ZYX';
     this._threeCamera = threeCamera;
 
@@ -623,8 +639,9 @@ export default class LayerRenderer {
     const height = this._oldHeight;
     const resolution = pixiRenderer.resolution;
     this._renderTexture = PIXI.RenderTexture.create({
-      width,
-      height,
+      // A size of 0 is forbidden by Pixi.
+      width: width || 100,
+      height: height || 100,
       resolution,
     });
     this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;

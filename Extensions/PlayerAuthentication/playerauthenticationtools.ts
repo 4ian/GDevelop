@@ -379,7 +379,8 @@ namespace gdjs {
 
       // Check origin of message.
       if (checkOrigin && !allowedOrigins.includes(event.origin)) {
-        throw new Error(`Unexpected origin: ${event.origin}`);
+        // Automatic authentication message ignored: wrong origin. Return silently.
+        return;
       }
       // Check that message is not malformed.
       if (!event.data.id) {

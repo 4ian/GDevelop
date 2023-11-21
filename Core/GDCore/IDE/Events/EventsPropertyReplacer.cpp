@@ -97,6 +97,9 @@ class GD_CORE_API ExpressionPropertyReplacer
 
         if (node.child) node.child->Visit(*this);
       }, [&]() {
+        // Do nothing, it's a parameter.
+        if (node.child) node.child->Visit(*this);
+      }, [&]() {
         // This is something else - potentially a deleted property.
         // Check if it's coming from the target container with
         // properties to replace.
@@ -139,6 +142,8 @@ class GD_CORE_API ExpressionPropertyReplacer
           // (because the target is in the scope), replace or remove it:
           RenameOrRemovePropertyOfTargetPropertyContainer(node.identifierName);
         }
+      }, [&]() {
+        // Do nothing, it's a parameter.
       }, [&]() {
         // This is something else - potentially a deleted property.
         // Check if it's coming from the target container with

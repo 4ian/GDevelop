@@ -57,6 +57,9 @@ export type TranslatedText =
 type InAppTutorialFlowStepDOMChangeTrigger =
   | {| presenceOfElement: string |}
   | {| absenceOfElement: string |};
+type InAppTutorialFlowStepShortcutTrigger =
+  | InAppTutorialFlowStepDOMChangeTrigger
+  | {| objectAddedInLayout: true |};
 
 export type InAppTutorialFlowStepTrigger =
   | InAppTutorialFlowStepDOMChangeTrigger
@@ -64,6 +67,7 @@ export type InAppTutorialFlowStepTrigger =
   | {| valueHasChanged: true |}
   | {| valueEquals: string |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
+  | {| objectAddedInLayout: true |}
   | {| previewLaunched: true |}
   | {| clickOnTooltipButton: TranslatedText |};
 
@@ -72,6 +76,7 @@ export type InAppTutorialFlowStepFormattedTrigger =
   | {| valueEquals: string |}
   | {| valueHasChanged: true |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
+  | {| objectAddedInLayout: true |}
   | {| previewLaunched: true |}
   | {| clickOnTooltipButton: string |};
 
@@ -107,7 +112,7 @@ export type InAppTutorialFlowStep = {|
   shortcuts?: Array<{|
     stepId: string,
     // TODO: Adapt provider to make it possible to use other triggers as shortcuts
-    trigger: InAppTutorialFlowStepDOMChangeTrigger,
+    trigger: InAppTutorialFlowStepShortcutTrigger,
   |}>,
   dialog?: InAppTutorialDialog,
   mapProjectData?: {

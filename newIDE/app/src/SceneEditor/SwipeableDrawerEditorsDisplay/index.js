@@ -1,27 +1,23 @@
 // @flow
 
 import * as React from 'react';
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import InstancesEditor from '../../InstancesEditor';
 import InstancePropertiesEditor, {
   type InstancePropertiesEditorInterface,
 } from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
-import TagsButton from '../../UI/EditorMosaic/TagsButton';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
-import ObjectGroupsList from '../../ObjectGroupsList';
-import InstancesList from '../../InstancesEditor/InstancesList';
+import ObjectGroupsList, {
+  type ObjectGroupsListInterface,
+} from '../../ObjectGroupsList';
+import InstancesList, {
+  type InstancesListInterface,
+} from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
-import {
-  getTagsFromString,
-  buildTagsMenuTemplate,
-  type SelectedTags,
-} from '../../Utils/TagsHelper';
-import { enumerateObjects } from '../../ObjectsList/EnumerateObjects';
 import Rectangle from '../../Utils/Rectangle';
 import SwipeableDrawer from './SwipeableDrawer';
 import BottomToolbar from './BottomToolbar';
@@ -34,6 +30,9 @@ import {
   type SceneEditorsDisplayInterface,
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
+import ErrorBoundary from '../../UI/ErrorBoundary';
+
+export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
 const editorTitleById = {
   'objects-list': <Trans>Objects</Trans>,
@@ -64,10 +63,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     onSelectInstances,
   } = props;
   const selectedInstances = props.instancesSelection.getSelectedInstances();
-  const [
-    selectedObjectTags,
-    setSelectedObjectTags,
-  ] = React.useState<SelectedTags>([]);
   const { values } = React.useContext(PreferencesContext);
   const screenType = useScreenType();
 
@@ -75,10 +70,10 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
-  const instancesListRef = React.useRef<?InstancesList>(null);
+  const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
-  const objectGroupsListRef = React.useRef<?ObjectGroupsList>(null);
+  const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
   const [selectedEditorId, setSelectedEditorId] = React.useState<?EditorId>(
     null
@@ -136,6 +131,23 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     },
     [selectedEditorId, drawerOpeningState]
   );
+  const renameObjectFolderOrObjectWithContext = React.useCallback(
+    objectWithContext => {
+      if (objectsListRef.current)
+        objectsListRef.current.renameObjectFolderOrObjectWithContext(
+          objectWithContext
+        );
+    },
+    []
+  );
+
+  const startSceneRendering = React.useCallback((start: boolean) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    if (start) editor.restartSceneRendering();
+    else editor.pauseSceneRendering();
+  }, []);
 
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
@@ -150,6 +162,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView: halfOpenOrCloseDrawerOnEditor,
       isEditorVisible,
+      startSceneRendering,
+      renameObjectFolderOrObjectWithContext,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
         setZoomFactor: editor ? editor.setZoomFactor : noop,
@@ -199,64 +213,56 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     ]
   );
 
-  const getAllObjectTags = React.useCallback(
-    (): Array<string> => {
-      const tagsSet: Set<string> = new Set();
-      enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
-        getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
-      });
+  const selectedObjectNames = props.selectedObjectFolderOrObjectsWithContext
+    .map(objectFolderOrObjectWithContext => {
+      const { objectFolderOrObject } = objectFolderOrObjectWithContext;
 
-      return Array.from(tagsSet);
-    },
-    [project, layout]
-  );
+      if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
 
-  const buildObjectTagsMenuTemplate = React.useCallback(
-    (i18n: I18nType): Array<any> => {
-      return buildTagsMenuTemplate({
-        noTagLabel: i18n._(t`No tags - add a tag to an object first`),
-        getAllTags: getAllObjectTags,
-        selectedTags: selectedObjectTags,
-        onChange: setSelectedObjectTags,
-      });
-    },
-    [selectedObjectTags, getAllObjectTags]
-  );
+      if (objectFolderOrObject.isFolder()) return null;
+      return objectFolderOrObject.getObject().getName();
+    })
+    .filter(Boolean);
 
   return (
     <FullSizeMeasurer>
       {({ width, height }) => (
         <div style={styles.container}>
-          <InstancesEditor
-            ref={editorRef}
-            height={height}
-            width={width}
-            project={project}
-            layout={layout}
-            selectedLayer={selectedLayer}
-            screenType={screenType}
-            initialInstances={initialInstances}
-            instancesEditorSettings={props.instancesEditorSettings}
-            onInstancesEditorSettingsMutated={
-              props.onInstancesEditorSettingsMutated
-            }
-            instancesSelection={props.instancesSelection}
-            onInstancesAdded={props.onInstancesAdded}
-            onInstancesSelected={props.onInstancesSelected}
-            onInstanceDoubleClicked={props.onInstanceDoubleClicked}
-            onInstancesMoved={props.onInstancesMoved}
-            onInstancesResized={props.onInstancesResized}
-            onInstancesRotated={props.onInstancesRotated}
-            selectedObjectNames={props.selectedObjectNames}
-            onContextMenu={props.onContextMenu}
-            isInstanceOf3DObject={props.isInstanceOf3DObject}
-            instancesEditorShortcutsCallbacks={
-              props.instancesEditorShortcutsCallbacks
-            }
-            pauseRendering={!props.isActive}
-            showObjectInstancesIn3D={values.use3DEditor}
-          />
-          <div style={styles.bottomContainer}>
+          <ErrorBoundary
+            componentTitle={<Trans>Instances editor.</Trans>}
+            scope="scene-editor-canvas"
+          >
+            <InstancesEditor
+              ref={editorRef}
+              height={height}
+              width={width}
+              project={project}
+              layout={layout}
+              selectedLayer={selectedLayer}
+              screenType={screenType}
+              initialInstances={initialInstances}
+              instancesEditorSettings={props.instancesEditorSettings}
+              onInstancesEditorSettingsMutated={
+                props.onInstancesEditorSettingsMutated
+              }
+              instancesSelection={props.instancesSelection}
+              onInstancesAdded={props.onInstancesAdded}
+              onInstancesSelected={props.onInstancesSelected}
+              onInstanceDoubleClicked={props.onInstanceDoubleClicked}
+              onInstancesMoved={props.onInstancesMoved}
+              onInstancesResized={props.onInstancesResized}
+              onInstancesRotated={props.onInstancesRotated}
+              selectedObjectNames={selectedObjectNames}
+              onContextMenu={props.onContextMenu}
+              isInstanceOf3DObject={props.isInstanceOf3DObject}
+              instancesEditorShortcutsCallbacks={
+                props.instancesEditorShortcutsCallbacks
+              }
+              pauseRendering={!props.isActive}
+              showObjectInstancesIn3D={values.use3DEditor}
+            />
+          </ErrorBoundary>
+          <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
             <SwipeableDrawer
               maxHeight={height}
               title={
@@ -264,17 +270,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               }
               openingState={drawerOpeningState}
               setOpeningState={setDrawerOpeningState}
-              topBarControls={
-                selectedEditorId === 'objects-list'
-                  ? [
-                      <TagsButton
-                        key="tags"
-                        size="small"
-                        buildMenuTemplate={buildObjectTagsMenuTemplate}
-                      />,
-                    ]
-                  : null
-              }
             >
               {selectedEditorId === 'objects-list' && (
                 <I18n>
@@ -291,12 +286,14 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         props.onSelectAllInstancesOfObjectInLayout
                       }
                       resourceManagementProps={props.resourceManagementProps}
-                      selectedObjectNames={props.selectedObjectNames}
+                      selectedObjectFolderOrObjectsWithContext={
+                        props.selectedObjectFolderOrObjectsWithContext
+                      }
                       canInstallPrivateAsset={props.canInstallPrivateAsset}
                       onEditObject={props.onEditObject}
                       onExportObject={props.onExportObject}
-                      onDeleteObject={(objectWithContext, cb) =>
-                        props.onDeleteObject(i18n, objectWithContext, cb)
+                      onDeleteObjects={(objectWithContext, cb) =>
+                        props.onDeleteObjects(i18n, objectWithContext, cb)
                       }
                       getValidatedObjectOrGroupName={(newName, global) =>
                         props.getValidatedObjectOrGroupName(
@@ -306,20 +303,19 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         )
                       }
                       onObjectCreated={props.onObjectCreated}
-                      onObjectSelected={props.onObjectSelected}
-                      renamedObjectWithContext={props.renamedObjectWithContext}
-                      onRenameObjectStart={props.onRenameObjectStart}
-                      onRenameObjectFinish={props.onRenameObjectFinish}
+                      onObjectFolderOrObjectWithContextSelected={
+                        props.onObjectFolderOrObjectWithContextSelected
+                      }
+                      onRenameObjectFolderOrObjectWithContextFinish={
+                        props.onRenameObjectFolderOrObjectWithContextFinish
+                      }
                       onAddObjectInstance={objectName =>
                         props.onAddObjectInstance(objectName, 'upperCenter')
                       }
                       onObjectPasted={props.updateBehaviorsSharedData}
-                      selectedObjectTags={selectedObjectTags}
                       beforeSetAsGlobalObject={objectName =>
                         props.canObjectOrGroupBeGlobal(i18n, objectName)
                       }
-                      onChangeSelectedObjectTags={setSelectedObjectTags}
-                      getAllObjectTags={getAllObjectTags}
                       ref={objectsListRef}
                       unsavedChanges={props.unsavedChanges}
                       hotReloadPreviewButtonProps={

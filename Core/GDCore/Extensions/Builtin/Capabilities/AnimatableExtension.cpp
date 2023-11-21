@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Animatable capability"))
+      .SetIcon("res/actions/animation24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Animations and images"))
       .SetIcon("res/actions/animation24.png");
 
@@ -53,6 +55,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Animation index")))
       .MarkAsSimple();
+  aut.GetAllExpressions()["Index"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "string",
@@ -69,6 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "objectAnimationName", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Animation name")))
       .MarkAsSimple();
+  aut.GetAllStrExpressions()["Name"].SetGroup("");
 
   aut.AddScopedAction("PauseAnimation",
                 _("Pause the animation"),
@@ -107,6 +111,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Speed scale")))
       .MarkAsSimple();
+  aut.GetAllExpressions()["SpeedScale"].SetGroup("");
 
   aut.AddScopedCondition("IsAnimationPaused",
                    _("Animation paused"),
@@ -130,6 +135,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
       .MarkAsSimple();
+
+  aut.AddExpressionAndConditionAndAction(
+         "number",
+         "ElapsedTime",
+         _("Animation elapsed time"),
+         _("the elapsed time from the beginning of the animation (in seconds)"),
+         _("the animation elapsed time"),
+         _("Animations and images"),
+         "res/actions/animation24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
+      .UseStandardParameters(
+          "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
+                        _("Elapsed time (in seconds)")))
+      .MarkAsAdvanced();
+  aut.GetAllExpressions()["ElapsedTime"].SetGroup("");
+
+  aut.AddExpression(
+         "Duration",
+         _("Animation duration"),
+         _("Return the current animation duration (in seconds)."),
+         _("Animations and images"),
+         "res/actions/animation24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "AnimatableBehavior");
 }
 
 }  // namespace gd

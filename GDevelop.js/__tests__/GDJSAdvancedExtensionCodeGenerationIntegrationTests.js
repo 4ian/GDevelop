@@ -36,7 +36,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement,
-      { parameterTypes }
+      { parameterTypes, logCode: false }
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -103,6 +103,39 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         {
           type: { value: 'BuiltinAdvanced::CompareArgumentAsString' },
           parameters: ['MyParameter', '=', '"456"'],
+        },
+      ]
+    );
+
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+  });
+
+  it('can generate a string parameter condition that is true with a contains operator', function () {
+    const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      { MyParameter: 'string' },
+      ['Hello word!'],
+      [
+        {
+          type: { value: 'CompareArgumentAsString' },
+          parameters: ['"MyParameter"', 'contains', '"word"'],
+        },
+      ]
+    );
+
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a string parameter condition that is false with a contains operator', function () {
+    const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      { MyParameter: 'string' },
+      ['Hello word!'],
+      [
+        {
+          type: { value: 'CompareArgumentAsString' },
+          parameters: ['"MyParameter"', 'contains', '"Hi!"'],
         },
       ]
     );

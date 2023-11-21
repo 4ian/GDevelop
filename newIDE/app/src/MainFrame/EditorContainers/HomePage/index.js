@@ -4,10 +4,11 @@ import { I18n } from '@lingui/react';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
+  type FileMetadata,
   type StorageProvider,
 } from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
-import BuildSection, { type BuildSectionInterface } from './BuildSection';
+import BuildSection from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import CommunitySection from './CommunitySection';
@@ -16,7 +17,6 @@ import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
-import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
@@ -29,6 +29,12 @@ import TeamProvider from '../../../Profile/Team/TeamProvider';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import PreferencesContext from '../../Preferences/PreferencesContext';
+import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
+import {
+  sendUserSurveyHidden,
+  sendUserSurveyStarted,
+} from '../../../Utils/Analytics/EventSender';
 
 const styles = {
   container: {
@@ -61,13 +67,13 @@ const styles = {
 
 type Props = {|
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
 
   isActive: boolean,
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
   storageProviders: Array<StorageProvider>,
-  initialTab?: ?string,
 
   // Project opening
   canOpen: boolean,
@@ -113,6 +119,7 @@ export const HomePage = React.memo<Props>(
     (
       {
         project,
+        fileMetadata,
         canOpen,
         onChooseProject,
         onOpenRecentFile,
@@ -131,7 +138,6 @@ export const HomePage = React.memo<Props>(
         onOpenAbout,
         isActive,
         storageProviders,
-        initialTab,
         onSave,
         canSave,
         resourceManagementProps,
@@ -139,9 +145,14 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
-      const { authenticated, onCloudProjectsChanged } = React.useContext(
-        AuthenticatedUserContext
-      );
+      const {
+        authenticated,
+        onCloudProjectsChanged,
+        loginState,
+      } = React.useContext(AuthenticatedUserContext);
+      const userSurveyStartedRef = React.useRef<boolean>(false);
+      const userSurveyHiddenRef = React.useRef<boolean>(false);
+      const shouldChangeTabAfterUserLoggedIn = React.useRef<boolean>(true);
       const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
@@ -149,13 +160,55 @@ export const HomePage = React.memo<Props>(
         fetchGameTemplates,
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
-      const {
-        values: { showGetStartedSection },
-        setShowGetStartedSection,
-      } = React.useContext(PreferencesContext);
-      const buildSectionRef = React.useRef<?BuildSectionInterface>(null);
+      const [showUserChip, setShowUserChip] = React.useState<boolean>(false);
+
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';
+      const {
+        values: { showGetStartedSectionByDefault },
+      } = React.useContext(PreferencesContext);
+      const initialTab = showGetStartedSectionByDefault
+        ? 'get-started'
+        : 'build';
+
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+
+      React.useEffect(
+        () => {
+          if (initialTab === 'get-started') {
+            incrementGetStartedSectionViewCount();
+          }
+        },
+        [initialTab]
+      );
+
+      // If the user is not authenticated, the GetStarted section is displayed.
+      React.useEffect(
+        () => {
+          if (shouldChangeTabAfterUserLoggedIn.current) {
+            setActiveTab(authenticated ? initialTab : 'get-started');
+          }
+        },
+        // Only the initialTab at component mounting is interesting
+        // and we don't want to change the active tab if initialTab changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [authenticated]
+      );
+
+      // This effect makes sure that the tab changing cannot happen once the editor is up
+      // and running (shouldChangeTabAfterUserLoggedIn is never set back to true).
+      // At the time the HomePage is mounting, if there is any firebase data on the device
+      // the authentication is ongoing, with loginState having the value 'loggingIn'.
+      // So once the authentication is over (loginState with value 'done'), the above effect
+      // (that changes the tab) is run prior to this one, the tab is changed
+      // and shouldChangeTabAfterUserLoggedIn is set to false.
+      React.useEffect(
+        () => {
+          if (loginState === 'loggingIn') return;
+          shouldChangeTabAfterUserLoggedIn.current = false;
+        },
+        [loginState]
+      );
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
@@ -177,26 +230,13 @@ export const HomePage = React.memo<Props>(
         [isActive, authenticated, onCloudProjectsChanged]
       );
 
-      // Refresh build section when homepage becomes active
-      React.useEffect(
-        () => {
-          if (isActive && activeTab === 'build' && buildSectionRef.current) {
-            buildSectionRef.current.forceUpdate();
-          }
-        },
-        // Active tab is excluded from the dependencies because switching tab
-        // mounts and unmounts section, so the data is already up to date.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [isActive]
-      );
-
       const getProject = React.useCallback(() => {
         return undefined;
       }, []);
 
       const updateToolbar = React.useCallback(
         () => {
-          if (setToolbar)
+          if (setToolbar) {
             setToolbar(
               <HomePageHeader
                 hasProject={!!project}
@@ -205,8 +245,10 @@ export const HomePage = React.memo<Props>(
                 onOpenProjectManager={onOpenProjectManager}
                 onSave={onSave}
                 canSave={canSave}
+                showUserChip={showUserChip}
               />
             );
+          }
         },
         [
           setToolbar,
@@ -216,7 +258,26 @@ export const HomePage = React.memo<Props>(
           project,
           onSave,
           canSave,
+          showUserChip,
         ]
+      );
+
+      // Ensure the toolbar is up to date when the active tab changes.
+      React.useEffect(
+        () => {
+          updateToolbar();
+        },
+        [updateToolbar]
+      );
+
+      React.useEffect(
+        () => {
+          // Always show the user chip, apart on the GetStarted page which handles it on its own.
+          if (activeTab !== 'get-started') {
+            setShowUserChip(true);
+          }
+        },
+        [activeTab]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -268,10 +329,6 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(
-        showGetStartedSection ? 'get-started' : 'build'
-      );
-
       // If the user logs out and is on the team view section, go back to the build section.
       React.useEffect(
         () => {
@@ -282,27 +339,55 @@ export const HomePage = React.memo<Props>(
         [authenticated, activeTab]
       );
 
+      const onUserSurveyStarted = React.useCallback(() => {
+        if (userSurveyStartedRef.current) return;
+        sendUserSurveyStarted();
+        userSurveyStartedRef.current = true;
+      }, []);
+      const onUserSurveyHidden = React.useCallback(() => {
+        if (userSurveyHiddenRef.current) return;
+        sendUserSurveyHidden();
+        userSurveyHiddenRef.current = true;
+      }, []);
+
+      React.useEffect(
+        () => {
+          if (!authenticated) {
+            userSurveyStartedRef.current = false;
+            userSurveyHiddenRef.current = false;
+          }
+        },
+        // Reset flag that prevents multiple send of the same event on user change.
+        [authenticated]
+      );
+
+      const shouldDisplayAnnouncements =
+        activeTab !== 'community' &&
+        // Get started page displays announcements itself.
+        activeTab !== 'get-started' &&
+        !!announcements;
+
       return (
         <I18n>
           {({ i18n }) => (
             <TeamProvider>
               <div style={isMobile ? styles.mobileContainer : styles.container}>
                 <div style={styles.scrollableContainer}>
-                  {activeTab !== 'community' && !!announcements && (
+                  {shouldDisplayAnnouncements && (
                     <AnnouncementsFeed canClose level="urgent" addMargins />
                   )}
                   {activeTab === 'get-started' && (
                     <GetStartedSection
-                      onTabChange={setActiveTab}
+                      showUserChip={setShowUserChip}
                       selectInAppTutorial={selectInAppTutorial}
-                      showGetStartedSection={showGetStartedSection}
-                      setShowGetStartedSection={setShowGetStartedSection}
+                      onUserSurveyStarted={onUserSurveyStarted}
+                      onUserSurveyHidden={onUserSurveyHidden}
                     />
                   )}
                   {activeTab === 'build' && (
                     <BuildSection
-                      ref={buildSectionRef}
                       project={project}
+                      currentFileMetadata={fileMetadata}
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
@@ -315,6 +400,7 @@ export const HomePage = React.memo<Props>(
                       }
                       onOpenRecentFile={onOpenRecentFile}
                       storageProviders={storageProviders}
+                      i18n={i18n}
                     />
                   )}
                   {activeTab === 'learn' && (
@@ -342,6 +428,7 @@ export const HomePage = React.memo<Props>(
                       project={project}
                       onOpenRecentFile={onOpenRecentFile}
                       storageProviders={storageProviders}
+                      currentFileMetadata={fileMetadata}
                     />
                   )}
                 </div>
@@ -369,6 +456,7 @@ export const renderHomePageContainer = (
   <HomePage
     ref={props.ref}
     project={props.project}
+    fileMetadata={props.fileMetadata}
     isActive={props.isActive}
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
@@ -395,9 +483,6 @@ export const renderHomePageContainer = (
     onOpenAbout={props.onOpenAbout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
-    }
-    initialTab={
-      (props.extraEditorProps && props.extraEditorProps.initialTab) || null
     }
     onSave={props.onSave}
     canSave={props.canSave}

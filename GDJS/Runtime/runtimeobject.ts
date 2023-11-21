@@ -199,8 +199,10 @@ namespace gdjs {
     > = {};
 
     //Forces:
-    protected _forces: gdjs.Force[] = [];
-    _averageForce: gdjs.Force;
+    protected _instantForces: gdjs.Force[] = [];
+    _permanentForceX: float = 0;
+    _permanentForceY: float = 0;
+    _totalForce: gdjs.Force;
 
     /**
      * Contains the behaviors of the object, except those not having lifecycle functions.
@@ -237,7 +239,7 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(
         objectData ? objectData.variables : undefined
       );
-      this._averageForce = new gdjs.Force(0, 0, 0);
+      this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
       const effectsManager = this._runtimeScene.getGame().getEffectsManager();
       if (effectsManager) {
@@ -473,7 +475,7 @@ namespace gdjs {
      *
      * @param instanceContainer The container owning the object.
      */
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       const theLayer = instanceContainer.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
@@ -489,6 +491,8 @@ namespace gdjs {
       this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
     }
+
+    onDestroyed(): void {}
 
     /**
      * Called whenever the scene owning the object is paused.
@@ -1084,9 +1088,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are numbers).
+     * Change an effect property value (for properties that are numbers).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (number).
      */
     setEffectDoubleParameter(
@@ -1106,9 +1110,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are strings).
+     * Change an effect property value (for properties that are strings).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (string).
      */
     setEffectStringParameter(
@@ -1128,9 +1132,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are booleans).
+     * Change an effect property value (for properties that are booleans).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (boolean).
      */
     setEffectBooleanParameter(
@@ -1350,7 +1354,21 @@ namespace gdjs {
      * @param multiplier Set the force multiplier
      */
     addForce(x: float, y: float, multiplier: integer): void {
-      this._forces.push(this._getRecycledForce(x, y, multiplier));
+      if (multiplier === 1) {
+        this._permanentForceX += x;
+        this._permanentForceY += y;
+      } else if (
+        multiplier === 0 &&
+        this._instantForces.length > 0 &&
+        this._instantForces[0].getMultiplier() === 0
+      ) {
+        // Avoid to instantiate new a Force for each instance force.
+        this._instantForces[0].add(x, y);
+      } else {
+        // Handle legacy forces with multiplier different from 0 and 1
+        // (or the 1st instant force).
+        this._instantForces.push(this._getRecycledForce(x, y, multiplier));
+      }
     }
 
     /**
@@ -1365,7 +1383,7 @@ namespace gdjs {
       //TODO: Benchmark with Math.PI
       const forceX = Math.cos(angleInRadians) * len;
       const forceY = Math.sin(angleInRadians) * len;
-      this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
+      this.addForce(forceX, forceY, multiplier);
     }
 
     /**
@@ -1387,7 +1405,7 @@ namespace gdjs {
       );
       const forceX = Math.cos(angleInRadians) * len;
       const forceY = Math.sin(angleInRadians) * len;
-      this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
+      this.addForce(forceX, forceY, multiplier);
     }
 
     /**
@@ -1419,9 +1437,11 @@ namespace gdjs {
     clearForces(): void {
       RuntimeObject.forcesGarbage.push.apply(
         RuntimeObject.forcesGarbage,
-        this._forces
+        this._instantForces
       );
-      this._forces.length = 0;
+      this._instantForces.length = 0;
+      this._permanentForceX = 0;
+      this._permanentForceY = 0;
     }
 
     /**
@@ -1429,7 +1449,11 @@ namespace gdjs {
      * @return true if no forces are applied on the object.
      */
     hasNoForces(): boolean {
-      return this._forces.length === 0;
+      return (
+        this._instantForces.length === 0 &&
+        this._permanentForceX === 0 &&
+        this._permanentForceY === 0
+      );
     }
 
     /**
@@ -1437,8 +1461,8 @@ namespace gdjs {
      * remove null ones.
      */
     updateForces(elapsedTime: float): void {
-      for (let i = 0; i < this._forces.length; ) {
-        const force = this._forces[i];
+      for (let i = 0; i < this._instantForces.length; ) {
+        const force = this._instantForces[i];
         const multiplier = force.getMultiplier();
         if (multiplier === 1) {
           // Permanent force
@@ -1450,7 +1474,7 @@ namespace gdjs {
             force.getLength() <= 0.001
           ) {
             RuntimeObject.forcesGarbage.push(force);
-            this._forces.splice(i, 1);
+            this._instantForces.splice(i, 1);
           } else {
             // Deprecated way of updating forces progressively.
             force.setLength(
@@ -1469,20 +1493,18 @@ namespace gdjs {
      * @return A force object.
      */
     getAverageForce(): gdjs.Force {
-      let averageX = 0;
-      let averageY = 0;
-      for (let i = 0, len = this._forces.length; i < len; ++i) {
-        averageX += this._forces[i].getX();
-        averageY += this._forces[i].getY();
+      this._totalForce.clear();
+      this._totalForce.add(this._permanentForceX, this._permanentForceY);
+      for (let i = 0, len = this._instantForces.length; i < len; ++i) {
+        this._totalForce.addForce(this._instantForces[i]);
       }
-      this._averageForce.setX(averageX);
-      this._averageForce.setY(averageY);
-      return this._averageForce;
+      return this._totalForce;
     }
 
     /**
      * Return true if the average angle of the forces applied on the object
      * is in a given range.
+     * @deprecated Use isTotalForceAngleAround instead.
      *
      * @param angle The angle to be tested.
      * @param toleranceInDegrees The length of the range :
@@ -1495,6 +1517,26 @@ namespace gdjs {
         averageAngle += 360;
       }
       return Math.abs(angle - averageAngle) < toleranceInDegrees / 2;
+    }
+
+    /**
+     * Return true if the angle of the total force applied on the object
+     * is in a given range.
+     *
+     * @param angle The angle to be tested.
+     * @param toleranceInDegrees The maximum distance from the given angle.
+     * @return true if the difference between the force angle the given `angle`
+     * is less or equals the `toleranceInDegrees`.
+     */
+    isTotalForceAngleAround(angle: float, toleranceInDegrees: float): boolean {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(
+            this.getAverageForce().getAngle(),
+            angle
+          )
+        ) <= toleranceInDegrees
+      );
     }
 
     //Hit boxes and collision :

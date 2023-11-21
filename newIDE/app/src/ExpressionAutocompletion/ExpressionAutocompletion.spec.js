@@ -5,6 +5,12 @@ import {
 } from '.';
 const gd: libGDevelop = global.gd;
 
+// $FlowExpectedError
+const makeFakeI18n = (fakeI18n): I18nType => ({
+  ...fakeI18n,
+  _: message => message.id,
+});
+
 const makeTestContext = () => {
   const project = gd.ProjectHelper.createNewGDJSProject();
   const testLayout = project.insertNewLayout('Scene', 0);
@@ -83,7 +89,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toHaveLength(2);
       expect(autocompletions).toEqual(
@@ -116,7 +123,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions2
+        completionDescriptions2,
+        makeFakeI18n()
       );
       expect(autocompletions2).toHaveLength(1);
       expect(autocompletions2).toEqual(
@@ -153,7 +161,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -208,7 +217,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -243,7 +253,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -282,7 +293,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -331,7 +343,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -368,7 +381,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -406,7 +420,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([
@@ -449,7 +464,8 @@ describe('ExpressionAutocompletion', () => {
           projectScopedContainers,
           scope,
         },
-        completionDescriptions
+        completionDescriptions,
+        makeFakeI18n()
       );
       expect(autocompletions).toEqual(
         expect.arrayContaining([

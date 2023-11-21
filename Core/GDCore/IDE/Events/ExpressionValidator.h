@@ -103,9 +103,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             "example: \"Your name: \" + VariableString(PlayerName).", node.rightHandSide->location);
       }
       else if (node.op != '+') {
-      RaiseOperatorError(
-          _("You've used an operator that is not supported. Only + can be used "
-            "to concatenate texts."),
+        RaiseOperatorError(
+            _("You've used an operator that is not supported. Only + can be used "
+              "to concatenate texts."),
             ExpressionParserLocation(node.leftHandSide->location.GetEndPosition() + 1, node.location.GetEndPosition()));
       }
     } else if (leftType == Type::Object) {
@@ -124,7 +124,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.rightHandSide->Visit(*this);
     const Type rightType = childType;
 
-    childType = leftType;
+    // The type is decided by the first operand, unless it can (`number|string`)
+    // or should (`unknown`) be refined, in which case we go for the right
+    // operand (which got visited knowing the type of the first operand, so it's
+    // equal or strictly more precise than the left operand).
+    childType = (leftType == Type::Unknown || leftType == Type::NumberOrString) ? leftType : rightType;
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     ReportAnyError(node);
@@ -219,6 +223,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
               node.location);
         }, [&]() {
+          // This is a parameter.
+          // Being in this node implies that there is at least a child - which is not supported for parameters.
+          RaiseTypeError(_("Accessing a child variable of a parameter is not possible - just write the parameter name."),
+              node.location);
+        }, [&]() {
           // This is something else.
           RaiseTypeError(_("No object, variable or property with this name found."),
               node.location);
@@ -304,8 +313,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       RaiseTypeError(
           _("You've entered a name, but this type was expected:") + " " + TypeToString(parentType),
           node.location);
+      childType = parentType;
+    } else {
+      childType = parentType;
     }
-    childType = parentType;
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     ReportAnyError(node);
@@ -372,6 +383,16 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void RaiseOperatorError(
       const gd::String &message, const ExpressionParserLocation &location) {
     RaiseError("invalid_operator", message, location);
+  }
+
+  void ReadChildTypeFromVariable(gd::Variable::Type variableType) {
+    if (variableType == gd::Variable::Number) {
+      childType = Type::Number;
+    } else if (variableType == gd::Variable::String) {
+      childType = Type::String;
+    } else {
+      // Nothing - we don't know the precise type (this could be used as a string or as a number).
+    }
   }
 
   static Type StringToType(const gd::String &type);

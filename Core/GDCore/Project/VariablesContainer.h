@@ -139,9 +139,9 @@ class GD_CORE_API VariablesContainer {
   inline void Clear() { variables.clear(); }
 
   /**
-   * \brief Call the callback for each variable with a name starting with the specified prefix.
+   * \brief Call the callback for each variable with a name matching the specified search.
    */
-  void ForEachVariableWithPrefix(const gd::String& prefix, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
+  void ForEachVariableMatchingSearch(const gd::String& search, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
   ///@}
 
   /** \name Saving and loading

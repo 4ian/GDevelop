@@ -51,13 +51,15 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
-import ErrorBoundary from '../UI/ErrorBoundary';
+import ErrorBoundary, {
+  getEditorErrorBoundaryProps,
+} from '../UI/ErrorBoundary';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
   type PreviewLauncherComponent,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -83,7 +85,10 @@ import PreferencesContext, {
   type InAppTutorialUserProgress,
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
+import {
+  type ShareDialogWithoutExportsProps,
+  type ShareTab,
+} from '../ExportAndShare/ShareDialog';
 import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -173,12 +178,12 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
-import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
-
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import useResourcesWatcher from './ResourcesWatcher';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -297,7 +302,7 @@ export type Props = {|
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
-  renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
+  renderShareDialog?: ShareDialogWithoutExportsProps => React.Node,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -389,7 +394,11 @@ const MainFrame = (props: Props) => {
     isProjectClosedSoAvoidReloadingExtensions,
     setIsProjectClosedSoAvoidReloadingExtensions,
   ] = React.useState<boolean>(false);
-  const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState<boolean>(false);
+  const [
+    shareDialogInitialTab,
+    setShareDialogInitialTab,
+  ] = React.useState<?ShareTab>(null);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
@@ -469,7 +478,7 @@ const MainFrame = (props: Props) => {
     eventsFunctionsExtensionsError,
   } = state;
   const {
-    renderExportDialog,
+    renderShareDialog,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -492,6 +501,14 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
+  useResourcesWatcher({
+    getStorageProvider,
+    fileMetadata: currentFileMetadata,
+    editorTabs: state.editorTabs,
+    isProjectSplitInMultipleFiles: currentProject
+      ? currentProject.isFolderProject()
+      : false,
+  });
 
   /**
    * This reference is useful to get the current opened project,
@@ -705,6 +722,22 @@ const MainFrame = (props: Props) => {
     [_closeSnackMessage, _showSnackMessage]
   );
 
+  const openShareDialog = React.useCallback(
+    (initialTab?: ShareTab) => {
+      setShareDialogInitialTab(initialTab || null);
+      setShareDialogOpen(true);
+    },
+    [setShareDialogOpen, setShareDialogInitialTab]
+  );
+
+  const closeShareDialog = React.useCallback(
+    () => {
+      setShareDialogOpen(false);
+      setShareDialogInitialTab(null);
+    },
+    [setShareDialogOpen, setShareDialogInitialTab]
+  );
+
   const openInitialFileMetadata = async () => {
     if (!initialFileMetadataToOpen) return;
 
@@ -876,7 +909,7 @@ const MainFrame = (props: Props) => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
+      PixiResourcesLoader.burstCache();
 
       const state = await setState(state => ({
         ...state,
@@ -2169,6 +2202,7 @@ const MainFrame = (props: Props) => {
         onSaveProjectAs,
         onChooseSaveProjectAsLocation,
         getWriteErrorMessage,
+        canFileMetadataBeSafelySavedAs,
       } = newStorageProviderOperations;
       if (!onSaveProjectAs) {
         // The new storage provider can't even save as. It's strange that it was even
@@ -2194,16 +2228,16 @@ const MainFrame = (props: Props) => {
             return; // Save as was cancelled.
           }
 
-          if (
-            newStorageProvider.internalName === 'LocalFile' &&
-            saveAsLocation.fileIdentifier &&
-            isTryingToSaveInForbiddenPath(saveAsLocation.fileIdentifier)
-          ) {
-            await showAlert({
-              title: t`Choose another location`,
-              message: t`You are trying to save the project in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location.`,
-            });
-            return;
+          if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
+            const canProjectBeSafelySavedAs = await canFileMetadataBeSafelySavedAs(
+              currentFileMetadata,
+              {
+                showAlert,
+                showConfirmation,
+              }
+            );
+
+            if (!canProjectBeSafelySavedAs) return;
           }
           newSaveAsLocation = saveAsLocation;
         }
@@ -2313,6 +2347,7 @@ const MainFrame = (props: Props) => {
       authenticatedUser,
       currentlyRunningInAppTutorial,
       showAlert,
+      showConfirmation,
     ]
   );
 
@@ -2363,7 +2398,10 @@ const MainFrame = (props: Props) => {
       }
 
       const storageProviderOperations = getStorageProviderOperations();
-      const { onSaveProject } = storageProviderOperations;
+      const {
+        onSaveProject,
+        canFileMetadataBeSafelySaved,
+      } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
@@ -2387,15 +2425,19 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        if (
-          storageProviderInternalName === 'LocalFile' &&
-          isTryingToSaveInForbiddenPath(currentFileMetadata.fileIdentifier)
-        ) {
-          await showAlert({
-            title: t`Choose another location`,
-            message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
-          });
-          // We don't block the save, as the user may want to save it anyway.
+        if (canFileMetadataBeSafelySaved) {
+          const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
+            currentFileMetadata,
+            {
+              showAlert,
+              showConfirmation,
+            }
+          );
+          if (!canProjectBeSafelySaved) return;
+
+          // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
+          // for too long.
+          _replaceSnackMessage(i18n._(t`Saving...`), null);
         }
 
         const { wasSaved, fileMetadata } = await onSaveProject(
@@ -2447,13 +2489,14 @@ const MainFrame = (props: Props) => {
           unsavedChanges.sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
-      } catch (rawError) {
-        showErrorBox({
-          message: i18n._(
-            t`Unable to save the project! Please try again later or save the project in another location.`
-          ),
-          rawError,
-          errorId: 'project-save-error',
+      } catch (error) {
+        const message =
+          error.response && error.response.status === 403
+            ? t`You don't have permissions to save this project. Please choose another location.`
+            : t`An error occurred when saving the project. Please try again later.`;
+        showAlert({
+          title: t`Unable to save the project`,
+          message,
         });
         _closeSnackMessage();
       } finally {
@@ -2481,6 +2524,7 @@ const MainFrame = (props: Props) => {
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
       showAlert,
+      showConfirmation,
     ]
   );
 
@@ -2848,7 +2892,8 @@ const MainFrame = (props: Props) => {
     onCloseProject: async () => {
       askToCloseProject();
     },
-    onExportGame: React.useCallback(() => openExportDialog(true), []),
+    onExportGame: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
     onOpenLayout: name => {
       openLayout(name);
     },
@@ -2896,7 +2941,8 @@ const MainFrame = (props: Props) => {
     onSaveProjectAs: saveProjectAs,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
-    onExportProject: () => openExportDialog(true),
+    onExportProject: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
     onCreateProject: () => setExampleStoreDialogOpen(true),
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
@@ -3046,7 +3092,9 @@ const MainFrame = (props: Props) => {
         canSave={canSave}
         onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
-        exportProject={() => openExportDialog(true)}
+        openShareDialog={() =>
+          openShareDialog(/* leave the dialog decide which tab to open */)
+        }
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -3069,19 +3117,21 @@ const MainFrame = (props: Props) => {
       >
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+          const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
-                  title="This editor encountered a problem"
-                  scope="mainframe"
+                  componentTitle={errorBoundaryProps.componentTitle}
+                  scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
                     fileMetadata: currentFileMetadata,
+                    storageProvider: getStorageProvider(),
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
@@ -3193,15 +3243,17 @@ const MainFrame = (props: Props) => {
         }}
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
-      {!!renderExportDialog &&
-        exportDialogOpen &&
-        renderExportDialog({
-          onClose: () => openExportDialog(false),
-          onChangeSubscription: () => {
-            openExportDialog(false);
-          },
+      {!!renderShareDialog &&
+        shareDialogOpen &&
+        renderShareDialog({
+          onClose: closeShareDialog,
+          onChangeSubscription: closeShareDialog,
           project: state.currentProject,
           onSaveProject: saveProject,
+          isSavingProject: isSavingProject,
+          fileMetadata: currentFileMetadata,
+          storageProvider: getStorageProvider(),
+          initialTab: shareDialogInitialTab,
         })}
       {exampleStoreDialogOpen && (
         <ExampleStoreDialog
@@ -3235,7 +3287,7 @@ const MainFrame = (props: Props) => {
           {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openExportDialog(true),
+            onExport: () => openShareDialog('publish'),
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;
@@ -3311,18 +3363,18 @@ const MainFrame = (props: Props) => {
       {preferencesDialogOpen && (
         <PreferencesDialog
           i18n={props.i18n}
-          onClose={languageChanged => {
+          onClose={options => {
             openPreferencesDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}
       {languageDialogOpen && (
         <LanguageDialog
           open
-          onClose={languageChanged => {
+          onClose={options => {
             openLanguageDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}

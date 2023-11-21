@@ -24,6 +24,7 @@ import {
   shouldUseAppStoreProduct,
   purchaseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
+import Form from '../../UI/Form';
 
 const PasswordPromptDialog = (props: {
   passwordValue: string,
@@ -51,15 +52,7 @@ const PasswordPromptDialog = (props: {
       />,
     ]}
   >
-    <form
-      onSubmit={event => {
-        // Prevent browser to navigate on form submission.
-        event.preventDefault();
-        props.onApply();
-      }}
-      autoComplete="off"
-      name="store-password"
-    >
+    <Form onSubmit={props.onApply} name="store-password">
       <TextField
         fullWidth
         autoFocus="desktopAndMobileDevices"
@@ -70,7 +63,7 @@ const PasswordPromptDialog = (props: {
           props.setPasswordValue(value);
         }}
       />
-    </form>
+    </Form>
   </Dialog>
 );
 
@@ -88,8 +81,8 @@ const PrivateGameTemplatePurchaseDialog = ({
   const {
     profile,
     getAuthorizationHeader,
-    onLogin,
-    onCreateAccount,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
     receivedGameTemplates,
     onPurchaseSuccessful,
   } = React.useContext(AuthenticatedUserContext);
@@ -263,8 +256,8 @@ const PrivateGameTemplatePurchaseDialog = ({
         subtitle: <Trans>Log-in to purchase this item</Trans>,
         content: (
           <CreateProfile
-            onLogin={onLogin}
-            onCreateAccount={onCreateAccount}
+            onOpenLoginDialog={onOpenLoginDialog}
+            onOpenCreateAccountDialog={onOpenCreateAccountDialog}
             message={
               <Trans>
                 Game templates will be linked to your user account and available

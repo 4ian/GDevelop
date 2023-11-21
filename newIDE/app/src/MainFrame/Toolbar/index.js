@@ -2,9 +2,9 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import { Toolbar, ToolbarGroup } from '../../UI/Toolbar';
-import PreviewAndPublishButtons, {
-  type PreviewAndPublishButtonsProps,
-} from './PreviewAndPublishButtons';
+import PreviewAndShareButtons, {
+  type PreviewAndShareButtonsProps,
+} from './PreviewAndShareButtons';
 import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../UI/CustomSvgIcons/Floppy';
 import IconButton from '../../UI/IconButton';
@@ -13,16 +13,50 @@ import { Spacer } from '../../UI/Grid';
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
   toggleProjectManager: () => void,
-  exportProject: () => void,
+  openShareDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
 
-  ...PreviewAndPublishButtonsProps,
+  ...PreviewAndShareButtonsProps,
 |};
 
 export type ToolbarInterface = {|
   setEditorToolbar: (React.Node | null) => void,
 |};
+
+type LeftButtonsToolbarGroupProps = {|
+  toggleProjectManager: () => void,
+  onSave: () => Promise<void>,
+  canSave: boolean,
+|};
+
+const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
+  function LeftButtonsToolbarGroup(props) {
+    return (
+      <ToolbarGroup firstChild>
+        <IconButton
+          size="small"
+          id="main-toolbar-project-manager-button"
+          onClick={props.toggleProjectManager}
+          tooltip={t`Project Manager`}
+          color="default"
+        >
+          <ProjectManagerIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          id="toolbar-save-button"
+          onClick={props.onSave}
+          tooltip={t`Save project`}
+          color="default"
+          disabled={!props.canSave}
+        >
+          <FloppyIcon />
+        </IconButton>
+      </ToolbarGroup>
+    );
+  }
+);
 
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
@@ -35,30 +69,14 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       <Toolbar>
         {props.showProjectButtons ? (
           <>
-            <ToolbarGroup firstChild>
-              <IconButton
-                size="small"
-                id="main-toolbar-project-manager-button"
-                onClick={props.toggleProjectManager}
-                tooltip={t`Project Manager`}
-                color="default"
-              >
-                <ProjectManagerIcon />
-              </IconButton>
-              <IconButton
-                size="small"
-                id="toolbar-save-button"
-                onClick={props.onSave}
-                tooltip={t`Save project`}
-                color="default"
-                disabled={!props.canSave}
-              >
-                <FloppyIcon />
-              </IconButton>
-            </ToolbarGroup>
+            <LeftButtonsToolbarGroup
+              toggleProjectManager={props.toggleProjectManager}
+              onSave={props.onSave}
+              canSave={props.canSave}
+            />
             <ToolbarGroup>
               <Spacer />
-              <PreviewAndPublishButtons
+              <PreviewAndShareButtons
                 onPreviewWithoutHotReload={props.onPreviewWithoutHotReload}
                 onOpenDebugger={props.onOpenDebugger}
                 onNetworkPreview={props.onNetworkPreview}
@@ -68,7 +86,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 isPreviewEnabled={props.isPreviewEnabled}
                 previewState={props.previewState}
                 hasPreviewsRunning={props.hasPreviewsRunning}
-                exportProject={props.exportProject}
+                openShareDialog={props.openShareDialog}
               />
               <Spacer />
             </ToolbarGroup>

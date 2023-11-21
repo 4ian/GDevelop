@@ -55,7 +55,7 @@ export const prepareExampleShortHeaders = (
 
 const getItemUniqueId = (
   item: ExampleShortHeader | PrivateGameTemplateListingData
-) => item.name;
+) => item.id;
 
 type Props = {|
   isOpening: boolean,
@@ -263,7 +263,10 @@ export const ExampleStore = ({
                           sendExampleDetailsOpened(item.slug);
                           onSelectExampleShortHeader(item);
                         }}
-                        onOpen={onOpenNewProjectSetupDialog}
+                        onOpen={() => {
+                          onSelectExampleShortHeader(item);
+                          onOpenNewProjectSetupDialog();
+                        }}
                       />
                     );
                   }

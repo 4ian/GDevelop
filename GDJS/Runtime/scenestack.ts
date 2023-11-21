@@ -113,6 +113,7 @@ namespace gdjs {
             externalLayoutData.instances,
             0,
             0,
+            0,
             /*trackByPersistentUuid=*/
             true
           );

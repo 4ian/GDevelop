@@ -87,6 +87,11 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
   const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
   const auto& propertiesContainersList = projectScopedContainers.GetPropertiesContainersList();
+  const auto& parametersVectorsList = projectScopedContainers.GetParametersVectorsList();
+
+  // Unless we find something precise (like a variable or property or parameter with a known type),
+  // we consider this node will be of the type required by the parent.
+  childType = parentType;
 
   return projectScopedContainers.MatchIdentifierWithName<bool>(identifier.identifierName,
     [&]() {
@@ -94,14 +99,33 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
       if (identifier.childIdentifierName.empty()) {
         RaiseTypeError(_("An object variable or expression should be entered."),
                         identifier.identifierNameLocation);
+
         return true; // We should have found a variable.
       }
 
-      if (!objectsContainersList.HasObjectOrGroupWithVariableNamed(identifier.identifierName, identifier.childIdentifierName)) {
+      auto variableExistence = objectsContainersList.HasObjectOrGroupWithVariableNamed(identifier.identifierName, identifier.childIdentifierName);
+
+      if (variableExistence == gd::ObjectsContainersList::DoesNotExist) {
         RaiseTypeError(_("This variable does not exist on this object or group."),
-                        identifier.identifierNameLocation);
+                        identifier.childIdentifierNameLocation);
+
         return true; // We should have found a variable.
       }
+      else if (variableExistence == gd::ObjectsContainersList::ExistsOnlyOnSomeObjectsOfTheGroup) {
+        RaiseTypeError(_("This variable only exists on some objects of the group. It must be declared for all objects."),
+                        identifier.childIdentifierNameLocation);
+
+        return true; // We should have found a variable.
+      }
+      else if (variableExistence == gd::ObjectsContainersList::GroupIsEmpty) {
+        RaiseTypeError(_("This group is empty. Add an object to this group first."),
+                        identifier.identifierNameLocation);
+
+        return true; // We should have found a variable.
+      }
+
+      auto variableType = objectsContainersList.GetTypeOfObjectOrGroupVariable(identifier.identifierName, identifier.childIdentifierName);
+      ReadChildTypeFromVariable(variableType);
 
       return true; // We found a variable.
     }, [&]() {
@@ -109,7 +133,6 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
 
       // Try to identify a declared variable with the name (and maybe the child
       // variable).
-
       const gd::Variable& variable =
           variablesContainersList.Get(identifier.identifierName);
 
@@ -117,6 +140,7 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
         // Just the root variable is accessed, check it can be used in an
         // expression.
         validateVariableTypeForExpression(variable.GetType());
+        ReadChildTypeFromVariable(variable.GetType());
 
         return true; // We found a variable.
       } else {
@@ -130,6 +154,7 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
 
         const gd::Variable& childVariable =
             variable.GetChild(identifier.childIdentifierName);
+        ReadChildTypeFromVariable(childVariable.GetType());
         return true; // We found a variable.
       }
     }, [&]() {
@@ -137,10 +162,48 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
       if (!identifier.childIdentifierName.empty()) {
         RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
             identifier.childIdentifierNameLocation);
+
         return true; // We found a property, even if the child is not allowed.
       }
 
+      const gd::NamedPropertyDescriptor& property = projectScopedContainers
+          .GetPropertiesContainersList().Get(identifier.identifierName).second;
+
+      if (property.GetType() == "Number") {
+       childType = Type::Number;
+      } else if (property.GetType() == "Boolean") {
+        // Nothing - we don't know the precise type (this could be used a string or as a number)
+      } else {
+        // Assume type is String or equivalent.
+        childType = Type::String;
+      }
+
       return true; // We found a property.
+    }, [&]() {
+      // This is a parameter.
+      if (!identifier.childIdentifierName.empty()) {
+        RaiseTypeError(_("Accessing a child variable of a parameter is not possible - just write the parameter name."),
+            identifier.childIdentifierNameLocation);
+
+        return true; // We found a parameter, even if the child is not allowed.
+      }
+
+      const auto& parameter = gd::ParameterMetadataTools::Get(parametersVectorsList, identifier.identifierName);
+      const auto& valueTypeMetadata = parameter.GetValueTypeMetadata();
+      if (valueTypeMetadata.IsNumber()) {
+        childType = Type::Number;
+      } else if (valueTypeMetadata.IsString()) {
+        childType = Type::String;
+      } else if (valueTypeMetadata.IsBoolean()) {
+        // Nothing - we don't know the precise type (this could be used as a string or as a number).
+      } else {
+        RaiseTypeError(_("This parameter is not a string, number or boolean - it can't be used in an expression."),
+            identifier.identifierNameLocation);
+
+        return true; // We found a parameter, even though the type is incompatible.
+      }
+
+      return true; // We found a parameter.
     }, [&]() {
       // This is something else.
       return false;

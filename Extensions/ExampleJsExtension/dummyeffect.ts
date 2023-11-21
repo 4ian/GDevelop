@@ -43,7 +43,7 @@ namespace gdjs {
         // But be careful about the existing member of the filter (consider
         // updating the filter uniforms directly).
 
-        // You can also access to the effect parameters, classified by type:
+        // You can also access to the effect properties, classified by type:
         // `effectData.doubleParameters.opacity`
         // `effectData.stringParameters.someImage`
         // `effectData.stringParameters.someColor`
@@ -66,7 +66,11 @@ namespace gdjs {
         // You can update the uniforms or other state of the filter.
       }
       // Function that will be called to update a (number) parameter of the PIXI filter with a new value
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         if (parameterName === 'opacity') {
           filter.uniforms.opacity = gdjs.PixiFiltersTools.clampValue(
             value,
@@ -76,9 +80,17 @@ namespace gdjs {
         }
       }
       // Function that will be called to update a (string) parameter of the PIXI filter with a new value
-      updateStringParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
       // Function that will be called to update a (boolean) parameter of the PIXI filter with a new value
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

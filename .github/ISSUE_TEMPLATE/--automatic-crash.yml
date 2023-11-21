@@ -1,0 +1,37 @@
+name: 💥 Automatic crash report
+description: Do not use this template for bug reports. This template is only for automatic crash reports.
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe what you were doing when the crash happened
+      description: If applicable, add screenshots to help explain your problem.
+      placeholder: |
+        1. Went to '...'
+        2. Clicked on '...'
+        3. Scrolled down to '...'
+        4. Saw error
+  - type: input
+    id: gdevelop_version
+    attributes:
+      label: GDevelop version
+      description: |
+        The version of GDevelop used. Leave the prefilled value.
+    validations:
+      required: true
+  - type: textarea
+    id: platform_info
+    attributes:
+      label: Platform info
+      description: |
+        The platform you are using GDevelop on. Leave the prefilled value.
+  - type: textarea
+    id: error_stack
+    attributes:
+      label: Additional error context
+      description: Additonal context about the problem. Leave the prefilled value.
+  - type: textarea
+    id: component_stack
+    attributes:
+      label: Additional component context
+      description: Additonal context about the problem. Leave the prefilled value.

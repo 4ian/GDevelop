@@ -9,6 +9,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
+import alertDecorator from '../../AlertDecorator';
 import ObjectsList from '../../../ObjectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
@@ -17,7 +18,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'LayoutEditor/ObjectsList',
   component: ObjectsList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator, muiDecorator],
 };
 
 export const Default = () => (
@@ -33,16 +34,15 @@ export const Default = () => (
         onExportObject={action('On export object')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
-        selectedObjectNames={[]}
-        selectedObjectTags={[]}
-        onChangeSelectedObjectTags={selectedObjectTags => {}}
-        getAllObjectTags={() => []}
+        selectedObjectFolderOrObjectsWithContext={[]}
         getValidatedObjectOrGroupName={newName => newName}
-        onDeleteObject={(objectWithContext, cb) => cb(true)}
-        onRenameObjectStart={() => {}}
-        onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
-        onObjectSelected={() => {}}
-        renamedObjectWithContext={null}
+        onDeleteObjects={(objectsWithContext, cb) => cb(true)}
+        onRenameObjectFolderOrObjectWithContextFinish={(
+          objectWithContext,
+          newName,
+          cb
+        ) => cb(true)}
+        onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         canInstallPrivateAsset={() => false}
       />
@@ -64,55 +64,19 @@ export const WithSerializedObjectView = () => (
           onExportObject={action('On export object')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
-          selectedObjectNames={[]}
-          selectedObjectTags={[]}
-          onChangeSelectedObjectTags={selectedObjectTags => {}}
-          getAllObjectTags={() => []}
+          selectedObjectFolderOrObjectsWithContext={[]}
           getValidatedObjectOrGroupName={newName => newName}
-          onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameObjectStart={() => {}}
-          onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
-          onObjectSelected={() => {}}
-          renamedObjectWithContext={null}
+          onDeleteObjects={(objectsWithContext, cb) => cb(true)}
+          onRenameObjectFolderOrObjectWithContextFinish={(
+            objectWithContext,
+            newName,
+            cb
+          ) => cb(true)}
+          onObjectFolderOrObjectWithContextSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           canInstallPrivateAsset={() => false}
         />
       </div>
     </SerializedObjectDisplay>
-  </DragAndDropContextProvider>
-);
-
-export const WithTags = () => (
-  <DragAndDropContextProvider>
-    <div style={{ height: 250 }}>
-      <ObjectsList
-        getThumbnail={() => 'res/unknown32.png'}
-        project={testProject.project}
-        objectsContainer={testProject.testLayout}
-        layout={testProject.testLayout}
-        resourceManagementProps={fakeResourceManagementProps}
-        onEditObject={action('On edit object')}
-        onExportObject={action('On export object')}
-        onAddObjectInstance={action('On add instance to the scene')}
-        onObjectCreated={action('On object created')}
-        selectedObjectNames={[]}
-        selectedObjectTags={['Tag1', 'Tag2']}
-        onChangeSelectedObjectTags={action('on change selected object tags')}
-        getAllObjectTags={() => [
-          'Tag1',
-          'Tag2',
-          'Looooooooooong Tag 3',
-          'Unselected Tag 4',
-        ]}
-        getValidatedObjectOrGroupName={newName => newName}
-        onDeleteObject={(objectWithContext, cb) => cb(true)}
-        onRenameObjectStart={() => {}}
-        onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
-        onObjectSelected={() => {}}
-        renamedObjectWithContext={null}
-        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        canInstallPrivateAsset={() => false}
-      />
-    </div>
   </DragAndDropContextProvider>
 );

@@ -13,6 +13,7 @@ import {
   instructionParameter,
   disabledText,
   icon,
+  warningInstruction,
 } from './ClassNames';
 import {
   type InstructionsListContext,
@@ -47,13 +48,14 @@ import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
 import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
+import Warning from '../../UI/CustomSvgIcons/Warning';
 
 const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
     whiteSpace: 'normal',
-    wordWrap: 'break-word',
+    overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices (or for long expressions).
     cursor: 'pointer',
     marginBottom: 1,
   },
@@ -214,12 +216,14 @@ const Instruction = (props: Props) => {
     []
   );
   const preferences = React.useContext(PreferencesContext);
-  const {
-    palette: { type },
-  } = React.useContext(GDevelopThemeContext);
+  const theme = React.useContext(GDevelopThemeContext);
+  const type = theme.palette.type;
+  const warningColor = theme.message.warning;
 
   const useAssignmentOperators =
     preferences.values.eventsSheetUseAssignmentOperators;
+  const showDeprecatedInstructionWarning =
+    preferences.values.showDeprecatedInstructionWarning;
 
   /**
    * Render the different parts of the text of the instruction.
@@ -435,7 +439,7 @@ const Instruction = (props: Props) => {
       },
       [onContextMenu]
     ),
-    'events-tree-event-component'
+    { context: 'events-tree-event-component' }
   );
 
   return (
@@ -489,6 +493,8 @@ const Instruction = (props: Props) => {
                 className={classNames({
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
+                  [warningInstruction]:
+                    showDeprecatedInstructionWarning && metadata.isHidden(),
                 })}
                 onClick={e => {
                   e.stopPropagation();
@@ -523,6 +529,25 @@ const Instruction = (props: Props) => {
                 tabIndex={0}
                 id={id}
               >
+                {showDeprecatedInstructionWarning && metadata.isHidden() ? (
+                  <Tooltip
+                    title={
+                      props.isCondition ? (
+                        <Trans>Deprecated condition</Trans>
+                      ) : (
+                        <Trans>Deprecated action</Trans>
+                      )
+                    }
+                    fontSize="small"
+                  >
+                    <Warning
+                      style={{ color: warningColor }}
+                      className={classNames({
+                        [icon]: true,
+                      })}
+                    />
+                  </Tooltip>
+                ) : null}
                 {instruction.isInverted() && (
                   <img
                     className={classNames({

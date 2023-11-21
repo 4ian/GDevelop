@@ -45,12 +45,18 @@ export const hasChildThatContainsStringInNameOrValue = (
 export const insertInVariablesContainer = (
   variablesContainer: gdVariablesContainer,
   name: string,
-  serializedVariable: ?any,
-  index: ?number
+  serializedVariable: any | null,
+  index: number,
+  inheritedVariablesContainer: ?gdVariablesContainer
 ): { name: string, variable: gdVariable } => {
   const newName = newNameGenerator(
     name,
-    name => variablesContainer.has(name),
+    name => {
+      return (
+        variablesContainer.has(name) ||
+        (!!inheritedVariablesContainer && inheritedVariablesContainer.has(name))
+      );
+    },
     serializedVariable ? 'CopyOf' : undefined
   );
   const newVariable = new gd.Variable();
@@ -60,11 +66,7 @@ export const insertInVariablesContainer = (
   } else {
     newVariable.setString('');
   }
-  const variable = variablesContainer.insert(
-    newName,
-    newVariable,
-    index || variablesContainer.count()
-  );
+  const variable = variablesContainer.insert(newName, newVariable, index);
   newVariable.delete();
   return { name: newName, variable };
 };

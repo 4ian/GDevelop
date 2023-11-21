@@ -49,7 +49,8 @@ struct GD_CORE_API ExpressionCompletionDescription {
     ExpressionWithPrefix,
     Variable,
     TextWithPrefix,
-    Property
+    Property,
+    Parameter
   };
 
   /**
@@ -394,12 +395,10 @@ class GD_CORE_API ExpressionCompletionFinder
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
-    AddCompletionsForAllIdentifiersWithPrefix("", type);
+    AddCompletionsForAllIdentifiersMatchingSearch("", type);
     completions.push_back(
         ExpressionCompletionDescription::ForExpressionWithPrefix(
             type, "", searchedPosition + 1, searchedPosition + 1));
@@ -408,12 +407,10 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
-    AddCompletionsForAllIdentifiersWithPrefix("", type);
+    AddCompletionsForAllIdentifiersMatchingSearch("", type);
     completions.push_back(
         ExpressionCompletionDescription::ForExpressionWithPrefix(
             type, "", searchedPosition + 1, searchedPosition + 1));
@@ -487,18 +484,25 @@ class GD_CORE_API ExpressionCompletionFinder
     const auto& objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
     if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
-      const gd::VariablesContainer* variablesContainer = nullptr;
       if (type == "globalvar") {
-        variablesContainer =
+        const auto* variablesContainer =
             projectScopedContainers.GetVariablesContainersList()
                 .GetTopMostVariablesContainer();
+        if (variablesContainer) {
+          AddCompletionsForVariablesMatchingSearch(
+              *variablesContainer, node.name, node.nameLocation);
+        }
       } else if (type == "scenevar") {
-        variablesContainer =
+        const auto* variablesContainer =
             projectScopedContainers.GetVariablesContainersList()
                 .GetBottomMostVariablesContainer();
+        if (variablesContainer) {
+          AddCompletionsForVariablesMatchingSearch(
+              *variablesContainer, node.name, node.nameLocation);
+        }
       } else if (type == "objectvar") {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
             platform,
@@ -507,17 +511,12 @@ class GD_CORE_API ExpressionCompletionFinder
             // so the object will be found inside the expression itself.
             "",
             node);
-        variablesContainer =
-            objectsContainersList.GetObjectOrGroupVariablesContainer(
-                objectName);
-      }
 
-      if (variablesContainer) {
-        AddCompletionsForVariablesWithPrefix(
-            *variablesContainer, node.name, node.nameLocation);
+        AddCompletionsForObjectOrGroupVariablesMatchingSearch(
+            objectsContainersList, objectName, node.name, node.nameLocation);
       }
     } else {
-      AddCompletionsForObjectsAndVariablesWithPrefix(
+      AddCompletionsForObjectsAndVariablesMatchingSearch(
           node.name, type, node.nameLocation);
     }
   }
@@ -532,21 +531,30 @@ class GD_CORE_API ExpressionCompletionFinder
     const auto& objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
     if (gd::ParameterMetadata::IsObject(type)) {
       // Only show completions of objects if an object is required.
-      AddCompletionsForObjectWithPrefix(
+      AddCompletionsForObjectMatchingSearch(
           node.identifierName, type, node.location);
     } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
-      const gd::VariablesContainer* variablesContainer = nullptr;
       if (type == "globalvar") {
-        variablesContainer =
+        const auto* variablesContainer =
             projectScopedContainers.GetVariablesContainersList()
                 .GetTopMostVariablesContainer();
+        if (variablesContainer) {
+          AddCompletionsForVariablesMatchingSearch(*variablesContainer,
+                                               node.identifierName,
+                                               node.identifierNameLocation);
+        }
       } else if (type == "scenevar") {
-        variablesContainer =
+        const auto* variablesContainer =
             projectScopedContainers.GetVariablesContainersList()
                 .GetBottomMostVariablesContainer();
+        if (variablesContainer) {
+          AddCompletionsForVariablesMatchingSearch(*variablesContainer,
+                                               node.identifierName,
+                                               node.identifierNameLocation);
+        }
       } else if (type == "objectvar") {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
             platform,
@@ -555,21 +563,18 @@ class GD_CORE_API ExpressionCompletionFinder
             // so the object will be found inside the expression itself.
             "",
             node);
-        variablesContainer =
-            objectsContainersList.GetObjectOrGroupVariablesContainer(
-                objectName);
-      }
 
-      if (variablesContainer) {
-        AddCompletionsForVariablesWithPrefix(*variablesContainer,
-                                             node.identifierName,
-                                             node.identifierNameLocation);
+        AddCompletionsForObjectOrGroupVariablesMatchingSearch(
+            objectsContainersList,
+            objectName,
+            node.identifierName,
+            node.identifierNameLocation);
       }
     } else {
       // Object function, behavior name, variable, object variable.
       if (IsCaretOn(node.identifierNameLocation)) {
         // Is this the proper position?
-        AddCompletionsForAllIdentifiersWithPrefix(
+        AddCompletionsForAllIdentifiersMatchingSearch(
             node.identifierName, type, node.identifierNameLocation);
         if (!node.identifierNameDotLocation.IsValid()) {
           completions.push_back(
@@ -584,16 +589,11 @@ class GD_CORE_API ExpressionCompletionFinder
         const gd::String& objectName = node.identifierName;
 
         // Might be an object variable, object behavior or object expression:
-        const auto* variablesContainer =
-            projectScopedContainers.GetObjectsContainersList()
-                .GetObjectOrGroupVariablesContainer(objectName);
-        if (variablesContainer) {
-          AddCompletionsForVariablesWithPrefix(
-              *variablesContainer,
-              node.childIdentifierName,
-              node.childIdentifierNameLocation);
-        }
-
+        AddCompletionsForObjectOrGroupVariablesMatchingSearch(
+            objectsContainersList,
+            objectName,
+            node.childIdentifierName,
+            node.childIdentifierNameLocation);
         completions.push_back(
             ExpressionCompletionDescription::ForBehaviorWithPrefix(
                 node.childIdentifierName,
@@ -611,16 +611,14 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
     if (!node.behaviorFunctionName.empty() ||
         node.behaviorNameNamespaceSeparatorLocation.IsValid()) {
       // Behavior function (or behavior function being written, with the
       // function name missing)
       if (IsCaretOn(node.objectNameLocation)) {
-        AddCompletionsForObjectWithPrefix(
+        AddCompletionsForObjectMatchingSearch(
             node.objectName, type, node.objectNameLocation);
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
@@ -644,7 +642,7 @@ class GD_CORE_API ExpressionCompletionFinder
     } else {
       // Object function or behavior name
       if (IsCaretOn(node.objectNameLocation)) {
-        AddCompletionsForObjectWithPrefix(
+        AddCompletionsForObjectMatchingSearch(
             node.objectName, type, node.objectNameLocation);
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
@@ -665,17 +663,15 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
     bool isCaretOnParenthesis = IsCaretOn(node.openingParenthesisLocation) ||
                                 IsCaretOn(node.closingParenthesisLocation);
 
     if (!node.behaviorName.empty()) {
       // Behavior function
       if (IsCaretOn(node.objectNameLocation)) {
-        AddCompletionsForObjectWithPrefix(
+        AddCompletionsForObjectMatchingSearch(
             node.objectName, type, node.objectNameLocation);
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.behaviorNameLocation)) {
@@ -699,7 +695,7 @@ class GD_CORE_API ExpressionCompletionFinder
     } else if (!node.objectName.empty()) {
       // Object function
       if (IsCaretOn(node.objectNameLocation)) {
-        AddCompletionsForObjectWithPrefix(
+        AddCompletionsForObjectMatchingSearch(
             node.objectName, type, node.objectNameLocation);
       } else {
         // Add completions for behaviors, because we could imagine that the user
@@ -737,12 +733,10 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
-    const auto& objectsContainersList =
-        projectScopedContainers.GetObjectsContainersList();
     auto type = gd::ExpressionTypeFinder::GetType(
-        platform, objectsContainersList, rootType, node);
+        platform, projectScopedContainers, rootType, node);
 
-    AddCompletionsForAllIdentifiersWithPrefix(node.text, type, node.location);
+    AddCompletionsForAllIdentifiersMatchingSearch(node.text, type, node.location);
     completions.push_back(
         ExpressionCompletionDescription::ForExpressionWithPrefix(
             type,
@@ -761,12 +755,12 @@ class GD_CORE_API ExpressionCompletionFinder
              (inclusive && searchedPosition <= location.GetEndPosition())));
   }
 
-  void AddCompletionsForVariablesWithPrefix(
+  void AddCompletionsForVariablesMatchingSearch(
       const gd::VariablesContainer& variablesContainer,
-      const gd::String& prefix,
+      const gd::String& search,
       const ExpressionParserLocation& location) {
-    variablesContainer.ForEachVariableWithPrefix(
-        prefix,
+    variablesContainer.ForEachVariableMatchingSearch(
+        search,
         [&](const gd::String& variableName, const gd::Variable& variable) {
           ExpressionCompletionDescription description(
               ExpressionCompletionDescription::Variable,
@@ -778,12 +772,31 @@ class GD_CORE_API ExpressionCompletionFinder
         });
   }
 
-  void AddCompletionsForObjectWithPrefix(
-      const gd::String& prefix,
+  void AddCompletionsForObjectOrGroupVariablesMatchingSearch(
+      const gd::ObjectsContainersList& objectsContainersList,
+      const gd::String& objectOrGroupName,
+      const gd::String& search,
+      const ExpressionParserLocation& location) {
+    objectsContainersList.ForEachObjectOrGroupVariableMatchingSearch(
+        objectOrGroupName,
+        search,
+        [&](const gd::String& variableName, const gd::Variable& variable) {
+          ExpressionCompletionDescription description(
+              ExpressionCompletionDescription::Variable,
+              location.GetStartPosition(),
+              location.GetEndPosition());
+          description.SetCompletion(variableName);
+          description.SetVariableType(variable.GetType());
+          completions.push_back(description);
+        });
+  }
+
+  void AddCompletionsForObjectMatchingSearch(
+      const gd::String& search,
       const gd::String& type,
       const ExpressionParserLocation& location) {
-    projectScopedContainers.GetObjectsContainersList().ForEachNameWithPrefix(
-        prefix,
+    projectScopedContainers.GetObjectsContainersList().ForEachNameMatchingSearch(
+        search,
         [&](const gd::String& name,
             const gd::ObjectConfiguration* objectConfiguration) {
           ExpressionCompletionDescription description(
@@ -797,12 +810,12 @@ class GD_CORE_API ExpressionCompletionFinder
         });
   }
 
-  void AddCompletionsForObjectsAndVariablesWithPrefix(
-      const gd::String& prefix,
+  void AddCompletionsForObjectsAndVariablesMatchingSearch(
+      const gd::String& search,
       const gd::String& type,
       const ExpressionParserLocation& location) {
-    projectScopedContainers.ForEachIdentifierWithPrefix(
-        prefix,
+    projectScopedContainers.ForEachIdentifierMatchingSearch(
+        search,
         [&](const gd::String& objectName,
             const ObjectConfiguration* objectConfiguration) {
           ExpressionCompletionDescription description(
@@ -825,23 +838,26 @@ class GD_CORE_API ExpressionCompletionFinder
         },
         [&](const gd::NamedPropertyDescriptor& property) {
           // Ignore properties here.
+        },
+        [&](const gd::ParameterMetadata& parameter) {
+          // Ignore parameters here.
         });
   }
 
-  void AddCompletionsForAllIdentifiersWithPrefix(const gd::String& prefix,
+  void AddCompletionsForAllIdentifiersMatchingSearch(const gd::String& search,
                                                  const gd::String& type) {
-    AddCompletionsForAllIdentifiersWithPrefix(
-        prefix,
+    AddCompletionsForAllIdentifiersMatchingSearch(
+        search,
         type,
         ExpressionParserLocation(searchedPosition + 1, searchedPosition + 1));
   }
 
-  void AddCompletionsForAllIdentifiersWithPrefix(
-      const gd::String& prefix,
+  void AddCompletionsForAllIdentifiersMatchingSearch(
+      const gd::String& search,
       const gd::String& type,
       const ExpressionParserLocation& location) {
-    projectScopedContainers.ForEachIdentifierWithPrefix(
-        prefix,
+    projectScopedContainers.ForEachIdentifierMatchingSearch(
+        search,
         [&](const gd::String& objectName,
             const ObjectConfiguration* objectConfiguration) {
           ExpressionCompletionDescription description(
@@ -869,6 +885,15 @@ class GD_CORE_API ExpressionCompletionFinder
               location.GetEndPosition());
           description.SetCompletion(property.GetName());
           description.SetType(property.GetType());
+          completions.push_back(description);
+        },
+        [&](const gd::ParameterMetadata& parameter) {
+          ExpressionCompletionDescription description(
+              ExpressionCompletionDescription::Parameter,
+              location.GetStartPosition(),
+              location.GetEndPosition());
+          description.SetCompletion(parameter.GetName());
+          description.SetType(parameter.GetType());
           completions.push_back(description);
         });
   }

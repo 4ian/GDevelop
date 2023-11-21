@@ -44,6 +44,7 @@ declare class libGDevelop {
   VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
   VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
+  VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
   MapStringDouble: Class<gdMapStringDouble>;
@@ -71,6 +72,7 @@ declare class libGDevelop {
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
   Watermark: Class<gdWatermark>;
+  ObjectFolderOrObject: Class<gdObjectFolderOrObject>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
   ObjectsContainersList: Class<gdObjectsContainersList>;
@@ -201,6 +203,7 @@ declare class libGDevelop {
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;
   ArbitraryEventsWorker: Class<gdArbitraryEventsWorker>;
+  ArbitraryObjectsWorker: Class<gdArbitraryObjectsWorker>;
   EventsLeaderboardsLister: Class<gdEventsLeaderboardsLister>;
   EventsLeaderboardsRenamer: Class<gdEventsLeaderboardsRenamer>;
   EventsParametersLister: Class<gdEventsParametersLister>;
@@ -214,6 +217,7 @@ declare class libGDevelop {
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
   ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
+  ObjectsUsingResourceCollector: Class<gdObjectsUsingResourceCollector>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
   EditorSettings: Class<gdEditorSettings>;
   Point: Class<gdPoint>;

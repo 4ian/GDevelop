@@ -126,6 +126,10 @@ namespace gdjs {
     getHeight(): float {
       return this._pixiObject.height;
     }
+
+    destroy(): void {
+      this._pixiObject.destroy(true);
+    }
   }
 
   export type BBTextRuntimeObjectRenderer =

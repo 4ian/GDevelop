@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
@@ -52,6 +53,8 @@ export const quicklyAnalyzeVariableName = (
   name: string,
   variablesContainer?: ?gdVariablesContainer
 ): VariableNameQuickAnalyzeResult => {
+  if (!name) return VariableNameQuickAnalyzeResults.OK;
+
   for (let i = 0; i < name.length; ++i) {
     const character = name[i];
 
@@ -181,58 +184,64 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           formula. You can only use this for structure or arrays. For example:
           Score[3].
         </Trans>
-      ) : quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
-        <Trans>
-          This variable is not declared. Use the variable editor to add it.
-        </Trans>
       ) : null;
+    const warningTranslatableText =
+      quicklyAnalysisResult ===
+      VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+        ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
+        : null;
 
     return (
-      <TextFieldWithButtonLayout
-        renderTextField={() => (
-          <SemiControlledAutoComplete
-            margin={isInline ? 'none' : 'dense'}
-            floatingLabelText={description}
-            helperMarkdownText={
-              parameterMetadata
-                ? parameterMetadata.getLongDescription()
-                : undefined
+      <I18n>
+        {({ i18n }) => (
+          <TextFieldWithButtonLayout
+            renderTextField={() => (
+              <SemiControlledAutoComplete
+                margin={isInline ? 'none' : 'dense'}
+                floatingLabelText={description}
+                helperMarkdownText={
+                  warningTranslatableText
+                    ? i18n._(warningTranslatableText)
+                    : parameterMetadata
+                    ? parameterMetadata.getLongDescription()
+                    : undefined
+                }
+                errorText={errorText}
+                fullWidth
+                value={value}
+                onChange={onChange}
+                onRequestClose={onRequestClose}
+                onApply={onApply}
+                dataSource={[
+                  ...autocompletionVariableNames,
+                  onOpenDialog && variablesContainer
+                    ? {
+                        translatableValue: t`Add or edit variables...`,
+                        text: '',
+                        value: '',
+                        onClick: onOpenDialog,
+                      }
+                    : null,
+                ].filter(Boolean)}
+                openOnFocus={!isInline}
+                ref={field}
+                id={id}
+              />
+            )}
+            renderButton={style =>
+              onOpenDialog && !isInline ? (
+                <RaisedButton
+                  icon={<ShareExternal />}
+                  disabled={!variablesContainer}
+                  primary
+                  style={style}
+                  onClick={onOpenDialog}
+                />
+              ) : null
             }
-            errorText={errorText}
-            fullWidth
-            value={value}
-            onChange={onChange}
-            onRequestClose={onRequestClose}
-            onApply={onApply}
-            dataSource={[
-              ...autocompletionVariableNames,
-              onOpenDialog
-                ? {
-                    translatableValue: t`Add or edit variables...`,
-                    text: '',
-                    value: '',
-                    onClick: onOpenDialog,
-                  }
-                : null,
-            ].filter(Boolean)}
-            openOnFocus={!isInline}
-            ref={field}
-            id={id}
           />
         )}
-        renderButton={style =>
-          onOpenDialog && !isInline ? (
-            <RaisedButton
-              icon={<ShareExternal />}
-              disabled={!variablesContainer}
-              primary
-              style={style}
-              onClick={onOpenDialog}
-            />
-          ) : null
-        }
-      />
+      </I18n>
     );
   }
 );

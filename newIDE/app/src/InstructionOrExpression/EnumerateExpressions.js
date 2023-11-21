@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import {
   type EnumeratedExpressionMetadata,
   type InstructionOrExpressionScope,
@@ -54,7 +55,8 @@ const enumerateExpressionMetadataMap = (
 
 /** Enumerate all the free expressions available. */
 export const enumerateFreeExpressions = (
-  type: string
+  type: string,
+  i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -62,7 +64,7 @@ export const enumerateFreeExpressions = (
 
   return flatten(
     mapVector(allExtensions, extension => {
-      const prefix = getExtensionPrefix(extension);
+      const prefix = getExtensionPrefix(extension, i18n);
       const scope = {
         extension,
         objectMetadata: undefined,
@@ -174,17 +176,18 @@ export const enumerateBehaviorExpressions = (
 
 /** Enumerate all the expressions available. */
 export const enumerateAllExpressions = (
-  type: string
+  type: string,
+  i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
   const objectsExpressions = [];
   const behaviorsExpressions = [];
-  const freeExpressions = enumerateFreeExpressions(type);
+  const freeExpressions = enumerateFreeExpressions(type, i18n);
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   mapVector(allExtensions, extension => {
-    const prefix = getExtensionPrefix(extension);
+    const prefix = getExtensionPrefix(extension, i18n);
 
     //Objects expressions:
     mapVector(extension.getExtensionObjectsTypes(), objectType => {

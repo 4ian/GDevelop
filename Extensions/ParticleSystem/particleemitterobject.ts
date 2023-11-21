@@ -417,9 +417,9 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDestroyed(): void {
       if (this._renderer) this._renderer.destroy();
-      super.onDestroyFromScene(instanceContainer);
+      super.onDestroyed();
     }
 
     getEmitterForceMin(): number {

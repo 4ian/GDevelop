@@ -148,7 +148,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \return Code
    */
   virtual gd::String GenerateEventsListCode(
-      gd::EventsList& events, gd::EventsCodeGenerationContext& context);
+      gd::EventsList& events, gd::EventsCodeGenerationContext& context) override;
 
   /**
    * Generate code for executing a condition list
@@ -161,7 +161,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   virtual gd::String GenerateConditionsListCode(
       gd::InstructionsList& conditions,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context) override;
 
   /**
    * \brief Generate the full name for accessing to a boolean variable used for
@@ -169,7 +169,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   virtual gd::String GenerateBooleanFullName(
       const gd::String& boolName,
-      const gd::EventsCodeGenerationContext& context);
+      const gd::EventsCodeGenerationContext& context) override;
 
   /**
    * \brief Generate the full name for accessing to a boolean variable used for
@@ -177,20 +177,20 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   virtual gd::String GenerateUpperScopeBooleanFullName(
       const gd::String& boolName,
-      const gd::EventsCodeGenerationContext& context);
+      const gd::EventsCodeGenerationContext& context) override;
 
   /**
    * \brief Set a boolean to false.
    */
   virtual gd::String GenerateBooleanInitializationToFalse(
       const gd::String& boolName,
-      const gd::EventsCodeGenerationContext& context);
+      const gd::EventsCodeGenerationContext& context) override;
 
   /**
    * \brief Get the full name for accessing to a list of objects
    */
   virtual gd::String GetObjectListName(
-      const gd::String& name, const gd::EventsCodeGenerationContext& context);
+      const gd::String& name, const gd::EventsCodeGenerationContext& context) override;
 
   /**
    * \brief Get the namespace to be used to store code generated
@@ -199,7 +199,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    *
    * Example: "gdjs.something."
    */
-  virtual gd::String GetCodeNamespaceAccessor() {
+  virtual gd::String GetCodeNamespaceAccessor() override {
     return GetCodeNamespace() + ".";
   };
 
@@ -209,7 +209,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    *
    * Example: "gdjs.something"
    */
-  virtual gd::String GetCodeNamespace() { return codeNamespace; };
+  virtual gd::String GetCodeNamespace() override { return codeNamespace; };
 
   /**
    * \brief Specify the code namespace to use, useful for functions as it is not
@@ -228,7 +228,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::EventsCodeGenerationContext& context,
       const gd::String& lastObjectName,
       std::vector<std::pair<gd::String, gd::String> >*
-          supplementaryParametersTypes);
+          supplementaryParametersTypes) override;
 
   virtual gd::String GenerateObjectFunctionCall(
       gd::String objectListName,
@@ -236,7 +236,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::ExpressionCodeGenerationInformation& codeInfo,
       gd::String parametersStr,
       gd::String defaultOutput,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context) override;
 
   virtual gd::String GenerateObjectBehaviorFunctionCall(
       gd::String objectListName,
@@ -245,14 +245,14 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::ExpressionCodeGenerationInformation& codeInfo,
       gd::String parametersStr,
       gd::String defaultOutput,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context) override;
 
   virtual gd::String GenerateFreeCondition(
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       const gd::String& returnBoolean,
       bool conditionInverted,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context) override;
 
   virtual gd::String GenerateObjectCondition(
       const gd::String& objectName,
@@ -261,7 +261,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       const gd::String& returnBoolean,
       bool conditionInverted,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context) override;
 
   virtual gd::String GenerateBehaviorCondition(
       const gd::String& objectName,
@@ -271,7 +271,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       const gd::String& returnBoolean,
       bool conditionInverted,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context) override;
 
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
@@ -280,7 +280,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& optionalAsyncCallbackName = "");
+      const gd::String& optionalAsyncCallbackName = "") override;
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -290,53 +290,68 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& optionalAsyncCallbackName = "");
+      const gd::String& optionalAsyncCallbackName = "") override;
 
   virtual gd::String GenerateGetBehaviorNameCode(
-      const gd::String& behaviorName);
+      const gd::String& behaviorName) override;
 
   virtual gd::String GenerateGetVariable(
       const gd::String& variableName,
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& objectName);
+      const gd::String& objectName) override;
 
-  virtual gd::String GenerateVariableAccessor(gd::String childName) {
+  virtual gd::String GenerateVariableAccessor(gd::String childName) override {
+    // This could be probably optimised by using `getChildNamed`.
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
   };
 
   virtual gd::String GenerateVariableBracketAccessor(
-      gd::String expressionCode) {
+      gd::String expressionCode) override {
+    // This uses `getChild` which allows to access a child
+    // with a number (an index, for an array) or a string (for a structure).
+    // This could be optimised, if the type of the accessed variable AND the type of the index is known,
+    // so that `getChildAt` (for an array, with an index) or `getChildNamed` (for a structure, with a name)
+    // is used instead.
     return ".getChild(" + expressionCode + ")";
   };
 
-  virtual gd::String GenerateBadVariable() {
+  virtual gd::String GenerateBadVariable() override {
     return "gdjs.VariablesContainer.badVariable";
   }
 
   virtual gd::String GeneratePropertyGetter(const gd::PropertiesContainer& propertiesContainer,
                                             const gd::NamedPropertyDescriptor& property,
                                             const gd::String& type,
-                                            gd::EventsCodeGenerationContext& context);
+                                            gd::EventsCodeGenerationContext& context) override;
 
-  virtual gd::String GenerateBadObject() { return "null"; }
+  virtual gd::String GenerateParameterGetter(const gd::ParameterMetadata& parameter,
+                                             const gd::String& type,
+                                             gd::EventsCodeGenerationContext& context) override;
+
+  virtual gd::String GenerateBadObject() override { return "null"; }
 
   virtual gd::String GenerateObject(const gd::String& objectName,
                                     const gd::String& type,
-                                    gd::EventsCodeGenerationContext& context);
+                                    gd::EventsCodeGenerationContext& context) override;
 
-  virtual gd::String GenerateNegatedPredicate(const gd::String& predicate) const {
+  virtual gd::String GenerateNegatedPredicate(const gd::String& predicate) const override {
     return "!(" + predicate + ")";
   };
 
   virtual gd::String GenerateObjectsDeclarationCode(
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context) override;
 
   virtual gd::String GenerateAllInstancesGetterCode(
       const gd::String& objectName, gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateProfilerSectionBegin(const gd::String& section);
-  virtual gd::String GenerateProfilerSectionEnd(const gd::String& section);
+  virtual gd::String GenerateProfilerSectionBegin(const gd::String& section) override;
+  virtual gd::String GenerateProfilerSectionEnd(const gd::String& section) override;
+
+  virtual gd::String GenerateRelationalOperation(
+    const gd::String& relationalOperator,
+    const gd::String& lhs,
+    const gd::String& rhs) override;
 
  private:
   static gd::String GenerateEventsListCompleteFunctionCode(

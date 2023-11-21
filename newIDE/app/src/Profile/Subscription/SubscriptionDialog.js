@@ -73,7 +73,7 @@ const cancelImmediatelyConfirmationTexts = {
 };
 const seamlesslyChangeConfirmationTexts = {
   title: t`Update your subscription`,
-  message: t`Are you sure you want to subscribe to this new plan? Your next payment will be pro-rated.`,
+  message: t`Are you sure you want to change your plan? Your next payment will be pro-rated.`,
   confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
 };
@@ -202,9 +202,7 @@ export default function SubscriptionDialog({
       const hasExpiredRedeemedSubscription =
         !!subscription.redemptionCodeValidUntil &&
         subscription.redemptionCodeValidUntil < Date.now();
-      const shouldShowAlert =
-        (needToCancelSubscription && !hasExpiredRedeemedSubscription) || // we don't show an alert if the redeemed code is expired
-        hasValidRedeemedSubscription;
+      const shouldSkipAlert = hasExpiredRedeemedSubscription; // we don't show an alert if the redeemed code is expired
 
       // Changing the existing subscription.
       const confirmDialogTexts =
@@ -214,7 +212,7 @@ export default function SubscriptionDialog({
           ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
           : cancelAndChangeConfirmationTexts;
 
-      if (shouldShowAlert) {
+      if (!shouldSkipAlert) {
         const answer = await showConfirmation(confirmDialogTexts);
         if (!answer) return;
       }
@@ -514,13 +512,13 @@ export default function SubscriptionDialog({
                     <FlatButton
                       key="login"
                       label={<Trans>Login</Trans>}
-                      onClick={authenticatedUser.onLogin}
+                      onClick={authenticatedUser.onOpenLoginDialog}
                     />,
                     <DialogPrimaryButton
                       key="create-account"
                       label={<Trans>Create my account</Trans>}
                       primary
-                      onClick={authenticatedUser.onCreateAccount}
+                      onClick={authenticatedUser.onOpenCreateAccountDialog}
                     />,
                   ]}
                 >

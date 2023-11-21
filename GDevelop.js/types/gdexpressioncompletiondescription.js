@@ -6,6 +6,7 @@ declare class gdExpressionCompletionDescription {
   static Variable: 3;
   static TextWithPrefix: 4;
   static Property: 5;
+  static Parameter: 6;
   getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
   getType(): string;
   getVariableType(): Variable_Type;

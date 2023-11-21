@@ -1217,6 +1217,7 @@ namespace gdjs {
             [newInstance],
             0,
             0,
+            0,
             /*trackByPersistentUuid=*/
             true
           );

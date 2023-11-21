@@ -16,6 +16,48 @@
         "value": "#2E3440"
       }
     },
+    "success": {
+      "dark": {
+        "value": "#16CF89",
+        "comment": "Palette/Green/50"
+      },
+      "color": {
+        "value": "#45D9A1",
+        "comment": "Palette/Green/40"
+      },
+      "light": {
+        "value": "#8BE7C4",
+        "comment": "Palette/Green/30"
+      }
+    },
+    "warning": {
+      "dark": {
+        "value": "#FFA929",
+        "comment": "Palette/Yellow/50"
+      },
+      "color": {
+        "value": "#FFBC57",
+        "comment": "Palette/Yellow/40"
+      },
+      "light": {
+        "value": "#FFD28F",
+        "comment": "Palette/Yellow/30"
+      }
+    },
+    "error": {
+      "dark": {
+        "value": "#FF5E3B",
+        "comment": "Palette/Red/50"
+      },
+      "color": {
+        "value": "#FF8569",
+        "comment": "Palette/Red/40"
+      },
+      "light": {
+        "value": "#FFA38F",
+        "comment": "Palette/Red/30"
+      }
+    },
     "surface": {
       "titlebar": {
         "background-color": {
@@ -154,7 +196,7 @@
     },
     "selection": {
       "background-color": {
-        "value": "#88C0D0"
+        "value": "#4d6e96"
       },
       "color": {
         "value": "#FFFFFF"
@@ -238,6 +280,11 @@
       }
     },
     "list-item": {
+      "hover": {
+        "background-color": {
+          "value": "#39516f"
+        }
+      },
       "group": {
         "text": {
           "color": {
@@ -462,6 +509,12 @@
       },
       "border": {
         "value": "1px solid {event-sheet.sub-instructions.border-color.value}"
+      }
+    },
+    "warning-instruction": {
+      "background-color": {
+        "value": "rgba(255, 188, 87, 0.125)",
+        "comment": "Palette/Yellow/40 and alpha"
       }
     },
     "instruction-parameter": {

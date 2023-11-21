@@ -79,7 +79,10 @@ namespace gdjs {
           try {
             await this.loadJsonAsync(resource.name);
           } catch (error) {
-            logger.error('Error while preloading a json resource:' + error);
+            logger.error(
+              `Error while preloading json resource ${resource.name}:`,
+              error
+            );
           }
           loadedCount++;
           onProgress(loadedCount, this._resources.size);

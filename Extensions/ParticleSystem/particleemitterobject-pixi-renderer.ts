@@ -117,9 +117,16 @@ namespace gdjs {
                 x: objectData.particleGravityX,
                 y: objectData.particleGravityY,
               },
-              minStart: objectData.emitterForceMax,
+              minStart: objectData.emitterForceMin,
               maxStart: objectData.emitterForceMax,
-              rotate: true,
+              // See _updateRotateFlagFromSpeed
+              rotate:
+                objectData.particleAngle1 === 0 &&
+                objectData.particleAngle2 === 0 &&
+                (objectData.particleGravityX !== 0 ||
+                  objectData.particleGravityY !== 0 ||
+                  objectData.emitterForceMin < 0 ||
+                  objectData.emitterForceMax < 0),
             },
           },
           {
@@ -243,8 +250,8 @@ namespace gdjs {
     setAngle(angle1: float, angle2: float): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('rotation');
-      behavior.minStart = angle1;
-      behavior.maxStart = angle2;
+      behavior.minStart = gdjs.toRad(angle1);
+      behavior.maxStart = gdjs.toRad(angle2);
     }
 
     setForce(min: float, max: float): void {
@@ -273,6 +280,29 @@ namespace gdjs {
       const behavior: any = this.emitter.getBehavior('moveAcceleration');
       behavior.accel.x = x;
       behavior.accel.y = y;
+      this._updateRotateFlagFromSpeed();
+    }
+
+    /**
+     * When rotate from `moveAcceleration` is `true` the rotation is set
+     * according to the speed direction. This is overriding the particle
+     * rotation calculated by from `rotation`.
+     */
+    private _updateRotateFlagFromSpeed() {
+      const rotation: any = this.emitter.getBehavior('rotation');
+      const moveAcceleration: any = this.emitter.getBehavior(
+        'moveAcceleration'
+      );
+      moveAcceleration.rotate =
+        rotation.minSpeed === 0 &&
+        rotation.maxSpeed === 0 &&
+        // This part is to avoid to do `atan` every frame when the object
+        // direction doesn't change.
+        (moveAcceleration.accel.x !== 0 ||
+          moveAcceleration.accel.y !== 0 ||
+          // Negative speeds need a 180° rotation.
+          moveAcceleration.minStart < 0 ||
+          moveAcceleration.maxStart < 0);
     }
 
     setColor(
@@ -311,8 +341,9 @@ namespace gdjs {
     setParticleRotationSpeed(min: float, max: float): void {
       // Access private members of the behavior to apply changes right away.
       const behavior: any = this.emitter.getBehavior('rotation');
-      behavior.minSpeed = min;
-      behavior.maxSpeed = max;
+      behavior.minSpeed = gdjs.toRad(min);
+      behavior.maxSpeed = gdjs.toRad(max);
+      this._updateRotateFlagFromSpeed();
     }
 
     setMaxParticlesCount(count: float): void {

@@ -49,12 +49,14 @@ export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = 
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
     name: 'Worms 2D',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d35c',
     name: 'Crash Bandicoot',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
 ];
@@ -64,60 +66,70 @@ const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372141',
     name: 'Worms 2D 1',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d352',
     name: 'Crash Bandicoot 2',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
     name: 'Worms 2D 3',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d354',
     name: 'Crash Bandicoot 4',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372145',
     name: 'Worms 2D 5',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d356',
     name: 'Crash Bandicoot 6',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372147',
     name: 'Worms 2D 7',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d358',
     name: 'Crash Bandicoot 8',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372149',
     name: 'Worms 2D 9',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d350',
     name: 'Crash Bandicoot 10',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
 ];
@@ -283,6 +295,7 @@ export const limitsForNoSubscriptionUser: Limits = {
     cloudProjects: {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: 3,
@@ -318,6 +331,7 @@ export const limitsForSilverUser: Limits = {
     cloudProjects: {
       maximumCount: 50,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -353,6 +367,7 @@ export const limitsForGoldUser: Limits = {
     cloudProjects: {
       maximumCount: 100,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -388,6 +403,7 @@ export const limitsForStartupUser: Limits = {
     cloudProjects: {
       maximumCount: 500,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 1,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -423,6 +439,7 @@ export const limitsForBusinessUser: Limits = {
     cloudProjects: {
       maximumCount: 500,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 1,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -458,6 +475,7 @@ export const limitsReached: Limits = {
     cloudProjects: {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: 3,
@@ -485,8 +503,40 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   loginState: 'done',
+  creatingOrLoggingInAccount: false,
+  authenticationError: null,
   badges: null,
   cloudProjects: null,
+  recommendations: [
+    {
+      type: 'gdevelop-tutorial',
+      id: 'playlist-get-started',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'gdevelop-teaching-kids',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'tween-behavior',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'wiki-play-music-and-sounds',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'wiki-prefabs',
+    },
+    {
+      type: 'guided-lessons',
+      lessonsIds: ['healthBar', 'timer', 'plinkoMultiplier'],
+    },
+    {
+      type: 'plan',
+      id: 'gold',
+    },
+  ],
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
@@ -508,12 +558,15 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   ],
   receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
+  onLogin: async () => {},
   onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
+  onCreateAccount: async () => {},
+  onResetPassword: async () => {},
+  onEditProfile: async () => {},
+  onOpenLoginDialog: () => {},
+  onOpenEditProfileDialog: () => {},
+  onOpenChangeEmailDialog: () => {},
+  onOpenCreateAccountDialog: () => {},
   onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
@@ -1564,6 +1617,7 @@ export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData 
   description: 'This is a fake private game template',
   id: 'fake-id',
   sellerId: 'fake-seller-id',
+  isSellerGDevelop: false,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
   categories: ['adventure'],

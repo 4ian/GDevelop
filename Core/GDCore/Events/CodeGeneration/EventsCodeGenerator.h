@@ -12,8 +12,8 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/String.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/String.h"
 namespace gd {
 class EventsList;
 class Expression;
@@ -58,8 +58,9 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Construct a code generator for the specified
    * objects/groups and platform
    */
-  EventsCodeGenerator(const gd::Platform& platform,
-                      const gd::ProjectScopedContainers& projectScopedContainers_);
+  EventsCodeGenerator(
+      const gd::Platform& platform,
+      const gd::ProjectScopedContainers& projectScopedContainers_);
   virtual ~EventsCodeGenerator(){};
 
   /**
@@ -472,10 +473,15 @@ class GD_CORE_API EventsCodeGenerator {
    */
   size_t GenerateSingleUsageUniqueIdForEventsList();
 
+  virtual gd::String GenerateRelationalOperation(
+      const gd::String& relationalOperator,
+      const gd::String& lhs,
+      const gd::String& rhs);
+
+ protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);
 
- protected:
   /**
    * \brief Generate the code for a single parameter.
    *
@@ -546,7 +552,9 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   virtual gd::String GenerateVariableValueAs(const gd::String& type) {
-    return type == "string" ? ".getAsString()" : ".getAsNumber()";
+    return type == "number|string" ? ".getAsNumberOrString()"
+           : type == "string"      ? ".getAsString()"
+                                   : ".getAsNumber()";
   }
 
   /**
@@ -577,10 +585,16 @@ class GD_CORE_API EventsCodeGenerator {
     return "fakeObjectListOf_" + objectName;
   }
 
-  virtual gd::String GeneratePropertyGetter(const gd::PropertiesContainer& propertiesContainer,
-                                            const gd::NamedPropertyDescriptor& property,
-                                            const gd::String& type,
-                                            gd::EventsCodeGenerationContext& context);
+  virtual gd::String GeneratePropertyGetter(
+      const gd::PropertiesContainer& propertiesContainer,
+      const gd::NamedPropertyDescriptor& property,
+      const gd::String& type,
+      gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String GenerateParameterGetter(
+      const gd::ParameterMetadata& parameter,
+      const gd::String& type,
+      gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate the code to reference an object which is
@@ -661,7 +675,8 @@ class GD_CORE_API EventsCodeGenerator {
    * The default implementation generates C-style code : It wraps the predicate
    * inside parenthesis and add a !.
    */
-  virtual gd::String GenerateNegatedPredicate(const gd::String& predicate) const {
+  virtual gd::String GenerateNegatedPredicate(
+      const gd::String& predicate) const {
     return "!(" + predicate + ")";
   };
 
@@ -722,6 +737,7 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::String& callStartString,
       std::size_t startFromArgument = 0);
+
   gd::String GenerateOperatorCall(const gd::InstructionMetadata& instrInfos,
                                   const std::vector<gd::String>& arguments,
                                   const gd::String& callStartString,

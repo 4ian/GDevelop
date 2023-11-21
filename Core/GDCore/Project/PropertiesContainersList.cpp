@@ -55,12 +55,12 @@ bool PropertiesContainersList::HasPropertiesContainer(const gd::PropertiesContai
   return false;
 }
 
-void PropertiesContainersList::ForEachPropertyWithPrefix(
-    const gd::String& prefix,
+void PropertiesContainersList::ForEachPropertyMatchingSearch(
+    const gd::String& search,
     std::function<void(const gd::NamedPropertyDescriptor& property)> fn) const {
   for (auto it = propertiesContainers.rbegin(); it != propertiesContainers.rend();
        ++it) {
-    (*it)->ForEachPropertyWithPrefix(prefix, fn);
+    (*it)->ForEachPropertyMatchingSearch(search, fn);
   }
 }
 

@@ -105,11 +105,11 @@
     ]
   },
   "devDependencies": {
+    "@electron/notarize": "^2.1.0",
     "adm-zip": "^0.5.10",
     "dotenv": "^8.2.0",
     "electron": "18.2.2",
     "electron-builder": "^23.6.0",
-    "electron-notarize": "^0.2.1",
     "minimist": "^1.2.3",
     "prettier": "1.15.3",
     "shelljs": "0.8.4"

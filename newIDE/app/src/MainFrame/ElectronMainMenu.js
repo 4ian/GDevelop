@@ -78,7 +78,13 @@ const ElectronMainMenu = ({
   callbacks: MainMenuCallbacks,
   extraCallbacks: MainMenuExtraCallbacks,
 |}) => {
-  const { i18n, project, recentProjectFiles, shortcutMap } = props;
+  const {
+    i18n,
+    project,
+    recentProjectFiles,
+    shortcutMap,
+    isApplicationTopLevelMenu,
+  } = props;
   const { onClosePreview } = extraCallbacks;
   const language = i18n.language;
   const [
@@ -154,6 +160,11 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-invite-collaborators',
+    callback: callbacks.onInviteCollaborators,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-create-template',
     callback: callbacks.onCreateProject,
     shouldApply: isFocusedOnMainWindow,
@@ -219,12 +230,19 @@ const ElectronMainMenu = ({
             i18n,
             recentProjectFiles,
             shortcutMap,
-            isApplicationTopLevelMenu: true,
+            isApplicationTopLevelMenu,
           })
         );
       }
     },
-    [i18n, language, project, recentProjectFiles, shortcutMap]
+    [
+      i18n,
+      language,
+      project,
+      recentProjectFiles,
+      shortcutMap,
+      isApplicationTopLevelMenu,
+    ]
   );
 
   const { onOpenRecentFile } = callbacks;

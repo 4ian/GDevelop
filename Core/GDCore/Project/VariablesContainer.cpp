@@ -162,11 +162,13 @@ void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
   variables.insert(variables.begin() + newIndex, nameAndVariable);
 }
 
-void VariablesContainer::ForEachVariableWithPrefix(
-    const gd::String& prefix,
-    std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const {
-  for (const auto& nameAndVariable: variables) {
-    if (nameAndVariable.first.find(prefix) == 0) fn(nameAndVariable.first, *nameAndVariable.second);
+void VariablesContainer::ForEachVariableMatchingSearch(
+    const gd::String& search,
+    std::function<void(const gd::String& name, const gd::Variable& variable)>
+        fn) const {
+  for (const auto& nameAndVariable : variables) {
+    if (nameAndVariable.first.FindCaseInsensitive(search) != gd::String::npos)
+      fn(nameAndVariable.first, *nameAndVariable.second);
   }
 }
 
@@ -199,7 +201,7 @@ void VariablesContainer::UnserializeFrom(const SerializerElement& element) {
 
 VariablesContainer& VariablesContainer::ResetPersistentUuid() {
   persistentUuid = UUID::MakeUuid4();
-  for(auto& variable: variables) {
+  for (auto& variable : variables) {
     variable.second->ResetPersistentUuid();
   }
 
@@ -208,7 +210,7 @@ VariablesContainer& VariablesContainer::ResetPersistentUuid() {
 
 VariablesContainer& VariablesContainer::ClearPersistentUuid() {
   persistentUuid = "";
-  for(auto& variable: variables) {
+  for (auto& variable : variables) {
     variable.second->ClearPersistentUuid();
   }
 

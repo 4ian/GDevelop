@@ -103,7 +103,7 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   // This "translation" from the type to an enum could be avoided
   // if all types were moved to an enum.
   auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetObjectsContainersList(),
+                                            codeGenerator.GetProjectScopedContainers(),
                                             rootType,
                                             node);
 
@@ -156,6 +156,9 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
       // Properties are not supported.
       output += GenerateDefaultValue(type);
     }, [&]() {
+      // Parameters are not supported.
+      output += GenerateDefaultValue(type);
+    }, [&]() {
       // The identifier does not represents a variable (or a child variable), or not at least an existing
       // one, nor an object variable. It's invalid.
       output += GenerateDefaultValue(type);
@@ -188,7 +191,7 @@ void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
     return;
   }
 
-  ExpressionCodeGenerator generator("string", "", codeGenerator, context);
+  ExpressionCodeGenerator generator("number|string", "", codeGenerator, context);
   node.expression->Visit(generator);
   output +=
       codeGenerator.GenerateVariableBracketAccessor(generator.GetOutput());
@@ -197,7 +200,7 @@ void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
 
 void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetObjectsContainersList(),
+                                            codeGenerator.GetProjectScopedContainers(),
                                             rootType,
                                             node);
 
@@ -224,8 +227,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   } else {
     const auto& variablesContainersList = codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
     const auto& propertiesContainersList = codeGenerator.GetProjectScopedContainers().GetPropertiesContainersList();
+    const auto& parametersVectorsList = codeGenerator.GetProjectScopedContainers().GetParametersVectorsList();
 
-    // The node represents a variable or an object.
+    // The node represents a variable, property, parameter or an object.
     codeGenerator.GetProjectScopedContainers().MatchIdentifierWithName<void>(node.identifierName, [&]() {
       // Generate the code to access the object variable.
       output += codeGenerator.GenerateGetVariable(
@@ -255,6 +259,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       output += codeGenerator.GeneratePropertyGetter(
         propertiesContainerAndProperty.first, propertiesContainerAndProperty.second, type, context);
     }, [&]() {
+      const auto& parameter = gd::ParameterMetadataTools::Get(parametersVectorsList, node.identifierName);
+      output += codeGenerator.GenerateParameterGetter(parameter, type, context);
+    }, [&]() {
       // The identifier does not represents a variable (or a child variable), or not at least an existing
       // one, nor an object variable. It's invalid.
       output += GenerateDefaultValue(type);
@@ -264,7 +271,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
 
 void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
   auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetObjectsContainersList(),
+                                            codeGenerator.GetProjectScopedContainers(),
                                             rootType,
                                             node);
 
@@ -495,7 +502,7 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
   auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetObjectsContainersList(),
+                                            codeGenerator.GetProjectScopedContainers(),
                                             rootType,
                                             node);
   output += GenerateDefaultValue(type);
@@ -504,7 +511,7 @@ void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
 void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(
     ObjectFunctionNameNode& node) {
   auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetObjectsContainersList(),
+                                            codeGenerator.GetProjectScopedContainers(),
                                             rootType,
                                             node);
   output += GenerateDefaultValue(type);

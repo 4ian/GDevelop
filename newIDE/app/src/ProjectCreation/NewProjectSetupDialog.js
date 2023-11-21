@@ -509,8 +509,10 @@ const NewProjectSetupDialog = ({
               <Paper background="dark" variant="outlined">
                 <Line justifyContent="center">
                   <CreateProfile
-                    onLogin={authenticatedUser.onLogin}
-                    onCreateAccount={authenticatedUser.onCreateAccount}
+                    onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+                    onOpenCreateAccountDialog={
+                      authenticatedUser.onOpenCreateAccountDialog
+                    }
                     message={
                       <Trans>
                         Create an account to store your project online.

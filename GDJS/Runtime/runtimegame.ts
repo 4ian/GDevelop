@@ -736,42 +736,40 @@ namespace gdjs {
     loadAllAssetsAsync = async (
       progressCallback?: (progress: float) => void
     ) => {
-      const loadingScreen = gdjs.LoadingScreenRenderer
-        ? new gdjs.LoadingScreenRenderer(
-            this.getRenderer()!,
-            this._imageManager!,
-            this._data.properties.loadingScreen
-          )
-        : null;
-      const allAssetsTotal = this._data.resources.resources.length;
-      let loadedAssets = 0;
+      try {
+        const loadingScreen = gdjs.LoadingScreenRenderer
+          ? new gdjs.LoadingScreenRenderer(
+              this.getRenderer()!,
+              this._imageManager!,
+              this._data.properties.loadingScreen
+            )
+          : null;
+        const allAssetsTotal = this._data.resources.resources.length;
+        let loadedAssets = 0;
 
-      const onProgress = (count: integer, total: integer) => {
-        const percent = Math.floor(
-          (100 * (loadedAssets + count)) / allAssetsTotal
-        );
-        if (loadingScreen) loadingScreen.setPercent(percent);
-        if (progressCallback) {
-          progressCallback(percent);
-        }
-      };
+        const onProgress = (count: integer, total: integer) => {
+          const percent = Math.floor(
+            (100 * (loadedAssets + count)) / allAssetsTotal
+          );
+          if (loadingScreen) loadingScreen.setPercent(percent);
+          if (progressCallback) {
+            progressCallback(percent);
+          }
+        };
 
-      if (this._imageManager)
-        loadedAssets += await this._imageManager.loadTextures(onProgress);
-      if (this._soundManager)
-        loadedAssets += await this._soundManager.preloadAudio(onProgress);
-      if (this._fontManager)
-        loadedAssets += await this._fontManager.loadFonts(onProgress);
-      loadedAssets += await this._jsonManager.preloadJsons(onProgress);
-      if (this._model3DManager)
-        loadedAssets += await this._model3DManager.loadModels(onProgress);
-      if (this._bitmapFontManager)
-        loadedAssets += await this._bitmapFontManager.loadBitmapFontData(
-          onProgress
-        );
+        if (this._imageManager) loadedAssets += await this._imageManager.loadTextures(onProgress);
+        if (this._soundManager) loadedAssets += await this._soundManager.preloadAudio(onProgress);
+        if (this._fontManager) loadedAssets += await this._fontManager.loadFonts(onProgress);
+        loadedAssets += await this._jsonManager.preloadJsons(onProgress);
+        if (this._model3DManager) loadedAssets += await this._model3DManager.loadModels(onProgress);
+        if (this._bitmapFontManager) await this._bitmapFontManager.loadBitmapFontData(onProgress);
+        await loadingScreen.unload();
+        await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+      } catch (e) {
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 
-      if (loadingScreen) await loadingScreen.unload();
-      await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+        throw e;
+      }
     };
 
     /**
@@ -845,7 +843,6 @@ namespace gdjs {
         this._setupGameVisibilityEvents();
 
         // The standard game loop
-        const that = this;
         let accumulatedElapsedTime = 0;
         this._hasJustResumed = false;
 
@@ -853,45 +850,53 @@ namespace gdjs {
           ? this._renderer.startGameLoop.bind(this._renderer)
           : gdjs.RuntimeGame.fallbackGameLoopStarter;
 
-        startGameLoop(function (lastCallElapsedTime) {
-          if (that._paused) {
-            return true;
-          }
+        startGameLoop((lastCallElapsedTime) => {
+          try {
+            if (this._paused) {
+              return true;
+            }
 
-          // Skip the frame if we rendering frames too fast
-          accumulatedElapsedTime += lastCallElapsedTime;
-          if (
-            that._maxFPS > 0 &&
-            1000.0 / accumulatedElapsedTime > that._maxFPS + 7
-          ) {
-            // Only skip frame if the framerate is 7 frames above the maximum framerate.
-            // Most browser/engines will try to run at slightly more than 60 frames per second.
-            // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
-            // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
-            return true;
-          }
-          const elapsedTime = accumulatedElapsedTime;
-          accumulatedElapsedTime = 0;
+            // Skip the frame if we rendering frames too fast
+            accumulatedElapsedTime += lastCallElapsedTime;
+            if (
+              this._maxFPS > 0 &&
+              1000.0 / accumulatedElapsedTime > this._maxFPS + 7
+            ) {
+              // Only skip frame if the framerate is 7 frames above the maximum framerate.
+              // Most browser/engines will try to run at slightly more than 60 frames per second.
+              // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
+              // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
+              return true;
+            }
+            const elapsedTime = accumulatedElapsedTime;
+            accumulatedElapsedTime = 0;
 
-          // Manage resize events.
-          if (that._notifyScenesForGameResolutionResize) {
-            that._sceneStack.onGameResolutionResized();
-            that._notifyScenesForGameResolutionResize = false;
-          }
+            // Manage resize events.
+            if (this._notifyScenesForGameResolutionResize) {
+              this._sceneStack.onGameResolutionResized();
+              this._notifyScenesForGameResolutionResize = false;
+            }
 
-          // Render and step the scene.
-          if (that._sceneStack.step(elapsedTime)) {
-            that.getInputManager().onFrameEnded();
-            that._hasJustResumed = false;
-            return true;
+            // Render and step the scene.
+            if (this._sceneStack.step(elapsedTime)) {
+              this.getInputManager().onFrameEnded();
+              this._hasJustResumed = false;
+              return true;
+            }
+            return false;
+          } catch (e) {
+            if (this._debuggerClient)
+              this._debuggerClient.onUncaughtException(e);
+
+            throw e;
           }
-          return false;
         });
         setTimeout(() => {
           this._setupSessionMetrics();
         }, 10000);
       } catch (e) {
-        logger.error('Internal crash: ' + e);
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+
         throw e;
       }
     }

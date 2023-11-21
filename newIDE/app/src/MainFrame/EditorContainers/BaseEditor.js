@@ -3,7 +3,7 @@ import * as React from 'react';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import type { StorageProvider } from '../../ProjectsStorage';
-import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
+import { type PreviewDebuggerServer } from '../../ExportAndShare/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import {
   type FileMetadataAndStorageProviderName,
@@ -19,7 +19,6 @@ export type EditorContainerExtraProps = {|
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
-  initialTab?: ?string,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -27,6 +26,7 @@ export type RenderEditorContainerProps = {|
   projectItemName: ?string,
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
   setToolbar: (?React.Node) => void,
 
   // Some optional extra props to pass to the rendered editor

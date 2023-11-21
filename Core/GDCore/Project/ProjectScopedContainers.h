@@ -1,5 +1,7 @@
 #pragma once
 #include <set>
+
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "ObjectsContainersList.h"
 #include "PropertiesContainersList.h"
 #include "VariablesContainersList.h"
@@ -68,48 +70,78 @@ class ProjectScopedContainers {
     return *this;
   }
 
+  ProjectScopedContainers &AddParameters(
+      const std::vector<gd::ParameterMetadata> &parameters) {
+    parametersVectorsList.push_back(&parameters);
+
+    return *this;
+  }
+
   template <class ReturnType>
   ReturnType MatchIdentifierWithName(
       const gd::String &name,
       std::function<ReturnType()> objectCallback,
       std::function<ReturnType()> variableCallback,
       std::function<ReturnType()> propertyCallback,
+      std::function<ReturnType()> parameterCallback,
       std::function<ReturnType()> notFoundCallback) const {
     if (objectsContainersList.HasObjectOrGroupNamed(name))
       return objectCallback();
     else if (variablesContainersList.Has(name))
       return variableCallback();
+    else if (ParameterMetadataTools::Has(parametersVectorsList, name))
+      return parameterCallback();
     else if (propertiesContainersList.Has(name))
       return propertyCallback();
 
     return notFoundCallback();
   };
 
-  void ForEachIdentifierWithPrefix(
-      const gd::String &prefix,
-      std::function<void(const gd::String& name, const ObjectConfiguration* objectConfiguration)> objectCallback,
-      std::function<void(const gd::String& name, const gd::Variable& variable)> variableCallback,
-      std::function<void(const gd::NamedPropertyDescriptor& property)> propertyCallback) const {
+  void ForEachIdentifierMatchingSearch(
+      const gd::String &search,
+      std::function<void(const gd::String &name,
+                         const ObjectConfiguration *objectConfiguration)>
+          objectCallback,
+      std::function<void(const gd::String &name, const gd::Variable &variable)>
+          variableCallback,
+      std::function<void(const gd::NamedPropertyDescriptor &property)>
+          propertyCallback,
+      std::function<void(const gd::ParameterMetadata &parameter)>
+          parameterCallback) const {
     std::set<gd::String> namesAlreadySeen;
 
-    objectsContainersList.ForEachNameWithPrefix(prefix, [&](const gd::String& name, const ObjectConfiguration* objectConfiguration) {
-      if (namesAlreadySeen.count(name) == 0) {
-        namesAlreadySeen.insert(name);
-        objectCallback(name, objectConfiguration);
-      }
-    });
-    variablesContainersList.ForEachVariableWithPrefix(prefix, [&](const gd::String& name, const gd::Variable& variable) {
-      if (namesAlreadySeen.count(name) == 0) {
-        namesAlreadySeen.insert(name);
-        variableCallback(name, variable);
-      }
-    });
-    propertiesContainersList.ForEachPropertyWithPrefix(prefix, [&](const gd::NamedPropertyDescriptor& property) {
-      if (namesAlreadySeen.count(property.GetName()) == 0) {
-        namesAlreadySeen.insert(property.GetName());
-        propertyCallback(property);
-      }
-    });
+    objectsContainersList.ForEachNameMatchingSearch(
+        search,
+        [&](const gd::String &name,
+            const ObjectConfiguration *objectConfiguration) {
+          if (namesAlreadySeen.count(name) == 0) {
+            namesAlreadySeen.insert(name);
+            objectCallback(name, objectConfiguration);
+          }
+        });
+    variablesContainersList.ForEachVariableMatchingSearch(
+        search, [&](const gd::String &name, const gd::Variable &variable) {
+          if (namesAlreadySeen.count(name) == 0) {
+            namesAlreadySeen.insert(name);
+            variableCallback(name, variable);
+          }
+        });
+    gd::ParameterMetadataTools::ForEachParameterMatchingSearch(
+        parametersVectorsList,
+        search,
+        [&](const gd::ParameterMetadata &parameter) {
+          if (namesAlreadySeen.count(parameter.GetName()) == 0) {
+            namesAlreadySeen.insert(parameter.GetName());
+            parameterCallback(parameter);
+          }
+        });
+    propertiesContainersList.ForEachPropertyMatchingSearch(
+        search, [&](const gd::NamedPropertyDescriptor &property) {
+          if (namesAlreadySeen.count(property.GetName()) == 0) {
+            namesAlreadySeen.insert(property.GetName());
+            propertyCallback(property);
+          }
+        });
   };
 
   const gd::ObjectsContainersList &GetObjectsContainersList() const {
@@ -124,6 +156,10 @@ class ProjectScopedContainers {
     return propertiesContainersList;
   };
 
+  const std::vector<const std::vector<gd::ParameterMetadata> *> &GetParametersVectorsList() const {
+    return parametersVectorsList;
+  };
+
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
   ProjectScopedContainers(){};
@@ -132,6 +168,7 @@ class ProjectScopedContainers {
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;
   gd::PropertiesContainersList propertiesContainersList;
+  std::vector<const std::vector<gd::ParameterMetadata> *> parametersVectorsList;
 };
 
 }  // namespace gd

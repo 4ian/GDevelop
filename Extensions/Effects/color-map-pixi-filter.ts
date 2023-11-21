@@ -2,7 +2,7 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'ColorMap',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const colorMapTexture = target
           .getRuntimeScene()
           .getGame()
@@ -19,8 +19,12 @@ namespace gdjs {
         );
         return colorMapFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
         if (parameterName === 'mix') {
           colorMapFilter.mix = gdjs.PixiFiltersTools.clampValue(
@@ -30,8 +34,16 @@ namespace gdjs {
           );
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {
         const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
         if (parameterName === 'nearest') {
           colorMapFilter.nearest = value;

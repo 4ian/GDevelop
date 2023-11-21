@@ -472,41 +472,29 @@ namespace gdjs {
       const direction = this._animations[this._currentAnimation].directions[
         this._currentDirection
       ];
-      const oldFrame = this._currentFrame;
-      const animationDuration =
-        direction.frames.length * direction.timeBetweenFrames;
+      const animationDuration = this.getAnimationDuration();
       if (
         !this._animationPaused &&
         (direction.loop || this._animationElapsedTime !== animationDuration) &&
         direction.timeBetweenFrames
       ) {
-        const elapsedTime = this.getElapsedTime() / 1000;
-        this._animationElapsedTime += elapsedTime * this._animationSpeedScale;
-        if (direction.loop) {
-          this._animationElapsedTime = gdjs.evtTools.common.mod(
-            this._animationElapsedTime,
-            direction.frames.length * direction.timeBetweenFrames
-          );
-        } else {
-          this._animationElapsedTime = gdjs.evtTools.common.clamp(
-            this._animationElapsedTime,
-            0,
-            animationDuration
-          );
-        }
-        this._currentFrame = Math.min(
-          Math.floor(this._animationElapsedTime / direction.timeBetweenFrames),
-          direction.frames.length - 1
+        const animationElapsedTime =
+          this._animationElapsedTime +
+          (this.getElapsedTime() / 1000) * this._animationSpeedScale;
+        this.setAnimationElapsedTime(
+          direction.loop
+            ? gdjs.evtTools.common.mod(animationElapsedTime, animationDuration)
+            : gdjs.evtTools.common.clamp(
+                animationElapsedTime,
+                0,
+                animationDuration
+              )
         );
       }
 
-      if (oldFrame !== this._currentFrame || this._animationFrameDirty) {
+      if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      if (oldFrame !== this._currentFrame) {
-        this.invalidateHitboxes();
-      }
-
       if (this._renderer) this._renderer.ensureUpToDate();
     }
 
@@ -752,6 +740,38 @@ namespace gdjs {
      */
     getAnimationFrame(): number {
       return this._currentFrame;
+    }
+
+    getAnimationElapsedTime(): float {
+      return this._animationElapsedTime;
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      const direction = this._animations[this._currentAnimation].directions[
+        this._currentDirection
+      ];
+      this._animationElapsedTime = gdjs.evtTools.common.clamp(
+        time,
+        0,
+        this.getAnimationDuration()
+      );
+
+      const oldFrame = this._currentFrame;
+      this._currentFrame = Math.min(
+        Math.floor(this._animationElapsedTime / direction.timeBetweenFrames),
+        direction.frames.length - 1
+      );
+      if (oldFrame !== this._currentFrame) {
+        this._updateAnimationFrame();
+        this.invalidateHitboxes();
+      }
+    }
+
+    getAnimationDuration(): number {
+      const direction = this._animations[this._currentAnimation].directions[
+        this._currentDirection
+      ];
+      return direction.frames.length * direction.timeBetweenFrames;
     }
 
     getAnimationFrameCount(): number {

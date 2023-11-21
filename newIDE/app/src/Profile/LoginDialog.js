@@ -5,21 +5,19 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Column } from '../UI/Grid';
-import TextField from '../UI/TextField';
 import {
-  type LoginForm,
+  type LoginForm as LoginFormType,
   type ForgotPasswordForm,
   type AuthError,
 } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
-import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
 import { ColumnStackLayout } from '../UI/Layout';
 import HelpButton from '../UI/HelpButton';
 import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
-import ForgotPasswordDialog from './ForgotPasswordDialog';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import LoginForm from './LoginForm';
 
 const styles = {
   formContainer: {
@@ -30,7 +28,7 @@ const styles = {
 type Props = {|
   onClose: () => void,
   onGoToCreateAccount: () => void,
-  onLogin: (form: LoginForm) => Promise<void>,
+  onLogin: (form: LoginFormType) => Promise<void>,
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
@@ -48,10 +46,6 @@ const LoginDialog = ({
   const isMobileScreen = windowWidth === 'small';
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [
-    isForgotPasswordDialogOpen,
-    setIsForgotPasswordDialogOpen,
-  ] = React.useState(false);
 
   const doLogin = () => {
     if (loginInProgress) return;
@@ -91,12 +85,7 @@ const LoginDialog = ({
       ]}
       cannotBeDismissed={loginInProgress}
       onRequestClose={onClose}
-      onApply={() => {
-        // This is a hack to avoid submitting the login form
-        // when submitting the forgot password form.
-        if (isForgotPasswordDialogOpen) return;
-        doLogin();
-      }}
+      onApply={doLogin}
       maxWidth="sm"
       open
       flexColumnBody
@@ -129,68 +118,21 @@ const LoginDialog = ({
           style={{
             ...styles.formContainer,
             // Take full width on mobile.
-            width: isMobileScreen ? '100%' : '60%',
+            width: isMobileScreen ? '95%' : '60%',
           }}
         >
-          <form
-            onSubmit={event => {
-              // Prevent browser to navigate on form submission.
-              event.preventDefault();
-              doLogin();
-            }}
-            autoComplete="on"
-            name="login"
-          >
-            <ColumnStackLayout noMargin>
-              <TextField
-                autoFocus="desktop"
-                value={email}
-                floatingLabelText={<Trans>Email</Trans>}
-                errorText={getEmailErrorText(error)}
-                onChange={(e, value) => {
-                  setEmail(value);
-                }}
-                onBlur={event => {
-                  setEmail(event.currentTarget.value.trim());
-                }}
-                fullWidth
-                disabled={loginInProgress}
-              />
-              <TextField
-                value={password}
-                floatingLabelText={<Trans>Password</Trans>}
-                errorText={getPasswordErrorText(error)}
-                type="password"
-                onChange={(e, value) => {
-                  setPassword(value);
-                }}
-                fullWidth
-                disabled={loginInProgress}
-              />
-              {/*
-                This input is needed so that the browser submits the form when
-                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
-              */}
-              <input type="submit" value="Submit" style={{ display: 'none' }} />
-            </ColumnStackLayout>
-          </form>
+          <LoginForm
+            onLogin={doLogin}
+            email={email}
+            onChangeEmail={setEmail}
+            password={password}
+            onChangePassword={setPassword}
+            onForgotPassword={onForgotPassword}
+            loginInProgress={loginInProgress}
+            error={error}
+          />
         </div>
-        <Link
-          href=""
-          onClick={() => setIsForgotPasswordDialogOpen(true)}
-          disabled={loginInProgress}
-        >
-          <Text size="body2" noMargin color="inherit">
-            <Trans>Did you forget your password?</Trans>
-          </Text>
-        </Link>
       </ColumnStackLayout>
-      {isForgotPasswordDialogOpen && (
-        <ForgotPasswordDialog
-          onClose={() => setIsForgotPasswordDialogOpen(false)}
-          onForgotPassword={onForgotPassword}
-        />
-      )}
     </Dialog>
   );
 };

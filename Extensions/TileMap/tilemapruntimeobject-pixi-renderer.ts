@@ -122,6 +122,11 @@ namespace gdjs {
     getScaleY(): float {
       return this._pixiObject.scale.y;
     }
+
+    destroy(): void {
+      // Keep textures because they are shared by all tile maps.
+      this._pixiObject.destroy(false);
+    }
   }
   export const TileMapRuntimeObjectRenderer =
     gdjs.TileMapRuntimeObjectPixiRenderer;

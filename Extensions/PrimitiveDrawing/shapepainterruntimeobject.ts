@@ -178,6 +178,11 @@ namespace gdjs {
       super.stepBehaviorsPreEvents(instanceContainer);
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Clear the graphics.
      */
@@ -225,6 +230,38 @@ namespace gdjs {
           endY2,
           radius
         );
+    }
+
+    drawChamferRectangle(
+      startX1: float,
+      startY1: float,
+      endX2: float,
+      endY2: float,
+      chamfer: float
+    ) {
+      this._renderer.drawChamferRectangle(
+        startX1,
+        startY1,
+        endX2,
+        endY2,
+        chamfer
+      );
+    }
+
+    drawRegularPolygon(
+      centerX: float,
+      centerY: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this._renderer.drawRegularPolygon(
+        centerX,
+        centerY,
+        sides,
+        radius,
+        rotation
+      );
     }
 
     drawStar(

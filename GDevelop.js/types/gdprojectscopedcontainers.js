@@ -3,6 +3,7 @@ declare class gdProjectScopedContainers {
   static makeNewProjectScopedContainersForProjectAndLayout(project: gdProject, layout: gdLayout): gdProjectScopedContainers;
   static makeNewProjectScopedContainersFor(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer): gdProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: gdPropertiesContainer): gdProjectScopedContainers;
+  addParameters(parameters: gdVectorParameterMetadata): gdProjectScopedContainers;
   getObjectsContainersList(): gdObjectsContainersList;
   getVariablesContainersList(): gdVariablesContainersList;
   delete(): void;

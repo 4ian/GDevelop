@@ -1617,6 +1617,8 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::String &objectName,
     bool isObjectGroup, bool removeEventsAndGroups) {
+  // In theory we should pass a ProjectScopedContainers to this function so it does not have to construct one.
+  // In practice, this is ok because we only deal with objects.
   auto projectScopedContainers = gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainer, objectsContainer);
 
   if (removeEventsAndGroups) {

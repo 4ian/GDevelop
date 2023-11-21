@@ -122,6 +122,13 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
+   * \brief Return true if the type is a boolean.
+   */
+  bool IsBoolean() const {
+    return gd::ValueTypeMetadata::IsTypeExpression("boolean", name);
+  }
+
+  /**
    * \brief Return true if the type of the parameter is a number.
    * \note If you had a new type of parameter, also add it in the IDE (
    * see EventsFunctionParametersEditor, ParameterRenderingService
@@ -193,6 +200,8 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "externalLayoutName" ||
              parameterType == "leaderboardId" ||
              parameterType == "identifier";
+    } else if (type == "boolean") {
+      return parameterType == "yesorno" || parameterType == "trueorfalse";
     } else if (type == "variable") {
       return
              parameterType == "variable" || // Any variable.

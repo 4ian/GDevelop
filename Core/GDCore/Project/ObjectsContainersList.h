@@ -42,12 +42,20 @@ class GD_CORE_API ObjectsContainersList {
    */
   bool HasObjectOrGroupNamed(const gd::String& name) const;
 
+  enum VariableExistence {
+    DoesNotExist,
+    Exists,
+    GroupIsEmpty,
+    ExistsOnlyOnSomeObjectsOfTheGroup
+  };
+
   /**
    * \brief Check if the specified object or group has the specified variable in
    * its declared variables.
    */
-  bool HasObjectOrGroupWithVariableNamed(const gd::String& objectOrGroupName,
-                                         const gd::String& variableName) const;
+  VariableExistence HasObjectOrGroupWithVariableNamed(
+      const gd::String& objectOrGroupName,
+      const gd::String& variableName) const;
 
   /**
    * \brief Check if the specified object or group has the specified variables
@@ -63,6 +71,11 @@ class GD_CORE_API ObjectsContainersList {
    */
   const gd::VariablesContainer* GetObjectOrGroupVariablesContainer(
       const gd::String& objectOrGroupName) const;
+
+  /**
+   * \brief Get a type from an object/group variable.
+   */
+  gd::Variable::Type GetTypeOfObjectOrGroupVariable(const gd::String& objectOrGroupName, const gd::String& variableName) const;
 
   /**
    * \brief Get a type from an object/group name.
@@ -81,18 +94,21 @@ class GD_CORE_API ObjectsContainersList {
                                   const gd::String& behaviorName) const;
 
   /**
-    * \brief Get the type of a behavior if an object or all objects of a group has it.
-    */
-  gd::String GetTypeOfBehaviorInObjectOrGroup(const gd::String &objectOrGroupName,
-                                              const gd::String &behaviorName,
-                                              bool searchInGroups = true) const;
+   * \brief Get the type of a behavior if an object or all objects of a group
+   * has it.
+   */
+  gd::String GetTypeOfBehaviorInObjectOrGroup(
+      const gd::String& objectOrGroupName,
+      const gd::String& behaviorName,
+      bool searchInGroups = true) const;
 
   /**
    * \brief Get a type from a behavior name
    * @return Type of the behavior.
    * @deprecated - Use GetTypeOfBehaviorInObjectOrGroup instead.
    */
-  gd::String GetTypeOfBehavior(const gd::String& behaviorName, bool searchInGroups = true) const;
+  gd::String GetTypeOfBehavior(const gd::String& behaviorName,
+                               bool searchInGroups = true) const;
 
   /**
    * \brief Get behaviors of an object/group
@@ -101,9 +117,8 @@ class GD_CORE_API ObjectsContainersList {
    *
    * @return Vector containing names of behaviors
    */
-  std::vector<gd::String>
-  GetBehaviorsOfObject(const gd::String& objectName,
-                       bool searchInGroups = true) const;
+  std::vector<gd::String> GetBehaviorsOfObject(
+      const gd::String& objectName, bool searchInGroups = true) const;
 
   /**
    * \brief Return a list containing all objects refered to by the group.
@@ -121,9 +136,24 @@ class GD_CORE_API ObjectsContainersList {
   void ForEachObject(std::function<void(const gd::Object& object)> fn) const;
 
   /**
-   * \brief Call the callback for each object or group name starting with the prefix passed in parameter.
+   * \brief Call the callback for each object or group name matching the
+   * search passed in parameter.
    */
-  void ForEachNameWithPrefix(const gd::String& prefix, std::function<void(const gd::String& name, const gd::ObjectConfiguration* objectConfiguration)> fn) const;
+  void ForEachNameMatchingSearch(
+      const gd::String& search,
+      std::function<void(const gd::String& name,
+                         const gd::ObjectConfiguration* objectConfiguration)>
+          fn) const;
+
+  /**
+   * \brief Call the callback for each variable of the object (or group)
+   * matching the search passed in parameter.
+   */
+  void ForEachObjectOrGroupVariableMatchingSearch(
+      const gd::String& objectOrGroupName,
+      const gd::String& search,
+      std::function<void(const gd::String& variableName,
+                         const gd::Variable& variable)> fn) const;
 
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
@@ -131,6 +161,17 @@ class GD_CORE_API ObjectsContainersList {
 
  private:
   bool HasObjectNamed(const gd::String& name) const;
+
+  bool HasObjectWithVariableNamed(const gd::String& objectName,
+                                  const gd::String& variableName) const;
+
+  gd::Variable::Type GetTypeOfObjectVariable(const gd::String& objectName, const gd::String& variableName) const;
+
+  void ForEachObjectVariableMatchingSearch(
+      const gd::String& objectOrGroupName,
+      const gd::String& search,
+      std::function<void(const gd::String& variableName,
+                         const gd::Variable& variable)> fn) const;
 
   void Add(const gd::ObjectsContainer& objectsContainer) {
     objectsContainers.push_back(&objectsContainer);

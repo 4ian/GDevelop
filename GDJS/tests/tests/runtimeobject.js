@@ -5,8 +5,14 @@
  */
 
 describe('gdjs.RuntimeObject', () => {
-  const runtimeGame = gdjs.getPixiRuntimeGame();
-  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  /** @type {gdjs.RuntimeGame} */
+  let runtimeGame;
+  /** @type {gdjs.TestRuntimeScene} */
+  let runtimeScene;
+  beforeEach(function () {
+    runtimeGame = gdjs.getPixiRuntimeGame();
+    runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+  });
 
   it('should compute distances properly', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -411,5 +417,164 @@ describe('gdjs.RuntimeObject', () => {
     expect(rayCastFromMiddleLeftFarResult.collision).to.be(true);
     expect(rayCastFromMiddleLeftFarResult.farX).to.be(100);
     expect(rayCastFromMiddleLeftFarResult.farY).to.be(50);
+  });
+
+  it('can be moved with a permanent force', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(100, 40, 1);
+
+    expect(object.getX()).to.be(15);
+    expect(object.getY()).to.be(20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with 2 permanent forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(75, 10, 1);
+    object.addForce(25, 30, 1);
+
+    expect(object.getX()).to.be(15);
+    expect(object.getY()).to.be(20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with an instant force', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      object.addForce(100, 40, 0);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+
+    // The object no longer moves.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with 2 instant forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      object.addForce(75, 10, 0);
+      object.addForce(25, 30, 0);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+
+    // The object no longer moves.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with permanent and instant forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(75, 10, 1);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      object.addForce(25, 30, 0);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can clear forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(75, 10, 1);
+    object.addForce(25, 30, 0);
+    object.addForce(75, 10, 0);
+    object.addForce(25, 30, 1);
+    object.clearForces();
+
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(15);
+    expect(object.getY()).to.be(20);
   });
 });

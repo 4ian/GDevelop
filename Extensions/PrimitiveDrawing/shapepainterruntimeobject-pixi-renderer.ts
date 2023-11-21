@@ -136,6 +136,50 @@ namespace gdjs {
       this.invalidateBounds();
     }
 
+    drawChamferRectangle(
+      x1: float,
+      y1: float,
+      x2: float,
+      y2: float,
+      chamfer: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawChamferRect(x1, y1, x2 - x1, y2 - y1, chamfer);
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawRegularPolygon(
+      x1: float,
+      y1: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawRegularPolygon(
+        x1,
+        y1,
+        radius,
+        sides,
+        rotation ? gdjs.toRad(rotation) : 0
+      );
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
     drawStar(
       x1: float,
       y1: float,
@@ -519,6 +563,10 @@ namespace gdjs {
           this._graphics.filters.splice(antialiasingFilterIndex, 1);
         }
       }
+    }
+
+    destroy(): void {
+      this._graphics.destroy();
     }
   }
 

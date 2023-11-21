@@ -49,6 +49,11 @@ interface VectorVariable {
     [Const] Variable WRAPPED_at(unsigned long index);
 };
 
+interface VectorObjectFolderOrObject {
+    unsigned long size();
+    [Const] ObjectFolderOrObject at(unsigned long index);
+};
+
 interface MapStringString {
     void MapStringString();
 
@@ -396,21 +401,43 @@ interface Watermark {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface ObjectFolderOrObject {
+    void ObjectFolderOrObject();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] gdObject GetObject();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasObjectNamed([Const] DOMString name);
+    [Ref] ObjectFolderOrObject GetObjectNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] ObjectFolderOrObject GetChildAt(unsigned long pos);
+    [Ref] ObjectFolderOrObject GetObjectChild([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] ObjectFolderOrObject child);
+    [Ref] ObjectFolderOrObject GetParent();
+    [Ref] ObjectFolderOrObject InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectFolderOrObject newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] ObjectFolderOrObject childToRemove);
+    boolean IsADescendantOf([Const, Ref] ObjectFolderOrObject otherObjectFolderOrObject);
+};
+
 interface ObjectsContainer {
     void ObjectsContainer();
 
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
-
+    [Ref] ObjectFolderOrObject GetRootFolder();
+    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
@@ -530,8 +557,6 @@ interface Project {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 
-    boolean STATIC_IsUsageOfUnicodeIdentifierNamesAllowed();
-    void STATIC_AllowUsageOfUnicodeIdentifierNames(boolean enable);
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
 
@@ -544,17 +569,18 @@ interface Project {
 
     //Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
-
+    [Ref] ObjectFolderOrObject GetRootFolder();
+    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
@@ -582,6 +608,9 @@ interface ProjectScopedContainers {
 
   [Ref] ProjectScopedContainers AddPropertiesContainer(
         [Const, Ref] PropertiesContainer propertiesContainer);
+
+  [Ref] ProjectScopedContainers AddParameters(
+        [Const, Ref] VectorParameterMetadata parameters);
 
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
@@ -684,8 +713,6 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
     boolean Is3DObject();
 
     [Ref] ObjectConfiguration GetConfiguration();
@@ -787,17 +814,18 @@ interface Layout {
 
     //Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
-
+    [Ref] ObjectFolderOrObject GetRootFolder();
+    [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
@@ -1688,6 +1716,9 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata SetHidden();
     boolean IsHidden();
+
+    [Ref] ObjectMetadata MarkAsRenderedIn3D();
+    boolean IsRenderedIn3D();
 };
 
 interface BehaviorMetadata {
@@ -2293,6 +2324,7 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+    void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
 };
 
 interface ResourceExposer {
@@ -2556,7 +2588,8 @@ enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::ExpressionWithPrefix",
   "ExpressionCompletionDescription::Variable",
   "ExpressionCompletionDescription::TextWithPrefix",
-  "ExpressionCompletionDescription::Property"
+  "ExpressionCompletionDescription::Property",
+  "ExpressionCompletionDescription::Parameter"
 };
 
 interface ExpressionCompletionDescription {
@@ -2596,7 +2629,7 @@ interface ExpressionNodeLocationFinder {
 };
 
 interface ExpressionTypeFinder {
-    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainersList objectsContainersList, [Const] DOMString rootType, [Ref] ExpressionNode node);
+    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ProjectScopedContainers projectScopedContainers, [Const] DOMString rootType, [Ref] ExpressionNode node);
 };
 
 interface ExpressionNode {
@@ -2738,6 +2771,9 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
     [Const, Ref] DOMString GetDefaultName();
 
+    [Ref] EventsBasedObject MarkAsRenderedIn3D(boolean isRenderedIn3D);
+    boolean IsRenderedIn3D();
+
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
@@ -2745,17 +2781,18 @@ interface EventsBasedObject {
 
     // Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
     [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
     boolean HasObjectNamed([Const] DOMString name);
     [Ref] gdObject GetObject([Const] DOMString name);
     [Ref] gdObject GetObjectAt(unsigned long pos);
     unsigned long GetObjectPosition([Const] DOMString name);
     void RemoveObject([Const] DOMString name);
-    void SwapObjects(unsigned long first, unsigned long second);
     void MoveObject(unsigned long oldIndex, unsigned long newIndex);
-    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    void MoveObjectFolderOrObjectToAnotherContainerInFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectsContainer newObjectsContainer, [Ref] ObjectFolderOrObject parentObjectFolderOrObject, unsigned long newPosition);
     unsigned long GetObjectsCount();
 
+    [Ref] ObjectFolderOrObject GetRootFolder();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 EventsBasedObject implements AbstractEventsBasedEntity;
@@ -2880,6 +2917,10 @@ interface ArbitraryEventsWorker {
     void Launch([Ref] EventsList events);
 };
 
+interface ArbitraryObjectsWorker {
+    void Launch([Ref] ObjectsContainer container);
+};
+
 interface EventsLeaderboardsLister {
     void EventsLeaderboardsLister([Ref] Project project);
     [Const, Ref] SetString GetLeaderboardIds();
@@ -2974,6 +3015,14 @@ interface ProjectResourcesCopier {
                                  boolean updateOriginalProject,
                                  boolean preserveAbsoluteFilenames,
                                  boolean preserveDirectoryStructure);
+};
+
+interface ObjectsUsingResourceCollector {
+    void ObjectsUsingResourceCollector([Const] DOMString resourceName);
+    [Const, Ref] VectorString GetObjectNames();
+
+    //Inherited from ArbitraryObjectsWorker
+    void Launch([Ref] ObjectsContainer container);
 };
 
 interface ResourcesInUseHelper {

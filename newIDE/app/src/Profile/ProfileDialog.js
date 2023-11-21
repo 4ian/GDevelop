@@ -21,6 +21,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RouterContext from '../MainFrame/RouterContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -205,8 +206,12 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
               <Column expand noMargin>
                 <AuthenticatedUserProfileDetails
                   authenticatedUser={authenticatedUser}
-                  onEditProfile={authenticatedUser.onEdit}
-                  onChangeEmail={authenticatedUser.onChangeEmail}
+                  onOpenEditProfileDialog={
+                    authenticatedUser.onOpenEditProfileDialog
+                  }
+                  onOpenChangeEmailDialog={
+                    authenticatedUser.onOpenChangeEmailDialog
+                  }
                 />
                 <SubscriptionDetails
                   subscription={authenticatedUser.subscription}
@@ -233,8 +238,10 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
       ) : (
         <Column noMargin expand justifyContent="center">
           <CreateProfile
-            onLogin={authenticatedUser.onLogin}
-            onCreateAccount={authenticatedUser.onCreateAccount}
+            onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+            onOpenCreateAccountDialog={
+              authenticatedUser.onOpenCreateAccountDialog
+            }
             message={
               <Trans>
                 Create an account to register your games and to get access to
@@ -249,4 +256,14 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   );
 };
 
-export default ProfileDialog;
+const ProfileDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Profile</Trans>}
+    scope="profile"
+    onClose={props.onClose}
+  >
+    <ProfileDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ProfileDialogWithErrorBoundary;

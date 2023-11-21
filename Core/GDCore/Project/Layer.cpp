@@ -19,7 +19,7 @@ Layer::Layer()
       isLocked(false),
       isLightingLayer(false),
       followBaseLayerCamera(false),
-      camera3DNearPlaneDistance(0.1),
+      camera3DNearPlaneDistance(3),
       camera3DFarPlaneDistance(10000),
       camera3DFieldOfView(45),
       ambientLightColorR(200),

@@ -203,7 +203,7 @@ module.exports = {
     object
       .addAction(
         'SetTime',
-        _('Set time'),
+        _('Current time'),
         _('Set the time of the video'),
         _('the time'),
         '',
@@ -224,7 +224,7 @@ module.exports = {
     object
       .addAction(
         'SetVolume',
-        _('Set volume'),
+        _('Volume'),
         _('Set the volume of the video object.'),
         _('the volume'),
         '',

@@ -26,10 +26,6 @@ jobs:
           command: brew install cmake
 
       - run:
-          name: Install dependencies for AWS S3 upload
-          command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
-
-      - run:
           name: Install Emscripten (for GDevelop.js)
           command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
 

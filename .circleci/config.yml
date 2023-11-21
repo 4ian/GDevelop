@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:
@@ -107,7 +107,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       - run:
           name: Install system dependencies for Electron builder
@@ -127,7 +127,7 @@ jobs:
       # Build GDevelop.js (and run tests to ensure it works)
       - run:
           name: Build GDevelop.js
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --detectOpenHandles --forceExit && cd ..
 
       # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
       - run:
@@ -184,7 +184,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:
@@ -200,7 +200,7 @@ jobs:
       # Build GDevelop.js (and run tests to ensure it works)
       - run:
           name: Build GDevelop.js
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --detectOpenHandles --forceExit && cd ..
 
       - save_cache:
           paths:

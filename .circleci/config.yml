@@ -16,6 +16,7 @@ jobs:
   build-macos:
     macos:
       xcode: 14.2.0
+    # resource_class: macos.m1.medium.gen1
     steps:
       - checkout
 
@@ -35,7 +36,7 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "newIDE/electron-app/app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
             # fallback to using the latest cache if no exact match is found
             - gd-macos-nodejs-dependencies---
 
@@ -51,14 +52,15 @@ jobs:
       # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
       - run:
           name: Install GDevelop IDE dependencies
-          command: cd newIDE/app && npm install && cd ../electron-app && npm install
+          command: cd newIDE/app && npm install && cd ../electron-app && npm install && cd app && npm install --arch=arm64 --force @parcel/watcher-darwin-arm64
 
       - save_cache:
           paths:
             - newIDE/electron-app/node_modules
+            - newIDE/electron-app/app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
-          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "newIDE/electron-app/app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
@@ -116,7 +118,7 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "newIDE/electron-app/app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
             # fallback to using the latest cache if no exact match is found
             - gd-linux-nodejs-dependencies---
 
@@ -137,9 +139,10 @@ jobs:
       - save_cache:
           paths:
             - newIDE/electron-app/node_modules
+            - newIDE/electron-app/app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
-          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "newIDE/electron-app/app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:

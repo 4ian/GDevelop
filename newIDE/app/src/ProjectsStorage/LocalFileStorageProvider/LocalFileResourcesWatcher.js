@@ -55,7 +55,11 @@ export const setupResourcesWatcher =
           path.join(folderPath, autosaveFile),
         ];
         if (options && options.isProjectSplitInMultipleFiles) {
-          ignore.push(`{${splittedProjectFolderNames.join(',')}}/*.json`);
+          ignore.push(
+            ...splittedProjectFolderNames.map(folderName =>
+              path.join(folderPath, folderName, '*.json')
+            )
+          );
         }
         const subscriptionIdPromise = ipcRenderer.invoke(
           'local-filesystem-watcher-setup',

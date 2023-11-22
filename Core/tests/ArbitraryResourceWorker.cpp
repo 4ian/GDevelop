@@ -388,7 +388,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
     }
   }
 
-  SECTION("ExposeWholeProjectResources") {
+  SECTION("ExposeLayoutResources") {
     SECTION("Can find there is no resource usage in an empty layer") {
       gd::Platform platform;
       gd::Project project;

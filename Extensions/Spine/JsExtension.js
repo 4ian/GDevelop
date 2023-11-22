@@ -208,11 +208,11 @@ module.exports = {
     const { PIXI, RenderedInstance, gd } = objectsRenderingService;
 
     class RenderedSpineInstance extends RenderedInstance {
-      _spine;
+      _spine = null;
       _rect = new PIXI.Graphics();
-      _initialWidth;
-      _initialHeight;
-      _animationIndex;
+      _initialWidth = null;
+      _initialHeight = null;
+      _animationIndex = -1;
 
       constructor(
         project,
@@ -238,38 +238,11 @@ module.exports = {
         this._pixiObject.addChild(this._rect);
         this._pixiContainer.addChild(this._pixiObject);
 
-        this.loadSpine();
+        this._loadSpine();
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'CppPlatform/Extensions/spriteicon.png';
-      }
-
-      loadSpine() {
-        const jsonResourceName = this.properties
-          .get('jsonResourceName')
-          .getValue();
-        const imageResourceName = this.properties
-          .get('imageResourceName')
-          .getValue();
-        const atlasResourceName = this.properties
-          .get('atlasResourceName')
-          .getValue();
-
-        this._pixiResourcesLoader
-          .getSpineData(
-            this._project,
-            jsonResourceName,
-            imageResourceName,
-            atlasResourceName
-          )
-          .then((spineData) => {
-            if (!spineData) return;
-
-            this._spine = new PIXI.Spine(spineData);
-            this._pixiObject.addChild(this._spine);
-            this.update();
-          });
       }
 
       update() {
@@ -288,15 +261,15 @@ module.exports = {
         this._rect.lineStyle(0, 0xffffff);
         this._rect.drawRect(0, 0, width, height);
 
-        const s = this._spine;
-        if (s) {
-          s.width = width;
-          s.height = height;
-          s.alpha = this.properties.get('opacity').getValue() / 255;
-          const localBounds = s.getLocalBounds(undefined, true);
-          s.position.set(
-            -localBounds.x * s.scale.x,
-            -localBounds.y * s.scale.y
+        const { _spine: spine } = this;
+        if (spine) {
+          spine.width = width;
+          spine.height = height;
+          spine.alpha = this._getProperties().get('opacity').getValue() / 255;
+          const localBounds = spine.getLocalBounds(undefined, true);
+          spine.position.set(
+            -localBounds.x * spine.scale.x,
+            -localBounds.y * spine.scale.y
           );
         }
 
@@ -307,10 +280,11 @@ module.exports = {
        * @param {number} index - animation index
        */
       setAnimation(index) {
-        const { configuration, _spine: s } = this;
+        const { _spine: spine } = this;
+        const configuration = this._getConfiguration();
 
         if (
-          !s ||
+          !spine ||
           configuration.hasNoAnimations() ||
           index === this._animationIndex
         ) {
@@ -330,43 +304,80 @@ module.exports = {
 
         // reset scale to track new animation range
         // if custom size is set it will be reinitialized in update method
-        s.scale.set(1, 1);
-        s.state.setAnimation(0, source, shouldLoop);
-        s.state.tracks[0].trackTime = 0;
-        s.update(0);
-        s.autoUpdate = false;
-        this._initialWidth = s.width;
-        this._initialHeight = s.height;
+        spine.scale.set(1, 1);
+        spine.state.setAnimation(0, source, shouldLoop);
+        spine.state.tracks[0].trackTime = 0;
+        spine.update(0);
+        spine.autoUpdate = false;
+        this._initialWidth = spine.width;
+        this._initialHeight = spine.height;
       }
 
       /**
        * @returns {number} default width
        */
       getDefaultWidth() {
-        const scale = Number(this.properties.get('scale').getValue()) || 1;
-
-        return typeof this._initialWidth === 'number'
-          ? this._initialWidth * scale
-          : 256;
+        return (this._initialWidth !== null
+          ? this._initialWidth * this.getScale()
+          : 256);
       }
 
       /**
        * @returns {number} default height
        */
       getDefaultHeight() {
-        const scale = Number(this.properties.get('scale').getValue()) || 1;
-
-        return typeof this._initialHeight === 'number'
-          ? this._initialHeight * scale
-          : 256;
+        return (this._initialHeight !== null
+          ? this._initialHeight * this.getScale()
+          : 256);
       }
 
-      get configuration() {
+      /**
+       * @returns {number} defined scale
+       */
+      getScale() {
+        return Number(this._getProperties().get('scale').getValue()) || 1;
+      }
+
+      /**
+       * @returns this spine object configuration
+       */
+      _getConfiguration() {
         return gd.asSpineConfiguration(this._associatedObjectConfiguration);
       }
 
-      get properties() {
+      /**
+       * @returns this object properties container
+       */
+      _getProperties() {
         return this._associatedObjectConfiguration.getProperties();
+      }
+
+      _loadSpine() {
+        const properties = this._getProperties();
+        const jsonResourceName = properties
+          .get('jsonResourceName')
+          .getValue();
+        const imageResourceName = properties
+          .get('imageResourceName')
+          .getValue();
+        const atlasResourceName = properties
+          .get('atlasResourceName')
+          .getValue();
+
+        this._pixiResourcesLoader
+          .getSpineData(
+            this._project,
+            jsonResourceName,
+            imageResourceName,
+            atlasResourceName
+          )
+          .then((spineData) => {
+            if (!spineData) return;
+
+            this._spine = new PIXI.Spine(spineData);
+            this._pixiObject.addChild(this._spine);
+            this.update();
+          });
       }
     }
 

@@ -78,7 +78,7 @@ namespace gdjs {
     extraInitializationFromInitialInstance(
       initialInstanceData: InstanceData
     ): void {
-      const animationData = initialInstanceData.numberProperties?.find(
+      const animationData = initialInstanceData.numberProperties.find(
         (data) => data.name === 'animation'
       );
       const animationIndex = animationData

@@ -13,7 +13,7 @@ namespace gdjs {
         const sound = instanceContainer
           .getScene()
           .getSoundManager()
-          .getSoundOnChannel(channel);
+          ?.getSoundOnChannel(channel);
         if (sound) sound.setSpatialPosition(x, y, z);
         else
           logger.error(

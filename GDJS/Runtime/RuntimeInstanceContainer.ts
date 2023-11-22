@@ -61,12 +61,12 @@ namespace gdjs {
     /**
      * Get the renderer associated to the container.
      */
-    abstract getRenderer(): gdjs.RuntimeInstanceContainerRenderer;
+    abstract getRenderer(): gdjs.RuntimeInstanceContainerRenderer | null;
 
     /**
      * Get the renderer for visual debugging associated to the container.
      */
-    abstract getDebuggerRenderer(): gdjs.DebuggerRenderer;
+    abstract getDebuggerRenderer(): gdjs.DebuggerRenderer | null;
 
     /**
      * Get the {@link gdjs.RuntimeGame} associated to this.
@@ -149,7 +149,7 @@ namespace gdjs {
       showCustomPoints: boolean
     ): void {
       if (this._debugDrawEnabled && !enableDebugDraw) {
-        this.getDebuggerRenderer().clearDebugDraw();
+        this.getDebuggerRenderer()?.clearDebugDraw();
       }
 
       this._debugDrawEnabled = enableDebugDraw;
@@ -400,7 +400,7 @@ namespace gdjs {
           // Update effects, only for visible objects.
           if (rendererObject.visible) {
             this.getGame()
-              .getEffectsManager()
+              .getEffectsManager()!
               .updatePreRender(object.getRendererEffects(), object);
           }
         }
@@ -689,7 +689,7 @@ namespace gdjs {
       this._orderedLayers.splice(layerIndex, 1);
       this._orderedLayers.splice(newIndex, 0, layer);
 
-      this.getRenderer().setLayerIndex(layer, newIndex);
+      this.getRenderer()?.setLayerIndex(layer, newIndex);
     }
 
     /**

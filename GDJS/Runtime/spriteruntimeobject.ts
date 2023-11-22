@@ -90,9 +90,10 @@ namespace gdjs {
     image: string;
 
     //TODO: Rename in imageName, and do not store it in the object?
-    texture: any;
+    texture?: import('@pixi/core').Texture;
     center: SpritePoint = { x: 0, y: 0 };
     origin: SpritePoint = { x: 0, y: 0 };
+    dimensions: { height: number; width: number };
     hasCustomHitBoxes: boolean = false;
     customHitBoxes: gdjs.Polygon[] = [];
     points: Hashtable<SpritePoint>;
@@ -101,21 +102,24 @@ namespace gdjs {
      * @param imageManager The game image manager
      * @param frameData The frame data used to initialize the frame
      */
-    constructor(imageManager: gdjs.ImageManager, frameData: SpriteFrameData) {
+    constructor(runtimeGame: gdjs.RuntimeGame, frameData: SpriteFrameData) {
       this.image = frameData ? frameData.image : '';
-      this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(
-        imageManager,
-        this.image
-      );
+      this.dimensions = runtimeGame.getResourceBaseDimensions(this.image);
+      if (gdjs.SpriteRuntimeObjectRenderer) {
+        this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(
+          runtimeGame.getImageManager(),
+          this.image
+        );
+      }
       this.points = new Hashtable();
-      this.reinitialize(imageManager, frameData);
+      this.reinitialize(runtimeGame, frameData);
     }
 
     /**
      * @param imageManager The game image manager
      * @param frameData The frame data used to initialize the frame
      */
-    reinitialize(imageManager: gdjs.ImageManager, frameData: SpriteFrameData) {
+    reinitialize(runtimeGame: gdjs.RuntimeGame, frameData: SpriteFrameData) {
       this.points.clear();
       for (let i = 0, len = frameData.points.length; i < len; ++i) {
         const ptData = frameData.points[i];
@@ -130,14 +134,8 @@ namespace gdjs {
         this.center.x = center.x;
         this.center.y = center.y;
       } else {
-        this.center.x =
-          gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameWidth(
-            this.texture
-          ) / 2;
-        this.center.y =
-          gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameHeight(
-            this.texture
-          ) / 2;
+        this.center.x = this.dimensions.width / 2;
+        this.center.y = this.dimensions.height / 2;
       }
 
       //Load the custom collision mask, if any:
@@ -202,14 +200,14 @@ namespace gdjs {
     frames: SpriteAnimationFrame[] = [];
 
     constructor(
-      imageManager: gdjs.PixiImageManager,
+      runtimeGame: gdjs.RuntimeGame,
       directionData: SpriteDirectionData
     ) {
       this.timeBetweenFrames = directionData
         ? directionData.timeBetweenFrames
         : 1.0;
       this.loop = !!directionData.looping;
-      this.reinitialize(imageManager, directionData);
+      this.reinitialize(runtimeGame, directionData);
     }
 
     /**
@@ -217,7 +215,7 @@ namespace gdjs {
      * @param directionData The direction data used to initialize the direction
      */
     reinitialize(
-      imageManager: gdjs.ImageManager,
+      runtimeGame: gdjs.RuntimeGame,
       directionData: SpriteDirectionData
     ) {
       this.timeBetweenFrames = directionData
@@ -228,10 +226,10 @@ namespace gdjs {
       for (const len = directionData.sprites.length; i < len; ++i) {
         const frameData = directionData.sprites[i];
         if (i < this.frames.length) {
-          this.frames[i].reinitialize(imageManager, frameData);
+          this.frames[i].reinitialize(runtimeGame, frameData);
         } else {
           this.frames.push(
-            new gdjs.SpriteAnimationFrame(imageManager, frameData)
+            new gdjs.SpriteAnimationFrame(runtimeGame, frameData)
           );
         }
       }
@@ -250,33 +248,27 @@ namespace gdjs {
     name: string;
     directions: gdjs.SpriteAnimationDirection[] = [];
 
-    constructor(
-      imageManager: gdjs.PixiImageManager,
-      animData: SpriteAnimationData
-    ) {
+    constructor(runtimeGame: gdjs.RuntimeGame, animData: SpriteAnimationData) {
       this.hasMultipleDirections = !!animData.useMultipleDirections;
       this.name = animData.name || '';
-      this.reinitialize(imageManager, animData);
+      this.reinitialize(runtimeGame, animData);
     }
 
     /**
      * @param imageManager The game image manager
      * @param animData The animation data used to initialize the animation
      */
-    reinitialize(
-      imageManager: gdjs.ImageManager,
-      animData: SpriteAnimationData
-    ) {
+    reinitialize(runtimeGame: gdjs.RuntimeGame, animData: SpriteAnimationData) {
       this.hasMultipleDirections = !!animData.useMultipleDirections;
       this.name = animData.name || '';
       let i = 0;
       for (const len = animData.directions.length; i < len; ++i) {
         const directionData = animData.directions[i];
         if (i < this.directions.length) {
-          this.directions[i].reinitialize(imageManager, directionData);
+          this.directions[i].reinitialize(runtimeGame, directionData);
         } else {
           this.directions.push(
-            new gdjs.SpriteAnimationDirection(imageManager, directionData)
+            new gdjs.SpriteAnimationDirection(runtimeGame, directionData)
           );
         }
       }
@@ -310,6 +302,7 @@ namespace gdjs {
     _flippedY: boolean = false;
     opacity: float = 255;
     _updateIfNotVisible: boolean;
+    color: string = '255;255;255';
 
     //Animations:
     _animations: gdjs.SpriteAnimation[] = [];
@@ -337,15 +330,17 @@ namespace gdjs {
       for (let i = 0, len = spriteObjectData.animations.length; i < len; ++i) {
         this._animations.push(
           new gdjs.SpriteAnimation(
-            instanceContainer.getGame().getImageManager(),
+            instanceContainer.getGame(),
             spriteObjectData.animations[i]
           )
         );
       }
-      this._renderer = new gdjs.SpriteRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      if (gdjs.SpriteRuntimeObjectRenderer) {
+        this._renderer = new gdjs.SpriteRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
       this._updateAnimationFrame();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -373,15 +368,12 @@ namespace gdjs {
         const animData = spriteObjectData.animations[i];
         if (i < this._animations.length) {
           this._animations[i].reinitialize(
-            instanceContainer.getGame().getImageManager(),
+            instanceContainer.getGame(),
             animData
           );
         } else {
           this._animations.push(
-            new gdjs.SpriteAnimation(
-              instanceContainer.getGame().getImageManager(),
-              animData
-            )
+            new gdjs.SpriteAnimation(instanceContainer.getGame(), animData)
           );
         }
       }
@@ -389,7 +381,7 @@ namespace gdjs {
 
       //Make sure to delete already existing animations which are not used anymore.
       this._animationFrame = null;
-      this._renderer.reinitialize(this, instanceContainer);
+      if (this._renderer) this._renderer.reinitialize(this, instanceContainer);
       this._updateAnimationFrame();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object reinitialize method.
@@ -406,15 +398,12 @@ namespace gdjs {
         const animData = newObjectData.animations[i];
         if (i < this._animations.length) {
           this._animations[i].reinitialize(
-            instanceContainer.getGame().getImageManager(),
+            instanceContainer.getGame(),
             animData
           );
         } else {
           this._animations.push(
-            new gdjs.SpriteAnimation(
-              instanceContainer.getGame().getImageManager(),
-              animData
-            )
+            new gdjs.SpriteAnimation(instanceContainer.getGame(), animData)
           );
         }
       }
@@ -456,15 +445,23 @@ namespace gdjs {
      * Update the current frame of the object according to the elapsed time on the scene.
      */
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      //Playing the animation of all objects including the ones outside the screen can be
-      //costly when the scene is big with a lot of animated objects. By default, we skip
-      //updating the object if it is not visible.
+      // By default, do not update animations if there is no renderer.
+      // If the developer specifically instructed that the sprite should always update
+      // even if it is not visible, then even if there is no renderer we must oblige
+      // to not break game logic.
+      if (this._updateIfNotVisible && !this._renderer) return;
+
+      // Playing the animation of all objects including the ones outside the screen can be
+      // costly when the scene is big with a lot of animated objects. By default, we skip
+      // updating the object if it is not visible.
       if (
         !this._updateIfNotVisible &&
+        this._renderer &&
         !this._renderer.getRendererObject().visible
       ) {
         return;
       }
+
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=
@@ -498,7 +495,7 @@ namespace gdjs {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      this._renderer.ensureUpToDate();
+      if (this._renderer) this._renderer.ensureUpToDate();
     }
 
     /**
@@ -509,7 +506,8 @@ namespace gdjs {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      this._renderer.ensureUpToDate();
+
+      if (this._renderer) this._renderer.ensureUpToDate();
     }
 
     /**
@@ -533,7 +531,7 @@ namespace gdjs {
         ];
         if (this._currentFrame < direction.frames.length) {
           this._animationFrame = direction.frames[this._currentFrame];
-          if (this._animationFrame !== null) {
+          if (this._animationFrame !== null && this._renderer) {
             this._renderer.updateFrame(this._animationFrame);
           }
           return;
@@ -545,7 +543,7 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     /**
@@ -619,7 +617,7 @@ namespace gdjs {
         this._animationElapsedTime = 0;
 
         //TODO: This may be unnecessary.
-        this._renderer.update();
+        if (this._renderer) this._renderer.update();
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
       }
@@ -676,7 +674,7 @@ namespace gdjs {
         }
         this.angle = newValue;
         this.invalidateHitboxes();
-        this._renderer.updateAngle();
+        if (this._renderer) this._renderer.updateAngle();
       } else {
         newValue = newValue | 0;
         if (
@@ -692,7 +690,7 @@ namespace gdjs {
         this.angle = 0;
 
         //TODO: This may be unnecessary.
-        this._renderer.update();
+        if (this._renderer) this._renderer.update();
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
       }
@@ -1000,7 +998,7 @@ namespace gdjs {
         return (
           this.x +
           (-this._animationFrame.origin.x -
-            this._renderer.getUnscaledWidth() +
+            this._animationFrame.dimensions.width +
             2 * this._animationFrame.center.x) *
             absScaleX
         );
@@ -1025,7 +1023,7 @@ namespace gdjs {
         return (
           this.y +
           (-this._animationFrame.origin.y -
-            this._renderer.getUnscaledHeight() +
+            this._animationFrame.dimensions.height +
             2 * this._animationFrame.center.y) *
             absScaleY
         );
@@ -1048,7 +1046,8 @@ namespace gdjs {
         return this._animationFrame.center.x * Math.abs(this._scaleX);
       } else {
         return (
-          (this._renderer.getUnscaledWidth() - this._animationFrame.center.x) *
+          (this._animationFrame.dimensions.width -
+            this._animationFrame.center.x) *
           Math.abs(this._scaleX)
         );
       }
@@ -1070,7 +1069,8 @@ namespace gdjs {
         return this._animationFrame.center.y * Math.abs(this._scaleY);
       } else {
         return (
-          (this._renderer.getUnscaledHeight() - this._animationFrame.center.y) *
+          (this._animationFrame.dimensions.height -
+            this._animationFrame.center.y) *
           Math.abs(this._scaleY)
         );
       }
@@ -1087,7 +1087,7 @@ namespace gdjs {
       this.x = x;
       if (this._animationFrame !== null) {
         this.invalidateHitboxes();
-        this._renderer.updateX();
+        if (this._renderer) this._renderer.updateX();
       }
     }
 
@@ -1102,7 +1102,7 @@ namespace gdjs {
       this.y = y;
       if (this._animationFrame !== null) {
         this.invalidateHitboxes();
-        this._renderer.updateY();
+        if (this._renderer) this._renderer.updateY();
       }
     }
 
@@ -1119,7 +1119,7 @@ namespace gdjs {
           return;
         }
         this.angle = angle;
-        this._renderer.updateAngle();
+        if (this._renderer) this._renderer.updateAngle();
         this.invalidateHitboxes();
       } else {
         angle = angle % 360;
@@ -1151,7 +1151,7 @@ namespace gdjs {
         return;
       }
       this._blendMode = newMode;
-      this._renderer.update();
+      if (this._renderer) this._renderer.update();
     }
 
     getBlendMode() {
@@ -1166,7 +1166,7 @@ namespace gdjs {
         opacity = 255;
       }
       this.opacity = opacity;
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     getOpacity(): number {
@@ -1182,7 +1182,7 @@ namespace gdjs {
         enable = true;
       }
       this.hidden = enable;
-      this._renderer.updateVisibility();
+      if (this._renderer) this._renderer.updateVisibility();
     }
 
     /**
@@ -1191,7 +1191,8 @@ namespace gdjs {
      * @param rgbColor The color, in RGB format ("128;200;255").
      */
     setColor(rgbColor: string): void {
-      this._renderer.setColor(rgbColor);
+      this.color = rgbColor;
+      if (this._renderer) this._renderer.setColor(rgbColor);
     }
 
     /**
@@ -1200,7 +1201,7 @@ namespace gdjs {
      * @returns The color, in RGB format ("128;200;255").
      */
     getColor(): string {
-      return this._renderer.getColor();
+      return this.color;
     }
 
     flipX(enable: boolean) {
@@ -1208,7 +1209,7 @@ namespace gdjs {
         this._scaleX *= -1;
         this._flippedX = enable;
         this.invalidateHitboxes();
-        this._renderer.update();
+        if (this._renderer) this._renderer.update();
       }
     }
 
@@ -1217,7 +1218,7 @@ namespace gdjs {
         this._scaleY *= -1;
         this._flippedY = enable;
         this.invalidateHitboxes();
-        this._renderer.update();
+        if (this._renderer) this._renderer.update();
       }
     }
 
@@ -1239,7 +1240,8 @@ namespace gdjs {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      return this._renderer.getWidth();
+      if (this._animationFrame === null) return 0;
+      return this._animationFrame.dimensions.width * this._scaleX;
     }
 
     /**
@@ -1251,27 +1253,34 @@ namespace gdjs {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      return this._renderer.getHeight();
+      if (this._animationFrame === null) return 0;
+      return this._animationFrame.dimensions.height * this._scaleY;
     }
 
     setWidth(newWidth: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      const unscaledWidth = this._renderer.getUnscaledWidth();
-      if (unscaledWidth !== 0) {
-        this.setScaleX(newWidth / unscaledWidth);
+      if (
+        this._animationFrame === null ||
+        this._animationFrame.dimensions.width === 0
+      ) {
+        return;
       }
+      this.setScaleX(newWidth / this._animationFrame.dimensions.width);
     }
 
     setHeight(newHeight: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      const unscaledHeight = this._renderer.getUnscaledHeight();
-      if (unscaledHeight !== 0) {
-        this.setScaleY(newHeight / unscaledHeight);
+      if (
+        this._animationFrame === null ||
+        this._animationFrame.dimensions.height === 0
+      ) {
+        return;
       }
+      this.setScaleY(newHeight / this._animationFrame.dimensions.height);
     }
 
     setSize(newWidth: float, newHeight: float): void {
@@ -1296,7 +1305,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this._renderer.update();
+      if (this._renderer) this._renderer.update();
       this.invalidateHitboxes();
     }
 
@@ -1313,7 +1322,7 @@ namespace gdjs {
         return;
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
-      this._renderer.update();
+      if (this._renderer) this._renderer.update();
       this.invalidateHitboxes();
     }
 
@@ -1330,7 +1339,7 @@ namespace gdjs {
         return;
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this._renderer.update();
+      if (this._renderer) this._renderer.update();
       this.invalidateHitboxes();
     }
 

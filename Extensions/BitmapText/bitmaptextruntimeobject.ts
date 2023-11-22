@@ -50,7 +50,7 @@ namespace gdjs {
     _wrappingWidth: float;
     _align: string;
 
-    _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
+    _renderer: gdjs.BitmapTextRuntimeObjectRenderer;
 
     /**
      * @param instanceContainer The container the object belongs to.
@@ -75,17 +75,19 @@ namespace gdjs {
       this._wrappingWidth = 0;
       this._align = objectData.content.align;
 
-      this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      if (gdjs.BitmapTextRuntimeObjectRenderer) {
+        this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     // @ts-ignore
@@ -101,7 +103,7 @@ namespace gdjs {
       }
       if (oldObjectData.content.tint !== newObjectData.content.tint) {
         this._tint = gdjs.rgbOrHexToRGBColor(newObjectData.content.tint);
-        this._renderer.updateTint();
+        if (this._renderer) this._renderer.updateTint();
       }
       if (
         oldObjectData.content.bitmapFontResourceName !==
@@ -143,7 +145,7 @@ namespace gdjs {
 
     onDestroyed(): void {
       super.onDestroyed();
-      this._renderer.onDestroy();
+      if (this._renderer) this._renderer.onDestroy();
     }
 
     /**
@@ -151,7 +153,7 @@ namespace gdjs {
      */
     setText(text: string): void {
       this._text = text;
-      this._renderer.updateTextContent();
+      if (this._renderer) this._renderer.updateTextContent();
       this.invalidateHitboxes();
     }
 
@@ -164,7 +166,7 @@ namespace gdjs {
 
     setTint(rgbColorString: string): void {
       this._tint = gdjs.rgbOrHexToRGBColor(rgbColorString);
-      this._renderer.updateTint();
+      if (this._renderer) this._renderer.updateTint();
     }
 
     getTint(): string {
@@ -197,7 +199,7 @@ namespace gdjs {
       if (this._scaleX === scaleX) return;
 
       this._scaleX = scaleX;
-      this._renderer.updateScale();
+      if (this._renderer) this._renderer.updateScale();
       this.invalidateHitboxes();
     }
 
@@ -208,12 +210,17 @@ namespace gdjs {
       if (this._scaleY === scaleY) return;
 
       this._scaleY = scaleY;
-      this._renderer.updateScale();
+      if (this._renderer) this._renderer.updateScale();
       this.invalidateHitboxes();
     }
 
     getFontSize(): float {
-      return this._renderer.getFontSize();
+      // Ideally, we'd pre-compute and store the font size in the resource from the IDE.
+      // However, since the font is currently extracted from two resources, this is not yet possible.
+      // We use 1 as a sensible default in the meantime when no renderer is present.
+      // TODO: When we add pre-computing of resource dimensions, we should change this to store
+      //       the font size in the bitmap font resource metadata directly.
+      return this._renderer ? this._renderer.getFontSize() : 1;
     }
 
     setBitmapFontAndTextureAtlasResourceName(
@@ -222,11 +229,11 @@ namespace gdjs {
     ): void {
       if (bitmapFontResourceName) {
         this.setBitmapFontResourceName(bitmapFontResourceName);
-        this._renderer.updateFont();
+        if (this._renderer) this._renderer.updateFont();
       }
       if (textureAtlasResourceName) {
         this.setTextureAtlasResourceName(textureAtlasResourceName);
-        this._renderer.updateFont();
+        if (this._renderer) this._renderer.updateFont();
       }
     }
 
@@ -248,7 +255,7 @@ namespace gdjs {
 
     setAlignment(align: string): void {
       this._align = align;
-      this._renderer.updateAlignment();
+      if (this._renderer) this._renderer.updateAlignment();
     }
 
     getAlignment(): string {
@@ -261,7 +268,7 @@ namespace gdjs {
      */
     setX(x: float): void {
       super.setX(x);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -270,7 +277,7 @@ namespace gdjs {
      */
     setY(y: float): void {
       super.setY(y);
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -279,7 +286,7 @@ namespace gdjs {
      */
     setAngle(angle: float): void {
       super.setAngle(angle);
-      this._renderer.updateAngle();
+      if (this._renderer) this._renderer.updateAngle();
     }
 
     /**
@@ -294,7 +301,7 @@ namespace gdjs {
         opacity = 255;
       }
       this._opacity = opacity;
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     /**
@@ -310,7 +317,7 @@ namespace gdjs {
      */
     setWrappingWidth(width: float): void {
       this._wrappingWidth = width;
-      this._renderer.updateWrappingWidth();
+      if (this._renderer) this._renderer.updateWrappingWidth();
       this.invalidateHitboxes();
     }
 
@@ -323,7 +330,7 @@ namespace gdjs {
 
     setWordWrap(wordWrap: boolean): void {
       this._wordWrap = wordWrap;
-      this._renderer.updateWrappingWidth();
+      if (this._renderer) this._renderer.updateWrappingWidth();
       this.invalidateHitboxes();
     }
 
@@ -335,14 +342,33 @@ namespace gdjs {
      * Get the width of the object.
      */
     getWidth(): float {
-      return this._renderer.getWidth();
+      if (this._renderer) return this._renderer.getWidth();
+      // When there is no renderer, we make a very rough assumption about the text size to not break game logic
+      // that might depend on changes of the text size, this is very much an edge case though so we won't
+      // implement a more complex text measuring system.
+      // We get the longest line, and multiply its length by the character size.
+      else
+        return (
+          this._text
+            .split('\n')
+            .reduce(
+              (biggestLength, line) =>
+                line.length > biggestLength ? line.length : biggestLength,
+              0
+            ) * this.getFontSize()
+        );
     }
 
     /**
      * Get the height of the object.
      */
     getHeight(): float {
-      return this._renderer.getHeight();
+      if (this._renderer) return this._renderer.getHeight();
+      // When there is no renderer, we make a very rough assumption about the text size to not break game logic
+      // that might depend on changes of the text size, this is very much an edge case though so we won't
+      // implement a more complex text measuring system.
+      // We get the amount of lines, and multiply it by the character size.
+      else return this._text.split('\n').length * this.getFontSize();
     }
   }
   gdjs.registerObject(

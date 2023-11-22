@@ -70,7 +70,7 @@ namespace gdjs {
       this._pixiContainer.filters = [];
 
       // Setup rendering for lighting or 3D rendering:
-      const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
+      const pixiRenderer = runtimeGameRenderer!.getPIXIRenderer();
       if (this._isLightingLayer) {
         this._clearColor = layer.getClearColor();
         this._setupLightingRendering(
@@ -635,6 +635,7 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
-  export type LayerRenderer = gdjs.LayerPixiRenderer;
-  export const LayerRenderer = gdjs.LayerPixiRenderer;
+  export type LayerRenderer = gdjs.LayerPixiRenderer | undefined;
+  type LayerRendererClass = typeof LayerPixiRenderer | undefined;
+  export const LayerRenderer: LayerRendererClass = gdjs.LayerPixiRenderer;
 }

@@ -63,7 +63,7 @@ namespace gdjs {
     node: THREE.Object3D<THREE.Event>
   ) => node.traverse(setBasicMaterialTo);
 
-  class Model3DRuntimeObject3DRenderer extends gdjs.RuntimeObject3DRenderer {
+  class Model3DRuntimeObjectThreeRenderer extends gdjs.RuntimeObject3DThreeRenderer {
     private _model3DRuntimeObject: gdjs.Model3DRuntimeObject;
     /**
      * The 3D model stretched in a 1x1x1 cube.
@@ -87,7 +87,7 @@ namespace gdjs {
       // GLB files with skeleton must not have any transformation to work properly.
       const originalModel = instanceContainer
         .getGame()
-        .getModel3DManager()
+        .getModel3DManager()!
         .getModel(runtimeObject._modelResourceName);
       // _updateModel will actually add a clone of the model.
       const model = new THREE.Group();
@@ -368,6 +368,11 @@ namespace gdjs {
     }
   }
 
-  export const Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
-  export type Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
+  export type Model3DRuntimeObjectRenderer =
+    | Model3DRuntimeObjectThreeRenderer
+    | undefined;
+  type Model3DRuntimeObjectRendererClass =
+    | typeof Model3DRuntimeObjectThreeRenderer
+    | undefined;
+  export const Model3DRuntimeObjectRenderer: Model3DRuntimeObjectRendererClass = Model3DRuntimeObjectThreeRenderer;
 }

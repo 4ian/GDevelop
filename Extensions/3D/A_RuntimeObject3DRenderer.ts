@@ -1,5 +1,5 @@
 namespace gdjs {
-  export abstract class RuntimeObject3DRenderer {
+  export abstract class RuntimeObject3DThreeRenderer {
     protected _object: gdjs.RuntimeObject3D;
     private _threeObject3D: THREE.Object3D;
 
@@ -14,7 +14,7 @@ namespace gdjs {
 
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .add3DRendererObject(this._threeObject3D);
     }
 
@@ -52,4 +52,12 @@ namespace gdjs {
       this._threeObject3D.visible = !this._object.isHidden();
     }
   }
+
+  export type RuntimeObject3DRenderer =
+    | RuntimeObject3DThreeRenderer
+    | undefined;
+  type RuntimeObject3DRendererClass =
+    | typeof RuntimeObject3DThreeRenderer
+    | undefined;
+  export const RuntimeObject3DRenderer: RuntimeObject3DRendererClass = RuntimeObject3DThreeRenderer;
 }

@@ -86,10 +86,12 @@ namespace gdjs {
       ];
       this._str = textObjectData.string;
       this._textAlign = textObjectData.textAlignment;
-      this._renderer = new gdjs.TextRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      if (gdjs.TextRuntimeObjectRenderer) {
+        this._renderer = new gdjs.TextRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -138,11 +140,11 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      this._renderer.ensureUpToDate();
+      if (this._renderer) this._renderer.ensureUpToDate();
     }
 
     onDestroyed(): void {
@@ -167,7 +169,7 @@ namespace gdjs {
      */
     private _updateTextPosition() {
       this.invalidateHitboxes();
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -192,7 +194,7 @@ namespace gdjs {
      */
     setAngle(angle: float): void {
       super.setAngle(angle);
-      this._renderer.updateAngle();
+      if (this._renderer) this._renderer.updateAngle();
     }
 
     /**
@@ -206,7 +208,7 @@ namespace gdjs {
         opacity = 255;
       }
       this.opacity = opacity;
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     /**
@@ -249,7 +251,7 @@ namespace gdjs {
         return;
       }
       this._str = text;
-      this._renderer.updateString();
+      if (this._renderer) this._renderer.updateString();
       this._updateTextPosition();
     }
 
@@ -269,7 +271,7 @@ namespace gdjs {
         newSize = 1;
       }
       this._characterSize = newSize;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -278,7 +280,7 @@ namespace gdjs {
      */
     setFontName(fontResourceName: string): void {
       this._fontName = fontResourceName;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -294,7 +296,7 @@ namespace gdjs {
      */
     setBold(enable): void {
       this._bold = enable;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -310,21 +312,41 @@ namespace gdjs {
      */
     setItalic(enable): void {
       this._italic = enable;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
      * Get width of the text.
      */
     getWidth(): float {
-      return this._wrapping ? this._wrappingWidth : this._renderer.getWidth();
+      if (this._wrapping) return this._wrappingWidth;
+      else if (this._renderer) return this._renderer.getWidth();
+      // When there is no renderer, we make a very rough assumption about the text size to not break game logic
+      // that might depend on changes of the text size, this is very much an edge case though so we won't
+      // implement a more complex text measuring system.
+      // We get the longest line, and multiply its length by the character size.
+      else
+        return (
+          this._str
+            .split('\n')
+            .reduce(
+              (biggestLength, line) =>
+                line.length > biggestLength ? line.length : biggestLength,
+              0
+            ) * this._characterSize
+        );
     }
 
     /**
      * Get height of the text.
      */
     getHeight(): float {
-      return this._renderer.getHeight();
+      if (this._renderer) return this._renderer.getHeight();
+      // When there is no renderer, we make a very rough assumption about the text size to not break game logic
+      // that might depend on changes of the text size, this is very much an edge case though so we won't
+      // implement a more complex text measuring system.
+      // We get the amount of lines, and multiply it by the character size.
+      else return this._str.split('\n').length * this._characterSize;
     }
 
     /**
@@ -371,7 +393,7 @@ namespace gdjs {
 
       this._scaleX = newScale;
       this._scaleY = newScale;
-      this._renderer.setScale(newScale);
+      if (this._renderer) this._renderer.setScale(newScale);
       this.invalidateHitboxes();
     }
 
@@ -383,7 +405,7 @@ namespace gdjs {
       if (this._scaleX === newScale) return;
 
       this._scaleX = newScale;
-      this._renderer.setScaleX(newScale);
+      if (this._renderer) this._renderer.setScaleX(newScale);
       this.invalidateHitboxes();
     }
 
@@ -395,7 +417,7 @@ namespace gdjs {
       if (this._scaleY === newScale) return;
 
       this._scaleY = newScale;
-      this._renderer.setScaleY(newScale);
+      if (this._renderer) this._renderer.setScaleY(newScale);
       this.invalidateHitboxes();
     }
 
@@ -412,7 +434,7 @@ namespace gdjs {
       this._color[1] = parseInt(color[1], 10);
       this._color[2] = parseInt(color[2], 10);
       this._useGradient = false;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -429,7 +451,7 @@ namespace gdjs {
      */
     setTextAlignment(alignment: string): void {
       this._textAlign = alignment;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -455,7 +477,7 @@ namespace gdjs {
       if (this._wrapping === enable) return;
 
       this._wrapping = enable;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
       this.invalidateHitboxes();
     }
 
@@ -477,7 +499,7 @@ namespace gdjs {
       if (this._wrappingWidth === width) return;
 
       this._wrappingWidth = width;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
       this.invalidateHitboxes();
     }
 
@@ -495,7 +517,7 @@ namespace gdjs {
       this._outlineColor[1] = parseInt(color[1], 10);
       this._outlineColor[2] = parseInt(color[2], 10);
       this._outlineThickness = thickness;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -522,7 +544,7 @@ namespace gdjs {
       this._shadowBlur = blur;
       this._shadowAngle = angle;
       this._shadow = true;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -575,7 +597,7 @@ namespace gdjs {
       }
       this._gradientType = strGradientType;
       this._useGradient = this._gradient.length > 1 ? true : false;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -584,7 +606,7 @@ namespace gdjs {
      */
     showShadow(enable: boolean): void {
       this._shadow = enable;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
 
     /**
@@ -601,7 +623,7 @@ namespace gdjs {
      */
     setPadding(value: float): void {
       this._padding = value;
-      this._renderer.updateStyle();
+      if (this._renderer) this._renderer.updateStyle();
     }
   }
   gdjs.registerObject('TextObject::Text', gdjs.TextRuntimeObject);

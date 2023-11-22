@@ -10,7 +10,7 @@ namespace gdjs {
     _property1: string;
 
     // Create the renderer (see dummyruntimeobject-pixi-renderer.js)
-    _renderer: any;
+    _renderer: gdjs.DummyRuntimeObjectRenderer;
     // @ts-expect-error ts-migrate(2564) FIXME: Property 'opacity' has no initializer and is not d... Remove this comment to see the full error message
     opacity: float;
 
@@ -18,17 +18,23 @@ namespace gdjs {
       // *ALWAYS* call the base gdjs.RuntimeObject constructor.
       super(instanceContainer, objectData);
       this._property1 = objectData.content.property1;
-      this._renderer = new gdjs.DummyRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+
+      // All renderer code is potentially undefined! Although TypeScript should already force you
+      // to, make sure to always add a check for undefined before using any renderer code.
+      // This ensures the code is able to run without a renderer, for example in a server build of the game.
+      if (gdjs.DummyRuntimeObjectRenderer) {
+        this._renderer = new gdjs.DummyRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
     getRendererObject() {
-      return this._renderer.getRendererObject();
+      return this._renderer?.getRendererObject();
     }
 
     updateFromObjectData(oldObjectData, newObjectData): boolean {
@@ -36,7 +42,7 @@ namespace gdjs {
       // This is useful for "hot-reloading".
       if (oldObjectData.content.property1 !== newObjectData.content.property1) {
         this._property1 = newObjectData.content.property1;
-        this._renderer.updateText();
+        if (this._renderer) this._renderer.updateText();
       }
       return true;
     }
@@ -48,7 +54,7 @@ namespace gdjs {
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       // This is an example: typically you want to make sure the renderer
       // is up to date with the object.
-      this._renderer.ensureUpToDate();
+      if (this._renderer) this._renderer.ensureUpToDate();
     }
 
     /**
@@ -64,7 +70,7 @@ namespace gdjs {
     private _updatePosition() {
       // This is an example: typically you want to tell the renderer to update
       // the position of the object.
-      this._renderer.updatePosition();
+      if (this._renderer) this._renderer.updatePosition();
     }
 
     /**
@@ -94,7 +100,7 @@ namespace gdjs {
       super.setAngle(angle);
 
       // Tell the renderer to update the rendered object
-      this._renderer.updateAngle();
+      if (this._renderer) this._renderer.updateAngle();
     }
 
     /**
@@ -110,7 +116,7 @@ namespace gdjs {
       this.opacity = opacity;
 
       // Tell the renderer to update the rendered object
-      this._renderer.updateOpacity();
+      if (this._renderer) this._renderer.updateOpacity();
     }
 
     /**

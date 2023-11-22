@@ -32,7 +32,7 @@ namespace gdjs {
       this._cameraY = this.getHeight() / 2;
 
       // Let the renderer do its final set up:
-      this._renderer.onCreated();
+      this._renderer?.onCreated();
     }
 
     /**
@@ -54,7 +54,7 @@ namespace gdjs {
         this._runtimeScene.getViewportOriginX() - oldGameResolutionOriginX;
       this._cameraY +=
         this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
-      this._renderer.updatePosition();
+      this._renderer?.updatePosition();
     }
 
     /**
@@ -88,7 +88,7 @@ namespace gdjs {
     setCameraX(x: float, cameraId?: integer): void {
       this._forceDimensionUpdate();
       this._cameraX = x;
-      this._renderer.updatePosition();
+      this._renderer?.updatePosition();
     }
 
     /**
@@ -100,7 +100,7 @@ namespace gdjs {
     setCameraY(y: float, cameraId?: integer): void {
       this._forceDimensionUpdate();
       this._cameraY = y;
-      this._renderer.updatePosition();
+      this._renderer?.updatePosition();
     }
 
     /**
@@ -134,7 +134,7 @@ namespace gdjs {
     setCameraZoom(newZoom: float, cameraId?: integer): void {
       this._zoomFactor = newZoom;
       this._isCameraZDirty = true;
-      this._renderer.updatePosition();
+      this._renderer?.updatePosition();
     }
 
     /**
@@ -170,7 +170,7 @@ namespace gdjs {
 
       this._cameraZ = z;
       this._isCameraZDirty = false;
-      this._renderer.updatePosition();
+      this._renderer?.updatePosition();
     }
 
     /**
@@ -216,7 +216,7 @@ namespace gdjs {
      */
     setCameraRotation(rotation: float, cameraId?: integer): void {
       this._cameraRotation = rotation;
-      this._renderer.updatePosition();
+      this._renderer?.updatePosition();
     }
 
     /**
@@ -241,7 +241,8 @@ namespace gdjs {
       // The result parameter used to be optional.
       let position = result || [0, 0];
 
-      if (this._renderer.isCameraRotatedIn3D()) {
+      // TODO: Check if that doesn't break any 3D logic
+      if (this._renderer?.isCameraRotatedIn3D()) {
         return this._renderer.transformTo3DWorld(x, y, 0, cameraId, result);
       }
 

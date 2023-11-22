@@ -63,7 +63,7 @@ namespace gdjs {
       this._wrapperContainer.addChild(this._spritesContainer);
       instanceContainer
         .getLayer('')
-        .getRenderer()
+        .getRenderer()!
         .addRendererObject(this._wrapperContainer, runtimeObject.getZOrder());
     }
 
@@ -203,7 +203,7 @@ namespace gdjs {
       const obj = this._object;
       const texture = instanceContainer
         .getGame()
-        .getImageManager()
+        .getImageManager()!
         .getPIXITexture(textureName).baseTexture;
       this._textureWidth = texture.width;
       this._textureHeight = texture.height;
@@ -407,6 +407,11 @@ namespace gdjs {
     }
   }
 
-  export const PanelSpriteRuntimeObjectRenderer = PanelSpriteRuntimeObjectPixiRenderer;
-  export type PanelSpriteRuntimeObjectRenderer = PanelSpriteRuntimeObjectPixiRenderer;
+  export type PanelSpriteRuntimeObjectRenderer =
+    | PanelSpriteRuntimeObjectPixiRenderer
+    | undefined;
+  type PanelSpriteRuntimeObjectRendererClass =
+    | typeof PanelSpriteRuntimeObjectPixiRenderer
+    | undefined;
+  export const PanelSpriteRuntimeObjectRenderer: PanelSpriteRuntimeObjectRendererClass = PanelSpriteRuntimeObjectPixiRenderer;
 }

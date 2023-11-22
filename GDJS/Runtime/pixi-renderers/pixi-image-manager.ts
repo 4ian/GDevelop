@@ -205,7 +205,7 @@ namespace gdjs {
       const pixiTexture = this.getPIXITexture(resourceName);
       const pixiRenderer = this._resourcesLoader._runtimeGame
         .getRenderer()
-        .getPIXIRenderer();
+        ?.getPIXIRenderer();
       if (!pixiRenderer) throw new Error('No PIXI renderer was found.');
 
       // @ts-ignore - source does exist on resource.
@@ -377,6 +377,7 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
-  export const ImageManager = gdjs.PixiImageManager;
-  export type ImageManager = gdjs.PixiImageManager;
+  export type ImageManager = gdjs.PixiImageManager | undefined;
+  type ImageManagerClass = typeof PixiImageManager | undefined;
+  export const ImageManager: ImageManagerClass = gdjs.PixiImageManager;
 }

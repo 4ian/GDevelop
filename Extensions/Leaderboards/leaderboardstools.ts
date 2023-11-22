@@ -610,7 +610,7 @@ namespace gdjs {
         const domElementContainer = runtimeScene
           .getGame()
           .getRenderer()
-          .getDomElementContainer();
+          ?.getDomElementContainer();
         if (!domElementContainer) {
           if (options.callOnErrorIfDomElementContainerMissing) {
             handleErrorDisplayingLeaderboard(
@@ -757,7 +757,7 @@ namespace gdjs {
             const domElementContainer = runtimeScene
               .getGame()
               .getRenderer()
-              .getDomElementContainer();
+              ?.getDomElementContainer();
             if (!domElementContainer) {
               handleErrorDisplayingLeaderboard(
                 runtimeScene,
@@ -825,7 +825,7 @@ namespace gdjs {
           const domElementContainer = runtimeScene
             .getGame()
             .getRenderer()
-            .getDomElementContainer();
+            ?.getDomElementContainer();
           if (!domElementContainer) {
             logger.info(
               "The div element covering the game couldn't be found, the leaderboard view must be already closed."
@@ -849,7 +849,7 @@ namespace gdjs {
           // but reset the flag indicating the view is loaded (if it was).
           _leaderboardViewIframeLoaded = false;
 
-          const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
+          const gameCanvas = runtimeScene.getGame().getRenderer()?.getCanvas();
           if (gameCanvas) gameCanvas.focus();
         }
       };

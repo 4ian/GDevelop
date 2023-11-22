@@ -98,15 +98,17 @@ namespace gdjs {
       this._centerPoint = getPointForLocation(
         objectData.content.centerLocation
       );
-      this._renderer = new gdjs.Model3DRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      if (gdjs.Model3DRuntimeObjectRenderer) {
+        this._renderer = new gdjs.Model3DRuntimeObjectRenderer(
+          this,
+          instanceContainer
+        );
+      }
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
       this._updateModel(objectData);
-      if (this._animations.length > 0) {
+      if (this._animations.length > 0 && this._renderer) {
         this._renderer.playAnimation(
           this._animations[0].source,
           this._animations[0].loop
@@ -167,15 +169,16 @@ namespace gdjs {
       const rotationY = objectData.content.rotationY || 0;
       const rotationZ = objectData.content.rotationZ || 0;
       const keepAspectRatio = objectData.content.keepAspectRatio;
-      this._renderer._updateModel(
-        rotationX,
-        rotationY,
-        rotationZ,
-        this._getOriginalWidth(),
-        this._getOriginalHeight(),
-        this._getOriginalDepth(),
-        keepAspectRatio
-      );
+      if (this._renderer)
+        this._renderer._updateModel(
+          rotationX,
+          rotationY,
+          rotationZ,
+          this._getOriginalWidth(),
+          this._getOriginalHeight(),
+          this._getOriginalDepth(),
+          keepAspectRatio
+        );
     }
 
     getRenderer(): RuntimeObject3DRenderer {
@@ -196,7 +199,8 @@ namespace gdjs {
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       const elapsedTime = this.getElapsedTime() / 1000;
-      this._renderer.updateAnimation(elapsedTime * this._animationSpeedScale);
+      if (this._renderer)
+        this._renderer.updateAnimation(elapsedTime * this._animationSpeedScale);
     }
 
     /**
@@ -220,9 +224,11 @@ namespace gdjs {
       ) {
         const animation = this._animations[animationIndex];
         this._currentAnimationIndex = animationIndex;
-        this._renderer.playAnimation(animation.source, animation.loop);
-        if (this._animationPaused) {
-          this._renderer.pauseAnimation();
+        if (this._renderer) {
+          this._renderer.playAnimation(animation.source, animation.loop);
+          if (this._animationPaused) {
+            this._renderer.pauseAnimation();
+          }
         }
       }
     }
@@ -266,7 +272,7 @@ namespace gdjs {
      * - the last frame has been displayed long enough.
      */
     hasAnimationEnded(): boolean {
-      return this._renderer.hasAnimationEnded();
+      return this._renderer ? this._renderer.hasAnimationEnded() : true;
     }
 
     isAnimationPaused() {
@@ -275,12 +281,12 @@ namespace gdjs {
 
     pauseAnimation() {
       this._animationPaused = true;
-      this._renderer.pauseAnimation();
+      if (this._renderer) this._renderer.pauseAnimation();
     }
 
     resumeAnimation() {
       this._animationPaused = false;
-      this._renderer.resumeAnimation();
+      if (this._renderer) this._renderer.resumeAnimation();
     }
 
     getAnimationSpeedScale() {
@@ -291,27 +297,35 @@ namespace gdjs {
       this._animationSpeedScale = ratio;
     }
 
+    // TODO: Before merging this PR, the next 3 methods should be refactored to work without renderer.
     getAnimationElapsedTime(): float {
-      return this._renderer.getAnimationElapsedTime();
+      return this._renderer!.getAnimationElapsedTime();
     }
 
     setAnimationElapsedTime(time: float): void {
-      this._renderer.setAnimationElapsedTime(time);
+      this._renderer!.setAnimationElapsedTime(time);
     }
 
     getAnimationDuration(): float {
-      return this._renderer.getAnimationDuration(
+      return this._renderer!.getAnimationDuration(
         this._animations[this._currentAnimationIndex].source
       );
     }
 
+    // TODO: The non-null type assertions done on the next 4 methods here are INVALID!!
+    //       the renderer may *not* be present at this point, and this code WILL BREAK
+    //       without a renderer!
+    //       It is necessary to change this in the future to pre-compute the model origin
+    //       and center point on the IDE and embed it in the 3D Model resource to be used
+    //       here through gdjs.RuntimeGame#getResourceBaseDimensions instead of relying
+    //       on the renderer.
     getCenterX(): float {
-      const centerPoint = this._renderer.getCenterPoint();
+      const centerPoint = this._renderer!.getCenterPoint();
       return this.getWidth() * centerPoint[0];
     }
 
     getCenterY(): float {
-      const centerPoint = this._renderer.getCenterPoint();
+      const centerPoint = this._renderer!.getCenterPoint();
       return this.getHeight() * centerPoint[1];
     }
 
@@ -321,12 +335,12 @@ namespace gdjs {
     }
 
     getDrawableX(): float {
-      const originPoint = this._renderer.getOriginPoint();
+      const originPoint = this._renderer!.getOriginPoint();
       return this.getX() - this.getWidth() * originPoint[0];
     }
 
     getDrawableY(): float {
-      const originPoint = this._renderer.getOriginPoint();
+      const originPoint = this._renderer!.getOriginPoint();
       return this.getY() - this.getHeight() * originPoint[1];
     }
 

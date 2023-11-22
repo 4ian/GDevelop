@@ -47,7 +47,7 @@ namespace gdjs {
       const remote = instanceContainer
         .getGame()
         .getRenderer()
-        .getElectronRemote();
+        ?.getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('desktop') || '';
@@ -67,7 +67,7 @@ namespace gdjs {
       const remote = instanceContainer
         .getGame()
         .getRenderer()
-        .getElectronRemote();
+        ?.getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('documents') || '';
@@ -87,7 +87,7 @@ namespace gdjs {
       const remote = instanceContainer
         .getGame()
         .getRenderer()
-        .getElectronRemote();
+        ?.getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('pictures') || '';
@@ -107,7 +107,7 @@ namespace gdjs {
       const remote = instanceContainer
         .getGame()
         .getRenderer()
-        .getElectronRemote();
+        ?.getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('exe') || '';
@@ -142,7 +142,7 @@ namespace gdjs {
       const remote = instanceContainer
         .getGame()
         .getRenderer()
-        .getElectronRemote();
+        ?.getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('userData') || '';
@@ -161,7 +161,7 @@ namespace gdjs {
       const remote = instanceContainer
         .getGame()
         .getRenderer()
-        .getElectronRemote();
+        ?.getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('home') || '';
@@ -181,7 +181,7 @@ namespace gdjs {
       const remote = instanceContainer
         .getGame()
         .getRenderer()
-        .getElectronRemote();
+        ?.getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('temp') || '';

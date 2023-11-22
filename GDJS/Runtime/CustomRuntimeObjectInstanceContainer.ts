@@ -35,12 +35,16 @@ namespace gdjs {
       this._parent = parent;
       this._customObject = customObject;
       this._runtimeScene = parent.getScene();
-      this._renderer = new gdjs.CustomObjectRenderer(
-        customObject,
-        this,
-        parent
-      );
-      this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
+      if (gdjs.CustomObjectRenderer) {
+        this._renderer = new gdjs.CustomObjectRenderer(
+          customObject,
+          this,
+          parent
+        );
+      }
+      if (gdjs.DebuggerRenderer) {
+        this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
+      }
     }
 
     addLayer(layerData: LayerData) {
@@ -214,13 +218,13 @@ namespace gdjs {
           if (rendererObject.visible) {
             this.getGame()
               .getEffectsManager()
-              .updatePreRender(object.getRendererEffects(), object);
+              ?.updatePreRender(object.getRendererEffects(), object);
           }
         }
 
         // Set to true to enable debug rendering (look for the implementation in the renderer
         // to see what is rendered).
-        if (this._debugDrawEnabled) {
+        if (this._debugDrawEnabled && this._debuggerRenderer) {
           this._debuggerRenderer.renderDebugDraw(
             allInstancesList,
             this._debugDrawShowHiddenInstances,
@@ -264,8 +268,8 @@ namespace gdjs {
     /**
      * Get the renderer associated to the RuntimeScene.
      */
-    getRenderer(): gdjs.CustomObjectRenderer {
-      return this._renderer;
+    getRenderer() {
+      return this._renderer || null;
     }
 
     getDebuggerRenderer() {

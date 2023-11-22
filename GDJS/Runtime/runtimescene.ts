@@ -13,8 +13,8 @@ namespace gdjs {
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
 
-    _renderer: RuntimeSceneRenderer;
-    _debuggerRenderer: gdjs.DebuggerRenderer;
+    _renderer?: RuntimeSceneRenderer;
+    _debuggerRenderer?: gdjs.DebuggerRenderer;
     _variables: gdjs.VariablesContainer;
     _runtimeGame: gdjs.RuntimeGame;
     _lastId: integer = 0;
@@ -62,12 +62,15 @@ namespace gdjs {
         ? runtimeGame.getGameResolutionHeight()
         : 0;
 
-      this._renderer = new gdjs.RuntimeSceneRenderer(
-        this,
-        // @ts-ignore This is needed because of test. They should mock RuntimeGame instead.
-        runtimeGame ? runtimeGame.getRenderer() : null
-      );
-      this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
+      if (gdjs.RuntimeSceneRenderer) {
+        this._renderer = new gdjs.RuntimeSceneRenderer(
+          this,
+          // @ts-ignore This is needed because of test. They should mock RuntimeGame instead.
+          runtimeGame ? runtimeGame.getRenderer() : null
+        );
+      }
+      if (gdjs.DebuggerRenderer)
+        this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
 
       // What to do after the frame is rendered.
 
@@ -103,7 +106,7 @@ namespace gdjs {
           );
         }
       }
-      this._renderer.onGameResolutionResized();
+      this._renderer?.onGameResolutionResized();
     }
 
     /**
@@ -123,7 +126,7 @@ namespace gdjs {
 
       //Setup main properties
       if (this._runtimeGame) {
-        this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
+        this._runtimeGame.getRenderer()?.setWindowTitle(sceneData.title);
       }
       this._name = sceneData.name;
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
@@ -187,7 +190,7 @@ namespace gdjs {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
       }
       if (sceneData.stopSoundsOnStartup && this._runtimeGame) {
-        this._runtimeGame.getSoundManager().clearAll();
+        this._runtimeGame.getSoundManager()?.clearAll();
       }
       this._isLoaded = true;
       this._timeManager.reset();
@@ -390,39 +393,43 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.end('callbacks and extensions (post-events)');
       }
-      if (this._profiler) {
-        this._profiler.begin('objects (pre-render, effects update)');
-      }
-      this._updateObjectsPreRender();
-      if (this._profiler) {
-        this._profiler.end('objects (pre-render, effects update)');
-      }
-      if (this._profiler) {
-        this._profiler.begin('layers (effects update)');
-      }
-      this._updateLayersPreRender();
-      if (this._profiler) {
-        this._profiler.end('layers (effects update)');
-      }
-      if (this._profiler) {
-        this._profiler.begin('render');
-      }
 
-      // Set to true to enable debug rendering (look for the implementation in the renderer
-      // to see what is rendered).
-      if (this._debugDrawEnabled) {
-        this._debuggerRenderer.renderDebugDraw(
-          this.getAdhocListOfAllInstances(),
-          this._debugDrawShowHiddenInstances,
-          this._debugDrawShowPointsNames,
-          this._debugDrawShowCustomPoints
-        );
-      }
+      const shouldRender = Boolean(this._renderer);
+      if (shouldRender) {
+        if (this._profiler) {
+          this._profiler.begin('objects (pre-render, effects update)');
+        }
+        this._updateObjectsPreRender();
+        if (this._profiler) {
+          this._profiler.end('objects (pre-render, effects update)');
+        }
+        if (this._profiler) {
+          this._profiler.begin('layers (effects update)');
+        }
+        this._updateLayersPreRender();
+        if (this._profiler) {
+          this._profiler.end('layers (effects update)');
+        }
+        if (this._profiler) {
+          this._profiler.begin('render');
+        }
 
-      this._isJustResumed = false;
-      this.render();
-      if (this._profiler) {
-        this._profiler.end('render');
+        // Set to true to enable debug rendering (look for the implementation in the renderer
+        // to see what is rendered).
+        if (this._debugDrawEnabled && this._debuggerRenderer) {
+          this._debuggerRenderer.renderDebugDraw(
+            this.getAdhocListOfAllInstances(),
+            this._debugDrawShowHiddenInstances,
+            this._debugDrawShowPointsNames,
+            this._debugDrawShowCustomPoints
+          );
+        }
+
+        this._isJustResumed = false;
+        this.render();
+        if (this._profiler) {
+          this._profiler.end('render');
+        }
       }
       if (this._profiler) {
         this._profiler.endFrame();
@@ -434,7 +441,7 @@ namespace gdjs {
      * Render the PIXI container associated to the runtimeScene.
      */
     render() {
-      this._renderer.render();
+      this._renderer?.render();
     }
 
     /**
@@ -495,7 +502,7 @@ namespace gdjs {
             if (rendererObject.visible) {
               this._runtimeGame
                 .getEffectsManager()
-                .updatePreRender(object.getRendererEffects(), object);
+                ?.updatePreRender(object.getRendererEffects(), object);
 
               // Perform pre-render update only if the object is visible
               // (including if there is no visibility AABB returned previously).
@@ -561,12 +568,12 @@ namespace gdjs {
       return this._lastId;
     }
 
-    getRenderer(): gdjs.RuntimeScenePixiRenderer {
-      return this._renderer;
+    getRenderer(): gdjs.RuntimeScenePixiRenderer | null {
+      return this._renderer || null;
     }
 
-    getDebuggerRenderer() {
-      return this._debuggerRenderer;
+    getDebuggerRenderer(): gdjs.DebuggerRenderer | null {
+      return this._debuggerRenderer || null;
     }
 
     getGame() {

@@ -17,7 +17,7 @@ namespace gdjs {
       instanceContainer
         .getLayer('')
         .getRenderer()
-        .addRendererObject(this._text, runtimeObject.getZOrder());
+        ?.addRendererObject(this._text, runtimeObject.getZOrder());
       this._text.text =
         runtimeObject._str.length === 0 ? ' ' : runtimeObject._str;
 
@@ -210,6 +210,11 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export const TextRuntimeObjectRenderer = TextRuntimeObjectPixiRenderer;
-  export type TextRuntimeObjectRenderer = TextRuntimeObjectPixiRenderer;
+  export type TextRuntimeObjectRenderer =
+    | TextRuntimeObjectPixiRenderer
+    | undefined;
+  type TextRuntimeObjectRendererClass =
+    | typeof TextRuntimeObjectPixiRenderer
+    | undefined;
+  export const TextRuntimeObjectRenderer: TextRuntimeObjectRendererClass = TextRuntimeObjectPixiRenderer;
 }

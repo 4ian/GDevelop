@@ -2,6 +2,10 @@ namespace gdjs {
   export namespace scene3d {
     const assumedFovIn2D = 45;
 
+    // TODO: All functions in this namespace keep 3D camera state in a ThreeJS
+    //       and will default to 0 if it cannot be found. This breaks 3D logic
+    //       when ThreeJS is not present, and needs to be fixed by moving the
+    //       state to the layer object.
     export namespace camera {
       export const getCameraZ = (
         runtimeScene: RuntimeScene,
@@ -10,7 +14,7 @@ namespace gdjs {
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
         return layer.getCameraZ(fov, cameraIndex);
       };
@@ -23,7 +27,7 @@ namespace gdjs {
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
         layer.setCameraZ(z, fov, cameraIndex);
       };
@@ -36,7 +40,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return 0;
         return gdjs.toDegrees(threeCamera.rotation.x);
       };
@@ -50,7 +54,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return;
 
         threeCamera.rotation.x = gdjs.toRad(angle);
@@ -64,7 +68,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return 0;
         return gdjs.toDegrees(threeCamera.rotation.y);
       };
@@ -78,7 +82,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return;
 
         threeCamera.rotation.y = gdjs.toRad(angle);
@@ -96,7 +100,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return;
 
         if (isStandingOnY) {
@@ -126,7 +130,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return;
 
         if (isStandingOnY) {
@@ -147,7 +151,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return 0;
         return threeCamera.near;
       };
@@ -161,7 +165,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return;
 
         threeCamera.near = Math.min(
@@ -171,7 +175,7 @@ namespace gdjs {
           // Near value cannot exceed far value.
           threeCamera.far
         );
-        layerRenderer.setThreeCameraDirty(true);
+        if (layerRenderer) layerRenderer.setThreeCameraDirty(true);
       };
 
       export const getFarPlane = (
@@ -182,7 +186,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return 0;
         return threeCamera.far;
       };
@@ -196,12 +200,12 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return;
 
         // Far value cannot be lower than near value
         threeCamera.far = Math.max(distance, threeCamera.near);
-        layerRenderer.setThreeCameraDirty(true);
+        if (layerRenderer) layerRenderer.setThreeCameraDirty(true);
       };
 
       export const getFov = (
@@ -212,7 +216,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return 45;
         return threeCamera.fov;
       };
@@ -226,11 +230,11 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
+        const threeCamera = layerRenderer?.getThreeCamera();
         if (!threeCamera) return;
 
         threeCamera.fov = Math.min(Math.max(angle, 0), 180);
-        layerRenderer.setThreeCameraDirty(true);
+        if (layerRenderer) layerRenderer.setThreeCameraDirty(true);
       };
     }
   }

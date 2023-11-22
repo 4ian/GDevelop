@@ -15,6 +15,7 @@
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
+#include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -129,14 +130,26 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       return false;
     }
 
+    auto projectUsedResources =
+        gd::SceneResourcesFinder::FindProjectResources(exportedProject);
+    std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
+    for (std::size_t layoutIndex = 0;
+         layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
+      auto &layout = exportedProject.GetLayout(layoutIndex);
+      scenesUsedResources[layout.GetName()] =
+          gd::SceneResourcesFinder::FindSceneResources(exportedProject,
+                                                            layout);
+    }
+
     // Strip the project (*after* generating events as the events may use
     // stripped things like objects groups...)...
     gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
-    helper.ExportProjectData(
-        fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
+    helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                             noRuntimeGameOptions, projectUsedResources,
+                             scenesUsedResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     // Export a WebManifest with project metadata

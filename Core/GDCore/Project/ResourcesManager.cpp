@@ -534,19 +534,7 @@ void ResourcesManager::SerializeTo(SerializerElement& element) const {
     if (resources[i] == std::shared_ptr<Resource>()) break;
 
     SerializerElement& resourceElement = resourcesElement.AddChild("resource");
-    resourceElement.SetAttribute("kind", resources[i]->GetKind());
-    resourceElement.SetAttribute("name", resources[i]->GetName());
-    resourceElement.SetAttribute("metadata", resources[i]->GetMetadata());
-
-    const gd::String& originName = resources[i]->GetOriginName();
-    const gd::String& originIdentifier = resources[i]->GetOriginIdentifier();
-    if (!originName.empty() || !originIdentifier.empty()) {
-      resourceElement.AddChild("origin")
-          .SetAttribute("name", originName)
-          .SetAttribute("identifier", originIdentifier);
-    }
-
-    resources[i]->SerializeTo(resourceElement);
+    gd::ResourcesManager::SerializeResourceTo(*resources[i], resourceElement);
   }
 
   SerializerElement& resourcesFoldersElement =
@@ -554,6 +542,22 @@ void ResourcesManager::SerializeTo(SerializerElement& element) const {
   resourcesFoldersElement.ConsiderAsArrayOf("folder");
   for (std::size_t i = 0; i < folders.size(); ++i)
     folders[i].SerializeTo(resourcesFoldersElement.AddChild("folder"));
+}
+
+void ResourcesManager::SerializeResourceTo(gd::Resource &resource,
+                                           SerializerElement &resourceElement) {
+  resourceElement.SetAttribute("kind", resource.GetKind());
+  resourceElement.SetAttribute("name", resource.GetName());
+  resourceElement.SetAttribute("metadata", resource.GetMetadata());
+
+  const gd::String &originName = resource.GetOriginName();
+  const gd::String &originIdentifier = resource.GetOriginIdentifier();
+  if (!originName.empty() || !originIdentifier.empty()) {
+    resourceElement.AddChild("origin")
+        .SetAttribute("name", originName)
+        .SetAttribute("identifier", originIdentifier);
+  }
+  resource.SerializeTo(resourceElement);
 }
 
 void ImageResource::SetFile(const gd::String& newFile) {

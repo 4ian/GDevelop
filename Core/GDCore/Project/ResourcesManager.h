@@ -663,6 +663,11 @@ class GD_CORE_API ResourcesManager {
   void SerializeTo(SerializerElement& element) const;
 
   /**
+   * \brief Serialize one resource.
+   */
+  static void SerializeResourceTo(gd::Resource& resource, SerializerElement& resourceElement);
+
+  /**
    * \brief Unserialize the object.
    */
   void UnserializeFrom(const SerializerElement& element);

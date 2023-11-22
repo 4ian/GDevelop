@@ -37,7 +37,7 @@ namespace gd {
  * \see ResourcesMergingHelper
  * \see gd::ResourcesInUseHelper
  *
- * \see gd::LaunchResourceWorkerOnEvents
+ * \see gd::GetResourceWorkerOnEvents
  *
  * \ingroup IDE
  */

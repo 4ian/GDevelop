@@ -58,6 +58,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
       behaviorsSharedData: [],
       objects: [],
       instances: [],
+      usedResources: [],
     });
     setFramesPerSecond(runtimeScene, framePerSecond);
     return runtimeScene;

@@ -5,6 +5,7 @@
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 
 using namespace std;
 namespace gd {
@@ -57,7 +58,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
   extension
       .AddCondition("DoesSceneExist",
                     _("Does scene exist"),
-                    _("Check if scene exists."),
+                    _("Check if a scene exists."),
                     _("Scene _PARAM1_ exists"),
                     "",
                     "res/actions/texte.png",
@@ -163,6 +164,45 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "res/actions/window.png")
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddAction("PrioritizeLoadingOfScene",
+                 _("Preload scene"),
+                 _("Preload a scene resources as soon as possible in background."),
+                 _("Preload scene _PARAM1_ in background"),
+                 "",
+                 "res/actions/replaceScene24.png",
+                 "res/actions/replaceScene.png")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("sceneName", _("Name of the new scene"))
+      .MarkAsAdvanced();
+
+  extension.AddExpressionAndCondition("number",
+                                "SceneLoadingProgress",
+                                _("Scene loading progress"),
+                                _("The progress of resources loading in background for a scene (between 0 and 1)."),
+                                _("_PARAM0_ loading progress"),
+                                _(""),
+                                "res/actions/replaceScene24.png")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("sceneName", _("Scene name"))
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("AreSceneAssetsLoaded",
+                    _("Scene preloaded"),
+                    _("Check if scene resources have finished to load in background."),
+                    _("Scene _PARAM1_ was preloaded in background"),
+                    "",
+                    "res/actions/replaceScene24.png",
+                    "res/actions/replaceScene.png")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("sceneName", _("Scene name"))
+      .MarkAsAdvanced();
 }
 
 }  // namespace gd

@@ -19,8 +19,6 @@ init:
 install:
   # Build GDevelop.js (and run tests to ensure it works).
   # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
-  # Also install setuptools as our old version of Emscripten uses distutils which was removed in Python 3.12.
-  # setuptools will make distutils available again (but we should migrate to a newer Emscripten version).
   - cmd: >-
       cd GDevelop.js
 
@@ -30,16 +28,18 @@ install:
 
       cd emsdk
 
-      emsdk install 1.39.6
+      emsdk install 3.1.21
 
-      CMD /C "emsdk activate 1.39.6 && pip install setuptools && cd .. && npm run build"
-
-
+      CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
 
       cd ..\..
 
-  # Build GDevelop IDE
+  # Build GDevelop IDE.
+  # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
+  # setuptools will make distutils available again (but we should migrate our packages probably).
   - cmd: >-
+      pip install setuptools
+  
       cd newIDE\app
 
       npm -v && npm install

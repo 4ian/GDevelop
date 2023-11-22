@@ -773,6 +773,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           getNewsletterEmail: payload.getNewsletterEmail,
           appLanguage: preferences.language,
           donateLink: payload.donateLink,
+          discordUsername: payload.discordUsername,
           communityLinks: payload.communityLinks,
           survey: payload.survey,
         }

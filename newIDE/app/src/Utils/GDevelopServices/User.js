@@ -116,6 +116,7 @@ export type UserPublicProfile = {|
   username: ?string,
   description: ?string,
   donateLink: ?string,
+  discordUsername: ?string,
   communityLinks: CommunityLinks,
   iconUrl: string,
 |};
@@ -356,6 +357,11 @@ export const donateLinkConfig = {
       ? profileLinkFormattingErrorMessage
       : undefined,
   maxLength: 150,
+};
+
+export const discordUsernameConfig = {
+  icon: <Discord />,
+  maxLength: 32,
 };
 
 export const communityLinksConfig = {

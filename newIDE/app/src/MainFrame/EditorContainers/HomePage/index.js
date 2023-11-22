@@ -35,6 +35,11 @@ import {
   sendUserSurveyHidden,
   sendUserSurveyStarted,
 } from '../../../Utils/Analytics/EventSender';
+import { type RouteArguments } from '../../RouterContext';
+
+const isShopRequested = (routeArguments: RouteArguments): boolean =>
+  routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
+  routeArguments['initial-dialog'] === 'store'; // New way of opening the store
 
 const styles = {
   container: {
@@ -173,18 +178,49 @@ export const HomePage = React.memo<Props>(
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
 
+      const { routeArguments, removeRouteArguments } = React.useContext(
+        RouterContext
+      );
+      const { setInitialPackUserFriendlySlug } = React.useContext(
+        AssetStoreContext
+      );
+      const isShopRequestedAtOpening = React.useRef<boolean>(
+        isShopRequested(routeArguments)
+      );
+
+      // Open the store and a pack or game template if asked to do so.
       React.useEffect(
         () => {
-          if (initialTab === 'get-started') {
-            incrementGetStartedSectionViewCount();
+          if (isShopRequested(routeArguments)) {
+            setActiveTab('shop');
+            if (routeArguments['asset-pack']) {
+              setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            }
+            if (routeArguments['game-template']) {
+              setInitialGameTemplateUserFriendlySlug(
+                routeArguments['game-template']
+              );
+            }
+            // Remove the arguments so that the asset store is not opened again.
+            removeRouteArguments([
+              'initial-dialog',
+              'asset-pack',
+              'game-template',
+            ]);
           }
         },
-        [initialTab]
+        [
+          routeArguments,
+          removeRouteArguments,
+          setInitialPackUserFriendlySlug,
+          setInitialGameTemplateUserFriendlySlug,
+        ]
       );
 
       // If the user is not authenticated, the GetStarted section is displayed.
       React.useEffect(
         () => {
+          if (isShopRequestedAtOpening.current) return;
           if (shouldChangeTabAfterUserLoggedIn.current) {
             setActiveTab(authenticated ? initialTab : 'get-started');
           }
@@ -192,7 +228,7 @@ export const HomePage = React.memo<Props>(
         // Only the initialTab at component mounting is interesting
         // and we don't want to change the active tab if initialTab changes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [authenticated]
+        [authenticated, routeArguments]
       );
 
       // This effect makes sure that the tab changing cannot happen once the editor is up
@@ -208,6 +244,15 @@ export const HomePage = React.memo<Props>(
           shouldChangeTabAfterUserLoggedIn.current = false;
         },
         [loginState]
+      );
+
+      React.useEffect(
+        () => {
+          if (initialTab === 'get-started') {
+            incrementGetStartedSectionViewCount();
+          }
+        },
+        [initialTab]
       );
 
       // Load everything when the user opens the home page, to avoid future loading times.
@@ -289,45 +334,6 @@ export const HomePage = React.memo<Props>(
         updateToolbar,
         forceUpdateEditor,
       }));
-
-      const { routeArguments, removeRouteArguments } = React.useContext(
-        RouterContext
-      );
-      const { setInitialPackUserFriendlySlug } = React.useContext(
-        AssetStoreContext
-      );
-
-      // Open the store and a pack or game template if asked to do so.
-      React.useEffect(
-        () => {
-          if (
-            routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
-            routeArguments['initial-dialog'] === 'store' // New way of opening the store
-          ) {
-            setActiveTab('shop');
-            if (routeArguments['asset-pack']) {
-              setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
-            }
-            if (routeArguments['game-template']) {
-              setInitialGameTemplateUserFriendlySlug(
-                routeArguments['game-template']
-              );
-            }
-            // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments([
-              'initial-dialog',
-              'asset-pack',
-              'game-template',
-            ]);
-          }
-        },
-        [
-          routeArguments,
-          removeRouteArguments,
-          setInitialPackUserFriendlySlug,
-          setInitialGameTemplateUserFriendlySlug,
-        ]
-      );
 
       // If the user logs out and is on the team view section, go back to the build section.
       React.useEffect(

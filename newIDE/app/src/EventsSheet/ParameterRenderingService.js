@@ -64,6 +64,7 @@ import IdentifierField from './ParameterFields/IdentifierField';
 import TilemapResourceField from './ParameterFields/TilemapResourceField';
 import TilesetResourceField from './ParameterFields/TilesetResourceField';
 import Model3DResourceField from './ParameterFields/Model3DResourceField';
+import AtlasResourceField from './ParameterFields/AtlasResourceField';
 
 const gd: libGDevelop = global.gd;
 
@@ -94,6 +95,7 @@ const components = {
   bitmapFontResource: BitmapFontResourceField,
   fontResource: FontResourceField,
   model3DResource: Model3DResourceField,
+  atlasResource: AtlasResourceField,
   color: ColorExpressionField,
   police: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
@@ -151,7 +153,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   fontResource: t`Font resource`,
   jsonResource: t`JSON resource`,
   tilemapResource: t`Tile map resource`,
-  model3DResource: t`3D model resource`,
+  atlasResource: t`Atlas resource`,
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
   sceneName: t`Scene name`,

@@ -24,7 +24,8 @@ export type ResourceKind =
   | 'tilemap'
   | 'tileset'
   | 'bitmapFont'
-  | 'model3D';
+  | 'model3D'
+  | 'atlas';
 
 export const allResourceKindsAndMetadata = [
   {
@@ -80,6 +81,12 @@ export const allResourceKindsAndMetadata = [
     displayName: t`3D model`,
     fileExtensions: ['glb'],
     createNewResource: () => new gd.Model3DResource(),
+  },
+  {
+    kind: 'atlas',
+    displayName: t`Atlas`,
+    fileExtensions: ['atlas'],
+    createNewResource: () => new gd.AtlasResource(),
   },
 ];
 

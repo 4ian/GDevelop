@@ -62,6 +62,9 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   virtual void ExposeModel3D(gd::String& resourceName) override {
     RenameIfNeeded(resourceName);
   };
+  virtual void ExposeAtlas(gd::String& resourceName) override {
+    RenameIfNeeded(resourceName);
+  };
 
  private:
   void RenameIfNeeded(gd::String& resourceName) {

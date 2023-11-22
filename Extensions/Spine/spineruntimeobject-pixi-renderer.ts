@@ -17,7 +17,7 @@ namespace gdjs {
       private instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      this._rendererObject = this.constructrendererObject();
+      this._rendererObject = this.constructRendererObject();
 
       this.updateTimeScale();
       this.updatePosition();
@@ -131,7 +131,7 @@ namespace gdjs {
       }
     }
 
-    private constructrendererObject(): pixi_spine.Spine | PIXI.Container {
+    private constructRendererObject(): pixi_spine.Spine | PIXI.Container {
       const game = this.instanceContainer.getGame();
       const spineData = game
         .getSpineManager()

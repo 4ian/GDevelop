@@ -228,7 +228,7 @@ export const HomePage = React.memo<Props>(
         // Only the initialTab at component mounting is interesting
         // and we don't want to change the active tab if initialTab changes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [authenticated, routeArguments]
+        [authenticated]
       );
 
       // This effect makes sure that the tab changing cannot happen once the editor is up

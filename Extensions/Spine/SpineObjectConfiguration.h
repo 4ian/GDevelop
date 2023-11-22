@@ -28,12 +28,12 @@ public:
   void SetName(const gd::String &name_) { name = name_; }
 
   /**
-   * \brief Return the name of the animation from the GLB file.
+   * \brief Return the name of the animation from the spine file.
    */
   const gd::String &GetSource() const { return source; }
 
   /**
-   * \brief Change the name of the animation from the GLB file.
+   * \brief Change the name of the animation from the spine file.
    */
   void SetSource(const gd::String &source_) { source = source_; }
 
@@ -161,4 +161,6 @@ private:
   gd::String atlasResourceName;
 
   std::vector<SpineAnimation> animations;
+
+  static SpineAnimation badAnimation;
 };

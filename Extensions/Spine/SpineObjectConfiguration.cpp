@@ -18,6 +18,8 @@ This project is released under the MIT License.
 
 using namespace std;
 
+SpineAnimation SpineObjectConfiguration::badAnimation;
+
 SpineObjectConfiguration::SpineObjectConfiguration()
     : scale(1), opacity(255), timeScale(1),
       jsonResourceName(""), imageResourceName(""), atlasResourceName("") {};
@@ -166,17 +168,13 @@ void SpineObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker &work
 
 const SpineAnimation &
 SpineObjectConfiguration::GetAnimation(std::size_t nb) const {
-  if (nb >= animations.size()) {
-    nb = nb % animations.size();
-  }
+  if (nb >= animations.size()) return badAnimation;
 
   return animations[nb];
 }
 
 SpineAnimation &SpineObjectConfiguration::GetAnimation(std::size_t nb) {
-  if (nb >= animations.size()) {
-    nb = nb % animations.size();
-  }
+  if (nb >= animations.size()) return badAnimation;
 
   return animations[nb];
 }

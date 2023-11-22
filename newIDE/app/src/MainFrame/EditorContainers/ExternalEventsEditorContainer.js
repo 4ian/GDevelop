@@ -17,6 +17,10 @@ import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender
 import HelpButton from '../../UI/HelpButton';
 import TutorialButton from '../../UI/TutorialButton';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../ResourcesWatcher';
 
 const styles = {
   container: {
@@ -36,6 +40,7 @@ export class ExternalEventsEditorContainer extends React.Component<
   State
 > {
   editor: ?EventsSheetInterface;
+  resourceExternallyChangedCallbackId: ?string;
 
   state = {
     externalPropertiesDialogOpen: false,
@@ -46,6 +51,17 @@ export class ExternalEventsEditorContainer extends React.Component<
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
     return this.props.isActive || nextProps.isActive;
+  }
+
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
   }
 
   onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {

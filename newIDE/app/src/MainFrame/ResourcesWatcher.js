@@ -3,17 +3,36 @@ import * as React from 'react';
 import ResourcesLoader from '../ResourcesLoader';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
+
+const callbacks: { [key: string]: Function } = {};
+
+let callbackId = 1;
+const getNewId = () => {
+  return callbackId++;
+};
+
+export const registerOnResourceExternallyChangedCallback = (
+  callback: Function
+) => {
+  const id = getNewId().toString();
+  callbacks[id] = callback;
+  return id;
+};
+
+export const unregisterOnResourceExternallyChangedCallback = (
+  callbackId: ?string
+) => {
+  if (!callbackId || !callbacks[callbackId]) return;
+  delete callbacks[callbackId];
+};
 
 const useResourcesWatcher = ({
   getStorageProvider,
   fileMetadata,
-  editorTabs,
   isProjectSplitInMultipleFiles,
 }: {|
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
-  editorTabs: EditorTabsState,
   isProjectSplitInMultipleFiles: boolean,
 |}) => {
   const {
@@ -23,29 +42,14 @@ const useResourcesWatcher = ({
   // thus triggering the effect.
   const fileIdentifier = fileMetadata ? fileMetadata.fileIdentifier : null;
 
-  // Callbacks are extracted from editorTabs to avoid redefining informEditorsResourceExternallyChanged
-  // thus triggering the effect on each active tab change (stored in editorTabs).
-  const callbacks = React.useMemo(
-    () =>
-      editorTabs.editors
-        .map(
-          editorTab =>
-            editorTab.editorRef &&
-            editorTab.editorRef.editor &&
-            // Each editor container has an accessible editor property.
-            // $FlowFixMe[prop-missing]
-            editorTab.editorRef.editor.onResourceExternallyChanged
-        )
-        .filter(Boolean),
-    [editorTabs.editors]
-  );
-
   const informEditorsResourceExternallyChanged = React.useCallback(
     (resourceInfo: {| identifier: string |}) => {
       ResourcesLoader.burstAllUrlsCache();
-      callbacks.forEach(callback => callback(resourceInfo));
+      Object.keys(callbacks).forEach(callbackId =>
+        callbacks[callbackId](resourceInfo)
+      );
     },
-    [callbacks]
+    []
   );
 
   React.useEffect(

@@ -504,7 +504,6 @@ const MainFrame = (props: Props) => {
   useResourcesWatcher({
     getStorageProvider,
     fileMetadata: currentFileMetadata,
-    editorTabs: state.editorTabs,
     isProjectSplitInMultipleFiles: currentProject
       ? currentProject.isFolderProject()
       : false,

@@ -93,6 +93,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<BitmapFontResource>();
   else if (kind == "model3D")
     return std::make_shared<Model3DResource>();
+  else if (kind == "atlas")
+    return std::make_shared<AtlasResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();
@@ -748,6 +750,20 @@ void Model3DResource::UnserializeFrom(const SerializerElement& element) {
 }
 
 void Model3DResource::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute("file", GetFile());
+}
+
+void AtlasResource::SetFile(const gd::String& newFile) {
+  file = NormalizePathSeparator(newFile);
+}
+
+void AtlasResource::UnserializeFrom(const SerializerElement& element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+}
+
+void AtlasResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }

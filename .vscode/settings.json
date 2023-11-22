@@ -113,7 +113,8 @@
     "memory_resource": "cpp",
     "__bits": "cpp",
     "__verbose_abort": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "charconv": "cpp"
   },
   "files.exclude": {
     "Binaries/*build*": true,

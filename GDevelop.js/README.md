@@ -1,8 +1,6 @@
 # GDevelop.js
 
-This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
-
-> 🎮 GDevelop is a full-featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop.io).
+These are the bindings of GDevelop core classes to WebAssembly+JavaScript. This allows [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
 
 ## How to build
 
@@ -16,46 +14,38 @@ This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows
 
 - Install [Emscripten](https://github.com/kripken/emscripten) version `3.1.21`, as explained below or on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 
-```bash
-git clone https://github.com/emscripten-core/emsdk/
-cd emsdk
-git pull
-./emsdk install 3.1.21
-./emsdk activate 3.1.21
-```
-
-> ⚠️ If you are on Apple M1, this version of emsdk may not be available for this architecture and you will get an error when installing it, indicating a missing binary. If this is the case, a workaround is to modify the `emsdk.py` line 132 with `machine = 'x86_64'` to ensure a correct binary is downloaded.
+  ```bash
+  git clone https://github.com/emscripten-core/emsdk/
+  cd emsdk
+  git pull
+  ./emsdk install 3.1.21
+  ./emsdk activate 3.1.21
+  ```
 
 - Whenever you try to build GDevelop.js in the future, you will have to load the emsdk environement into your terminal window again by running:
 
-| Linux/macOS             | Windows (Powershell) | Windows (cmd.exe) |
-| ----------------------- | -------------------- | ----------------- |
-| `source ./emsdk_env.sh` | `./emsdk_env.ps1`    | `./emsdk_env.bat` |
+  | Linux/macOS             | Windows (Powershell) | Windows (cmd.exe) |
+  | ----------------------- | -------------------- | ----------------- |
+  | `source ./emsdk_env.sh` | `./emsdk_env.ps1`    | `./emsdk_env.bat` |
 
 - With the emscripten environement loaded into your terminal, launch the build from GDevelop.js folder:
 
-```bash
-cd GDevelop.js
-npm install
-npm run build
-```
+  ```bash
+  cd GDevelop.js
+  npm install # Only the first time.
+  npm run build # After any C++ changes.
+  ```
 
-> ⚠️ If the npm install fails, relaunch it in a different terminal using a recent Node.js and npm version (to avoid using the old npm version from Emscripten).
-
-> ℹ️ Output is created in _/path/to/GD/Binaries/embuild/GDevelop.js/_ and also copied to GDevelop 5 IDE (`newIDE` folder).
-
-> ℹ️ You only need to run `npm install` the first time you make a build.
-
--> ⏱ The linking (last step) of the build can be made a few seconds faster by specifying `-- --dev`. Be sure to remove it before building a release version, as this disable "link-time optimizations" of the generated WebAssembly module.
+-> ⏱ The linking (last step) of the build can be made a few seconds faster by specifying `-- --dev`.
 
 - You can then launch GDevelop 5 that will use your build of GDevelop.js:
 
-```bash
-cd ..
-cd newIDE/app
-npm install
-npm start
-```
+  ```bash
+  cd ..
+  cd newIDE/app
+  npm install
+  npm start
+  ```
 
 More information in [GDevelop 5 README](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md).
 

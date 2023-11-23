@@ -2,10 +2,7 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import {
-  type Game,
-  registerGame,
-} from '../Utils/GDevelopServices/Game';
+import { type Game, registerGame } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
@@ -13,27 +10,58 @@ import { GameDetailsDialog, type GameDetailsTab } from './GameDetailsDialog';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RouterContext from '../MainFrame/RouterContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import SearchBar from '../UI/SearchBar';
+import { useDebounce } from '../Utils/UseDebounce';
+
+const getGamesToDisplay = ({
+  project,
+  games,
+  searchText,
+}: {|
+  project: ?gdProject,
+  games: Array<Game>,
+  searchText: string,
+|}): Array<Game> => {
+  const projectUuid = project ? project.getProjectUuid() : null;
+  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
+  const displayedGames = [
+    thisGame,
+    ...games.filter(game => game !== thisGame),
+  ].filter(Boolean);
+  if (!searchText) return displayedGames;
+  return displayedGames.filter(game =>
+    game.gameName.toLowerCase().includes(searchText.toLowerCase())
+  );
+};
 
 type Props = {|
   project: ?gdProject,
   games: Array<Game>,
   onRefreshGames: () => Promise<void>,
-  onGameUpdated: (Game) => void,
+  onGameUpdated: Game => void,
 |};
 
-export const GamesList = ({ project, games, onRefreshGames, onGameUpdated }: Props) => {
+export const GamesList = ({
+  project,
+  games,
+  onRefreshGames,
+  onGameUpdated,
+}: Props) => {
   const {
     routeArguments,
     addRouteArguments,
     removeRouteArguments,
   } = React.useContext(RouterContext);
-  const {
-    getAuthorizationHeader,
-    profile,
-  } = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [openedGame, setOpenedGame] = React.useState<?Game>(null);
   const { showAlert, showConfirmation } = useAlertDialog();
   const [isGameRegistering, setIsGameRegistering] = React.useState(false);
+  const [searchText, setSearchText] = React.useState<string>('');
+  const [displayedGames, setDisplayedGames] = React.useState<Array<Game>>(
+    games
+  );
 
   const onRegisterGame = React.useCallback(
     async () => {
@@ -122,12 +150,22 @@ export const GamesList = ({ project, games, onRefreshGames, onGameUpdated }: Pro
     ]
   );
 
+  const getGamesToDisplayDebounced = useDebounce(() => {
+    setDisplayedGames(
+      getGamesToDisplay({
+        project,
+        games,
+        searchText,
+      })
+    );
+  }, 250);
+
+  React.useEffect(getGamesToDisplayDebounced, [
+    searchText,
+    getGamesToDisplayDebounced,
+  ]);
+
   const projectUuid = project ? project.getProjectUuid() : null;
-  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
-  const displayedGames = [
-    thisGame,
-    ...games.filter(game => game !== thisGame),
-  ].filter(Boolean);
 
   return (
     <ColumnStackLayout noMargin>
@@ -138,18 +176,25 @@ export const GamesList = ({ project, games, onRefreshGames, onGameUpdated }: Pro
           onGameRegistered={onRefreshGames}
         />
       )}
-      {displayedGames.map(game => (
-        <GameCard
-          key={game.id}
-          isCurrentGame={!!projectUuid && game.id === projectUuid}
-          game={game}
-          onOpenGameManager={(tab: GameDetailsTab) => {
-            addRouteArguments({ 'games-dashboard-tab': tab });
-            setOpenedGame(game);
-          }}
-          onUpdateGame={onRefreshGames}
-        />
-      ))}
+      <SearchBar
+        value={searchText}
+        onChange={setSearchText}
+        // Search is triggered on each search text change
+        onRequestSearch={() => {}}
+      />
+      {displayedGames &&
+        displayedGames.map(game => (
+          <GameCard
+            key={game.id}
+            isCurrentGame={!!projectUuid && game.id === projectUuid}
+            game={game}
+            onOpenGameManager={(tab: GameDetailsTab) => {
+              addRouteArguments({ 'games-dashboard-tab': tab });
+              setOpenedGame(game);
+            }}
+            onUpdateGame={onRefreshGames}
+          />
+        ))}
       {openedGame && (
         <GameDetailsDialog
           game={openedGame}
@@ -160,7 +205,7 @@ export const GamesList = ({ project, games, onRefreshGames, onGameUpdated }: Pro
             setOpenedGame(null);
           }}
           onGameUpdated={updatedGame => {
-            onGameUpdated(updatedGame)
+            onGameUpdated(updatedGame);
             setOpenedGame(updatedGame);
           }}
           onGameDeleted={() => {

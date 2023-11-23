@@ -491,11 +491,6 @@ class GD_CORE_API ExpressionParser2 {
     std::vector<std::unique_ptr<ExpressionNode>> parameters;
     gd::String lastObjectName = "";
 
-    // By convention, object is always the first parameter, and behavior the
-    // second one.
-    size_t parameterIndex =
-        WrittenParametersFirstIndex(objectName, behaviorName);
-
     bool previousCharacterIsParameterSeparator = false;
     while (!IsEndReached()) {
       SkipAllWhitespaces();
@@ -514,7 +509,6 @@ class GD_CORE_API ExpressionParser2 {
       SkipAllWhitespaces();
       previousCharacterIsParameterSeparator = CheckIfChar(IsParameterSeparator);
       SkipIfChar(IsParameterSeparator);
-      parameterIndex++;
     }
 
     ExpressionParserLocation invalidClosingParenthesisLocation;

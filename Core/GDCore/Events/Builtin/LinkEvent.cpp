@@ -164,7 +164,7 @@ void LinkEvent::UnserializeFrom(gd::Project& project,
 }
 
 bool LinkEvent::AcceptVisitor(gd::EventVisitor &eventVisitor) {
-  return BaseEvent::AcceptVisitor(eventVisitor) |
+  return BaseEvent::AcceptVisitor(eventVisitor) ||
          eventVisitor.VisitLinkEvent(*this);
 }
 

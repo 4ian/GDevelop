@@ -34,5 +34,8 @@ describe('FileToCloudProjectResourceUploader', () => {
     expect(getInputAcceptedMimesAndExtensions('atlas')).toMatchInlineSnapshot(
       `".atlas"`
     );
+    expect(getInputAcceptedMimesAndExtensions('spine')).toMatchInlineSnapshot(
+      `"application/json,.json"`
+    );
   });
 });

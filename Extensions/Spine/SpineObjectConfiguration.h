@@ -156,7 +156,7 @@ private:
   double opacity;
   double timeScale;
 
-  gd::String jsonResourceName;
+  gd::String spineResourceName;
   gd::String imageResourceName;
   gd::String atlasResourceName;
 

@@ -472,7 +472,7 @@ export default class PixiResourcesLoader {
   ): Promise<ISkeleton> {
     const resourceManager = project.getResourcesManager();
     const resourcesData = [
-      [spineName, 'json'],
+      [spineName, 'spine'],
       [atlasImageName, 'image'],
       [atlasTextName, 'atlas'],
     ];

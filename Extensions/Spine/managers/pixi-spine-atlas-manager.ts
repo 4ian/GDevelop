@@ -5,12 +5,12 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Atlas Manager');
-  type AtlasManagerOnProgressCallback = (
+  type SpineAtlasManagerOnProgressCallback = (
     loadedCount: integer,
     totalCount: integer
   ) => void;
   /** The callback called when a text that was requested is loaded (or an error occurred). */
-  export type AtlasManagerRequestCallback = (
+  export type SpineAtlasManagerRequestCallback = (
     error: Error | null,
     content?: pixi_spine.TextureAtlas
   ) => void;
@@ -27,10 +27,12 @@ namespace gdjs {
    * You should properly handle errors, and give the developer/player a way to know
    * that loading failed.
    */
-  export class AtlasManager {
+  export class SpineAtlasManager {
     private _resourcesLoader: RuntimeGameResourcesLoader;
     private _resources: ResourceData[];
-    private _loadedAtlases: { [key: string]: pixi_spine.TextureAtlas } = {};
+    private _loadedSpineAtlases: {
+      [key: string]: pixi_spine.TextureAtlas;
+    } = {};
 
     /**
      * @param resources The resources data of the game.
@@ -55,7 +57,7 @@ namespace gdjs {
     }
 
     /**
-     * Request all the text resources to be preloaded (unless they are marked as not preloaded).
+     * Request all the atlas resources to be preloaded (unless they are marked as not preloaded).
      *
      * Note that even if a atlas is already loaded, it will be reloaded (useful for hot-reloading,
      * as atlas files can have been modified without the editor knowing).
@@ -64,7 +66,7 @@ namespace gdjs {
      * @param onComplete The function called when all atlases are loaded.
      */
     async preloadAll(
-      onProgress: AtlasManagerOnProgressCallback
+      onProgress: SpineAtlasManagerOnProgressCallback
     ): Promise<integer> {
       const atlasResources = this._resources.filter(
         (resource) => isAtlasResource(resource) && !resource.disablePreload
@@ -75,7 +77,7 @@ namespace gdjs {
         atlasResources.map(
           (resource, i) =>
             new Promise<void>((resolve) => {
-              const onLoad: AtlasManagerRequestCallback = (error) => {
+              const onLoad: SpineAtlasManagerRequestCallback = (error) => {
                 if (error) {
                   logger.error(
                     'Error while preloading a text resource:' + error
@@ -99,7 +101,10 @@ namespace gdjs {
      * @param resources The data of resource to load.
      * @param callback The callback to pass atlas to it once it is loaded.
      */
-    load(resource: ResourceData, callback: AtlasManagerRequestCallback): void {
+    load(
+      resource: ResourceData,
+      callback: SpineAtlasManagerRequestCallback
+    ): void {
       if (!isAtlasResource(resource))
         callback(new Error(`${resource.name} is on atlas!`));
 
@@ -110,7 +115,7 @@ namespace gdjs {
 
       const image = this._imageManager.getPIXITexture(metadata.image);
       const onLoad = (atlas: pixi_spine.TextureAtlas) => {
-        this._loadedAtlases[resource.name] = atlas;
+        this._loadedSpineAtlases[resource.name] = atlas;
         callback(null, atlas);
       };
 
@@ -144,7 +149,7 @@ namespace gdjs {
      * @returns true if the content of the atlas resource is loaded, false otherwise.
      */
     isLoaded(resourceName: string): boolean {
-      return resourceName in this._loadedAtlases;
+      return resourceName in this._loadedSpineAtlases;
     }
 
     /**
@@ -154,7 +159,7 @@ namespace gdjs {
      * @returns the TextureAtlas of the atlas if loaded, `null` otherwise.
      */
     getAtlasTexture(resourceName: string): pixi_spine.TextureAtlas | null {
-      return this._loadedAtlases[resourceName] || null;
+      return this._loadedSpineAtlases[resourceName] || null;
     }
   }
 }

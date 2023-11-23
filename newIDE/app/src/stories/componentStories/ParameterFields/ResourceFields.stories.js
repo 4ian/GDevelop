@@ -19,6 +19,7 @@ import JsonResourceField from '../../../EventsSheet/ParameterFields/JsonResource
 import TilemapResourceField from '../../../EventsSheet/ParameterFields/TilemapResourceField';
 import Model3DResourceField from '../../../EventsSheet/ParameterFields/Model3DResourceField';
 import AtlasResourceField from '../../../EventsSheet/ParameterFields/AtlasResourceField';
+import SpineResourceField from '../../../EventsSheet/ParameterFields/SpineResourceField';
 
 export const AllResourceFields = () => (
   <Column expand>
@@ -187,6 +188,26 @@ export const AllResourceFields = () => (
         initialValue={''}
         render={(value, onChange) => (
           <AtlasResourceField
+            project={testProject.project}
+            scope={{
+              project: testProject.project,
+              layout: testProject.testLayout,
+            }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            value={value}
+            onChange={onChange}
+            parameterRenderingService={ParameterRenderingService}
+            resourceManagementProps={fakeResourceManagementProps}
+          />
+        )}
+      />
+    </Line>
+    <Line expand>
+      <ValueStateHolder
+        initialValue={''}
+        render={(value, onChange) => (
+          <SpineResourceField
             project={testProject.project}
             scope={{
               project: testProject.project,

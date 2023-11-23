@@ -22,6 +22,6 @@ const originalSpinePackage = JSON.parse(readContent(path.join(originalSpineDir, 
 const originalSpineContent = readContent(path.join(originalSpineDir, originalSpinePackage.extensionConfig.bundle), 'Cannot find pixi-spine bundle.');
 
 const varSpineExport = '\nvar pixi_spine = this.PIXI.spine;\n';
-const runtimeSpinePath = 'Runtime/pixi-renderers/pixi-spine.js';
+const runtimeSpinePath = '../Extensions/Spine/pixi-spine/pixi-spine.js';
 new shell.ShellString(originalSpineContent + varSpineExport).to(runtimeSpinePath);
 

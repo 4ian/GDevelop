@@ -157,6 +157,8 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
         worker.ExposeModel3D(newPropertyValue);
       } else if (resourceType == "atlas") {
         worker.ExposeAtlas(newPropertyValue);
+      } else if (resourceType == "spine") {
+        worker.ExposeSpine(newPropertyValue);
       }
 
       if (newPropertyValue != oldPropertyValue) {

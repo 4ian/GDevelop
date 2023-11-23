@@ -115,12 +115,12 @@ const SpineEditor = ({
   const [skeleton, setSkeleton] = React.useState<?ISkeletonData>(null);
   const getSkeleton = React.useCallback(
     (
-      jsonResourceName: string,
+      spineResourceName: string,
       imageResourceName: string,
       atlasResourceName: string
     ) => {
       if (
-        [jsonResourceName, imageResourceName, atlasResourceName].some(
+        [spineResourceName, imageResourceName, atlasResourceName].some(
           resName => !resName
         )
       ) {
@@ -129,7 +129,7 @@ const SpineEditor = ({
 
       return PixiResourcesLoader.getSpineData(
         project,
-        jsonResourceName,
+        spineResourceName,
         imageResourceName,
         atlasResourceName
       ).then(newSkeleton => {
@@ -141,21 +141,21 @@ const SpineEditor = ({
     [project]
   );
   getSkeleton(
-    properties.get('jsonResourceName').getValue(),
+    properties.get('spineResourceName').getValue(),
     properties.get('imageResourceName').getValue(),
     properties.get('atlasResourceName').getValue()
   );
 
-  const onChangeJsonResourceName = React.useCallback(
-    (jsonResourceName: string) => {
+  const onChangeSpineResourceName = React.useCallback(
+    (spineResourceName: string) => {
       const atlasResourceName = properties.get('atlasResourceName').getValue();
 
       if (atlasResourceName) {
-        extendMetadata(jsonResourceName, { atlas: atlasResourceName });
+        extendMetadata(spineResourceName, { atlas: atlasResourceName });
       }
 
       getSkeleton(
-        jsonResourceName,
+        spineResourceName,
         properties.get('imageResourceName').getValue(),
         atlasResourceName
       ).then(newSkeleton => {
@@ -166,18 +166,18 @@ const SpineEditor = ({
   );
   const onChangeAtlasResourceName = React.useCallback(
     (atlasResourceName: string) => {
-      const jsonResourceName = properties.get('jsonResourceName').getValue();
+      const spineResourceName = properties.get('spineResourceName').getValue();
       const imageResourceName = properties.get('imageResourceName').getValue();
 
-      if (jsonResourceName) {
-        extendMetadata(jsonResourceName, { atlas: atlasResourceName });
+      if (spineResourceName) {
+        extendMetadata(spineResourceName, { atlas: atlasResourceName });
       }
       if (imageResourceName) {
         extendMetadata(atlasResourceName, { image: imageResourceName });
       }
 
       getSkeleton(
-        properties.get('jsonResourceName').getValue(),
+        properties.get('spineResourceName').getValue(),
         imageResourceName,
         atlasResourceName
       ).then(newSkeleton => {
@@ -195,7 +195,7 @@ const SpineEditor = ({
       }
 
       getSkeleton(
-        properties.get('jsonResourceName').getValue(),
+        properties.get('spineResourceName').getValue(),
         imageResourceName,
         atlasResourceName
       ).then(newSkeleton => {
@@ -385,10 +385,10 @@ const SpineEditor = ({
         <ColumnStackLayout noMargin>
           <PropertyResourceSelector
             objectConfiguration={objectConfiguration}
-            propertyName="jsonResourceName"
+            propertyName="spineResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
-            onChange={onChangeJsonResourceName}
+            onChange={onChangeSpineResourceName}
           />
           <PropertyResourceSelector
             objectConfiguration={objectConfiguration}

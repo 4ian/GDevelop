@@ -22,7 +22,7 @@ SpineAnimation SpineObjectConfiguration::badAnimation;
 
 SpineObjectConfiguration::SpineObjectConfiguration()
     : scale(1), opacity(255), timeScale(1),
-      jsonResourceName(""), imageResourceName(""), atlasResourceName("") {};
+      spineResourceName(""), imageResourceName(""), atlasResourceName("") {};
 
 bool SpineObjectConfiguration::UpdateProperty(const gd::String &propertyName, const gd::String &newValue) {
   if (propertyName == "scale") {
@@ -37,8 +37,8 @@ bool SpineObjectConfiguration::UpdateProperty(const gd::String &propertyName, co
     timeScale = newValue.To<double>();
     return true;
   }
-  if (propertyName == "jsonResourceName") {
-    jsonResourceName = newValue;
+  if (propertyName == "spineResourceName") {
+    spineResourceName = newValue;
     return true;
   }
   if (propertyName == "imageResourceName") {
@@ -75,11 +75,11 @@ SpineObjectConfiguration::GetProperties() const {
       .SetLabel(_("Time Scale"))
       .SetGroup(_("Play"));
 
-  objectProperties["jsonResourceName"]
-      .SetValue(jsonResourceName)
+  objectProperties["spineResourceName"]
+      .SetValue(spineResourceName)
       .SetType("resource")
-      .AddExtraInfo("json")
-      .SetLabel(_("Json"));
+      .AddExtraInfo("spine")
+      .SetLabel(_("Spine json"));
 
   objectProperties["imageResourceName"]
       .SetValue(imageResourceName)
@@ -124,7 +124,7 @@ void SpineObjectConfiguration::DoUnserializeFrom(gd::Project &project, const gd:
   scale = content.GetDoubleAttribute("scale");
   opacity = content.GetDoubleAttribute("opacity");
   timeScale = content.GetDoubleAttribute("timeScale");
-  jsonResourceName = content.GetStringAttribute("jsonResourceName");
+  spineResourceName = content.GetStringAttribute("spineResourceName");
   imageResourceName = content.GetStringAttribute("imageResourceName");
   atlasResourceName = content.GetStringAttribute("atlasResourceName");
 
@@ -146,7 +146,7 @@ void SpineObjectConfiguration::DoSerializeTo(gd::SerializerElement &element) con
   content.SetAttribute("scale", scale);
   content.SetAttribute("opacity", opacity);
   content.SetAttribute("timeScale", timeScale);
-  content.SetAttribute("jsonResourceName", jsonResourceName);
+  content.SetAttribute("spineResourceName", spineResourceName);
   content.SetAttribute("imageResourceName", imageResourceName);
   content.SetAttribute("atlasResourceName", atlasResourceName);
 
@@ -161,7 +161,7 @@ void SpineObjectConfiguration::DoSerializeTo(gd::SerializerElement &element) con
 }
 
 void SpineObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker &worker) {
-  worker.ExposeJson(jsonResourceName);
+  worker.ExposeSpine(spineResourceName);
   worker.ExposeImage(imageResourceName);
   worker.ExposeAtlas(atlasResourceName);
 }

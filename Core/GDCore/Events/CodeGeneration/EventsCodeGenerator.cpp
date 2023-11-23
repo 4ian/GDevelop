@@ -715,6 +715,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
              metadata.GetType() == "videoResource" ||
              metadata.GetType() == "model3DResource" ||
              metadata.GetType() == "atlasResource" ||
+             metadata.GetType() == "spineResource" ||
              // Deprecated, old parameter names:
              metadata.GetType() == "password" || metadata.GetType() == "musicfile" ||
              metadata.GetType() == "soundfile" || metadata.GetType() == "police") {

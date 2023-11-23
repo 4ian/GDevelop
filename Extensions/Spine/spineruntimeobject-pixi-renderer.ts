@@ -133,14 +133,18 @@ namespace gdjs {
 
     private constructRendererObject(): pixi_spine.Spine | PIXI.Container {
       const game = this.instanceContainer.getGame();
-      const spineData = game
-        .getSpineManager()
-        .getSpine(this._object.jsonResourceName);
-      const rendererObject = spineData
-        ? new pixi_spine.Spine(spineData)
-        : new PIXI.Container();
+      const spineManager = game.getSpineManager();
 
-      return rendererObject;
+      if (
+        !spineManager ||
+        !spineManager.isSpineLoaded(this._object.spineResourceName)
+      ) {
+        return new PIXI.Container();
+      }
+
+      return new pixi_spine.Spine(
+        spineManager.getSpine(this._object.spineResourceName)
+      );
     }
 
     private updateBounds(): void {

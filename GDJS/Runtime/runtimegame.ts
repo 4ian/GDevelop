@@ -140,8 +140,8 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
-    _spineManager: SpineManager;
-    _atlasManager: AtlasManager;
+    _spineManager: SpineManager | null = null;
+    _spineAtlasManager: SpineAtlasManager | null = null;
     _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
@@ -227,17 +227,9 @@ namespace gdjs {
         resources,
         this._resourcesLoader
       );
-      this._spineManager = new gdjs.SpineManager();
-      this._atlasManager = new gdjs.AtlasManager(
-        this._data.resources.resources,
-        this._resourcesLoader,
-        this._imageManager
-      );
       this._jsonManager = new gdjs.JsonManager(
         resources,
-        this._resourcesLoader,
-        this._spineManager,
-        this._atlasManager
+        this._resourcesLoader
       );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         resources,
@@ -248,6 +240,20 @@ namespace gdjs {
         resources,
         this._resourcesLoader
       );
+
+      if (pixi_spine) {
+        this._spineAtlasManager = new gdjs.SpineAtlasManager(
+          this._data.resources.resources,
+          this._resourcesLoader,
+          this._imageManager
+        );
+        this._spineManager = new gdjs.SpineManager(
+          resources,
+          this._resourcesLoader,
+          this._spineAtlasManager
+        );
+      }
+
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
@@ -324,18 +330,24 @@ namespace gdjs {
      * @param projectData The object (usually stored in data.json) containing the full project data
      */
     setProjectData(projectData: ProjectData): void {
-      const { resources } = projectData.resources;
-
       this._data = projectData;
-      [
+
+      const { resources } = projectData.resources;
+      const managers: {
+        setResources: InstanceType<typeof gdjs.ImageManager>['setResources'];
+      }[] = [
         this._imageManager,
         this._soundManager,
         this._fontManager,
         this._jsonManager,
-        this._atlasManager,
         this._bitmapFontManager,
         this._model3DManager,
-      ].forEach((manager) => manager.setResources(resources));
+      ];
+
+      if (this._spineAtlasManager) managers.push(this._spineAtlasManager);
+      if (this._spineManager) managers.push(this._spineManager);
+
+      managers.forEach((manager) => manager.setResources(resources));
     }
 
     /**
@@ -409,7 +421,12 @@ namespace gdjs {
       return this._jsonManager;
     }
 
-    getSpineManager(): gdjs.SpineManager {
+    /**
+     * Get the spine manager of the game, used to load and construct spine skeletons from game
+     * resources.
+     * @return The json manager for the game
+     */
+    getSpineManager(): gdjs.SpineManager | null {
       return this._spineManager;
     }
 
@@ -418,8 +435,8 @@ namespace gdjs {
      * resources.
      * @return The atlas manager for the game
      */
-    getAtlasManager(): gdjs.AtlasManager {
-      return this._atlasManager;
+    getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
+      return this._spineAtlasManager;
     }
 
     /**
@@ -746,9 +763,16 @@ namespace gdjs {
         loadedAssets += await this._imageManager.loadTextures(onProgress);
         loadedAssets += await this._soundManager.preloadAudio(onProgress);
         loadedAssets += await this._fontManager.loadFonts(onProgress);
-        loadedAssets += await this._atlasManager.preloadAll(onProgress);
-        loadedAssets += await this._jsonManager.preloadAll(onProgress);
+        loadedAssets += await this._jsonManager.preloadJsons(onProgress);
         loadedAssets += await this._model3DManager.loadModels(onProgress);
+
+        if (this._spineAtlasManager) {
+          loadedAssets += await this._spineAtlasManager.preloadAll(onProgress);
+        }
+        if (this._spineManager) {
+          loadedAssets += await this._spineManager.preloadAll(onProgress);
+        }
+
         await this._bitmapFontManager.loadBitmapFontData(onProgress);
         await loadingScreen.unload();
         await gdjs.getAllAsynchronouslyLoadingLibraryPromise();

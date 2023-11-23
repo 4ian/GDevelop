@@ -95,6 +95,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<Model3DResource>();
   else if (kind == "atlas")
     return std::make_shared<AtlasResource>();
+  else if (kind == "spine")
+    return std::make_shared<SpineResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();

@@ -1117,6 +1117,11 @@ interface JsonResource {
 };
 JsonResource implements Resource;
 
+interface SpineResource {
+    void SpineResource();
+};
+SpineResource implements JsonResource;
+
 interface TilemapResource {
     void TilemapResource();
 };

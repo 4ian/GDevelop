@@ -49,6 +49,7 @@ const ResourcePreview = (props: Props) => {
     case 'tileset':
     case 'model3D':
     case 'atlas':
+    case 'spine':
       return <GenericIconPreview renderIcon={props => <File {...props} />} />;
     case 'video':
       return <GenericIconPreview renderIcon={props => <Video {...props} />} />;

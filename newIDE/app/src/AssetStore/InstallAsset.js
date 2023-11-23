@@ -123,6 +123,8 @@ export const installResource = (
     newResource = new gd.Model3DResource();
   } else if (serializedResource.kind === 'atlas') {
     newResource = new gd.AtlasResource();
+  } else if (serializedResource.kind === 'spine') {
+    newResource = new gd.SpineResource();
   } else {
     throw new Error(
       `Resource of kind "${serializedResource.kind}" is not supported.`

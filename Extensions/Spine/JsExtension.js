@@ -53,6 +53,9 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Spine/spineruntimeobject.js')
       .addIncludeFile('Extensions/Spine/spineruntimeobject-pixi-renderer.js')
+      .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
+      .addIncludeFile('Extensions/Spine/managers/pixi-spine-atlas-manager.js')
+      .addIncludeFile('Extensions/Spine/managers/pixi-spine-manager.js')
       .setCategoryFullName(_('General'));
 
     object
@@ -189,14 +192,7 @@ module.exports = {
    */
   registerEditorConfigurations: function (
     objectsEditorService /*: ObjectsEditorService */
-  ) {
-    objectsEditorService.registerEditorConfiguration(
-      'SpineObject::SpineObject',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/spine',
-      })
-    );
-  },
+  ) { },
   /**
    * Register renderers for instance of objects on the scene editor.
    *
@@ -354,8 +350,8 @@ module.exports = {
 
       _loadSpine() {
         const properties = this._getProperties();
-        const jsonResourceName = properties
-          .get('jsonResourceName')
+        const spineResourceName = properties
+          .get('spineResourceName')
           .getValue();
         const imageResourceName = properties
           .get('imageResourceName')
@@ -367,7 +363,7 @@ module.exports = {
         this._pixiResourcesLoader
           .getSpineData(
             this._project,
-            jsonResourceName,
+            spineResourceName,
             imageResourceName,
             atlasResourceName
           )

@@ -6,7 +6,7 @@ namespace gdjs {
       opacity: float;
       scale: float;
       timeScale: float;
-      jsonResourceName: string;
+      spineResourceName: string;
       atlasResourceName: string;
       imageResourceName: string;
       animations: SpineAnimation[];
@@ -22,7 +22,7 @@ namespace gdjs {
     private _currentAnimationIndex = 0;
     private _renderer: gdjs.SpineRuntimeObjectPixiRenderer;
 
-    readonly jsonResourceName: string;
+    readonly spineResourceName: string;
     readonly atlasResourceName: string;
     readonly imageResourceName: string;
 
@@ -40,7 +40,7 @@ namespace gdjs {
       this._timeScale = objectData.content.timeScale;
       this._opacity = objectData.content.opacity;
       this._scale = objectData.content.scale;
-      this.jsonResourceName = objectData.content.jsonResourceName;
+      this.spineResourceName = objectData.content.spineResourceName;
       this.atlasResourceName = objectData.content.atlasResourceName;
       this.imageResourceName = objectData.content.imageResourceName;
       this._renderer = new gdjs.SpineRuntimeObjectRenderer(

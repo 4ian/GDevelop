@@ -57,6 +57,11 @@ void ArbitraryResourceWorker::ExposeAtlas(gd::String& resourceName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeSpine(gd::String& resourceName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -199,6 +204,10 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
     ExposeAtlas(resourceName);
     return;
   }
+  if (resourceType == "spine") {
+    ExposeSpine(resourceName);
+    return;
+  }
   gd::LogError("Unexpected resource type: " + resourceType + " for: " + resourceName);
   return;
 }
@@ -268,6 +277,10 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
         } else if (parameterMetadata.GetType() == "atlasResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeAtlas(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "spineResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeSpine(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);
         }
       });

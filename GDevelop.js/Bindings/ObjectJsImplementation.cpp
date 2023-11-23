@@ -197,6 +197,8 @@ void ObjectJsImplementation::ExposeResources(gd::ArbitraryResourceWorker& worker
         worker.ExposeModel3D(newPropertyValue);
       } else if (resourceType == "atlas") {
         worker.ExposeAtlas(newPropertyValue);
+      } else if (resourceType == "spine") {
+        worker.ExposeSpine(newPropertyValue);
       }
 
       if (newPropertyValue != oldPropertyValue) {

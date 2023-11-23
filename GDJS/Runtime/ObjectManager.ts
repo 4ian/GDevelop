@@ -1,6 +1,12 @@
 namespace gdjs {
   // TODO Do something like BehaviorRBushAABB
   // TODO Allow to use getVisibilityAABB or getAABB
+  /**
+   * Allow to do spacial searches on objects as fast as possible.
+   *
+   * Objects are put in an R-Tree only if they didn't move recently to avoid to
+   * update the R-Tree too often.
+   */
   export class ObjectManager {
     private _allInstances: Array<RuntimeObject> = [];
     private _awakeInstances: Array<RuntimeObject> = [];

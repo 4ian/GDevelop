@@ -1,12 +1,9 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
-import PlaceholderError from '../UI/PlaceholderError';
 import {
   type Game,
-  getGames,
   registerGame,
 } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
@@ -19,41 +16,24 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 
 type Props = {|
   project: ?gdProject,
+  games: Array<Game>,
+  onRefreshGames: () => Promise<void>,
+  onGameUpdated: (Game) => void,
 |};
 
-export const GamesList = ({ project }: Props) => {
+export const GamesList = ({ project, games, onRefreshGames, onGameUpdated }: Props) => {
   const {
     routeArguments,
     addRouteArguments,
     removeRouteArguments,
   } = React.useContext(RouterContext);
-  const [error, setError] = React.useState<?Error>(null);
-  const [games, setGames] = React.useState<?Array<Game>>(null);
   const {
-    authenticated,
-    firebaseUser,
     getAuthorizationHeader,
     profile,
   } = React.useContext(AuthenticatedUserContext);
   const [openedGame, setOpenedGame] = React.useState<?Game>(null);
   const { showAlert, showConfirmation } = useAlertDialog();
   const [isGameRegistering, setIsGameRegistering] = React.useState(false);
-
-  const loadGames = React.useCallback(
-    async () => {
-      if (!authenticated || !firebaseUser) return;
-
-      try {
-        setError(null);
-        const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
-        setGames(games);
-      } catch (error) {
-        console.error('Error while loading user games.', error);
-        setError(error);
-      }
-    },
-    [authenticated, firebaseUser, getAuthorizationHeader]
-  );
 
   const onRegisterGame = React.useCallback(
     async () => {
@@ -68,7 +48,7 @@ export const GamesList = ({ project }: Props) => {
           gameName: project.getName() || 'Untitled game',
           templateSlug: project.getTemplateSlug(),
         });
-        await loadGames();
+        await onRefreshGames();
       } catch (error) {
         console.error('Unable to register the game.', error);
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -92,7 +72,7 @@ export const GamesList = ({ project }: Props) => {
         setIsGameRegistering(false);
       }
     },
-    [getAuthorizationHeader, profile, project, showAlert, loadGames]
+    [getAuthorizationHeader, profile, project, showAlert, onRefreshGames]
   );
 
   React.useEffect(
@@ -142,35 +122,6 @@ export const GamesList = ({ project }: Props) => {
     ]
   );
 
-  React.useEffect(
-    () => {
-      loadGames();
-    },
-    [loadGames]
-  );
-
-  if (!authenticated) {
-    return null;
-  }
-
-  if (!games && error) {
-    return (
-      <PlaceholderError
-        onRetry={() => {
-          loadGames();
-        }}
-      >
-        <Trans>
-          Can't load the games. Verify your internet connection or retry later.
-        </Trans>
-      </PlaceholderError>
-    );
-  }
-
-  if (!games) {
-    return <PlaceholderLoader />;
-  }
-
   const projectUuid = project ? project.getProjectUuid() : null;
   const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
   const displayedGames = [
@@ -184,7 +135,7 @@ export const GamesList = ({ project }: Props) => {
         <GameRegistration
           project={project}
           hideLoader
-          onGameRegistered={loadGames}
+          onGameRegistered={onRefreshGames}
         />
       )}
       {displayedGames.map(game => (
@@ -196,7 +147,7 @@ export const GamesList = ({ project }: Props) => {
             addRouteArguments({ 'games-dashboard-tab': tab });
             setOpenedGame(game);
           }}
-          onUpdateGame={loadGames}
+          onUpdateGame={onRefreshGames}
         />
       ))}
       {openedGame && (
@@ -209,14 +160,12 @@ export const GamesList = ({ project }: Props) => {
             setOpenedGame(null);
           }}
           onGameUpdated={updatedGame => {
-            setGames(
-              games.map(game => (game === openedGame ? updatedGame : game))
-            );
+            onGameUpdated(updatedGame)
             setOpenedGame(updatedGame);
           }}
           onGameDeleted={() => {
             setOpenedGame(null);
-            loadGames();
+            onRefreshGames();
           }}
         />
       )}

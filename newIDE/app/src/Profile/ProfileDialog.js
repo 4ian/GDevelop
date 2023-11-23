@@ -20,8 +20,10 @@ import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RouterContext from '../MainFrame/RouterContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
+import { getGames, type Game } from '../Utils/GDevelopServices/Game';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import PlaceholderError from '../UI/PlaceholderError';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -40,8 +42,18 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
 
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const {
+    authenticated,
+    firebaseUser,
+    getAuthorizationHeader,
+  } = authenticatedUser;
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
+
+  const [games, setGames] = React.useState<?Array<Game>>(null);
+  const [gamesFetchingError, setGamesFetchingError] = React.useState<?Error>(
+    null
+  );
 
   React.useEffect(
     () => {
@@ -124,6 +136,32 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
     [authenticatedUser]
   );
 
+  const loadGames = React.useCallback(
+    async () => {
+      if (!authenticated || !firebaseUser) return;
+
+      try {
+        setGamesFetchingError(null);
+        const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
+        setGames(games);
+      } catch (error) {
+        console.error('Error while loading user games.', error);
+        setGamesFetchingError(error);
+      }
+    },
+    [authenticated, firebaseUser, getAuthorizationHeader]
+  );
+
+  const onGameUpdated = React.useCallback(
+    (updatedGame: Game) => {
+      if (!games) return;
+      setGames(
+        games.map(game => (game.id === updatedGame.id ? updatedGame : game))
+      );
+    },
+    [games]
+  );
+
   React.useEffect(
     () => {
       if (open) authenticatedUser.onRefreshUserProfile();
@@ -131,6 +169,16 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
     // We don't want to fetch again when authenticatedUser changes,
     // just the first time this page opens.
     [authenticatedUser.onRefreshUserProfile, open] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  // Only fetch games if the user decides to open the games dashboard tab.
+  React.useEffect(
+    () => {
+      if (currentTab === 'games-dashboard' && !games) {
+        loadGames();
+      }
+    },
+    [loadGames, currentTab, games]
   );
 
   const onLogout = React.useCallback(
@@ -231,9 +279,24 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
               </Column>
             </Line>
           )}
-          {currentTab === 'games-dashboard' && (
-            <GamesList project={currentProject} />
-          )}
+          {currentTab === 'games-dashboard' &&
+            (games ? (
+              <GamesList
+                project={currentProject}
+                onRefreshGames={loadGames}
+                games={games}
+                onGameUpdated={onGameUpdated}
+              />
+            ) : gamesFetchingError ? (
+              <PlaceholderError onRetry={loadGames}>
+                <Trans>
+                  Can't load the games. Verify your internet connection or retry
+                  later.
+                </Trans>
+              </PlaceholderError>
+            ) : (
+              <PlaceholderLoader />
+            ))}
         </>
       ) : (
         <Column noMargin expand justifyContent="center">

@@ -3,7 +3,7 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
-    (global = global || self, global.RBush = factory());
+    (global = global || self, global.rbush = global.RBush = factory());
     }(this, function () { 'use strict';
     
     function quickselect(arr, k, left, right, compare) {
@@ -86,7 +86,7 @@
                     const childBBox = node.leaf ? toBBox(child) : child;
     
                     if (intersects(bbox, childBBox)) {
-                        if (node.leaf) result.push(child.source);
+                        if (node.leaf) result.push(child.source || child);
                         else if (contains(bbox, childBBox)) this._all(child, result);
                         else nodesToSearch.push(child);
                     }
@@ -229,7 +229,7 @@
         _all(node, result) {
             const nodesToSearch = [];
             while (node) {
-                if (node.leaf) node.children.forEach(child => result.push(child.source));
+                if (node.leaf) node.children.forEach(child => result.push(child.source || child));
                 else nodesToSearch.push(...node.children);
     
                 node = nodesToSearch.pop();
@@ -573,4 +573,3 @@
     return RBush;
     
     }));
-    

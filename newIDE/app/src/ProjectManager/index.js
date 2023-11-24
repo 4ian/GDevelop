@@ -25,10 +25,6 @@ import {
 } from '../Utils/Serializer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import Flag from '@material-ui/icons/Flag';
-import SettingsApplications from '@material-ui/icons/SettingsApplications';
-import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
-import VariableTree from '../UI/CustomSvgIcons/VariableTree';
-import ArtTrack from '@material-ui/icons/ArtTrack';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
@@ -53,6 +49,10 @@ import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDrop
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import Settings from '../UI/CustomSvgIcons/Settings';
+import Picture from '../UI/CustomSvgIcons/Picture';
+import Publish from '../UI/CustomSvgIcons/Publish';
+import ProjectResources from '../UI/CustomSvgIcons/ProjectResources';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -80,7 +80,7 @@ const styles = {
     overflowY: 'scroll',
     scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     marginTop: 16,
-    padding: '0 16px 16px 16px',
+    padding: '0 8px 12px 12px',
     position: 'relative',
   },
   searchBarContainer: {
@@ -778,31 +778,37 @@ class ProjectManager extends React.Component<Props, State> {
                     id={getTabId('game-properties')}
                     key="properties"
                     primaryText={<Trans>Properties</Trans>}
-                    leftIcon={<SettingsApplications />}
+                    leftIcon={<Settings />}
                     onClick={this._openProjectProperties}
-                    noPadding
-                  />,
-                  <ListItem
-                    id={getTabId('global-variables')}
-                    key="global-variables"
-                    primaryText={<Trans>Global variables</Trans>}
-                    leftIcon={<VariableTree />}
-                    onClick={this._openProjectVariables}
                     noPadding
                   />,
                   <ListItem
                     id={getTabId('game-icons')}
                     key="icons"
                     primaryText={<Trans>Icons and thumbnail</Trans>}
-                    leftIcon={<PhotoLibrary />}
+                    leftIcon={<Picture />}
                     onClick={this.props.onOpenPlatformSpecificAssets}
+                    noPadding
+                  />,
+                ]}
+              />
+              <ProjectStructureItem
+                id={getTabId('project-settings')}
+                primaryText={<Trans>Project settings</Trans>}
+                renderNestedItems={() => [
+                  <ListItem
+                    id={getTabId('global-variables')}
+                    key="global-variables"
+                    primaryText={<Trans>Global variables</Trans>}
+                    leftIcon={<Publish />}
+                    onClick={this._openProjectVariables}
                     noPadding
                   />,
                   <ListItem
                     id={getTabId('game-resources')}
                     key="resources"
                     primaryText={<Trans>Resources</Trans>}
-                    leftIcon={<ArtTrack />}
+                    leftIcon={<ProjectResources />}
                     onClick={this.props.onOpenResources}
                     noPadding
                   />,

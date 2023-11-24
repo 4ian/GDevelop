@@ -138,6 +138,9 @@ const enumerateExtraBehaviorInstructions = (
   return allInstructions;
 };
 
+/**
+ * Enumerate free instructions that start with an object parameter.
+ */
 const enumerateExtraObjectInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
@@ -169,6 +172,10 @@ const enumerateExtraObjectInstructions = (
   return allInstructions;
 };
 
+/**
+ * Enumerate free instructions excluding the instructions that have been moved to
+ * the object instructions list unless they are in `freeInstructionsToKeep`.
+ */
 const enumerateFreeInstructionsWithoutExtra = (
   isCondition: boolean,
   extension: gdPlatformExtension,
@@ -225,6 +232,13 @@ const enumerateInstruction = (
   ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
+  let description = instrMetadata.getDescription();
+  if (description.length > 140) {
+    const spaceIndex = description.indexOf(' ', 140);
+    if (spaceIndex >= 0) {
+      description = description.substring(0, spaceIndex);
+    }
+  }
   const groupName = i18n
     ? i18n._(instrMetadata.getGroup())
     : instrMetadata.getGroup();
@@ -238,6 +252,7 @@ const enumerateInstruction = (
     metadata: instrMetadata,
     iconFilename,
     displayedName,
+    description,
     fullGroupName,
     scope,
     isPrivate: instrMetadata.isPrivate(),
@@ -406,6 +421,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
   const scope = { extension, objectMetadata };
   const prefix = '';
 
+  // Free instructions
   allInstructions = [
     ...allInstructions,
     ...enumerateExtensionInstructions(
@@ -418,7 +434,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     ),
   ];
 
-  // Free object instructions:
+  // Free object instructions
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
@@ -453,13 +469,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition
           ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
           : baseObjectExtension.getAllActionsForObject(baseObjectType),
-        scope,
-        i18n
-      ),
-      ...enumerateExtraObjectInstructions(
-        isCondition,
-        baseObjectExtension,
-        baseObjectType,
         scope,
         i18n
       ),

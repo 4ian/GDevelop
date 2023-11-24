@@ -226,7 +226,7 @@ void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
   eventWorker.Launch(layout.GetEvents(),
       gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout));
 
-  DependenciesAnalyzer dependenciesAnalyzer = DependenciesAnalyzer(project, layout);
+  DependenciesAnalyzer dependenciesAnalyzer(project, layout);
   dependenciesAnalyzer.Analyze();
   for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
     const gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);

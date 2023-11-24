@@ -32,6 +32,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
       behaviorsSharedData: [],
       objects: [],
       instances: [],
+      usedResources: [],
     });
     runtimeScene._timeManager.getElapsedTime = function () {
       return timeDelta;

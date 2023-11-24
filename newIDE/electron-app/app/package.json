@@ -9,11 +9,10 @@
   "main": "main.js",
   "dependencies": {
     "@electron/remote": "^2.0.8",
-    "@parcel/watcher": "2.3.0",
     "archiver": "^2.1.1",
     "async": "^2.6.0",
     "axios": "^0.19.1",
-    "chokidar": "^3.5.1",
+    "chokidar": "3.5.3",
     "discord-rich-presence": "^0.0.8",
     "dotenv": "^4.0.0",
     "electron-editor-context-menu": "^1.1.1",

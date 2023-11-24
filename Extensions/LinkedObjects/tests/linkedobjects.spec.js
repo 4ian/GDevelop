@@ -33,6 +33,7 @@ describe('gdjs.LinksManager', function () {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
+      usedResources: [],
     });
 
     const manager = gdjs.LinksManager.getManager(runtimeScene);

@@ -12,6 +12,7 @@ declare interface ProjectData {
   gdVersion: GdVersionData;
   properties: ProjectPropertiesData;
   resources: ResourcesData;
+  usedResources: ResourceReference[];
   objects: ObjectData[];
   variables: RootVariableData[];
   layouts: LayoutData[];
@@ -83,6 +84,7 @@ declare interface LayoutData {
   objects: ObjectData[];
   layers: LayerData[];
   behaviorsSharedData: BehaviorSharedData[];
+  usedResources: ResourceReference[];
 }
 
 declare interface EventsFunctionsExtensionData {
@@ -262,6 +264,10 @@ declare interface ResourceData {
   preloadAsSound?: boolean;
   preloadAsMusic?: boolean;
   preloadInCache?: boolean;
+}
+
+declare interface ResourceReference {
+  name: string;
 }
 
 declare type ResourceKind =

@@ -203,7 +203,7 @@ module.exports = {
     object
       .addAction(
         'SetRadius',
-        _('Set the radius of light object'),
+        _('Light radius'),
         _('Set the radius of light object'),
         _('Set the radius of _PARAM0_ to: _PARAM1_'),
         '',
@@ -218,7 +218,7 @@ module.exports = {
     object
       .addAction(
         'SetColor',
-        _('Set the color of light object'),
+        _('Light color'),
         _('Set the color of light object in format "R;G;B" string.'),
         _('Set the color of _PARAM0_ to: _PARAM1_'),
         '',

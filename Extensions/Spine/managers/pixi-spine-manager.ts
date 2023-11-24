@@ -6,110 +6,78 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Spine Manager');
 
+  const resourceKinds: ResourceKind[] = ['spine'];
+
   /**
    * SpineManager manages pixi spine skeleton data.
    */
-  export class SpineManager {
-    private _resourcesLoader: RuntimeGameResourcesLoader;
-    private _resources: Map<string, ResourceData>;
-    private _spineData: { [key: string]: pixi_spine.ISkeletonData } = {};
+  export class SpineManager implements gdjs.ResourceManager {
     private _spineAtlasManager: SpineAtlasManager;
+    private _resourceLoader: ResourceLoader;
+    private _loadedSpines = new gdjs.ResourceCache<pixi_spine.ISkeletonData>();
 
     /**
      * @param resourceDataArray The resources data of the game.
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
-      resourceDataArray: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader,
+      resourceLoader: gdjs.ResourceLoader,
       spineAtlasManager: SpineAtlasManager
     ) {
-      this._resources = new Map<string, ResourceData>();
-      this.setResources(resourceDataArray);
-      this._resourcesLoader = resourcesLoader;
+      this._resourceLoader = resourceLoader;
       this._spineAtlasManager = spineAtlasManager;
     }
 
-    /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     *
-     * @param resourceDataArray The resources data of the game.
-     */
-    setResources(resourceDataArray: ResourceData[]): void {
-      this._resources.clear();
-      for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'spine') {
-          this._resources.set(resourceData.name, resourceData);
-        }
-      }
+    getResourceKinds(): ResourceKind[] {
+      return resourceKinds;
     }
 
-    /**
-     * Request all the json resources to be preloaded (unless they are marked as not preloaded).
-     *
-     * Note that even if a JSON is already loaded, it will be reloaded (useful for hot-reloading,
-     * as JSON files can have been modified without the editor knowing).
-     *
-     * @param onProgress The function called after each json is loaded.
-     * @returns the promise of loaded jsons count.
-     */
-    async preloadAll(
-      onProgress: (loadingCount: integer, totalCount: integer) => void
-    ): Promise<integer> {
-      let loadedNumber = 0;
-      const getPreferences = (file: string) =>
-        ({
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because pixi-spine parses resources by itself.
+    }
+
+    async loadResource(resourceName: string): Promise<void> {
+      const resource = this._getSpineResource(resourceName);
+
+      if (!resource) {
+        return logger.error(`Unable to find spine json for resource ${resourceName}.`);
+      }
+
+      try {
+        const metadata = resource.metadata
+          ? JSON.parse(resource.metadata)
+          : {};
+
+        if (!metadata.atlas) {
+          return logger.error(`Unable to find atlas metadata for resource spine json ${resourceName}.`);
+        }
+
+        const spineAtlas = await this._spineAtlasManager.getOrLoad(metadata.atlas);
+        PIXI.Assets.setPreferences({
           preferWorkers: false,
-          crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(resource.file)
             ? 'use-credentials'
             : 'anonymous',
-        } as Partial<PIXI.AssetsPreferences>);
-      const jsonPromises = Array.from(
-        this._resources.values(),
-        async (resource) => {
-          try {
-            const metadata = resource.metadata
-              ? JSON.parse(resource.metadata)
-              : {};
-            const atlasInDependencies =
-              !!metadata.atlas &&
-              this._spineAtlasManager.isLoaded(metadata.atlas);
+        });
+        PIXI.Assets.add(
+          resource.name,
+          resource.file,
+          { spineAtlas }
+        );
+        const loadedJson = await PIXI.Assets.load(resource.name);
 
-            PIXI.Assets.setPreferences(getPreferences(resource.file));
-            PIXI.Assets.add(
-              resource.name,
-              resource.file,
-              atlasInDependencies
-                ? {
-                    spineAtlas: this._spineAtlasManager.getAtlasTexture(
-                      metadata.atlas
-                    ),
-                  }
-                : undefined
-            );
-            const loadedJson = await PIXI.Assets.load(resource.name);
-
-            if (loadedJson.spineData) {
-              this._spineData[resource.name] = loadedJson.spineData;
-            } else {
-              logger.error(
-                `Loader cannot process spine resource ${resource.name} correctly.`
-              );
-            }
-          } catch (error) {
-            logger.error(
-              `Error while preloading spine resource ${resource.name}:`,
-              error
-            );
-          }
-
-          onProgress(loadedNumber++, this._resources.size);
+        if (loadedJson.spineData) {
+          this._loadedSpines.set(resource, loadedJson.spineData);
+        } else {
+          logger.error(
+            `Loader cannot process spine resource ${resource.name} correctly.`
+          );
         }
-      );
-
-      await Promise.all(jsonPromises);
-
-      return loadedNumber;
+      } catch (error) {
+        logger.error(
+          `Error while preloading spine resource ${resource.name}: ${error}`
+        );
+      }
     }
 
     /**
@@ -119,8 +87,8 @@ namespace gdjs {
      * @param resourceName The name of the spine skeleton.
      * @returns the spine skeleton if loaded, `null` otherwise.
      */
-    getSpine(resourceName: string): pixi_spine.ISkeletonData {
-      return this._spineData[resourceName] || null;
+    getSpine(resourceName: string): pixi_spine.ISkeletonData | null {
+      return this._loadedSpines.getFromName(resourceName);
     }
 
     /**
@@ -129,7 +97,14 @@ namespace gdjs {
      * @returns true if the content of the spine skeleton is loaded, false otherwise.
      */
     isSpineLoaded(resourceName: string): boolean {
-      return !!this._spineData[resourceName];
+      return !!this._loadedSpines.getFromName(resourceName);
     }
+
+    private _getSpineResource(resourceName: string): ResourceData | null {
+      const resource = this._resourceLoader.getResource(resourceName);
+      return (resource && this.getResourceKinds().includes(resource.kind)
+        ? resource
+        : null);
+    };
   }
 }

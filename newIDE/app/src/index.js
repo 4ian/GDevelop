@@ -95,9 +95,12 @@ class Bootstrapper extends Component<{}, State> {
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
         locateFile: (path: string, prefix: string) => {
-          return (
-            prefix + path + `?cache-buster=${VersionMetadata.versionWithHash}`
-          );
+          // This function is called by Emscripten to locate the .wasm file only.
+          // As the wasm is at the root of the public folder, we can just return
+          // the path to the file.
+          // Plus, on Electron, the prefix seems to be pointing to the root of the
+          // app.asar archive, which is completely wrong.
+          return path + `?cache-buster=${VersionMetadata.versionWithHash}`;
         },
       }).then(gd => {
         global.gd = gd;

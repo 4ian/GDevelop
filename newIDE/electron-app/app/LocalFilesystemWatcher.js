@@ -1,8 +1,8 @@
 // @flow
-const watcher = require('@parcel/watcher');
+const fileWatcher = require('chokidar');
 
-let subscriptions = {};
-let newSubscriptionId = 1
+let subscriptionCancelers = {};
+let newSubscriptionId = 1;
 
 const getNewSubscriptionId = () => {
   const id = newSubscriptionId++;
@@ -12,31 +12,38 @@ const getNewSubscriptionId = () => {
 const setupWatcher = (folderPath, fileWiseCallback, serializedOptions) => {
   const options = JSON.parse(serializedOptions);
   const newSubscriptionId = getNewSubscriptionId();
-  watcher
-    .subscribe(
-      folderPath,
-      (err, fileChangeEvents) => {
-        fileChangeEvents.forEach(fileChangeEvent =>
-          fileWiseCallback(fileChangeEvent.path)
-        );
+  const watcher = fileWatcher
+    .watch(folderPath, {
+      ignored: options.ignore,
+      ignoreInitial: true,
+      awaitWriteFinish: {
+        stabilityThreshold: 250,
+        pollInterval: 100,
       },
-      options
+    })
+    .on(
+      'change',
+      // TODO: Is it safe to let it like that since the OS could for some reason
+      // do never-ending operations on the folder or its children, making the debounce
+      // never ending.
+      fileWiseCallback
     )
-    .then(subscription => {
-      subscriptions[newSubscriptionId] = subscription;
-    });
+    .on('unlink', fileWiseCallback)
+    .on('add', fileWiseCallback);
+
+  subscriptionCancelers[newSubscriptionId] = () => watcher.unwatch(folderPath);
+
   return newSubscriptionId;
 };
 
 const disableWatcher = id => {
-  const subscription = subscriptions[id];
-  if (!subscription) {
+  const subscriptionCanceler = subscriptionCancelers[id];
+  if (!subscriptionCanceler) {
     console.log('No watcher subscription to disable.');
     return;
   }
-  subscription.unsubscribe().then(() => {
-    delete subscriptions[id];
-  });
+  subscriptionCanceler();
+  delete subscriptionCancelers[id];
 };
 
 module.exports = {

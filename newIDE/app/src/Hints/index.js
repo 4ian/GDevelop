@@ -169,6 +169,12 @@ Use the THNK Framework if you seek an easier, more performant and more flexible 
       message: t`If the parameter is a string or a number, you probably want to use the expressions "GetArgumentAsString" or "GetArgumentAsNumber", along with the conditions "Compare two strings" or "Compare two numbers".`,
     };
   }
+  if (type === 'PrioritizeLoadingOfScene') {
+    return {
+      kind: 'info',
+      message: t`For most games, the default automatic loading of resources will be fine. This action should only be used when trying to avoid loading screens from appearing between scenes.`,
+    };
+  }
 
   return null;
 };

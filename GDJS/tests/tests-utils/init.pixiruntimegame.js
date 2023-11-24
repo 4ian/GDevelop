@@ -64,6 +64,7 @@ gdjs.getPixiRuntimeGame = (settings) => {
     externalLayouts: [],
     resources: (settings && settings.resources) || { resources: [] },
     eventsFunctionsExtensions: [],
+    usedResources: [],
   });
 
   return runtimeGame;

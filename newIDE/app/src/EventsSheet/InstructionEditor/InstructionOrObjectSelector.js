@@ -68,6 +68,18 @@ export const styles = {
 
 export type TabName = 'objects' | 'free-instructions';
 
+const moveDeprecatedInstructionsDown = (
+  results: Array<SearchResult<EnumeratedInstructionMetadata>>
+) => {
+  const deprecatedResults = results.filter(result =>
+    result.item.fullGroupName.includes('deprecated')
+  );
+  const notDeprecatedResults = results.filter(
+    result => !result.item.fullGroupName.includes('deprecated')
+  );
+  return [...notDeprecatedResults, ...deprecatedResults];
+};
+
 type State = {|
   searchText: string,
   searchResults: {
@@ -179,6 +191,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       keys: [
         { name: 'displayedName', weight: 5 },
         { name: 'fullGroupName', weight: 1 },
+        { name: 'description', weight: 3 },
       ],
     });
     this.objectSearchApi = new Fuse(allObjectsList, {
@@ -224,17 +237,20 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
             }))
           : [],
         instructions: this.instructionSearchApi
-          ? this.instructionSearchApi
-              .search(
-                getFuseSearchQueryForMultipleKeys(searchText, [
-                  'displayedName',
-                  'fullGroupName',
-                ])
-              )
-              .map(result => ({
-                item: result.item,
-                matches: tuneMatches(result, searchText),
-              }))
+          ? moveDeprecatedInstructionsDown(
+              this.instructionSearchApi
+                .search(
+                  getFuseSearchQueryForMultipleKeys(searchText, [
+                    'displayedName',
+                    'fullGroupName',
+                    'description',
+                  ])
+                )
+                .map(result => ({
+                  item: result.item,
+                  matches: tuneMatches(result, searchText),
+                }))
+            )
           : [],
       },
     });

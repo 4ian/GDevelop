@@ -5,19 +5,14 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Atlas Manager');
-  type SpineAtlasManagerOnProgressCallback = (
-    loadedCount: integer,
-    totalCount: integer
-  ) => void;
+
   /** The callback called when a text that was requested is loaded (or an error occurred). */
   export type SpineAtlasManagerRequestCallback = (
     error: Error | null,
     content?: pixi_spine.TextureAtlas
   ) => void;
 
-  const atlasKinds: ReadonlyArray<string> = ['atlas'];
-  const isAtlasResource = (resource: ResourceData) =>
-    atlasKinds.includes(resource.kind);
+  const atlasKinds: ResourceKind[] = ['atlas'];
 
   /**
    * AtlasManager loads atlas files with pixi loader, using the "atlas" resources
@@ -27,73 +22,67 @@ namespace gdjs {
    * You should properly handle errors, and give the developer/player a way to know
    * that loading failed.
    */
-  export class SpineAtlasManager {
-    private _resourcesLoader: RuntimeGameResourcesLoader;
-    private _resources: ResourceData[];
-    private _loadedSpineAtlases: {
-      [key: string]: pixi_spine.TextureAtlas;
-    } = {};
+  export class SpineAtlasManager implements gdjs.ResourceManager {
+    private _imageManager: ImageManager;
+    private _resourceLoader: ResourceLoader;
+    private _loadedSpineAtlases = new gdjs.ResourceCache<pixi_spine.TextureAtlas>();
+    private _loadingSpineAtlases = new gdjs.ResourceCache<Promise<pixi_spine.TextureAtlas>>();
 
     /**
      * @param resources The resources data of the game.
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
-      resources: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader,
-      private _imageManager: ImageManager
+      resourceLoader: gdjs.ResourceLoader,
+      imageManager: ImageManager
     ) {
-      this._resources = resources;
-      this._resourcesLoader = resourcesLoader;
+      this._resourceLoader = resourceLoader;
+      this._imageManager = imageManager;
+    }
+
+    getResourceKinds(): ResourceKind[] {
+      return atlasKinds;
+    }
+
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because pixi-spine parses resources by itself.
+    }
+
+    async loadResource(resourceName: string): Promise<void> {
+      await this.getOrLoad(resourceName);
     }
 
     /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
+     * Returns promisified loaded atlas resource if it is availble, loads it otherwise.
      *
-     * @param resources The resources data of the game.
+     * @param resources The data of resource to load.
      */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
-    }
+    getOrLoad(resourceName: string): Promise<pixi_spine.TextureAtlas> {
+      const resource = this._getAtlasResource(resourceName);
 
-    /**
-     * Request all the atlas resources to be preloaded (unless they are marked as not preloaded).
-     *
-     * Note that even if a atlas is already loaded, it will be reloaded (useful for hot-reloading,
-     * as atlas files can have been modified without the editor knowing).
-     *
-     * @param onProgress The function called after each atlas is loaded.
-     * @param onComplete The function called when all atlases are loaded.
-     */
-    async preloadAll(
-      onProgress: SpineAtlasManagerOnProgressCallback
-    ): Promise<integer> {
-      const atlasResources = this._resources.filter(
-        (resource) => isAtlasResource(resource) && !resource.disablePreload
-      );
-      let loaded = 0;
+      if (!resource) {
+        return Promise.reject(`Unable to find atlas for resource '${resourceName}'.`);
+      }
 
-      await Promise.all(
-        atlasResources.map(
-          (resource, i) =>
-            new Promise<void>((resolve) => {
-              const onLoad: SpineAtlasManagerRequestCallback = (error) => {
-                if (error) {
-                  logger.error(
-                    'Error while preloading a text resource:' + error
-                  );
-                }
-                onProgress(loaded, atlasResources.length);
-                resolve();
-              };
+      if (!this._loadingSpineAtlases.get(resource)) {
+        this._loadingSpineAtlases.set(resource, new Promise<pixi_spine.TextureAtlas>((resolve, reject) => {
+          const onLoad: SpineAtlasManagerRequestCallback = (error, content) => {
+            if (error) {
+              return reject(`Error while preloading a spine atlas resource: ${error}`);
+            }
+            if (!content) {
+              return reject(`Cannot reach texture atlas for resource '${resourceName}'.`);
+            }
+  
+            resolve(content);
+          };
+  
+          this.load(resource, onLoad);
+        }));
+      }
 
-              this.load(atlasResources[i], onLoad);
-            })
-        )
-      );
-
-      return Promise.resolve(atlasResources.length);
-    }
+      return this._loadingSpineAtlases.get(resource)!;
+    } 
 
     /**
      * Load specified atlas resource and pass it to callback once it is loaded.
@@ -105,23 +94,20 @@ namespace gdjs {
       resource: ResourceData,
       callback: SpineAtlasManagerRequestCallback
     ): void {
-      if (!isAtlasResource(resource))
-        callback(new Error(`${resource.name} is on atlas!`));
-
       const metadata = resource.metadata ? JSON.parse(resource.metadata) : {};
 
       if (!metadata.image)
         callback(new Error(`${resource.name} do not have image metadata!`));
 
-      const image = this._imageManager.getPIXITexture(metadata.image);
+      const image = this._imageManager.getOrLoadPIXITexture(metadata.image);
       const onLoad = (atlas: pixi_spine.TextureAtlas) => {
-        this._loadedSpineAtlases[resource.name] = atlas;
+        this._loadedSpineAtlases.set(resource, atlas);
         callback(null, atlas);
       };
 
       PIXI.Assets.setPreferences({
         preferWorkers: false,
-        crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(
+        crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
           resource.file
         )
           ? 'use-credentials'
@@ -149,7 +135,7 @@ namespace gdjs {
      * @returns true if the content of the atlas resource is loaded, false otherwise.
      */
     isLoaded(resourceName: string): boolean {
-      return resourceName in this._loadedSpineAtlases;
+      return !!this._loadedSpineAtlases.getFromName(resourceName);
     }
 
     /**
@@ -159,7 +145,14 @@ namespace gdjs {
      * @returns the TextureAtlas of the atlas if loaded, `null` otherwise.
      */
     getAtlasTexture(resourceName: string): pixi_spine.TextureAtlas | null {
-      return this._loadedSpineAtlases[resourceName] || null;
+      return this._loadedSpineAtlases.getFromName(resourceName);
+    }
+
+    private _getAtlasResource(resourceName: string): ResourceData | null {
+      const resource = this._resourceLoader.getResource(resourceName);
+        return (resource && this.getResourceKinds().includes(resource.kind)
+          ? resource
+          : null);
     }
   }
 }

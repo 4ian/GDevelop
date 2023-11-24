@@ -49,6 +49,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
       './newIDE/app/resources/GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js',
       './newIDE/app/resources/GDJS/Runtime/Model3DManager.js',
+      './newIDE/app/resources/GDJS/Runtime/ResourceLoader.js',
+      './newIDE/app/resources/GDJS/Runtime/ResourceCache.js',
       './newIDE/app/resources/GDJS/Runtime/timemanager.js',
       './newIDE/app/resources/GDJS/Runtime/polygon.js',
       './newIDE/app/resources/GDJS/Runtime/runtimeobject.js',

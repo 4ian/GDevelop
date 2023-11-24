@@ -66,6 +66,10 @@ import {
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import uniq from 'lodash/uniq';
 import { cleanNonExistingObjectFolderOrObjectWithContexts } from './ObjectFolderOrObjectsSelection';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -153,6 +157,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
+  resourceExternallyChangedCallbackId: ?string;
 
   constructor(props: Props) {
     super(props);
@@ -197,6 +202,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+  }
+
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
   }
 
   getInstancesEditorSettings() {

@@ -51,7 +51,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
   // Copy resources
   map<gd::String, gd::String>& resourcesNewFilename =
       resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
-  unsigned int i = 0;
   for (map<gd::String, gd::String>::const_iterator it =
            resourcesNewFilename.begin();
        it != resourcesNewFilename.end();
@@ -71,8 +70,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
                        destinationFile + _("\"."));
       }
     }
-
-    ++i;
   }
 
   return true;

@@ -143,7 +143,7 @@ namespace gdjs {
       }
 
       return new pixi_spine.Spine(
-        spineManager.getSpine(this._object.spineResourceName)
+        spineManager.getSpine(this._object.spineResourceName)!
       );
     }
 

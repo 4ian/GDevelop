@@ -48,8 +48,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import SceneIcon from '../UI/CustomSvgIcons/Scene';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
-import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
-import { ShortcutsReminder } from './ShortcutsReminder';
 import Paper from '../UI/Paper';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
@@ -125,7 +123,6 @@ type Props = {|
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
-  shortcutMap: ShortcutMap,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -718,7 +715,6 @@ class ProjectManager extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       onInstallExtension,
-      shortcutMap,
     } = this.props;
     const {
       renamedItemKind,
@@ -773,7 +769,6 @@ class ProjectManager extends React.Component<Props, State> {
                 />
               </Paper>
             </div>
-            <ShortcutsReminder shortcutMap={shortcutMap} />
             <List>
               <ProjectStructureItem
                 id={getTabId('game-settings')}

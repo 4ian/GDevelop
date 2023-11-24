@@ -9,7 +9,6 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../../GDevelopJsInitializerDecorator';
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
-import defaultShortcuts from '../../../KeyboardShortcuts/DefaultShortcuts';
 
 export default {
   title: 'Project Creation/ProjectManager',
@@ -19,7 +18,6 @@ export default {
 export const Default = () => (
   <ProjectManager
     project={testProject.project}
-    shortcutMap={defaultShortcuts}
     onSaveProjectProperties={async () => true}
     onChangeProjectName={action('onChangeProjectName')}
     onOpenExternalEvents={action('onOpenExternalEvents')}
@@ -54,7 +52,6 @@ export const Default = () => (
 export const ErrorsInFunctions = () => (
   <ProjectManager
     project={testProject.project}
-    shortcutMap={defaultShortcuts}
     onSaveProjectProperties={async () => true}
     onChangeProjectName={action('onChangeProjectName')}
     onOpenExternalEvents={action('onOpenExternalEvents')}

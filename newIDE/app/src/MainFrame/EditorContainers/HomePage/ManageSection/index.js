@@ -9,7 +9,7 @@ import GamesList from '../../../../GameDashboard/GamesList';
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { Column } from '../../../../UI/Grid';
+import { Column, Line } from '../../../../UI/Grid';
 import Paper from '../../../../UI/Paper';
 import BackgroundText from '../../../../UI/BackgroundText';
 import {
@@ -25,7 +25,7 @@ import { getHelpLink } from '../../../../Utils/HelpLink';
 const publishingWikiArticle = getHelpLink('/publishing/');
 
 const styles = {
-  notLoggedInMessage: { padding: 16 },
+  backgroundMessage: { padding: 16 },
   buttonContainer: { minWidth: 150 },
 };
 
@@ -58,9 +58,9 @@ const ManageSection = ({
           <Paper
             variant="outlined"
             background="dark"
-            style={styles.notLoggedInMessage}
+            style={styles.backgroundMessage}
           >
-            <ColumnStackLayout>
+            <ColumnStackLayout noMargin>
               <BackgroundText>
                 <Trans>
                   Log-in or create an account to access your{' '}
@@ -100,12 +100,50 @@ const ManageSection = ({
             </ColumnStackLayout>
           </Paper>
         ) : games ? (
-          <GamesList
-            project={project}
-            games={games}
-            onRefreshGames={onRefreshGames}
-            onGameUpdated={onGameUpdated}
-          />
+          games.length === 0 ? (
+            <Paper
+              variant="outlined"
+              background="dark"
+              style={styles.backgroundMessage}
+            >
+              <ColumnStackLayout noMargin>
+                <Column noMargin>
+                  <Line noMargin justifyContent="center">
+                    <BackgroundText>
+                      <Trans>
+                        Learn how many users are playing your game, control
+                        published versions, and collect feedback from play
+                        testers.
+                      </Trans>
+                    </BackgroundText>
+                  </Line>
+
+                  <Line noMargin justifyContent="center">
+                    <BackgroundText>
+                      <Trans>
+                        <Link
+                          href={publishingWikiArticle}
+                          onClick={() =>
+                            Window.openExternalURL(publishingWikiArticle)
+                          }
+                        >
+                          Share a project
+                        </Link>{' '}
+                        to get started.
+                      </Trans>
+                    </BackgroundText>
+                  </Line>
+                </Column>
+              </ColumnStackLayout>
+            </Paper>
+          ) : (
+            <GamesList
+              project={project}
+              games={games}
+              onRefreshGames={onRefreshGames}
+              onGameUpdated={onGameUpdated}
+            />
+          )
         ) : gamesFetchingError ? (
           <PlaceholderError onRetry={onRefreshGames}>
             <Trans>

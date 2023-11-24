@@ -26,6 +26,8 @@ import PlaceholderError from '../UI/PlaceholderError';
 import useGamesList from '../GameDashboard/UseGamesList';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
+import { ColumnStackLayout } from '../UI/Layout';
+import AlertMessage from '../UI/AlertMessage';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -256,13 +258,21 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
           )}
           {currentTab === 'games-dashboard' &&
             (games ? (
-              <GamesList
-                project={currentProject}
-                onRefreshGames={fetchGames}
-                games={games}
-                onGameUpdated={onGameUpdated}
-                onOpenGame={setOpenedGame}
-              />
+              <ColumnStackLayout>
+                <AlertMessage kind="info">
+                  <Trans>
+                    You can find the Games Dashboard on the home page under the
+                    Manage tab.
+                  </Trans>
+                </AlertMessage>
+                <GamesList
+                  project={currentProject}
+                  onRefreshGames={fetchGames}
+                  games={games}
+                  onGameUpdated={onGameUpdated}
+                  onOpenGame={setOpenedGame}
+                />
+              </ColumnStackLayout>
             ) : gamesFetchingError ? (
               <PlaceholderError onRetry={fetchGames}>
                 <Trans>
@@ -295,7 +305,9 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
         <GameDetailsDialog
           game={openedGame}
           project={
-            !!projectUuid && openedGame.id === projectUuid ? currentProject : null
+            !!projectUuid && openedGame.id === projectUuid
+              ? currentProject
+              : null
           }
           onClose={() => {
             setOpenedGame(null);

@@ -108,6 +108,7 @@ const ManageSection = ({
                 onLoading={() => {}}
                 currentTab={currentTab}
                 setCurrentTab={setCurrentTab}
+                analyticsSource="homepage"
               />
             </ColumnStackLayout>
           </Paper>

@@ -18,6 +18,7 @@ type Props = {|
   onClose: () => void,
   onGameUpdated: (updatedGame: Game) => void,
   onGameDeleted: () => void,
+  analyticsSource: 'profile' | 'homepage' | 'projectManager',
 |};
 
 export const GameDetailsDialog = ({
@@ -26,6 +27,7 @@ export const GameDetailsDialog = ({
   onClose,
   onGameUpdated,
   onGameDeleted,
+  analyticsSource,
 }: Props) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [currentTab, setCurrentTab] = React.useState<GameDetailsTab>('details');
@@ -75,6 +77,7 @@ export const GameDetailsDialog = ({
             onLoading={setIsLoading}
             currentTab={currentTab}
             setCurrentTab={setCurrentTab}
+            analyticsSource={analyticsSource}
           />
         </Dialog>
       )}

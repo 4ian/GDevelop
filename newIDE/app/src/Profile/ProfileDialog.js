@@ -320,6 +320,7 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
             setOpenedGame(null);
             fetchGames();
           }}
+          analyticsSource="profile"
         />
       )}
     </Dialog>

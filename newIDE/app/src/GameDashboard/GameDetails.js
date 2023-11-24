@@ -44,6 +44,7 @@ import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
 import { GameMonetization } from './Monetization/GameMonetization';
 import RouterContext from '../MainFrame/RouterContext';
+import { sendGameDetailsOpened } from '../Utils/Analytics/EventSender';
 
 export type GameDetailsTab =
   | 'details'
@@ -88,6 +89,7 @@ type Props = {|
   onLoading: boolean => void,
   currentTab: GameDetailsTab,
   setCurrentTab: GameDetailsTab => void,
+  analyticsSource: 'profile' | 'homepage' | 'projectManager',
 |};
 
 const GameDetails = ({
@@ -98,6 +100,7 @@ const GameDetails = ({
   onLoading,
   currentTab,
   setCurrentTab,
+  analyticsSource,
 }: Props) => {
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
@@ -155,6 +158,13 @@ const GameDetails = ({
       loadPublicGame();
     },
     [loadPublicGame]
+  );
+
+  React.useEffect(
+    () => {
+      sendGameDetailsOpened({ from: analyticsSource });
+    },
+    [analyticsSource]
   );
 
   const handleGameUpdated = React.useCallback(

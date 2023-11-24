@@ -31,9 +31,16 @@ import Link from '../UI/Link';
 import {
   communityLinksConfig,
   type CommunityLinks,
+  syncDiscordUsername,
 } from '../Utils/GDevelopServices/User';
 import { PrivateAssetPackTile } from '../AssetStore/ShopTiles';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
+import IconButton from '../UI/IconButton';
+import Refresh from '../UI/CustomSvgIcons/Refresh';
+import Check from '../UI/CustomSvgIcons/Check';
+import { MarkdownText } from '../UI/MarkdownText';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { type Subscription } from '../Utils/GDevelopServices/Usage';
 
 const getAssetPackColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -97,6 +104,7 @@ type DisplayedProfile = {
 
 type Props = {|
   profile: ?DisplayedProfile,
+  subscription?: ?Subscription,
   isAuthenticatedUserProfile?: boolean,
   error?: ?Error,
   onRetry?: () => void,
@@ -108,6 +116,7 @@ type Props = {|
 
 const ProfileDetails = ({
   profile,
+  subscription,
   isAuthenticatedUserProfile,
   error,
   onRetry,
@@ -136,6 +145,46 @@ const ProfileDetails = ({
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
   const windowWidth = useResponsiveWindowWidth();
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader } = React.useContext(AuthenticatedUserContext);
+  const { showAlert } = useAlertDialog();
+
+  const [
+    discordUsernameSyncStatus,
+    setDiscordUsernameSyncStatus,
+  ] = React.useState<null | 'syncing' | 'success'>(null);
+
+  const onSyncDiscordUsername = React.useCallback(
+    async () => {
+      if (!profile) return;
+      setDiscordUsernameSyncStatus('syncing');
+      try {
+        await syncDiscordUsername(getAuthorizationHeader, profile.id);
+        setDiscordUsernameSyncStatus('success');
+      } catch (error) {
+        console.error('Error while syncing discord username:', error);
+        if (
+          error.response &&
+          error.response.status === 400 &&
+          error.response.data.code ===
+            'discord-role-update/discord-user-not-found'
+        ) {
+          showAlert({
+            title: t`Discord user not found`,
+            message: t`Ensure you don't have any typo in your username and that you have joined the GDevelop Discord server.`,
+          });
+          return;
+        }
+        showAlert({
+          title: t`Discord username sync failed`,
+          message: t`Something went wrong while syncing your Discord username. Please try again later.`,
+        });
+      } finally {
+        // Wait a bit to avoid spam and allow showing the success icon.
+        setTimeout(() => setDiscordUsernameSyncStatus(null), 3000);
+      }
+    },
+    [getAuthorizationHeader, profile, showAlert]
+  );
 
   const assetPackTiles = React.useMemo(
     () => {
@@ -258,15 +307,47 @@ const ProfileDetails = ({
             )}
             {(isAuthenticatedUserProfile || !!discordUsername) && ( // Always show on private profile.
               <Column noMargin>
-                <Text noMargin size="body-small">
-                  <Trans>Discord username</Trans>
-                </Text>
+                <LineStackLayout noMargin alignItems="center">
+                  <Text noMargin size="body-small">
+                    <Trans>Discord username</Trans>
+                  </Text>
+                  {isAuthenticatedUserProfile &&
+                    !!subscription &&
+                    !!subscription.planId &&
+                    !!discordUsername && (
+                      <IconButton
+                        onClick={onSyncDiscordUsername}
+                        disabled={discordUsernameSyncStatus !== null}
+                        tooltip={t`Sync your role on GDevelop's Discord server`}
+                        size="small"
+                      >
+                        {discordUsernameSyncStatus === 'success' ? (
+                          <Check fontSize="small" />
+                        ) : (
+                          <Refresh fontSize="small" />
+                        )}
+                      </IconButton>
+                    )}
+                </LineStackLayout>
                 <Text>
-                  {discordUsername || (
-                    <Trans>
-                      No discord username defined. Add it to get access to a
-                      dedicated channel!
-                    </Trans>
+                  {!isAuthenticatedUserProfile ? (
+                    discordUsername
+                  ) : !discordUsername ? (
+                    !subscription || !subscription.planId ? (
+                      <MarkdownText
+                        translatableSource={t`No discord username defined. Add it and get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
+                      />
+                    ) : (
+                      <MarkdownText
+                        translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
+                      />
+                    )
+                  ) : !subscription || !subscription.planId ? (
+                    <MarkdownText
+                      translatableSource={t`Get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
+                    />
+                  ) : (
+                    discordUsername
                   )}
                 </Text>
               </Column>

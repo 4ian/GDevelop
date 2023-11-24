@@ -338,6 +338,21 @@ export const getUsernameAvailability = async (
   return response.data;
 };
 
+export const syncDiscordUsername = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await axios.post(
+    `${GDevelopUserApi.baseUrl}/user/${userId}/action/update-discord-role`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+};
+
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;
 const profileLinkFormattingErrorMessage = (
   <Trans>Please enter a valid URL, starting with https://</Trans>

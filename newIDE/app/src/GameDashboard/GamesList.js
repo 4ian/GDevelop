@@ -6,7 +6,7 @@ import { type Game, registerGame } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
-import { GameDetailsDialog, type GameDetailsTab } from './GameDetailsDialog';
+import { type GameDetailsTab } from './GameDetails';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RouterContext from '../MainFrame/RouterContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
@@ -39,6 +39,7 @@ type Props = {|
   games: Array<Game>,
   onRefreshGames: () => Promise<void>,
   onGameUpdated: Game => void,
+  onOpenGame: (?Game) => void,
 |};
 
 const GamesList = ({
@@ -46,6 +47,7 @@ const GamesList = ({
   games,
   onRefreshGames,
   onGameUpdated,
+  onOpenGame,
 }: Props) => {
   const {
     routeArguments,
@@ -55,7 +57,6 @@ const GamesList = ({
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [openedGame, setOpenedGame] = React.useState<?Game>(null);
   const { showAlert, showConfirmation } = useAlertDialog();
   const [isGameRegistering, setIsGameRegistering] = React.useState(false);
   const [searchText, setSearchText] = React.useState<string>('');
@@ -112,7 +113,7 @@ const GamesList = ({
           const game = games.find(game => game.id === initialGameId);
           removeRouteArguments(['game-id']);
           if (game) {
-            setOpenedGame(game);
+            onOpenGame(game);
           } else {
             // If the game is not in the list, then either
             // - allow to register it, if it's the current project.
@@ -147,6 +148,7 @@ const GamesList = ({
       showConfirmation,
       showAlert,
       project,
+      onOpenGame
     ]
   );
 
@@ -195,30 +197,11 @@ const GamesList = ({
             game={game}
             onOpenGameManager={(tab: GameDetailsTab) => {
               addRouteArguments({ 'games-dashboard-tab': tab });
-              setOpenedGame(game);
+              onOpenGame(game);
             }}
             onUpdateGame={onRefreshGames}
           />
         ))}
-      {openedGame && (
-        <GameDetailsDialog
-          game={openedGame}
-          project={
-            !!projectUuid && openedGame.id === projectUuid ? project : null
-          }
-          onClose={() => {
-            setOpenedGame(null);
-          }}
-          onGameUpdated={updatedGame => {
-            onGameUpdated(updatedGame);
-            setOpenedGame(updatedGame);
-          }}
-          onGameDeleted={() => {
-            setOpenedGame(null);
-            onRefreshGames();
-          }}
-        />
-      )}
     </ColumnStackLayout>
   );
 };

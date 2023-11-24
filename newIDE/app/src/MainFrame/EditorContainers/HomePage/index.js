@@ -37,6 +37,8 @@ import {
   sendUserSurveyStarted,
 } from '../../../Utils/Analytics/EventSender';
 import { type RouteArguments } from '../../RouterContext';
+import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
+import { type Game } from '../../../Utils/GDevelopServices/Game';
 import useGamesList from '../../../GameDashboard/UseGamesList';
 
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -168,6 +170,8 @@ export const HomePage = React.memo<Props>(
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
       const [showUserChip, setShowUserChip] = React.useState<boolean>(false);
+      const [openedGame, setOpenedGame] = React.useState<?Game>(null);
+      const [gameDetailsCurrentTab, setGameDetailsCurrentTab] = React.useState<GameDetailsTab>('details');
 
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';
@@ -407,6 +411,10 @@ export const HomePage = React.memo<Props>(
                       onGameUpdated={onGameUpdated}
                       onRefreshGames={fetchGames}
                       gamesFetchingError={gamesFetchingError}
+                      openedGame={openedGame}
+                      setOpenedGame={setOpenedGame}
+                      currentTab={gameDetailsCurrentTab}
+                      setCurrentTab={setGameDetailsCurrentTab}
                     />
                   )}
                   {activeTab === 'get-started' && (

@@ -24,6 +24,8 @@ import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopService
 import ErrorBoundary from '../UI/ErrorBoundary';
 import PlaceholderError from '../UI/PlaceholderError';
 import useGamesList from '../GameDashboard/UseGamesList';
+import { type Game } from '../Utils/GDevelopServices/Game';
+import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -40,6 +42,7 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
 
+  const [openedGame, setOpenedGame] = React.useState<?Game>(null);
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
@@ -50,6 +53,8 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
     onGameUpdated,
     fetchGames,
   } = useGamesList();
+
+  const projectUuid = currentProject ? currentProject.getProjectUuid() : null;
 
   React.useEffect(
     () => {
@@ -256,6 +261,7 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
                 onRefreshGames={fetchGames}
                 games={games}
                 onGameUpdated={onGameUpdated}
+                onOpenGame={setOpenedGame}
               />
             ) : gamesFetchingError ? (
               <PlaceholderError onRetry={fetchGames}>
@@ -284,6 +290,25 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
             }
           />
         </Column>
+      )}
+      {openedGame && (
+        <GameDetailsDialog
+          game={openedGame}
+          project={
+            !!projectUuid && openedGame.id === projectUuid ? currentProject : null
+          }
+          onClose={() => {
+            setOpenedGame(null);
+          }}
+          onGameUpdated={updatedGame => {
+            onGameUpdated(updatedGame);
+            setOpenedGame(updatedGame);
+          }}
+          onGameDeleted={() => {
+            setOpenedGame(null);
+            fetchGames();
+          }}
+        />
       )}
     </Dialog>
   );

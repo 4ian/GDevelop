@@ -28,6 +28,7 @@ export const WithoutAProjectOpened = () => {
         games={[game1, game2]}
         onGameUpdated={action('onGameUpdated')}
         onRefreshGames={action('onRefreshGames')}
+        onOpenGame={action('onOpenGame')}
       />
     </AuthenticatedUserContext.Provider>
   );

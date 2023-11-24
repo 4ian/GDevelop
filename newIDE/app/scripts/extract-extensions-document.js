@@ -380,6 +380,41 @@ const generateAllExtensionsSections = extensions => {
   return extensionSectionsContent;
 };
 
+/**
+ * @param {Array<any>} extensions The extension (gdEventsFunctionsExtension)
+ */
+const generateExtensionsMkDocsDotPagesFile = async (extensions) => {
+  const extensionsByCategory = sortKeys(
+    groupBy(extensions, pair => pair.getCategory() || 'General')
+  );
+
+  let pagesList = '';
+  for (const category in extensionsByCategory) {
+    pagesList += `    - ${category}:\n`;
+
+    const extensions = extensionsByCategory[category];
+    for (const extension of extensions) {
+      const folderName = getExtensionFolderName(extension.getName());
+      pagesList += `        - ${extension.getFullName()}: ${folderName}\n`;
+    }
+  }
+
+  const dotPagesContent = `nav:
+    - index.md
+    - search.md
+    - tiers.md
+    - Create your own extensions:
+        - Create a new extension : create.md
+        - best-practices.md
+        - share-extension.md
+${pagesList}    - ...
+`;
+
+  const extensionsDotPagesFilePath = path.join(extensionsRootPath, '.pages');
+  await fs.writeFile(extensionsDotPagesFilePath, dotPagesContent);
+  console.info(`ℹ️ File generated: ${extensionsDotPagesFilePath}`);
+};
+
 const generateExtensionsList = async gd => {
   let content = `## Extensions list
 
@@ -400,11 +435,11 @@ Here are listed all the extensions available in GDevelop. The list is divided in
     header => header.tier === 'community'
   );
 
-  const reviewedExtensions = reviewedExtensionShortHeaders.map(
-    header => project.getEventsFunctionsExtension(header.name)
+  const reviewedExtensions = reviewedExtensionShortHeaders.map(header =>
+    project.getEventsFunctionsExtension(header.name)
   );
-  const communityExtensions = communityExtensionShortHeaders.map(
-    header => project.getEventsFunctionsExtension(header.name)
+  const communityExtensions = communityExtensionShortHeaders.map(header =>
+    project.getEventsFunctionsExtension(header.name)
   );
 
   content += '## Reviewed extensions\n\n';
@@ -454,6 +489,12 @@ does or inspect its content before using it.
     );
   }
   content += generateAllExtensionsSections(communityExtensions);
+
+  await generateExtensionsMkDocsDotPagesFile([
+    ...reviewedExtensions,
+    ...communityExtensions,
+  ]);
+
   project.delete();
   return content;
 };

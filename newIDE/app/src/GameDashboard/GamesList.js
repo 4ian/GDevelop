@@ -185,6 +185,7 @@ const GamesList = ({
         onChange={setSearchText}
         // Search is triggered on each search text change
         onRequestSearch={() => {}}
+        placeholder={t`Search by name`}
       />
       {displayedGames &&
         displayedGames.map(game => (

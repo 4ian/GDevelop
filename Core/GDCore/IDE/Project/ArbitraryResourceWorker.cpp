@@ -243,10 +243,12 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
         } else if (parameterMetadata.GetType() == "jsonResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeJson(updatedParameterValue);
+          worker.ExposeEmbeddeds(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);
         } else if (parameterMetadata.GetType() == "tilemapResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeTilemap(updatedParameterValue);
+          worker.ExposeEmbeddeds(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);
         } else if (parameterMetadata.GetType() == "tilesetResource") {
           gd::String updatedParameterValue = parameterValue;

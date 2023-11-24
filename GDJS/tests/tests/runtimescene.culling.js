@@ -56,8 +56,15 @@ describe('gdjs.RuntimeScene culling tests', () => {
 
     scene.renderAndStep(1000 / 60);
     expect(object.getRendererObject().visible).to.be(false);
+
+    object.setLayer('');
+
+    scene.renderAndStep(1000 / 60);
+    expect(object.getRendererObject().visible).to.be(true);
   });
 
+  // This is important to avoid games with big levels to be CPU limited during
+  // the 2 first seconds.
   it('should allow objects to sleep at the end of the 1st frame', () => {
     const game = gdjs.getPixiRuntimeGame();
     const scene = new gdjs.TestRuntimeScene(game, ['']);
@@ -88,6 +95,7 @@ describe('gdjs.RuntimeScene culling tests', () => {
     object.setY(200);
     expect(object.getSpatialSearchSleepState().isAwake()).to.be(true);
 
+    // Objects can sleep every 64 frames if they haven't moved for 1 second.
     for (let index = 0; index < 60 + 64; index++) {
       scene.renderAndStep(1000 / 60);
     }

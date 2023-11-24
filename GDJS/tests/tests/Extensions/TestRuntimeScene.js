@@ -4,11 +4,14 @@
 gdjs.TestRuntimeScene = class TestRuntimeScene extends gdjs.RuntimeScene {
   /**
    * @param {gdjs.RuntimeGame} runtimeGame
+   * @param {gdjs.RuntimeGame} runtimeGame
    */
-  constructor(runtimeGame) {
+  constructor(runtimeGame, layerNames = ['']) {
     super(runtimeGame);
 
-    this.addLayer({ name: '', cameras: [], effects: [] });
+    for (const layerName of layerNames) {
+      this.addLayer({ name: layerName, cameras: [], effects: [] });
+    }
   }
 
   /**

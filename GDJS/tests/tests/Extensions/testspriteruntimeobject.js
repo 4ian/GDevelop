@@ -39,7 +39,6 @@
                   { name: 'Origin', x: 0, y: 0 },
                 ],
                 hasCustomCollisionMask: false,
-                customCollisionMask: null,
               },
             ],
           },

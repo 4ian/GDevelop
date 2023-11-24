@@ -7,12 +7,27 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import GamesList from '../../../../GameDashboard/GamesList';
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
-import PlaceholderMessage from '../../../../UI/PlaceholderMessage';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { Column } from '../../../../UI/Grid';
+import Paper from '../../../../UI/Paper';
+import BackgroundText from '../../../../UI/BackgroundText';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../../UI/Layout';
+import RaisedButton from '../../../../UI/RaisedButton';
+import FlatButton from '../../../../UI/FlatButton';
+import Link from '../../../../UI/Link';
+import Window from '../../../../Utils/Window';
+import { getHelpLink } from '../../../../Utils/HelpLink';
 
-const styles = {};
+const publishingWikiArticle = getHelpLink('/publishing/');
+
+const styles = {
+  notLoggedInMessage: { padding: 16 },
+  buttonContainer: { minWidth: 150 },
+};
 
 type Props = {|
   project: ?gdProject,
@@ -30,13 +45,60 @@ const ManageSection = ({
   gamesFetchingError,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile } = authenticatedUser;
+  const {
+    profile,
+    onOpenCreateAccountDialog,
+    onOpenLoginDialog,
+  } = authenticatedUser;
 
   return (
     <SectionContainer flexBody title={<Trans>Manage Games</Trans>}>
       <SectionRow expand>
         {!profile ? (
-          <PlaceholderMessage>Salut</PlaceholderMessage>
+          <Paper
+            variant="outlined"
+            background="dark"
+            style={styles.notLoggedInMessage}
+          >
+            <ColumnStackLayout>
+              <BackgroundText>
+                <Trans>
+                  Log-in or create an account to access your{' '}
+                  <Link
+                    href={publishingWikiArticle}
+                    onClick={() =>
+                      Window.openExternalURL(publishingWikiArticle)
+                    }
+                  >
+                    published games
+                  </Link>{' '}
+                  retention metrics, and player feedback.
+                </Trans>
+              </BackgroundText>
+              <ResponsiveLineStackLayout
+                noMargin
+                noColumnMargin
+                justifyContent="center"
+              >
+                <div style={styles.buttonContainer}>
+                  <FlatButton
+                    fullWidth
+                    primary
+                    label={<Trans>Login</Trans>}
+                    onClick={onOpenLoginDialog}
+                  />
+                </div>
+                <div style={styles.buttonContainer}>
+                  <RaisedButton
+                    fullWidth
+                    primary
+                    label={<Trans>Create an account</Trans>}
+                    onClick={onOpenCreateAccountDialog}
+                  />
+                </div>
+              </ResponsiveLineStackLayout>
+            </ColumnStackLayout>
+          </Paper>
         ) : games ? (
           <GamesList
             project={project}

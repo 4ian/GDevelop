@@ -160,9 +160,13 @@ const GamesList = ({
     );
   }, 250);
 
+  // Refresh games to display when:
+  // - search text changes (user input)
+  // - games change (refresh following an update for instance)
   React.useEffect(getGamesToDisplayDebounced, [
-    searchText,
     getGamesToDisplayDebounced,
+    searchText,
+    games,
   ]);
 
   const projectUuid = project ? project.getProjectUuid() : null;
@@ -218,4 +222,4 @@ const GamesList = ({
   );
 };
 
-export default GamesList
+export default GamesList;

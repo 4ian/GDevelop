@@ -41,7 +41,7 @@ type Props = {|
   onGameUpdated: Game => void,
 |};
 
-export const GamesList = ({
+const GamesList = ({
   project,
   games,
   onRefreshGames,
@@ -217,3 +217,5 @@ export const GamesList = ({
     </ColumnStackLayout>
   );
 };
+
+export default GamesList

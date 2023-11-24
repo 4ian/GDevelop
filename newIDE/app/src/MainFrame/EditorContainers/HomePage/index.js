@@ -11,6 +11,7 @@ import GetStartedSection from './GetStartedSection';
 import BuildSection from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
+import ManageSection from './ManageSection';
 import CommunitySection from './CommunitySection';
 import StoreSection from './StoreSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
@@ -36,6 +37,7 @@ import {
   sendUserSurveyStarted,
 } from '../../../Utils/Analytics/EventSender';
 import { type RouteArguments } from '../../RouterContext';
+import useGamesList from '../../../GameDashboard/UseGamesList';
 
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
   routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
@@ -187,6 +189,12 @@ export const HomePage = React.memo<Props>(
       const isShopRequestedAtOpening = React.useRef<boolean>(
         isShopRequested(routeArguments)
       );
+      const {
+        games,
+        gamesFetchingError,
+        onGameUpdated,
+        fetchGames,
+      } = useGamesList();
 
       // Open the store and a pack or game template if asked to do so.
       React.useEffect(
@@ -263,6 +271,16 @@ export const HomePage = React.memo<Props>(
           fetchTutorials();
         },
         [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
+      );
+
+      // Only fetch games if the user decides to open the games dashboard tab.
+      React.useEffect(
+        () => {
+          if (activeTab === 'manage' && !games) {
+            fetchGames();
+          }
+        },
+        [fetchGames, activeTab, games]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -381,6 +399,15 @@ export const HomePage = React.memo<Props>(
                 <div style={styles.scrollableContainer}>
                   {shouldDisplayAnnouncements && (
                     <AnnouncementsFeed canClose level="urgent" addMargins />
+                  )}
+                  {activeTab === 'manage' && (
+                    <ManageSection
+                      project={project}
+                      games={games}
+                      onGameUpdated={onGameUpdated}
+                      onRefreshGames={fetchGames}
+                      gamesFetchingError={gamesFetchingError}
+                    />
                   )}
                   {activeTab === 'get-started' && (
                     <GetStartedSection

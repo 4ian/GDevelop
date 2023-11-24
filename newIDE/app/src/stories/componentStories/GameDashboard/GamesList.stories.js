@@ -12,7 +12,7 @@ import {
   game2,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { GamesList } from '../../../GameDashboard/GamesList';
+import GamesList from '../../../GameDashboard/GamesList';
 
 export default {
   title: 'GameDashboard/GamesList',

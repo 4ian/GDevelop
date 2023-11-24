@@ -18,6 +18,7 @@ import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import HomePageMenuBar from './HomePageMenuBar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import GraphsIcon from '../../../UI/CustomSvgIcons/Graphs';
 
 export const styles = {
   drawerContent: {
@@ -39,6 +40,7 @@ export const styles = {
 
 export type HomeTab =
   | 'get-started'
+  | 'manage'
   | 'build'
   | 'learn'
   | 'play'
@@ -63,6 +65,12 @@ export const homePageMenuTabs: {
     tab: 'build',
     id: 'home-build-tab',
     getIcon: color => <PickAxeIcon fontSize="small" color={color} />,
+  },
+  {
+    label: <Trans>Manage</Trans>,
+    tab: 'manage',
+    id: 'home-manage-tab',
+    getIcon: color => <GraphsIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Shop</Trans>,

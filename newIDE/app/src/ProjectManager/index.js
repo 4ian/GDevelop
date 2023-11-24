@@ -53,6 +53,8 @@ import Settings from '../UI/CustomSvgIcons/Settings';
 import Picture from '../UI/CustomSvgIcons/Picture';
 import Publish from '../UI/CustomSvgIcons/Publish';
 import ProjectResources from '../UI/CustomSvgIcons/ProjectResources';
+import GamesDashboardInfo from './GamesDashboardInfo';
+
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -790,6 +792,7 @@ class ProjectManager extends React.Component<Props, State> {
                     onClick={this.props.onOpenPlatformSpecificAssets}
                     noPadding
                   />,
+                  <GamesDashboardInfo />,
                 ]}
               />
               <ProjectStructureItem

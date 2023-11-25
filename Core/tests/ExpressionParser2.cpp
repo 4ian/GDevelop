@@ -2828,10 +2828,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable2Node.identifierName == "MyVar2");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, objectsContainersList, "", variable1Node);
+          platform, projectScopedContainers, "", variable1Node);
       REQUIRE(variable1ObjectName == "MyObject1");
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, objectsContainersList, "", variable2Node);
+          platform, projectScopedContainers, "", variable2Node);
       REQUIRE(variable2ObjectName == "MyObject2");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
@@ -2859,10 +2859,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable2Node.identifierName == "MyVar2");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, objectsContainersList, "", variable1Node);
+          platform, projectScopedContainers, "", variable1Node);
       REQUIRE(variable1ObjectName == "MyObject1");
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, objectsContainersList, "", variable2Node);
+          platform, projectScopedContainers, "", variable2Node);
       REQUIRE(variable2ObjectName == "MyObject1");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
@@ -2883,7 +2883,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable1Node.identifierName == "MyVar1");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, objectsContainersList, "MySpriteObject", variable1Node);
+          platform, projectScopedContainers, "MySpriteObject", variable1Node);
       REQUIRE(variable1ObjectName == "MySpriteObject");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
@@ -2905,7 +2905,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable1Node.childIdentifierName == "MyChild");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-          platform, objectsContainersList, "MySpriteObject", variable1Node);
+          platform, projectScopedContainers, "MySpriteObject", variable1Node);
       REQUIRE(variable1ObjectName == "MySpriteObject");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");

@@ -116,10 +116,13 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
                   ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                   : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
-    auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetObjectsContainersList(),
-                                          rootObjectName,
-                                          node);
+    auto objectName = scope == gd::EventsCodeGenerator::OBJECT_VARIABLE
+                          ? gd::ExpressionVariableOwnerFinder::GetObjectName(
+                                codeGenerator.GetPlatform(),
+                                codeGenerator.GetProjectScopedContainers(),
+                                rootObjectName,
+                                node)
+                          : "";
     output += codeGenerator.GenerateGetVariable(
         node.name, scope, context, objectName);
     if (node.child) node.child->Visit(*this);
@@ -208,22 +211,25 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
     output +=
         codeGenerator.GenerateObject(node.identifierName, type, context);
   } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
-      EventsCodeGenerator::VariableScope scope =
-          type == "globalvar"
-              ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-              : ((type == "scenevar")
-                    ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
-                    : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+    EventsCodeGenerator::VariableScope scope =
+        type == "globalvar"
+            ? gd::EventsCodeGenerator::PROJECT_VARIABLE
+            : ((type == "scenevar")
+                  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
+                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
-      auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetObjectsContainersList(),
-                                            rootObjectName,
-                                            node);
-      output += codeGenerator.GenerateGetVariable(
-          node.identifierName, scope, context, objectName);
-      if (!node.childIdentifierName.empty()) {
-        output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
-      }
+    auto objectName = scope == gd::EventsCodeGenerator::OBJECT_VARIABLE
+                          ? gd::ExpressionVariableOwnerFinder::GetObjectName(
+                                codeGenerator.GetPlatform(),
+                                codeGenerator.GetProjectScopedContainers(),
+                                rootObjectName,
+                                node)
+                          : "";
+    output += codeGenerator.GenerateGetVariable(
+        node.identifierName, scope, context, objectName);
+    if (!node.childIdentifierName.empty()) {
+      output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
+    }
   } else {
     const auto& variablesContainersList = codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
     const auto& propertiesContainersList = codeGenerator.GetProjectScopedContainers().GetPropertiesContainersList();
@@ -432,7 +438,7 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
     if (!parameterMetadata.IsCodeOnly()) {
       if (nonCodeOnlyParameterIndex < parameters.size()) {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
-                                              codeGenerator.GetObjectsContainersList(),
+                                              codeGenerator.GetProjectScopedContainers(),
                                               rootObjectName,
                                               *parameters[nonCodeOnlyParameterIndex].get());
         ExpressionCodeGenerator generator(parameterMetadata.GetType(), objectName, codeGenerator, context);

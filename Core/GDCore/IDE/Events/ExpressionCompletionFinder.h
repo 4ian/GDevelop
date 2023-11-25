@@ -506,10 +506,8 @@ class GD_CORE_API ExpressionCompletionFinder
       } else if (type == "objectvar") {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
             platform,
-            objectsContainersList,
-            // Variable fields doesn't use expression completion,
-            // so the object will be found inside the expression itself.
-            "",
+            projectScopedContainers,
+            rootObjectName,
             node);
 
         AddCompletionsForObjectOrGroupVariablesMatchingSearch(
@@ -521,11 +519,37 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
-    // No completions
+    // Use this finder or another one to walk back and make the list of
+    // variables: RootVariable: from `OnVisitVariableNode`: bracket accessor (in
+    // case of array or structure, take the first children) variable accessor
+    // Once we have this, walk through the variable.
+    // if (node.parent) node.parent->Visit(*this);
+
+    const gd::Variable* variable =
+        gd::ExpressionVariableOwnerFinder::GetVariableUnderNode(
+            platform, projectScopedContainers, rootObjectName, node);
+
+    if (variable) {
+    std::cout << "Autocomplete for (variable accessor) " << &variable << std::endl;
+      if (variable->GetType() == gd::Variable::Structure) {
+        for (const auto& name : variable->GetAllChildrenNames()) {
+          const auto& childVariable = variable->GetChild(name);
+          ExpressionCompletionDescription description(
+              ExpressionCompletionDescription::Variable,
+              node.nameLocation.GetStartPosition(),
+              node.nameLocation.GetEndPosition());
+          description.SetCompletion(name);
+          description.SetVariableType(childVariable.GetType());
+          completions.push_back(description);
+        }
+      }
+      // TODO: array
+    }
   }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
-    // No completions
+    // TODO
+    // if (node.parent) node.parent->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     const auto& objectsContainersList =
@@ -543,8 +567,8 @@ class GD_CORE_API ExpressionCompletionFinder
                 .GetTopMostVariablesContainer();
         if (variablesContainer) {
           AddCompletionsForVariablesMatchingSearch(*variablesContainer,
-                                               node.identifierName,
-                                               node.identifierNameLocation);
+                                                   node.identifierName,
+                                                   node.identifierNameLocation);
         }
       } else if (type == "scenevar") {
         const auto* variablesContainer =
@@ -552,16 +576,14 @@ class GD_CORE_API ExpressionCompletionFinder
                 .GetBottomMostVariablesContainer();
         if (variablesContainer) {
           AddCompletionsForVariablesMatchingSearch(*variablesContainer,
-                                               node.identifierName,
-                                               node.identifierNameLocation);
+                                                   node.identifierName,
+                                                   node.identifierNameLocation);
         }
       } else if (type == "objectvar") {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
             platform,
-            objectsContainersList,
-            // Variable fields doesn't use expression completion,
-            // so the object will be found inside the expression itself.
-            "",
+            projectScopedContainers,
+            rootObjectName,
             node);
 
         AddCompletionsForObjectOrGroupVariablesMatchingSearch(
@@ -586,27 +608,66 @@ class GD_CORE_API ExpressionCompletionFinder
         }
       } else if (IsCaretOn(node.identifierNameDotLocation) ||
                  IsCaretOn(node.childIdentifierNameLocation)) {
-        const gd::String& objectName = node.identifierName;
+        // Might be:
+        // - An object variable, object behavior or object expression.
+        // - Or a variable with a child.
+        projectScopedContainers.MatchIdentifierWithName<void>(
+            node.identifierName,
+            [&]() {
+              // This is an object.
+              const gd::String& objectName = node.identifierName;
+              AddCompletionsForObjectOrGroupVariablesMatchingSearch(
+                  objectsContainersList,
+                  objectName,
+                  node.childIdentifierName,
+                  node.childIdentifierNameLocation);
+              completions.push_back(
+                  ExpressionCompletionDescription::ForBehaviorWithPrefix(
+                      node.childIdentifierName,
+                      node.childIdentifierNameLocation.GetStartPosition(),
+                      node.childIdentifierNameLocation.GetEndPosition(),
+                      objectName));
+              completions.push_back(
+                  ExpressionCompletionDescription::ForExpressionWithPrefix(
+                      type,
+                      node.childIdentifierName,
+                      node.childIdentifierNameLocation.GetStartPosition(),
+                      node.childIdentifierNameLocation.GetEndPosition(),
+                      objectName));
+            },
+            [&]() {
+              // This is a variable.
 
-        // Might be an object variable, object behavior or object expression:
-        AddCompletionsForObjectOrGroupVariablesMatchingSearch(
-            objectsContainersList,
-            objectName,
-            node.childIdentifierName,
-            node.childIdentifierNameLocation);
-        completions.push_back(
-            ExpressionCompletionDescription::ForBehaviorWithPrefix(
-                node.childIdentifierName,
-                node.childIdentifierNameLocation.GetStartPosition(),
-                node.childIdentifierNameLocation.GetEndPosition(),
-                objectName));
-        completions.push_back(
-            ExpressionCompletionDescription::ForExpressionWithPrefix(
-                type,
-                node.childIdentifierName,
-                node.childIdentifierNameLocation.GetStartPosition(),
-                node.childIdentifierNameLocation.GetEndPosition(),
-                objectName));
+              const gd::Variable* variable =
+                  gd::ExpressionVariableOwnerFinder::GetVariableUnderNode(
+                      platform, projectScopedContainers, rootObjectName, node);
+
+              if (variable) {
+                std::cout << "Autocomplete for (identifier) " << &variable << std::endl;
+                if (variable->GetType() == gd::Variable::Structure) {
+                  for (const auto& name : variable->GetAllChildrenNames()) {
+                    const auto& childVariable = variable->GetChild(name);
+                    ExpressionCompletionDescription description(
+                        ExpressionCompletionDescription::Variable,
+                        node.childIdentifierNameLocation.GetStartPosition(),
+                        node.childIdentifierNameLocation.GetEndPosition());
+                    description.SetCompletion(name);
+                    description.SetVariableType(childVariable.GetType());
+                    completions.push_back(description);
+                  }
+                }
+                // TODO: array
+              }
+            },
+            [&]() {
+              // Ignore properties here.
+            },
+            [&]() {
+              // Ignore parameters here.
+            },
+            [&]() {
+              // Ignore unrecognised identifiers here.
+            });
       }
     }
   }
@@ -736,7 +797,8 @@ class GD_CORE_API ExpressionCompletionFinder
     auto type = gd::ExpressionTypeFinder::GetType(
         platform, projectScopedContainers, rootType, node);
 
-    AddCompletionsForAllIdentifiersMatchingSearch(node.text, type, node.location);
+    AddCompletionsForAllIdentifiersMatchingSearch(
+        node.text, type, node.location);
     completions.push_back(
         ExpressionCompletionDescription::ForExpressionWithPrefix(
             type,
@@ -795,19 +857,20 @@ class GD_CORE_API ExpressionCompletionFinder
       const gd::String& search,
       const gd::String& type,
       const ExpressionParserLocation& location) {
-    projectScopedContainers.GetObjectsContainersList().ForEachNameMatchingSearch(
-        search,
-        [&](const gd::String& name,
-            const gd::ObjectConfiguration* objectConfiguration) {
-          ExpressionCompletionDescription description(
-              ExpressionCompletionDescription::Object,
-              location.GetStartPosition(),
-              location.GetEndPosition());
-          description.SetObjectConfiguration(objectConfiguration);
-          description.SetCompletion(name);
-          description.SetType(type);
-          completions.push_back(description);
-        });
+    projectScopedContainers.GetObjectsContainersList()
+        .ForEachNameMatchingSearch(
+            search,
+            [&](const gd::String& name,
+                const gd::ObjectConfiguration* objectConfiguration) {
+              ExpressionCompletionDescription description(
+                  ExpressionCompletionDescription::Object,
+                  location.GetStartPosition(),
+                  location.GetEndPosition());
+              description.SetObjectConfiguration(objectConfiguration);
+              description.SetCompletion(name);
+              description.SetType(type);
+              completions.push_back(description);
+            });
   }
 
   void AddCompletionsForObjectsAndVariablesMatchingSearch(
@@ -845,7 +908,7 @@ class GD_CORE_API ExpressionCompletionFinder
   }
 
   void AddCompletionsForAllIdentifiersMatchingSearch(const gd::String& search,
-                                                 const gd::String& type) {
+                                                     const gd::String& type) {
     AddCompletionsForAllIdentifiersMatchingSearch(
         search,
         type,
@@ -917,6 +980,7 @@ class GD_CORE_API ExpressionCompletionFinder
   const gd::Platform& platform;
   const gd::ProjectScopedContainers& projectScopedContainers;
   const gd::String rootType;
+  const gd::String rootObjectName; // TODO
 };
 
 }  // namespace gd

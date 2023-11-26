@@ -2809,8 +2809,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // as ExpressionVariableOwnerFinder depends on this parameter type
       // information.
       auto node = parser.ParseExpression(
-          "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObject1, "
-          "MyVar1, MyObject2, MyVar2)");
+          "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MySpriteObject, "
+          "MyVariable, MySpriteObject2, MyVariable2)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto &identifierObject1Node =
@@ -2822,17 +2822,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &variable2Node =
           dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[3]);
 
-      REQUIRE(identifierObject1Node.identifierName == "MyObject1");
-      REQUIRE(identifierObject2Node.identifierName == "MyObject2");
-      REQUIRE(variable1Node.identifierName == "MyVar1");
-      REQUIRE(variable2Node.identifierName == "MyVar2");
+      REQUIRE(identifierObject1Node.identifierName == "MySpriteObject");
+      REQUIRE(identifierObject2Node.identifierName == "MySpriteObject2");
+      REQUIRE(variable1Node.identifierName == "MyVariable");
+      REQUIRE(variable2Node.identifierName == "MyVariable2");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, projectScopedContainers, "", variable1Node);
-      REQUIRE(variable1ObjectName == "MyObject1");
+      REQUIRE(variable1ObjectName == "MySpriteObject");
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, projectScopedContainers, "", variable2Node);
-      REQUIRE(variable2ObjectName == "MyObject2");
+      REQUIRE(variable2ObjectName == "MySpriteObject2");
+
+      // Also check the ability to find the last parent of the variables:
+      auto lastParentOfVariable1Node = gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, "", variable1Node);
+      REQUIRE(lastParentOfVariable1Node.variablesContainer == &mySpriteObject.GetVariables());
+      auto lastParentOfVariable2Node = gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, "", variable2Node);
+      REQUIRE(lastParentOfVariable2Node.variablesContainer == &mySpriteObject2.GetVariables());
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
@@ -2843,8 +2851,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Valid function call with 2 object variable from the same object") {
     {
       auto node = parser.ParseExpression(
-          "MyExtension::GetStringWith1ObjectParamAnd2ObjectVarParam(MyObject1, "
-          "MyVar1, MyVar2)");
+          "MyExtension::GetStringWith1ObjectParamAnd2ObjectVarParam(MySpriteObject, "
+          "MyVariable, MyVariable2)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto &identifierObject1Node =
@@ -2854,16 +2862,24 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &variable2Node =
           dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
 
-      REQUIRE(identifierObject1Node.identifierName == "MyObject1");
-      REQUIRE(variable1Node.identifierName == "MyVar1");
-      REQUIRE(variable2Node.identifierName == "MyVar2");
+      REQUIRE(identifierObject1Node.identifierName == "MySpriteObject");
+      REQUIRE(variable1Node.identifierName == "MyVariable");
+      REQUIRE(variable2Node.identifierName == "MyVariable2");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, projectScopedContainers, "", variable1Node);
-      REQUIRE(variable1ObjectName == "MyObject1");
+      REQUIRE(variable1ObjectName == "MySpriteObject");
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, projectScopedContainers, "", variable2Node);
-      REQUIRE(variable2ObjectName == "MyObject1");
+      REQUIRE(variable2ObjectName == "MySpriteObject");
+
+      // Also check the ability to find the last parent of the variables:
+      auto lastParentOfVariable1Node = gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, "", variable1Node);
+      REQUIRE(lastParentOfVariable1Node.variablesContainer == &mySpriteObject.GetVariables());
+      auto lastParentOfVariable2Node = gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, "", variable2Node);
+      REQUIRE(lastParentOfVariable2Node.variablesContainer == &mySpriteObject.GetVariables());
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
@@ -2874,17 +2890,22 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Valid object function call with 1 object variable from the object of the function") {
     {
       auto node = parser.ParseExpression(
-          "MySpriteObject.GetObjectVariableAsNumber(MyVar1)");
+          "MySpriteObject.GetObjectVariableAsNumber(MyVariable)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto &variable1Node =
           dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
 
-      REQUIRE(variable1Node.identifierName == "MyVar1");
+      REQUIRE(variable1Node.identifierName == "MyVariable");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, projectScopedContainers, "MySpriteObject", variable1Node);
       REQUIRE(variable1ObjectName == "MySpriteObject");
+
+      // Also check the ability to find the last parent of the variable:
+      auto lastParentOfVariable1Node = gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, "MySpriteObject", variable1Node);
+      REQUIRE(lastParentOfVariable1Node.variablesContainer == &mySpriteObject.GetVariables());
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
@@ -2895,18 +2916,23 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Valid object function call with 1 object variable from the object of the function with a child") {
     {
       auto node = parser.ParseExpression(
-          "MySpriteObject.GetObjectVariableAsNumber(MyVar1.MyChild)");
+          "MySpriteObject.GetObjectVariableAsNumber(MyVariable.MyChild)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
       auto &variable1Node =
           dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
 
-      REQUIRE(variable1Node.identifierName == "MyVar1");
+      REQUIRE(variable1Node.identifierName == "MyVariable");
       REQUIRE(variable1Node.childIdentifierName == "MyChild");
 
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, projectScopedContainers, "MySpriteObject", variable1Node);
       REQUIRE(variable1ObjectName == "MySpriteObject");
+
+      // Also check the ability to find the last parent of the variable:
+      auto lastParentOfVariable1Node = gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, "MySpriteObject", variable1Node);
+      REQUIRE(lastParentOfVariable1Node.variable == &mySpriteObject.GetVariables().Get("MyVariable"));
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);

@@ -60,6 +60,398 @@ describe('gd.ExpressionCompletionFinder', function () {
     return completionDescriptionAsStrings;
   }
 
+  describe('Variable completion tests', () => {
+    beforeAll(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      layout = project.insertNewLayout('Scene', 0);
+
+      const object = layout.insertNewObject(
+        project,
+        'Sprite',
+        'MySpriteObject',
+        0
+      );
+
+      const makeChildrenTestVariables = (structure) => {
+        structure.castTo('Structure');
+        const structureChild1 = structure.getChild('Child1Structure');
+        structureChild1.castTo('Structure');
+        structureChild1.getChild('Child1StructureChild1');
+        structureChild1.getChild('Child1StructureChild2');
+        structureChild1.getChild('Child1StructureChild3');
+        const structureChild2 = structure.getChild('Child2Array');
+        structureChild2.castTo('Array');
+        const structureChild3 = structure.getChild('Child3Boolean');
+        structureChild3.castTo('Boolean');
+      };
+
+      object
+        .getVariables()
+        .insertNew('MyObjectVariableNumber', 0)
+        .castTo('Number');
+      object
+        .getVariables()
+        .insertNew('MyObjectVariableString', 1)
+        .castTo('String');
+      makeChildrenTestVariables(
+        object.getVariables().insertNew('MyObjectVariableStructure', 2)
+      );
+
+      layout.getVariables().insertNew('MyVariable', 0);
+      layout.getVariables().insertNew('MyVariable2', 1);
+      layout.getVariables().insertNew('UnrelatedVariable3', 2);
+      makeChildrenTestVariables(
+        layout.getVariables().insertNew('MyVariableStructure', 3)
+      );
+
+      project.getVariables().insertNew('MyGlobalVariable', 0);
+      project.getVariables().insertNew('MyVariable2', 1); // Will be "shadowed" by the layout variable.
+      makeChildrenTestVariables(
+        layout.getVariables().insertNew('MyGlobalVariableStructure', 2)
+      );
+    });
+
+    afterAll(() => {
+      project.delete();
+    });
+
+    describe('Object variables completion', () => {
+      test('Root variables', () => {
+        expect(testCompletions('number', 'MySpriteObject.|'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 1, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 1, no type, 1, no prefix, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 2, number, 1, no prefix, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        expect(testCompletions('number', 'MySpriteObject|.'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          ]
+        `);
+      });
+
+      it('Root variables (objectvar parameter)', () => {
+        expect(testCompletions('number', 'MySpriteObject.Variable(MyObject|'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 1, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 1 level', () => {
+        // Completions of children:
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.MyObjectVariableStructure.|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        // Completion of the variable, if we move the cursor back:
+
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.MyObjectVariableStructure|.'
+          )
+        ).toMatchInlineSnapshot(`
+        [
+          "{ 3, no type, 1, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 1, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+        ]
+      `);
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject|.MyObjectVariableStructure.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 1 level (objectvar parameter)', () => {
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.Variable(MyObjectVariableStructure.|'
+          )
+        ).toMatchInlineSnapshot(`
+        [
+          "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+        ]
+      `);
+
+        // Completion of the variable, if we move the cursor back:
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.Variable(MyObjectVariableStructure|.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 2 levels', () => {
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.MyObjectVariableStructure.Child1Structure.|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 1, no prefix, Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        // Completion of the previous variables, if we move the cursor back:
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.MyObjectVariableStructure.Child1Structure|.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.MyObjectVariableStructure|.Child1Structure.'
+          )
+        ).toMatchInlineSnapshot(`
+        [
+          "{ 3, no type, 1, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 1, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+        ]
+      `);
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject|.MyObjectVariableStructure.Child1Structure.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 2 levels (objectvar parameter)', () => {
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.Variable(MyObjectVariableStructure.Child1Structure.|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 1, no prefix, Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.Variable(MyObjectVariableStructure.Child1Structure|.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.Variable(MyObjectVariableStructure|.Child1Structure.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+    });
+
+    describe('Scene variables completion', () => {
+      test('Root variables', () => {
+        expect(testCompletions('number', 'MyVariab|')).toMatchInlineSnapshot(`
+                  [
+                    "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 2, number, 1, MyVariab, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                  ]
+              `);
+      });
+
+      test('Root variables (scenevar parameter)', () => {
+        expect(testCompletions('number', 'Variable(MyVaria|)'))
+          .toMatchInlineSnapshot(`
+                  [
+                    "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                  ]
+              `);
+      });
+
+      test('Structure, 1 level', () => {
+        expect(testCompletions('number', 'MyVariableStructure.|'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        // Completion of the previous variables, if we move the cursor back:
+        expect(testCompletions('number', 'MyVariableStructure|.'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 1 level (scenevar parameter)', () => {
+        expect(testCompletions('number', 'Variable(MyVariableStructure.|'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        // Completion of the previous variables, if we move the cursor back:
+        expect(testCompletions('number', 'Variable(MyVariableStructure|.'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 2 levels', () => {
+        expect(
+          testCompletions('number', 'MyVariableStructure.Child1Structure.|')
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 1, no prefix, Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        // Completion of the previous variables, if we move the cursor back:
+        expect(
+          testCompletions('number', 'MyVariableStructure.Child1Structure|.')
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        expect(
+          testCompletions('number', 'MyVariableStructure|.Child1Structure.')
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 2 levels (scenevar parameter)', () => {
+        expect(
+          testCompletions(
+            'number',
+            'Variable(MyVariableStructure.Child1Structure.|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 1, no prefix, Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        // Completion of the previous variables, if we move the cursor back:
+        expect(
+          testCompletions(
+            'number',
+            'Variable(MyVariableStructure.Child1Structure|.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+        expect(
+          testCompletions(
+            'number',
+            'Variable(MyVariableStructure|.Child1Structure.'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+    });
+
+    describe('Global variables completion', () => {
+      test('Root variables', () => {
+        expect(testCompletions('number', 'MyGlo|')).toMatchInlineSnapshot(`
+                  [
+                    "{ 3, no type, 3, no prefix, MyGlobalVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 2, number, 1, MyGlo, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                  ]
+              `);
+      });
+
+      test('Root variables (globalvar parameter)', () => {
+        expect(testCompletions('number', 'GlobalVariable(My|)'))
+          .toMatchInlineSnapshot(`
+                  [
+                    "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                    "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+                  ]
+              `);
+      });
+    });
+  });
+
   describe('Various tests', () => {
     beforeAll(() => {
       project = new gd.ProjectHelper.createNewGDJSProject();

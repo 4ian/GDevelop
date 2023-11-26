@@ -140,6 +140,7 @@ ObjectsContainersList::GetObjectOrGroupVariablesContainer(
       return &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
+      // TODO: for completion for groups.
       // Could be adapted if objects groups have variables in the future.
       // This would allow handling the renaming of variables of an object group.
     }

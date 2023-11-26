@@ -7,12 +7,9 @@ const {
 
 describe('libGD.js - GDJS Boolean Operator Code Generation integration tests', () => {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   const generateAndRunVariableAffectationWithConditions = (conditions) => {
     const serializerElement = gd.Serializer.fromJSObject([

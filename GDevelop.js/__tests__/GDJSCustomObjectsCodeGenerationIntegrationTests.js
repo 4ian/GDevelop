@@ -9,13 +9,10 @@ const { makeTestExtensions } = require('../TestUtils/TestExtensions.js');
 
 describe('libGD.js - GDJS Custom Object Code Generation integration tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      makeTestExtensions(gd);
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+    makeTestExtensions(gd);
+  });
 
   it('generates a working custom object with properties (with different types), all used in an expression', () => {
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();

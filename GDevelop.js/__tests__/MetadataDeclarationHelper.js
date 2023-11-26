@@ -2,12 +2,9 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 
 describe('MetadataDeclarationHelper', () => {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   it('can create metadata for free actions', () => {
     const extension = new gd.PlatformExtension();

@@ -342,12 +342,18 @@ const ProfileDetails = ({
                         translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
                       />
                     )
-                  ) : !subscription || !subscription.planId ? (
-                    <MarkdownText
-                      translatableSource={t`Get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
-                    />
                   ) : (
-                    discordUsername
+                    <>
+                      {discordUsername}
+                      {(!subscription || !subscription.planId) && (
+                        <>
+                          {' - '}
+                          <MarkdownText
+                            translatableSource={t`Get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
+                          />
+                        </>
+                      )}
+                    </>
                   )}
                 </Text>
               </Column>

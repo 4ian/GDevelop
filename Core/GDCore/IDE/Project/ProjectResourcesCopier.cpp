@@ -25,28 +25,29 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
     bool updateOriginalProject,
     bool preserveAbsoluteFilenames,
     bool preserveDirectoryStructure) {
-  // Check if there are some resources with absolute filenames
-  gd::ResourcesAbsolutePathChecker absolutePathChecker(originalProject.GetResourcesManager(), fs);
-  gd::ResourceExposer::ExposeWholeProjectResources(originalProject, absolutePathChecker);
 
-  auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
+  gd::Project& project = originalProject;
+  if (!updateOriginalProject) {
+    std::shared_ptr<gd::Project> clonedProject(new gd::Project(originalProject));
+    project = *clonedProject;
+  }
+
+  // Check if there are some resources with absolute filenames
+  gd::ResourcesAbsolutePathChecker absolutePathChecker(project.GetResourcesManager(), fs);
+  gd::ResourceExposer::ExposeWholeProjectResources(project, absolutePathChecker);
+
+  auto projectDirectory = fs.DirNameFrom(project.GetProjectFile());
   std::cout << "Copying all resources from " << projectDirectory << " to "
             << destinationDirectory << "..." << std::endl;
 
   // Get the resources to be copied
-  gd::ResourcesMergingHelper resourcesMergingHelper(originalProject.GetResourcesManager(), fs);
+  gd::ResourcesMergingHelper resourcesMergingHelper(project.GetResourcesManager(), fs);
   resourcesMergingHelper.SetBaseDirectory(projectDirectory);
   resourcesMergingHelper.PreserveDirectoriesStructure(
       preserveDirectoryStructure);
   resourcesMergingHelper.PreserveAbsoluteFilenames(
       preserveAbsoluteFilenames);
-
-  if (updateOriginalProject) {
-    gd::ResourceExposer::ExposeWholeProjectResources(originalProject, resourcesMergingHelper);
-  } else {
-    std::shared_ptr<gd::Project> project(new gd::Project(originalProject));
-    gd::ResourceExposer::ExposeWholeProjectResources(*project, resourcesMergingHelper);
-  }
+  gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesMergingHelper);
 
   // Copy resources
   map<gd::String, gd::String>& resourcesNewFilename =

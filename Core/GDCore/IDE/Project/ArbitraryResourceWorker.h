@@ -42,10 +42,9 @@ namespace gd {
  * \ingroup IDE
  */
 class GD_CORE_API ArbitraryResourceWorker {
- public:
-  ArbitraryResourceWorker(gd::ResourcesManager &resourcesManager) {
-    resourcesManagers.push_back(&resourcesManager);
-  };
+public:
+  ArbitraryResourceWorker(gd::ResourcesManager &resourcesManager_)
+      : resourcesManager(&resourcesManager_){};
   virtual ~ArbitraryResourceWorker();
 
   /**
@@ -124,11 +123,6 @@ class GD_CORE_API ArbitraryResourceWorker {
    */
   virtual void ExposeEmbeddeds(gd::String &resourceName);
 
- protected:
-  const std::vector<gd::ResourcesManager *> &GetResources() {
-    return resourcesManagers;
-  };
-
  private:
   /**
    * \brief Expose a resource: resources that have a file are
@@ -136,7 +130,7 @@ class GD_CORE_API ArbitraryResourceWorker {
    */
   void ExposeResource(gd::Resource &resource);
 
-  std::vector<gd::ResourcesManager *> resourcesManagers;
+  gd::ResourcesManager * resourcesManager;
 };
 
 /**

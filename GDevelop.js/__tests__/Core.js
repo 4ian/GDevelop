@@ -1594,7 +1594,7 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       spriteConfiguration.addAnimation(animation);
 
-      let worker = extend(new gd.ArbitraryResourceWorkerJS(), {
+      let worker = extend(new gd.ArbitraryResourceWorkerJS(project.getResourcesManager()), {
         exposeImage: function (image) {
           expect(image).toBe('Used');
           done();
@@ -1703,7 +1703,7 @@ describe('libGD.js', function () {
       spriteObject2.addAnimation(animation2);
 
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image1');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image1');
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -1712,7 +1712,7 @@ describe('libGD.js', function () {
         expect(objectNames).toContain('MyObject2');
       }
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image2');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image2');
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -1720,7 +1720,7 @@ describe('libGD.js', function () {
         expect(objectNames).toContain('MyObject');
       }
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image3');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image3');
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -3381,7 +3381,7 @@ describe('libGD.js', function () {
       const fs = makeFakeAbstractFileSystem(gd, {});
 
       // Check that ResourcesMergingHelper can update the filenames
-      const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
+      const resourcesMergingHelper = new gd.ResourcesMergingHelper(project.getResourcesManager(), fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
       gd.ResourceExposer.exposeWholeProjectResources(
         project,

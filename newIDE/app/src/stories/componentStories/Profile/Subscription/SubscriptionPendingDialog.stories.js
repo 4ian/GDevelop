@@ -7,6 +7,7 @@ import paperDecorator from '../../../PaperDecorator';
 import {
   indieUserProfile,
   fakeSilverAuthenticatedUser,
+  fakeStartupAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionPendingDialog from '../../../../Profile/Subscription/SubscriptionPendingDialog';
@@ -36,10 +37,20 @@ const fakeProfileWithoutDiscordUsername = {
   discordUsername: '',
 };
 
-export const AuthenticatedUserWithSubscriptionButWithoutDiscordUsername = () => (
+export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = () => (
   <SubscriptionPendingDialog
     authenticatedUser={{
       ...fakeSilverAuthenticatedUser,
+      profile: fakeProfileWithoutDiscordUsername,
+    }}
+    onClose={action('on close')}
+  />
+);
+
+export const AuthenticatedUserWithStartupSubscriptionButWithoutDiscordUsername = () => (
+  <SubscriptionPendingDialog
+    authenticatedUser={{
+      ...fakeStartupAuthenticatedUser,
       profile: fakeProfileWithoutDiscordUsername,
     }}
     onClose={action('on close')}

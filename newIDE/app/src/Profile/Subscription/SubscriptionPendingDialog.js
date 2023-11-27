@@ -30,6 +30,11 @@ export default function SubscriptionPendingDialog({
     !!authenticatedUser &&
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.planId;
+  const hasGoldOrStartupPlan =
+    !!authenticatedUser &&
+    !!authenticatedUser.subscription &&
+    (authenticatedUser.subscription.planId === 'gdevelop_gold' ||
+      authenticatedUser.subscription.planId === 'gdevelop_startup');
   useInterval(
     () => {
       authenticatedUser.onRefreshUserProfile().catch(() => {
@@ -176,7 +181,7 @@ export default function SubscriptionPendingDialog({
                   </Trans>
                 </BackgroundText>
               </Line>
-              {!currentDiscordUsername && (
+              {!currentDiscordUsername && !!hasGoldOrStartupPlan && (
                 <Line>
                   <TextField
                     value={discordUsername}

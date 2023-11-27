@@ -188,7 +188,7 @@ export default function SubscriptionPendingDialog({
                     disabled={isLoading}
                     maxLength={discordUsernameConfig.maxLength}
                     helperMarkdownText={i18n._(
-                      t`Add your Discord username to get access to a dedicated channel! Join the [GDevelop Discord](https://discord.gg/gdevelop)`
+                      t`Add your Discord username to get access to a dedicated channel! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
                     )}
                   />
                 </Line>

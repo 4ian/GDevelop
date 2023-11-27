@@ -33,6 +33,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import Form from '../../UI/Form';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 export const emailRegex = /^(.+)@(.+)$/;
 
@@ -177,11 +178,14 @@ const InviteHome = ({ cloudProjectId }: Props) => {
         setProjectUserAcls(collaboratorProjectUserAcls);
       } catch (error) {
         console.error('Unable to fetch the project user acls', error);
-        if (error.response && error.response.status === 404) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
           setFetchError('project-not-found');
           return;
         }
-        if (error.response && error.response.status === 403) {
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
           setFetchError('project-not-owned');
           return;
         }
@@ -263,35 +267,39 @@ const InviteHome = ({ cloudProjectId }: Props) => {
       await fetchProjectUserAcls();
     } catch (error) {
       console.error('Unable to add collaborator', error);
-      if (error.response && error.response.status === 400) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 400) {
         if (
-          error.response.data.code ===
+          extractedStatusAndCode.code ===
           'project-user-acl-creation/user-already-added'
         ) {
           setAddError('user-already-added');
           return;
         }
         if (
-          error.response.data.code === 'project-user-acl-creation/user-is-owner'
+          extractedStatusAndCode.code ===
+          'project-user-acl-creation/user-is-owner'
         ) {
           setAddError('user-owner');
           return;
         }
       }
-      if (error.response && error.response.status === 404) {
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
         setAddError('user-not-found');
         return;
       }
-      if (error.response && error.response.status === 403) {
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
         if (
-          error.response.data.code ===
+          extractedStatusAndCode.code ===
           'project-user-acl-creation/collaborators-not-allowed'
         ) {
           setAddError('not-allowed');
           return;
         }
         if (
-          error.response.data.code ===
+          extractedStatusAndCode.code ===
           'project-user-acl-creation/too-many-guest-collaborators-on-project'
         ) {
           setAddError('max-guest-collaborators');

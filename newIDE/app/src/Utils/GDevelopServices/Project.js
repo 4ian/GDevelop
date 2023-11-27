@@ -9,6 +9,7 @@ import PromisePool from '@supercharge/promise-pool';
 import { getFileSha512TruncatedTo256 } from '../FileHasher';
 import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
@@ -153,7 +154,8 @@ const refetchCredentialsForProjectAndRetryIfUnauthorized = async <T>(
     const response = await apiCall();
     return response;
   } catch (error) {
-    if (error.response && error.response.status === 403) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
       await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
       const response = await apiCall();
       return response;

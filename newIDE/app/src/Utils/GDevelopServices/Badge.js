@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
 export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';
@@ -73,11 +74,12 @@ const createOrEnsureBadgeForUser = async (
     );
     onBadgesChanged();
     return response.data;
-  } catch (err) {
-    if (err.response && err.response.status === 409) {
+  } catch (error) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 409) {
       console.warn('Badge already exists');
     } else {
-      throw err;
+      throw error;
     }
   }
 };

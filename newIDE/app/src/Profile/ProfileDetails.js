@@ -41,6 +41,7 @@ import Check from '../UI/CustomSvgIcons/Check';
 import { MarkdownText } from '../UI/MarkdownText';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type Subscription } from '../Utils/GDevelopServices/Usage';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const getAssetPackColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -162,10 +163,13 @@ const ProfileDetails = ({
         setDiscordUsernameSyncStatus('success');
       } catch (error) {
         console.error('Error while syncing discord username:', error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
         if (
-          error.response &&
-          error.response.status === 400 &&
-          error.response.data.code ===
+          extractedStatusAndCode &&
+          extractedStatusAndCode.status === 400 &&
+          extractedStatusAndCode.code ===
             'discord-role-update/discord-user-not-found'
         ) {
           showAlert({
@@ -335,11 +339,11 @@ const ProfileDetails = ({
                   ) : !discordUsername ? (
                     !subscription || !subscription.planId ? (
                       <MarkdownText
-                        translatableSource={t`No discord username defined. Add it and get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
+                        translatableSource={t`No discord username defined. Add it and get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                       />
                     ) : (
                       <MarkdownText
-                        translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
+                        translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                       />
                     )
                   ) : (
@@ -349,7 +353,7 @@ const ProfileDetails = ({
                         <>
                           {' - '}
                           <MarkdownText
-                            translatableSource={t`Get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop)`}
+                            translatableSource={t`Get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                           />
                         </>
                       )}

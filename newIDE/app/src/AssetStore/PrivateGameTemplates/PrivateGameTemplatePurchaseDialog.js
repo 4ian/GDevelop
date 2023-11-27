@@ -25,6 +25,7 @@ import {
   purchaseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
 import Form from '../../UI/Form';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 const PasswordPromptDialog = (props: {
   passwordValue: string,
@@ -131,10 +132,13 @@ const PrivateGameTemplatePurchaseDialog = ({
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       if (
-        error.response &&
-        error.response.status === 403 &&
-        error.response.data.code === 'auth/wrong-password'
+        extractedStatusAndCode &&
+        extractedStatusAndCode.status === 403 &&
+        extractedStatusAndCode.code === 'auth/wrong-password'
       ) {
         await showAlert({
           title: t`Operation not allowed`,

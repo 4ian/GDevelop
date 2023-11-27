@@ -312,7 +312,7 @@ const EditProfileDialog = ({
                 disabled={actionInProgress}
                 maxLength={discordUsernameConfig.maxLength}
                 helperMarkdownText={i18n._(
-                  t`Add your Discord username to get access to a dedicated channel if you have a subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop)`
+                  t`Add your Discord username to get access to a dedicated channel if you have a subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
                 )}
               />
               <TextField

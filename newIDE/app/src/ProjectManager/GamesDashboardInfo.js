@@ -14,7 +14,6 @@ import { Trans } from '@lingui/macro';
 import Publish from '../UI/CustomSvgIcons/Publish';
 import Paper from '../UI/Paper';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { type Game } from '../Utils/GDevelopServices/Game';
 import { ListItem } from '../UI/List';
 import { getProjectManagerItemId } from '.';
 
@@ -33,10 +32,13 @@ const styles = {
 
 type Props = {|
   onShareProject: () => void,
-  games: ?Array<Game>,
+  onOpenGamesDashboardDialog?: ?() => void,
 |};
 
-const GamesDashboardInfo = ({ onShareProject, games }: Props) => {
+const GamesDashboardInfo = ({
+  onShareProject,
+  onOpenGamesDashboardDialog,
+}: Props) => {
   const { profile, onOpenLoginDialog } = React.useContext(
     AuthenticatedUserContext
   );
@@ -53,15 +55,13 @@ const GamesDashboardInfo = ({ onShareProject, games }: Props) => {
     [profile, onShareProject, onOpenLoginDialog]
   );
 
-  if (games && games.length > 0) {
+  if (onOpenGamesDashboardDialog) {
     return (
       <ListItem
         id={getProjectManagerItemId('manage')}
         primaryText={<Trans>Games Dashboard</Trans>}
         leftIcon={<Graphs />}
-        onClick={() => {
-          console.log('salut');
-        }}
+        onClick={onOpenGamesDashboardDialog}
         noPadding
       />
     );

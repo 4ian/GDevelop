@@ -57,6 +57,7 @@ import GamesDashboardInfo from './GamesDashboardInfo';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useGamesList from '../GameDashboard/UseGamesList';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -204,6 +205,14 @@ const ProjectManager = React.memo(
       setOpenedExtensionShortHeader,
     ] = React.useState(null);
     const [openedExtensionName, setOpenedExtensionName] = React.useState(null);
+    const [openGameDetails, setOpenGameDetails] = React.useState<boolean>(
+      false
+    );
+
+    const projectUuid = project.getProjectUuid();
+    const gameMatchingProjectUuid = games
+      ? games.find(game => game.id === projectUuid)
+      : null;
 
     React.useEffect(() => {
       if (!freezeUpdate && shouldAutofocusInput && searchBarRef.current) {
@@ -826,6 +835,10 @@ const ProjectManager = React.memo(
       searchText
     );
 
+    const onOpenGamesDashboardDialog = gameMatchingProjectUuid
+      ? () => setOpenGameDetails(true)
+      : null;
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -873,7 +886,7 @@ const ProjectManager = React.memo(
                   />,
                   <GamesDashboardInfo
                     onShareProject={onShareProject}
-                    games={games}
+                    onOpenGamesDashboardDialog={onOpenGamesDashboardDialog}
                     key="manage"
                   />,
                 ]}
@@ -1318,6 +1331,21 @@ const ProjectManager = React.memo(
                 extensionShortHeader={openedExtensionShortHeader}
                 extensionName={openedExtensionName}
                 onInstallExtension={onInstallExtension}
+              />
+            )}
+            {openGameDetails && gameMatchingProjectUuid && (
+              <GameDetailsDialog
+                project={project}
+                analyticsSource="projectManager"
+                game={gameMatchingProjectUuid}
+                onClose={() => setOpenGameDetails(false)}
+                onGameDeleted={() => {
+                  setOpenGameDetails(false);
+                  fetchGames();
+                }}
+                onGameUpdated={() => {
+                  fetchGames();
+                }}
               />
             )}
           </div>

@@ -14,7 +14,7 @@ import { Trans } from '@lingui/macro';
 import Publish from '../UI/CustomSvgIcons/Publish';
 import Paper from '../UI/Paper';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import useGamesList from '../GameDashboard/UseGamesList';
+import { type Game } from '../Utils/GDevelopServices/Game';
 import { ListItem } from '../UI/List';
 import { getProjectManagerItemId } from '.';
 
@@ -33,14 +33,14 @@ const styles = {
 
 type Props = {|
   onShareProject: () => void,
+  games: ?Array<Game>,
 |};
 
-const GamesDashboardInfo = ({ onShareProject }: Props) => {
+const GamesDashboardInfo = ({ onShareProject, games }: Props) => {
   const { profile, onOpenLoginDialog } = React.useContext(
     AuthenticatedUserContext
   );
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { games, fetchGames } = useGamesList();
 
   const onClickShare = React.useCallback(
     () => {
@@ -51,13 +51,6 @@ const GamesDashboardInfo = ({ onShareProject }: Props) => {
       }
     },
     [profile, onShareProject, onOpenLoginDialog]
-  );
-
-  React.useEffect(
-    () => {
-      fetchGames();
-    },
-    [fetchGames]
   );
 
   if (games && games.length > 0) {

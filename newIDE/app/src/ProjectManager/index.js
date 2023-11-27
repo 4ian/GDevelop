@@ -55,6 +55,8 @@ import Publish from '../UI/CustomSvgIcons/Publish';
 import ProjectResources from '../UI/CustomSvgIcons/ProjectResources';
 import GamesDashboardInfo from './GamesDashboardInfo';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import useGamesList from '../GameDashboard/UseGamesList';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -162,6 +164,10 @@ const ProjectManager = React.memo(
   }: Props) => {
     const forceUpdate = useForceUpdate();
     const shouldAutofocusInput = useShouldAutofocusInput();
+    const { profile } = React.useContext(AuthenticatedUserContext);
+    const userId = profile ? profile.id : null;
+    const { games, fetchGames } = useGamesList();
+
     const searchBarRef = React.useRef<?SearchBarInterface>(null);
     const draggedLayoutIndexRef = React.useRef<number | null>(null);
     const draggedExternalLayoutIndexRef = React.useRef<number | null>(null);
@@ -204,6 +210,13 @@ const ProjectManager = React.memo(
         searchBarRef.current.focus();
       }
     });
+
+    React.useEffect(
+      () => {
+        fetchGames();
+      },
+      [fetchGames, userId]
+    );
 
     const onProjectItemModified = React.useCallback(
       () => {
@@ -860,6 +873,7 @@ const ProjectManager = React.memo(
                   />,
                   <GamesDashboardInfo
                     onShareProject={onShareProject}
+                    games={games}
                     key="manage"
                   />,
                 ]}

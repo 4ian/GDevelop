@@ -6,6 +6,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const useGamesList = () => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const gamesFetchingPromise = React.useRef<?Promise<any>>(null);
   const {
     authenticated,
     firebaseUser,
@@ -19,15 +20,25 @@ const useGamesList = () => {
 
   const fetchGames = React.useCallback(
     async () => {
-      if (!authenticated || !firebaseUser) return;
+      if (!authenticated || !firebaseUser) {
+        setGames(null);
+        return;
+      }
+      if (gamesFetchingPromise.current) return;
 
       try {
         setGamesFetchingError(null);
-        const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
+        gamesFetchingPromise.current = getGames(
+          getAuthorizationHeader,
+          firebaseUser.uid
+        );
+        const games = await gamesFetchingPromise.current;
         setGames(games);
       } catch (error) {
         console.error('Error while loading user games.', error);
         setGamesFetchingError(error);
+      } finally {
+        gamesFetchingPromise.current = null;
       }
     },
     [authenticated, firebaseUser, getAuthorizationHeader]

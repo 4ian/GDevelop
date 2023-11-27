@@ -105,9 +105,8 @@ class GD_CORE_API ExpressionVariableOwnerFinder
     // with a legacy pre-scoped variable parameter:
     if (node.parent) node.parent->Visit(*this);
 
-    // TODO: factor
     if (thisIsALegacyPrescopedVariable) {
-      // The identifier represents a variable name, and the variables container
+      // The node represents a variable name, and the variables container
       // containing it was identified in the FunctionCallNode.
       childVariableNames.insert(childVariableNames.begin(), node.name);
       if (legacyPrescopedVariablesContainer)
@@ -115,6 +114,8 @@ class GD_CORE_API ExpressionVariableOwnerFinder
             *legacyPrescopedVariablesContainer, childVariableNames);
     } else {
       // Otherwise, the identifier is to be interpreted as usual:
+      // it can be an object (on which a variable is accessed),
+      // or a variable.
       projectScopedContainers.MatchIdentifierWithName<void>(
           node.name,
           [&]() {
@@ -140,9 +141,11 @@ class GD_CORE_API ExpressionVariableOwnerFinder
           },
           [&]() {
             // Ignore properties here.
+            // There is no support for "children" of properties.
           },
           [&]() {
             // Ignore parameters here.
+            // There is no support for "children" of parameters.
           },
           [&]() {
             // Ignore unrecognised identifiers here.
@@ -181,6 +184,8 @@ class GD_CORE_API ExpressionVariableOwnerFinder
 
     } else {
       // Otherwise, the identifier is to be interpreted as usual:
+      // it can be an object (on which a variable is accessed),
+      // or a variable.
       projectScopedContainers.MatchIdentifierWithName<void>(
           node.identifierName,
           [&]() {
@@ -213,9 +218,11 @@ class GD_CORE_API ExpressionVariableOwnerFinder
           },
           [&]() {
             // Ignore properties here.
+            // There is no support for "children" of properties.
           },
           [&]() {
             // Ignore parameters here.
+            // There is no support for "children" of properties.
           },
           [&]() {
             // Ignore unrecognised identifiers here.
@@ -226,6 +233,8 @@ class GD_CORE_API ExpressionVariableOwnerFinder
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
+    // Add a child with an empty name, which will be interpreted as
+    // "take the first child/item of the structure/array".
     childVariableNames.insert(childVariableNames.begin(), "");
     if (node.parent) node.parent->Visit(*this);
   }

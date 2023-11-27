@@ -375,7 +375,6 @@ export const donateLinkConfig = {
 };
 
 export const discordUsernameConfig = {
-  icon: <Discord />,
   maxLength: 32,
 };
 

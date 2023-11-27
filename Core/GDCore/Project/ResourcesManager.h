@@ -374,6 +374,21 @@ class GD_CORE_API JsonResource : public Resource {
 };
 
 /**
+ * \brief Describe a spine json file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API SpineResource : public JsonResource {
+ public:
+  SpineResource() : JsonResource() { SetKind("spine"); };
+  virtual ~SpineResource(){};
+  virtual SpineResource* Clone() const override {
+    return new SpineResource(*this);
+  }
+};
+
+/**
  * \brief Describe a tilemap file used by a project.
  *
  * \see Resource
@@ -493,6 +508,32 @@ class GD_CORE_API Model3DResource : public Resource {
   virtual ~Model3DResource(){};
   virtual Model3DResource* Clone() const override {
     return new Model3DResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+  virtual bool UseFile() const override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
+ * \brief Describe an atlas file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API AtlasResource : public Resource {
+ public:
+  AtlasResource() : Resource() { SetKind("atlas"); };
+  virtual ~AtlasResource(){};
+  virtual AtlasResource* Clone() const override {
+    return new AtlasResource(*this);
   }
 
   virtual const gd::String& GetFile() const override { return file; };

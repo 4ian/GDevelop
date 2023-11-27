@@ -91,7 +91,7 @@ const ManageSection = ({
             square={false}
             style={styles.gameDetailsContainer}
           >
-            <ColumnStackLayout noMargin expand>
+            <ColumnStackLayout noMargin expand noOverflowParent>
               <Tabs
                 value={currentTab}
                 onChange={setCurrentTab}

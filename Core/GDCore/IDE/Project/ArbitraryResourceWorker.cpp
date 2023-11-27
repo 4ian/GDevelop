@@ -96,11 +96,9 @@ void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
   ExposeFile(fontName);
 };
 
-void ArbitraryResourceWorker::ExposeResources(
-    gd::ResourcesManager* resourcesManager) {
-  if (!resourcesManager) return;
-
-  resourcesManagers.push_back(resourcesManager);
+void ArbitraryResourceWorker::ExposeResources() {
+  if (resourcesManagers.empty()) return;
+  gd::ResourcesManager* resourcesManager = resourcesManagers[0];
 
   std::vector<gd::String> resources = resourcesManager->GetAllResourceNames();
   for (std::size_t i = 0; i < resources.size(); i++) {
@@ -176,6 +174,7 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "tilemap") {
     ExposeTilemap(resourceName);
+    ExposeEmbeddeds(resourceName);
     return;
   }
   if (resourceType == "tileset") {
@@ -184,6 +183,7 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "json") {
     ExposeJson(resourceName);
+    ExposeEmbeddeds(resourceName);
     return;
   }
   if (resourceType == "video") {

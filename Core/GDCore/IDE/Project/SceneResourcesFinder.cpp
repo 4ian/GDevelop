@@ -13,11 +13,7 @@
 namespace gd {
 
 std::set<gd::String> SceneResourcesFinder::FindProjectResources(gd::Project &project) {
-  gd::SceneResourcesFinder resourceWorker;
-
-  // TODO Refactor this to avoid to list all project resources as files.
-  gd::ResourcesManager* resourcesManager = &(project.GetResourcesManager());
-  resourceWorker.ExposeResources(resourcesManager);
+  gd::SceneResourcesFinder resourceWorker(project.GetResourcesManager());
 
   gd::ResourceExposer::ExposeProjectResources(project, resourceWorker);
   return resourceWorker.resourceNames;
@@ -25,11 +21,7 @@ std::set<gd::String> SceneResourcesFinder::FindProjectResources(gd::Project &pro
 
 std::set<gd::String> SceneResourcesFinder::FindSceneResources(gd::Project &project,
     gd::Layout &layout) {
-  gd::SceneResourcesFinder resourceWorker;
-
-  // TODO Refactor this to avoid to list all project resources as files.
-  gd::ResourcesManager* resourcesManager = &(project.GetResourcesManager());
-  resourceWorker.ExposeResources(resourcesManager);
+  gd::SceneResourcesFinder resourceWorker(project.GetResourcesManager());
 
   gd::ResourceExposer::ExposeLayoutResources(project, layout, resourceWorker);
   return resourceWorker.resourceNames;

@@ -29,7 +29,9 @@
 #include "GDCore/Project/ExternalEvents.h"
 
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker {
- public:
+public:
+  ArbitraryResourceWorkerTest(gd::ResourcesManager &resourcesManager)
+      : ArbitraryResourceWorker(resourcesManager){};
   virtual void ExposeFile(gd::String& file) { files.push_back(file); };
   virtual void ExposeImage(gd::String& imageName) {
     images.push_back(imageName);
@@ -59,7 +61,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
       REQUIRE(worker.files.size() == 4);
@@ -81,7 +83,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       gd::SpriteObject spriteConfiguration;
       gd::Animation anim;
@@ -126,7 +128,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
       
       auto& layout = project.InsertNewLayout("Scene", 0);
 
@@ -161,7 +163,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
 
@@ -196,7 +198,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& externalEvents = project.InsertNewExternalEvents("MyExternalEvents", 0);
 
@@ -232,7 +234,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& function = extension.InsertNewEventsFunction("MyFreeFunction", 0);
@@ -269,7 +271,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& behavior = extension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
@@ -307,7 +309,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& object = extension.GetEventsBasedObjects().InsertNew("MyObject", 0);
@@ -345,7 +347,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
       layout.InsertNewLayer("MyLayer", 0);
@@ -371,7 +373,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
       layout.InsertNewLayer("MyLayer", 0);
@@ -402,7 +404,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
 
@@ -425,7 +427,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.png", "image");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
       
       auto& layout = project.InsertNewLayout("Scene", 0);
 
@@ -459,7 +461,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
 
@@ -494,7 +496,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
       auto& externalEvents = project.InsertNewExternalEvents("MyExternalEvents", 0);
@@ -530,7 +532,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
       auto& externalEvents = project.InsertNewExternalEvents("MyExternalEvents", 0);
@@ -572,7 +574,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
       auto& externalEventsA = project.InsertNewExternalEvents("MyExternalEventsA", 0);
@@ -619,7 +621,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
       auto& otherLayout = project.InsertNewLayout("MyOtherScene", 0);
@@ -654,7 +656,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
       auto& otherLayout = project.InsertNewLayout("MyOtherScene", 0);
@@ -696,7 +698,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res3", "path/to/file3.fnt", "bitmapFont");
       project.GetResourcesManager().AddResource(
           "res4", "path/to/file4.png", "audio");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("MyScene", 0);
 
@@ -740,7 +742,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& function = extension.InsertNewEventsFunction("MyFreeFunction", 0);
@@ -780,7 +782,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& behavior = extension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
@@ -821,7 +823,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
       auto& object = extension.GetEventsBasedObjects().InsertNew("MyObject", 0);
@@ -862,7 +864,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
       layout.InsertNewLayer("MyLayer", 0);
@@ -887,7 +889,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res2", "path/to/file2.png", "image");
       project.GetResourcesManager().AddResource(
           "res3", "path/to/file3.png", "image");
-      ArbitraryResourceWorkerTest worker;
+      ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& layout = project.InsertNewLayout("Scene", 0);
       layout.InsertNewLayer("MyLayer", 0);

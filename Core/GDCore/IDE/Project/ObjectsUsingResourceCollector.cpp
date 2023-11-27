@@ -6,7 +6,7 @@
 namespace gd {
 
 void ObjectsUsingResourceCollector::DoVisitObject(gd::Object& object) {
-  gd::ResourceNameMatcher resourceNameMatcher(resourceName);
+  gd::ResourceNameMatcher resourceNameMatcher(resourcesManager, resourceName);
 
   object.GetConfiguration().ExposeResources(resourceNameMatcher);
   if (resourceNameMatcher.AnyResourceMatches()) {

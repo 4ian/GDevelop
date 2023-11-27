@@ -43,7 +43,9 @@ namespace gd {
  */
 class GD_CORE_API ArbitraryResourceWorker {
  public:
-  ArbitraryResourceWorker(){};
+  ArbitraryResourceWorker(gd::ResourcesManager &resourcesManager) {
+    resourcesManagers.push_back(&resourcesManager);
+  };
   virtual ~ArbitraryResourceWorker();
 
   /**
@@ -52,7 +54,7 @@ class GD_CORE_API ArbitraryResourceWorker {
    * first to ensure that resources are known so that images, shaders & audio
    * can make reference to them.
    */
-  void ExposeResources(gd::ResourcesManager *resourcesManager);
+  void ExposeResources();
 
   /**
    * \brief Expose a resource from a given type.

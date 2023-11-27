@@ -244,6 +244,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         editorDisplay.forceUpdateObjectsList();
 
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
+          project.getResourcesManager(),
           resourceName
         );
         // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
@@ -1602,7 +1603,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   reloadResourcesFor = (object: gdObject) => {
     const { project } = this.props;
 
-    const resourcesInUse = new gd.ResourcesInUseHelper();
+    const resourcesInUse = new gd.ResourcesInUseHelper(
+      project.getResourcesManager()
+    );
     object.getConfiguration().exposeResources(resourcesInUse);
     const objectResourceNames = resourcesInUse
       .getAllImages()

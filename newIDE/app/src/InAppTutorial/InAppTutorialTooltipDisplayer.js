@@ -338,76 +338,72 @@ const InAppTutorialTooltipDisplayer = ({
       : '#FAFAFA'; // Grey00
 
   return (
-    <>
-      <Popper
-        id="in-app-tutorial-tooltip-displayer"
-        open={show}
-        className={classes.popper}
-        anchorEl={anchorElement}
-        transition
-        placement={placement}
-        popperOptions={{
-          modifiers: {
-            arrow: { enabled: true, element: '#arrow-popper' },
-            offset: {
-              enabled: true,
-              offset: '0,10',
-            },
-            preventOverflow: {
-              enabled: true,
-              boundariesElement: document.querySelector('.main-frame'),
-            },
+    <Popper
+      id="in-app-tutorial-tooltip-displayer"
+      open={show}
+      className={classes.popper}
+      anchorEl={anchorElement}
+      transition
+      placement={placement}
+      popperOptions={{
+        modifiers: {
+          arrow: { enabled: true, element: '#arrow-popper' },
+          offset: {
+            enabled: true,
+            offset: '0,10',
           },
-        }}
-        style={{
-          zIndex: getDisplayZIndexForHighlighter(anchorElement),
-          maxWidth: 'min(90%, 300px)',
-          width: isMobileScreen ? '100%' : undefined,
-        }}
-      >
-        {({ TransitionProps }) => (
-          <>
-            <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
-              <Paper
-                style={{
-                  ...styles.paper,
-                  backgroundColor,
-                }}
-                elevation={4}
-              >
-                <Column noMargin>
-                  <TooltipHeader
-                    paletteType={paletteType}
-                    // Display the hide button when standalone only
-                    showFoldButton={!!tooltip.standalone}
-                    showQuitButton={showQuitButton}
-                    progress={progress}
-                    tooltipContent={
-                      folded ? tooltip.title || tooltip.description : undefined
-                    }
-                    onClickFoldButton={() => setFolded(!folded)}
-                    endTutorial={endTutorial}
-                  />
-                  {!folded && (
-                    <TooltipBody
-                      tooltip={tooltip}
-                      buttonLabel={buttonLabel}
-                      goToNextStep={goToNextStep}
-                    />
-                  )}
-                </Column>
-                <span
-                  id="arrow-popper"
-                  className={classes.arrow}
-                  ref={arrowRef}
-                  style={{ color: backgroundColor }}
+          preventOverflow: {
+            enabled: true,
+            boundariesElement: document.querySelector('.main-frame'),
+          },
+        },
+      }}
+      style={{
+        zIndex: getDisplayZIndexForHighlighter(anchorElement),
+        maxWidth: 'min(90%, 300px)',
+        width: isMobileScreen ? '100%' : undefined,
+      }}
+    >
+      {({ TransitionProps }) => (
+        <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
+          <Paper
+            style={{
+              ...styles.paper,
+              backgroundColor,
+            }}
+            elevation={4}
+          >
+            <Column noMargin>
+              <TooltipHeader
+                paletteType={paletteType}
+                // Display the hide button when standalone only
+                showFoldButton={!!tooltip.standalone}
+                showQuitButton={showQuitButton}
+                progress={progress}
+                tooltipContent={
+                  folded ? tooltip.title || tooltip.description : undefined
+                }
+                onClickFoldButton={() => setFolded(!folded)}
+                endTutorial={endTutorial}
+              />
+              {!folded && (
+                <TooltipBody
+                  tooltip={tooltip}
+                  buttonLabel={buttonLabel}
+                  goToNextStep={goToNextStep}
                 />
-              </Paper>
-            </Fade>
-          </>
-        )}
-      </Popper>
-    </>
+              )}
+            </Column>
+            <span
+              id="arrow-popper"
+              className={classes.arrow}
+              ref={arrowRef}
+              style={{ color: backgroundColor }}
+            />
+          </Paper>
+        </Fade>
+      )}
+    </Popper>
   );
 };
 

@@ -217,7 +217,9 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "jsonResource" ||
              parameterType == "tilemapResource" ||
              parameterType == "tilesetResource" ||
-             parameterType == "model3DResource";
+             parameterType == "model3DResource" ||
+             parameterType == "atlasResource" ||
+             parameterType == "spineResource";
     }
     return false;
   }

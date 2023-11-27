@@ -4,8 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  const logger = new gdjs.Logger('Atlas Manager');
-
   /** The callback called when a text that was requested is loaded (or an error occurred). */
   export type SpineAtlasManagerRequestCallback = (
     error: Error | null,

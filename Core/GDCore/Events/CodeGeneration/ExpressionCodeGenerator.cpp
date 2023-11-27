@@ -219,7 +219,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
                   : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
       auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetObjectsContainersList(),
+                                            codeGenerator.GetProjectScopedContainers(),
                                             rootObjectName,
                                             node);
 

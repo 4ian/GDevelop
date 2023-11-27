@@ -83,8 +83,8 @@ class GD_CORE_API ExpressionVariableOwnerFinder
       const gd::String& rootObjectName_)
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
-        objectName(rootObjectName_),  // If no other object is found, the node
-                                      // is linked to the rootObjectName.
+        objectName(),
+        rootObjectName(rootObjectName_),
         variableNode(nullptr),
         thisIsALegacyPrescopedVariable(false),
         legacyPrescopedVariablesContainer(nullptr){};
@@ -104,6 +104,9 @@ class GD_CORE_API ExpressionVariableOwnerFinder
     // Check if the parent is a function call, in which we might be dealing
     // with a legacy pre-scoped variable parameter:
     if (node.parent) node.parent->Visit(*this);
+    else {
+      objectName = rootObjectName;
+    }
 
     if (thisIsALegacyPrescopedVariable) {
       // The node represents a variable name, and the variables container
@@ -168,6 +171,9 @@ class GD_CORE_API ExpressionVariableOwnerFinder
     // Check if the parent is a function call, in which we might be dealing
     // with a legacy pre-scoped variable parameter:
     if (node.parent) node.parent->Visit(*this);
+    else {
+      objectName = rootObjectName;
+    }
 
     if (thisIsALegacyPrescopedVariable) {
       // The identifier represents a variable name, and the variables container
@@ -367,6 +373,7 @@ class GD_CORE_API ExpressionVariableOwnerFinder
   }
 
   gd::String objectName;
+  const gd::String& rootObjectName;
   gd::ExpressionNode* variableNode;
   std::vector<gd::String> childVariableNames;
   bool thisIsALegacyPrescopedVariable;

@@ -55,7 +55,6 @@ import Publish from '../UI/CustomSvgIcons/Publish';
 import ProjectResources from '../UI/CustomSvgIcons/ProjectResources';
 import GamesDashboardInfo from './GamesDashboardInfo';
 
-
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
@@ -99,7 +98,8 @@ type ProjectItemKind =
   | 'external-layout'
   | 'events-functions-extension';
 
-const getTabId = (identifier: string) => `project-manager-tab-${identifier}`;
+export const getProjectManagerItemId = (identifier: string) =>
+  `project-manager-tab-${identifier}`;
 
 type Props = {|
   project: gdProject,
@@ -125,6 +125,7 @@ type Props = {|
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
+  onShareProject: () => void,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -717,6 +718,7 @@ class ProjectManager extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       onInstallExtension,
+      onShareProject,
     } = this.props;
     const {
       renamedItemKind,
@@ -773,11 +775,11 @@ class ProjectManager extends React.Component<Props, State> {
             </div>
             <List>
               <ProjectStructureItem
-                id={getTabId('game-settings')}
+                id={getProjectManagerItemId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}
                 renderNestedItems={() => [
                   <ListItem
-                    id={getTabId('game-properties')}
+                    id={getProjectManagerItemId('game-properties')}
                     key="properties"
                     primaryText={<Trans>Properties</Trans>}
                     leftIcon={<Settings />}
@@ -785,22 +787,25 @@ class ProjectManager extends React.Component<Props, State> {
                     noPadding
                   />,
                   <ListItem
-                    id={getTabId('game-icons')}
+                    id={getProjectManagerItemId('game-icons')}
                     key="icons"
                     primaryText={<Trans>Icons and thumbnail</Trans>}
                     leftIcon={<Picture />}
                     onClick={this.props.onOpenPlatformSpecificAssets}
                     noPadding
                   />,
-                  <GamesDashboardInfo />,
+                  <GamesDashboardInfo
+                    onShareProject={onShareProject}
+                    key="manage"
+                  />,
                 ]}
               />
               <ProjectStructureItem
-                id={getTabId('project-settings')}
+                id={getProjectManagerItemId('project-settings')}
                 primaryText={<Trans>Project settings</Trans>}
                 renderNestedItems={() => [
                   <ListItem
-                    id={getTabId('global-variables')}
+                    id={getProjectManagerItemId('global-variables')}
                     key="global-variables"
                     primaryText={<Trans>Global variables</Trans>}
                     leftIcon={<Publish />}
@@ -808,7 +813,7 @@ class ProjectManager extends React.Component<Props, State> {
                     noPadding
                   />,
                   <ListItem
-                    id={getTabId('game-resources')}
+                    id={getProjectManagerItemId('game-resources')}
                     key="resources"
                     primaryText={<Trans>Resources</Trans>}
                     leftIcon={<ProjectResources />}
@@ -818,7 +823,7 @@ class ProjectManager extends React.Component<Props, State> {
                 ]}
               />
               <ProjectStructureItem
-                id={getTabId('scenes')}
+                id={getProjectManagerItemId('scenes')}
                 primaryText={<Trans>Scenes</Trans>}
                 renderNestedItems={() => [
                   ...displayedScenes.map((layout: gdLayout, i: number) => {
@@ -915,7 +920,7 @@ class ProjectManager extends React.Component<Props, State> {
                 ]}
               />
               <ProjectStructureItem
-                id={getTabId('extensions')}
+                id={getProjectManagerItemId('extensions')}
                 primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
@@ -1015,7 +1020,7 @@ class ProjectManager extends React.Component<Props, State> {
                 ]}
               />
               <ProjectStructureItem
-                id={getTabId('external-events')}
+                id={getProjectManagerItemId('external-events')}
                 primaryText={<Trans>External events</Trans>}
                 renderNestedItems={() => [
                   ...displayedExternalEvents.map((externalEvents, i) => {
@@ -1086,7 +1091,7 @@ class ProjectManager extends React.Component<Props, State> {
                 ]}
               />
               <ProjectStructureItem
-                id={getTabId('external-layouts')}
+                id={getProjectManagerItemId('external-layouts')}
                 primaryText={<Trans>External layouts</Trans>}
                 renderNestedItems={() => [
                   ...displayedExternalLayouts.map((externalLayout, i) => {

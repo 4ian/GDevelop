@@ -13,6 +13,10 @@ import Window from '../Utils/Window';
 import { Trans } from '@lingui/macro';
 import Publish from '../UI/CustomSvgIcons/Publish';
 import Paper from '../UI/Paper';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import useGamesList from '../GameDashboard/UseGamesList';
+import { ListItem } from '../UI/List';
+import { getProjectManagerItemId } from '.';
 
 const publishingWikiArticle = getHelpLink('/publishing/');
 
@@ -28,11 +32,48 @@ const styles = {
 };
 
 type Props = {|
-  onClickShare: () => void,
+  onShareProject: () => void,
 |};
 
-const GamesDashboardInfo = ({ onClickShare }: Props) => {
+const GamesDashboardInfo = ({ onShareProject }: Props) => {
+  const { profile, onOpenLoginDialog } = React.useContext(
+    AuthenticatedUserContext
+  );
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { games, fetchGames } = useGamesList();
+
+  const onClickShare = React.useCallback(
+    () => {
+      if (!!profile) {
+        onShareProject();
+      } else {
+        onOpenLoginDialog();
+      }
+    },
+    [profile, onShareProject, onOpenLoginDialog]
+  );
+
+  React.useEffect(
+    () => {
+      fetchGames();
+    },
+    [fetchGames]
+  );
+
+  if (games && games.length > 0) {
+    return (
+      <ListItem
+        id={getProjectManagerItemId('manage')}
+        primaryText={<Trans>Games Dashboard</Trans>}
+        leftIcon={<Graphs />}
+        onClick={() => {
+          console.log('salut');
+        }}
+        noPadding
+      />
+    );
+  }
+
   return (
     <Paper
       square={false}
@@ -46,7 +87,7 @@ const GamesDashboardInfo = ({ onClickShare }: Props) => {
         <div style={styles.gamesDashboardInfoTextContainer}>
           <ColumnStackLayout noMargin>
             <LineStackLayout noMargin alignItems="center">
-              <Graphs fontSize="medium" />
+              <Graphs />
               <Text noMargin>
                 <Trans>Games Dashboard</Trans>
               </Text>

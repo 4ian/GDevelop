@@ -43,6 +43,7 @@ export const Default = () => (
     onReloadEventsFunctionsExtensions={action(
       'onReloadEventsFunctionsExtensions'
     )}
+    onShareProject={action('onShareProject')}
     freezeUpdate={false}
     hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
     resourceManagementProps={fakeResourceManagementProps}
@@ -79,6 +80,7 @@ export const ErrorsInFunctions = () => (
     onReloadEventsFunctionsExtensions={action(
       'onReloadEventsFunctionsExtensions'
     )}
+    onShareProject={action('onShareProject')}
     freezeUpdate={false}
     hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
     resourceManagementProps={fakeResourceManagementProps}

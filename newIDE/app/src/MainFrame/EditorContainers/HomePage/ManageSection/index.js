@@ -81,10 +81,10 @@ const ManageSection = ({
         title={null} // Use a smaller title below
         backAction={onBack}
       >
-          <Text size="title" allowSelection>
-            {openedGame.gameName}
-          </Text>
-          <LargeSpacer />
+        <Text size="title" allowSelection>
+          {openedGame.gameName}
+        </Text>
+        <LargeSpacer />
         <SectionRow expand>
           <Paper
             background="medium"

@@ -148,7 +148,7 @@ const GamesList = ({
       showConfirmation,
       showAlert,
       project,
-      onOpenGame
+      onOpenGame,
     ]
   );
 

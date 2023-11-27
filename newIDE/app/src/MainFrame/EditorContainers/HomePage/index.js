@@ -171,7 +171,10 @@ export const HomePage = React.memo<Props>(
       } = React.useContext(PrivateGameTemplateStoreContext);
       const [showUserChip, setShowUserChip] = React.useState<boolean>(false);
       const [openedGame, setOpenedGame] = React.useState<?Game>(null);
-      const [gameDetailsCurrentTab, setGameDetailsCurrentTab] = React.useState<GameDetailsTab>('details');
+      const [
+        gameDetailsCurrentTab,
+        setGameDetailsCurrentTab,
+      ] = React.useState<GameDetailsTab>('details');
 
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';

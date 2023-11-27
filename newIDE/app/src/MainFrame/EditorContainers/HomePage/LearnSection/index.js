@@ -82,14 +82,12 @@ const styles = {
 type Props = {|
   onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
-  onOpenHelpFinder: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const LearnSection = ({
   onOpenExampleStore,
   onTabChange,
-  onOpenHelpFinder,
   selectInAppTutorial,
 }: Props) => {
   const {
@@ -127,8 +125,6 @@ const LearnSection = ({
   return !selectedCategory ? (
     <MainPage
       onOpenExampleStore={onOpenExampleStore}
-      onOpenHelpFinder={onOpenHelpFinder}
-      onStartTutorial={() => onTabChange('get-started')}
       onTabChange={onTabChange}
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}

@@ -95,7 +95,6 @@ type Props = {|
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
-  onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
@@ -134,7 +133,6 @@ export const HomePage = React.memo<Props>(
         onOpenExampleStoreWithPrivateGameTemplateListingData,
         onOpenPrivateGameTemplateListingData,
         onOpenProjectManager,
-        onOpenHelpFinder,
         onOpenLanguageDialog,
         onOpenProfile,
         setToolbar,
@@ -413,7 +411,6 @@ export const HomePage = React.memo<Props>(
                     <LearnSection
                       onOpenExampleStore={onOpenExampleStore}
                       onTabChange={setActiveTab}
-                      onOpenHelpFinder={onOpenHelpFinder}
                       selectInAppTutorial={selectInAppTutorial}
                     />
                   )}
@@ -481,7 +478,6 @@ export const renderHomePageContainer = (
     }
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
-    onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     selectInAppTutorial={props.selectInAppTutorial}

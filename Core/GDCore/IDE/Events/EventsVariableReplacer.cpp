@@ -246,7 +246,7 @@ class GD_CORE_API ExpressionVariableReplacer
         } else if (parameterMetadata->GetType() == "objectvar") {
           auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
               platform,
-              projectScopedContainers,
+              projectScopedContainers.GetObjectsContainersList(),
               node.objectName,
               *node.parameters[parameterIndex].get());
           forcedInitialVariablesContainer =

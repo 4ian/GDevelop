@@ -116,13 +116,10 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
                   ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                   : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
-    auto objectName = scope == gd::EventsCodeGenerator::OBJECT_VARIABLE
-                          ? gd::ExpressionVariableOwnerFinder::GetObjectName(
-                                codeGenerator.GetPlatform(),
-                                codeGenerator.GetProjectScopedContainers(),
-                                rootObjectName,
-                                node)
-                          : "";
+    auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
+                                          codeGenerator.GetObjectsContainersList(),
+                                          rootObjectName,
+                                          node);
     output += codeGenerator.GenerateGetVariable(
         node.name, scope, context, objectName);
     if (node.child) node.child->Visit(*this);
@@ -211,24 +208,17 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
     output +=
         codeGenerator.GenerateObject(node.identifierName, type, context);
   } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
-    EventsCodeGenerator::VariableScope scope =
-        type == "globalvar"
-            ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-            : ((type == "scenevar")
-                  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
-                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+      EventsCodeGenerator::VariableScope scope =
+          type == "globalvar"
+              ? gd::EventsCodeGenerator::PROJECT_VARIABLE
+              : ((type == "scenevar")
+                    ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
+                    : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
       auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetProjectScopedContainers(),
+                                            codeGenerator.GetObjectsContainersList(),
                                             rootObjectName,
                                             node);
-
-    if (type == "objectvar" && node.identifierName == "Name") {
-      std::cout << node.identifierName << std::endl;
-      std::cout << "rootType: " << rootType << ", objectName: " << objectName << std::endl;
-      std::cout << "context current object: " << context.GetCurrentObject() << std::endl;
-    }
-
       output += codeGenerator.GenerateGetVariable(
           node.identifierName, scope, context, objectName);
       if (!node.childIdentifierName.empty()) {
@@ -442,27 +432,12 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
     if (!parameterMetadata.IsCodeOnly()) {
       if (nonCodeOnlyParameterIndex < parameters.size()) {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
-                                              codeGenerator.GetProjectScopedContainers(),
+                                              codeGenerator.GetObjectsContainersList(),
                                               rootObjectName,
                                               *parameters[nonCodeOnlyParameterIndex].get());
-
-        if (expressionMetadata.GetFullName() == "Text variable") {
-          std::cout << "TEXT VARIABLE condition::" << std::endl;
-          std::cout << "rootObjectName: " << rootObjectName << std::endl;
-          std::cout << "objectName: " << objectName << std::endl;
-          std::cout << "nonCodeOnlyParameterIndex: " << nonCodeOnlyParameterIndex << std::endl;
-          std::cout << "context: " << context.GetCurrentObject() << std::endl;
-        }
-
         ExpressionCodeGenerator generator(parameterMetadata.GetType(), objectName, codeGenerator, context);
         parameters[nonCodeOnlyParameterIndex]->Visit(generator);
-        gd::String output = generator.GetOutput();
-
-        if (expressionMetadata.GetFullName() == "Text variable") {
-          std::cout << "Output: " << output << std::endl;
-        }
-
-        parametersCode += output;
+        parametersCode += generator.GetOutput();
       } else if (parameterMetadata.IsOptional()) {
         ExpressionCodeGenerator generator(parameterMetadata.GetType(), "", codeGenerator, context);
         // Optional parameters default value were not parsed at the time of the

@@ -18,6 +18,7 @@
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariableParentFinder.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 
@@ -500,7 +501,7 @@ class GD_CORE_API ExpressionCompletionFinder
         }
       } else if (type == "objectvar") {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-            platform, projectScopedContainers, rootObjectName, node);
+            platform, objectsContainersList, rootObjectName, node);
 
         AddCompletionsForObjectOrGroupVariablesMatchingSearch(
             objectsContainersList, objectName, node.name, node.nameLocation);
@@ -512,8 +513,8 @@ class GD_CORE_API ExpressionCompletionFinder
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     VariableOrVariablesContainer variableOrVariablesContainer =
-        gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
-            platform, projectScopedContainers, rootObjectName, node);
+        gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+            platform, projectScopedContainers, node);
 
     AddCompletionsForChildrenVariablesOf(variableOrVariablesContainer,
                                          node.nameLocation);
@@ -556,7 +557,7 @@ class GD_CORE_API ExpressionCompletionFinder
         }
       } else if (type == "objectvar") {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
-            platform, projectScopedContainers, rootObjectName, node);
+            platform, objectsContainersList, rootObjectName, node);
 
         if (IsCaretOn(node.identifierNameDotLocation) ||
             IsCaretOn(node.childIdentifierNameLocation)) {
@@ -625,8 +626,8 @@ class GD_CORE_API ExpressionCompletionFinder
             [&]() {
               // This is a variable.
               VariableOrVariablesContainer variableOrVariablesContainer =
-                  gd::ExpressionVariableOwnerFinder::GetLastParentOfNode(
-                      platform, projectScopedContainers, rootObjectName, node);
+                  gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+                      platform, projectScopedContainers, node);
 
               AddCompletionsForChildrenVariablesOf(
                   variableOrVariablesContainer,

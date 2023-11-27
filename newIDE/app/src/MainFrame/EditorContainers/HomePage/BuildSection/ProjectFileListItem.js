@@ -36,6 +36,7 @@ import { type LastModifiedInfo } from './utils';
 import DotBadge from '../../../../UI/DotBadge';
 import { type FileMetadata } from '../../../../ProjectsStorage';
 import StatusIndicator from './StatusIndicator';
+import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -260,8 +261,11 @@ export const ProjectFileListItem = ({
       await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
       authenticatedUser.onCloudProjectsChanged();
     } catch (error) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       const message =
-        error.response && error.response.status === 403
+        extractedStatusAndCode && extractedStatusAndCode.status === 403
           ? t`You don't have permissions to delete this project.`
           : t`An error occurred when saving the project. Please try again later.`;
       showAlert({

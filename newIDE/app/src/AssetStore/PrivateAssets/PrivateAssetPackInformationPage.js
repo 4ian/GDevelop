@@ -41,6 +41,7 @@ import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { PrivateAssetPackTile, PromoBundleAssetPackCard } from '../ShopTiles';
 import { AssetStoreContext } from '../AssetStoreContext';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 const cellSpacing = 8;
 
@@ -290,7 +291,10 @@ const PrivateAssetPackInformationPage = ({
           setAssetPack(assetPack);
           setSellerPublicProfile(profile);
         } catch (error) {
-          if (error.response && error.response.status === 404) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
             setErrorText(
               <Trans>
                 Asset pack not found - An error occurred, please try again

@@ -58,6 +58,7 @@ const AuthenticatedUserProfileDetails = ({
             ? { ...authenticatedUser.profile, email: firebaseUser.email }
             : null
         }
+        subscription={authenticatedUser.subscription}
         isAuthenticatedUserProfile
         onOpenChangeEmailDialog={onOpenChangeEmailDialog}
         onOpenEditProfileDialog={onOpenEditProfileDialog}

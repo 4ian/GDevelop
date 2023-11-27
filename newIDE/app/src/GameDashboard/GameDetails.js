@@ -16,7 +16,7 @@ import {
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import { type TabOptions } from '../UI/Tabs';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -498,7 +498,7 @@ const GameDetails = ({
                     <SelectOption value="landscape" label={t`Landscape`} />
                     <SelectOption value="portrait" label={t`Portrait`} />
                   </SelectField>
-                  <Line noMargin justifyContent="flex-end">
+                  <ResponsiveLineStackLayout noMargin justifyContent="flex-end">
                     <FlatButton
                       onClick={() => {
                         const answer = Window.showConfirmDialog(
@@ -518,24 +518,20 @@ const GameDetails = ({
                       label={<Trans>Unregister this game</Trans>}
                       disabled={isGameUpdating}
                     />
-                    <Spacer />
                     {publicGame.publicWebBuildId && (
-                      <>
-                        <RaisedButton
-                          onClick={() => {
-                            const answer = Window.showConfirmDialog(
-                              'Are you sure you want to unpublish this game? \n\nThis will make your gd.games unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
-                            );
+                      <RaisedButton
+                        onClick={() => {
+                          const answer = Window.showConfirmDialog(
+                            'Are you sure you want to unpublish this game? \n\nThis will make your gd.games unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
+                          );
 
-                            if (!answer) return;
+                          if (!answer) return;
 
-                            unpublishGame();
-                          }}
-                          label={<Trans>Unpublish from gd.games</Trans>}
-                          disabled={isGameUpdating}
-                        />
-                        <Spacer />
-                      </>
+                          unpublishGame();
+                        }}
+                        label={<Trans>Unpublish from gd.games</Trans>}
+                        disabled={isGameUpdating}
+                      />
                     )}
                     <RaisedButton
                       primary
@@ -543,7 +539,7 @@ const GameDetails = ({
                       label={<Trans>Edit game details</Trans>}
                       disabled={!isGameOpenedAsProject || isGameUpdating}
                     />
-                  </Line>
+                  </ResponsiveLineStackLayout>
                   {gameUnregisterErrorText ? (
                     <PlaceholderError>
                       {gameUnregisterErrorText}

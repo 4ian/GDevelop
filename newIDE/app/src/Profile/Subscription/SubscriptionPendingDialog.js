@@ -180,9 +180,8 @@ export default function SubscriptionPendingDialog({
                 <Line>
                   <TextField
                     value={discordUsername}
-                    floatingLabelText={<Trans>Discord username</Trans>}
                     fullWidth
-                    translatableHintText={t`Your Discord username`}
+                    translatableHintText={t`Enter your Discord username`}
                     onChange={(e, value) => {
                       setDiscordUsername(value);
                     }}

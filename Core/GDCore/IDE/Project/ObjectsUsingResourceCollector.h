@@ -23,7 +23,7 @@ class GD_CORE_API ObjectsUsingResourceCollector
 public:
   ObjectsUsingResourceCollector(gd::ResourcesManager &resourcesManager_,
                                 const gd::String &resourceName_)
-      : resourcesManager(resourcesManager_), resourceName(resourceName_){};
+      : resourcesManager(&resourcesManager_), resourceName(resourceName_){};
   virtual ~ObjectsUsingResourceCollector();
 
   std::vector<gd::String>& GetObjectNames() { return objectNames; }
@@ -33,7 +33,7 @@ public:
 
   std::vector<gd::String> objectNames;
   gd::String resourceName;
-  gd::ResourcesManager &resourcesManager;
+  gd::ResourcesManager *resourcesManager;
 };
 
 class GD_CORE_API ResourceNameMatcher : public ArbitraryResourceWorker {

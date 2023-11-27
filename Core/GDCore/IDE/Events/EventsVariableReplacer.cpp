@@ -136,7 +136,7 @@ class GD_CORE_API ExpressionVariableReplacer
     auto& objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     if (!objectNameToUseForVariableAccessor.empty()) {
-      if (objectsContainersList.HasVariablesContainer(
+      if (objectsContainersList.HasObjectOrGroupVariablesContainer(
               objectNameToUseForVariableAccessor, targetVariablesContainer)) {
         // The node represents an object variable, and this object variables are
         // the target. Do the replacement or removals:
@@ -177,7 +177,7 @@ class GD_CORE_API ExpressionVariableReplacer
         GetPotentialNewName(node.identifierName),
         [&]() {
           // This represents an object.
-          if (objectsContainersList.HasVariablesContainer(
+          if (objectsContainersList.HasObjectOrGroupVariablesContainer(
                   node.identifierName, targetVariablesContainer)) {
             // The node represents an object variable, and this object variables
             // are the target. Do the replacement or removals:

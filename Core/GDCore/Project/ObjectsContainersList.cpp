@@ -113,7 +113,7 @@ bool ObjectsContainersList::HasObjectWithVariableNamed(
   return false;
 }
 
-bool ObjectsContainersList::HasVariablesContainer(
+bool ObjectsContainersList::HasObjectOrGroupVariablesContainer(
     const gd::String& objectOrGroupName,
     const gd::VariablesContainer& variablesContainer) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
@@ -123,8 +123,31 @@ bool ObjectsContainersList::HasVariablesContainer(
              &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // Could be adapted if objects groups have variables in the future.
-      // This would allow handling the renaming of variables of an object group.
+      // For groups, we consider that the first object of the group defines the
+      // variables available for this group. Note that this is slightly
+      // different than other methods where a group is considered as the
+      // "intersection" of all of its objects.
+      const auto& objectNames =
+          (*it)->GetObjectGroups().Get(objectOrGroupName).GetAllObjectsNames();
+
+      if (!objectNames.empty()) {
+        return HasObjectVariablesContainer(objectNames[0], variablesContainer);
+      }
+      return false;
+    }
+  }
+
+  return false;
+}
+
+bool ObjectsContainersList::HasObjectVariablesContainer(
+    const gd::String& objectName,
+    const gd::VariablesContainer& variablesContainer) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectName)) {
+      return &variablesContainer ==
+             &(*it)->GetObject(objectName).GetVariables();
     }
   }
 
@@ -140,9 +163,30 @@ ObjectsContainersList::GetObjectOrGroupVariablesContainer(
       return &(*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
-      // TODO: for completion for groups.
-      // Could be adapted if objects groups have variables in the future.
-      // This would allow handling the renaming of variables of an object group.
+      // For groups, we consider that the first object of the group defines the
+      // variables available for this group. Note that this is slightly
+      // different than other methods where a group is considered as the
+      // "intersection" of all of its objects.
+      const auto& objectNames =
+          (*it)->GetObjectGroups().Get(objectOrGroupName).GetAllObjectsNames();
+
+      if (!objectNames.empty()) {
+        return GetObjectVariablesContainer(objectNames[0]);
+      }
+      return nullptr;
+    }
+  }
+
+  return nullptr;
+}
+
+const gd::VariablesContainer*
+ObjectsContainersList::GetObjectVariablesContainer(
+    const gd::String& objectName) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectName)) {
+      return &(*it)->GetObject(objectName).GetVariables();
     }
   }
 
@@ -151,7 +195,6 @@ ObjectsContainersList::GetObjectOrGroupVariablesContainer(
 
 gd::Variable::Type ObjectsContainersList::GetTypeOfObjectOrGroupVariable(
     const gd::String& objectOrGroupName, const gd::String& variableName) const {
-
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
@@ -183,13 +226,12 @@ gd::Variable::Type ObjectsContainersList::GetTypeOfObjectOrGroupVariable(
   return Variable::Type::Number;
 }
 
-gd::Variable::Type ObjectsContainersList::GetTypeOfObjectVariable(const gd::String& objectName, const gd::String& variableName) const {
-
+gd::Variable::Type ObjectsContainersList::GetTypeOfObjectVariable(
+    const gd::String& objectName, const gd::String& variableName) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectName)) {
-      const auto& variables =
-          (*it)->GetObject(objectName).GetVariables();
+      const auto& variables = (*it)->GetObject(objectName).GetVariables();
 
       return variables.Get(variableName).GetType();
     }

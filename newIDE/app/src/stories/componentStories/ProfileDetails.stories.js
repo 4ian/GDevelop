@@ -8,7 +8,8 @@ import paperDecorator from '../PaperDecorator';
 import ProfileDetails from '../../Profile/ProfileDetails';
 import {
   indieUserProfile,
-  subscriptionForBusinessUser,
+  subscriptionForStartupUser,
+  subscriptionForSilverUser,
 } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
@@ -54,16 +55,24 @@ const getAssetPacksListingData = (
   },
 ];
 
-export const MyCompleteProfileWithSubscription = () => (
+export const MyCompleteProfileWithoutSubscription = () => (
+  <ProfileDetails profile={indieUserProfile} isAuthenticatedUserProfile />
+);
+
+export const MyCompleteProfileWithSilverSubscription = () => (
   <ProfileDetails
     profile={indieUserProfile}
     isAuthenticatedUserProfile
-    subscription={subscriptionForBusinessUser}
+    subscription={subscriptionForSilverUser}
   />
 );
 
-export const MyCompleteProfileWithoutSubscription = () => (
-  <ProfileDetails profile={indieUserProfile} isAuthenticatedUserProfile />
+export const MyCompleteProfileWithBusinessSubscription = () => (
+  <ProfileDetails
+    profile={indieUserProfile}
+    isAuthenticatedUserProfile
+    subscription={subscriptionForStartupUser}
+  />
 );
 
 export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
@@ -73,11 +82,11 @@ export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
   />
 );
 
-export const MyProfileWithoutDiscordUsernameButWithSubscription = () => (
+export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
   <ProfileDetails
     profile={{ ...indieUserProfile, discordUsername: '' }}
     isAuthenticatedUserProfile
-    subscription={subscriptionForBusinessUser}
+    subscription={subscriptionForStartupUser}
   />
 );
 

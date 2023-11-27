@@ -257,6 +257,12 @@ const ProfileDetails = ({
     [assetPacksListingDatas, onAssetPackOpen, receivedAssetPacks]
   );
 
+  const hasGoldOrProSubscription =
+    !!subscription &&
+    !!subscription.planId &&
+    (subscription.planId === 'gdevelop_gold' ||
+      subscription.planId === 'gdevelop_startup');
+
   if (error)
     return (
       <PlaceholderError onRetry={onRetry}>
@@ -316,8 +322,7 @@ const ProfileDetails = ({
                     <Trans>Discord username</Trans>
                   </Text>
                   {isAuthenticatedUserProfile &&
-                    !!subscription &&
-                    !!subscription.planId &&
+                    hasGoldOrProSubscription &&
                     !!discordUsername && (
                       <IconButton
                         onClick={onSyncDiscordUsername}
@@ -337,9 +342,9 @@ const ProfileDetails = ({
                   {!isAuthenticatedUserProfile ? (
                     discordUsername
                   ) : !discordUsername ? (
-                    !subscription || !subscription.planId ? (
+                    !hasGoldOrProSubscription ? (
                       <MarkdownText
-                        translatableSource={t`No discord username defined. Add it and get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                        translatableSource={t`No discord username defined. Add it and get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                       />
                     ) : (
                       <MarkdownText
@@ -349,11 +354,11 @@ const ProfileDetails = ({
                   ) : (
                     <>
                       {discordUsername}
-                      {(!subscription || !subscription.planId) && (
+                      {!hasGoldOrProSubscription && (
                         <>
                           {' - '}
                           <MarkdownText
-                            translatableSource={t`Get a subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                            translatableSource={t`Get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                           />
                         </>
                       )}

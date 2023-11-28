@@ -3182,7 +3182,6 @@ const MainFrame = (props: Props) => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProfile: () => openProfileDialog(true),
-                    onOpenHelpFinder: openCommandPalette,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),

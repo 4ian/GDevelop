@@ -13,7 +13,10 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import SearchBar from '../UI/SearchBar';
 import { useDebounce } from '../Utils/UseDebounce';
 import Fuse from 'fuse.js';
-import { getFuseSearchQueryForSimpleArray, sharedFuseConfiguration } from '../UI/Search/UseSearchStructuredItem';
+import {
+  getFuseSearchQueryForSimpleArray,
+  sharedFuseConfiguration,
+} from '../UI/Search/UseSearchStructuredItem';
 
 const getGamesToDisplay = ({
   project,
@@ -32,7 +35,9 @@ const getGamesToDisplay = ({
     ? [thisGame, ...games.filter(game => game.id !== thisGame.id)]
     : games;
   if (!searchText) return orderedGames;
-  const searchResults = searchClient.search(getFuseSearchQueryForSimpleArray(searchText))
+  const searchResults = searchClient.search(
+    getFuseSearchQueryForSimpleArray(searchText)
+  );
   return searchResults.map(result => result.item);
 };
 

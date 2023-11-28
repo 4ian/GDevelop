@@ -88,7 +88,7 @@ export const WithThumbnailSetInContent = () => {
           anchorElement={anchorEl}
           placement="bottom"
           content={[
-            <TreeLeaves style={{height: 80, width: '100%'}} />,
+            <TreeLeaves style={{ height: 80, width: '100%' }} />,
 
             <Text noMargin>
               Follow your game’s online performance, manage published versions,

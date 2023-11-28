@@ -44,7 +44,7 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'model3d-animations-list'
 );
 
-const styles = {
+export const styles = {
   rowContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -91,7 +91,7 @@ type PropertyFieldProps = {|
   propertyName: string,
 |};
 
-const PropertyField = ({
+export const PropertyField = ({
   objectConfiguration,
   propertyName,
 }: PropertyFieldProps) => {
@@ -136,7 +136,7 @@ const PropertyField = ({
   );
 };
 
-const PropertyCheckbox = ({
+export const PropertyCheckbox = ({
   objectConfiguration,
   propertyName,
 }: PropertyFieldProps) => {
@@ -178,7 +178,7 @@ type PropertyResourceSelectorProps = {|
   onChange: (value: string) => void,
 |};
 
-const PropertyResourceSelector = ({
+export const PropertyResourceSelector = ({
   objectConfiguration,
   propertyName,
   project,

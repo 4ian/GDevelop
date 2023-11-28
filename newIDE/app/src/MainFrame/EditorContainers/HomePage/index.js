@@ -46,7 +46,9 @@ import HighlightingTooltip from '../../../UI/HighlightingTooltip';
 import Text from '../../../UI/Text';
 import Link from '../../../UI/Link';
 import Window from '../../../Utils/Window';
+import { getHelpLink } from '../../../Utils/HelpLink';
 
+const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
   routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
   routeArguments['initial-dialog'] === 'store'; // New way of opening the store
@@ -534,6 +536,7 @@ export const HomePage = React.memo<Props>(
                   // $FlowIgnore - displayTooltipDelayed makes sure the element is defined
                   anchorElement={manageTabElement}
                   title={<Trans>Games Dashboard</Trans>}
+                  thumbnailSource="res/features/games-dashboard.svg"
                   content={[
                     <Text noMargin key="paragraph">
                       <Trans>
@@ -543,9 +546,9 @@ export const HomePage = React.memo<Props>(
                     </Text>,
                     <Text noMargin key="link">
                       <Link
-                        href="https://gdevelop.io"
+                        href={gamesDashboardWikiArticle}
                         onClick={() =>
-                          Window.openExternalURL('https://gdevelop.io')
+                          Window.openExternalURL(gamesDashboardWikiArticle)
                         }
                       >
                         <Trans>Learn more</Trans>

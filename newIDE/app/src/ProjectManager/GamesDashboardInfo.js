@@ -21,6 +21,7 @@ import { getProjectManagerItemId } from '.';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const publishingWikiArticle = getHelpLink('/publishing/');
+const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 
 const styles = {
   gamesDashboardInfoContainer: {
@@ -118,6 +119,7 @@ const GamesDashboardInfo = ({
           <HighlightingTooltip
             // $FlowIgnore - displayTooltipDelayed makes sure the element is defined
             anchorElement={gameDashboardItemContainer}
+            thumbnailSource="res/features/games-dashboard.svg"
             title={<Trans>Game Dashboard</Trans>}
             content={[
               <Text noMargin key="paragraph">
@@ -128,8 +130,10 @@ const GamesDashboardInfo = ({
               </Text>,
               <Text noMargin key="link">
                 <Link
-                  href="https://gdevelop.io"
-                  onClick={() => Window.openExternalURL('https://gdevelop.io')}
+                  href={gamesDashboardWikiArticle}
+                  onClick={() =>
+                    Window.openExternalURL(gamesDashboardWikiArticle)
+                  }
                 >
                   <Trans>Learn more</Trans>
                 </Link>

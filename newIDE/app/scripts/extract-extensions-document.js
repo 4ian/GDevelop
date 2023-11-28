@@ -383,22 +383,37 @@ const generateAllExtensionsSections = extensions => {
 /**
  * @param {Array<any>} extensions The extension (gdEventsFunctionsExtension)
  */
-const generateExtensionsMkDocsDotPagesFile = async (extensions) => {
+const generateExtensionsPageList = (extensions, indentationLevel) => {
   const extensionsByCategory = sortKeys(
     groupBy(extensions, pair => pair.getCategory() || 'General')
   );
 
+  const baseIndentation = ' '.repeat(4 * indentationLevel);
+
   let pagesList = '';
   for (const category in extensionsByCategory) {
-    pagesList += `    - ${category}:\n`;
+    pagesList += `${baseIndentation}- ${category}:\n`;
 
     const extensions = extensionsByCategory[category];
     for (const extension of extensions) {
       const folderName = getExtensionFolderName(extension.getName());
-      pagesList += `        - ${extension.getFullName()}: ${folderName}\n`;
+      pagesList += `${baseIndentation}    - ${extension.getFullName()}: ${folderName}\n`;
     }
   }
 
+  return pagesList.length === 0
+    ? pagesList
+    : pagesList.substring(0, pagesList.length - 1);
+};
+
+/**
+ * @param {Array<any>} reviewedExtensions The extension (gdEventsFunctionsExtension)
+ * @param {Array<any>} communityExtensions The extension (gdEventsFunctionsExtension)
+ */
+const generateExtensionsMkDocsDotPagesFile = async (
+  reviewedExtensions,
+  communityExtensions
+) => {
   const dotPagesContent = `nav:
     - index.md
     - search.md
@@ -407,7 +422,10 @@ const generateExtensionsMkDocsDotPagesFile = async (extensions) => {
         - Create a new extension : create.md
         - best-practices.md
         - share-extension.md
-${pagesList}    - ...
+${generateExtensionsPageList(reviewedExtensions, 1)}
+    - Community extensions:
+${generateExtensionsPageList(communityExtensions, 2)}
+    - ...
 `;
 
   const extensionsDotPagesFilePath = path.join(extensionsRootPath, '.pages');
@@ -490,10 +508,10 @@ does or inspect its content before using it.
   }
   content += generateAllExtensionsSections(communityExtensions);
 
-  await generateExtensionsMkDocsDotPagesFile([
-    ...reviewedExtensions,
-    ...communityExtensions,
-  ]);
+  await generateExtensionsMkDocsDotPagesFile(
+    reviewedExtensions,
+    communityExtensions
+  );
 
   project.delete();
   return content;

@@ -209,6 +209,8 @@ module.exports = {
       _initialWidth = null;
       _initialHeight = null;
       _animationIndex = -1;
+      _spineOriginOffsetX = 0;
+      _spineOriginOffsetY = 0;
 
       constructor(
         project,
@@ -251,25 +253,37 @@ module.exports = {
 
         const width = this.getWidth();
         const height = this.getHeight();
-
-        this._rect.clear();
-        this._rect.beginFill(0xffffff);
-        this._rect.lineStyle(0, 0xffffff);
-        this._rect.drawRect(0, 0, width, height);
-
         const { _spine: spine } = this;
+
         if (spine) {
           spine.width = width;
           spine.height = height;
           spine.alpha = this._getProperties().get('opacity').getValue() / 255;
           const localBounds = spine.getLocalBounds(undefined, true);
-          spine.position.set(
-            -localBounds.x * spine.scale.x,
-            -localBounds.y * spine.scale.y
-          );
+          
+          this._spineOriginOffsetX = localBounds.x * spine.scale.x;
+          this._spineOriginOffsetY = localBounds.y * spine.scale.y;
+          this._rect.position.set(this._spineOriginOffsetX, this._spineOriginOffsetY);
         }
 
-        this._pixiObject.calculateBounds();
+        this._rect.clear();
+        this._rect.beginFill(0xffffff);
+        this._rect.lineStyle(1, 0xff0000);
+        this._rect.drawRect(0, 0, width, height);
+      }
+
+      /**
+       * @returns x coordinate of this spine origin offset
+       */
+      getOriginX() {
+        return -this._spineOriginOffsetX;
+      }
+
+      /**
+       * @returns y coordinate of this spine origin offset
+       */
+      getOriginY() {
+        return -this._spineOriginOffsetY;
       }
 
       /**

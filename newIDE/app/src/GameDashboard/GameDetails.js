@@ -37,7 +37,7 @@ import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import Crown from '../UI/CustomSvgIcons/Crown';
-import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
@@ -113,7 +113,7 @@ const GameDetails = ({
     setGameUnregisterErrorText,
   ] = React.useState<?string>(null);
   const [isGameUpdating, setIsGameUpdating] = React.useState(false);
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showAlert } = useAlertDialog();
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [publicGame, setPublicGame] = React.useState<?PublicGame>(null);
@@ -187,12 +187,10 @@ const GameDetails = ({
 
     const ownerIds = partialGameChange.ownerIds;
     if (!ownerIds || !ownerIds.length) {
-      showWarningBox(
-        i18n._(
-          t`You must select at least one user to be the owner of the game.`
-        ),
-        { delayToNextTick: true }
-      );
+      await showAlert({
+        title: t`Select an owner`,
+        message: t`You must select at least one user to be the owner of the game.`,
+      });
       return false;
     }
 

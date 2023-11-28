@@ -25,6 +25,26 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
     bool updateOriginalProject,
     bool preserveAbsoluteFilenames,
     bool preserveDirectoryStructure) {
+  if (updateOriginalProject) {
+    gd::ProjectResourcesCopier::CopyAllResourcesTo(
+        originalProject, originalProject, fs, destinationDirectory,
+        preserveAbsoluteFilenames, preserveDirectoryStructure);
+  } else {
+    gd::Project clonedProject = originalProject;
+    gd::ProjectResourcesCopier::CopyAllResourcesTo(
+        originalProject, clonedProject, fs, destinationDirectory,
+        preserveAbsoluteFilenames, preserveDirectoryStructure);
+  }
+  return true;
+}
+
+bool ProjectResourcesCopier::CopyAllResourcesTo(
+    gd::Project& originalProject,
+    gd::Project& clonedProject,
+    AbstractFileSystem& fs,
+    gd::String destinationDirectory,
+    bool preserveAbsoluteFilenames,
+    bool preserveDirectoryStructure) {
 
   // Check if there are some resources with absolute filenames
   gd::ResourcesAbsolutePathChecker absolutePathChecker(originalProject.GetResourcesManager(), fs);
@@ -34,20 +54,15 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
   std::cout << "Copying all resources from " << projectDirectory << " to "
             << destinationDirectory << "..." << std::endl;
 
-  gd::Project& project = originalProject;
-  if (!updateOriginalProject) {
-    std::shared_ptr<gd::Project> clonedProject(new gd::Project(originalProject));
-    project = *clonedProject;
-  }
-
   // Get the resources to be copied
-  gd::ResourcesMergingHelper resourcesMergingHelper(project.GetResourcesManager(), fs);
+  gd::ResourcesMergingHelper resourcesMergingHelper(
+      clonedProject.GetResourcesManager(), fs);
   resourcesMergingHelper.SetBaseDirectory(projectDirectory);
   resourcesMergingHelper.PreserveDirectoriesStructure(
       preserveDirectoryStructure);
-  resourcesMergingHelper.PreserveAbsoluteFilenames(
-      preserveAbsoluteFilenames);
-  gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesMergingHelper);
+  resourcesMergingHelper.PreserveAbsoluteFilenames(preserveAbsoluteFilenames);
+  gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
+                                                    resourcesMergingHelper);
 
   // Copy resources
   map<gd::String, gd::String>& resourcesNewFilename =

@@ -136,7 +136,7 @@ export function PublicGameProperties({
       const categories = await getGameCategories();
       setAllGameCategories(categories);
     } catch (error) {
-      console.log('An error occurred while fetching game categories.');
+      console.error('An error occurred while fetching game categories.', error);
     }
   }, []);
 

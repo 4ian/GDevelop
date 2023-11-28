@@ -26,7 +26,6 @@ import Chip from '@material-ui/core/Chip';
 import Builds from '../ExportAndShare/Builds';
 import AlertMessage from '../UI/AlertMessage';
 import RaisedButton from '../UI/RaisedButton';
-import Window from '../Utils/Window';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
@@ -45,6 +44,7 @@ import GameFeedback from './Feedbacks/GameFeedback';
 import { GameMonetization } from './Monetization/GameMonetization';
 import RouterContext from '../MainFrame/RouterContext';
 import { sendGameDetailsOpened } from '../Utils/Analytics/EventSender';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 export type GameDetailsTab =
   | 'details'
@@ -113,6 +113,7 @@ const GameDetails = ({
     setGameUnregisterErrorText,
   ] = React.useState<?string>(null);
   const [isGameUpdating, setIsGameUpdating] = React.useState(false);
+  const { showConfirmation } = useAlertDialog();
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [publicGame, setPublicGame] = React.useState<?PublicGame>(null);
@@ -290,33 +291,36 @@ const GameDetails = ({
     return true;
   };
 
-  const unregisterGame = async (i18n: I18nType) => {
-    if (!profile) return;
-    const { id } = profile;
-    setGameUnregisterErrorText(null);
-    onLoading(true);
-    try {
-      setIsGameUpdating(true);
-      await deleteGame(getAuthorizationHeader, id, game.id);
-      onGameDeleted();
-    } catch (error) {
-      console.error('Unable to delete the game:', error);
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.code === 'game-deletion/leaderboards-exist'
-      ) {
-        setGameUnregisterErrorText(
-          i18n._(
-            t`You cannot unregister a game that has active leaderboards. To delete them, go in the Leaderboards tab, and delete them one by one.`
-          )
-        );
+  const unregisterGame = React.useCallback(
+    async (i18n: I18nType) => {
+      if (!profile) return;
+      const { id } = profile;
+      setGameUnregisterErrorText(null);
+      onLoading(true);
+      try {
+        setIsGameUpdating(true);
+        await deleteGame(getAuthorizationHeader, id, game.id);
+        onGameDeleted();
+      } catch (error) {
+        console.error('Unable to delete the game:', error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.code === 'game-deletion/leaderboards-exist'
+        ) {
+          setGameUnregisterErrorText(
+            i18n._(
+              t`You cannot unregister a game that has active leaderboards. To delete them, go in the Leaderboards tab, and delete them one by one.`
+            )
+          );
+        }
+      } finally {
+        setIsGameUpdating(false);
+        onLoading(false);
       }
-    } finally {
-      setIsGameUpdating(false);
-      onLoading(false);
-    }
-  };
+    },
+    [onLoading, game.id, profile, onGameDeleted, getAuthorizationHeader]
+  );
 
   const unpublishGame = React.useCallback(
     async () => {
@@ -341,6 +345,34 @@ const GameDetails = ({
       }
     },
     [game, getAuthorizationHeader, profile, handleGameUpdated]
+  );
+
+  const onClickUnregister = React.useCallback(
+    async (i18n: I18nType) => {
+      const answer = await showConfirmation({
+        title: t`Unregister game`,
+        message: t`Are you sure you want to unregister this game?${'\n\n'}It will disappear from your games dashboard and you won't get access to analytics, unless you register it again.`,
+      });
+
+      if (!answer) return;
+
+      unregisterGame(i18n);
+    },
+    [unregisterGame, showConfirmation]
+  );
+
+  const onClickUnpublish = React.useCallback(
+    async (i18n: I18nType) => {
+      const answer = await showConfirmation({
+        title: t`Unpublish game`,
+        message: t`Are you sure you want to unpublish this game?${'\n\n'}This will make your gd.games unique game URL not accessible anymore.${'\n\n'}You can decide at any time to publish it again.`,
+      });
+
+      if (!answer) return;
+
+      unpublishGame();
+    },
+    [unpublishGame, showConfirmation]
   );
 
   const authorUsernames =
@@ -500,35 +532,13 @@ const GameDetails = ({
                   </SelectField>
                   <ResponsiveLineStackLayout noMargin justifyContent="flex-end">
                     <FlatButton
-                      onClick={() => {
-                        const answer = Window.showConfirmDialog(
-                          i18n._(
-                            t`Are you sure you want to unregister this game?`
-                          ) +
-                            '\n\n' +
-                            i18n._(
-                              t`It will disappear from your games dashboard and you won't get access to analytics, unless you register it again.`
-                            )
-                        );
-
-                        if (!answer) return;
-
-                        unregisterGame(i18n);
-                      }}
+                      onClick={() => onClickUnregister(i18n)}
                       label={<Trans>Unregister this game</Trans>}
                       disabled={isGameUpdating}
                     />
                     {publicGame.publicWebBuildId && (
                       <RaisedButton
-                        onClick={() => {
-                          const answer = Window.showConfirmDialog(
-                            'Are you sure you want to unpublish this game? \n\nThis will make your gd.games unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
-                          );
-
-                          if (!answer) return;
-
-                          unpublishGame();
-                        }}
+                        onClick={() => onClickUnpublish(i18n)}
                         label={<Trans>Unpublish from gd.games</Trans>}
                         disabled={isGameUpdating}
                       />

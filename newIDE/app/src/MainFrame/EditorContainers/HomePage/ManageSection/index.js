@@ -230,8 +230,8 @@ const ManageSection = ({
 
 const ManageSectionWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
-    componentTitle={<Trans>Team section</Trans>}
-    scope="start-page-team"
+    componentTitle={<Trans>Manage section</Trans>}
+    scope="start-page-manage"
   >
     <ManageSection {...props} />
   </ErrorBoundary>

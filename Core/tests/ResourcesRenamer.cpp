@@ -15,11 +15,10 @@
 
 TEST_CASE("ResourcesRenamer", "[common]") {
   SECTION("It renames resources that are exposed") {
+    gd::Project project;
     std::map<gd::String, gd::String> renamings = {
         {"Resource1", "RenamedResource1"}};
-    gd::ResourcesRenamer resourcesRenamer(renamings);
-
-    gd::Project project;
+    gd::ResourcesRenamer resourcesRenamer(project.GetResourcesManager(), renamings);
 
     // Add "classic", plain resources.
     gd::ImageResource resource1;
@@ -45,11 +44,10 @@ TEST_CASE("ResourcesRenamer", "[common]") {
   }
 
   SECTION("It renames embedded resources") {
+    gd::Project project;
     std::map<gd::String, gd::String> renamings = {
         {"Resource1", "RenamedResource1"}};
-    gd::ResourcesRenamer resourcesRenamer(renamings);
-
-    gd::Project project;
+    gd::ResourcesRenamer resourcesRenamer(project.GetResourcesManager(), renamings);
 
     // Add "classic", plain resources.
     gd::ImageResource resource1;

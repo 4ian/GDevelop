@@ -33,8 +33,9 @@ std::set<gd::String> & usedImages = resourcesInUse.GetAllImages();
  * \ingroup IDE
  */
 class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
- public:
-  ResourcesInUseHelper() : gd::ArbitraryResourceWorker(){};
+public:
+  ResourcesInUseHelper(gd::ResourcesManager &resourcesManager)
+      : gd::ArbitraryResourceWorker(resourcesManager){};
   virtual ~ResourcesInUseHelper(){};
 
   std::set<gd::String>& GetAllImages() { return GetAll("image"); };

@@ -28,6 +28,7 @@ import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
 import WikiSearchBar from '../../../../UI/WikiSearchBar';
+import FlingGame from '../InAppTutorials/FlingGame';
 
 const useStyles = makeStyles({
   tile: {
@@ -234,6 +235,17 @@ const MainPage = ({
             onSelectCategory={onSelectCategory}
             tutorials={tutorials}
           />
+        </SectionRow>
+        <SectionRow>
+          <Text noMargin size="section-title">
+            <Trans>Create and Publish a Fling game</Trans>
+          </Text>
+          <Text size="body" color="secondary" noMargin>
+            <Trans>
+              3-part tutorial to creating and publishing a game from scratch.
+            </Trans>
+          </Text>
+          <FlingGame selectInAppTutorial={selectInAppTutorial} />
         </SectionRow>
         <SectionRow>
           <LineStackLayout

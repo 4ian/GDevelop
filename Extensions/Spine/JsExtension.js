@@ -143,6 +143,7 @@ module.exports = {
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .addParameter('number', _('Mixing duration'), '', false)
       .markAsSimple()
       .setFunctionName('setAnimationIndex')
       .setGetter('getCurrentAnimationIndex');
@@ -162,6 +163,7 @@ module.exports = {
         'objectAnimationName',
         gd.ParameterOptions.makeNewOptions().setDescription(_('Animation name'))
       )
+      .addParameter('number', _('Mixing duration'), '', false)
       .markAsAdvanced()
       .setFunctionName('setAnimationName')
       .setGetter('getAnimationName');

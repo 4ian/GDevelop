@@ -19,7 +19,7 @@ namespace gdjs {
     private _scale: number;
     private _timeScale: number;
     private _animations: SpineAnimation[];
-    private _currentAnimationIndex = 0;
+    private _currentAnimationIndex = -1;
     private _renderer: gdjs.SpineRuntimeObjectPixiRenderer;
 
     readonly spineResourceName: string;
@@ -85,7 +85,7 @@ namespace gdjs {
         ? animationData.value
         : this._currentAnimationIndex;
 
-      this.setAnimationIndex(animationIndex);
+      this.setAnimationIndex(animationIndex, 0);
 
       if (initialInstanceData.customSize) {
         this.setScale(1);
@@ -163,18 +163,39 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    setAnimationIndex(animationIndex: number): void {
+    setAnimationIndex(animationIndex: number, mixingDuration: number): void {
       if (!this.isAnimationIndex(animationIndex)) {
         return;
       }
 
+      const previousAnimationName = this.getAnimationSource(
+        this._currentAnimationIndex
+      );
+      const newAnimationName = this.getAnimationSource(animationIndex);
+
+      if (
+        previousAnimationName &&
+        newAnimationName &&
+        newAnimationName !== previousAnimationName
+      ) {
+        this._renderer.setMixing(
+          previousAnimationName,
+          newAnimationName,
+          mixingDuration
+        );
+      }
+
       const animation = this._animations[animationIndex];
       this._currentAnimationIndex = animationIndex;
+
       this._renderer.setAnimation(animation.source, animation.loop);
     }
 
-    setAnimationName(animationName: string): void {
-      this.setAnimationIndex(this.getAnimationIndex(animationName));
+    setAnimationName(animationName: string, mixingDuration: number): void {
+      this.setAnimationIndex(
+        this.getAnimationIndex(animationName),
+        mixingDuration
+      );
     }
 
     getCurrentAnimationIndex(): number {
@@ -185,6 +206,10 @@ namespace gdjs {
       return this.isAnimationIndex(this._currentAnimationIndex)
         ? this._animations[this._currentAnimationIndex].name
         : '';
+    }
+
+    getAnimationSource(index: number): string {
+      return this.isAnimationIndex(index) ? this._animations[index].source : '';
     }
 
     getAnimationIndex(animationName: string): number {

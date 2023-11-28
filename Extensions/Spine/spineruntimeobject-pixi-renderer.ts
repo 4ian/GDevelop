@@ -83,6 +83,12 @@ namespace gdjs {
       this._rendererObject.height = height;
     }
 
+    setMixing(from: string, to: string, duration: number): void {
+      if (!isSpine(this._rendererObject)) return;
+
+      this._rendererObject.stateData.setMix(from, to, duration);
+    }
+
     setAnimation(animation: string, loop: boolean): void {
       if (isSpine(this._rendererObject)) {
         const onCompleteListener: pixi_spine.IAnimationStateListener = {

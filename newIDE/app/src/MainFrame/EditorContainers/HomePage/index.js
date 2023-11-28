@@ -440,6 +440,14 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
+      const handleGameUpdated = React.useCallback(
+        (game: Game) => {
+          onGameUpdated(game);
+          fetchGames();
+        },
+        [fetchGames, onGameUpdated]
+      );
+
       const shouldDisplayAnnouncements =
         activeTab !== 'community' &&
         // Get started page displays announcements itself.
@@ -459,7 +467,7 @@ export const HomePage = React.memo<Props>(
                     <ManageSection
                       project={project}
                       games={games}
-                      onGameUpdated={onGameUpdated}
+                      onGameUpdated={handleGameUpdated}
                       onRefreshGames={fetchGames}
                       gamesFetchingError={gamesFetchingError}
                       openedGame={openedGame}

@@ -313,6 +313,7 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
             setOpenedGame(null);
           }}
           onGameUpdated={updatedGame => {
+            fetchGames();
             onGameUpdated(updatedGame);
             setOpenedGame(updatedGame);
           }}

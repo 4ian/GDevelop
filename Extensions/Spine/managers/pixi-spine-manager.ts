@@ -40,30 +40,32 @@ namespace gdjs {
       const resource = this._getSpineResource(resourceName);
 
       if (!resource) {
-        return logger.error(`Unable to find spine json for resource ${resourceName}.`);
+        return logger.error(
+          `Unable to find spine json for resource ${resourceName}.`
+        );
       }
 
       try {
-        const metadata = resource.metadata
-          ? JSON.parse(resource.metadata)
-          : {};
+        const metadata = resource.metadata ? JSON.parse(resource.metadata) : {};
 
         if (!metadata.atlas) {
-          return logger.error(`Unable to find atlas metadata for resource spine json ${resourceName}.`);
+          return logger.error(
+            `Unable to find atlas metadata for resource spine json ${resourceName}.`
+          );
         }
 
-        const spineAtlas = await this._spineAtlasManager.getOrLoad(metadata.atlas);
+        const spineAtlas = await this._spineAtlasManager.getOrLoad(
+          metadata.atlas
+        );
         PIXI.Assets.setPreferences({
           preferWorkers: false,
-          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(resource.file)
+          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
+            resource.file
+          )
             ? 'use-credentials'
             : 'anonymous',
         });
-        PIXI.Assets.add(
-          resource.name,
-          resource.file,
-          { spineAtlas }
-        );
+        PIXI.Assets.add(resource.name, resource.file, { spineAtlas });
         const loadedJson = await PIXI.Assets.load(resource.name);
 
         if (loadedJson.spineData) {
@@ -102,9 +104,9 @@ namespace gdjs {
 
     private _getSpineResource(resourceName: string): ResourceData | null {
       const resource = this._resourceLoader.getResource(resourceName);
-      return (resource && this.getResourceKinds().includes(resource.kind)
+      return resource && this.getResourceKinds().includes(resource.kind)
         ? resource
-        : null);
-    };
+        : null;
+    }
   }
 }

@@ -166,8 +166,14 @@ namespace gdjs {
 
       // add spine related managers only if spine extension is used
       if (gdjs.SpineAtlasManager && gdjs.SpineManager) {
-        this._spineAtlasManager = new gdjs.SpineAtlasManager(this, this._imageManager);
-        this._spineManager = new gdjs.SpineManager(this, this._spineAtlasManager);
+        this._spineAtlasManager = new gdjs.SpineAtlasManager(
+          this,
+          this._imageManager
+        );
+        this._spineManager = new gdjs.SpineManager(
+          this,
+          this._spineAtlasManager
+        );
       }
 
       const resourceManagers: Array<ResourceManager> = [
@@ -179,7 +185,8 @@ namespace gdjs {
         this._model3DManager,
       ];
 
-      if (this._spineAtlasManager) resourceManagers.push(this._spineAtlasManager);
+      if (this._spineAtlasManager)
+        resourceManagers.push(this._spineAtlasManager);
       if (this._spineManager) resourceManagers.push(this._spineManager);
 
       this._resourceManagersMap = new Map<ResourceKind, ResourceManager>();

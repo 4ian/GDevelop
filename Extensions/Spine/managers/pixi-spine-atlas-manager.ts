@@ -23,8 +23,12 @@ namespace gdjs {
   export class SpineAtlasManager implements gdjs.ResourceManager {
     private _imageManager: ImageManager;
     private _resourceLoader: ResourceLoader;
-    private _loadedSpineAtlases = new gdjs.ResourceCache<pixi_spine.TextureAtlas>();
-    private _loadingSpineAtlases = new gdjs.ResourceCache<Promise<pixi_spine.TextureAtlas>>();
+    private _loadedSpineAtlases = new gdjs.ResourceCache<
+      pixi_spine.TextureAtlas
+    >();
+    private _loadingSpineAtlases = new gdjs.ResourceCache<
+      Promise<pixi_spine.TextureAtlas>
+    >();
 
     /**
      * @param resources The resources data of the game.
@@ -59,28 +63,40 @@ namespace gdjs {
       const resource = this._getAtlasResource(resourceName);
 
       if (!resource) {
-        return Promise.reject(`Unable to find atlas for resource '${resourceName}'.`);
+        return Promise.reject(
+          `Unable to find atlas for resource '${resourceName}'.`
+        );
       }
 
       if (!this._loadingSpineAtlases.get(resource)) {
-        this._loadingSpineAtlases.set(resource, new Promise<pixi_spine.TextureAtlas>((resolve, reject) => {
-          const onLoad: SpineAtlasManagerRequestCallback = (error, content) => {
-            if (error) {
-              return reject(`Error while preloading a spine atlas resource: ${error}`);
-            }
-            if (!content) {
-              return reject(`Cannot reach texture atlas for resource '${resourceName}'.`);
-            }
-  
-            resolve(content);
-          };
-  
-          this.load(resource, onLoad);
-        }));
+        this._loadingSpineAtlases.set(
+          resource,
+          new Promise<pixi_spine.TextureAtlas>((resolve, reject) => {
+            const onLoad: SpineAtlasManagerRequestCallback = (
+              error,
+              content
+            ) => {
+              if (error) {
+                return reject(
+                  `Error while preloading a spine atlas resource: ${error}`
+                );
+              }
+              if (!content) {
+                return reject(
+                  `Cannot reach texture atlas for resource '${resourceName}'.`
+                );
+              }
+
+              resolve(content);
+            };
+
+            this.load(resource, onLoad);
+          })
+        );
       }
 
       return this._loadingSpineAtlases.get(resource)!;
-    } 
+    }
 
     /**
      * Load specified atlas resource and pass it to callback once it is loaded.
@@ -148,9 +164,9 @@ namespace gdjs {
 
     private _getAtlasResource(resourceName: string): ResourceData | null {
       const resource = this._resourceLoader.getResource(resourceName);
-        return (resource && this.getResourceKinds().includes(resource.kind)
-          ? resource
-          : null);
+      return resource && this.getResourceKinds().includes(resource.kind)
+        ? resource
+        : null;
     }
   }
 }

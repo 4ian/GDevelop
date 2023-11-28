@@ -9,13 +9,10 @@ const { makeTestExtensions } = require('../TestUtils/TestExtensions');
 
 describe('libGD.js - GDJS Async Code Generation integration tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      makeTestExtensions(gd);
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+    makeTestExtensions(gd);
+  });
 
   describe('Basics', () => {
     it('generates a working function with asynchronous actions', function () {

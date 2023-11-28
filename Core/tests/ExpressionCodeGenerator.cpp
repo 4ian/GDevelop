@@ -1252,6 +1252,49 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "MySpriteObject.getObjectStringWith2ObjectParam(fakeObjectListOf_"
             "Object1, fakeObjectListOf_Object2) ?? \"\"");
   }
+  SECTION("Edge cases (variables with object name in objectvar parameter)") {
+    SECTION("Simple case") {
+      gd::String output = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+          codeGenerator,
+          context,
+          "objectvar", // We suppose we generate an "objectvar" parameter.
+          "MyOtherSpriteObject", // This "variable name" is the same as an object name (but this is valid).
+          "MySpriteObject" // The object owning the variable: MySpriteObject.
+          );
+
+      // This seems "obvious", but we had cases where MyOtherSpriteObject could have been interpreted as an object
+      // when the code generation is not properly recognizing "objectvar".
+      REQUIRE(output == "getVariableForObject(MySpriteObject, MyOtherSpriteObject)");
+    }
+
+    SECTION("With child variable") {
+      gd::String output = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+          codeGenerator,
+          context,
+          "objectvar", // We suppose we generate an "objectvar" parameter.
+          "MyOtherSpriteObject.Child", // This "variable name" is the same as an object name (but this is valid).
+          "MySpriteObject" // The object owning the variable: MySpriteObject.
+          );
+
+      // This seems "obvious", but we had cases where MyOtherSpriteObject could have been interpreted as an object
+      // when the code generation is not properly recognizing "objectvar".
+      REQUIRE(output == "getVariableForObject(MySpriteObject, MyOtherSpriteObject).getChild(\"Child\")");
+    }
+
+    SECTION("With child and grandchild variable") {
+      gd::String output = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+          codeGenerator,
+          context,
+          "objectvar", // We suppose we generate an "objectvar" parameter.
+          "MyOtherSpriteObject.Child.Grandchild", // This "variable name" is the same as an object name (but this is valid).
+          "MySpriteObject" // The object owning the variable: MySpriteObject.
+          );
+
+      // This seems "obvious", but we had cases where MyOtherSpriteObject could have been interpreted as an object
+      // when the code generation is not properly recognizing "objectvar".
+      REQUIRE(output == "getVariableForObject(MySpriteObject, MyOtherSpriteObject).getChild(\"Child\").getChild(\"Grandchild\")");
+    }
+  }
   SECTION("Mixed test (1)") {
     {
       auto node = parser.ParseExpression("-+-MyExtension::MouseX(,)");

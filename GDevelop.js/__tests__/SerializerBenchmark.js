@@ -17,12 +17,9 @@ describe.skip('gd.Serializer benchmarks', function () {
       `;
 
   const json = '[' + new Array(1000).fill(partialJson).join(',') + ']';
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   it('Benchmark JSON string -> SerializerElement', function () {
     const benchmarkSuite = makeBenchmarkSuite({

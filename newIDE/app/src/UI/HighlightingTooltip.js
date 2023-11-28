@@ -10,6 +10,7 @@ import IconButton from './IconButton';
 import Cross from './CustomSvgIcons/Cross';
 import { ColumnStackLayout } from './Layout';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 
 const styles = {
   paper: {
@@ -101,6 +102,10 @@ const HighlightingTooltip = ({
 }: Props) => {
   const classes = useClasses();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
+  if (currentlyRunningInAppTutorial) return null;
 
   return (
     <Popper

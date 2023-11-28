@@ -326,7 +326,6 @@ const InAppTutorialTooltipDisplayer = ({
 
   useIsElementVisibleInScroll(anchorElement, updateVisibility);
 
-  const arrowRef = React.useRef<?HTMLSpanElement>(null);
   const classes = useClasses();
   const placement =
     isMobileScreen && tooltip.mobilePlacement
@@ -397,7 +396,6 @@ const InAppTutorialTooltipDisplayer = ({
             <span
               id="arrow-popper"
               className={classes.arrow}
-              ref={arrowRef}
               style={{ color: backgroundColor }}
             />
           </Paper>

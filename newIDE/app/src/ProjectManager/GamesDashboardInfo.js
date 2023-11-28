@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 
 import Link from '../UI/Link';
 import RaisedButton from '../UI/RaisedButton';
@@ -10,7 +11,6 @@ import Graphs from '../UI/CustomSvgIcons/Graphs';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
-import { Trans } from '@lingui/macro';
 import Publish from '../UI/CustomSvgIcons/Publish';
 import Paper from '../UI/Paper';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -59,7 +59,7 @@ const GamesDashboardInfo = ({
     return (
       <ListItem
         id={getProjectManagerItemId('manage')}
-        primaryText={<Trans>Games Dashboard</Trans>}
+        primaryText={<Trans>Game Dashboard</Trans>}
         leftIcon={<Graphs />}
         onClick={onOpenGamesDashboardDialog}
         noPadding

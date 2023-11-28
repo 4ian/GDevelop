@@ -120,6 +120,8 @@ namespace gdjs {
     private _jsonManager: JsonManager;
     private _model3DManager: Model3DManager;
     private _bitmapFontManager: BitmapFontManager;
+    private _spineAtlasManager: SpineAtlasManager | null = null;
+    private _spineManager: SpineManager | null = null;
 
     /**
      * Only used by events.
@@ -162,6 +164,12 @@ namespace gdjs {
       );
       this._model3DManager = new gdjs.Model3DManager(this);
 
+      // add spine related managers only if spine extension is used
+      if (gdjs.SpineAtlasManager && gdjs.SpineManager) {
+        this._spineAtlasManager = new gdjs.SpineAtlasManager(this, this._imageManager);
+        this._spineManager = new gdjs.SpineManager(this, this._spineAtlasManager);
+      }
+
       const resourceManagers: Array<ResourceManager> = [
         this._imageManager,
         this._soundManager,
@@ -170,6 +178,10 @@ namespace gdjs {
         this._bitmapFontManager,
         this._model3DManager,
       ];
+
+      if (this._spineAtlasManager) resourceManagers.push(this._spineAtlasManager);
+      if (this._spineManager) resourceManagers.push(this._spineManager);
+
       this._resourceManagersMap = new Map<ResourceKind, ResourceManager>();
       for (const resourceManager of resourceManagers) {
         for (const resourceKind of resourceManager.getResourceKinds()) {
@@ -551,6 +563,24 @@ namespace gdjs {
      */
     getModel3DManager(): gdjs.Model3DManager {
       return this._model3DManager;
+    }
+
+    /**
+     * Get the spine manager of the game, used to load and construct spine skeletons from game
+     * resources.
+     * @return The json manager for the game
+     */
+    getSpineManager(): gdjs.SpineManager | null {
+      return this._spineManager;
+    }
+
+    /**
+     * Get the atlas manager of the game, used to load atlases from game
+     * resources.
+     * @return The atlas manager for the game
+     */
+    getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
+      return this._spineAtlasManager;
     }
   }
 }

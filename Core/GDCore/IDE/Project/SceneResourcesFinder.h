@@ -79,6 +79,12 @@ private:
   void ExposeModel3D(gd::String &resourceName) override {
     AddUsedResource(resourceName);
   };
+  void ExposeAtlas(gd::String &resourceName) override {
+    AddUsedResource(resourceName);
+  };
+  void ExposeSpine(gd::String &resourceName) override {
+    AddUsedResource(resourceName);
+  };
 
   std::set<gd::String> resourceNames;
 };

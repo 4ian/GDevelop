@@ -28,6 +28,11 @@ class ExpressionMetadata;
 
 namespace gd {
 
+/**
+ * \brief Contains a variables container or a variable. Useful
+ * to refer to the parent of a variable (which can be a VariablesContainer
+ * or another Variable).
+ */
 struct VariableOrVariablesContainer {
   const gd::VariablesContainer* variablesContainer;
   const gd::Variable* variable;

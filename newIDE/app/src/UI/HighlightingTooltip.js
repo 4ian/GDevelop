@@ -4,7 +4,11 @@ import * as React from 'react';
 import Text from './Text';
 import { Line } from './Grid';
 import { getDisplayZIndexForHighlighter } from '../InAppTutorial/HTMLUtils';
-import { Fade, Paper, Popper, makeStyles } from '@material-ui/core';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Fade from '@material-ui/core/Fade';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
+import { makeStyles } from '@material-ui/core/styles';
 import { CorsAwareImage } from './CorsAwareImage';
 import IconButton from './IconButton';
 import Cross from './CustomSvgIcons/Cross';
@@ -90,6 +94,7 @@ type Props = {|
   anchorElement: HTMLElement,
   onClose: () => void,
   placement: 'left' | 'top' | 'bottom' | 'right',
+  closeWithBackdropClick: boolean,
 |};
 
 const HighlightingTooltip = ({
@@ -99,6 +104,7 @@ const HighlightingTooltip = ({
   anchorElement,
   onClose,
   placement,
+  closeWithBackdropClick,
 }: Props) => {
   const classes = useClasses();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -107,7 +113,7 @@ const HighlightingTooltip = ({
   );
   if (currentlyRunningInAppTutorial) return null;
 
-  return (
+  const popper = (
     <Popper
       id="in-app-tutorial-tooltip-displayer"
       open={true}
@@ -170,6 +176,21 @@ const HighlightingTooltip = ({
       )}
     </Popper>
   );
+
+  if (closeWithBackdropClick) {
+    return (
+      <ClickAwayListener
+        onClickAway={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          onClose();
+        }}
+      >
+        {popper}
+      </ClickAwayListener>
+    );
+  }
+  return popper;
 };
 
 export default HighlightingTooltip;

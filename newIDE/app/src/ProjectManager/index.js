@@ -888,6 +888,7 @@ const ProjectManager = React.memo(
                     onShareProject={onShareProject}
                     onOpenGamesDashboardDialog={onOpenGamesDashboardDialog}
                     key="manage"
+                    canDisplayTooltip={!freezeUpdate}
                   />,
                 ]}
               />

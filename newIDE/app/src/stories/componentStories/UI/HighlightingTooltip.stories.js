@@ -42,11 +42,11 @@ export const WithThumbnailSetByHref = () => {
           anchorElement={anchorEl}
           placement="right"
           content={[
-            <Text noMargin>
+            <Text noMargin key="paragraph">
               Follow your game’s online performance, manage published versions,
               and collect player feedback.
             </Text>,
-            <Text noMargin>
+            <Text noMargin key="link">
               <Link
                 href="https://gdevelop.io"
                 onClick={() => Window.openExternalURL('https://gdevelop.io')}
@@ -57,6 +57,7 @@ export const WithThumbnailSetByHref = () => {
           ]}
           thumbnailSource="https://resources.gdevelop-app.com/tutorials/images/best-practices-when-making-games.png?gdUsage=img"
           onClose={action('onClose')}
+          closeWithBackdropClick={false}
         />
       )}
     </FixedHeightFlexContainer>
@@ -103,6 +104,7 @@ export const WithThumbnailSetInContent = () => {
             </Text>,
           ]}
           onClose={action('onClose')}
+          closeWithBackdropClick={false}
         />
       )}
     </FixedHeightFlexContainer>

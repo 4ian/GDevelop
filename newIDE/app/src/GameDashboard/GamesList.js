@@ -12,26 +12,28 @@ import RouterContext from '../MainFrame/RouterContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import SearchBar from '../UI/SearchBar';
 import { useDebounce } from '../Utils/UseDebounce';
+import Fuse from 'fuse.js';
+import { getFuseSearchQueryForSimpleArray, sharedFuseConfiguration } from '../UI/Search/UseSearchStructuredItem';
 
 const getGamesToDisplay = ({
   project,
   games,
   searchText,
+  searchClient,
 }: {|
   project: ?gdProject,
   games: Array<Game>,
   searchText: string,
+  searchClient: Fuse,
 |}): Array<Game> => {
   const projectUuid = project ? project.getProjectUuid() : null;
   const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
-  const displayedGames = [
-    thisGame,
-    ...games.filter(game => game !== thisGame),
-  ].filter(Boolean);
-  if (!searchText) return displayedGames;
-  return displayedGames.filter(game =>
-    game.gameName.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const orderedGames = thisGame
+    ? [thisGame, ...games.filter(game => game.id !== thisGame.id)]
+    : games;
+  if (!searchText) return orderedGames;
+  const searchResults = searchClient.search(getFuseSearchQueryForSimpleArray(searchText))
+  return searchResults.map(result => result.item);
 };
 
 type Props = {|
@@ -62,6 +64,15 @@ const GamesList = ({
   const [searchText, setSearchText] = React.useState<string>('');
   const [displayedGames, setDisplayedGames] = React.useState<Array<Game>>(
     games
+  );
+
+  const searchClient = React.useMemo(
+    () =>
+      new Fuse(games, {
+        ...sharedFuseConfiguration,
+        keys: [{ name: 'gameName', weight: 1 }],
+      }),
+    [games]
   );
 
   const onRegisterGame = React.useCallback(
@@ -158,6 +169,7 @@ const GamesList = ({
         project,
         games,
         searchText,
+        searchClient,
       })
     );
   }, 250);

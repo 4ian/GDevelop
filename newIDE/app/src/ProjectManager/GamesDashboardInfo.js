@@ -120,6 +120,7 @@ const GamesDashboardInfo = ({
             // $FlowIgnore - displayTooltipDelayed makes sure the element is defined
             anchorElement={gameDashboardItemContainer}
             thumbnailSource="res/features/games-dashboard.svg"
+            thumbnailAlt={'Red hero presenting games analytics'}
             title={<Trans>Game Dashboard</Trans>}
             content={[
               <Text noMargin key="paragraph">

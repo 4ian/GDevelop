@@ -90,6 +90,7 @@ const useClasses = makeStyles({
 type Props = {|
   title: React.Node,
   thumbnailSource?: string,
+  thumbnailAlt?: string,
   content: React.Node,
   anchorElement: HTMLElement,
   onClose: () => void,
@@ -100,6 +101,7 @@ type Props = {|
 const HighlightingTooltip = ({
   title,
   thumbnailSource,
+  thumbnailAlt,
   content,
   anchorElement,
   onClose,
@@ -157,10 +159,10 @@ const HighlightingTooltip = ({
                   <Cross fontSize="small" />
                 </IconButton>
               </Line>
-              {thumbnailSource && (
+              {thumbnailSource && thumbnailAlt && (
                 <CorsAwareImage
                   src={thumbnailSource}
-                  alt="hello"
+                  alt={thumbnailAlt}
                   style={{ aspectRatio: '16 / 9', objectFit: 'cover' }}
                 />
               )}

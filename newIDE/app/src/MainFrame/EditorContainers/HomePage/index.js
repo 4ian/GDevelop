@@ -545,6 +545,7 @@ export const HomePage = React.memo<Props>(
                   anchorElement={manageTabElement}
                   title={<Trans>Games Dashboard</Trans>}
                   thumbnailSource="res/features/games-dashboard.svg"
+                  thumbnailAlt={'Red hero presenting games analytics'}
                   content={[
                     <Text noMargin key="paragraph">
                       <Trans>

@@ -339,6 +339,7 @@ namespace gdjs {
       this.aabb.max[1] = 0;
       this._variables = new gdjs.VariablesContainer(objectData.variables);
       this.clearForces();
+      this._lifecycleSleepState._reinitialize(gdjs.ObjectSleepState.State.ASleep);
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
@@ -361,6 +362,7 @@ namespace gdjs {
         }
         behaviorsCount++;
         if (behavior.usesLifecycleFunction()) {
+          this._lifecycleSleepState.wakeUp();
           if (
             behaviorsUsingLifecycleFunctionCount < this._activeBehaviors.length
           ) {
@@ -494,7 +496,7 @@ namespace gdjs {
       if (this._livingOnScene) {
         instanceContainer.markObjectForDeletion(this);
         this._livingOnScene = false;
-        this._lifecycleSleepState._forceToSleep();
+        this._lifecycleSleepState._destroy();
       }
     }
 

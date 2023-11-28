@@ -10,7 +10,7 @@ namespace gdjs {
     private _isNeedingToBeAwake: () => boolean;
     private _state: ObjectSleepState.State;
     private _lastActivityFrameIndex: integer;
-    private _onWakingUpCallbacks: Array<(object: RuntimeObject) => void> = [];
+    _onWakingUpCallbacks: Array<(object: RuntimeObject) => void> = [];
 
     constructor(
       object: RuntimeObject,
@@ -25,6 +25,21 @@ namespace gdjs {
         .getFrameIndex();
     }
 
+    _reinitialize(
+      initialSleepState: ObjectSleepState.State
+    ) : void {
+      this._onWakingUpCallbacks.length = 0;
+      this._state = initialSleepState;
+      this._lastActivityFrameIndex = this._object
+        .getRuntimeScene()
+        .getFrameIndex();
+    }
+
+    _destroy(): void {
+      this._state = gdjs.ObjectSleepState.State.Destroyed;
+      this._onWakingUpCallbacks.length = 0;
+    }
+
     canSleep(): boolean {
       return (
         this._state === gdjs.ObjectSleepState.State.CanSleepThisFrame ||
@@ -35,14 +50,8 @@ namespace gdjs {
     }
 
     isAwake(): boolean {
-      return this._state !== gdjs.ObjectSleepState.State.ASleep;
-    }
-
-    _forceToSleep(): void {
-      if (!this.isAwake()) {
-        return;
-      }
-      this._lastActivityFrameIndex = Number.NEGATIVE_INFINITY;
+      return this._state === gdjs.ObjectSleepState.State.AWake ||
+      this._state === gdjs.ObjectSleepState.State.CanSleepThisFrame;
     }
 
     wakeUp() {
@@ -62,10 +71,7 @@ namespace gdjs {
     }
 
     tryToSleep(): void {
-      if (
-        this._lastActivityFrameIndex !== Number.NEGATIVE_INFINITY &&
-        this._isNeedingToBeAwake()
-      ) {
+      if (this._isNeedingToBeAwake()) {
         this._lastActivityFrameIndex = this._object
           .getRuntimeScene()
           .getFrameIndex();
@@ -91,7 +97,7 @@ namespace gdjs {
           }
           sleepState._state = gdjs.ObjectSleepState.State.ASleep;
           onFallenAsleep(object);
-          sleepState._onWakingUpCallbacks.push(onWakingUp);
+          sleepState.registerOnWakingUp(onWakingUp);
         } else {
           awakeObjects[writeIndex] = object;
           writeIndex++;
@@ -107,6 +113,7 @@ namespace gdjs {
       ASleep,
       CanSleepThisFrame,
       AWake,
+      Destroyed,
     }
   }
 }

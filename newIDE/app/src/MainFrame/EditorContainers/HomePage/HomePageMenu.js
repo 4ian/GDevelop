@@ -193,9 +193,9 @@ export const HomePageMenu = ({
                     <DoubleChevronArrowLeft />
                   </IconButton>
                 </Line>
-                {tabsToDisplay.map(({ label, tab, getIcon }, index) => (
+                {tabsToDisplay.map(({ label, tab, getIcon, id }) => (
                   <VerticalTabButton
-                    key={index}
+                    key={id}
                     label={label}
                     onClick={() => {
                       setActiveTab(tab);

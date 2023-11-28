@@ -61,7 +61,6 @@
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
     "path-browserify": "^1.0.1",
-    "pixi-simple-gesture": "github:4ian/pixi-simple-gesture#v0.3.3",
     "pixi-spine": "4.0.4",
     "pixi.js-legacy": "^7.3.0",
     "posthog-js": "^1.57.2",

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { Trans } from '@lingui/macro';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -40,6 +41,11 @@ import { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
 import { type Game } from '../../../Utils/GDevelopServices/Game';
 import useGamesList from '../../../GameDashboard/UseGamesList';
+import useDisplayNewFeature from '../../../Utils/UseDisplayNewFeature';
+import HighlightingTooltip from '../../../UI/HighlightingTooltip';
+import Text from '../../../UI/Text';
+import Link from '../../../UI/Link';
+import Window from '../../../Utils/Window';
 
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
   routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
@@ -196,12 +202,35 @@ export const HomePage = React.memo<Props>(
       const isShopRequestedAtOpening = React.useRef<boolean>(
         isShopRequested(routeArguments)
       );
+      const [
+        displayTooltipDelayed,
+        setDisplayTooltipDelayed,
+      ] = React.useState<boolean>(false);
       const {
         games,
         gamesFetchingError,
         onGameUpdated,
         fetchGames,
       } = useGamesList();
+      const {
+        shouldDisplayNewFeatureHighlighting,
+        acknowledgeNewFeature,
+      } = useDisplayNewFeature();
+      const manageTabElement = document.getElementById('home-manage-tab');
+      const shouldDisplayTooltip = shouldDisplayNewFeatureHighlighting({
+        featureId: 'gamesDashboardInHomePage',
+      });
+
+      const displayTooltip =
+        isActive && shouldDisplayTooltip && manageTabElement;
+
+      const onCloseTooltip = React.useCallback(
+        () => {
+          setDisplayTooltipDelayed(false);
+          acknowledgeNewFeature({ featureId: 'gamesDashboardInHomePage' });
+        },
+        [acknowledgeNewFeature]
+      );
 
       // Open the store and a pack or game template if asked to do so.
       React.useEffect(
@@ -288,6 +317,23 @@ export const HomePage = React.memo<Props>(
           }
         },
         [fetchGames, activeTab, games]
+      );
+
+      React.useEffect(
+        () => {
+          if (displayTooltip) {
+            const timeoutId = setTimeout(() => {
+              setDisplayTooltipDelayed(true);
+            }, 500);
+            return () => clearTimeout(timeoutId);
+          } else {
+            setDisplayTooltipDelayed(false);
+          }
+        },
+        // Delay display of tooltip because home tab is the first to be opened
+        // but the editor might open a project at start, displaying the tooltip
+        // while the project is loading, giving the impression of a glitch.
+        [displayTooltip]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -483,6 +529,34 @@ export const HomePage = React.memo<Props>(
                   onOpenAbout={onOpenAbout}
                 />
               </div>
+              {displayTooltipDelayed && (
+                <HighlightingTooltip
+                  // $FlowIgnore - displayTooltipDelayed makes sure the element is defined
+                  anchorElement={manageTabElement}
+                  title={<Trans>Games Dashboard</Trans>}
+                  content={[
+                    <Text noMargin key="paragraph">
+                      <Trans>
+                        Follow your games’ online performance, manage published
+                        versions, and collect player feedback.
+                      </Trans>
+                    </Text>,
+                    <Text noMargin key="link">
+                      <Link
+                        href="https://gdevelop.io"
+                        onClick={() =>
+                          Window.openExternalURL('https://gdevelop.io')
+                        }
+                      >
+                        <Trans>Learn more</Trans>
+                      </Link>
+                    </Text>,
+                  ]}
+                  placement={isMobile ? 'bottom' : 'right'}
+                  onClose={onCloseTooltip}
+                  closeWithBackdropClick={false}
+                />
+              )}
             </TeamProvider>
           )}
         </I18n>

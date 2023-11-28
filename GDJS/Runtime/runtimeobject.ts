@@ -147,6 +147,8 @@ namespace gdjs {
     return true;
   };
 
+  type RuntimeObjectCallback = (object: gdjs.RuntimeObject) => void;
+
   /**
    * RuntimeObject represents an object being used on a RuntimeScene.
    *
@@ -164,9 +166,12 @@ namespace gdjs {
     layer: string = '';
     protected _nameId: integer;
     protected _livingOnScene: boolean = true;
+    protected _lifecycleSleepState: ObjectSleepState;
 
     readonly id: integer;
     private destroyCallbacks = new Set<() => void>();
+    // HitboxChanges happen a lot, an Array is faster to iterate.
+    private hitBoxChangedCallbacks: Array<RuntimeObjectCallback> = [];
     _runtimeScene: gdjs.RuntimeInstanceContainer;
 
     /**
@@ -181,12 +186,15 @@ namespace gdjs {
      * not "thread safe" or "re-entrant algorithm" safe.
      */
     pick: boolean = false;
+    pickingId: integer = 0;
 
     //Hit boxes:
     protected _defaultHitBoxes: gdjs.Polygon[] = [];
     protected hitBoxes: gdjs.Polygon[];
     protected hitBoxesDirty: boolean = true;
+    // TODO use a different AABB for collision mask and rendered image.
     protected aabb: AABB = { min: [0, 0], max: [0, 0] };
+
     protected _isIncludedInParentCollisionMask = true;
 
     //Variables:
@@ -212,6 +220,7 @@ namespace gdjs {
      * are never used.
      */
     protected _behaviors: gdjs.RuntimeBehavior[] = [];
+    protected _activeBehaviors: gdjs.RuntimeBehavior[] = [];
     /**
      * Contains the behaviors of the object by name.
      *
@@ -229,10 +238,11 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: ObjectData & any
     ) {
+      const scene = instanceContainer.getScene();
       this.name = objectData.name || '';
       this.type = objectData.type || '';
       this._nameId = RuntimeObject.getNameIdentifier(this.name);
-      this.id = instanceContainer.getScene().createNewUniqueId();
+      this.id = scene.createNewUniqueId();
       this._runtimeScene = instanceContainer;
       this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0, 0));
       this.hitBoxes = this._defaultHitBoxes;
@@ -241,8 +251,14 @@ namespace gdjs {
       );
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
+      this._timers = new Hashtable();
+      this._lifecycleSleepState = new gdjs.ObjectSleepState(
+        this,
+        () => this.isNeedingLifecycleFunctions(),
+        gdjs.ObjectSleepState.State.ASleep
+      );
       for (let i = 0; i < objectData.effects.length; ++i) {
-        this._runtimeScene
+        scene
           .getGame()
           .getEffectsManager()
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
@@ -253,12 +269,13 @@ namespace gdjs {
         const autoData = objectData.behaviors[i];
         const Ctor = gdjs.getBehaviorConstructor(autoData.type);
         const behavior = new Ctor(instanceContainer, autoData, this);
+        this._behaviors.push(behavior);
         if (behavior.usesLifecycleFunction()) {
-          this._behaviors.push(behavior);
+          this._activeBehaviors.push(behavior);
+          this._lifecycleSleepState.wakeUp();
         }
         this._behaviorsTable.put(autoData.name, behavior);
       }
-      this._timers = new Hashtable();
     }
 
     //Common members functions related to the object and its runtimeScene :
@@ -326,6 +343,7 @@ namespace gdjs {
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
       const behaviorsDataCount = objectData.behaviors.length;
+      let behaviorsCount = 0;
       let behaviorsUsingLifecycleFunctionCount = 0;
       for (
         let behaviorDataIndex = 0;
@@ -336,17 +354,28 @@ namespace gdjs {
         const Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
         // TODO: Add support for behavior recycling with a `reinitialize` method.
         const behavior = new Ctor(runtimeScene, behaviorData, this);
+        if (behaviorsCount < this._behaviors.length) {
+          this._behaviors[behaviorsCount] = behavior;
+        } else {
+          this._behaviors.push(behavior);
+        }
+        behaviorsCount++;
         if (behavior.usesLifecycleFunction()) {
-          if (behaviorsUsingLifecycleFunctionCount < this._behaviors.length) {
-            this._behaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
+          if (
+            behaviorsUsingLifecycleFunctionCount < this._activeBehaviors.length
+          ) {
+            this._activeBehaviors[
+              behaviorsUsingLifecycleFunctionCount
+            ] = behavior;
           } else {
-            this._behaviors.push(behavior);
+            this._activeBehaviors.push(behavior);
           }
           behaviorsUsingLifecycleFunctionCount++;
         }
         this._behaviorsTable.put(behaviorData.name, behavior);
       }
-      this._behaviors.length = behaviorsUsingLifecycleFunctionCount;
+      this._behaviors.length = behaviorsCount;
+      this._activeBehaviors.length = behaviorsUsingLifecycleFunctionCount;
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
@@ -439,6 +468,22 @@ namespace gdjs {
       return false;
     }
 
+    isNeedingLifecycleFunctions(): boolean {
+      return (
+        this._activeBehaviors.length > 0 ||
+        !this.hasNoForces() ||
+        !!this._timers.firstKey()
+      );
+    }
+
+    getLifecycleSleepState(): ObjectSleepState {
+      return this._lifecycleSleepState;
+    }
+
+    isAlive(): boolean {
+      return this._livingOnScene;
+    }
+
     /**
      * Remove an object from a scene.
      *
@@ -449,6 +494,7 @@ namespace gdjs {
       if (this._livingOnScene) {
         instanceContainer.markObjectForDeletion(this);
         this._livingOnScene = false;
+        this._lifecycleSleepState._forceToSleep();
       }
     }
 
@@ -485,6 +531,30 @@ namespace gdjs {
     }
 
     onDestroyed(): void {}
+
+    registerHitboxChangedCallback(callback: RuntimeObjectCallback) {
+      if (this.hitBoxChangedCallbacks.includes(callback)) {
+        return;
+      }
+      this.hitBoxChangedCallbacks.push(callback);
+    }
+
+    /**
+     * Send a signal that the object hitboxes are no longer up to date.
+     *
+     * The signal is propagated to parents so
+     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
+     * directly.
+     */
+    invalidateHitboxes(): void {
+      // TODO EBO Check that no community extension set hitBoxesDirty to true
+      // directly.
+      this.hitBoxesDirty = true;
+      this._runtimeScene.onChildrenLocationChanged();
+      for (const callback of this.hitBoxChangedCallbacks) {
+        callback(this);
+      }
+    }
 
     /**
      * Called whenever the scene owning the object is paused.
@@ -568,20 +638,6 @@ namespace gdjs {
       }
       this.x = x;
       this.invalidateHitboxes();
-    }
-
-    /**
-     * Send a signal that the object hitboxes are no longer up to date.
-     *
-     * The signal is propagated to parents so
-     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
-     * directly.
-     */
-    invalidateHitboxes(): void {
-      // TODO EBO Check that no community extension set hitBoxesDirty to true
-      // directly.
-      this.hitBoxesDirty = true;
-      this._runtimeScene.onChildrenLocationChanged();
     }
 
     /**
@@ -1363,6 +1419,7 @@ namespace gdjs {
         // (or the 1st instant force).
         this._instantForces.push(this._getRecycledForce(x, y, multiplier));
       }
+      this._lifecycleSleepState.wakeUp();
     }
 
     /**
@@ -1781,8 +1838,8 @@ namespace gdjs {
     stepBehaviorsPreEvents(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPreEvents(instanceContainer);
+      for (let i = 0, len = this._activeBehaviors.length; i < len; ++i) {
+        this._activeBehaviors[i].stepPreEvents(instanceContainer);
       }
     }
 
@@ -1792,8 +1849,8 @@ namespace gdjs {
     stepBehaviorsPostEvents(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPostEvents(instanceContainer);
+      for (let i = 0, len = this._activeBehaviors.length; i < len; ++i) {
+        this._activeBehaviors[i].stepPostEvents(instanceContainer);
       }
     }
 
@@ -1870,9 +1927,17 @@ namespace gdjs {
         return false;
       }
       behavior.onDestroy();
-      const behaviorIndex = this._behaviors.indexOf(behavior);
-      if (behaviorIndex !== -1) {
-        this._behaviors.splice(behaviorIndex, 1);
+      {
+        const behaviorIndex = this._behaviors.indexOf(behavior);
+        if (behaviorIndex !== -1) {
+          this._behaviors.splice(behaviorIndex, 1);
+        }
+      }
+      {
+        const behaviorIndex = this._activeBehaviors.indexOf(behavior);
+        if (behaviorIndex !== -1) {
+          this._activeBehaviors.splice(behaviorIndex, 1);
+        }
       }
       this._behaviorsTable.remove(name);
       return true;
@@ -1926,6 +1991,7 @@ namespace gdjs {
     timerElapsedTime(timerName: string, timeInSeconds: float): boolean {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this._lifecycleSleepState.wakeUp();
         return false;
       }
       return this.getTimerElapsedTimeInSeconds(timerName) >= timeInSeconds;
@@ -1950,6 +2016,7 @@ namespace gdjs {
     resetTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this._lifecycleSleepState.wakeUp();
       }
       this._timers.get(timerName).reset();
     }
@@ -1961,6 +2028,7 @@ namespace gdjs {
     pauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this._lifecycleSleepState.wakeUp();
       }
       this._timers.get(timerName).setPaused(true);
     }
@@ -1972,6 +2040,7 @@ namespace gdjs {
     unpauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
         this._timers.put(timerName, new gdjs.Timer(timerName));
+        this._lifecycleSleepState.wakeUp();
       }
       this._timers.get(timerName).setPaused(false);
     }

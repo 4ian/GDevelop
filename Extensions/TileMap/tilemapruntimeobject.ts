@@ -39,12 +39,21 @@ namespace gdjs {
       );
       this._updateTileMap();
 
+      if (this.isNeedingLifecycleFunctions()) {
+        this.getLifecycleSleepState().wakeUp();
+      }
+
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
     getRendererObject() {
       return this._renderer.getRendererObject();
+    }
+
+    isNeedingLifecycleFunctions(): boolean {
+      // TODO Tile maps without animated tiles should return false.
+      return true;
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {

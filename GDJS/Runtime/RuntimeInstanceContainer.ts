@@ -15,6 +15,8 @@ namespace gdjs {
     /** Contains the instances living on the container */
     _instances: Hashtable<RuntimeObject[]>;
 
+    _activeInstances: Array<RuntimeObject> = [];
+
     /**
      * An array used to create a list of all instance when necessary.
      * @see gdjs.RuntimeInstanceContainer#_constructListOfAllInstances}
@@ -485,13 +487,23 @@ namespace gdjs {
       return this._allInstancesList;
     }
 
+    getActiveInstances(): gdjs.RuntimeObject[] {
+      gdjs.ObjectSleepState.updateAwakeObjects(
+        this._activeInstances,
+        (object) => object.getLifecycleSleepState(),
+        (object) => {},
+        (object) => this._activeInstances.push(object)
+      );
+      return this._activeInstances;
+    }
+
     /**
      * Update the objects before launching the events.
      */
     _updateObjectsPreEvents() {
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       // may delete the objects.
-      const allInstancesList = this.getAdhocListOfAllInstances();
+      const allInstancesList = this.getActiveInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const obj = allInstancesList[i];
         const elapsedTime = obj.getElapsedTime();
@@ -506,7 +518,7 @@ namespace gdjs {
           obj.update(this);
         }
         obj.updateTimers(elapsedTime);
-        allInstancesList[i].stepBehaviorsPreEvents(this);
+        obj.stepBehaviorsPreEvents(this);
       }
 
       // Some behaviors may have request objects to be deleted.
@@ -521,7 +533,7 @@ namespace gdjs {
 
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       // may delete the objects.
-      const allInstancesList = this.getAdhocListOfAllInstances();
+      const allInstancesList = this.getActiveInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         allInstancesList[i].stepBehaviorsPostEvents(this);
       }
@@ -535,11 +547,20 @@ namespace gdjs {
      * @param obj The object to be added.
      */
     addObject(obj: gdjs.RuntimeObject) {
-      if (!this._instances.containsKey(obj.name)) {
-        this._instances.put(obj.name, []);
+      let instances = this._instances.get(obj.name);
+      if (!instances) {
+        instances = [];
+        this._instances.put(obj.name, instances);
       }
-      this._instances.get(obj.name).push(obj);
-      this._allInstancesListIsUpToDate = false;
+      instances.push(obj);
+      this._allInstancesList.push(obj);
+      if (obj.getLifecycleSleepState().isAwake()) {
+        this._activeInstances.push(obj);
+      } else {
+        obj
+          .getLifecycleSleepState()
+          .registerOnWakingUp((object) => this._activeInstances.push(object));
+      }
     }
 
     /**
@@ -717,19 +738,22 @@ namespace gdjs {
      * Update the objects positions according to their forces
      */
     updateObjectsForces(): void {
-      for (const name in this._instances.items) {
-        if (this._instances.items.hasOwnProperty(name)) {
-          const list = this._instances.items[name];
-          for (let j = 0, listLen = list.length; j < listLen; ++j) {
-            const obj = list[j];
-            if (!obj.hasNoForces()) {
-              const averageForce = obj.getAverageForce();
-              const elapsedTimeInSeconds = obj.getElapsedTime() / 1000;
-              obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
-              obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
-              obj.updateForces(elapsedTimeInSeconds);
-            }
-          }
+      for (
+        let i = 0, listLen = this._activeInstances.length;
+        i < listLen;
+        ++i
+      ) {
+        const object = this._activeInstances[i];
+        if (!object.hasNoForces()) {
+          const averageForce = object.getAverageForce();
+          const elapsedTimeInSeconds = object.getElapsedTime() / 1000;
+          object.setX(
+            object.getX() + averageForce.getX() * elapsedTimeInSeconds
+          );
+          object.setY(
+            object.getY() + averageForce.getY() * elapsedTimeInSeconds
+          );
+          object.updateForces(elapsedTimeInSeconds);
         }
       }
     }

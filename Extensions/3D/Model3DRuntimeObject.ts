@@ -113,6 +113,10 @@ namespace gdjs {
         );
       }
 
+      if (this.isNeedingLifecycleFunctions()) {
+        this.getLifecycleSleepState().wakeUp();
+      }
+
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
@@ -192,6 +196,10 @@ namespace gdjs {
       } else {
         return gdjs.Model3DRuntimeObject.MaterialType.Basic;
       }
+    }
+
+    isNeedingLifecycleFunctions(): boolean {
+      return super.isNeedingLifecycleFunctions() || this._animations.length > 0;
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {

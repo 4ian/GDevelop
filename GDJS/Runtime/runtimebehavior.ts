@@ -16,18 +16,18 @@ namespace gdjs {
     minY: float = 0;
     maxX: float = 0;
     maxY: float = 0;
-    behavior: T;
+    source: T;
 
     constructor(behavior: T) {
-      this.behavior = behavior;
+      this.source = behavior;
       this.updateAABBFromOwner();
     }
 
     updateAABBFromOwner() {
-      this.minX = this.behavior.owner.getAABB().min[0];
-      this.minY = this.behavior.owner.getAABB().min[1];
-      this.maxX = this.behavior.owner.getAABB().max[0];
-      this.maxY = this.behavior.owner.getAABB().max[1];
+      this.minX = this.source.owner.getAABB().min[0];
+      this.minY = this.source.owner.getAABB().min[1];
+      this.maxX = this.source.owner.getAABB().max[0];
+      this.maxY = this.source.owner.getAABB().max[1];
     }
   }
 

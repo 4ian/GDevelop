@@ -1,11 +1,9 @@
 namespace gdjs {
-  declare var rbush: any;
-
   export class LightObstaclesManager {
-    _obstacleRBush: any;
+    _obstacleRBush: RBush<LightObstacleRuntimeBehavior>;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      this._obstacleRBush = new rbush();
+      this._obstacleRBush = new RBush<LightObstacleRuntimeBehavior>();
     }
 
     /**
@@ -41,6 +39,9 @@ namespace gdjs {
      * added before.
      */
     removeObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
+      if (!obstacle.currentRBushAABB) {
+        return;
+      }
       this._obstacleRBush.remove(obstacle.currentRBushAABB);
     }
 
@@ -59,9 +60,9 @@ namespace gdjs {
       // is not necessarily in the middle of the object (for sprites for example).
       const x = object.getX();
       const y = object.getY();
-      const searchArea = gdjs.staticObject(
+      const searchArea: SearchArea = gdjs.staticObject(
         LightObstaclesManager.prototype.getAllObstaclesAround
-      );
+      ) as SearchArea;
       // @ts-ignore
       searchArea.minX = x - radius;
       // @ts-ignore
@@ -70,13 +71,8 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyObstacles: gdjs.BehaviorRBushAABB<
-        gdjs.LightObstacleRuntimeBehavior
-      >[] = this._obstacleRBush.search(searchArea);
       result.length = 0;
-      nearbyObstacles.forEach((nearbyObstacle) =>
-        result.push(nearbyObstacle.behavior)
-      );
+      this._obstacleRBush.search(searchArea, result);
     }
   }
 

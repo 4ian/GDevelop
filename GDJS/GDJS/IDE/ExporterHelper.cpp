@@ -670,6 +670,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "ResourceCache.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "polygon.js");
+  InsertUnique(includesFiles, "ObjectSleepState.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
   InsertUnique(includesFiles, "RuntimeInstanceContainer.js");

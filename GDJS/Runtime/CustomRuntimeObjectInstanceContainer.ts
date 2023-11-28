@@ -236,32 +236,6 @@ namespace gdjs {
     }
 
     /**
-     * Update the objects before launching the events.
-     */
-    _updateObjectsPreEvents() {
-      const allInstancesList = this.getAdhocListOfAllInstances();
-      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
-        const obj = allInstancesList[i];
-        const elapsedTime = obj.getElapsedTime();
-        if (!obj.hasNoForces()) {
-          const averageForce = obj.getAverageForce();
-          const elapsedTimeInSeconds = elapsedTime / 1000;
-          obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
-          obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
-          obj.update(this);
-          obj.updateForces(elapsedTimeInSeconds);
-        } else {
-          obj.update(this);
-        }
-        obj.updateTimers(elapsedTime);
-        obj.stepBehaviorsPreEvents(this);
-      }
-
-      // Some behaviors may have request objects to be deleted.
-      this._cacheOrClearRemovedInstances();
-    }
-
-    /**
      * Get the renderer associated to the RuntimeScene.
      */
     getRenderer(): gdjs.CustomObjectRenderer {

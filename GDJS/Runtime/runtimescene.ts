@@ -42,6 +42,8 @@ namespace gdjs {
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
 
+    private _frameIndex: integer = 0;
+
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
 
@@ -427,6 +429,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.endFrame();
       }
+      this._frameIndex++;
       return !!this.getRequestedChange();
     }
 
@@ -733,6 +736,10 @@ namespace gdjs {
      */
     sceneJustResumed(): boolean {
       return this._isJustResumed;
+    }
+
+    getFrameIndex(): integer {
+      return this._frameIndex;
     }
   }
 

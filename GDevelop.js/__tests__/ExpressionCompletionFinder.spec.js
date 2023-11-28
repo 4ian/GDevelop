@@ -82,6 +82,9 @@ describe('gd.ExpressionCompletionFinder', function () {
         structureChild1.getChild('Child1StructureChild1');
         structureChild1.getChild('Child1StructureChild2');
         structureChild1.getChild('Child1StructureChild3');
+        structureChild1.getChild(
+          'Child1 Unsafe Because of Spaces so not listed'
+        );
 
         // With a child array, containing 2 structures and a number.
         // Useful to test completion of the array children.
@@ -178,6 +181,21 @@ describe('gd.ExpressionCompletionFinder', function () {
         `);
       });
 
+      test('Root variables (eager completion of children)', () => {
+        expect(
+          testCompletions('number', 'MySpriteObject.MyObjectVariableStructure|')
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyObjectVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, MyObjectVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 1, no type, 1, MyObjectVariableStructure, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 2, number, 1, MyObjectVariableStructure, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
       test('Root variables (objectvar parameter)', () => {
         expect(testCompletions('number', 'MySpriteObject.Variable(MyObject|'))
           .toMatchInlineSnapshot(`
@@ -185,6 +203,22 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 1, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Root variables (objectvar parameter, eager completion of children)', () => {
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.Variable(MyObjectVariableStructure|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, MyObjectVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyObjectVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, MyObjectVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -229,6 +263,24 @@ describe('gd.ExpressionCompletionFinder', function () {
         `);
       });
 
+      test('Structure, 1 level (eager completion of children)', () => {
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.MyObjectVariableStructure.Child1Structure|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
       test('Structure, 1 level (objectvar parameter)', () => {
         expect(
           testCompletions(
@@ -252,6 +304,24 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 1 level (objectvar parameter, eager completion of children)', () => {
+        expect(
+          testCompletions(
+            'number',
+            'MySpriteObject.Variable(MyObjectVariableStructure.Child1Structure|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -490,7 +560,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         `);
       });
 
-      test('Structure, 1 level (scenevar parameter)', () => {
+      test('Structure, 1 level (objectvar parameter)', () => {
         // Completions of children:
         expect(
           testCompletions(
@@ -690,13 +760,26 @@ describe('gd.ExpressionCompletionFinder', function () {
     describe('Scene variables completion', () => {
       test('Root variables', () => {
         expect(testCompletions('number', 'MyVariab|')).toMatchInlineSnapshot(`
-                  [
-                    "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 2, number, 1, MyVariab, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                  ]
-              `);
+          [
+            "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 2, number, 1, MyVariab, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Root variables (eager completion of children)', () => {
+        expect(testCompletions('number', 'MyVariableStructure|'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, MyVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, MyVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 2, number, 1, MyVariableStructure, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
       });
 
       test('Root variables (scenevar parameter)', () => {
@@ -708,6 +791,18 @@ describe('gd.ExpressionCompletionFinder', function () {
                     "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
                   ]
               `);
+      });
+
+      test('Root variables (scenevar parameter, eager completion of children)', () => {
+        expect(testCompletions('number', 'Variable(MyVariableStructure|)'))
+          .toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, MyVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, MyVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
       });
 
       test('Structure, 1 level', () => {
@@ -728,6 +823,21 @@ describe('gd.ExpressionCompletionFinder', function () {
         `);
       });
 
+      test('Structure, 1 level (eager completion of children)', () => {
+        expect(
+          testCompletions('number', 'MyVariableStructure.Child1Structure|')
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
       test('Structure, 1 level (scenevar parameter)', () => {
         expect(testCompletions('number', 'Variable(MyVariableStructure.|'))
           .toMatchInlineSnapshot(`
@@ -742,6 +852,24 @@ describe('gd.ExpressionCompletionFinder', function () {
           .toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
+      });
+
+      test('Structure, 1 level (scenevar parameter, eager completion of children)', () => {
+        expect(
+          testCompletions(
+            'number',
+            'Variable(MyVariableStructure.Child1Structure|'
+          )
+        ).toMatchInlineSnapshot(`
+          [
+            "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });

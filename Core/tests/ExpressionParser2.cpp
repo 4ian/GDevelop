@@ -1607,6 +1607,21 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Invalid object variables (empty variable name, extra dot)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObjects..");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "A name should be entered after the dot.");
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+              "A name should be entered after the dot.");
+    }
+  }
+
   SECTION("Invalid object variables (object group, partially existing variable)") {
     {
       auto node =
@@ -1689,6 +1704,42 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "An object variable or expression should be entered.");
+    }
+  }
+  SECTION("Invalid object variables (extra dot)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable.");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "A name should be entered after the dot.");
+    }
+  }
+  SECTION("Invalid object variables (extra dot after brackets)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable[\"MyChild\"].");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "A name should be entered after the dot.");
+    }
+  }
+  SECTION("Invalid object variables (extra dot before brackets)") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.MyVariable.[\"MyChild\"]");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "A name should be entered after the dot.");
     }
   }
 
@@ -2157,6 +2208,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         dynamic_cast<gd::IdentifierNode &>(*node);
     REQUIRE(identifierNode.identifierName == "MyObject");
     REQUIRE(identifierNode.childIdentifierName == "");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 2);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+          "A name should be entered after the dot.");
+    REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+          "An object variable or expression should be entered.");
   }
 
   SECTION("Unfinished object function name of type string with parentheses") {
@@ -2168,6 +2227,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionCall.objectName == "MyObject");
     REQUIRE(objectFunctionCall.functionName == "");
     REQUIRE(type == "string");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 2);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+          "A name should be entered after the dot.");
+    REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+          "Enter the name of the function to call.");
   }
 
   SECTION("Unfinished object function name of type number with parentheses") {
@@ -2194,6 +2261,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(type == "number|string");
   }
 
+  SECTION("Unfinished object function/variable name with multiple dots") {
+    auto node = parser.ParseExpression("MyObject..");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 2);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+          "A name should be entered after the dot.");
+    REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+          "A name should be entered after the dot.");
+  }
+
   SECTION("Unfinished object behavior name") {
     auto node = parser.ParseExpression("MyObject.MyBehavior::");
     REQUIRE(node != nullptr);
@@ -2202,6 +2282,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.behaviorFunctionName == "");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+          "An opening parenthesis was expected here to call a function.");
   }
 
   SECTION("Unfinished object behavior name of type string with parentheses") {
@@ -2214,6 +2300,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.functionName == "");
     REQUIRE(type == "string");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+          "Enter the name of the function to call.");
   }
 
   SECTION("Unfinished object behavior name of type number with parentheses") {
@@ -2499,10 +2591,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         node->Visit(validator);
         REQUIRE(validator.GetFatalErrors().size() == 1);
 
-        // TODO: The error message could be improved
         REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-                "Cannot find an expression with this name: \nDouble "
-                "check that you've not made any typo in the name.");
+                "Enter the name of the function to call.");
         REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
         REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 25);
       }
@@ -2838,10 +2928,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // Also check the ability to find the last parent of the variables:
       auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
-      REQUIRE(lastParentOfVariable1Node.variablesContainer == &mySpriteObject.GetVariables());
+      REQUIRE(lastParentOfVariable1Node.parentVariablesContainer == &mySpriteObject.GetVariables());
       auto lastParentOfVariable2Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable2Node);
-      REQUIRE(lastParentOfVariable2Node.variablesContainer == &mySpriteObject2.GetVariables());
+      REQUIRE(lastParentOfVariable2Node.parentVariablesContainer == &mySpriteObject2.GetVariables());
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
@@ -2877,10 +2967,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // Also check the ability to find the last parent of the variables:
       auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
-      REQUIRE(lastParentOfVariable1Node.variablesContainer == &mySpriteObject.GetVariables());
+      REQUIRE(lastParentOfVariable1Node.parentVariablesContainer == &mySpriteObject.GetVariables());
       auto lastParentOfVariable2Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable2Node);
-      REQUIRE(lastParentOfVariable2Node.variablesContainer == &mySpriteObject.GetVariables());
+      REQUIRE(lastParentOfVariable2Node.parentVariablesContainer == &mySpriteObject.GetVariables());
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
@@ -2906,7 +2996,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // Also check the ability to find the last parent of the variable:
       auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
-      REQUIRE(lastParentOfVariable1Node.variablesContainer == &mySpriteObject.GetVariables());
+      REQUIRE(lastParentOfVariable1Node.parentVariablesContainer == &mySpriteObject.GetVariables());
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
@@ -2933,7 +3023,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // Also check the ability to find the last parent of the variable:
       auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
-      REQUIRE(lastParentOfVariable1Node.variable == &mySpriteObject.GetVariables().Get("MyVariable"));
+      REQUIRE(lastParentOfVariable1Node.parentVariable == &mySpriteObject.GetVariables().Get("MyVariable"));
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);

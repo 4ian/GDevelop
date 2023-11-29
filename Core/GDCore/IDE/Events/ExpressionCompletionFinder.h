@@ -489,7 +489,10 @@ class GD_CORE_API ExpressionCompletionFinder
     auto type = gd::ExpressionTypeFinder::GetType(
         platform, projectScopedContainers, rootType, node);
 
+    // Only attempt to complete with the children of the variable
+    // if it's the last child (no more `.AnotherVariable` written after).
     bool eagerlyCompleteIfExactMatch = node.child == nullptr;
+
     if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       if (type == "globalvar" || type == "scenevar") {
         const auto* variablesContainer =
@@ -564,7 +567,10 @@ class GD_CORE_API ExpressionCompletionFinder
                   node.childIdentifierName);
             }
           } else {
-            // Complete a root variable of the scene or project:
+            // Complete a root variable of the scene or project.
+
+            // Don't attempt to complete children variables if there is
+            // already a dot written (`MyVariable.`).
             bool eagerlyCompleteIfPossible =
                 !node.identifierNameDotLocation.IsValid();
             AddCompletionsForVariablesMatchingSearch(
@@ -592,7 +598,10 @@ class GD_CORE_API ExpressionCompletionFinder
                 node.childIdentifierName);
           }
         } else {
-          // Complete a root variable of the object:
+          // Complete a root variable of the object.
+
+          // Don't attempt to complete children variables if there is
+          // already a dot written (`MyVariable.`).
           bool eagerlyCompleteIfPossible =
               !node.identifierNameDotLocation.IsValid();
           AddCompletionsForObjectOrGroupVariablesMatchingSearch(

@@ -235,7 +235,6 @@ const Instruction = (props: Props) => {
     i18n: I18nType
   ) => {
     const { instruction, disabled, renderObjectThumbnail } = props;
-    console.log(metadata.getSentence());
     const formattedTexts = instrFormatter.getAsFormattedText(
       instruction,
       metadata

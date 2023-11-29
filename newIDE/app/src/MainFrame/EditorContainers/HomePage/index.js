@@ -24,7 +24,6 @@ import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
-import RouterContext from '../../RouterContext';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import TeamSection from './TeamSection';
 import TeamProvider from '../../../Profile/Team/TeamProvider';
@@ -37,7 +36,7 @@ import {
   sendUserSurveyHidden,
   sendUserSurveyStarted,
 } from '../../../Utils/Analytics/EventSender';
-import { type RouteArguments } from '../../RouterContext';
+import RouterContext, { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
 import { type Game } from '../../../Utils/GDevelopServices/Game';
 import useGamesList from '../../../GameDashboard/UseGamesList';
@@ -52,6 +51,8 @@ const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
   routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
   routeArguments['initial-dialog'] === 'store'; // New way of opening the store
+const isGamesDashboardRequested = (routeArguments: RouteArguments): boolean =>
+  routeArguments['initial-dialog'] === 'games-dashboard';
 
 const styles = {
   container: {
@@ -204,6 +205,9 @@ export const HomePage = React.memo<Props>(
       const isShopRequestedAtOpening = React.useRef<boolean>(
         isShopRequested(routeArguments)
       );
+      const isGamesDashboardRequestedAtOpening = React.useRef<boolean>(
+        isGamesDashboardRequested(routeArguments)
+      );
       const [
         displayTooltipDelayed,
         setDisplayTooltipDelayed,
@@ -253,6 +257,9 @@ export const HomePage = React.memo<Props>(
               'asset-pack',
               'game-template',
             ]);
+          } else if (isGamesDashboardRequested(routeArguments)) {
+            setActiveTab('manage');
+            removeRouteArguments(['initial-dialog']);
           }
         },
         [
@@ -263,10 +270,15 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
-      // If the user is not authenticated, the GetStarted section is displayed.
+      // If the user is not authenticated, the GetStarted section is displayed unless
+      // a specific tab is requested via the url.
       React.useEffect(
         () => {
-          if (isShopRequestedAtOpening.current) return;
+          if (
+            isShopRequestedAtOpening.current ||
+            isGamesDashboardRequestedAtOpening.current
+          )
+            return;
           if (shouldChangeTabAfterUserLoggedIn.current) {
             setActiveTab(authenticated ? initialTab : 'get-started');
           }
@@ -311,10 +323,12 @@ export const HomePage = React.memo<Props>(
         [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
       );
 
-      // Only fetch games if the user decides to open the games dashboard tab.
+      // Only fetch games if the user decides to open the games dashboard tab
+      // or the build tab to enable the context menu on project list items that
+      // redirects to the games dashboard.
       React.useEffect(
         () => {
-          if (activeTab === 'manage' && !games) {
+          if ((activeTab === 'manage' || activeTab === 'build') && !games) {
             fetchGames();
           }
         },
@@ -448,6 +462,25 @@ export const HomePage = React.memo<Props>(
         [fetchGames, onGameUpdated]
       );
 
+      const onManageGame = React.useCallback(
+        ({ gameId }: { gameId: string }) => {
+          if (!games) return;
+          const matchingGame = games.find(game => game.id === gameId);
+          if (!matchingGame) return;
+          setOpenedGame(matchingGame);
+          setActiveTab('manage');
+        },
+        [games]
+      );
+      const canManageGame = React.useCallback(
+        ({ gameId }: { gameId: string }): boolean => {
+          if (!games) return false;
+          const matchingGameIndex = games.findIndex(game => game.id === gameId);
+          return matchingGameIndex > -1;
+        },
+        [games]
+      );
+
       const shouldDisplayAnnouncements =
         activeTab !== 'community' &&
         // Get started page displays announcements itself.
@@ -499,6 +532,8 @@ export const HomePage = React.memo<Props>(
                         onOpenExampleStoreWithPrivateGameTemplateListingData
                       }
                       onOpenRecentFile={onOpenRecentFile}
+                      onManageGame={onManageGame}
+                      canManageGame={canManageGame}
                       storageProviders={storageProviders}
                       i18n={i18n}
                     />

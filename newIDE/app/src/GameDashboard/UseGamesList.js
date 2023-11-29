@@ -19,12 +19,12 @@ const useGamesList = () => {
   );
 
   const fetchGames = React.useCallback(
-    async () => {
+    async (): Promise<void> => {
       if (!authenticated || !firebaseUser) {
         setGames(null);
         return;
       }
-      if (gamesFetchingPromise.current) return;
+      if (gamesFetchingPromise.current) return gamesFetchingPromise.current;
 
       try {
         setGamesFetchingError(null);

@@ -28,7 +28,6 @@ import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '../../../../UI/IconButton';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
-import RouterContext from '../../../RouterContext';
 import { useLongTouch } from '../../../../Utils/UseLongTouch';
 import { Avatar, Tooltip } from '@material-ui/core';
 import { getGravatarUrl } from '../../../../UI/GravatarUrl';
@@ -206,6 +205,8 @@ type ProjectFileListItemProps = {|
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   isWindowWidthMediumOrLarger: boolean,
   hideDeleteContextMenuAction?: boolean,
+  onManageGame?: ({ gameId: string }) => void,
+  canManageGame?: ({ gameId: string }) => boolean,
 |};
 
 export const ProjectFileListItem = ({
@@ -216,10 +217,11 @@ export const ProjectFileListItem = ({
   onOpenRecentFile,
   isWindowWidthMediumOrLarger,
   hideDeleteContextMenuAction,
+  onManageGame,
+  canManageGame,
 }: ProjectFileListItemProps) => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
-  const { navigateToRoute } = React.useContext(RouterContext);
   const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -311,15 +313,13 @@ export const ProjectFileListItem = ({
     }
 
     const gameId = file.fileMetadata.gameId;
-    if (gameId) {
+    if (gameId && onManageGame && canManageGame) {
       actions = actions.concat([
         { type: 'separator' },
         {
           label: i18n._(t`Manage game`),
-          click: () =>
-            navigateToRoute('games-dashboard', {
-              'game-id': gameId,
-            }),
+          click: () => onManageGame({ gameId }),
+          enabled: canManageGame({ gameId }),
         },
       ]);
     }

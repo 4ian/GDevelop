@@ -59,9 +59,8 @@ const useOpenInitialDialog = ({
           removeRouteArguments(['initial-dialog', 'tutorial-id']);
           break;
         case 'games-dashboard':
-          openProfileDialog(true);
-          // As the games dashboard is not a dialog in itself, we don't remove the argument
-          // and let the ProfileDialog do it once the tab is opened.
+          // Do nothing as it should open the games dashboard on the homepage
+          // in the manage tab. So the homepage handles the route arguments itself.
           break;
         default:
           break;

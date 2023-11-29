@@ -18,7 +18,6 @@ import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import RouterContext from '../MainFrame/RouterContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
 import ErrorBoundary from '../UI/ErrorBoundary';
@@ -38,9 +37,6 @@ type Props = {|
 |};
 
 const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
-  const { routeArguments, removeRouteArguments } = React.useContext(
-    RouterContext
-  );
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
 
@@ -57,16 +53,6 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   } = useGamesList();
 
   const projectUuid = currentProject ? currentProject.getProjectUuid() : null;
-
-  React.useEffect(
-    () => {
-      if (routeArguments['initial-dialog'] === 'games-dashboard') {
-        setCurrentTab('games-dashboard');
-        removeRouteArguments(['initial-dialog']);
-      }
-    },
-    [routeArguments, removeRouteArguments]
-  );
 
   const markBadgesAsSeen = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {

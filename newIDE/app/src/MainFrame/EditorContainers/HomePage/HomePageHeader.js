@@ -7,7 +7,7 @@ import FlatButton from '../../../UI/FlatButton';
 import { Column, Line } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
-import ProjectManager from '../../../UI/CustomSvgIcons/ProjectManager';
+import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
@@ -57,7 +57,7 @@ export const HomePageHeader = ({
                 color="default"
                 disabled={!hasProject}
               >
-                <ProjectManager />
+                <ProjectManagerIcon />
               </IconButton>
               {!!hasProject && (
                 <IconButton

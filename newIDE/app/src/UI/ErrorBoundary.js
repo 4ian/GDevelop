@@ -44,6 +44,7 @@ type ErrorBoundaryScope =
   | 'start-page-play'
   | 'start-page-community'
   | 'start-page-team'
+  | 'start-page-manage'
   | 'about'
   | 'preferences'
   | 'profile'

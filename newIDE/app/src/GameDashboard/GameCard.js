@@ -27,7 +27,7 @@ import {
   type Game,
 } from '../Utils/GDevelopServices/Game';
 import Window from '../Utils/Window';
-import { type GameDetailsTab } from './GameDetailsDialog';
+import { type GameDetailsTab } from './GameDetails';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import BackgroundText from '../UI/BackgroundText';
 import Card from '../UI/Card';

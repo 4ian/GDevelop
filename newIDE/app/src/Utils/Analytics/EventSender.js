@@ -192,6 +192,12 @@ export const sendExportLaunched = (exportKind: string) => {
   });
 };
 
+export const sendGameDetailsOpened = (options: {
+  from: 'profile' | 'homepage' | 'projectManager',
+}) => {
+  recordEvent('game_details_opened', options);
+};
+
 export const sendExampleDetailsOpened = (slug: string) => {
   recordEvent('example-details-opened', { slug });
 };

@@ -303,7 +303,7 @@ export type Props = {|
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
-  renderShareDialog?: ShareDialogWithoutExportsProps => React.Node,
+  renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -3047,11 +3047,11 @@ const MainFrame = (props: Props) => {
                 currentProject
               );
             }}
+            onShareProject={() => setShareDialogOpen(true)}
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
-            shortcutMap={shortcutMap}
           />
         )}
         {!state.currentProject && (
@@ -3245,8 +3245,7 @@ const MainFrame = (props: Props) => {
         }}
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
-      {!!renderShareDialog &&
-        shareDialogOpen &&
+      {shareDialogOpen &&
         renderShareDialog({
           onClose: closeShareDialog,
           onChangeSubscription: closeShareDialog,

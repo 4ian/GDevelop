@@ -76,6 +76,8 @@ type Props = {|
   ) => void,
   storageProviders: Array<StorageProvider>,
   i18n: I18nType,
+  onManageGame: ({ gameId: string }) => void,
+  canManageGame: ({ gameId: string }) => boolean,
 |};
 
 const BuildSection = ({
@@ -90,6 +92,8 @@ const BuildSection = ({
   onOpenRecentFile,
   storageProviders,
   i18n,
+  onManageGame,
+  canManageGame,
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
@@ -349,6 +353,8 @@ const BuildSection = ({
                           file.fileMetadata.fileIdentifier
                         ]
                       }
+                      onManageGame={onManageGame}
+                      canManageGame={canManageGame}
                     />
                   ))
                 ) : (

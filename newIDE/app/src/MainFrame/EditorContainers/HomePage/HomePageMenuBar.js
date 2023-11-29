@@ -112,6 +112,7 @@ const HomePageMenuBar = ({
                     setActiveTab(tab);
                   }}
                   selected={isActive}
+                  id={id}
                 >
                   <span style={styles.buttonLabel}>
                     {getIcon(isActive ? 'inherit' : 'secondary')}
@@ -135,6 +136,7 @@ const HomePageMenuBar = ({
                 disableFocusRipple
                 style={styles.button}
                 onClick={onClick}
+                id={id}
               >
                 <span style={styles.buttonLabel}>{getIcon('secondary')}</span>
               </IconButton>

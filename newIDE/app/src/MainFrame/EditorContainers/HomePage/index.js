@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { Trans } from '@lingui/macro';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -11,6 +12,7 @@ import GetStartedSection from './GetStartedSection';
 import BuildSection from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
+import ManageSection from './ManageSection';
 import CommunitySection from './CommunitySection';
 import StoreSection from './StoreSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
@@ -22,7 +24,6 @@ import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
-import RouterContext from '../../RouterContext';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import TeamSection from './TeamSection';
 import TeamProvider from '../../../Profile/Team/TeamProvider';
@@ -35,11 +36,23 @@ import {
   sendUserSurveyHidden,
   sendUserSurveyStarted,
 } from '../../../Utils/Analytics/EventSender';
-import { type RouteArguments } from '../../RouterContext';
+import RouterContext, { type RouteArguments } from '../../RouterContext';
+import { type GameDetailsTab } from '../../../GameDashboard/GameDetails';
+import { type Game } from '../../../Utils/GDevelopServices/Game';
+import useGamesList from '../../../GameDashboard/UseGamesList';
+import useDisplayNewFeature from '../../../Utils/UseDisplayNewFeature';
+import HighlightingTooltip from '../../../UI/HighlightingTooltip';
+import Text from '../../../UI/Text';
+import Link from '../../../UI/Link';
+import Window from '../../../Utils/Window';
+import { getHelpLink } from '../../../Utils/HelpLink';
 
+const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
   routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
   routeArguments['initial-dialog'] === 'store'; // New way of opening the store
+const isGamesDashboardRequested = (routeArguments: RouteArguments): boolean =>
+  routeArguments['initial-dialog'] === 'games-dashboard';
 
 const styles = {
   container: {
@@ -164,6 +177,11 @@ export const HomePage = React.memo<Props>(
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
       const [showUserChip, setShowUserChip] = React.useState<boolean>(false);
+      const [openedGame, setOpenedGame] = React.useState<?Game>(null);
+      const [
+        gameDetailsCurrentTab,
+        setGameDetailsCurrentTab,
+      ] = React.useState<GameDetailsTab>('details');
 
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';
@@ -185,6 +203,38 @@ export const HomePage = React.memo<Props>(
       const isShopRequestedAtOpening = React.useRef<boolean>(
         isShopRequested(routeArguments)
       );
+      const isGamesDashboardRequestedAtOpening = React.useRef<boolean>(
+        isGamesDashboardRequested(routeArguments)
+      );
+      const [
+        displayTooltipDelayed,
+        setDisplayTooltipDelayed,
+      ] = React.useState<boolean>(false);
+      const {
+        games,
+        gamesFetchingError,
+        onGameUpdated,
+        fetchGames,
+      } = useGamesList();
+      const {
+        shouldDisplayNewFeatureHighlighting,
+        acknowledgeNewFeature,
+      } = useDisplayNewFeature();
+      const manageTabElement = document.getElementById('home-manage-tab');
+      const shouldDisplayTooltip = shouldDisplayNewFeatureHighlighting({
+        featureId: 'gamesDashboardInHomePage',
+      });
+
+      const displayTooltip =
+        isActive && shouldDisplayTooltip && manageTabElement;
+
+      const onCloseTooltip = React.useCallback(
+        () => {
+          setDisplayTooltipDelayed(false);
+          acknowledgeNewFeature({ featureId: 'gamesDashboardInHomePage' });
+        },
+        [acknowledgeNewFeature]
+      );
 
       // Open the store and a pack or game template if asked to do so.
       React.useEffect(
@@ -205,6 +255,9 @@ export const HomePage = React.memo<Props>(
               'asset-pack',
               'game-template',
             ]);
+          } else if (isGamesDashboardRequested(routeArguments)) {
+            setActiveTab('manage');
+            removeRouteArguments(['initial-dialog']);
           }
         },
         [
@@ -215,10 +268,15 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
-      // If the user is not authenticated, the GetStarted section is displayed.
+      // If the user is not authenticated, the GetStarted section is displayed unless
+      // a specific tab is requested via the url.
       React.useEffect(
         () => {
-          if (isShopRequestedAtOpening.current) return;
+          if (
+            isShopRequestedAtOpening.current ||
+            isGamesDashboardRequestedAtOpening.current
+          )
+            return;
           if (shouldChangeTabAfterUserLoggedIn.current) {
             setActiveTab(authenticated ? initialTab : 'get-started');
           }
@@ -261,6 +319,35 @@ export const HomePage = React.memo<Props>(
           fetchTutorials();
         },
         [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
+      );
+
+      // Only fetch games if the user decides to open the games dashboard tab
+      // or the build tab to enable the context menu on project list items that
+      // redirects to the games dashboard.
+      React.useEffect(
+        () => {
+          if ((activeTab === 'manage' || activeTab === 'build') && !games) {
+            fetchGames();
+          }
+        },
+        [fetchGames, activeTab, games]
+      );
+
+      React.useEffect(
+        () => {
+          if (displayTooltip) {
+            const timeoutId = setTimeout(() => {
+              setDisplayTooltipDelayed(true);
+            }, 500);
+            return () => clearTimeout(timeoutId);
+          } else {
+            setDisplayTooltipDelayed(false);
+          }
+        },
+        // Delay display of tooltip because home tab is the first to be opened
+        // but the editor might open a project at start, displaying the tooltip
+        // while the project is loading, giving the impression of a glitch.
+        [displayTooltip]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -365,6 +452,34 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
+      const handleGameUpdated = React.useCallback(
+        (game: Game) => {
+          onGameUpdated(game);
+          if (openedGame) setOpenedGame(game);
+        },
+        [onGameUpdated, openedGame]
+      );
+
+      const onManageGame = React.useCallback(
+        ({ gameId }: { gameId: string }) => {
+          if (!games) return;
+          const matchingGame = games.find(game => game.id === gameId);
+          if (!matchingGame) return;
+          setOpenedGame(matchingGame);
+          setActiveTab('manage');
+        },
+        [games]
+      );
+
+      const canManageGame = React.useCallback(
+        ({ gameId }: { gameId: string }): boolean => {
+          if (!games) return false;
+          const matchingGameIndex = games.findIndex(game => game.id === gameId);
+          return matchingGameIndex > -1;
+        },
+        [games]
+      );
+
       const shouldDisplayAnnouncements =
         activeTab !== 'community' &&
         // Get started page displays announcements itself.
@@ -379,6 +494,19 @@ export const HomePage = React.memo<Props>(
                 <div style={styles.scrollableContainer}>
                   {shouldDisplayAnnouncements && (
                     <AnnouncementsFeed canClose level="urgent" addMargins />
+                  )}
+                  {activeTab === 'manage' && (
+                    <ManageSection
+                      project={project}
+                      games={games}
+                      onGameUpdated={handleGameUpdated}
+                      onRefreshGames={fetchGames}
+                      gamesFetchingError={gamesFetchingError}
+                      openedGame={openedGame}
+                      setOpenedGame={setOpenedGame}
+                      currentTab={gameDetailsCurrentTab}
+                      setCurrentTab={setGameDetailsCurrentTab}
+                    />
                   )}
                   {activeTab === 'get-started' && (
                     <GetStartedSection
@@ -403,6 +531,8 @@ export const HomePage = React.memo<Props>(
                         onOpenExampleStoreWithPrivateGameTemplateListingData
                       }
                       onOpenRecentFile={onOpenRecentFile}
+                      onManageGame={onManageGame}
+                      canManageGame={canManageGame}
                       storageProviders={storageProviders}
                       i18n={i18n}
                     />
@@ -442,6 +572,36 @@ export const HomePage = React.memo<Props>(
                   onOpenAbout={onOpenAbout}
                 />
               </div>
+              {displayTooltipDelayed && (
+                <HighlightingTooltip
+                  // $FlowIgnore - displayTooltipDelayed makes sure the element is defined
+                  anchorElement={manageTabElement}
+                  title={<Trans>Games Dashboard</Trans>}
+                  thumbnailSource="res/features/games-dashboard.svg"
+                  thumbnailAlt={'Red hero presenting games analytics'}
+                  content={[
+                    <Text noMargin key="paragraph">
+                      <Trans>
+                        Follow your games’ online performance, manage published
+                        versions, and collect player feedback.
+                      </Trans>
+                    </Text>,
+                    <Text noMargin key="link">
+                      <Link
+                        href={gamesDashboardWikiArticle}
+                        onClick={() =>
+                          Window.openExternalURL(gamesDashboardWikiArticle)
+                        }
+                      >
+                        <Trans>Learn more</Trans>
+                      </Link>
+                    </Text>,
+                  ]}
+                  placement={isMobile ? 'bottom' : 'right'}
+                  onClose={onCloseTooltip}
+                  closeWithBackdropClick={false}
+                />
+              )}
             </TeamProvider>
           )}
         </I18n>

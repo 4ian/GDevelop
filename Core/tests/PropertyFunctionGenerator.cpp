@@ -91,8 +91,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       auto &getterAction = getterEvent.GetActions().at(0);
       REQUIRE(getterAction.GetType() == "SetReturnNumber");
       REQUIRE(getterAction.GetParametersCount() == 1);
-      REQUIRE(getterAction.GetParameter(0).GetPlainString() ==
-              "Object.Behavior::PropertyMovementAngle()");
+      REQUIRE(getterAction.GetParameter(0).GetPlainString() == "MovementAngle");
     }
     {
       auto &setter =
@@ -124,8 +123,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterAction.GetParameter(0).GetPlainString() == "Object");
       REQUIRE(setterAction.GetParameter(1).GetPlainString() == "Behavior");
       REQUIRE(setterAction.GetParameter(2).GetPlainString() == "=");
-      REQUIRE(setterAction.GetParameter(3).GetPlainString() ==
-              "GetArgumentAsNumber(\"Value\")");
+      REQUIRE(setterAction.GetParameter(3).GetPlainString() == "Value");
     }
   }
 
@@ -375,8 +373,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterAction.GetParametersCount() == 3);
       REQUIRE(setterAction.GetParameter(0).GetPlainString() == "Object");
       REQUIRE(setterAction.GetParameter(1).GetPlainString() == "=");
-      REQUIRE(setterAction.GetParameter(2).GetPlainString() ==
-              "GetArgumentAsNumber(\"Value\")");
+      REQUIRE(setterAction.GetParameter(2).GetPlainString() == "Value");
     }
   }
 

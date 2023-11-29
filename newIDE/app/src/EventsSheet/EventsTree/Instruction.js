@@ -268,7 +268,7 @@ const Instruction = (props: Props) => {
                 />
               );
             }
-            return <span key={i}>{i === 0 ? capitalize(value) : value}</span>;
+            return <span key={i}>{value}</span>;
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);

@@ -341,8 +341,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       auto &getterAction = getterEvent.GetActions().at(0);
       REQUIRE(getterAction.GetType() == "SetReturnNumber");
       REQUIRE(getterAction.GetParametersCount() == 1);
-      REQUIRE(getterAction.GetParameter(0).GetPlainString() ==
-              "Object.PropertyMovementAngle()");
+      REQUIRE(getterAction.GetParameter(0).GetPlainString() == "MovementAngle");
     }
     {
       auto &setter =
@@ -575,8 +574,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       auto &getterAction = getterEvent.GetActions().at(0);
       REQUIRE(getterAction.GetType() == "SetReturnNumber");
       REQUIRE(getterAction.GetParametersCount() == 1);
-      REQUIRE(getterAction.GetParameter(0).GetPlainString() ==
-              "Object.Behavior::SharedPropertyMovementAngle()");
+      REQUIRE(getterAction.GetParameter(0).GetPlainString() == "MovementAngle");
     }
     {
       auto &setter =

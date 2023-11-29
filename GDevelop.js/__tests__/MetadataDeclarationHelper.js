@@ -178,7 +178,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getFullName()).toBe('Some value');
     expect(condition.getDescription()).toBe('Compare some value.');
     // The IDE fixes the first letter case.
-    expect(condition.getSentence()).toBe('some value _PARAM1_ _PARAM2_');
+    expect(condition.getSentence()).toBe('Some value _PARAM1_ _PARAM2_');
 
     extension.delete();
     project.delete();
@@ -486,7 +486,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe('Compare some value.');
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'some value of _PARAM0_ _PARAM2_ _PARAM3_'
+      'Some value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
 
     expect(condition.getParametersCount()).toBe(5);
@@ -635,7 +635,7 @@ describe('MetadataDeclarationHelper', () => {
     );
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'the property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
+      'The property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);
@@ -819,7 +819,7 @@ describe('MetadataDeclarationHelper', () => {
     );
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'the property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
+      'The property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);
@@ -1233,7 +1233,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe('Compare some value.');
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'some value of _PARAM0_ _PARAM1_ _PARAM2_'
+      'Some value of _PARAM0_ _PARAM1_ _PARAM2_'
     );
 
     expect(condition.getParametersCount()).toBe(4);
@@ -1369,7 +1369,7 @@ describe('MetadataDeclarationHelper', () => {
     );
     // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'the property value for the some value of _PARAM0_ _PARAM1_ _PARAM2_'
+      'The property value for the some value of _PARAM0_ _PARAM1_ _PARAM2_'
     );
     expect(condition.isHidden()).toBe(false);
     expect(condition.isPrivate()).toBe(true);

@@ -190,7 +190,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
       gd::String templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
 
       sentence =
-          templateSentence.FindAndReplace("<subject>", sentence)
+          templateSentence.FindAndReplace("<subject>", sentence.CapitalizeFirstLetter())
               .FindAndReplace(
                   "<operator>",
                   "_PARAM" + gd::String::From(operatorParamIndex) + "_")
@@ -200,7 +200,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
       gd::String templateSentence = _("<subject> <operator> <value>");
 
       sentence =
-          templateSentence.FindAndReplace("<subject>", sentence)
+          templateSentence.FindAndReplace("<subject>", sentence.CapitalizeFirstLetter())
               .FindAndReplace(
                   "<operator>",
                   "_PARAM" + gd::String::From(operatorParamIndex) + "_")

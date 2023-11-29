@@ -32,8 +32,8 @@ const useGamesList = () => {
           getAuthorizationHeader,
           firebaseUser.uid
         );
-        const games = await gamesFetchingPromise.current;
-        setGames(games);
+        const fetchedGames = await gamesFetchingPromise.current;
+        setGames(fetchedGames);
       } catch (error) {
         console.error('Error while loading user games.', error);
         setGamesFetchingError(error);

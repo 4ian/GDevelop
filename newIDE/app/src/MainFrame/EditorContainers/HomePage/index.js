@@ -457,9 +457,9 @@ export const HomePage = React.memo<Props>(
       const handleGameUpdated = React.useCallback(
         (game: Game) => {
           onGameUpdated(game);
-          fetchGames();
+          if (openedGame) setOpenedGame(game);
         },
-        [fetchGames, onGameUpdated]
+        [onGameUpdated, openedGame]
       );
 
       const onManageGame = React.useCallback(
@@ -472,6 +472,7 @@ export const HomePage = React.memo<Props>(
         },
         [games]
       );
+
       const canManageGame = React.useCallback(
         ({ gameId }: { gameId: string }): boolean => {
           if (!games) return false;

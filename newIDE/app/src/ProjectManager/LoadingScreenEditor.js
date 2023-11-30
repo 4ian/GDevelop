@@ -36,6 +36,18 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
+type TimeSettings = {|
+  minDuration: number,
+  logoAndProgressFadeInDuration: number,
+  logoAndProgressLogoFadeInDelay: number,
+|};
+
+const forcedLogo: TimeSettings = {
+  minDuration: 2,
+  logoAndProgressFadeInDuration: 0.2,
+  logoAndProgressLogoFadeInDelay: 0,
+};
+
 const watermarkPlacementOptions = [
   { value: 'top', label: t`Top` },
   { value: 'top-left', label: t`Top left corner` },
@@ -64,6 +76,13 @@ export const LoadingScreenEditor = ({
     forceUpdate();
     onLoadingScreenUpdated();
   };
+
+  /** Remember the settings chosen by users when they are forced to a value */
+  const timeSettings = React.useRef<TimeSettings>({
+    minDuration: loadingScreen.getMinDuration(),
+    logoAndProgressFadeInDuration: loadingScreen.getLogoAndProgressFadeInDuration(),
+    logoAndProgressLogoFadeInDelay: loadingScreen.getLogoAndProgressLogoFadeInDelay(),
+  });
 
   return (
     <I18n>
@@ -150,6 +169,28 @@ export const LoadingScreenEditor = ({
                       return;
                     }
                     watermark.showGDevelopWatermark(checked);
+                    if (checked) {
+                      loadingScreen.setMinDuration(
+                        timeSettings.current.minDuration
+                      );
+                      loadingScreen.setLogoAndProgressFadeInDuration(
+                        timeSettings.current.logoAndProgressFadeInDuration
+                      );
+                      loadingScreen.setLogoAndProgressLogoFadeInDelay(
+                        timeSettings.current.logoAndProgressLogoFadeInDelay
+                      );
+                    } else if (
+                      subscriptionChecker.current &&
+                      !subscriptionChecker.current.hasUserSubscription()
+                    ) {
+                      loadingScreen.setMinDuration(forcedLogo.minDuration);
+                      loadingScreen.setLogoAndProgressFadeInDuration(
+                        forcedLogo.logoAndProgressFadeInDuration
+                      );
+                      loadingScreen.setLogoAndProgressLogoFadeInDelay(
+                        forcedLogo.logoAndProgressLogoFadeInDelay
+                      );
+                    }
                     onUpdate();
                   }}
                 />
@@ -359,6 +400,41 @@ export const LoadingScreenEditor = ({
               }}
             />
           </ResponsiveLineStackLayout>
+          <Text size="block-title">
+            <Trans>Duration</Trans>
+          </Text>
+          <SemiControlledTextField
+            floatingLabelText={
+              <Trans>Minimum duration of the screen (in seconds)</Trans>
+            }
+            step={0.1}
+            fullWidth
+            type="number"
+            value={'' + loadingScreen.getMinDuration()}
+            onChange={newValue => {
+              if (
+                newValue < forcedLogo.minDuration &&
+                !watermark.isGDevelopWatermarkShown() &&
+                subscriptionChecker.current &&
+                !subscriptionChecker.current.checkUserHasSubscription()
+              ) {
+                // If users want to reduce GDevelop splash screen although
+                // watermark is hidden, we don't allow it if they have no subscription.
+                return;
+              }
+              const currentMinDuration = loadingScreen.getMinDuration();
+              const newMinDuration = Math.max(0, parseFloat(newValue));
+              if (currentMinDuration === newMinDuration) {
+                return;
+              }
+              loadingScreen.setMinDuration(newMinDuration);
+              timeSettings.current.minDuration = newMinDuration;
+              onUpdate();
+            }}
+            helperMarkdownText={i18n._(
+              t`When previewing the game in the editor, this duration is ignored (the game preview starts as soon as possible).`
+            )}
+          />
           <ResponsiveLineStackLayout noMargin>
             <SemiControlledTextField
               floatingLabelText={
@@ -373,6 +449,16 @@ export const LoadingScreenEditor = ({
               type="number"
               value={'' + loadingScreen.getLogoAndProgressLogoFadeInDelay()}
               onChange={newValue => {
+                if (
+                  newValue > forcedLogo.logoAndProgressLogoFadeInDelay &&
+                  !watermark.isGDevelopWatermarkShown() &&
+                  subscriptionChecker.current &&
+                  !subscriptionChecker.current.checkUserHasSubscription()
+                ) {
+                  // If users want to reduce GDevelop splash screen although
+                  // watermark is hidden, we don't allow it if they have no subscription.
+                  return;
+                }
                 const currentLogoAndProgressLogoFadeInDelay = loadingScreen.getLogoAndProgressLogoFadeInDelay();
                 const newLogoAndProgressLogoFadeInDelay = Math.max(
                   0,
@@ -386,6 +472,7 @@ export const LoadingScreenEditor = ({
                 loadingScreen.setLogoAndProgressLogoFadeInDelay(
                   newLogoAndProgressLogoFadeInDelay
                 );
+                timeSettings.current.logoAndProgressLogoFadeInDelay = newLogoAndProgressLogoFadeInDelay;
                 onUpdate();
               }}
             />
@@ -402,6 +489,16 @@ export const LoadingScreenEditor = ({
               type="number"
               value={'' + loadingScreen.getLogoAndProgressFadeInDuration()}
               onChange={newValue => {
+                if (
+                  newValue > forcedLogo.logoAndProgressFadeInDuration &&
+                  !watermark.isGDevelopWatermarkShown() &&
+                  subscriptionChecker.current &&
+                  !subscriptionChecker.current.checkUserHasSubscription()
+                ) {
+                  // If users want to reduce GDevelop splash screen although
+                  // watermark is hidden, we don't allow it if they have no subscription.
+                  return;
+                }
                 const currentLogoAndProgressFadeInDuration = loadingScreen.getLogoAndProgressFadeInDuration();
                 const newLogoAndProgressFadeInDuration = Math.max(
                   0,
@@ -415,6 +512,7 @@ export const LoadingScreenEditor = ({
                 loadingScreen.setLogoAndProgressFadeInDuration(
                   newLogoAndProgressFadeInDuration
                 );
+                timeSettings.current.logoAndProgressFadeInDuration = newLogoAndProgressFadeInDuration;
                 onUpdate();
               }}
             />
@@ -427,30 +525,6 @@ export const LoadingScreenEditor = ({
               </Trans>
             </AlertMessage>
           ) : null}
-          <Text size="block-title">
-            <Trans>Duration</Trans>
-          </Text>
-          <SemiControlledTextField
-            floatingLabelText={
-              <Trans>Minimum duration of the screen (in seconds)</Trans>
-            }
-            step={0.1}
-            fullWidth
-            type="number"
-            value={'' + loadingScreen.getMinDuration()}
-            onChange={newValue => {
-              const currentMinDuration = loadingScreen.getMinDuration();
-              const newMinDuration = Math.max(0, parseFloat(newValue));
-              if (currentMinDuration === newMinDuration) {
-                return;
-              }
-              loadingScreen.setMinDuration(newMinDuration);
-              onUpdate();
-            }}
-            helperMarkdownText={i18n._(
-              t`When previewing the game in the editor, this duration is ignored (the game preview starts as soon as possible).`
-            )}
-          />
 
           <SubscriptionChecker
             ref={subscriptionChecker}

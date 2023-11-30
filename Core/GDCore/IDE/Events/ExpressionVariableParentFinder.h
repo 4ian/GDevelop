@@ -33,9 +33,9 @@ namespace gd {
  * to refer to the parent of a variable (which can be a VariablesContainer
  * or another Variable).
  */
-struct VariableOrVariablesContainer {
-  const gd::VariablesContainer* variablesContainer;
-  const gd::Variable* variable;
+struct VariableAndItsParent {
+  const gd::VariablesContainer* parentVariablesContainer;
+  const gd::Variable* parentVariable;
 };
 
 /**
@@ -49,14 +49,14 @@ class GD_CORE_API ExpressionVariableParentFinder
     : public ExpressionParser2NodeWorker {
  public:
 
-  static VariableOrVariablesContainer GetLastParentOfNode(
+  static VariableAndItsParent GetLastParentOfNode(
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers,
       gd::ExpressionNode& node) {
     gd::ExpressionVariableParentFinder typeFinder(
         platform, projectScopedContainers);
     node.Visit(typeFinder);
-    return typeFinder.lastParentOfNode;
+    return typeFinder.variableAndItsParent;
   }
 
   virtual ~ExpressionVariableParentFinder(){};
@@ -69,6 +69,7 @@ class GD_CORE_API ExpressionVariableParentFinder
         projectScopedContainers(projectScopedContainers_),
         variableNode(nullptr),
         thisIsALegacyPrescopedVariable(false),
+        bailOutBecauseEmptyVariableName(false),
         legacyPrescopedVariablesContainer(nullptr){};
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {}
@@ -92,7 +93,7 @@ class GD_CORE_API ExpressionVariableParentFinder
       // containing it was identified in the FunctionCallNode.
       childVariableNames.insert(childVariableNames.begin(), node.name);
       if (legacyPrescopedVariablesContainer)
-        lastParentOfNode = WalkUntilLastParent(
+        variableAndItsParent = WalkUntilLastParent(
             *legacyPrescopedVariablesContainer, childVariableNames);
     } else {
       // Otherwise, the identifier is to be interpreted as usual:
@@ -106,14 +107,14 @@ class GD_CORE_API ExpressionVariableParentFinder
                 projectScopedContainers.GetObjectsContainersList()
                     .GetObjectOrGroupVariablesContainer(node.name);
             if (variablesContainer)
-              lastParentOfNode =
+              variableAndItsParent =
                   WalkUntilLastParent(*variablesContainer, childVariableNames);
           },
           [&]() {
             // This is a variable.
             if (projectScopedContainers.GetVariablesContainersList().Has(
                     node.name)) {
-              lastParentOfNode = WalkUntilLastParent(
+              variableAndItsParent = WalkUntilLastParent(
                   projectScopedContainers.GetVariablesContainersList().Get(
                       node.name),
                   childVariableNames);
@@ -133,6 +134,13 @@ class GD_CORE_API ExpressionVariableParentFinder
     }
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
+    if (node.name.empty() && node.child) {
+      // A variable accessor should always have a name if it has a child (i.e: another accessor).
+      // While the parser may have generated an empty name,
+      // flag this so we avoid finding a wrong parent (and so, run the risk of giving
+      // wrong autocompletions).
+      bailOutBecauseEmptyVariableName = true;
+    }
     childVariableNames.insert(childVariableNames.begin(), node.name);
     if (node.parent) node.parent->Visit(*this);
   }
@@ -159,7 +167,7 @@ class GD_CORE_API ExpressionVariableParentFinder
                                 node.identifierName);
 
       if (legacyPrescopedVariablesContainer)
-        lastParentOfNode = WalkUntilLastParent(
+        variableAndItsParent = WalkUntilLastParent(
             *legacyPrescopedVariablesContainer, childVariableNames);
 
     } else {
@@ -178,7 +186,7 @@ class GD_CORE_API ExpressionVariableParentFinder
                 projectScopedContainers.GetObjectsContainersList()
                     .GetObjectOrGroupVariablesContainer(node.identifierName);
             if (variablesContainer)
-              lastParentOfNode =
+              variableAndItsParent =
                   WalkUntilLastParent(*variablesContainer, childVariableNames);
           },
           [&]() {
@@ -189,7 +197,7 @@ class GD_CORE_API ExpressionVariableParentFinder
 
             if (projectScopedContainers.GetVariablesContainersList().Has(
                     node.identifierName)) {
-              lastParentOfNode = WalkUntilLastParent(
+              variableAndItsParent = WalkUntilLastParent(
                   projectScopedContainers.GetVariablesContainersList().Get(
                       node.identifierName),
                   childVariableNames);
@@ -287,10 +295,13 @@ class GD_CORE_API ExpressionVariableParentFinder
   }
 
  private:
-  static VariableOrVariablesContainer WalkUntilLastParent(
+  VariableAndItsParent WalkUntilLastParent(
       const gd::Variable& variable,
       const std::vector<gd::String>& childVariableNames,
       size_t startIndex = 0) {
+    if (bailOutBecauseEmptyVariableName)
+      return {}; // Do not even attempt to find the parent if we had an issue when visiting nodes.
+
     const gd::Variable* currentVariable = &variable;
 
     // Walk until size - 1 as we want the last parent.
@@ -323,33 +334,34 @@ class GD_CORE_API ExpressionVariableParentFinder
 
     // Return the last parent of the chain of variables (so not the last variable
     // but the one before it).
-    return {.variable = currentVariable};
+    return {.parentVariable = currentVariable};
   }
 
-  static VariableOrVariablesContainer WalkUntilLastParent(
+  VariableAndItsParent WalkUntilLastParent(
       const gd::VariablesContainer& variablesContainer,
       const std::vector<gd::String>& childVariableNames) {
+    if (bailOutBecauseEmptyVariableName)
+      return {}; // Do not even attempt to find the parent if we had an issue when visiting nodes.
     if (childVariableNames.empty())
       return {};  // There is no "parent" to the variables container itself.
-    if (childVariableNames.size() == 1)
-      return {// Only one child: the parent is the variables container itself.
-              .variablesContainer = &variablesContainer};
 
     const gd::String& firstChildName = *childVariableNames.begin();
-    if (!variablesContainer.Has(firstChildName)) {
-      // The child does not exist - there is no "parent".
-      return {};
-    }
 
-    return WalkUntilLastParent(
-        variablesContainer.Get(firstChildName), childVariableNames, 1);
+    const gd::Variable* variable = variablesContainer.Has(firstChildName) ?
+      &variablesContainer.Get(firstChildName) : nullptr;
+    if (childVariableNames.size() == 1 || !variable)
+      return {// Only one child: the parent is the variables container itself.
+              .parentVariablesContainer = &variablesContainer};
+
+    return WalkUntilLastParent(*variable, childVariableNames, 1);
   }
 
   gd::ExpressionNode* variableNode;
   std::vector<gd::String> childVariableNames;
   bool thisIsALegacyPrescopedVariable;
+  bool bailOutBecauseEmptyVariableName;
   const gd::VariablesContainer* legacyPrescopedVariablesContainer;
-  VariableOrVariablesContainer lastParentOfNode;
+  VariableAndItsParent variableAndItsParent;
 
   const gd::Platform& platform;
   const gd::ProjectScopedContainers& projectScopedContainers;

@@ -54,6 +54,8 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("drawChamferRectangle");
     GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::RegularPolygon"]
         .SetFunctionName("drawRegularPolygon");
+    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Torus"]
+        .SetFunctionName("drawTorus");
     GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
         .SetFunctionName("drawStar");
     GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]

@@ -155,6 +155,32 @@ namespace gdjs {
       this.invalidateBounds();
     }
 
+    drawTorus(
+      x1: float,
+      y1: float,
+      innerRadius: float,
+      outerRadius: float,
+      startArc: float,
+      endArc: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      this._graphics.drawTorus(
+        x1,
+        y1,
+        innerRadius,
+        outerRadius,
+        startArc ? gdjs.toRad(startArc) : 0,
+        endArc ? gdjs.toRad(endArc) : 0
+      );
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
     drawRegularPolygon(
       x1: float,
       y1: float,

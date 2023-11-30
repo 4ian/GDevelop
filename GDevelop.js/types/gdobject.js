@@ -8,8 +8,6 @@ declare class gdObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
-  setTags(tags: string): void;
-  getTags(): string;
   is3DObject(): boolean;
   getConfiguration(): gdObjectConfiguration;
   getVariables(): gdVariablesContainer;
@@ -22,6 +20,8 @@ declare class gdObject {
   renameBehavior(oldName: string, name: string): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
+  resetPersistentUuid(): gdObject;
+  clearPersistentUuid(): gdObject;
   delete(): void;
   ptr: number;
 };

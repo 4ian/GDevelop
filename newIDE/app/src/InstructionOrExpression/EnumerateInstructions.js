@@ -10,69 +10,92 @@ const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
 
-type ExtensionsExtraInstructions = {
-  BuiltinObject?: {
-    '': Array<string>,
-  },
-  Physics2?: {
-    'Physics2::Physics2Behavior': Array<string>,
-  },
-};
-
-const freeActionsToAddToObject: ExtensionsExtraInstructions = {
-  BuiltinObject: {
-    '': ['AjoutHasard', 'Create', 'AjoutObjConcern'],
-  },
-};
-
-const freeConditionsToAddToObject: ExtensionsExtraInstructions = {
-  BuiltinObject: {
-    '': [
-      'AjoutHasard',
-      'AjoutObjConcern',
-      'CollisionNP',
-      'SceneInstancesCount',
-      'PickedInstancesCount',
-      'PickNearest',
-      'Distance',
-      'SeDirige',
-      'EstTourne',
-      'SourisSurObjet',
-    ],
-  },
-};
-
-const freeActionsToAddToBehavior: ExtensionsExtraInstructions = {};
-
-const freeConditionsToAddToBehavior: ExtensionsExtraInstructions = {
-  Physics2: {
-    'Physics2::Physics2Behavior': [
-      'Physics2::Collision',
-      'Physics2::CollisionStarted',
-      'Physics2::CollisionStopped',
-    ],
-  },
-};
-
-const freeInstructionsToRemove = {
+const freeInstructionsToKeep = {
   BuiltinObject: [
     // Note: even if "Create" was added to the object actions for convenience,
     // we also keep it in the list of free actions.
-
-    // $FlowFixMe
-    ...freeConditionsToAddToObject.BuiltinObject[''],
+    'Create',
+    'CreateByName',
   ],
-  Physics2: [
-    // $FlowFixMe
-    ...freeConditionsToAddToBehavior.Physics2['Physics2::Physics2Behavior'],
-  ],
+  BuiltinCamera: ['CentreCamera'],
+  Scene3D: ['Scene3D::TurnCameraTowardObject'],
 };
 
-export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
-  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName();
+const isObjectInstruction = (
+  instructionMetadata: gdInstructionMetadata,
+  objectType?: string
+): boolean => {
+  let firstParameterIndex = -1;
+  for (
+    let index = 0;
+    index < instructionMetadata.getParametersCount();
+    index++
+  ) {
+    const parameter = instructionMetadata.getParameter(index);
+    if (!parameter.isCodeOnly()) {
+      firstParameterIndex = index;
+      break;
+    }
+  }
+  if (firstParameterIndex === -1) {
+    return false;
+  }
+  const firstParameter = instructionMetadata.getParameter(firstParameterIndex);
+  if (!gd.ParameterMetadata.isObject(firstParameter.getType())) {
+    return false;
+  }
+  if (
+    objectType &&
+    firstParameter.getExtraInfo() !== '' &&
+    firstParameter.getExtraInfo() !== objectType
+  ) {
+    return false;
+  }
+  if (firstParameterIndex === instructionMetadata.getParametersCount() - 1) {
+    return true;
+  }
+  const secondParameter = instructionMetadata.getParameter(
+    firstParameterIndex + 1
+  );
+  return !gd.ParameterMetadata.isBehavior(secondParameter.getType());
 };
 
-const getExtensionTranslatedPrefix = (
+const isBehaviorInstruction = (
+  instructionMetadata: gdInstructionMetadata,
+  behaviorType?: string
+): boolean => {
+  let firstParameterIndex = -1;
+  for (
+    let index = 0;
+    index < instructionMetadata.getParametersCount();
+    index++
+  ) {
+    const parameter = instructionMetadata.getParameter(index);
+    if (!parameter.isCodeOnly()) {
+      firstParameterIndex = index;
+      break;
+    }
+  }
+  if (firstParameterIndex === -1) {
+    return false;
+  }
+  const firstParameter = instructionMetadata.getParameter(firstParameterIndex);
+  if (!gd.ParameterMetadata.isObject(firstParameter.getType())) {
+    return false;
+  }
+  if (firstParameterIndex === instructionMetadata.getParametersCount() - 1) {
+    return false;
+  }
+  const secondParameter = instructionMetadata.getParameter(
+    firstParameterIndex + 1
+  );
+  return (
+    gd.ParameterMetadata.isBehavior(secondParameter.getType()) &&
+    (!behaviorType || secondParameter.getExtraInfo() === behaviorType)
+  );
+};
+
+export const getExtensionPrefix = (
   extension: gdPlatformExtension,
   i18n: I18nType
 ): string => {
@@ -83,116 +106,146 @@ const getExtensionTranslatedPrefix = (
   );
 };
 
-/**
- * When all instructions are searched, some can be duplicated
- * (on purpose, so that it's easier to find them for users)
- * in both the object instructions and in the free instructions.
- *
- * This removes the duplication, useful for showing results in a list.
- */
-export const deduplicateInstructionsList = (
-  list: Array<EnumeratedInstructionMetadata>
-): Array<EnumeratedInstructionMetadata> => {
-  let createFound = false;
-  return list.filter(enumerateInstruction => {
-    if (enumerateInstruction.type === 'Create') {
-      if (createFound) return false;
-
-      createFound = true;
-    }
-
-    return true;
-  });
-};
-
-const filterInstructionsToRemove = (
-  list: Array<EnumeratedInstructionMetadata>,
-  typesToRemove: ?$ReadOnlyArray<string>
-) => {
-  const types = typesToRemove; // Make Flow happy
-  if (!types) return list;
-
-  return list.filter(metadata => types.indexOf(metadata.type) === -1);
-};
-
 const enumerateExtraBehaviorInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
   behaviorType: string,
   prefix: string,
-  scope: InstructionOrExpressionScope
-) => {
-  const extensionName = extension.getName();
-
-  const extensionsExtraInstructions = isCondition
-    ? freeConditionsToAddToBehavior[extensionName]
-    : freeActionsToAddToBehavior[extensionName];
-  if (!extensionsExtraInstructions) {
-    return [];
-  }
-
-  const objectExtraInstructions = extensionsExtraInstructions[behaviorType];
-  if (!objectExtraInstructions) {
-    return [];
-  }
-
-  const instructionMetadataMap = isCondition
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
+): Array<EnumeratedInstructionMetadata> => {
+  const instructions = isCondition
     ? extension.getAllConditions()
     : extension.getAllActions();
 
-  return objectExtraInstructions.map(type =>
-    enumerateInstruction(prefix, type, instructionMetadataMap.get(type), scope)
-  );
+  // Get the map containing the metadata of the instructions provided by the extension...
+  const instructionsTypes = instructions.keys();
+  const allInstructions = [];
+
+  //... and add each instruction
+  for (let j = 0; j < instructionsTypes.size(); ++j) {
+    const type = instructionsTypes.at(j);
+    const instrMetadata = instructions.get(type);
+    if (
+      !instrMetadata.isHidden() &&
+      isBehaviorInstruction(instrMetadata, behaviorType)
+    ) {
+      allInstructions.push(
+        enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
+      );
+    }
+  }
+  return allInstructions;
 };
 
 const enumerateExtraObjectInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
   objectType: string,
-  prefix: string,
-  scope: InstructionOrExpressionScope
-) => {
-  const extensionName = extension.getName();
-
-  const extensionsExtraInstructions = isCondition
-    ? freeConditionsToAddToObject[extensionName]
-    : freeActionsToAddToObject[extensionName];
-  if (!extensionsExtraInstructions) {
-    return [];
-  }
-
-  const objectExtraInstructions = extensionsExtraInstructions[objectType];
-  if (!objectExtraInstructions) {
-    return [];
-  }
-
-  const instructionMetadataMap = isCondition
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
+): Array<EnumeratedInstructionMetadata> => {
+  const instructions = isCondition
     ? extension.getAllConditions()
     : extension.getAllActions();
 
-  return objectExtraInstructions.map(type =>
-    enumerateInstruction(prefix, type, instructionMetadataMap.get(type), scope)
-  );
+  // Get the map containing the metadata of the instructions provided by the extension...
+  const instructionsTypes = instructions.keys();
+  const allInstructions = [];
+
+  //... and add each instruction
+  for (let j = 0; j < instructionsTypes.size(); ++j) {
+    const type = instructionsTypes.at(j);
+    const instrMetadata = instructions.get(type);
+    if (
+      !instrMetadata.isHidden() &&
+      isObjectInstruction(instrMetadata, objectType)
+    ) {
+      allInstructions.push(
+        enumerateInstruction('', type, instrMetadata, scope, i18n)
+      );
+    }
+  }
+  return allInstructions;
+};
+
+const enumerateFreeInstructionsWithoutExtra = (
+  isCondition: boolean,
+  extension: gdPlatformExtension,
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
+): Array<EnumeratedInstructionMetadata> => {
+  const instructions = isCondition
+    ? extension.getAllConditions()
+    : extension.getAllActions();
+  const prefix = getExtensionPrefix(extension, i18n);
+  const extensionInstructionsToKeep =
+    freeInstructionsToKeep[extension.getName()];
+
+  // Get the map containing the metadata of the instructions provided by the extension...
+  const instructionsTypes = instructions.keys();
+  const allInstructions = [];
+
+  //... and add each instruction
+  for (let j = 0; j < instructionsTypes.size(); ++j) {
+    const type = instructionsTypes.at(j);
+    const instrMetadata = instructions.get(type);
+
+    const isWhiteListed =
+      extensionInstructionsToKeep &&
+      extensionInstructionsToKeep.indexOf(type) !== -1;
+    if (
+      !instrMetadata.isHidden() &&
+      (isWhiteListed ||
+        // Exclude instructions that are moved to the object instructions list.
+        (!isObjectInstruction(instrMetadata) &&
+          !isBehaviorInstruction(instrMetadata)))
+    ) {
+      allInstructions.push(
+        enumerateInstruction(
+          prefix,
+          type,
+          instrMetadata,
+          scope,
+          i18n,
+          /* ignoresGroups */ isWhiteListed
+        )
+      );
+    }
+  }
+  return allInstructions;
 };
 
 const enumerateInstruction = (
   prefix: string,
   type: string,
   instrMetadata: gdInstructionMetadata,
-  scope: InstructionOrExpressionScope
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType,
+  ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
-  const groupName = instrMetadata.getGroup();
+  let description = instrMetadata.getDescription();
+  if (description.length > 140) {
+    const spaceIndex = description.indexOf(' ', 140);
+    if (spaceIndex >= 0) {
+      description = description.substring(0, spaceIndex);
+    }
+  }
+  const groupName = i18n
+    ? i18n._(instrMetadata.getGroup())
+    : instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
-  const fullGroupName = [prefix, groupName]
-    .filter(Boolean)
-    .join(GROUP_DELIMITER);
+  const fullGroupName = ignoresGroups
+    ? prefix
+    : [prefix, groupName].filter(Boolean).join(GROUP_DELIMITER);
 
   return {
     type,
     metadata: instrMetadata,
     iconFilename,
     displayedName,
+    description,
     fullGroupName,
     scope,
     isPrivate: instrMetadata.isPrivate(),
@@ -206,7 +259,8 @@ const enumerateInstruction = (
 const enumerateExtensionInstructions = (
   prefix: string,
   instructions: gdMapStringInstructionMetadata,
-  scope: InstructionOrExpressionScope
+  scope: InstructionOrExpressionScope,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
@@ -218,16 +272,8 @@ const enumerateExtensionInstructions = (
     const instrMetadata = instructions.get(type);
     if (instrMetadata.isHidden()) continue;
 
-    if (
-      scope.objectMetadata &&
-      scope.objectMetadata.isUnsupportedBaseObjectCapability(
-        instrMetadata.getRequiredBaseObjectCapability()
-      )
-    )
-      continue; // Skip instructions not supported by the object.
-
     allInstructions.push(
-      enumerateInstruction(prefix, type, instrMetadata, scope)
+      enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
     );
   }
 
@@ -238,7 +284,8 @@ const enumerateExtensionInstructions = (
  * List all the instructions available.
  */
 export const enumerateAllInstructions = (
-  isCondition: boolean
+  isCondition: boolean,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   let allInstructions = [];
 
@@ -247,10 +294,9 @@ export const enumerateAllInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
-    const extensionName = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
-    const prefix = getExtensionPrefix(extension);
+    const prefix = getExtensionPrefix(extension, i18n);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(
@@ -260,15 +306,10 @@ export const enumerateAllInstructions = (
         extension,
         objectMetadata: undefined,
         behaviorMetadata: undefined,
-      }
+      },
+      i18n
     );
-    allInstructions = [
-      ...allInstructions,
-      ...filterInstructionsToRemove(
-        extensionFreeInstructions,
-        freeInstructionsToRemove[extensionName]
-      ),
-    ];
+    allInstructions = [...allInstructions, ...extensionFreeInstructions];
 
     //Objects instructions:
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
@@ -282,14 +323,8 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
-          scope
-        ),
-        ...enumerateExtraObjectInstructions(
-          isCondition,
-          extension,
-          objectType,
-          prefix,
-          scope
+          scope,
+          i18n
         ),
       ];
     }
@@ -307,14 +342,8 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          scope
-        ),
-        ...enumerateExtraBehaviorInstructions(
-          isCondition,
-          extension,
-          behaviorType,
-          prefix,
-          scope
+          scope,
+          i18n
         ),
       ];
     }
@@ -345,9 +374,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
   isCondition: boolean,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  objectName: string
+  objectName: string,
+  i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  let allInstructions = [];
+  let allInstructions: Array<EnumeratedInstructionMetadata> = [];
 
   const objectType: string = gd.getTypeOfObject(
     globalObjectsContainer,
@@ -391,16 +421,29 @@ export const enumerateObjectAndBehaviorsInstructions = (
       isCondition
         ? extension.getAllConditionsForObject(objectType)
         : extension.getAllActionsForObject(objectType),
-      scope
-    ),
-    ...enumerateExtraObjectInstructions(
-      isCondition,
-      extension,
-      objectType,
-      prefix,
-      scope
+      scope,
+      i18n
     ),
   ];
+
+  // Free object instructions:
+  const allExtensions = gd
+    .asPlatform(gd.JsPlatform.get())
+    .getAllPlatformExtensions();
+  for (let i = 0; i < allExtensions.size(); ++i) {
+    const extension = allExtensions.at(i);
+
+    allInstructions = [
+      ...allInstructions,
+      ...enumerateExtraObjectInstructions(
+        isCondition,
+        extension,
+        objectType,
+        scope,
+        i18n
+      ),
+    ];
+  }
 
   // Enumerate instructions of the base object that the object "inherits" from.
   const baseObjectType = ''; /* An empty string means the base object */
@@ -418,22 +461,20 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition
           ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
           : baseObjectExtension.getAllActionsForObject(baseObjectType),
-        scope
+        scope,
+        i18n
       ),
       ...enumerateExtraObjectInstructions(
         isCondition,
         baseObjectExtension,
         baseObjectType,
-        prefix,
-        scope
+        scope,
+        i18n
       ),
     ];
   }
 
   // Enumerate behaviors instructions.
-  const allExtensions = gd
-    .asPlatform(gd.JsPlatform.get())
-    .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
     const behaviorTypes = extension
@@ -446,6 +487,24 @@ export const enumerateObjectAndBehaviorsInstructions = (
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { extension, behaviorMetadata };
 
+      // Free functions can require a behavior even if this behavior is from
+      // another extension.
+      const freeBehaviorInstructions: Array<EnumeratedInstructionMetadata> = [];
+      for (let i = 0; i < allExtensions.size(); ++i) {
+        const extension = allExtensions.at(i);
+        freeBehaviorInstructions.push.apply(
+          freeBehaviorInstructions,
+          enumerateExtraBehaviorInstructions(
+            isCondition,
+            extension,
+            behaviorType,
+            prefix,
+            scope,
+            i18n
+          )
+        );
+      }
+
       // Show them at the top of the list.
       allInstructions = [
         ...enumerateExtensionInstructions(
@@ -453,18 +512,23 @@ export const enumerateObjectAndBehaviorsInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          scope
+          scope,
+          i18n
         ),
-        ...enumerateExtraBehaviorInstructions(
-          isCondition,
-          extension,
-          behaviorType,
-          prefix,
-          scope
-        ),
+        ...freeBehaviorInstructions,
         ...allInstructions,
       ];
     });
+  }
+
+  // 'CreateByName' action only makes sense for groups.
+  if (
+    !globalObjectsContainer.getObjectGroups().has(objectName) &&
+    !objectsContainer.getObjectGroups().has(objectName)
+  ) {
+    allInstructions = allInstructions.filter(
+      instruction => instruction.type !== 'CreateByName'
+    );
   }
 
   return orderFirstInstructionsWithoutGroup(allInstructions);
@@ -475,31 +539,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
  * to an object.
  */
 export const enumerateFreeInstructions = (
-  isCondition: boolean
-): Array<EnumeratedInstructionMetadata> => {
-  return doEnumerateFreeInstructions(isCondition, getExtensionPrefix);
-};
-
-/**
- * Enumerate all the instructions that are not directly tied
- * to an object.
- */
-export const enumerateFreeInstructionsWithTranslatedCategories = (
   isCondition: boolean,
   i18n: I18nType
-): Array<EnumeratedInstructionMetadata> => {
-  return doEnumerateFreeInstructions(isCondition, extension =>
-    getExtensionTranslatedPrefix(extension, i18n)
-  );
-};
-
-/**
- * Enumerate all the instructions that are not directly tied
- * to an object.
- */
-const doEnumerateFreeInstructions = (
-  isCondition: boolean,
-  getExtensionPrefix: (extension: gdPlatformExtension) => string
 ): Array<EnumeratedInstructionMetadata> => {
   let allFreeInstructions = [];
 
@@ -508,28 +549,21 @@ const doEnumerateFreeInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
-    const extensionName: string = extension.getName();
-    const prefix = getExtensionPrefix(extension);
 
-    //Free instructions
-    const extensionFreeInstructions = enumerateExtensionInstructions(
-      prefix,
-      isCondition ? extension.getAllConditions() : extension.getAllActions(),
-      {
+    allFreeInstructions.push.apply(
+      allFreeInstructions,
+      enumerateFreeInstructionsWithoutExtra(
+        isCondition,
         extension,
-        objectMetadata: undefined,
-        behaviorMetadata: undefined,
-      }
+        {
+          extension,
+          objectMetadata: undefined,
+          behaviorMetadata: undefined,
+        },
+        i18n
+      )
     );
-    allFreeInstructions = [
-      ...allFreeInstructions,
-      ...filterInstructionsToRemove(
-        extensionFreeInstructions,
-        freeInstructionsToRemove[extensionName]
-      ),
-    ];
   }
-
   return allFreeInstructions;
 };
 

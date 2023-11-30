@@ -25,7 +25,7 @@ export const CustomObject = () => (
       onApply={() => action('Apply changes')}
       onCancel={() => action('Cancel changes')}
       onRename={() => action('Rename object')}
-      canRenameObject={name => true}
+      getValidatedObjectOrGroupName={newName => newName}
       project={testProject.project}
       layout={testProject.testLayout}
       resourceManagementProps={fakeResourceManagementProps}
@@ -50,7 +50,7 @@ export const StandardObject = () => (
       onApply={() => action('Apply changes')}
       onCancel={() => action('Cancel changes')}
       onRename={() => action('Rename object')}
-      canRenameObject={name => true}
+      getValidatedObjectOrGroupName={newName => newName}
       project={testProject.project}
       layout={testProject.testLayout}
       resourceManagementProps={fakeResourceManagementProps}

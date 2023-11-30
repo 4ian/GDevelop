@@ -1,6 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import capitalize from 'lodash/capitalize';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { mapFor } from '../../Utils/MapFor';
@@ -12,6 +13,7 @@ import {
   instructionParameter,
   disabledText,
   icon,
+  warningInstruction,
 } from './ClassNames';
 import {
   type InstructionsListContext,
@@ -37,17 +39,23 @@ import {
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import {
+  type EventsScope,
+  getProjectScopedContainersFromScope,
+} from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
+import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
+import Warning from '../../UI/CustomSvgIcons/Warning';
 
 const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
     whiteSpace: 'normal',
-    wordWrap: 'break-word',
+    overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices (or for long expressions).
     cursor: 'pointer',
     marginBottom: 1,
   },
@@ -55,17 +63,12 @@ const styles = {
 
 export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
 
-const capitalize = (str: string) => {
-  if (!str) return '';
-
-  return str[0].toUpperCase() + str.substr(1);
-};
-
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
   isCondition: boolean,
 }>(reactDndInstructionType);
 
 type Props = {|
+  platform: gdPlatform,
   instruction: gdInstruction,
   isCondition: boolean,
   onClick: Function,
@@ -195,6 +198,7 @@ const InstructionMissing = (props: {|
 
 const Instruction = (props: Props) => {
   const {
+    platform,
     instruction,
     isCondition,
     onClick,
@@ -204,6 +208,7 @@ const Instruction = (props: Props) => {
     objectsContainer,
     id,
     resourcesManager,
+    scope,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -211,12 +216,14 @@ const Instruction = (props: Props) => {
     []
   );
   const preferences = React.useContext(PreferencesContext);
-  const {
-    palette: { type },
-  } = React.useContext(GDevelopThemeContext);
+  const theme = React.useContext(GDevelopThemeContext);
+  const type = theme.palette.type;
+  const warningColor = theme.message.warning;
 
   const useAssignmentOperators =
     preferences.values.eventsSheetUseAssignmentOperators;
+  const showDeprecatedInstructionWarning =
+    preferences.values.showDeprecatedInstructionWarning;
 
   /**
    * Render the different parts of the text of the instruction.
@@ -283,8 +290,11 @@ const Instruction = (props: Props) => {
                 .getRootNode();
               const expressionValidator = new gd.ExpressionValidator(
                 gd.JsPlatform.get(),
-                globalObjectsContainer,
-                objectsContainer,
+                getProjectScopedContainersFromScope(
+                  scope,
+                  globalObjectsContainer,
+                  objectsContainer
+                ),
                 parameterType
               );
               expressionNode.visit(expressionValidator);
@@ -308,7 +318,17 @@ const Instruction = (props: Props) => {
                     objectsContainer,
                     objectOrGroupName,
                     /*searchInGroups=*/ true
-                  ) === parameterMetadata.getExtraInfo());
+                  ) === parameterMetadata.getExtraInfo()) &&
+                checkHasRequiredCapability({
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectName: objectOrGroupName,
+                  requiredBehaviorTypes: getRequiredBehaviorTypes(
+                    platform,
+                    metadata,
+                    parameterIndex
+                  ),
+                });
             } else if (
               gd.ParameterMetadata.isExpression('resource', parameterType)
             ) {
@@ -419,7 +439,7 @@ const Instruction = (props: Props) => {
       },
       [onContextMenu]
     ),
-    'events-tree-event-component'
+    { context: 'events-tree-event-component' }
   );
 
   return (
@@ -473,6 +493,8 @@ const Instruction = (props: Props) => {
                 className={classNames({
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
+                  [warningInstruction]:
+                    showDeprecatedInstructionWarning && metadata.isHidden(),
                 })}
                 onClick={e => {
                   e.stopPropagation();
@@ -507,6 +529,25 @@ const Instruction = (props: Props) => {
                 tabIndex={0}
                 id={id}
               >
+                {showDeprecatedInstructionWarning && metadata.isHidden() ? (
+                  <Tooltip
+                    title={
+                      props.isCondition ? (
+                        <Trans>Deprecated condition</Trans>
+                      ) : (
+                        <Trans>Deprecated action</Trans>
+                      )
+                    }
+                    fontSize="small"
+                  >
+                    <Warning
+                      style={{ color: warningColor }}
+                      className={classNames({
+                        [icon]: true,
+                      })}
+                    />
+                  </Tooltip>
+                ) : null}
                 {instruction.isInverted() && (
                   <img
                     className={classNames({
@@ -562,6 +603,7 @@ const Instruction = (props: Props) => {
                 {instructionDragSourceDropTargetElement}
                 {metadata.canHaveSubInstructions() && (
                   <InstructionsList
+                    platform={props.platform}
                     style={
                       {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
                     }

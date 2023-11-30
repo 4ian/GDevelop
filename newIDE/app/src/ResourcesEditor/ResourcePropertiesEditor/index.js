@@ -21,6 +21,7 @@ const styles = {
   propertiesContainer: {
     padding: 8,
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     overflowX: 'hidden',
     flex: 1,
   },
@@ -62,19 +63,7 @@ const ResourcePropertiesEditor = React.forwardRef<
     },
     ref
   ) => {
-    const _forceUpdate = useForceUpdate();
-    const resourcePreviewRef = React.useRef<?ResourcePreview>(null);
-
-    const forceUpdate = React.useCallback(
-      () => {
-        _forceUpdate();
-        if (resourcePreviewRef.current) {
-          resourcePreviewRef.current.forceUpdate();
-        }
-      },
-      [_forceUpdate]
-    );
-
+    const forceUpdate = useForceUpdate();
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
     const chooseResourcePath = React.useCallback(
@@ -182,7 +171,6 @@ const ResourcePropertiesEditor = React.forwardRef<
 
       return (
         <ResourcePreview
-          ref={resourcePreviewRef}
           resourceName={resources[0].getName()}
           resourcesLoader={resourcesLoader}
           project={project}

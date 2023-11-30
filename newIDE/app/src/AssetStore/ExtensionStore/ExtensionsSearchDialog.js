@@ -19,6 +19,7 @@ import {
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 
 type Props = {|
   project: gdProject,
@@ -31,14 +32,15 @@ type Props = {|
 /**
  * Allows to browse and install events based extensions.
  */
-export default function ExtensionsSearchDialog({
+const ExtensionsSearchDialog = ({
   project,
   onClose,
   onInstallExtension,
   onExtensionInstalled,
   onCreateNew,
-}: Props) {
+}: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -115,7 +117,7 @@ export default function ExtensionsSearchDialog({
                 leftIcon={<Download />}
                 key="import"
                 label={
-                  windowWidth === 'small' ? (
+                  isMobileScreen ? (
                     <Trans>Import</Trans>
                   ) : (
                     <Trans>Import extension</Trans>
@@ -132,7 +134,7 @@ export default function ExtensionsSearchDialog({
                 key="create-new"
                 onClick={onCreateNew}
                 label={
-                  windowWidth === 'small' ? (
+                  isMobileScreen ? (
                     <Trans>Create</Trans>
                   ) : (
                     <Trans>Create a new extension</Trans>
@@ -170,4 +172,16 @@ export default function ExtensionsSearchDialog({
       )}
     </I18n>
   );
-}
+};
+
+const ExtensionsSearchDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Extensions search</Trans>}
+    scope="extensions-search-dialog"
+    onClose={props.onClose}
+  >
+    <ExtensionsSearchDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ExtensionsSearchDialogWithErrorBoundary;

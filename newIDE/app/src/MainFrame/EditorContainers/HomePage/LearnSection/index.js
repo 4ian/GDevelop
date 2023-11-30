@@ -12,13 +12,13 @@ import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
 import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
 import Paper from '../../../../UI/Paper';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -69,6 +69,7 @@ export const formatTutorialToImageTileComponent = (
   overlayText: tutorial.duration
     ? secondsToMinutesAndSeconds(tutorial.duration)
     : '\u{1F4D8}',
+  overlayTextPosition: 'bottomRight',
 });
 
 const styles = {
@@ -79,14 +80,14 @@ const styles = {
 };
 
 type Props = {|
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const LearnSection = ({
-  onCreateProject,
+  onOpenExampleStore,
   onTabChange,
   onOpenHelpFinder,
   selectInAppTutorial,
@@ -125,7 +126,7 @@ const LearnSection = ({
 
   return !selectedCategory ? (
     <MainPage
-      onCreateProject={onCreateProject}
+      onOpenExampleStore={onOpenExampleStore}
       onOpenHelpFinder={onOpenHelpFinder}
       onStartTutorial={() => onTabChange('get-started')}
       onTabChange={onTabChange}
@@ -142,4 +143,13 @@ const LearnSection = ({
   );
 };
 
-export default LearnSection;
+const LearnSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Learn section</Trans>}
+    scope="start-page-learn"
+  >
+    <LearnSection {...props} />
+  </ErrorBoundary>
+);
+
+export default LearnSectionWithErrorBoundary;

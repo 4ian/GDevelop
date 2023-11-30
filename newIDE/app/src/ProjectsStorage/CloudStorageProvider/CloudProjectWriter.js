@@ -17,6 +17,8 @@ import {
   createZipWithSingleTextFile,
   unzipFirstEntryOfBlob,
 } from '../../Utils/Zip.js/Utils';
+import ProjectCache from '../../Utils/ProjectCache';
+import { getProjectCache } from './CloudProjectOpener';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -74,28 +76,39 @@ export const generateOnSaveProject = (
   fileMetadata: FileMetadata,
   options?: {| previousVersion: string |}
 ) => {
+  const cloudProjectId = fileMetadata.fileIdentifier;
+  const gameId = project.getProjectUuid();
   if (!fileMetadata.gameId) {
     console.info('Game id was never set, updating the cloud project.');
     try {
-      await updateCloudProject(authenticatedUser, fileMetadata.fileIdentifier, {
-        gameId: project.getProjectUuid(),
+      await updateCloudProject(authenticatedUser, cloudProjectId, {
+        gameId,
       });
     } catch (error) {
       console.error('Could not update cloud project with gameId', error);
       // Do not throw, as this is not a blocking error.
     }
   }
-  const newFileMetadata = {
-    ...fileMetadata,
-    gameId: project.getProjectUuid(),
-  };
   const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,
     project,
-    cloudProjectId: newFileMetadata.fileIdentifier,
+    cloudProjectId,
     options,
   });
+
+  const newFileMetadata: FileMetadata = {
+    ...fileMetadata,
+    gameId,
+    // lastModifiedDate is not set since it will be set by backend services
+    // and then frontend will use it to transform the list of cloud project
+    // items into a list of FileMetadata.
+  };
   if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
+
+  // Save the version being modified in the file metadata, so that it can be
+  // used when saving to compare with the last version of the project, and
+  // raise a conflict warning if different.
+  newFileMetadata.version = newVersion;
   return {
     wasSaved: true,
     fileMetadata: newFileMetadata,
@@ -226,9 +239,10 @@ export const generateOnSaveProjectAs = (
     });
     if (!cloudProject)
       throw new Error('No cloud project was returned from creation api call.');
+    const cloudProjectId = cloudProject.id;
 
-    const fileMetadata = {
-      fileIdentifier: cloudProject.id,
+    const fileMetadata: FileMetadata = {
+      fileIdentifier: cloudProjectId,
       gameId,
     };
 
@@ -236,7 +250,6 @@ export const generateOnSaveProjectAs = (
     await options.onMoveResources({ newFileMetadata: fileMetadata });
 
     // Commit the changes to the newly created cloud project.
-    const cloudProjectId = fileMetadata.fileIdentifier;
     await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
     const newVersion = await zipProjectAndCommitVersion({
       authenticatedUser,
@@ -245,6 +258,11 @@ export const generateOnSaveProjectAs = (
     });
     if (!newVersion)
       throw new Error('No version id was returned from committing api call.');
+
+    // Save the version being modified in the file metadata, so that it can be
+    // used when saving to compare with the last version of the project, and
+    // raise a conflict warning if different.
+    fileMetadata.version = newVersion;
 
     return {
       wasSaved: true,
@@ -256,10 +274,25 @@ export const generateOnSaveProjectAs = (
   }
 };
 
-export const onRenderNewProjectSaveAsLocationChooser = ({
+export const getProjectLocation = ({
+  projectName,
+  saveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  newProjectsDefaultFolder?: string,
+|}): SaveAsLocation => {
+  return {
+    name: projectName,
+  };
+};
+
+export const renderNewProjectSaveAsLocationChooser = ({
   projectName,
   saveAsLocation,
   setSaveAsLocation,
+  newProjectsDefaultFolder,
 }: {|
   projectName: string,
   saveAsLocation: ?SaveAsLocation,
@@ -267,10 +300,32 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
   newProjectsDefaultFolder?: string,
 |}) => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
-    setSaveAsLocation({
-      name: projectName,
-    });
+    setSaveAsLocation(
+      getProjectLocation({
+        projectName,
+        saveAsLocation,
+        newProjectsDefaultFolder,
+      })
+    );
   }
-
   return null;
 };
+
+export const generateOnAutoSaveProject = (
+  authenticatedUser: AuthenticatedUser
+) =>
+  ProjectCache.isAvailable()
+    ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
+        const { profile } = authenticatedUser;
+        if (!profile) return;
+        const cloudProjectId = fileMetadata.fileIdentifier;
+        const projectCache = getProjectCache();
+        projectCache.put(
+          {
+            userId: profile.id,
+            cloudProjectId,
+          },
+          project
+        );
+      }
+    : undefined;

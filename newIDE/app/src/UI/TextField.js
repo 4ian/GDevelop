@@ -12,9 +12,10 @@ import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 type ValueProps =
-  // Support "text" and "password" type:
+  // Support "text", "password" and "email" type:
+  // "email" type is used to display appropriate keyboard on mobile.
   | {|
-      type?: 'text' | 'password' | 'search',
+      type?: 'text' | 'password' | 'email',
       value: string,
       onChange?: (
         event: {| target: {| value: string |} |},
@@ -346,7 +347,10 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
                   </IconButton>
                 </InputAdornment>
               ) : props.endAdornment ? (
-                <InputAdornment position="end">
+                <InputAdornment
+                  position="end"
+                  style={props.multiline ? { marginTop: -17 } : undefined}
+                >
                   {props.endAdornment}
                 </InputAdornment>
               ) : (

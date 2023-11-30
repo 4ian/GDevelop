@@ -60,6 +60,25 @@ namespace gdjs {
       this._dirty = true;
     }
 
+    clear() {
+      this._x = 0;
+      this._y = 0;
+      this._length = 0;
+      this._dirty = false;
+    }
+
+    addForce(force: Force) {
+      this._x += force._x;
+      this._y += force._y;
+      this._dirty = true;
+    }
+
+    add(x: float, y: float) {
+      this._x += x;
+      this._y += y;
+      this._dirty = true;
+    }
+
     /**
      * Set the angle of the force.
      * @param angle The new angle

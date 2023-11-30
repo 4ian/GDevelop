@@ -3,7 +3,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { type DebuggerId } from '../Export/PreviewLauncher.flow';
+import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
 
 type Props = {|
   selectedId: DebuggerId,

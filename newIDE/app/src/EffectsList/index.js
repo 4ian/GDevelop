@@ -50,14 +50,19 @@ import {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
-import FlatButton from '../UI/FlatButton';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type ConnectDragSource } from 'react-dnd';
+import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 
 const gd: libGDevelop = global.gd;
 
 const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
-const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');
+const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
+  '2d-effects-list'
+);
+const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
+  '3d-effects-list'
+);
 
 const styles = {
   rowContainer: {
@@ -86,6 +91,237 @@ export const useEffectOverridingAlertDialog = () => {
   };
 };
 
+const Effect = React.forwardRef(
+  (
+    {
+      layerRenderingType,
+      target,
+      project,
+      resourceManagementProps,
+      effectsContainer,
+      effect,
+      removeEffect,
+      copyEffect,
+      pasteEffectsBefore,
+      chooseEffectType,
+      allEffectMetadata,
+      onEffectsUpdated,
+      onEffectsRenamed,
+      nameErrors,
+      setNameErrors,
+      connectDragSource,
+    }: {|
+      layerRenderingType: '2d' | '3d',
+      target: 'object' | 'layer',
+      project: gdProject,
+      resourceManagementProps: ResourceManagementProps,
+      effectsContainer: gdEffectsContainer,
+      effect: gdEffect,
+      onEffectsUpdated: () => void,
+      onEffectsRenamed: (oldName: string, newName: string) => void,
+      removeEffect: (effect: gdEffect) => void,
+      copyEffect: (effect: gdEffect) => void,
+      pasteEffectsBefore: (effect: gdEffect) => Promise<void>,
+      chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
+      allEffectMetadata: Array<EnumeratedEffectMetadata>,
+      nameErrors: { [number]: React.Node },
+      setNameErrors: (nameErrors: { [number]: React.Node }) => void,
+      connectDragSource: ConnectDragSource,
+    |},
+    ref
+  ) => {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+    const preferences = React.useContext(PreferencesContext);
+    const showEffectParameterNames =
+      preferences.values.showEffectParameterNames;
+    const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
+
+    const forceUpdate = useForceUpdate();
+
+    const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
+
+    const renameEffect = React.useCallback(
+      (effect: gdEffect, newName: string) => {
+        if (newName === effect.getName()) return;
+        if (nameErrors[effect.ptr]) {
+          const newNameErrors = { ...nameErrors };
+          delete newNameErrors[effect.ptr];
+          setNameErrors(newNameErrors);
+        }
+
+        if (!newName) {
+          setNameErrors({
+            ...nameErrors,
+            [effect.ptr]: <Trans>Effects cannot have empty names</Trans>,
+          });
+          return;
+        }
+
+        if (effectsContainer.hasEffectNamed(newName)) {
+          setNameErrors({
+            ...nameErrors,
+            [effect.ptr]: (
+              <Trans>The effect name {newName} is already taken</Trans>
+            ),
+          });
+          return;
+        }
+        const oldName = effect.getName();
+        effect.setName(newName);
+        forceUpdate();
+        onEffectsRenamed(oldName, newName);
+        onEffectsUpdated();
+      },
+      [
+        effectsContainer,
+        forceUpdate,
+        nameErrors,
+        onEffectsRenamed,
+        onEffectsUpdated,
+        setNameErrors,
+      ]
+    );
+
+    const effectType = effect.getEffectType();
+    const effectMetadata = getEnumeratedEffectMetadata(
+      allEffectMetadata,
+      effectType
+    );
+
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <React.Fragment>
+            <div
+              ref={ref}
+              style={{
+                ...styles.rowContent,
+                backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+              }}
+            >
+              {connectDragSource(
+                <span>
+                  <Column>
+                    <DragHandleIcon />
+                  </Column>
+                </span>
+              )}
+              <ResponsiveLineStackLayout expand>
+                <Line noMargin expand alignItems="center">
+                  <Text noMargin noShrink>
+                    <Trans>Effect name:</Trans>
+                  </Text>
+                  <Spacer />
+                  <SemiControlledTextField
+                    margin="none"
+                    commitOnBlur
+                    errorText={nameErrors[effect.ptr]}
+                    translatableHintText={t`Enter the effect name`}
+                    value={effect.getName()}
+                    onChange={newName => {
+                      renameEffect(effect, newName);
+                    }}
+                    fullWidth
+                  />
+                </Line>
+                <Line noMargin expand alignItems="center">
+                  <Text noMargin noShrink>
+                    <Trans>Type:</Trans>
+                  </Text>
+                  <Spacer />
+                  <SelectField
+                    margin="none"
+                    value={effectType}
+                    onChange={(e, i, newEffectType: string) =>
+                      chooseEffectType(effect, newEffectType)
+                    }
+                    fullWidth
+                    translatableHintText={t`Choose the effect to apply`}
+                  >
+                    {allEffectMetadata.map(effectMetadata => (
+                      <SelectOption
+                        key={effectMetadata.type}
+                        value={effectMetadata.type}
+                        label={effectMetadata.fullName}
+                        disabled={
+                          target === 'object' &&
+                          effectMetadata.isMarkedAsNotWorkingForObjects
+                        }
+                      />
+                    ))}
+                  </SelectField>
+                </Line>
+              </ResponsiveLineStackLayout>
+              <ElementWithMenu
+                element={
+                  <IconButton size="small">
+                    <ThreeDotsMenu />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Delete`),
+                    click: () => removeEffect(effect),
+                  },
+                  {
+                    label: i18n._(t`Copy`),
+                    click: () => copyEffect(effect),
+                  },
+                  {
+                    label: i18n._(t`Paste`),
+                    click: () => pasteEffectsBefore(effect),
+                    enabled: isClipboardContainingEffects,
+                  },
+                  { type: 'separator' },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Show Properties Names`),
+                    checked: showEffectParameterNames,
+                    click: () =>
+                      setShowEffectParameterNames(!showEffectParameterNames),
+                  },
+                ]}
+              />
+              <Spacer />
+            </div>
+            {effectType && (
+              <Line expand noMargin>
+                <Column expand>
+                  {effectMetadata ? (
+                    <React.Fragment>
+                      <Line>
+                        <BackgroundText>
+                          <MarkdownText source={effectMetadata.description} />
+                        </BackgroundText>
+                      </Line>
+                      <PropertiesEditor
+                        instances={[effect]}
+                        schema={effectMetadata.parametersSchema}
+                        project={project}
+                        resourceManagementProps={resourceManagementProps}
+                        renderExtraDescriptionText={
+                          showEffectParameterNames
+                            ? parameterName =>
+                                i18n._(
+                                  t`Property name in events: \`${parameterName}\` `
+                                )
+                            : undefined
+                        }
+                      />
+                    </React.Fragment>
+                  ) : null}
+                  <Spacer />
+                </Column>
+              </Line>
+            )}
+          </React.Fragment>
+        )}
+      </I18n>
+    );
+  }
+);
+
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
@@ -103,6 +339,44 @@ const getEnumeratedEffectMetadata = (
   return allEffectDescriptions.find(
     effectMetadata => effectMetadata.type === effectType
   );
+};
+
+export const getEffects2DCount = (
+  platform: gdPlatform,
+  effectsContainer: gdEffectsContainer
+) => {
+  const effectCount = effectsContainer.getEffectsCount();
+  let effect2DCount = 0;
+  for (let i = 0; i < effectCount; i++) {
+    const effect: gdEffect = effectsContainer.getEffectAt(i);
+    const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+      platform,
+      effect.getEffectType()
+    );
+    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor3D()) {
+      effect2DCount++;
+    }
+  }
+  return effect2DCount;
+};
+
+export const getEffects3DCount = (
+  platform: gdPlatform,
+  effectsContainer: gdEffectsContainer
+) => {
+  const effectCount = effectsContainer.getEffectsCount();
+  let effect3DCount = 0;
+  for (let i = 0; i < effectCount; i++) {
+    const effect: gdEffect = effectsContainer.getEffectAt(i);
+    const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+      platform,
+      effect.getEffectType()
+    );
+    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor2D()) {
+      effect3DCount++;
+    }
+  }
+  return effect3DCount;
 };
 
 /**
@@ -141,12 +415,7 @@ export default function EffectsList(props: Props) {
 
   const draggedEffect = React.useRef<?gdEffect>(null);
 
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
-  const preferences = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const showEffectParameterNames = preferences.values.showEffectParameterNames;
-  const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
@@ -156,25 +425,59 @@ export default function EffectsList(props: Props) {
     [props.project]
   );
 
+  const all3DEffectMetadata = React.useMemo(
+    () => allEffectMetadata.filter(effect => effect.isMarkedAsOnlyWorkingFor3D),
+    [allEffectMetadata]
+  );
+
+  const all2DEffectMetadata = React.useMemo(
+    () => allEffectMetadata.filter(effect => effect.isMarkedAsOnlyWorkingFor2D),
+    [allEffectMetadata]
+  );
+
   const showEffectOverridingConfirmation = useEffectOverridingAlertDialog();
 
   const forceUpdate = useForceUpdate();
 
+  const chooseEffectType = React.useCallback(
+    (effect: gdEffect, newEffectType: string) => {
+      effect.setEffectType(newEffectType);
+      const effectMetadata = getEnumeratedEffectMetadata(
+        allEffectMetadata,
+        newEffectType
+      );
+
+      if (effectMetadata) {
+        setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
+      }
+
+      forceUpdate();
+      onEffectsUpdated();
+    },
+    [allEffectMetadata, forceUpdate, onEffectsUpdated]
+  );
+
   const _addEffect = React.useCallback(
-    () => {
+    (is3D: boolean) => {
       const newName = newNameGenerator('Effect', name =>
         effectsContainer.hasEffectNamed(name)
       );
-      effectsContainer.insertNewEffect(
+      const effect = effectsContainer.insertNewEffect(
         newName,
         effectsContainer.getEffectsCount()
       );
+
+      if (is3D) {
+        chooseEffectType(effect, 'Scene3D::DirectionalLight');
+      } else {
+        chooseEffectType(effect, 'Outline');
+      }
 
       forceUpdate();
       onEffectsUpdated();
       setJustAddedEffectName(newName);
     },
-    [effectsContainer, forceUpdate, onEffectsUpdated]
+    [chooseEffectType, effectsContainer, forceUpdate, onEffectsUpdated]
   );
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(
@@ -355,69 +658,7 @@ export default function EffectsList(props: Props) {
     [effectsContainer, forceUpdate, onEffectsUpdated]
   );
 
-  const renameEffect = React.useCallback(
-    (effect: gdEffect, newName: string) => {
-      if (newName === effect.getName()) return;
-      if (nameErrors[effect.ptr]) {
-        const newNameErrors = { ...nameErrors };
-        delete newNameErrors[effect.ptr];
-        setNameErrors(newNameErrors);
-      }
-
-      if (!newName) {
-        setNameErrors({
-          ...nameErrors,
-          [effect.ptr]: <Trans>Effects cannot have empty names</Trans>,
-        });
-        return;
-      }
-
-      if (effectsContainer.hasEffectNamed(newName)) {
-        setNameErrors({
-          ...nameErrors,
-          [effect.ptr]: (
-            <Trans>The effect name {newName} is already taken</Trans>
-          ),
-        });
-        return;
-      }
-      const oldName = effect.getName();
-      effect.setName(newName);
-      forceUpdate();
-      onEffectsRenamed(oldName, newName);
-      onEffectsUpdated();
-    },
-    [
-      effectsContainer,
-      forceUpdate,
-      nameErrors,
-      onEffectsRenamed,
-      onEffectsUpdated,
-    ]
-  );
-
-  const chooseEffectType = React.useCallback(
-    (effect: gdEffect, newEffectType: string) => {
-      effect.setEffectType(newEffectType);
-      const effectMetadata = getEnumeratedEffectMetadata(
-        allEffectMetadata,
-        newEffectType
-      );
-
-      if (effectMetadata) {
-        setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
-      }
-
-      forceUpdate();
-      onEffectsUpdated();
-    },
-    [allEffectMetadata, forceUpdate, onEffectsUpdated]
-  );
-
   const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
-
-  const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
 
   const getDuplicatedUniqueEffectMetadata = React.useCallback(
     () => {
@@ -435,7 +676,11 @@ export default function EffectsList(props: Props) {
         if (!effectMetadata) {
           continue;
         }
-        if (effectMetadata.isMarkedAsOnlyWorkingFor3D) {
+        // TODO Add an `isUnique` attribute in effect metadata if more effect are unique.
+        if (
+          effectType === 'Scene3D::LinearFog' ||
+          effectType === 'Scene3D::ExponentialFog'
+        ) {
           if (uniqueEffectTypes.includes(effectType)) {
             return effectMetadata;
           }
@@ -449,11 +694,22 @@ export default function EffectsList(props: Props) {
 
   const duplicatedUniqueEffectMetadata = getDuplicatedUniqueEffectMetadata();
 
+  // Count the number of effects to hide titles of empty sections.
+  const platform = project.getCurrentPlatform();
+  const effects2DCount = getEffects2DCount(platform, effectsContainer);
+  const effects3DCount = getEffects3DCount(platform, effectsContainer);
+  const visibleEffectsCount =
+    props.layerRenderingType === '2d'
+      ? effects2DCount
+      : props.layerRenderingType === '3d'
+      ? effects3DCount
+      : effectsContainer.getEffectsCount();
+
   return (
     <I18n>
       {({ i18n }) => (
         <Column noMargin expand useFullHeight>
-          {effectsContainer.getEffectsCount() !== 0 ? (
+          {visibleEffectsCount !== 0 ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
                 {duplicatedUniqueEffectMetadata && (
@@ -486,229 +742,204 @@ export default function EffectsList(props: Props) {
                     </Column>
                   </Line>
                 )}
-                <Line>
+                {props.layerRenderingType !== '2d' && effects3DCount > 0 && (
                   <Column noMargin expand>
-                    {mapFor(
-                      0,
-                      effectsContainer.getEffectsCount(),
-                      (i: number) => {
-                        const effect: gdEffect = effectsContainer.getEffectAt(
-                          i
-                        );
-                        const effectType = effect.getEffectType();
-                        const effectMetadata = getEnumeratedEffectMetadata(
-                          allEffectMetadata,
-                          effectType
-                        );
-
-                        const effectRef =
-                          justAddedEffectName === effect.getName()
-                            ? justAddedEffectElement
-                            : null;
-
-                        return (
-                          <DragSourceAndDropTarget
-                            key={effect.ptr}
-                            beginDrag={() => {
-                              draggedEffect.current = effect;
-                              return {};
-                            }}
-                            canDrag={() => true}
-                            canDrop={() => true}
-                            drop={() => {
-                              moveEffect(effect);
-                            }}
-                          >
-                            {({
-                              connectDragSource,
-                              connectDropTarget,
-                              isOver,
-                              canDrop,
-                            }) =>
-                              connectDropTarget(
-                                <div
-                                  key={effect.ptr}
-                                  style={styles.rowContainer}
-                                >
-                                  {isOver && (
-                                    <DropIndicator canDrop={canDrop} />
-                                  )}
-                                  <div
-                                    ref={effectRef}
-                                    style={{
-                                      ...styles.rowContent,
-                                      backgroundColor:
-                                        gdevelopTheme.list.itemsBackgroundColor,
-                                    }}
-                                  >
-                                    {connectDragSource(
-                                      <span>
-                                        <Column>
-                                          <DragHandleIcon />
-                                        </Column>
-                                      </span>
-                                    )}
-                                    <ResponsiveLineStackLayout expand>
-                                      <Line noMargin expand alignItems="center">
-                                        <Text noMargin noShrink>
-                                          <Trans>Effect name:</Trans>
-                                        </Text>
-                                        <Spacer />
-                                        <SemiControlledTextField
-                                          margin="none"
-                                          commitOnBlur
-                                          errorText={nameErrors[effect.ptr]}
-                                          translatableHintText={t`Enter the effect name`}
-                                          value={effect.getName()}
-                                          onChange={newName => {
-                                            renameEffect(effect, newName);
-                                          }}
-                                          fullWidth
-                                        />
-                                      </Line>
-                                      <Line noMargin expand alignItems="center">
-                                        <Text noMargin noShrink>
-                                          <Trans>Type:</Trans>
-                                        </Text>
-                                        <Spacer />
-                                        <SelectField
-                                          margin="none"
-                                          value={effectType}
-                                          onChange={(
-                                            e,
-                                            i,
-                                            newEffectType: string
-                                          ) =>
-                                            chooseEffectType(
-                                              effect,
-                                              newEffectType
-                                            )
-                                          }
-                                          fullWidth
-                                          translatableHintText={t`Choose the effect to apply`}
-                                        >
-                                          {allEffectMetadata.map(
-                                            effectMetadata => (
-                                              <SelectOption
-                                                key={effectMetadata.type}
-                                                value={effectMetadata.type}
-                                                label={effectMetadata.fullName}
-                                                disabled={
-                                                  (props.target === 'object' &&
-                                                    effectMetadata.isMarkedAsNotWorkingForObjects) ||
-                                                  (props.layerRenderingType ===
-                                                    '3d' &&
-                                                    effectMetadata.isMarkedAsOnlyWorkingFor2D) ||
-                                                  (props.layerRenderingType ===
-                                                    '2d' &&
-                                                    effectMetadata.isMarkedAsOnlyWorkingFor3D)
-                                                }
-                                              />
-                                            )
-                                          )}
-                                        </SelectField>
-                                      </Line>
-                                    </ResponsiveLineStackLayout>
-                                    <ElementWithMenu
-                                      element={
-                                        <IconButton size="small">
-                                          <ThreeDotsMenu />
-                                        </IconButton>
-                                      }
-                                      buildMenuTemplate={(i18n: I18nType) => [
-                                        {
-                                          label: i18n._(t`Delete`),
-                                          click: () => removeEffect(effect),
-                                        },
-                                        {
-                                          label: i18n._(t`Copy`),
-                                          click: () => copyEffect(effect),
-                                        },
-                                        {
-                                          label: i18n._(t`Paste`),
-                                          click: () =>
-                                            pasteEffectsBefore(effect),
-                                          enabled: isClipboardContainingEffects,
-                                        },
-                                        { type: 'separator' },
-                                        {
-                                          type: 'checkbox',
-                                          label: i18n._(
-                                            t`Show Parameter Names`
-                                          ),
-                                          checked: showEffectParameterNames,
-                                          click: () =>
-                                            setShowEffectParameterNames(
-                                              !showEffectParameterNames
-                                            ),
-                                        },
-                                      ]}
-                                    />
-                                    <Spacer />
-                                  </div>
-                                  {effectType && (
-                                    <Line expand noMargin>
-                                      <Column expand>
-                                        {effectMetadata ? (
-                                          <React.Fragment>
-                                            <Line>
-                                              <BackgroundText>
-                                                <MarkdownText
-                                                  source={
-                                                    effectMetadata.description
-                                                  }
-                                                />
-                                              </BackgroundText>
-                                            </Line>
-                                            <PropertiesEditor
-                                              instances={[effect]}
-                                              schema={
-                                                effectMetadata.parametersSchema
-                                              }
-                                              project={props.project}
-                                              resourceManagementProps={
-                                                props.resourceManagementProps
-                                              }
-                                              renderExtraDescriptionText={
-                                                showEffectParameterNames
-                                                  ? parameterName =>
-                                                      i18n._(
-                                                        t`Parameter name in events: \`${parameterName}\` `
-                                                      )
-                                                  : undefined
-                                              }
-                                            />
-                                          </React.Fragment>
-                                        ) : null}
-                                        <Spacer />
-                                      </Column>
-                                    </Line>
-                                  )}
-                                </div>
-                              )
-                            }
-                          </DragSourceAndDropTarget>
-                        );
-                      }
+                    {props.layerRenderingType !== '3d' && (
+                      <Column noMargin>
+                        <Line>
+                          <Text size="block-title">
+                            <Trans>3D effects</Trans>
+                          </Text>
+                        </Line>
+                      </Column>
                     )}
+                    <Line>
+                      <Column noMargin expand>
+                        {mapFor(
+                          0,
+                          effectsContainer.getEffectsCount(),
+                          (i: number) => {
+                            const effect: gdEffect = effectsContainer.getEffectAt(
+                              i
+                            );
+                            const effectType = effect.getEffectType();
+                            const effectMetadata = getEnumeratedEffectMetadata(
+                              allEffectMetadata,
+                              effectType
+                            );
+
+                            const effectRef =
+                              justAddedEffectName === effect.getName()
+                                ? justAddedEffectElement
+                                : null;
+
+                            return !effectMetadata ||
+                              !effectMetadata.isMarkedAsOnlyWorkingFor2D ? (
+                              <DragSourceAndDropTarget3D
+                                key={effect.ptr}
+                                beginDrag={() => {
+                                  draggedEffect.current = effect;
+                                  return {};
+                                }}
+                                canDrag={() => true}
+                                canDrop={() => true}
+                                drop={() => {
+                                  moveEffect(effect);
+                                }}
+                              >
+                                {({
+                                  connectDragSource,
+                                  connectDropTarget,
+                                  isOver,
+                                  canDrop,
+                                }) =>
+                                  connectDropTarget(
+                                    <div
+                                      key={effect.ptr}
+                                      style={styles.rowContainer}
+                                    >
+                                      {isOver && (
+                                        <DropIndicator canDrop={canDrop} />
+                                      )}
+                                      <Effect
+                                        ref={effectRef}
+                                        layerRenderingType={'3d'}
+                                        target={target}
+                                        project={project}
+                                        resourceManagementProps={
+                                          props.resourceManagementProps
+                                        }
+                                        effectsContainer={effectsContainer}
+                                        effect={effect}
+                                        removeEffect={removeEffect}
+                                        copyEffect={copyEffect}
+                                        pasteEffectsBefore={pasteEffectsBefore}
+                                        chooseEffectType={chooseEffectType}
+                                        allEffectMetadata={all3DEffectMetadata}
+                                        onEffectsUpdated={onEffectsUpdated}
+                                        onEffectsRenamed={onEffectsRenamed}
+                                        nameErrors={nameErrors}
+                                        setNameErrors={setNameErrors}
+                                        connectDragSource={connectDragSource}
+                                      />
+                                    </div>
+                                  )
+                                }
+                              </DragSourceAndDropTarget3D>
+                            ) : null;
+                          }
+                        )}
+                      </Column>
+                    </Line>
                   </Column>
-                </Line>
+                )}
+                {props.layerRenderingType !== '3d' && effects2DCount > 0 && (
+                  <Column noMargin expand>
+                    {props.layerRenderingType !== '2d' && (
+                      <Column noMargin>
+                        <Line>
+                          <Text size="block-title">
+                            <Trans>2D effects</Trans>
+                          </Text>
+                        </Line>
+                      </Column>
+                    )}
+                    <Line>
+                      <Column noMargin expand>
+                        {mapFor(
+                          0,
+                          effectsContainer.getEffectsCount(),
+                          (i: number) => {
+                            const effect: gdEffect = effectsContainer.getEffectAt(
+                              i
+                            );
+                            const effectType = effect.getEffectType();
+                            const effectMetadata = getEnumeratedEffectMetadata(
+                              allEffectMetadata,
+                              effectType
+                            );
+
+                            const effectRef =
+                              justAddedEffectName === effect.getName()
+                                ? justAddedEffectElement
+                                : null;
+
+                            return !effectMetadata ||
+                              !effectMetadata.isMarkedAsOnlyWorkingFor3D ? (
+                              <DragSourceAndDropTarget2D
+                                key={effect.ptr}
+                                beginDrag={() => {
+                                  draggedEffect.current = effect;
+                                  return {};
+                                }}
+                                canDrag={() => true}
+                                canDrop={() => true}
+                                drop={() => {
+                                  moveEffect(effect);
+                                }}
+                              >
+                                {({
+                                  connectDragSource,
+                                  connectDropTarget,
+                                  isOver,
+                                  canDrop,
+                                }) =>
+                                  connectDropTarget(
+                                    <div
+                                      key={effect.ptr}
+                                      style={styles.rowContainer}
+                                    >
+                                      {isOver && (
+                                        <DropIndicator canDrop={canDrop} />
+                                      )}
+                                      <Effect
+                                        ref={effectRef}
+                                        layerRenderingType={'2d'}
+                                        target={target}
+                                        project={project}
+                                        resourceManagementProps={
+                                          props.resourceManagementProps
+                                        }
+                                        effectsContainer={effectsContainer}
+                                        effect={effect}
+                                        removeEffect={removeEffect}
+                                        copyEffect={copyEffect}
+                                        pasteEffectsBefore={pasteEffectsBefore}
+                                        chooseEffectType={chooseEffectType}
+                                        allEffectMetadata={all2DEffectMetadata}
+                                        onEffectsUpdated={onEffectsUpdated}
+                                        onEffectsRenamed={onEffectsRenamed}
+                                        nameErrors={nameErrors}
+                                        setNameErrors={setNameErrors}
+                                        connectDragSource={connectDragSource}
+                                      />
+                                    </div>
+                                  )
+                                }
+                              </DragSourceAndDropTarget2D>
+                            ) : null;
+                          }
+                        )}
+                      </Column>
+                    </Line>
+                  </Column>
+                )}
               </ScrollView>
               <Column>
                 <Line noMargin>
                   <LineStackLayout expand>
-                    <FlatButton
+                    <ResponsiveFlatButton
                       key={'copy-all-effects'}
                       leftIcon={<CopyIcon />}
-                      label={isSmall ? '' : <Trans>Copy all effects</Trans>}
+                      label={<Trans>Copy all effects</Trans>}
                       onClick={() => {
                         copyAllEffects();
                       }}
                     />
-                    <FlatButton
+                    <ResponsiveFlatButton
                       key={'paste-effects'}
                       leftIcon={<PasteIcon />}
-                      label={isSmall ? '' : <Trans>Paste</Trans>}
+                      label={<Trans>Paste</Trans>}
                       onClick={() => {
                         pasteEffectsAtTheEnd();
                       }}
@@ -716,38 +947,74 @@ export default function EffectsList(props: Props) {
                     />
                   </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>
-                    <RaisedButton
-                      primary
-                      label={<Trans>Add an effect</Trans>}
-                      onClick={addEffect}
-                      icon={<Add />}
-                    />
+                    {props.layerRenderingType !== '2d' && (
+                      <RaisedButton
+                        primary
+                        label={<Trans>Add a 3D effect</Trans>}
+                        onClick={() => addEffect(true)}
+                        icon={<Add />}
+                      />
+                    )}
+                    {props.layerRenderingType !== '3d' && (
+                      <RaisedButton
+                        primary
+                        label={<Trans>Add a 2D effect</Trans>}
+                        onClick={() => addEffect(false)}
+                        icon={<Add />}
+                      />
+                    )}
                   </LineStackLayout>
                 </Line>
               </Column>
             </React.Fragment>
           ) : (
             <Column noMargin expand justifyContent="center">
-              <EmptyPlaceholder
-                title={<Trans>Add your first effect</Trans>}
-                description={
-                  <Trans>Effects create visual changes to the object.</Trans>
-                }
-                actionLabel={<Trans>Add an effect</Trans>}
-                helpPagePath={
-                  props.target === 'object'
-                    ? '/objects/effects'
-                    : '/interface/scene-editor/layer-effects'
-                }
-                onAction={addEffect}
-                secondaryActionIcon={<PasteIcon />}
-                secondaryActionLabel={
-                  isClipboardContainingEffects ? <Trans>Paste</Trans> : null
-                }
-                onSecondaryAction={() => {
-                  pasteEffectsAtTheEnd();
-                }}
-              />
+              {props.layerRenderingType === '' ||
+              props.layerRenderingType === '2d+3d' ? (
+                <EmptyPlaceholder
+                  title={<Trans>Add your first effect</Trans>}
+                  description={
+                    <Trans>Effects create visual changes to the object.</Trans>
+                  }
+                  actionLabel={<Trans>Add a 2D effect</Trans>}
+                  helpPagePath={
+                    props.target === 'object'
+                      ? '/objects/effects'
+                      : '/interface/scene-editor/layer-effects'
+                  }
+                  onAction={() => addEffect(false)}
+                  secondaryActionIcon={<Add />}
+                  secondaryActionLabel={<Trans>Add a 3D effect</Trans>}
+                  onSecondaryAction={() => addEffect(true)}
+                />
+              ) : (
+                <EmptyPlaceholder
+                  title={<Trans>Add your first effect</Trans>}
+                  description={
+                    <Trans>Effects create visual changes to the object.</Trans>
+                  }
+                  actionLabel={
+                    props.layerRenderingType === '3d' ? (
+                      <Trans>Add a 3D effect</Trans>
+                    ) : (
+                      <Trans>Add a 2D effect</Trans>
+                    )
+                  }
+                  helpPagePath={
+                    props.target === 'object'
+                      ? '/objects/effects'
+                      : '/interface/scene-editor/layer-effects'
+                  }
+                  onAction={() => addEffect(props.layerRenderingType === '3d')}
+                  secondaryActionIcon={<PasteIcon />}
+                  secondaryActionLabel={
+                    isClipboardContainingEffects ? <Trans>Paste</Trans> : null
+                  }
+                  onSecondaryAction={() => {
+                    pasteEffectsAtTheEnd();
+                  }}
+                />
+              )}
             </Column>
           )}
         </Column>

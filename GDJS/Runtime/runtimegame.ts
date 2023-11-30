@@ -211,29 +211,31 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
       this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
+
+      const resources = this._data.resources.resources;
       this._imageManager = new gdjs.ImageManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._soundManager = new gdjs.SoundManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._fontManager = new gdjs.FontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._jsonManager = new gdjs.JsonManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader,
         this._imageManager
       );
       this._model3DManager = new gdjs.Model3DManager(
-        this._data.resources.resources,
+        resources,
         this._resourcesLoader
       );
       this._effectsManager = new gdjs.EffectsManager();
@@ -681,117 +683,52 @@ namespace gdjs {
     /**
      * Load all assets, displaying progress in renderer.
      */
-    loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
-      const loadingScreen = new gdjs.LoadingScreenRenderer(
-        this.getRenderer(),
-        this._imageManager,
-        this._data.properties.loadingScreen
-      );
-      const allAssetsTotal = this._data.resources.resources.length;
-      const that = this;
+    loadAllAssets(
+      callback: () => void,
+      progressCallback?: (progress: float) => void
+    ) {
+      this.loadAllAssetsAsync(progressCallback).then(callback);
+    }
 
-      // TODO: All the `loadXXX` (or `preloadXXX`) methods would be
-      // better converted to return promises, for better readability of the code.
-      // See how `loadBitmapFontData` is done.
-      this._imageManager.loadTextures(
-        function (count, total) {
-          const percent = Math.floor((count / allAssetsTotal) * 100);
+    /**
+     * Load all assets, displaying progress in renderer.
+     */
+    loadAllAssetsAsync = async (
+      progressCallback?: (progress: float) => void
+    ) => {
+      try {
+        const loadingScreen = new gdjs.LoadingScreenRenderer(
+          this.getRenderer(),
+          this._imageManager,
+          this._data.properties.loadingScreen
+        );
+        const allAssetsTotal = this._data.resources.resources.length;
+        let loadedAssets = 0;
+
+        const onProgress = (count: integer, total: integer) => {
+          const percent = Math.floor(
+            (100 * (loadedAssets + count)) / allAssetsTotal
+          );
           loadingScreen.setPercent(percent);
           if (progressCallback) {
             progressCallback(percent);
           }
-        },
-        function (texturesTotalCount) {
-          that._soundManager.preloadAudio(
-            function (count, total) {
-              const percent = Math.floor(
-                ((texturesTotalCount + count) / allAssetsTotal) * 100
-              );
-              loadingScreen.setPercent(percent);
-              if (progressCallback) {
-                progressCallback(percent);
-              }
-            },
-            function (audioTotalCount) {
-              that._fontManager.loadFonts(
-                function (count, total) {
-                  const percent = Math.floor(
-                    ((texturesTotalCount + audioTotalCount + count) /
-                      allAssetsTotal) *
-                      100
-                  );
-                  loadingScreen.setPercent(percent);
-                  if (progressCallback) {
-                    progressCallback(percent);
-                  }
-                },
-                function (fontTotalCount) {
-                  that._jsonManager.preloadJsons(
-                    function (count, total) {
-                      const percent = Math.floor(
-                        ((texturesTotalCount +
-                          audioTotalCount +
-                          fontTotalCount +
-                          count) /
-                          allAssetsTotal) *
-                          100
-                      );
-                      loadingScreen.setPercent(percent);
-                      if (progressCallback) {
-                        progressCallback(percent);
-                      }
-                    },
-                    function (jsonTotalCount) {
-                      that._model3DManager.loadModels(
-                        function (count, total) {
-                          const percent = Math.floor(
-                            ((texturesTotalCount +
-                              audioTotalCount +
-                              fontTotalCount +
-                              jsonTotalCount +
-                              count) /
-                              allAssetsTotal) *
-                              100
-                          );
-                          loadingScreen.setPercent(percent);
-                          if (progressCallback) {
-                            progressCallback(percent);
-                          }
-                        },
-                        function (model3DTotalCount) {
-                          that._bitmapFontManager
-                            .loadBitmapFontData((count) => {
-                              var percent = Math.floor(
-                                ((texturesTotalCount +
-                                  audioTotalCount +
-                                  fontTotalCount +
-                                  jsonTotalCount +
-                                  model3DTotalCount +
-                                  count) /
-                                  allAssetsTotal) *
-                                  100
-                              );
-                              loadingScreen.setPercent(percent);
-                              if (progressCallback) progressCallback(percent);
-                            })
-                            .then(() => loadingScreen.unload())
-                            .then(() =>
-                              gdjs.getAllAsynchronouslyLoadingLibraryPromise()
-                            )
-                            .then(() => {
-                              callback();
-                            });
-                        }
-                      );
-                    }
-                  );
-                }
-              );
-            }
-          );
-        }
-      );
-    }
+        };
+
+        loadedAssets += await this._imageManager.loadTextures(onProgress);
+        loadedAssets += await this._soundManager.preloadAudio(onProgress);
+        loadedAssets += await this._fontManager.loadFonts(onProgress);
+        loadedAssets += await this._jsonManager.preloadJsons(onProgress);
+        loadedAssets += await this._model3DManager.loadModels(onProgress);
+        await this._bitmapFontManager.loadBitmapFontData(onProgress);
+        await loadingScreen.unload();
+        await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+      } catch (e) {
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+
+        throw e;
+      }
+    };
 
     /**
      * Start the game loop, to be called once assets are loaded.
@@ -830,48 +767,55 @@ namespace gdjs {
         this._setupGameVisibilityEvents();
 
         // The standard game loop
-        const that = this;
         let accumulatedElapsedTime = 0;
         this._hasJustResumed = false;
-        this._renderer.startGameLoop(function (lastCallElapsedTime) {
-          if (that._paused) {
-            return true;
-          }
+        this._renderer.startGameLoop((lastCallElapsedTime) => {
+          try {
+            if (this._paused) {
+              return true;
+            }
 
-          // Skip the frame if we rendering frames too fast
-          accumulatedElapsedTime += lastCallElapsedTime;
-          if (
-            that._maxFPS > 0 &&
-            1000.0 / accumulatedElapsedTime > that._maxFPS + 7
-          ) {
-            // Only skip frame if the framerate is 7 frames above the maximum framerate.
-            // Most browser/engines will try to run at slightly more than 60 frames per second.
-            // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
-            // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
-            return true;
-          }
-          const elapsedTime = accumulatedElapsedTime;
-          accumulatedElapsedTime = 0;
+            // Skip the frame if we rendering frames too fast
+            accumulatedElapsedTime += lastCallElapsedTime;
+            if (
+              this._maxFPS > 0 &&
+              1000.0 / accumulatedElapsedTime > this._maxFPS + 7
+            ) {
+              // Only skip frame if the framerate is 7 frames above the maximum framerate.
+              // Most browser/engines will try to run at slightly more than 60 frames per second.
+              // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
+              // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
+              return true;
+            }
+            const elapsedTime = accumulatedElapsedTime;
+            accumulatedElapsedTime = 0;
 
-          // Manage resize events.
-          if (that._notifyScenesForGameResolutionResize) {
-            that._sceneStack.onGameResolutionResized();
-            that._notifyScenesForGameResolutionResize = false;
-          }
+            // Manage resize events.
+            if (this._notifyScenesForGameResolutionResize) {
+              this._sceneStack.onGameResolutionResized();
+              this._notifyScenesForGameResolutionResize = false;
+            }
 
-          // Render and step the scene.
-          if (that._sceneStack.step(elapsedTime)) {
-            that.getInputManager().onFrameEnded();
-            that._hasJustResumed = false;
-            return true;
+            // Render and step the scene.
+            if (this._sceneStack.step(elapsedTime)) {
+              this.getInputManager().onFrameEnded();
+              this._hasJustResumed = false;
+              return true;
+            }
+            return false;
+          } catch (e) {
+            if (this._debuggerClient)
+              this._debuggerClient.onUncaughtException(e);
+
+            throw e;
           }
-          return false;
         });
         setTimeout(() => {
           this._setupSessionMetrics();
         }, 10000);
       } catch (e) {
-        logger.error('Internal crash: ' + e);
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+
         throw e;
       }
     }

@@ -23,7 +23,9 @@ import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
 import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
+import { PrivateGameTemplateStoreStateProvider } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { BehaviorStoreStateProvider } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import AlertProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
@@ -33,11 +35,13 @@ import { SubscriptionSuggestionProvider } from '../Profile/Subscription/Subscrip
 import { RouterContextProvider } from './RouterContext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
+import { useShopNavigation } from '../AssetStore/AssetStoreNavigator';
+import { Trans } from '@lingui/macro';
 
 type Props = {|
   authentication: Authentication,
   disableCheckForUpdates: boolean,
-  onlyAppStorePrivateAssetPacks?: boolean,
+  onlyAppStoreShopItems?: boolean,
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
@@ -57,8 +61,9 @@ const Providers = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
-  onlyAppStorePrivateAssetPacks,
+  onlyAppStoreShopItems,
 }: Props) => {
+  const shopNavigationState = useShopNavigation();
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>
@@ -69,7 +74,7 @@ const Providers = ({
                 <GDI18nProvider language={values.language.replace('_', '-')}>
                   <FullThemeProvider>
                     <ErrorBoundary
-                      title="GDevelop encountered an issue"
+                      componentTitle={<Trans>GDevelop app</Trans>}
                       scope="app"
                     >
                       <InAppTutorialProvider>
@@ -96,20 +101,34 @@ const Providers = ({
                                       <CommandsContextProvider>
                                         <AssetStoreStateProvider
                                           onlyAppStorePrivateAssetPacks={
-                                            onlyAppStorePrivateAssetPacks
+                                            onlyAppStoreShopItems
+                                          }
+                                          shopNavigationState={
+                                            shopNavigationState
                                           }
                                         >
                                           <ResourceStoreStateProvider>
                                             <ExampleStoreStateProvider>
-                                              <ExtensionStoreStateProvider>
-                                                <TutorialStateProvider>
-                                                  <AnnouncementsFeedStateProvider>
-                                                    <PrivateAssetsAuthorizationProvider>
-                                                      {children({ i18n })}
-                                                    </PrivateAssetsAuthorizationProvider>
-                                                  </AnnouncementsFeedStateProvider>
-                                                </TutorialStateProvider>
-                                              </ExtensionStoreStateProvider>
+                                              <PrivateGameTemplateStoreStateProvider
+                                                onlyAppStorePrivateGameTemplates={
+                                                  onlyAppStoreShopItems
+                                                }
+                                                shopNavigationState={
+                                                  shopNavigationState
+                                                }
+                                              >
+                                                <ExtensionStoreStateProvider>
+                                                  <BehaviorStoreStateProvider>
+                                                    <TutorialStateProvider>
+                                                      <AnnouncementsFeedStateProvider>
+                                                        <PrivateAssetsAuthorizationProvider>
+                                                          {children({ i18n })}
+                                                        </PrivateAssetsAuthorizationProvider>
+                                                      </AnnouncementsFeedStateProvider>
+                                                    </TutorialStateProvider>
+                                                  </BehaviorStoreStateProvider>
+                                                </ExtensionStoreStateProvider>
+                                              </PrivateGameTemplateStoreStateProvider>
                                             </ExampleStoreStateProvider>
                                           </ResourceStoreStateProvider>
                                         </AssetStoreStateProvider>

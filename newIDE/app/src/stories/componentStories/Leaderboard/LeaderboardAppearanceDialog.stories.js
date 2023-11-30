@@ -8,6 +8,7 @@ import LeaderboardAppearanceDialog from '../../../GameDashboard/LeaderboardAdmin
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
   fakeSilverAuthenticatedUser,
+  fakeBusinessAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
 } from '../../../fixtures/GDevelopServicesTestData';
 
@@ -38,8 +39,27 @@ export const WithoutSubscription = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const WithSubscription = () => (
+export const WithSilverSubscription = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+    <LeaderboardAppearanceDialog
+      open
+      onClose={() => action('onClose')()}
+      onSave={() => action('onSave')()}
+      leaderboardCustomizationSettings={{
+        scoreTitle: 'Coins collected',
+        scoreFormatting: {
+          type: 'custom',
+          prefix: '',
+          suffix: ' coins',
+          precision: 0,
+        },
+      }}
+    />
+  </AuthenticatedUserContext.Provider>
+);
+
+export const WithBusinessSubscription = () => (
+  <AuthenticatedUserContext.Provider value={fakeBusinessAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open
       onClose={() => action('onClose')()}

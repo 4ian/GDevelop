@@ -15,7 +15,6 @@ import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { getIDEVersion } from '../../Version';
 import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import optionalRequire from '../../Utils/OptionalRequire';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
@@ -23,6 +22,7 @@ import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 const electron = optionalRequire('electron');
 
@@ -50,7 +50,7 @@ type Props = {|
   onHeightComputed: number => void,
 |};
 
-export const ExampleListItem = ({
+const ExampleListItem = ({
   exampleShortHeader,
   matches,
   isOpening,
@@ -58,6 +58,7 @@ export const ExampleListItem = ({
   onOpen,
   onHeightComputed,
 }: Props) => {
+  const { showAlert } = useAlertDialog();
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
@@ -76,17 +77,13 @@ export const ExampleListItem = ({
         const example = await getExample(exampleShortHeader);
         openExampleInWebApp(example);
       } catch (error) {
-        showErrorBox({
-          message:
-            i18n._(t`Unable to fetch the example.`) +
-            ' ' +
-            i18n._(t`Verify your internet connection or try again later.`),
-          rawError: error,
-          errorId: 'example-load-error',
+        await showAlert({
+          title: t`Unable to fetch the example.`,
+          message: t`Verify your internet connection or try again later.`,
         });
       }
     },
-    [exampleShortHeader]
+    [exampleShortHeader, showAlert]
   );
 
   const renderExampleField = (field: 'shortDescription' | 'name') => {
@@ -118,26 +115,24 @@ export const ExampleListItem = ({
             )}
             <Column expand noMargin>
               <Text noMargin>{renderExampleField('name')} </Text>
-              {
-                <Line>
-                  <div style={{ flexWrap: 'wrap' }}>
-                    {exampleShortHeader.difficultyLevel && (
-                      <ExampleDifficultyChip
-                        difficultyLevel={exampleShortHeader.difficultyLevel}
-                      />
-                    )}
-                    {exampleShortHeader.codeSizeLevel && (
-                      <ExampleSizeChip
-                        codeSizeLevel={exampleShortHeader.codeSizeLevel}
-                      />
-                    )}
-                    {exampleShortHeader.authors &&
-                      exampleShortHeader.authors.map(author => (
-                        <UserPublicProfileChip user={author} key={author.id} />
-                      ))}
-                  </div>
-                </Line>
-              }
+              <Line>
+                <div style={{ flexWrap: 'wrap' }}>
+                  {exampleShortHeader.difficultyLevel && (
+                    <ExampleDifficultyChip
+                      difficultyLevel={exampleShortHeader.difficultyLevel}
+                    />
+                  )}
+                  {exampleShortHeader.codeSizeLevel && (
+                    <ExampleSizeChip
+                      codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                    />
+                  )}
+                  {exampleShortHeader.authors &&
+                    exampleShortHeader.authors.map(author => (
+                      <UserPublicProfileChip user={author} key={author.id} />
+                    ))}
+                </div>
+              </Line>
               <Text
                 noMargin
                 size="body2"
@@ -148,12 +143,12 @@ export const ExampleListItem = ({
             </Column>
           </ResponsiveLineStackLayout>
         </ButtonBase>
-        <Column noMargin justifyContent="flex-end">
+        <Column justifyContent="flex-end">
           <Line noMargin justifyContent="flex-end">
             <FlatButtonWithSplitMenu
               label={<Trans>Open</Trans>}
               disabled={isOpening || !isCompatible}
-              onClick={() => onOpen()}
+              onClick={onOpen}
               buildMenuTemplate={i18n => [
                 {
                   label: i18n._(t`Open details`),
@@ -175,3 +170,5 @@ export const ExampleListItem = ({
     </div>
   );
 };
+
+export default ExampleListItem;

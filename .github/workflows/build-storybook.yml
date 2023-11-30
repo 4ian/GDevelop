@@ -9,6 +9,10 @@ name: Build Storybook
 on:
   # Launch on all commits.
   push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**" # Don't run on new tags
   # Allows to run this workflow manually from the Actions tab,
   # to publish on Chromatic (not done by default).
   workflow_dispatch:
@@ -24,8 +28,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'npm'
-          cache-dependency-path: 'newIDE/app/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "newIDE/app/package-lock.json"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2

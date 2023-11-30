@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import TextField from '../UI/TextField';
@@ -9,8 +8,8 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import Checkbox from '../UI/Checkbox';
 
 const gd: libGDevelop = global.gd;
 
@@ -70,31 +69,26 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         fullWidth
         rows={3}
       />
-      <I18n>
-        {({ i18n }) => (
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelText={<Trans>Default name for created objects</Trans>}
-            value={
-              eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
-            }
-            onChange={text => {
-              if (gd.Project.validateName(text)) {
-                eventsBasedObject.setDefaultName(text);
-                forceUpdate();
-              } else {
-                showWarningBox(
-                  i18n._(
-                    t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-                  ),
-                  { delayToNextTick: true }
-                );
-              }
-            }}
-            fullWidth
-          />
-        )}
-      </I18n>
+      <SemiControlledTextField
+        commitOnBlur
+        floatingLabelText={<Trans>Default name for created objects</Trans>}
+        value={
+          eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
+        }
+        onChange={newName => {
+          eventsBasedObject.setDefaultName(gd.Project.getSafeName(newName));
+          forceUpdate();
+        }}
+        fullWidth
+      />
+      <Checkbox
+        label={<Trans>Use 3D rendering</Trans>}
+        checked={eventsBasedObject.isRenderedIn3D()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsRenderedIn3D(checked);
+          forceUpdate();
+        }}
+      />
       {eventsBasedObject.getEventsFunctions().getEventsFunctionsCount() ===
         0 && (
         <DismissableAlertMessage

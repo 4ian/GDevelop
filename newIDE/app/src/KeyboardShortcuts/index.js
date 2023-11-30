@@ -19,6 +19,64 @@ type KeyType =
   | 'numrow-arith' // Numrow-, Numrow=
   | 'other'; // Tab, Space
 
+const eventWhichToCode = {
+  '48': 'Digit0',
+  '49': 'Digit1',
+  '50': 'Digit2',
+  '51': 'Digit3',
+  '52': 'Digit4',
+  '53': 'Digit5',
+  '54': 'Digit6',
+  '55': 'Digit7',
+  '56': 'Digit8',
+  '57': 'Digit9',
+  '65': 'KeyA',
+  '66': 'KeyB',
+  '67': 'KeyC',
+  '68': 'KeyD',
+  '69': 'KeyE',
+  '70': 'KeyF',
+  '71': 'KeyG',
+  '72': 'KeyH',
+  '73': 'KeyI',
+  '74': 'KeyJ',
+  '75': 'KeyK',
+  '76': 'KeyL',
+  '77': 'KeyM',
+  '78': 'KeyN',
+  '79': 'KeyO',
+  '80': 'KeyP',
+  '81': 'KeyQ',
+  '82': 'KeyR',
+  '83': 'KeyS',
+  '84': 'KeyT',
+  '85': 'KeyU',
+  '86': 'KeyV',
+  '87': 'KeyW',
+  '88': 'KeyX',
+  '89': 'KeyY',
+  '90': 'KeyZ',
+  '112': 'F1',
+  '113': 'F2',
+  '114': 'F3',
+  '115': 'F4',
+  '116': 'F5',
+  '117': 'F6',
+  '118': 'F7',
+  '119': 'F8',
+  '120': 'F9',
+  '121': 'F10',
+  '122': 'F11',
+  '123': 'F12',
+  '188': 'Comma',
+};
+
+const getCodeFromEvent = (e: KeyboardEvent): string => {
+  if (e.which.toString() in eventWhichToCode)
+    return eventWhichToCode[e.which.toString()];
+  return e.code || ''; // Somehow `code` was sometimes reported to be undefined.
+};
+
 /**
  * Given a key code, gives the associated KeyType.
  * Returns null if the key code can't be categorised.
@@ -30,7 +88,7 @@ const getKeyTypeFromCode = (code: string): KeyType | null => {
   if (code.indexOf('F') === 0) return 'fn-row';
   if (code === 'NumpadAdd' || code === 'NumpadSubtract') return 'numpad-arith';
   if (code === 'Equal' || code === 'Minus') return 'numrow-arith';
-  if (code === 'Tab' || code === 'Space') return 'other';
+  if (code === 'Tab' || code === 'Space' || code === 'Comma') return 'other';
   return null;
 };
 
@@ -43,7 +101,7 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): string => {
   if (e.shiftKey) shortcutString += 'Shift+';
   if (e.altKey) shortcutString += 'Alt+';
 
-  const code = e.code || ''; // Somehow `code` was sometimes reported to be undefined.
+  const code = getCodeFromEvent(e);
   const keyType = getKeyTypeFromCode(code);
   if (keyType) shortcutString += code;
   return shortcutString;
@@ -55,7 +113,7 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): string => {
  */
 export const isValidShortcutEvent = (e: KeyboardEvent): boolean => {
   // Check if action key is a shortcut supported key
-  const code = e.code || ''; // Somehow `code` was sometimes reported to be undefined.
+  const code = getCodeFromEvent(e);
   const keyType = getKeyTypeFromCode(code);
   if (!keyType) return false;
 
@@ -145,13 +203,16 @@ const getKeyDisplayName = (code: string) => {
   if (keyType === 'fn-row') return code;
   if (keyType === 'numpad-arith') return code === 'NumpadAdd' ? 'Num+' : 'Num-';
   if (keyType === 'numrow-arith') return code === 'Minus' ? '-' : '=';
+  if (code === 'Comma') return ',';
   return code; // Tab, Space
 };
 
 /**
  * Parses shortcut string into array of platform-specific key strings
  */
-export const getShortcutDisplayName = (shortcutString: string) => {
+export const getShortcutDisplayName = (shortcutString: ?string) => {
+  if (!shortcutString) return '';
+
   return shortcutString
     .split('+')
     .map<string>(keyCode => {

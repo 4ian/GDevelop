@@ -17,9 +17,11 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/Effect.h"
+#include "GDCore/Tools/Log.h"
+#include "GDCore/IDE/ResourceExposer.h"
 
 using namespace std;
 
@@ -131,29 +133,9 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
           std::cout << targetResourceName << std::endl;
           gd::Resource& targetResource =
               resourcesManager->GetResource(targetResourceName);
-          const gd::String& targetResourceKind = targetResource.GetKind();
 
           gd::String potentiallyUpdatedTargetResourceName = targetResourceName;
-
-          if (targetResourceKind == "audio") {
-            ExposeAudio(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "bitmapFont") {
-            ExposeBitmapFont(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "font") {
-            ExposeFont(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "image") {
-            ExposeImage(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "json") {
-            ExposeJson(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "tilemap") {
-            ExposeTilemap(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "tileset") {
-            ExposeTileset(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "video") {
-            ExposeVideo(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "model3D") {
-            ExposeModel3D(potentiallyUpdatedTargetResourceName);
-          }
+          ExposeResourceWithType(targetResource.GetKind(), potentiallyUpdatedTargetResourceName);
 
           if (potentiallyUpdatedTargetResourceName != targetResourceName) {
             // The resource name was renamed. Also update the mapping.
@@ -170,6 +152,48 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
   }
 }
 
+void ArbitraryResourceWorker::ExposeResourceWithType(
+    const gd::String &resourceType, gd::String &resourceName) {
+  if (resourceType == "image") {
+    ExposeImage(resourceName);
+    return;
+  }
+  if (resourceType == "model3D") {
+    ExposeModel3D(resourceName);
+    return;
+  }
+  if (resourceType == "audio") {
+    ExposeAudio(resourceName);
+    return;
+  }
+  if (resourceType == "font") {
+    ExposeFont(resourceName);
+    return;
+  }
+  if (resourceType == "bitmapFont") {
+    ExposeBitmapFont(resourceName);
+    return;
+  }
+  if (resourceType == "tilemap") {
+    ExposeTilemap(resourceName);
+    return;
+  }
+  if (resourceType == "tileset") {
+    ExposeTileset(resourceName);
+    return;
+  }
+  if (resourceType == "json") {
+    ExposeJson(resourceName);
+    return;
+  }
+  if (resourceType == "video") {
+    ExposeVideo(resourceName);
+    return;
+  }
+  gd::LogError("Unexpected resource type: " + resourceType + " for: " + resourceName);
+  return;
+}
+
 void ArbitraryResourceWorker::ExposeResource(gd::Resource& resource) {
   if (!resource.UseFile()) return;
 
@@ -180,85 +204,97 @@ void ArbitraryResourceWorker::ExposeResource(gd::Resource& resource) {
 
 ArbitraryResourceWorker::~ArbitraryResourceWorker() {}
 
-/**
- * Launch the specified resource worker on every resource referenced in the
- * events.
- */
-class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
- public:
-  ResourceWorkerInEventsWorker(const gd::Project& project_,
-                               gd::ArbitraryResourceWorker& worker_)
-      : project(project_), worker(worker_){};
-  virtual ~ResourceWorkerInEventsWorker(){};
+bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instruction, bool isCondition) {
+  const auto& platform = project.GetCurrentPlatform();
+  const auto& metadata = isCondition
+                              ? gd::MetadataProvider::GetConditionMetadata(
+                                    platform, instruction.GetType())
+                              : gd::MetadataProvider::GetActionMetadata(
+                                    platform, instruction.GetType());
 
- private:
-  bool DoVisitInstruction(gd::Instruction& instruction, bool isCondition) {
-    const auto& platform = project.GetCurrentPlatform();
-    const auto& metadata = isCondition
-                               ? gd::MetadataProvider::GetConditionMetadata(
-                                     platform, instruction.GetType())
-                               : gd::MetadataProvider::GetActionMetadata(
-                                     platform, instruction.GetType());
+  gd::ParameterMetadataTools::IterateOverParametersWithIndex(
+      instruction.GetParameters(),
+      metadata.GetParameters(),
+      [this, &instruction](const gd::ParameterMetadata& parameterMetadata,
+                            const gd::Expression& parameterExpression,
+                            size_t parameterIndex,
+                            const gd::String& lastObjectName) {
+        const String& parameterValue = parameterExpression.GetPlainString();
+        if (parameterMetadata.GetType() ==
+                "police" ||  // Should be renamed fontResource
+            parameterMetadata.GetType() == "fontResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeFont(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "soundfile" ||
+                    parameterMetadata.GetType() ==
+                        "musicfile") {  // Should be renamed audioResource
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeAudio(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "bitmapFontResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeBitmapFont(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "imageResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeImage(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "jsonResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeJson(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "tilemapResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeTilemap(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "tilesetResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeTileset(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "model3DResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeModel3D(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        }
+      });
 
-    gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-        instruction.GetParameters(),
-        metadata.GetParameters(),
-        [this, &instruction](const gd::ParameterMetadata& parameterMetadata,
-                             const gd::Expression& parameterExpression,
-                             size_t parameterIndex,
-                             const gd::String& lastObjectName) {
-          const String& parameterValue = parameterExpression.GetPlainString();
-          if (parameterMetadata.GetType() ==
-                  "police" ||  // Should be renamed fontResource
-              parameterMetadata.GetType() == "fontResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeFont(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "soundfile" ||
-                     parameterMetadata.GetType() ==
-                         "musicfile") {  // Should be renamed audioResource
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeAudio(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "bitmapFontResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeBitmapFont(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "imageResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeImage(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "jsonResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeJson(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "tilemapResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeTilemap(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "tilesetResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeTileset(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "model3DResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeModel3D(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          }
-        });
-
-    return false;
-  };
-
-  const gd::Project& project;
-  gd::ArbitraryResourceWorker& worker;
+  return false;
 };
 
 void LaunchResourceWorkerOnEvents(const gd::Project& project,
                                   gd::EventsList& events,
                                   gd::ArbitraryResourceWorker& worker) {
-  ResourceWorkerInEventsWorker eventsWorker(project, worker);
+  gd::ResourceWorkerInEventsWorker eventsWorker(project, worker);
   eventsWorker.Launch(events);
+}
+
+gd::ResourceWorkerInEventsWorker
+GetResourceWorkerOnEvents(const gd::Project &project,
+                          gd::ArbitraryResourceWorker &worker) {
+  gd::ResourceWorkerInEventsWorker eventsWorker(project, worker);
+  return eventsWorker;
+}
+
+void ResourceWorkerInObjectsWorker::DoVisitObject(gd::Object &object) {
+  object.GetConfiguration().ExposeResources(worker);
+  auto& effects = object.GetEffects();
+  for (size_t effectIndex = 0; effectIndex < effects.GetEffectsCount(); effectIndex++)
+  {
+    auto& effect = effects.GetEffect(effectIndex);
+    gd::ResourceExposer::ExposeEffectResources(project.GetCurrentPlatform(), effect, worker);
+  }
+};
+
+void ResourceWorkerInObjectsWorker::DoVisitBehavior(gd::Behavior &behavior){
+    // TODO Allow behaviors to expose resources
+};
+
+gd::ResourceWorkerInObjectsWorker
+GetResourceWorkerOnObjects(const gd::Project &project,
+                           gd::ArbitraryResourceWorker &worker) {
+  gd::ResourceWorkerInObjectsWorker resourcesWorker(project, worker);
+  return resourcesWorker;
 }
 
 }  // namespace gd

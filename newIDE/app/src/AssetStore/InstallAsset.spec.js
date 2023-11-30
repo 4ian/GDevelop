@@ -403,12 +403,7 @@ describe('InstallAsset', () => {
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       await expect(
@@ -439,9 +434,7 @@ describe('InstallAsset', () => {
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
+        headers: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
           // The project contains the 1.0.0 of this extension.
@@ -474,9 +467,7 @@ describe('InstallAsset', () => {
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
+        headers: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
           // The project contains the 1.0.0 of this extension.
@@ -502,12 +493,7 @@ describe('InstallAsset', () => {
 
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       await expect(
@@ -634,12 +620,7 @@ describe('InstallAsset', () => {
 
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       mockFn(getExtension).mockImplementationOnce(

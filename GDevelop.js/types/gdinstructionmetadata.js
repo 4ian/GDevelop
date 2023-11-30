@@ -36,8 +36,6 @@ declare class gdInstructionMetadata extends gdAbstractFunctionMetadata {
   setParameterExtraInfo(extraInfo: string): gdInstructionMetadata;
   useStandardOperatorParameters(type: string, options: gdParameterOptions): gdInstructionMetadata;
   useStandardRelationalOperatorParameters(type: string, options: gdParameterOptions): gdInstructionMetadata;
-  setRequiresBaseObjectCapability(capability: string): gdInstructionMetadata;
-  getRequiredBaseObjectCapability(): string;
   markAsSimple(): gdInstructionMetadata;
   markAsAdvanced(): gdInstructionMetadata;
   markAsComplex(): gdInstructionMetadata;

@@ -21,9 +21,6 @@ const MAX_TILE_SIZE = 300;
 const SPACING = 8;
 
 const styles = {
-  container: {
-    marginTop: 25,
-  },
   buttonStyle: {
     textAlign: 'left',
     width: '100%',
@@ -34,8 +31,6 @@ const styles = {
   },
   overlay: {
     position: 'absolute',
-    right: 8,
-    bottom: 8,
     background: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 4,
     padding: '2px 6px',
@@ -45,7 +40,7 @@ const styles = {
     marginTop: 0,
     marginBottom: 0,
   },
-  titleContainer: {
+  titleContainerWithMinHeight: {
     // Fix min height to ensure the content stays aligned.
     // 2 line heights (20) + 2 text paddings (6)
     minHeight: 2 * 20 + 2 * 6,
@@ -89,13 +84,40 @@ const useStylesForTileHover = makeStyles(theme =>
   })
 );
 
-const ImageOverlay = ({ content }: {| content: React.Node |}) => (
-  <div style={styles.overlay}>
-    <Typography variant="body1" style={styles.overlayText}>
-      {content}
-    </Typography>
-  </div>
-);
+type OverlayTextPosition =
+  | 'topLeft'
+  | 'topRight'
+  | 'bottomLeft'
+  | 'bottomRight';
+
+const ImageOverlay = ({
+  content,
+  position,
+}: {|
+  content: React.Node,
+  position: OverlayTextPosition,
+|}) => {
+  const positionStyles = {
+    top: position === 'topLeft' || position === 'topRight' ? 8 : undefined,
+    bottom:
+      position === 'bottomLeft' || position === 'bottomRight' ? 8 : undefined,
+    left: position === 'topLeft' || position === 'bottomLeft' ? 8 : undefined,
+    right:
+      position === 'topRight' || position === 'bottomRight' ? 8 : undefined,
+  };
+  return (
+    <div
+      style={{
+        ...styles.overlay,
+        ...positionStyles,
+      }}
+    >
+      <Typography variant="body1" style={styles.overlayText}>
+        {content}
+      </Typography>
+    </div>
+  );
+};
 
 export type ImageTileComponent = {|
   onClick: () => void,
@@ -103,6 +125,7 @@ export type ImageTileComponent = {|
   title?: string,
   description?: string,
   overlayText?: string | React.Node,
+  overlayTextPosition?: OverlayTextPosition,
 |};
 
 type ImageTileGridProps = {|
@@ -120,7 +143,7 @@ const ImageTileGrid = ({
 }: ImageTileGridProps) => {
   const windowWidth = useResponsiveWindowWidth();
   const tileClasses = useStylesForTileHover();
-  const MAX_COLUMNS = getColumnsFromWidth('large');
+  const MAX_COLUMNS = getColumnsFromWidth('xlarge');
   const limit = getLimitFromWidth ? getLimitFromWidth(windowWidth) : undefined;
   const itemsToDisplay = limit ? items.slice(0, limit) : items;
   const forceUpdate = useForceUpdate();
@@ -140,84 +163,91 @@ const ImageTileGrid = ({
     [forceUpdate, isMounted]
   );
 
+  const columns = getColumnsFromWidth(windowWidth);
+
   return (
-    <div style={styles.container}>
-      <Line noMargin>
-        <GridList
-          cols={getColumnsFromWidth(windowWidth)}
-          style={{
-            flex: 1,
-            maxWidth: (MAX_TILE_SIZE + 2 * SPACING) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
-          }}
-          cellHeight="auto"
-          spacing={SPACING * 2}
-        >
-          {isLoading
-            ? new Array(getColumnsFromWidth(windowWidth))
-                .fill(0)
-                .map((_, index) => (
-                  // Display tiles but with skeletons while the data is loading.
-                  <GridListTile key={index} classes={tileClasses}>
-                    <Skeleton
-                      variant="rect"
-                      width="100%"
-                      height="100%"
-                      style={styles.dataLoadingSkeleton}
-                    />
-                  </GridListTile>
-                ))
-            : itemsToDisplay.map((item, index) => (
-                <GridListTile key={index} classes={tileClasses}>
-                  <ButtonBase
-                    style={styles.buttonStyle}
-                    onClick={item.onClick}
-                    tabIndex={0}
-                    focusRipple
-                  >
-                    <Column expand noMargin>
-                      <div style={styles.imageContainer}>
-                        {!loadedImageUrls.current.has(item.imageUrl) ? (
-                          // Display a skeleton behind the image while it's loading.
-                          <Skeleton
-                            variant="rect"
-                            width="100%"
-                            height="100%"
-                            style={styles.imageLoadingSkeleton}
-                          />
-                        ) : null}
-                        <CorsAwareImage
-                          style={{
-                            // Once ready, animate the image display.
-                            opacity: loadedImageUrls.current.has(item.imageUrl)
-                              ? 1
-                              : 0,
-                            ...styles.thumbnailImageWithDescription,
-                          }}
-                          src={item.imageUrl}
-                          alt={`thumbnail ${index}`}
-                          onLoad={() => setImageLoaded(item.imageUrl)}
+    <Line noMargin>
+      <GridList
+        cols={columns}
+        style={{
+          flex: 1,
+          maxWidth: (MAX_TILE_SIZE + 2 * SPACING) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
+        }}
+        cellHeight="auto"
+        spacing={SPACING * 2}
+      >
+        {isLoading
+          ? new Array(columns).fill(0).map((_, index) => (
+              // Display tiles but with skeletons while the data is loading.
+              <GridListTile key={index} classes={tileClasses}>
+                <Skeleton
+                  variant="rect"
+                  width="100%"
+                  height="100%"
+                  style={styles.dataLoadingSkeleton}
+                />
+              </GridListTile>
+            ))
+          : itemsToDisplay.map((item, index) => (
+              <GridListTile key={index} classes={tileClasses}>
+                <ButtonBase
+                  style={styles.buttonStyle}
+                  onClick={item.onClick}
+                  tabIndex={0}
+                  focusRipple
+                >
+                  <Column expand noMargin>
+                    <div style={styles.imageContainer}>
+                      {!loadedImageUrls.current.has(item.imageUrl) ? (
+                        // Display a skeleton behind the image while it's loading.
+                        <Skeleton
+                          variant="rect"
+                          width="100%"
+                          height="100%"
+                          style={styles.imageLoadingSkeleton}
                         />
-                        {item.overlayText && (
-                          <ImageOverlay content={item.overlayText} />
-                        )}
+                      ) : null}
+                      <CorsAwareImage
+                        style={{
+                          // Once ready, animate the image display.
+                          opacity: loadedImageUrls.current.has(item.imageUrl)
+                            ? 1
+                            : 0,
+                          ...styles.thumbnailImageWithDescription,
+                        }}
+                        src={item.imageUrl}
+                        alt={`thumbnail ${index}`}
+                        onLoad={() => setImageLoaded(item.imageUrl)}
+                      />
+                      {item.overlayText && (
+                        <ImageOverlay
+                          content={item.overlayText}
+                          position={item.overlayTextPosition || 'bottomRight'}
+                        />
+                      )}
+                    </div>
+                    {item.title && (
+                      <div
+                        style={
+                          columns === 1
+                            ? undefined
+                            : styles.titleContainerWithMinHeight
+                        }
+                      >
+                        <Text size="sub-title">{item.title}</Text>
                       </div>
-                      {item.title && (
-                        <div style={styles.titleContainer}>
-                          <Text size="sub-title">{item.title}</Text>
-                        </div>
-                      )}
-                      {item.description && (
-                        <Text size="body" color="secondary">
-                          {shortenString(item.description, 120)}
-                        </Text>
-                      )}
-                    </Column>
-                  </ButtonBase>
-                </GridListTile>
-              ))}
-        </GridList>
-      </Line>
-    </div>
+                    )}
+                    {item.description && (
+                      <Text size="body" color="secondary">
+                        {shortenString(item.description, 120)}
+                      </Text>
+                    )}
+                  </Column>
+                </ButtonBase>
+              </GridListTile>
+            ))}
+      </GridList>
+    </Line>
   );
 };
 

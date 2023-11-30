@@ -32,6 +32,7 @@ const mockedLeaderboards = Array(5)
 const mockedEntries = Array(8)
   .fill(0)
   .map((_, index) => ({
+    leaderboardId: '489165zad49-a8ad6-4a984-dcz8da-hjqn983qh0',
     id: `fze8f4ze9f489ze4f9zef4${index}`,
     playerName: `player${index % 2}`,
     score: Math.round(Math.random() * 20 + 150),

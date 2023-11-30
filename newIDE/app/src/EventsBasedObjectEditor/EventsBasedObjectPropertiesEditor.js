@@ -14,7 +14,6 @@ import EmptyMessage from '../UI/EmptyMessage';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
@@ -43,46 +42,29 @@ const styles = {
   },
 };
 
-const validatePropertyName = (
-  i18n: I18nType,
-  properties: gdNamedPropertyDescriptorsList,
-  newName: string
-) => {
-  if (!newName) {
-    showWarningBox(i18n._(t`The name of a property cannot be empty.`), {
-      delayToNextTick: true,
-    });
-    return false;
-  }
-  if (newName === 'name' || newName === 'type') {
-    showWarningBox(
-      i18n._(
-        t`The name of a property cannot be "name" or "type", as they are used by GDevelop internally.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-  if (properties.has(newName)) {
-    showWarningBox(
-      i18n._(
-        t`This name is already used by another property. Choose a unique name for each property.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-  if (!gd.Project.validateName(newName)) {
-    showWarningBox(
-      i18n._(
-        t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
+// Those names are used internally by GDevelop.
+const PROTECTED_PROPERTY_NAMES = ['name', 'type'];
 
-  return true;
+const getValidatedPropertyName = (
+  i18n: I18nType,
+  properties: gdPropertiesContainer,
+  newName: string
+): string => {
+  const safeAndUniqueNewName = newNameGenerator(
+    gd.Project.getSafeName(newName),
+    tentativeNewName => {
+      if (
+        properties.has(tentativeNewName) ||
+        PROTECTED_PROPERTY_NAMES.includes(tentativeNewName)
+      ) {
+        return true;
+      }
+
+      return false;
+    }
+  );
+
+  return safeAndUniqueNewName;
 };
 
 const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
@@ -174,17 +156,18 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                             value={property.getName()}
                             onChange={newName => {
                               if (newName === property.getName()) return;
-                              if (
-                                !validatePropertyName(i18n, properties, newName)
-                              )
-                                return;
 
-                              this.props.onRenameProperty(
-                                property.getName(),
+                              const validatedNewName = getValidatedPropertyName(
+                                i18n,
+                                properties,
                                 newName
                               );
+                              this.props.onRenameProperty(
+                                property.getName(),
+                                validatedNewName
+                              );
+                              property.setName(validatedNewName);
 
-                              property.setName(newName);
                               this.forceUpdate();
                               this.props.onPropertiesUpdated &&
                                 this.props.onPropertiesUpdated();

@@ -7,6 +7,9 @@ declare class libGDevelop {
   getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
+  isDefaultBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): boolean;
+  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;
+  getBehaviorNamesInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): gdVectorString;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
@@ -41,6 +44,7 @@ declare class libGDevelop {
   VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
   VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
+  VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
   MapStringDouble: Class<gdMapStringDouble>;
@@ -62,13 +66,17 @@ declare class libGDevelop {
   Variable_Type: Class<Variable_Type>;
   Variable: Class<gdVariable>;
   VariablesContainer: Class<gdVariablesContainer>;
+  VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
   Watermark: Class<gdWatermark>;
+  ObjectFolderOrObject: Class<gdObjectFolderOrObject>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  ObjectsContainersList: Class<gdObjectsContainersList>;
+  ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
@@ -154,6 +162,8 @@ declare class libGDevelop {
   UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
   VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
   ProjectBrowserHelper: Class<gdProjectBrowserHelper>;
+  ResourceExposer: Class<gdResourceExposer>;
+  VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
@@ -180,18 +190,20 @@ declare class libGDevelop {
   ExpressionParser2: Class<gdExpressionParser2>;
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
+  EventsFunctionsContainer_FunctionOwner: Class<EventsFunctionsContainer_FunctionOwner>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;
   EventsBasedBehavior: Class<gdEventsBasedBehavior>;
   EventsBasedBehaviorsList: Class<gdEventsBasedBehaviorsList>;
   EventsBasedObject: Class<gdEventsBasedObject>;
   EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
-  NamedPropertyDescriptorsList: Class<gdNamedPropertyDescriptorsList>;
+  PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;
   ArbitraryEventsWorker: Class<gdArbitraryEventsWorker>;
+  ArbitraryObjectsWorker: Class<gdArbitraryObjectsWorker>;
   EventsLeaderboardsLister: Class<gdEventsLeaderboardsLister>;
   EventsLeaderboardsRenamer: Class<gdEventsLeaderboardsRenamer>;
   EventsParametersLister: Class<gdEventsParametersLister>;
@@ -205,6 +217,7 @@ declare class libGDevelop {
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
   ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
+  ObjectsUsingResourceCollector: Class<gdObjectsUsingResourceCollector>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
   EditorSettings: Class<gdEditorSettings>;
   Point: Class<gdPoint>;

@@ -70,13 +70,15 @@ const StorageProviderListItem = ({
                 <Line noMargin>
                   <FlatButton
                     label={i18n._(t`Create an Account`)}
-                    onClick={() => authenticatedUser.onCreateAccount()}
+                    onClick={() =>
+                      authenticatedUser.onOpenCreateAccountDialog()
+                    }
                   />
                   <Spacer />
                   <RaisedButton
                     primary
                     label={i18n._(t`Login with GDevelop`)}
-                    onClick={() => authenticatedUser.onLogin()}
+                    onClick={() => authenticatedUser.onOpenLoginDialog()}
                   />
                 </Line>
               )}

@@ -64,11 +64,12 @@ export const CardWidget = ({
 }: Props) => {
   const classes = useStylesForWidget(useDefaultDisabledStyle);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
 
   const widgetMaxWidth =
     size === 'banner'
       ? undefined
-      : windowWidth === 'small'
+      : isMobileScreen
       ? undefined
       : size === 'small'
       ? SMALL_WIDGET_SIZE

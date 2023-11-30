@@ -38,6 +38,7 @@ const Card = ({
   disabled,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <MUICard
@@ -61,12 +62,8 @@ const Card = ({
           <div
             style={{
               ...styles.headerContainer,
-              paddingLeft: windowWidth === 'small' ? 8 : 32,
-              paddingRight: cardCornerAction
-                ? windowWidth === 'small'
-                  ? 8
-                  : 32
-                : 0,
+              paddingLeft: isMobileScreen ? 8 : 32,
+              paddingRight: cardCornerAction ? (isMobileScreen ? 8 : 32) : 0,
             }}
           >
             {header}
@@ -76,8 +73,8 @@ const Card = ({
         <CardContent
           style={{
             ...styles.cardContent,
-            paddingRight: windowWidth === 'small' ? 8 : 32,
-            paddingLeft: windowWidth === 'small' ? 8 : 32,
+            paddingRight: isMobileScreen ? 8 : 32,
+            paddingLeft: isMobileScreen ? 8 : 32,
           }}
         >
           {children}

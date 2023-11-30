@@ -16,6 +16,10 @@ import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingS
 import Paper from '../../../UI/Paper';
 import { mapVector } from '../../../Utils/MapFor';
 import { Trans } from '@lingui/macro';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import { getVariableTypeToIcon } from '../../../VariablesList/VariableTypeSelector';
+
+const gd: libGDevelop = global.gd;
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -23,16 +27,41 @@ const defaultTextStyle = {
   overflowWrap: 'break-word',
 };
 
-const AutocompletionIcon = React.memo(({ src }) => (
-  <img
-    alt=""
-    src={src}
-    style={{
-      maxWidth: 16,
-      maxHeight: 16,
-    }}
-  />
-));
+const autocompletionIconSizeStyle = {
+  maxWidth: 16,
+  maxHeight: 16,
+};
+
+const getTypeToIcon = (type: string) => {
+  // Reuse variable icons for property types.
+  if (type === 'number') {
+    return getVariableTypeToIcon()[gd.Variable.Number];
+  } else if (type === 'boolean') {
+    return getVariableTypeToIcon()[gd.Variable.Boolean];
+  } else {
+    return getVariableTypeToIcon()[gd.Variable.String];
+  }
+};
+
+const AutocompletionIcon = React.memo(({ src }) => {
+  const {
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
+
+  const shouldInvertGrayScale =
+    paletteType === 'dark' &&
+    (src.startsWith('data:image/svg+xml') || src.includes('_black'));
+  return (
+    <img
+      src={src}
+      alt=""
+      style={{
+        ...autocompletionIconSizeStyle,
+        filter: shouldInvertGrayScale ? 'grayscale(1) invert(1)' : undefined,
+      }}
+    />
+  );
+});
 
 const formatParameterTypesString = (
   parameterRenderingService: ParameterRenderingServiceType,
@@ -50,65 +79,25 @@ const formatParameterTypesString = (
     .join(', ');
 };
 
-const DisplayedTextAutocompletion = React.forwardRef(
+const AutocompletionRow = React.forwardRef(
   (
     {
-      expressionAutocompletion,
+      icon,
+      iconSrc,
+      label,
+      parametersLabel,
       isSelected,
       onClick,
     }: {|
-      expressionAutocompletion: ExpressionAutocompletion,
+      icon: React.Node | null,
+      iconSrc: string | null,
+      label: string,
+      parametersLabel: string | null,
       isSelected: boolean,
       onClick: () => void,
-    |},
-    ref
-  ) => (
-    <ButtonBase
-      style={styles.button}
-      onPointerDown={e =>
-        // Prevent default behavior that gives the focus to the button and makes
-        // the field lose focus, hence closing the autocompletion displayer.
-        e.preventDefault()
-      }
-      onClick={onClick}
-      ref={ref}
-    >
-      <Text style={defaultTextStyle} noMargin align="left">
-        {isSelected ? (
-          <b>{expressionAutocompletion.completion}</b>
-        ) : (
-          expressionAutocompletion.completion
-        )}
-      </Text>
-    </ButtonBase>
-  )
-);
-
-const DisplayedExpressionAutocompletion = React.forwardRef(
-  (
-    {
-      expressionAutocompletion,
-      isSelected,
-      onClick,
-      i18n,
-      parameterRenderingService,
-    }: {|
-      expressionAutocompletion: ExpressionAutocompletion,
-      isSelected: boolean,
-      onClick: () => void,
-      i18n: I18nType,
-      parameterRenderingService: ParameterRenderingServiceType,
     |},
     ref
   ) => {
-    if (!expressionAutocompletion.enumeratedExpressionMetadata) return null;
-
-    const title = isSelected ? (
-      <b>{expressionAutocompletion.completion}</b>
-    ) : (
-      expressionAutocompletion.completion
-    );
-
     return (
       <ButtonBase
         style={styles.button}
@@ -120,111 +109,15 @@ const DisplayedExpressionAutocompletion = React.forwardRef(
         onClick={onClick}
         ref={ref}
       >
-        <AutocompletionIcon
-          src={
-            expressionAutocompletion.enumeratedExpressionMetadata.iconFilename
-          }
-        />
+        {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
         <Spacer />
         <Text style={defaultTextStyle} noMargin align="left">
-          {title}(
-          <i>
-            {formatParameterTypesString(
-              parameterRenderingService,
-              i18n,
-              expressionAutocompletion.enumeratedExpressionMetadata
-            )}
-          </i>
-          )
-        </Text>
-      </ButtonBase>
-    );
-  }
-);
-
-const DisplayedObjectAutocompletion = React.forwardRef(
-  (
-    {
-      project,
-      expressionAutocompletion,
-      isSelected,
-      onClick,
-    }: {|
-      project: ?gdProject,
-      expressionAutocompletion: ExpressionAutocompletion,
-      isSelected: boolean,
-      onClick: () => void,
-    |},
-    ref
-  ) => {
-    const thumbnail =
-      project && expressionAutocompletion.object
-        ? ObjectsRenderingService.getThumbnail(
-            project,
-            expressionAutocompletion.object.getConfiguration()
-          )
-        : 'res/types/object.png';
-
-    const title = isSelected ? (
-      <b>{expressionAutocompletion.completion}</b>
-    ) : (
-      expressionAutocompletion.completion
-    );
-
-    return (
-      <ButtonBase
-        style={styles.button}
-        onPointerDown={e =>
-          // Prevent default behavior that gives the focus to the button and makes
-          // the field lose focus, hence closing the autocompletion displayer.
-          e.preventDefault()
-        }
-        onClick={onClick}
-        ref={ref}
-      >
-        <AutocompletionIcon src={thumbnail} />
-        <Spacer />
-        <Text style={defaultTextStyle} noMargin align="left">
-          {title}
-        </Text>
-      </ButtonBase>
-    );
-  }
-);
-
-const DisplayedBehaviorAutocompletion = React.forwardRef(
-  (
-    {
-      expressionAutocompletion,
-      isSelected,
-      onClick,
-    }: {|
-      expressionAutocompletion: ExpressionAutocompletion,
-      isSelected: boolean,
-      onClick: () => void,
-    |},
-    ref
-  ) => {
-    const title = isSelected ? (
-      <b>{expressionAutocompletion.completion}</b>
-    ) : (
-      expressionAutocompletion.completion
-    );
-    return (
-      <ButtonBase
-        style={styles.button}
-        onPointerDown={e =>
-          // Prevent default behavior that gives the focus to the button and makes
-          // the field lose focus, hence closing the autocompletion displayer.
-          e.preventDefault()
-        }
-        onClick={onClick}
-        ref={ref}
-      >
-        <AutocompletionIcon src={'res/types/behavior.png'} />
-        <Spacer />
-        <Text style={defaultTextStyle} noMargin align="left">
-          {title}
+          {isSelected ? <b>{label}</b> : label}
+          {parametersLabel && (
+            <>
+              (<i>{parametersLabel}</i>)
+            </>
+          )}
         </Text>
       </ButtonBase>
     );
@@ -375,46 +268,75 @@ export default function ExpressionAutocompletionsDisplayer({
                     ? selectedAutocompletionElement
                     : undefined;
 
-                  return expressionAutocompletion.kind === 'Text' ||
-                    expressionAutocompletion.kind === 'FullExpression' ||
-                    expressionAutocompletion.kind === 'Variable' ? (
-                    <DisplayedTextAutocompletion
-                      key={index}
-                      expressionAutocompletion={expressionAutocompletion}
-                      isSelected={isSelected}
-                      onClick={() => onChoose(expressionAutocompletion)}
-                      ref={ref}
-                    />
-                  ) : expressionAutocompletion.kind === 'Expression' ? (
-                    !expressionAutocompletion.isExact && (
-                      <DisplayedExpressionAutocompletion
-                        key={index}
-                        expressionAutocompletion={expressionAutocompletion}
-                        onClick={() => onChoose(expressionAutocompletion)}
-                        isSelected={isSelected}
-                        i18n={i18n}
-                        parameterRenderingService={parameterRenderingService}
-                        ref={ref}
-                      />
-                    )
-                  ) : expressionAutocompletion.kind === 'Object' ? (
-                    <DisplayedObjectAutocompletion
-                      key={index}
-                      project={project}
-                      expressionAutocompletion={expressionAutocompletion}
-                      onClick={() => onChoose(expressionAutocompletion)}
-                      isSelected={isSelected}
-                      ref={ref}
-                    />
-                  ) : expressionAutocompletion.kind === 'Behavior' ? (
-                    <DisplayedBehaviorAutocompletion
-                      key={index}
-                      expressionAutocompletion={expressionAutocompletion}
-                      onClick={() => onChoose(expressionAutocompletion)}
-                      isSelected={isSelected}
-                      ref={ref}
-                    />
+                  const parametersLabel = expressionAutocompletion.enumeratedExpressionMetadata
+                    ? formatParameterTypesString(
+                        parameterRenderingService,
+                        i18n,
+                        expressionAutocompletion.enumeratedExpressionMetadata
+                      )
+                    : null;
+
+                  const label = expressionAutocompletion.completion;
+                  const iconSrc =
+                    expressionAutocompletion.kind === 'Expression'
+                      ? expressionAutocompletion.enumeratedExpressionMetadata
+                          .iconFilename
+                      : expressionAutocompletion.kind === 'Object'
+                      ? project && expressionAutocompletion.objectConfiguration
+                        ? ObjectsRenderingService.getThumbnail(
+                            project,
+                            expressionAutocompletion.objectConfiguration
+                          )
+                        : 'res/types/object.png'
+                      : expressionAutocompletion.kind === 'Behavior'
+                      ? project && expressionAutocompletion.behaviorType
+                        ? gd.MetadataProvider.getBehaviorMetadata(
+                            project.getCurrentPlatform(),
+                            expressionAutocompletion.behaviorType
+                          ).getIconFilename()
+                        : 'res/types/behavior.png'
+                      : null;
+
+                  const IconComponent =
+                    expressionAutocompletion.kind === 'Variable'
+                      ? getVariableTypeToIcon()[
+                          expressionAutocompletion.variableType
+                        ]
+                      : expressionAutocompletion.kind === 'Property'
+                      ? getTypeToIcon(
+                          gd.ValueTypeMetadata.getPrimitiveValueType(
+                            gd.ValueTypeMetadata.convertPropertyTypeToValueType(
+                              expressionAutocompletion.propertyType
+                            )
+                          )
+                        )
+                      : expressionAutocompletion.kind === 'Parameter'
+                      ? getTypeToIcon(
+                          gd.ValueTypeMetadata.getPrimitiveValueType(
+                            expressionAutocompletion.parameterType
+                          )
+                        )
+                      : null;
+                  const icon = IconComponent ? (
+                    <IconComponent style={autocompletionIconSizeStyle} />
                   ) : null;
+
+                  if (expressionAutocompletion.kind === 'Expression') {
+                    if (expressionAutocompletion.isExact) return null;
+                  }
+
+                  return (
+                    <AutocompletionRow
+                      key={index}
+                      icon={icon}
+                      iconSrc={iconSrc}
+                      label={label}
+                      parametersLabel={parametersLabel}
+                      onClick={() => onChoose(expressionAutocompletion)}
+                      isSelected={isSelected}
+                      ref={ref}
+                    />
+                  );
                 }
               )}
               {remainingCount > 0 && (

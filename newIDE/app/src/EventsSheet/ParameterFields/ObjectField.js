@@ -14,6 +14,35 @@ import { Trans } from '@lingui/macro';
 import { nameAndIconContainer } from '../EventsTree/ClassNames';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
+const gd: libGDevelop = global.gd;
+
+export const getRequiredBehaviorTypes = (
+  platform: gdPlatform,
+  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  parameterIndex: number
+) => {
+  const requiredBehaviorTypes: Array<string> = [];
+  for (
+    let index = parameterIndex + 1;
+    index < functionMetadata.getParametersCount();
+    index++
+  ) {
+    const behaviorParameter = functionMetadata.getParameter(index);
+    if (behaviorParameter.getType() !== 'behavior') {
+      break;
+    }
+    const behaviorType = behaviorParameter.getExtraInfo();
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      platform,
+      behaviorType
+    );
+    if (behaviorMetadata.isHidden()) {
+      requiredBehaviorTypes.push(behaviorType);
+    }
+  }
+  return requiredBehaviorTypes;
+};
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
     const { currentlyRunningInAppTutorial } = React.useContext(
@@ -31,7 +60,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { parameterMetadata } = props;
+    const {
+      project,
+      parameterMetadata,
+      parameterIndex,
+      instructionMetadata,
+      expressionMetadata,
+    } = props;
 
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -45,36 +80,45 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
+    const requiredBehaviorTypes = React.useMemo(
+      () => {
+        const functionMetadata = instructionMetadata || expressionMetadata;
+        if (!project || !functionMetadata || parameterIndex === undefined) {
+          return [];
+        }
+        return getRequiredBehaviorTypes(
+          project.getCurrentPlatform(),
+          functionMetadata,
+          parameterIndex
+        );
+      },
+      [expressionMetadata, instructionMetadata, parameterIndex, project]
+    );
+
     return (
       <ObjectSelector
         margin={props.isInline ? 'none' : 'dense'}
-        project={props.project}
+        project={project}
         value={props.value}
         onChange={props.onChange}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
+        // Some instructions apply to all objects BUT not some objects
+        // lacking a specific capability offered by a default behavior.
         allowedObjectType={allowedObjectType}
-        requiredObjectCapability={
-          // Some instructions apply to all objects BUT not some objects
-          // lacking a specific capability usually offered by all objects.
-          props.instructionMetadata
-            ? props.instructionMetadata.getRequiredBaseObjectCapability()
-            : props.expressionMetadata
-            ? props.expressionMetadata.getRequiredBaseObjectCapability()
-            : undefined
-        }
+        requiredBehaviorTypes={requiredBehaviorTypes}
         globalObjectsContainer={props.globalObjectsContainer}
         objectsContainer={props.objectsContainer}
         floatingLabelText={description}
         helperMarkdownText={longDescription}
         id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-object-selector`
+          parameterIndex !== undefined
+            ? `parameter-${parameterIndex}-object-selector`
             : undefined
         }
         fullWidth
         errorTextIfInvalid={
-          allowedObjectType ? (
+          allowedObjectType || requiredBehaviorTypes.length > 0 ? (
             <Trans>The object does not exist or can't be used here.</Trans>
           ) : (
             <Trans>Enter the name of an object.</Trans>

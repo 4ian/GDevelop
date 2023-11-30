@@ -3,9 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
-#ifndef ParameterMetadataTools_H
-#define ParameterMetadataTools_H
+#pragma once
+#include <functional>
 #include <vector>
 #include <memory>
 #include "GDCore/String.h"
@@ -13,6 +12,7 @@ namespace gd {
 class Platform;
 class Project;
 class ObjectsContainer;
+class ObjectsContainersList;
 class ParameterMetadata;
 class Expression;
 struct FunctionCallNode;
@@ -26,6 +26,19 @@ class GD_CORE_API ParameterMetadataTools {
       const gd::Project& project,
       const std::vector<gd::ParameterMetadata>& parameters,
       gd::ObjectsContainer& outputObjectsContainer);
+
+  static void ForEachParameterMatchingSearch(
+      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const gd::String& search,
+      std::function<void(const gd::ParameterMetadata&)> cb);
+
+  static bool Has(
+      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const gd::String& parameterName);
+
+  static const gd::ParameterMetadata& Get(
+      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const gd::String& parameterName);
 
   /**
    * Iterate over a list of parameters and their values.
@@ -59,8 +72,7 @@ class GD_CORE_API ParameterMetadataTools {
    */
   static void IterateOverParametersWithIndex(
       const gd::Platform &platform,
-      const gd::ObjectsContainer &globalObjectsContainer,
-      const gd::ObjectsContainer &objectsContainer, FunctionCallNode &node,
+      const gd::ObjectsContainersList &objectsContainersList, FunctionCallNode &node,
       std::function<void(const gd::ParameterMetadata &parameterMetadata,
                          std::unique_ptr<gd::ExpressionNode> &parameterNode,
                          size_t parameterIndex,
@@ -74,8 +86,8 @@ class GD_CORE_API ParameterMetadataTools {
   static size_t GetObjectParameterIndexFor(
       const std::vector<gd::ParameterMetadata>& parametersMetadata,
       size_t parameterIndex);
+
+private:
+  static const gd::ParameterMetadata badParameterMetadata;
 };
 }  // namespace gd
-
-#endif  // ParameterMetadataTools_H
-#endif

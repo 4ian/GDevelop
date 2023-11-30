@@ -28,6 +28,7 @@ import {
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
 import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -48,12 +49,14 @@ export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = 
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
     name: 'Worms 2D',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d35c',
     name: 'Crash Bandicoot',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
 ];
@@ -63,60 +66,70 @@ const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372141',
     name: 'Worms 2D 1',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d352',
     name: 'Crash Bandicoot 2',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
     name: 'Worms 2D 3',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d354',
     name: 'Crash Bandicoot 4',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372145',
     name: 'Worms 2D 5',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d356',
     name: 'Crash Bandicoot 6',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372147',
     name: 'Worms 2D 7',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d358',
     name: 'Crash Bandicoot 8',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
   {
     id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372149',
     name: 'Worms 2D 9',
     createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-05T00:36:53.972Z',
     lastModifiedAt: '2022-02-07T00:36:53.972Z',
   },
   {
     id: 'fb4d878a-1935-4916-b681-f9235475d350',
     name: 'Crash Bandicoot 10',
     createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2020-01-24T00:36:53.972Z',
     lastModifiedAt: '2020-02-06T00:36:53.972Z',
   },
 ];
@@ -197,14 +210,21 @@ export const subscriptionForGoldUser: Subscription = {
   planId: 'gdevelop_gold',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
-  userId: 'silver-user',
+  userId: 'gold-user',
 };
 
 export const subscriptionForStartupUser: Subscription = {
   planId: 'gdevelop_startup',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
-  userId: 'silver-user',
+  userId: 'startup-user',
+};
+
+export const subscriptionForBusinessUser: Subscription = {
+  planId: 'gdevelop_business',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'business-user',
 };
 
 export const subscriptionForEducationPlan: Subscription = {
@@ -248,6 +268,14 @@ export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {
   redemptionCodeValidUntil: Date.now() - 1000,
 };
 
+export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  cancelAtPeriodEnd: true,
+};
+
 export const noSubscription: Subscription = {
   planId: null,
   createdAt: 1515084011000,
@@ -267,11 +295,13 @@ export const limitsForNoSubscriptionUser: Limits = {
     cloudProjects: {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'NONE',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -301,11 +331,13 @@ export const limitsForSilverUser: Limits = {
     cloudProjects: {
       maximumCount: 50,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'BASIC',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -335,11 +367,13 @@ export const limitsForGoldUser: Limits = {
     cloudProjects: {
       maximumCount: 100,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -369,11 +403,49 @@ export const limitsForStartupUser: Limits = {
     cloudProjects: {
       maximumCount: 500,
       canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 1,
     },
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 1000,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForBusinessUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 500,
+      canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 1,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: true,
     },
   },
   limits: {
@@ -403,11 +475,13 @@ export const limitsReached: Limits = {
     cloudProjects: {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'BASIC',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -429,8 +503,40 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   loginState: 'done',
+  creatingOrLoggingInAccount: false,
+  authenticationError: null,
   badges: null,
   cloudProjects: null,
+  recommendations: [
+    {
+      type: 'gdevelop-tutorial',
+      id: 'playlist-get-started',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'gdevelop-teaching-kids',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'tween-behavior',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'wiki-play-music-and-sounds',
+    },
+    {
+      type: 'gdevelop-tutorial',
+      id: 'wiki-prefabs',
+    },
+    {
+      type: 'guided-lessons',
+      lessonsIds: ['healthBar', 'timer', 'plinkoMultiplier'],
+    },
+    {
+      type: 'plan',
+      id: 'gold',
+    },
+  ],
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
@@ -450,13 +556,17 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
       content: {},
     },
   ],
+  receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
+  onLogin: async () => {},
   onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
+  onCreateAccount: async () => {},
+  onResetPassword: async () => {},
+  onEditProfile: async () => {},
+  onOpenLoginDialog: () => {},
+  onOpenEditProfileDialog: () => {},
+  onOpenChangeEmailDialog: () => {},
+  onOpenCreateAccountDialog: () => {},
   onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
@@ -486,6 +596,11 @@ export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   subscription: subscriptionForSilverUser,
   limits: limitsForSilverUser,
 };
+export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionButCancelAtPeriodEnd,
+  limits: limitsForSilverUser,
+};
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   cloudProjects: tenCloudProjects,
@@ -499,7 +614,12 @@ export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
 export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForStartupUser,
-  limits: limitsForGoldUser,
+  limits: limitsForStartupUser,
+};
+export const fakeBusinessAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForBusinessUser,
+  limits: limitsForBusinessUser,
 };
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
@@ -1080,6 +1200,22 @@ export const fakePrivateAssetShortHeader1: AssetShortHeader = {
   dominantColors: [255],
 };
 
+export const fakePrivateAsset1: Asset = {
+  ...fakePrivateAssetShortHeader1,
+  description: 'A very nice Dino.',
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  dominantColors: [255],
+  objectAssets: [
+    {
+      object: {},
+      resources: [],
+      requiredExtensions: [],
+    },
+  ],
+};
+
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
   authorIds: [],
@@ -1476,6 +1612,23 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   codeSizeLevel: 'small',
 };
 
+export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData = {
+  name: 'Fake private game template',
+  description: 'This is a fake private game template',
+  id: 'fake-id',
+  sellerId: 'fake-seller-id',
+  isSellerGDevelop: false,
+  productType: 'GAME_TEMPLATE',
+  listing: 'GAME_TEMPLATE',
+  categories: ['adventure'],
+  updatedAt: '2020-01-01',
+  createdAt: '2020-01-01',
+  thumbnailUrls: [],
+  prices: [],
+  appStoreProductId: null,
+  includedListableProductIds: [],
+};
+
 export const fakeAssetPacks: PublicAssetPacks = {
   starterPacks: [
     {
@@ -1485,6 +1638,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/platformer.png',
       assetsCount: 16,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Space Shooter',
@@ -1493,6 +1648,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
       assetsCount: 140,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Tanks',
@@ -1501,6 +1658,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/tank pack.png',
       assetsCount: 32,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Pixel Adventure',
@@ -1509,6 +1668,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel adventure pack.png',
       assetsCount: 80,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Fake Paid External',
@@ -1517,6 +1678,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pirate bomb pack.png',
       assetsCount: 48,
+      authors: [],
+      licenses: [],
       externalWebLink: 'https://example.com',
       userFriendlyPrice: '$4.99',
     },
@@ -1527,6 +1690,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel effects pack.png',
       assetsCount: 20,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Emotes',
@@ -1534,6 +1699,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       categories: [],
       thumbnailUrl: 'https://resources.gdevelop-app.com/assets/Packs/emote.png',
       assetsCount: 176,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Dinosaurus Characters',
@@ -1542,6 +1709,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/24x24 dino characters.png',
       assetsCount: 5,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Fake Paid Spinning Items',
@@ -1550,6 +1719,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art spinning items.png',
       assetsCount: 30,
+      authors: [],
+      licenses: [],
       userFriendlyPrice: '$4.99',
     },
     {
@@ -1559,6 +1730,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art rpg items.png',
       assetsCount: 64,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'RPG Items',
@@ -1567,6 +1740,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 rpg item pack.png',
       assetsCount: 144,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'Fantasy Icons',
@@ -1575,6 +1750,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/32x32 fantasy icons pack v2.png',
       assetsCount: 285,
+      authors: [],
+      licenses: [],
     },
     {
       name: 'On-Screen Controls',
@@ -1583,6 +1760,8 @@ export const fakeAssetPacks: PublicAssetPacks = {
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/on-screen controls.png',
       assetsCount: 287,
+      authors: [],
+      licenses: [],
     },
   ],
 };

@@ -7,16 +7,18 @@ import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
 import Paper from '../../../UI/Paper';
+import { LineStackLayout } from '../../../UI/Layout';
 
 export const SECTION_PADDING = 30;
 
 const styles = {
-  mobileScrollContainer: {
+  title: { overflowWrap: 'anywhere', textWrap: 'wrap' },
+  mobileContainer: {
     paddingTop: 10,
     paddingLeft: 5,
     paddingRight: 5,
   },
-  desktopScrollContainer: {
+  desktopContainer: {
     paddingTop: SECTION_PADDING,
     paddingLeft: SECTION_PADDING,
     paddingRight: SECTION_PADDING,
@@ -32,46 +34,61 @@ const styles = {
     flexDirection: 'column',
     paddingBottom: SECTION_PADDING,
   },
-  scrollContainer: {
+  container: {
     flex: 1,
+  },
+  scrollContainer: {
     overflowY: 'scroll', // Force a scrollbar to prevent layout shifts.
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
+  },
+  noScrollContainer: {
+    overflowY: 'hidden',
   },
 };
 
 type Props = {|
   children: React.Node,
   title: React.Node,
+  titleAdornment?: React.Node,
   subtitleText?: React.Node,
   renderSubtitle?: () => React.Node,
   backAction?: () => void,
   flexBody?: boolean,
   renderFooter?: () => React.Node,
+  noScroll?: boolean,
 |};
 
 const SectionContainer = ({
   children,
   title,
+  titleAdornment,
   subtitleText,
   renderSubtitle,
   backAction,
   flexBody,
   renderFooter,
+  noScroll,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
+  const containerStyle: {|
+    paddingTop: number,
+    paddingLeft: number,
+    paddingRight: number,
+  |} = isMobileScreen ? styles.mobileContainer : styles.desktopContainer;
+  const scrollStyle: {| overflowY: string, scrollbarWidth?: string |} = noScroll
+    ? styles.noScrollContainer
+    : styles.scrollContainer;
+  const paperStyle = {
+    ...styles.container,
+    display: flexBody ? 'flex' : 'block',
+    ...containerStyle,
+    ...scrollStyle,
+  };
 
   return (
     <Column useFullHeight noMargin expand>
-      <Paper
-        style={{
-          ...styles.scrollContainer,
-          display: flexBody ? 'flex' : 'block',
-          ...(windowWidth === 'small'
-            ? styles.mobileScrollContainer
-            : styles.desktopScrollContainer),
-        }}
-        square
-        background="dark"
-      >
+      <Paper style={paperStyle} square background="dark">
         <Column noOverflowParent expand>
           {title && (
             <SectionRow>
@@ -84,11 +101,16 @@ const SectionContainer = ({
                   />
                 </Line>
               )}
-              <Line noMargin>
-                <Text size="bold-title" noMargin>
+              <LineStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Text size="bold-title" noMargin style={styles.title}>
                   {title}
                 </Text>
-              </Line>
+                {titleAdornment && <Column noMargin>{titleAdornment}</Column>}
+              </LineStackLayout>
               {subtitleText && (
                 <Line noMargin>
                   <Text noMargin>{subtitleText}</Text>
@@ -102,9 +124,7 @@ const SectionContainer = ({
       </Paper>
       {renderFooter && (
         <Paper
-          style={
-            windowWidth === 'small' ? styles.mobileFooter : styles.desktopFooter
-          }
+          style={isMobileScreen ? styles.mobileFooter : styles.desktopFooter}
           square
           background="dark"
         >

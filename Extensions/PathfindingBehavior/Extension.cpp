@@ -22,6 +22,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Movement")
+      .SetTags("pathfinding, obstacle, collision")
       .SetExtensionHelpPath("/behaviors/pathfinding");
   extension.AddInstructionOrExpressionGroupMetadata(_("Pathfinding behavior"))
       .SetIcon("CppPlatform/Extensions/AStaricon16.png");
@@ -236,8 +237,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            "MovementAngleIsAround",
            _("Angle of movement on its path"),
            _("Compare the angle of movement of an object on its path."),
-           _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
-             ": _PARAM3_ degrees)"),
+           _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
            _("Movement on the path"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
@@ -637,8 +637,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCost");
 
     aut.AddAction("SetImpassable",
-                  _("Should object be impassable?"),
-                  _("Decide if the object is an impassable obstacle"),
+                  _("Should object be impassable"),
+                  _("Decide if the object is an impassable obstacle."),
                   _("Set _PARAM0_ as an impassable obstacle: _PARAM2_"),
                   _("Obstacles"),
                   "CppPlatform/Extensions/pathfindingobstacleicon24.png",
@@ -646,12 +646,12 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
-        .AddParameter("yesorno", _("Impassable?"))
+        .AddParameter("yesorno", _("Impassable"))
         .SetFunctionName("SetImpassable");
 
     aut.AddCondition("IsImpassable",
-                     _("Is object impassable?"),
-                     _("Check if the obstacle is impassable"),
+                     _("Impassable obstacle"),
+                     _("Check if the obstacle is impassable."),
                      _("_PARAM0_ is impassable"),
                      _("Obstacles"),
                      "CppPlatform/Extensions/pathfindingobstacleicon24.png",

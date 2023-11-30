@@ -18,6 +18,7 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
                                "Victor Levasseur",
                                "Open source (MIT License)")
       .SetCategory("User interface")
+      .SetTags("anchor, ui, layout")
       .SetExtensionHelpPath("/behaviors/anchor");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(

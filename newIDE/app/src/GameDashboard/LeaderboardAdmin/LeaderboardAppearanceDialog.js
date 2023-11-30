@@ -33,6 +33,8 @@ import LeaderboardPlaygroundCard from './LeaderboardPlaygroundCard';
 import { rgbStringToHexString } from '../../Utils/ColorTransformer';
 import Link from '../../UI/Link';
 import Window from '../../Utils/Window';
+import Checkbox from '../../UI/Checkbox';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
 
 const unitToAbbreviation = {
   hour: 'HH',
@@ -99,7 +101,7 @@ function LeaderboardAppearanceDialog({
 }: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const canUserCustomizeTheme = canUserCustomizeLeaderboardTheme(
+  const { canUseTheme, canUseCustomCss } = canUserCustomizeLeaderboardTheme(
     authenticatedUser
   );
   const rgbLeaderboardTheme = getRGBLeaderboardTheme(
@@ -131,6 +133,17 @@ function LeaderboardAppearanceDialog({
     defaultDisplayedEntriesNumberError,
     setDefaultDisplayedEntriesNumberError,
   ] = React.useState<?string>(null);
+  const [customCss, setCustomCss] = React.useState<string>(
+    (leaderboardCustomizationSettings &&
+      leaderboardCustomizationSettings.customCss) ||
+      ''
+  );
+  const [useCustomCss, setUseCustomCss] = React.useState<boolean>(
+    !!(
+      leaderboardCustomizationSettings &&
+      leaderboardCustomizationSettings.useCustomCss
+    )
+  );
   const [scoreTitle, setScoreTitle] = React.useState<string>(
     leaderboardCustomizationSettings
       ? leaderboardCustomizationSettings.scoreTitle
@@ -210,7 +223,7 @@ function LeaderboardAppearanceDialog({
               precision,
             }
           : { type: scoreType, ...unitSelectOptions[timeUnits] },
-      theme: canUserCustomizeTheme
+      theme: canUseTheme
         ? {
             backgroundColor: rgbStringToHexString(backgroundColor),
             textColor: rgbStringToHexString(textColor),
@@ -220,6 +233,8 @@ function LeaderboardAppearanceDialog({
             highlightTextColor: rgbStringToHexString(highlightTextColor),
           }
         : undefined,
+      useCustomCss,
+      customCss,
     };
     await onSave(customizationSettings);
   };
@@ -289,6 +304,10 @@ function LeaderboardAppearanceDialog({
               }}
               disabled={isLoading}
             />
+            <Spacer />
+            <Text size="sub-title" noMargin>
+              <Trans>Visual appearance</Trans>
+            </Text>
             <ResponsiveLineStackLayout noMargin>
               <ColorField
                 floatingLabelText={<Trans>Background color</Trans>}
@@ -296,7 +315,7 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={backgroundColor}
                 onChange={setBackgroundColor}
-                disabled={!canUserCustomizeTheme || isLoading}
+                disabled={!canUseTheme || isLoading}
               />
               <ColorField
                 floatingLabelText={<Trans>Text color</Trans>}
@@ -304,7 +323,7 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={textColor}
                 onChange={setTextColor}
-                disabled={!canUserCustomizeTheme || isLoading}
+                disabled={!canUseTheme || isLoading}
               />
             </ResponsiveLineStackLayout>
             <ResponsiveLineStackLayout noMargin>
@@ -314,7 +333,7 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={highlightBackgroundColor}
                 onChange={setHighlightBackgroundColor}
-                disabled={!canUserCustomizeTheme || isLoading}
+                disabled={!canUseTheme || isLoading}
               />
               <ColorField
                 floatingLabelText={<Trans>Highlight text color</Trans>}
@@ -322,10 +341,10 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={highlightTextColor}
                 onChange={setHighlightTextColor}
-                disabled={!canUserCustomizeTheme || isLoading}
+                disabled={!canUseTheme || isLoading}
               />
             </ResponsiveLineStackLayout>
-            {!canUserCustomizeTheme ? (
+            {!canUseTheme ? (
               <GetSubscriptionCard subscriptionDialogOpeningReason="Leaderboard customization">
                 <Line>
                   <Column noMargin>
@@ -333,6 +352,59 @@ function LeaderboardAppearanceDialog({
                       <Trans>
                         Get a silver or gold subscription to unlock color
                         customization.
+                      </Trans>
+                    </Text>
+                    <Link
+                      href="https://gd.games/playground/test-leaderboard"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://gd.games/playground/test-leaderboard'
+                        )
+                      }
+                    >
+                      <Text noMargin color="inherit">
+                        <Trans>Test it out!</Trans>
+                      </Text>
+                    </Link>
+                  </Column>
+                </Line>
+              </GetSubscriptionCard>
+            ) : (
+              <LeaderboardPlaygroundCard />
+            )}
+            <Spacer />
+            <Text size="sub-title" noMargin>
+              <Trans>Visual appearance (advanced)</Trans>
+            </Text>
+            <Checkbox
+              label={<Trans>Use custom CSS for the leaderboard</Trans>}
+              disabled={
+                // Disable the checkbox if it's loading,
+                // or if custom css is not allowed - unless it's already checked,
+                // in which case we allow to uncheck it.
+                (!canUseCustomCss && !useCustomCss) || isLoading
+              }
+              checked={useCustomCss}
+              onCheck={(e, checked) => setUseCustomCss(checked)}
+            />
+            <SemiControlledTextField
+              fullWidth
+              floatingLabelText={<Trans>Custom CSS</Trans>}
+              multiline
+              rows={4}
+              rowsMax={15}
+              value={customCss}
+              onChange={setCustomCss}
+              disabled={!useCustomCss || isLoading}
+            />
+            {!canUseCustomCss ? (
+              <GetSubscriptionCard subscriptionDialogOpeningReason="Leaderboard customization">
+                <Line>
+                  <Column noMargin>
+                    <Text noMargin>
+                      <Trans>
+                        Get a business subscription to unlock custom CSS or
+                        contact us.
                       </Trans>
                     </Text>
                     <Link

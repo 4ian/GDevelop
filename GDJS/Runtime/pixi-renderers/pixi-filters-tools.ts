@@ -1,6 +1,5 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Filters');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   export namespace PixiFiltersTools {
     export const clampValue = function (value, min, max) {
@@ -226,6 +225,25 @@ namespace gdjs {
           value
         );
       }
+    }
+
+    export class EmptyFilter {
+      isEnabled(target: EffectsTarget): boolean {
+        return false;
+      }
+      setEnabled(target: EffectsTarget, enabled: boolean): boolean {
+        return false;
+      }
+      applyEffect(target: EffectsTarget): boolean {
+        return false;
+      }
+      removeEffect(target: EffectsTarget): boolean {
+        return false;
+      }
+      updatePreRender(target: gdjs.EffectsTarget): any {}
+      updateDoubleParameter(parameterName: string, value: number): void {}
+      updateStringParameter(parameterName: string, value: string): void {}
+      updateBooleanParameter(parameterName: string, value: boolean): void {}
     }
   }
 }

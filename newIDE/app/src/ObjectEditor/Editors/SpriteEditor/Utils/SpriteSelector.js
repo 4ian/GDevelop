@@ -30,6 +30,8 @@ type Props = {|
 
   setSameForAllAnimationsLabel: React.Node,
   setSameForAllSpritesLabel: React.Node,
+
+  hideControlsForSprite?: (sprite: gdSprite) => boolean,
 |};
 
 /**
@@ -52,6 +54,7 @@ const SpriteSelector = ({
   setSameForAllSprites,
   setSameForAllAnimationsLabel,
   setSameForAllSpritesLabel,
+  hideControlsForSprite,
 }: Props) => {
   const { animation, direction, sprite } = getCurrentElements(
     spriteConfiguration,
@@ -60,12 +63,11 @@ const SpriteSelector = ({
     spriteIndex
   );
 
-  const hideControls =
+  const shouldHideControls =
     !direction ||
     !direction.getSpritesCount() ||
-    spriteConfiguration.adaptCollisionMaskAutomatically() ||
     !sprite ||
-    sprite.isFullImageCollisionMask();
+    (hideControlsForSprite && hideControlsForSprite(sprite));
 
   return (
     <React.Fragment>
@@ -120,7 +122,7 @@ const SpriteSelector = ({
           </SelectField>
         )}
       </ResponsiveLineStackLayout>
-      {!hideControls && (
+      {!shouldHideControls && (
         <>
           <Toggle
             label={setSameForAllAnimationsLabel}

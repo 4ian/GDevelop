@@ -64,41 +64,48 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
     object.drawLineV2(10, 10, 20, 30, 3);
 
     // Check the automatically computed bounds:
-    expect(object.getDrawableX()).to.be(8.5);
-    expect(object.getDrawableY()).to.be(8.5);
-    expect(object.getWidth()).to.be(13);
-    expect(object.getHeight()).to.be(23);
+    const drawableX = 8.658359213500127;
+    const drawableY = 9.329179606750063;
+    const width = 12.683281572999746;
+    const height = 21.341640786499873;
+    expect(object.getDrawableX()).to.be(drawableX);
+    expect(object.getDrawableY()).to.be(drawableY);
+    expect(object.getWidth()).to.be(width);
+    expect(object.getHeight()).to.be(height);
 
     // Check the automatic center positioning:
     expect(object.getCenterXInScene()).to.be(15);
     expect(object.getCenterYInScene()).to.be(20);
-    expect(object.getCenterX()).to.be(15 - 8.5);
-    expect(object.getCenterY()).to.be(20 - 8.5);
+    expect(object.getCenterX()).to.be(15 - drawableX);
+    expect(object.getCenterY()).to.be(20 - drawableY);
 
     // Check hit boxes:
     expect(object.getAABB()).to.eql({
-      min: [8.5, 8.5],
-      max: [8.5 + 13, 8.5 + 23],
+      min: [drawableX, drawableY],
+      max: [drawableX + width, drawableY + height],
     });
 
     // Check after scaling (scaling is done from the origin):
     object.setScale(2);
-    expect(object.getDrawableX()).to.be(17);
-    expect(object.getDrawableY()).to.be(17);
-    expect(object.getWidth()).to.be(13 * 2);
-    expect(object.getHeight()).to.be(23 * 2);
-    expect(object.getAABB()).to.eql({ min: [17, 17], max: [43, 63] });
+    expect(object.getDrawableX()).to.be(2 * drawableX);
+    expect(object.getDrawableY()).to.be(2 * drawableY);
+    expect(object.getWidth()).to.be(2 * width);
+    expect(object.getHeight()).to.be(2 * height);
+    expect(object.getAABB()).to.eql({
+      min: [2 * drawableX, 2 * drawableY],
+      max: [2 * (drawableX + width), 2 * (drawableY + height)],
+    });
 
     // Check after rotating (rotating is done from the center):
     object.setAngle(45);
-    expect(object.getDrawableX()).to.be(17); // Drawable X/Y is not impacted...
-    expect(object.getDrawableY()).to.be(17);
-    expect(object.getWidth()).to.be(13 * 2); // ...Neither is the size
-    expect(object.getHeight()).to.be(23 * 2);
+    expect(object.getDrawableX()).to.be(2 * drawableX); // Drawable X/Y is not impacted...
+    expect(object.getDrawableY()).to.be(2 * drawableY);
+    expect(object.getWidth()).to.be(2 * width); // ...Neither is the size
+    expect(object.getHeight()).to.be(2 * height);
     expect(object.getAABB()).to.eql({
       // The hit boxes/AABB are rotated:
-      min: [4.54415587728429, 14.54415587728429],
-      max: [55.45584412271571, 65.45584412271572],
+      min: [5.940746670252036, 15.940746670252032],
+      max: [54.05925332974796, 64.05925332974797],
     });
   });
 
@@ -116,37 +123,44 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
     object.setRotationCenter(10, 9);
 
     // Check the automatically computed bounds (not impacted by the center):
-    expect(object.getDrawableX()).to.be(8.5);
-    expect(object.getDrawableY()).to.be(8.5);
-    expect(object.getWidth()).to.be(13);
-    expect(object.getHeight()).to.be(23);
+    const drawableX = 8.658359213500127;
+    const drawableY = 9.329179606750063;
+    const width = 12.683281572999746;
+    const height = 21.341640786499873;
+    expect(object.getDrawableX()).to.be(drawableX);
+    expect(object.getDrawableY()).to.be(drawableY);
+    expect(object.getWidth()).to.be(width);
+    expect(object.getHeight()).to.be(height);
 
     // Check the center positioning:
     expect(object.getCenterXInScene()).to.be(10);
     expect(object.getCenterYInScene()).to.be(9);
-    expect(object.getCenterX()).to.be(10 - 8.5);
-    expect(object.getCenterY()).to.be(9 - 8.5);
+    expect(object.getCenterX()).to.be(10 - drawableX);
+    expect(object.getCenterY()).to.be(9 - drawableY);
 
     // Check hit boxes (not impacted by the center, as no rotation is made):
     expect(object.getAABB()).to.eql({
-      min: [8.5, 8.5],
-      max: [8.5 + 13, 8.5 + 23],
+      min: [drawableX, drawableY],
+      max: [drawableX + width, drawableY + height],
     });
 
     // Check after scaling (scaling is done from the origin):
     object.setScale(2);
-    expect(object.getDrawableX()).to.be(17);
-    expect(object.getDrawableY()).to.be(17);
-    expect(object.getWidth()).to.be(13 * 2);
-    expect(object.getHeight()).to.be(23 * 2);
-    expect(object.getAABB()).to.eql({ min: [17, 17], max: [43, 63] });
+    expect(object.getDrawableX()).to.be(2 * drawableX);
+    expect(object.getDrawableY()).to.be(2 * drawableY);
+    expect(object.getWidth()).to.be(2 * width);
+    expect(object.getHeight()).to.be(2 * height);
+    expect(object.getAABB()).to.eql({
+      min: [2 * drawableX, 2 * drawableY],
+      max: [2 * (drawableX + width), 2 * (drawableY + height)],
+    });
 
     // Check after rotating (rotating is done from the center):
     object.setAngle(45);
     expect(object.getAABB()).to.eql({
       // The hit boxes/AABB are rotated:
-      min: [-13.941125496954278, 15.17157287525381],
-      max: [36.970562748477136, 66.08326112068524],
+      min: [-12.544534703986535, 16.568163668221555],
+      max: [35.57397195550939, 64.6866703277175],
     });
 
     // Draw outside of the current bounds.
@@ -178,8 +192,8 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
     const object = makeShapePainterRuntimeObject(runtimeScene);
 
     object.drawLineV2(0, 0, 10, 10, 2);
-    expect(object.getWidth()).to.be(12);
-    expect(object.getHeight()).to.be(12);
+    expect(object.getWidth()).to.be(11.414213562373096);
+    expect(object.getHeight()).to.be(11.414213562373096);
 
     // Check changes in position/scale are taken into account:
     object.setPosition(50, 100);

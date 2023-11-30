@@ -4,6 +4,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   getExtension,
   type ExtensionShortHeader,
+  type BehaviorShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { addSerializedExtensionsToProject } from '../InstallAsset';
 import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -17,7 +18,7 @@ export const installExtension = async (
   i18n: I18nType,
   project: gdProject,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  extensionShortHeader: ExtensionShortHeader
+  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<boolean> => {
   try {
     const serializedExtension = await getExtension(extensionShortHeader);

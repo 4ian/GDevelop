@@ -104,6 +104,7 @@ type ListItemProps = {|
     backgroundColor?: string,
     borderBottom?: string,
     opacity?: number,
+    paddingLeft?: number,
   |},
 
   leftIcon?: React.Node,
@@ -115,7 +116,7 @@ type ListItemProps = {|
   data?: HTMLDataset,
 |};
 
-export type ListItemRefType = any; // Should be a material-ui ListIten
+export type ListItemRefType = any; // Should be a material-ui ListItem
 
 /**
  * A ListItem to be used in a List.
@@ -351,6 +352,7 @@ type ListProps = {|
   style?: {|
     overflowY?: 'scroll',
     flex?: 1,
+    scrollbarWidth?: 'thin',
     padding?: number,
   |},
   useGap?: boolean,

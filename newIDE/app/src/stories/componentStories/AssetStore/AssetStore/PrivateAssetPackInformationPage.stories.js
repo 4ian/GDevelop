@@ -13,6 +13,8 @@ import {
 } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import { client as assetApiAxiosClient } from '../../../../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../../../../Utils/GDevelopServices/Shop';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { fakeSilverAuthenticatedUserWithCloudProjects } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
@@ -23,6 +25,7 @@ export default {
 const privateAssetPackListingData: PrivateAssetPackListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
   productType: 'ASSET_PACK',
   thumbnailUrls: [
     'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
@@ -107,6 +110,7 @@ export const Default = () => {
         {
           id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
           sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+          isSellerGDevelop: false,
           productType: 'ASSET_PACK',
           thumbnailUrls: [
             'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
@@ -125,6 +129,7 @@ export const Default = () => {
         {
           id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
           sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+          isSellerGDevelop: false,
           productType: 'ASSET_PACK',
           thumbnailUrls: [
             'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
@@ -142,6 +147,103 @@ export const Default = () => {
         },
       ]}
     />
+  );
+};
+export const ForAlreadyPurchasedAssetPack = () => {
+  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateAssetPackListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateAssetPackListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
+  assetServiceMock
+    .onGet(
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+    )
+    .reply(200, privateAssetPackDetails)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <AuthenticatedUserContext.Provider
+      value={{
+        ...fakeSilverAuthenticatedUserWithCloudProjects,
+        receivedAssetPacks: [
+          {
+            id: privateAssetPackListingData.id,
+            // Useless data for the component below.
+            name: privateAssetPackListingData.name,
+            createdAt: '2',
+            updatedAt: '2',
+            longDescription: 'longDescription',
+            content: { sprite: 9 },
+            previewImageUrls: [],
+            tag: 'tag',
+          },
+        ],
+      }}
+    >
+      <PrivateAssetPackInformationPage
+        privateAssetPackListingData={privateAssetPackListingData}
+        isPurchaseDialogOpen={false}
+        onOpenPurchaseDialog={() => action('open purchase dialog')()}
+        onAssetPackOpen={() => action('open asset pack')()}
+        privateAssetPacksFromSameCreatorListingData={[
+          {
+            id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
+            sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+            isSellerGDevelop: false,
+            productType: 'ASSET_PACK',
+            thumbnailUrls: [
+              'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+            ],
+            updatedAt: '2022-09-14T12:43:51.329Z',
+            createdAt: '2022-09-14T12:43:51.329Z',
+            listing: 'ASSET_PACK',
+            description: '5 assets',
+            name: 'French Food',
+            categories: ['props'],
+            prices: [
+              { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
+            ],
+            appStoreProductId: null,
+          },
+          {
+            id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
+            sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+            isSellerGDevelop: false,
+            productType: 'ASSET_PACK',
+            thumbnailUrls: [
+              'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
+            ],
+            updatedAt: '2022-09-14T12:43:51.329Z',
+            createdAt: '2022-09-14T12:43:51.329Z',
+            listing: 'ASSET_PACK',
+            description: '8 assets',
+            name: 'French Sounds',
+            categories: ['sounds'],
+            prices: [
+              { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
+            ],
+            appStoreProductId: 'fake.product.id',
+          },
+        ]}
+      />
+    </AuthenticatedUserContext.Provider>
   );
 };
 export const WithPurchaseDialogOpen = () => {

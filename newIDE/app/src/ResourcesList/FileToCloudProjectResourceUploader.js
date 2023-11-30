@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import path from 'path-browserify';
 import {
   allResourceKindsAndMetadata,
   type ChooseResourceOptions,
@@ -39,19 +40,36 @@ const resourceKindToInputAcceptedMimes = {
   tilemap: ['application/json'],
   tileset: ['application/json'],
   bitmapFont: [],
-  model3D: ['model/gltf-binary'],
+  model3D: [
+    'file',
+    // The following mime type is not handled by Safari. The verification will be handled
+    // after the files have been picked.
+    // 'model/gltf-binary'
+  ],
+};
+
+const getAcceptedExtensions = (
+  resourceKind: ResourceKind,
+  withLeadingDot: boolean = true
+): string[] => {
+  const resourceKindMetadata =
+    allResourceKindsAndMetadata.find(({ kind }) => kind === resourceKind) ||
+    null;
+  if (!resourceKindMetadata) return [];
+  return withLeadingDot
+    ? resourceKindMetadata.fileExtensions.map(extension => '.' + extension)
+    : resourceKindMetadata.fileExtensions;
+};
+
+const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
+  return resourceKindToInputAcceptedMimes[resourceKind] || [];
 };
 
 export const getInputAcceptedMimesAndExtensions = (
   resourceKind: ResourceKind
 ) => {
-  const resourceKindMetadata =
-    allResourceKindsAndMetadata.find(({ kind }) => kind === resourceKind) ||
-    null;
-  const acceptedExtensions = resourceKindMetadata
-    ? resourceKindMetadata.fileExtensions.map(extension => '.' + extension)
-    : [];
-  const acceptedMimes = resourceKindToInputAcceptedMimes[resourceKind] || [];
+  const acceptedExtensions = getAcceptedExtensions(resourceKind);
+  const acceptedMimes = getAcceptedMimeTypes(resourceKind);
 
   return [...acceptedMimes, ...acceptedExtensions].join(',');
 };
@@ -71,6 +89,7 @@ export const FileToCloudProjectResourceUploader = ({
   const [error, setError] = React.useState<?Error>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+  const [filteredOutFiles, setFilteredOutFiles] = React.useState<File[]>([]);
   const hasSelectedFiles = selectedFiles.length > 0;
   const storageProvider = React.useMemo(getStorageProvider, [
     getStorageProvider,
@@ -171,6 +190,30 @@ export const FileToCloudProjectResourceUploader = ({
     [canUploadFiles, onUpload, error]
   );
 
+  const shouldValidateFilePostPicking = React.useMemo(
+    () => {
+      const acceptedMimeTypes = getAcceptedMimeTypes(options.resourceKind);
+      // Safari does not use file extensions to filter files pre-picking and
+      // Safari also does not recognize all mime types. So if the only accepted
+      // mime type is 'file', the file validation should happen post-picking.
+      return acceptedMimeTypes.length === 1 && acceptedMimeTypes[0] === 'file';
+    },
+    [options.resourceKind]
+  );
+
+  const validateFilePostPicking = React.useCallback(
+    (file: File) => {
+      const acceptedExtensions = getAcceptedExtensions(
+        options.resourceKind,
+        false
+      );
+      return acceptedExtensions.includes(
+        path.extname(file.name).replace(/^\./, '')
+      );
+    },
+    [options.resourceKind]
+  );
+
   return (
     <ColumnStackLayout noMargin>
       {!isConnected ? (
@@ -202,15 +245,33 @@ export const FileToCloudProjectResourceUploader = ({
               disabled={!canChooseFiles}
               onChange={event => {
                 const files = [];
+                const newFilteredOutFiles = [];
                 for (let i = 0; i < event.currentTarget.files.length; i++) {
-                  files.push(event.currentTarget.files[i]);
+                  const selectedFile = event.currentTarget.files[i];
+                  if (
+                    !shouldValidateFilePostPicking ||
+                    validateFilePostPicking(selectedFile)
+                  ) {
+                    files.push(selectedFile);
+                  } else {
+                    newFilteredOutFiles.push(selectedFile);
+                  }
                 }
+                setFilteredOutFiles(newFilteredOutFiles);
                 setSelectedFiles(files);
 
                 // Remove the previous error, if any, to let a new upload attempt be triggered.
                 setError(null);
               }}
             />
+            {filteredOutFiles.length > 0 && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  The following file(s) cannot be used for this kind of object:{' '}
+                  {filteredOutFiles.map(file => file.name).join(', ')}
+                </Trans>
+              </AlertMessage>
+            )}
           </Column>
         </Line>
       </Paper>
@@ -242,7 +303,7 @@ export const FileToCloudProjectResourceUploader = ({
       )}
       <LineStackLayout alignItems="center" justifyContent="stretch" expand>
         {isUploading ? (
-          <LinearProgress expand value={uploadProgress} variant="determinate" />
+          <LinearProgress value={uploadProgress} variant="determinate" />
         ) : null}
       </LineStackLayout>
       {error && (

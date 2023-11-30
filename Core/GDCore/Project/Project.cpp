@@ -15,13 +15,12 @@
 #include <vector>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Parsers/GrammarTerminals.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -83,8 +82,43 @@ Project::~Project() {}
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
-    const gd::String& type, const gd::String& name) const {
-  return gd::make_unique<Object>(name, type, CreateObjectConfiguration(type));
+    const gd::String& objectType, const gd::String& name) const {
+  std::unique_ptr<gd::Object> object = gd::make_unique<Object>(
+      name, objectType, CreateObjectConfiguration(objectType));
+
+  auto& platform = GetCurrentPlatform();
+  auto& project = *this;
+  auto addDefaultBehavior = [&platform, &project, &object, &objectType](
+                                const gd::String& behaviorType) {
+    auto& behaviorMetadata =
+        gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+    if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      gd::LogWarning("Object: " + objectType +
+                     " has an unknown default behavior: " + behaviorType);
+      return;
+    }
+    auto* behavior = object->AddNewBehavior(
+        project, behaviorType, behaviorMetadata.GetDefaultName());
+    behavior->SetDefaultBehavior(true);
+  };
+
+  if (Project::HasEventsBasedObject(objectType)) {
+    addDefaultBehavior("EffectCapability::EffectBehavior");
+    addDefaultBehavior("ResizableCapability::ResizableBehavior");
+    addDefaultBehavior("ScalableCapability::ScalableBehavior");
+    addDefaultBehavior("FlippableCapability::FlippableBehavior");
+  } else {
+    auto& objectMetadata =
+        gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+    if (MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
+      gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
+    }
+    for (auto& behaviorType : objectMetadata.GetDefaultBehaviors()) {
+      addDefaultBehavior(behaviorType);
+    }
+  }
+
+  return std::move(object);
 }
 
 std::unique_ptr<gd::ObjectConfiguration> Project::CreateObjectConfiguration(
@@ -630,8 +664,10 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
-  SetAntialiasingMode(propElement.GetStringAttribute("antialiasingMode", "MSAA"));
-  SetAntialisingEnabledOnMobile(propElement.GetBoolAttribute("antialisingEnabledOnMobile", false));
+  SetAntialiasingMode(
+      propElement.GetStringAttribute("antialiasingMode", "MSAA"));
+  SetAntialisingEnabledOnMobile(
+      propElement.GetBoolAttribute("antialisingEnabledOnMobile", false));
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
@@ -805,6 +841,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   resourcesManager.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
   UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
+  if (element.HasChild("objectsFolderStructure")) {
+    UnserializeFoldersFrom(*this, element.GetChild("objectsFolderStructure", 0));
+  }
+  AddMissingObjectsInRootFolder();
+
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
   scenes.clear();
@@ -887,7 +928,8 @@ void Project::SerializeTo(SerializerElement& element) const {
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   propElement.SetAttribute("antialiasingMode", antialiasingMode);
-  propElement.SetAttribute("antialisingEnabledOnMobile", isAntialisingEnabledOnMobile);
+  propElement.SetAttribute("antialisingEnabledOnMobile",
+                           isAntialisingEnabledOnMobile);
   propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
@@ -955,6 +997,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   resourcesManager.SerializeTo(element.AddChild("resources"));
   SerializeObjectsTo(element.AddChild("objects"));
+  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
 
@@ -993,58 +1036,42 @@ void Project::SerializeTo(SerializerElement& element) const {
         externalSourceFilesElement.AddChild("sourceFile"));
 }
 
-bool Project::ValidateName(const gd::String& name) {
+bool Project::IsNameSafe(const gd::String& name) {
   if (name.empty()) return false;
 
   if (isdigit(name[0])) return false;
 
-  gd::String allowedCharacters =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-  return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
+  for (auto character : name) {
+    if (!GrammarTerminals::IsAllowedInIdentifier(character)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
-void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::ProjectBrowserHelper::ExposeProjectEvents for a method that
-  // traverse the whole project (this time for events) and ExposeProjectEffects
-  // (this time for effects). Ideally, this method could be moved outside of
-  // gd::Project.
+gd::String Project::GetSafeName(const gd::String& name) {
+  if (name.empty()) return "Unnamed";
 
-  gd::ResourcesManager* resourcesManager = &GetResourcesManager();
+  gd::String newName = name;
 
-  // Add project resources
-  worker.ExposeResources(resourcesManager);
-  platformSpecificAssets.ExposeResources(worker);
+  if (isdigit(name[0])) newName = "_" + newName;
 
-  // Add layouts resources
-  for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
-    for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j) {  // Add objects resources
-      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
-    }
+  for (size_t i = 0; i < newName.size(); ++i) {
+    // Note that iterating on the characters is not super efficient (O(n^2),
+    // which could be avoided with an iterator), but this function is not
+    // critical for performance (only used to generate a name when a user
+    // creates a new entity or rename one).
+    auto character = newName[i];
+    bool isAllowed = GrammarTerminals::IsAllowedInIdentifier(character);
 
-    LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
-  }
-  // Add external events resources
-  for (std::size_t s = 0; s < GetExternalEventsCount(); s++) {
-    LaunchResourceWorkerOnEvents(
-        *this, GetExternalEvents(s).GetEvents(), worker);
-  }
-  // Add events functions extensions resources
-  for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
-    auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
+    // Replace all unallowed letters by an underscore.
+    if (!isAllowed) {
+      newName.replace(i, 1, '_');
     }
   }
 
-  // Add global objects resources
-  for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).GetConfiguration().ExposeResources(worker);
-  }
-
-  // Add loading screen background image if present
-  if (loadingScreen.GetBackgroundImageResourceName() != "")
-    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
+  return newName;
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {

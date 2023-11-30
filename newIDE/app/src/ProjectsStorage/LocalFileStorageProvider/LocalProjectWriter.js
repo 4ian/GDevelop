@@ -17,6 +17,13 @@ const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 
+export const splittedProjectFolderNames = [
+  'layouts',
+  'externalLayouts',
+  'externalEvents',
+  'eventsFunctionsExtensions',
+];
+
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();
   return new Promise((resolve, reject) => {
@@ -42,7 +49,7 @@ const checkFileContent = (filePath: string, expectedContent: string) => {
   });
 };
 
-export const writeAndCheckFile = async (
+const writeAndCheckFile = async (
   content: string,
   filePath: string
 ): Promise<void> => {
@@ -75,13 +82,9 @@ const writeProjectFiles = (
       pathSeparator: '/',
       getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
       shouldSplit: splitPaths(
-        new Set([
-          '/layouts/*',
-          '/externalLayouts/*',
-          '/externalEvents/*',
-          '/layouts/*',
-          '/eventsFunctionsExtensions/*',
-        ])
+        new Set(
+          splittedProjectFolderNames.map(folderName => `/${folderName}/*`)
+        )
       ),
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
     });
@@ -245,17 +248,15 @@ const cleanUpProjectFileName = (projectFileName: string) =>
     .replace(consecutiveSpacesRegex, ' ')
     .trim();
 
-export const onRenderNewProjectSaveAsLocationChooser = ({
+export const getProjectLocation = ({
   projectName,
   saveAsLocation,
-  setSaveAsLocation,
   newProjectsDefaultFolder,
 }: {
   projectName: string,
   saveAsLocation: ?SaveAsLocation,
-  setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
-}) => {
+}): SaveAsLocation => {
   const outputPath = saveAsLocation
     ? path.dirname(saveAsLocation.fileIdentifier)
     : newProjectsDefaultFolder
@@ -264,22 +265,57 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
   const projectFileName = projectName
     ? cleanUpProjectFileName(projectName) + '.json'
     : 'game.json';
-  if (!saveAsLocation) {
-    setSaveAsLocation({
-      fileIdentifier: path.join(outputPath, projectFileName),
-    });
-  }
+  return {
+    fileIdentifier: path.join(outputPath, projectFileName),
+  };
+};
 
+export const renderNewProjectSaveAsLocationChooser = ({
+  projectName,
+  saveAsLocation,
+  setSaveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
+|}) => {
+  const projectLocation = getProjectLocation({
+    projectName,
+    saveAsLocation,
+    newProjectsDefaultFolder,
+  });
   return (
     <LocalFolderPicker
       fullWidth
-      value={outputPath}
-      onChange={newOutputPath =>
-        setSaveAsLocation({
-          fileIdentifier: path.join(newOutputPath, projectFileName),
-        })
-      }
+      value={path.dirname(projectLocation.fileIdentifier)}
+      onChange={newOutputPath => {
+        const newOutputFileIdentifier = path.join(
+          newOutputPath,
+          path.basename(projectLocation.fileIdentifier)
+        );
+        setSaveAsLocation(
+          getProjectLocation({
+            projectName,
+            saveAsLocation: {
+              fileIdentifier: newOutputFileIdentifier,
+            },
+            newProjectsDefaultFolder,
+          })
+        );
+      }}
       type="create-game"
     />
   );
+};
+
+export const isTryingToSaveInForbiddenPath = (filePath: string): boolean => {
+  if (!remote) return false; // This should not happen, but let's be safe.
+  // If the user is saving locally and chose the same location as where the
+  // executable is running, prevent this, as it will be deleted when the app is updated.
+  const exePath = remote.app.getPath('exe');
+  if (!exePath) return false; // This should not happen, but let's be safe.
+  const gdevelopDirectory = path.dirname(exePath);
+  return filePath.startsWith(gdevelopDirectory);
 };

@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   enum LoadingScreenState {
     NOT_STARTED,
     STARTED,
@@ -52,9 +50,9 @@ namespace gdjs {
         // without a canvas.
         return;
       }
-      this._pixiRenderer.backgroundColor = this._loadingScreenData.backgroundColor;
+      this._pixiRenderer.background.color = this._loadingScreenData.backgroundColor;
 
-      const backgroundTexture = imageManager.getPIXITexture(
+      const backgroundTexture = imageManager.getOrLoadPIXITexture(
         loadingScreenData.backgroundImageResourceName
       );
       if (backgroundTexture !== imageManager.getInvalidPIXITexture()) {

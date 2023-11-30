@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import gesture from 'pixi-simple-gesture';
-import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
+import KeyboardShortcuts, { MID_MOUSE_BUTTON } from '../UI/KeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -193,6 +193,9 @@ export default class InstancesEditor extends Component<Props> {
         preserveDrawingBuffer: true,
         antialias: false,
         backgroundAlpha: 0,
+        // It's the default value, but it's better to make it explicit.
+        // It allows instances composed of several pixi objects to detect hovering.
+        eventMode: 'auto',
         // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
       });
 
@@ -212,6 +215,11 @@ export default class InstancesEditor extends Component<Props> {
 
       gameCanvas = this.pixiRenderer.view;
     }
+
+    // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
+    // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
+    this.pixiRenderer.plugins.accessibility.destroy();
+    delete this.pixiRenderer.plugins.accessibility;
 
     // Add the renderer view element to the DOM
     canvasArea.appendChild(gameCanvas);
@@ -280,11 +288,11 @@ export default class InstancesEditor extends Component<Props> {
       this.props.width,
       this.props.height
     );
-    gesture.panable(this.backgroundArea);
-    this.backgroundArea.on('mousedown', event =>
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y)
+    panable(this.backgroundArea);
+    this.backgroundArea.addEventListener('mousedown', event =>
+      this._onBackgroundClicked(event.data.global.x, event.data.global.y, event)
     );
-    this.backgroundArea.on(
+    this.backgroundArea.addEventListener(
       'rightclick',
       (interactionEvent: PIXI.InteractionEvent) => {
         const {
@@ -301,19 +309,19 @@ export default class InstancesEditor extends Component<Props> {
         return false;
       }
     );
-    this.backgroundArea.on('touchstart', event => {
+    this.backgroundArea.addEventListener('touchstart', event => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
         return;
       }
 
       this._onBackgroundClicked(event.data.global.x, event.data.global.y);
     });
-    this.backgroundArea.on('mousemove', event => {
+    this.backgroundArea.addEventListener('globalmousemove', event => {
       const cursorX = event.data.global.x || 0;
       const cursorY = event.data.global.y || 0;
       this._onMouseMove(cursorX, cursorY);
     });
-    this.backgroundArea.on('panmove', event =>
+    this.backgroundArea.addEventListener('panmove', (event: PanMoveEvent) =>
       this._onPanMove(
         event.deltaX,
         event.deltaY,
@@ -321,7 +329,7 @@ export default class InstancesEditor extends Component<Props> {
         event.data.global.y
       )
     );
-    this.backgroundArea.on('panend', event => this._onPanEnd());
+    this.backgroundArea.addEventListener('panend', event => this._onPanEnd());
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
@@ -476,15 +484,31 @@ export default class InstancesEditor extends Component<Props> {
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
-    this.selectionRectangle.delete();
-    this.instancesRenderer.delete();
-    this._instancesAdder.unmount();
-    this.pinchHandler.unmount();
-    this.longTouchHandler.unmount();
+    // We've seen all those elements being undefined in some cases, so
+    // by security, check that they are defined before deleting them.
+    if (this.selectionRectangle) {
+      this.selectionRectangle.delete();
+    }
+    if (this.instancesRenderer) {
+      this.instancesRenderer.delete();
+    }
+    if (this._instancesAdder) {
+      this._instancesAdder.unmount();
+    }
+    if (this.pinchHandler) {
+      this.pinchHandler.unmount();
+    }
+    if (this.longTouchHandler) {
+      this.longTouchHandler.unmount();
+    }
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
-    this.pixiContainer.destroy();
-    this.pixiRenderer.destroy();
+    if (this.pixiContainer) {
+      this.pixiContainer.destroy();
+    }
+    if (this.pixiRenderer) {
+      this.pixiRenderer.destroy();
+    }
   }
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
@@ -628,23 +652,31 @@ export default class InstancesEditor extends Component<Props> {
     this.lastCursorY = y;
   };
 
-  _onBackgroundClicked = (x: number, y: number) => {
+  _onBackgroundClicked = (x: number, y: number, event?: PointerEvent) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
+
+    // KeyboardShortcuts.shouldMoveView cannot be used here because
+    // the click event fires first on the background, then on the pixi
+    // view which KeyboardShortcuts listens to. So KeyboardShortcuts
+    // will always be late.
+    const shouldMoveView =
+      this.keyboardShortcuts.shouldMoveView() ||
+      (event ? event.button === MID_MOUSE_BUTTON : false);
 
     // Selection rectangle is only drawn in _onPanMove,
     // which can happen a few milliseconds after a background
     // click/touch - enough to have the selection rectangle being
     // offset from the first click - which looks laggy. Set
     // the start position now.
-    if (!this.keyboardShortcuts.shouldMoveView()) {
+    if (!shouldMoveView) {
       this.selectionRectangle.startSelectionRectangle(x, y);
     }
 
     if (
       !this.keyboardShortcuts.shouldMultiSelect() &&
-      !this.keyboardShortcuts.shouldMoveView() &&
+      !shouldMoveView &&
       this.props.instancesSelection.hasSelectedInstances()
     ) {
       this.props.instancesSelection.clearSelection();
@@ -735,7 +767,8 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onOverInstance = (instance: gdInitialInstance) => {
-    this.highlightedInstance.setInstance(instance);
+    if (!this.instancesMover.isMoving())
+      this.highlightedInstance.setInstance(instance);
   };
 
   _onDownInstance = (
@@ -1051,6 +1084,12 @@ export default class InstancesEditor extends Component<Props> {
   pauseSceneRendering = () => {
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     this._renderingPaused = true;
+    // Deactivate interactions when the scene is paused.
+    // Useful when the scene is paused to reload textures. The event system
+    // might try to check if pointer is over a PIXI object using the texture
+    // of the object. If there is no texture, it will crash.
+    // The PIXI.EventSystem is not based on the PIXI.Ticker.
+    this.instancesRenderer.getPixiContainer().eventMode = 'none';
 
     stopPIXITicker();
   };
@@ -1058,6 +1097,7 @@ export default class InstancesEditor extends Component<Props> {
   restartSceneRendering = () => {
     this._renderingPaused = false;
     this._renderScene();
+    this.instancesRenderer.getPixiContainer().eventMode = 'auto';
 
     startPIXITicker();
   };

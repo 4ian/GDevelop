@@ -9,34 +9,41 @@ import { Trans } from '@lingui/macro';
 import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
+import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 type Props = {|
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
+  onOpenPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
 |};
 
 const StoreSection = ({
   project,
   resourceManagementProps,
   canInstallPrivateAsset,
+  onOpenPrivateGameTemplateListingData,
 }: Props) => {
   const [
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const { searchResults, navigationState } = React.useContext(
-    AssetStoreContext
-  );
+  const {
+    assetShortHeadersSearchResults,
+    shopNavigationState,
+  } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
-  } = navigationState.getCurrentPage();
+  } = shopNavigationState.getCurrentPage();
 
   const assetShortHeadersToInstall = openedAssetShortHeader
     ? [openedAssetShortHeader]
     : openedAssetPack
-    ? searchResults
+    ? assetShortHeadersSearchResults
     : [];
 
   const existingAssetStoreIds = React.useMemo(
@@ -60,8 +67,13 @@ const StoreSection = ({
     <SectionContainer
       title={null /* Give the asset store the full space to display */}
       flexBody
+      noScroll
     >
-      <AssetStore />
+      <AssetStore
+        onOpenPrivateGameTemplateListingData={
+          onOpenPrivateGameTemplateListingData
+        }
+      />
       <Line justifyContent="flex-end">
         <RaisedButton
           primary
@@ -112,4 +124,13 @@ const StoreSection = ({
   );
 };
 
-export default StoreSection;
+const StoreSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Shop section</Trans>}
+    scope="start-page-shop"
+  >
+    <StoreSection {...props} />
+  </ErrorBoundary>
+);
+
+export default StoreSectionWithErrorBoundary;

@@ -306,7 +306,7 @@ const void SetupEvents(gd::EventsList &eventList) {
       action.SetParameter(
           0,
           gd::Expression(
-              "ObjectWithMyBehavior.GetObjectNumber()"));
+              "ObjectWithMyBehavior.GetObjectNumber() + ObjectWithMyBehavior.MyVariable + ObjectWithMyBehavior.MyStructureVariable.Child"));
       event.GetActions().Insert(action);
       eventList.InsertEvent(event);
     }
@@ -415,13 +415,13 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorSharedPropertyAction) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the layout using "MyProperty" action
+    // Create an event in the layout using "MySharedProperty" action
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
       instruction.SetType(
           "MyEventsExtension::MyEventsBasedBehavior::" +
-          gd::EventsBasedBehavior::GetSharedPropertyActionName("MyProperty"));
+          gd::EventsBasedBehavior::GetSharedPropertyActionName("MySharedProperty"));
       event.GetActions().Insert(instruction);
       eventList.InsertEvent(event);
     }
@@ -429,13 +429,13 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorSharedPropertyCondition) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the layout using "MyProperty" condition
+    // Create an event in the layout using "MySharedProperty" condition
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
       instruction.SetType(
           "MyEventsExtension::MyEventsBasedBehavior::" +
-          gd::EventsBasedBehavior::GetSharedPropertyConditionName("MyProperty"));
+          gd::EventsBasedBehavior::GetSharedPropertyConditionName("MySharedProperty"));
       event.GetConditions().Insert(instruction);
       eventList.InsertEvent(event);
     }
@@ -443,7 +443,7 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorSharedPropertyExpression) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the layout using "MyProperty" expression
+    // Create an event in the layout using "MySharedProperty" expression
     {
       gd::StandardEvent event;
       gd::Instruction instruction;
@@ -452,7 +452,7 @@ const void SetupEvents(gd::EventsList &eventList) {
       instruction.SetParameter(
           0, gd::Expression("ObjectWithMyBehavior.MyBehavior::" +
                             gd::EventsBasedBehavior::GetSharedPropertyExpressionName(
-                                "MyProperty") +
+                                "MySharedProperty") +
                             "()"));
       event.GetActions().Insert(instruction);
       eventList.InsertEvent(event);
@@ -929,11 +929,15 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         .SetFunctionType(gd::EventsFunction::ActionWithOperator)
         .SetGetterName("MyBehaviorEventsFunctionExpressionAndCondition");
 
-    // Add property
+    // Add a property:
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("MyProperty", 0)
         .SetType("Number");
-    // The same name is used for the shared property to ensure there is no name
+    // Add a shared property:
+    eventsBasedBehavior.GetSharedPropertyDescriptors()
+        .InsertNew("MySharedProperty", 0)
+        .SetType("Number");
+    // The same name is used for another shared property to ensure there is no name
     // collision.
     eventsBasedBehavior.GetSharedPropertyDescriptors()
         .InsertNew("MyProperty", 0)
@@ -1068,6 +1072,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &childObject = eventsBasedObject.InsertNewObject(
         project, "MyExtension::Sprite", "ObjectWithMyBehavior", 0);
     childObject.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
+    childObject.GetVariables().InsertNew("MyVariable");
+    childObject.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
     auto &group = eventsBasedObject.GetObjectGroups().InsertNew("GroupWithMyBehavior");
     group.AddObject(childObject.GetName());
 
@@ -1154,6 +1160,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &object = layout.InsertNewObject(project, "MyExtension::Sprite",
                                           "ObjectWithMyBehavior", 0);
     object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
+    object.GetVariables().InsertNew("MyVariable");
+    object.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
     auto &group = layout.GetObjectGroups().InsertNew("GroupWithMyBehavior", 0);
     group.AddObject("ObjectWithMyBehavior");
 
@@ -1455,10 +1463,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         REQUIRE(GetEventFirstActionFirstParameterString(eventsList->GetEvent(
                     FreeFunctionWithObjects)) == "RenamedObjectWithMyBehavior");
 
-        // Check object name has been renamed in expressions.
+        // Check object name has been renamed in expressions and in object variables.
         REQUIRE(GetEventFirstActionFirstParameterString(
                     eventsList->GetEvent(FreeFunctionWithObjectExpression)) ==
-                "RenamedObjectWithMyBehavior.GetObjectNumber()");
+                "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
       }
     }
   }
@@ -1567,6 +1575,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       gd::ParameterMetadataTools::ParametersToObjectsContainer(
           project, eventsFunction.GetParameters(), objectsContainer);
 
+      // Simulate a variable in ObjectWithMyBehavior, even if this is not
+      // supported by the editor.
+      auto& objectWithMyBehavior = objectsContainer.GetObject("ObjectWithMyBehavior");
+      objectWithMyBehavior.GetVariables().InsertNew("MyVariable");
+      objectWithMyBehavior.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
+
       // Trigger the refactoring after the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
           project, eventsFunction, globalObjectsContainer, objectsContainer,
@@ -1579,11 +1593,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               eventsFunction.GetEvents().GetEvent(FreeFunctionWithObjects)) ==
           "RenamedObjectWithMyBehavior");
 
-      // Check object name has been renamed in expressions.
+      // Check object name has been renamed in expressions and object variables.
       REQUIRE(GetEventFirstActionFirstParameterString(
                   eventsFunction.GetEvents().GetEvent(
                       FreeFunctionWithObjectExpression)) ==
-              "RenamedObjectWithMyBehavior.GetObjectNumber()");
+              "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
     }
   }
 
@@ -1618,10 +1632,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 objectFunctionEvents.GetEvent(FreeFunctionWithObjects)) ==
             "RenamedObjectWithMyBehavior");
 
-    // Check object name has been renamed in expressions.
+    // Check object name has been renamed in expressions and object variables.
     REQUIRE(GetEventFirstActionFirstParameterString(
                 objectFunctionEvents.GetEvent(FreeFunctionWithObjectExpression)) ==
-              "RenamedObjectWithMyBehavior.GetObjectNumber()");
+              "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
   }
 
   SECTION("Object deleted (in events function)") {
@@ -1742,7 +1756,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     eventsList->GetEvent(BehaviorActionWithOperator)) ==
           "MyRenamedExtension::MyEventsBasedBehavior::"
           "MyBehaviorEventsFunctionActionWithOperator");
-      
+
       // Check if events-based behaviors properties have been renamed in
       // instructions
       REQUIRE(GetEventFirstActionType(
@@ -1752,7 +1766,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyRenamedExtension::MyEventsBasedBehavior::"
-              "SetSharedPropertyMyProperty");
+              "SetSharedPropertyMySharedProperty");
 
       // Check events-based behavior methods have *not* been renamed in
       // expressions
@@ -2114,7 +2128,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyEventsExtension::MyRenamedEventsBasedBehavior::"
-              "SetSharedPropertyMyProperty");
+              "SetSharedPropertyMySharedProperty");
 
       // Check events-based behavior methods have *not* been renamed in
       // expressions
@@ -2729,16 +2743,16 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SetSharedPropertyMyProperty");
+              "SetSharedPropertyMySharedProperty");
 
       REQUIRE(GetEventFirstConditionType(
                   eventsList->GetEvent(BehaviorSharedPropertyCondition)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SharedPropertyMyProperty");
+              "SharedPropertyMySharedProperty");
 
       REQUIRE(GetEventFirstActionFirstParameterString(
                   eventsList->GetEvent(BehaviorSharedPropertyExpression)) ==
-              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMyProperty()");
+              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMySharedProperty()");
     }
   }
 
@@ -2751,6 +2765,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
 
     gd::WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
+        project, eventsExtension, eventsBasedBehavior, "MySharedProperty",
+        "MyRenamedSharedProperty");
+
+    // Also wrongly try to rename a property that is not a shared property.
+    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
         project, eventsExtension, eventsBasedBehavior, "MyProperty",
         "MyRenamedProperty");
 
@@ -2760,16 +2779,16 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionType(
                   eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SetSharedPropertyMyRenamedProperty");
+              "SetSharedPropertyMyRenamedSharedProperty");
 
       REQUIRE(GetEventFirstConditionType(
                   eventsList->GetEvent(BehaviorSharedPropertyCondition)) ==
               "MyEventsExtension::MyEventsBasedBehavior::"
-              "SharedPropertyMyRenamedProperty");
+              "SharedPropertyMyRenamedSharedProperty");
 
       REQUIRE(GetEventFirstActionFirstParameterString(
                   eventsList->GetEvent(BehaviorSharedPropertyExpression)) ==
-              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMyRenamedProperty()");
+              "ObjectWithMyBehavior.MyBehavior::SharedPropertyMyRenamedSharedProperty()");
 
       // Ensure that the property was NOT renamed.
       REQUIRE(GetEventFirstActionType(
@@ -2951,7 +2970,7 @@ TEST_CASE("WholeProjectRefactorer (FixInvalidRequiredBehaviorProperties)",
   // - add the behavior "A" to an object
   // Check that no behavior is added on the object for it and that there is no
   // crash.
-  
+
   SECTION("Fix nothing if there are no missing required behavior") {
     gd::Project project;
     gd::Platform platform;
@@ -3348,10 +3367,21 @@ const gd::Instruction &CreateActionWithLayerParameter(gd::Project &project,
   action.SetParameter(3, gd::Expression("\"My layer\""));
   return event.GetActions().Insert(action);
 }
+const gd::Instruction &CreateActionWithEmptyLayerParameter(gd::Project &project,
+                                                      gd::EventsList &events) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
 
+  gd::Instruction action;
+  action.SetType("MyExtension::SetCameraCenterX");
+  action.SetParametersCount(4);
+  action.SetParameter(3, gd::Expression(""));
+  return event.GetActions().Insert(action);
+}
 const gd::Instruction &
 CreateExpressionWithLayerParameter(gd::Project &project,
-                                   gd::EventsList &events) {
+                                   gd::EventsList &events,
+                                   const gd::String &layerName) {
   gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
       events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
 
@@ -3359,8 +3389,8 @@ CreateExpressionWithLayerParameter(gd::Project &project,
   action.SetType("MyExtension::DoSomething");
   action.SetParametersCount(1);
   action.SetParameter(
-      0, gd::Expression("MyExtension::CameraCenterX(\"My layer\") + "
-                        "MyExtension::CameraCenterX(\"My layer\")"));
+      0, gd::Expression("MyExtension::CameraCenterX(\"" + layerName + "\") + "
+                        "MyExtension::CameraCenterX(\"" + layerName + "\")"));
   return event.GetActions().Insert(action);
 }
 } // namespace
@@ -3390,13 +3420,13 @@ TEST_CASE("RenameLayer", "[common]") {
         project, otherExternalEvents.GetEvents());
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
     auto &externalExpression =
-        CreateExpressionWithLayerParameter(project, externalEvents.GetEvents());
+        CreateExpressionWithLayerParameter(project, externalEvents.GetEvents(), "My layer");
     auto &otherLayoutExpression =
-        CreateExpressionWithLayerParameter(project, otherLayout.GetEvents());
+        CreateExpressionWithLayerParameter(project, otherLayout.GetEvents(), "My layer");
     auto &otherExternalExpression = CreateExpressionWithLayerParameter(
-        project, otherExternalEvents.GetEvents());
+        project, otherExternalEvents.GetEvents(), "My layer");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "My renamed layer");
@@ -3434,7 +3464,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layout = project.InsertNewLayout("My layout", 0);
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "layerA");
@@ -3442,6 +3472,57 @@ TEST_CASE("RenameLayer", "[common]") {
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::CameraCenterX(\"layerA\") + "
             "MyExtension::CameraCenterX(\"layerA\")");
+  }
+
+  SECTION("Can rename a layer when a layer parameter is empty") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutAction =
+        CreateActionWithEmptyLayerParameter(project, layout.GetEvents());
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+                                            "layerA");
+
+    REQUIRE(layoutAction.GetParameter(0).GetPlainString() == "");
+  }
+
+  SECTION("Can't rename a layer to an empty name") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+                                            "");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My layer\") + "
+            "MyExtension::CameraCenterX(\"My layer\")");
+  }
+
+  SECTION("Can't rename a layer from an empty name") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "");
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "", "My layer");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"\") + "
+            "MyExtension::CameraCenterX(\"\")");
   }
 }
 
@@ -3625,7 +3706,6 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     auto &wrongLayerExpression =
         CreateExpressionWithLayerEffectParameter(project, layout.GetEvents(), "My layer 2");
 
-    std::cout << "RenameLayerEffect" << std::endl;
     gd::WholeProjectRefactorer::RenameLayerEffect(project, layout, layer, "My effect",
                                             "My renamed effect");
 
@@ -3657,5 +3737,131 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     REQUIRE(wrongLayerExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
+  }
+}
+
+TEST_CASE("RemoveLayer", "[common]") {
+  SECTION("Can remove instances in a layout and its associated external layouts") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+
+    layout.InsertNewLayer("My layer", 0);
+    otherLayout.InsertNewLayer("My layer", 0);
+
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    auto &otherExternalLayout =
+        project.InsertNewExternalLayout("My other external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    otherExternalLayout.SetAssociatedLayout("My other layout");
+
+    auto &initialInstances = layout.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+
+    auto &externalInitialInstances = externalLayout.GetInitialInstances();
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("");
+
+    auto &otherInitialInstances = otherLayout.GetInitialInstances();
+    otherInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    auto &otherExternalInitialInstances = otherExternalLayout.GetInitialInstances();
+    otherExternalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 5);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 3);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
+
+    gd::WholeProjectRefactorer::RemoveLayer(project, layout, "My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 2);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
+  }
+}
+
+TEST_CASE("MergeLayers", "[common]") {
+  SECTION("Can merge instances from a layout into another layout (and their associated external layouts)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+
+    layout.InsertNewLayer("My layer", 0);
+    otherLayout.InsertNewLayer("My layer", 0);
+
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    auto &otherExternalLayout =
+        project.InsertNewExternalLayout("My other external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    otherExternalLayout.SetAssociatedLayout("My other layout");
+
+    auto &initialInstances = layout.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+
+    auto &externalInitialInstances = externalLayout.GetInitialInstances();
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+
+    auto &otherInitialInstances = otherLayout.GetInitialInstances();
+    otherInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    auto &otherExternalInitialInstances = otherExternalLayout.GetInitialInstances();
+    otherExternalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 4);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
+
+    gd::WholeProjectRefactorer::MergeLayers(project, layout, "My layer", "");
+
+    // No instance was removed.
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 4);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    // No instance remain in "My layer".
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
+
+    // Layers with the same name in other layouts are untouched.
+    REQUIRE(otherInitialInstances.GetLayerInstancesCount("My layer") == 1);
+    REQUIRE(otherExternalInitialInstances.GetLayerInstancesCount("My layer") == 1);
+
+    // Other layers from the same layout are untouched.
+    REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My other layer") == 1);
   }
 }

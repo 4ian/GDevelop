@@ -224,30 +224,26 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   }
 
   /**
-   * \brief The "capabilities" that are offered by the base object that are
-   * *not* supported by this object, and should be hidden in the editor
-   * interface.
+   * \brief The "capabilities" that are offered by through behaviors.
    */
-  const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
-    return unsupportedBaseObjectCapabilities;
+  const std::set<gd::String>& GetDefaultBehaviors() const {
+    return defaultBehaviorTypes;
   }
 
   /**
-   * \brief Add a "capability" that is offered by the base object that is *not*
-   * supported by this object, and should be hidden in the editor interface.
+   * \brief Return true if object has a default behavior of the given type.
    */
-  ObjectMetadata& AddUnsupportedBaseObjectCapability(
-      const gd::String& capability) {
-    unsupportedBaseObjectCapabilities.insert(capability);
+  bool HasDefaultBehavior(const gd::String& behaviorType) const {
+    return defaultBehaviorTypes.find(behaviorType) != defaultBehaviorTypes.end();
+  }
+
+  /**
+   * \brief Add a "capability" that is offered by through a behavior.
+   */
+  ObjectMetadata& AddDefaultBehavior(
+      const gd::String& behaviorType) {
+    defaultBehaviorTypes.insert(behaviorType);
     return *this;
-  }
-
-  /**
-   * \brief Check if a "capability" that is offered by the base object is *not*
-   * supported by this object, and should be hidden in the editor interface.
-   */
-  bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
-    return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();
   }
 
   const gd::String& GetName() const override { return name; }
@@ -307,11 +303,23 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
     return *this;
   }
 
-
   /**
-   * \brief Return true if the instruction must be hidden in the IDE.
+   * \brief Return true if the object must be hidden in the IDE.
    */
   bool IsHidden() const { return hidden; }
+
+  /**
+   * \brief Declare a usage of the 3D renderer.
+   */
+  ObjectMetadata &MarkAsRenderedIn3D() {
+    isRenderedIn3D = true;
+    return *this;
+  }
+
+  /**
+   * \brief Return true if the object uses the 3D renderer.
+   */
+  bool IsRenderedIn3D() const { return isRenderedIn3D; }
 
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
@@ -331,8 +339,9 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String description;
   gd::String iconFilename;
   gd::String categoryFullName;
-  std::set<gd::String> unsupportedBaseObjectCapabilities;
+  std::set<gd::String> defaultBehaviorTypes;
   bool hidden = false;
+  bool isRenderedIn3D = false;
 
   std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

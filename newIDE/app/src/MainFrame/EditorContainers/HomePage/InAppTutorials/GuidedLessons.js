@@ -43,12 +43,15 @@ const getColumnsFromWidth = (width: WidthType) => {
     case 'medium':
       return 2;
     case 'large':
-    default:
       return 3;
+    case 'xlarge':
+      return 4;
+    default:
+      return 2;
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('large');
+const MAX_COLUMNS = getColumnsFromWidth('xlarge');
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {
@@ -57,7 +60,7 @@ const styles = {
     // Avoid tiles taking too much space on large screens.
     maxWidth: MAX_SECTION_WIDTH,
     overflow: 'hidden',
-    width: '100%',
+    width: `calc(100% + ${2 * ITEMS_SPACING}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
   },
   bannerContainer: {
     width: '100%',
@@ -67,21 +70,21 @@ const styles = {
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
+  /** To use to restrict the lessons that are displayed. */
+  lessonsIds?: ?Array<string>,
 |};
 
-const GuidedLessons = ({ selectInAppTutorial }: Props) => {
+const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
   const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,
     fetchInAppTutorials,
+    currentlyRunningInAppTutorial,
   } = React.useContext(InAppTutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
 
   const getTutorialPartProgress = ({ tutorialId }: { tutorialId: string }) => {
     const tutorialProgress = getTutorialProgress({
@@ -172,7 +175,7 @@ const GuidedLessons = ({ selectInAppTutorial }: Props) => {
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
     },
-  ];
+  ].filter(item => (lessonsIds ? lessonsIds.includes(item.id) : true));
 
   return (
     <Line>
@@ -188,18 +191,20 @@ const GuidedLessons = ({ selectInAppTutorial }: Props) => {
           <PlaceholderLoader />
         ) : (
           <ColumnStackLayout noMargin>
-            <Column>
-              <LineStackLayout alignItems="center">
-                {lessonsProgress !== 100 ? (
-                  <Text displayInlineAsSpan noMargin size="body2">
-                    {lessonsProgress}%
-                  </Text>
-                ) : (
-                  <Trophy />
-                )}
-                <ColoredLinearProgress value={lessonsProgress} />
-              </LineStackLayout>
-            </Column>
+            {!lessonsIds && (
+              <Column>
+                <LineStackLayout alignItems="center">
+                  {lessonsProgress !== 100 ? (
+                    <Text displayInlineAsSpan noMargin size="body2">
+                      {lessonsProgress}%
+                    </Text>
+                  ) : (
+                    <Trophy />
+                  )}
+                  <ColoredLinearProgress value={lessonsProgress} />
+                </LineStackLayout>
+              </Column>
+            )}
             <GridList
               cols={getColumnsFromWidth(windowWidth)}
               style={styles.grid}

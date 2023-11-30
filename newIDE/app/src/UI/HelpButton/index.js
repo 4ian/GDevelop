@@ -19,6 +19,7 @@ type PropsType = {
  */
 const HelpButton = (props: PropsType) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   if (!props.helpPagePath) return null;
   const helpLink = getHelpLink(props.helpPagePath, props.anchor);
   if (!helpLink) return null;
@@ -29,7 +30,7 @@ const HelpButton = (props: PropsType) => {
     }
   };
 
-  return windowWidth !== 'small' ? (
+  return !isMobileScreen ? (
     <TextButton
       onClick={onClick}
       target="_blank"

@@ -23,7 +23,7 @@ export const OperatorFieldString = () => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -40,7 +40,7 @@ export const OperatorFieldNumber = () => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -57,7 +57,7 @@ export const OperatorFieldColor = () => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -72,7 +72,7 @@ export const OperatorFieldUnknownType = () => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}

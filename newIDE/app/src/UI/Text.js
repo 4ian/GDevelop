@@ -46,6 +46,7 @@ type Props = {|
     overflowWrap?: 'break-word' | 'anywhere',
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
+    textWrap?: 'wrap',
 
     // Allow user to select text
     userSelect?: 'text',

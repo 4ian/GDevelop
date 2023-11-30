@@ -268,19 +268,16 @@ export const WithObjectsList = () => (
                   onEditObject={action('On edit object')}
                   onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}
-                  selectedObjectNames={[]}
-                  selectedObjectTags={[]}
-                  onChangeSelectedObjectTags={() => {}}
-                  getAllObjectTags={() => []}
-                  canRenameObject={() => true}
-                  onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameObjectStart={() => {}}
-                  onRenameObjectFinish={(objectWithContext, newName, cb) =>
-                    cb(true)
-                  }
+                  selectedObjectFolderOrObjectsWithContext={[]}
+                  getValidatedObjectOrGroupName={newName => newName}
+                  onDeleteObjects={(objectsWithContext, cb) => cb(true)}
+                  onRenameObjectFolderOrObjectWithContextFinish={(
+                    objectFolderOrObjectWithContext,
+                    newName,
+                    cb
+                  ) => cb(true)}
                   onObjectCreated={() => {}}
-                  onObjectSelected={() => {}}
-                  renamedObjectWithContext={null}
+                  onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   canInstallPrivateAsset={() => false}
                 />

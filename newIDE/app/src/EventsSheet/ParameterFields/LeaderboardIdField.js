@@ -37,7 +37,12 @@ const useFetchLeaderboards = () => {
   );
   const fetchLeaderboards = React.useCallback(
     async () => {
-      await listLeaderboards();
+      try {
+        await listLeaderboards();
+      } catch (e) {
+        // Do not throw or show alert as this can be triggered every time the field is seen.
+        console.error('Unable to fetch leaderboards', e);
+      }
     },
     [listLeaderboards]
   );

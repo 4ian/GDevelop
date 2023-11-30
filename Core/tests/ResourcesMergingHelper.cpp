@@ -16,6 +16,7 @@
 #include "GDCore/Tools/SystemStats.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "catch.hpp"
+#include "GDCore/IDE/ResourceExposer.h"
 
 class MockFileSystem : public gd::AbstractFileSystem {
  public:
@@ -75,7 +76,7 @@ TEST_CASE("ResourcesMergingHelper", "[common]") {
     project.GetResourcesManager().AddResource(
         "Image3", "subfolder/image3.png", "image");
 
-    project.ExposeResources(resourcesMerger);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesMerger);
 
     auto resourcesFilenames =
         resourcesMerger.GetAllResourcesOldAndNewFilename();
@@ -101,7 +102,7 @@ TEST_CASE("ResourcesMergingHelper", "[common]") {
     project.GetResourcesManager().AddResource(
         "Image3", "subfolder/image3.png", "image");
 
-    project.ExposeResources(resourcesMerger);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesMerger);
 
     auto resourcesFilenames =
         resourcesMerger.GetAllResourcesOldAndNewFilename();

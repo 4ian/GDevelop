@@ -443,7 +443,7 @@ module.exports = {
     extension
       .addAction(
         'SetAlwaysOnTop',
-        _('Make the windows always on top'),
+        _('Make the window always on top'),
         _('Puts the window constantly above all other windows.'),
         _('Make window always on top: _PARAM0_, level: _PARAM1_'),
         _('Windows, Linux, macOS'),

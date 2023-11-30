@@ -11,11 +11,11 @@ import ImagePreview, {
 } from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
-  allSpritesHaveSamePointsAs,
+  allAnimationSpritesHaveSamePointsAs,
   copyAnimationsSpritePoints,
+  allObjectSpritesHaveSamePointsAs,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
-import every from 'lodash/every';
 import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import EditorMosaic, {
@@ -93,17 +93,14 @@ const PointsEditor = ({
   // Note: sprite should always be defined so this value will be correctly initialised.
   const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
     sprite
-      ? every(
-          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const otherAnimation = spriteConfiguration.getAnimation(i);
-            return allSpritesHaveSamePointsAs(sprite, otherAnimation);
-          })
-        )
+      ? allObjectSpritesHaveSamePointsAs(sprite, objectConfiguration)
       : false
   );
   // Note: sprite & animation should always be defined so this value will be correctly initialised.
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(
-    sprite && animation ? allSpritesHaveSamePointsAs(sprite, animation) : false
+    sprite && animation
+      ? allAnimationSpritesHaveSamePointsAs(sprite, animation)
+      : false
   );
 
   const updatePoints = React.useCallback(
@@ -149,7 +146,9 @@ const PointsEditor = ({
       if (!sprite || !animation) {
         return;
       }
-      setSamePointsForSprites(allSpritesHaveSamePointsAs(sprite, animation));
+      setSamePointsForSprites(
+        allAnimationSpritesHaveSamePointsAs(sprite, animation)
+      );
     },
     [animation, sprite]
   );
@@ -200,9 +199,11 @@ const PointsEditor = ({
   );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const screenSize = useResponsiveWindowWidth();
-  const editorNodes =
-    screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
+  const editorNodes = isMobileScreen
+    ? verticalMosaicNodes
+    : horizontalMosaicNodes;
 
   if (!objectConfiguration.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';

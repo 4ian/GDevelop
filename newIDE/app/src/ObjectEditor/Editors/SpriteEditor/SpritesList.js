@@ -13,6 +13,11 @@ import {
   allDirectionSpritesHaveSameCollisionMasksAs,
   deleteSpritesFromAnimation,
   duplicateSpritesInAnimation,
+  isFirstSpriteUsingFullImageCollisionMask,
+  allObjectSpritesHaveSameCollisionMaskAs,
+  allObjectSpritesHaveSamePointsAs,
+  getCurrentElements,
+  getTotalSpritesCount,
 } from './Utils/SpriteObjectHelper';
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
@@ -37,6 +42,7 @@ import Add from '../../../UI/CustomSvgIcons/Add';
 import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../UI/Menu/ContextMenu';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -143,13 +149,15 @@ const SortableList = SortableContainer(
 const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   let allDirectionSpritesHaveSamePoints = false;
   let allDirectionSpritesHaveSameCollisionMasks = false;
-  if (direction.getSpritesCount() !== 0) {
+  const firstDirectionSprite =
+    direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+  if (firstDirectionSprite) {
     allDirectionSpritesHaveSamePoints = allDirectionSpritesHaveSamePointsAs(
-      direction.getSprite(0),
+      firstDirectionSprite,
       direction
     );
     allDirectionSpritesHaveSameCollisionMasks = allDirectionSpritesHaveSameCollisionMasksAs(
-      direction.getSprite(0),
+      firstDirectionSprite,
       direction
     );
   }
@@ -157,6 +165,34 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   return {
     allDirectionSpritesHaveSamePoints,
     allDirectionSpritesHaveSameCollisionMasks,
+  };
+};
+
+/**
+ * Check if all sprites of the object have the same points and collision masks
+ */
+const checkObjectPointsAndCollisionsMasks = (
+  spriteConfiguration: gdSpriteObject
+) => {
+  let allObjectSpritesHaveSamePoints = false;
+  let allObjectSpritesHaveSameCollisionMasks = false;
+  const firstObjectSprite = getCurrentElements(spriteConfiguration, 0, 0, 0)
+    .sprite;
+
+  if (firstObjectSprite) {
+    allObjectSpritesHaveSamePoints = allObjectSpritesHaveSamePointsAs(
+      firstObjectSprite,
+      spriteConfiguration
+    );
+    allObjectSpritesHaveSameCollisionMasks = allObjectSpritesHaveSameCollisionMaskAs(
+      firstObjectSprite,
+      spriteConfiguration
+    );
+  }
+
+  return {
+    allObjectSpritesHaveSamePoints,
+    allObjectSpritesHaveSameCollisionMasks,
   };
 };
 
@@ -172,6 +208,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resourceManagementProps: ResourceManagementProps,
   onReplaceByDirection: (newDirection: gdDirection) => void,
+  onSpriteAdded: (sprite: gdSprite) => void,
   onSpriteUpdated?: () => void,
   onFirstSpriteUpdated?: () => void,
   onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
@@ -186,6 +223,7 @@ const SpritesList = ({
   resourcesLoader,
   resourceManagementProps,
   onReplaceByDirection,
+  onSpriteAdded,
   onSpriteUpdated,
   onFirstSpriteUpdated,
   onChangeName,
@@ -202,6 +240,7 @@ const SpritesList = ({
   }>({});
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
+  const { showConfirmation } = useAlertDialog();
 
   const updateSelectionIndexesAfterMoveUp = React.useCallback(
     (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
@@ -287,12 +326,55 @@ const SpritesList = ({
     ]
   );
 
-  const onAddSprite = React.useCallback(
-    async (resourceSource: ResourceSource) => {
+  const applyPointsAndMasksToSpriteIfNecessary = React.useCallback(
+    (sprite: gdSprite) => {
       const {
         allDirectionSpritesHaveSameCollisionMasks,
         allDirectionSpritesHaveSamePoints,
       } = checkDirectionPointsAndCollisionsMasks(direction);
+      const {
+        allObjectSpritesHaveSameCollisionMasks,
+        allObjectSpritesHaveSamePoints,
+      } = checkObjectPointsAndCollisionsMasks(spriteConfiguration);
+      const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
+        spriteConfiguration
+      );
+      const firstObjectSprite = getCurrentElements(spriteConfiguration, 0, 0, 0)
+        .sprite;
+      const firstDirectionSprite =
+        direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+
+      // Copy points if toggles were set before adding the sprite.
+      if (allObjectSpritesHaveSamePoints && firstObjectSprite) {
+        // Copy points from the first sprite of the object, if existing.
+        copySpritePoints(firstObjectSprite, sprite);
+      } else if (allDirectionSpritesHaveSamePoints && firstDirectionSprite) {
+        // Copy points from the first sprite of the direction, if this is not the first one we add.
+        copySpritePoints(firstDirectionSprite, sprite);
+      }
+
+      // Copy collision masks if toggles were set before adding the sprite.
+      if (allObjectSpritesHaveSameCollisionMasks && firstObjectSprite) {
+        // Copy collision masks from the first sprite of the object, if existing.
+        copySpritePolygons(firstObjectSprite, sprite);
+      } else if (
+        allDirectionSpritesHaveSameCollisionMasks &&
+        firstDirectionSprite
+      ) {
+        // Copy collision masks from the first sprite of the direction, if this is not the first one we add.
+        copySpritePolygons(firstDirectionSprite, sprite);
+      }
+
+      if (shouldUseFullImageCollisionMask) {
+        sprite.setFullImageCollisionMask(true);
+      }
+    },
+    [direction, spriteConfiguration]
+  );
+
+  const onAddSprite = React.useCallback(
+    async (resourceSource: ResourceSource) => {
+      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
 
       const resources = await resourceManagementProps.onChooseResource({
         initialSourceName: resourceSource.name,
@@ -306,12 +388,10 @@ const SpritesList = ({
 
         const sprite = new gd.Sprite();
         sprite.setImageName(resource.getName());
-        if (allDirectionSpritesHaveSamePoints) {
-          copySpritePoints(direction.getSprite(0), sprite);
-        }
-        if (allDirectionSpritesHaveSameCollisionMasks) {
-          copySpritePolygons(direction.getSprite(0), sprite);
-        }
+
+        applyPointsAndMasksToSpriteIfNecessary(sprite);
+
+        onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
         direction.addSprite(sprite);
         sprite.delete();
       });
@@ -325,8 +405,8 @@ const SpritesList = ({
       await resourceManagementProps.onFetchNewlyAddedResources();
 
       if (resources.length && onSpriteUpdated) onSpriteUpdated();
-      if (direction.getSpritesCount() === 1 && onFirstSpriteUpdated) {
-        // If the sprites count is 1, we can assume the first sprite was added.
+      if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+        // If there was no sprites before, we can assume the first sprite was added.
         onFirstSpriteUpdated();
       }
     },
@@ -336,7 +416,9 @@ const SpritesList = ({
       resourceManagementProps,
       forceUpdate,
       onSpriteUpdated,
+      onSpriteAdded,
       onFirstSpriteUpdated,
+      applyPointsAndMasksToSpriteIfNecessary,
     ]
   );
 
@@ -345,11 +427,6 @@ const SpritesList = ({
       const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
         return direction.getSprite(i).getImageName();
       });
-
-      const {
-        allDirectionSpritesHaveSameCollisionMasks,
-        allDirectionSpritesHaveSamePoints,
-      } = checkDirectionPointsAndCollisionsMasks(direction);
 
       try {
         setExternalEditorOpened(true);
@@ -393,17 +470,15 @@ const SpritesList = ({
             resource.originalIndex !== undefined &&
             resource.originalIndex !== null
           ) {
+            // The sprite existed before, so we can copy its points and collision masks.
             const originalSprite = direction.getSprite(resource.originalIndex);
             copySpritePoints(originalSprite, sprite);
             copySpritePolygons(originalSprite, sprite);
           } else {
-            if (allDirectionSpritesHaveSamePoints) {
-              copySpritePoints(direction.getSprite(0), sprite);
-            }
-            if (allDirectionSpritesHaveSameCollisionMasks) {
-              copySpritePolygons(direction.getSprite(0), sprite);
-            }
+            // The sprite is new, apply points & collision masks if necessary.
+            applyPointsAndMasksToSpriteIfNecessary(sprite);
           }
+          onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
           newDirection.addSprite(sprite);
           sprite.delete();
         });
@@ -445,22 +520,48 @@ const SpritesList = ({
       objectName,
       onReplaceByDirection,
       onSpriteUpdated,
+      onSpriteAdded,
       onFirstSpriteUpdated,
       project,
       resourceManagementProps,
       resourcesLoader,
       onChangeName,
+      applyPointsAndMasksToSpriteIfNecessary,
     ]
   );
 
   const deleteSprites = React.useCallback(
-    () => {
+    async () => {
       const sprites = selectedSprites.current;
       const firstSpritePtr = spriteConfiguration
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0).ptr;
-      const isFirstSpriteDeleted = !!sprites[firstSpritePtr];
+      const isObjectFirstSpriteDeleted = !!sprites[firstSpritePtr];
+
+      const totalSpritesCount = getTotalSpritesCount(spriteConfiguration);
+      const isDeletingLastSprites =
+        Object.keys(sprites).length === totalSpritesCount;
+      const oneOfSpritesInCurrentDirection =
+        direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+
+      const isUsingCustomCollisionMask =
+        !spriteConfiguration.adaptCollisionMaskAutomatically() &&
+        oneOfSpritesInCurrentDirection &&
+        !oneOfSpritesInCurrentDirection.isFullImageCollisionMask();
+      const shouldWarnBecauseLosingCustomCollisionMask =
+        isDeletingLastSprites && isUsingCustomCollisionMask;
+
+      if (shouldWarnBecauseLosingCustomCollisionMask) {
+        const deleteAnswer = await showConfirmation({
+          title: t`Remove the sprite`,
+          message: t`You are about to remove the last sprite of this object, which has a custom collision mask. The custom collision mask will be lost. Are you sure you want to continue?`,
+          confirmButtonLabel: t`Remove`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!deleteAnswer) return;
+      }
+
       mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
         const animation = spriteConfiguration.getAnimation(index);
         deleteSpritesFromAnimation(animation, sprites);
@@ -470,9 +571,22 @@ const SpritesList = ({
       selectedSprites.current = {};
       forceUpdate();
       if (onSpriteUpdated) onSpriteUpdated();
-      if (isFirstSpriteDeleted && onFirstSpriteUpdated) onFirstSpriteUpdated();
+      if (isObjectFirstSpriteDeleted && onFirstSpriteUpdated)
+        onFirstSpriteUpdated();
+      if (shouldWarnBecauseLosingCustomCollisionMask) {
+        // The user has deleted the last custom collision mask, so revert to automatic
+        // collision mask adaptation.
+        spriteConfiguration.setAdaptCollisionMaskAutomatically(true);
+      }
     },
-    [onSpriteUpdated, onFirstSpriteUpdated, spriteConfiguration, forceUpdate]
+    [
+      onSpriteUpdated,
+      onFirstSpriteUpdated,
+      spriteConfiguration,
+      forceUpdate,
+      showConfirmation,
+      direction,
+    ]
   );
 
   const duplicateSprites = React.useCallback(

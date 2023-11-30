@@ -11,7 +11,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   globalObjectGroups: gdObjectGroupsContainer,
   objectGroups: gdObjectGroupsContainer,
-  canRenameGroup: (newName: string) => boolean,
+  getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onDeleteGroup: (
     groupWithScope: GroupWithContext,
     done: (boolean) => void
@@ -60,7 +60,9 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
           onEditGroup={this.editGroup}
           onDeleteGroup={this.props.onDeleteGroup}
           onRenameGroup={this.props.onRenameGroup}
-          canRenameGroup={this.props.canRenameGroup}
+          getValidatedObjectOrGroupName={
+            this.props.getValidatedObjectOrGroupName
+          }
           onGroupAdded={this.props.onGroupsUpdated}
           onGroupRemoved={this.props.onGroupsUpdated}
           onGroupRenamed={this.props.onGroupsUpdated}

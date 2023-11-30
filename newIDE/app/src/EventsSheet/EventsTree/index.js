@@ -128,6 +128,10 @@ type EventsContainerProps = {|
   idPrefix: string,
 |};
 
+const hiddenBecauseHeightNotComputedYetStyle = {
+  visibility: 'hidden',
+};
+
 /**
  * The component containing an event.
  * It will report the rendered event height so that the EventsTree can
@@ -167,7 +171,7 @@ const EventContainer = (props: EventsContainerProps) => {
       },
       [onEventContextMenu]
     ),
-    'events-tree-event-component'
+    { context: 'events-tree-event-component' }
   );
 
   const EventComponent = EventsRenderingService.getEventComponent(event);
@@ -178,6 +182,11 @@ const EventContainer = (props: EventsContainerProps) => {
       onClick={props.onEventClick}
       onContextMenu={_onEventContextMenu}
       {...longTouchForContextMenuProps}
+      style={
+        eventsHeightsCache.getEventHeight(event)
+          ? undefined
+          : hiddenBecauseHeightNotComputedYetStyle
+      }
     >
       {!!EventComponent && (
         <div style={styles.eventComponentContainer}>

@@ -10,7 +10,7 @@ module.exports = function (grunt) {
   const buildOutputPath = '../Binaries/embuild/GDevelop.js/';
   const buildPath = '../Binaries/embuild';
 
-  let cmakeBinary = 'emconfigure cmake';
+  let cmakeBinary = 'emcmake cmake';
   let cmakeGeneratorArgs = [];
   let makeBinary = 'emmake make';
   let makeArgs = ['-j 4'];
@@ -44,11 +44,11 @@ module.exports = function (grunt) {
 
     // Find CMake in usual folders or fallback to PATH.
     if (fs.existsSync('C:\\Program Files\\CMake\\bin\\cmake.exe')) {
-      cmakeBinary = 'emconfigure "C:\\Program Files\\CMake\\bin\\cmake"';
+      cmakeBinary = 'emcmake "C:\\Program Files\\CMake\\bin\\cmake"';
     } else if (
       fs.existsSync('C:\\Program Files (x86)\\CMake\\bin\\cmake.exe')
     ) {
-      cmakeBinary = 'emconfigure "C:\\Program Files (x86)\\CMake\\bin\\cmake"';
+      cmakeBinary = 'emcmake "C:\\Program Files (x86)\\CMake\\bin\\cmake"';
     } else {
       console.log(
         "⚠️ Can't find CMake in its usual Program Files folder. Make sure you have cmake in your PATH instead."

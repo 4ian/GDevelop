@@ -373,7 +373,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                 )}
               </ResponsiveLineStackLayout>
               <ColumnStackLayout expand noMargin>
-                {!!feedbacks && feedbacks.length && (
+                {!!feedbacks && feedbacks.length > 0 && (
                   <FeedbackAverageCard feedbacks={feedbacks} />
                 )}
               </ColumnStackLayout>

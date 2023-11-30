@@ -2,12 +2,16 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Adjustment',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const adjustmentFilter = new PIXI.filters.AdjustmentFilter();
         return adjustmentFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
         const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
         if (parameterName === 'gamma') {
           adjustmentFilter.gamma = value;
@@ -27,8 +31,16 @@ namespace gdjs {
           adjustmentFilter.alpha = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

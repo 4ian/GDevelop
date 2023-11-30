@@ -280,6 +280,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           windowWidth={this.props.windowWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachChildVariableEvent.getConditions()}
               style={style}
               className={className}
@@ -309,6 +310,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachChildVariableEvent.getActions()}
               style={
                 {

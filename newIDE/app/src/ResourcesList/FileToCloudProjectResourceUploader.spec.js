@@ -29,7 +29,7 @@ describe('FileToCloudProjectResourceUploader', () => {
       `"video/mp4,video/webm,.mp4,.webm"`
     );
     expect(getInputAcceptedMimesAndExtensions('model3D')).toMatchInlineSnapshot(
-      `"model/gltf-binary,.glb"`
+      `"file,.glb"`
     );
   });
 });

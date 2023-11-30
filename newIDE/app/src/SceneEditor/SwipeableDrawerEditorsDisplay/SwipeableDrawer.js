@@ -19,6 +19,7 @@ const styles = {
     display: 'flex',
     flex: 1,
     overflowY: 'auto',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     overflowX: 'hidden',
   },
   topBarContainer: {
@@ -97,7 +98,7 @@ type Props = {|
   title: React.Node,
   openingState: DrawerOpeningState,
   setOpeningState: DrawerOpeningState => void,
-  topBarControls: ?React.Node,
+  topBarControls?: ?React.Node,
 |};
 
 const SwipeableDrawer = (props: Props) => {

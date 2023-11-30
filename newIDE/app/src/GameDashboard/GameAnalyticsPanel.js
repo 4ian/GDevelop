@@ -75,7 +75,7 @@ const CustomTooltip = ({
         <Text size="sub-title" noMargin>
           {label}
         </Text>
-        {payload.length &&
+        {payload.length > 0 &&
           payload.map(
             (
               {

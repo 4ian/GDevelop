@@ -5,11 +5,6 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('JSON Manager');
-  type JsonManagerOnProgressCallback = (
-    loadedCount: integer,
-    totalCount: integer
-  ) => void;
-  type JsonManagerOnCompleteCallback = (totalCount: integer) => void;
 
   /** The callback called when a json that was requested is loaded (or an error occurred). */
   export type JsonManagerRequestCallback = (
@@ -27,30 +22,40 @@ namespace gdjs {
    */
   export class JsonManager {
     _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: ResourceData[];
+    _resources: Map<string, ResourceData>;
 
     _loadedJsons: { [key: string]: Object } = {};
     _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
 
     /**
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      * @param resourcesLoader The resources loader of the game.
      */
     constructor(
-      resources: ResourceData[],
+      resourceDataArray: ResourceData[],
       resourcesLoader: RuntimeGameResourcesLoader
     ) {
-      this._resources = resources;
+      this._resources = new Map<string, ResourceData>();
+      this.setResources(resourceDataArray);
       this._resourcesLoader = resourcesLoader;
     }
 
     /**
      * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
      *
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
      */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
+    setResources(resourceDataArray: ResourceData[]): void {
+      this._resources.clear();
+      for (const resourceData of resourceDataArray) {
+        if (
+          resourceData.kind === 'json' ||
+          resourceData.kind === 'tilemap' ||
+          resourceData.kind === 'tileset'
+        ) {
+          this._resources.set(resourceData.name, resourceData);
+        }
+      }
     }
 
     /**
@@ -60,40 +65,42 @@ namespace gdjs {
      * as JSON files can have been modified without the editor knowing).
      *
      * @param onProgress The function called after each json is loaded.
-     * @param onComplete The function called when all jsons are loaded.
      */
-    preloadJsons(
-      onProgress: JsonManagerOnProgressCallback,
-      onComplete: JsonManagerOnCompleteCallback
-    ): void {
-      const resources = this._resources;
-      const jsonResources = resources.filter(function (resource) {
-        return (
-          (resource.kind === 'json' ||
-            resource.kind === 'tilemap' ||
-            resource.kind === 'tileset') &&
-          !resource.disablePreload
-        );
-      });
-      if (jsonResources.length === 0) {
-        return onComplete(jsonResources.length);
-      }
-      let loaded = 0;
+    async preloadJsons(
+      onProgress: (loadedCount: integer, totalCount: integer) => void
+    ): Promise<integer> {
+      const preloadedResources = [...this._resources.values()].filter(
+        (resource) => !resource.disablePreload
+      );
 
-      const onLoad: JsonManagerRequestCallback = function (error) {
-        if (error) {
-          logger.error('Error while preloading a json resource:' + error);
-        }
-        loaded++;
-        if (loaded === jsonResources.length) {
-          onComplete(jsonResources.length);
-        } else {
-          onProgress(loaded, jsonResources.length);
-        }
-      };
-      for (let i = 0; i < jsonResources.length; ++i) {
-        this.loadJson(jsonResources[i].name, onLoad);
-      }
+      let loadedCount = 0;
+      await Promise.all(
+        preloadedResources.map(async (resource) => {
+          try {
+            await this.loadJsonAsync(resource.name);
+          } catch (error) {
+            logger.error(
+              `Error while preloading json resource ${resource.name}:`,
+              error
+            );
+          }
+          loadedCount++;
+          onProgress(loadedCount, this._resources.size);
+        })
+      );
+      return loadedCount;
+    }
+
+    loadJsonAsync(resourceName: string): Promise<Object | null> {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.loadJson(resourceName, (error, content) => {
+          if (error) {
+            reject(error.message);
+          }
+          resolve(content);
+        });
+      });
     }
 
     /**
@@ -105,14 +112,7 @@ namespace gdjs {
      * @param callback The callback function called when json is loaded (or an error occurred).
      */
     loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
-      const resource = this._resources.find(function (resource) {
-        return (
-          (resource.kind === 'json' ||
-            resource.kind === 'tilemap' ||
-            resource.kind === 'tileset') &&
-          resource.name === resourceName
-        );
-      });
+      const resource = this._resources.get(resourceName);
       if (!resource) {
         callback(
           new Error(

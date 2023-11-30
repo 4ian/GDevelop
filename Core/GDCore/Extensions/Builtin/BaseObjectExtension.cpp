@@ -29,8 +29,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/force24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
       .SetIcon("res/conditions/var24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Timers"))
+      .SetIcon("res/actions/timer24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Visibility"))
+      .SetIcon("res/actions/visibilite24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Position"))
       .SetIcon("res/actions/position24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Angle"))
+      .SetIcon("res/actions/direction24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
+      .SetIcon("res/actions/scale24_black.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -388,7 +396,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Z order"),
                 _("Modify the Z-order of an object"),
                 _("the z-order"),
-                _("Z order"),
+                _("Layers and cameras"),
                 "res/actions/planicon24.png",
                 "res/actions/planicon.png")
 
@@ -542,7 +550,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Z-order"),
                    _("Compare the Z-order of the specified object."),
                    _("the Z-order"),
-                   _("Z-order"),
+                   _("Layer"),
                    "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
 
@@ -609,6 +617,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddCondition("AngleOfDisplacement",
                    _("Angle of movement (using forces)"),
                    _("Compare the angle of movement of an object according to "
@@ -618,7 +627,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Movement using forces"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")
+      .SetHidden()
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Angle, in degrees"))
+      .AddParameter("expression", _("Tolerance, in degrees"))
+      .MarkAsAdvanced();
 
+  obj.AddCondition("IsTotalForceAngleAround",
+                   _("Angle of movement (using forces)"),
+                   _("Compare the angle of movement of an object according to "
+                     "the forces applied on it."),
+                   _("Angle of movement of _PARAM0_ is _PARAM1_ ± _PARAM2_°"),
+                   _("Movement using forces"),
+                   "res/conditions/vitesse24.png",
+                   "res/conditions/vitesse.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Tolerance, in degrees"))
@@ -1101,6 +1123,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"));
 
+  // Deprecated
   obj.AddExpression("Largeur",
                     _("Width"),
                     _("Width of the object"),
@@ -1116,6 +1139,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"));
 
+  // Deprecated
   obj.AddExpression("Hauteur",
                     _("Height"),
                     _("Height of the object"),
@@ -1127,7 +1151,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddExpression("ZOrder",
                     _("Z-order"),
                     _("Z-order of an object"),
-                    _("Visibility"),
+                    "",
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"));
 
@@ -1201,7 +1225,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddExpression("ObjectTimerElapsedTime",
                     _("Object timer value"),
                     _("Value of an object timer"),
-                    _("Object timers"),
+                    _("Timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer");
@@ -1251,6 +1275,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target X position"))
       .AddParameter("expression", _("Target Y position"));
 
+  // Deprecated
   obj.AddAction("EnableEffect",
                 _("Enable an object effect"),
                 _("Enable an effect on the object"),
@@ -1262,12 +1287,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetEffectDoubleParameter",
-                _("Effect parameter (number)"),
-                _("Change the value of a parameter of an effect.") + "\n" +
-                    _("You can find the parameter names (and change the effect "
+                _("Effect property (number)"),
+                _("Change the value of a property of an effect.") + "\n" +
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
@@ -1275,16 +1301,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
       .AddParameter("expression", _("New value"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetEffectStringParameter",
-                _("Effect parameter (string)"),
-                _("Change the value (string) of a parameter of an effect.") +
+                _("Effect property (string)"),
+                _("Change the value (string) of a property of an effect.") +
                     "\n" +
-                    _("You can find the parameter names (and change the effect "
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
@@ -1292,15 +1319,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
       .AddParameter("string", _("New value"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetEffectBooleanParameter",
-                _("Effect parameter (enable or disable)"),
-                _("Enable or disable a parameter of an effect.") + "\n" +
-                    _("You can find the parameter names (and change the effect "
+                _("Effect property (enable or disable)"),
+                _("Enable or disable a property of an effect.") + "\n" +
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Enable _PARAM2_ for effect _PARAM1_ of _PARAM0_: _PARAM3_"),
                 _("Effects"),
@@ -1308,11 +1336,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
-      .AddParameter("yesorno", _("Enable?"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
+      .AddParameter("yesorno", _("Enable this property"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition("IsEffectEnabled",
                    _("Effect is enabled"),
                    _("Check if the effect on an object is enabled."),
@@ -1323,7 +1352,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetHidden();
 
   obj.AddAction("SetIncludedInParentCollisionMask",
                 _("Include in parent collision mask"),
@@ -1595,7 +1624,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Cast a ray from _PARAM1_;_PARAM2_, angle: _PARAM3_ and max "
             "distance: _PARAM4_px, against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
-          "",
+          _("Collision"),
           "res/conditions/raycast24.png",
           "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))
@@ -1626,7 +1655,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Cast a ray from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
             "against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
-          "",
+          _("Collision"),
           "res/conditions/raycast24.png",
           "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))

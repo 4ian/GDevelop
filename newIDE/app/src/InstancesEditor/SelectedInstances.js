@@ -1,5 +1,5 @@
 // @flow
-import gesture from 'pixi-simple-gesture';
+import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js-legacy';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
@@ -137,16 +137,16 @@ export default class SelectedInstances {
 
   _makeButton(
     objectButton: PIXI.Graphics,
-    onMove: (event: any) => void,
+    onMove: (event: PanMoveEvent) => void,
     onEnd: () => void,
     cursor: string
   ) {
-    objectButton.interactive = true;
+    objectButton.eventMode = 'static';
     objectButton.buttonMode = true;
     objectButton.cursor = cursor;
-    gesture.panable(objectButton);
-    objectButton.on('panmove', onMove);
-    objectButton.on('panend', onEnd);
+    panable(objectButton);
+    objectButton.addEventListener('panmove', onMove);
+    objectButton.addEventListener('panend', onEnd);
     this.pixiContainer.addChild(objectButton);
   }
 

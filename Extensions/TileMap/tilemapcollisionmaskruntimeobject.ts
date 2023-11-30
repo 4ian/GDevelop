@@ -4,7 +4,9 @@ namespace gdjs {
    * An object that handle hitboxes for a tile map.
    * @extends gdjs.RuntimeObject
    */
-  export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
+  export class TileMapCollisionMaskRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable {
     private _tilemapJsonFile: string;
     private _tilesetJsonFile: string;
     private _renderer: gdjs.TileMap.TileMapCollisionMaskRenderer;
@@ -460,11 +462,6 @@ namespace gdjs {
       this._transformationIsUpToDate = false;
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param width The new width of the object, in pixels.
-     */
     setWidth(width: float): void {
       if (this._width === width) {
         return;
@@ -475,11 +472,6 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param height The new height of the object, in pixels.
-     */
     setHeight(height: float): void {
       if (this._height === height) {
         return;
@@ -490,12 +482,17 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
+    }
+
     /**
      * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      *
      * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
-    getScale(): number {
+    getScale(): float {
       const scaleX = this.getScaleX();
       const scaleY = this.getScaleY();
       return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);

@@ -15,6 +15,8 @@ import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
+import ErrorBoundary from '../../UI/ErrorBoundary';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 const gd = global.gd;
 
 const minimumWidths = {
@@ -24,18 +26,6 @@ const minimumWidths = {
   numberProperty: 40,
   layerName: 50,
 };
-
-type State = {|
-  searchText: string,
-  sortBy: string,
-  sortDirection: SortDirection,
-|};
-
-type Props = {|
-  instances: gdInitialInstancesContainer,
-  selectedInstances: Array<gdInitialInstance>,
-  onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
-|};
 
 type RenderedRowInfo = {
   instance: gdInitialInstance,
@@ -55,7 +45,12 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
   },
-  tableContainer: { flex: 1, overflowX: 'auto', overflowY: 'hidden' },
+  tableContainer: {
+    flex: 1,
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
+  },
 };
 
 const compareStrings = (x: string, y: string, direction: number): number => {
@@ -67,7 +62,23 @@ const compareStrings = (x: string, y: string, direction: number): number => {
   return 0;
 };
 
-export default class InstancesList extends Component<Props, State> {
+export type InstancesListInterface = {|
+  forceUpdate: () => void,
+|};
+
+type State = {|
+  searchText: string,
+  sortBy: string,
+  sortDirection: SortDirection,
+|};
+
+type Props = {|
+  instances: gdInitialInstancesContainer,
+  selectedInstances: Array<gdInitialInstance>,
+  onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
+|};
+
+class InstancesList extends Component<Props, State> {
   state = {
     searchText: '',
     sortBy: '',
@@ -339,3 +350,24 @@ export default class InstancesList extends Component<Props, State> {
     );
   }
 }
+
+const InstancesListWithErrorBoundary = React.forwardRef<
+  Props,
+  InstancesListInterface
+>((props, ref) => {
+  const forceUpdate = useForceUpdate();
+  React.useImperativeHandle(ref, () => ({
+    forceUpdate,
+  }));
+
+  return (
+    <ErrorBoundary
+      componentTitle={<Trans>Instances list</Trans>}
+      scope="scene-editor-instances-list"
+    >
+      <InstancesList {...props} />
+    </ErrorBoundary>
+  );
+});
+
+export default InstancesListWithErrorBoundary;

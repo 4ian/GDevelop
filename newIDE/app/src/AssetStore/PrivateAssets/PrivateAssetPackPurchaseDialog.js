@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import {
   listUserPurchases,
   type PrivateAssetPackListingData,
@@ -15,17 +15,16 @@ import Window from '../../Utils/Window';
 import { Line, Spacer } from '../../UI/Grid';
 import CircularProgress from '../../UI/CircularProgress';
 import BackgroundText from '../../UI/BackgroundText';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import FlatButton from '../../UI/FlatButton';
-import { LineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import TextField from '../../UI/TextField';
-
-type Props = {|
-  privateAssetPackListingData: PrivateAssetPackListingData,
-  onSuccessfulPurchase: () => Promise<void>,
-  onClose: () => void,
-|};
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import {
+  shouldUseAppStoreProduct,
+  purchaseAppStoreProduct,
+} from '../../Utils/AppStorePurchases';
+import Form from '../../UI/Form';
 
 const PasswordPromptDialog = (props: {
   passwordValue: string,
@@ -53,30 +52,39 @@ const PasswordPromptDialog = (props: {
       />,
     ]}
   >
-    <TextField
-      fullWidth
-      autoFocus="desktopAndMobileDevices"
-      value={props.passwordValue}
-      floatingLabelText={<Trans>Password</Trans>}
-      type="password"
-      onChange={(e, value) => {
-        props.setPasswordValue(value);
-      }}
-    />
+    <Form onSubmit={props.onApply} name="asset-store-password">
+      <TextField
+        fullWidth
+        autoFocus="desktopAndMobileDevices"
+        value={props.passwordValue}
+        floatingLabelText={<Trans>Password</Trans>}
+        type="password"
+        onChange={(e, value) => {
+          props.setPasswordValue(value);
+        }}
+      />
+    </Form>
   </Dialog>
 );
+
+type Props = {|
+  privateAssetPackListingData: PrivateAssetPackListingData,
+  onClose: () => void,
+  simulateAppStoreProduct?: boolean,
+|};
 
 const PrivateAssetPackPurchaseDialog = ({
   privateAssetPackListingData,
   onClose,
-  onSuccessfulPurchase,
+  simulateAppStoreProduct,
 }: Props) => {
   const {
     profile,
     getAuthorizationHeader,
-    onLogin,
-    onCreateAccount,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
     receivedAssetPacks,
+    onPurchaseSuccessful,
   } = React.useContext(AuthenticatedUserContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
@@ -89,14 +97,34 @@ const PrivateAssetPackPurchaseDialog = ({
     setDisplayPasswordPrompt,
   ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
+  const { showAlert } = useAlertDialog();
+
+  const shouldUseOrSimulateAppStoreProduct =
+    shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
   const onStartPurchase = async () => {
     if (!profile) return;
     setDisplayPasswordPrompt(false);
+
+    // Purchase with the App Store.
+    if (shouldUseOrSimulateAppStoreProduct) {
+      try {
+        setIsPurchasing(true);
+        await purchaseAppStoreProduct(
+          privateAssetPackListingData.appStoreProductId
+        );
+      } finally {
+        setIsPurchasing(false);
+      }
+      return;
+    }
+
+    // Purchase with web.
     try {
       setIsPurchasing(true);
       const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
-        stripePriceId: privateAssetPackListingData.prices[0].stripePriceId,
+        productId: privateAssetPackListingData.id,
+        priceName: privateAssetPackListingData.prices[0].name,
         userId: profile.id,
         customerEmail: profile.email,
         ...(password ? { password } : undefined),
@@ -108,17 +136,15 @@ const PrivateAssetPackPurchaseDialog = ({
         error.response.status === 403 &&
         error.response.data.code === 'auth/wrong-password'
       ) {
-        showErrorBox({
-          message: 'Operation not allowed',
-          rawError: error,
-          errorId: 'asset-pack-purchase-not-authorized',
+        await showAlert({
+          title: t`Operation not allowed`,
+          message: t`The password you entered is incorrect. Please try again.`,
         });
       } else {
         console.error('Unable to get the checkout URL', error);
-        showErrorBox({
-          message: `Unable to get the checkout URL. Please try again later.`,
-          rawError: error,
-          errorId: 'asset-pack-checkout-error',
+        await showAlert({
+          title: t`An error happened`,
+          message: t`Unable to get the checkout URL. Please try again later.`,
         });
       }
       setIsPurchasing(false);
@@ -150,14 +176,13 @@ const PrivateAssetPackPurchaseDialog = ({
         ) {
           // We found the purchase, the user has bought the asset pack.
           // We do not close the dialog yet, as we need to trigger a refresh of the asset store.
-          await onSuccessfulPurchase();
+          await onPurchaseSuccessful();
         }
       } catch (error) {
         console.error('Unable to get the user purchases', error);
-        showErrorBox({
-          message: `An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the asset store to see your asset pack!`,
-          rawError: error,
-          errorId: 'asset-pack-purchase-error',
+        await showAlert({
+          title: t`An error happened`,
+          message: t`An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the store to see your asset pack!`,
         });
       }
     },
@@ -165,7 +190,8 @@ const PrivateAssetPackPurchaseDialog = ({
       profile,
       getAuthorizationHeader,
       privateAssetPackListingData,
-      onSuccessfulPurchase,
+      onPurchaseSuccessful,
+      showAlert,
     ]
   );
 
@@ -230,12 +256,13 @@ const PrivateAssetPackPurchaseDialog = ({
         subtitle: <Trans>Log-in to purchase this item</Trans>,
         content: (
           <CreateProfile
-            onLogin={onLogin}
-            onCreateAccount={onCreateAccount}
+            onOpenLoginDialog={onOpenLoginDialog}
+            onOpenCreateAccountDialog={onOpenCreateAccountDialog}
             message={
               <Trans>
                 Asset packs will be linked to your user account and available
-                for all your projects. Log-in or sign-up to purchase this pack.
+                for all your projects. Log-in or sign-up to purchase this pack
+                (or restore your existing purchase).
               </Trans>
             }
             justifyContent="center"
@@ -249,8 +276,8 @@ const PrivateAssetPackPurchaseDialog = ({
           <Line justifyContent="center" alignItems="center">
             <Text>
               <Trans>
-                You can close this window and go back to the asset store to
-                download your assets.
+                You can now go back to the asset store to use the assets in your
+                games.
               </Trans>
             </Text>
           </Line>
@@ -258,8 +285,23 @@ const PrivateAssetPackPurchaseDialog = ({
       }
     : isPurchasing
     ? {
-        subtitle: <Trans>Complete your payment on the web browser</Trans>,
-        content: (
+        subtitle: shouldUseOrSimulateAppStoreProduct ? (
+          <Trans>Complete your purchase with the app store.</Trans>
+        ) : (
+          <Trans>Complete your payment on the web browser</Trans>
+        ),
+        content: shouldUseOrSimulateAppStoreProduct ? (
+          <>
+            <ColumnStackLayout justifyContent="center" alignItems="center">
+              <CircularProgress size={40} />
+              <Text>
+                <Trans>
+                  The purchase will be linked to your account once done.
+                </Trans>
+              </Text>
+            </ColumnStackLayout>
+          </>
+        ) : (
           <>
             <Line justifyContent="center" alignItems="center">
               <CircularProgress size={20} />
@@ -296,7 +338,7 @@ const PrivateAssetPackPurchaseDialog = ({
             your account {profile.email}.
           </Trans>
         ),
-        content: (
+        content: shouldUseOrSimulateAppStoreProduct ? null : (
           <Line justifyContent="center" alignItems="center">
             <Text>
               <Trans>

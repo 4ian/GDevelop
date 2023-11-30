@@ -112,12 +112,62 @@ export default function ValueTypeEditor({
                   value="objectAnimationName"
                   label={t`Object animation (text)`}
                 />
+                <SelectOption
+                  value="layerEffectName"
+                  label={t`Layer effect (text)`}
+                />
+                <SelectOption
+                  value="layerEffectParameterName"
+                  label={t`Layer effect property (text)`}
+                />
+                <SelectOption
+                  value="objectEffectName"
+                  label={t`Object effect (text)`}
+                />
+                <SelectOption
+                  value="objectEffectParameterName"
+                  label={t`Object effect property (text)`}
+                />
+                <SelectOption
+                  value="leaderboardId"
+                  label={t`Leaderboad (text)`}
+                />
                 <SelectOption value="identifier" label={t`Identifier (text)`} />
                 <SelectOption value="scenevar" label={t`Scene variable`} />
                 {!isExpressionType && (
                   <SelectOption
                     value="objectListOrEmptyIfJustDeclared"
                     label={t`Created objects`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="imageResource"
+                    label={t`Image resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="audioResource"
+                    label={t`Audio resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="jsonResource"
+                    label={t`JSON resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="fontResource"
+                    label={t`Font resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="bitmapFontResource"
+                    label={t`Bitmap font resource (JavaScript only)`}
                   />
                 )}
               </SelectField>

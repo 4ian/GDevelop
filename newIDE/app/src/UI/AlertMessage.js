@@ -11,7 +11,7 @@ import Paper from './Paper';
 import Cross from './CustomSvgIcons/Cross';
 import WarningFilled from './CustomSvgIcons/WarningFilled';
 import ErrorFilled from './CustomSvgIcons/ErrorFilled';
-import Info from './CustomSvgIcons/Info';
+import SquaredInfo from './CustomSvgIcons/SquaredInfo';
 
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
@@ -88,7 +88,7 @@ const AlertMessage = ({
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
-                      {kind === 'info' && <Info style={styles.icon} />}
+                      {kind === 'info' && <SquaredInfo style={styles.icon} />}
                       {kind === 'warning' && (
                         <WarningFilled
                           style={{

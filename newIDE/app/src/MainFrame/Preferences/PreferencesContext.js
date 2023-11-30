@@ -6,6 +6,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import { isWebGLSupported } from '../../Utils/WebGL';
@@ -188,7 +189,6 @@ export type PreferencesValues = {|
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
-  useUndefinedVariablesInAutocompletion: boolean,
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   eventsSheetZoomLevel: number,
@@ -200,18 +200,22 @@ export type PreferencesValues = {|
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
+  shareDialogDefaultTab: 'invite' | 'publish',
   isMenuBarHiddenInPreview: boolean,
   isAlwaysOnTopInPreview: boolean,
   backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
   showCommunityExtensions: boolean,
-  showGetStartedSection: boolean,
+  showGetStartedSectionByDefault: boolean,
   showEventBasedObjectsEditor: boolean,
+  showDeprecatedInstructionWarning: boolean,
   use3DEditor: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
   newProjectsDefaultFolder: string,
   newProjectsDefaultStorageProviderName: string,
   useShortcutToClosePreviewWindow: boolean,
+  watchProjectFolderFilesForLocalProjects: boolean,
+  editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
 |};
 
 /**
@@ -234,7 +238,6 @@ export type Preferences = {|
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
-  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setEventsSheetZoomLevel: (zoomLevel: number) => void,
@@ -265,6 +268,8 @@ export type Preferences = {|
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
   getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
   setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
+  getShareDialogDefaultTab: () => 'invite' | 'publish',
+  setShareDialogDefaultTab: ('invite' | 'publish') => void,
   getIsMenuBarHiddenInPreview: () => boolean,
   setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
   setBackdropClickBehavior: (value: string) => void,
@@ -272,9 +277,11 @@ export type Preferences = {|
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
   setEventsSheetCancelInlineParameter: (value: string) => void,
   setShowCommunityExtensions: (enabled: boolean) => void,
-  setShowGetStartedSection: (enabled: boolean) => void,
+  setShowGetStartedSectionByDefault: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  setShowDeprecatedInstructionWarning: (enabled: boolean) => void,
+  getShowDeprecatedInstructionWarning: () => boolean,
   setUse3DEditor: (enabled: boolean) => void,
   getUse3DEditor: () => boolean,
   setNewProjectsDefaultStorageProviderName: (name: string) => void,
@@ -289,6 +296,14 @@ export type Preferences = {|
   |}) => ?InAppTutorialUserProgress,
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
   setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
+  setWatchProjectFolderFilesForLocalProjects: (enabled: boolean) => void,
+  getEditorStateForProject: (
+    projectId: string
+  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  setEditorStateForProject: (
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -309,7 +324,6 @@ export const initialPreferences = {
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
-    useUndefinedVariablesInAutocompletion: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     eventsSheetZoomLevel: 14,
@@ -321,18 +335,22 @@ export const initialPreferences = {
     hasProjectOpened: false,
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
+    shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
     backdropClickBehavior: 'nothing',
     eventsSheetCancelInlineParameter: 'apply',
     showCommunityExtensions: false,
-    showGetStartedSection: true,
+    showGetStartedSectionByDefault: true,
     showEventBasedObjectsEditor: false,
+    showDeprecatedInstructionWarning: false,
     use3DEditor: isWebGLSupported(),
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
+    watchProjectFolderFilesForLocalProjects: true,
+    editorStateByProject: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -349,7 +367,6 @@ export const initialPreferences = {
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
-  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setEventsSheetZoomLevel: (zoomLevel: number) => {},
@@ -372,6 +389,8 @@ export const initialPreferences = {
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
   getNewObjectDialogDefaultTab: () => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
+  getShareDialogDefaultTab: () => 'invite',
+  setShareDialogDefaultTab: () => {},
   getIsMenuBarHiddenInPreview: () => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
@@ -379,9 +398,11 @@ export const initialPreferences = {
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
   setShowCommunityExtensions: () => {},
-  setShowGetStartedSection: (enabled: boolean) => {},
+  setShowGetStartedSectionByDefault: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
+  setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
+  getShowDeprecatedInstructionWarning: () => false,
   setUse3DEditor: (enabled: boolean) => {},
   getUse3DEditor: () => false,
   saveTutorialProgress: () => {},
@@ -389,6 +410,9 @@ export const initialPreferences = {
   setNewProjectsDefaultFolder: () => {},
   setNewProjectsDefaultStorageProviderName: () => {},
   setUseShortcutToClosePreviewWindow: () => {},
+  setWatchProjectFolderFilesForLocalProjects: () => {},
+  getEditorStateForProject: projectId => {},
+  setEditorStateForProject: (projectId, editorState) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

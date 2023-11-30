@@ -353,4 +353,30 @@ describe('InstancesSelection', () => {
     instance2OfObject2.delete();
     instance3OfObject2.delete();
   });
+
+  it('can clean non existing instances', () => {
+    const initialInstancesContainer = new gd.InitialInstancesContainer();
+    const instance1 = initialInstancesContainer.insertNewInitialInstance();
+    const instance2 = initialInstancesContainer.insertNewInitialInstance();
+    const instance3 = initialInstancesContainer.insertNewInitialInstance();
+    const instance4 = initialInstancesContainer.insertNewInitialInstance();
+
+    const instancesSelection = new InstancesSelection();
+    instancesSelection.selectInstances({
+      multiSelect: true,
+      instances: [instance1, instance2, instance3, instance4],
+      layersLocks: null,
+    });
+
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(4);
+    initialInstancesContainer.removeInstance(instance2);
+    initialInstancesContainer.removeInstance(instance4);
+
+    instancesSelection.cleanNonExistingInstances(initialInstancesContainer);
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(2);
+    expect(instancesSelection.getSelectedInstances()).toContain(instance1);
+    expect(instancesSelection.getSelectedInstances()).toContain(instance3);
+
+    initialInstancesContainer.delete();
+  });
 });

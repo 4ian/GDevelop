@@ -19,7 +19,13 @@ namespace gdjs {
    *
    * @see gdjs.CustomRuntimeObjectInstanceContainer
    */
-  export class CustomRuntimeObject extends gdjs.RuntimeObject {
+  export class CustomRuntimeObject
+    extends gdjs.RuntimeObject
+    implements
+      gdjs.Resizable,
+      gdjs.Scalable,
+      gdjs.Flippable,
+      gdjs.OpacityHandler {
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
@@ -82,11 +88,11 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(parent: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
       // Let subclasses do something before the object is destroyed.
       this.onDestroy(parent);
       // Let behaviors do something before the object is destroyed.
-      super.onDestroyFromScene(parent);
+      super.onDeletedFromScene(parent);
       // Destroy the children.
       this._instanceContainer.onDestroyFromScene(parent);
     }
@@ -496,7 +502,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScale(newScale: number): void {
+    setScale(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -518,7 +524,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleX(newScale: number): void {
+    setScaleX(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -536,7 +542,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleY(newScale: number): void {
+    setScaleY(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -549,14 +555,24 @@ namespace gdjs {
     }
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case
-     * they are different).
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in
-     * case they are different).
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
      */
-    getScale(): number {
+    getScaleMean(): float {
       return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): float {
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**
@@ -578,10 +594,7 @@ namespace gdjs {
     }
 
     // Visibility and display :
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
+
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -593,10 +606,6 @@ namespace gdjs {
       this.getRenderer().updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
     getOpacity(): number {
       return this.opacity;
     }

@@ -24,7 +24,7 @@ const useOpenInitialDialog = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const { onCreateAccount, authenticated } = React.useContext(
+  const { onOpenCreateAccountDialog, authenticated } = React.useContext(
     AuthenticatedUserContext
   );
 
@@ -42,7 +42,7 @@ const useOpenInitialDialog = ({
             if (authenticated) {
               openProfileDialog(true);
             } else {
-              onCreateAccount();
+              onOpenCreateAccountDialog();
             }
             removeRouteArguments(['initial-dialog']);
           }, 2000);
@@ -74,7 +74,7 @@ const useOpenInitialDialog = ({
       removeRouteArguments,
       openSubscriptionDialog,
       authenticated,
-      onCreateAccount,
+      onOpenCreateAccountDialog,
     ]
   );
 };

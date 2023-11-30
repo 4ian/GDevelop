@@ -1,8 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Video object PIXI renderer');
 
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The PIXI.js renderer for the VideoRuntimeObject.
    */
@@ -28,12 +26,6 @@ namespace gdjs {
           .getImageManager()
           .getPIXIVideoTexture(this._object._videoResource)
       );
-      this._pixiObject._texture.baseTexture.resource.autoPlay = false;
-
-      // Needed to avoid video not playing/crashing in Chrome/Chromium browsers.
-      // See https://github.com/pixijs/pixi.js/issues/5996
-      this._pixiObject._texture.baseTexture.resource.source.preload = 'auto';
-      this._pixiObject._texture.baseTexture.resource.source.autoload = true;
 
       // Will be set to true when video texture is loaded.
       instanceContainer
@@ -57,10 +49,12 @@ namespace gdjs {
     }
 
     /**
-     * To be called when the object is removed from the scene: will pause the video.
+     * To be called when the object is removed from the scene: will stop the video
+     * (goes back to beginning).
      */
     onDestroy() {
-      this.pause();
+      this.stop();
+      this._pixiObject.destroy(false);
     }
 
     ensureUpToDate() {
@@ -178,6 +172,18 @@ namespace gdjs {
         return;
       }
       source.pause();
+    }
+
+    /**
+     * Stops the video and comes back to first frame.
+     */
+    stop() {
+      const source = this._getHTMLVideoElementSource();
+      if (!source) {
+        return;
+      }
+      source.pause();
+      source.currentTime = 0;
     }
 
     // Autoplay was prevented.

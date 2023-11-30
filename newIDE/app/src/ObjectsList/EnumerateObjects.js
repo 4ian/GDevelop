@@ -1,8 +1,8 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
-import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
 import { type RequiredExtension } from '../AssetStore/InstallAsset';
+
 const gd: libGDevelop = global.gd;
 
 export type EnumeratedObjectMetadata = {|
@@ -157,37 +157,22 @@ export const enumerateObjectTypes = (
 
 export type ObjectFilteringOptions = {|
   searchText: string,
-  selectedTags: SelectedTags,
   hideExactMatches?: boolean,
 |};
 
-export const filterObjectByTags = (
-  objectWithContext: ObjectWithContext,
-  selectedTags: SelectedTags
-): boolean => {
-  if (!selectedTags.length) return true;
-
-  const objectTags = objectWithContext.object.getTags();
-  return hasStringAllTags(objectTags, selectedTags);
-};
-
 export const filterObjectsList = (
   list: ObjectWithContextList,
-  { searchText, selectedTags, hideExactMatches }: ObjectFilteringOptions
+  { searchText, hideExactMatches }: ObjectFilteringOptions
 ): ObjectWithContextList => {
-  if (!searchText && !selectedTags.length) return list;
+  if (!searchText) return list;
 
-  return list
-    .filter(objectWithContext =>
-      filterObjectByTags(objectWithContext, selectedTags)
-    )
-    .filter((objectWithContext: ObjectWithContext) => {
-      const objectName = objectWithContext.object.getName();
+  return list.filter((objectWithContext: ObjectWithContext) => {
+    const objectName = objectWithContext.object.getName();
 
-      if (hideExactMatches && searchText === objectName) return undefined;
+    if (hideExactMatches && searchText === objectName) return undefined;
 
-      return objectName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
-    });
+    return objectName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
+  });
 };
 
 export type GroupFilteringOptions = {|
@@ -221,28 +206,53 @@ export const enumerateGroups = (
 export const enumerateObjectsAndGroups = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  type: ?string = undefined
+  objectType: ?string = undefined,
+  requiredBehaviorTypes?: Array<string> = []
 ) => {
   const filterObject = (object: gdObject): boolean => {
     return (
-      !type ||
-      gd.getTypeOfObject(
-        globalObjectsContainer,
-        objectsContainer,
-        object.getName(),
-        false
-      ) === type
+      (!objectType ||
+        gd.getTypeOfObject(
+          globalObjectsContainer,
+          objectsContainer,
+          object.getName(),
+          false
+        ) === objectType) &&
+      requiredBehaviorTypes.every(
+        requiredBehaviorType =>
+          gd
+            .getBehaviorNamesInObjectOrGroup(
+              globalObjectsContainer,
+              objectsContainer,
+              object.getName(),
+              requiredBehaviorType,
+              false
+            )
+            .size() > 0
+      )
     );
   };
   const filterGroup = (group: gdObjectGroup): boolean => {
     return (
-      !type ||
-      gd.getTypeOfObject(
-        globalObjectsContainer,
-        objectsContainer,
-        group.getName(),
-        true
-      ) === type
+      (!objectType ||
+        gd.getTypeOfObject(
+          globalObjectsContainer,
+          objectsContainer,
+          group.getName(),
+          true
+        ) === objectType) &&
+      requiredBehaviorTypes.every(
+        behaviorType =>
+          gd
+            .getBehaviorNamesInObjectOrGroup(
+              globalObjectsContainer,
+              objectsContainer,
+              group.getName(),
+              behaviorType,
+              true
+            )
+            .size() > 0
+      )
     );
   };
 
@@ -286,11 +296,7 @@ export const enumerateObjectsAndGroups = (
   );
 
   return {
-    containerObjectsList,
-    projectObjectsList,
     allObjectsList,
-    containerGroupsList,
-    projectGroupsList,
     allGroupsList,
   };
 };

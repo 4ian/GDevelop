@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   class PanelSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.PanelSpriteRuntimeObject;
     /**
@@ -96,6 +95,10 @@ namespace gdjs {
       // in Pixi will create a flicker when cacheAsBitmap is set to true.
       // (see https://github.com/pixijs/pixijs/issues/4610)
       this._wrapperContainer.alpha = this._object.opacity / 255;
+      // When the opacity is updated, the cache must be invalidated, otherwise
+      // there is a risk of the panel sprite has been cached previously with a
+      // different opacity (and cannot be updated anymore).
+      this._spritesContainer.cacheAsBitmap = false;
     }
 
     updateAngle(): void {
@@ -373,7 +376,7 @@ namespace gdjs {
     }
 
     getColor() {
-      const rgb = PIXI.utils.hex2rgb(this._centerSprite.tint);
+      const rgb = new PIXI.Color(this._centerSprite.tint).toRgbArray();
       return (
         Math.floor(rgb[0] * 255) +
         ';' +
@@ -389,6 +392,18 @@ namespace gdjs {
 
     getTextureHeight() {
       return this._textureHeight;
+    }
+
+    destroy() {
+      // Destroy textures because they are instantiated by this class.
+      for (const borderSprite of this._borderSprites) {
+        borderSprite.destroy({ texture: true });
+      }
+      this._centerSprite.destroy({ texture: true });
+      // Destroy the containers without handling children because they are
+      // already handled above.
+      this._wrapperContainer.destroy(false);
+      this._spritesContainer.destroy(false);
     }
   }
 

@@ -4,6 +4,10 @@ name: Extract translations
 on:
   # Execute for all commits (to ensure translations extraction works)
   push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**" # Don't run on new tags
   # Allows to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
@@ -15,14 +19,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'npm'
-          cache-dependency-path: 'newIDE/app/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "newIDE/app/package-lock.json"
 
       - name: Install gettext
         run: sudo apt update && sudo apt install gettext -y
 
       - name: Install newIDE dependencies
-        run: npm install
+        run: npm ci
         working-directory: newIDE/app
 
       - name: Extract translations

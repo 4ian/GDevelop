@@ -11,6 +11,10 @@
 # almost always during development (any change in GDJS/extensions, or any restart of the app).
 <PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/.*
 
+[untyped]
+# react-window has some errors
+<PROJECT_ROOT>/node_modules/react-window/*
+
 [declarations]
 # lingui-js triggers some Flow errors
 <PROJECT_ROOT>/node_modules/@lingui/core/.*

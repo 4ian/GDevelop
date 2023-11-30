@@ -26,6 +26,7 @@ export default {
 const privateAssetPackListingData: PrivateAssetPackListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
   productType: 'ASSET_PACK',
   thumbnailUrls: [
     'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
@@ -46,7 +47,6 @@ export const NotLoggedIn = () => {
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
         onClose={() => action('close')()}
-        onSuccessfulPurchase={() => action('purchase')()}
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -58,7 +58,6 @@ export const LoggedIn = () => {
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
         onClose={() => action('close')()}
-        onSuccessfulPurchase={() => action('purchase')()}
       />
     </AuthenticatedUserContext.Provider>
   );

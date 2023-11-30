@@ -45,16 +45,16 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
-  it('can create metadata for free actions with an underscore', () => {
+  it('can create metadata for free actions with an underscore and unicode characters', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();
 
     const eventExtension = project.insertNewEventsFunctionsExtension(
-      'MyExtension',
+      'My🧩Extension',
       0
     );
     const eventFunction = eventExtension.insertNewEventsFunction(
-      'My_Function',
+      'My_📝Function',
       0
     );
     eventFunction.setFunctionType(gd.EventsFunction.Action);
@@ -68,10 +68,10 @@ describe('MetadataDeclarationHelper', () => {
     );
     metadataDeclarationHelper.delete();
 
-    expect(extension.getAllActions().has('My_Function')).toBe(true);
-    const action = extension.getAllActions().get('My_Function');
+    expect(extension.getAllActions().has('My_📝Function')).toBe(true);
+    const action = extension.getAllActions().get('My_📝Function');
     expect(action.getFunctionName()).toBe(
-      'gdjs.evtsExt__MyExtension__My_Function.func'
+      'gdjs.evtsExt__My_129513Extension__My__128221Function.func'
     );
 
     extension.delete();
@@ -1356,7 +1356,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(action.getParametersCount()).toBe(3);
     expect(action.getParameter(0).getType()).toBe('object');
-    expect(action.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(action.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
     expect(action.getParameter(1).getType()).toBe('operator');
     expect(action.getParameter(2).getType()).toBe('string');
 
@@ -1379,7 +1379,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(condition.getParametersCount()).toBe(3);
     expect(condition.getParameter(0).getType()).toBe('object');
-    expect(condition.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(condition.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
     expect(condition.getParameter(1).getType()).toBe('relationalOperator');
     expect(condition.getParameter(2).getType()).toBe('string');
 
@@ -1397,7 +1397,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(expression.getParametersCount()).toBe(1);
     expect(expression.getParameter(0).getType()).toBe('object');
-    expect(expression.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(expression.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
 
     extension.delete();
     project.delete();
@@ -1450,7 +1450,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(action.getParametersCount()).toBe(2);
     expect(action.getParameter(0).getType()).toBe('object');
-    expect(action.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(action.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
     expect(action.getParameter(1).getType()).toBe('yesorno');
 
     expect(
@@ -1471,7 +1471,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(condition.getParametersCount()).toBe(1);
     expect(condition.getParameter(0).getType()).toBe('object');
-    expect(condition.getParameter(0).getExtraInfo()).toBe('MyObject');
+    expect(condition.getParameter(0).getValueTypeMetadata().getExtraInfo()).toBe('MyObject');
 
     extension.delete();
     project.delete();

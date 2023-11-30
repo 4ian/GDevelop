@@ -7,7 +7,9 @@
 
 #include <set>
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
+#include "GDCore/String.h"
 namespace gd {
 class Platform;
 class Project;
@@ -18,6 +20,7 @@ class String;
 class EventsFunctionsExtension;
 class EventsFunction;
 class ObjectsContainer;
+class VariablesContainer;
 class EventsBasedBehavior;
 class EventsBasedObject;
 class ArbitraryEventsWorker;
@@ -30,9 +33,19 @@ class Behavior;
 class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
 class ProjectBrowser;
+class SerializerElement;
 }  // namespace gd
 
 namespace gd {
+
+struct VariablesChangeset {
+  std::unordered_set<gd::String> removedVariableNames;
+  std::unordered_map<gd::String, gd::String> oldToNewVariableNames;
+
+  bool HasRemovedVariables() { return !removedVariableNames.empty(); }
+
+  VariablesChangeset& ClearRemovedVariables() { removedVariableNames.clear(); return *this; }
+};
 
 /**
  * \brief Tool functions to do refactoring on the whole project after
@@ -44,6 +57,23 @@ namespace gd {
  */
 class GD_CORE_API WholeProjectRefactorer {
  public:
+
+  /**
+   * \brief Compute the changes made on the variables of a variable container.
+   */
+  static VariablesChangeset ComputeChangesetForVariablesContainer(
+    gd::Project &project,
+    const gd::SerializerElement &oldSerializedVariablesContainer,
+    const gd::VariablesContainer &newVariablesContainer);
+
+  /**
+   * \brief Refactor the project according to the changes (renaming or deletion)
+   * made to variables.
+   */
+  static void ApplyRefactoringForVariablesContainer(
+    gd::Project &project,
+    const gd::VariablesContainer &newVariablesContainer,
+    const gd::VariablesChangeset& changeset);
 
   /**
    * \brief Refactor the project **before** an events function extension is
@@ -455,6 +485,26 @@ class GD_CORE_API WholeProjectRefactorer {
   static void EnsureObjectEventsFunctionsProperParameters(
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedObject& eventsBasedObject);
+
+  /**
+   * \brief Remove all the instances from one layer.
+   */
+  static void RemoveLayer(gd::Project &project, gd::Layout &layout,
+                          const gd::String &layerName);
+
+  /**
+   * \brief Move all the instances from one layer into another.
+   */
+  static void MergeLayers(gd::Project &project, gd::Layout &layout,
+                          const gd::String &originLayerName,
+                          const gd::String &targetLayerName);
+
+  /**
+   * \brief Return the number of instances on the layer named \a layerName and
+   * all its associated layouts.
+   */
+  static size_t GetLayoutAndExternalLayoutLayerInstancesCount(
+      gd::Project &project, gd::Layout &layout, const gd::String &layerName);
 
   virtual ~WholeProjectRefactorer(){};
 

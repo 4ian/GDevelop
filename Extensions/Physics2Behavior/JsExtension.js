@@ -34,7 +34,8 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/behaviors/physics2')
-      .setCategory('Movement');
+      .setCategory('Movement')
+      .setTags("physics, gravity, obstacle, collision");
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');
@@ -552,7 +553,7 @@ module.exports = {
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
         _('Set the world time scale of _PARAM0_ to _PARAM2_'),
-        '',
+        _('Global'),
         'res/physics32.png',
         'res/physics32.png'
       )
@@ -1464,7 +1465,7 @@ module.exports = {
         'ApplyForce',
         _('Apply force'),
         _(
-          'Apply a force to the object. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply a force to the object over time. It "accelerates" an object and must be used every frame during a time period.'
         ),
         _('Apply to _PARAM0_ a force of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
@@ -1475,8 +1476,10 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('X component (N)'))
       .addParameter('expression', _('Y component (N)'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .setParameterLongDescription(_('A force is like an acceleration but depends on the mass.'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
       .getCodeExtraInformation()
       .setFunctionName('applyForce');
 
@@ -1485,7 +1488,7 @@ module.exports = {
         'ApplyPolarForce',
         _('Apply force (angle)'),
         _(
-          'Apply a force to the object using polar coordinates. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply a force to the object over time using polar coordinates. It "accelerates" an object and must be used every frame during a time period.'
         ),
         _('Apply to _PARAM0_ a force of angle _PARAM2_ and length _PARAM3_'),
         _('Forces & impulses'),
@@ -1496,8 +1499,10 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
       .addParameter('expression', _('Length (N)'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .setParameterLongDescription(_('A force is like an acceleration but depends on the mass.'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
       .getCodeExtraInformation()
       .setFunctionName('applyPolarForce');
 
@@ -1506,7 +1511,7 @@ module.exports = {
         'ApplyForceTowardPosition',
         _('Apply force toward position'),
         _(
-          'Apply a force to the object to move it toward a position. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply a force to the object over time to move it toward a position. It "accelerates" an object and must be used every frame during a time period.'
         ),
         _(
           'Apply to _PARAM0_ a force of length _PARAM2_ towards _PARAM3_;_PARAM4_'
@@ -1518,10 +1523,12 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Length (N)'))
+      .setParameterLongDescription(_('A force is like an acceleration but depends on the mass.'))
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
       .getCodeExtraInformation()
       .setFunctionName('applyForceTowardPosition');
 
@@ -1530,7 +1537,7 @@ module.exports = {
         'ApplyImpulse',
         _('Apply impulse'),
         _(
-          'Apply an impulse to the object. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply an impulse to the object. It instantly changes the speed, to give an initial speed for instance.'
         ),
         _('Apply to _PARAM0_ an impulse of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
@@ -1541,14 +1548,16 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter(
         'expression',
-        _('X component (in Newton * seconds or kilogram * meter per second)')
+        _('X component (N·s or kg·m·s⁻¹)')
       )
       .addParameter(
         'expression',
-        _('Y component (in Newton * seconds or kilogram * meter per second)')
+        _('Y component (N·s or kg·m·s⁻¹)')
       )
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .setParameterLongDescription(_('An impulse is like a speed addition but depends on the mass.'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
       .getCodeExtraInformation()
       .setFunctionName('applyImpulse');
 
@@ -1557,7 +1566,7 @@ module.exports = {
         'ApplyPolarImpulse',
         _('Apply impulse (angle)'),
         _(
-          'Apply an impulse to the object using polar coordinates. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply an impulse to the object using polar coordinates. It instantly changes the speed, to give an initial speed for instance.'
         ),
         _(
           'Apply to _PARAM0_ an impulse of angle _PARAM2_ and length _PARAM3_ (applied at _PARAM4_;_PARAM5_)'
@@ -1571,10 +1580,12 @@ module.exports = {
       .addParameter('expression', _('Angle'))
       .addParameter(
         'expression',
-        _('Length (in Newton * seconds or kilogram * meter per second)')
+        _('Length (N·s or kg·m·s⁻¹)')
       )
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .setParameterLongDescription(_('An impulse is like a speed addition but depends on the mass.'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
       .getCodeExtraInformation()
       .setFunctionName('applyPolarImpulse');
 
@@ -1583,7 +1594,7 @@ module.exports = {
         'ApplyImpulseTowardPosition',
         _('Apply impulse toward position'),
         _(
-          'Apply an impulse to the object to move it toward a position. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply an impulse to the object to move it toward a position. It instantly changes the speed, to give an initial speed for instance.'
         ),
         _(
           'Apply to _PARAM0_ an impulse of length _PARAM2_ towards _PARAM3_;_PARAM4_ (applied at _PARAM5_;_PARAM6_)'
@@ -1596,12 +1607,14 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter(
         'expression',
-        _('Length (in Newton * seconds or kilogram * meter per second)')
+        _('Length (N·s or kg·m·s⁻¹)')
       )
+      .setParameterLongDescription(_('An impulse is like a speed addition but depends on the mass.'))
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
       .getCodeExtraInformation()
       .setFunctionName('applyImpulseTowardPosition');
 
@@ -1610,7 +1623,7 @@ module.exports = {
         'ApplyTorque',
         _('Apply torque (rotational force)'),
         _(
-          'Apply a torque (also called "rotational force") to the object. This will make the object rotate without moving it.'
+          'Apply a torque (also called "rotational force") to the object. It "accelerates" an object rotation and must be used every frame during a time period.'
         ),
         _('Apply to _PARAM0_ a torque of _PARAM2_'),
         _('Forces & impulses'),
@@ -1619,7 +1632,8 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Torque (N.m)'))
+      .addParameter('expression', _('Torque (N·m)'))
+      .setParameterLongDescription(_('A torque is like a rotation acceleration but depends on the mass.'))
       .getCodeExtraInformation()
       .setFunctionName('applyTorque');
 
@@ -1628,7 +1642,7 @@ module.exports = {
         'ApplyAngularImpulse',
         _('Apply angular impulse (rotational impulse)'),
         _(
-          'Apply an angular impulse (also called a "rotational impulse") to the object. This will make the object rotate without moving it.'
+          'Apply an angular impulse (also called a "rotational impulse") to the object. It instantly changes the rotation speed, to give an initial speed for instance.'
         ),
         _('Apply to _PARAM0_ an angular impulse of _PARAM2_'),
         _('Forces & impulses'),
@@ -1637,7 +1651,8 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Angular impulse (N.m.s'))
+      .addParameter('expression', _('Angular impulse (N·m·s'))
+      .setParameterLongDescription(_('An impulse is like a rotation speed addition but depends on the mass.'))
       .getCodeExtraInformation()
       .setFunctionName('applyAngularImpulse');
 

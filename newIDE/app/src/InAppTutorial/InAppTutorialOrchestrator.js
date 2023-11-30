@@ -36,6 +36,7 @@ const selectorInterpolationProjectDataAccessors = {
   objectInObjectOrResourceSelector: 'objectInObjectOrResourceSelector:',
   editorTab: 'editorTab:',
 };
+const legacyItemInObjectListDomSelectorPattern = /#object-item-[0-9]{1,2}$/;
 
 const getPhasesStartIndices = (endIndices: Array<number>): Array<number> =>
   endIndices.map((_, i) => {
@@ -64,7 +65,7 @@ const interpolateText = (
       if (objectName && project && project.getLayoutsCount() > 0) {
         const layout = project.getLayoutAt(0);
         replacement = getInstanceCountInLayoutForObject(
-          layout,
+          layout.getInitialInstances(),
           objectName
         ).toString();
       }
@@ -101,6 +102,10 @@ const translateAndInterpolateText = ({
   } else {
     translatedText = i18n._(text.messageDescriptor, data);
   }
+
+  // Something went wrong with the translation, let's hide the text.
+  if (typeof translatedText !== 'string') return '';
+
   return interpolateText(translatedText, data, project);
 };
 
@@ -130,6 +135,22 @@ const interpolateEditorTabActiveTrigger = (
   return `button[id^="tab"][data-active="true"][data-type="${
     editorType === 'Scene' ? 'layout' : 'layout-events'
   }"]${sceneNameFilter}`;
+};
+
+const countObjectsInScene = ({
+  project,
+  sceneName,
+}: {|
+  project: gdProject,
+  sceneName: string,
+|}): ?number => {
+  if (project.getLayoutsCount() === 0) return;
+
+  const layout = project.hasLayoutNamed(sceneName)
+    ? project.getLayout(sceneName)
+    : project.getLayoutAt(0);
+
+  return layout.getObjectsCount();
 };
 
 export const getEditorTabSelector = ({
@@ -238,6 +259,9 @@ const isDomBasedTriggerComplete = (
   if (!trigger) return false;
   if (
     trigger.presenceOfElement &&
+    !trigger.presenceOfElement.match(
+      legacyItemInObjectListDomSelectorPattern
+    ) &&
     document.querySelector(
       interpolateElementId(trigger.presenceOfElement, data)
     )
@@ -386,6 +410,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
     const [data, setData] = React.useState<{| [key: string]: string |}>(
       startProjectData
     );
+    const objectCountBySceneRef = React.useRef<{|
+      [sceneName: string]: number,
+    |}>({});
     const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
       false
     );
@@ -412,6 +439,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
       objectName: string,
       count?: number,
     |}>(null);
+    const [
+      sceneObjectCountToWatch,
+      setSceneObjectCountToWatch,
+    ] = React.useState<boolean>(false);
     const domObserverRef = React.useRef<?MutationObserver>(null);
     const [
       shouldWatchProjectChanges,
@@ -464,7 +495,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
     );
 
     const goToStep = React.useCallback(
-      (stepIndex: number) => {
+      ({
+        stepIndex,
+        gatherData,
+      }: {
+        stepIndex: number,
+        gatherData?: boolean,
+      }) => {
         if (stepIndex >= stepCount) {
           setDisplayEndDialog(true);
           return;
@@ -486,12 +523,23 @@ const InAppTutorialOrchestrator = React.forwardRef<
             nextStepIndex += 1;
           else break;
         }
+        if (gatherData) {
+          const newData = gatherProjectDataOnMultipleSteps({
+            flow,
+            startIndex: currentStepIndex,
+            endIndex: nextStepIndex - 1,
+            data,
+            project,
+          });
+          setData(newData);
+        }
 
         changeStep(nextStepIndex);
       },
-      [flow, changeStep, stepCount, data]
+      [flow, changeStep, stepCount, data, project, currentStepIndex]
     );
 
+    // Compute phases start positions on flow change.
     React.useEffect(
       () => {
         const indices = [];
@@ -529,6 +577,24 @@ const InAppTutorialOrchestrator = React.forwardRef<
         });
       },
       [currentStepIndex, endIndicesPerPhase]
+    );
+
+    const hasCurrentSceneObjectsCountIncreased = React.useCallback(
+      (): boolean => {
+        if (!project || project.getLayoutsCount() === 0 || !currentSceneName)
+          return false;
+        const count = countObjectsInScene({
+          project,
+          sceneName: currentSceneName,
+        });
+        const initialCount = objectCountBySceneRef.current[currentSceneName];
+        return (
+          typeof initialCount === 'number' &&
+          typeof count === 'number' &&
+          count > initialCount
+        );
+      },
+      [project, currentSceneName]
     );
 
     const getProgress = () => {
@@ -573,8 +639,17 @@ const InAppTutorialOrchestrator = React.forwardRef<
           if (!shortcuts) return;
           for (let shortcutStep of shortcuts) {
             // Find the first shortcut in the list that can be triggered.
-            // TODO: Add support for not-dom based triggers
-            if (isDomBasedTriggerComplete(shortcutStep.trigger, data)) {
+            // TODO: Add support for all triggers types
+            if (
+              isDomBasedTriggerComplete(shortcutStep.trigger, data) ||
+              (shortcutStep.trigger &&
+                (shortcutStep.trigger.objectAddedInLayout ||
+                  (shortcutStep.trigger.presenceOfElement &&
+                    shortcutStep.trigger.presenceOfElement.match(
+                      legacyItemInObjectListDomSelectorPattern
+                    ))) &&
+                hasCurrentSceneObjectsCountIncreased())
+            ) {
               shouldGoToStepAtIndex = flow.findIndex(
                 step => step.id === shortcutStep.stepId
               );
@@ -589,30 +664,25 @@ const InAppTutorialOrchestrator = React.forwardRef<
               break;
             }
           }
-          if (shouldGoToStepAtIndex == null) return;
+          if (shouldGoToStepAtIndex === null) return;
         }
 
-        // If a change of step is going to happen, first record the data for
-        // all the steps that are about to be closed.
-        const newData = gatherProjectDataOnMultipleSteps({
-          flow,
-          startIndex: currentStepIndex,
-          endIndex: shouldGoToStepAtIndex - 1,
-          data,
-          project,
-        });
-        setData(newData);
-
-        goToStep(shouldGoToStepAtIndex);
+        goToStep({ stepIndex: shouldGoToStepAtIndex, gatherData: true });
       },
-      [currentStepIndex, project, goToStep, data, flow]
+      [
+        currentStepIndex,
+        goToStep,
+        data,
+        flow,
+        hasCurrentSceneObjectsCountIncreased,
+      ]
     );
 
     const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
 
     const goToNextStep = React.useCallback(
-      () => {
-        goToStep(currentStepIndex + 1);
+      (gatherData?: boolean) => {
+        goToStep({ stepIndex: currentStepIndex + 1, gatherData });
       },
       [currentStepIndex, goToStep]
     );
@@ -687,6 +757,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         setElementWithValueToWatchIfChanged(null);
         setElementWithValueToWatchIfEquals(null);
         setObjectSceneInstancesToWatch(null);
+        setSceneObjectCountToWatch(false);
         setShouldWatchProjectChanges(false);
         // If index out of bounds, display end dialog.
         if (currentStepIndex >= stepCount) {
@@ -694,6 +765,20 @@ const InAppTutorialOrchestrator = React.forwardRef<
         }
       },
       [currentStep, currentStepIndex, stepCount, editorSwitches]
+    );
+
+    // Update some refs on each step change and on current scene change.
+    React.useEffect(
+      () => {
+        if (!currentStep || !currentSceneName || !project) return;
+        const count = countObjectsInScene({
+          project,
+          sceneName: currentSceneName,
+        });
+        if (typeof count !== 'number') return;
+        objectCountBySceneRef.current[currentSceneName] = count;
+      },
+      [currentStep, currentSceneName, project]
     );
 
     // Set up watchers if the next step trigger is not dom-based.
@@ -726,6 +811,15 @@ const InAppTutorialOrchestrator = React.forwardRef<
             sceneName,
             count: nextStepTrigger.instancesCount,
           });
+        } else if (
+          nextStepTrigger &&
+          (nextStepTrigger.objectAddedInLayout ||
+            (nextStepTrigger.presenceOfElement &&
+              nextStepTrigger.presenceOfElement.match(
+                legacyItemInObjectListDomSelectorPattern
+              )))
+        ) {
+          setSceneObjectCountToWatch(true);
         }
       },
       [currentStep, data]
@@ -810,13 +904,27 @@ const InAppTutorialOrchestrator = React.forwardRef<
         } else {
           // Otherwise, we check if there is the expected number of instances.
           const instancesCount = getInstanceCountInLayoutForObject(
-            layout,
+            layout.getInitialInstances(),
             objectName
           );
           if (instancesCount >= count) goToNextStep();
         }
       },
       [project, goToNextStep, objectSceneInstancesToWatch]
+    );
+
+    const watchSceneObjects = React.useCallback(
+      () => {
+        if (!sceneObjectCountToWatch) return;
+        if (hasCurrentSceneObjectsCountIncreased()) {
+          goToNextStep(true);
+        }
+      },
+      [
+        hasCurrentSceneObjectsCountIncreased,
+        goToNextStep,
+        sceneObjectCountToWatch,
+      ]
     );
 
     useInterval(forceUpdate, shouldWatchProjectChanges ? 500 : null);
@@ -832,6 +940,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       watchSceneInstanceChanges,
       objectSceneInstancesToWatch ? 500 : null
     );
+    useInterval(watchSceneObjects, sceneObjectCountToWatch ? 1000 : null);
     useInterval(
       watchDomForNextStepTrigger,
       currentStep && currentStep.isTriggerFlickering ? 500 : null

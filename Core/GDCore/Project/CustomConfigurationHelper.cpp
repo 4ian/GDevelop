@@ -8,6 +8,7 @@
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -17,7 +18,7 @@
 using namespace gd;
 
 void CustomConfigurationHelper::InitializeContent(
-    const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+    const gd::PropertiesContainer &properties,
     gd::SerializerElement &configurationContent) {
   for (auto &&property : properties.GetInternalVector()) {
     auto &element = configurationContent.AddChild(property->GetName());
@@ -35,7 +36,7 @@ void CustomConfigurationHelper::InitializeContent(
 }
 
 std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetProperties(
-    const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+    const gd::PropertiesContainer &properties,
     const gd::SerializerElement &configurationContent) {
   auto behaviorProperties = std::map<gd::String, gd::PropertyDescriptor>();
 
@@ -71,7 +72,7 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
 }
 
 bool CustomConfigurationHelper::UpdateProperty(
-    const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+    const gd::PropertiesContainer &properties,
     gd::SerializerElement &configurationContent,
     const gd::String &propertyName,
     const gd::String &newValue) {

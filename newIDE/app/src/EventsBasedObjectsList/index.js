@@ -8,7 +8,6 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import SearchBar from '../UI/SearchBar';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import {
@@ -116,26 +115,18 @@ export default class EventsBasedObjectsList extends React.Component<
   };
 
   _rename = (eventsBasedObject: gdEventsBasedObject, newName: string) => {
-    const { eventsBasedObjectsList } = this.props;
     this.setState({
       renamedEventsBasedObject: null,
     });
 
     if (eventsBasedObject.getName() === newName) return;
 
-    if (eventsBasedObjectsList.has(newName)) {
-      showWarningBox('Another object with this name already exists.', {
-        delayToNextTick: true,
-      });
-      return;
-    }
-
     this.props.onRenameEventsBasedObject(
       eventsBasedObject,
       newName,
       doRename => {
         if (!doRename) return;
-        eventsBasedObject.setName(newName);
+
         this._onEventsBasedObjectModified();
         this.props.onEventsBasedObjectRenamed(eventsBasedObject);
       }

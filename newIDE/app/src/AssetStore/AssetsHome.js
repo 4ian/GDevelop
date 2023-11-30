@@ -1,74 +1,108 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
-import GridListTile from '@material-ui/core/GridListTile';
 import GridList from '@material-ui/core/GridList';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
-import { PrivateAssetPackPriceTag } from './PrivateAssets/PrivateAssetPackPriceTag';
 import type {
   PublicAssetPacks,
   PublicAssetPack,
 } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
-import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import Paper from '../UI/Paper';
 import { mergeArraysPerGroup } from '../Utils/Array';
-import { textEllipsisStyle } from '../UI/TextEllipsis';
+import {
+  CategoryTile,
+  PrivateAssetPackTile,
+  PublicAssetPackTile,
+  PrivateGameTemplateTile,
+} from './ShopTiles';
 
-const columns = 3;
-const columnsForSmallWindow = 1;
-const columnsForMediumWindow = 2;
-const categoryColumns = 4;
-const categoryColumnsForSmallWindow = 2;
-const categoryColumnsForMediumWindow = 3;
 const cellSpacing = 2;
 
-export const assetCategories = {
+const getCategoryColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+      return 4;
+    case 'xlarge':
+      return 6;
+    default:
+      return 3;
+  }
+};
+
+const getShopItemsColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 2;
+    case 'large':
+      return 3;
+    case 'xlarge':
+      return 5;
+    default:
+      return 2;
+  }
+};
+
+export const shopCategories = {
   'full-game-pack': {
     title: <Trans>Full Game Packs</Trans>,
     imageAlt: 'Full game asset packs category',
-    imageSource: 'res/asset-categories/Full_game_pack.jpeg',
+    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
+  },
+  'game-template': {
+    title: <Trans>Game Templates</Trans>,
+    imageAlt: 'Premium game templates category',
+    imageSource: 'res/shop-categories/Game_Templates.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,
     imageAlt: 'Characters asset packs category',
-    imageSource: 'res/asset-categories/Characters.jpeg',
+    imageSource: 'res/shop-categories/Characters.jpeg',
   },
   props: {
     title: <Trans>Props</Trans>,
     imageAlt: 'Props asset packs category',
-    imageSource: 'res/asset-categories/Props.jpeg',
+    imageSource: 'res/shop-categories/Props.jpeg',
   },
   background: {
     title: <Trans>Backgrounds</Trans>,
     imageAlt: 'Backgrounds asset packs category',
-    imageSource: 'res/asset-categories/Backgrounds.jpeg',
+    imageSource: 'res/shop-categories/Backgrounds.jpeg',
   },
   'visual-effect': {
     title: <Trans>Visual Effects</Trans>,
     imageAlt: 'Visual effects asset packs category',
-    imageSource: 'res/asset-categories/Visual_Effects.jpeg',
+    imageSource: 'res/shop-categories/Visual_Effects.jpeg',
   },
   interface: {
     title: <Trans>UI/Interface</Trans>,
     imageAlt: 'User Interface asset packs category',
-    imageSource: 'res/asset-categories/Interface.jpeg',
+    imageSource: 'res/shop-categories/Interface.jpeg',
   },
   prefab: {
     title: <Trans>Prefabs (Ready-to-use Objects)</Trans>,
     imageAlt: 'Prefabs asset packs category',
-    imageSource: 'res/asset-categories/Prefabs.jpeg',
+    imageSource: 'res/shop-categories/Prefabs.jpeg',
   },
   sounds: {
     title: <Trans>Sounds and musics</Trans>,
     imageAlt: 'Sounds and musics asset packs category',
-    imageSource: 'res/asset-categories/Sounds.jpeg',
+    imageSource: 'res/shop-categories/Sounds.jpeg',
   },
 };
 
@@ -78,198 +112,6 @@ const styles = {
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
-  priceTagContainer: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    cursor: 'default',
-  },
-  previewImage: {
-    width: '100%',
-    // Prevent cumulative layout shift by enforcing
-    // the 16:9 ratio.
-    aspectRatio: '16 / 9',
-    objectFit: 'cover',
-    position: 'relative',
-    background: '#7147ed',
-  },
-  cardContainer: {
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  paper: {
-    margin: 4,
-  },
-  packTitle: {
-    ...textEllipsisStyle,
-    overflowWrap: 'break-word',
-  },
-};
-
-const useStylesForGridListItem = makeStyles(theme =>
-  createStyles({
-    root: {
-      '&:focus': {
-        border: `2px solid ${theme.palette.primary.main}`,
-        outline: 'none',
-      },
-      '&:focus-visible': { outline: 'unset' },
-    },
-  })
-);
-
-const PublicAssetPackTile = ({
-  assetPack,
-  onSelect,
-  style,
-}: {|
-  assetPack: PublicAssetPack,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-|}) => {
-  const classesForGridListItem = useStylesForGridListItem();
-  return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={onSelect}
-    >
-      <Paper
-        id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
-        elevation={2}
-        style={styles.paper}
-        background="light"
-      >
-        <CorsAwareImage
-          key={assetPack.name}
-          style={styles.previewImage}
-          src={assetPack.thumbnailUrl}
-          alt={`Preview image of asset pack ${assetPack.name}`}
-        />
-        <Column>
-          <Line justifyContent="space-between" noMargin>
-            <Text style={styles.packTitle} size="body2">
-              {assetPack.name}
-            </Text>
-            <Text style={styles.packTitle} color="primary" size="body2">
-              <Trans>{assetPack.assetsCount} Assets</Trans>
-              {assetPack.userFriendlyPrice
-                ? ' - ' + assetPack.userFriendlyPrice
-                : null}
-            </Text>
-          </Line>
-        </Column>
-      </Paper>
-    </GridListTile>
-  );
-};
-
-export const PrivateAssetPackTile = ({
-  assetPackListingData,
-  onSelect,
-  style,
-  owned,
-}: {|
-  assetPackListingData: PrivateAssetPackListingData,
-  onSelect: () => void,
-  /** Props needed so that GidList component can adjust tile size */
-  style?: any,
-  owned: boolean,
-|}) => {
-  const classesForGridListItem = useStylesForGridListItem();
-  return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={onSelect}
-    >
-      <Paper elevation={2} style={styles.paper} background="light">
-        <CorsAwareImage
-          key={assetPackListingData.name}
-          style={styles.previewImage}
-          src={assetPackListingData.thumbnailUrls[0]}
-          alt={`Preview image of asset pack ${assetPackListingData.name}`}
-        />
-        <div style={styles.priceTagContainer}>
-          <PrivateAssetPackPriceTag
-            privateAssetPackListingData={assetPackListingData}
-            withOverlay
-            owned={owned}
-          />
-        </div>
-        <Column>
-          <Line justifyContent="space-between" noMargin>
-            <Text style={styles.packTitle} size="body2">
-              {assetPackListingData.name}
-            </Text>
-            <Text style={styles.packTitle} color="primary" size="body2">
-              <Trans>{assetPackListingData.description}</Trans>
-            </Text>
-          </Line>
-        </Column>
-      </Paper>
-    </GridListTile>
-  );
-};
-
-export const CategoryTile = ({
-  id,
-  title,
-  imageSource,
-  imageAlt,
-  onSelect,
-  style,
-}: {|
-  id: string,
-  title: React.Node,
-  imageSource: string,
-  imageAlt: string,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-|}) => {
-  const classesForGridListItem = useStylesForGridListItem();
-  return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={onSelect}
-    >
-      <Paper id={id} elevation={2} style={styles.paper} background="light">
-        <CorsAwareImage
-          style={styles.previewImage}
-          src={imageSource}
-          alt={imageAlt}
-        />
-        <Column>
-          <Line justifyContent="center" noMargin>
-            <Text style={styles.packTitle} size="sub-title">
-              {title}
-            </Text>
-          </Line>
-        </Column>
-      </Paper>
-    </GridListTile>
-  );
 };
 
 export type AssetsHomeInterface = {|
@@ -279,32 +121,40 @@ export type AssetsHomeInterface = {|
 
 type Props = {|
   publicAssetPacks: PublicAssetPacks,
-  privateAssetPacksListingData: Array<PrivateAssetPackListingData>,
+  privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
+  privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
   assetPackRandomOrdering: {|
     starterPacks: Array<number>,
     privateAssetPacks: Array<number>,
   |},
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
+  onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
   onCategorySelection: string => void,
-  openedAssetCategory: string | null,
+  openedShopCategory: string | null,
+  hideGameTemplates?: boolean,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },
-      privateAssetPacksListingData,
+      privateAssetPackListingDatas,
+      privateGameTemplateListingDatas,
       assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
+      onPrivateGameTemplateSelection,
       onCategorySelection,
-      openedAssetCategory,
+      openedShopCategory,
+      hideGameTemplates,
     }: Props,
     ref
   ) => {
     const windowWidth = useResponsiveWindowWidth();
-    const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
+      AuthenticatedUserContext
+    );
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -325,11 +175,39 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       },
     }));
 
+    const categoryTiles = React.useMemo(
+      () =>
+        Object.entries(shopCategories).map(
+          // $FlowExpectedError - Object.entries does not infer well the type of the value.
+          ([id, { title, imageSource, imageAlt }]) =>
+            hideGameTemplates && id === 'game-template' ? null : (
+              <CategoryTile
+                // This id would be more appropriate if it was shop-category-...
+                // but it is kept as is to avoid breaking some guided lessons using this
+                // id to add prefabs for instance.
+                id={`asset-pack-category-${id.replace(/\s/g, '-')}`}
+                key={id}
+                imageSource={imageSource}
+                imageAlt={imageAlt}
+                title={title}
+                onSelect={() => {
+                  onCategorySelection(id);
+                }}
+              />
+            )
+        ),
+      [onCategorySelection, hideGameTemplates]
+    );
+
+    const openedShopCategoryTitle = openedShopCategory
+      ? shopCategories[openedShopCategory].title
+      : null;
+
     const starterPacksTiles: Array<React.Node> = starterPacks
       .filter(
         assetPack =>
-          !openedAssetCategory ||
-          assetPack.categories.includes(openedAssetCategory)
+          !openedShopCategory ||
+          assetPack.categories.includes(openedShopCategory)
       )
       .map((pack, index) => ({
         pos: assetPackRandomOrdering.starterPacks[index],
@@ -345,68 +223,126 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         />
       ));
 
-    const privateAssetPacksTiles: Array<React.Node> = privateAssetPacksListingData
-      .filter(
-        assetPackListingData =>
-          !openedAssetCategory ||
-          assetPackListingData.categories.includes(openedAssetCategory)
-      )
-      .map((listingData, index) => ({
-        pos: assetPackRandomOrdering.privateAssetPacks[index],
-        listingData,
-      }))
-      .sort((a, b) => a.pos - b.pos)
-      .map(sortObject => sortObject.listingData)
-      .map(assetPackListingData => (
-        <PrivateAssetPackTile
-          assetPackListingData={assetPackListingData}
-          onSelect={() => {
-            onPrivateAssetPackSelection(assetPackListingData);
-          }}
-          owned={
-            !!receivedAssetPacks &&
-            !!receivedAssetPacks.find(
-              pack => pack.id === assetPackListingData.id
-            )
-          }
-          key={assetPackListingData.id}
-        />
-      ));
+    const { allStandAloneTiles, allBundleTiles } = React.useMemo(
+      () => {
+        const privateAssetPackStandAloneTiles: Array<React.Node> = [];
+        const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+        const privateAssetPackBundleTiles: Array<React.Node> = [];
+        const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-    const allTiles = mergeArraysPerGroup(
-      privateAssetPacksTiles,
-      starterPacksTiles,
-      2,
-      1
+        privateAssetPackListingDatas
+          .filter(
+            assetPackListingData =>
+              !openedShopCategory ||
+              assetPackListingData.categories.includes(openedShopCategory)
+          )
+          .map((listingData, index) => ({
+            pos: assetPackRandomOrdering.privateAssetPacks[index],
+            listingData,
+          }))
+          .sort((a, b) => a.pos - b.pos)
+          .map(sortObject => sortObject.listingData)
+          .filter(Boolean)
+          .forEach(assetPackListingData => {
+            const isPackOwned =
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackListingData.id
+              );
+            const tile = (
+              <PrivateAssetPackTile
+                assetPackListingData={assetPackListingData}
+                onSelect={() => {
+                  onPrivateAssetPackSelection(assetPackListingData);
+                }}
+                owned={isPackOwned}
+                key={assetPackListingData.id}
+              />
+            );
+            if (
+              assetPackListingData.includedListableProductIds &&
+              !!assetPackListingData.includedListableProductIds.length
+            ) {
+              if (isPackOwned) {
+                privateOwnedAssetPackBundleTiles.push(tile);
+              } else {
+                privateAssetPackBundleTiles.push(tile);
+              }
+            } else {
+              if (isPackOwned) {
+                privateOwnedAssetPackStandAloneTiles.push(tile);
+              } else {
+                privateAssetPackStandAloneTiles.push(tile);
+              }
+            }
+          });
+
+        const allBundleTiles = [
+          ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+          ...privateAssetPackBundleTiles,
+        ];
+
+        const allStandAloneTiles = [
+          ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+          ...mergeArraysPerGroup(
+            privateAssetPackStandAloneTiles,
+            starterPacksTiles,
+            2,
+            1
+          ),
+        ];
+
+        return { allStandAloneTiles, allBundleTiles };
+      },
+      [
+        privateAssetPackListingDatas,
+        openedShopCategory,
+        assetPackRandomOrdering,
+        onPrivateAssetPackSelection,
+        starterPacksTiles,
+        receivedAssetPacks,
+      ]
     );
 
-    const categoryTiles = Object.entries(assetCategories).map(
-      // $FlowExpectedError - Object.entries does not infer well the type of the value.
-      ([id, { title, imageSource, imageAlt }]) => (
-        <CategoryTile
-          id={`asset-pack-category-${id.replace(/\s/g, '-')}`}
-          key={id}
-          imageSource={imageSource}
-          imageAlt={imageAlt}
-          title={title}
-          onSelect={() => {
-            onCategorySelection(id);
-          }}
-        />
-      )
+    const gameTemplateTiles = React.useMemo(
+      () => {
+        // Only show game templates if the category is not set or is set to "game-template".
+        return privateGameTemplateListingDatas
+          .filter(
+            privateGameTemplateListingData =>
+              !openedShopCategory || openedShopCategory === 'game-template'
+          )
+          .map((privateGameTemplateListingData, index) => (
+            <PrivateGameTemplateTile
+              privateGameTemplateListingData={privateGameTemplateListingData}
+              onSelect={() => {
+                onPrivateGameTemplateSelection(privateGameTemplateListingData);
+              }}
+              owned={
+                !!receivedGameTemplates &&
+                !!receivedGameTemplates.find(
+                  pack => pack.id === privateGameTemplateListingData.id
+                )
+              }
+              key={privateGameTemplateListingData.id}
+            />
+          ));
+      },
+      [
+        privateGameTemplateListingDatas,
+        openedShopCategory,
+        onPrivateGameTemplateSelection,
+        receivedGameTemplates,
+      ]
     );
-
-    const openedAssetCategoryTitle = openedAssetCategory
-      ? assetCategories[openedAssetCategory].title
-      : null;
 
     return (
       <ScrollView
         ref={scrollView}
         id="asset-store-home"
-        data={{ isFiltered: !!openedAssetCategory ? 'true' : 'false' }}
+        data={{ isFiltered: !!openedShopCategory ? 'true' : 'false' }}
       >
-        {openedAssetCategory ? null : (
+        {openedShopCategory ? null : (
           <>
             <Column>
               <Line>
@@ -416,13 +352,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={
-                windowWidth === 'small'
-                  ? categoryColumnsForSmallWindow
-                  : windowWidth === 'medium'
-                  ? categoryColumnsForMediumWindow
-                  : categoryColumns
-              }
+              cols={getCategoryColumns(windowWidth)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -431,30 +361,69 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </GridList>
           </>
         )}
-        <Column>
-          <Line>
-            <Text size="block-title">
-              {openedAssetCategoryTitle ? (
-                openedAssetCategoryTitle
-              ) : (
+        {allBundleTiles.length ? (
+          <>
+            <Column>
+              <Line>
+                <Text size="block-title">
+                  <Trans>Bundles</Trans>
+                </Text>
+              </Line>
+            </Column>
+            <GridList
+              cols={getShopItemsColumns(windowWidth)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              {allBundleTiles}
+            </GridList>
+          </>
+        ) : null}
+        {openedShopCategoryTitle && (
+          <Column>
+            <Line>
+              <Text size="block-title">{openedShopCategoryTitle}</Text>
+            </Line>
+          </Column>
+        )}
+        {!hideGameTemplates && (
+          <>
+            {!openedShopCategoryTitle && (
+              <Column>
+                <Line>
+                  <Text size="block-title">
+                    <Trans>All game templates</Trans>
+                  </Text>
+                </Line>
+              </Column>
+            )}
+            <GridList
+              cols={getShopItemsColumns(windowWidth)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              {gameTemplateTiles}
+            </GridList>
+          </>
+        )}
+        {!openedShopCategoryTitle && (
+          <Column>
+            <Line>
+              <Text size="block-title">
                 <Trans>All asset packs</Trans>
-              )}
-            </Text>
-          </Line>
-        </Column>
+              </Text>
+            </Line>
+          </Column>
+        )}
         <GridList
-          cols={
-            windowWidth === 'small'
-              ? columnsForSmallWindow
-              : windowWidth === 'medium'
-              ? columnsForMediumWindow
-              : columns
-          }
+          cols={getShopItemsColumns(windowWidth)}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}
         >
-          {allTiles}
+          {allStandAloneTiles}
         </GridList>
       </ScrollView>
     );

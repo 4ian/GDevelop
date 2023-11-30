@@ -60,12 +60,16 @@ export default function SubscriptionPendingDialog({
     >
       {!hasPlan ? (
         <Column noMargin>
-          <Line>
+          <Line expand alignItems="center" justifyContent="center">
             <Text>
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
-              {'💜'}{' '}
+              {'💜'}
+            </Text>
+          </Line>
+          <Line expand alignItems="center" justifyContent="center" noMargin>
+            <Text>
               <b>
                 <Trans>
                   Your browser will now open to enter your payment details.
@@ -93,7 +97,7 @@ export default function SubscriptionPendingDialog({
         </Column>
       ) : (
         <Column noMargin>
-          <Line>
+          <Line expand alignItems="center" justifyContent="center">
             <Text>
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!

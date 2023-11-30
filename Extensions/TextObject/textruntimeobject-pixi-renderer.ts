@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class TextRuntimeObjectPixiRenderer {
     _object: gdjs.TextRuntimeObject;
     _fontManager: any;
@@ -204,6 +202,10 @@ namespace gdjs {
      */
     setScaleY(newScale: float): void {
       this._text.scale.y = newScale;
+    }
+
+    destroy() {
+      this._text.destroy(true);
     }
   }
 

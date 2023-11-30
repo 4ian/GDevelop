@@ -8,6 +8,8 @@
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/CustomBehavior.h"
+#include "GDCore/Project/CustomBehaviorsSharedData.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Project.h"
@@ -33,6 +35,10 @@ void MetadataDeclarationHelper::DeclareExtension(
                                eventsFunctionsExtension.GetAuthor(), "")
       .SetExtensionHelpPath(eventsFunctionsExtension.GetHelpPath())
       .SetIconUrl(eventsFunctionsExtension.GetIconUrl());
+
+  for(auto tag : eventsFunctionsExtension.GetTags()) {
+    extension.AddTag(tag);
+  }
 
   if (!fullName.empty()) {
     extension.AddInstructionOrExpressionGroupMetadata(fullName).SetIcon(
@@ -71,15 +77,26 @@ const gd::String &MetadataDeclarationHelper::GetExtensionIconUrl(
  * events based behavior.
  */
 gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
+    const gd::Project &project,
     gd::PlatformExtension &extension,
     const gd::EventsBasedBehavior &eventsBasedBehavior) {
   auto &behaviorMetadata =
       extension
-          .AddEventsBasedBehavior(eventsBasedBehavior.GetName(),
-                                  eventsBasedBehavior.GetFullName() ||
-                                      eventsBasedBehavior.GetName(),
-                                  eventsBasedBehavior.GetDescription(), "",
-                                  GetExtensionIconUrl(extension))
+          .AddBehavior(
+              eventsBasedBehavior.GetName(),
+              eventsBasedBehavior.GetFullName() ||
+                  eventsBasedBehavior.GetName(),
+              eventsBasedBehavior.GetName(),
+              eventsBasedBehavior.GetDescription(), "",
+              GetExtensionIconUrl(extension), "",
+              std::make_shared<gd::CustomBehavior>(
+                  eventsBasedBehavior.GetName(), project,
+                  PlatformExtension::GetBehaviorFullType(
+                      extension.GetName(), eventsBasedBehavior.GetName())),
+              std::make_shared<gd::CustomBehaviorsSharedData>(
+                  eventsBasedBehavior.GetName(), project,
+                  PlatformExtension::GetBehaviorFullType(
+                      extension.GetName(), eventsBasedBehavior.GetName())))
           .SetObjectType(eventsBasedBehavior.GetObjectType());
 
   if (eventsBasedBehavior.IsPrivate())
@@ -107,12 +124,22 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // several categories, we can assume it"s not scoped correctly.
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
-          .SetCategoryFullName(extension.GetCategory());
+          .SetCategoryFullName(extension.GetCategory())
+          // Update Project::CreateObject when default behavior are added.
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
+          .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
+  if (eventsBasedObject.IsRenderedIn3D()) {
+    objectMetadata.MarkAsRenderedIn3D();
+  }
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.
   const gd::String &objectType = eventsBasedObject.GetName();
 
+  // Deprecated
   objectMetadata
       .AddScopedAction("Width", _("Width"), _("Change the width of an object."),
                        _("the width"), _("Size"),
@@ -122,6 +149,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setWidth")
       .SetGetter("getWidth");
 
@@ -131,14 +159,15 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
                  _("the width"), _("Size"),
                  "res/actions/scaleWidth24_black.png",
                  "res/actions/scale_black.png")
-      .SetHidden()
       .AddParameter("object", _("Object"), objectType)
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setWidth")
       .SetGetter("getWidth");
 
+  // Deprecated
   objectMetadata
       .AddScopedAction("Height", _("Height"),
                        _("Change the height of an object."), _("the height"),
@@ -148,6 +177,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setHeight")
       .SetGetter("getHeight");
 
@@ -157,14 +187,15 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
                  _("the height"), _("Size"),
                  "res/actions/scaleHeight24_black.png",
                  "res/actions/scale_black.png")
-      .SetHidden()
       .AddParameter("object", _("Object"), objectType)
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setHeight")
       .SetGetter("getHeight");
 
+  // Deprecated
   objectMetadata
       .AddScopedAction(
           "Scale", _("Scale"), _("Modify the scale of the specified object."),
@@ -174,8 +205,9 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setScale")
-      .SetGetter("getScale");
+      .SetGetter("getScaleMean");
 
   // Deprecated
   objectMetadata
@@ -183,14 +215,15 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
                  _("Modify the scale of the specified object."), _("the scale"),
                  _("Size"), "res/actions/scale24_black.png",
                  "res/actions/scale_black.png")
-      .SetHidden()
       .AddParameter("object", _("Object"), objectType)
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setScale")
-      .SetGetter("getScale");
+      .SetGetter("getScaleMean");
 
+  // Deprecated
   objectMetadata
       .AddExpressionAndConditionAndAction(
           "number", "ScaleX", _("Scale on X axis"),
@@ -199,9 +232,11 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .AddParameter("object", _("Object"), objectType)
       .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setScaleX")
       .SetGetter("getScaleX");
 
+  // Deprecated
   objectMetadata
       .AddExpressionAndConditionAndAction(
           "number", "ScaleY", _("Scale on Y axis"),
@@ -210,9 +245,11 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .AddParameter("object", _("Object"), objectType)
       .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("setScaleY")
       .SetGetter("getScaleY");
 
+  // Deprecated
   objectMetadata
       .AddScopedAction("FlipX", _("Flip the object horizontally"),
                        _("Flip the object horizontally"),
@@ -221,6 +258,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .AddParameter("object", _("Object"), objectType)
       .AddParameter("yesorno", _("Activate flipping"))
       .MarkAsSimple()
+      .SetHidden()
       .SetFunctionName("flipX");
 
   // Deprecated
@@ -229,12 +267,13 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
                  _("Flip the object horizontally"),
                  _("Flip horizontally _PARAM0_: _PARAM1_"), _("Effects"),
                  "res/actions/flipX24.png", "res/actions/flipX.png")
-      .SetHidden()
       .AddParameter("object", _("Object"), objectType)
       .AddParameter("yesorno", _("Activate flipping"))
       .MarkAsSimple()
+      .SetHidden()
       .SetFunctionName("flipX");
 
+  // Deprecated
   objectMetadata
       .AddScopedAction("FlipY", _("Flip the object vertically"),
                        _("Flip the object vertically"),
@@ -243,8 +282,10 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .AddParameter("object", _("Object"), objectType)
       .AddParameter("yesorno", _("Activate flipping"))
       .MarkAsSimple()
+      .SetHidden()
       .SetFunctionName("flipY");
 
+  // Deprecated
   objectMetadata
       .AddAction("FlipY", _("Flip the object vertically"),
                  _("Flip the object vertically"),
@@ -254,14 +295,17 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .AddParameter("object", _("Object"), objectType)
       .AddParameter("yesorno", _("Activate flipping"))
       .MarkAsSimple()
+      .SetHidden()
       .SetFunctionName("flipY");
 
+  // Deprecated
   objectMetadata
       .AddScopedCondition("FlippedX", _("Horizontally flipped"),
                           _("Check if the object is horizontally flipped"),
                           _("_PARAM0_ is horizontally flipped"), _("Effects"),
                           "res/actions/flipX24.png", "res/actions/flipX.png")
       .AddParameter("object", _("Object"), objectType)
+      .SetHidden()
       .SetFunctionName("isFlippedX");
 
   // Deprecated
@@ -270,16 +314,18 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
                     _("Check if the object is horizontally flipped"),
                     _("_PARAM0_ is horizontally flipped"), _("Effects"),
                     "res/actions/flipX24.png", "res/actions/flipX.png")
-      .SetHidden()
       .AddParameter("object", _("Object"), objectType)
+      .SetHidden()
       .SetFunctionName("isFlippedX");
 
+  // Deprecated
   objectMetadata
       .AddScopedCondition("FlippedY", _("Vertically flipped"),
                           _("Check if the object is vertically flipped"),
                           _("_PARAM0_ is vertically flipped"), _("Effects"),
                           "res/actions/flipY24.png", "res/actions/flipY.png")
       .AddParameter("object", _("Object"), objectType)
+      .SetHidden()
       .SetFunctionName("isFlippedY");
 
   // Deprecated
@@ -288,8 +334,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
                     _("Check if the object is vertically flipped"),
                     _("_PARAM0_ is vertically flipped"), _("Effects"),
                     "res/actions/flipY24.png", "res/actions/flipY.png")
-      .SetHidden()
       .AddParameter("object", _("Object"), objectType)
+      .SetHidden()
       .SetFunctionName("isFlippedY");
 
   objectMetadata
@@ -301,7 +347,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .AddParameter("object", _("Object"), objectType)
       .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("setOpacity")
-      .SetGetter("getOpacity");
+      .SetGetter("getOpacity")
+      .SetHidden();
 
   return objectMetadata;
 }
@@ -1348,7 +1395,7 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
 }
 
 gd::String MetadataDeclarationHelper::GetExtensionCodeNamespacePrefix(
-    const gd::EventsFunctionsExtension eventsFunctionsExtension) {
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
   return "gdjs.evtsExt__" + EventsCodeNameMangler::GetMangledName(
                                 eventsFunctionsExtension.GetName());
 }
@@ -1411,7 +1458,7 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::GenerateBehaviorMetadata(
     const gd::EventsBasedBehavior &eventsBasedBehavior,
     std::map<gd::String, gd::String> &behaviorMethodMangledNames) {
   auto &behaviorMetadata =
-      DeclareBehaviorMetadata(extension, eventsBasedBehavior);
+      DeclareBehaviorMetadata(project, extension, eventsBasedBehavior);
 
   auto &eventsFunctionsContainer = eventsBasedBehavior.GetEventsFunctions();
 

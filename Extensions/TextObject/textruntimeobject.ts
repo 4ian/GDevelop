@@ -34,7 +34,9 @@ namespace gdjs {
   /**
    * Displays a text.
    */
-  export class TextRuntimeObject extends gdjs.RuntimeObject {
+  export class TextRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.TextContainer, gdjs.OpacityHandler {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -143,6 +145,11 @@ namespace gdjs {
       this._renderer.ensureUpToDate();
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Initialize the extra parameters that could be set for an instance.
      */
@@ -211,20 +218,37 @@ namespace gdjs {
 
     /**
      * Get the string displayed by the object.
+     * @deprecated use `getText` instead
      */
     getString(): string {
+      return this.getText();
+    }
+
+    /**
+     * Set the string displayed by the object.
+     * @param text The new text
+     * @deprecated use `setText` instead
+     */
+    setString(text: string): void {
+      this.setText(text);
+    }
+
+    /**
+     * Get the string displayed by the object.
+     */
+    getText(): string {
       return this._str;
     }
 
     /**
      * Set the string displayed by the object.
-     * @param str The new text
+     * @param text The new text
      */
-    setString(str: string): void {
-      if (str === this._str) {
+    setText(text: string): void {
+      if (text === this._str) {
         return;
       }
-      this._str = str;
+      this._str = text;
       this._renderer.updateString();
       this._updateTextPosition();
     }
@@ -304,10 +328,24 @@ namespace gdjs {
     }
 
     /**
-     * Get scale of the text.
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
+     */
+    getScaleMean(): float {
+      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): float {
-      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**

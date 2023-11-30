@@ -16,7 +16,9 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -86,15 +88,17 @@ void ProjectBrowserHelper::ExposeLayoutEvents(
 void ProjectBrowserHelper::ExposeLayoutEvents(
     gd::Project &project, gd::Layout &layout,
     gd::ArbitraryEventsWorkerWithContext &worker) {
+  auto projectScopedContainers =
+    gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
 
   // Add layouts events
-  worker.Launch(layout.GetEvents(), project, layout);
+  worker.Launch(layout.GetEvents(), projectScopedContainers);
 
   // Add external events events
   for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
     auto &externalEvents = project.GetExternalEvents(s);
     if (externalEvents.GetAssociatedLayout() == layout.GetName()) {
-      worker.Launch(externalEvents.GetEvents(), project, layout);
+      worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
     }
   }
 }
@@ -108,15 +112,19 @@ void ProjectBrowserHelper::ExposeProjectEvents(
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
     auto &layout = project.GetLayout(s);
-    worker.Launch(layout.GetEvents(), project, layout);
+    auto projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+    worker.Launch(layout.GetEvents(), projectScopedContainers);
   }
   // Add external events events
   for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
     const auto &externalEvents = project.GetExternalEvents(s);
     const gd::String &associatedLayout = externalEvents.GetAssociatedLayout();
     if (project.HasLayoutNamed(associatedLayout)) {
-      worker.Launch(project.GetExternalEvents(s).GetEvents(), project,
-                    project.GetLayout(associatedLayout));
+      auto &layout = project.GetLayout(associatedLayout);
+      auto projectScopedContainers =
+        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+      worker.Launch(project.GetExternalEvents(s).GetEvents(), projectScopedContainers);
     }
   }
   // Add events based extensions
@@ -130,9 +138,11 @@ void ProjectBrowserHelper::ExposeProjectEvents(
       gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
           project, eventsFunctionsExtension, *eventsFunction,
           globalObjectsAndGroups, objectsAndGroups);
+      auto projectScopedContainers =
+        gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
+      projectScopedContainers.AddParameters(eventsFunction->GetParametersForEvents(eventsFunctionsExtension));
 
-      worker.Launch(eventsFunction->GetEvents(), globalObjectsAndGroups,
-                    objectsAndGroups);
+      worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
     }
 
     // Add (behavior) events functions
@@ -169,9 +179,13 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
     gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
         project, eventsBasedBehavior, *eventsFunction, globalObjectsAndGroups,
         objectsAndGroups);
+    auto projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
+    projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetSharedPropertyDescriptors());
+    projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetPropertyDescriptors());
+    projectScopedContainers.AddParameters(eventsFunction->GetParametersForEvents(eventsBasedBehavior.GetEventsFunctions()));
 
-    worker.Launch(eventsFunction->GetEvents(), globalObjectsAndGroups,
-                  objectsAndGroups);
+    worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }
 }
 
@@ -185,9 +199,12 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
         project, eventsBasedObject, *eventsFunction, globalObjectsAndGroups,
         objectsAndGroups);
+    auto projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsAndGroups, objectsAndGroups);
+    projectScopedContainers.AddPropertiesContainer(eventsBasedObject.GetPropertyDescriptors());
+    projectScopedContainers.AddParameters(eventsFunction->GetParametersForEvents(eventsBasedObject.GetEventsFunctions()));
 
-    worker.Launch(eventsFunction->GetEvents(), globalObjectsAndGroups,
-                  objectsAndGroups);
+    worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }
 }
 
@@ -197,7 +214,7 @@ void ProjectBrowserHelper::ExposeProjectObjects(
   // Global objects
   worker.Launch(project);
 
-  // Layers objects
+  // Layout objects
   for (size_t i = 0; i < project.GetLayoutsCount(); i++) {
     worker.Launch(project.GetLayout(i));
   }

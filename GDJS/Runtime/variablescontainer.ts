@@ -244,6 +244,7 @@ namespace gdjs {
       getValue: () => 0,
       getChild: () => gdjs.VariablesContainer.badVariable,
       getChildAt: () => gdjs.VariablesContainer.badVariable,
+      getChildNamed: () => gdjs.VariablesContainer.badVariable,
       hasChild: function () {
         return false;
       },
@@ -269,6 +270,9 @@ namespace gdjs {
         return '0';
       },
       getAsNumber: function () {
+        return 0;
+      },
+      getAsNumberOrString: function () {
         return 0;
       },
       getAsBoolean: function () {

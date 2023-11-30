@@ -35,6 +35,8 @@ export type TestProject = {|
   testEventsBasedObject: gdEventsBasedObject,
   testObjectEventsFunction: gdEventsFunction,
   layerWithEffects: gdLayer,
+  layerWith3DEffects: gdLayer,
+  layerWith2DEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
   spriteObjectWithEffects: gdObject,
@@ -343,10 +345,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'DraggableBehavior::Draggable',
     'Draggable'
   );
-
-  // Add some tags
-  tiledSpriteObject.setTags('Tag1');
-  spriteObject.setTags('Tag1, Tag2');
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -747,19 +745,61 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Create a layer with some effects
   const layerWithEffects = new gd.Layer();
+  {
+    const effect1 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+    const effect4 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect4', 1);
 
-  const effect1 = layerWithEffects.getEffects().insertNewEffect('MyEffect1', 0);
-  const effect2 = layerWithEffects.getEffects().insertNewEffect('MyEffect2', 1);
-  const effect3 = layerWithEffects.getEffects().insertNewEffect('MyEffect3', 1);
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+    effect4.setEffectType('FakeDirectionalLight');
+  }
+  // Create a layer with some 3D effects
+  const layerWith3DEffects = new gd.Layer();
+  {
+    const effect4 = layerWith3DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect4', 1);
 
-  effect1.setEffectType('FakeSepia');
-  effect1.setDoubleParameter('opacity', 0.6);
-  effect2.setEffectType('FakeNight');
-  effect2.setDoubleParameter('intensity', 0.1);
-  effect2.setDoubleParameter('opacity', 0.2);
-  effect3.setEffectType('FakeEffectWithVariousParameters');
-  effect3.setDoubleParameter('intensity', 0.1);
-  effect3.setStringParameter('image', 'my-image');
+    effect4.setEffectType('FakeDirectionalLight');
+  }
+  // Create a layer with some 2D effects
+  const layerWith2DEffects = new gd.Layer();
+  {
+    const effect1 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+  }
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
   layerWithEffectWithoutEffectType
@@ -854,6 +894,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testEventsBasedObject: buttonEventBasedObject,
     testObjectEventsFunction,
     layerWithEffects,
+    layerWith3DEffects,
+    layerWith2DEffects,
     layerWithEffectWithoutEffectType,
     layerWithoutEffects,
     spriteObjectWithEffects,

@@ -12,7 +12,6 @@ import {
   type TutorialCategory,
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -44,24 +43,30 @@ const getHelpItemsColumnsFromWidth = (width: WidthType) => {
     case 'medium':
       return 3;
     case 'large':
-    default:
       return 4;
+    case 'xlarge':
+      return 5;
+    default:
+      return 3;
   }
 };
 
 const getTutorialsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
     case 'small':
-      return 2;
+      return 1;
     case 'medium':
       return 3;
     case 'large':
-    default:
       return 5;
+    case 'xlarge':
+      return 6;
+    default:
+      return 3;
   }
 };
 
-const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large');
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('xlarge');
 const styles = {
   grid: {
     textAlign: 'center',
@@ -74,9 +79,37 @@ const styles = {
   },
 };
 
+type TutorialsRowProps = {|
+  tutorials: Tutorial[],
+  category: TutorialCategory,
+  onSelectCategory: TutorialCategory => void,
+|};
+
+export const TutorialsRow = ({
+  tutorials,
+  category,
+  onSelectCategory,
+}: TutorialsRowProps) => (
+  <I18n>
+    {({ i18n }) => (
+      <ImageTileRow
+        title={TUTORIAL_CATEGORY_TEXTS[category].title}
+        description={TUTORIAL_CATEGORY_TEXTS[category].description}
+        items={tutorials
+          .filter(tutorial => tutorial.category === category)
+          .map(tutorial => formatTutorialToImageTileComponent(i18n, tutorial))}
+        onShowAll={() => onSelectCategory(category)}
+        showAllIcon={<ChevronArrowRight fontSize="small" />}
+        getColumnsFromWidth={getTutorialsColumnsFromWidth}
+        getLimitFromWidth={getTutorialsColumnsFromWidth}
+      />
+    )}
+  </I18n>
+);
+
 type Props = {|
   onStartTutorial: () => void,
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
@@ -86,7 +119,7 @@ type Props = {|
 
 const MainPage = ({
   onStartTutorial,
-  onCreateProject,
+  onOpenExampleStore,
   onTabChange,
   onOpenHelpFinder,
   onSelectCategory,
@@ -98,6 +131,9 @@ const MainPage = ({
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
+  const isTabletOrSmallLaptop =
+    windowWidth === 'small' || windowWidth === 'medium';
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -124,7 +160,7 @@ const MainPage = ({
     {
       title: <Trans>Examples</Trans>,
       description: <Trans>Have look at existing games from the inside</Trans>,
-      action: onCreateProject,
+      action: onOpenExampleStore,
     },
     {
       title: <Trans>Community</Trans>,
@@ -132,26 +168,6 @@ const MainPage = ({
       action: () => onTabChange('community'),
     },
   ].filter(Boolean);
-
-  const renderTutorialsRow = (category: TutorialCategory) => (
-    <I18n>
-      {({ i18n }) => (
-        <ImageTileRow
-          title={TUTORIAL_CATEGORY_TEXTS[category].title}
-          description={TUTORIAL_CATEGORY_TEXTS[category].description}
-          items={tutorials
-            .filter(tutorial => tutorial.category === category)
-            .map(tutorial =>
-              formatTutorialToImageTileComponent(i18n, tutorial)
-            )}
-          onShowAll={() => onSelectCategory(category)}
-          showAllIcon={<ChevronArrowRight fontSize="small" />}
-          getColumnsFromWidth={getTutorialsColumnsFromWidth}
-          getLimitFromWidth={getTutorialsColumnsFromWidth}
-        />
-      )}
-    </I18n>
-  );
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
@@ -217,9 +233,27 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>{renderTutorialsRow('official-beginner')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('official-intermediate')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('official-advanced')}</SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="official-beginner"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="official-intermediate"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="official-advanced"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
         <SectionRow>
           <LineStackLayout
             justifyContent="space-between"
@@ -233,7 +267,7 @@ const MainPage = ({
               </Text>
             </Column>
             <LineStackLayout noMargin>
-              {windowWidth === 'large' && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -242,10 +276,16 @@ const MainPage = ({
                   }}
                   primary
                   leftIcon={<Upload />}
-                  label={<Trans>Submit your project as an example</Trans>}
+                  label={
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit an example</Trans>
+                    ) : (
+                      <Trans>Submit your project as an example</Trans>
+                    )
+                  }
                 />
               )}
-              {windowWidth === 'large' && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -255,7 +295,13 @@ const MainPage = ({
                   primary
                   leftIcon={<TranslateIcon />}
                   label={
-                    <Trans>Submit a tutorial translated in your language</Trans>
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit a tutorial</Trans>
+                    ) : (
+                      <Trans>
+                        Submit a tutorial translated in your language
+                      </Trans>
+                    )
                   }
                 />
               )}
@@ -267,8 +313,20 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>{renderTutorialsRow('full-game')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('game-mechanic')}</SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="full-game"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            category="game-mechanic"
+            onSelectCategory={onSelectCategory}
+            tutorials={tutorials}
+          />
+        </SectionRow>
       </>
     </SectionContainer>
   );

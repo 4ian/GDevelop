@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import {
   type EnumeratedExpressionMetadata,
   type InstructionOrExpressionScope,
@@ -23,16 +24,8 @@ const enumerateExpressionMetadataMap = (
       return null; // Skip hidden expressions
     }
 
-    if (
-      scope.objectMetadata &&
-      scope.objectMetadata.isUnsupportedBaseObjectCapability(
-        exprMetadata.getRequiredBaseObjectCapability()
-      )
-    )
-      return null; // Skip expressions not supported by the object.
-
-    var parameters = [];
-    for (var i = 0; i < exprMetadata.getParametersCount(); i++) {
+    let parameters = [];
+    for (let i = 0; i < exprMetadata.getParametersCount(); i++) {
       if (scope.objectMetadata && i === 0) continue;
       if (scope.behaviorMetadata && i <= 1) continue; //Skip object and behavior parameters
       if (exprMetadata.getParameter(i).isCodeOnly()) continue;
@@ -62,7 +55,8 @@ const enumerateExpressionMetadataMap = (
 
 /** Enumerate all the free expressions available. */
 export const enumerateFreeExpressions = (
-  type: string
+  type: string,
+  i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -70,7 +64,7 @@ export const enumerateFreeExpressions = (
 
   return flatten(
     mapVector(allExtensions, extension => {
-      const prefix = getExtensionPrefix(extension);
+      const prefix = getExtensionPrefix(extension, i18n);
       const scope = {
         extension,
         objectMetadata: undefined,
@@ -109,13 +103,13 @@ export const enumerateObjectExpressions = (
   const scope = { extension, objectMetadata };
 
   let objectsExpressions = [
-    ...(!shouldOnlyBeNumberType(type)
-      ? enumerateExpressionMetadataMap(
+    ...(shouldOnlyBeNumberType(type)
+      ? []
+      : enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForObject(objectType),
           scope
-        )
-      : []),
+        )),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForObject(objectType),
@@ -133,13 +127,13 @@ export const enumerateObjectExpressions = (
 
     objectsExpressions = [
       ...objectsExpressions,
-      ...(!shouldOnlyBeNumberType(type)
-        ? enumerateExpressionMetadataMap(
+      ...(shouldOnlyBeNumberType(type)
+        ? []
+        : enumerateExpressionMetadataMap(
             '',
             extension.getAllStrExpressionsForObject(baseObjectType),
             scope
-          )
-        : []),
+          )),
       ...enumerateExpressionMetadataMap(
         '',
         extension.getAllExpressionsForObject(baseObjectType),
@@ -165,13 +159,13 @@ export const enumerateBehaviorExpressions = (
   const scope = { extension, behaviorMetadata };
 
   return [
-    ...(!shouldOnlyBeNumberType(type)
-      ? enumerateExpressionMetadataMap(
+    ...(shouldOnlyBeNumberType(type)
+      ? []
+      : enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForBehavior(behaviorType),
           scope
-        )
-      : []),
+        )),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForBehavior(behaviorType),
@@ -182,17 +176,18 @@ export const enumerateBehaviorExpressions = (
 
 /** Enumerate all the expressions available. */
 export const enumerateAllExpressions = (
-  type: string
+  type: string,
+  i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
   const objectsExpressions = [];
   const behaviorsExpressions = [];
-  const freeExpressions = enumerateFreeExpressions(type);
+  const freeExpressions = enumerateFreeExpressions(type, i18n);
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   mapVector(allExtensions, extension => {
-    const prefix = getExtensionPrefix(extension);
+    const prefix = getExtensionPrefix(extension, i18n);
 
     //Objects expressions:
     mapVector(extension.getExtensionObjectsTypes(), objectType => {

@@ -1,11 +1,11 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * Displays a Tilemap object (mapeditor.org supported).
    */
-  export class TileMapRuntimeObject extends gdjs.RuntimeObject {
+  export class TileMapRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler {
     _frameElapsedTime: float = 0;
     _opacity: float;
     _tilemapJsonFile: string;
@@ -158,6 +158,11 @@ namespace gdjs {
       );
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Set the Tilemap file to display.
      */
@@ -234,11 +239,6 @@ namespace gdjs {
       return this._animationSpeedScale;
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param width The new width of the object, in pixels.
-     */
     setWidth(width: float): void {
       if (this.getWidth() === width) return;
 
@@ -246,11 +246,6 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param height The new height of the object, in pixels.
-     */
     setHeight(height: float): void {
       if (this.getHeight() === height) return;
 
@@ -258,12 +253,17 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
+    }
+
     /**
      * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      *
      * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
-    getScale(): number {
+    getScale(): float {
       const scaleX = this.getScaleX();
       const scaleY = this.getScaleY();
       return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
@@ -324,18 +324,11 @@ namespace gdjs {
       this._renderer.updateAngle();
     }
 
-    /**
-     * Set object opacity.
-     * @param opacity The new opacity of the object (0-255).
-     */
     setOpacity(opacity: float): void {
       this._opacity = opacity;
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get object opacity.
-     */
     getOpacity(): float {
       return this._opacity;
     }

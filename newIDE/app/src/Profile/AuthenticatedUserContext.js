@@ -1,9 +1,18 @@
 // @flow
 import * as React from 'react';
-import { type Profile } from '../Utils/GDevelopServices/Authentication';
+import {
+  type Profile,
+  type LoginForm,
+  type RegisterForm,
+  type PatchUserPayload,
+  type ForgotPasswordForm,
+  type AuthError,
+} from '../Utils/GDevelopServices/Authentication';
+import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import { type Recommendation } from '../Utils/GDevelopServices/User';
 import {
   type Limits,
   type Usages,
@@ -12,6 +21,7 @@ import {
 import {
   type AssetShortHeader,
   type PrivateAssetPack,
+  type PrivateGameTemplate,
 } from '../Utils/GDevelopServices/Asset';
 
 export type AuthenticatedUser = {|
@@ -19,20 +29,34 @@ export type AuthenticatedUser = {|
   firebaseUser: ?FirebaseUser,
   profile: ?Profile,
   loginState: null | 'loggingIn' | 'done',
+  creatingOrLoggingInAccount: boolean,
   badges: ?Array<Badge>,
   cloudProjects: ?Array<CloudProjectWithUserAccessInfo>,
   cloudProjectsFetchingErrorLabel: ?React.Node,
   receivedAssetPacks: ?Array<PrivateAssetPack>,
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
+  receivedGameTemplates: ?Array<PrivateGameTemplate>,
+  recommendations: ?Array<Recommendation>,
   limits: ?Limits,
+  authenticationError: ?AuthError,
   usages: ?Usages,
   subscription: ?Subscription,
+  onLogin: (form: LoginForm) => Promise<void>,
   onLogout: () => Promise<void>,
-  onLogin: () => void,
-  onForgotPassword: () => Promise<void>,
-  onEdit: () => void,
-  onChangeEmail: () => void,
-  onCreateAccount: () => void,
+  onCreateAccount: (
+    form: RegisterForm,
+    preferences: PreferencesValues
+  ) => Promise<void>,
+  onEditProfile: (
+    payload: PatchUserPayload,
+    preferences: PreferencesValues,
+    options: {| throwError: boolean |}
+  ) => Promise<void>,
+  onResetPassword: ForgotPasswordForm => Promise<void>,
+  onOpenLoginDialog: () => void,
+  onOpenEditProfileDialog: () => void,
+  onOpenChangeEmailDialog: () => void,
+  onOpenCreateAccountDialog: () => void,
   onBadgesChanged: () => Promise<void>,
   onCloudProjectsChanged: () => Promise<void>,
   onRefreshUserProfile: () => Promise<void>,
@@ -53,20 +77,27 @@ export const initialAuthenticatedUser = {
   firebaseUser: null,
   profile: null,
   loginState: null,
+  creatingOrLoggingInAccount: false,
   badges: null,
   cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
   receivedAssetPacks: null,
   receivedAssetShortHeaders: null,
+  receivedGameTemplates: null,
+  recommendations: null,
   subscription: null,
   usages: null,
   limits: null,
+  authenticationError: null,
+  onLogin: async () => {},
   onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
+  onCreateAccount: async () => {},
+  onEditProfile: async () => {},
+  onResetPassword: async () => {},
+  onOpenLoginDialog: () => {},
+  onOpenEditProfileDialog: () => {},
+  onOpenChangeEmailDialog: () => {},
+  onOpenCreateAccountDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {},
@@ -91,6 +122,7 @@ export const authenticatedUserLoggedOutAttributes = {
   cloudProjectsFetchingErrorLabel: null,
   receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
   receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
+  receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
   subscription: null,
   usages: null,
   limits: null,

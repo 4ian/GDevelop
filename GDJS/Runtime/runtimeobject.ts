@@ -153,7 +153,7 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject implements EffectsTarget {
+  export class RuntimeObject implements EffectsTarget, gdjs.EffectHandler {
     name: string;
     type: string;
     x: float = 0;
@@ -199,13 +199,25 @@ namespace gdjs {
     > = {};
 
     //Forces:
-    protected _forces: gdjs.Force[] = [];
-    _averageForce: gdjs.Force;
+    protected _instantForces: gdjs.Force[] = [];
+    _permanentForceX: float = 0;
+    _permanentForceY: float = 0;
+    _totalForce: gdjs.Force;
 
     /**
-     * Contains the behaviors of the object.
+     * Contains the behaviors of the object, except those not having lifecycle functions.
+     *
+     * This means default, hidden, "capability" behaviors are not included in this array.
+     * This avoids wasting time iterating on them when we know their lifecycle functions
+     * are never used.
      */
     protected _behaviors: gdjs.RuntimeBehavior[] = [];
+    /**
+     * Contains the behaviors of the object by name.
+     *
+     * This includes the default, hidden, "capability" behaviors (those to handle opacity,
+     * effects, scale, size...).
+     */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;
 
@@ -227,7 +239,7 @@ namespace gdjs {
       this._variables = new gdjs.VariablesContainer(
         objectData ? objectData.variables : undefined
       );
-      this._averageForce = new gdjs.Force(0, 0, 0);
+      this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
         this._runtimeScene
@@ -236,13 +248,15 @@ namespace gdjs {
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
         this.updateAllEffectParameters(objectData.effects[i]);
       }
-
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
         const autoData = objectData.behaviors[i];
         const Ctor = gdjs.getBehaviorConstructor(autoData.type);
-        this._behaviors.push(new Ctor(instanceContainer, autoData, this));
-        this._behaviorsTable.put(autoData.name, this._behaviors[i]);
+        const behavior = new Ctor(instanceContainer, autoData, this);
+        if (behavior.usesLifecycleFunction()) {
+          this._behaviors.push(behavior);
+        }
+        this._behaviorsTable.put(autoData.name, behavior);
       }
       this._timers = new Hashtable();
     }
@@ -311,19 +325,28 @@ namespace gdjs {
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
-      let i = 0;
-      for (const len = objectData.behaviors.length; i < len; ++i) {
-        const behaviorData = objectData.behaviors[i];
+      const behaviorsDataCount = objectData.behaviors.length;
+      let behaviorsUsingLifecycleFunctionCount = 0;
+      for (
+        let behaviorDataIndex = 0;
+        behaviorDataIndex < behaviorsDataCount;
+        ++behaviorDataIndex
+      ) {
+        const behaviorData = objectData.behaviors[behaviorDataIndex];
         const Ctor = gdjs.getBehaviorConstructor(behaviorData.type);
-        if (i < this._behaviors.length) {
-          // TODO: Add support for behavior recycling with a `reinitialize` method.
-          this._behaviors[i] = new Ctor(runtimeScene, behaviorData, this);
-        } else {
-          this._behaviors.push(new Ctor(runtimeScene, behaviorData, this));
+        // TODO: Add support for behavior recycling with a `reinitialize` method.
+        const behavior = new Ctor(runtimeScene, behaviorData, this);
+        if (behavior.usesLifecycleFunction()) {
+          if (behaviorsUsingLifecycleFunctionCount < this._behaviors.length) {
+            this._behaviors[behaviorsUsingLifecycleFunctionCount] = behavior;
+          } else {
+            this._behaviors.push(behavior);
+          }
+          behaviorsUsingLifecycleFunctionCount++;
         }
-        this._behaviorsTable.put(behaviorData.name, this._behaviors[i]);
+        this._behaviorsTable.put(behaviorData.name, behavior);
       }
-      this._behaviors.length = i;
+      this._behaviors.length = behaviorsUsingLifecycleFunctionCount;
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
@@ -444,7 +467,7 @@ namespace gdjs {
      *
      * @param instanceContainer The container owning the object.
      */
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       const theLayer = instanceContainer.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
@@ -460,6 +483,8 @@ namespace gdjs {
       this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
     }
+
+    onDestroyed(): void {}
 
     /**
      * Called whenever the scene owning the object is paused.
@@ -1057,9 +1082,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are numbers).
+     * Change an effect property value (for properties that are numbers).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (number).
      */
     setEffectDoubleParameter(
@@ -1079,9 +1104,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are strings).
+     * Change an effect property value (for properties that are strings).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (string).
      */
     setEffectStringParameter(
@@ -1101,9 +1126,9 @@ namespace gdjs {
     }
 
     /**
-     * Change an effect parameter value (for parameters that are booleans).
+     * Change an effect property value (for properties that are booleans).
      * @param name The name of the effect to update.
-     * @param parameterName The name of the parameter to update.
+     * @param parameterName The name of the property to update.
      * @param value The new value (boolean).
      */
     setEffectBooleanParameter(
@@ -1222,7 +1247,7 @@ namespace gdjs {
     }
 
     /**
-     * Return the width of the object.
+     * Return the height of the object.
      * @return The height of the object
      */
     getHeight(): float {
@@ -1323,7 +1348,21 @@ namespace gdjs {
      * @param multiplier Set the force multiplier
      */
     addForce(x: float, y: float, multiplier: integer): void {
-      this._forces.push(this._getRecycledForce(x, y, multiplier));
+      if (multiplier === 1) {
+        this._permanentForceX += x;
+        this._permanentForceY += y;
+      } else if (
+        multiplier === 0 &&
+        this._instantForces.length > 0 &&
+        this._instantForces[0].getMultiplier() === 0
+      ) {
+        // Avoid to instantiate new a Force for each instance force.
+        this._instantForces[0].add(x, y);
+      } else {
+        // Handle legacy forces with multiplier different from 0 and 1
+        // (or the 1st instant force).
+        this._instantForces.push(this._getRecycledForce(x, y, multiplier));
+      }
     }
 
     /**
@@ -1338,7 +1377,7 @@ namespace gdjs {
       //TODO: Benchmark with Math.PI
       const forceX = Math.cos(angleInRadians) * len;
       const forceY = Math.sin(angleInRadians) * len;
-      this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
+      this.addForce(forceX, forceY, multiplier);
     }
 
     /**
@@ -1360,7 +1399,7 @@ namespace gdjs {
       );
       const forceX = Math.cos(angleInRadians) * len;
       const forceY = Math.sin(angleInRadians) * len;
-      this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
+      this.addForce(forceX, forceY, multiplier);
     }
 
     /**
@@ -1392,9 +1431,11 @@ namespace gdjs {
     clearForces(): void {
       RuntimeObject.forcesGarbage.push.apply(
         RuntimeObject.forcesGarbage,
-        this._forces
+        this._instantForces
       );
-      this._forces.length = 0;
+      this._instantForces.length = 0;
+      this._permanentForceX = 0;
+      this._permanentForceY = 0;
     }
 
     /**
@@ -1402,7 +1443,11 @@ namespace gdjs {
      * @return true if no forces are applied on the object.
      */
     hasNoForces(): boolean {
-      return this._forces.length === 0;
+      return (
+        this._instantForces.length === 0 &&
+        this._permanentForceX === 0 &&
+        this._permanentForceY === 0
+      );
     }
 
     /**
@@ -1410,8 +1455,8 @@ namespace gdjs {
      * remove null ones.
      */
     updateForces(elapsedTime: float): void {
-      for (let i = 0; i < this._forces.length; ) {
-        const force = this._forces[i];
+      for (let i = 0; i < this._instantForces.length; ) {
+        const force = this._instantForces[i];
         const multiplier = force.getMultiplier();
         if (multiplier === 1) {
           // Permanent force
@@ -1423,7 +1468,7 @@ namespace gdjs {
             force.getLength() <= 0.001
           ) {
             RuntimeObject.forcesGarbage.push(force);
-            this._forces.splice(i, 1);
+            this._instantForces.splice(i, 1);
           } else {
             // Deprecated way of updating forces progressively.
             force.setLength(
@@ -1442,20 +1487,18 @@ namespace gdjs {
      * @return A force object.
      */
     getAverageForce(): gdjs.Force {
-      let averageX = 0;
-      let averageY = 0;
-      for (let i = 0, len = this._forces.length; i < len; ++i) {
-        averageX += this._forces[i].getX();
-        averageY += this._forces[i].getY();
+      this._totalForce.clear();
+      this._totalForce.add(this._permanentForceX, this._permanentForceY);
+      for (let i = 0, len = this._instantForces.length; i < len; ++i) {
+        this._totalForce.addForce(this._instantForces[i]);
       }
-      this._averageForce.setX(averageX);
-      this._averageForce.setY(averageY);
-      return this._averageForce;
+      return this._totalForce;
     }
 
     /**
      * Return true if the average angle of the forces applied on the object
      * is in a given range.
+     * @deprecated Use isTotalForceAngleAround instead.
      *
      * @param angle The angle to be tested.
      * @param toleranceInDegrees The length of the range :
@@ -1468,6 +1511,26 @@ namespace gdjs {
         averageAngle += 360;
       }
       return Math.abs(angle - averageAngle) < toleranceInDegrees / 2;
+    }
+
+    /**
+     * Return true if the angle of the total force applied on the object
+     * is in a given range.
+     *
+     * @param angle The angle to be tested.
+     * @param toleranceInDegrees The maximum distance from the given angle.
+     * @return true if the difference between the force angle the given `angle`
+     * is less or equals the `toleranceInDegrees`.
+     */
+    isTotalForceAngleAround(angle: float, toleranceInDegrees: float): boolean {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(
+            this.getAverageForce().getAngle(),
+            angle
+          )
+        ) <= toleranceInDegrees
+      );
     }
 
     //Hit boxes and collision :
@@ -1831,7 +1894,9 @@ namespace gdjs {
         behaviorData,
         this
       );
-      this._behaviors.push(newRuntimeBehavior);
+      if (newRuntimeBehavior.usesLifecycleFunction()) {
+        this._behaviors.push(newRuntimeBehavior);
+      }
       this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
       return true;
     }

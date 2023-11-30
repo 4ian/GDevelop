@@ -53,6 +53,8 @@ import { ShortcutsReminder } from './ShortcutsReminder';
 import Paper from '../UI/Paper';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -78,6 +80,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     marginTop: 16,
     padding: '0 16px 16px 16px',
     position: 'relative',
@@ -145,7 +148,7 @@ type State = {|
   layoutVariablesDialogOpen: boolean,
 |};
 
-export default class ProjectManager extends React.Component<Props, State> {
+class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBarInterface;
   _draggedLayoutIndex: number | null = null;
   _draggedExternalLayoutIndex: number | null = null;
@@ -302,9 +305,9 @@ export default class ProjectManager extends React.Component<Props, State> {
       project.hasLayoutNamed(name)
     );
     const newLayout = project.insertNewLayout(newName, index + 1);
-
     newLayout.setName(newName);
     newLayout.updateBehaviorsSharedData(project);
+    addDefaultLightToAllLayers(newLayout);
 
     this._onProjectItemModified();
 
@@ -1154,6 +1157,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             </List>
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog
+                project={project}
                 title={<Trans>Global Variables</Trans>}
                 open
                 variablesContainer={project.getVariables()}
@@ -1273,3 +1277,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
   }
 }
+
+const ProjectManagerWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Project manager</Trans>}
+    scope="project-manager"
+  >
+    <ProjectManager {...props} />
+  </ErrorBoundary>
+);
+
+export default ProjectManagerWithErrorBoundary;

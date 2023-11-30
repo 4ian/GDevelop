@@ -117,6 +117,18 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     }
   }
 
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    // Destroy textures because they are instantiated by this class.
+    for (const borderSprite of this._borderSprites) {
+      borderSprite.destroy({ texture: true });
+    }
+    // Destroy the containers without handling children because they are
+    // already handled above.
+    this._centerSprite.destroy({ texture: true });
+    this._pixiObject.destroy(false);
+  }
+
   updateAngle() {
     this._pixiObject.rotation = RenderedInstance.toRad(
       this._instance.getAngle()
@@ -236,7 +248,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       return;
     }
 
-    console.log('Updating PanelSprite instance texture');
     function makeInsideTexture(rect) {
       if (rect.width < 0) rect.width = 0;
       if (rect.height < 0) rect.height = 0;

@@ -21,8 +21,10 @@ import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 import FlatButton from '../UI/FlatButton';
 import Coffee from '../UI/CustomSvgIcons/Coffee';
 import { GridList } from '@material-ui/core';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 import Link from '../UI/Link';
@@ -30,6 +32,30 @@ import {
   communityLinksConfig,
   type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
+import { PrivateAssetPackTile } from '../AssetStore/ShopTiles';
+import AuthenticatedUserContext from './AuthenticatedUserContext';
+
+const getAssetPackColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 3;
+    case 'large':
+    case 'xlarge':
+      return 4;
+    default:
+      return 3;
+  }
+};
+
+const styles = {
+  grid: {
+    margin: 0, // Remove the default margin of the grid.
+    // Remove the scroll capability of the grid, the scroll view handles it.
+    overflow: 'unset',
+  },
+};
 
 const CommunityLinksLines = ({
   isAuthenticatedUserProfile,
@@ -73,9 +99,9 @@ type Props = {|
   isAuthenticatedUserProfile?: boolean,
   error?: ?Error,
   onRetry?: () => void,
-  onChangeEmail?: () => void,
-  onEditProfile?: () => void,
-  assetPacksListingData?: ?Array<PrivateAssetPackListingData>,
+  onOpenChangeEmailDialog?: () => void,
+  onOpenEditProfileDialog?: () => void,
+  assetPacksListingDatas?: ?Array<PrivateAssetPackListingData>,
   onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
 |};
 
@@ -84,9 +110,9 @@ const ProfileDetails = ({
   isAuthenticatedUserProfile,
   error,
   onRetry,
-  onChangeEmail,
-  onEditProfile,
-  assetPacksListingData,
+  onOpenChangeEmailDialog,
+  onOpenEditProfileDialog,
+  assetPacksListingDatas,
   onAssetPackOpen,
 }: Props) => {
   const donateLink = profile ? profile.donateLink : null;
@@ -106,6 +132,74 @@ const ProfileDetails = ({
   const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
   const windowWidth = useResponsiveWindowWidth();
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+
+  const assetPackTiles = React.useMemo(
+    () => {
+      if (
+        !onAssetPackOpen ||
+        !assetPacksListingDatas ||
+        !assetPacksListingDatas.length
+      )
+        return null;
+
+      const privateAssetPackStandAloneTiles: Array<React.Node> = [];
+      const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+      const privateAssetPackBundleTiles: Array<React.Node> = [];
+      const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
+
+      assetPacksListingDatas.forEach(assetPackListingData => {
+        const isPackOwned =
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(
+            pack => pack.id === assetPackListingData.id
+          );
+        const tile = (
+          <PrivateAssetPackTile
+            assetPackListingData={assetPackListingData}
+            onSelect={() => {
+              sendAssetPackOpened({
+                assetPackName: assetPackListingData.name,
+                assetPackId: assetPackListingData.id,
+                assetPackTag: null,
+                assetPackKind: 'private',
+                source: 'author-profile',
+              });
+              onAssetPackOpen(assetPackListingData);
+            }}
+            owned={isPackOwned}
+            key={assetPackListingData.id}
+          />
+        );
+        if (
+          assetPackListingData.includedListableProductIds &&
+          !!assetPackListingData.includedListableProductIds.length
+        ) {
+          if (isPackOwned) {
+            privateOwnedAssetPackBundleTiles.push(tile);
+          } else {
+            privateAssetPackBundleTiles.push(tile);
+          }
+        } else {
+          if (isPackOwned) {
+            privateOwnedAssetPackStandAloneTiles.push(tile);
+          } else {
+            privateAssetPackStandAloneTiles.push(tile);
+          }
+        }
+      });
+
+      const allTiles = [
+        ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+        ...privateAssetPackBundleTiles, // Then non-owned bundles.
+        ...privateOwnedAssetPackStandAloneTiles, // Then owned packs.
+        ...privateAssetPackStandAloneTiles, // Then non-owned packs.
+      ];
+
+      return allTiles;
+    },
+    [assetPacksListingDatas, onAssetPackOpen, receivedAssetPacks]
+  );
 
   if (error)
     return (
@@ -117,7 +211,7 @@ const ProfileDetails = ({
       </PlaceholderError>
     );
 
-  if (!profile || (!isAuthenticatedUserProfile && !assetPacksListingData)) {
+  if (!profile || (!isAuthenticatedUserProfile && !assetPacksListingDatas)) {
     return <PlaceholderLoader />;
   }
 
@@ -248,11 +342,11 @@ const ProfileDetails = ({
                 <RaisedButton
                   label={<Trans>Edit my profile</Trans>}
                   primary
-                  onClick={onEditProfile}
+                  onClick={onOpenEditProfileDialog}
                 />
                 <FlatButton
                   label={<Trans>Change my email</Trans>}
-                  onClick={onChangeEmail}
+                  onClick={onOpenChangeEmailDialog}
                   disabled={profile.isEmailAutogenerated}
                 />
                 <FlatButton
@@ -269,43 +363,25 @@ const ProfileDetails = ({
                 />
               </ResponsiveLineStackLayout>
             )}
-            {!isAuthenticatedUserProfile &&
-              onAssetPackOpen &&
-              assetPacksListingData &&
-              assetPacksListingData.length > 0 && (
-                <ColumnStackLayout expand noMargin>
-                  <Line noMargin>
-                    <Text size="block-title">
-                      <Trans>Asset packs</Trans>
-                    </Text>
-                  </Line>
-                  <Line expand noMargin justifyContent="start">
-                    <GridList
-                      cols={windowWidth === 'small' ? 1 : 3}
-                      cellHeight="auto"
-                      spacing={2}
-                    >
-                      {assetPacksListingData.map(assetPackListingData => (
-                        <PrivateAssetPackTile
-                          assetPackListingData={assetPackListingData}
-                          onSelect={() => {
-                            sendAssetPackOpened({
-                              assetPackName: assetPackListingData.name,
-                              assetPackId: assetPackListingData.id,
-                              assetPackTag: null,
-                              assetPackKind: 'private',
-                              source: 'author-profile',
-                            });
-                            onAssetPackOpen(assetPackListingData);
-                          }}
-                          owned={false}
-                          key={assetPackListingData.id}
-                        />
-                      ))}
-                    </GridList>
-                  </Line>
-                </ColumnStackLayout>
-              )}
+            {!isAuthenticatedUserProfile && assetPackTiles && (
+              <ColumnStackLayout expand noMargin>
+                <Line noMargin>
+                  <Text size="block-title">
+                    <Trans>Asset packs</Trans>
+                  </Text>
+                </Line>
+                <Line expand noMargin justifyContent="start">
+                  <GridList
+                    cols={getAssetPackColumnsFromWidth(windowWidth)}
+                    cellHeight="auto"
+                    spacing={4}
+                    style={styles.grid}
+                  >
+                    {assetPackTiles}
+                  </GridList>
+                </Line>
+              </ColumnStackLayout>
+            )}
           </ColumnStackLayout>
         </ResponsiveLineStackLayout>
       )}

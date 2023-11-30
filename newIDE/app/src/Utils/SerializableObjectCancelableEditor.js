@@ -9,6 +9,16 @@ type Props = {|
   serializableObject: gdSerializable,
   useProjectToUnserialize?: ?gdProject,
   onCancel: () => void | Promise<void>,
+
+  /**
+   * In the future, most serializable objects will be able to have
+   * persistent UUID to identify them uniquely. In the meantime, some
+   * UUIDs are used to check for changes in a serialized object, but must
+   * not be persisted in the project file. In this case, this will
+   * reset the UUIDs (which are probabably not set) and clear them when cancelled.
+   * If you must manually clear them if changes are applied.
+   */
+  resetThenClearPersistentUuid?: boolean,
 |};
 
 const changesBeforeShowingWarning = 1;
@@ -22,8 +32,9 @@ export const useSerializableObjectCancelableEditor = ({
   serializableObject,
   useProjectToUnserialize,
   onCancel,
+  resetThenClearPersistentUuid,
 }: Props) => {
-  const serializedElementRef = React.useRef(null);
+  const serializedElementRef = React.useRef<gdSerializerElement | null>(null);
   const numberOfChangesRef = React.useRef(0);
   const { showConfirmation } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
@@ -38,6 +49,9 @@ export const useSerializableObjectCancelableEditor = ({
         serializedElementRef.current = null;
       }
 
+      if (resetThenClearPersistentUuid)
+        serializableObject.resetPersistentUuid();
+
       serializedElementRef.current = new gd.SerializerElement();
       serializableObject.serializeTo(serializedElementRef.current);
 
@@ -48,8 +62,16 @@ export const useSerializableObjectCancelableEditor = ({
         }
       };
     },
-    [serializableObject]
+    [serializableObject, resetThenClearPersistentUuid]
   );
+
+  const getOriginalContentSerializedElement = React.useCallback(() => {
+    if (!serializedElementRef.current) {
+      throw new Error('serializedElementRef should always be non null.');
+    }
+
+    return serializedElementRef.current;
+  }, []);
 
   const notifyOfChange = React.useCallback(() => {
     numberOfChangesRef.current++;
@@ -98,6 +120,9 @@ export const useSerializableObjectCancelableEditor = ({
         );
       }
 
+      if (resetThenClearPersistentUuid)
+        serializableObject.clearPersistentUuid();
+
       onCancel();
     },
     [
@@ -106,8 +131,14 @@ export const useSerializableObjectCancelableEditor = ({
       onCancel,
       showConfirmation,
       backdropClickBehavior,
+      resetThenClearPersistentUuid,
     ]
   );
 
-  return { onCancelChanges, notifyOfChange, hasUnsavedChanges };
+  return {
+    onCancelChanges,
+    notifyOfChange,
+    hasUnsavedChanges,
+    getOriginalContentSerializedElement,
+  };
 };

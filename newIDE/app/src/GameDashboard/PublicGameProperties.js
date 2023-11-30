@@ -122,7 +122,7 @@ export function PublicGameProperties({
   const { profile } = React.useContext(AuthenticatedUserContext);
 
   const hasGameSlug =
-    userSlug && userSlug.length && profile && profile.username;
+    userSlug && !!userSlug.length && profile && profile.username;
 
   const hasValidGameSlug =
     hasGameSlug && (profile && userSlug !== profile.username);

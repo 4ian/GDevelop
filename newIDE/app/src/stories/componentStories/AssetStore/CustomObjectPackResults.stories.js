@@ -7,6 +7,7 @@ import paperDecorator from '../../PaperDecorator';
 import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
 import { CustomObjectPackResults } from '../../../AssetStore/NewObjectFromScratch';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
+import { useShopNavigation } from '../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/CustomObjectPackResults',
@@ -14,28 +15,35 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
+const Wrapper = ({ children }: { children: React.Node }) => {
+  const navigationState = useShopNavigation();
+  return (
+    <FixedHeightFlexContainer height={500}>
+      <AssetStoreStateProvider shopNavigationState={navigationState}>
+        {children}
+      </AssetStoreStateProvider>
+    </FixedHeightFlexContainer>
+  );
+};
+
 export const Default = () => (
-  <FixedHeightFlexContainer height={400}>
-    <AssetStoreStateProvider>
-      <CustomObjectPackResults
-        packTag="multitouch joysticks"
-        onAssetSelect={action('onAssetSelect')}
-        onBack={action('onBack')}
-        isAssetBeingInstalled={false}
-      />
-    </AssetStoreStateProvider>
-  </FixedHeightFlexContainer>
+  <Wrapper>
+    <CustomObjectPackResults
+      packTag="multitouch joysticks"
+      onAssetSelect={action('onAssetSelect')}
+      onBack={action('onBack')}
+      isAssetBeingInstalled={false}
+    />
+  </Wrapper>
 );
 
 export const Installing = () => (
-  <FixedHeightFlexContainer height={400}>
-    <AssetStoreStateProvider>
-      <CustomObjectPackResults
-        packTag="multitouch joysticks"
-        onAssetSelect={action('onAssetSelect')}
-        onBack={action('onBack')}
-        isAssetBeingInstalled
-      />
-    </AssetStoreStateProvider>
-  </FixedHeightFlexContainer>
+  <Wrapper>
+    <CustomObjectPackResults
+      packTag="multitouch joysticks"
+      onAssetSelect={action('onAssetSelect')}
+      onBack={action('onBack')}
+      isAssetBeingInstalled
+    />
+  </Wrapper>
 );

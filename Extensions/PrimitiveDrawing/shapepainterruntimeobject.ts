@@ -40,7 +40,9 @@ namespace gdjs {
   /**
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
    */
-  export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
+  export class ShapePainterRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
     _scaleX: number = 1;
     _scaleY: number = 1;
     _blendMode: number = 0;
@@ -172,6 +174,11 @@ namespace gdjs {
       super.stepBehaviorsPreEvents(instanceContainer);
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Clear the graphics.
      */
@@ -216,6 +223,38 @@ namespace gdjs {
         endX2,
         endY2,
         radius
+      );
+    }
+
+    drawChamferRectangle(
+      startX1: float,
+      startY1: float,
+      endX2: float,
+      endY2: float,
+      chamfer: float
+    ) {
+      this._renderer.drawChamferRectangle(
+        startX1,
+        startY1,
+        endX2,
+        endY2,
+        chamfer
+      );
+    }
+
+    drawRegularPolygon(
+      centerX: float,
+      centerY: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this._renderer.drawRegularPolygon(
+        centerX,
+        centerY,
+        sides,
+        radius,
+        rotation
       );
     }
 
@@ -555,11 +594,6 @@ namespace gdjs {
       );
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param newWidth The new width of the object, in pixels.
-     */
     setWidth(newWidth: float): void {
       const unscaledWidth = this._renderer.getUnscaledWidth();
       if (unscaledWidth !== 0) {
@@ -567,16 +601,16 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param newHeight The new height of the object, in pixels.
-     */
     setHeight(newHeight: float): void {
       const unscaledHeight = this._renderer.getUnscaledHeight();
       if (unscaledHeight !== 0) {
         this.setScaleY(newHeight / unscaledHeight);
       }
+    }
+
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     /**

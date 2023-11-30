@@ -5,6 +5,10 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import {
+  type ShowAlertFunction,
+  type ShowConfirmFunction,
+} from '../UI/Alert/AlertContext';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -18,6 +22,8 @@ export type FileMetadata = {|
   lastModifiedDate?: number,
   name?: string,
   gameId?: string,
+  /** The user id of the user owning the project if not the authenticated user. */
+  ownerId?: string,
 |};
 
 /**
@@ -120,6 +126,20 @@ export type StorageProviderOperations = {|
     /** This is the location where the project was saved, or null if not persisted. */
     fileMetadata: ?FileMetadata,
   |}>,
+  canFileMetadataBeSafelySaved?: (
+    fileMetadata: FileMetadata,
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
+  ) => Promise<boolean>,
+  canFileMetadataBeSafelySavedAs?: (
+    fileMetadata: FileMetadata,
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
+  ) => Promise<boolean>,
 
   // Project properties saving:
   onChangeProjectProperty?: (
@@ -133,10 +153,10 @@ export type StorageProviderOperations = {|
     project: gdProject,
     fileMetadata: FileMetadata
   ) => Promise<void>,
-  hasAutoSave?: (
+  getAutoSaveCreationDate?: (
     fileMetadata: FileMetadata,
     compareLastModified: boolean
-  ) => Promise<boolean>,
+  ) => Promise<?number>,
   onGetAutoSave?: (fileMetadata: FileMetadata) => Promise<FileMetadata>,
 |};
 
@@ -152,7 +172,12 @@ export type StorageProvider = {|
   disabled?: boolean,
   renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
   getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
-  onRenderNewProjectSaveAsLocationChooser?: (props: {|
+  getProjectLocation?: ({|
+    projectName: string,
+    saveAsLocation: ?SaveAsLocation,
+    newProjectsDefaultFolder?: string,
+  |}) => SaveAsLocation,
+  renderNewProjectSaveAsLocationChooser?: (props: {|
     projectName: string,
     saveAsLocation: ?SaveAsLocation,
     setSaveAsLocation: (?SaveAsLocation) => void,
@@ -168,4 +193,10 @@ export type StorageProvider = {|
   createResourceOperations?: ({|
     authenticatedUser: AuthenticatedUser,
   |}) => ResourcesActionsMenuBuilder,
+  /** Resources external changes */
+  setupResourcesWatcher?: ({|
+    fileIdentifier: string,
+    callback: ({| identifier: string |}) => void,
+    options?: any,
+  |}) => () => void,
 |};

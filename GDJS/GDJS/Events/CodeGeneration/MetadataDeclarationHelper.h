@@ -66,9 +66,29 @@ public:
       const gd::EventsBasedObject &eventsBasedObject,
       std::map<gd::String, gd::String> &objectMethodMangledNames);
 
+  /** Generate the namespace prefix for an extension. */
+  static gd::String GetExtensionCodeNamespacePrefix(
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension);
+
+  /** Generate the fully qualified name for a free function. */
   static gd::String GetFreeFunctionCodeName(
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsFunction &eventsFunction);
+
+  /** Generate the namespace for a free function. */
+  static gd::String
+  GetFreeFunctionCodeNamespace(const gd::EventsFunction &eventsFunction,
+                               const gd::String &codeNamespacePrefix);
+
+  /** Generate the namespace for a behavior function. */
+  static gd::String GetBehaviorFunctionCodeNamespace(
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &codeNamespacePrefix);
+
+  /** Generate the namespace for an object function. */
+  static gd::String
+  GetObjectFunctionCodeNamespace(const gd::EventsBasedObject &eventsBasedObject,
+                                 const gd::String &codeNamespacePrefix);
 
   /**
    * Declare an extension from an events based extension.
@@ -164,7 +184,8 @@ private:
    * events based behavior.
    */
   static gd::BehaviorMetadata &
-  DeclareBehaviorMetadata(gd::PlatformExtension &extension,
+  DeclareBehaviorMetadata(const gd::Project &project,
+                          gd::PlatformExtension &extension,
                           const gd::EventsBasedBehavior &eventsBasedBehavior);
 
   /**
@@ -291,24 +312,6 @@ private:
       const gd::EventsFunction &eventsFunction,
       gd::MultipleInstructionMetadata &multipleInstructionMetadata,
       const int userDefinedFirstParameterIndex);
-
-  static gd::String GetExtensionCodeNamespacePrefix(
-      const gd::EventsFunctionsExtension eventsFunctionsExtension);
-
-  /** Generate the namespace for a free function. */
-  static gd::String
-  GetFreeFunctionCodeNamespace(const gd::EventsFunction &eventsFunction,
-                               const gd::String &codeNamespacePrefix);
-
-  /** Generate the namespace for a behavior function. */
-  static gd::String GetBehaviorFunctionCodeNamespace(
-      const gd::EventsBasedBehavior &eventsBasedBehavior,
-      const gd::String &codeNamespacePrefix);
-
-  /** Generate the namespace for an object function. */
-  static gd::String
-  GetObjectFunctionCodeNamespace(const gd::EventsBasedObject &eventsBasedObject,
-                                 const gd::String &codeNamespacePrefix);
 
   static gd::String RemoveTrailingDot(const gd::String &description);
 

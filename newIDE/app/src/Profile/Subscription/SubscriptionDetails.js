@@ -23,6 +23,7 @@ import Paper from '../../UI/Paper';
 import PlanCard from './PlanCard';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import AlertMessage from '../../UI/AlertMessage';
 
 const styles = {
   diamondIcon: {
@@ -155,6 +156,14 @@ const SubscriptionDetails = ({
               isHighlighted={false}
               background="medium"
             />
+            {subscription.cancelAtPeriodEnd && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  Your subscription is being cancelled: you will lose the
+                  benefits at the end of the period you already paid for.
+                </Trans>
+              </AlertMessage>
+            )}
             {!!redemptionCodeExpirationDate && (
               <I18n>
                 {({ i18n }) => (

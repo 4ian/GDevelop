@@ -35,7 +35,9 @@ export const ReplacePromptDialog = ({
   onClose,
   onTriggerReplace,
 }: ReplacePromptDialogProps) => {
-  const { authenticated, onLogin } = React.useContext(AuthenticatedUserContext);
+  const { authenticated, onOpenLoginDialog } = React.useContext(
+    AuthenticatedUserContext
+  );
 
   return (
     <Dialog
@@ -67,7 +69,7 @@ export const ReplacePromptDialog = ({
               <DialogPrimaryButton
                 label={<Trans>Login now</Trans>}
                 primary
-                onClick={() => onLogin()}
+                onClick={() => onOpenLoginDialog()}
                 key="login-now"
                 id="login-now"
               />,

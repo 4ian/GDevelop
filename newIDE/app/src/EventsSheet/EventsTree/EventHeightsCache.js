@@ -35,9 +35,18 @@ export default class EventHeightsCache {
   }
 
   setEventHeight(event: gdBaseEvent, height: number) {
+    if (height === 0) {
+      // Don't store the new height because it's 0, meaning a new rendering later
+      // will then render the proper height. In the meantime, we don't want to
+      // store this empty rendering BUT we still need to notify the parent that
+      // an update is needed.
+      this._notifyComponent();
+      return;
+    }
+
     const cachedHeight = this.eventHeights[event.ptr];
     if (cachedHeight === undefined || cachedHeight !== height) {
-      // console.log(event.ptr, 'has a new height', height, 'old:', cachedHeight);
+      // Notify the parent component that a height changed.
       this._notifyComponent();
     }
 
@@ -45,6 +54,6 @@ export default class EventHeightsCache {
   }
 
   getEventHeight(event: gdBaseEvent): number {
-    return this.eventHeights[event.ptr] || 60;
+    return this.eventHeights[event.ptr] || 0;
   }
 }

@@ -1,5 +1,6 @@
 // @flow
 import axios from 'axios';
+import capitalize from 'lodash/capitalize';
 import { type I18n as I18nType } from '@lingui/core';
 import { GDevelopGameApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { type Filters } from './Filters';
@@ -95,10 +96,6 @@ export type AllShowcasedGames = {
 export type GameApiError = {|
   code: 'game-deletion/leaderboards-exist',
 |};
-
-const capitalize = (str: string) => {
-  return str ? str[0].toUpperCase() + str.substr(1) : '';
-};
 
 export const getCategoryName = (category: string, i18n: I18nType) => {
   switch (category) {

@@ -1,0 +1,14 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "onCreateCommand": "cd newIDE/app && npm install && cd ../electron-app && npm install",
+  "forwardPorts": [3000],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "ms-vscode.cpptools",
+        "flowtype.flow-for-vscode"
+      ]
+    }
+  }
+}

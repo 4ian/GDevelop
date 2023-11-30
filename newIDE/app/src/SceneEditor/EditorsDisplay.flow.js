@@ -16,6 +16,7 @@ import { type InstancesEditorShortcutsCallbacks } from '../InstancesEditor';
 import { type EditorId } from '.';
 import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
+import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 
 export type SceneEditorsDisplayProps = {|
   project: gdProject,
@@ -31,8 +32,7 @@ export type SceneEditorsDisplayProps = {|
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
   onEditObject: gdObject => void,
-  selectedObjectNames: string[],
-  renamedObjectWithContext: ?ObjectWithContext,
+  selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
   onSelectLayer: (layerName: string) => void,
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
@@ -43,20 +43,21 @@ export type SceneEditorsDisplayProps = {|
     done: (boolean) => void
   ) => void,
   onObjectCreated: gdObject => void,
-  onObjectSelected: (?ObjectWithContext) => void,
+  onObjectFolderOrObjectWithContextSelected: (
+    ?ObjectFolderOrObjectWithContext
+  ) => void,
   onExportObject: (object: ?gdObject) => void,
-  onDeleteObject: (
+  onDeleteObjects: (
     i18n: I18nType,
-    objectWithContext: ObjectWithContext,
+    objectsWithContext: ObjectWithContext[],
     cb: (boolean) => void
   ) => void,
   onAddObjectInstance: (
     objectName: string,
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
-  onRenameObjectStart: (?ObjectWithContext) => void,
-  onRenameObjectFinish: (
-    objectWithContext: ObjectWithContext,
+  onRenameObjectFolderOrObjectWithContextFinish: (
+    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     newName: string,
     done: (boolean) => void
   ) => void,
@@ -70,19 +71,14 @@ export type SceneEditorsDisplayProps = {|
     newName: string,
     done: (boolean) => void
   ) => void,
-  canRenameObjectGroup: (
+  getValidatedObjectOrGroupName: (
     newName: string,
     global: boolean,
     i18n: I18nType
-  ) => boolean,
+  ) => string,
   canObjectOrGroupBeGlobal: (
     i18n: I18nType,
     objectOrGroupName: string
-  ) => boolean,
-  canObjectOrGroupUseNewName: (
-    newName: string,
-    global: boolean,
-    i18n: I18nType
   ) => boolean,
 
   updateBehaviorsSharedData: () => void,
@@ -126,6 +122,7 @@ export type SceneEditorsDisplayInterface = {|
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
+  renameObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext => void,
   viewControls: {|
     zoomBy: (factor: number) => void,
     setZoomFactor: (factor: number) => void,
@@ -140,6 +137,7 @@ export type SceneEditorsDisplayInterface = {|
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
   |},
+  startSceneRendering: (start: boolean) => void,
   instancesHandlers: {|
     getSelectionAABB: () => Rectangle,
     addInstances: (

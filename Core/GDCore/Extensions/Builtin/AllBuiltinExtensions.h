@@ -43,6 +43,13 @@ class GD_CORE_API BuiltinExtensionsImplementer {
   static void ImplementsVariablesExtension(gd::PlatformExtension& extension);
   static void ImplementsWindowExtension(gd::PlatformExtension& extension);
   static void ImplementsAsyncExtension(gd::PlatformExtension& extension);
+  static void ImplementsResizableExtension(gd::PlatformExtension& extension);
+  static void ImplementsScalableExtension(gd::PlatformExtension& extension);
+  static void ImplementsFlippableExtension(gd::PlatformExtension& extension);
+  static void ImplementsAnimatableExtension(gd::PlatformExtension& extension);
+  static void ImplementsEffectExtension(gd::PlatformExtension& extension);
+  static void ImplementsOpacityExtension(gd::PlatformExtension& extension);
+  static void ImplementsTextContainerExtension(gd::PlatformExtension& extension);
 };
 
 }  // namespace gd

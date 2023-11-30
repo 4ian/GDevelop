@@ -83,7 +83,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         structureChild1.getChild('Child1StructureChild2');
         structureChild1.getChild('Child1StructureChild3');
         structureChild1.getChild(
-          'Child1 Unsafe Because of Spaces so not listed'
+          'Child1Structure with unsafe "`/+ characters and spaces'
         );
 
         // With a child array, containing 2 structures and a number.
@@ -272,6 +272,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure["Child1Structure with unsafe \\"\`/+ characters and spaces"], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -317,6 +318,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure["Child1Structure with unsafe \\"\`/+ characters and spaces"], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -829,6 +831,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure["Child1Structure with unsafe \\"\`/+ characters and spaces"], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -865,6 +868,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 1, no prefix, Child1Structure["Child1Structure with unsafe \\"\`/+ characters and spaces"], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 1, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",

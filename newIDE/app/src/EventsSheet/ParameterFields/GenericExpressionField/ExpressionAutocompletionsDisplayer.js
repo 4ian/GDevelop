@@ -98,6 +98,8 @@ const AutocompletionRow = React.forwardRef(
     |},
     ref
   ) => {
+    const trimmedLabel = label.length > 46 ? label.substr(0, 46) + '…' : label;
+
     return (
       <ButtonBase
         style={styles.button}
@@ -112,7 +114,7 @@ const AutocompletionRow = React.forwardRef(
         {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
         <Spacer />
         <Text style={defaultTextStyle} noMargin align="left">
-          {isSelected ? <b>{label}</b> : label}
+          {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
           {parametersLabel && (
             <>
               (<i>{parametersLabel}</i>)

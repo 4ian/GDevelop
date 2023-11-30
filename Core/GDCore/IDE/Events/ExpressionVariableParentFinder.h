@@ -347,7 +347,6 @@ class GD_CORE_API ExpressionVariableParentFinder
 
     const gd::String& firstChildName = *childVariableNames.begin();
 
-// TODO: move again?
     const gd::Variable* variable = variablesContainer.Has(firstChildName) ?
       &variablesContainer.Get(firstChildName) : nullptr;
     if (childVariableNames.size() == 1 || !variable)

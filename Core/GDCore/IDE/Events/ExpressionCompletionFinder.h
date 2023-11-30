@@ -615,6 +615,8 @@ class GD_CORE_API ExpressionCompletionFinder
     } else {
       // Object function, behavior name, variable, object variable.
       if (IsCaretOn(node.identifierNameLocation)) {
+        // Don't attempt to complete children variables if there is
+        // already a dot written (`MyVariable.`).
         bool eagerlyCompleteIfPossible =
             !node.identifierNameDotLocation.IsValid();
         AddCompletionsForAllIdentifiersMatchingSearch(
@@ -833,8 +835,8 @@ class GD_CORE_API ExpressionCompletionFinder
   }
 
   /**
-   * A slightly less strict check than `gd::Project::IsNameSafe` as child variables can be completed
-   * even if they start with a number.
+   * A slightly less strict check than `gd::Project::IsNameSafe` as child
+   * variables can be completed even if they start with a number.
    */
   bool IsIdentifierSafe(const gd::String& name) {
     if (name.empty()) return false;
@@ -898,14 +900,19 @@ class GD_CORE_API ExpressionCompletionFinder
     if (variable.GetType() == gd::Variable::Structure) {
       gd::String prefix = variableName + ".";
       for (const auto& name : variable.GetAllChildrenNames()) {
-        if (!IsIdentifierSafe(name)) continue;
+        gd::String completion =
+            IsIdentifierSafe(name)
+                ? (prefix + name)
+                : (variableName + "[" +
+                   gd::ExpressionParser2NodePrinter::PrintStringLiteral(name) +
+                   "]");
 
         const auto& childVariable = variable.GetChild(name);
         ExpressionCompletionDescription description(
             ExpressionCompletionDescription::Variable,
             location.GetStartPosition(),
             location.GetEndPosition());
-        description.SetCompletion(prefix + name);
+        description.SetCompletion(completion);
         description.SetVariableType(childVariable.GetType());
         completions.push_back(description);
       }

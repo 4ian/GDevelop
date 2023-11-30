@@ -168,6 +168,7 @@ namespace gdjs {
         this._object._fillColor,
         this._object._fillOpacity / 255
       );
+      //@ts-ignore from @pixi/graphics-extras
       this._graphics.drawTorus(
         x1,
         y1,

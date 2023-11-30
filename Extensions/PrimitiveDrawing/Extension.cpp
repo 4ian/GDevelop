@@ -163,9 +163,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Torus",
                _("Torus"),
                _("Draw a torus on screen"),
-               _("Draw at _PARAM1_;_PARAM2_ a torus with inner radius:"
+               _("Draw at _PARAM1_;_PARAM2_ a torus with inner radius"
                "_PARAM3_ and outer radius _PARAM4_ and "
-               "with start arc _PARAM5_ and end arc _PARAM6_"
+               "with start arc _PARAM5_° and end arc _PARAM6_°"
                "with _PARAM0_"),
                _("Drawing"),
                "res/actions/torus24.png",

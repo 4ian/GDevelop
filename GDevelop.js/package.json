@@ -20,6 +20,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.3.1",
     "extend": "^2.0.1",
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",

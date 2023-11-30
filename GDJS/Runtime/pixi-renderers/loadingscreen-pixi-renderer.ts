@@ -58,10 +58,7 @@ namespace gdjs {
       const backgroundTexture = imageManager.getOrLoadPIXITexture(
         loadingScreenData.backgroundImageResourceName
       );
-      if (
-        backgroundTexture !== imageManager.getInvalidPIXITexture() &&
-        isFirstScene
-      ) {
+      if (backgroundTexture !== imageManager.getInvalidPIXITexture()) {
         this._backgroundSprite = PIXI.Sprite.from(backgroundTexture);
         this._backgroundSprite.alpha = 0;
         this._backgroundSprite.anchor.x = 0.5;

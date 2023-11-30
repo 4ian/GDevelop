@@ -6,7 +6,7 @@ namespace gdjs {
   }
 
   const fadeIn = (
-    object: PIXI.DisplayObject | null,
+    object: { alpha: number } | null,
     duration: float,
     deltaTimeInMs: float
   ) => {
@@ -54,6 +54,7 @@ namespace gdjs {
         return;
       }
       this._pixiRenderer.background.color = this._loadingScreenData.backgroundColor;
+      this._pixiRenderer.background.alpha = 0;
 
       const backgroundTexture = imageManager.getOrLoadPIXITexture(
         loadingScreenData.backgroundImageResourceName
@@ -170,6 +171,13 @@ namespace gdjs {
       } else if (this._state == LoadingScreenState.STARTED) {
         const backgroundFadeInDuration = this._loadingScreenData
           .backgroundFadeInDuration;
+
+        this._pixiRenderer.clear();
+        fadeIn(
+          this._pixiRenderer.background,
+          backgroundFadeInDuration,
+          deltaTimeInMs
+        );
         fadeIn(this._backgroundSprite, backgroundFadeInDuration, deltaTimeInMs);
 
         if (hasFadedIn(this._backgroundSprite)) {
@@ -242,6 +250,13 @@ namespace gdjs {
           );
           this._progressBarGraphics.endFill();
         }
+      } else if (this._state === LoadingScreenState.FINISHED) {
+        // Display a black screen to avoid a stretched image of the loading
+        // screen to appear.
+        this._pixiRenderer.background.color = 'black';
+        this._pixiRenderer.background.alpha = 1;
+        this._pixiRenderer.clear();
+        this._loadingScreenContainer.removeChildren();
       }
 
       this._pixiRenderer.render(this._loadingScreenContainer);

@@ -123,48 +123,33 @@ namespace gdjs {
         const errorIsInJs = isErrorComingFromJavaScriptCode(
           this._uncaughtException
         );
-        this._uncaughtExceptionElement = h(
-          'div',
-          {
-            style: styles.errorContainer,
-          },
-          h(
-            'button',
-            {
-              style: styles.closeButton,
-              onClick: () => this.setUncaughtException(null),
-            },
-            '×'
-          ),
-          h(
-            'h2',
-            {
-              style: styles.errorTitle,
-            },
-            errorIsInJs
-              ? 'An error happened in a JavaScript code event.'
-              : 'A crash or error happened in the game.'
-          ),
-          h(
-            'p',
-            {
-              style: styles.errorMessage,
-            },
-            (errorIsInJs
-              ? 'This error comes from a JavaScript code event. Verify your code to ensure no error is happening. You can use the Developer Tools (menu "View" > "Toggle Developer Tools"). Full error is: '
-              : "If you're using JavaScript, verify your code. Otherwise, this might be an issue with GDevelop - consider reporting a bug. Full error is: ") +
-              this._uncaughtException.message
-          ),
-          h(
-            'pre',
-            {
-              style: styles.stacktrace,
-            },
-            this._uncaughtException.stack || '(No stracktrace).'
-          )
+        this._uncaughtExceptionElement = (
+          <div style={styles.errorContainer}>
+            <button
+              style={styles.closeButton}
+              onClick={() => this.setUncaughtException(null)}
+            >
+              ×
+            </button>
+            <h2 style={styles.errorTitle}>
+              {errorIsInJs
+                ? 'An error happened in a JavaScript code event.'
+                : 'A crash or error happened in the game.'}
+            </h2>
+            <p style={styles.errorMessage}>
+              {(errorIsInJs
+                ? 'This error comes from a JavaScript code event. Verify your code to ensure no error is happening. You can use the Developer Tools (menu "View" > "Toggle Developer Tools"). Full error is: '
+                : "If you're using JavaScript, verify your code. Otherwise, this might be an issue with GDevelop - consider reporting a bug. Full error is: ") +
+                this._uncaughtException.message}
+            </p>
+            <pre style={styles.stacktrace}>
+              {this._uncaughtException.stack || '(No stracktrace).'}
+            </pre>
+          </div>
         );
 
-        domElementContainer.appendChild(this._uncaughtExceptionElement);
+        if (this._uncaughtExceptionElement)
+          domElementContainer.appendChild(this._uncaughtExceptionElement);
       }
     }
   }

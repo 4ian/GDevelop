@@ -23,7 +23,11 @@
     },
     "baseUrl": "./",
     "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise"],
-    "typeRoots": ["GDJS/node_modules/@types/"]
+    "typeRoots": ["GDJS/node_modules/@types/"],
+    // JSX syntax for lightweight rendering in the game engine:
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   },
   "include": [
     "GDJS/Runtime/**/*",

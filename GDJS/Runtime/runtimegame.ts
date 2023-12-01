@@ -650,6 +650,8 @@ namespace gdjs {
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       try {
+        // Download the loading screen background image first to be able to
+        // display the loading screen as soon as possible.
         const backgroundImageResourceName = this._data.properties.loadingScreen
           .backgroundImageResourceName;
         if (backgroundImageResourceName) {

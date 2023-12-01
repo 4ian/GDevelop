@@ -183,13 +183,27 @@ export const LoadingScreenEditor = ({
                       subscriptionChecker.current &&
                       !subscriptionChecker.current.hasUserSubscription()
                     ) {
-                      loadingScreen.setMinDuration(forcedLogo.minDuration);
-                      loadingScreen.setLogoAndProgressFadeInDuration(
+                      if (
+                        loadingScreen.getMinDuration() < forcedLogo.minDuration
+                      ) {
+                        loadingScreen.setMinDuration(forcedLogo.minDuration);
+                      }
+                      if (
+                        loadingScreen.getLogoAndProgressFadeInDuration() >
                         forcedLogo.logoAndProgressFadeInDuration
-                      );
-                      loadingScreen.setLogoAndProgressLogoFadeInDelay(
+                      ) {
+                        loadingScreen.setLogoAndProgressFadeInDuration(
+                          forcedLogo.logoAndProgressFadeInDuration
+                        );
+                      }
+                      if (
+                        loadingScreen.getLogoAndProgressLogoFadeInDelay() >
                         forcedLogo.logoAndProgressLogoFadeInDelay
-                      );
+                      ) {
+                        loadingScreen.setLogoAndProgressLogoFadeInDelay(
+                          forcedLogo.logoAndProgressLogoFadeInDelay
+                        );
+                      }
                     }
                     onUpdate();
                   }}

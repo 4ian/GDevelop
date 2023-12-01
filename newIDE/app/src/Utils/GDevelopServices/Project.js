@@ -83,11 +83,27 @@ type CloudProject = {|
 export type CloudProjectVersion = {|
   projectId: string,
   id: string,
+  label?: string,
   createdAt: string,
   /** Was not always recorded so can be undefined. Represents the user who created this version. */
   userId?: string,
   /** previousVersion is null when the entity represents the initial version of a project. */
   previousVersion: null | string,
+  /** If the version is a restoration from a previous one, this attribute is set. */
+  restoredFromVersionId?: string,
+|};
+
+export type FilledCloudProjectVersion = {|
+  projectId: string,
+  id: string,
+  label?: string,
+  createdAt: string,
+  /** Was not always recorded so can be undefined. Represents the user who created this version. */
+  userId?: string,
+  /** previousVersion is null when the entity represents the initial version of a project. */
+  previousVersion: null | string,
+  /** If the version is a restoration from a previous one, this attribute is set. */
+  restoredFromVersion?: CloudProjectVersion,
 |};
 
 export type CloudProjectWithUserAccessInfo = {|
@@ -182,7 +198,7 @@ const getVersionIdFromPath = (path: string): string => {
 export const getLastVersionsOfProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
-): Promise<?Array<CloudProjectVersion>> => {
+): Promise<?Array<FilledCloudProjectVersion>> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 

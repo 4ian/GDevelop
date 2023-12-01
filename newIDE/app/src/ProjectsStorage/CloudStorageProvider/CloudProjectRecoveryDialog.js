@@ -13,7 +13,7 @@ import Text from '../../UI/Text';
 import {
   getLastVersionsOfProject,
   isCloudProjectVersionSane,
-  type CloudProjectVersion,
+  type FilledCloudProjectVersion,
 } from '../../Utils/GDevelopServices/Project';
 import FlatButton from '../../UI/FlatButton';
 import { sendCloudProjectCouldNotBeOpened } from '../../Utils/Analytics/EventSender';
@@ -36,7 +36,7 @@ const CloudProjectRecoveryDialog = ({
   const [
     lastSaneVersion,
     setLastSaneVersion,
-  ] = React.useState<?CloudProjectVersion>(null);
+  ] = React.useState<?FilledCloudProjectVersion>(null);
   const [isErrored, setIsErrored] = React.useState<boolean>(false);
   const [
     saneVersionHasNotBeenFound,

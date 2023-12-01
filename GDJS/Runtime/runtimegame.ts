@@ -650,25 +650,36 @@ namespace gdjs {
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       try {
-        await this._loadAssetsWithLoadingScreen(
-          /* isFirstScene = */ true,
-          async (onProgress) => {
-            // TODO Is a setting needed?
-            if (false) {
-              await this._resourcesLoader.loadAllResources(onProgress);
-            } else {
-              await this._resourcesLoader.loadGlobalAndFirstSceneResources(
-                firstSceneName,
-                onProgress
-              );
-              // Don't await as it must not block the first scene from starting.
-              this._resourcesLoader.loadAllSceneInBackground();
-            }
-          },
-          progressCallback
-        );
-        // TODO This is probably not necessary in case of hot reload.
-        await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+        // Download the loading screen background image first to be able to
+        // display the loading screen as soon as possible.
+        const backgroundImageResourceName = this._data.properties.loadingScreen
+          .backgroundImageResourceName;
+        if (backgroundImageResourceName) {
+          await this._resourcesLoader
+            .getImageManager()
+            .loadResource(backgroundImageResourceName);
+        }
+        await Promise.all([
+          this._loadAssetsWithLoadingScreen(
+            /* isFirstScene = */ true,
+            async (onProgress) => {
+              // TODO Is a setting needed?
+              if (false) {
+                await this._resourcesLoader.loadAllResources(onProgress);
+              } else {
+                await this._resourcesLoader.loadGlobalAndFirstSceneResources(
+                  firstSceneName,
+                  onProgress
+                );
+                // Don't await as it must not block the first scene from starting.
+                this._resourcesLoader.loadAllSceneInBackground();
+              }
+            },
+            progressCallback
+          ),
+          // TODO This is probably not necessary in case of hot reload.
+          gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
+        ]);
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 

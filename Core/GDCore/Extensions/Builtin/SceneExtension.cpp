@@ -171,8 +171,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Preload a scene resources as soon as possible in background."),
                  _("Preload scene _PARAM1_ in background"),
                  "",
-                 "res/actions/replaceScene24.png",
-                 "res/actions/replaceScene.png")
+                 "res/actions/hourglass_black.svg",
+                 "res/actions/hourglass_black.svg")
       .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
@@ -184,7 +184,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                                 _("The progress of resources loading in background for a scene (between 0 and 1)."),
                                 _("_PARAM0_ loading progress"),
                                 _(""),
-                                "res/actions/replaceScene24.png")
+                                "res/actions/hourglass_black.svg")
       .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))
@@ -197,8 +197,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     _("Check if scene resources have finished to load in background."),
                     _("Scene _PARAM1_ was preloaded in background"),
                     "",
-                    "res/actions/replaceScene24.png",
-                    "res/actions/replaceScene.png")
+                    "res/actions/hourglass_black.svg",
+                    "res/actions/hourglass_black.svg")
       .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))

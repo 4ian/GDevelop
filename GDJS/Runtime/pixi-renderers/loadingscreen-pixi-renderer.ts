@@ -173,11 +173,13 @@ namespace gdjs {
           .backgroundFadeInDuration;
 
         this._pixiRenderer.clear();
-        fadeIn(
-          this._pixiRenderer.background,
-          backgroundFadeInDuration,
-          deltaTimeInMs
-        );
+        if (!this._backgroundSprite) {
+          fadeIn(
+            this._pixiRenderer.background,
+            backgroundFadeInDuration,
+            deltaTimeInMs
+          );
+        }
         fadeIn(this._backgroundSprite, backgroundFadeInDuration, deltaTimeInMs);
 
         if (hasFadedIn(this._backgroundSprite)) {

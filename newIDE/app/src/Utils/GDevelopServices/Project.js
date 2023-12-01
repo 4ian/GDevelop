@@ -179,28 +179,6 @@ const getVersionIdFromPath = (path: string): string => {
   return path.substring(filenameStartIndex, filenameEndIndex);
 };
 
-export const getProjectVersion = async (
-  authenticatedUser: AuthenticatedUser,
-  cloudProjectId: string,
-  versionId: string
-): Promise<?CloudProjectVersion> => {
-  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return;
-
-  const { uid: userId } = firebaseUser;
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await apiClient.get(
-    `/project/${cloudProjectId}/version/${versionId}`,
-    {
-      headers: {
-        Authorization: authorizationHeader,
-      },
-      params: { userId },
-    }
-  );
-  return response.data;
-};
-
 export const getLastVersionsOfProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string

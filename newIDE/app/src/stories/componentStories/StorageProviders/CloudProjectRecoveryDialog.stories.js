@@ -8,7 +8,7 @@ import emptyGameContent from './fixtures/emptyGame.json';
 
 import {
   apiClient as projectApiAxiosClient,
-  type CloudProjectVersion,
+  type FilledCloudProjectVersion,
   projectResourcesClient as resourcesAxiosClient,
 } from '../../../Utils/GDevelopServices/Project';
 import CloudProjectRecoveryDialog from '../../../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
@@ -29,7 +29,7 @@ export default {
 
 export const Default = () => {
   const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
-  const versions: Array<CloudProjectVersion> = [
+  const versions: Array<FilledCloudProjectVersion> = [
     {
       id: '8e067d2d-6f08-4f93-ad2d-f3ad5ca3c69c',
       projectId,
@@ -99,7 +99,7 @@ export const Default = () => {
 
 export const NoFallbackVersion = () => {
   const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
-  const versions: Array<CloudProjectVersion> = [
+  const versions: Array<FilledCloudProjectVersion> = [
     {
       id: '8e067d2d-6f08-4f93-ad2d-f3ad5ca3c69c',
       projectId,

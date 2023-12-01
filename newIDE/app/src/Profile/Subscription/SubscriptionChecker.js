@@ -73,7 +73,10 @@ const SubscriptionChecker = React.forwardRef<
     return hasValidSubscriptionPlan(authenticatedUser.subscription);
   };
 
-  React.useImperativeHandle(ref, () => ({ checkUserHasSubscription, hasUserSubscription }));
+  React.useImperativeHandle(ref, () => ({
+    checkUserHasSubscription,
+    hasUserSubscription,
+  }));
 
   return (
     <Dialog

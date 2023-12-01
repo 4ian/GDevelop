@@ -412,8 +412,9 @@ export const LoadingScreenEditor = ({
             type="number"
             value={'' + loadingScreen.getMinDuration()}
             onChange={newValue => {
+              const newMinDuration = Math.max(0, parseFloat(newValue));
               if (
-                newValue < forcedLogo.minDuration &&
+                newMinDuration < forcedLogo.minDuration &&
                 !watermark.isGDevelopWatermarkShown() &&
                 subscriptionChecker.current &&
                 !subscriptionChecker.current.checkUserHasSubscription()
@@ -423,7 +424,6 @@ export const LoadingScreenEditor = ({
                 return;
               }
               const currentMinDuration = loadingScreen.getMinDuration();
-              const newMinDuration = Math.max(0, parseFloat(newValue));
               if (currentMinDuration === newMinDuration) {
                 return;
               }
@@ -449,8 +449,13 @@ export const LoadingScreenEditor = ({
               type="number"
               value={'' + loadingScreen.getLogoAndProgressLogoFadeInDelay()}
               onChange={newValue => {
+                const newLogoAndProgressLogoFadeInDelay = Math.max(
+                  0,
+                  parseFloat(newValue)
+                );
                 if (
-                  newValue > forcedLogo.logoAndProgressLogoFadeInDelay &&
+                  newLogoAndProgressLogoFadeInDelay >
+                    forcedLogo.logoAndProgressLogoFadeInDelay &&
                   !watermark.isGDevelopWatermarkShown() &&
                   subscriptionChecker.current &&
                   !subscriptionChecker.current.checkUserHasSubscription()
@@ -460,10 +465,6 @@ export const LoadingScreenEditor = ({
                   return;
                 }
                 const currentLogoAndProgressLogoFadeInDelay = loadingScreen.getLogoAndProgressLogoFadeInDelay();
-                const newLogoAndProgressLogoFadeInDelay = Math.max(
-                  0,
-                  parseFloat(newValue)
-                );
                 if (
                   currentLogoAndProgressLogoFadeInDelay ===
                   newLogoAndProgressLogoFadeInDelay
@@ -489,8 +490,13 @@ export const LoadingScreenEditor = ({
               type="number"
               value={'' + loadingScreen.getLogoAndProgressFadeInDuration()}
               onChange={newValue => {
+                const newLogoAndProgressFadeInDuration = Math.max(
+                  0,
+                  parseFloat(newValue)
+                );
                 if (
-                  newValue > forcedLogo.logoAndProgressFadeInDuration &&
+                  newLogoAndProgressFadeInDuration >
+                    forcedLogo.logoAndProgressFadeInDuration &&
                   !watermark.isGDevelopWatermarkShown() &&
                   subscriptionChecker.current &&
                   !subscriptionChecker.current.checkUserHasSubscription()
@@ -500,10 +506,6 @@ export const LoadingScreenEditor = ({
                   return;
                 }
                 const currentLogoAndProgressFadeInDuration = loadingScreen.getLogoAndProgressFadeInDuration();
-                const newLogoAndProgressFadeInDuration = Math.max(
-                  0,
-                  parseFloat(newValue)
-                );
                 if (
                   currentLogoAndProgressFadeInDuration ===
                   newLogoAndProgressFadeInDuration

@@ -17,16 +17,32 @@ namespace gdjs {
         if (parameterName !== 'brightness') {
           return;
         }
-        brightnessFilter.brightness(
-          gdjs.PixiFiltersTools.clampValue(value, 0, 1),
-          false
-        );
+        const brightness = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
+        //@ts-ignore
+        brightnessFilter.__brightness = brightness;
+        brightnessFilter.brightness(brightness, false);
+      }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        if (parameterName === 'brightness') {
+          //@ts-ignore
+          return brightnessFilter.__brightness;
+        }
+        return 0;
       }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

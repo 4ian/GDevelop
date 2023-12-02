@@ -17,6 +17,13 @@ namespace gdjs {
           colorReplaceFilter.epsilon = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
+        if (parameterName === 'epsilon') {
+          return colorReplaceFilter.epsilon;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
@@ -32,6 +39,29 @@ namespace gdjs {
             value
           );
         }
+      }
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {
+        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
+        if (parameterName === 'originalColor') {
+          colorReplaceFilter.originalColor = value;
+        } else if (parameterName === 'newColor') {
+          colorReplaceFilter.newColor = value;
+        }
+      }
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
+        if (parameterName === 'originalColor') {
+          //@ts-ignore
+          return colorReplaceFilter.originalColor;
+        } else if (parameterName === 'newColor') {
+          //@ts-ignore
+          return colorReplaceFilter.newColor;
+        }
+        return 0;
       }
       updateBooleanParameter(
         filter: PIXI.Filter,

@@ -79,12 +79,26 @@ namespace gdjs {
           );
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        if (parameterName === 'opacity') {
+          return filter.uniforms.opacity;
+        }
+        return 0;
+      }
       // Function that will be called to update a (string) parameter of the PIXI filter with a new value
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       // Function that will be called to update a (boolean) parameter of the PIXI filter with a new value
       updateBooleanParameter(
         filter: PIXI.Filter,

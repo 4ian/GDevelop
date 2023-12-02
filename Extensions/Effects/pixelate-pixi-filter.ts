@@ -19,11 +19,27 @@ namespace gdjs {
           pixelateFilter.size = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter;
+        if (parameterName === 'size') {
+          //@ts-ignore
+          return pixelateFilter.size;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

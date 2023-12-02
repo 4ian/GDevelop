@@ -74,6 +74,16 @@ namespace gdjs {
               this.updateRotation();
             }
           }
+          getDoubleParameter(parameterName: string): number {
+            if (parameterName === 'intensity') {
+              return this.light.intensity;
+            } else if (parameterName === 'elevation') {
+              return this.elevation;
+            } else if (parameterName === 'rotation') {
+              return this.rotation;
+            }
+            return 0;
+          }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'skyColor') {
               this.light.color = new THREE.Color(
@@ -89,6 +99,23 @@ namespace gdjs {
               this.top = value;
               this.updateRotation();
             }
+          }
+          updateColorParameter(parameterName: string, value: number): void {
+            if (parameterName === 'skyColor') {
+              this.light.color.setHex(value);
+            }
+            if (parameterName === 'groundColor') {
+              this.light.groundColor.setHex(value);
+            }
+          }
+          getColorParameter(parameterName: string): number {
+            if (parameterName === 'skyColor') {
+              return this.light.color.getHex();
+            }
+            if (parameterName === 'groundColor') {
+              return this.light.groundColor.getHex();
+            }
+            return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
           updateRotation() {

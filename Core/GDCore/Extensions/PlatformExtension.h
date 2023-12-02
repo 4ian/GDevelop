@@ -264,8 +264,11 @@ class GD_CORE_API PlatformExtension {
    *
    * \param name The name of the behavior
    * \param fullname The user friendly name of the behavior
+   * \param defaultName The default name of behavior instances
    * \param description The user friendly description of the behavior
+   * \param group The behavior category label
    * \param icon The icon of the behavior.
+   * \param className The name of the class implementing the behavior
    * \param instance An instance of the behavior that
    * will be used to create the behavior
    * \param sharedDatasInstance Optional
@@ -288,6 +291,7 @@ class GD_CORE_API PlatformExtension {
    * \param name The name of the behavior
    * \param fullname The user friendly name of the behavior
    * \param description The user friendly description of the behavior
+   * \param group The behavior category label
    * \param icon The icon of the behavior.
    */
   gd::BehaviorMetadata& AddEventsBasedBehavior(

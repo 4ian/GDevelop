@@ -23,7 +23,8 @@ const freeInstructionsToKeep = {
 
 const isObjectInstruction = (
   instructionMetadata: gdInstructionMetadata,
-  objectType?: string
+  objectType?: string,
+  objectBehaviorTypes?: Set<string>
 ): boolean => {
   let firstParameterIndex = -1;
   for (
@@ -51,13 +52,19 @@ const isObjectInstruction = (
   ) {
     return false;
   }
-  if (firstParameterIndex === instructionMetadata.getParametersCount() - 1) {
-    return true;
+
+  for (let parameterIndex = firstParameterIndex + 1; parameterIndex < instructionMetadata.getParametersCount(); parameterIndex++) {
+    const parameter = instructionMetadata.getParameter(
+      parameterIndex
+    );
+    if (!gd.ParameterMetadata.isBehavior(parameter.getType())) {
+      return true;
+    }
+    if (!objectBehaviorTypes || !objectBehaviorTypes.has(parameter.getExtraInfo())) {
+      return false;
+    }
   }
-  const secondParameter = instructionMetadata.getParameter(
-    firstParameterIndex + 1
-  );
-  return !gd.ParameterMetadata.isBehavior(secondParameter.getType());
+  return true;
 };
 
 const isBehaviorInstruction = (
@@ -267,7 +274,9 @@ const enumerateExtensionInstructions = (
   prefix: string,
   instructions: gdMapStringInstructionMetadata,
   scope: InstructionOrExpressionScope,
-  i18n: I18nType
+  i18n: I18nType,
+  objectType?: string,
+  objectBehaviorTypes?: Set<string>
 ): Array<EnumeratedInstructionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
@@ -277,11 +286,12 @@ const enumerateExtensionInstructions = (
   for (let j = 0; j < instructionsTypes.size(); ++j) {
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
-    if (instrMetadata.isHidden()) continue;
-
-    allInstructions.push(
-      enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
-    );
+    if (!instrMetadata.isHidden() && 
+    isObjectInstruction(instrMetadata, objectType, objectBehaviorTypes)) {
+      allInstructions.push(
+        enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
+      );
+    }
   }
 
   return allInstructions;
@@ -514,7 +524,11 @@ export const enumerateObjectAndBehaviorsInstructions = (
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
           scope,
-          i18n
+          i18n,
+          // Allow behaviors to have some of their instruction to be restricted
+          // to some type of object.
+          objectType,
+          objectBehaviorTypes,
         ),
         ...freeBehaviorInstructions,
         ...allInstructions,

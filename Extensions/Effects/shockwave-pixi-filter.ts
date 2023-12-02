@@ -1,4 +1,9 @@
 namespace gdjs {
+  interface ShockwaveFilterExtra {
+    // @ts-ignore - extra properties are stored on the filter.
+    _centerX: number;
+    _centerY: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Shockwave',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -7,16 +12,15 @@ namespace gdjs {
         return shockwaveFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const shockwaveFilter = (filter as unknown) as PIXI.filters.ShockwaveFilter;
+        const shockwaveFilter = (filter as unknown) as PIXI.filters.ShockwaveFilter &
+          ShockwaveFilterExtra;
         if (shockwaveFilter.speed !== 0) {
           shockwaveFilter.time += target.getElapsedTime() / 1000;
         }
         shockwaveFilter.center[0] = Math.round(
-          // @ts-ignore - extra properties are stored on the filter.
           shockwaveFilter._centerX * target.getWidth()
         );
         shockwaveFilter.center[1] = Math.round(
-          // @ts-ignore - extra properties are stored on the filter.
           shockwaveFilter._centerY * target.getHeight()
         );
       }
@@ -25,12 +29,11 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const shockwaveFilter = filter as PIXI.filters.ShockwaveFilter;
+        const shockwaveFilter = filter as PIXI.filters.ShockwaveFilter &
+          ShockwaveFilterExtra;
         if (parameterName === 'centerX') {
-          // @ts-ignore - extra properties are stored on the filter.
           shockwaveFilter._centerX = value;
         } else if (parameterName === 'centerY') {
-          // @ts-ignore - extra properties are stored on the filter.
           shockwaveFilter._centerY = value;
         } else if (parameterName === 'time') {
           shockwaveFilter.time = value;
@@ -46,11 +49,48 @@ namespace gdjs {
           shockwaveFilter.radius = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const shockwaveFilter = filter as PIXI.filters.ShockwaveFilter &
+          ShockwaveFilterExtra;
+        if (parameterName === 'centerX') {
+          return shockwaveFilter._centerX;
+        }
+        if (parameterName === 'centerY') {
+          return shockwaveFilter._centerY;
+        }
+        if (parameterName === 'time') {
+          return shockwaveFilter.time;
+        }
+        if (parameterName === 'speed') {
+          return shockwaveFilter.speed;
+        }
+        if (parameterName === 'amplitude') {
+          return shockwaveFilter.amplitude;
+        }
+        if (parameterName === 'wavelength') {
+          return shockwaveFilter.wavelength;
+        }
+        if (parameterName === 'brightness') {
+          return shockwaveFilter.brightness;
+        }
+        if (parameterName === 'radius') {
+          return shockwaveFilter.radius;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

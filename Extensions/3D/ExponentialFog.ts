@@ -58,12 +58,29 @@ namespace gdjs {
               this.fog.density = value;
             }
           }
+          getDoubleParameter(parameterName: string): number {
+            if (parameterName === 'density') {
+              return this.fog.density;
+            }
+            return 0;
+          }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'color') {
               this.fog.color = new THREE.Color(
                 gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value)
               );
             }
+          }
+          updateColorParameter(parameterName: string, value: number): void {
+            if (parameterName === 'color') {
+              this.fog.color.setHex(value);
+            }
+          }
+          getColorParameter(parameterName: string): number {
+            if (parameterName === 'color') {
+              return this.fog.color.getHex();
+            }
+            return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
         })();

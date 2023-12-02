@@ -95,7 +95,7 @@ module.exports = {
       .addParameter('expression', _('Weighting'))
       .setParameterLongDescription(_('From 0 to 1.'))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .setFunctionName('gdjs.evtTools.tween.ease');
 
     // Deprecated
@@ -122,8 +122,7 @@ module.exports = {
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber');
 
@@ -150,8 +149,7 @@ module.exports = {
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber2');
 
@@ -177,8 +175,7 @@ module.exports = {
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber3');
 
@@ -207,8 +204,7 @@ module.exports = {
       .setDefaultValue('no')
       .markAsAdvanced()
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.addLayoutValueTween');
 
@@ -238,8 +234,7 @@ module.exports = {
       .setDefaultValue('no')
       .markAsAdvanced()
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.addLayerValueTween');
 
@@ -265,8 +260,7 @@ module.exports = {
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCamera');
 
@@ -291,8 +285,7 @@ module.exports = {
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCamera2');
 
@@ -317,8 +310,7 @@ module.exports = {
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraZoom');
 
@@ -342,8 +334,7 @@ module.exports = {
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraZoom2');
 
@@ -368,8 +359,7 @@ module.exports = {
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraRotation');
 
@@ -393,10 +383,61 @@ module.exports = {
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraRotation2');
+
+      extension
+        .addAction(
+          'TweenNumberEffectPropertyTween',
+          _('Tween number effect property'),
+          _('Tweens a number effect property from its current value to a new one.'),
+          _(
+            'Tween the property _PARAM5_ for effect _PARAM4_ of _PARAM0_ to _PARAM3_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+          ),
+          _('Scene Tweens'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+        .addParameter('expression', _('To value'), '', false)
+        .addParameter('layer', _('Layer'), '', true)
+        .addParameter("layerEffectName", _("Effect name"))
+        .addParameter("layerEffectParameterName", _("Property name"))
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
+        .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+        .setFunctionName('gdjs.evtTools.tween.tweenNumberEffectPropertyTween');
+  
+      extension
+        .addAction(
+          'TweenColorEffectPropertyTween',
+          _('Tween color effect property'),
+          _('Tweens a color effect property from its current value to a new one.'),
+          _(
+            'Tween the color property _PARAM5_ for effect _PARAM4_ of _PARAM0_ to _PARAM3_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+          ),
+          _('Scene Tweens'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+        .addParameter('color', _('To color'), '', false)
+        .addParameter('layer', _('Layer'), '', true)
+        .addParameter("layerEffectName", _("Effect name"))
+        .addParameter("layerEffectParameterName", _("Property name"))
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
+        .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+        .setFunctionName('gdjs.evtTools.tween.tweenColorEffectPropertyTween');
 
     extension
       .addCondition(
@@ -411,8 +452,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenExists');
 
@@ -429,8 +469,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenIsPlaying');
 
@@ -447,8 +486,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.sceneTweenHasFinished');
 
@@ -465,8 +503,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.pauseSceneTween');
 
@@ -484,8 +521,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .addParameter('yesorno', _('Jump to the end'), '', false)
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.stopSceneTween');
 
@@ -502,8 +538,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.resumeSceneTween');
 
@@ -522,8 +557,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.removeSceneTween');
 
@@ -540,8 +574,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.getProgress');
 
@@ -558,8 +591,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.getValue');
 
@@ -597,7 +629,7 @@ module.exports = {
         tweenBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile('Extensions/TweenBehavior/standard-easing-functions.js')
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
 
     // Behavior related
@@ -1504,6 +1536,70 @@ module.exports = {
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectOpacityTween2');
+
+    behavior
+      .addScopedAction(
+        'AddNumberEffectPropertyTween',
+        _('Tween number effect property'),
+        _('Tweens a number effect property from its current value to a new one.'),
+        _(
+          'Tween the property _PARAM5_ for effect _PARAM4_ of _PARAM0_ to _PARAM3_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+        ),
+        _('Effects'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter("behavior", _("Effect capability"), "EffectCapability::EffectBehavior")
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('expression', _('To value'), '', false)
+      .addParameter("objectEffectName", _("Effect name"))
+      .addParameter("objectEffectParameterName", _("Property name"))
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addNumberEffectPropertyTween');
+
+    behavior
+      .addScopedAction(
+        'AddColorEffectPropertyTween',
+        _('Tween color effect property'),
+        _('Tweens a color effect property from its current value to a new one.'),
+        _(
+          'Tween the color property _PARAM5_ for effect _PARAM4_ of _PARAM0_ to _PARAM3_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+        ),
+        _('Effects'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter("behavior", _("Effect capability"), "EffectCapability::EffectBehavior")
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('color', _('To color'), '', false)
+      .addParameter("objectEffectName", _("Effect name"))
+      .addParameter("objectEffectParameterName", _("Property name"))
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addNumberEffectPropertyTween');
 
     // deprecated
     behavior

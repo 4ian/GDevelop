@@ -26,6 +26,26 @@ namespace gdjs {
           bevelFilter.shadowAlpha = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        if (parameterName === 'rotation') {
+          return bevelFilter.rotation;
+        }
+        if (parameterName === 'thickness') {
+          return bevelFilter.thickness;
+        }
+        if (parameterName === 'distance') {
+          // @ts-ignore
+          return bevelFilter.distance;
+        }
+        if (parameterName === 'lightAlpha') {
+          return bevelFilter.lightAlpha;
+        }
+        if (parameterName === 'shadowAlpha') {
+          return bevelFilter.shadowAlpha;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
@@ -42,6 +62,29 @@ namespace gdjs {
             value
           );
         }
+      }
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        if (parameterName === 'lightColor') {
+          bevelFilter.lightColor = value;
+        }
+        if (parameterName === 'shadowColor') {
+          bevelFilter.shadowColor = value;
+        }
+      }
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        if (parameterName === 'lightColor') {
+          return bevelFilter.lightColor;
+        }
+        if (parameterName === 'shadowColor') {
+          return bevelFilter.shadowColor;
+        }
+        return 0;
       }
       updateBooleanParameter(
         filter: PIXI.Filter,

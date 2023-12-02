@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
@@ -64,17 +65,14 @@ InstructionMetadata& InstructionMetadata::AddParameter(
       // For objects/behavior, the supplementary information
       // parameter is an object/behavior type...
       ((gd::ParameterMetadata::IsObject(type) ||
-       gd::ParameterMetadata::IsBehavior(type))
-       // Prefix with the namespace if it's not already there.
-       && !(supplementaryInformation.rfind(extensionNamespace, 0) == 0))
-          ? (supplementaryInformation.empty()
-                 ? ""
-                 : extensionNamespace +
-                       supplementaryInformation  //... so prefix it with the
-                                                 // extension
-                                                 // namespace.
-             )
-          : supplementaryInformation);  // Otherwise don't change anything
+        gd::ParameterMetadata::IsBehavior(type))
+               // Prefix with the namespace if it's not already there.
+               && (supplementaryInformation.find(
+                       PlatformExtension::GetNamespaceSeparator()) != gd::String::npos)
+           ? supplementaryInformation
+           : (supplementaryInformation.empty()
+                  ? ""
+                  : extensionNamespace + supplementaryInformation)));
 
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.

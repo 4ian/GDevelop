@@ -27,11 +27,41 @@ namespace gdjs {
           rgbSplitFilter.blue.y = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+        if (parameterName === 'redX') {
+          return rgbSplitFilter.red.x;
+        }
+        if (parameterName === 'redY') {
+          return rgbSplitFilter.red.y;
+        }
+        if (parameterName === 'greenX') {
+          return rgbSplitFilter.green.x;
+        }
+        if (parameterName === 'greenY') {
+          return rgbSplitFilter.green.y;
+        }
+        if (parameterName === 'blueX') {
+          return rgbSplitFilter.blue.x;
+        }
+        if (parameterName === 'blueY') {
+          return rgbSplitFilter.blue.y;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

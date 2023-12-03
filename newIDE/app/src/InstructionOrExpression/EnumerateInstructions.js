@@ -53,14 +53,19 @@ const isObjectInstruction = (
     return false;
   }
 
-  for (let parameterIndex = firstParameterIndex + 1; parameterIndex < instructionMetadata.getParametersCount(); parameterIndex++) {
-    const parameter = instructionMetadata.getParameter(
-      parameterIndex
-    );
+  if (!objectBehaviorTypes) {
+    return true;
+  }
+  for (
+    let parameterIndex = firstParameterIndex + 1;
+    parameterIndex < instructionMetadata.getParametersCount();
+    parameterIndex++
+  ) {
+    const parameter = instructionMetadata.getParameter(parameterIndex);
     if (!gd.ParameterMetadata.isBehavior(parameter.getType())) {
       return true;
     }
-    if (!objectBehaviorTypes || !objectBehaviorTypes.has(parameter.getExtraInfo())) {
+    if (!objectBehaviorTypes.has(parameter.getExtraInfo())) {
       return false;
     }
   }
@@ -286,8 +291,11 @@ const enumerateExtensionInstructions = (
   for (let j = 0; j < instructionsTypes.size(); ++j) {
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
-    if (!instrMetadata.isHidden() && 
-    isObjectInstruction(instrMetadata, objectType, objectBehaviorTypes)) {
+    if (
+      !instrMetadata.isHidden() &&
+      (!objectType ||
+        isObjectInstruction(instrMetadata, objectType, objectBehaviorTypes))
+    ) {
       allInstructions.push(
         enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
       );
@@ -528,7 +536,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
           // Allow behaviors to have some of their instruction to be restricted
           // to some type of object.
           objectType,
-          objectBehaviorTypes,
+          objectBehaviorTypes
         ),
         ...freeBehaviorInstructions,
         ...allInstructions,

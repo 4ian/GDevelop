@@ -121,7 +121,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/TextObject/textruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TextObject/textruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
-      './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/standard-easing-functions.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/TweenManager.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/tweentools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/tweenruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/A_firebasejs/*.js',

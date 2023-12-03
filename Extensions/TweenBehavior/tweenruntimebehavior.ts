@@ -954,7 +954,7 @@ namespace gdjs {
         duration,
         easing,
         linearInterpolation,
-        effect.getDoubleParameter(propertyName),
+        effect ? effect.getDoubleParameter(propertyName) : 0,
         toValue,
         (value: float) => {
           if (effect) {
@@ -988,7 +988,7 @@ namespace gdjs {
     ) {
       const effect = this.owner.getRendererEffects()[effectName];
       const rgbFromColor = gdjs.hexNumberToRGB(
-        effect.getColorParameter(propertyName)
+        effect ? effect.getColorParameter(propertyName) : 0
       );
       const rgbToColor: float[] = gdjs.rgbOrHexToRGBColor(toColorStr);
 

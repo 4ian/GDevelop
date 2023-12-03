@@ -126,6 +126,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/tweenruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/A_firebasejs/*.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/B_firebasetools/*.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/outline-pixi-filter.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-outline.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/kawase-blur-pixi-filter.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-kawase-blur.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapcollisionmaskruntimeobject.js',

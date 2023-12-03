@@ -1042,7 +1042,9 @@ namespace gdjs {
      */
     addEffect(effectData: EffectData): boolean {
       const rendererObject = this.getRendererObject();
-      if (!rendererObject) return false;
+      if (!rendererObject) {
+        return false;
+      }
 
       return this._runtimeScene
         .getGame()

@@ -3,6 +3,7 @@ GDevelop - Tween Behavior Extension
 Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Tween');
   interface IColorable extends gdjs.RuntimeObject {
     setColor(color: string): void;
     getColor(): string;
@@ -948,6 +949,11 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean
     ) {
       const effect = this.owner.getRendererEffects()[effectName];
+      if (!effect) {
+        logger.error(
+          `The object "${this.owner.name}" doesn't have any effect called "${effectName}"`
+        );
+      }
       this._tweens.addSimpleTween(
         identifier,
         this.owner,
@@ -987,6 +993,11 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean
     ) {
       const effect = this.owner.getRendererEffects()[effectName];
+      if (!effect) {
+        logger.error(
+          `The object "${this.owner.name}" doesn't have any effect called "${effectName}"`
+        );
+      }
       const rgbFromColor = gdjs.hexNumberToRGB(
         effect ? effect.getColorParameter(propertyName) : 0
       );

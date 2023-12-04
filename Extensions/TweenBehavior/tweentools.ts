@@ -8,6 +8,8 @@ namespace gdjs {
   }
   export namespace evtTools {
     export namespace tween {
+      const logger = new gdjs.Logger('Tween');
+
       export const getTweensMap = (runtimeScene: RuntimeScene) =>
         runtimeScene._tweens ||
         (runtimeScene._tweens = new gdjs.evtTools.tween.TweenManager());
@@ -503,6 +505,11 @@ namespace gdjs {
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         const effect = layer.getRendererEffects()[effectName];
+        if (!effect) {
+          logger.error(
+            `The layer "${layer.getName()}" doesn't have any effect called "${effectName}"`
+          );
+        }
         getTweensMap(runtimeScene).addSimpleTween(
           identifier,
           layer,
@@ -542,6 +549,11 @@ namespace gdjs {
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         const effect = layer.getRendererEffects()[effectName];
+        if (!effect) {
+          logger.error(
+            `The layer "${layer.getName()}" doesn't have any effect called "${effectName}"`
+          );
+        }
         const rgbFromColor = gdjs.hexNumberToRGB(
           effect ? effect.getColorParameter(propertyName) : 0
         );

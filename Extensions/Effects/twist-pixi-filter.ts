@@ -1,6 +1,6 @@
 namespace gdjs {
   interface TwistFilterExtra {
-    // @ts-ignore - extra properties are stored on the filter.
+    // extra properties are stored on the filter.
     _offsetX: number;
     _offsetY: number;
   }

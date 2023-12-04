@@ -443,7 +443,6 @@ const inAppTutorialProgressLastFiredEvents: {
     nextCheckTimeoutId: TimeoutID | null,
   },
 } = {};
-const builtInTutorialIds = ['onboarding'];
 
 /**
  * Register the progress of a tutorial.
@@ -469,17 +468,12 @@ export const sendInAppTutorialProgress = ({
       lastStep: step,
       nextCheckTimeoutId: null,
     };
-    recordEvent(
-      builtInTutorialIds.includes(tutorialId)
-        ? 'in-app-tutorial-built-in'
-        : 'in-app-tutorial-external',
-      {
-        tutorialId,
-        step,
-        isCompleted,
-        spentMoreThan30SecondsSinceLastStep: !!spentMoreThan30SecondsSinceLastStep,
-      }
-    );
+    recordEvent('in-app-tutorial-external', {
+      tutorialId,
+      step,
+      isCompleted,
+      spentMoreThan30SecondsSinceLastStep: !!spentMoreThan30SecondsSinceLastStep,
+    });
   };
 
   // We receive a new progress event, so we can clear the timeout used

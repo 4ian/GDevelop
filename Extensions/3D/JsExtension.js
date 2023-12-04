@@ -64,7 +64,7 @@ module.exports = {
           _('Position'),
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setZ')
@@ -80,7 +80,7 @@ module.exports = {
           _('Position/Center'),
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setCenterZInScene')
@@ -96,7 +96,7 @@ module.exports = {
           _('Size'),
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setDepth')
@@ -112,7 +112,7 @@ module.exports = {
           _('Size'),
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters(
           'number',
@@ -134,7 +134,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('yesorno', _('Activate flipping'))
         .markAsSimple()
@@ -150,7 +150,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .setFunctionName('isFlippedZ');
 
@@ -164,7 +164,7 @@ module.exports = {
           _('Angle'),
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setRotationX')
@@ -180,7 +180,7 @@ module.exports = {
           _('Angle'),
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setRotationY')
@@ -198,7 +198,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
@@ -216,7 +216,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
@@ -234,7 +234,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D object'))
+        .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
@@ -501,7 +501,7 @@ module.exports = {
           'res/actions/flipX24.png',
           'res/actions/flipX.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('yesorno', _('Activate flipping'))
         .setHidden()
         .markAsSimple()
@@ -518,7 +518,7 @@ module.exports = {
           'res/actions/flipY24.png',
           'res/actions/flipY.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('yesorno', _('Activate flipping'))
         .setHidden()
         .markAsSimple()
@@ -535,7 +535,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('yesorno', _('Activate flipping'))
         .markAsSimple()
         .setHidden()
@@ -552,7 +552,7 @@ module.exports = {
           'res/actions/flipX24.png',
           'res/actions/flipX.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .setHidden()
         .setFunctionName('isFlippedX');
 
@@ -567,7 +567,7 @@ module.exports = {
           'res/actions/flipY24.png',
           'res/actions/flipY.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .setHidden()
         .setFunctionName('isFlippedY');
 
@@ -582,7 +582,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .setHidden()
         .setFunctionName('isFlippedZ');
 
@@ -690,7 +690,7 @@ module.exports = {
           _('Animations and images'),
           'res/actions/animation24.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .markAsSimple()
         .setHidden()
@@ -708,7 +708,7 @@ module.exports = {
           _('Animations and images'),
           'res/actions/animation24.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .useStandardParameters(
           'objectAnimationName',
           gd.ParameterOptions.makeNewOptions().setDescription(
@@ -731,7 +731,7 @@ module.exports = {
           'res/actions/animation24.png',
           'res/actions/animation.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .markAsSimple()
         .setHidden()
         .setFunctionName('pauseAnimation');
@@ -747,7 +747,7 @@ module.exports = {
           'res/actions/animation24.png',
           'res/actions/animation.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .markAsSimple()
         .setHidden()
         .setFunctionName('resumeAnimation');
@@ -765,7 +765,7 @@ module.exports = {
           _('Animations and images'),
           'res/actions/animation24.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(_('Speed scale'))
@@ -786,7 +786,7 @@ module.exports = {
           'res/conditions/animation24.png',
           'res/conditions/animation.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .markAsSimple()
         .setHidden()
         .setFunctionName('isAnimationPaused');
@@ -804,7 +804,7 @@ module.exports = {
           'res/conditions/animation24.png',
           'res/conditions/animation.png'
         )
-        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
         .markAsSimple()
         .setHidden()
         .setFunctionName('hasAnimationEnded');
@@ -1364,7 +1364,7 @@ module.exports = {
         'res/actions/flipX24.png',
         'res/actions/flipX.png'
       )
-      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('yesorno', _('Activate flipping'))
       .markAsSimple()
       .setHidden()
@@ -1381,7 +1381,7 @@ module.exports = {
         'res/actions/flipY24.png',
         'res/actions/flipY.png'
       )
-      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('yesorno', _('Activate flipping'))
       .markAsSimple()
       .setHidden()
@@ -1398,7 +1398,7 @@ module.exports = {
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('yesorno', _('Activate flipping'))
       .markAsSimple()
       .setHidden()
@@ -1415,7 +1415,7 @@ module.exports = {
         'res/actions/flipX24.png',
         'res/actions/flipX.png'
       )
-      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .setHidden()
       .setFunctionName('isFlippedX');
 
@@ -1430,7 +1430,7 @@ module.exports = {
         'res/actions/flipY24.png',
         'res/actions/flipY.png'
       )
-      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .setHidden()
       .setFunctionName('isFlippedY');
 
@@ -1445,7 +1445,7 @@ module.exports = {
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .setHidden()
       .setFunctionName('isFlippedZ');
 

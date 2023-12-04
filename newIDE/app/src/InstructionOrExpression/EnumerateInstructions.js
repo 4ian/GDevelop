@@ -23,10 +23,9 @@ const freeInstructionsToKeep = {
 
 /**
  * Check if the instruction can be use according to an object and its behaviors.
- * @param {*} instructionMetadata The instruction being checked
- * @param {*} objectType The object type
- * @param {*} objectBehaviorTypes The object behaviors 
- * @returns 
+ * @param instructionMetadata The instruction being checked
+ * @param objectType The object type
+ * @param objectBehaviorTypes The object behaviors
  */
 const isObjectInstruction = (
   instructionMetadata: gdInstructionMetadata,

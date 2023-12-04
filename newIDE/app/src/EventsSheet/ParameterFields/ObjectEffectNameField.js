@@ -7,7 +7,6 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import getObjectByName from '../../Utils/GetObjectByName';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import { enumerateEffectNames } from '../../EffectsList/EnumerateEffects';

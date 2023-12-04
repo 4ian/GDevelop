@@ -32,18 +32,18 @@ const versions: Array<FilledCloudProjectVersion> = [
     id: '0b43b267-ae5a-4822-a926-af14bf52f06d',
     projectId,
     createdAt: '2023-12-04T16:02:26.729Z',
-    previousVersion: '8e067d2d-6f08-4f93-ad2d-f3ad5ca3c69c',
+    previousVersion: '24ab6329-9fed-41a3-989f-f88b90647658',
     userId: 'a9bc54be-07e1-4f29-9739-5fbec2b04da7'
   },
   {
-    id: 'dddbe02b-be5e-4008-aff4-90ab32e3315a',
+    id: '24ab6329-9fed-41a3-989f-f88b90647658',
     projectId,
     createdAt: '2023-08-01T07:21:26.729Z',
-    previousVersion: '0b43b267-ae5a-4822-a926-af14bf52f06d',
+    previousVersion: '30194561-9651-445b-8cec-702310ca2ec8',
     userId: 'c73c4d69-86a2-441b-a8b7-afe6b8fce810'
   },
   {
-    id: '0b43b267-ae5a-4822-a926-af14bf52f06d',
+    id: '30194561-9651-445b-8cec-702310ca2ec8',
     projectId,
     createdAt: '2023-07-28T19:52:26.729Z',
     previousVersion: '8e067d2d-6f08-4f93-ad2d-f3ad5ca3c69c',

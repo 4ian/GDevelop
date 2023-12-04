@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { type FilledCloudProjectVersion } from '../Utils/GDevelopServices/Project';
 import {
   getUserPublicProfilesByIds,
@@ -15,6 +17,9 @@ import { LineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 
 const thisYear = new Date().getFullYear();
 
@@ -34,11 +39,20 @@ const styles = {
 type ProjectVersionRowProps = {|
   version: FilledCloudProjectVersion,
   usersPublicProfileByIds: UserPublicProfileByIds,
+  isEditing: boolean,
+  onRename: (FilledCloudProjectVersion, string) => void,
+  onContextMenu: (
+    event: PointerEvent,
+    version: FilledCloudProjectVersion
+  ) => void,
 |};
 
 const ProjectVersionRow = ({
   version,
   usersPublicProfileByIds,
+  isEditing,
+  onRename,
+  onContextMenu,
 }: ProjectVersionRowProps) => {
   const authorPublicProfile = version.userId
     ? usersPublicProfileByIds[version.userId]
@@ -48,12 +62,25 @@ const ProjectVersionRow = ({
       {({ i18n }) => (
         <Line justifyContent="space-between" alignItems="flex-start">
           <Column noMargin>
-            <Text noMargin>
-              {i18n.date(version.createdAt, {
-                hour: 'numeric',
-                minute: 'numeric',
-              })}
-            </Text>
+            {isEditing ? (
+              <SemiControlledTextField
+                margin="none"
+                value=""
+                translatableHintText={t`End of jam`}
+                onChange={value => {
+                  onRename(version, value);
+                }}
+                commitOnBlur
+                autoFocus="desktopAndMobileDevices"
+              />
+            ) : (
+              <Text noMargin>
+                {i18n.date(version.createdAt, {
+                  hour: 'numeric',
+                  minute: 'numeric',
+                })}
+              </Text>
+            )}
 
             {authorPublicProfile && (
               <LineStackLayout noMargin>
@@ -67,6 +94,14 @@ const ProjectVersionRow = ({
               </LineStackLayout>
             )}
           </Column>
+          <IconButton
+            size="small"
+            onClick={event => {
+              onContextMenu(event, version);
+            }}
+          >
+            <ThreeDotsMenu />
+          </IconButton>
         </Line>
       )}
     </I18n>
@@ -76,13 +111,21 @@ const ProjectVersionRow = ({
 type DayGroupRowProps = {|
   day: number,
   versions: FilledCloudProjectVersion[],
-
+  editedVersionId: ?string,
+  onRenameVersion: (FilledCloudProjectVersion, string) => void,
+  onContextMenu: (
+    event: PointerEvent,
+    version: FilledCloudProjectVersion
+  ) => void,
   usersPublicProfileByIds: UserPublicProfileByIds,
 |};
 
 const DayGroupRow = ({
   day,
   versions,
+  editedVersionId,
+  onRenameVersion,
+  onContextMenu,
   usersPublicProfileByIds,
 }: DayGroupRowProps) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
@@ -110,7 +153,10 @@ const DayGroupRow = ({
                 <ProjectVersionRow
                   key={version.id}
                   version={version}
+                  onRename={onRenameVersion}
                   usersPublicProfileByIds={usersPublicProfileByIds}
+                  isEditing={version.id === editedVersionId}
+                  onContextMenu={onContextMenu}
                 />
               ))}
             </div>
@@ -151,6 +197,8 @@ const VersionHistory = ({ versions }: Props) => {
     usersPublicProfileByIds,
     setUsersPublicProfileByIds,
   ] = React.useState<?UserPublicProfileByIds>();
+  const [editedVersionId, setEditedVersionId] = React.useState<?string>(null);
+  const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
 
   const userIdsToFetch = React.useMemo(
     () => versions.map(version => version.userId).filter(Boolean),
@@ -183,27 +231,68 @@ const VersionHistory = ({ versions }: Props) => {
     [userIdsToFetch]
   );
 
+  const buildVersionMenuTemplate = React.useCallback(
+    (i18n: I18nType, options: { version: FilledCloudProjectVersion }) => {
+      return [
+        {
+          label: i18n._(options.version.label ? t`Edit name` : t`Name version`),
+          click: () => {
+            setEditedVersionId(options.version.id);
+          },
+        },
+      ];
+    },
+    []
+  );
+
+  const onRenameVersion = React.useCallback(
+    (version: FilledCloudProjectVersion, newName: string) => {
+      console.log(version.id, newName);
+      setEditedVersionId(null);
+    },
+    []
+  );
+
+  const openContextMenu = React.useCallback(
+    (event: PointerEvent, version: FilledCloudProjectVersion) => {
+      const { current: contextMenu } = contextMenuRef;
+      if (!contextMenu) return;
+      contextMenu.open(event.clientX, event.clientY, { version });
+    },
+    []
+  );
+
   if (!usersPublicProfileByIds) return null;
+  console.log(editedVersionId);
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Column>
-          {days.map(day => {
-            const dayVersions = versionsGroupedByDay[day];
-            if (!dayVersions || dayVersions.length === 0) return null;
-            return (
-              <DayGroupRow
-                key={day}
-                versions={dayVersions}
-                day={day}
-                usersPublicProfileByIds={usersPublicProfileByIds}
-              />
-            );
-          })}
-        </Column>
-      )}
-    </I18n>
+    <>
+      <I18n>
+        {({ i18n }) => (
+          <Column>
+            {days.map(day => {
+              const dayVersions = versionsGroupedByDay[day];
+              if (!dayVersions || dayVersions.length === 0) return null;
+              return (
+                <DayGroupRow
+                  key={day}
+                  versions={dayVersions}
+                  day={day}
+                  usersPublicProfileByIds={usersPublicProfileByIds}
+                  onRenameVersion={onRenameVersion}
+                  onContextMenu={openContextMenu}
+                  editedVersionId={editedVersionId}
+                />
+              );
+            })}
+          </Column>
+        )}
+      </I18n>
+      <ContextMenu
+        ref={contextMenuRef}
+        buildMenuTemplate={buildVersionMenuTemplate}
+      />
+    </>
   );
 };
 

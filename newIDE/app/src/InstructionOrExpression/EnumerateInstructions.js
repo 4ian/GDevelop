@@ -157,6 +157,7 @@ const enumerateExtraObjectInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
   objectType: string,
+  objectBehaviorTypes?: Set<string>,
   scope: InstructionOrExpressionScope,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
@@ -174,7 +175,7 @@ const enumerateExtraObjectInstructions = (
     const instrMetadata = instructions.get(type);
     if (
       !instrMetadata.isHidden() &&
-      isObjectInstruction(instrMetadata, objectType)
+      isObjectInstruction(instrMetadata, objectType, objectBehaviorTypes)
     ) {
       allInstructions.push(
         enumerateInstruction('', type, instrMetadata, scope, i18n)
@@ -465,6 +466,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition,
         extension,
         objectType,
+        objectBehaviorTypes,
         scope,
         i18n
       ),

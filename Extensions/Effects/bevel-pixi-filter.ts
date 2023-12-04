@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface BevelFilterExtra {
+    /** It's defined for the configuration but not for the filter. */
+    distance: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Bevel',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -12,13 +16,13 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+          BevelFilterExtra;
         if (parameterName === 'rotation') {
           bevelFilter.rotation = value;
         } else if (parameterName === 'thickness') {
           bevelFilter.thickness = value;
         } else if (parameterName === 'distance') {
-          // @ts-ignore
           bevelFilter.distance = value;
         } else if (parameterName === 'lightAlpha') {
           bevelFilter.lightAlpha = value;
@@ -27,7 +31,8 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+          BevelFilterExtra;
         if (parameterName === 'rotation') {
           return bevelFilter.rotation;
         }
@@ -35,7 +40,6 @@ namespace gdjs {
           return bevelFilter.thickness;
         }
         if (parameterName === 'distance') {
-          // @ts-ignore
           return bevelFilter.distance;
         }
         if (parameterName === 'lightAlpha') {
@@ -51,7 +55,8 @@ namespace gdjs {
         parameterName: string,
         value: string
       ) {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+          BevelFilterExtra;
         if (parameterName === 'lightColor') {
           bevelFilter.lightColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
             value
@@ -68,7 +73,8 @@ namespace gdjs {
         parameterName: string,
         value: number
       ): void {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+          BevelFilterExtra;
         if (parameterName === 'lightColor') {
           bevelFilter.lightColor = value;
         }

@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface BrightnessFilterExtra {
+    /** It allows to get back the value as the filter uses a matrix.  */
+    __brightness: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Brightness',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -13,19 +17,19 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+          BrightnessFilterExtra;
         if (parameterName !== 'brightness') {
           return;
         }
         const brightness = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
-        //@ts-ignore
         brightnessFilter.__brightness = brightness;
         brightnessFilter.brightness(brightness, false);
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+          BrightnessFilterExtra;
         if (parameterName === 'brightness') {
-          //@ts-ignore
           return brightnessFilter.__brightness;
         }
         return 0;

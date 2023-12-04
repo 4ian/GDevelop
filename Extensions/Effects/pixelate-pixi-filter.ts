@@ -1,4 +1,8 @@
 namespace gdjs {
+  interface PixelateFilterExtra {
+    /** It's only set to a number. */
+    size: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Pixelate',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -14,15 +18,16 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter;
+        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
+          PixelateFilterExtra;
         if (parameterName === 'size') {
           pixelateFilter.size = value;
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter;
+        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
+          PixelateFilterExtra;
         if (parameterName === 'size') {
-          //@ts-ignore
           return pixelateFilter.size;
         }
         return 0;

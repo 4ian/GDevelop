@@ -27,11 +27,35 @@ namespace gdjs {
           );
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
+        if (parameterName === 'centerX') {
+          return bulgePinchFilter.center[0];
+        }
+        if (parameterName === 'centerY') {
+          return bulgePinchFilter.center[1];
+        }
+        if (parameterName === 'radius') {
+          return bulgePinchFilter.radius;
+        }
+        if (parameterName === 'strength') {
+          return bulgePinchFilter.strength;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

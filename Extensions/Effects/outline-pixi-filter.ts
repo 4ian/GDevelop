@@ -19,6 +19,16 @@ namespace gdjs {
           outlineFilter.padding = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        if (parameterName === 'thickness') {
+          return outlineFilter.thickness;
+        }
+        if (parameterName === 'padding') {
+          return outlineFilter.padding;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
@@ -30,6 +40,23 @@ namespace gdjs {
             value
           );
         }
+      }
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {
+        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        if (parameterName === 'color') {
+          outlineFilter.color = value;
+        }
+      }
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        if (parameterName === 'color') {
+          return outlineFilter.color;
+        }
+        return 0;
       }
       updateBooleanParameter(
         filter: PIXI.Filter,

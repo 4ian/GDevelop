@@ -10,7 +10,13 @@ import {
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import Avatar from '@material-ui/core/Avatar';
+import Collapse from '@material-ui/core/Collapse';
 import { LineStackLayout } from '../UI/Layout';
+import IconButton from '../UI/IconButton';
+import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
+import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+
+const thisYear = new Date().getFullYear();
 
 const styles = {
   avatar: {
@@ -18,6 +24,11 @@ const styles = {
     height: 20,
   },
   username: { opacity: 0.7 },
+  versionsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    paddingLeft: 30, // Width of the collapse icon button.
+  },
 };
 
 type ProjectVersionRowProps = {|
@@ -36,7 +47,7 @@ const ProjectVersionRow = ({
     <I18n>
       {({ i18n }) => (
         <Line justifyContent="space-between" alignItems="flex-start">
-          <Column>
+          <Column noMargin>
             <Text noMargin>
               {i18n.date(version.createdAt, {
                 hour: 'numeric',
@@ -57,6 +68,54 @@ const ProjectVersionRow = ({
             )}
           </Column>
         </Line>
+      )}
+    </I18n>
+  );
+};
+
+type DayGroupRowProps = {|
+  day: number,
+  versions: FilledCloudProjectVersion[],
+
+  usersPublicProfileByIds: UserPublicProfileByIds,
+|};
+
+const DayGroupRow = ({
+  day,
+  versions,
+  usersPublicProfileByIds,
+}: DayGroupRowProps) => {
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const displayYear = new Date(day).getFullYear() !== thisYear;
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <React.Fragment>
+          <Line alignItems="center">
+            <IconButton onClick={() => setIsOpen(!isOpen)} size="small">
+              {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
+            </IconButton>
+            <Text>
+              {i18n.date(day, {
+                month: 'short',
+                day: 'numeric',
+                year: displayYear ? 'numeric' : undefined,
+              })}
+            </Text>
+          </Line>
+          <Collapse in={isOpen}>
+            <div style={styles.versionsContainer}>
+              {versions.map(version => (
+                <ProjectVersionRow
+                  key={version.id}
+                  version={version}
+                  usersPublicProfileByIds={usersPublicProfileByIds}
+                />
+              ))}
+            </div>
+          </Collapse>
+        </React.Fragment>
       )}
     </I18n>
   );
@@ -125,7 +184,6 @@ const VersionHistory = ({ versions }: Props) => {
   );
 
   if (!usersPublicProfileByIds) return null;
-  const now = new Date();
 
   return (
     <I18n>
@@ -134,27 +192,13 @@ const VersionHistory = ({ versions }: Props) => {
           {days.map(day => {
             const dayVersions = versionsGroupedByDay[day];
             if (!dayVersions || dayVersions.length === 0) return null;
-            const displayYear =
-              new Date(day).getFullYear() !== now.getFullYear();
             return (
-              <React.Fragment key={day}>
-                <div>
-                  <Text>
-                    {i18n.date(day, {
-                      month: 'short',
-                      day: 'numeric',
-                      year: displayYear ? 'numeric' : undefined,
-                    })}
-                  </Text>
-                </div>
-                {dayVersions.map(version => (
-                  <ProjectVersionRow
-                    key={version.id}
-                    version={version}
-                    usersPublicProfileByIds={usersPublicProfileByIds}
-                  />
-                ))}
-              </React.Fragment>
+              <DayGroupRow
+                key={day}
+                versions={dayVersions}
+                day={day}
+                usersPublicProfileByIds={usersPublicProfileByIds}
+              />
             );
           })}
         </Column>

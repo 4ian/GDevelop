@@ -158,6 +158,28 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Bottom Y position"))
         .AddParameter("expression", _("Chamfer (in pixels)"))
         .SetFunctionName("DrawChamferRectangle");
+
+
+  obj.AddAction("Torus",
+               _("Torus"),
+               _("Draw a torus on screen"),
+               _("Draw at _PARAM1_;_PARAM2_ a torus with inner radius"
+               "_PARAM3_ and outer radius _PARAM4_ and "
+               "with start arc _PARAM5_° and end arc _PARAM6_°"
+               "with _PARAM0_"),
+               _("Drawing"),
+               "res/actions/torus24.png",
+               "res/actions/torus.png")
+        
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
+        .AddParameter("expression", _("X position of center"))
+        .AddParameter("expression", _("Y position of center"))
+        .AddParameter("expression", _("Inner Radius (in pixels)"))
+        .AddParameter("expression", _("Outer Radius (in pixels)"))
+        .AddParameter("expression", _("Start Arc (in degrees)"))
+        .AddParameter("expression", _("End Arc (in degrees)"))
+        .SetFunctionName("DrawTorus");
+  
   
   obj.AddAction("RegularPolygon",
                 _("Regular Polygon"),

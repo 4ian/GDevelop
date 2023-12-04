@@ -76,6 +76,7 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import Text from '../UI/Text';
 import { MultilineVariableEditorDialog } from './MultilineVariableEditorDialog';
 import { MarkdownText } from '../UI/MarkdownText';
+import Paper from '../UI/Paper';
 const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
@@ -1709,13 +1710,17 @@ const VariablesList = (props: Props) => {
                           : null}
                         {renderTree(i18n)}
                         {!!undefinedVariableNames.length && (
-                          <Text>
-                            <MarkdownText
-                              translatableSource={t`There are variables used in events but not declared in this list: ${'`' +
-                                undefinedVariableNames.join('`, `') +
-                                '`'}.`}
-                            />
-                          </Text>
+                          <Paper background="dark" variant="outlined">
+                            <Column>
+                              <Text>
+                                <MarkdownText
+                                  translatableSource={t`There are variables used in events but not declared in this list: ${'`' +
+                                    undefinedVariableNames.join('`, `') +
+                                    '`'}.`}
+                                />
+                              </Text>
+                            </Column>
+                          </Paper>
                         )}
                       </ScrollView>
                     )}

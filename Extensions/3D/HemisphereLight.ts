@@ -98,7 +98,7 @@ namespace gdjs {
               this.rotationObject.rotation.y = -gdjs.toRad(this.elevation);
             } else {
               // 0° becomes a light from Z+.
-              this.rotationObject.rotation.y = gdjs.toRad(this.rotation) - 90;
+              this.rotationObject.rotation.y = gdjs.toRad(this.rotation - 90);
               this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
             }
           }

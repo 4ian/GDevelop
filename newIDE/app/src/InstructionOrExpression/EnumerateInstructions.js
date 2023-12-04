@@ -21,6 +21,13 @@ const freeInstructionsToKeep = {
   Scene3D: ['Scene3D::TurnCameraTowardObject'],
 };
 
+/**
+ * Check if the instruction can be use according to an object and its behaviors.
+ * @param {*} instructionMetadata The instruction being checked
+ * @param {*} objectType The object type
+ * @param {*} objectBehaviorTypes The object behaviors 
+ * @returns 
+ */
 const isObjectInstruction = (
   instructionMetadata: gdInstructionMetadata,
   objectType?: string,
@@ -54,6 +61,7 @@ const isObjectInstruction = (
   }
 
   if (!objectBehaviorTypes) {
+    // The object is matching and behaviors are not checked.
     return true;
   }
   for (
@@ -63,6 +71,8 @@ const isObjectInstruction = (
   ) {
     const parameter = instructionMetadata.getParameter(parameterIndex);
     if (!gd.ParameterMetadata.isBehavior(parameter.getType())) {
+      // No more behavior parameter to check.
+      // The instruction can be used with the object.
       return true;
     }
     if (!objectBehaviorTypes.has(parameter.getExtraInfo())) {

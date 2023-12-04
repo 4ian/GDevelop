@@ -393,7 +393,7 @@ module.exports = {
           _('Tween number effect property'),
           _('Tweens a number effect property from its current value to a new one.'),
           _(
-            'Tween the property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+            'Tween the property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM1_'
           ),
           _('Scene Tweens'),
           'JsPlatform/Extensions/tween_behavior24.png',
@@ -419,7 +419,7 @@ module.exports = {
           _('Tween color effect property'),
           _('Tweens a color effect property from its current value to a new one.'),
           _(
-            'Tween the color property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+            'Tween the color property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM1_'
           ),
           _('Scene Tweens'),
           'JsPlatform/Extensions/tween_behavior24.png',
@@ -1543,7 +1543,7 @@ module.exports = {
         _('Tween number effect property'),
         _('Tweens a number effect property from its current value to a new one.'),
         _(
-          'Tween the property _PARAM5_ for effect _PARAM4_ of _PARAM0_ to _PARAM3_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+          'Tween the property _PARAM6_ for effect _PARAM5_ of _PARAM0_ to _PARAM4_ with easing _PARAM7_ over _PARAM8_ seconds as _PARAM3_'
         ),
         _('Effects'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -1575,7 +1575,7 @@ module.exports = {
         _('Tween color effect property'),
         _('Tweens a color effect property from its current value to a new one.'),
         _(
-          'Tween the color property _PARAM5_ for effect _PARAM4_ of _PARAM0_ to _PARAM3_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM2_'
+          'Tween the color property _PARAM6_ for effect _PARAM5_ of _PARAM0_ to _PARAM4_ with easing _PARAM7_ over _PARAM8_ seconds as _PARAM3_'
         ),
         _('Effects'),
         'JsPlatform/Extensions/tween_behavior24.png',

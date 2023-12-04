@@ -597,7 +597,11 @@ const VariablesList = (props: Props) => {
 
   const undefinedVariableNames = allVariablesNames
     ? allVariablesNames.filter(variableName => {
-        return !props.variablesContainer.has(variableName);
+        return (
+          !props.variablesContainer.has(variableName) &&
+          (!props.inheritedVariablesContainer ||
+            !props.inheritedVariablesContainer.has(variableName))
+        );
       })
     : [];
 

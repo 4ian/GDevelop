@@ -520,7 +520,7 @@ namespace gdjs {
       };
 
       /**
-       * Tween a numeric object effect property.
+       * Tween a color object effect property.
        * @param runtimeScene The scene
        * @param identifier Unique id to identify the tween
        * @param toColorStr The target RGB color (format "128;200;255" with values between 0 and 255 for red, green and blue)

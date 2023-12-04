@@ -154,10 +154,17 @@ export const searchCreatorPublicProfilesByUsername = (
     .then(response => response.data);
 };
 
-export const getUserBadges = (id: string): Promise<Array<Badge>> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/user/${id}/badge`)
-    .then(response => response.data);
+export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/user/${id}/badge`
+  );
+
+  const badges = response.data;
+  if (!Array.isArray(badges)) {
+    throw new Error('Invalid response from the badges API');
+  }
+
+  return badges;
 };
 
 export const listUserTeams = async (

@@ -112,10 +112,15 @@ export const addCreateBadgePreHookIfNotClaimed = <
   };
 };
 
-export const getAchievements = (): Promise<Array<Achievement>> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/achievement`)
-    .then(response => response.data);
+export const getAchievements = async (): Promise<Array<Achievement>> => {
+  const response = await axios.get(`${GDevelopUserApi.baseUrl}/achievement`);
+
+  const achievements = response.data;
+  if (!Array.isArray(achievements)) {
+    throw new Error('Invalid response from the achievements API');
+  }
+
+  return achievements;
 };
 
 export const markBadgesAsSeen = async (

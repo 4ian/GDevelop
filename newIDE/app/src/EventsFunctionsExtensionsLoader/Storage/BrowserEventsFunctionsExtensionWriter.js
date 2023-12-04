@@ -44,17 +44,19 @@ export default class BrowserEventsFunctionsExtensionWriter {
     }
   };
 
-  static chooseCustomObjectFile = async (
+  static chooseObjectAssetFile = async (
     objectName?: string
   ): Promise<?string> => {
     return objectName;
   };
 
-  static writeCustomObject = (
-    customObject: gdObject,
+  static writeObjectsAssets = (
+    project: gdProject,
+    exportedObjects: gdObject[],
     filename: string
   ): Promise<void> => {
-    const exportedObject = customObject.clone().get();
+    //TODO Make an equivalent of LocalEventsFunctionsExtensionWriter.
+    const exportedObject = exportedObjects[0].clone().get();
     exportedObject.getVariables().clear();
     exportedObject.getEffects().clear();
     exportedObject
@@ -66,7 +68,7 @@ export default class BrowserEventsFunctionsExtensionWriter {
       filename,
       JSON.stringify(serializedObject)
     ).catch(err => {
-      console.error('Unable to write the events function extension:', err);
+      console.error('Unable to write the objects:', err);
       throw err;
     });
   };

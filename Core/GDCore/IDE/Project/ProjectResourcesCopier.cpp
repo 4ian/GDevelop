@@ -113,9 +113,10 @@ void ProjectResourcesCopier::NormalizeResourceNames(
       auto &animation = spriteConfiguration.GetAnimation(animationIndex);
       auto &direction = animation.GetDirection(0);
 
-      const gd::String &animationName = animation.GetName().empty()
-                                            ? gd::String::From(animationIndex)
-                                            : animation.GetName();
+      const gd::String &animationName =
+          animation.GetName().empty()
+              ? gd::String::From(animationIndex)
+              : animation.GetName().FindAndReplace("_", " ", true);
 
       // Search frames that share the same resource.
       map<gd::String, std::vector<int>> frameIndexes;

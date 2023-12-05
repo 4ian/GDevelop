@@ -19,6 +19,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'mobile';
@@ -184,13 +185,16 @@ const ShareDialog = ({
           project.getProjectUuid()
         );
         setGame(game);
-      } catch (err) {
-        console.error('Unable to load the game', err);
-        if (err && err.status === 404) {
+      } catch (error) {
+        console.error('Unable to load the game', error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
           setGameError('not-found');
           return;
         }
-        if (err && err.status === 403) {
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
           setGameError('not-owned');
           return;
         }

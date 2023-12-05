@@ -46,6 +46,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
           },
         ],
         instances: [],
+        usedResources: [],
       });
 
       const object = runtimeScene.createObject('Object1');

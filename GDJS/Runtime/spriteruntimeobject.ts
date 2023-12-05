@@ -1379,7 +1379,7 @@ namespace gdjs {
      * @param scene The scene containing the object
      * @deprecated
      */
-    turnTowardObject(obj: gdjs.RuntimeObject, scene: gdjs.RuntimeScene) {
+    turnTowardObject(obj: gdjs.RuntimeObject | null, scene: gdjs.RuntimeScene) {
       if (obj === null) {
         return;
       }

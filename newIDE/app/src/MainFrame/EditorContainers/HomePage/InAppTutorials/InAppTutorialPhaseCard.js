@@ -3,11 +3,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import Divider from '@material-ui/core/Divider';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Text from '../../../../UI/Text';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 import { CardWidget } from '../CardWidget';
@@ -153,54 +149,27 @@ const InAppTutorialPhaseCard = ({
                 </Text>
                 {keyPoints && <Divider />}
                 {keyPoints && (
-                  <ResponsiveLineStackLayout noColumnMargin noMargin>
-                    <Column
-                      noMargin
-                      alignItems="flex-start"
-                      justifyContent="flex-start"
-                      expand
-                    >
-                      <ul style={styles.keyPointsList}>
-                        {keyPoints.map((keyPoint, index) =>
-                          index % 2 === 0 ? (
-                            <Text
-                              key={`key-point-${index}`}
-                              size="body2"
-                              noMargin
-                              style={getTextStyle(shouldTextBeDisabled)}
-                              color="secondary"
-                              displayAsListItem
-                            >
-                              {i18n._(keyPoint)}
-                            </Text>
-                          ) : null
-                        )}
-                      </ul>
-                    </Column>
-                    <Column
-                      noMargin
-                      alignItems="flex-start"
-                      justifyContent="flex-start"
-                      expand
-                    >
-                      <ul style={styles.keyPointsList}>
-                        {keyPoints.map((keyPoint, index) =>
-                          index % 2 === 1 ? (
-                            <Text
-                              key={`key-point-${index}`}
-                              size="body2"
-                              noMargin
-                              style={getTextStyle(shouldTextBeDisabled)}
-                              color="secondary"
-                              displayAsListItem
-                            >
-                              {i18n._(keyPoint)}
-                            </Text>
-                          ) : null
-                        )}
-                      </ul>
-                    </Column>
-                  </ResponsiveLineStackLayout>
+                  <Column
+                    noMargin
+                    alignItems="flex-start"
+                    justifyContent="flex-start"
+                    expand
+                  >
+                    <ul style={styles.keyPointsList}>
+                      {keyPoints.map((keyPoint, index) => (
+                        <Text
+                          key={`key-point-${index}`}
+                          size="body2"
+                          noMargin
+                          style={getTextStyle(shouldTextBeDisabled)}
+                          color="secondary"
+                          displayAsListItem
+                        >
+                          {i18n._(keyPoint)}
+                        </Text>
+                      ))}
+                    </ul>
+                  </Column>
                 )}
               </ColumnStackLayout>
             </div>

@@ -2988,7 +2988,7 @@ interface ArbitraryResourceWorker {
 };
 [JSImplementation=ArbitraryResourceWorker]
 interface ArbitraryResourceWorkerJS {
-    void ArbitraryResourceWorkerJS();
+    void ArbitraryResourceWorkerJS([Ref] ResourcesManager resourcesManager);
 
     void ExposeImage([Ref] DOMString image);
     void ExposeShader([Ref] DOMString shader);
@@ -2996,7 +2996,7 @@ interface ArbitraryResourceWorkerJS {
 };
 
 interface ResourcesMergingHelper {
-    void ResourcesMergingHelper([Ref] AbstractFileSystem fs);
+    void ResourcesMergingHelper([Ref] ResourcesManager resourcesManager, [Ref] AbstractFileSystem fs);
 
     void SetBaseDirectory([Const] DOMString basePath);
     [Ref] MapStringString GetAllResourcesOldAndNewFilename();
@@ -3004,7 +3004,7 @@ interface ResourcesMergingHelper {
 ResourcesMergingHelper implements ArbitraryResourceWorker;
 
 interface ResourcesRenamer {
-    void ResourcesRenamer([Const, Ref] MapStringString oldToNewNames);
+    void ResourcesRenamer([Ref] ResourcesManager resourcesManager, [Const, Ref] MapStringString oldToNewNames);
 };
 ResourcesRenamer implements ArbitraryResourceWorker;
 
@@ -3018,7 +3018,7 @@ interface ProjectResourcesCopier {
 };
 
 interface ObjectsUsingResourceCollector {
-    void ObjectsUsingResourceCollector([Const] DOMString resourceName);
+    void ObjectsUsingResourceCollector([Ref] ResourcesManager resourcesManager, [Const] DOMString resourceName);
     [Const, Ref] VectorString GetObjectNames();
 
     //Inherited from ArbitraryObjectsWorker
@@ -3026,7 +3026,7 @@ interface ObjectsUsingResourceCollector {
 };
 
 interface ResourcesInUseHelper {
-    void ResourcesInUseHelper();
+    void ResourcesInUseHelper([Ref] ResourcesManager resourcesManager);
 
     [Ref] SetString GetAllImages();
     [Ref] SetString GetAllAudios();

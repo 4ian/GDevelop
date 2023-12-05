@@ -7,12 +7,9 @@ const {
 
 describe('libGD.js - GDJS Code Generation integration tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   const generateAndRunVariableAffectationWithConditions = (
     conditions

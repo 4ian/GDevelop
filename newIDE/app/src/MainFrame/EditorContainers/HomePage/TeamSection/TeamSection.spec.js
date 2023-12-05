@@ -9,6 +9,7 @@ const getDefaultUser = ({ id }: { id: string }) => ({
   description: null,
   username: null,
   donateLink: null,
+  discordUsername: null,
   email: `${id}@email.net`,
   getGameStatsEmail: false,
   getNewsletterEmail: false,

@@ -106,6 +106,7 @@ describe('gdjs.EffectsManager', () => {
       behaviorsSharedData: [],
       objects: [],
       instances: [],
+      usedResources: [],
     });
 
     const runtimeLayer = runtimeScene.getLayer('');

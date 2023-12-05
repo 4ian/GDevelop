@@ -141,11 +141,19 @@ export const buildMainMenuDeclarativeTemplate = ({
       },
       {
         label: i18n._(t`Open Recent`),
-        submenu: recentProjectFiles.map(item => ({
-          label: item.fileMetadata.fileIdentifier,
-          onClickSendEvent: 'main-menu-open-recent',
-          eventArgs: item,
-        })),
+        submenu:
+          recentProjectFiles.length > 0
+            ? recentProjectFiles.map(item => ({
+                label: item.fileMetadata.fileIdentifier,
+                onClickSendEvent: 'main-menu-open-recent',
+                eventArgs: item,
+              }))
+            : [
+                {
+                  label: i18n._(t`No recent project`),
+                  enabled: false,
+                },
+              ],
       },
       { type: 'separator' },
       {

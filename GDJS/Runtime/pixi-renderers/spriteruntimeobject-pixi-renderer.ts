@@ -184,15 +184,18 @@ namespace gdjs {
       return this._sprite.texture.frame.height;
     }
 
-    static getAnimationFrame(imageManager, imageName) {
+    static getAnimationFrame(
+      imageManager: gdjs.PixiImageManager,
+      imageName: string
+    ) {
       return imageManager.getPIXITexture(imageName);
     }
 
-    static getAnimationFrameWidth(pixiTexture) {
+    static getAnimationFrameWidth(pixiTexture: PIXI.Texture) {
       return pixiTexture.width;
     }
 
-    static getAnimationFrameHeight(pixiTexture) {
+    static getAnimationFrameHeight(pixiTexture: PIXI.Texture) {
       return pixiTexture.height;
     }
   }

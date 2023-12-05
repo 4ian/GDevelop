@@ -61,7 +61,7 @@ class GD_CORE_API ObjectsContainersList {
    * \brief Check if the specified object or group has the specified variables
    * container.
    */
-  bool HasVariablesContainer(
+  bool HasObjectOrGroupVariablesContainer(
       const gd::String& objectOrGroupName,
       const gd::VariablesContainer& variablesContainer) const;
 
@@ -164,6 +164,13 @@ class GD_CORE_API ObjectsContainersList {
 
   bool HasObjectWithVariableNamed(const gd::String& objectName,
                                   const gd::String& variableName) const;
+
+  bool HasObjectVariablesContainer(
+      const gd::String& objectName,
+      const gd::VariablesContainer& variablesContainer) const;
+
+  const gd::VariablesContainer* GetObjectVariablesContainer(
+      const gd::String& objectName) const;
 
   gd::Variable::Type GetTypeOfObjectVariable(const gd::String& objectName, const gd::String& variableName) const;
 

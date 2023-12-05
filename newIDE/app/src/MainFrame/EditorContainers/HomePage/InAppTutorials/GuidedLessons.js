@@ -41,13 +41,13 @@ const getColumnsFromWidth = (width: WidthType) => {
     case 'small':
       return 1;
     case 'medium':
-      return 2;
-    case 'large':
       return 3;
-    case 'xlarge':
+    case 'large':
       return 4;
+    case 'xlarge':
+      return 6;
     default:
-      return 2;
+      return 3;
   }
 };
 

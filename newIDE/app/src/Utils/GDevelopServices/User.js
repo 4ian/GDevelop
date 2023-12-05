@@ -116,6 +116,7 @@ export type UserPublicProfile = {|
   username: ?string,
   description: ?string,
   donateLink: ?string,
+  discordUsername: ?string,
   communityLinks: CommunityLinks,
   iconUrl: string,
 |};
@@ -153,10 +154,17 @@ export const searchCreatorPublicProfilesByUsername = (
     .then(response => response.data);
 };
 
-export const getUserBadges = (id: string): Promise<Array<Badge>> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/user/${id}/badge`)
-    .then(response => response.data);
+export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
+  const response = await axios.get(
+    `${GDevelopUserApi.baseUrl}/user/${id}/badge`
+  );
+
+  const badges = response.data;
+  if (!Array.isArray(badges)) {
+    throw new Error('Invalid response from the badges API');
+  }
+
+  return badges;
 };
 
 export const listUserTeams = async (
@@ -337,6 +345,21 @@ export const getUsernameAvailability = async (
   return response.data;
 };
 
+export const syncDiscordUsername = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await axios.post(
+    `${GDevelopUserApi.baseUrl}/user/${userId}/action/update-discord-role`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+};
+
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;
 const profileLinkFormattingErrorMessage = (
   <Trans>Please enter a valid URL, starting with https://</Trans>
@@ -356,6 +379,10 @@ export const donateLinkConfig = {
       ? profileLinkFormattingErrorMessage
       : undefined,
   maxLength: 150,
+};
+
+export const discordUsernameConfig = {
+  maxLength: 32,
 };
 
 export const communityLinksConfig = {

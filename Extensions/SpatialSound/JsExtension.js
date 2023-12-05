@@ -67,9 +67,9 @@ module.exports = {
     extension
       .addAction(
         'SetListenerPosition',
-        _('Set position of the listener'),
-        _('Sets the spatial position of the listener/player.'),
-        _('Set the listener position to _PARAM0_, _PARAM1_, _PARAM2_'),
+        _('Listener position'),
+        _('Change the spatial position of the listener/player.'),
+        _('Change the listener position to _PARAM0_, _PARAM1_, _PARAM2_'),
         '',
         'res/actions/son24.png',
         'res/actions/son.png'

@@ -326,6 +326,36 @@ namespace gdjs {
       ): boolean => {
         return runtimeScene.getGame().hasScene(sceneName);
       };
+
+      /**
+       * Preload a scene assets as soon as possible in background.
+       */
+      export const prioritizeLoadingOfScene = (
+        runtimeScene: gdjs.RuntimeScene,
+        sceneName: string
+      ): void => {
+        runtimeScene.getGame().prioritizeLoadingOfScene(sceneName);
+      };
+
+      /**
+       * @return The progress of assets loading in background for a scene (between 0 and 1).
+       */
+      export const getSceneLoadingProgress = (
+        runtimeScene: gdjs.RuntimeScene,
+        sceneName: string
+      ): float => {
+        return runtimeScene.getGame().getSceneLoadingProgress(sceneName);
+      };
+
+      /**
+       * Check if scene assets have finished to load in background.
+       */
+      export const areSceneAssetsLoaded = (
+        runtimeScene: gdjs.RuntimeScene,
+        sceneName: string
+      ): boolean => {
+        return runtimeScene.getGame().areSceneAssetsLoaded(sceneName);
+      };
     }
   }
 }

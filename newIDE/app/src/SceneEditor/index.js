@@ -66,6 +66,10 @@ import {
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import uniq from 'lodash/uniq';
 import { cleanNonExistingObjectFolderOrObjectWithContexts } from './ObjectFolderOrObjectsSelection';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -153,6 +157,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
+  resourceExternallyChangedCallbackId: ?string;
 
   constructor(props: Props) {
     super(props);
@@ -199,6 +204,17 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.props.unsavedChanges.triggerUnsavedChanges();
   }
 
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
+  }
+
   getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
   }
@@ -228,6 +244,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         editorDisplay.forceUpdateObjectsList();
 
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
+          project.getResourcesManager(),
           resourceName
         );
         // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
@@ -1586,7 +1603,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   reloadResourcesFor = (object: gdObject) => {
     const { project } = this.props;
 
-    const resourcesInUse = new gd.ResourcesInUseHelper();
+    const resourcesInUse = new gd.ResourcesInUseHelper(
+      project.getResourcesManager()
+    );
     object.getConfiguration().exposeResources(resourcesInUse);
     const objectResourceNames = resourcesInUse
       .getAllImages()

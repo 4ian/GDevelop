@@ -132,8 +132,12 @@ export function PublicGameProperties({
   >([]);
 
   const fetchGameCategories = React.useCallback(async () => {
-    const categories = await getGameCategories();
-    setAllGameCategories(categories);
+    try {
+      const categories = await getGameCategories();
+      setAllGameCategories(categories);
+    } catch (error) {
+      console.error('An error occurred while fetching game categories.', error);
+    }
   }, []);
 
   React.useEffect(

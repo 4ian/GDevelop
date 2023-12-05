@@ -237,7 +237,8 @@ const InstructionParametersEditor = React.forwardRef<
       objectName
     );
 
-    const iconFilename = instructionMetadata.getIconFilename();
+    // For some reason, iconFileName can sometimes be undefined. see https://github.com/4ian/GDevelop/issues/5958.
+    const iconFilename = instructionMetadata.getIconFilename() || '';
     const shouldInvertGrayScale =
       paletteType === 'dark' &&
       (iconFilename.startsWith('data:image/svg+xml') ||
@@ -251,7 +252,7 @@ const InstructionParametersEditor = React.forwardRef<
             <Column expand>
               <Line alignItems="flex-start">
                 <img
-                  src={instructionMetadata.getIconFilename()}
+                  src={iconFilename}
                   alt=""
                   style={{
                     ...styles.icon,

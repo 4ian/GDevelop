@@ -184,6 +184,7 @@ import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -302,7 +303,7 @@ export type Props = {|
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
-  renderShareDialog?: ShareDialogWithoutExportsProps => React.Node,
+  renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -504,7 +505,6 @@ const MainFrame = (props: Props) => {
   useResourcesWatcher({
     getStorageProvider,
     fileMetadata: currentFileMetadata,
-    editorTabs: state.editorTabs,
     isProjectSplitInMultipleFiles: currentProject
       ? currentProject.isFolderProject()
       : false,
@@ -2490,8 +2490,11 @@ const MainFrame = (props: Props) => {
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
         const message =
-          error.response && error.response.status === 403
+          extractedStatusAndCode && extractedStatusAndCode.status === 403
             ? t`You don't have permissions to save this project. Please choose another location.`
             : t`An error occurred when saving the project. Please try again later.`;
         showAlert({
@@ -3044,11 +3047,11 @@ const MainFrame = (props: Props) => {
                 currentProject
               );
             }}
+            onShareProject={() => setShareDialogOpen(true)}
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
-            shortcutMap={shortcutMap}
           />
         )}
         {!state.currentProject && (
@@ -3179,7 +3182,6 @@ const MainFrame = (props: Props) => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProfile: () => openProfileDialog(true),
-                    onOpenHelpFinder: openCommandPalette,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3243,8 +3245,7 @@ const MainFrame = (props: Props) => {
         }}
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
-      {!!renderShareDialog &&
-        shareDialogOpen &&
+      {shareDialogOpen &&
         renderShareDialog({
           onClose: closeShareDialog,
           onChangeSubscription: closeShareDialog,

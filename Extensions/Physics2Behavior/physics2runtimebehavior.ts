@@ -1837,7 +1837,7 @@ namespace gdjs {
     addDistanceJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       length: float,
@@ -2083,7 +2083,7 @@ namespace gdjs {
     addRevoluteJointBetweenTwoBodies(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       enableLimit: boolean,
@@ -2383,7 +2383,7 @@ namespace gdjs {
     addPrismaticJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       axisAngle: float,
@@ -2754,7 +2754,7 @@ namespace gdjs {
     addPulleyJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       groundX1: float,
@@ -3237,7 +3237,7 @@ namespace gdjs {
     addWheelJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       axisAngle: float,
@@ -3522,7 +3522,7 @@ namespace gdjs {
     addWeldJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       referenceAngle: float,
@@ -3673,7 +3673,7 @@ namespace gdjs {
     addRopeJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       maxLength: float,
@@ -3782,7 +3782,7 @@ namespace gdjs {
     addFrictionJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       maxForce: float,
@@ -3914,7 +3914,7 @@ namespace gdjs {
 
     // Motor joint
     addMotorJoint(
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       offsetX: float,
       offsetY: float,
       offsetAngle: float,

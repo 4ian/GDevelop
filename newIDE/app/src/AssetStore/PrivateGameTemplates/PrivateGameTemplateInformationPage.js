@@ -37,6 +37,7 @@ import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { capitalize } from 'lodash';
 import FlatButton from '../../UI/FlatButton';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 const styles = {
   disabledText: { opacity: 0.6 },
@@ -123,7 +124,10 @@ const PrivateGameTemplateInformationPage = ({
           setGameTemplate(gameTemplate);
           setSellerPublicProfile(profile);
         } catch (error) {
-          if (error.response && error.response.status === 404) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
             setErrorText(
               <Trans>
                 Game template not found - An error occurred, please try again

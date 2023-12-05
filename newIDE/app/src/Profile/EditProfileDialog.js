@@ -14,6 +14,7 @@ import {
 import {
   communityLinksConfig,
   donateLinkConfig,
+  discordUsernameConfig,
   type UsernameAvailability,
   type CommunityLinkType,
 } from '../Utils/GDevelopServices/User';
@@ -111,6 +112,9 @@ const EditProfileDialog = ({
     profile.description || ''
   );
   const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
+  const [discordUsername, setDiscordUsername] = React.useState(
+    profile.discordUsername || ''
+  );
   const [personalWebsiteLink, setPersonalWebsiteLink] = React.useState(
     communityLinks.personalWebsiteLink || ''
   );
@@ -192,6 +196,7 @@ const EditProfileDialog = ({
       getGameStatsEmail,
       getNewsletterEmail,
       donateLink,
+      discordUsername,
       communityLinks: {
         personalWebsiteLink,
         personalWebsite2Link,
@@ -295,6 +300,20 @@ const EditProfileDialog = ({
                 onAvailabilityCheckLoading={setIsValidatingUsername}
                 isValidatingUsername={isValidatingUsername}
                 disabled={actionInProgress}
+              />
+              <TextField
+                value={discordUsername}
+                floatingLabelText={<Trans>Discord username</Trans>}
+                fullWidth
+                translatableHintText={t`Your Discord username`}
+                onChange={(e, value) => {
+                  setDiscordUsername(value);
+                }}
+                disabled={actionInProgress}
+                maxLength={discordUsernameConfig.maxLength}
+                helperMarkdownText={i18n._(
+                  t`Add your Discord username to get access to a dedicated channel if you have a Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
+                )}
               />
               <TextField
                 value={description}

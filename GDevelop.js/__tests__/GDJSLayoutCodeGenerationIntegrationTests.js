@@ -6,12 +6,9 @@ const {
 
 describe('libGD.js - GDJS Scene Code Generation integration tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   it('generates code for a link to an external events', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();

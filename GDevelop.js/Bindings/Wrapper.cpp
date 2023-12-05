@@ -120,6 +120,9 @@
  */
 class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
  public:
+   ArbitraryResourceWorkerJS(gd::ResourcesManager &resourcesManager)
+      : ArbitraryResourceWorker(resourcesManager){};
+
   void ExposeImage(gd::String &arg0) {
     arg0 = (const char *)EM_ASM_INT(
         {

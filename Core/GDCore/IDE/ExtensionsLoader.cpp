@@ -43,7 +43,6 @@ void ExtensionsLoader::LoadAllExtensions(const gd::String &directory,
   struct dirent *lecture;
   DIR *rep;
   rep = opendir(directory.c_str());
-  int l = 0;
 
   if (rep == NULL) {
     cout << "Unable to open Extensions (" << directory << ") directory."
@@ -63,8 +62,6 @@ void ExtensionsLoader::LoadAllExtensions(const gd::String &directory,
 
       LoadExtension(directory + "/" + lec, platform, forgiving);
       librariesLoaded.push_back(directory + "/" + lec);
-
-      l++;
     }
   }
 
@@ -103,7 +100,6 @@ void ExtensionsLoader::ExtensionsLoadingDone(const gd::String &directory) {
   struct dirent *lecture;
   DIR *rep;
   rep = opendir(directory.c_str());
-  int l = 0;
 
   if (rep == NULL) {
     cout << "Unable to open Extensions (" << directory << ") directory."
@@ -118,7 +114,6 @@ void ExtensionsLoader::ExtensionsLoadingDone(const gd::String &directory) {
         lec.find(".xgd" + suffix, lec.length() - 4 - suffix.length()) !=
             string::npos) {
       librariesLoaded.push_back(directory + "/" + lec);
-      l++;
     }
   }
 

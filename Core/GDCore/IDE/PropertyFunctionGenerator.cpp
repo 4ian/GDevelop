@@ -128,11 +128,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     } else {
       gd::Instruction action;
       action.SetType("SetReturn" + numberOrString);
-      gd::String receiver = isBehavior ? "Object.Behavior::" : "Object.";
-      gd::String propertyPrefix =
-          (isSharedProperties ? "SharedProperty" : "Property");
-      action.AddParameter(receiver + propertyPrefix + property.GetName() +
-                          "()");
+      action.AddParameter(property.GetName());
       event.GetActions().Insert(action, 0);
     }
   }
@@ -233,15 +229,13 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       gd::Instruction action;
       action.SetType(setterType);
       action.AddParameter("Object");
-      gd::String parameterGetterCall =
-          "GetArgumentAs" + numberOrString + "(\"Value\")";
       if (isBehavior) {
         action.AddParameter("Behavior");
         action.AddParameter("=");
-        action.AddParameter(parameterGetterCall);
+        action.AddParameter("Value");
       } else {
         action.AddParameter("=");
-        action.AddParameter(parameterGetterCall);
+        action.AddParameter("Value");
       }
       event.GetActions().Insert(action, 0);
     }

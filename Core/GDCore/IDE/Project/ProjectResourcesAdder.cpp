@@ -18,8 +18,9 @@ namespace gd {
 std::vector<gd::String> ProjectResourcesAdder::GetAllUseless(
     gd::Project& project, const gd::String& resourceType) {
   std::vector<gd::String> unusedResources;
+
   // Search for resources used in the project
-  gd::ResourcesInUseHelper resourcesInUse;
+  gd::ResourcesInUseHelper resourcesInUse(project.GetResourcesManager());
   gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesInUse);
   std::set<gd::String>& usedResources = resourcesInUse.GetAll(resourceType);
 

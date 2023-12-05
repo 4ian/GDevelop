@@ -72,6 +72,7 @@ import MaxLeaderboardCountAlertMessage from './MaxLeaderboardCountAlertMessage';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import Paper from '../../UI/Paper';
 import SwitchHorizontal from '../../UI/CustomSvgIcons/SwitchHorizontal';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 type Props = {|
   onLoading: boolean => void,
@@ -312,12 +313,15 @@ export const LeaderboardAdmin = ({
         setApiError(null);
         try {
           await listLeaderboards();
-        } catch (err) {
-          if (err.response && err.response.status === 404) {
+        } catch (error) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
             setDisplayGameRegistration(true);
             return;
           }
-          console.error('An error occurred when fetching leaderboards', err);
+          console.error('An error occurred when fetching leaderboards', error);
           setApiError({
             action: 'leaderboardsFetching',
             message: (
@@ -406,12 +410,15 @@ export const LeaderboardAdmin = ({
     setApiError(null);
     try {
       await resetLeaderboard();
-    } catch (err) {
-      console.error('An error occurred when resetting leaderboard', err);
+    } catch (error) {
+      console.error('An error occurred when resetting leaderboard', error);
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       setApiError({
         action: 'leaderboardReset',
         message:
-          err.status && err.status === 409 ? (
+          extractedStatusAndCode && extractedStatusAndCode.status === 409 ? (
             <Trans>
               This leaderboard is already resetting, please wait a bit, close
               the dialog, come back and try again.

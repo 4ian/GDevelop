@@ -37,13 +37,14 @@ namespace gd {
  * \see ResourcesMergingHelper
  * \see gd::ResourcesInUseHelper
  *
- * \see gd::LaunchResourceWorkerOnEvents
+ * \see gd::GetResourceWorkerOnEvents
  *
  * \ingroup IDE
  */
 class GD_CORE_API ArbitraryResourceWorker {
- public:
-  ArbitraryResourceWorker(){};
+public:
+  ArbitraryResourceWorker(gd::ResourcesManager &resourcesManager_)
+      : resourcesManager(&resourcesManager_){};
   virtual ~ArbitraryResourceWorker();
 
   /**
@@ -52,7 +53,7 @@ class GD_CORE_API ArbitraryResourceWorker {
    * first to ensure that resources are known so that images, shaders & audio
    * can make reference to them.
    */
-  void ExposeResources(gd::ResourcesManager *resourcesManager);
+  void ExposeResources();
 
   /**
    * \brief Expose a resource from a given type.
@@ -122,11 +123,6 @@ class GD_CORE_API ArbitraryResourceWorker {
    */
   virtual void ExposeEmbeddeds(gd::String &resourceName);
 
- protected:
-  const std::vector<gd::ResourcesManager *> &GetResources() {
-    return resourcesManagers;
-  };
-
  private:
   /**
    * \brief Expose a resource: resources that have a file are
@@ -134,7 +130,7 @@ class GD_CORE_API ArbitraryResourceWorker {
    */
   void ExposeResource(gd::Resource &resource);
 
-  std::vector<gd::ResourcesManager *> resourcesManagers;
+  gd::ResourcesManager * resourcesManager;
 };
 
 /**

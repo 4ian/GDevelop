@@ -73,6 +73,16 @@ const ProjectVersionRow = ({
                 commitOnBlur
                 autoFocus="desktopAndMobileDevices"
               />
+            ) : version.label ? (
+              <LineStackLayout noMargin>
+                <Text noMargin>{version.label}</Text>
+                <Text noMargin style={styles.username}>
+                  {i18n.date(version.createdAt, {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                  })}
+                </Text>
+              </LineStackLayout>
             ) : (
               <Text noMargin>
                 {i18n.date(version.createdAt, {
@@ -190,9 +200,13 @@ const groupVersionsByDay = (
 
 type Props = {|
   versions: Array<FilledCloudProjectVersion>,
+  onRenameVersion: (
+    FilledCloudProjectVersion,
+    {| label: string |}
+  ) => Promise<void>,
 |};
 
-const VersionHistory = ({ versions }: Props) => {
+const VersionHistory = ({ versions, onRenameVersion }: Props) => {
   const [
     usersPublicProfileByIds,
     setUsersPublicProfileByIds,
@@ -245,12 +259,12 @@ const VersionHistory = ({ versions }: Props) => {
     []
   );
 
-  const onRenameVersion = React.useCallback(
+  const renameVersion = React.useCallback(
     (version: FilledCloudProjectVersion, newName: string) => {
-      console.log(version.id, newName);
+      onRenameVersion(version, { label: newName });
       setEditedVersionId(null);
     },
-    []
+    [onRenameVersion]
   );
 
   const openContextMenu = React.useCallback(
@@ -279,7 +293,7 @@ const VersionHistory = ({ versions }: Props) => {
                   versions={dayVersions}
                   day={day}
                   usersPublicProfileByIds={usersPublicProfileByIds}
-                  onRenameVersion={onRenameVersion}
+                  onRenameVersion={renameVersion}
                   onContextMenu={openContextMenu}
                   editedVersionId={editedVersionId}
                 />

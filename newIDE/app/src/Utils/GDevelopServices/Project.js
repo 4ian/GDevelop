@@ -12,6 +12,7 @@ import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
+export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
 export const projectResourcesClient = axios.create({
@@ -708,4 +709,36 @@ export const listProjectUserAcls = async (
   }
 
   return projectUserAcls;
+};
+
+export const updateCloudProjectVersion = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  versionId: string,
+  attributes: {| label: string |}
+): Promise<?CloudProject> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const trimmedLabel = attributes.label.trim();
+
+  const cleanedAttributes = {
+    label: trimmedLabel
+      ? trimmedLabel.slice(0, CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH)
+      : null,
+  };
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.patch(
+    `/project/${cloudProjectId}/version/${versionId}`,
+    cleanedAttributes,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return response.data;
 };

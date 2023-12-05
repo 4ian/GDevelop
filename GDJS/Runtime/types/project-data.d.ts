@@ -279,4 +279,6 @@ declare type ResourceKind =
   | 'tilemap'
   | 'tileset'
   | 'bitmapFont'
-  | 'model3D';
+  | 'model3D'
+  | 'atlas'
+  | 'spine';

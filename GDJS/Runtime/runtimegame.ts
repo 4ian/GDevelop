@@ -152,6 +152,7 @@ namespace gdjs {
         getGlobalResourceNames(data),
         data.layouts
       );
+
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
@@ -304,6 +305,24 @@ namespace gdjs {
      */
     getModel3DManager(): gdjs.Model3DManager {
       return this._resourcesLoader.getModel3DManager();
+    }
+
+    /**
+     * Get the spine manager of the game, used to load and construct spine skeletons from game
+     * resources.
+     * @return The json manager for the game
+     */
+    getSpineManager(): gdjs.SpineManager | null {
+      return this._resourcesLoader.getSpineManager();
+    }
+
+    /**
+     * Get the atlas manager of the game, used to load atlases from game
+     * resources.
+     * @return The atlas manager for the game
+     */
+    getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
+      return this._resourcesLoader.getSpineAtlasManager();
     }
 
     /**

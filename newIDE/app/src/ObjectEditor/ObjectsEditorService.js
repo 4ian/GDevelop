@@ -1,4 +1,3 @@
-
 // @flow
 import TextEditor from './Editors/TextEditor';
 import TiledSpriteEditor from './Editors/TiledSpriteEditor';

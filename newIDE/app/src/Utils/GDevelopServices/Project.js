@@ -194,7 +194,13 @@ export const getLastVersionsOfProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  const projectVersions = response.data;
+
+  if (!Array.isArray(projectVersions)) {
+    throw new Error('Invalid response from the project versions API');
+  }
+
+  return projectVersions;
 };
 
 export const getCredentialsForCloudProject = async (
@@ -384,7 +390,13 @@ export const listUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const cloudProjects = response.data;
+
+  if (!Array.isArray(cloudProjects)) {
+    throw new Error('Invalid response from the projects API');
+  }
+
+  return cloudProjects;
 };
 
 export const listOtherUserCloudProjects = async (
@@ -397,7 +409,13 @@ export const listOtherUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const cloudProjects = response.data;
+
+  if (!Array.isArray(cloudProjects)) {
+    throw new Error('Invalid response from the projects API');
+  }
+
+  return cloudProjects;
 };
 
 export const getCloudProject = async (
@@ -667,5 +685,11 @@ export const listProjectUserAcls = async (
     },
     params: { userId: currentUserId, projectId },
   });
-  return response.data;
+  const projectUserAcls = response.data;
+
+  if (!Array.isArray(projectUserAcls)) {
+    throw new Error('Invalid response from the project user acls API');
+  }
+
+  return projectUserAcls;
 };

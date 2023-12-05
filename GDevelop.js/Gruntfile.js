@@ -111,9 +111,17 @@ module.exports = function (grunt) {
           },
         },
       },
-      // Copy the library to newIDE
-      generateTypes: {
+      // Generate typings from the Bindings.idl
+      generateFlowTypes: {
         command: 'node scripts/generate-types.js',
+        options: {
+          execOptions: {
+            cwd: __dirname,
+          },
+        },
+      },
+      generateTSTypes: {
+        command: 'node scripts/generate-dts.mjs',
         options: {
           execOptions: {
             cwd: __dirname,
@@ -148,6 +156,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'build:raw',
     'shell:copyToNewIDE',
-    'shell:generateTypes',
+    'shell:generateFlowTypes',
+    'shell:generateTSTypes',
   ]);
 };

@@ -1,3 +1,4 @@
+
 // @flow
 import TextEditor from './Editors/TextEditor';
 import TiledSpriteEditor from './Editors/TiledSpriteEditor';
@@ -10,6 +11,7 @@ import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
 import CustomObjectPropertiesEditor from './Editors/CustomObjectPropertiesEditor';
 import Cube3DEditor from './Editors/Cube3DEditor';
 import Model3DEditor from './Editors/Model3DEditor';
+import SpineEditor from './Editors/SpineEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -164,6 +166,21 @@ const ObjectsEditorService = {
       ): gdObjectJsImplementation =>
         gd.asObjectJsImplementation(objectConfiguration),
       helpPagePath: '/objects/3d-model',
+    },
+    'SpineObject::SpineObject': {
+      component: SpineEditor,
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectConfiguration =>
+        gd
+          .asObjectJsImplementation(objectConfiguration)
+          .clone()
+          .release(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectJsImplementation =>
+        gd.asObjectJsImplementation(objectConfiguration),
+      helpPagePath: '/objects/spine',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,

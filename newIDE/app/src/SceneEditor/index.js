@@ -661,6 +661,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
+    console.log('on instances selected');
     if (instances.length === 0) {
       this.setState(
         { selectedObjectFolderOrObjectsWithContext: [] },
@@ -673,7 +674,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     // representing all the instances selected.
     const lastSelectedInstance = instances[instances.length - 1];
     const objectName = lastSelectedInstance.getObjectName();
+    console.log('object name', objectName);
     if (project.hasObjectNamed(objectName)) {
+      console.log('object is global');
       this.setState(
         {
           selectedObjectFolderOrObjectsWithContext: [
@@ -688,6 +691,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.updateToolbar
       );
     } else if (layout.hasObjectNamed(objectName)) {
+      console.log('object is scene');
       this.setState(
         {
           selectedObjectFolderOrObjectsWithContext: [
@@ -757,6 +761,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     multiSelect: boolean,
     targetPosition?: 'center' | 'upperCenter'
   ) => {
+    console.log('selecting instances');
     this.instancesSelection.selectInstances({
       instances,
       multiSelect,
@@ -771,8 +776,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         offset = [0, viewPosition.toSceneScale(viewPosition.getHeight() / 4)];
       }
 
+      console.log('centering view');
       viewControls.centerViewOnLastInstance(instances, offset);
     }
+    console.log('updating toolbar after selecting instance');
     this.updateToolbar();
   };
 
@@ -1202,16 +1209,22 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   deleteSelection = () => {
+    console.log('deleteSelection');
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.forEach(instance => {
       if (instance.isLocked()) return;
+      console.log('removeInstance');
       this.props.initialInstances.removeInstance(instance);
     });
 
+    console.log('clearSelection');
     this.instancesSelection.clearSelection();
-    if (this.editorDisplay)
+    if (this.editorDisplay) {
+      console.log('clearHighlightedInstance');
       this.editorDisplay.instancesHandlers.clearHighlightedInstance();
+    }
 
+    console.log('setting state');
     this.setState(
       {
         selectedObjectFolderOrObjectsWithContext: [],
@@ -1222,6 +1235,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         ),
       },
       () => {
+        console.log('setting state callback');
         this.updateToolbar();
         this.forceUpdatePropertiesEditor();
       }

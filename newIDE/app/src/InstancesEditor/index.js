@@ -783,6 +783,7 @@ export default class InstancesEditor extends Component<Props> {
       return;
     }
 
+    console.log('on down instance, select');
     this.props.instancesSelection.selectInstance({
       instance,
       multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
@@ -790,6 +791,7 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     if (this.props.onInstancesSelected) {
+      console.log('now call onInstancesSelected');
       this.props.onInstancesSelected(
         this.props.instancesSelection.getSelectedInstances()
       );

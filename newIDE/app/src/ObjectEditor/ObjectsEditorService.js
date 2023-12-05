@@ -1,3 +1,4 @@
+
 // @flow
 import TextEditor from './Editors/TextEditor';
 import TiledSpriteEditor from './Editors/TiledSpriteEditor';
@@ -179,7 +180,7 @@ const ObjectsEditorService = {
         objectConfiguration: gdObjectConfiguration
       ): gdObjectJsImplementation =>
         gd.asObjectJsImplementation(objectConfiguration),
-      helpPagePath: '/objects/3d-model',
+      helpPagePath: '/objects/spine',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,

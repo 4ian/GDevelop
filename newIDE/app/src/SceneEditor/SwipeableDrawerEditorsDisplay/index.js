@@ -196,6 +196,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
         addSerializedInstances: editor
           ? editor.addSerializedInstances
           : () => [],
+        destroyInstanceRenderers: editor
+          ? editor.destroyInstanceRenderers
+          : () => {},
       },
     };
   });

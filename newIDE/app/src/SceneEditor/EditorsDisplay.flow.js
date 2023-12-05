@@ -155,5 +155,6 @@ export type SceneEditorsDisplayInterface = {|
       preventSnapToGrid?: boolean,
       addInstancesInTheForeground?: boolean,
     |}) => Array<gdInitialInstance>,
+    destroyInstanceRenderers: (gdInitialInstance[]) => void,
   |},
 |};

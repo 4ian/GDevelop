@@ -329,6 +329,18 @@ export default class InstancesRenderer {
     }
   }
 
+  destroyInstanceRenderers(instances: gdInitialInstance[]) {
+    console.log("DESTROY INSTANCES RENDERERS")
+    for (let i in this.layersRenderers) {
+      if (this.layersRenderers.hasOwnProperty(i)) {
+        const layerRenderer = this.layersRenderers[i];
+
+        console.log("DESTROY INSTANCES RENDERERS in layer")
+        layerRenderer.destroyInstanceRenderers(instances);
+      }
+    }
+  }
+
   /**
    * Clean up rendered layers that are not existing anymore
    */

@@ -206,6 +206,9 @@ const MosaicEditorsDisplay = React.forwardRef<
         addSerializedInstances: editor
           ? editor.addSerializedInstances
           : () => [],
+        destroyInstanceRenderers: editor
+          ? editor.destroyInstanceRenderers
+          : () => {},
       },
     };
   });

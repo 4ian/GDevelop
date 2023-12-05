@@ -621,6 +621,11 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
+  destroyInstanceRenderers = (instances: gdInitialInstance[]) => {
+    console.log('instancesEditor.destroyInstanceRenderers: ', instances.length);
+    this.instancesRenderer.destroyInstanceRenderers(instances);
+  };
+
   /**
    * Immediately add serialized instances at the given
    * position (in scene coordinates).
@@ -783,7 +788,10 @@ export default class InstancesEditor extends Component<Props> {
       return;
     }
 
-    console.log('on down instance, select');
+    console.log(
+      'on down instance, select, object name:',
+      instance.getObjectName()
+    );
     this.props.instancesSelection.selectInstance({
       instance,
       multiSelect: this.keyboardShortcuts.shouldMultiSelect(),

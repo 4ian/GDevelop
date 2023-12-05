@@ -1216,12 +1216,18 @@ export default class SceneEditor extends React.Component<Props, State> {
       console.log('removeInstance');
       this.props.initialInstances.removeInstance(instance);
     });
+    const { editorDisplay } = this;
+    if (editorDisplay) {
+      editorDisplay.instancesHandlers.destroyInstanceRenderers(
+        selectedInstances
+      );
+    }
 
-    console.log('clearSelection');
+    console.log('clearSelection', selectedInstances.length);
     this.instancesSelection.clearSelection();
-    if (this.editorDisplay) {
-      console.log('clearHighlightedInstance');
-      this.editorDisplay.instancesHandlers.clearHighlightedInstance();
+    if (editorDisplay) {
+      console.log('clearHighlightedInstance', selectedInstances.length);
+      editorDisplay.instancesHandlers.clearHighlightedInstance();
     }
 
     console.log('setting state');

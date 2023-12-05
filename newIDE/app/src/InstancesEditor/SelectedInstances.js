@@ -234,6 +234,8 @@ export default class SelectedInstances {
       }
 
       const instance = selection[i];
+    console.log(instance, instance.getObjectName())
+
       const instanceRect = this.instanceMeasurer.getInstanceAABB(
         instance,
         new Rectangle()

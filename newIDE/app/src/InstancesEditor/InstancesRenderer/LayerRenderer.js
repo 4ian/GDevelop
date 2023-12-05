@@ -743,6 +743,18 @@ export default class LayerRenderer {
     }
   }
 
+  destroyInstanceRenderers(instances: gdInitialInstance[]) {
+    console.log('layer.destroyInstanceRenderers: ', instances.length)
+    for (let instanceToDestroy of instances) {
+      console.log('instance to destroy for object ', instanceToDestroy.getObjectName())
+      const renderedInstance = this.renderedInstances[instanceToDestroy.ptr]
+      if (renderedInstance) {
+        console.log("DESTROY")
+        renderedInstance.onRemovedFromScene();
+      }
+    }
+  }
+
   /**
    * Remove rendered instances that are not associated to any instance anymore
    * (this can happen after an instance has been deleted).
@@ -753,7 +765,9 @@ export default class LayerRenderer {
       if (this.renderedInstances.hasOwnProperty(i)) {
         const renderedInstance = this.renderedInstances[i];
         if (!renderedInstance.wasUsed) {
+          console.log("was not used, on remove from scene")
           renderedInstance.onRemovedFromScene();
+          console.log("delete rendered instance")
           delete this.renderedInstances[i];
         } else renderedInstance.wasUsed = false;
       }

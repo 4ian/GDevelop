@@ -3,7 +3,7 @@ import {
   type Asset,
   isPixelArt,
   isPublicAssetResourceUrl,
-  extractFilenameWithExtensionFromPublicAssetResourceUrl,
+  extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { unserializeFromJSObject } from '../Utils/Serializer';
@@ -81,7 +81,9 @@ export const installResource = (
   const resourceOriginCleanedName: string = isPublicAssetResourceUrl(
     resourceFileUrl
   )
-    ? extractFilenameWithExtensionFromPublicAssetResourceUrl(resourceFileUrl)
+    ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
+        resourceFileUrl
+      )
     : resourceOriginRawName;
   const resourceOriginIdentifier: string = serializedResource.origin
     ? serializedResource.origin.identifier

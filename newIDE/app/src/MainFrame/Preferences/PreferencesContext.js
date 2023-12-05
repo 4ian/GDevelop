@@ -215,6 +215,9 @@ export type PreferencesValues = {|
   newProjectsDefaultStorageProviderName: string,
   useShortcutToClosePreviewWindow: boolean,
   watchProjectFolderFilesForLocalProjects: boolean,
+  newFeaturesAcknowledgements: {
+    [featureId: string]: {| dates: [number] |},
+  },
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
 |};
 
@@ -297,6 +300,9 @@ export type Preferences = {|
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
   setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
   setWatchProjectFolderFilesForLocalProjects: (enabled: boolean) => void,
+  setNewFeaturesAcknowledgements: ({
+    [featureId: string]: {| dates: [number] |},
+  }) => void,
   getEditorStateForProject: (
     projectId: string
   ) => ?{| editorTabs: EditorTabsPersistedState |},
@@ -350,6 +356,7 @@ export const initialPreferences = {
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
+    newFeaturesAcknowledgements: {},
     editorStateByProject: {},
   },
   setLanguage: () => {},
@@ -411,6 +418,7 @@ export const initialPreferences = {
   setNewProjectsDefaultStorageProviderName: () => {},
   setUseShortcutToClosePreviewWindow: () => {},
   setWatchProjectFolderFilesForLocalProjects: () => {},
+  setNewFeaturesAcknowledgements: () => {},
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId, editorState) => {},
 };

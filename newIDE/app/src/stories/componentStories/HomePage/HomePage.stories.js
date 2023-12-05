@@ -136,7 +136,6 @@ const WrappedHomePage = ({
                   action('onOpenPrivateGameTemplateListingData')()
                 }
                 onOpenProjectManager={() => action('onOpenProjectManager')()}
-                onOpenHelpFinder={() => action('onOpenHelpFinder')()}
                 onOpenLanguageDialog={() => action('open language dialog')()}
                 onOpenNewProjectSetupDialog={() =>
                   action('onOpenNewProjectSetupDialog')()

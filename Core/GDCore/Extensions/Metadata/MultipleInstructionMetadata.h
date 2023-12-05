@@ -192,6 +192,16 @@ class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata 
   }
 
   /**
+   * \see gd::InstructionMetadata::SetHelpPath
+   */
+  MultipleInstructionMetadata &SetHelpPath(const gd::String &path) {
+    if (expression) expression->SetHelpPath(path);
+    if (condition) condition->SetHelpPath(path);
+    if (action) action->SetHelpPath(path);
+    return *this;
+  }
+
+  /**
    * \see gd::InstructionMetadata::MarkAsSimple
    */
   MultipleInstructionMetadata &MarkAsSimple() {

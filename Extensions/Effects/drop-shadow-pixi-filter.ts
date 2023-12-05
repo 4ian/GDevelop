@@ -27,6 +27,28 @@ namespace gdjs {
           dropShadowFilter.padding = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        if (parameterName === 'blur') {
+          return dropShadowFilter.blur;
+        }
+        if (parameterName === 'quality') {
+          return dropShadowFilter.quality;
+        }
+        if (parameterName === 'alpha') {
+          return dropShadowFilter.alpha;
+        }
+        if (parameterName === 'distance') {
+          return dropShadowFilter.distance;
+        }
+        if (parameterName === 'rotation') {
+          return dropShadowFilter.rotation;
+        }
+        if (parameterName === 'padding') {
+          return dropShadowFilter.padding;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
@@ -38,6 +60,23 @@ namespace gdjs {
             value
           );
         }
+      }
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {
+        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        if (parameterName === 'color') {
+          dropShadowFilter.color = value;
+        }
+      }
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        if (parameterName === 'color') {
+          return dropShadowFilter.color;
+        }
+        return 0;
       }
       updateBooleanParameter(
         filter: PIXI.Filter,

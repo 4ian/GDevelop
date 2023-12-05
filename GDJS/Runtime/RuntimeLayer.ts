@@ -371,6 +371,15 @@ namespace gdjs {
     }
 
     /**
+     * Returns the collection of effects to be rendered by the
+     * underlying renderer.
+     * @returns The renderer effects.
+     */
+    getRendererEffects() {
+      return this._rendererEffects;
+    }
+
+    /**
      * Add a new effect, or replace the one with the same name.
      * @param effectData The data of the effect to add.
      */

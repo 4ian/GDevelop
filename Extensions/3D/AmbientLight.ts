@@ -61,12 +61,29 @@ namespace gdjs {
               this.light.intensity = value;
             }
           }
+          getDoubleParameter(parameterName: string): number {
+            if (parameterName === 'intensity') {
+              return this.light.intensity;
+            }
+            return 0;
+          }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'color') {
-              this.light.color = new THREE.Color(
+              this.light.color.setHex(
                 gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value)
               );
             }
+          }
+          updateColorParameter(parameterName: string, value: number): void {
+            if (parameterName === 'color') {
+              this.light.color.setHex(value);
+            }
+          }
+          getColorParameter(parameterName: string): number {
+            if (parameterName === 'color') {
+              return this.light.color.getHex();
+            }
+            return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
         })();

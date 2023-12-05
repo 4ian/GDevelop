@@ -52,6 +52,7 @@ import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
 import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 type Props = {|
   authentication: Authentication,
@@ -419,7 +420,10 @@ export default class AuthenticatedUserProvider extends React.Component<
           },
         })),
       error => {
-        if (error.response.status === 404) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
           console.warn(
             'List recommendations endpoint returned 404, user might not have completed survey.'
           );
@@ -773,6 +777,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           getNewsletterEmail: payload.getNewsletterEmail,
           appLanguage: preferences.language,
           donateLink: payload.donateLink,
+          discordUsername: payload.discordUsername,
           communityLinks: payload.communityLinks,
           survey: payload.survey,
         }

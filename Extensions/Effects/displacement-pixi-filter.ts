@@ -29,11 +29,29 @@ namespace gdjs {
           displacementFilter.scale.y = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        if (parameterName === 'scaleX') {
+          return displacementFilter.scale.x;
+        }
+        if (parameterName === 'scaleY') {
+          return displacementFilter.scale.y;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

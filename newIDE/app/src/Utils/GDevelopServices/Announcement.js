@@ -17,5 +17,10 @@ export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
   const response = await axios.get(
     `${GDevelopReleaseApi.baseUrl}/announcement`
   );
-  return response.data;
+  const announcements = response.data;
+  if (!Array.isArray(announcements)) {
+    throw new Error('Invalid response from the announcements API');
+  }
+
+  return announcements;
 };

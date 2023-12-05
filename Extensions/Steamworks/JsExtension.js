@@ -178,7 +178,7 @@ module.exports = {
     extension
       .addAction(
         'SetRichPresence',
-        _('Change the Steam rich presence'),
+        _('Steam rich presence'),
         _(
           "Changes an attribute of Steam's rich presence. Allows other player to see exactly what the player's currently doing in the game."
         ),

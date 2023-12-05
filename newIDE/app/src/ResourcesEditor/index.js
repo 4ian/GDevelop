@@ -19,6 +19,10 @@ import {
 import { type FileMetadata } from '../ProjectsStorage';
 import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
 import type { StorageProvider } from '../ProjectsStorage';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -65,7 +69,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   static defaultProps = {
     setToolbar: () => {},
   };
-
+  resourceExternallyChangedCallbackId: ?string;
   editorMosaic: ?EditorMosaic = null;
   _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
   _resourcesList: ?ResourcesList = null;
@@ -73,6 +77,17 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   state = {
     selectedResource: null,
   };
+
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
+  }
 
   refreshResourcesList() {
     if (this._resourcesList) this._resourcesList.forceUpdate();

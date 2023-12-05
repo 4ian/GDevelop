@@ -1,6 +1,6 @@
 // @ts-check
 
-const gdevelopWikiUrlRoot = 'https://wiki.gdevelop.io/gdevelop5';
+const gdevelopWikiUrlRoot = '/gdevelop5';
 const improperlyFormattedHelpPaths = new Set();
 
 /** @param {string} str */

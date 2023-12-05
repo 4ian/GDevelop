@@ -548,7 +548,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction(
           "ChangeLayerTimeScale",
-          _("Change layer time scale"),
+          _("Layer time scale"),
           _("Change the time scale applied to the objects of the layer."),
           _("Set the time scale of layer _PARAM1_ to _PARAM2_"),
           "",
@@ -594,7 +594,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction(
           "SetLayerAmbientLightColor",
-          _("Set the ambient light color"),
+          _("Ambient light color"),
           _("Set the ambient light color of the lighting layer in format "
             "\"R;G;B\" string."),
           _("Set the ambient color of the lighting layer _PARAM1_ to _PARAM2_"),

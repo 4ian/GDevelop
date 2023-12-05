@@ -34,11 +34,26 @@ namespace gdjs {
           );
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        if (parameterName === 'mix') {
+          return colorMapFilter.mix;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

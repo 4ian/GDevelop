@@ -108,6 +108,10 @@ import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../UI/AlertMessage';
 import { Column, Line } from '../UI/Grid';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -238,6 +242,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   });
 
   eventContextMenu: ?ContextMenuInterface;
+  resourceExternallyChangedCallbackId: ?string;
   instructionContextMenu: ?ContextMenuInterface;
   addNewEvent: (
     type: string,
@@ -297,6 +302,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {

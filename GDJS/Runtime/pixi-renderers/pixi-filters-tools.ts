@@ -106,6 +106,9 @@ namespace gdjs {
       updateStringParameter(parameterName: string, value: string): void;
       /** The function to be called to update a parameter (with a boolean) */
       updateBooleanParameter(parameterName: string, value: boolean): void;
+      updateColorParameter(parameterName: string, value: number): void;
+      getDoubleParameter(parameterName: string): number;
+      getColorParameter(parameterName: string): number;
     }
 
     /** A wrapper allowing to create a PIXI filter and update it using a common interface */
@@ -146,6 +149,19 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ): void;
+      abstract updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void;
+      abstract getDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string
+      ): number;
+      abstract getColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string
+      ): number;
     }
 
     /**An effect used to manipulate a Pixi filter. */
@@ -225,9 +241,31 @@ namespace gdjs {
           value
         );
       }
+
+      updateColorParameter(parameterName: string, value: number): void {
+        this.filterCreator.updateColorParameter(
+          this.pixiFilter,
+          parameterName,
+          value
+        );
+      }
+
+      getDoubleParameter(parameterName: string): number {
+        return this.filterCreator.getDoubleParameter(
+          this.pixiFilter,
+          parameterName
+        );
+      }
+
+      getColorParameter(parameterName: string): number {
+        return this.filterCreator.getColorParameter(
+          this.pixiFilter,
+          parameterName
+        );
+      }
     }
 
-    export class EmptyFilter {
+    export class EmptyFilter implements Filter {
       isEnabled(target: EffectsTarget): boolean {
         return false;
       }
@@ -244,6 +282,13 @@ namespace gdjs {
       updateDoubleParameter(parameterName: string, value: number): void {}
       updateStringParameter(parameterName: string, value: string): void {}
       updateBooleanParameter(parameterName: string, value: boolean): void {}
+      updateColorParameter(parameterName: string, value: number): void {}
+      getDoubleParameter(parameterName: string): number {
+        return 0;
+      }
+      getColorParameter(parameterName: string): number {
+        return 0;
+      }
     }
   }
 }

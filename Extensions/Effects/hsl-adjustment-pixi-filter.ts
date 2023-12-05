@@ -23,11 +23,35 @@ namespace gdjs {
           hslAdjustmentFilter.alpha = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const hslAdjustmentFilter = filter as PIXI.filters.HslAdjustmentFilter;
+        if (parameterName === 'hue') {
+          return hslAdjustmentFilter.hue;
+        }
+        if (parameterName === 'saturation') {
+          return hslAdjustmentFilter.saturation;
+        }
+        if (parameterName === 'lightness') {
+          return hslAdjustmentFilter.lightness;
+        }
+        if (parameterName === 'alpha') {
+          return hslAdjustmentFilter.alpha;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

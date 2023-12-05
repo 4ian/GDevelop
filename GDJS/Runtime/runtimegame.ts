@@ -6,6 +6,9 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Game manager');
 
+  const sleep = (ms: float) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   /** Identify a script file, with its content hash (useful for hot-reloading). */
   export type RuntimeGameOptionsScriptFile = {
     /** The path for this script file. */
@@ -13,6 +16,9 @@ namespace gdjs {
     /** The hash of the script file content. */
     hash: number;
   };
+
+  const getGlobalResourceNames = (projectData: ProjectData): Array<string> =>
+    projectData.usedResources.map((resource) => resource.name);
 
   /** Options given to the game at startup. */
   export type RuntimeGameOptions = {
@@ -63,86 +69,15 @@ namespace gdjs {
     environment?: 'dev';
   };
 
-  const addSearchParameterToUrl = (
-    url: string,
-    urlEncodedParameterName: string,
-    urlEncodedValue: string
-  ) => {
-    if (url.startsWith('data:') || url.startsWith('blob:')) {
-      // blob/data protocol does not support search parameters, which are useless anyway.
-      return url;
-    }
-
-    const separator = url.indexOf('?') === -1 ? '?' : '&';
-    return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
-  };
-
-  const checkIfIsGDevelopCloudBucketUrl = (url: string): boolean => {
-    return (
-      url.startsWith('https://project-resources.gdevelop.io/') ||
-      url.startsWith('https://project-resources-dev.gdevelop.io/')
-    );
-  };
-
-  /**
-   * Gives helper methods used when resources are loaded from an URL.
-   */
-  export class RuntimeGameResourcesLoader {
-    _runtimeGame: RuntimeGame;
-
-    constructor(runtimeGame: RuntimeGame) {
-      this._runtimeGame = runtimeGame;
-    }
-
-    /**
-     * Complete the given URL with any specific parameter required to access
-     * the resource (this can be for example a token needed to access the resource).
-     */
-    getFullUrl(url: string) {
-      const { gdevelopResourceToken } = this._runtimeGame._options;
-      if (!gdevelopResourceToken) return url;
-
-      if (!checkIfIsGDevelopCloudBucketUrl(url)) return url;
-
-      return addSearchParameterToUrl(
-        url,
-        'gd_resource_token',
-        encodeURIComponent(gdevelopResourceToken)
-      );
-    }
-
-    /**
-     * Return true if the specified URL must be loaded with cookies ("credentials")
-     * sent to grant access to them.
-     */
-    checkIfCredentialsRequired(url: string) {
-      if (this._runtimeGame._options.gdevelopResourceToken) return false;
-
-      // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-      // i.e: its gdevelop.io cookie, to be passed.
-      // Note that this is only useful during previews.
-      if (checkIfIsGDevelopCloudBucketUrl(url)) return true;
-
-      // For other resources, use the default way of loading resources ("anonymous" or "same-site").
-      return false;
-    }
-  }
-
   /**
    * Represents a game being played.
    */
   export class RuntimeGame {
-    _resourcesLoader: RuntimeGameResourcesLoader;
+    _resourcesLoader: gdjs.ResourceLoader;
     _variables: VariablesContainer;
     _data: ProjectData;
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
-    _imageManager: ImageManager;
-    _soundManager: SoundManager;
-    _fontManager: FontManager;
-    _jsonManager: JsonManager;
-    _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
-    _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
     _minFPS: integer;
     _gameResolutionWidth: integer;
@@ -210,33 +145,12 @@ namespace gdjs {
       this._options = options || {};
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
-      this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
 
-      const resources = this._data.resources.resources;
-      this._imageManager = new gdjs.ImageManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._soundManager = new gdjs.SoundManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._fontManager = new gdjs.FontManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._jsonManager = new gdjs.JsonManager(
-        resources,
-        this._resourcesLoader
-      );
-      this._bitmapFontManager = new gdjs.BitmapFontManager(
-        resources,
-        this._resourcesLoader,
-        this._imageManager
-      );
-      this._model3DManager = new gdjs.Model3DManager(
-        resources,
-        this._resourcesLoader
+      this._resourcesLoader = new gdjs.ResourceLoader(
+        this,
+        data.resources.resources,
+        getGlobalResourceNames(data),
+        data.layouts
       );
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
@@ -315,12 +229,11 @@ namespace gdjs {
      */
     setProjectData(projectData: ProjectData): void {
       this._data = projectData;
-      this._imageManager.setResources(this._data.resources.resources);
-      this._soundManager.setResources(this._data.resources.resources);
-      this._fontManager.setResources(this._data.resources.resources);
-      this._jsonManager.setResources(this._data.resources.resources);
-      this._bitmapFontManager.setResources(this._data.resources.resources);
-      this._model3DManager.setResources(this._data.resources.resources);
+      this._resourcesLoader.setResources(
+        projectData.resources.resources,
+        getGlobalResourceNames(projectData),
+        projectData.layouts
+      );
     }
 
     /**
@@ -348,7 +261,7 @@ namespace gdjs {
      * @return The sound manager.
      */
     getSoundManager(): gdjs.HowlerSoundManager {
-      return this._soundManager;
+      return this._resourcesLoader.getSoundManager();
     }
 
     /**
@@ -356,7 +269,7 @@ namespace gdjs {
      * @return The image manager.
      */
     getImageManager(): gdjs.PixiImageManager {
-      return this._imageManager;
+      return this._resourcesLoader.getImageManager();
     }
 
     /**
@@ -364,7 +277,7 @@ namespace gdjs {
      * @return The font manager.
      */
     getFontManager(): gdjs.FontFaceObserverFontManager {
-      return this._fontManager;
+      return this._resourcesLoader.getFontManager();
     }
 
     /**
@@ -372,8 +285,25 @@ namespace gdjs {
      * @return The bitmap font manager.
      */
     getBitmapFontManager(): gdjs.BitmapFontManager {
-      // @ts-ignore
-      return this._bitmapFontManager;
+      return this._resourcesLoader.getBitmapFontManager();
+    }
+
+    /**
+     * Get the JSON manager of the game, used to load JSON from game
+     * resources.
+     * @return The json manager for the game
+     */
+    getJsonManager(): gdjs.JsonManager {
+      return this._resourcesLoader.getJsonManager();
+    }
+
+    /**
+     * Get the 3D model manager of the game, used to load 3D model from game
+     * resources.
+     * @return The 3D model manager for the game
+     */
+    getModel3DManager(): gdjs.Model3DManager {
+      return this._resourcesLoader.getModel3DManager();
     }
 
     /**
@@ -383,24 +313,6 @@ namespace gdjs {
      */
     getInputManager(): gdjs.InputManager {
       return this._inputManager;
-    }
-
-    /**
-     * Get the JSON manager of the game, used to load JSON from game
-     * resources.
-     * @return The json manager for the game
-     */
-    getJsonManager(): gdjs.JsonManager {
-      return this._jsonManager;
-    }
-
-    /**
-     * Get the 3D model manager of the game, used to load 3D model from game
-     * resources.
-     * @return The 3D model manager for the game
-     */
-    getModel3DManager(): gdjs.Model3DManager {
-      return this._model3DManager;
     }
 
     /**
@@ -681,54 +593,162 @@ namespace gdjs {
     }
 
     /**
-     * Load all assets, displaying progress in renderer.
+     * Preload a scene assets as soon as possible in background.
+     */
+    prioritizeLoadingOfScene(sceneName: string) {
+      // Don't await the scene assets to be loaded.
+      this._resourcesLoader.loadSceneResources(sceneName);
+    }
+
+    /**
+     * @return The progress of assets loading in background for a scene
+     * (between 0 and 1).
+     */
+    getSceneLoadingProgress(sceneName: string): number {
+      return this._resourcesLoader.getSceneLoadingProgress(sceneName);
+    }
+
+    /**
+     * @returns true when all the resources of the given scene are loaded
+     * (but maybe not parsed).
+     */
+    areSceneAssetsLoaded(sceneName: string): boolean {
+      return this._resourcesLoader.areSceneAssetsLoaded(sceneName);
+    }
+
+    /**
+     * @returns true when all the resources of the given scene are loaded and
+     * parsed.
+     */
+    areSceneAssetsReady(sceneName: string): boolean {
+      return this._resourcesLoader.areSceneAssetsReady(sceneName);
+    }
+
+    /**
+     * Load all assets needed to display the 1st scene, displaying progress in
+     * renderer.
      */
     loadAllAssets(
       callback: () => void,
       progressCallback?: (progress: float) => void
     ) {
-      this.loadAllAssetsAsync(progressCallback).then(callback);
+      this.loadFirstAssetsAndStartBackgroundLoading(
+        this._getFirstSceneName(),
+        progressCallback
+      ).then(callback);
     }
 
     /**
-     * Load all assets, displaying progress in renderer.
+     * Load all assets needed to display the 1st scene, displaying progress in
+     * renderer.
+     *
+     * When a game is hot-reload, this method can be called with the current
+     * scene.
      */
-    loadAllAssetsAsync = async (
+    async loadFirstAssetsAndStartBackgroundLoading(
+      firstSceneName: string,
       progressCallback?: (progress: float) => void
-    ) => {
+    ): Promise<void> {
       try {
-        const loadingScreen = new gdjs.LoadingScreenRenderer(
-          this.getRenderer(),
-          this._imageManager,
-          this._data.properties.loadingScreen
-        );
-        const allAssetsTotal = this._data.resources.resources.length;
-        let loadedAssets = 0;
-
-        const onProgress = (count: integer, total: integer) => {
-          const percent = Math.floor(
-            (100 * (loadedAssets + count)) / allAssetsTotal
-          );
-          loadingScreen.setPercent(percent);
-          if (progressCallback) {
-            progressCallback(percent);
-          }
-        };
-
-        loadedAssets += await this._imageManager.loadTextures(onProgress);
-        loadedAssets += await this._soundManager.preloadAudio(onProgress);
-        loadedAssets += await this._fontManager.loadFonts(onProgress);
-        loadedAssets += await this._jsonManager.preloadJsons(onProgress);
-        loadedAssets += await this._model3DManager.loadModels(onProgress);
-        await this._bitmapFontManager.loadBitmapFontData(onProgress);
-        await loadingScreen.unload();
-        await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
+        // Download the loading screen background image first to be able to
+        // display the loading screen as soon as possible.
+        const backgroundImageResourceName = this._data.properties.loadingScreen
+          .backgroundImageResourceName;
+        if (backgroundImageResourceName) {
+          await this._resourcesLoader
+            .getImageManager()
+            .loadResource(backgroundImageResourceName);
+        }
+        await Promise.all([
+          this._loadAssetsWithLoadingScreen(
+            /* isFirstScene = */ true,
+            async (onProgress) => {
+              // TODO Is a setting needed?
+              if (false) {
+                await this._resourcesLoader.loadAllResources(onProgress);
+              } else {
+                await this._resourcesLoader.loadGlobalAndFirstSceneResources(
+                  firstSceneName,
+                  onProgress
+                );
+                // Don't await as it must not block the first scene from starting.
+                this._resourcesLoader.loadAllSceneInBackground();
+              }
+            },
+            progressCallback
+          ),
+          // TODO This is probably not necessary in case of hot reload.
+          gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
+        ]);
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 
         throw e;
       }
-    };
+    }
+
+    /**
+     * Load all assets for a given scene, displaying progress in renderer.
+     */
+    async loadSceneAssets(
+      sceneName: string,
+      progressCallback?: (progress: float) => void
+    ): Promise<void> {
+      await this._loadAssetsWithLoadingScreen(
+        /* isFirstLayout = */ false,
+        async (onProgress) => {
+          await this._resourcesLoader.loadAndProcessSceneResources(
+            sceneName,
+            onProgress
+          );
+        },
+        progressCallback
+      );
+    }
+
+    /**
+     * Load assets, displaying progress in renderer.
+     */
+    private async _loadAssetsWithLoadingScreen(
+      isFirstScene: boolean,
+      loadAssets: (
+        onProgress: (count: integer, total: integer) => Promise<void>
+      ) => Promise<void>,
+      progressCallback?: (progress: float) => void
+    ): Promise<void> {
+      this.pause(true);
+      const loadingScreen = new gdjs.LoadingScreenRenderer(
+        this.getRenderer(),
+        this._resourcesLoader.getImageManager(),
+        this._data.properties.loadingScreen,
+        isFirstScene
+      );
+
+      const onProgress = async (count: integer, total: integer) => {
+        const percent = Math.floor((100 * count) / total);
+        loadingScreen.setPercent(percent);
+        if (progressCallback) {
+          progressCallback(percent);
+        }
+        const hasRendered = loadingScreen.renderIfNeeded();
+        if (hasRendered) {
+          // Give a chance to draw calls from the renderer to be handled.
+          await sleep(1);
+        }
+      };
+      await loadAssets(onProgress);
+
+      await loadingScreen.unload();
+      this.pause(false);
+    }
+
+    private _getFirstSceneName(): string {
+      const firstSceneName = this._data.firstLayout;
+      return this.hasScene(firstSceneName)
+        ? firstSceneName
+        : // @ts-ignore - no risk of null object.
+          this.getSceneData().name;
+    }
 
     /**
      * Start the game loop, to be called once assets are loaded.
@@ -742,12 +762,8 @@ namespace gdjs {
         this._forceGameResolutionUpdate();
 
         // Load the first scene
-        const firstSceneName = this._data.firstLayout;
         this._sceneStack.push(
-          this.hasScene(firstSceneName)
-            ? firstSceneName
-            : // @ts-ignore - no risk of null object.
-              this.getSceneData().name,
+          this._getFirstSceneName(),
           this._injectExternalLayout
         );
         this._watermark.displayAtStartup();

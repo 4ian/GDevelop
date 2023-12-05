@@ -425,6 +425,58 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getHeight()).to.be(440);
   });
 
+  it('can tween a number effect property', () => {
+    sprite.addEffect({
+      effectType: 'Outline',
+      name: 'MyEffect',
+      doubleParameters: { padding: 0, thickness: 200 },
+      stringParameters: { color: '16;32;64' },
+      booleanParameters: {},
+    });
+    spriteBehavior.addNumberEffectPropertyTween(
+      null,
+      'MyTween',
+      600,
+      'MyEffect',
+      'thickness',
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () =>
+      sprite.getRendererEffects()['MyEffect'].getDoubleParameter('thickness')
+    );
+    expect(
+      sprite.getRendererEffects()['MyEffect'].getDoubleParameter('thickness')
+    ).to.be(440);
+  });
+
+  it('can tween a color effect property', () => {
+    sprite.addEffect({
+      effectType: 'Outline',
+      name: 'MyEffect',
+      doubleParameters: { padding: 0, thickness: 200 },
+      stringParameters: { color: '16;32;64' },
+      booleanParameters: {},
+    });
+    spriteBehavior.addColorEffectPropertyTween(
+      null,
+      'MyTween',
+      '255;192;128',
+      'MyEffect',
+      'color',
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () =>
+      sprite.getRendererEffects()['MyEffect'].getColorParameter('color')
+    );
+    expect(
+      sprite.getRendererEffects()['MyEffect'].getColorParameter('color')
+    ).to.be(gdjs.rgbOrHexStringToNumber('76;235;27'));
+  });
+
   it('can tween the opacity', () => {
     sprite.setOpacity(128);
     spriteBehavior.addObjectOpacityTween2(

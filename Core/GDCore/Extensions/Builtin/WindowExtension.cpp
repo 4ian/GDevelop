@@ -87,8 +87,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
   extension
       .AddAction(
           "SetWindowSize",
-          _("Change the size of the game window"),
-          _("This action changes the size of the game window. Note that this "
+          _("Game window size"),
+          _("Changes the size of the game window. Note that this "
             "will only work on platform supporting this operation: games "
             "running in browsers or on mobile phones can not update their "
             "window size. Game resolution can still be updated."),

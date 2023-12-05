@@ -3,6 +3,7 @@ GDevelop - Tween Behavior Extension
 Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Tween');
   interface IColorable extends gdjs.RuntimeObject {
     setColor(color: string): void;
     getColor(): string;
@@ -37,46 +38,12 @@ namespace gdjs {
     return o.setCharacterSize && o.getCharacterSize;
   }
 
-  function rgbToHsl(r: number, g: number, b: number): number[] {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    let v = Math.max(r, g, b),
-      c = v - Math.min(r, g, b),
-      f = 1 - Math.abs(v + v - c - 1);
-    let h =
-      c &&
-      (v === r ? (g - b) / c : v === g ? 2 + (b - r) / c : 4 + (r - g) / c);
-    return [
-      Math.round(60 * (h < 0 ? h + 6 : h)),
-      Math.round((f ? c / f : 0) * 100),
-      Math.round(((v + v - c) / 2) * 100),
-    ];
-  }
-
-  function hslToRgb(h: number, s: number, l: number): number[] {
-    h = h %= 360;
-    if (h < 0) {
-      h += 360;
-    }
-    s = s / 100;
-    l = l / 100;
-    const a = s * Math.min(l, 1 - l);
-    const f = (n = 0, k = (n + h / 30) % 12) =>
-      l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return [
-      Math.round(f(0) * 255),
-      Math.round(f(8) * 255),
-      Math.round(f(4) * 255),
-    ];
-  }
-
   const linearInterpolation = gdjs.evtTools.common.lerp;
   const exponentialInterpolation =
     gdjs.evtTools.common.exponentialInterpolation;
 
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
-    private _tweens = new gdjs.TweenRuntimeBehavior.TweenManager();
+    private _tweens = new gdjs.evtTools.tween.TweenManager();
     private _isActive: boolean = true;
 
     /**
@@ -211,7 +178,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       if (variable.getType() !== 'number') {
         return;
@@ -328,7 +295,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       this._tweens.addMultiTween(
         identifier,
@@ -400,7 +367,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       this._tweens.addSimpleTween(
         identifier,
@@ -472,7 +439,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       this._tweens.addSimpleTween(
         identifier,
@@ -576,7 +543,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       this._tweens.addSimpleTween(
         identifier,
@@ -664,8 +631,8 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
-      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+      timeSource: gdjs.evtTools.tween.TimeSource,
+      interpolation: gdjs.evtTools.tween.Interpolation
     ) {
       const owner = this.owner;
       if (!isScalable(owner)) return;
@@ -765,8 +732,8 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
-      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+      timeSource: gdjs.evtTools.tween.TimeSource,
+      interpolation: gdjs.evtTools.tween.Interpolation
     ) {
       const owner = this.owner;
       if (!isScalable(owner)) return;
@@ -858,8 +825,8 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
-      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+      timeSource: gdjs.evtTools.tween.TimeSource,
+      interpolation: gdjs.evtTools.tween.Interpolation
     ) {
       const owner = this.owner;
       if (!isScalable(owner)) return;
@@ -942,7 +909,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       const owner = this.owner;
       if (!isOpaque(owner)) return;
@@ -956,6 +923,119 @@ namespace gdjs {
         owner.getOpacity(),
         toOpacity,
         (value: float) => owner.setOpacity(value),
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
+     * Tween a numeric object effect property.
+     * @param effectBehavior Only used by events can be set to null
+     * @param identifier Unique id to identify the tween
+     * @param toValue The targeted value
+     * @param effectName Effect name
+     * @param propertyName Property name
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addNumberEffectPropertyTween(
+      effectBehavior: any,
+      identifier: string,
+      toValue: float,
+      effectName: string,
+      propertyName: string,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      const effect = this.owner.getRendererEffects()[effectName];
+      if (!effect) {
+        logger.error(
+          `The object "${this.owner.name}" doesn't have any effect called "${effectName}"`
+        );
+      }
+      this._tweens.addSimpleTween(
+        identifier,
+        this.owner,
+        duration,
+        easing,
+        linearInterpolation,
+        effect ? effect.getDoubleParameter(propertyName) : 0,
+        toValue,
+        (value: float) => {
+          if (effect) {
+            effect.updateDoubleParameter(propertyName, value);
+          }
+        },
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
+     * Tween a color object effect property.
+     * @param effectBehavior Only used by events can be set to null
+     * @param identifier Unique id to identify the tween
+     * @param toColorStr The target RGB color (format "128;200;255" with values between 0 and 255 for red, green and blue)
+     * @param effectName Effect name
+     * @param propertyName Property name
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addColorEffectPropertyTween(
+      effectBehavior: any,
+      identifier: string,
+      toColorStr: string,
+      effectName: string,
+      propertyName: string,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      const effect = this.owner.getRendererEffects()[effectName];
+      if (!effect) {
+        logger.error(
+          `The object "${this.owner.name}" doesn't have any effect called "${effectName}"`
+        );
+      }
+      const rgbFromColor = gdjs.hexNumberToRGB(
+        effect ? effect.getColorParameter(propertyName) : 0
+      );
+      const rgbToColor: float[] = gdjs.rgbOrHexToRGBColor(toColorStr);
+
+      this._tweens.addMultiTween(
+        identifier,
+        this.owner,
+        duration,
+        easing,
+        linearInterpolation,
+        gdjs.evtTools.tween.rgbToHsl(
+          rgbFromColor.r,
+          rgbFromColor.g,
+          rgbFromColor.b
+        ),
+        gdjs.evtTools.tween.rgbToHsl(
+          rgbToColor[0],
+          rgbToColor[1],
+          rgbToColor[2]
+        ),
+        ([hue, saturation, lightness]) => {
+          if (effect) {
+            const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+              hue,
+              saturation,
+              lightness
+            );
+            effect.updateColorParameter(
+              propertyName,
+              gdjs.rgbToHexNumber(
+                rgbFromHslColor[0],
+                rgbFromHslColor[1],
+                rgbFromHslColor[2]
+              )
+            );
+          }
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1024,7 +1104,7 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean,
       useHSLColorTransition: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       const owner = this.owner;
       if (!isColorable(owner)) {
@@ -1038,14 +1118,22 @@ namespace gdjs {
       let targetedValue;
       let setValue;
       if (useHSLColorTransition) {
-        initialValue = rgbToHsl(
+        initialValue = gdjs.evtTools.tween.rgbToHsl(
           rgbFromColor[0],
           rgbFromColor[1],
           rgbFromColor[2]
         );
-        targetedValue = rgbToHsl(rgbToColor[0], rgbToColor[1], rgbToColor[2]);
+        targetedValue = gdjs.evtTools.tween.rgbToHsl(
+          rgbToColor[0],
+          rgbToColor[1],
+          rgbToColor[2]
+        );
         setValue = ([hue, saturation, lightness]) => {
-          const rgbFromHslColor = hslToRgb(hue, saturation, lightness);
+          const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+            hue,
+            saturation,
+            lightness
+          );
           owner.setColor(
             Math.floor(rgbFromHslColor[0]) +
               ';' +
@@ -1155,14 +1243,14 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       if (!isColorable(this.owner)) return;
       const owner = this.owner;
 
       const rgbFromColor: string[] = owner.getColor().split(';');
       if (rgbFromColor.length < 3) return;
-      const hslFromColor = rgbToHsl(
+      const hslFromColor = gdjs.evtTools.tween.rgbToHsl(
         parseFloat(rgbFromColor[0]),
         parseFloat(rgbFromColor[1]),
         parseFloat(rgbFromColor[2])
@@ -1188,7 +1276,11 @@ namespace gdjs {
         hslFromColor,
         [toH, toS, toL],
         ([hue, saturation, lightness]) => {
-          const rgbFromHslColor = hslToRgb(hue, saturation, lightness);
+          const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+            hue,
+            saturation,
+            lightness
+          );
 
           owner.setColor(
             Math.floor(rgbFromHslColor[0]) +
@@ -1262,8 +1354,8 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
-      interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+      timeSource: gdjs.evtTools.tween.TimeSource,
+      interpolation: gdjs.evtTools.tween.Interpolation
     ) {
       const owner = this.owner;
       if (!isCharacterScalable(owner)) return;
@@ -1338,7 +1430,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       this._tweens.addSimpleTween(
         identifier,
@@ -1410,7 +1502,7 @@ namespace gdjs {
       easing: string,
       duration: float,
       destroyObjectWhenFinished: boolean,
-      timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+      timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       this._tweens.addSimpleTween(
         identifier,
@@ -1551,443 +1643,4 @@ namespace gdjs {
     }
   }
   gdjs.registerBehavior('Tween::TweenBehavior', gdjs.TweenRuntimeBehavior);
-
-  export namespace TweenRuntimeBehavior {
-    const easingFunctions = gdjs.evtTools.tween.easingFunctions;
-
-    /**
-     * A tween manager that is used for layout tweens or object tweens.
-     * @ignore
-     */
-    export class TweenManager {
-      /**
-       * All the tweens of a layout or a behavior.
-       */
-      private _tweens = new Map<string, TweenRuntimeBehavior.TweenInstance>();
-      /**
-       * Allow fast iteration on tween that are active.
-       */
-      private _activeTweens = new Array<TweenRuntimeBehavior.TweenInstance>();
-
-      constructor() {}
-
-      /**
-       * Make all active tween step toward the end.
-       * @param timeDelta the duration from the previous step in seconds
-       * @param layoutTimeDelta the duration from the previous step ignoring layer time scale in seconds
-       */
-      step(): void {
-        let writeIndex = 0;
-        for (
-          let readIndex = 0;
-          readIndex < this._activeTweens.length;
-          readIndex++
-        ) {
-          const tween = this._activeTweens[readIndex];
-
-          tween.step();
-          if (!tween.hasFinished()) {
-            this._activeTweens[writeIndex] = tween;
-            writeIndex++;
-          }
-        }
-        this._activeTweens.length = writeIndex;
-      }
-
-      /**
-       * Add a tween on one value.
-       */
-      addSimpleTween(
-        identifier: string,
-        timeSource: TimeSource,
-        totalDuration: number,
-        easingIdentifier: string,
-        interpolate: Interpolation,
-        initialValue: float,
-        targetedValue: float,
-        setValue: (value: float) => void,
-        onFinish?: (() => void) | null
-      ): void {
-        const easing = easingFunctions[easingIdentifier];
-        if (!easing) return;
-
-        // Remove any prior tween
-        this.removeTween(identifier);
-
-        // Initialize the tween instance
-        const tween = new TweenRuntimeBehavior.SimpleTweenInstance(
-          timeSource,
-          totalDuration,
-          easing,
-          interpolate,
-          initialValue,
-          targetedValue,
-          setValue,
-          onFinish
-        );
-        this._tweens.set(identifier, tween);
-        this._addActiveTween(tween);
-      }
-
-      /**
-       * Add a tween on several values.
-       */
-      addMultiTween(
-        identifier: string,
-        timeSource: TimeSource,
-        totalDuration: number,
-        easingIdentifier: string,
-        interpolate: Interpolation,
-        initialValue: Array<float>,
-        targetedValue: Array<float>,
-        setValue: (value: Array<float>) => void,
-        onFinish?: (() => void) | null
-      ): void {
-        const easing = easingFunctions[easingIdentifier];
-        if (!easing) return;
-
-        // Remove any prior tween
-        this.removeTween(identifier);
-
-        // Initialize the tween instance
-        const tween = new TweenRuntimeBehavior.MultiTweenInstance(
-          timeSource,
-          totalDuration,
-          easing,
-          interpolate,
-          initialValue,
-          targetedValue,
-          setValue,
-          onFinish
-        );
-        this._tweens.set(identifier, tween);
-        this._addActiveTween(tween);
-      }
-
-      /**
-       * Tween exists.
-       * @param identifier Unique id to identify the tween
-       * @returns The tween exists
-       */
-      exists(identifier: string): boolean {
-        return this._tweens.has(identifier);
-      }
-
-      /**
-       * Tween is playing.
-       * @param identifier Unique id to identify the tween
-       */
-      isPlaying(identifier: string): boolean {
-        const tween = this._tweens.get(identifier);
-        return !!tween && tween.isPlaying();
-      }
-
-      /**
-       * Tween has finished.
-       * @param identifier Unique id to identify the tween
-       */
-      hasFinished(identifier: string): boolean {
-        const tween = this._tweens.get(identifier);
-        return !!tween && tween.hasFinished();
-      }
-
-      /**
-       * Pause a tween.
-       * @param identifier Unique id to identify the tween
-       */
-      pauseTween(identifier: string) {
-        const tween = this._tweens.get(identifier);
-        if (!tween || !tween.isPlaying() || tween.hasFinished()) {
-          return;
-        }
-        this._removeActiveTween(tween);
-        tween.pause();
-      }
-
-      /**
-       * Resume a tween.
-       * @param identifier Unique id to identify the tween
-       */
-      resumeTween(identifier: string) {
-        const tween = this._tweens.get(identifier);
-        if (!tween || tween.isPlaying() || tween.hasFinished()) {
-          return;
-        }
-        this._addActiveTween(tween);
-        tween.resume();
-      }
-
-      /**
-       * Stop a tween.
-       * @param identifier Unique id to identify the tween
-       * @param jumpToDest Move to destination
-       */
-      stopTween(identifier: string, jumpToDest: boolean) {
-        const tween = this._tweens.get(identifier);
-        if (!tween || tween.hasFinished()) {
-          return;
-        }
-        if (tween.isPlaying()) {
-          this._removeActiveTween(tween);
-        }
-        tween.stop(jumpToDest);
-      }
-
-      /**
-       * Remove a tween.
-       * @param identifier Unique id to identify the tween
-       */
-      removeTween(identifier: string) {
-        const tween = this._tweens.get(identifier);
-        if (!tween) {
-          return;
-        }
-        if (tween.isPlaying()) {
-          this._removeActiveTween(tween);
-        }
-        this._tweens.delete(identifier);
-      }
-
-      _addActiveTween(tween: TweenInstance): void {
-        this._activeTweens.push(tween);
-      }
-
-      _removeActiveTween(tween: TweenInstance): void {
-        const index = this._activeTweens.findIndex(
-          (activeTween) => activeTween === tween
-        );
-        this._activeTweens.splice(index, 1);
-      }
-
-      /**
-       * Get tween progress.
-       * @param identifier Unique id to identify the tween
-       * @returns Progress of playing tween animation (between 0.0 and 1.0)
-       */
-      getProgress(identifier: string): float {
-        const tween = this._tweens.get(identifier);
-        if (!tween) {
-          return 0;
-        }
-        return tween.getProgress();
-      }
-
-      /**
-       * Get tween value.
-       *
-       * It returns 0 for tweens with several values.
-       *
-       * @param identifier Unique id to identify the tween
-       * @returns Value of playing tween animation
-       */
-      getValue(identifier: string): float {
-        const tween = this._tweens.get(identifier);
-        if (!tween) {
-          return 0;
-        }
-        return tween.getValue();
-      }
-    }
-
-    export interface TimeSource {
-      getElapsedTime(): float;
-    }
-
-    /**
-     * An interpolation function.
-     * @ignore
-     */
-    export type Interpolation = (
-      from: float,
-      to: float,
-      progress: float
-    ) => float;
-
-    const noEffect = () => {};
-
-    /**
-     * A tween.
-     * @ignore
-     */
-    export interface TweenInstance {
-      /**
-       * Step toward the end.
-       * @param timeDelta the duration from the previous step in seconds
-       * @param layoutTimeDelta the duration from the previous step ignoring layer time scale in seconds
-       */
-      step(): void;
-      isPlaying(): boolean;
-      hasFinished(): boolean;
-      stop(jumpToDest: boolean): void;
-      resume(): void;
-      pause(): void;
-      getProgress(): float;
-      getValue(): float;
-    }
-
-    /**
-     * A tween.
-     * @ignore
-     */
-    export abstract class AbstractTweenInstance implements TweenInstance {
-      protected elapsedTime: float;
-      protected totalDuration: float;
-      protected easing: (progress: float) => float;
-      protected interpolate: Interpolation;
-      protected onFinish: () => void;
-      protected timeSource: TimeSource;
-      protected isPaused = false;
-
-      constructor(
-        timeSource: TimeSource,
-        totalDuration: float,
-        easing: (progress: float) => float,
-        interpolate: Interpolation,
-        onFinish?: (() => void) | null
-      ) {
-        this.timeSource = timeSource;
-        this.totalDuration = totalDuration;
-        this.easing = easing;
-        this.interpolate = interpolate;
-        this.elapsedTime = 0;
-        this.onFinish = onFinish || noEffect;
-      }
-
-      step(): void {
-        if (!this.isPlaying()) {
-          return;
-        }
-        this.elapsedTime = Math.min(
-          this.elapsedTime + this.timeSource.getElapsedTime() / 1000,
-          this.totalDuration
-        );
-        this._updateValue();
-      }
-
-      protected abstract _updateValue(): void;
-      abstract getValue(): float;
-
-      isPlaying(): boolean {
-        return !this.isPaused && !this.hasFinished();
-      }
-
-      hasFinished(): boolean {
-        return this.elapsedTime === this.totalDuration;
-      }
-
-      stop(jumpToDest: boolean): void {
-        this.elapsedTime = this.totalDuration;
-        if (jumpToDest) {
-          this._updateValue();
-        }
-      }
-
-      resume(): void {
-        this.isPaused = false;
-      }
-
-      pause(): void {
-        this.isPaused = true;
-      }
-
-      getProgress(): float {
-        return this.elapsedTime / this.totalDuration;
-      }
-    }
-
-    /**
-     * A tween with only one value.
-     * @ignore
-     */
-    export class SimpleTweenInstance extends AbstractTweenInstance {
-      initialValue: float;
-      targetedValue: float;
-      setValue: (value: float) => void;
-      currentValue: float;
-
-      constructor(
-        timeSource: TimeSource,
-        totalDuration: float,
-        easing: (progress: float) => float,
-        interpolate: Interpolation,
-        initialValue: float,
-        targetedValue: float,
-        setValue: (value: float) => void,
-        onFinish?: (() => void) | null
-      ) {
-        super(timeSource, totalDuration, easing, interpolate, onFinish);
-        this.initialValue = initialValue;
-        this.currentValue = initialValue;
-        this.targetedValue = targetedValue;
-        this.setValue = setValue;
-      }
-
-      protected _updateValue() {
-        const easedProgress = this.easing(this.getProgress());
-        const value = this.interpolate(
-          this.initialValue,
-          this.targetedValue,
-          easedProgress
-        );
-        this.currentValue = value;
-        this.setValue(value);
-        if (this.hasFinished()) {
-          this.onFinish();
-        }
-      }
-
-      getValue(): float {
-        return this.currentValue;
-      }
-    }
-
-    /**
-     * A tween with multiple values.
-     * @ignore
-     */
-    export class MultiTweenInstance extends AbstractTweenInstance {
-      initialValue: Array<float>;
-      targetedValue: Array<float>;
-      setValue: (value: Array<float>) => void;
-
-      currentValues = new Array<float>();
-
-      constructor(
-        timeSource: TimeSource,
-        totalDuration: float,
-        easing: (progress: float) => float,
-        interpolate: Interpolation,
-        initialValue: Array<float>,
-        targetedValue: Array<float>,
-        setValue: (value: Array<float>) => void,
-        onFinish?: (() => void) | null
-      ) {
-        super(timeSource, totalDuration, easing, interpolate, onFinish);
-        this.initialValue = initialValue;
-        this.targetedValue = targetedValue;
-        this.setValue = setValue;
-      }
-
-      protected _updateValue() {
-        const easedProgress = this.easing(this.getProgress());
-        const length = this.initialValue.length;
-        this.currentValues.length = length;
-        for (let index = 0; index < length; index++) {
-          this.currentValues[index] = this.interpolate(
-            this.initialValue[index],
-            this.targetedValue[index],
-            easedProgress
-          );
-        }
-        this.setValue(this.currentValues);
-        if (this.hasFinished()) {
-          this.onFinish();
-        }
-      }
-
-      getValue(): float {
-        return 0;
-      }
-    }
-  }
 }

@@ -12,7 +12,13 @@ type Props = BehaviorEditorProps;
 
 export default class BehaviorPropertiesEditor extends React.Component<Props> {
   render() {
-    const { behavior, object, onBehaviorUpdated } = this.props;
+    const {
+      project,
+      behavior,
+      object,
+      onBehaviorUpdated,
+      resourceManagementProps,
+    } = this.props;
 
     const propertiesSchema = propertiesMapToSchema(
       behavior.getProperties(),
@@ -27,9 +33,11 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
       <Column expand>
         {propertiesSchema.length ? (
           <PropertiesEditor
+            project={project}
             schema={propertiesSchema}
             instances={[behavior]}
             onInstancesModified={onBehaviorUpdated}
+            resourceManagementProps={resourceManagementProps}
           />
         ) : (
           <EmptyMessage>

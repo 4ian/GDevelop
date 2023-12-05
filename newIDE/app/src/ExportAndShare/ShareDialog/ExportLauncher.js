@@ -35,6 +35,7 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_WEB_EXPORT,
 } from '../../Utils/GDevelopServices/Badge';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 type State = {|
   exportStep: BuildStep,
@@ -169,8 +170,11 @@ export default class ExportLauncher extends Component<Props, State> {
       try {
         // Try to fetch the game to see if it's registered but do not do anything with it.
         await getGame(getAuthorizationHeader, userId, gameId);
-      } catch (err) {
-        if (err.response.status === 404) {
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.code === 404) {
           // If the game is not registered, register it before launching the export.
           const authorName =
             this.props.project.getAuthor() || 'Unspecified publisher';

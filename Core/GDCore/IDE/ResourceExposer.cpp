@@ -24,6 +24,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 
 namespace gd {
 
@@ -32,10 +33,9 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
   // traverse the whole project (this time for events) and ExposeProjectEffects
   // (this time for effects).
 
-  gd::ResourcesManager* resourcesManager = &(project.GetResourcesManager());
-
   // Expose any project resources as files.
-  worker.ExposeResources(resourcesManager);
+  worker.ExposeResources();
+
   project.GetPlatformSpecificAssets().ExposeResources(worker);
 
   // Expose event resources
@@ -73,6 +73,49 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
     worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
 }
 
+void ResourceExposer::ExposeProjectResources(gd::Project& project, gd::ArbitraryResourceWorker& worker) {
+  // Expose global objects configuration resources
+  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
+  objectWorker.Launch(project);
+}
+
+void ResourceExposer::ExposeLayoutResources(
+    gd::Project &project, gd::Layout &layout,
+    gd::ArbitraryResourceWorker &worker) {
+
+  // Expose object configuration resources
+  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
+  gd::ProjectBrowserHelper::ExposeLayoutObjects(layout, objectWorker);
+
+  // Expose layer effect resources
+  for (std::size_t layerIndex = 0; layerIndex < layout.GetLayersCount();
+       layerIndex++) {
+    auto &layer = layout.GetLayer(layerIndex);
+
+    auto &effects = layer.GetEffects();
+    for (size_t effectIndex = 0; effectIndex < effects.GetEffectsCount();
+         effectIndex++) {
+      auto &effect = effects.GetEffect(effectIndex);
+      gd::ResourceExposer::ExposeEffectResources(project.GetCurrentPlatform(),
+                                                 effect, worker);
+    }
+  }
+
+  // Expose event resources
+  auto eventWorker = gd::GetResourceWorkerOnEvents(project, worker);
+  gd::ProjectBrowserHelper::ExposeLayoutEventsAndDependencies(project, layout,
+                                                              eventWorker);
+
+  // Exposed extension event resources
+  // Note that using resources in extensions is very unlikely and probably not
+  // worth the effort of something smart.
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(project, eventsFunctionsExtension, eventWorker);
+  }
+}
+
 void ResourceExposer::ExposeEffectResources(
     gd::Platform &platform, gd::Effect &effect,
     gd::ArbitraryResourceWorker &worker) {
@@ -88,11 +131,13 @@ void ResourceExposer::ExposeEffectResources(
       auto &resourceType = propertyDescriptor.GetExtraInfo()[0];
 
       const gd::String &resourceName = effect.GetStringParameter(propertyName);
-      gd::String potentiallyUpdatedResourceName = resourceName;
-      worker.ExposeResourceWithType(resourceType,
-                                    potentiallyUpdatedResourceName);
-      if (potentiallyUpdatedResourceName != resourceName) {
-        effect.SetStringParameter(propertyName, potentiallyUpdatedResourceName);
+      if (!resourceName.empty()) {
+        gd::String potentiallyUpdatedResourceName = resourceName;
+        worker.ExposeResourceWithType(resourceType,
+                                      potentiallyUpdatedResourceName);
+        if (potentiallyUpdatedResourceName != resourceName) {
+          effect.SetStringParameter(propertyName, potentiallyUpdatedResourceName);
+        }
       }
     }
   }

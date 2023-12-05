@@ -195,8 +195,8 @@ namespace gdjs {
 
       export const linkObjects = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
-        objA: gdjs.RuntimeObject,
-        objB: gdjs.RuntimeObject
+        objA: gdjs.RuntimeObject | null,
+        objB: gdjs.RuntimeObject | null
       ) {
         if (objA === null || objB === null) {
           return;
@@ -206,8 +206,8 @@ namespace gdjs {
 
       export const removeLinkBetween = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
-        objA: gdjs.RuntimeObject,
-        objB: gdjs.RuntimeObject
+        objA: gdjs.RuntimeObject | null,
+        objB: gdjs.RuntimeObject | null
       ) {
         if (objA === null || objB === null) {
           return;
@@ -231,7 +231,7 @@ namespace gdjs {
       export const pickObjectsLinkedTo = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
-        obj: gdjs.RuntimeObject,
+        obj: gdjs.RuntimeObject | null,
         eventsFunctionContext: EventsFunctionContext | undefined
       ) {
         if (obj === null) {

@@ -7,13 +7,9 @@ const { makeTestExtensions } = require('../TestUtils/TestExtensions');
 
 describe('libGD.js - GDJS project serialization tests', function () {
   let gd = null;
-
-  beforeAll((done) => {
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      makeTestExtensions(gd);
-      done();
-    });
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+    makeTestExtensions(gd);
   });
 
   it('should keep TextObject configuration after after a save and reload', function () {

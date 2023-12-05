@@ -27,6 +27,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
     behaviorsSharedData: [],
     objects: [],
     instances: [],
+    usedResources: [],
   });
 
   var object = new gdjs.TestRuntimeObject(runtimeScene, {

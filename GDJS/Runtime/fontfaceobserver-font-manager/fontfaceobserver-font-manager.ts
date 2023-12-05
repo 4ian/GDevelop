@@ -6,46 +6,29 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Font manager');
 
+  const resourceKinds: Array<ResourceKind> = ['font'];
+
   /**
    * FontFaceObserverFontManager loads fonts (using `FontFace` or `fontfaceobserver` library)
    * from the game resources (see `loadFonts`), and allow to access to
    * the font families of the loaded fonts during the game (see `getFontFamily`).
    */
-  export class FontFaceObserverFontManager {
-    _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: Map<string, ResourceData>;
+  export class FontFaceObserverFontManager implements gdjs.ResourceManager {
+    _resourceLoader: gdjs.ResourceLoader;
     // Associate font resource names to the loaded font family
-    _loadedFontFamily: { [key: string]: string } = {};
-    // Associate font resource names to the resources, for faster access
-    _loadedFonts: { [key: string]: ResourceData } = {};
-    _filenameToFontFamily: { [key: string]: string } = {};
+    _loadedFontFamily = new gdjs.ResourceCache<string>();
+    _loadedFontFamilySet = new Set<string>();
 
     /**
      * @param resources The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
      */
-    constructor(
-      resourceDataArray: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader
-    ) {
-      this._resources = new Map<string, ResourceData>();
-      this.setResources(resourceDataArray);
-      this._resourcesLoader = resourcesLoader;
+    constructor(resourceLoader: gdjs.ResourceLoader) {
+      this._resourceLoader = resourceLoader;
     }
 
-    // Cache the result of transforming a filename to a font family - useful to avoid duplicates.
-    /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     *
-     * @param resources The resources data of the game.
-     */
-    setResources(resourceDataArray: ResourceData[]): void {
-      this._resources.clear();
-      for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'font') {
-          this._resources.set(resourceData.name, resourceData);
-        }
-      }
+    getResourceKinds(): ResourceKind[] {
+      return resourceKinds;
     }
 
     /**
@@ -58,10 +41,7 @@ namespace gdjs {
      * or "Arial" if not loaded.
      */
     getFontFamily(resourceName: string): string {
-      if (this._loadedFontFamily[resourceName]) {
-        return this._loadedFontFamily[resourceName];
-      }
-      return 'Arial';
+      return this._loadedFontFamily.getFromName(resourceName) || 'Arial';
     }
 
     /**
@@ -76,10 +56,8 @@ namespace gdjs {
      * @returns The file of the font resource.
      */
     getFontFile(resourceName: string): string {
-      if (this._loadedFonts[resourceName]) {
-        return this._loadedFonts[resourceName].file || '';
-      }
-      return resourceName;
+      const resource = this._resourceLoader.getResource(resourceName);
+      return resource ? resource.file || '' : resourceName;
     }
 
     /**
@@ -92,26 +70,20 @@ namespace gdjs {
      * @param filename The filename of the font.
      * @returns The font family to be used for this font resource.
      */
-    _getFontFamilyFromFilename(filename: string): string {
-      if (this._filenameToFontFamily[filename]) {
-        return this._filenameToFontFamily[filename];
-      }
-
+    _getFontFamilyFromFilename(resource: ResourceData): string {
       // Replaces all non-alphanumeric characters with dashes to ensure no issues when
       // referring to this font family (see https://github.com/4ian/GDevelop/issues/1521).
       let baseSlugifiedName =
-        'gdjs_font_' + filename.toLowerCase().replace(/[^\w]/gi, '-');
+        'gdjs_font_' + resource.file.toLowerCase().replace(/[^\w]/gi, '-');
 
       // Ensure the generated font family is unique.
       const slugifiedName = baseSlugifiedName;
       let uniqueSuffix = 2;
-      while (!!this._filenameToFontFamily[baseSlugifiedName]) {
+      while (this._loadedFontFamilySet.has(baseSlugifiedName)) {
         baseSlugifiedName = baseSlugifiedName + '-' + uniqueSuffix;
         uniqueSuffix++;
       }
-
-      // Cache the result to avoid collision with a similar slugified name for another filename.
-      return (this._filenameToFontFamily[filename] = slugifiedName);
+      return slugifiedName;
     }
 
     /**
@@ -131,8 +103,8 @@ namespace gdjs {
       // @ts-ignore
       if (typeof FontFace !== 'undefined') {
         // Load the given font using CSS Font Loading API.
-        return fetch(this._resourcesLoader.getFullUrl(src), {
-          credentials: this._resourcesLoader.checkIfCredentialsRequired(src)
+        return fetch(this._resourceLoader.getFullUrl(src), {
+          credentials: this._resourceLoader.checkIfCredentialsRequired(src)
             ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
               // i.e: its gdevelop.io cookie, to be passed.
               'include'
@@ -184,59 +156,46 @@ namespace gdjs {
       }
     }
 
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because fonts are light enough to be parsed in background.
+    }
+
     /**
      * Load the specified resources, so that fonts are loaded and can then be
      * used by using the font family returned by getFontFamily.
      * @param onProgress Callback called each time a new file is loaded.
      */
-    async loadFonts(
-      onProgress: (loadedCount: integer, totalCount: integer) => void
-    ): Promise<integer> {
-      // Construct the list of files to be loaded.
-      // For one loaded file, it can have one or more resources
-      // that use it.
-      const filesResources: { [key: string]: ResourceData[] } = {};
-      for (const res of this._resources.values()) {
-        if (res.file) {
-          if (!!this._loadedFonts[res.name]) {
-            continue;
-          }
-          filesResources[res.file] = filesResources[res.file]
-            ? filesResources[res.file].concat(res)
-            : [res];
-        }
-      }
-      const totalCount = Object.keys(filesResources).length;
-      if (totalCount === 0) {
-        return 0;
+    async loadResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn('Unable to find font for resource "' + resourceName + '".');
+        return;
       }
 
-      let loadingCount = 0;
-      await Promise.all(
-        Object.keys(filesResources).map(async (file) => {
-          const fontFamily = this._getFontFamilyFromFilename(file);
-          const fontResources = filesResources[file];
-          try {
-            await this._loadFont(fontFamily, file);
-          } catch (error) {
-            logger.error(
-              'Error loading font resource "' +
-                fontResources[0].name +
-                '" (file: ' +
-                file +
-                '): ' +
-                (error.message || 'Unknown error')
-            );
-          }
-          fontResources.forEach((resource) => {
-            this._loadedFontFamily[resource.name] = fontFamily;
-            this._loadedFonts[resource.name] = resource;
-          });
-          loadingCount++;
-          onProgress(loadingCount, totalCount);
-        })
-      );
-      return totalCount;
+      if (this._loadedFontFamily.get(resource)) {
+        return;
+      }
+      const file = resource.file;
+      if (!file) {
+        return;
+      }
+
+      const fontFamily = this._getFontFamilyFromFilename(resource);
+      // Cache the result to avoid collision with a similar slugified name for another filename.
+      this._loadedFontFamily.set(resource, fontFamily);
+      this._loadedFontFamilySet.add(fontFamily);
+      try {
+        await this._loadFont(fontFamily, file);
+      } catch (error) {
+        logger.error(
+          'Error loading font resource "' +
+            resource.name +
+            '" (file: ' +
+            file +
+            '): ' +
+            (error.message || 'Unknown error')
+        );
+      }
     }
   }
 

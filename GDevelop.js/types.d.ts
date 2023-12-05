@@ -28,10 +28,12 @@ enum Variable_Type {
 
 enum ExpressionCompletionDescription_CompletionKind {
   Object = 0,
-  Behavior = 1,
-  Expression = 2,
+  BehaviorWithPrefix = 1,
+  ExpressionWithPrefix = 2,
   Variable = 3,
-  Text = 4,
+  TextWithPrefix = 4,
+  Property = 5,
+  Parameter = 6,
 }
 
 enum EventsFunction_FunctionType {
@@ -40,6 +42,12 @@ enum EventsFunction_FunctionType {
   Expression = 2,
   ExpressionAndCondition = 3,
   ActionWithOperator = 4,
+}
+
+enum EventsFunctionsContainer_FunctionOwner {
+  Extension = 0,
+  Behavior = 1,
+  Object = 2,
 }
 
 enum ParticleEmitterObject_RendererType {
@@ -76,6 +84,11 @@ export class VectorInt extends EmscriptenObject {
 export class VectorVariable extends EmscriptenObject {
   size(): number;
   at(index: number): Variable;
+}
+
+export class VectorObjectFolderOrObject extends EmscriptenObject {
+  size(): number;
+  at(index: number): ObjectFolderOrObject;
 }
 
 export class MapStringString extends EmscriptenObject {
@@ -249,6 +262,8 @@ export class Variable extends EmscriptenObject {
   insertChild(name: string, variable: Variable): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+  resetPersistentUuid(): Variable;
+  clearPersistentUuid(): Variable;
 }
 
 export class VariablesContainer extends EmscriptenObject {
@@ -269,6 +284,13 @@ export class VariablesContainer extends EmscriptenObject {
   removeRecursively(variableToRemove: Variable): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+  resetPersistentUuid(): VariablesContainer;
+  clearPersistentUuid(): VariablesContainer;
+}
+
+export class VariablesContainersList extends EmscriptenObject {
+  static makeNewVariablesContainersListForProjectAndLayout(project: Project, layout: Layout): VariablesContainersList;
+  static makeNewEmptyVariablesContainersList(): VariablesContainersList;
 }
 
 export class ObjectGroup extends EmscriptenObject {
@@ -355,19 +377,42 @@ export class Watermark extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
+export class ObjectFolderOrObject extends EmscriptenObject {
+  constructor(): void;
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getObject(): gdObject;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasObjectNamed(name: string): boolean;
+  getObjectNamed(name: string): ObjectFolderOrObject;
+  getChildrenCount(): number;
+  getChildAt(pos: number): ObjectFolderOrObject;
+  getObjectChild(name: string): ObjectFolderOrObject;
+  getChildPosition(child: ObjectFolderOrObject): number;
+  getParent(): ObjectFolderOrObject;
+  insertNewFolder(name: string, newPosition: number): ObjectFolderOrObject;
+  moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: ObjectFolderOrObject, newParentFolder: ObjectFolderOrObject, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: ObjectFolderOrObject): void;
+  isADescendantOf(otherObjectFolderOrObject: ObjectFolderOrObject): boolean;
+}
+
 export class ObjectsContainer extends EmscriptenObject {
   constructor(): void;
   insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
   hasObjectNamed(name: string): boolean;
   getObject(name: string): gdObject;
   getObjectAt(pos: number): gdObject;
   getObjectPosition(name: string): number;
   removeObject(name: string): void;
-  swapObjects(first: number, second: number): void;
   moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
+  getRootFolder(): ObjectFolderOrObject;
+  getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
 }
 
@@ -473,25 +518,48 @@ export class Project extends EmscriptenObject {
   getEventsBasedObject(type: string): EventsBasedObject;
   getVariables(): VariablesContainer;
   getResourcesManager(): ResourcesManager;
-  exposeResources(worker: ArbitraryResourceWorker): void;
-  static validateName(name: string): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+  static isNameSafe(name: string): boolean;
+  static getSafeName(name: string): string;
   fREE_GetTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
   fREE_GetTypeOfObject(layout: Layout, name: string, searchInGroups: boolean): string;
   fREE_GetBehaviorsOfObject(layout: Layout, name: string, searchInGroups: boolean): VectorString;
+  fREE_IsDefaultBehavior(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
+  fREE_GetTypeOfBehaviorInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+  fREE_GetBehaviorNamesInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
   insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
   hasObjectNamed(name: string): boolean;
   getObject(name: string): gdObject;
   getObjectAt(pos: number): gdObject;
   getObjectPosition(name: string): number;
   removeObject(name: string): void;
-  swapObjects(first: number, second: number): void;
   moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
+  getRootFolder(): ObjectFolderOrObject;
+  getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
+}
+
+export class ObjectsContainersList extends EmscriptenObject {
+  static makeNewObjectsContainersListForProjectAndLayout(project: Project, layout: Layout): ObjectsContainersList;
+  static makeNewObjectsContainersListForContainers(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): ObjectsContainersList;
+  getTypeOfObject(objectName: string): string;
+  getTypeOfBehavior(name: string, searchInGroups: boolean): string;
+  getBehaviorsOfObject(name: string, searchInGroups: boolean): VectorString;
+  getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+}
+
+export class ProjectScopedContainers extends EmscriptenObject {
+  static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
+  static makeNewProjectScopedContainersFor(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): ProjectScopedContainers;
+  addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
+  addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;
+  getObjectsContainersList(): ObjectsContainersList;
+  getVariablesContainersList(): VariablesContainersList;
 }
 
 export class ExtensionProperties extends EmscriptenObject {
@@ -514,6 +582,9 @@ export class Behavior extends EmscriptenObject {
   initializeContent(): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  isDefaultBehavior(): boolean;
 }
 
 export class BehaviorJsImplementation extends EmscriptenObject {
@@ -567,8 +638,6 @@ export class gdObject extends EmscriptenObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
-  setTags(tags: string): void;
-  getTags(): string;
   is3DObject(): boolean;
   getConfiguration(): ObjectConfiguration;
   getVariables(): VariablesContainer;
@@ -581,6 +650,8 @@ export class gdObject extends EmscriptenObject {
   renameBehavior(oldName: string, name: string): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  resetPersistentUuid(): gdObject;
+  clearPersistentUuid(): gdObject;
 }
 
 export class UniquePtrObject extends EmscriptenObject {
@@ -644,16 +715,18 @@ export class Layout extends EmscriptenObject {
   setStopSoundsOnStartup(enable: boolean): void;
   stopSoundsOnStartup(): boolean;
   insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
   hasObjectNamed(name: string): boolean;
   getObject(name: string): gdObject;
   getObjectAt(pos: number): gdObject;
   getObjectPosition(name: string): number;
   removeObject(name: string): void;
-  swapObjects(first: number, second: number): void;
   moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
+  getRootFolder(): ObjectFolderOrObject;
+  getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
 }
 
@@ -968,6 +1041,7 @@ export class InitialInstancesContainer extends EmscriptenObject {
   someInstancesAreOnLayer(layer: string): boolean;
   renameInstancesOfObject(oldName: string, newName: string): void;
   removeInstance(inst: InitialInstance): void;
+  getLayerInstancesCount(layerName: string): number;
   insertNewInitialInstance(): InitialInstance;
   insertInitialInstance(inst: InitialInstance): InitialInstance;
   serializeTo(element: SerializerElement): void;
@@ -1148,8 +1222,6 @@ export class InstructionMetadata extends EmscriptenObject {
   setParameterExtraInfo(extraInfo: string): InstructionMetadata;
   useStandardOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
   useStandardRelationalOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
-  setRequiresBaseObjectCapability(capability: string): InstructionMetadata;
-  getRequiredBaseObjectCapability(): string;
   markAsSimple(): InstructionMetadata;
   markAsAdvanced(): InstructionMetadata;
   markAsComplex(): InstructionMetadata;
@@ -1194,8 +1266,6 @@ export class ExpressionMetadata extends EmscriptenObject {
   setDefaultValue(defaultValue: string): ExpressionMetadata;
   setParameterLongDescription(longDescription: string): ExpressionMetadata;
   setParameterExtraInfo(extraInfo: string): ExpressionMetadata;
-  setRequiresBaseObjectCapability(capability: string): ExpressionMetadata;
-  getRequiredBaseObjectCapability(): string;
   getCodeExtraInformation(): ExpressionMetadata;
   setFunctionName(functionName: string): ExpressionMetadata;
   getFunctionName(): string;
@@ -1299,6 +1369,7 @@ export class VectorParameterMetadata extends EmscriptenObject {
   at(index: number): ParameterMetadata;
   set(index: number, parameterMetadata: ParameterMetadata): void;
   fREE_removeFromVectorParameterMetadata(index: number): void;
+  fREE_insertIntoVectorParameterMetadata(index: number, parameterMetadata: ParameterMetadata): void;
   fREE_swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
   clear(): void;
 }
@@ -1336,11 +1407,13 @@ export class ObjectMetadata extends EmscriptenObject {
   getAllStrExpressions(): MapStringExpressionMetadata;
   setIncludeFile(includeFile: string): ObjectMetadata;
   addIncludeFile(includeFile: string): ObjectMetadata;
-  getUnsupportedBaseObjectCapabilities(): SetString;
-  addUnsupportedBaseObjectCapability(capability: string): ObjectMetadata;
-  isUnsupportedBaseObjectCapability(capability: string): boolean;
+  getDefaultBehaviors(): SetString;
+  hasDefaultBehavior(behaviorType: string): boolean;
+  addDefaultBehavior(behaviorType: string): ObjectMetadata;
   setHidden(): ObjectMetadata;
   isHidden(): boolean;
+  markAsRenderedIn3D(): ObjectMetadata;
+  isRenderedIn3D(): boolean;
 }
 
 export class BehaviorMetadata extends EmscriptenObject {
@@ -1372,8 +1445,11 @@ export class BehaviorMetadata extends EmscriptenObject {
   addRequiredFile(resourceFile: string): BehaviorMetadata;
   setObjectType(objectType: string): BehaviorMetadata;
   getObjectType(): string;
+  getRequiredBehaviorTypes(): VectorString;
   isPrivate(): boolean;
   setPrivate(): BehaviorMetadata;
+  isHidden(): boolean;
+  setHidden(): BehaviorMetadata;
   get(): Behavior;
   getSharedDataInstance(): BehaviorsSharedData;
 }
@@ -1413,6 +1489,8 @@ export class PlatformExtension extends EmscriptenObject {
   setCategory(category: string): PlatformExtension;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
+  getTags(): VectorString;
+  setTags(csvTags: string): PlatformExtension;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1462,6 +1540,7 @@ export class PlatformExtension extends EmscriptenObject {
   getAllProperties(): MapStringPropertyDescriptor;
   getAllDependencies(): VectorDependencyMetadata;
   static getNamespaceSeparator(): string;
+  static getBehaviorFullType(extensionName: string, behaviorName: string): string;
 }
 
 export class EventsList extends EmscriptenObject {
@@ -1718,8 +1797,8 @@ export class VectorEventsSearchResult extends EmscriptenObject {
 }
 
 export class EventsRefactorer extends EmscriptenObject {
-  static renameObjectInEvents(platform: Platform, project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, oldName: string, newName: string): void;
-  static removeObjectInEvents(platform: Platform, project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, name: string): void;
+  static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, oldName: string, newName: string): void;
+  static removeObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, name: string): void;
   static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
   static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
 }
@@ -1739,9 +1818,21 @@ export class VectorUnfilledRequiredBehaviorPropertyProblem extends EmscriptenObj
 
 export class ProjectBrowserHelper extends EmscriptenObject {
   static exposeProjectEvents(project: Project, worker: ArbitraryEventsWorker): void;
+  static exposeProjectObjects(project: Project, worker: ArbitraryObjectsWorker): void;
+}
+
+export class ResourceExposer extends EmscriptenObject {
+  static exposeWholeProjectResources(project: Project, worker: ArbitraryResourceWorker): void;
+}
+
+export class VariablesChangeset extends EmscriptenObject {
+  hasRemovedVariables(): boolean;
+  clearRemovedVariables(): VariablesChangeset;
 }
 
 export class WholeProjectRefactorer extends EmscriptenObject {
+  static computeChangesetForVariablesContainer(project: Project, oldSerializedVariablesContainer: SerializerElement, newVariablesContainer: VariablesContainer): VariablesChangeset;
+  static applyRefactoringForVariablesContainer(project: Project, newVariablesContainer: VariablesContainer, changeset: VariablesChangeset): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
   static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
@@ -1780,6 +1871,9 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static findInvalidRequiredBehaviorProperties(project: Project): VectorUnfilledRequiredBehaviorPropertyProblem;
   static getBehaviorsWithType(obj: gdObject, type: string): VectorString;
   static fixInvalidRequiredBehaviorProperties(project: Project): boolean;
+  static removeLayer(project: Project, layout: Layout, layerName: string): void;
+  static mergeLayers(project: Project, layout: Layout, originLayerName: string, targetLayerName: string): void;
+  static getLayoutAndExternalLayoutLayerInstancesCount(project: Project, layout: Layout, layerName: string): number;
 }
 
 export class PropertyFunctionGenerator extends EmscriptenObject {
@@ -1866,7 +1960,7 @@ export class VectorExpressionParserDiagnostic extends EmscriptenObject {
 }
 
 export class ExpressionValidator extends EmscriptenObject {
-  constructor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string): void;
+  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string): void;
   getAllErrors(): VectorExpressionParserDiagnostic;
   getFatalErrors(): VectorExpressionParserDiagnostic;
 }
@@ -1874,7 +1968,9 @@ export class ExpressionValidator extends EmscriptenObject {
 export class ExpressionCompletionDescription extends EmscriptenObject {
   getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
   getType(): string;
+  getVariableType(): Variable_Type;
   getPrefix(): string;
+  getCompletion(): string;
   getObjectName(): string;
   getBehaviorName(): string;
   isExact(): boolean;
@@ -1882,6 +1978,9 @@ export class ExpressionCompletionDescription extends EmscriptenObject {
   getReplacementStartPosition(): number;
   getReplacementEndPosition(): number;
   getParameterMetadata(): ParameterMetadata;
+  hasObjectConfiguration(): boolean;
+  getObjectConfiguration(): ObjectConfiguration;
+  toString(): string;
 }
 
 export class VectorExpressionCompletionDescription extends EmscriptenObject {
@@ -1890,7 +1989,7 @@ export class VectorExpressionCompletionDescription extends EmscriptenObject {
 }
 
 export class ExpressionCompletionFinder extends EmscriptenObject {
-  static getCompletionDescriptionsFor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
+  static getCompletionDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
   getCompletionDescriptions(): VectorExpressionCompletionDescription;
 }
 
@@ -1899,7 +1998,7 @@ export class ExpressionNodeLocationFinder extends EmscriptenObject {
 }
 
 export class ExpressionTypeFinder extends EmscriptenObject {
-  static getType(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string, node: ExpressionNode): string;
+  static getType(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode): string;
 }
 
 export class ExpressionNode extends EmscriptenObject {
@@ -1958,7 +2057,7 @@ export class EventsFunctionsContainer extends EmscriptenObject {
 
 export class AbstractEventsBasedEntity extends EmscriptenObject {
   getEventsFunctions(): EventsFunctionsContainer;
-  getPropertyDescriptors(): NamedPropertyDescriptorsList;
+  getPropertyDescriptors(): PropertiesContainer;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
@@ -1975,7 +2074,7 @@ export class EventsBasedBehavior extends EmscriptenObject {
   getObjectType(): string;
   setPrivate(isPrivate: boolean): EventsBasedBehavior;
   isPrivate(): boolean;
-  getSharedPropertyDescriptors(): NamedPropertyDescriptorsList;
+  getSharedPropertyDescriptors(): PropertiesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
@@ -2010,21 +2109,24 @@ export class EventsBasedObject extends EmscriptenObject {
   getFullName(): string;
   setDefaultName(defaultName: string): EventsBasedObject;
   getDefaultName(): string;
+  markAsRenderedIn3D(isRenderedIn3D: boolean): EventsBasedObject;
+  isRenderedIn3D(): boolean;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
   static getPropertyToggleActionName(propertyName: string): string;
   insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
   hasObjectNamed(name: string): boolean;
   getObject(name: string): gdObject;
   getObjectAt(pos: number): gdObject;
   getObjectPosition(name: string): number;
   removeObject(name: string): void;
-  swapObjects(first: number, second: number): void;
   moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  moveObjectFolderOrObjectToAnotherContainerInFolder(objectFolderOrObject: ObjectFolderOrObject, newObjectsContainer: ObjectsContainer, parentObjectFolderOrObject: ObjectFolderOrObject, newPosition: number): void;
   getObjectsCount(): number;
+  getRootFolder(): ObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
 }
 
@@ -2042,8 +2144,8 @@ export class EventsBasedObjectsList extends EmscriptenObject {
   at(index: number): EventsBasedObject;
 }
 
-export class NamedPropertyDescriptorsList extends EmscriptenObject {
-  constructor(): void;
+export class PropertiesContainer extends EmscriptenObject {
+  constructor(owner: EventsFunctionsContainer_FunctionOwner): void;
   insertNew(name: string, pos: number): NamedPropertyDescriptor;
   insert(item: NamedPropertyDescriptor, pos: number): NamedPropertyDescriptor;
   has(name: string): boolean;
@@ -2134,6 +2236,10 @@ export class ArbitraryEventsWorker extends EmscriptenObject {
   launch(events: EventsList): void;
 }
 
+export class ArbitraryObjectsWorker extends EmscriptenObject {
+  launch(container: ObjectsContainer): void;
+}
+
 export class EventsLeaderboardsLister extends EmscriptenObject {
   constructor(project: Project): void;
   getLeaderboardIds(): SetString;
@@ -2178,9 +2284,9 @@ export class EventsContext extends EmscriptenObject {
 }
 
 export class EventsContextAnalyzer extends EmscriptenObject {
-  constructor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
+  constructor(platform: Platform): void;
   getEventsContext(): EventsContext;
-  launch(events: EventsList): void;
+  launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
 }
 
 export class ArbitraryResourceWorker extends EmscriptenObject {
@@ -2188,28 +2294,34 @@ export class ArbitraryResourceWorker extends EmscriptenObject {
 }
 
 export class ArbitraryResourceWorkerJS extends EmscriptenObject {
-  constructor(): void;
+  constructor(resourcesManager: ResourcesManager): void;
   exposeImage(image: string): void;
   exposeShader(shader: string): void;
   exposeFile(file: string): void;
 }
 
 export class ResourcesMergingHelper extends EmscriptenObject {
-  constructor(fs: AbstractFileSystem): void;
+  constructor(resourcesManager: ResourcesManager, fs: AbstractFileSystem): void;
   setBaseDirectory(basePath: string): void;
   getAllResourcesOldAndNewFilename(): MapStringString;
 }
 
 export class ResourcesRenamer extends EmscriptenObject {
-  constructor(oldToNewNames: MapStringString): void;
+  constructor(resourcesManager: ResourcesManager, oldToNewNames: MapStringString): void;
 }
 
 export class ProjectResourcesCopier extends EmscriptenObject {
   static copyAllResourcesTo(project: Project, fs: AbstractFileSystem, destinationDirectory: string, updateOriginalProject: boolean, preserveAbsoluteFilenames: boolean, preserveDirectoryStructure: boolean): boolean;
 }
 
+export class ObjectsUsingResourceCollector extends EmscriptenObject {
+  constructor(resourcesManager: ResourcesManager, resourceName: string): void;
+  getObjectNames(): VectorString;
+  launch(container: ObjectsContainer): void;
+}
+
 export class ResourcesInUseHelper extends EmscriptenObject {
-  constructor(): void;
+  constructor(resourcesManager: ResourcesManager): void;
   getAllImages(): SetString;
   getAllAudios(): SetString;
   getAllFonts(): SetString;
@@ -2561,7 +2673,11 @@ export class MetadataDeclarationHelper extends EmscriptenObject {
   generateFreeFunctionMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction): AbstractFunctionMetadata;
   static generateBehaviorMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, behaviorMethodMangledNames: MapStringString): BehaviorMetadata;
   static generateObjectMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, objectMethodMangledNames: MapStringString): ObjectMetadata;
+  static getExtensionCodeNamespacePrefix(eventsFunctionsExtension: EventsFunctionsExtension): string;
   static getFreeFunctionCodeName(eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction): string;
+  static getFreeFunctionCodeNamespace(eventsFunction: EventsFunction, codeNamespacePrefix: string): string;
+  static getBehaviorFunctionCodeNamespace(eventsBasedBehavior: EventsBasedBehavior, codeNamespacePrefix: string): string;
+  static getObjectFunctionCodeNamespace(eventsBasedObject: EventsBasedObject, codeNamespacePrefix: string): string;
   static isBehaviorLifecycleEventsFunction(functionName: string): boolean;
   static isObjectLifecycleEventsFunction(functionName: string): boolean;
   static isExtensionLifecycleEventsFunction(functionName: string): boolean;

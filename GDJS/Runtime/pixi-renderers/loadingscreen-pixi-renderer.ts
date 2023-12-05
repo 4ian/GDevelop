@@ -6,7 +6,7 @@ namespace gdjs {
   }
 
   const fadeIn = (
-    object: PIXI.DisplayObject | null,
+    object: { alpha: number } | null,
     duration: float,
     deltaTimeInMs: float
   ) => {
@@ -25,6 +25,7 @@ namespace gdjs {
   class LoadingScreenPixiRenderer {
     _pixiRenderer: PIXI.Renderer | null;
     _loadingScreenData: LoadingScreenData;
+    _isFirstLayout: boolean;
 
     _loadingScreenContainer: PIXI.Container;
     _backgroundSprite: PIXI.Sprite | null = null;
@@ -40,9 +41,11 @@ namespace gdjs {
     constructor(
       runtimeGamePixiRenderer: gdjs.RuntimeGamePixiRenderer,
       imageManager: gdjs.PixiImageManager,
-      loadingScreenData: LoadingScreenData
+      loadingScreenData: LoadingScreenData,
+      isFirstScene: boolean
     ) {
       this._loadingScreenData = loadingScreenData;
+      this._isFirstLayout = isFirstScene;
       this._loadingScreenContainer = new PIXI.Container();
       this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
       if (!this._pixiRenderer) {
@@ -51,6 +54,7 @@ namespace gdjs {
         return;
       }
       this._pixiRenderer.background.color = this._loadingScreenData.backgroundColor;
+      this._pixiRenderer.background.alpha = 0;
 
       const backgroundTexture = imageManager.getOrLoadPIXITexture(
         loadingScreenData.backgroundImageResourceName
@@ -63,7 +67,7 @@ namespace gdjs {
         this._loadingScreenContainer.addChild(this._backgroundSprite);
       }
 
-      if (loadingScreenData.showGDevelopSplash) {
+      if (loadingScreenData.showGDevelopSplash && isFirstScene) {
         this._gdevelopLogoSprite = PIXI.Sprite.from(gdjs.gdevelopLogo);
         this._gdevelopLogoSprite.alpha = 0;
         this._gdevelopLogoSprite.anchor.x = 0.5;
@@ -137,6 +141,22 @@ namespace gdjs {
         requestAnimationFrame(() => this._render(performance.now()));
       }
 
+      this._renderIfNeeded(timeInMs);
+    }
+
+    renderIfNeeded(): boolean {
+      return this._renderIfNeeded(performance.now());
+    }
+
+    private _renderIfNeeded(timeInMs: float): boolean {
+      if (timeInMs - this._lastFrameTimeInMs < 1000 / 60) {
+        return false;
+      }
+
+      if (!this._pixiRenderer) {
+        return false;
+      }
+
       const deltaTimeInMs = this._lastFrameTimeInMs
         ? timeInMs - this._lastFrameTimeInMs
         : 0;
@@ -151,6 +171,15 @@ namespace gdjs {
       } else if (this._state == LoadingScreenState.STARTED) {
         const backgroundFadeInDuration = this._loadingScreenData
           .backgroundFadeInDuration;
+
+        this._pixiRenderer.clear();
+        if (!this._backgroundSprite) {
+          fadeIn(
+            this._pixiRenderer.background,
+            backgroundFadeInDuration,
+            deltaTimeInMs
+          );
+        }
         fadeIn(this._backgroundSprite, backgroundFadeInDuration, deltaTimeInMs);
 
         if (hasFadedIn(this._backgroundSprite)) {
@@ -223,15 +252,24 @@ namespace gdjs {
           );
           this._progressBarGraphics.endFill();
         }
+      } else if (this._state === LoadingScreenState.FINISHED) {
+        // Display a black screen to avoid a stretched image of the loading
+        // screen to appear.
+        this._pixiRenderer.background.color = 'black';
+        this._pixiRenderer.background.alpha = 1;
+        this._pixiRenderer.clear();
+        this._loadingScreenContainer.removeChildren();
       }
 
       this._pixiRenderer.render(this._loadingScreenContainer);
+      return true;
     }
 
     unload(): Promise<void> {
       const totalElapsedTime = (performance.now() - this._startTimeInMs) / 1000;
       const remainingTime =
-        this._loadingScreenData.minDuration - totalElapsedTime;
+        (this._isFirstLayout ? this._loadingScreenData.minDuration : 0) -
+        totalElapsedTime;
       this.setPercent(100);
 
       // Ensure we have shown the loading screen for at least minDuration.

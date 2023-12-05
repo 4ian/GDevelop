@@ -168,7 +168,7 @@ namespace gdjs {
        * @deprecated Use `JSON.stringify(variable.toJSObject())` instead.
        */
       export const objectVariableStructureToJSON = function (
-        object: gdjs.RuntimeObject,
+        object: gdjs.RuntimeObject | null,
         variable: gdjs.Variable
       ): string {
         return JSON.stringify(variable.toJSObject());
@@ -205,7 +205,7 @@ namespace gdjs {
        */
       export const jsonToObjectVariableStructure = function (
         jsonStr: string,
-        object: gdjs.RuntimeObject,
+        object: gdjs.RuntimeObject | null,
         variable: gdjs.Variable
       ) {
         variable.fromJSON(jsonStr);

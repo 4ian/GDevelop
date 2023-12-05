@@ -33,6 +33,7 @@ const defaultProps = {
     updatedAt: 12345,
     appLanguage: 'en',
     donateLink: 'https://www.gdevelop-app.com',
+    discordUsername: 'indie-user#1234',
     communityLinks: {
       personalWebsiteLink: 'https://indie-user.com',
       personalWebsite2Link: 'https://indie-user2.com',

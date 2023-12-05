@@ -1042,7 +1042,9 @@ namespace gdjs {
      */
     addEffect(effectData: EffectData): boolean {
       const rendererObject = this.getRendererObject();
-      if (!rendererObject) return false;
+      if (!rendererObject) {
+        return false;
+      }
 
       return this._runtimeScene
         .getGame()
@@ -1410,7 +1412,7 @@ namespace gdjs {
      * @param multiplier Set the force multiplier
      */
     addForceTowardObject(
-      object: gdjs.RuntimeObject,
+      object: gdjs.RuntimeObject | null,
       len: float,
       multiplier: integer
     ): void {
@@ -2276,10 +2278,12 @@ namespace gdjs {
      * @param angleInDegrees The angle between the object and the target, in degrees.
      */
     putAroundObject(
-      obj: gdjs.RuntimeObject,
+      obj: gdjs.RuntimeObject | null,
       distance: float,
       angleInDegrees: float
     ): void {
+      if (!obj) return;
+
       this.putAround(
         obj.getDrawableX() + obj.getCenterX(),
         obj.getDrawableY() + obj.getCenterY(),

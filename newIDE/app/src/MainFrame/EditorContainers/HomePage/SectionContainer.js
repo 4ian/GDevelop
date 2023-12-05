@@ -90,17 +90,17 @@ const SectionContainer = ({
     <Column useFullHeight noMargin expand>
       <Paper style={paperStyle} square background="dark">
         <Column noOverflowParent expand>
+          {backAction && (
+            <Line>
+              <TextButton
+                onClick={backAction}
+                icon={<ArrowLeft fontSize="small" />}
+                label={<Trans>Back</Trans>}
+              />
+            </Line>
+          )}
           {title && (
             <SectionRow>
-              {backAction && (
-                <Line>
-                  <TextButton
-                    onClick={backAction}
-                    icon={<ArrowLeft fontSize="small" />}
-                    label={<Trans>Back</Trans>}
-                  />
-                </Line>
-              )}
               <LineStackLayout
                 noMargin
                 alignItems="center"

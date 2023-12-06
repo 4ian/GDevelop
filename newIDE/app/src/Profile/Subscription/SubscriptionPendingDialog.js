@@ -37,7 +37,7 @@ export default function SubscriptionPendingDialog({
       authenticatedUser.subscription.planId === 'gdevelop_startup');
   useInterval(
     () => {
-      authenticatedUser.onRefreshUserProfile().catch(() => {
+      authenticatedUser.onRefreshSubscription().catch(() => {
         // Ignore any error, will be retried anyway.
       });
     },

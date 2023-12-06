@@ -27,7 +27,8 @@ namespace gdjs {
     );
   };
 
-  const maxConcurrency = 20;
+  const maxForegroundConcurrency = 20;
+  const maxBackgroundConcurrency = 5;
   const maxAttempt = 3;
 
   /**
@@ -132,6 +133,7 @@ namespace gdjs {
      * Only used by events.
      */
     private currentSceneLoadingProgress: float = 0;
+    private _isLoadingScreenShown = false;
 
     /**
      * @param runtimeGame The game.
@@ -217,13 +219,17 @@ namespace gdjs {
       }
     }
 
+    onLoadingScreenShown(isLoadingScreenShown: boolean) {
+      this._isLoadingScreenShown = isLoadingScreenShown;
+    }
+
     async loadAllResources(
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<void> {
       let loadedCount = 0;
       await promisePoolAndRetry(
         [...this._resources.values()],
-        maxConcurrency,
+        maxForegroundConcurrency,
         maxAttempt,
         async (resource) => {
           await this._loadResource(resource);
@@ -254,7 +260,7 @@ namespace gdjs {
       const resources = [...this._globalResources, ...sceneResources.values()];
       await promisePoolAndRetry(
         resources,
-        maxConcurrency,
+        maxForegroundConcurrency,
         maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
@@ -318,7 +324,9 @@ namespace gdjs {
       let loadedCount = 0;
       await promisePoolAndRetry(
         [...sceneResources.values()],
-        maxConcurrency,
+        this._isLoadingScreenShown
+          ? maxForegroundConcurrency
+          : maxBackgroundConcurrency,
         maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);

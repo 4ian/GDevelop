@@ -151,10 +151,13 @@ export const Default = () => {
     newVersions.splice(index, 1, { ...version, label });
     setVersions(newVersions);
   };
+
   const onLoadMore = async () => {
     await delay(1000);
     setVersions([...versions, ...nextVersions]);
   };
+
+  const canLoadMore = versions.every(version => version.previousVersion);
 
   projectServiceMock
     .onGet(`${GDevelopUserApi.baseUrl}/user-public-profile`)
@@ -170,6 +173,7 @@ export const Default = () => {
       versions={versions}
       onRenameVersion={onRenameVersion}
       onLoadMore={onLoadMore}
+      canLoadMore={canLoadMore}
     />
   );
 };

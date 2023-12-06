@@ -238,9 +238,15 @@ type Props = {|
     {| label: string |}
   ) => Promise<void>,
   onLoadMore: () => Promise<void>,
+  canLoadMore: boolean,
 |};
 
-const VersionHistory = ({ versions, onRenameVersion, onLoadMore }: Props) => {
+const VersionHistory = ({
+  versions,
+  onRenameVersion,
+  onLoadMore,
+  canLoadMore,
+}: Props) => {
   const [
     usersPublicProfileByIds,
     setUsersPublicProfileByIds,
@@ -331,7 +337,6 @@ const VersionHistory = ({ versions, onRenameVersion, onLoadMore }: Props) => {
   );
 
   if (!usersPublicProfileByIds) return null;
-  console.log(editedVersionId);
 
   return (
     <>
@@ -356,12 +361,16 @@ const VersionHistory = ({ versions, onRenameVersion, onLoadMore }: Props) => {
             })}
             <FlatButton
               primary
-              disabled={isLoadingMoreVersions}
+              disabled={isLoadingMoreVersions || !canLoadMore}
               label={
-                isLoadingMoreVersions ? (
-                  <Trans>Loading...</Trans>
+                canLoadMore ? (
+                  isLoadingMoreVersions ? (
+                    <Trans>Loading...</Trans>
+                  ) : (
+                    <Trans>Show older</Trans>
+                  )
                 ) : (
-                  <Trans>Show older</Trans>
+                  <Trans>All versions loaded</Trans>
                 )
               }
               onClick={loadMore}

@@ -574,8 +574,8 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
+  onRefreshSubscription: async () => {
+    console.info('This should refresh the subscription');
   },
   onRefreshLimits: async () => {
     console.info('This should refresh the limits');

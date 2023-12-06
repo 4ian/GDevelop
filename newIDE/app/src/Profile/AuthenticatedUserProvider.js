@@ -200,7 +200,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
         },
-        onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
+        onRefreshSubscription: this._fetchUserSubscriptionLimitsAndUsages,
         onRefreshLimits: this._fetchUserLimits,
         onPurchaseSuccessful: this._fetchUserPurchases,
         onSendEmailVerification: this._doSendEmailVerification,

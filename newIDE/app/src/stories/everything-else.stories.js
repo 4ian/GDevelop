@@ -37,14 +37,7 @@ import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
-import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import {
-  subscriptionForIndieUser,
-  silverSubscriptionWithRedemptionCode,
-  silverSubscriptionWithExpiredRedemptionCode,
-  limitsForSilverUser,
-  limitsReached,
-  noSubscription,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -124,7 +117,6 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
-import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import fakeResourceManagementProps from './FakeResourceManagement';
 
@@ -2520,46 +2512,6 @@ storiesOf('Changelog', module)
   ))
   .add('complete changelog dialog', () => (
     <ChangelogDialog open onClose={action('close dialog')} />
-  ));
-
-storiesOf('CurrentUsageDisplayer', module)
-  .addDecorator(subscriptionSuggestionDecorator)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <CurrentUsageDisplayer
-      subscription={subscriptionForIndieUser}
-      currentUsage={limitsForSilverUser.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('with redemption code', () => (
-    <CurrentUsageDisplayer
-      subscription={silverSubscriptionWithRedemptionCode}
-      currentUsage={limitsForSilverUser.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('with expired redemption code', () => (
-    <CurrentUsageDisplayer
-      subscription={silverSubscriptionWithExpiredRedemptionCode}
-      currentUsage={limitsForSilverUser.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('limit reached', () => (
-    <CurrentUsageDisplayer
-      subscription={subscriptionForIndieUser}
-      currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('limit reached without subscription', () => (
-    <CurrentUsageDisplayer
-      subscription={noSubscription}
-      currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
   ));
 
 storiesOf('Profile/ContributionsDetails', module)

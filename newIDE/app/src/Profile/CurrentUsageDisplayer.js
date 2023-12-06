@@ -28,15 +28,27 @@ const CurrentUsageDisplayer = ({
   const hasSubscription = hasValidSubscriptionPlan(subscription);
   const loadedButHasNoSubscription =
     subscription && !hasValidSubscriptionPlan(subscription);
+  const remainingBuilds = Math.max(currentUsage.max - currentUsage.current, 0);
+  const remainingMultipleMessage = (
+    <Trans>
+      You have {remainingBuilds} builds remaining (You have used{' '}
+      {currentUsage.current}/{currentUsage.max} in the last 24h).
+    </Trans>
+  );
+  const remainingSingleMessage = (
+    <Trans>
+      You have {remainingBuilds} build remaining (You have used{' '}
+      {currentUsage.current}/{currentUsage.max} in the last 24h).
+    </Trans>
+  );
 
   return (
     <ColumnStackLayout noMargin>
       <AlertMessage kind="info">
         <Text>
-          <Trans>
-            You have {Math.max(currentUsage.max - currentUsage.current, 0)}{' '}
-            remaining builds for today (out of {currentUsage.max}).
-          </Trans>
+          {remainingBuilds === 1
+            ? remainingSingleMessage
+            : remainingMultipleMessage}
         </Text>
       </AlertMessage>
       {hasSubscription && currentUsage.limitReached && (

@@ -80,6 +80,12 @@ export default class ExportLauncher extends Component<Props, State> {
   buildsWatcher = new BuildsWatcher();
   launchWholeExport: (i18n: I18nType) => Promise<void>;
 
+  componentWillMount() {
+    // Fetch limits when the export launcher is opened, to ensure we display the
+    // latest limits.
+    this.props.authenticatedUser.onSubscriptionUpdated();
+  }
+
   componentWillUnmount() {
     this.buildsWatcher.stop();
   }
@@ -133,7 +139,8 @@ export default class ExportLauncher extends Component<Props, State> {
       onBuildUpdated: (build: Build) => {
         this.setState({ build });
         if (build.status !== 'pending') {
-          authenticatedUser.onRefreshUserProfile();
+          // Fetch limits again, as they may have changed.
+          authenticatedUser.onSubscriptionUpdated();
         }
       },
     });

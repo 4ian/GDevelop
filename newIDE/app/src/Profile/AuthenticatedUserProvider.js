@@ -201,6 +201,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           await this._reloadFirebaseProfile();
         },
         onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
+        onRefreshLimits: this._fetchUserLimits,
         onPurchaseSuccessful: this._fetchUserPurchases,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
@@ -484,7 +485,28 @@ export default class AuthenticatedUserProvider extends React.Component<
     );
   };
 
-  _fetchUserSubscriptionLimitsAndUsages = async () => {
+  _fetchUserSubscription = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const subscription = await getUserSubscription(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          subscription,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user subscriptions:', error);
+    }
+  };
+
+  _fetchUserUsages = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
     if (!firebaseUser) return;
@@ -503,21 +525,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading user usages:', error);
     }
+  };
 
-    try {
-      const subscription = await getUserSubscription(
-        authentication.getAuthorizationHeader,
-        firebaseUser.uid
-      );
-      this.setState(({ authenticatedUser }) => ({
-        authenticatedUser: {
-          ...authenticatedUser,
-          subscription,
-        },
-      }));
-    } catch (error) {
-      console.error('Error while loading user subscriptions:', error);
-    }
+  _fetchUserLimits = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
 
     try {
       const limits = await getUserLimits(
@@ -533,6 +546,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading user limits:', error);
     }
+  };
+
+  _fetchUserSubscriptionLimitsAndUsages = async () => {
+    await Promise.all([
+      this._fetchUserSubscription(),
+      this._fetchUserUsages(),
+      this._fetchUserLimits(),
+    ]);
   };
 
   _fetchUserAssetPacks = async () => {

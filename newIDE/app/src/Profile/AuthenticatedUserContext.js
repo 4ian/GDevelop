@@ -62,6 +62,7 @@ export type AuthenticatedUser = {|
   onRefreshUserProfile: () => Promise<void>,
   onRefreshFirebaseProfile: () => Promise<void>,
   onSubscriptionUpdated: () => Promise<void>,
+  onRefreshLimits: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
   onOpenEmailVerificationDialog: ({|
@@ -103,6 +104,7 @@ export const initialAuthenticatedUser = {
   onRefreshUserProfile: async () => {},
   onRefreshFirebaseProfile: async () => {},
   onSubscriptionUpdated: async () => {},
+  onRefreshLimits: async () => {},
   onPurchaseSuccessful: async () => {},
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},

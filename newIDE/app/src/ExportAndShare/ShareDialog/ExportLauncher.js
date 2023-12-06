@@ -83,7 +83,7 @@ export default class ExportLauncher extends Component<Props, State> {
   componentWillMount() {
     // Fetch limits when the export launcher is opened, to ensure we display the
     // latest limits.
-    this.props.authenticatedUser.onSubscriptionUpdated();
+    this.props.authenticatedUser.onRefreshLimits();
   }
 
   componentWillUnmount() {
@@ -140,7 +140,7 @@ export default class ExportLauncher extends Component<Props, State> {
         this.setState({ build });
         if (build.status !== 'pending') {
           // Fetch limits again, as they may have changed.
-          authenticatedUser.onSubscriptionUpdated();
+          authenticatedUser.onRefreshLimits();
         }
       },
     });

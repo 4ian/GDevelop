@@ -283,8 +283,8 @@ const NewProjectSetupDialog = ({
           error.response.data.code === 'project-generation/quota-exceeded'
         ) {
           setGenerationPrompt('');
-          // Fetch the user again to update the limits and show the subscription info.
-          await authenticatedUser.onSubscriptionUpdated();
+          // Fetch the limits again to show the warning about quota.
+          await authenticatedUser.onRefreshLimits();
         } else {
           showAlert({
             title: t`Unable to generate project`,

@@ -577,6 +577,9 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   onSubscriptionUpdated: async () => {
     console.info('This should refresh the subscriptions');
   },
+  onRefreshLimits: async () => {
+    console.info('This should refresh the limits');
+  },
   onPurchaseSuccessful: async () => {
     console.info('This should refresh the assets');
   },

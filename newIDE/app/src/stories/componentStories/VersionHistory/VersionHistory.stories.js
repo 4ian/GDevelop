@@ -174,6 +174,7 @@ export const Default = () => {
       onRenameVersion={onRenameVersion}
       onLoadMore={onLoadMore}
       canLoadMore={canLoadMore}
+      onCheckoutVersion={action('onCheckoutVersion')}
     />
   );
 };

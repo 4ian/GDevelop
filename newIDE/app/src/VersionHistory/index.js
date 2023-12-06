@@ -239,6 +239,7 @@ type Props = {|
   ) => Promise<void>,
   onLoadMore: () => Promise<void>,
   canLoadMore: boolean,
+  onCheckoutVersion: FilledCloudProjectVersion => void,
 |};
 
 const VersionHistory = ({
@@ -246,6 +247,7 @@ const VersionHistory = ({
   onRenameVersion,
   onLoadMore,
   canLoadMore,
+  onCheckoutVersion,
 }: Props) => {
   const [
     usersPublicProfileByIds,
@@ -298,9 +300,15 @@ const VersionHistory = ({
             setEditedVersionId(options.version.id);
           },
         },
+        {
+          label: i18n._(t`Checkout version`),
+          click: () => {
+            onCheckoutVersion(options.version);
+          },
+        },
       ];
     },
-    []
+    [onCheckoutVersion]
   );
 
   const renameVersion = React.useCallback(

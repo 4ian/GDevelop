@@ -271,7 +271,8 @@ namespace gdjs {
 
     unload(): Promise<void> {
       const totalElapsedTime = (performance.now() - this._startTimeInMs) / 1000;
-      const remainingTime = this._loadingScreenData.minDuration - totalElapsedTime;
+      const remainingTime =
+        this._loadingScreenData.minDuration - totalElapsedTime;
       this.setPercent(100);
 
       const fadeInDuration = Math.min(

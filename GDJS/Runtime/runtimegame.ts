@@ -722,7 +722,7 @@ namespace gdjs {
         this._resourcesLoader.getImageManager(),
         this._data.properties.loadingScreen,
         this._data.properties.watermark.showWatermark,
-        isFirstScene,
+        isFirstScene
       );
 
       const onProgress = async (count: integer, total: integer) => {

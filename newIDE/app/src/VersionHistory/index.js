@@ -4,7 +4,10 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import { type FilledCloudProjectVersion } from '../Utils/GDevelopServices/Project';
+import {
+  CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH,
+  type FilledCloudProjectVersion,
+} from '../Utils/GDevelopServices/Project';
 import {
   getUserPublicProfilesByIds,
   type UserPublicProfileByIds,
@@ -81,7 +84,11 @@ const ProjectVersionRow = ({
                 margin="none"
                 value={newLabel}
                 translatableHintText={t`End of jam`}
-                onChange={(event, text) => setNewLabel(text)}
+                onChange={(event, text) =>
+                  setNewLabel(
+                    text.slice(0, CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH)
+                  )
+                }
                 autoFocus="desktopAndMobileDevices"
                 onKeyPress={event => {
                   if (shouldValidate(event)) {

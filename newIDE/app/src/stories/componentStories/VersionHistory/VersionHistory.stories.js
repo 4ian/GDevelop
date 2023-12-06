@@ -39,7 +39,7 @@ const initialVersions: Array<FilledCloudProjectVersion> = [
   {
     id: '24ab6329-9fed-41a3-989f-f88b90647658',
     projectId,
-    label: 'Client presentation',
+    label: 'Client presentation for the newcomers of this year',
     createdAt: '2023-08-01T07:21:26.729Z',
     previousVersion: '30194561-9651-445b-8cec-702310ca2ec8',
     userId: 'c73c4d69-86a2-441b-a8b7-afe6b8fce810',

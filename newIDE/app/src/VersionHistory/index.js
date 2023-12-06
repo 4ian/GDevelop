@@ -43,6 +43,9 @@ const styles = {
     flexDirection: 'column',
     paddingLeft: 30, // Width of the collapse icon button.
   },
+  dateContainer: {
+    flexShrink: 0,
+  },
 };
 
 type ProjectVersionRowProps = {|
@@ -107,12 +110,14 @@ const ProjectVersionRow = ({
             ) : version.label ? (
               <LineStackLayout noMargin>
                 <Text noMargin>{version.label}</Text>
-                <Text noMargin style={styles.username}>
-                  {i18n.date(version.createdAt, {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                  })}
-                </Text>
+                <div style={styles.dateContainer}>
+                  <Text noMargin style={styles.username}>
+                    {i18n.date(version.createdAt, {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                    })}
+                  </Text>
+                </div>
               </LineStackLayout>
             ) : (
               <Text noMargin>

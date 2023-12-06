@@ -19,7 +19,11 @@ import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../UI/KeyboardShortcuts/InteractionKeys';
+import TextField, { type TextFieldInterface } from '../UI/TextField';
 
 const thisYear = new Date().getFullYear();
 
@@ -41,6 +45,7 @@ type ProjectVersionRowProps = {|
   usersPublicProfileByIds: UserPublicProfileByIds,
   isEditing: boolean,
   onRename: (FilledCloudProjectVersion, string) => void,
+  onCancelRenaming: () => void,
   onContextMenu: (
     event: PointerEvent,
     version: FilledCloudProjectVersion
@@ -52,26 +57,43 @@ const ProjectVersionRow = ({
   usersPublicProfileByIds,
   isEditing,
   onRename,
+  onCancelRenaming,
   onContextMenu,
 }: ProjectVersionRowProps) => {
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
+  const [newLabel, setNewLabel] = React.useState<string>(version.label || '');
   const authorPublicProfile = version.userId
     ? usersPublicProfileByIds[version.userId]
     : null;
+
+  const validateNewLabel = () => {
+    onRename(version, newLabel);
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
         <Line justifyContent="space-between" alignItems="flex-start">
           <Column noMargin>
             {isEditing ? (
-              <SemiControlledTextField
+              <TextField
+                ref={textFieldRef}
                 margin="none"
-                value=""
+                value={newLabel}
                 translatableHintText={t`End of jam`}
-                onChange={value => {
-                  onRename(version, value);
-                }}
-                commitOnBlur
+                onChange={(event, text) => setNewLabel(text)}
                 autoFocus="desktopAndMobileDevices"
+                onKeyPress={event => {
+                  if (shouldValidate(event)) {
+                    validateNewLabel();
+                  }
+                }}
+                onKeyUp={event => {
+                  if (shouldCloseOrCancel(event)) {
+                    setNewLabel(version.label || '');
+                    onCancelRenaming();
+                  }
+                }}
               />
             ) : version.label ? (
               <LineStackLayout noMargin>
@@ -123,6 +145,7 @@ type DayGroupRowProps = {|
   versions: FilledCloudProjectVersion[],
   editedVersionId: ?string,
   onRenameVersion: (FilledCloudProjectVersion, string) => void,
+  onCancelRenaming: () => void,
   onContextMenu: (
     event: PointerEvent,
     version: FilledCloudProjectVersion
@@ -135,6 +158,7 @@ const DayGroupRow = ({
   versions,
   editedVersionId,
   onRenameVersion,
+  onCancelRenaming,
   onContextMenu,
   usersPublicProfileByIds,
 }: DayGroupRowProps) => {
@@ -164,6 +188,7 @@ const DayGroupRow = ({
                   key={version.id}
                   version={version}
                   onRename={onRenameVersion}
+                  onCancelRenaming={onCancelRenaming}
                   usersPublicProfileByIds={usersPublicProfileByIds}
                   isEditing={version.id === editedVersionId}
                   onContextMenu={onContextMenu}
@@ -267,6 +292,10 @@ const VersionHistory = ({ versions, onRenameVersion }: Props) => {
     [onRenameVersion]
   );
 
+  const onCancelRenaming = React.useCallback(() => {
+    setEditedVersionId(null);
+  }, []);
+
   const openContextMenu = React.useCallback(
     (event: PointerEvent, version: FilledCloudProjectVersion) => {
       const { current: contextMenu } = contextMenuRef;
@@ -294,6 +323,7 @@ const VersionHistory = ({ versions, onRenameVersion }: Props) => {
                   day={day}
                   usersPublicProfileByIds={usersPublicProfileByIds}
                   onRenameVersion={renameVersion}
+                  onCancelRenaming={onCancelRenaming}
                   onContextMenu={openContextMenu}
                   editedVersionId={editedVersionId}
                 />

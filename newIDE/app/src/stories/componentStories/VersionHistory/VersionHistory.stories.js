@@ -39,6 +39,7 @@ const initialVersions: Array<FilledCloudProjectVersion> = [
   {
     id: '24ab6329-9fed-41a3-989f-f88b90647658',
     projectId,
+    label: 'Client presentation',
     createdAt: '2023-08-01T07:21:26.729Z',
     previousVersion: '30194561-9651-445b-8cec-702310ca2ec8',
     userId: 'c73c4d69-86a2-441b-a8b7-afe6b8fce810',
@@ -49,6 +50,13 @@ const initialVersions: Array<FilledCloudProjectVersion> = [
     createdAt: '2023-07-28T19:52:26.729Z',
     previousVersion: '8e067d2d-6f08-4f93-ad2d-f3ad5ca3c69c',
     userId: 'c73c4d69-86a2-441b-a8b7-afe6b8fce810',
+    restoredFromVersion: {
+      id: 'fd174383-30dd-4c69-945b-5d348b273828',
+      projectId,
+      createdAt: '2022-10-12T03:58:49.305Z',
+      previousVersion: '4b0e3a7a-3127-4f52-b7d8-ce646728b96b',
+      userId: 'a9bc54be-07e1-4f29-9739-5fbec2b04da7',
+    },
   },
   {
     id: '8e067d2d-6f08-4f93-ad2d-f3ad5ca3c69c',
@@ -67,6 +75,7 @@ const initialVersions: Array<FilledCloudProjectVersion> = [
   {
     id: '5280e344-bd36-4662-9948-cb0d18928d03',
     projectId,
+    label: 'No author',
     createdAt: '2022-10-12T10:11:49.305Z',
     previousVersion: 'e51c123a-2abb-47fc-aff6-50b0572c5dc2',
   },

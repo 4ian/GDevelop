@@ -28,6 +28,7 @@ import {
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
 import FlatButton from '../UI/FlatButton';
+import VersionBranch from '../UI/CustomSvgIcons/VersionBranch';
 
 const thisYear = new Date().getFullYear();
 
@@ -121,7 +122,18 @@ const ProjectVersionRow = ({
                 })}
               </Text>
             )}
-
+            {version.restoredFromVersion && (
+              <LineStackLayout noMargin alignItems="center">
+                <VersionBranch fontSize="small" />
+                <Text noMargin>
+                  {version.restoredFromVersion.label ||
+                    i18n.date(version.restoredFromVersion.createdAt, {
+                      dateStyle: 'long',
+                      timeStyle: 'short',
+                    })}
+                </Text>
+              </LineStackLayout>
+            )}
             {authorPublicProfile && (
               <LineStackLayout noMargin>
                 <Avatar

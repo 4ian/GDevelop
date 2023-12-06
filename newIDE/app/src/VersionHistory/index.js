@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import {
   CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH,
@@ -27,6 +27,7 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
+import FlatButton from '../UI/FlatButton';
 
 const thisYear = new Date().getFullYear();
 
@@ -236,14 +237,19 @@ type Props = {|
     FilledCloudProjectVersion,
     {| label: string |}
   ) => Promise<void>,
+  onLoadMore: () => Promise<void>,
 |};
 
-const VersionHistory = ({ versions, onRenameVersion }: Props) => {
+const VersionHistory = ({ versions, onRenameVersion, onLoadMore }: Props) => {
   const [
     usersPublicProfileByIds,
     setUsersPublicProfileByIds,
   ] = React.useState<?UserPublicProfileByIds>();
   const [editedVersionId, setEditedVersionId] = React.useState<?string>(null);
+  const [
+    isLoadingMoreVersions,
+    setIsLoadingMoreVersions,
+  ] = React.useState<boolean>(false);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
 
   const userIdsToFetch = React.useMemo(
@@ -312,6 +318,18 @@ const VersionHistory = ({ versions, onRenameVersion }: Props) => {
     []
   );
 
+  const loadMore = React.useCallback(
+    async () => {
+      setIsLoadingMoreVersions(true);
+      try {
+        await onLoadMore();
+      } finally {
+        setIsLoadingMoreVersions(false);
+      }
+    },
+    [onLoadMore]
+  );
+
   if (!usersPublicProfileByIds) return null;
   console.log(editedVersionId);
 
@@ -336,6 +354,18 @@ const VersionHistory = ({ versions, onRenameVersion }: Props) => {
                 />
               );
             })}
+            <FlatButton
+              primary
+              disabled={isLoadingMoreVersions}
+              label={
+                isLoadingMoreVersions ? (
+                  <Trans>Loading...</Trans>
+                ) : (
+                  <Trans>Show older</Trans>
+                )
+              }
+              onClick={loadMore}
+            />
           </Column>
         )}
       </I18n>

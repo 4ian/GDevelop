@@ -68,6 +68,44 @@ const initialVersions: Array<FilledCloudProjectVersion> = [
     id: '5280e344-bd36-4662-9948-cb0d18928d03',
     projectId,
     createdAt: '2022-10-12T10:11:49.305Z',
+    previousVersion: 'e51c123a-2abb-47fc-aff6-50b0572c5dc2',
+  },
+];
+
+const nextVersions: Array<FilledCloudProjectVersion> = [
+  {
+    id: 'e51c123a-2abb-47fc-aff6-50b0572c5dc2',
+    projectId,
+    createdAt: '2022-10-12T09:02:49.305Z',
+    previousVersion: 'fd174383-30dd-4c69-945b-5d348b273828',
+    userId: 'a9bc54be-07e1-4f29-9739-5fbec2b04da7',
+  },
+  {
+    id: 'fd174383-30dd-4c69-945b-5d348b273828',
+    projectId,
+    createdAt: '2022-10-12T03:58:49.305Z',
+    previousVersion: '4b0e3a7a-3127-4f52-b7d8-ce646728b96b',
+    userId: 'a9bc54be-07e1-4f29-9739-5fbec2b04da7',
+  },
+  {
+    id: '4b0e3a7a-3127-4f52-b7d8-ce646728b96b',
+    projectId,
+    createdAt: '2022-10-10T18:52:49.305Z',
+    previousVersion: '76d74273-2a87-4b65-af80-ce2ce75d796c',
+    userId: 'c73c4d69-86a2-441b-a8b7-afe6b8fce810',
+  },
+  {
+    id: '76d74273-2a87-4b65-af80-ce2ce75d796c',
+    projectId,
+    createdAt: '2022-10-09T17:51:49.305Z',
+    previousVersion: '5757f84a-c5e3-407f-9504-2dc9601382ac',
+    userId: 'c73c4d69-86a2-441b-a8b7-afe6b8fce810',
+  },
+  {
+    id: '5757f84a-c5e3-407f-9504-2dc9601382ac',
+    projectId,
+    createdAt: '2022-10-02T12:47:49.305Z',
+    userId: 'a9bc54be-07e1-4f29-9739-5fbec2b04da7',
     previousVersion: null,
   },
 ];
@@ -113,6 +151,10 @@ export const Default = () => {
     newVersions.splice(index, 1, { ...version, label });
     setVersions(newVersions);
   };
+  const onLoadMore = async () => {
+    await delay(1000);
+    setVersions([...versions, ...nextVersions]);
+  };
 
   projectServiceMock
     .onGet(`${GDevelopUserApi.baseUrl}/user-public-profile`)
@@ -124,6 +166,10 @@ export const Default = () => {
     });
 
   return (
-    <VersionHistory versions={versions} onRenameVersion={onRenameVersion} />
+    <VersionHistory
+      versions={versions}
+      onRenameVersion={onRenameVersion}
+      onLoadMore={onLoadMore}
+    />
   );
 };

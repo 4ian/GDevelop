@@ -38,13 +38,17 @@ namespace gdjs {
     _lastFrameTimeInMs: float = 0;
     _progressPercent: float = 0;
 
+    private _isWatermarkEnabled: boolean;
+
     constructor(
       runtimeGamePixiRenderer: gdjs.RuntimeGamePixiRenderer,
       imageManager: gdjs.PixiImageManager,
       loadingScreenData: LoadingScreenData,
+      isWatermarkEnabled: boolean,
       isFirstScene: boolean
     ) {
       this._loadingScreenData = loadingScreenData;
+      this._isWatermarkEnabled = isWatermarkEnabled;
       this._isFirstLayout = isFirstScene;
       this._loadingScreenContainer = new PIXI.Container();
       this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
@@ -272,8 +276,22 @@ namespace gdjs {
         totalElapsedTime;
       this.setPercent(100);
 
+      const fadeInDuration = Math.min(
+        this._loadingScreenData.showGDevelopSplash
+          ? this._loadingScreenData.logoAndProgressLogoFadeInDelay +
+              this._loadingScreenData.logoAndProgressFadeInDuration
+          : Number.POSITIVE_INFINITY,
+        this._loadingScreenData.backgroundImageResourceName ||
+          this._loadingScreenData.backgroundColor
+          ? this._loadingScreenData.backgroundFadeInDuration
+          : Number.POSITIVE_INFINITY
+      );
+
       // Ensure we have shown the loading screen for at least minDuration.
-      if (remainingTime <= 0) {
+      if (
+        remainingTime <= 0 ||
+        (this._isWatermarkEnabled && totalElapsedTime < fadeInDuration / 2)
+      ) {
         this._state = LoadingScreenState.FINISHED;
         return Promise.resolve();
       }

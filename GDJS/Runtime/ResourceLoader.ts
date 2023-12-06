@@ -626,7 +626,7 @@ namespace gdjs {
       logger.warn("Some assets couldn't be downloaded. Now, try again.");
     }
     for (
-      let attempt = 0;
+      let attempt = 1;
       attempt < maxAttempt && output.errors.length !== 0;
       attempt++
     ) {

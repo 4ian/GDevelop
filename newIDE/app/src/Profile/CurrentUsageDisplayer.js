@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
   hasValidSubscriptionPlan,
-  type CurrentUsage,
+  type Quota,
   type Subscription,
 } from '../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -15,30 +15,30 @@ import { ColumnStackLayout } from '../UI/Layout';
 
 type Props = {|
   subscription: ?Subscription,
-  currentUsage: ?CurrentUsage,
+  quota: ?Quota,
   onChangeSubscription: () => void,
 |};
 
 const CurrentUsageDisplayer = ({
   subscription,
-  currentUsage,
+  quota,
   onChangeSubscription,
 }: Props) => {
-  if (!currentUsage) return <PlaceholderLoader />;
+  if (!quota) return <PlaceholderLoader />;
   const hasSubscription = hasValidSubscriptionPlan(subscription);
   const loadedButHasNoSubscription =
     subscription && !hasValidSubscriptionPlan(subscription);
-  const remainingBuilds = Math.max(currentUsage.max - currentUsage.current, 0);
+  const remainingBuilds = Math.max(quota.max - quota.current, 0);
   const remainingMultipleMessage = (
     <Trans>
-      You have {remainingBuilds} builds remaining (You have used{' '}
-      {currentUsage.current}/{currentUsage.max} in the last 24h).
+      You have {remainingBuilds} builds remaining (You have used {quota.current}
+      /{quota.max} in the last 24h).
     </Trans>
   );
   const remainingSingleMessage = (
     <Trans>
-      You have {remainingBuilds} build remaining (You have used{' '}
-      {currentUsage.current}/{currentUsage.max} in the last 24h).
+      You have {remainingBuilds} build remaining (You have used {quota.current}/
+      {quota.max} in the last 24h).
     </Trans>
   );
 
@@ -51,7 +51,7 @@ const CurrentUsageDisplayer = ({
             : remainingMultipleMessage}
         </Text>
       </AlertMessage>
-      {hasSubscription && currentUsage.limitReached && (
+      {hasSubscription && quota.limitReached && (
         <GetSubscriptionCard subscriptionDialogOpeningReason="Build limit reached">
           <Text>
             <Trans>

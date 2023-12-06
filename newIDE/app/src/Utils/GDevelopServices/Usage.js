@@ -33,19 +33,9 @@ export type Subscription = {|
 |};
 
 /**
- * The current usage values made by a user of something.
- * Typically: the number of remaining builds for a user.
- */
-export type CurrentUsage = {|
-  limitReached: boolean,
-  current: number,
-  max: number,
-|};
-
-/**
  * This describes what a user can do on our online services.
  */
-export type Capabilities = {
+export type Capabilities = {|
   analytics: {
     sessions: boolean,
     players: boolean,
@@ -58,32 +48,59 @@ export type Capabilities = {
     canMaximumCountBeIncreased: boolean,
     maximumGuestCollaboratorsPerProject: number,
   },
-  /**
-   * leaderboards is marked as optional to prevent bugs at the moment
-   * the limit is enforced (endpoint deployed after the new version is released)
-   */
-  leaderboards?: {
+  leaderboards: {
     maximumCountPerGame: number,
     canMaximumCountPerGameBeIncreased: boolean,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
     canUseCustomCss: boolean,
   },
-};
+|};
 
-export type CurrentUsages = {
-  [string]: CurrentUsage,
+export type UsagePrices = {|
+  [key: string]: {|
+    priceInCredits: number,
+  |},
+|};
+
+export type UsagePurchasableQuantities = {|
+  [key: string]: {|
+    purchasableQuantity: number,
+  |},
+|};
+
+export type UserBalance = {|
+  amount: number,
+|};
+
+/**
+ * The current Quota values made by a user of something.
+ * Typically: the number of remaining builds for a user.
+ */
+export type Quota = {|
+  limitReached: boolean,
+  current: number,
+  max: number,
+|};
+
+export type Quotas = {
+  [string]: Quota,
 };
 
 /**
  * The limits communicated by the API for a user.
  */
-export type Limits = {
-  limits: CurrentUsages,
+export type Limits = {|
+  quotas: Quotas,
   capabilities: Capabilities,
+  credits: {
+    userBalance: UserBalance,
+    prices: UsagePrices,
+    purchasableQuantities: UsagePurchasableQuantities,
+  },
   message: string | typeof undefined,
-};
+|};
 
-export type PlanDetails = {
+export type PlanDetails = {|
   planId: string | null,
   legacyPlanId?: string,
   name: string,
@@ -95,7 +112,7 @@ export type PlanDetails = {
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
-};
+|};
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;

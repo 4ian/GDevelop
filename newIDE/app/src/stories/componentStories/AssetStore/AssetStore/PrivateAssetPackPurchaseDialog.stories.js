@@ -39,6 +39,8 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   categories: ['props'],
   prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
   appStoreProductId: null,
+  sellerStripeAccountId: 'sellerStripeProductId',
+  stripeProductId: 'stripeProductId',
 };
 
 export const NotLoggedIn = () => {

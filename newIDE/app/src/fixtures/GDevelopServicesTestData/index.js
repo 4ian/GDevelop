@@ -305,7 +305,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       canUseCustomCss: false,
     },
   },
-  limits: {
+  quotas: {
     'cordova-build': {
       current: 0,
       max: 2,
@@ -316,6 +316,13 @@ export const limitsForNoSubscriptionUser: Limits = {
       max: 3,
       limitReached: false,
     },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
   },
   message: undefined,
 };
@@ -341,7 +348,7 @@ export const limitsForSilverUser: Limits = {
       canUseCustomCss: false,
     },
   },
-  limits: {
+  quotas: {
     'cordova-build': {
       current: 2,
       max: 10,
@@ -352,6 +359,13 @@ export const limitsForSilverUser: Limits = {
       max: 1000,
       limitReached: false,
     },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
   },
   message: undefined,
 };
@@ -377,7 +391,7 @@ export const limitsForGoldUser: Limits = {
       canUseCustomCss: false,
     },
   },
-  limits: {
+  quotas: {
     'cordova-build': {
       current: 2,
       max: 70,
@@ -388,6 +402,13 @@ export const limitsForGoldUser: Limits = {
       max: 1000,
       limitReached: false,
     },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
   },
   message: undefined,
 };
@@ -413,7 +434,7 @@ export const limitsForStartupUser: Limits = {
       canUseCustomCss: false,
     },
   },
-  limits: {
+  quotas: {
     'cordova-build': {
       current: 2,
       max: 1000,
@@ -424,6 +445,13 @@ export const limitsForStartupUser: Limits = {
       max: 1000,
       limitReached: false,
     },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
   },
   message: undefined,
 };
@@ -449,7 +477,7 @@ export const limitsForBusinessUser: Limits = {
       canUseCustomCss: true,
     },
   },
-  limits: {
+  quotas: {
     'cordova-build': {
       current: 2,
       max: 1000,
@@ -460,6 +488,13 @@ export const limitsForBusinessUser: Limits = {
       max: 1000,
       limitReached: false,
     },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
   },
   message: undefined,
 };
@@ -485,7 +520,7 @@ export const limitsReached: Limits = {
       canUseCustomCss: false,
     },
   },
-  limits: {
+  quotas: {
     'cordova-build': {
       current: 10,
       max: 10,
@@ -496,6 +531,13 @@ export const limitsReached: Limits = {
       max: 3,
       limitReached: true,
     },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
   },
   message: undefined,
 };
@@ -1629,8 +1671,10 @@ export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData 
   createdAt: '2020-01-01',
   thumbnailUrls: [],
   prices: [],
-  appStoreProductId: null,
+  appStoreProductId: 'fake-app-store-product-id',
   includedListableProductIds: [],
+  sellerStripeAccountId: 'fake-seller-stripe-account-id',
+  stripeProductId: 'fake-stripe-product-id',
 };
 
 export const fakeAssetPacks: PublicAssetPacks = {

@@ -38,6 +38,8 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   categories: ['props'],
   prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
   appStoreProductId: null,
+  sellerStripeAccountId: 'sellerStripeProductId',
+  stripeProductId: 'stripeProductId',
 };
 
 const sellerPublicProfile = {
@@ -125,6 +127,8 @@ export const Default = () => {
             { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
           ],
           appStoreProductId: null,
+          sellerStripeAccountId: 'sellerStripeProductId',
+          stripeProductId: 'stripeProductId',
         },
         {
           id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
@@ -144,6 +148,8 @@ export const Default = () => {
             { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
           ],
           appStoreProductId: 'fake.product.id',
+          sellerStripeAccountId: 'sellerStripeProductId',
+          stripeProductId: 'stripeProductId',
         },
       ]}
     />
@@ -221,6 +227,8 @@ export const ForAlreadyPurchasedAssetPack = () => {
               { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
             ],
             appStoreProductId: null,
+            sellerStripeAccountId: 'sellerStripeProductId',
+            stripeProductId: 'stripeProductId',
           },
           {
             id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
@@ -240,6 +248,8 @@ export const ForAlreadyPurchasedAssetPack = () => {
               { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
             ],
             appStoreProductId: 'fake.product.id',
+            sellerStripeAccountId: 'sellerStripeProductId',
+            stripeProductId: 'stripeProductId',
           },
         ]}
       />

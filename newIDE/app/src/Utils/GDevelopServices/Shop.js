@@ -27,26 +27,48 @@ type ProductListingData = {|
   updatedAt: string,
   createdAt: string,
   thumbnailUrls: string[],
-  prices: StripePrice[],
-
-  /** The id of the product on the app stores - if any. */
-  appStoreProductId: string | null,
-
   includedListableProductIds?: string[],
+|};
+
+type StripeProductAttributes = {|
+  prices: StripePrice[],
+  sellerStripeAccountId: string,
+  stripeProductId: string,
+|};
+
+type AppStoreProductAttributes = {|
+  appStoreProductId: string | null,
   /** The thumbnails to use when on the app store - otherwise, use thumbnailUrls as usual. */
   appStoreThumbnailUrls?: string[] | null,
 |};
 
+type PaypalProductAttributes = {|
+  paypalProductId: string,
+  paypalPriceInUsd: number,
+|};
+
 export type PrivateAssetPackListingData = {|
   ...ProductListingData,
+  ...StripeProductAttributes,
+  ...AppStoreProductAttributes,
   productType: 'ASSET_PACK',
   listing: 'ASSET_PACK',
 |};
 
 export type PrivateGameTemplateListingData = {|
   ...ProductListingData,
+  ...StripeProductAttributes,
+  ...AppStoreProductAttributes,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
+|};
+
+export type CreditsPackageListingData = {|
+  ...ProductListingData,
+  ...StripeProductAttributes,
+  ...PaypalProductAttributes,
+  productType: 'CREDITS_PACKAGE',
+  listing: 'CREDITS_PACKAGE',
 |};
 
 type Purchase = {|
@@ -58,6 +80,7 @@ type Purchase = {|
   cancelledAt?: string,
   stripeCheckoutSessionId?: string,
   appStoreTransactionId?: string,
+  paypalOrderId?: string,
 |};
 
 export const listListedPrivateAssetPacks = async ({
@@ -70,7 +93,12 @@ export const listListedPrivateAssetPacks = async ({
       withAppStoreProductId: !!onlyAppStorePrivateAssetPacks,
     },
   });
-  return response.data;
+  const assetPacks = response.data;
+  if (!Array.isArray(assetPacks)) {
+    throw new Error('Invalid response from the asset packs API');
+  }
+
+  return assetPacks;
 };
 
 export const listListedPrivateGameTemplates = async ({
@@ -85,7 +113,7 @@ export const listListedPrivateGameTemplates = async ({
   });
   const gameTemplates = response.data;
   if (!Array.isArray(gameTemplates)) {
-    throw new Error('Invalid game templates');
+    throw new Error('Invalid response from the game templates API');
   }
 
   return gameTemplates;

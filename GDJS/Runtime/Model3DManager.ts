@@ -114,6 +114,9 @@ namespace gdjs {
       if (!loader) {
         return;
       }
+      if (this._loadedThreeModels.getFromName(resource.name)) {
+        return;
+      }
       const url = this._resourceLoader.getFullUrl(resource.file);
       try {
         const response = await fetch(url, {

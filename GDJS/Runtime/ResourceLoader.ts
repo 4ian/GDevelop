@@ -27,6 +27,9 @@ namespace gdjs {
     );
   };
 
+  const maxConcurrency = 20;
+  const maxAttempt = 3;
+
   /**
    * A task of pre-loading resources used by a scene.
    *
@@ -218,13 +221,16 @@ namespace gdjs {
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<void> {
       let loadedCount = 0;
-      await Promise.all(
-        [...this._resources.values()].map(async (resource) => {
+      await promisePoolAndRetry(
+        [...this._resources.values()],
+        maxConcurrency,
+        maxAttempt,
+        async (resource) => {
           await this._loadResource(resource);
           await this._processResource(resource);
           loadedCount++;
           onProgress(loadedCount, this._resources.size);
-        })
+        }
       );
       this._sceneNamesToLoad.clear();
       this._sceneNamesToMakeReady.clear();
@@ -246,8 +252,11 @@ namespace gdjs {
       }
       let loadedCount = 0;
       const resources = [...this._globalResources, ...sceneResources.values()];
-      await Promise.all(
-        resources.map(async (resourceName) => {
+      await promisePoolAndRetry(
+        resources,
+        maxConcurrency,
+        maxAttempt,
+        async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
             logger.warn('Unable to find resource "' + resourceName + '".');
@@ -257,7 +266,7 @@ namespace gdjs {
           await this._processResource(resource);
           loadedCount++;
           onProgress(loadedCount, resources.length);
-        })
+        }
       );
       this._setSceneAssetsLoaded(firstSceneName);
       this._setSceneAssetsReady(firstSceneName);
@@ -307,8 +316,11 @@ namespace gdjs {
         return;
       }
       let loadedCount = 0;
-      await Promise.all(
-        [...sceneResources.values()].map(async (resourceName) => {
+      await promisePoolAndRetry(
+        [...sceneResources.values()],
+        maxConcurrency,
+        maxAttempt,
+        async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
             logger.warn('Unable to find resource "' + resourceName + '".');
@@ -318,7 +330,7 @@ namespace gdjs {
           loadedCount++;
           this.currentSceneLoadingProgress = loadedCount / this._resources.size;
           onProgress && (await onProgress(loadedCount, this._resources.size));
-        })
+        }
       );
       this._setSceneAssetsLoaded(sceneName);
     }
@@ -553,4 +565,79 @@ namespace gdjs {
       return this._model3DManager;
     }
   }
+
+  type PromiseError<T> = { item: T; reason: any };
+
+  type PromisePoolOutput<T, U> = {
+    results: Array<U>;
+    errors: Array<PromiseError<T>>;
+  };
+
+  const promisePool = <T, U>(
+    items: Array<T>,
+    maxConcurrency: number,
+    asyncFunction: (item: T) => Promise<U>
+  ): Promise<PromisePoolOutput<T, U>> => {
+    const results: Array<U> = [];
+    const errors: Array<PromiseError<T>> = [];
+    let activePromises = 0;
+    let index = 0;
+
+    return new Promise((resolve, reject) => {
+      const executeNext = () => {
+        if (items.length === 0) {
+          resolve({ results, errors });
+          return;
+        }
+        while (activePromises < maxConcurrency && index < items.length) {
+          const item = items[index++];
+          activePromises++;
+
+          asyncFunction(item)
+            .then((result) => results.push(result))
+            .catch((reason) => errors.push({ item, reason }))
+            .finally(() => {
+              activePromises--;
+              if (index === items.length && activePromises === 0) {
+                resolve({ results, errors });
+              } else {
+                executeNext();
+              }
+            });
+        }
+      };
+
+      executeNext();
+    });
+  };
+
+  const promisePoolAndRetry = async <T, U>(
+    items: Array<T>,
+    maxConcurrency: number,
+    maxAttempt: number,
+    asyncFunction: (item: T) => Promise<U>
+  ): Promise<PromisePoolOutput<T, U>> => {
+    const output = await promisePool<T, U>(
+      items,
+      maxConcurrency,
+      asyncFunction
+    );
+    if (output.errors.length !== 0) {
+      logger.warn("Some assets couldn't be downloaded. Now, try again.");
+    }
+    for (
+      let attempt = 0;
+      attempt < maxAttempt && output.errors.length !== 0;
+      attempt++
+    ) {
+      const retryOutput = await promisePool<T, U>(
+        items,
+        maxConcurrency,
+        asyncFunction
+      );
+      output.results.push.apply(output.results, retryOutput.results);
+      output.errors = retryOutput.errors;
+    }
+    return output;
+  };
 }

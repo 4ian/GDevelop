@@ -271,9 +271,7 @@ namespace gdjs {
 
     unload(): Promise<void> {
       const totalElapsedTime = (performance.now() - this._startTimeInMs) / 1000;
-      const remainingTime =
-        (this._isFirstLayout ? this._loadingScreenData.minDuration : 0) -
-        totalElapsedTime;
+      const remainingTime = this._loadingScreenData.minDuration - totalElapsedTime;
       this.setPercent(100);
 
       const fadeInDuration = Math.min(
@@ -290,6 +288,7 @@ namespace gdjs {
       // Ensure we have shown the loading screen for at least minDuration.
       if (
         remainingTime <= 0 ||
+        !this._isFirstLayout ||
         (this._isWatermarkEnabled && totalElapsedTime < fadeInDuration / 2)
       ) {
         this._state = LoadingScreenState.FINISHED;

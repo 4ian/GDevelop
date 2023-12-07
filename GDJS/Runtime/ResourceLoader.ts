@@ -410,6 +410,7 @@ namespace gdjs {
       const task = this._prioritizeScene(sceneName);
       return new Promise<void>((resolve, reject) => {
         if (!task) {
+          this._isLoadingInForeground = false;
           resolve();
           return;
         }

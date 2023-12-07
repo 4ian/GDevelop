@@ -69,6 +69,11 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    clearCache(): void {
+      this._loadedThreeModels.clear();
+      this._downloadedArrayBuffers.clear();
+    }
+
     async processResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
@@ -112,6 +117,9 @@ namespace gdjs {
       }
       const loader = this._loader;
       if (!loader) {
+        return;
+      }
+      if (this._loadedThreeModels.get(resource)) {
         return;
       }
       const url = this._resourceLoader.getFullUrl(resource.file);

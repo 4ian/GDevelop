@@ -76,6 +76,24 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    clearCache(): void {
+      for (const texture of this._loadedTextures.getAllValues()) {
+        texture.destroy(true);
+      }
+      for (const name in this._loadedThreeTextures.items) {
+        const texture = this._loadedThreeTextures.items[name];
+        texture.dispose();
+      }
+      for (const name in this._loadedThreeMaterials.items) {
+        const texture = this._loadedThreeMaterials.items[name];
+        texture.dispose();
+      }
+      this._loadedTextures.clear();
+      this._loadedThreeTextures.clear();
+      this._loadedThreeMaterials.clear();
+      PIXI.Assets.cache.reset();
+    }
+
     /**
      * Return the PIXI texture associated to the specified resource name.
      * Returns a placeholder texture if not found.

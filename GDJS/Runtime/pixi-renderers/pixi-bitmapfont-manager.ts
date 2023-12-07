@@ -76,6 +76,10 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    clearCache(): void {
+      this._loadedFontsData.clear();
+    }
+
     /**
      * Get the instance of the default `Pixi.BitmapFont`, always available.
      */

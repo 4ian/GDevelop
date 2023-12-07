@@ -39,6 +39,11 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    clearCache(): void {
+      this._loadedJsons.clear();
+      this._callbacks.clear();
+    }
+
     /**
      * Request all the json resources to be preloaded (unless they are marked as not preloaded).
      *

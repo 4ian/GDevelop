@@ -146,12 +146,6 @@ namespace gdjs {
       this._resources = new Map<string, ResourceData>();
       this._globalResources = globalResources;
 
-      // These 3 attributes are filled by `setResources`.
-      this._sceneResources = new Map<string, Array<string>>();
-      this._sceneNamesToLoad = new Set<string>();
-      this._sceneNamesToMakeReady = new Set<string>();
-      this.setResources(resourceDataArray, globalResources, layoutDataArray);
-
       this._imageManager = new gdjs.ImageManager(this);
       this._soundManager = new gdjs.SoundManager(this);
       this._fontManager = new gdjs.FontManager(this);
@@ -176,6 +170,12 @@ namespace gdjs {
           this._resourceManagersMap.set(resourceKind, resourceManager);
         }
       }
+
+      // These 3 attributes are filled by `setResources`.
+      this._sceneResources = new Map<string, Array<string>>();
+      this._sceneNamesToLoad = new Set<string>();
+      this._sceneNamesToMakeReady = new Set<string>();
+      this.setResources(resourceDataArray, globalResources, layoutDataArray);
     }
 
     /**
@@ -211,6 +211,9 @@ namespace gdjs {
       this._resources.clear();
       for (const resourceData of resourceDataArray) {
         this._resources.set(resourceData.name, resourceData);
+      }
+      for (const resourceManager of this._resourceManagersMap.values()) {
+        resourceManager.clearCache();
       }
     }
 

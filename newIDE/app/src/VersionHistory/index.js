@@ -151,7 +151,7 @@ const ProjectVersionRow = ({
                 </LineStackLayout>
               </div>
             )}
-            {authorPublicProfile && (
+            {authorPublicProfile ? (
               <LineStackLayout noMargin>
                 <Avatar
                   src={authorPublicProfile.iconUrl}
@@ -159,6 +159,13 @@ const ProjectVersionRow = ({
                 />
                 <Text noMargin style={styles.username}>
                   {authorPublicProfile.username}
+                </Text>
+              </LineStackLayout>
+            ) : (
+              <LineStackLayout noMargin>
+                {/* TODO: Add green hero avatar */}
+                <Text noMargin style={styles.username}>
+                  <Trans>Anonymous Green Hero</Trans>
                 </Text>
               </LineStackLayout>
             )}

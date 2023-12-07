@@ -721,6 +721,7 @@ namespace gdjs {
         this.getRenderer(),
         this._resourcesLoader.getImageManager(),
         this._data.properties.loadingScreen,
+        this._data.properties.watermark.showWatermark,
         isFirstScene
       );
 

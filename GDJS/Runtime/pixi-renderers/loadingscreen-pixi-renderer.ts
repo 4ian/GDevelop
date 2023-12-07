@@ -38,13 +38,17 @@ namespace gdjs {
     _lastFrameTimeInMs: float = 0;
     _progressPercent: float = 0;
 
+    private _isWatermarkEnabled: boolean;
+
     constructor(
       runtimeGamePixiRenderer: gdjs.RuntimeGamePixiRenderer,
       imageManager: gdjs.PixiImageManager,
       loadingScreenData: LoadingScreenData,
+      isWatermarkEnabled: boolean,
       isFirstScene: boolean
     ) {
       this._loadingScreenData = loadingScreenData;
+      this._isWatermarkEnabled = isWatermarkEnabled;
       this._isFirstLayout = isFirstScene;
       this._loadingScreenContainer = new PIXI.Container();
       this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
@@ -267,16 +271,40 @@ namespace gdjs {
 
     unload(): Promise<void> {
       const totalElapsedTime = (performance.now() - this._startTimeInMs) / 1000;
-      const remainingTime =
-        (this._isFirstLayout ? this._loadingScreenData.minDuration : 0) -
-        totalElapsedTime;
-      this.setPercent(100);
 
-      // Ensure we have shown the loading screen for at least minDuration.
-      if (remainingTime <= 0) {
+      /**
+       * The duration before something bright may appear on screen at 100%
+       * opacity.
+       */
+      const fadeInDuration = Math.min(
+        this._loadingScreenData.showGDevelopSplash
+          ? this._loadingScreenData.logoAndProgressLogoFadeInDelay +
+              this._loadingScreenData.logoAndProgressFadeInDuration
+          : Number.POSITIVE_INFINITY,
+        this._loadingScreenData.backgroundImageResourceName ||
+          this._loadingScreenData.backgroundColor
+          ? this._loadingScreenData.backgroundFadeInDuration
+          : Number.POSITIVE_INFINITY
+      );
+
+      if (
+        // Intermediate loading screens can be skipped as soon as possible.
+        !this._isFirstLayout ||
+        // Skip the 1st loading screen if nothing is too much visible yet to
+        // avoid flashing users eyes.
+        // This will likely only happen when the game is played a 2nd time
+        // and resources are already in cache.
+        (this._isWatermarkEnabled && totalElapsedTime < fadeInDuration / 2) ||
+        // Otherwise, display the loading screen at least the minimal duration
+        // set in game settings.
+        totalElapsedTime > this._loadingScreenData.minDuration
+      ) {
         this._state = LoadingScreenState.FINISHED;
         return Promise.resolve();
       }
+      const remainingTime =
+        this._loadingScreenData.minDuration - totalElapsedTime;
+      this.setPercent(100);
       return new Promise((resolve) =>
         setTimeout(() => {
           this._state = LoadingScreenState.FINISHED;

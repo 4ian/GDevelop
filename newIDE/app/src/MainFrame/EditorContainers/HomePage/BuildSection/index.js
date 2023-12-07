@@ -117,6 +117,7 @@ const BuildSection = ({
     limits,
     cloudProjectsFetchingErrorLabel,
     onCloudProjectsChanged,
+    onOpenLoginDialog,
   } = authenticatedUser;
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
@@ -401,6 +402,8 @@ const BuildSection = ({
         message={<Trans>Log in to see your cloud projects.</Trans>}
         visible={showInfoAboutCloudProjects}
         hide={() => setShowInfoAboutCloudProjects(false)}
+        onActionClick={onOpenLoginDialog}
+        actionLabel={<Trans>Log in</Trans>}
       />
     </>
   );

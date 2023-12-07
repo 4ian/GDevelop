@@ -60,6 +60,7 @@ const styles = {
   },
   projectSkeleton: { borderRadius: 6 },
   noProjectsContainer: { padding: 10 },
+  refreshIconContainer: { fontSize: 20, display: 'flex', alignItems: 'center' },
 };
 
 type Props = {|
@@ -251,7 +252,9 @@ const BuildSection = ({
                   onClick={refreshCloudProjects}
                   disabled={isRefreshing}
                 >
-                  <Refresh />
+                  <div style={styles.refreshIconContainer}>
+                    <Refresh fontSize="inherit" />
+                  </div>
                 </IconButton>
               </LineStackLayout>
             </Column>

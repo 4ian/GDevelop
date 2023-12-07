@@ -28,7 +28,7 @@ import {
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
 import FlatButton from '../UI/FlatButton';
-import VersionBranch from '../UI/CustomSvgIcons/VersionBranch';
+import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 
 const thisYear = new Date().getFullYear();
 
@@ -45,6 +45,14 @@ const styles = {
   },
   dateContainer: {
     flexShrink: 0,
+  },
+  iconContainer: {
+    fontSize: 20,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  restoredVersionContainer: {
+    opacity: 0.7,
   },
 };
 
@@ -128,16 +136,20 @@ const ProjectVersionRow = ({
               </Text>
             )}
             {version.restoredFromVersion && (
-              <LineStackLayout noMargin alignItems="center">
-                <VersionBranch fontSize="small" />
-                <Text noMargin>
-                  {version.restoredFromVersion.label ||
-                    i18n.date(version.restoredFromVersion.createdAt, {
-                      dateStyle: 'long',
-                      timeStyle: 'short',
-                    })}
-                </Text>
-              </LineStackLayout>
+              <div style={styles.restoredVersionContainer}>
+                <LineStackLayout noMargin alignItems="center">
+                  <div style={styles.iconContainer}>
+                    <FileWithLines fontSize="inherit" />
+                  </div>
+                  <Text noMargin>
+                    {version.restoredFromVersion.label ||
+                      i18n.date(version.restoredFromVersion.createdAt, {
+                        dateStyle: 'long',
+                        timeStyle: 'short',
+                      })}
+                  </Text>
+                </LineStackLayout>
+              </div>
             )}
             {authorPublicProfile && (
               <LineStackLayout noMargin>

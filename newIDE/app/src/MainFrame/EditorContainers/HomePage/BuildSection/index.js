@@ -107,8 +107,8 @@ const BuildSection = ({
     SubscriptionSuggestionContext
   );
   const [
-    showInfoAboutCloudProjects,
-    setShowInfoAboutCloudProjects,
+    showCloudProjectsInfoIfNotLoggedIn,
+    setShowCloudProjectsInfoIfNotLoggedIn,
   ] = React.useState<boolean>(false);
   const {
     authenticated,
@@ -168,7 +168,7 @@ const BuildSection = ({
     async () => {
       if (isRefreshing) return;
       if (!authenticated) {
-        setShowInfoAboutCloudProjects(true);
+        setShowCloudProjectsInfoIfNotLoggedIn(true);
         return;
       }
       try {
@@ -400,8 +400,9 @@ const BuildSection = ({
       </SectionContainer>
       <InfoBar
         message={<Trans>Log in to see your cloud projects.</Trans>}
-        visible={showInfoAboutCloudProjects}
-        hide={() => setShowInfoAboutCloudProjects(false)}
+        visible={showCloudProjectsInfoIfNotLoggedIn}
+        hide={() => setShowCloudProjectsInfoIfNotLoggedIn(false)}
+        duration={5000}
         onActionClick={onOpenLoginDialog}
         actionLabel={<Trans>Log in</Trans>}
       />

@@ -717,7 +717,6 @@ namespace gdjs {
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       this.pause(true);
-      this._resourcesLoader.onLoadingScreenShown(true);
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
         this._resourcesLoader.getImageManager(),
@@ -740,7 +739,6 @@ namespace gdjs {
       await loadAssets(onProgress);
 
       await loadingScreen.unload();
-      this._resourcesLoader.onLoadingScreenShown(false);
       this.pause(false);
     }
 

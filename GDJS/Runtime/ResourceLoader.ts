@@ -134,11 +134,11 @@ namespace gdjs {
      */
     private currentSceneLoadingProgress: float = 0;
     /**
-     * It's set to `false` during intermediary loading screen to use a greater
+     * It's set to `true` during intermediary loading screen to use a greater
      * concurrency as the game is paused and doesn't need bandwidth (for video
      * or music streaming or online multiplayer).
      */
-    private _isLoadingInBackground = true;
+    private _isLoadingInForeground = true;
 
     /**
      * @param runtimeGame The game.
@@ -325,9 +325,9 @@ namespace gdjs {
       let loadedCount = 0;
       await processAndRetryIfNeededWithPromisePool(
         [...sceneResources.values()],
-        this._isLoadingInBackground
-          ? maxBackgroundConcurrency
-          : maxForegroundConcurrency,
+        this._isLoadingInForeground
+        ? maxForegroundConcurrency
+          : maxBackgroundConcurrency,
         maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
@@ -406,7 +406,7 @@ namespace gdjs {
       sceneName: string,
       onProgress?: (count: number, total: number) => void
     ): Promise<void> {
-      this._isLoadingInBackground = false;
+      this._isLoadingInForeground = true;
       const task = this._prioritizeScene(sceneName);
       return new Promise<void>((resolve, reject) => {
         if (!task) {
@@ -414,7 +414,7 @@ namespace gdjs {
           return;
         }
         task.registerCallback(() => {
-          this._isLoadingInBackground = true;
+          this._isLoadingInForeground = false;
           resolve();
         }, onProgress);
       });

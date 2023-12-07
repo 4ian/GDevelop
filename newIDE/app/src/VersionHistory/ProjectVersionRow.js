@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import { Trans, t } from '@lingui/macro';
 import Avatar from '@material-ui/core/Avatar';
 import Collapse from '@material-ui/core/Collapse';
+import ButtonBase from '@material-ui/core/ButtonBase';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import {
   CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH,
@@ -49,16 +50,20 @@ const styles = {
   restoredVersionContainer: {
     opacity: 0.7,
   },
+  sharedRowStyle: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 4,
+  },
 };
 
 const useClassesForRowContainer = makeStyles(theme =>
   createStyles({
     root: {
-      display: 'flex',
+      ...styles.sharedRowStyle,
       justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: 8,
-      borderRadius: 4,
+      alignItems: 'flex-start',
       '&:focus': {
         backgroundColor: theme.palette.action.hover,
       },
@@ -209,6 +214,21 @@ const ProjectVersionRow = ({
   );
 };
 
+const useClassesForDayCollapse = makeStyles(theme =>
+  createStyles({
+    root: {
+      ...styles.sharedRowStyle,
+      justifyContent: 'flex-start',
+      '&:focus': {
+        backgroundColor: theme.palette.action.hover,
+      },
+      '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+      },
+    },
+  })
+);
+
 type DayGroupRowProps = {|
   day: number,
   versions: FilledCloudProjectVersion[],
@@ -244,6 +264,8 @@ export const DayGroupRow = ({
     }
   }
 
+  const classes = useClassesForDayCollapse();
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -262,18 +284,21 @@ export const DayGroupRow = ({
           ))}
           {unnamedVersions.length > 0 && (
             <>
-              <Line alignItems="center">
-                <IconButton onClick={() => setIsOpen(!isOpen)} size="small">
+              <ButtonBase
+                onClick={() => setIsOpen(!isOpen)}
+                className={classes.root}
+              >
+                <Line alignItems="center" noMargin>
                   {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
-                </IconButton>
-                <Text>
-                  {i18n.date(day, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: displayYear ? 'numeric' : undefined,
-                  })}
-                </Text>
-              </Line>
+                  <Text noMargin>
+                    {i18n.date(day, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: displayYear ? 'numeric' : undefined,
+                    })}
+                  </Text>
+                </Line>
+              </ButtonBase>
               <Collapse in={isOpen}>
                 <div style={styles.versionsContainer}>
                   {unnamedVersions.map(version => (

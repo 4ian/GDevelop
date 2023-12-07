@@ -275,6 +275,10 @@ namespace gdjs {
         this._loadingScreenData.minDuration - totalElapsedTime;
       this.setPercent(100);
 
+      /**
+       * The duration before something bright may appear on screen at 100%
+       * opacity.
+       */
       const fadeInDuration = Math.min(
         this._loadingScreenData.showGDevelopSplash
           ? this._loadingScreenData.logoAndProgressLogoFadeInDelay +
@@ -286,10 +290,15 @@ namespace gdjs {
           : Number.POSITIVE_INFINITY
       );
 
-      // Ensure we have shown the loading screen for at least minDuration.
       if (
-        remainingTime <= 0 ||
+        // Intermediate loading screens can be skipped as soon as possible.
         !this._isFirstLayout ||
+        // Ensure we have shown the loading screen for at least minDuration.
+        remainingTime <= 0 ||
+        // Skip the 1st loading screen if nothing is too much visible to avoid
+        // flashing users eyes.
+        // This will likely only happen when the game is played a 2nd time
+        // and resources are already in cache.
         (this._isWatermarkEnabled && totalElapsedTime < fadeInDuration / 2)
       ) {
         this._state = LoadingScreenState.FINISHED;

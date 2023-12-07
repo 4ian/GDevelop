@@ -3,6 +3,9 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { Trans, t } from '@lingui/macro';
+import Avatar from '@material-ui/core/Avatar';
+import Collapse from '@material-ui/core/Collapse';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import {
   CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH,
   type FilledCloudProjectVersion,
@@ -10,8 +13,6 @@ import {
 import { type UserPublicProfileByIds } from '../Utils/GDevelopServices/User';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
-import Avatar from '@material-ui/core/Avatar';
-import Collapse from '@material-ui/core/Collapse';
 import { LineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
@@ -50,6 +51,24 @@ const styles = {
   },
 };
 
+const useClassesForRowContainer = makeStyles(theme =>
+  createStyles({
+    root: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 8,
+      borderRadius: 4,
+      '&:focus': {
+        backgroundColor: theme.palette.action.hover,
+      },
+      '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+      },
+    },
+  })
+);
+
 type Props = {|
   version: FilledCloudProjectVersion,
   usersPublicProfileByIds: UserPublicProfileByIds,
@@ -82,10 +101,12 @@ const ProjectVersionRow = ({
     onRename(version, newLabel);
   };
 
+  const classes = useClassesForRowContainer();
+
   return (
     <I18n>
       {({ i18n }) => (
-        <Line justifyContent="space-between" alignItems="flex-start">
+        <div className={classes.root}>
           <Column noMargin>
             {isEditing ? (
               <TextField
@@ -182,7 +203,7 @@ const ProjectVersionRow = ({
           >
             <ThreeDotsMenu />
           </IconButton>
-        </Line>
+        </div>
       )}
     </I18n>
   );

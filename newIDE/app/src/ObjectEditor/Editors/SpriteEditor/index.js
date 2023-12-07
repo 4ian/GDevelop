@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import SpritesList from './SpritesList';
+import SpritesList, { addAnimationFrame } from './SpritesList';
 import IconButton from '../../../UI/IconButton';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -262,6 +262,63 @@ export default function SpriteEditor({
       forceUpdate();
     },
     [spriteConfiguration, forceUpdate, onCreateMatchingSpriteCollisionMask]
+  );
+
+  const onSpriteAdded = React.useCallback(
+    (sprite: gdSprite) => {
+      // If a sprite is added, we want to ensure it gets the automatic
+      // collision mask of the object, if the option is enabled.
+      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
+        onApplyFirstSpriteCollisionMaskToSprite(sprite);
+      }
+    },
+    [onApplyFirstSpriteCollisionMaskToSprite, spriteConfiguration]
+  );
+
+  const addAnimations = React.useCallback(
+    (resourcesByAnimation: Map<string, Array<gdResource>>) => {
+      setNameErrors({});
+
+      const allAnimationNames = mapFor(
+        0,
+        spriteConfiguration.getAnimationsCount(),
+        index => spriteConfiguration.getAnimation(index).getName()
+      );
+
+      for (const [name, resources] of resourcesByAnimation) {
+        const animation = new gd.Animation();
+        let newName = name;
+        for (let index = 0; index < 10; index++) {
+          if (!allAnimationNames.includes(newName)) {
+            animation.setName(name);
+            break;
+          }
+          newName = name + ' ' + index;
+        }
+        animation.setDirectionsCount(1);
+        const direction = animation.getDirection(0);
+        for (const resource of resources) {
+          addAnimationFrame(
+            spriteConfiguration,
+            direction,
+            resource,
+            onSpriteAdded
+          );
+        }
+        spriteConfiguration.addAnimation(animation);
+        animation.delete();
+      }
+      forceUpdate();
+      onSizeUpdated();
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [
+      forceUpdate,
+      onObjectUpdated,
+      onSizeUpdated,
+      onSpriteAdded,
+      spriteConfiguration,
+    ]
   );
 
   const addAnimation = React.useCallback(
@@ -584,17 +641,8 @@ export default function SpriteEditor({
                                                 }
                                               : undefined
                                           }
-                                          onSpriteAdded={(sprite: gdSprite) => {
-                                            // If a sprite is added, we want to ensure it gets the automatic
-                                            // collision mask of the object, if the option is enabled.
-                                            if (
-                                              spriteConfiguration.adaptCollisionMaskAutomatically()
-                                            ) {
-                                              onApplyFirstSpriteCollisionMaskToSprite(
-                                                sprite
-                                              );
-                                            }
-                                          }}
+                                          onSpriteAdded={onSpriteAdded}
+                                          addAnimations={addAnimations}
                                         />
                                       );
                                     }

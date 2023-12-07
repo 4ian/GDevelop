@@ -194,8 +194,8 @@ export const ExampleStore = ({
 
       for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
         searchItems.push(exampleShortHeaderItems[i]);
-        if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
-          const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+        if (i % 2 === 1 && privateGameTemplateItems.length > 0) {
+          const nextPrivateGameTemplateIndex = Math.floor(i / 2);
           if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
             searchItems.push(
               privateGameTemplateItems[nextPrivateGameTemplateIndex]

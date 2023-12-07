@@ -157,7 +157,21 @@ export const Default = () => {
     await delay(500);
     const newVersions = [...versions];
     const index = newVersions.findIndex(version_ => version_.id === version.id);
-    newVersions.splice(index, 1, { ...version, label });
+    newVersions.splice(index, 1, { ...version, label: label || undefined });
+    newVersions.forEach(version_ => {
+      if (
+        version_.restoredFromVersion &&
+        version_.restoredFromVersion.id === version.id
+      ) {
+        version_.restoredFromVersion = {
+          id: version.id,
+          createdAt: version.createdAt,
+          previousVersion: version.previousVersion,
+          projectId: version.projectId,
+          label: label || undefined,
+        };
+      }
+    });
     setVersions(newVersions);
   };
 

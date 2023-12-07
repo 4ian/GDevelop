@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 
@@ -49,6 +49,7 @@ import {
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import InfoBar from '../../../../UI/Messages/InfoBar';
 
 const styles = {
   listItem: {
@@ -105,7 +106,12 @@ const BuildSection = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+  const [
+    showInfoAboutCloudProjects,
+    setShowInfoAboutCloudProjects,
+  ] = React.useState<boolean>(false);
   const {
+    authenticated,
     profile,
     cloudProjects,
     limits,
@@ -160,6 +166,10 @@ const BuildSection = ({
   const refreshCloudProjects = React.useCallback(
     async () => {
       if (isRefreshing) return;
+      if (!authenticated) {
+        setShowInfoAboutCloudProjects(true);
+        return;
+      }
       try {
         setIsRefreshing(true);
         await onCloudProjectsChanged();
@@ -168,7 +178,7 @@ const BuildSection = ({
         setTimeout(() => setIsRefreshing(false), 2000);
       }
     },
-    [onCloudProjectsChanged, isRefreshing]
+    [onCloudProjectsChanged, isRefreshing, authenticated]
   );
 
   projectFiles.sort((a, b) => {
@@ -251,6 +261,7 @@ const BuildSection = ({
                   size="small"
                   onClick={refreshCloudProjects}
                   disabled={isRefreshing}
+                  tooltip={t`Refresh cloud projects`}
                 >
                   <div style={styles.refreshIconContainer}>
                     <Refresh fontSize="inherit" />
@@ -386,6 +397,11 @@ const BuildSection = ({
           </Line>
         </SectionRow>
       </SectionContainer>
+      <InfoBar
+        message={<Trans>Log in to see your cloud projects.</Trans>}
+        visible={showInfoAboutCloudProjects}
+        hide={() => setShowInfoAboutCloudProjects(false)}
+      />
     </>
   );
 };

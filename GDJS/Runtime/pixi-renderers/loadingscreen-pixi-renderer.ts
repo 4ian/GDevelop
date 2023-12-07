@@ -271,9 +271,6 @@ namespace gdjs {
 
     unload(): Promise<void> {
       const totalElapsedTime = (performance.now() - this._startTimeInMs) / 1000;
-      const remainingTime =
-        this._loadingScreenData.minDuration - totalElapsedTime;
-      this.setPercent(100);
 
       /**
        * The duration before something bright may appear on screen at 100%
@@ -293,17 +290,21 @@ namespace gdjs {
       if (
         // Intermediate loading screens can be skipped as soon as possible.
         !this._isFirstLayout ||
-        // Ensure we have shown the loading screen for at least minDuration.
-        remainingTime <= 0 ||
-        // Skip the 1st loading screen if nothing is too much visible to avoid
-        // flashing users eyes.
+        // Skip the 1st loading screen if nothing is too much visible yet to
+        // avoid flashing users eyes.
         // This will likely only happen when the game is played a 2nd time
         // and resources are already in cache.
-        (this._isWatermarkEnabled && totalElapsedTime < fadeInDuration / 2)
+        (this._isWatermarkEnabled && totalElapsedTime < fadeInDuration / 2) ||
+        // Otherwise, display the loading screen at least the minimal duration
+        // set in game settings.
+        totalElapsedTime > this._loadingScreenData.minDuration
       ) {
         this._state = LoadingScreenState.FINISHED;
         return Promise.resolve();
       }
+      const remainingTime =
+        this._loadingScreenData.minDuration - totalElapsedTime;
+      this.setPercent(100);
       return new Promise((resolve) =>
         setTimeout(() => {
           this._state = LoadingScreenState.FINISHED;

@@ -66,6 +66,7 @@ type ProjectVersionRowProps = {|
     event: PointerEvent,
     version: FilledCloudProjectVersion
   ) => void,
+  displayFullDate?: boolean,
 |};
 
 const ProjectVersionRow = ({
@@ -75,6 +76,7 @@ const ProjectVersionRow = ({
   onRename,
   onCancelRenaming,
   onContextMenu,
+  displayFullDate,
 }: ProjectVersionRowProps) => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const [newLabel, setNewLabel] = React.useState<string>(version.label || '');
@@ -120,10 +122,18 @@ const ProjectVersionRow = ({
                 <Text noMargin>{version.label}</Text>
                 <div style={styles.dateContainer}>
                   <Text noMargin style={styles.username}>
-                    {i18n.date(version.createdAt, {
-                      hour: 'numeric',
-                      minute: 'numeric',
-                    })}
+                    {i18n.date(
+                      version.createdAt,
+                      displayFullDate
+                        ? {
+                            dateStyle: 'long',
+                            timeStyle: 'short',
+                          }
+                        : {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                          }
+                    )}
                   </Text>
                 </div>
               </LineStackLayout>
@@ -208,38 +218,64 @@ const DayGroupRow = ({
 }: DayGroupRowProps) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const displayYear = new Date(day).getFullYear() !== thisYear;
+  const namedVersions = [];
+  const unnamedVersions = [];
+  for (let i = 0; i < versions.length; i++) {
+    const version = versions[i];
+    if (version.label) {
+      namedVersions.push(version);
+    } else {
+      unnamedVersions.push(version);
+    }
+  }
 
   return (
     <I18n>
       {({ i18n }) => (
         <React.Fragment>
-          <Line alignItems="center">
-            <IconButton onClick={() => setIsOpen(!isOpen)} size="small">
-              {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
-            </IconButton>
-            <Text>
-              {i18n.date(day, {
-                month: 'short',
-                day: 'numeric',
-                year: displayYear ? 'numeric' : undefined,
-              })}
-            </Text>
-          </Line>
-          <Collapse in={isOpen}>
-            <div style={styles.versionsContainer}>
-              {versions.map(version => (
-                <ProjectVersionRow
-                  key={version.id}
-                  version={version}
-                  onRename={onRenameVersion}
-                  onCancelRenaming={onCancelRenaming}
-                  usersPublicProfileByIds={usersPublicProfileByIds}
-                  isEditing={version.id === editedVersionId}
-                  onContextMenu={onContextMenu}
-                />
-              ))}
-            </div>
-          </Collapse>
+          {namedVersions.map(version => (
+            <ProjectVersionRow
+              key={version.id}
+              version={version}
+              onRename={onRenameVersion}
+              onCancelRenaming={onCancelRenaming}
+              usersPublicProfileByIds={usersPublicProfileByIds}
+              isEditing={version.id === editedVersionId}
+              onContextMenu={onContextMenu}
+              displayFullDate
+            />
+          ))}
+          {unnamedVersions.length > 0 && (
+            <>
+              <Line alignItems="center">
+                <IconButton onClick={() => setIsOpen(!isOpen)} size="small">
+                  {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
+                </IconButton>
+                <Text>
+                  {i18n.date(day, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: displayYear ? 'numeric' : undefined,
+                  })}
+                </Text>
+              </Line>
+              <Collapse in={isOpen}>
+                <div style={styles.versionsContainer}>
+                  {unnamedVersions.map(version => (
+                    <ProjectVersionRow
+                      key={version.id}
+                      version={version}
+                      onRename={onRenameVersion}
+                      onCancelRenaming={onCancelRenaming}
+                      usersPublicProfileByIds={usersPublicProfileByIds}
+                      isEditing={version.id === editedVersionId}
+                      onContextMenu={onContextMenu}
+                    />
+                  ))}
+                </div>
+              </Collapse>
+            </>
+          )}
         </React.Fragment>
       )}
     </I18n>

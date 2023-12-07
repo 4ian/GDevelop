@@ -128,43 +128,35 @@ export const getExampleAndTemplateItemsForCarousel = ({
   const allItems: Array<CarouselThumbnail> = [];
   const privateGameTemplateItems = [
     ...(privateGameTemplateListingDatas
-      ? privateGameTemplateListingDatas
-          .sort((a, b) => {
-            if (a.isSellerGDevelop && b.isSellerGDevelop) return 0;
-            // Show the ones sold by GDevelop first.
-            if (a.isSellerGDevelop) return -1;
-            if (b.isSellerGDevelop) return 1;
-            return 0;
-          })
-          .map(privateGameTemplateListingData => {
-            const isTemplateOwned =
-              !!authenticatedUser.receivedGameTemplates &&
-              !!authenticatedUser.receivedGameTemplates.find(
-                receivedGameTemplate =>
-                  receivedGameTemplate.id === privateGameTemplateListingData.id
+      ? privateGameTemplateListingDatas.map(privateGameTemplateListingData => {
+          const isTemplateOwned =
+            !!authenticatedUser.receivedGameTemplates &&
+            !!authenticatedUser.receivedGameTemplates.find(
+              receivedGameTemplate =>
+                receivedGameTemplate.id === privateGameTemplateListingData.id
+            );
+          return {
+            id: privateGameTemplateListingData.id,
+            title: privateGameTemplateListingData.name,
+            thumbnailUrl: privateGameTemplateListingData.thumbnailUrls[0],
+            onClick: () => {
+              sendGameTemplateInformationOpened({
+                gameTemplateName: privateGameTemplateListingData.name,
+                gameTemplateId: privateGameTemplateListingData.id,
+                source: 'homepage',
+              });
+              onSelectPrivateGameTemplateListingData(
+                privateGameTemplateListingData
               );
-            return {
-              id: privateGameTemplateListingData.id,
-              title: privateGameTemplateListingData.name,
-              thumbnailUrl: privateGameTemplateListingData.thumbnailUrls[0],
-              onClick: () => {
-                sendGameTemplateInformationOpened({
-                  gameTemplateName: privateGameTemplateListingData.name,
-                  gameTemplateId: privateGameTemplateListingData.id,
-                  source: 'homepage',
-                });
-                onSelectPrivateGameTemplateListingData(
-                  privateGameTemplateListingData
-                );
-              },
-              overlayText: getProductPriceOrOwnedLabel({
-                i18n,
-                productListingData: privateGameTemplateListingData,
-                owned: isTemplateOwned,
-              }),
-              overlayTextPosition: 'topLeft',
-            };
-          })
+            },
+            overlayText: getProductPriceOrOwnedLabel({
+              i18n,
+              productListingData: privateGameTemplateListingData,
+              owned: isTemplateOwned,
+            }),
+            overlayTextPosition: 'topLeft',
+          };
+        })
       : []),
   ];
 
@@ -183,8 +175,8 @@ export const getExampleAndTemplateItemsForCarousel = ({
 
   for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
     allItems.push(exampleShortHeaderItems[i]);
-    if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
-      const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+    if (i % 2 === 1 && privateGameTemplateItems.length > 0) {
+      const nextPrivateGameTemplateIndex = Math.floor(i / 2);
       if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
         allItems.push(privateGameTemplateItems[nextPrivateGameTemplateIndex]);
     }

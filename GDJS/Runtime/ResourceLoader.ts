@@ -227,7 +227,7 @@ namespace gdjs {
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<void> {
       let loadedCount = 0;
-      await promisePoolAndRetry(
+      await processAndRetryIfNeededWithPromisePool(
         [...this._resources.values()],
         maxForegroundConcurrency,
         maxAttempt,
@@ -258,7 +258,7 @@ namespace gdjs {
       }
       let loadedCount = 0;
       const resources = [...this._globalResources, ...sceneResources.values()];
-      await promisePoolAndRetry(
+      await processAndRetryIfNeededWithPromisePool(
         resources,
         maxForegroundConcurrency,
         maxAttempt,
@@ -322,7 +322,7 @@ namespace gdjs {
         return;
       }
       let loadedCount = 0;
-      await promisePoolAndRetry(
+      await processAndRetryIfNeededWithPromisePool(
         [...sceneResources.values()],
         this._isLoadingScreenShown
           ? maxForegroundConcurrency
@@ -581,7 +581,7 @@ namespace gdjs {
     errors: Array<PromiseError<T>>;
   };
 
-  const promisePool = <T, U>(
+  const processWithPromisePool = <T, U>(
     items: Array<T>,
     maxConcurrency: number,
     asyncFunction: (item: T) => Promise<U>
@@ -619,13 +619,13 @@ namespace gdjs {
     });
   };
 
-  const promisePoolAndRetry = async <T, U>(
+  const processAndRetryIfNeededWithPromisePool = async <T, U>(
     items: Array<T>,
     maxConcurrency: number,
     maxAttempt: number,
     asyncFunction: (item: T) => Promise<U>
   ): Promise<PromisePoolOutput<T, U>> => {
-    const output = await promisePool<T, U>(
+    const output = await processWithPromisePool<T, U>(
       items,
       maxConcurrency,
       asyncFunction
@@ -638,7 +638,7 @@ namespace gdjs {
       attempt < maxAttempt && output.errors.length !== 0;
       attempt++
     ) {
-      const retryOutput = await promisePool<T, U>(
+      const retryOutput = await processWithPromisePool<T, U>(
         items,
         maxConcurrency,
         asyncFunction

@@ -96,12 +96,6 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Load all the 3D models.
-     *
-     * Note that even if a file is already loaded, it will be reloaded (useful for hot-reloading,
-     * as files can have been modified without the editor knowing).
-     */
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
@@ -114,7 +108,7 @@ namespace gdjs {
       if (!loader) {
         return;
       }
-      if (this._loadedThreeModels.getFromName(resource.name)) {
+      if (this._loadedThreeModels.get(resource)) {
         return;
       }
       const url = this._resourceLoader.getFullUrl(resource.file);

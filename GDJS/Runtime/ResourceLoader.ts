@@ -574,7 +574,7 @@ namespace gdjs {
     }
   }
 
-  type PromiseError<T> = { item: T; reason: any };
+  type PromiseError<T> = { item: T; error: Error };
 
   type PromisePoolOutput<T, U> = {
     results: Array<U>;
@@ -603,7 +603,7 @@ namespace gdjs {
 
           asyncFunction(item)
             .then((result) => results.push(result))
-            .catch((reason) => errors.push({ item, reason }))
+            .catch((error) => errors.push({ item, error }))
             .finally(() => {
               activePromises--;
               if (index === items.length && activePromises === 0) {
@@ -631,7 +631,7 @@ namespace gdjs {
       asyncFunction
     );
     if (output.errors.length !== 0) {
-      logger.warn("Some assets couldn't be downloaded. Now, try again.");
+      logger.warn("Some assets couldn't be downloaded. Trying again now.");
     }
     for (
       let attempt = 1;

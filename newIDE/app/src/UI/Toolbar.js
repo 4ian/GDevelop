@@ -4,16 +4,11 @@ import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 type ToolbarProps = {|
   children: React.Node,
-|};
-
-type ToolbarGroupProps = {|
-  children?: React.Node,
-  firstChild?: boolean,
-  lastChild?: boolean,
+  height?: number,
 |};
 
 export const Toolbar = React.memo<ToolbarProps>(
-  ({ children }: ToolbarProps) => {
+  ({ children, height }: ToolbarProps) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     return (
       <div
@@ -24,7 +19,7 @@ export const Toolbar = React.memo<ToolbarProps>(
           display: 'flex',
           overflowX: 'overlay',
           overflowY: 'hidden',
-          height: 40,
+          height: height || 40,
           paddingLeft: 8,
           paddingRight: 8,
         }}
@@ -45,6 +40,12 @@ const toolbarGroupStyle = props => ({
     ? 'flex-end'
     : 'center',
 });
+
+type ToolbarGroupProps = {|
+  children?: React.Node,
+  firstChild?: boolean,
+  lastChild?: boolean,
+|};
 
 export const ToolbarGroup = React.memo<ToolbarGroupProps>(
   (props: ToolbarGroupProps) => (

@@ -13,6 +13,7 @@ import { Column } from '../UI/Grid';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import FlatButton from '../UI/FlatButton';
 import { DayGroupRow } from './ProjectVersionRow';
+import EmptyMessage from '../UI/EmptyMessage';
 
 type VersionsGroupedByDay = {|
   [day: number]: Array<FilledCloudProjectVersion>,
@@ -171,22 +172,24 @@ const VersionHistory = ({
                 />
               );
             })}
-            <FlatButton
-              primary
-              disabled={isLoadingMoreVersions || !canLoadMore}
-              label={
-                canLoadMore ? (
+            {canLoadMore ? (
+              <FlatButton
+                primary
+                disabled={isLoadingMoreVersions || !canLoadMore}
+                label={
                   isLoadingMoreVersions ? (
                     <Trans>Loading...</Trans>
                   ) : (
                     <Trans>Show older</Trans>
                   )
-                ) : (
-                  <Trans>All versions loaded</Trans>
-                )
-              }
-              onClick={loadMore}
-            />
+                }
+                onClick={loadMore}
+              />
+            ) : (
+              <EmptyMessage>
+                <Trans>This is the end of the version history.</Trans>
+              </EmptyMessage>
+            )}
           </Column>
         )}
       </I18n>

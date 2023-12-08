@@ -36,13 +36,14 @@ type Props = {|
   id?: string,
 
   style?: {|
-    padding?: number,
+    padding?: number | string,
     width?: number,
     height?: number,
     cursor?: 'pointer',
     transform?: string,
     transition?: string,
     opacity?: number,
+    +fontSize?: 'inherit',
     +borderRadius?: number,
     margin?: number,
     marginRight?: number,

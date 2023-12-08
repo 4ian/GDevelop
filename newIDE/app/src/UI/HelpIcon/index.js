@@ -9,7 +9,7 @@ type PropsType = {|
   helpPagePath: ?string,
   disabled?: boolean,
   style?: {|
-    padding?: number,
+    padding?: number | string,
     width?: number,
     height?: number,
     transform?: string,

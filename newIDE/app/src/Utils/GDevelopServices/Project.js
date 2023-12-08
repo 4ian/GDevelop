@@ -10,6 +10,7 @@ import { getFileSha512TruncatedTo256 } from '../FileHasher';
 import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import { extractNextPageUriFromLinkHeader } from './Play';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -745,24 +746,38 @@ export const updateCloudProjectVersion = async (
 
 export const listVersionsOfProject = async (
   authenticatedUser: AuthenticatedUser,
-  cloudProjectId: string
-): Promise<?Array<FilledCloudProjectVersion>> => {
+  cloudProjectId: string,
+  options: {| forceUri: ?string |}
+): Promise<?{|
+  versions: Array<FilledCloudProjectVersion>,
+  nextPageUri: ?string,
+|}> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await apiClient.get(`/project/${cloudProjectId}/version`, {
+  const uri = options.forceUri || `/project/${cloudProjectId}/version`;
+
+  // $FlowFixMe
+  const response = await apiClient.get(uri, {
     headers: {
       Authorization: authorizationHeader,
     },
-    params: { userId, goal: 'history' },
+    params: options.forceUri
+      ? { userId }
+      : { userId, goal: 'history', perPage: 15 },
   });
+  const nextPageUri = response.headers.link
+    ? extractNextPageUriFromLinkHeader(response.headers.link)
+    : null;
   const projectVersions = response.data;
 
   if (!Array.isArray(projectVersions)) {
     throw new Error('Invalid response from the project versions API');
   }
-
-  return projectVersions;
+  return {
+    versions: projectVersions,
+    nextPageUri,
+  };
 };

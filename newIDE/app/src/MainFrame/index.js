@@ -185,6 +185,7 @@ import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/S
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import useVersionHistory from '../VersionHistory/useVersionHistory';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -508,6 +509,14 @@ const MainFrame = (props: Props) => {
     isProjectSplitInMultipleFiles: currentProject
       ? currentProject.isFolderProject()
       : false,
+  });
+  const {
+    renderVersionHistoryPanel,
+    showVersionHistoryButton,
+    openVersionHistoryPanel,
+  } = useVersionHistory({
+    getStorageProvider,
+    fileMetadata: currentFileMetadata,
   });
 
   /**
@@ -3116,6 +3125,8 @@ const MainFrame = (props: Props) => {
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
+        showVersionHistoryButton={showVersionHistoryButton}
+        onOpenVersionHistory={openVersionHistoryPanel}
       />
       <LeaderboardProvider
         gameId={
@@ -3415,6 +3426,7 @@ const MainFrame = (props: Props) => {
       {renderLeaderboardReplacerDialog()}
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
+      {renderVersionHistoryPanel()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

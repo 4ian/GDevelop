@@ -742,3 +742,27 @@ export const updateCloudProjectVersion = async (
   );
   return response.data;
 };
+
+export const listVersionsOfProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string
+): Promise<?Array<FilledCloudProjectVersion>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`/project/${cloudProjectId}/version`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId, goal: 'history' },
+  });
+  const projectVersions = response.data;
+
+  if (!Array.isArray(projectVersions)) {
+    throw new Error('Invalid response from the project versions API');
+  }
+
+  return projectVersions;
+};

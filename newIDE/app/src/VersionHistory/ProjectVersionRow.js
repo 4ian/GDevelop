@@ -24,7 +24,7 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
-import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
+import HistoryIcon from '../UI/CustomSvgIcons/History';
 import type { OpenedVersionStatus } from '.';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Chip from '../UI/Chip';
@@ -249,7 +249,7 @@ const ProjectVersionRow = ({
               <div style={styles.restoredVersionContainer}>
                 <LineStackLayout noMargin alignItems="center">
                   <div style={styles.iconContainer}>
-                    <FileWithLines fontSize="inherit" />
+                    <HistoryIcon fontSize="inherit" />
                   </div>
                   <Text noMargin>
                     {version.restoredFromVersion.label ||

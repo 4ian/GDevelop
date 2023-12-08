@@ -28,14 +28,14 @@ const separators = [' ', '_', '-', '.'];
 const trimFromSeparators = (value: string) => {
   let lowerIndex = 0;
   for (let index = 0; index < value.length; index++) {
-    if (!separators.some(separator => value.charAt(index))) {
+    if (!separators.includes(value.charAt(index))) {
       lowerIndex = index - 1;
       break;
     }
   }
-  let upperIndex = value.length;
-  for (let index = value.length; index >= lowerIndex; index--) {
-    if (!separators.some(separator => value.charAt(index))) {
+  let upperIndex = value.length - 1;
+  for (let index = value.length - 1; index >= lowerIndex; index--) {
+    if (!separators.includes(value.charAt(index))) {
       upperIndex = index + 1;
       break;
     }
@@ -76,7 +76,6 @@ export const groupResourcesByAnimations = (
       index: isNaN(index) ? null : index,
     };
   });
-  console.log(namedResources);
 
   const commonPrefix = findCommonPrefix(
     namedResources.map(resources => resources.name)
@@ -90,9 +89,11 @@ export const groupResourcesByAnimations = (
     }
   }
   for (const namedResource of namedResources) {
+    console.log(
+      namedResource.name + ' = ' + trimFromSeparators(namedResource.name)
+    );
     namedResource.name = trimFromSeparators(namedResource.name);
   }
-  console.log(namedResources);
 
   // Index the resources by animation names and frame indexes.
   const resourcesByName = groupBy(namedResources, ({ name }) => name);

@@ -48,10 +48,15 @@ export type HomeTab =
   | 'shop'
   | 'team-view';
 
+export type GetIconFunction = ({
+  color: string,
+  fontSize: 'inherit' | 'small',
+}) => React.Node;
+
 export type HomePageMenuTab = {|
   label: React.Node,
   tab: HomeTab,
-  getIcon: ({ color: string, fontSize: 'inherit' | 'small' }) => React.Node,
+  getIcon: GetIconFunction,
   id: string,
 |};
 

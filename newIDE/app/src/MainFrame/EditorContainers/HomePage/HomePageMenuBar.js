@@ -14,7 +14,7 @@ import {
   homePageMenuTabs,
   teamViewTab,
   type HomeTab,
-  type HomePageMenuTab,
+  type GetIconFunction,
 } from './HomePageMenu';
 import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -86,7 +86,7 @@ const HomePageMenuBar = ({
 
   const buttons: {
     label: React.Node,
-    getIcon: $PropertyType<HomePageMenuTab, 'getIcon'>,
+    getIcon: GetIconFunction,
     id: string,
     onClick: () => void,
   }[] = [

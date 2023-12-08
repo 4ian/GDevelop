@@ -56,6 +56,7 @@ const styles = {
     padding: 8,
     borderRadius: 4,
   },
+  labelTextfield: { width: '100%' },
 };
 
 const useClassesForRowContainer = makeStyles(theme =>
@@ -115,7 +116,7 @@ const ProjectVersionRow = ({
     <I18n>
       {({ i18n }) => (
         <div className={classes.root}>
-          <Column noMargin>
+          <Column noMargin expand>
             {isEditing ? (
               <TextField
                 ref={textFieldRef}
@@ -139,6 +140,7 @@ const ProjectVersionRow = ({
                     onCancelRenaming();
                   }
                 }}
+                style={styles.labelTextfield}
               />
             ) : version.label ? (
               <LineStackLayout noMargin>

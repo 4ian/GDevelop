@@ -24,14 +24,8 @@ import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../../ResourcesList/ResourceSource';
-import {
-  type ResourceExternalEditor,
-  type EditWithExternalEditorReturn,
-} from '../../../ResourcesList/ResourceExternalEditor';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
-import { ExternalEditorOpenedDialog } from '../../../UI/ExternalEditorOpenedDialog';
-import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import {
   ColumnStackLayout,
@@ -44,6 +38,8 @@ import ContextMenu, {
 } from '../../../UI/Menu/ContextMenu';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { groupResourcesByAnimations } from './AnimationImportHelper';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
+
 
 const gd: libGDevelop = global.gd;
 
@@ -198,7 +194,7 @@ const checkObjectPointsAndCollisionsMasks = (
   };
 };
 
-const applyPointsAndMasksToSpriteIfNecessary = (
+export const applyPointsAndMasksToSpriteIfNecessary = (
   spriteConfiguration: gdSpriteObject,
   direction: gdDirection,
   sprite: gdSprite
@@ -265,17 +261,17 @@ export const addAnimationFrame = (
   sprite.delete();
 };
 
-const removeExtensionFromFileName = (fileName: string) => {
-  const dotIndex = fileName.lastIndexOf('.');
-  return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
-};
-
 type Props = {|
   spriteConfiguration: gdSpriteObject,
   direction: gdDirection,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resourceManagementProps: ResourceManagementProps,
+  editWith: (
+    i18n: I18nType,
+    ResourceExternalEditor,
+    direction: gdDirection
+  ) => Promise<void>,
   onReplaceByDirection: (newDirection: gdDirection) => void,
   onSpriteAdded: (sprite: gdSprite) => void,
   onSpriteUpdated?: () => void,
@@ -292,6 +288,7 @@ const SpritesList = ({
   project,
   resourcesLoader,
   resourceManagementProps,
+  editWith,
   onReplaceByDirection,
   onSpriteAdded,
   onSpriteUpdated,
@@ -301,7 +298,6 @@ const SpritesList = ({
   objectName,
   animationName,
 }: Props) => {
-  const [externalEditorOpened, setExternalEditorOpened] = React.useState(false);
   // It's important to save the selected sprites in a ref, so that
   // we can update the selection when a context menu is opened without relying on the state.
   // Otherwise, the selection would be updated after the context menu is opened.
@@ -466,118 +462,6 @@ const SpritesList = ({
     ]
   );
 
-  const editWith = React.useCallback(
-    async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
-      const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
-        return direction.getSprite(i).getImageName();
-      });
-
-      try {
-        setExternalEditorOpened(true);
-        const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
-          {
-            project,
-            i18n,
-            getStorageProvider: resourceManagementProps.getStorageProvider,
-            resourceManagementProps,
-            resourceNames,
-            extraOptions: {
-              singleFrame: false,
-              fps:
-                direction.getTimeBetweenFrames() > 0
-                  ? 1 / direction.getTimeBetweenFrames()
-                  : 1,
-              name:
-                animationName ||
-                (resourceNames[0] &&
-                  removeExtensionFromFileName(resourceNames[0])) ||
-                objectName,
-              isLooping: direction.isLooping(),
-              existingMetadata: direction.getMetadata(),
-            },
-          }
-        );
-
-        setExternalEditorOpened(false);
-        if (!editResult) return;
-
-        const { resources, newMetadata, newName } = editResult;
-
-        const newDirection = new gd.Direction();
-        newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
-        newDirection.setLoop(direction.isLooping());
-        resources.forEach(resource => {
-          const sprite = new gd.Sprite();
-          sprite.setImageName(resource.name);
-          // Restore collision masks and points
-          if (
-            resource.originalIndex !== undefined &&
-            resource.originalIndex !== null
-          ) {
-            // The sprite existed before, so we can copy its points and collision masks.
-            const originalSprite = direction.getSprite(resource.originalIndex);
-            copySpritePoints(originalSprite, sprite);
-            copySpritePolygons(originalSprite, sprite);
-          } else {
-            // The sprite is new, apply points & collision masks if necessary.
-            applyPointsAndMasksToSpriteIfNecessary(
-              spriteConfiguration,
-              direction,
-              sprite
-            );
-          }
-          onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
-          newDirection.addSprite(sprite);
-          sprite.delete();
-        });
-
-        // Set metadata on the direction to allow editing again in the future.
-        if (newMetadata) {
-          newDirection.setMetadata(JSON.stringify(newMetadata));
-        }
-
-        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
-        onReplaceByDirection(newDirection);
-
-        // If a name was specified in the external editor, use it for the animation.
-        if (newName) {
-          onChangeName(newName);
-        }
-        newDirection.delete();
-
-        if (onSpriteUpdated) onSpriteUpdated();
-        // If an external editor is used to edit the sprites, we assume the first sprite was edited.
-        if (onFirstSpriteUpdated) onFirstSpriteUpdated();
-      } catch (error) {
-        setExternalEditorOpened(false);
-        console.error(
-          'An exception was thrown when launching or reading resources from the external editor:',
-          error
-        );
-        showErrorBox({
-          message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
-          rawError: error,
-          errorId: 'external-editor-error',
-        });
-      }
-    },
-    [
-      direction,
-      project,
-      resourceManagementProps,
-      animationName,
-      objectName,
-      resourcesLoader,
-      onReplaceByDirection,
-      onSpriteUpdated,
-      onFirstSpriteUpdated,
-      onSpriteAdded,
-      spriteConfiguration,
-      onChangeName,
-    ]
-  );
-
   const deleteSprites = React.useCallback(
     async () => {
       const sprites = selectedSprites.current;
@@ -707,7 +591,9 @@ const SpritesList = ({
         resourceExternalEditors={
           resourceManagementProps.resourceExternalEditors
         }
-        onEditWith={editWith}
+        onEditWith={(i18n, ResourceExternalEditor) =>
+          editWith(i18n, ResourceExternalEditor, direction)
+        }
         onDirectionUpdated={onSpriteUpdated}
       />
       <ResponsiveLineStackLayout noMargin expand alignItems="center">
@@ -763,7 +649,6 @@ const SpritesList = ({
           />
         </Column>
       </ResponsiveLineStackLayout>
-      {externalEditorOpened && <ExternalEditorOpenedDialog />}
     </ColumnStackLayout>
   );
 };

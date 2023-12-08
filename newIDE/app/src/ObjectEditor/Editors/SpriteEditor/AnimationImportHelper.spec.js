@@ -41,6 +41,20 @@ describe('AnimationImportHelper', () => {
     deleteResources(resources);
   });
 
+  it('can handle 1 frame alone', () => {
+    const resources = createResources([
+      'Assets/Player Jump.png',
+    ]);
+
+    const resourcesByAnimations = groupResourcesByAnimations(resources);
+    expect(resourcesByAnimations.size).toBe(1);
+    expect(getAnimationFramesCount(resourcesByAnimations, 'Player Jump')).toBe(
+      1
+    );
+
+    deleteResources(resources);
+  });
+
   it('can handle 1 animation alone', () => {
     const resources = createResources([
       'Assets/Player Run 1.png',

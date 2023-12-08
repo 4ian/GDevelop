@@ -411,18 +411,21 @@ const SpritesList = ({
         project.getResourcesManager().addResource(resource);
       });
 
-      if (directionSpritesCountBeforeAdding === 0) {
+      if (directionSpritesCountBeforeAdding === 0 && resources.length > 1) {
         const resourcesByAnimation = groupResourcesByAnimations(resources);
-        if (resourcesByAnimation) {
+        if (resourcesByAnimation.size > 1) {
           addAnimations(resourcesByAnimation);
         } else {
-          for (const resource of resources) {
-            addAnimationFrame(
-              spriteConfiguration,
-              direction,
-              resource,
-              onSpriteAdded
-            );
+          // Use `resourcesByAnimation` because frames are sorted.
+          for (const resources of resourcesByAnimation.values()) {
+            for (const resource of resources) {
+              addAnimationFrame(
+                spriteConfiguration,
+                direction,
+                resource,
+                onSpriteAdded
+              );
+            }
           }
         }
       } else {

@@ -326,7 +326,7 @@ namespace gdjs {
       await processAndRetryIfNeededWithPromisePool(
         [...sceneResources.values()],
         this._isLoadingInForeground
-        ? maxForegroundConcurrency
+          ? maxForegroundConcurrency
           : maxBackgroundConcurrency,
         maxAttempt,
         async (resourceName) => {

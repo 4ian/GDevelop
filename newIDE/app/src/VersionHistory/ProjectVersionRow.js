@@ -85,6 +85,7 @@ type Props = {|
     version: FilledCloudProjectVersion
   ) => void,
   displayFullDate?: boolean,
+  getAnonymousAvatar: () => {| src: string, alt: string |},
 |};
 
 const ProjectVersionRow = ({
@@ -95,6 +96,7 @@ const ProjectVersionRow = ({
   onCancelRenaming,
   onContextMenu,
   displayFullDate,
+  getAnonymousAvatar,
 }: Props) => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const [newLabel, setNewLabel] = React.useState<string>(version.label || '');
@@ -107,6 +109,7 @@ const ProjectVersionRow = ({
   };
 
   const classes = useClassesForRowContainer();
+  const anonymousAvatar = getAnonymousAvatar();
 
   return (
     <I18n>
@@ -182,7 +185,7 @@ const ProjectVersionRow = ({
               </div>
             )}
             {authorPublicProfile ? (
-              <LineStackLayout noMargin>
+              <LineStackLayout noMargin alignItems="center">
                 <Avatar
                   src={authorPublicProfile.iconUrl}
                   style={styles.avatar}
@@ -192,10 +195,14 @@ const ProjectVersionRow = ({
                 </Text>
               </LineStackLayout>
             ) : (
-              <LineStackLayout noMargin>
-                {/* TODO: Add green hero avatar */}
+              <LineStackLayout noMargin alignItems="center">
+                <img
+                  src={anonymousAvatar.src}
+                  alt={anonymousAvatar.alt}
+                  style={styles.avatar}
+                />
                 <Text noMargin style={styles.username}>
-                  <Trans>Anonymous Green Hero</Trans>
+                  <Trans>Anonymous </Trans>
                 </Text>
               </LineStackLayout>
             )}
@@ -240,6 +247,7 @@ type DayGroupRowProps = {|
     version: FilledCloudProjectVersion
   ) => void,
   usersPublicProfileByIds: UserPublicProfileByIds,
+  getAnonymousAvatar: () => {| src: string, alt: string |},
 |};
 
 export const DayGroupRow = ({
@@ -250,6 +258,7 @@ export const DayGroupRow = ({
   onCancelRenaming,
   onContextMenu,
   usersPublicProfileByIds,
+  getAnonymousAvatar,
 }: DayGroupRowProps) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const displayYear = new Date(day).getFullYear() !== thisYear;
@@ -279,6 +288,7 @@ export const DayGroupRow = ({
               usersPublicProfileByIds={usersPublicProfileByIds}
               isEditing={version.id === editedVersionId}
               onContextMenu={onContextMenu}
+              getAnonymousAvatar={getAnonymousAvatar}
               displayFullDate
             />
           ))}
@@ -310,6 +320,7 @@ export const DayGroupRow = ({
                       usersPublicProfileByIds={usersPublicProfileByIds}
                       isEditing={version.id === editedVersionId}
                       onContextMenu={onContextMenu}
+                      getAnonymousAvatar={getAnonymousAvatar}
                     />
                   ))}
                 </div>

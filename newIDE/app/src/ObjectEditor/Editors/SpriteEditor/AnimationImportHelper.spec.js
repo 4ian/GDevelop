@@ -42,9 +42,7 @@ describe('AnimationImportHelper', () => {
   });
 
   it('can handle 1 frame alone', () => {
-    const resources = createResources([
-      'Assets/Player Jump.png',
-    ]);
+    const resources = createResources(['Assets/Player Jump.png']);
 
     const resourcesByAnimations = groupResourcesByAnimations(resources);
     expect(resourcesByAnimations.size).toBe(1);

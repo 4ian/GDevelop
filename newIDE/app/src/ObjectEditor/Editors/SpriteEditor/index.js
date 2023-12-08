@@ -38,6 +38,9 @@ import {
   getCurrentElements,
   getTotalSpritesCount,
 } from './Utils/SpriteObjectHelper';
+import Edit from '../../../UI/CustomSvgIcons/Edit';
+import { groupResourcesByAnimations } from './AnimationImportHelper';
+import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 
 const gd: libGDevelop = global.gd;
 
@@ -474,6 +477,49 @@ export default function SpriteEditor({
     [forceUpdate, onObjectUpdated, spriteConfiguration]
   );
 
+  const storageProvider = resourceManagementProps.getStorageProvider();
+  const resourceSources = resourceManagementProps.resourceSources
+    .filter(source => source.kind === 'image')
+    .filter(
+      ({ onlyForStorageProvider }) =>
+        !onlyForStorageProvider ||
+        onlyForStorageProvider === storageProvider.internalName
+    );
+
+  const importImages = React.useCallback(
+    async () => {
+      const resources = await resourceManagementProps.onChooseResource({
+        initialSourceName: resourceSources[0].name,
+        multiSelection: true,
+        resourceKind: 'image',
+      });
+      if (resources.length === 0) {
+        return;
+      }
+      resources.forEach(resource => {
+        applyResourceDefaults(project, resource);
+        project.getResourcesManager().addResource(resource);
+      });
+
+      addAnimations(groupResourcesByAnimations(resources));
+
+      // Important, we are responsible for deleting the resources that were given to us.
+      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+      resources.forEach(resource => resource.delete());
+
+      forceUpdate();
+
+      await resourceManagementProps.onFetchNewlyAddedResources();
+
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [resourceManagementProps, resourceSources, addAnimations, forceUpdate, onObjectUpdated, project]
+  );
+
+  const imageResourceExternalEditors = resourceManagementProps.resourceExternalEditors.filter(
+    ({ kind }) => kind === 'image'
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -485,10 +531,21 @@ export default function SpriteEditor({
                 description={
                   <Trans>Animations are a sequence of images.</Trans>
                 }
-                actionLabel={<Trans>Add an animation</Trans>}
+                actionLabel={<Trans>Import images</Trans>}
+                secondaryActionLabel={
+                  i18n._(isMobileScreen
+                    ? t`Draw`
+                    : imageResourceExternalEditors[0].createDisplayName)
+                }
+                secondaryActionIcon={<Edit />}
                 helpPagePath="/objects/sprite"
                 tutorialId="intermediate-changing-animations"
-                onAction={addAnimation}
+                onAction={() => {
+                  importImages();
+                }}
+                onSecondaryAction={
+                  imageResourceExternalEditors.length ? addAnimation : undefined
+                }
               />
             </Column>
           ) : (

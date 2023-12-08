@@ -43,6 +43,11 @@ const groupVersionsByDay = (
   return versionsGroupedByDay;
 };
 
+export type OpenedVersionStatus = {|
+  id: string,
+  status: 'opened' | 'unsavedChanges' | 'saving' | 'saved',
+|};
+
 type Props = {|
   projectId: string,
   versions: Array<FilledCloudProjectVersion>,
@@ -50,6 +55,7 @@ type Props = {|
     FilledCloudProjectVersion,
     {| label: string |}
   ) => Promise<void>,
+  openedVersionStatus: ?OpenedVersionStatus,
   onLoadMore: () => Promise<void>,
   canLoadMore: boolean,
   onCheckoutVersion: FilledCloudProjectVersion => void,
@@ -59,6 +65,7 @@ const VersionHistory = ({
   projectId,
   versions,
   onRenameVersion,
+  openedVersionStatus,
   onLoadMore,
   canLoadMore,
   onCheckoutVersion,
@@ -190,6 +197,7 @@ const VersionHistory = ({
                   onContextMenu={openContextMenu}
                   editedVersionId={editedVersionId}
                   getAnonymousAvatar={getAnonymousAvatar}
+                  openedVersionStatus={openedVersionStatus}
                 />
               );
             })}

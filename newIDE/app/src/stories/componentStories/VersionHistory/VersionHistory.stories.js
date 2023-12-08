@@ -75,7 +75,6 @@ const initialVersions: Array<FilledCloudProjectVersion> = [
   {
     id: '5280e344-bd36-4662-9948-cb0d18928d03',
     projectId,
-    label: 'No author',
     createdAt: '2022-10-12T10:11:49.305Z',
     previousVersion: 'e51c123a-2abb-47fc-aff6-50b0572c5dc2',
   },

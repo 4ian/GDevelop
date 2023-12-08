@@ -62,6 +62,21 @@ const styles = {
   labelTextfield: { width: '100%' },
 };
 
+const useOutline = (
+  version: FilledCloudProjectVersion,
+  openedVersionStatus: ?OpenedVersionStatus
+) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  if (
+    !openedVersionStatus ||
+    openedVersionStatus.id !== version.id ||
+    openedVersionStatus.status !== 'unsavedChanges'
+  )
+    return undefined;
+
+  return { outline: `1px solid ${gdevelopTheme.statusIndicator.error}` };
+};
+
 const StatusChip = ({
   status,
 }: {|
@@ -152,6 +167,7 @@ const ProjectVersionRow = ({
   };
 
   const classes = useClassesForRowContainer();
+  const outlineStyle = useOutline(version, openedVersionStatus);
   const anonymousAvatar = getAnonymousAvatar();
 
   return (
@@ -163,6 +179,7 @@ const ProjectVersionRow = ({
               ? ' selected'
               : ''
           }`}
+          style={outlineStyle}
         >
           <Column noMargin expand>
             {openedVersionStatus &&

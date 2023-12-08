@@ -82,7 +82,7 @@ const VersionHistory = ({
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
 
   const userIdsToFetch = React.useMemo(
-    () => versions.map(version => version.userId).filter(Boolean),
+    () => new Set(versions.map(version => version.userId).filter(Boolean)),
     [versions]
   );
 
@@ -99,12 +99,12 @@ const VersionHistory = ({
     () => {
       (async () => {
         if (!userIdsToFetch) return;
-        if (userIdsToFetch.length === 0) {
+        if (userIdsToFetch.size === 0) {
           setUsersPublicProfileByIds({});
           return;
         }
         const _usersPublicProfileByIds = await getUserPublicProfilesByIds(
-          userIdsToFetch
+          Array.from(userIdsToFetch)
         );
         setUsersPublicProfileByIds(_usersPublicProfileByIds);
       })();
@@ -182,7 +182,7 @@ const VersionHistory = ({
     <>
       <I18n>
         {({ i18n }) => (
-          <Column>
+          <Column noMargin>
             {days.map(day => {
               const dayVersions = versionsGroupedByDay[day];
               if (!dayVersions || dayVersions.length === 0) return null;

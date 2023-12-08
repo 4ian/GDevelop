@@ -464,6 +464,15 @@ export const getRedirectToCheckoutUrl = ({
   return url.toString();
 };
 
+export const canSeeCloudProjectHistory = (
+  subscription: ?Subscription
+): boolean => {
+  if (!subscription) return false;
+  return ['gdevelop_pro', 'gdevelop_startup', 'gdevelop_startup'].includes(
+    subscription.planId
+  );
+};
+
 export const redeemCode = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,

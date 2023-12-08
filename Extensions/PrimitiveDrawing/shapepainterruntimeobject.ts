@@ -242,6 +242,24 @@ namespace gdjs {
       );
     }
 
+    drawTorus(
+      centerX: float,
+      centerY: float,
+      innerRadius: float,
+      outerRadius: float,
+      startArc: float,
+      endArc: float
+    ) {
+      this._renderer.drawTorus(
+        centerX,
+        centerY,
+        innerRadius,
+        outerRadius,
+        startArc,
+        endArc
+      );
+    }
+
     drawRegularPolygon(
       centerX: float,
       centerY: float,

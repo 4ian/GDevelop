@@ -44,7 +44,8 @@ public:
   virtual ~SceneResourcesFinder(){};
 
 private:
-  SceneResourcesFinder() : gd::ArbitraryResourceWorker(){};
+  SceneResourcesFinder(gd::ResourcesManager &resourcesManager)
+      : gd::ArbitraryResourceWorker(resourcesManager){};
 
   void AddUsedResource(gd::String &resourceName);
 

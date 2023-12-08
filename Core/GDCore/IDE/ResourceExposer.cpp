@@ -33,10 +33,8 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
   // traverse the whole project (this time for events) and ExposeProjectEffects
   // (this time for effects).
 
-  gd::ResourcesManager* resourcesManager = &(project.GetResourcesManager());
-
   // Expose any project resources as files.
-  worker.ExposeResources(resourcesManager);
+  worker.ExposeResources();
 
   project.GetPlatformSpecificAssets().ExposeResources(worker);
 

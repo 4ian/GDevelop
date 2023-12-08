@@ -4,13 +4,15 @@ Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   export interface RuntimeScene {
-    _tweens: gdjs.TweenRuntimeBehavior.TweenManager;
+    _tweens: gdjs.evtTools.tween.TweenManager;
   }
   export namespace evtTools {
     export namespace tween {
+      const logger = new gdjs.Logger('Tween');
+
       export const getTweensMap = (runtimeScene: RuntimeScene) =>
         runtimeScene._tweens ||
-        (runtimeScene._tweens = new gdjs.TweenRuntimeBehavior.TweenManager());
+        (runtimeScene._tweens = new gdjs.evtTools.tween.TweenManager());
 
       // Layout tweens from event-based objects won't step, but it's fine
       // because they don't have cameras anyway.
@@ -316,7 +318,7 @@ namespace gdjs {
         layerName: string,
         duration: number,
         easing: string,
-        timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+        timeSource: gdjs.evtTools.tween.TimeSource
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         getTweensMap(runtimeScene).addMultiTween(
@@ -394,8 +396,8 @@ namespace gdjs {
         layerName: string,
         duration: number,
         easing: string,
-        timeSource: gdjs.TweenRuntimeBehavior.TimeSource,
-        interpolation: gdjs.TweenRuntimeBehavior.Interpolation
+        timeSource: gdjs.evtTools.tween.TimeSource,
+        interpolation: gdjs.evtTools.tween.Interpolation
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         getTweensMap(runtimeScene).addSimpleTween(
@@ -465,7 +467,7 @@ namespace gdjs {
         layerName: string,
         duration: number,
         easing: string,
-        timeSource: gdjs.TweenRuntimeBehavior.TimeSource
+        timeSource: gdjs.evtTools.tween.TimeSource
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         getTweensMap(runtimeScene).addSimpleTween(
@@ -477,6 +479,119 @@ namespace gdjs {
           layer.getCameraRotation(),
           toRotation,
           (value: float) => layer.setCameraRotation(value)
+        );
+      };
+
+      /**
+       * Tween a numeric object effect property.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param toValue The targeted value
+       * @param layerName Layer name
+       * @param effectName Effect name
+       * @param propertyName Property name
+       * @param easing Easing function identifier
+       * @param duration Duration in seconds
+       */
+      export const tweenNumberEffectPropertyTween = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toValue: float,
+        layerName: string,
+        effectName: string,
+        propertyName: string,
+        easing: string,
+        duration: float
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const effect = layer.getRendererEffects()[effectName];
+        if (!effect) {
+          logger.error(
+            `The layer "${layer.getName()}" doesn't have any effect called "${effectName}"`
+          );
+        }
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          layer,
+          duration,
+          easing,
+          linearInterpolation,
+          effect ? effect.getDoubleParameter(propertyName) : 0,
+          toValue,
+          (value: float) => {
+            if (effect) {
+              effect.updateDoubleParameter(propertyName, value);
+            }
+          }
+        );
+      };
+
+      /**
+       * Tween a color object effect property.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param toColorStr The target RGB color (format "128;200;255" with values between 0 and 255 for red, green and blue)
+       * @param layerName Layer name
+       * @param effectName Effect name
+       * @param propertyName Property name
+       * @param easing Easing function identifier
+       * @param duration Duration in seconds
+       */
+      export const tweenColorEffectPropertyTween = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toColorStr: string,
+        layerName: string,
+        effectName: string,
+        propertyName: string,
+        easing: string,
+        duration: float
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const effect = layer.getRendererEffects()[effectName];
+        if (!effect) {
+          logger.error(
+            `The layer "${layer.getName()}" doesn't have any effect called "${effectName}"`
+          );
+        }
+        const rgbFromColor = gdjs.hexNumberToRGB(
+          effect ? effect.getColorParameter(propertyName) : 0
+        );
+        const rgbToColor: float[] = gdjs.rgbOrHexToRGBColor(toColorStr);
+
+        getTweensMap(runtimeScene).addMultiTween(
+          identifier,
+          layer,
+          duration,
+          easing,
+          linearInterpolation,
+          gdjs.evtTools.tween.rgbToHsl(
+            rgbFromColor.r,
+            rgbFromColor.g,
+            rgbFromColor.b
+          ),
+          gdjs.evtTools.tween.rgbToHsl(
+            rgbToColor[0],
+            rgbToColor[1],
+            rgbToColor[2]
+          ),
+          ([hue, saturation, lightness]) => {
+            if (effect) {
+              const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+                hue,
+                saturation,
+                lightness
+              );
+              effect.updateColorParameter(
+                propertyName,
+                gdjs.rgbToHexNumber(
+                  rgbFromHslColor[0],
+                  rgbFromHslColor[1],
+                  rgbFromHslColor[2]
+                )
+              );
+            }
+          }
         );
       };
     }

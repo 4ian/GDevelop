@@ -3,12 +3,9 @@ const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks');
 
 describe('libGD.js - GDJS Behavior Code Generation integration tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   it('generates a working empty behavior', function () {
     // Create an empty behavior

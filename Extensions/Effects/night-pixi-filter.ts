@@ -47,11 +47,22 @@ namespace gdjs {
           1
         );
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        return filter.uniforms[parameterName] || 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

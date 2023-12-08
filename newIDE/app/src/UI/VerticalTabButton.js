@@ -30,7 +30,7 @@ const styles = {
 type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
-  getIcon: (color: string) => React.Node,
+  getIcon: ({ color: string, fontSize: 'inherit' | 'small' }) => React.Node,
   isActive: boolean,
   hideLabel?: boolean,
   id?: string,
@@ -65,7 +65,10 @@ const VerticalTabButton = ({
             : styles.iconWrapperWithLabel
         }
       >
-        {getIcon(isActive ? 'inherit' : 'secondary')}
+        {getIcon({
+          color: isActive ? 'inherit' : 'secondary',
+          fontSize: 'small',
+        })}
       </div>
       {!hideLabel && (
         <>

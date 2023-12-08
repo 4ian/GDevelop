@@ -24,11 +24,11 @@ import GridListTile from '@material-ui/core/GridListTile';
 import { makeStyles } from '@material-ui/core/styles';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
-import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
 import WikiSearchBar from '../../../../UI/WikiSearchBar';
+import FlingGame from '../InAppTutorials/FlingGame';
 
 const useStyles = makeStyles({
   tile: {
@@ -108,28 +108,21 @@ export const TutorialsRow = ({
 );
 
 type Props = {|
-  onStartTutorial: () => void,
   onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
-  onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const MainPage = ({
-  onStartTutorial,
   onOpenExampleStore,
   onTabChange,
-  onOpenHelpFinder,
   onSelectCategory,
   tutorials,
   selectInAppTutorial,
 }: Props) => {
   const classes = useStyles();
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
   const isTabletOrSmallLaptop =
@@ -141,21 +134,10 @@ const MainPage = ({
     disabled?: boolean,
   }[] = [
     {
-      title: <Trans>Guided Tour</Trans>,
-      description: (
-        <Trans>
-          Learn the fundamentals of the editor with our assisted tutorial.
-        </Trans>
-      ),
-      action: () => {
-        onStartTutorial();
-      },
-      disabled: !!currentlyRunningInAppTutorial,
-    },
-    {
       title: <Trans>Documentation</Trans>,
       description: <Trans>Find the complete documentation on everything</Trans>,
-      action: onOpenHelpFinder,
+      action: () =>
+        Window.openExternalURL('https://wiki.gdevelop.io/gdevelop5/'),
     },
     {
       title: <Trans>Examples</Trans>,
@@ -253,6 +235,17 @@ const MainPage = ({
             onSelectCategory={onSelectCategory}
             tutorials={tutorials}
           />
+        </SectionRow>
+        <SectionRow>
+          <Text noMargin size="section-title">
+            <Trans>Create and Publish a Fling game</Trans>
+          </Text>
+          <Text size="body" color="secondary" noMargin>
+            <Trans>
+              3-part tutorial to creating and publishing a game from scratch.
+            </Trans>
+          </Text>
+          <FlingGame selectInAppTutorial={selectInAppTutorial} />
         </SectionRow>
         <SectionRow>
           <LineStackLayout

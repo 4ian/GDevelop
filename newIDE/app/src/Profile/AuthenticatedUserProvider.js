@@ -52,6 +52,7 @@ import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
 import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 type Props = {|
   authentication: Authentication,
@@ -199,7 +200,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
         },
-        onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
+        onRefreshSubscription: this._fetchUserSubscriptionLimitsAndUsages,
+        onRefreshLimits: this._fetchUserLimits,
         onPurchaseSuccessful: this._fetchUserPurchases,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
@@ -419,7 +421,10 @@ export default class AuthenticatedUserProvider extends React.Component<
           },
         })),
       error => {
-        if (error.response.status === 404) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
           console.warn(
             'List recommendations endpoint returned 404, user might not have completed survey.'
           );
@@ -480,7 +485,28 @@ export default class AuthenticatedUserProvider extends React.Component<
     );
   };
 
-  _fetchUserSubscriptionLimitsAndUsages = async () => {
+  _fetchUserSubscription = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const subscription = await getUserSubscription(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          subscription,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user subscriptions:', error);
+    }
+  };
+
+  _fetchUserUsages = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
     if (!firebaseUser) return;
@@ -499,21 +525,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading user usages:', error);
     }
+  };
 
-    try {
-      const subscription = await getUserSubscription(
-        authentication.getAuthorizationHeader,
-        firebaseUser.uid
-      );
-      this.setState(({ authenticatedUser }) => ({
-        authenticatedUser: {
-          ...authenticatedUser,
-          subscription,
-        },
-      }));
-    } catch (error) {
-      console.error('Error while loading user subscriptions:', error);
-    }
+  _fetchUserLimits = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
 
     try {
       const limits = await getUserLimits(
@@ -529,6 +546,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading user limits:', error);
     }
+  };
+
+  _fetchUserSubscriptionLimitsAndUsages = async () => {
+    await Promise.all([
+      this._fetchUserSubscription(),
+      this._fetchUserUsages(),
+      this._fetchUserLimits(),
+    ]);
   };
 
   _fetchUserAssetPacks = async () => {
@@ -773,6 +798,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           getNewsletterEmail: payload.getNewsletterEmail,
           appLanguage: preferences.language,
           donateLink: payload.donateLink,
+          discordUsername: payload.discordUsername,
           communityLinks: payload.communityLinks,
           survey: payload.survey,
         }

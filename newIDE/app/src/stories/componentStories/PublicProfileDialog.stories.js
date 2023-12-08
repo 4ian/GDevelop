@@ -17,6 +17,7 @@ const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   username: null,
   description: null,
   donateLink: null,
+  discordUsername: null,
   communityLinks: {},
 };
 

@@ -10,9 +10,21 @@ import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import Paper from '../../../UI/Paper';
-import { homePageMenuTabs, teamViewTab, type HomeTab } from './HomePageMenu';
+import {
+  homePageMenuTabs,
+  teamViewTab,
+  type HomeTab,
+  type GetIconFunction,
+} from './HomePageMenu';
 import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+
+const iconSize = 20;
+const iconButtonPaddingVertical = 8;
+const iconButtonPaddingHorizontal = 5;
+const iconButtonLabelPadding = 6;
+const toolbarHeight =
+  iconSize + 2 * iconButtonLabelPadding + 2 * iconButtonPaddingVertical;
 
 export const styles = {
   desktopMenu: {
@@ -30,12 +42,17 @@ export const styles = {
   },
   mobileContainer: {
     width: '100%',
+    fontSize: iconSize,
+    height: toolbarHeight,
   },
   bottomButtonsContainer: {
     marginBottom: 'env(safe-area-inset-bottom)',
   },
-  button: { padding: 6 },
-  buttonLabel: { padding: '0 6px' },
+  mobileButton: {
+    padding: `${iconButtonPaddingVertical}px ${iconButtonPaddingHorizontal}px`,
+    fontSize: 'inherit',
+  },
+  buttonLabel: { padding: iconButtonLabelPadding, display: 'flex' },
 };
 
 type Props = {|
@@ -69,7 +86,7 @@ const HomePageMenuBar = ({
 
   const buttons: {
     label: React.Node,
-    getIcon: (color: string) => React.Node,
+    getIcon: GetIconFunction,
     id: string,
     onClick: () => void,
   }[] = [
@@ -77,13 +94,17 @@ const HomePageMenuBar = ({
       label: <Trans>Preferences</Trans>,
       id: 'settings',
       onClick: onOpenPreferences,
-      getIcon: color => <Preferences fontSize="small" color={color} />,
+      getIcon: ({ color, fontSize }) => (
+        <Preferences fontSize={fontSize} color={color} />
+      ),
     },
     {
       label: <Trans>About GDevelop</Trans>,
       id: 'about-gdevelop',
       onClick: onOpenAbout,
-      getIcon: color => <GDevelopGLogo fontSize="small" color={color} />,
+      getIcon: ({ color, fontSize }) => (
+        <GDevelopGLogo fontSize={fontSize} color={color} />
+      ),
     },
   ];
 
@@ -97,7 +118,7 @@ const HomePageMenuBar = ({
           borderTop: `1px solid ${theme.home.separator.color}`,
         }}
       >
-        <Toolbar>
+        <Toolbar height={toolbarHeight}>
           <ToolbarGroup>
             {tabsToDisplay.map(({ label, tab, getIcon, id }) => {
               const isActive = activeTab === tab;
@@ -107,14 +128,18 @@ const HomePageMenuBar = ({
                   key={id}
                   disableRipple
                   disableFocusRipple
-                  style={styles.button}
+                  style={styles.mobileButton}
                   onClick={() => {
                     setActiveTab(tab);
                   }}
                   selected={isActive}
+                  id={id}
                 >
                   <span style={styles.buttonLabel}>
-                    {getIcon(isActive ? 'inherit' : 'secondary')}
+                    {getIcon({
+                      color: isActive ? 'inherit' : 'secondary',
+                      fontSize: 'inherit',
+                    })}
                   </span>
                 </IconButton>
               );
@@ -133,10 +158,13 @@ const HomePageMenuBar = ({
                 key={id}
                 disableRipple
                 disableFocusRipple
-                style={styles.button}
+                style={styles.mobileButton}
                 onClick={onClick}
+                id={id}
               >
-                <span style={styles.buttonLabel}>{getIcon('secondary')}</span>
+                <span style={styles.buttonLabel}>
+                  {getIcon({ color: 'secondary', fontSize: 'inherit' })}
+                </span>
               </IconButton>
             ))}
           </ToolbarGroup>

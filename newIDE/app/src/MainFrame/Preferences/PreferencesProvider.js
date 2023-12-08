@@ -170,6 +170,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(
       this
     ),
+    setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(
+      this
+    ),
     getEditorStateForProject: this._getEditorStateForProject.bind(this),
     setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
@@ -855,6 +858,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           watchProjectFolderFilesForLocalProjects: enable,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewFeaturesAcknowledgements(newFeaturesAcknowledgements: {
+    [featureId: string]: {| dates: [number] |},
+  }) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newFeaturesAcknowledgements,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

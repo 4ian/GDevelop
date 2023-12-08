@@ -69,16 +69,28 @@ const ObjectGroupEditor = ({
 
     const message =
       type === '' ? (
-        <Trans>
-          This group contains objects of different kinds. You'll only be able to
-          use actions and conditions common to all objects with this group.
-        </Trans>
+        <>
+          <Trans>
+            This group contains objects of different kinds. You'll only be able
+            to use actions and conditions common to all objects with this group.
+          </Trans>{' '}
+          <Trans>
+            Variables declared in all objects of the group will be visible in
+            event expressions.
+          </Trans>
+        </>
       ) : (
-        <Trans>
-          This group contains objects of the same kind ({type}). You can use
-          actions and conditions related to this kind of objects in events with
-          this group.
-        </Trans>
+        <>
+          <Trans>
+            This group contains objects of the same kind ({type}). You can use
+            actions and conditions related to this kind of objects in events
+            with this group.
+          </Trans>{' '}
+          <Trans>
+            Variables declared in all objects of the group will be visible in
+            event expressions.
+          </Trans>
+        </>
       );
 
     return <AlertMessage kind="info">{message}</AlertMessage>;

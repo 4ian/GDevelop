@@ -402,7 +402,7 @@ describe('gdjs.SceneStack', () => {
     gdjs._unregisterCallback(onRuntimeScenePaused);
   });
 
-  it.only('can start a layout which assets loading didn\'t stated yet and wait them to finish', async () => {
+  it('can start a layout which assets loading didn\'t stated yet and wait them to finish', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
     //@ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);

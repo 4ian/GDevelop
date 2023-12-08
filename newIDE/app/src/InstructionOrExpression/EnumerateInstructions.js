@@ -21,9 +21,16 @@ const freeInstructionsToKeep = {
   Scene3D: ['Scene3D::TurnCameraTowardObject'],
 };
 
+/**
+ * Check if the instruction can be use according to an object and its behaviors.
+ * @param instructionMetadata The instruction being checked
+ * @param objectType The object type
+ * @param objectBehaviorTypes The object behaviors
+ */
 const isObjectInstruction = (
   instructionMetadata: gdInstructionMetadata,
-  objectType?: string
+  objectType?: string,
+  objectBehaviorTypes?: Set<string>
 ): boolean => {
   let firstParameterIndex = -1;
   for (
@@ -51,13 +58,27 @@ const isObjectInstruction = (
   ) {
     return false;
   }
-  if (firstParameterIndex === instructionMetadata.getParametersCount() - 1) {
+
+  if (!objectBehaviorTypes) {
+    // The object is matching and behaviors are not checked.
     return true;
   }
-  const secondParameter = instructionMetadata.getParameter(
-    firstParameterIndex + 1
-  );
-  return !gd.ParameterMetadata.isBehavior(secondParameter.getType());
+  for (
+    let parameterIndex = firstParameterIndex + 1;
+    parameterIndex < instructionMetadata.getParametersCount();
+    parameterIndex++
+  ) {
+    const parameter = instructionMetadata.getParameter(parameterIndex);
+    if (!gd.ParameterMetadata.isBehavior(parameter.getType())) {
+      // No more behavior parameter to check.
+      // The instruction can be used with the object.
+      return true;
+    }
+    if (!objectBehaviorTypes.has(parameter.getExtraInfo())) {
+      return false;
+    }
+  }
+  return true;
 };
 
 const isBehaviorInstruction = (
@@ -145,6 +166,7 @@ const enumerateExtraObjectInstructions = (
   isCondition: boolean,
   extension: gdPlatformExtension,
   objectType: string,
+  objectBehaviorTypes?: Set<string>,
   scope: InstructionOrExpressionScope,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
@@ -162,7 +184,7 @@ const enumerateExtraObjectInstructions = (
     const instrMetadata = instructions.get(type);
     if (
       !instrMetadata.isHidden() &&
-      isObjectInstruction(instrMetadata, objectType)
+      isObjectInstruction(instrMetadata, objectType, objectBehaviorTypes)
     ) {
       allInstructions.push(
         enumerateInstruction('', type, instrMetadata, scope, i18n)
@@ -267,7 +289,9 @@ const enumerateExtensionInstructions = (
   prefix: string,
   instructions: gdMapStringInstructionMetadata,
   scope: InstructionOrExpressionScope,
-  i18n: I18nType
+  i18n: I18nType,
+  objectType?: string,
+  objectBehaviorTypes?: Set<string>
 ): Array<EnumeratedInstructionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
@@ -277,11 +301,15 @@ const enumerateExtensionInstructions = (
   for (let j = 0; j < instructionsTypes.size(); ++j) {
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
-    if (instrMetadata.isHidden()) continue;
-
-    allInstructions.push(
-      enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
-    );
+    if (
+      !instrMetadata.isHidden() &&
+      (!objectType ||
+        isObjectInstruction(instrMetadata, objectType, objectBehaviorTypes))
+    ) {
+      allInstructions.push(
+        enumerateInstruction(prefix, type, instrMetadata, scope, i18n)
+      );
+    }
   }
 
   return allInstructions;
@@ -447,6 +475,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition,
         extension,
         objectType,
+        objectBehaviorTypes,
         scope,
         i18n
       ),
@@ -514,7 +543,11 @@ export const enumerateObjectAndBehaviorsInstructions = (
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
           scope,
-          i18n
+          i18n,
+          // Allow behaviors to have some of their instruction to be restricted
+          // to some type of object.
+          objectType,
+          objectBehaviorTypes
         ),
         ...freeBehaviorInstructions,
         ...allInstructions,

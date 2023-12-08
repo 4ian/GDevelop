@@ -209,7 +209,10 @@ export const addAssetToProject = async ({
     // Resources may have been renamed to be added to the project.
     // In this case, rename them in the object.
     const renamedResourcesMap = toNewGdMapStringString(resourceNewNames);
-    const resourcesRenamer = new gd.ResourcesRenamer(renamedResourcesMap);
+    const resourcesRenamer = new gd.ResourcesRenamer(
+      project.getResourcesManager(),
+      renamedResourcesMap
+    );
     renamedResourcesMap.delete();
     object.getConfiguration().exposeResources(resourcesRenamer);
     resourcesRenamer.delete();

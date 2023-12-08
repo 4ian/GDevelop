@@ -263,11 +263,17 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
   }
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
-    RaiseError("invalid_function_name",
+    if (function.functionName.empty()) {
+      RaiseError("invalid_function_name",
+               _("Enter the name of the function to call."),
+               function.location);
+    } else {
+      RaiseError("invalid_function_name",
                _("Cannot find an expression with this name: ") +
                    function.functionName + "\n" +
                    _("Double check that you've not made any typo in the name."),
                function.location);
+    }
     return returnType;
   }
 

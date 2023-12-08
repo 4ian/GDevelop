@@ -270,7 +270,7 @@ const GetStartedSection = ({
           justifyContent="center"
           alignItems="center"
         >
-          <CircularProgress size={50} />
+          <CircularProgress size={40} />
         </ColumnStackLayout>
       </SectionContainer>
     );

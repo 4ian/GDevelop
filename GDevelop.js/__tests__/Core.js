@@ -19,12 +19,9 @@ const mapFor = /*:: <T> */ (
 
 describe('libGD.js', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   describe('gd.VersionWrapper', function () {
     it('can return the version number of the library', function () {
@@ -1594,7 +1591,7 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       spriteConfiguration.addAnimation(animation);
 
-      let worker = extend(new gd.ArbitraryResourceWorkerJS(), {
+      let worker = extend(new gd.ArbitraryResourceWorkerJS(project.getResourcesManager()), {
         exposeImage: function (image) {
           expect(image).toBe('Used');
           done();
@@ -1703,7 +1700,7 @@ describe('libGD.js', function () {
       spriteObject2.addAnimation(animation2);
 
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image1');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image1');
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -1712,7 +1709,7 @@ describe('libGD.js', function () {
         expect(objectNames).toContain('MyObject2');
       }
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image2');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image2');
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -1720,7 +1717,7 @@ describe('libGD.js', function () {
         expect(objectNames).toContain('MyObject');
       }
       {
-        const objectsCollector = new gd.ObjectsUsingResourceCollector('Image3');
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image3');
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -2499,59 +2496,60 @@ describe('libGD.js', function () {
         eventList = new gd.EventsList();
 
         /* Event 1 */
-        event1 = new gd.StandardEvent();
+        {
+          const event = new gd.StandardEvent();
 
-        let eventActions1 = event1.getActions();
-        let action1 = new gd.Instruction();
-        action1.setType('RotateTowardPosition'); // should generate the sentence `Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second`
-        action1.setParametersCount(4);
-        action1.setParameter(0, 'Platform');
-        action1.setParameter(1, '450');
-        action1.setParameter(2, '200');
-        action1.setParameter(3, '90');
-        eventActions1.push_back(action1);
+          let eventActions1 = event.getActions();
+          let action1 = new gd.Instruction();
+          action1.setType('RotateTowardPosition'); // should generate the sentence `Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second`
+          action1.setParametersCount(4);
+          action1.setParameter(0, 'Platform');
+          action1.setParameter(1, '450');
+          action1.setParameter(2, '200');
+          action1.setParameter(3, '90');
+          eventActions1.push_back(action1);
 
-        let eventConditions1 = event1.getConditions();
-        let condition1 = new gd.Instruction();
-        condition1.setType('PosX'); // should generate the sentence `the X position of _PARAM0_ _PARAM1_ _PARAM2_`
-        condition1.setParametersCount(3);
-        condition1.setParameter(0, 'MyCharacter');
-        condition1.setParameter(1, '<');
-        condition1.setParameter(2, '300');
-        eventConditions1.push_back(condition1);
+          let eventConditions1 = event.getConditions();
+          let condition1 = new gd.Instruction();
+          condition1.setType('PosX'); // should generate the sentence `the X position of _PARAM0_ _PARAM1_ _PARAM2_`
+          condition1.setParametersCount(3);
+          condition1.setParameter(0, 'MyCharacter');
+          condition1.setParameter(1, '<');
+          condition1.setParameter(2, '300');
+          eventConditions1.push_back(condition1);
 
-        event1 = eventList.insertEvent(event1, 0);
+          event1 = eventList.insertEvent(event, 0);
+          action1.delete();
+          condition1.delete();
+        }
 
         /* Event 2 */
+        {
+          const event = new gd.StandardEvent();
 
-        event2 = new gd.StandardEvent();
+          let eventActions2 = event.getActions();
+          let action2 = new gd.Instruction();
+          action2.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
+          action2.setParametersCount(1);
+          action2.setParameter(0, 'OtherCharacter');
+          eventActions2.push_back(action2);
 
-        let eventActions2 = event2.getActions();
-        let action2 = new gd.Instruction();
-        action2.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
-        action2.setParametersCount(1);
-        action2.setParameter(0, 'OtherCharacter');
-        eventActions2.push_back(action2);
+          let eventConditions2 = event.getConditions();
+          let condition2 = new gd.Instruction();
+          condition2.setType('Angle'); // should generate the sentence `the angle (in degrees) of _PARAM0_ _PARAM1_ _PARAM2_`
+          condition2.setParametersCount(3);
+          condition2.setParameter(0, 'OtherPlatform');
+          condition2.setParameter(1, '>');
+          condition2.setParameter(2, '55');
+          eventConditions2.push_back(condition2);
 
-        let eventConditions2 = event2.getConditions();
-        let condition2 = new gd.Instruction();
-        condition2.setType('Angle'); // should generate the sentence `the angle (in degrees) of _PARAM0_ _PARAM1_ _PARAM2_`
-        condition2.setParametersCount(3);
-        condition2.setParameter(0, 'OtherPlatform');
-        condition2.setParameter(1, '>');
-        condition2.setParameter(2, '55');
-        eventConditions2.push_back(condition2);
-
-        event2 = eventList.insertEvent(event2, 0);
+          event2 = eventList.insertEvent(event, 0);
+          action2.delete();
+          condition2.delete();
+        }
       });
 
       afterAll(() => {
-        action1.delete();
-        action2.delete();
-        condition1.delete();
-        condition2.delete();
-        event1.delete();
-        event2.delete();
         eventList.delete();
       });
 
@@ -2988,6 +2986,7 @@ describe('libGD.js', function () {
       const evt = new gd.StandardEvent();
       expect(evt.canHaveSubEvents()).toBe(true);
       expect(evt.isExecutable()).toBe(true);
+      evt.delete();
     });
     it('conditions and actions', function () {
       const evt = new gd.StandardEvent();
@@ -3002,9 +3001,6 @@ describe('libGD.js', function () {
       let act = new gd.Instruction();
       actions.push_back(act);
       expect(evt.getActions().size()).toBe(1);
-    });
-
-    afterAll(function () {
       evt.delete();
     });
   });
@@ -3381,7 +3377,7 @@ describe('libGD.js', function () {
       const fs = makeFakeAbstractFileSystem(gd, {});
 
       // Check that ResourcesMergingHelper can update the filenames
-      const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
+      const resourcesMergingHelper = new gd.ResourcesMergingHelper(project.getResourcesManager(), fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
       gd.ResourceExposer.exposeWholeProjectResources(
         project,
@@ -3867,314 +3863,6 @@ describe('libGD.js', function () {
     it('can parse arguments being expressions', function () {
       testExpression('number', 'MouseX(VariableString(myVariable), 0) + 1');
     });
-  });
-
-  describe('gd.ExpressionCompletionFinder', function () {
-    let project = null;
-    let layout = null;
-    let propertiesContainer = null;
-    let sharedPropertiesContainer = null;
-    beforeAll(() => {
-      project = new gd.ProjectHelper.createNewGDJSProject();
-      layout = project.insertNewLayout('Scene', 0);
-      const object = layout.insertNewObject(
-        project,
-        'Sprite',
-        'MySpriteObject',
-        0
-      );
-      object.getVariables().insertNew('MyObjectVariable', 0);
-      object.getVariables().insertNew('MyObjectGroupVariable1', 0);
-      object.getVariables().insertNew('MyObjectGroupVariable2', 0);
-      object.getVariables().insertNew('MyObjectGroupVariable3', 0);
-      const object2 = layout.insertNewObject(
-        project,
-        'Sprite',
-        'MySpriteObject2',
-        1
-      );
-      object2.getVariables().insertNew('MyObjectGroupVariable1', 0);
-      object2.getVariables().insertNew('MyObjectGroupVariable2', 0);
-      const objectGroup = layout
-        .getObjectGroups()
-        .insertNew('MyObjectGroup', 0);
-      objectGroup.addObject('MySpriteObject');
-      objectGroup.addObject('MySpriteObject2');
-      layout.insertNewObject(project, 'Sprite', 'UnrelatedSpriteObject3', 2);
-      layout.getVariables().insertNew('MyVariable', 0);
-      layout.getVariables().insertNew('MyVariable2', 1);
-      layout.getVariables().insertNew('UnrelatedVariable3', 2);
-      project.getVariables().insertNew('MyGlobalVariable', 0);
-      project.getVariables().insertNew('MyVariable2', 1); // Will be "shadowed" by the layout variable.
-
-      // Also create some properties (a bit unusual to have these "floating" properties containers,
-      // but this works well to test the completions).
-      propertiesContainer = new gd.PropertiesContainer(0);
-      propertiesContainer.insertNew('MyProperty1', 0);
-      propertiesContainer.insertNew('UnrelatedProperty2', 1);
-      sharedPropertiesContainer = new gd.PropertiesContainer(0);
-      sharedPropertiesContainer.insertNew('MySharedProperty1', 0);
-      sharedPropertiesContainer.insertNew('UnrelatedProperty2', 1);
-    });
-
-    afterAll(() => {
-      project.delete();
-      propertiesContainer.delete();
-      sharedPropertiesContainer.delete();
-    });
-
-    function testCompletions(type, expressionWithCaret) {
-      const caretPosition = expressionWithCaret.indexOf('|');
-      if (caretPosition === -1) {
-        throw new Error(
-          'Caret location not found in expression: ' + expressionWithCaret
-        );
-      }
-      const expression = expressionWithCaret.replace('|', '');
-      const parameters = new gd.VectorParameterMetadata();
-      const parameter1 = new gd.ParameterMetadata();
-      parameter1.setType('string');
-      parameter1.setName('MyParameter1');
-      const parameter2 = new gd.ParameterMetadata();
-      parameter2.setType('number');
-      parameter2.setName('MyParameter2');
-      parameters.push_back(parameter1);
-      parameters.push_back(parameter2);
-      parameter1.delete();
-      parameter2.delete();
-
-      const parser = new gd.ExpressionParser2();
-      const expressionNode = parser.parseExpression(expression).get();
-      const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-        gd.JsPlatform.get(),
-        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
-          project,
-          layout
-        )
-          .addPropertiesContainer(sharedPropertiesContainer)
-          .addPropertiesContainer(propertiesContainer)
-          .addParameters(parameters),
-        type,
-        expressionNode,
-        // We're looking for completion for the character just before the caret.
-        Math.max(0, caretPosition - 1)
-      );
-
-      const completionDescriptionAsStrings = [];
-      for (let i = 0; i < completionDescriptions.size(); i++) {
-        const completionDescription = completionDescriptions.at(i);
-
-        completionDescriptionAsStrings.push(completionDescription.toString());
-      }
-
-      parser.delete();
-      parameters.delete();
-      return completionDescriptionAsStrings;
-    }
-
-    it('completes an empty expression', function () {
-      // Verify we list everything (objects, variables, properties, expressions).
-      expect(testCompletions('number', '|')).toMatchInlineSnapshot(`
-Array [
-  "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, UnrelatedSpriteObject3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, UnrelatedVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 5, no type, 1, no prefix, UnrelatedProperty2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, no prefix, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('does not complete an expression with an operator', function () {
-      const completions = testCompletions('number', '1 +| ');
-      expect(completions).toHaveLength(0);
-    });
-
-    it('completes an expression with an operator and a prefix', function () {
-      expect(testCompletions('number', '1 + My| ')).toMatchInlineSnapshot(`
-Array [
-  "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, My, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes an expression with an operator and a case insensitive search string', function () {
-      expect(testCompletions('number', '1 + OBJ| ')).toMatchInlineSnapshot(`
-Array [
-  "{ 0, number, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, UnrelatedSpriteObject3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, number, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, OBJ, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-      expect(testCompletions('number', '1 + VARI| ')).toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, UnrelatedVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, VARI, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes an expression with an object function, behavior or object variable', function () {
-      // List variables, expressions and behaviors, if all of them are present:
-      expect(testCompletions('number', '1 + MySpriteObject.My| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 1, no type, 1, My, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, My, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-      // Only list expressions and behaviors if no matching variables:
-      expect(testCompletions('number', '1 + MySpriteObject.Func| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 1, no type, 1, Func, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, Func, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes an expression with an object group function, behavior or variable', function () {
-      // List variables, expressions and behaviors, if all of them are present:
-      expect(testCompletions('number', '1 + MyObjectGroup.My| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 1, no type, 1, My, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, My, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-      // Only list expressions and behaviors if no matching variables:
-      expect(testCompletions('number', '1 + MyObjectGroup.Func| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 1, no type, 1, Func, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, number, 1, Func, no completion, MyObjectGroup, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes an expression with a partial behavior function', function () {
-      expect(testCompletions('number', '1 + MySpriteObject.MyBehavior::Func| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 2, number, 1, Func, no completion, MySpriteObject, MyBehavior, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes an expression parameters', function () {
-      expect(testCompletions('number', '1 + MySpriteObject.PointX(My| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 0, string, 1, no prefix, MySpriteObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, string, 1, no prefix, MySpriteObject2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
-  "{ 0, string, 1, no prefix, MyObjectGroup, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 6, string, 1, no prefix, MyParameter1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 6, number, 1, no prefix, MyParameter2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 5, no type, 1, no prefix, MyProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 5, no type, 1, no prefix, MySharedProperty1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 2, string, 1, My, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes legacy pre-scoped variables ("scenevar" and "globalvar")', function () {
-      expect(testCompletions('number', 'Variable(M|')).toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-      expect(testCompletions('string', 'GlobalVariableString(M|'))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes an expression parameters (legacy pre-scoped variable)', function () {
-      // Verify only the object variable is autocompleted:
-      expect(testCompletions('number', '1 + MySpriteObject.Variable(My| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-      expect(
-        testCompletions(
-          'string',
-          '"Score:" + MySpriteObject.VariableString(My| '
-        )
-      ).toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    it('completes an expression parameters (group, legacy pre-scoped variable)', function () {
-      // Verify only the object group variable is autocompleted:
-      expect(testCompletions('number', '1 + MyObjectGroup.Variable(My| '))
-        .toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-      expect(
-        testCompletions(
-          'string',
-          '"Score:" + MyObjectGroup.VariableString(My| '
-        )
-      ).toMatchInlineSnapshot(`
-Array [
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-  "{ 3, no type, 1, no prefix, MyObjectGroupVariable1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-]
-`);
-    });
-
-    // More tests are done in C++ for ExpressionCompletionFinder.
   });
 
   describe('gd.Vector2f', function () {

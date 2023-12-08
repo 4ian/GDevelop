@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 
@@ -49,6 +49,7 @@ import {
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import InfoBar from '../../../../UI/Messages/InfoBar';
 
 const styles = {
   listItem: {
@@ -60,6 +61,7 @@ const styles = {
   },
   projectSkeleton: { borderRadius: 6 },
   noProjectsContainer: { padding: 10 },
+  refreshIconContainer: { fontSize: 20, display: 'flex', alignItems: 'center' },
 };
 
 type Props = {|
@@ -76,6 +78,8 @@ type Props = {|
   ) => void,
   storageProviders: Array<StorageProvider>,
   i18n: I18nType,
+  onManageGame: ({ gameId: string }) => void,
+  canManageGame: ({ gameId: string }) => boolean,
 |};
 
 const BuildSection = ({
@@ -90,6 +94,8 @@ const BuildSection = ({
   onOpenRecentFile,
   storageProviders,
   i18n,
+  onManageGame,
+  canManageGame,
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
@@ -100,12 +106,18 @@ const BuildSection = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+  const [
+    showCloudProjectsInfoIfNotLoggedIn,
+    setShowCloudProjectsInfoIfNotLoggedIn,
+  ] = React.useState<boolean>(false);
   const {
+    authenticated,
     profile,
     cloudProjects,
     limits,
     cloudProjectsFetchingErrorLabel,
     onCloudProjectsChanged,
+    onOpenLoginDialog,
   } = authenticatedUser;
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
@@ -155,6 +167,10 @@ const BuildSection = ({
   const refreshCloudProjects = React.useCallback(
     async () => {
       if (isRefreshing) return;
+      if (!authenticated) {
+        setShowCloudProjectsInfoIfNotLoggedIn(true);
+        return;
+      }
       try {
         setIsRefreshing(true);
         await onCloudProjectsChanged();
@@ -163,7 +179,7 @@ const BuildSection = ({
         setTimeout(() => setIsRefreshing(false), 2000);
       }
     },
-    [onCloudProjectsChanged, isRefreshing]
+    [onCloudProjectsChanged, isRefreshing, authenticated]
   );
 
   projectFiles.sort((a, b) => {
@@ -246,8 +262,11 @@ const BuildSection = ({
                   size="small"
                   onClick={refreshCloudProjects}
                   disabled={isRefreshing}
+                  tooltip={t`Refresh cloud projects`}
                 >
-                  <Refresh />
+                  <div style={styles.refreshIconContainer}>
+                    <Refresh fontSize="inherit" />
+                  </div>
                 </IconButton>
               </LineStackLayout>
             </Column>
@@ -349,6 +368,8 @@ const BuildSection = ({
                           file.fileMetadata.fileIdentifier
                         ]
                       }
+                      onManageGame={onManageGame}
+                      canManageGame={canManageGame}
                     />
                   ))
                 ) : (
@@ -377,6 +398,14 @@ const BuildSection = ({
           </Line>
         </SectionRow>
       </SectionContainer>
+      <InfoBar
+        message={<Trans>Log in to see your cloud projects.</Trans>}
+        visible={showCloudProjectsInfoIfNotLoggedIn}
+        hide={() => setShowCloudProjectsInfoIfNotLoggedIn(false)}
+        duration={5000}
+        onActionClick={onOpenLoginDialog}
+        actionLabel={<Trans>Log in</Trans>}
+      />
     </>
   );
 };

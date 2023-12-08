@@ -82,7 +82,6 @@ export type RenderEditorContainerProps = {|
   onOpenPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
-  onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenProfile: () => void,

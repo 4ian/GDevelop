@@ -820,7 +820,15 @@ namespace gdjs {
             'There was an error while preloading an audio file: ' + error
           );
         }
-      } else if (resource.preloadInCache) {
+      } else if (
+        resource.preloadInCache ||
+        // Force downloading of sounds.
+        // TODO Decide if sounds should be allowed to be downloaded after the scene starts.
+        // - they should be requested automatically at the end of the scene loading
+        // - they will be downloaded while the scene is playing
+        // - other scenes will be pre-loaded only when all the sounds for the current scene are in cache
+        !resource.preloadAsMusic
+      ) {
         // preloading as sound already does a XHR request, hence "else if"
         try {
           await new Promise((resolve, reject) => {

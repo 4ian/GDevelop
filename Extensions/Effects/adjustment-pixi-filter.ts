@@ -31,11 +31,47 @@ namespace gdjs {
           adjustmentFilter.alpha = value;
         }
       }
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
+        if (parameterName === 'gamma') {
+          return adjustmentFilter.gamma;
+        }
+        if (parameterName === 'saturation') {
+          return adjustmentFilter.saturation;
+        }
+        if (parameterName === 'contrast') {
+          return adjustmentFilter.contrast;
+        }
+        if (parameterName === 'brightness') {
+          return adjustmentFilter.brightness;
+        }
+        if (parameterName === 'red') {
+          return adjustmentFilter.red;
+        }
+        if (parameterName === 'green') {
+          return adjustmentFilter.green;
+        }
+        if (parameterName === 'blue') {
+          return adjustmentFilter.blue;
+        }
+        if (parameterName === 'alpha') {
+          return adjustmentFilter.alpha;
+        }
+        return 0;
+      }
       updateStringParameter(
         filter: PIXI.Filter,
         parameterName: string,
         value: string
       ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
       updateBooleanParameter(
         filter: PIXI.Filter,
         parameterName: string,

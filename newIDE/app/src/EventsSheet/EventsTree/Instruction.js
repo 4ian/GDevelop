@@ -1,7 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import capitalize from 'lodash/capitalize';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { mapFor } from '../../Utils/MapFor';
@@ -268,7 +267,7 @@ const Instruction = (props: Props) => {
                 />
               );
             }
-            return <span key={i}>{i === 0 ? capitalize(value) : value}</span>;
+            return <span key={i}>{value}</span>;
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);

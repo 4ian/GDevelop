@@ -174,13 +174,13 @@ export default function SubscriptionDialog({
         await changeUserSubscription(getAuthorizationHeader, profile.id, {
           planId: null,
         });
-        await authenticatedUser.onSubscriptionUpdated();
+        await authenticatedUser.onRefreshSubscription();
         showAlert({
           title: t`Subscription cancelled`,
           message: t`Your subscription is now cancelled.`,
         });
       } catch (rawError) {
-        await authenticatedUser.onSubscriptionUpdated();
+        await authenticatedUser.onRefreshSubscription();
         showErrorBox({
           message: i18n._(
             t`Your subscription could not be cancelled. Please try again later!`
@@ -224,7 +224,7 @@ export default function SubscriptionDialog({
           await changeUserSubscription(getAuthorizationHeader, profile.id, {
             planId: plan.planId,
           });
-          await authenticatedUser.onSubscriptionUpdated();
+          await authenticatedUser.onRefreshSubscription();
           showAlert({
             title: t`Subscription updated`,
             message: t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`,
@@ -247,7 +247,7 @@ export default function SubscriptionDialog({
           await changeUserSubscription(getAuthorizationHeader, profile.id, {
             planId: '',
           });
-          await authenticatedUser.onSubscriptionUpdated();
+          await authenticatedUser.onRefreshSubscription();
         } catch (rawError) {
           showErrorBox({
             message: i18n._(
@@ -536,7 +536,7 @@ export default function SubscriptionDialog({
                 authenticatedUser={authenticatedUser}
                 onClose={() => {
                   setSubscriptionPendingDialogOpen(false);
-                  authenticatedUser.onSubscriptionUpdated();
+                  authenticatedUser.onRefreshSubscription();
                 }}
               />
             )}
@@ -549,7 +549,7 @@ export default function SubscriptionDialog({
                   if (hasJustRedeemedCode) {
                     try {
                       setIsChangingSubscription(true);
-                      await authenticatedUser.onSubscriptionUpdated();
+                      await authenticatedUser.onRefreshSubscription();
                     } finally {
                       setIsChangingSubscription(false);
                       setSubscriptionPendingDialogOpen(true);

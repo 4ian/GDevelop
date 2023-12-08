@@ -4,8 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef ProjectObjectsUsingResourceCollector_H
-#define ProjectObjectsUsingResourceCollector_H
+#pragma once
 
 #include <vector>
 
@@ -21,9 +20,10 @@ namespace gd {
 
 class GD_CORE_API ObjectsUsingResourceCollector
     : public ArbitraryObjectsWorker {
- public:
-  ObjectsUsingResourceCollector(const gd::String& resourceName_)
-      : resourceName(resourceName_){};
+public:
+  ObjectsUsingResourceCollector(gd::ResourcesManager &resourcesManager_,
+                                const gd::String &resourceName_)
+      : resourcesManager(&resourcesManager_), resourceName(resourceName_){};
   virtual ~ObjectsUsingResourceCollector();
 
   std::vector<gd::String>& GetObjectNames() { return objectNames; }
@@ -33,12 +33,16 @@ class GD_CORE_API ObjectsUsingResourceCollector
 
   std::vector<gd::String> objectNames;
   gd::String resourceName;
+  gd::ResourcesManager *resourcesManager;
 };
 
 class GD_CORE_API ResourceNameMatcher : public ArbitraryResourceWorker {
- public:
-  ResourceNameMatcher(const gd::String& resourceName_)
-      : resourceName(resourceName_), matchesResourceName(false){};
+public:
+  ResourceNameMatcher(gd::ResourcesManager &resourcesManager,
+                      const gd::String &resourceName_)
+      : resourceName(resourceName_),
+        matchesResourceName(false), gd::ArbitraryResourceWorker(
+                                        resourcesManager){};
   virtual ~ResourceNameMatcher(){};
 
   bool AnyResourceMatches() { return matchesResourceName; }
@@ -91,5 +95,3 @@ class GD_CORE_API ResourceNameMatcher : public ArbitraryResourceWorker {
 };
 
 };  // namespace gd
-
-#endif  // ProjectObjectsUsingResourceCollector_H

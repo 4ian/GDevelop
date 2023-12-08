@@ -300,4 +300,58 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     checkProgress(6, () => camera.getCameraRotation(layout, '', 0));
     expect(camera.getCameraRotation(layout, '', 0)).to.be(440);
   });
+
+  it('can tween a number effect property', () => {
+    const layer = layout.getLayer('');
+    layer.addEffect({
+      effectType: 'Outline',
+      name: 'MyEffect',
+      doubleParameters: { padding: 0, thickness: 200 },
+      stringParameters: { color: '16;32;64' },
+      booleanParameters: {},
+    });
+    tween.tweenNumberEffectPropertyTween(
+      layout,
+      'MyTween',
+      600,
+      '',
+      'MyEffect',
+      'thickness',
+      'linear',
+      0.25
+    );
+    checkProgress(6, () =>
+      layer.getRendererEffects()['MyEffect'].getDoubleParameter('thickness')
+    );
+    expect(
+      layer.getRendererEffects()['MyEffect'].getDoubleParameter('thickness')
+    ).to.be(440);
+  });
+
+  it('can tween a color effect property', () => {
+    const layer = layout.getLayer('');
+    layer.addEffect({
+      effectType: 'Outline',
+      name: 'MyEffect',
+      doubleParameters: { padding: 0, thickness: 200 },
+      stringParameters: { color: '16;32;64' },
+      booleanParameters: {},
+    });
+    tween.tweenColorEffectPropertyTween(
+      layout,
+      'MyTween',
+      '255;192;128',
+      '',
+      'MyEffect',
+      'color',
+      'linear',
+      0.25
+    );
+    checkProgress(6, () =>
+      layer.getRendererEffects()['MyEffect'].getColorParameter('color')
+    );
+    expect(
+      layer.getRendererEffects()['MyEffect'].getColorParameter('color')
+    ).to.be(gdjs.rgbOrHexStringToNumber('76;235;27'));
+  });
 });

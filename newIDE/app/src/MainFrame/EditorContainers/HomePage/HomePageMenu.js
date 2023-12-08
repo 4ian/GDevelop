@@ -18,6 +18,7 @@ import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import HomePageMenuBar from './HomePageMenuBar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import GraphsIcon from '../../../UI/CustomSvgIcons/Graphs';
 
 export const styles = {
   drawerContent: {
@@ -39,6 +40,7 @@ export const styles = {
 
 export type HomeTab =
   | 'get-started'
+  | 'manage'
   | 'build'
   | 'learn'
   | 'play'
@@ -46,55 +48,84 @@ export type HomeTab =
   | 'shop'
   | 'team-view';
 
-export const homePageMenuTabs: {
+export type GetIconFunction = ({
+  color: string,
+  fontSize: 'inherit' | 'small',
+}) => React.Node;
+
+export type HomePageMenuTab = {|
   label: React.Node,
   tab: HomeTab,
-  getIcon: (color: string) => React.Node,
+  getIcon: GetIconFunction,
   id: string,
-}[] = [
+|};
+
+export const homePageMenuTabs: HomePageMenuTab[] = [
   {
     label: <Trans>Get Started</Trans>,
     tab: 'get-started',
     id: 'home-get-started-tab',
-    getIcon: color => <SunIcon fontSize="small" color={color} />,
+    getIcon: ({ color, fontSize }) => (
+      <SunIcon fontSize={fontSize} color={color} />
+    ),
   },
   {
     label: <Trans>Build</Trans>,
     tab: 'build',
     id: 'home-build-tab',
-    getIcon: color => <PickAxeIcon fontSize="small" color={color} />,
+    getIcon: ({ color, fontSize }) => (
+      <PickAxeIcon fontSize={fontSize} color={color} />
+    ),
+  },
+  {
+    label: <Trans>Manage</Trans>,
+    tab: 'manage',
+    id: 'home-manage-tab',
+    getIcon: ({ color, fontSize }) => (
+      <GraphsIcon fontSize={fontSize} color={color} />
+    ),
   },
   {
     label: <Trans>Shop</Trans>,
     tab: 'shop',
     id: 'home-shop-tab',
-    getIcon: color => <StoreIcon fontSize="small" color={color} />,
+    getIcon: ({ color, fontSize }) => (
+      <StoreIcon fontSize={fontSize} color={color} />
+    ),
   },
   {
     label: <Trans>Learn</Trans>,
     tab: 'learn',
     id: 'home-learn-tab',
-    getIcon: color => <SchoolIcon fontSize="small" color={color} />,
+    getIcon: ({ color, fontSize }) => (
+      <SchoolIcon fontSize={fontSize} color={color} />
+    ),
   },
   {
     label: <Trans>Play</Trans>,
     tab: 'play',
     id: 'home-play-tab',
-    getIcon: color => <GoogleControllerIcon fontSize="small" color={color} />,
+    getIcon: ({ color, fontSize }) => (
+      <GoogleControllerIcon fontSize={fontSize} color={color} />
+    ),
   },
   {
     label: <Trans>Community</Trans>,
     tab: 'community',
     id: 'home-community-tab',
-    getIcon: color => <WebIcon fontSize="small" color={color} />,
+    getIcon: ({ color, fontSize }) => (
+      <WebIcon fontSize={fontSize} color={color} />
+    ),
   },
 ];
 
-export const teamViewTab = {
+export const teamViewTab: HomePageMenuTab = {
   label: <Trans>Classrooms</Trans>,
   tab: 'team-view',
   id: 'team-view-tab',
-  getIcon: (color: string) => <BookLeafIcon fontSize="small" color={color} />,
+  getIcon: ({ color, fontSize }) => (
+    <BookLeafIcon fontSize={fontSize} color={color} />
+  ),
 };
 
 type Props = {|
@@ -128,7 +159,7 @@ export const HomePageMenu = ({
 
   const buttons: {
     label: React.Node,
-    getIcon: (color: string) => React.Node,
+    getIcon: ({ color: string, fontSize: 'inherit' | 'small' }) => React.Node,
     id: string,
     onClick: () => void,
   }[] = [
@@ -136,13 +167,17 @@ export const HomePageMenu = ({
       label: <Trans>Preferences</Trans>,
       id: 'settings',
       onClick: onOpenPreferences,
-      getIcon: color => <Preferences fontSize="small" color={color} />,
+      getIcon: ({ color, fontSize }) => (
+        <Preferences fontSize={fontSize} color={color} />
+      ),
     },
     {
       label: <Trans>About GDevelop</Trans>,
       id: 'about-gdevelop',
       onClick: onOpenAbout,
-      getIcon: color => <GDevelopGLogo fontSize="small" color={color} />,
+      getIcon: ({ color, fontSize }) => (
+        <GDevelopGLogo fontSize={fontSize} color={color} />
+      ),
     },
   ];
 
@@ -185,9 +220,9 @@ export const HomePageMenu = ({
                     <DoubleChevronArrowLeft />
                   </IconButton>
                 </Line>
-                {tabsToDisplay.map(({ label, tab, getIcon }, index) => (
+                {tabsToDisplay.map(({ label, tab, getIcon, id }) => (
                   <VerticalTabButton
-                    key={index}
+                    key={id}
                     label={label}
                     onClick={() => {
                       setActiveTab(tab);

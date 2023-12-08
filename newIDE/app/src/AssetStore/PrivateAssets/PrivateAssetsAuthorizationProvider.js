@@ -18,6 +18,7 @@ import {
   getAuthorizationTokenForPrivateAssets,
 } from '../../Utils/GDevelopServices/Shop';
 import PrivateAssetsAuthorizationContext from './PrivateAssetsAuthorizationContext';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 type Props = {| children: React.Node |};
 
@@ -94,7 +95,10 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       });
       return asset;
     } catch (error) {
-      if (error.response && error.response.status === 404) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
         // If the token is expired, fetch a new one and try again.
         token = await fetchAuthorizationToken(userId);
         const asset = await getPrivateAsset(assetShortHeader, token, {

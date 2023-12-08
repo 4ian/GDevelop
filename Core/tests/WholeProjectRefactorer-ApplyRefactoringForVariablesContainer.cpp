@@ -201,39 +201,34 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
                                   "MyRenamedGlobalStructureVariable");
     project.GetVariables().Rename("SharedVariableName",
                                   "RenamedGlobalVariableFromASharedName");
-    auto changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-        project,
-        originalSerializedProjectVariables,
-        project.GetVariables());
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project,
+            originalSerializedProjectVariables,
+            project.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project,
-        project.GetVariables(),
-        changeset);
+        project, project.GetVariables(), changeset);
 
     layout1.GetVariables().Rename("MySceneVariable", "MyRenamedSceneVariable");
     layout1.GetVariables().Rename("MySceneStructureVariable",
                                   "MyRenamedSceneStructureVariable");
-    changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-        project,
-        originalSerializedLayoutVariables,
-        layout1.GetVariables());
+    changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project, originalSerializedLayoutVariables, layout1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project,
-        layout1.GetVariables(),
-        changeset);
+        project, layout1.GetVariables(), changeset);
 
     object1.GetVariables().Rename("MyObjectVariable",
                                   "MyRenamedObjectVariable");
     object1.GetVariables().Rename("MyObjectStructureVariable",
                                   "MyRenamedObjectStructureVariable");
-    changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-        project,
-        originalSerializedObject1Variables,
-        object1.GetVariables());
+    changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project,
+            originalSerializedObject1Variables,
+            object1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project,
-        object1.GetVariables(),
-        changeset);
+        project, object1.GetVariables(), changeset);
 
     // Check the first layout is updated.
     // clang-format off
@@ -329,6 +324,182 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
               gd::Serializer::ToJSON(originalSerializedLayout2));
     }
   }
+
+  SECTION("Variable renamed (object group)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &layout1 = project.InsertNewLayout("Layout1", 0);
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(layout1.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+    gd::RepeatEvent &repeatEvent =
+        dynamic_cast<gd::RepeatEvent &>(layout1.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Repeat"));
+
+    // Declare variables in objects.
+    auto &object1 =
+        layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
+    object1.GetVariables().InsertNew("MyObjectVariable");
+    object1.GetVariables()
+        .InsertNew("MyObjectStructureVariable")
+        .GetChild("MyChild")
+        .SetValue(123);
+    auto &object2 =
+        layout1.InsertNewObject(project, "MyExtension::Sprite", "Object2", 0);
+    object2.GetVariables().InsertNew("MyObjectVariable");
+    object2.GetVariables()
+        .InsertNew("MyObjectStructureVariable")
+        .GetChild("MyChild")
+        .SetValue(123);
+
+    auto& group = layout1.GetObjectGroups().InsertNew("MyObjectGroup");
+    group.AddObject("Object1");
+    group.AddObject("Object2");
+
+    // Create an event using the variables.
+    // clang-format off
+    {
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomething");
+      action.SetParametersCount(1);
+      action.SetParameter(
+          0,
+          gd::Expression(
+              "1 + "
+              "Object1.MyObjectVariable + "
+              "Object2.MyObjectVariable + "
+              "MyObjectGroup.MyObjectVariable + "
+              "Object1.MyObjectStructureVariable.MyChild + "
+              "Object2.MyObjectStructureVariable.MyChild + "
+              "MyObjectGroup.MyObjectStructureVariable.MyChild"));
+      event.GetActions().Insert(action);
+    }
+    // Expressions with "old" "scenevar", "globalvar", "objectvar":
+    {
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomething");
+      action.SetParametersCount(1);
+      action.SetParameter(
+          0,
+          gd::Expression(
+              // "objectvar" (in a free expression):
+              "1 + "
+              "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object1, MyObjectVariable, Object2, MyObjectVariable) + "
+              "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObjectGroup, MyObjectVariable, MyObjectGroup, MyObjectVariable) + "
+              "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object1, MyObjectStructureVariable.MyChild, Object2, MyObjectStructureVariable.MyChild) + "
+              "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObjectGroup, MyObjectStructureVariable.MyChild, MyObjectGroup, MyObjectStructureVariable.MyChild) + "
+              // "objectvar" (using the name of the object being called):
+              "Object1.GetObjectVariableAsNumber(MyObjectVariable) + "
+              "Object2.GetObjectVariableAsNumber(MyObjectVariable) + "
+              "MyObjectGroup.GetObjectVariableAsNumber(MyObjectVariable) + "
+              "Object1.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild) + "
+              "Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild) + "
+              "MyObjectGroup.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild) + "
+              "Object1.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild.GrandChild) + "
+              "Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild.GrandChild) + "
+              "MyObjectGroup.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild.GrandChild)"));
+      event.GetActions().Insert(action);
+    }
+    {
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomethingWithLegacyPreScopedVariables");
+      action.SetParametersCount(4);
+      action.SetParameter(0, gd::Expression("MySceneVariable"));
+      action.SetParameter(1, gd::Expression("MyGlobalVariable"));
+      action.SetParameter(2, gd::Expression("MyObjectGroup"));
+      action.SetParameter(3, gd::Expression("MyObjectVariable"));
+      event.GetActions().Insert(action);
+    }
+
+    repeatEvent.SetRepeatExpression("1 + Object1.MyObjectVariable + Object2.MyObjectVariable + MyObjectGroup.MyObjectVariable");
+    // clang-format on
+
+    // Do a copy of layout1 to ensure other scene is unchanged after the
+    // refactoring.
+    gd::Layout layout2 = layout1;
+    layout2.SetName("Layout2");
+    project.InsertLayout(layout2, 1);
+    gd::SerializerElement originalSerializedLayout2;
+    layout2.SerializeTo(originalSerializedLayout2);
+
+    // Do the changes and launch the refactoring.
+    project.GetVariables().ResetPersistentUuid();
+    layout1.GetVariables().ResetPersistentUuid();
+    object1.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedObject1Variables;
+    object1.GetVariables().SerializeTo(originalSerializedObject1Variables);
+
+    object1.GetVariables().Rename("MyObjectVariable",
+                                  "MyRenamedObjectVariable");
+    object1.GetVariables().Rename("MyObjectStructureVariable",
+                                  "MyRenamedObjectStructureVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project,
+            originalSerializedObject1Variables,
+            object1.GetVariables());
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, object1.GetVariables(), changeset);
+
+    // Check the first layout is updated.
+    // clang-format off
+    {
+      // Updated direct access to variables:
+      REQUIRE(event.GetActions()[0].GetParameter(0).GetPlainString() ==
+            "1 + "
+            "Object1.MyRenamedObjectVariable + "
+            "Object2.MyObjectVariable + "
+            "MyObjectGroup.MyRenamedObjectVariable + "
+            "Object1.MyRenamedObjectStructureVariable.MyChild + "
+            "Object2.MyObjectStructureVariable.MyChild + "
+            "MyObjectGroup.MyRenamedObjectStructureVariable.MyChild"
+      );
+
+      // Updated access to variables using the legacy "pre-scoped" "scenevar",
+      // "globalvar" and "objectvar" parameters in expressions:
+      REQUIRE(event.GetActions()[1].GetParameter(0).GetPlainString() ==
+            "1 + "
+            // Multiple "objectvar" parameters in a free function:
+            "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object1, MyRenamedObjectVariable, Object2, MyObjectVariable) + "
+            "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObjectGroup, MyRenamedObjectVariable, MyObjectGroup, MyRenamedObjectVariable) + "
+            // Multiple "objectvar" parameters in a free function, with child
+            // variable:
+            "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object1, MyRenamedObjectStructureVariable.MyChild, Object2, MyObjectStructureVariable.MyChild) + "
+            "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObjectGroup, MyRenamedObjectStructureVariable.MyChild, MyObjectGroup, MyRenamedObjectStructureVariable.MyChild) + "
+            // Single "objectvar" from the object being accessed:
+            "Object1.GetObjectVariableAsNumber(MyRenamedObjectVariable) + "
+            "Object2.GetObjectVariableAsNumber(MyObjectVariable) + "
+            "MyObjectGroup.GetObjectVariableAsNumber(MyRenamedObjectVariable) + "
+            // Single "objectvar" from the object being accessed, with child
+            // variales:
+            "Object1.GetObjectVariableAsNumber(MyRenamedObjectStructureVariable.MyChild) + "
+            "Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild) + "
+            "MyObjectGroup.GetObjectVariableAsNumber(MyRenamedObjectStructureVariable.MyChild) + "
+            "Object1.GetObjectVariableAsNumber(MyRenamedObjectStructureVariable.MyChild.GrandChild) + "
+            "Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild.GrandChild) + "
+            "MyObjectGroup.GetObjectVariableAsNumber(MyRenamedObjectStructureVariable.MyChild.GrandChild)");
+
+      // Updated "objectvar" parameters of an
+      // instruction:
+      REQUIRE(event.GetActions()[2].GetParameter(2).GetPlainString() ==
+              "MyObjectGroup");
+      REQUIRE(event.GetActions()[2].GetParameter(3).GetPlainString() ==
+              "MyRenamedObjectVariable");
+    }
+
+    REQUIRE(repeatEvent.GetRepeatExpression() == "1 + Object1.MyRenamedObjectVariable + Object2.MyObjectVariable + MyObjectGroup.MyRenamedObjectVariable");
+    // clang-format on
+
+    // Check the other layout is untouched.
+    {
+      gd::SerializerElement serializedLayout2;
+      layout2.SerializeTo(serializedLayout2);
+      REQUIRE(gd::Serializer::ToJSON(serializedLayout2) ==
+              gd::Serializer::ToJSON(originalSerializedLayout2));
+    }
+  }
+
   SECTION("Variable removed (project, layout, object)") {
     gd::Project project;
     gd::Platform platform;
@@ -495,36 +666,31 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     project.GetVariables().Remove("MyGlobalVariable");
     project.GetVariables().Remove("MyGlobalStructureVariable");
     project.GetVariables().Remove("SharedVariableName");
-    auto changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-        project,
-        originalSerializedProjectVariables,
-        project.GetVariables());
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project,
+            originalSerializedProjectVariables,
+            project.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project,
-        project.GetVariables(),
-        changeset);
+        project, project.GetVariables(), changeset);
 
     layout1.GetVariables().Remove("MySceneVariable");
     layout1.GetVariables().Remove("MySceneStructureVariable");
-    changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-        project,
-        originalSerializedLayoutVariables,
-        layout1.GetVariables());
+    changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project, originalSerializedLayoutVariables, layout1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project,
-        layout1.GetVariables(),
-        changeset);
+        project, layout1.GetVariables(), changeset);
 
     object1.GetVariables().Remove("MyObjectVariable");
     object1.GetVariables().Remove("MyObjectStructureVariable");
-    changeset = gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-        project,
-        originalSerializedObject1Variables,
-        object1.GetVariables());
+    changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project,
+            originalSerializedObject1Variables,
+            object1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project,
-        object1.GetVariables(),
-        changeset);
+        project, object1.GetVariables(), changeset);
 
     // Check the first layout is updated.
     {

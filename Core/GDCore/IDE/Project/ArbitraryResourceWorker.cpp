@@ -73,14 +73,10 @@ void ArbitraryResourceWorker::ExposeBitmapFont(gd::String& bitmapFontName){
 };
 
 void ArbitraryResourceWorker::ExposeAudio(gd::String& audioName) {
-  for (auto resources : GetResources()) {
-    if (!resources) continue;
-
-    if (resources->HasResource(audioName) &&
-        resources->GetResource(audioName).GetKind() == "audio") {
-      // Nothing to do, the audio is a reference to a proper resource.
-      return;
-    }
+  if (resourcesManager->HasResource(audioName) &&
+      resourcesManager->GetResource(audioName).GetKind() == "audio") {
+    // Nothing to do, the audio is a reference to a proper resource.
+    return;
   }
 
   // For compatibility with older projects (where events were referring to files
@@ -90,14 +86,10 @@ void ArbitraryResourceWorker::ExposeAudio(gd::String& audioName) {
 };
 
 void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
-  for (auto resources : GetResources()) {
-    if (!resources) continue;
-
-    if (resources->HasResource(fontName) &&
-        resources->GetResource(fontName).GetKind() == "font") {
-      // Nothing to do, the font is a reference to a proper resource.
-      return;
-    }
+  if (resourcesManager->HasResource(fontName) &&
+      resourcesManager->GetResource(fontName).GetKind() == "font") {
+    // Nothing to do, the font is a reference to a proper resource.
+    return;
   }
 
   // For compatibility with older projects (where events were referring to files
@@ -106,12 +98,7 @@ void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
   ExposeFile(fontName);
 };
 
-void ArbitraryResourceWorker::ExposeResources(
-    gd::ResourcesManager* resourcesManager) {
-  if (!resourcesManager) return;
-
-  resourcesManagers.push_back(resourcesManager);
-
+void ArbitraryResourceWorker::ExposeResources() {
   std::vector<gd::String> resources = resourcesManager->GetAllResourceNames();
   for (std::size_t i = 0; i < resources.size(); i++) {
     if (resourcesManager->GetResource(resources[i]).UseFile())
@@ -120,9 +107,6 @@ void ArbitraryResourceWorker::ExposeResources(
 }
 
 void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
-  if (resourcesManagers.empty()) return;
-  gd::ResourcesManager* resourcesManager = resourcesManagers[0];
-
   gd::Resource& resource = resourcesManager->GetResource(resourceName);
 
   if (!resource.GetMetadata().empty()) {
@@ -186,6 +170,7 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "tilemap") {
     ExposeTilemap(resourceName);
+    ExposeEmbeddeds(resourceName);
     return;
   }
   if (resourceType == "tileset") {
@@ -194,6 +179,7 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "json") {
     ExposeJson(resourceName);
+    ExposeEmbeddeds(resourceName);
     return;
   }
   if (resourceType == "video") {
@@ -261,10 +247,12 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
         } else if (parameterMetadata.GetType() == "jsonResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeJson(updatedParameterValue);
+          worker.ExposeEmbeddeds(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);
         } else if (parameterMetadata.GetType() == "tilemapResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeTilemap(updatedParameterValue);
+          worker.ExposeEmbeddeds(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);
         } else if (parameterMetadata.GetType() == "tilesetResource") {
           gd::String updatedParameterValue = parameterValue;

@@ -12,7 +12,7 @@ import {
   type FilledCloudProjectVersion,
 } from '../Utils/GDevelopServices/Project';
 import { type UserPublicProfileByIds } from '../Utils/GDevelopServices/User';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import { LineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
@@ -25,6 +25,9 @@ import {
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
+import type { OpenedVersionStatus } from '.';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Chip from '../UI/Chip';
 
 const thisYear = new Date().getFullYear();
 
@@ -59,6 +62,40 @@ const styles = {
   labelTextfield: { width: '100%' },
 };
 
+const StatusChip = ({
+  status,
+}: {|
+  status: 'unsavedChanges' | 'saving' | 'saved',
+|}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const label =
+    status === 'unsavedChanges' ? (
+      <Trans>Unsaved changes</Trans>
+    ) : status === 'saving' ? (
+      <Trans>Saving...</Trans>
+    ) : (
+      <Trans>Changes saved</Trans>
+    );
+  const backgroundColor =
+    status === 'unsavedChanges'
+      ? gdevelopTheme.statusIndicator.error
+      : status === 'saving'
+      ? gdevelopTheme.statusIndicator.warning
+      : gdevelopTheme.statusIndicator.success;
+
+  return (
+    <Chip
+      style={{
+        backgroundColor,
+        color: '#111111',
+        padding: '3px 0',
+        height: 'auto',
+      }}
+      label={label}
+    />
+  );
+};
+
 const useClassesForRowContainer = makeStyles(theme =>
   createStyles({
     root: {
@@ -69,6 +106,9 @@ const useClassesForRowContainer = makeStyles(theme =>
         backgroundColor: theme.palette.action.hover,
       },
       '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+      },
+      '&.selected': {
         backgroundColor: theme.palette.action.hover,
       },
     },
@@ -86,6 +126,7 @@ type Props = {|
     version: FilledCloudProjectVersion
   ) => void,
   displayFullDate?: boolean,
+  openedVersionStatus: ?OpenedVersionStatus,
   getAnonymousAvatar: () => {| src: string, alt: string |},
 |};
 
@@ -97,6 +138,7 @@ const ProjectVersionRow = ({
   onCancelRenaming,
   onContextMenu,
   displayFullDate,
+  openedVersionStatus,
   getAnonymousAvatar,
 }: Props) => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
@@ -115,8 +157,24 @@ const ProjectVersionRow = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <div className={classes.root}>
+        <div
+          className={`${classes.root}${
+            openedVersionStatus && openedVersionStatus.id === version.id
+              ? ' selected'
+              : ''
+          }`}
+        >
           <Column noMargin expand>
+            {openedVersionStatus &&
+              openedVersionStatus.status !== 'opened' &&
+              openedVersionStatus.id === version.id && (
+                <>
+                  <Line noMargin>
+                    <StatusChip status={openedVersionStatus.status} />
+                  </Line>
+                  <Spacer />
+                </>
+              )}
             {isEditing ? (
               <TextField
                 ref={textFieldRef}
@@ -228,9 +286,6 @@ const useClassesForDayCollapse = makeStyles(theme =>
     root: {
       ...styles.sharedRowStyle,
       justifyContent: 'flex-start',
-      '&:focus': {
-        backgroundColor: theme.palette.action.hover,
-      },
       '&:hover': {
         backgroundColor: theme.palette.action.hover,
       },
@@ -248,6 +303,7 @@ type DayGroupRowProps = {|
     event: PointerEvent,
     version: FilledCloudProjectVersion
   ) => void,
+  openedVersionStatus: ?OpenedVersionStatus,
   usersPublicProfileByIds: UserPublicProfileByIds,
   getAnonymousAvatar: () => {| src: string, alt: string |},
 |};
@@ -259,6 +315,7 @@ export const DayGroupRow = ({
   onRenameVersion,
   onCancelRenaming,
   onContextMenu,
+  openedVersionStatus,
   usersPublicProfileByIds,
   getAnonymousAvatar,
 }: DayGroupRowProps) => {
@@ -291,6 +348,7 @@ export const DayGroupRow = ({
               isEditing={version.id === editedVersionId}
               onContextMenu={onContextMenu}
               getAnonymousAvatar={getAnonymousAvatar}
+              openedVersionStatus={openedVersionStatus}
               displayFullDate
             />
           ))}
@@ -323,6 +381,7 @@ export const DayGroupRow = ({
                       isEditing={version.id === editedVersionId}
                       onContextMenu={onContextMenu}
                       getAnonymousAvatar={getAnonymousAvatar}
+                      openedVersionStatus={openedVersionStatus}
                     />
                   ))}
                 </div>

@@ -2,17 +2,21 @@
 
 import * as React from 'react';
 
-import { action } from '@storybook/addon-actions';
 import { type FilledCloudProjectVersion } from '../../../Utils/GDevelopServices/Project';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import VersionHistory from '../../../VersionHistory';
 import MockAdapter from 'axios-mock-adapter';
-
+import type { OpenedVersionStatus } from '../../../VersionHistory';
 import { apiClient as projectApiAxiosClient } from '../../../Utils/GDevelopServices/User';
 import { GDevelopUserApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 import { delay } from '../../../Utils/Delay';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
+import FlatButton from '../../../UI/FlatButton';
 
 export default {
   title: 'VersionHistory',
@@ -145,9 +149,48 @@ export const Default = () => {
   const [versions, setVersions] = React.useState<FilledCloudProjectVersion[]>(
     initialVersions
   );
+  const [
+    openedVersionStatus,
+    setOpenedVersionStatus,
+  ] = React.useState<?OpenedVersionStatus>(null);
   const projectServiceMock = new MockAdapter(projectApiAxiosClient, {
     delayResponse: 1000,
   });
+
+  const onCheckoutVersion = React.useCallback(
+    (version: FilledCloudProjectVersion) => {
+      setOpenedVersionStatus({
+        id: version.id,
+        status: 'opened',
+      });
+    },
+    []
+  );
+
+  const onSaveCurrentlyOpenedVersion = React.useCallback(
+    async () => {
+      if (!openedVersionStatus) return;
+      setOpenedVersionStatus({ ...openedVersionStatus, status: 'saving' });
+      await delay(2000);
+      setOpenedVersionStatus({ ...openedVersionStatus, status: 'saved' });
+      await delay(3000);
+
+      setOpenedVersionStatus(null);
+    },
+    [openedVersionStatus]
+  );
+
+  const onAddChanges = React.useCallback(
+    () => {
+      if (!openedVersionStatus) return;
+      if (!openedVersionStatus) return;
+      setOpenedVersionStatus({
+        ...openedVersionStatus,
+        status: 'unsavedChanges',
+      });
+    },
+    [openedVersionStatus]
+  );
 
   const onRenameVersion = async (
     version: FilledCloudProjectVersion,
@@ -191,13 +234,22 @@ export const Default = () => {
     });
 
   return (
-    <VersionHistory
-      projectId={projectId}
-      versions={versions}
-      onRenameVersion={onRenameVersion}
-      onLoadMore={onLoadMore}
-      canLoadMore={canLoadMore}
-      onCheckoutVersion={action('onCheckoutVersion')}
-    />
+    <ResponsiveLineStackLayout>
+      <VersionHistory
+        projectId={projectId}
+        versions={versions}
+        onRenameVersion={onRenameVersion}
+        onLoadMore={onLoadMore}
+        canLoadMore={canLoadMore}
+        onCheckoutVersion={onCheckoutVersion}
+        openedVersionStatus={openedVersionStatus}
+      />
+      {openedVersionStatus && (
+        <ColumnStackLayout>
+          <FlatButton label="Save" onClick={onSaveCurrentlyOpenedVersion} />
+          <FlatButton label="Add changes to version" onClick={onAddChanges} />
+        </ColumnStackLayout>
+      )}
+    </ResponsiveLineStackLayout>
   );
 };

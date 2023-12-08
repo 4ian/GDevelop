@@ -17,6 +17,7 @@ import {
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
 import FlatButton from '../../../UI/FlatButton';
+import { Column } from '../../../UI/Grid';
 
 export default {
   title: 'VersionHistory',
@@ -235,15 +236,17 @@ export const Default = () => {
 
   return (
     <ResponsiveLineStackLayout>
-      <VersionHistory
-        projectId={projectId}
-        versions={versions}
-        onRenameVersion={onRenameVersion}
-        onLoadMore={onLoadMore}
-        canLoadMore={canLoadMore}
-        onCheckoutVersion={onCheckoutVersion}
-        openedVersionStatus={openedVersionStatus}
-      />
+      <Column expand>
+        <VersionHistory
+          projectId={projectId}
+          versions={versions}
+          onRenameVersion={onRenameVersion}
+          onLoadMore={onLoadMore}
+          canLoadMore={canLoadMore}
+          onCheckoutVersion={onCheckoutVersion}
+          openedVersionStatus={openedVersionStatus}
+        />
+      </Column>
       {openedVersionStatus && (
         <ColumnStackLayout>
           <FlatButton label="Save" onClick={onSaveCurrentlyOpenedVersion} />

@@ -15,6 +15,13 @@ import FlatButton from '../UI/FlatButton';
 import { DayGroupRow } from './ProjectVersionRow';
 import EmptyMessage from '../UI/EmptyMessage';
 
+const anonymousAvatars = [
+  { src: 'res/avatar/green-hero.svg', alt: 'Green hero avatar' },
+  { src: 'res/avatar/red-hero.svg', alt: 'Red hero avatar' },
+  { src: 'res/avatar/ghost.svg', alt: 'Ghost avatar' },
+  { src: 'res/avatar/pink-cloud.svg', alt: 'Pink cloud avatar' },
+];
+
 type VersionsGroupedByDay = {|
   [day: number]: Array<FilledCloudProjectVersion>,
 |};
@@ -37,6 +44,7 @@ const groupVersionsByDay = (
 };
 
 type Props = {|
+  projectId: string,
   versions: Array<FilledCloudProjectVersion>,
   onRenameVersion: (
     FilledCloudProjectVersion,
@@ -48,6 +56,7 @@ type Props = {|
 |};
 
 const VersionHistory = ({
+  projectId,
   versions,
   onRenameVersion,
   onLoadMore,
@@ -149,6 +158,17 @@ const VersionHistory = ({
     [onLoadMore]
   );
 
+  const getAnonymousAvatar = React.useCallback(
+    () => {
+      let projectIdAsNumber = 0;
+      projectId.split('').forEach(character => {
+        projectIdAsNumber += projectId.charCodeAt(0);
+      });
+      return anonymousAvatars[projectIdAsNumber % anonymousAvatars.length];
+    },
+    [projectId]
+  );
+
   if (!usersPublicProfileByIds) return null;
 
   return (
@@ -169,6 +189,7 @@ const VersionHistory = ({
                   onCancelRenaming={onCancelRenaming}
                   onContextMenu={openContextMenu}
                   editedVersionId={editedVersionId}
+                  getAnonymousAvatar={getAnonymousAvatar}
                 />
               );
             })}

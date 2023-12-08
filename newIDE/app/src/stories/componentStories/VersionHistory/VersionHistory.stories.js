@@ -193,6 +193,7 @@ export const Default = () => {
 
   return (
     <VersionHistory
+      projectId={projectId}
       versions={versions}
       onRenameVersion={onRenameVersion}
       onLoadMore={onLoadMore}

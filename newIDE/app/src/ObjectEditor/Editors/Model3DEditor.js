@@ -37,6 +37,8 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
+import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,6 +57,18 @@ const styles = {
     flex: 1,
     alignItems: 'center',
   },
+};
+
+const removeTailingZeroes = (value: string) => {
+  for (let index = value.length - 1; index > 0; index--) {
+    if (value.charAt(index) === '.') {
+      return value.substring(0, index);
+    }
+    if (value.charAt(index) !== '0') {
+      return value;
+    }
+  }
+  return value;
 };
 
 export const hasLight = (layout: ?gd.Layout) => {
@@ -89,21 +103,34 @@ export const hasLight = (layout: ?gd.Layout) => {
 type PropertyFieldProps = {|
   objectConfiguration: gdObjectConfiguration,
   propertyName: string,
+  onChange?: () => void,
 |};
 
 const PropertyField = ({
   objectConfiguration,
   propertyName,
+  onChange,
 }: PropertyFieldProps) => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 
-  const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
+  const updateProperty = React.useCallback(
+    (value: string) => {
+      const oldValue = objectConfiguration
+        .getProperties()
+        .get(propertyName)
+        .getValue();
+      objectConfiguration.updateProperty(propertyName, value);
+      const newValue = objectConfiguration
+        .getProperties()
+        .get(propertyName)
+        .getValue();
+      if (onChange && newValue !== oldValue) {
+        onChange();
+      }
       forceUpdate();
     },
-    [objectConfiguration, forceUpdate]
+    [objectConfiguration, propertyName, onChange, forceUpdate]
   );
 
   const property = properties.get(propertyName);
@@ -121,10 +148,9 @@ const PropertyField = ({
   return (
     <Column noMargin expand key={propertyName}>
       <SemiControlledTextField
-        commitOnBlur
         floatingLabelFixed
         floatingLabelText={property.getLabel()}
-        onChange={value => onChangeProperty(propertyName, value)}
+        onChange={updateProperty}
         value={property.getValue()}
         endAdornment={
           <Tooltip title={endAdornment.tooltipContent}>
@@ -260,19 +286,6 @@ const Model3DEditor = ({
     {}
   );
 
-  const [model3D, setModel3D] = React.useState<?GLTF>(null);
-  const getModel3D = React.useCallback(
-    (modelResourceName: string) => {
-      PixiResourcesLoader.get3DModel(project, modelResourceName).then(
-        newModel3d => {
-          setModel3D(newModel3d);
-        }
-      );
-    },
-    [project]
-  );
-  getModel3D(properties.get('modelResourceName').getValue());
-
   const onChangeProperty = React.useCallback(
     (property: string, value: string) => {
       objectConfiguration.updateProperty(property, value);
@@ -281,11 +294,128 @@ const Model3DEditor = ({
     [objectConfiguration, forceUpdate]
   );
 
+  // This doesn't loop indefinitely because the loader always return the same
+  // instance of GLTF.
+  const [gltf, setGltf] = React.useState<GLTF | null>(null);
+  const getGltf = React.useCallback(
+    (modelResourceName: string) => {
+      PixiResourcesLoader.get3DModel(project, modelResourceName).then(
+        newModel3d => {
+          setGltf(newModel3d);
+        }
+      );
+    },
+    [project]
+  );
+  getGltf(properties.get('modelResourceName').getValue());
   const onChangeModelResourceName = React.useCallback(
     (modelResourceName: string) => {
-      getModel3D(modelResourceName);
+      getGltf(modelResourceName);
     },
-    [getModel3D]
+    [getGltf]
+  );
+
+  const model3D = React.useMemo<THREE.Object3D | null>(
+    () => {
+      if (!gltf) {
+        return null;
+      }
+      const clonedModel3D = SkeletonUtils.clone(gltf.scene);
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      threeObject.add(clonedModel3D);
+      return threeObject;
+    },
+    [gltf]
+  );
+
+  const [rotationX, setRotationX] = React.useState<number>(
+    parseFloat(properties.get('rotationX').getValue()) || 0
+  );
+  const [rotationY, setRotationY] = React.useState<number>(
+    parseFloat(properties.get('rotationY').getValue()) || 0
+  );
+  const [rotationZ, setRotationZ] = React.useState<number>(
+    parseFloat(properties.get('rotationZ').getValue()) || 0
+  );
+  const onRotationChange = React.useCallback(
+    () => {
+      setRotationX(parseFloat(properties.get('rotationX').getValue()));
+      setRotationY(parseFloat(properties.get('rotationY').getValue()));
+      setRotationZ(parseFloat(properties.get('rotationZ').getValue()));
+    },
+    [properties]
+  );
+  const modelSize = React.useMemo<{ x: number, y: number, z: number } | null>(
+    () => {
+      if (!model3D) {
+        return null;
+      }
+      // These formulas are also used in:
+      // - gdjs.Model3DRuntimeObject3DRenderer._updateDefaultTransformation
+      // - Model3DRendered2DInstance
+      model3D.rotation.set(
+        (rotationX * Math.PI) / 180,
+        (rotationY * Math.PI) / 180,
+        (rotationZ * Math.PI) / 180
+      );
+      model3D.updateMatrixWorld(true);
+      const boundingBox = new THREE.Box3().setFromObject(model3D);
+      return {
+        x: boundingBox.max.x - boundingBox.min.x,
+        y: boundingBox.max.y - boundingBox.min.y,
+        z: boundingBox.max.z - boundingBox.min.z,
+      };
+    },
+    [model3D, rotationX, rotationY, rotationZ]
+  );
+
+  const [width, setWidth] = React.useState<number>(
+    parseFloat(properties.get('width').getValue()) || 0
+  );
+  const [height, setHeight] = React.useState<number>(
+    parseFloat(properties.get('height').getValue()) || 0
+  );
+  const [depth, setDepth] = React.useState<number>(
+    parseFloat(properties.get('depth').getValue()) || 0
+  );
+  const onDimensionChange = React.useCallback(
+    () => {
+      setWidth(parseFloat(properties.get('width').getValue()));
+      setHeight(parseFloat(properties.get('height').getValue()));
+      setDepth(parseFloat(properties.get('depth').getValue()));
+    },
+    [properties]
+  );
+  const scale = React.useMemo<number | null>(
+    () => {
+      if (!modelSize) {
+        return null;
+      }
+      return Math.min(
+        width / modelSize.x,
+        height / modelSize.y,
+        depth / modelSize.z
+      );
+    },
+    [depth, height, modelSize, width]
+  );
+
+  const setScale = React.useCallback(
+    (scale: number) => {
+      if (!modelSize) {
+        return;
+      }
+      const width = scale * modelSize.x;
+      const height = scale * modelSize.y;
+      const depth = scale * modelSize.z;
+      objectConfiguration.updateProperty('width', width.toString(10));
+      objectConfiguration.updateProperty('height', height.toString(10));
+      objectConfiguration.updateProperty('depth', depth.toString(10));
+      onDimensionChange();
+      forceUpdate();
+    },
+    [forceUpdate, modelSize, objectConfiguration, onDimensionChange]
   );
 
   const scanNewAnimations = React.useCallback(
@@ -515,14 +645,17 @@ const Model3DEditor = ({
             <PropertyField
               objectConfiguration={objectConfiguration}
               propertyName="rotationX"
+              onChange={onRotationChange}
             />
             <PropertyField
               objectConfiguration={objectConfiguration}
               propertyName="rotationY"
+              onChange={onRotationChange}
             />
             <PropertyField
               objectConfiguration={objectConfiguration}
               propertyName="rotationZ"
+              onChange={onRotationChange}
             />
           </ResponsiveLineStackLayout>
           <Text size="block-title" noMargin>
@@ -532,16 +665,29 @@ const Model3DEditor = ({
             <PropertyField
               objectConfiguration={objectConfiguration}
               propertyName="width"
+              onChange={onDimensionChange}
             />
             <PropertyField
               objectConfiguration={objectConfiguration}
               propertyName="height"
+              onChange={onDimensionChange}
             />
             <PropertyField
               objectConfiguration={objectConfiguration}
               propertyName="depth"
+              onChange={onDimensionChange}
             />
           </ResponsiveLineStackLayout>
+          <Column noMargin expand key={'ScalingRatio'}>
+            <SemiControlledTextField
+              floatingLabelFixed
+              floatingLabelText={<Trans>Scaling factor</Trans>}
+              onChange={value => setScale(parseFloat(value) || 0)}
+              value={
+                scale === null ? '' : removeTailingZeroes(scale.toPrecision(5))
+              }
+            />
+          </Column>
           <PropertyCheckbox
             objectConfiguration={objectConfiguration}
             propertyName="keepAspectRatio"

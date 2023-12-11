@@ -58,7 +58,7 @@ type Props = {|
   openedVersionStatus: ?OpenedVersionStatus,
   onLoadMore: () => Promise<void>,
   canLoadMore: boolean,
-  onCheckoutVersion: FilledCloudProjectVersion => void,
+  onCheckoutVersion: FilledCloudProjectVersion => Promise<void>,
 |};
 
 const VersionHistory = ({

@@ -13,7 +13,7 @@ import type { FileMetadata, StorageProvider } from '../ProjectsStorage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { canSeeCloudProjectHistory } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
-import VersionHistory from '.';
+import VersionHistory, { type OpenedVersionStatus } from '.';
 
 const styles = {
   drawerContent: {
@@ -48,10 +48,19 @@ const emptyPaginationState: PaginationState = {
 type Props = {|
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
+  onOpenCloudProjectOnSpecificVersion: (
+    fileMetadata: FileMetadata,
+    versionId: string
+  ) => Promise<void>,
 |};
 
-const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
+const useVersionHistory = ({
+  fileMetadata,
+  getStorageProvider,
+  onOpenCloudProjectOnSpecificVersion,
+}: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const preventEffectsRunningRef = React.useRef<boolean>(false);
   const {
     subscription,
     getAuthorizationHeader,
@@ -61,6 +70,10 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
   const [state, setState] = React.useState<PaginationState>(
     emptyPaginationState
   );
+  const [
+    checkedOutVersionStatus,
+    setCheckedOutVersionStatus,
+  ] = React.useState<?OpenedVersionStatus>(null);
   const [
     versionHistoryPanelOpen,
     setVersionHistoryPanelOpen,
@@ -84,6 +97,7 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
   React.useEffect(
     () => {
       (async () => {
+        if (preventEffectsRunningRef.current) return;
         if (!cloudProjectId || !showVersionHistoryButton) {
           setState(emptyPaginationState);
           return;
@@ -153,6 +167,17 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
     setVersionHistoryPanelOpen(true);
   }, []);
 
+  const onCheckoutVersion = React.useCallback(
+    async (version: FilledCloudProjectVersion) => {
+      if (!fileMetadata) return;
+      preventEffectsRunningRef.current = true;
+      await onOpenCloudProjectOnSpecificVersion(fileMetadata, version.id);
+      preventEffectsRunningRef.current = false;
+      setCheckedOutVersionStatus({ id: version.id, status: 'opened' });
+    },
+    [fileMetadata, onOpenCloudProjectOnSpecificVersion]
+  );
+
   const onRenameVersion = React.useCallback(
     async (
       version: FilledCloudProjectVersion,
@@ -204,10 +229,10 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
             <VersionHistory
               projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
               canLoadMore={!!state.nextPageUri}
-              onCheckoutVersion={() => console.log('checkout')}
+              onCheckoutVersion={onCheckoutVersion}
               onLoadMore={onLoadMoreVersions}
               onRenameVersion={onRenameVersion}
-              openedVersionStatus={null}
+              openedVersionStatus={checkedOutVersionStatus}
               versions={state.versions || []}
             />
           </Column>

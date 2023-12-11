@@ -11,6 +11,7 @@ import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { extractNextPageUriFromLinkHeader } from './Play';
+import { User as FirebaseUser } from 'firebase/auth';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -744,15 +745,22 @@ export const updateCloudProjectVersion = async (
   return response.data;
 };
 
+/**
+ * List versions of a cloud project.
+ * This method does not directly use the authenticatedUser object to enable
+ * listing versions in React effects. Using authenticatedUser as a dependency
+ * of an effect triggers the effect on each change of the profile (any update
+ * of badges, extensions, purchases, etc.).
+ */
 export const listVersionsOfProject = async (
-  authenticatedUser: AuthenticatedUser,
+  getAuthorizationHeader: () => Promise<string>,
+  firebaseUser: ?FirebaseUser,
   cloudProjectId: string,
   options: {| forceUri: ?string |}
 ): Promise<?{|
   versions: Array<FilledCloudProjectVersion>,
   nextPageUri: ?string,
 |}> => {
-  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
   const { uid: userId } = firebaseUser;

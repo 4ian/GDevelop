@@ -30,11 +30,14 @@ export default function SubscriptionPendingDialog({
     !!authenticatedUser &&
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.planId;
-  const hasGoldOrStartupPlan =
+  const canBenefitFromDiscordRole =
     !!authenticatedUser &&
     !!authenticatedUser.subscription &&
-    (authenticatedUser.subscription.planId === 'gdevelop_gold' ||
-      authenticatedUser.subscription.planId === 'gdevelop_startup');
+    ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      authenticatedUser.subscription.planId
+    ) &&
+    !authenticatedUser.subscription.benefitsFromEducationPlan;
+
   useInterval(
     () => {
       authenticatedUser.onRefreshSubscription().catch(() => {
@@ -181,7 +184,7 @@ export default function SubscriptionPendingDialog({
                   </Trans>
                 </BackgroundText>
               </Line>
-              {!currentDiscordUsername && !!hasGoldOrStartupPlan && (
+              {!currentDiscordUsername && canBenefitFromDiscordRole && (
                 <Line>
                   <TextField
                     value={discordUsername}

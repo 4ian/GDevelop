@@ -257,11 +257,13 @@ const ProfileDetails = ({
     [assetPacksListingDatas, onAssetPackOpen, receivedAssetPacks]
   );
 
-  const hasGoldOrProSubscription =
+  const canBenefitFromDiscordRole =
     !!subscription &&
     !!subscription.planId &&
-    (subscription.planId === 'gdevelop_gold' ||
-      subscription.planId === 'gdevelop_startup');
+    ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      subscription.planId
+    ) &&
+    !subscription.benefitsFromEducationPlan;
 
   if (error)
     return (
@@ -322,7 +324,7 @@ const ProfileDetails = ({
                     <Trans>Discord username</Trans>
                   </Text>
                   {isAuthenticatedUserProfile &&
-                    hasGoldOrProSubscription &&
+                    canBenefitFromDiscordRole &&
                     !!discordUsername && (
                       <IconButton
                         onClick={onSyncDiscordUsername}
@@ -342,9 +344,9 @@ const ProfileDetails = ({
                   {!isAuthenticatedUserProfile ? (
                     discordUsername
                   ) : !discordUsername ? (
-                    !hasGoldOrProSubscription ? (
+                    !canBenefitFromDiscordRole ? (
                       <MarkdownText
-                        translatableSource={t`No discord username defined. Add it and get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                        translatableSource={t`No discord username defined. Add it and get a Gold, Pro or Education subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                       />
                     ) : (
                       <MarkdownText
@@ -354,7 +356,7 @@ const ProfileDetails = ({
                   ) : (
                     <>
                       {discordUsername}
-                      {!hasGoldOrProSubscription && (
+                      {!canBenefitFromDiscordRole && (
                         <>
                           {' - '}
                           <MarkdownText

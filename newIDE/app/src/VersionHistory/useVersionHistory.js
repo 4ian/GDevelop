@@ -23,6 +23,27 @@ const styles = {
   },
 };
 
+const mergeVersionsLists = (
+  list1: FilledCloudProjectVersion[],
+  list2: FilledCloudProjectVersion[]
+) => {
+  const mostRecentVersionDateInList2 = Date.parse(list2[0].createdAt);
+  const moreRecentVersionsInList1 = list1.filter(
+    version => Date.parse(version.createdAt) > mostRecentVersionDateInList2
+  );
+  return [...moreRecentVersionsInList1, ...list2];
+};
+
+type PaginationState = {|
+  versions: ?(FilledCloudProjectVersion[]),
+  nextPageUri: ?Object,
+|};
+
+const emptyPaginationState: PaginationState = {
+  versions: null,
+  nextPageUri: null,
+};
+
 type Props = {|
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
@@ -35,11 +56,9 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
     firebaseUser,
   } = React.useContext(AuthenticatedUserContext);
   const storageProvider = getStorageProvider();
-  const [
-    versions,
-    setVersions,
-  ] = React.useState<?(FilledCloudProjectVersion[])>(null);
-  const [nextPageUri, setNextPageUri] = React.useState<?Object>(null);
+  const [state, setState] = React.useState<PaginationState>(
+    emptyPaginationState
+  );
   const [
     versionHistoryPanelOpen,
     setVersionHistoryPanelOpen,
@@ -51,15 +70,22 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
     storageProvider.internalName && fileMetadata
       ? fileMetadata.fileIdentifier
       : null;
+  const cloudProjectLastModifiedDate =
+    storageProvider.internalName && fileMetadata
+      ? fileMetadata.lastModifiedDate
+      : null;
 
+  // This effect is run in 2 cases:
+  // - at start up to list the versions (when both cloudProjectId and
+  //   cloudProjectLastModifiedDate are set at the same time)
+  // - when a new save is done (cloudProjectLastModifiedDate is updated)
   React.useEffect(
     () => {
       (async () => {
         if (!cloudProjectId || !showVersionHistoryButton) {
-          setVersions(null);
+          setState(emptyPaginationState);
           return;
         }
-        setNextPageUri(null);
         const listing = await listVersionsOfProject(
           getAuthorizationHeader,
           firebaseUser,
@@ -69,8 +95,28 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
           { forceUri: null }
         );
         if (!listing) return;
-        setVersions(listing.versions);
-        setNextPageUri(listing.nextPageUri);
+
+        setState(currentState => {
+          if (!currentState.versions) {
+            // Initial loading of versions.
+            return {
+              versions: listing.versions,
+              nextPageUri: listing.nextPageUri,
+            };
+          }
+          // From here, we're in the case where some versions where already loaded
+          // so the effect is triggered by a modification of cloudProjectLastModifiedDate.
+          // To the versions that are fetched should not replace the whole history that
+          // the user maybe spent time to load.
+          return {
+            versions: mergeVersionsLists(
+              listing.versions,
+              currentState.versions
+            ),
+            // Do not change next page URI.
+            nextPageUri: currentState.nextPageUri,
+          };
+        });
       })();
     },
     [
@@ -79,6 +125,7 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
       firebaseUser,
       cloudProjectId,
       showVersionHistoryButton,
+      cloudProjectLastModifiedDate,
     ]
   );
 
@@ -89,19 +136,15 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
         getAuthorizationHeader,
         firebaseUser,
         cloudProjectId,
-        { forceUri: nextPageUri }
+        { forceUri: state.nextPageUri }
       );
       if (!listing) return;
-      setVersions([...(versions || []), ...listing.versions]);
-      setNextPageUri(listing.nextPageUri);
+      setState({
+        versions: [...(state.versions || []), ...listing.versions],
+        nextPageUri: listing.nextPageUri,
+      });
     },
-    [
-      getAuthorizationHeader,
-      firebaseUser,
-      cloudProjectId,
-      nextPageUri,
-      versions,
-    ]
+    [getAuthorizationHeader, firebaseUser, cloudProjectId, state]
   );
 
   const openVersionHistoryPanel = React.useCallback(() => {
@@ -130,12 +173,12 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
           <Column expand>
             <VersionHistory
               projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-              canLoadMore={!!nextPageUri}
+              canLoadMore={!!state.nextPageUri}
               onCheckoutVersion={() => console.log('checkout')}
               onLoadMore={onLoadMoreVersions}
               onRenameVersion={async () => console.log('rename')}
               openedVersionStatus={null}
-              versions={versions || []}
+              versions={state.versions || []}
             />
           </Column>
         </Line>

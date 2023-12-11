@@ -59,7 +59,7 @@ const styles = {
   },
 };
 
-const removeTailingZeroes = (value: string) => {
+const removeTrailingZeroes = (value: string) => {
   for (let index = value.length - 1; index > 0; index--) {
     if (value.charAt(index) === '.') {
       return value.substring(0, index);
@@ -297,23 +297,20 @@ const Model3DEditor = ({
   // This doesn't loop indefinitely because the loader always return the same
   // instance of GLTF.
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
-  const getGltf = React.useCallback(
-    (modelResourceName: string) => {
-      PixiResourcesLoader.get3DModel(project, modelResourceName).then(
-        newModel3d => {
-          setGltf(newModel3d);
-        }
+  const loadGltf = React.useCallback(
+    async () => {
+      const modelResourceName = properties.get('modelResourceName').getValue();
+      const newModel3d = await PixiResourcesLoader.get3DModel(
+        project,
+        modelResourceName
       );
+      setGltf(newModel3d);
     },
-    [project]
+    [project, properties]
   );
-  getGltf(properties.get('modelResourceName').getValue());
-  const onChangeModelResourceName = React.useCallback(
-    (modelResourceName: string) => {
-      getGltf(modelResourceName);
-    },
-    [getGltf]
-  );
+  if (!gltf) {
+    loadGltf();
+  }
 
   const model3D = React.useMemo<THREE.Object3D | null>(
     () => {
@@ -330,13 +327,13 @@ const Model3DEditor = ({
   );
 
   const [rotationX, setRotationX] = React.useState<number>(
-    parseFloat(properties.get('rotationX').getValue()) || 0
+    () => parseFloat(properties.get('rotationX').getValue()) || 0
   );
   const [rotationY, setRotationY] = React.useState<number>(
-    parseFloat(properties.get('rotationY').getValue()) || 0
+    () => parseFloat(properties.get('rotationY').getValue()) || 0
   );
   const [rotationZ, setRotationZ] = React.useState<number>(
-    parseFloat(properties.get('rotationZ').getValue()) || 0
+    () => parseFloat(properties.get('rotationZ').getValue()) || 0
   );
   const onRotationChange = React.useCallback(
     () => {
@@ -371,13 +368,13 @@ const Model3DEditor = ({
   );
 
   const [width, setWidth] = React.useState<number>(
-    parseFloat(properties.get('width').getValue()) || 0
+    () => parseFloat(properties.get('width').getValue()) || 0
   );
   const [height, setHeight] = React.useState<number>(
-    parseFloat(properties.get('height').getValue()) || 0
+    () => parseFloat(properties.get('height').getValue()) || 0
   );
   const [depth, setDepth] = React.useState<number>(
-    parseFloat(properties.get('depth').getValue()) || 0
+    () => parseFloat(properties.get('depth').getValue()) || 0
   );
   const onDimensionChange = React.useCallback(
     () => {
@@ -602,7 +599,9 @@ const Model3DEditor = ({
             propertyName="modelResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
-            onChange={onChangeModelResourceName}
+            onChange={() => {
+              loadGltf();
+            }}
           />
           <SelectField
             value={properties.get('materialType').getValue()}
@@ -684,7 +683,7 @@ const Model3DEditor = ({
               floatingLabelText={<Trans>Scaling factor</Trans>}
               onChange={value => setScale(parseFloat(value) || 0)}
               value={
-                scale === null ? '' : removeTailingZeroes(scale.toPrecision(5))
+                scale === null ? '' : removeTrailingZeroes(scale.toPrecision(5))
               }
             />
           </Column>

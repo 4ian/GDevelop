@@ -53,7 +53,7 @@ const zipProjectAndCommitVersion = async ({
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
-  options?: {| previousVersion: string |},
+  options?: {| previousVersion?: string, restoredFromVersionId?: string |},
 |}): Promise<?string> => {
   const [zippedProject, projectJson] = await zipProject(project);
   const archiveIsSane = await checkZipContent(zippedProject, projectJson);
@@ -65,6 +65,7 @@ const zipProjectAndCommitVersion = async ({
     cloudProjectId,
     zippedProject,
     previousVersion: options ? options.previousVersion : null,
+    restoredFromVersionId: options ? options.restoredFromVersionId : null,
   });
   return newVersion;
 };
@@ -74,7 +75,7 @@ export const generateOnSaveProject = (
 ) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
-  options?: {| previousVersion: string |}
+  options?: {| previousVersion?: string, restoredFromVersionId?: string |}
 ) => {
   const cloudProjectId = fileMetadata.fileIdentifier;
   const gameId = project.getProjectUuid();

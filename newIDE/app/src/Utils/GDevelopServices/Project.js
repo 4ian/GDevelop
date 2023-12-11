@@ -292,11 +292,13 @@ export const commitVersion = async ({
   cloudProjectId,
   zippedProject,
   previousVersion,
+  restoredFromVersionId,
 }: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   zippedProject: Blob,
   previousVersion?: ?string,
+  restoredFromVersionId?: ?string,
 }): Promise<?string> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
@@ -323,19 +325,26 @@ export const commitVersion = async ({
         }
       )
   );
+  const body: {|
+    newVersion: string,
+    previousVersion?: string,
+    restoredFromVersionId?: string,
+  |} = { newVersion };
+  if (previousVersion) {
+    body.previousVersion = previousVersion;
+  }
+  if (restoredFromVersionId) {
+    body.restoredFromVersionId = restoredFromVersionId;
+  }
   // Inform backend a new version has been uploaded.
   try {
     // Backend only returns "OK".
-    await apiClient.post(
-      `/project/${cloudProjectId}/action/commit`,
-      { newVersion, ...(previousVersion ? { previousVersion } : undefined) },
-      {
-        headers: {
-          Authorization: authorizationHeader,
-        },
-        params: { userId },
-      }
-    );
+    await apiClient.post(`/project/${cloudProjectId}/action/commit`, body, {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    });
     return newVersion;
   } catch (error) {
     console.error('Error while committing version', error);

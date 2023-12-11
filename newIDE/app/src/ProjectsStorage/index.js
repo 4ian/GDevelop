@@ -101,7 +101,7 @@ export type StorageProviderOperations = {|
   onSaveProject?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    options?: {| previousVersion: string |}
+    options?: {| previousVersion?: string, restoredFromVersionId?: string |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,

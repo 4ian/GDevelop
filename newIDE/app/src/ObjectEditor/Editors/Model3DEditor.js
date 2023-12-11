@@ -294,8 +294,6 @@ const Model3DEditor = ({
     [objectConfiguration, forceUpdate]
   );
 
-  // This doesn't loop indefinitely because the loader always return the same
-  // instance of GLTF.
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
   const loadGltf = React.useCallback(
     async () => {

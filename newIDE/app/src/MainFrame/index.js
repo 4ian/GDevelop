@@ -510,14 +510,6 @@ const MainFrame = (props: Props) => {
       ? currentProject.isFolderProject()
       : false,
   });
-  const {
-    renderVersionHistoryPanel,
-    showVersionHistoryButton,
-    openVersionHistoryPanel,
-  } = useVersionHistory({
-    getStorageProvider,
-    fileMetadata: currentFileMetadata,
-  });
 
   /**
    * This reference is useful to get the current opened project,
@@ -2090,10 +2082,10 @@ const MainFrame = (props: Props) => {
   );
 
   const openFromFileMetadataWithStorageProvider = React.useCallback(
-    (
+    async (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
       options: ?{ openAllScenes: boolean }
-    ) => {
+    ): Promise<void> => {
       if (unsavedChanges.hasUnsavedChanges) {
         const answer = Window.showConfirmDialog(
           i18n._(
@@ -2114,7 +2106,7 @@ const MainFrame = (props: Props) => {
       if (!storageProvider) return;
 
       getStorageProviderOperations(storageProvider);
-      openFromFileMetadata(fileMetadata)
+      await openFromFileMetadata(fileMetadata)
         .then(state => {
           if (state) {
             const { currentProject } = state;
@@ -2170,6 +2162,29 @@ const MainFrame = (props: Props) => {
       openEditorTabsFromPersistedState,
     ]
   );
+
+  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+    (fileMetadata: FileMetadata, versionId: string): Promise<void> => {
+      return openFromFileMetadataWithStorageProvider({
+        storageProviderName: 'Cloud',
+        fileMetadata: {
+          ...fileMetadata,
+          version: versionId,
+        },
+      });
+    },
+    [openFromFileMetadataWithStorageProvider]
+  );
+
+  const {
+    renderVersionHistoryPanel,
+    showVersionHistoryButton,
+    openVersionHistoryPanel,
+  } = useVersionHistory({
+    getStorageProvider,
+    fileMetadata: currentFileMetadata,
+    onOpenCloudProjectOnSpecificVersion
+  });
 
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -2679,20 +2694,17 @@ const MainFrame = (props: Props) => {
     return true;
   };
 
-  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+  const onOpenCloudProjectOnSpecificVersionForRecovery = React.useCallback(
     (versionId: string) => {
       if (!cloudProjectFileMetadataToRecover) return;
-      openFromFileMetadataWithStorageProvider({
-        storageProviderName: 'Cloud',
-        fileMetadata: {
-          ...cloudProjectFileMetadataToRecover,
-          version: versionId,
-        },
-      });
+      onOpenCloudProjectOnSpecificVersion(
+        cloudProjectFileMetadataToRecover,
+        versionId
+      );
       setCloudProjectFileMetadataToRecover(null);
       setCloudProjectRecoveryOpenedVersionId(versionId);
     },
-    [openFromFileMetadataWithStorageProvider, cloudProjectFileMetadataToRecover]
+    [cloudProjectFileMetadataToRecover, onOpenCloudProjectOnSpecificVersion]
   );
 
   const canInstallPrivateAsset = React.useCallback(
@@ -3365,7 +3377,7 @@ const MainFrame = (props: Props) => {
         <CloudProjectRecoveryDialog
           cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
           onClose={() => setCloudProjectFileMetadataToRecover(null)}
-          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersion}
+          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersionForRecovery}
         />
       )}
       {cloudProjectSaveChoiceOpen && (

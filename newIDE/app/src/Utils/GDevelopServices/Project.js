@@ -727,7 +727,7 @@ export const updateCloudProjectVersion = async (
   const cleanedAttributes = {
     label: trimmedLabel
       ? trimmedLabel.slice(0, CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH)
-      : null,
+      : '',
   };
 
   const { uid: userId } = firebaseUser;

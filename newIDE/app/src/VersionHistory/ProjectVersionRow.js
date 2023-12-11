@@ -117,14 +117,11 @@ const useClassesForRowContainer = makeStyles(theme =>
       ...styles.sharedRowStyle,
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      '&:focus': {
-        backgroundColor: theme.palette.action.hover,
-      },
       '&:hover': {
         backgroundColor: theme.palette.action.hover,
       },
       '&.selected': {
-        backgroundColor: theme.palette.action.hover,
+        backgroundColor: theme.palette.action.focus,
       },
     },
   })
@@ -304,6 +301,9 @@ const useClassesForDayCollapse = makeStyles(theme =>
       ...styles.sharedRowStyle,
       justifyContent: 'flex-start',
       '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+      },
+      '&:focus': {
         backgroundColor: theme.palette.action.hover,
       },
     },

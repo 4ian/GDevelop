@@ -467,3 +467,13 @@ export const redeemCode = async (
     }
   );
 };
+
+export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
+  return (
+    !!subscription &&
+    ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      subscription.planId
+    ) &&
+    !subscription.benefitsFromEducationPlan
+  );
+};

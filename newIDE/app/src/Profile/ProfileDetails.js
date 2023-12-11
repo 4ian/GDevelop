@@ -40,7 +40,10 @@ import Refresh from '../UI/CustomSvgIcons/Refresh';
 import Check from '../UI/CustomSvgIcons/Check';
 import { MarkdownText } from '../UI/MarkdownText';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { type Subscription } from '../Utils/GDevelopServices/Usage';
+import {
+  canBenefitFromDiscordRole,
+  type Subscription,
+} from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const getAssetPackColumnsFromWidth = (width: WidthType) => {
@@ -257,11 +260,7 @@ const ProfileDetails = ({
     [assetPacksListingDatas, onAssetPackOpen, receivedAssetPacks]
   );
 
-  const hasGoldOrProSubscription =
-    !!subscription &&
-    !!subscription.planId &&
-    (subscription.planId === 'gdevelop_gold' ||
-      subscription.planId === 'gdevelop_startup');
+  const canUserBenefitFromDiscordRole = canBenefitFromDiscordRole(subscription);
 
   if (error)
     return (
@@ -322,7 +321,7 @@ const ProfileDetails = ({
                     <Trans>Discord username</Trans>
                   </Text>
                   {isAuthenticatedUserProfile &&
-                    hasGoldOrProSubscription &&
+                    canUserBenefitFromDiscordRole &&
                     !!discordUsername && (
                       <IconButton
                         onClick={onSyncDiscordUsername}
@@ -342,9 +341,9 @@ const ProfileDetails = ({
                   {!isAuthenticatedUserProfile ? (
                     discordUsername
                   ) : !discordUsername ? (
-                    !hasGoldOrProSubscription ? (
+                    !canUserBenefitFromDiscordRole ? (
                       <MarkdownText
-                        translatableSource={t`No discord username defined. Add it and get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                        translatableSource={t`No discord username defined. Add it and get a Gold, Pro or Education subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                       />
                     ) : (
                       <MarkdownText
@@ -354,7 +353,7 @@ const ProfileDetails = ({
                   ) : (
                     <>
                       {discordUsername}
-                      {!hasGoldOrProSubscription && (
+                      {!canUserBenefitFromDiscordRole && (
                         <>
                           {' - '}
                           <MarkdownText

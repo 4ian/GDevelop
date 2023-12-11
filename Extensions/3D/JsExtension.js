@@ -2736,6 +2736,9 @@ module.exports = {
         originalDepth,
         keepAspectRatio
       ) {
+        // These formulas are also used in:
+        // - gdjs.Model3DRuntimeObject3DRenderer._updateDefaultTransformation
+        // - Model3DEditor.modelSize
         threeObject.rotation.set(
           (rotationX * Math.PI) / 180,
           (rotationY * Math.PI) / 180,

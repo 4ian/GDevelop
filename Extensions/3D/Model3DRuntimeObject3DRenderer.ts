@@ -147,6 +147,9 @@ namespace gdjs {
       originalDepth: float,
       keepAspectRatio: boolean
     ) {
+      // These formulas are also used in:
+      // - Model3DEditor.modelSize
+      // - Model3DRendered2DInstance
       threeObject.rotation.set(
         gdjs.toRad(rotationX),
         gdjs.toRad(rotationY),

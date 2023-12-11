@@ -78,6 +78,8 @@ export const generateOnSaveProject = (
 ) => {
   const cloudProjectId = fileMetadata.fileIdentifier;
   const gameId = project.getProjectUuid();
+  const now = Date.now();
+
   if (!fileMetadata.gameId) {
     console.info('Game id was never set, updating the cloud project.');
     try {
@@ -99,9 +101,12 @@ export const generateOnSaveProject = (
   const newFileMetadata: FileMetadata = {
     ...fileMetadata,
     gameId,
-    // lastModifiedDate is not set since it will be set by backend services
-    // and then frontend will use it to transform the list of cloud project
-    // items into a list of FileMetadata.
+    // lastModifiedDate is set here even though it will be set by backend services.
+    // Regarding the list of cloud projects in the build section, it should not have
+    // an impact since the 2 dates are not used for the same purpose.
+    // But it's better to have an up-to-date current file metadata (used by the version
+    // history to know when to refresh the most recent version).
+    lastModifiedDate: now,
   };
   if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
 

@@ -718,7 +718,7 @@ export const updateCloudProjectVersion = async (
   cloudProjectId: string,
   versionId: string,
   attributes: {| label: string |}
-): Promise<?CloudProject> => {
+): Promise<?CloudProjectVersion> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 

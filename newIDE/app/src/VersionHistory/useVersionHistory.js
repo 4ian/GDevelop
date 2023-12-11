@@ -7,6 +7,7 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import {
   listVersionsOfProject,
   type FilledCloudProjectVersion,
+  updateCloudProjectVersion,
 } from '../Utils/GDevelopServices/Project';
 import type { FileMetadata, StorageProvider } from '../ProjectsStorage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -50,11 +51,12 @@ type Props = {|
 |};
 
 const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     subscription,
     getAuthorizationHeader,
     firebaseUser,
-  } = React.useContext(AuthenticatedUserContext);
+  } = authenticatedUser;
   const storageProvider = getStorageProvider();
   const [state, setState] = React.useState<PaginationState>(
     emptyPaginationState
@@ -151,6 +153,34 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
     setVersionHistoryPanelOpen(true);
   }, []);
 
+  const onRenameVersion = React.useCallback(
+    async (
+      version: FilledCloudProjectVersion,
+      attributes: {| label: string |}
+    ) => {
+      if (!cloudProjectId) return;
+      const updatedVersion = await updateCloudProjectVersion(
+        authenticatedUser,
+        cloudProjectId,
+        version.id,
+        attributes
+      );
+      if (!updatedVersion) return;
+      setState(currentState => {
+        if (!currentState.versions) return currentState;
+        return {
+          versions: currentState.versions.map(version =>
+            version.id === updatedVersion.id
+              ? { ...version, label: updatedVersion.label }
+              : version
+          ),
+          nextPageUri: currentState.nextPageUri,
+        };
+      });
+    },
+    [authenticatedUser, cloudProjectId]
+  );
+
   const renderVersionHistoryPanel = () => {
     return (
       <Drawer
@@ -176,7 +206,7 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
               canLoadMore={!!state.nextPageUri}
               onCheckoutVersion={() => console.log('checkout')}
               onLoadMore={onLoadMoreVersions}
-              onRenameVersion={async () => console.log('rename')}
+              onRenameVersion={onRenameVersion}
               openedVersionStatus={null}
               versions={state.versions || []}
             />

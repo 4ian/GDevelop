@@ -29,7 +29,11 @@ type Props = {|
 |};
 
 const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const {
+    subscription,
+    getAuthorizationHeader,
+    firebaseUser,
+  } = React.useContext(AuthenticatedUserContext);
   const storageProvider = getStorageProvider();
   const [
     versions,
@@ -42,7 +46,7 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
   ] = React.useState<boolean>(false);
   const showVersionHistoryButton =
     storageProvider.internalName === 'Cloud' &&
-    canSeeCloudProjectHistory(authenticatedUser.subscription);
+    canSeeCloudProjectHistory(subscription);
   const cloudProjectId =
     storageProvider.internalName && fileMetadata
       ? fileMetadata.fileIdentifier
@@ -51,17 +55,14 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
   React.useEffect(
     () => {
       (async () => {
-        if (!cloudProjectId) {
-          setVersions(null);
-          return;
-        }
-        if (!showVersionHistoryButton) {
+        if (!cloudProjectId || !showVersionHistoryButton) {
           setVersions(null);
           return;
         }
         setNextPageUri(null);
         const listing = await listVersionsOfProject(
-          authenticatedUser,
+          getAuthorizationHeader,
+          firebaseUser,
           cloudProjectId,
           // This effect should only run when the project changes, or the user subscription.
           // So we fetch the first page of versions.
@@ -74,7 +75,8 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
     },
     [
       storageProvider,
-      authenticatedUser,
+      getAuthorizationHeader,
+      firebaseUser,
       cloudProjectId,
       showVersionHistoryButton,
     ]
@@ -84,7 +86,8 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
     async () => {
       if (!cloudProjectId) return;
       const listing = await listVersionsOfProject(
-        authenticatedUser,
+        getAuthorizationHeader,
+        firebaseUser,
         cloudProjectId,
         { forceUri: nextPageUri }
       );
@@ -92,7 +95,13 @@ const useVersionHistory = ({ fileMetadata, getStorageProvider }: Props) => {
       setVersions([...(versions || []), ...listing.versions]);
       setNextPageUri(listing.nextPageUri);
     },
-    [authenticatedUser, cloudProjectId, nextPageUri, versions]
+    [
+      getAuthorizationHeader,
+      firebaseUser,
+      cloudProjectId,
+      nextPageUri,
+      versions,
+    ]
   );
 
   const openVersionHistoryPanel = React.useCallback(() => {

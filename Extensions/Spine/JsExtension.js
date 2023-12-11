@@ -369,19 +369,11 @@ module.exports = {
         const spineResourceName = properties
           .get('spineResourceName')
           .getValue();
-        const imageResourceName = properties
-          .get('imageResourceName')
-          .getValue();
-        const atlasResourceName = properties
-          .get('atlasResourceName')
-          .getValue();
 
         this._pixiResourcesLoader
           .getSpineData(
             this._project,
             spineResourceName,
-            imageResourceName,
-            atlasResourceName
           )
           .then((spineData) => {
             if (!spineData) return;

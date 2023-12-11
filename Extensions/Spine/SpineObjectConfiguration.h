@@ -157,8 +157,6 @@ private:
   double timeScale;
 
   gd::String spineResourceName;
-  gd::String imageResourceName;
-  gd::String atlasResourceName;
 
   std::vector<SpineAnimation> animations;
 

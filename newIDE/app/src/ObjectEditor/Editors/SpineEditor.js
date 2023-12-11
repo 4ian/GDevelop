@@ -51,7 +51,7 @@ const SpineEditor = ({
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const getResource = React.useCallback(
-    name => {
+    (name: string) => {
       const resourcesManager = project.getResourcesManager();
 
       return resourcesManager.hasResource(name)
@@ -65,19 +65,6 @@ const SpineEditor = ({
 
     return !!metadataString ? JSON.parse(metadataString) : {};
   };
-  const setMetadata = (resource, metadata) => {
-    if (resource) {
-      resource.setMetadata(JSON.stringify(metadata));
-    }
-  };
-  const extendMetadata = React.useCallback(
-    (resourceName, metadata) => {
-      const resource = getResource(resourceName);
-
-      setMetadata(resource, Object.assign(getMetadata(resource), metadata));
-    },
-    [getResource]
-  );
   const [
     justAddedAnimationName,
     setJustAddedAnimationName,
@@ -113,96 +100,57 @@ const SpineEditor = ({
   );
 
   const [skeleton, setSkeleton] = React.useState<?ISkeletonData>(null);
-  const getSkeleton = React.useCallback(
-    (
-      spineResourceName: string,
-      imageResourceName: string,
-      atlasResourceName: string
-    ) => {
-      if (
-        [spineResourceName, imageResourceName, atlasResourceName].some(
-          resName => !resName
-        )
-      ) {
-        return Promise.resolve(undefined);
-      }
+  const getEmbeddedResourcesMapping = React.useCallback(
+    (resourceName: string): { [string]: string } => {
+      const resource = getResource(resourceName);
 
-      return PixiResourcesLoader.getSpineData(
-        project,
-        spineResourceName,
-        imageResourceName,
-        atlasResourceName
-      ).then(newSkeleton => {
-        setSkeleton(newSkeleton);
-
-        return newSkeleton;
-      });
+      return getMetadata(resource).embeddedResourcesMapping;
     },
-    [project]
+    [getResource]
   );
-  getSkeleton(
-    properties.get('spineResourceName').getValue(),
-    properties.get('imageResourceName').getValue(),
-    properties.get('atlasResourceName').getValue()
+  const getSkeleton = React.useCallback(
+    (spineResourceName: string) => {
+      const jsonResourcesMapping = getEmbeddedResourcesMapping(
+        spineResourceName
+      );
+      if (!jsonResourcesMapping) return Promise.resolve(undefined);
+
+      const jsonResourcesMappingValues = Object.values(jsonResourcesMapping);
+      const textureAtlasName = jsonResourcesMappingValues[0];
+
+      // flow check
+      if (typeof textureAtlasName !== 'string')
+        return Promise.resolve(undefined);
+
+      const atlasResourcesMapping = getEmbeddedResourcesMapping(
+        textureAtlasName
+      );
+
+      if (
+        !atlasResourcesMapping ||
+        !Object.values(atlasResourcesMapping).length
+      )
+        return Promise.resolve(undefined);
+
+      return PixiResourcesLoader.getSpineData(project, spineResourceName).then(
+        newSkeleton => {
+          setSkeleton(newSkeleton);
+
+          return newSkeleton;
+        }
+      );
+    },
+    [project, getEmbeddedResourcesMapping]
   );
+  getSkeleton(properties.get('spineResourceName').getValue());
 
   const onChangeSpineResourceName = React.useCallback(
     (spineResourceName: string) => {
-      const atlasResourceName = properties.get('atlasResourceName').getValue();
-
-      if (atlasResourceName) {
-        extendMetadata(spineResourceName, { atlas: atlasResourceName });
-      }
-
-      getSkeleton(
-        spineResourceName,
-        properties.get('imageResourceName').getValue(),
-        atlasResourceName
-      ).then(newSkeleton => {
+      getSkeleton(spineResourceName).then(newSkeleton => {
         spineConfiguration.removeAllAnimations();
       });
     },
-    [getSkeleton, extendMetadata, properties, spineConfiguration]
-  );
-  const onChangeAtlasResourceName = React.useCallback(
-    (atlasResourceName: string) => {
-      const spineResourceName = properties.get('spineResourceName').getValue();
-      const imageResourceName = properties.get('imageResourceName').getValue();
-
-      if (spineResourceName) {
-        extendMetadata(spineResourceName, { atlas: atlasResourceName });
-      }
-      if (imageResourceName) {
-        extendMetadata(atlasResourceName, { image: imageResourceName });
-      }
-
-      getSkeleton(
-        properties.get('spineResourceName').getValue(),
-        imageResourceName,
-        atlasResourceName
-      ).then(newSkeleton => {
-        spineConfiguration.removeAllAnimations();
-      });
-    },
-    [getSkeleton, extendMetadata, properties, spineConfiguration]
-  );
-  const onChangeImageResourceName = React.useCallback(
-    (imageResourceName: string) => {
-      const atlasResourceName = properties.get('atlasResourceName').getValue();
-
-      if (atlasResourceName) {
-        extendMetadata(atlasResourceName, { image: imageResourceName });
-      }
-
-      getSkeleton(
-        properties.get('spineResourceName').getValue(),
-        imageResourceName,
-        atlasResourceName
-      ).then(newSkeleton => {
-        spineConfiguration.removeAllAnimations();
-      });
-    },
-    [getSkeleton, extendMetadata, properties, spineConfiguration]
+    [getSkeleton, spineConfiguration]
   );
 
   const scanNewAnimations = React.useCallback(
@@ -389,20 +337,6 @@ const SpineEditor = ({
             project={project}
             resourceManagementProps={resourceManagementProps}
             onChange={onChangeSpineResourceName}
-          />
-          <PropertyResourceSelector
-            objectConfiguration={objectConfiguration}
-            propertyName="atlasResourceName"
-            project={project}
-            resourceManagementProps={resourceManagementProps}
-            onChange={onChangeAtlasResourceName}
-          />
-          <PropertyResourceSelector
-            objectConfiguration={objectConfiguration}
-            propertyName="imageResourceName"
-            project={project}
-            resourceManagementProps={resourceManagementProps}
-            onChange={onChangeImageResourceName}
           />
           <Text size="block-title" noMargin>
             <Trans>Appearance</Trans>

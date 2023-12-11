@@ -208,6 +208,13 @@ namespace gdjs {
     }
 
     /**
+     * @returns the runtime game instance.
+     */
+    getRuntimeGame(): RuntimeGame {
+      return this._runtimeGame;
+    }
+
+    /**
      * Update the resources data of the game. Useful for hot-reloading, should
      * not be used otherwise.
      */

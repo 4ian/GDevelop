@@ -108,12 +108,29 @@ namespace gdjs {
       resource: ResourceData,
       callback: SpineAtlasManagerRequestCallback
     ): void {
-      const metadata = resource.metadata ? JSON.parse(resource.metadata) : {};
+      const game = this._resourceLoader.getRuntimeGame();
+      const embeddedResourcesMapping = game.getEmbeddedResourcesNames(
+        resource.name
+      );
 
-      if (!metadata.image)
-        callback(new Error(`${resource.name} do not have image metadata!`));
+      if (!embeddedResourcesMapping.length)
+        return callback(
+          new Error(`${resource.name} do not have image metadata!`)
+        );
 
-      const image = this._imageManager.getOrLoadPIXITexture(metadata.image);
+      const images = embeddedResourcesMapping.reduce<{
+        [key: string]: PIXI.Texture;
+      }>((imagesMap, embeddedResourceName) => {
+        const mappedResourceName = game.resolveEmbeddedResource(
+          resource.name,
+          embeddedResourceName
+        );
+        imagesMap[
+          embeddedResourceName
+        ] = this._imageManager.getOrLoadPIXITexture(mappedResourceName);
+
+        return imagesMap;
+      }, {});
       const onLoad = (atlas: pixi_spine.TextureAtlas) => {
         this._loadedSpineAtlases.set(resource, atlas);
         callback(null, atlas);
@@ -127,13 +144,14 @@ namespace gdjs {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add(resource.name, resource.file, { image });
+      PIXI.Assets.add(resource.name, resource.file, { images });
       PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
         (atlas) => {
           if (typeof atlas === 'string') {
             new pixi_spine.TextureAtlas(
               atlas,
-              (_, textureCb) => textureCb(image.baseTexture),
+              (textureName, textureCb) =>
+                textureCb(images[textureName].baseTexture),
               onLoad
             );
           } else {

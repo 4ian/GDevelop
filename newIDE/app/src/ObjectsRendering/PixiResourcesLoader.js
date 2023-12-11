@@ -4,7 +4,7 @@ import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import * as PIXI_SPINE from 'pixi-spine';
-import { ISkeleton } from 'pixi-spine';
+import { ISkeleton, TextureAtlas } from 'pixi-spine';
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
@@ -457,43 +457,57 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Return the Pixi spine data to the specified resource names.
+   * Return the Pixi spine texture atlas of the specified resource names.
    * @param project The project
-   * @param spineName The name of the spine json resource
-   * @param atlasImageName The name of the atlas image resource
    * @param atlasTextName The name of the atlas text resource
-   * @returns The requested material.
+   * @returns The requested texture atlas.
    */
-  static async getSpineData(
+  static async getSpineTextureAtlas(
     project: gdProject,
-    spineName: string,
-    atlasImageName: string,
-    atlasTextName: string
-  ): Promise<ISkeleton> {
+    spineTextureAtlasName: string
+  ): Promise<TextureAtlas> {
     const resourceManager = project.getResourcesManager();
-    const resourcesData = [
-      [spineName, 'spine'],
-      [atlasImageName, 'image'],
-      [atlasTextName, 'atlas'],
-    ];
-
-    for (const [resName, resKind] of resourcesData) {
-      if (!resourceManager.hasResource(resName)) {
-        return Promise.reject(`Unknown ${resKind} file ${resName}.`);
-      }
-      if (resourceManager.getResource(resName).getKind() !== resKind) {
-        return Promise.reject(
-          `The resource called ${resName} is not of appropriate file type ${resKind}.`
-        );
-      }
+    if (!resourceManager.hasResource(spineTextureAtlasName)) {
+      return Promise.reject(`Unknown atlas file ${spineTextureAtlasName}.`);
     }
 
-    // https://github.com/pixijs/spine/blob/master/examples/preload_atlas_text.md
-    if (!atlasPromises[atlasTextName]) {
-      atlasPromises[atlasTextName] = new Promise(resolve => {
+    const resource = resourceManager.getResource(spineTextureAtlasName);
+    if (resource.getKind() !== 'atlas') {
+      return Promise.reject(
+        `The resource called ${spineTextureAtlasName} is not of appropriate file type atlas.`
+      );
+    }
+
+    if (!atlasPromises[spineTextureAtlasName]) {
+      const metadataString = resource.getMetadata();
+      const textureAtlasMapping = metadataString
+        ? JSON.parse(metadataString).embeddedResourcesMapping
+        : {};
+      const textureAtlasMappingEntries = Object.entries(textureAtlasMapping);
+      if (!textureAtlasMappingEntries.length) {
+        return Promise.reject(
+          `Unable to find embedded resources mapping for ${spineTextureAtlasName} atlas.`
+        );
+      }
+
+      const images = textureAtlasMappingEntries.reduce(
+        (imagesMapping, [relatedPath, resourceName]) => {
+          // flow check
+          if (typeof resourceName === 'string') {
+            imagesMapping[relatedPath] = this.getPIXITexture(
+              project,
+              resourceName
+            );
+          }
+
+          return imagesMapping;
+        },
+        {}
+      );
+      atlasPromises[spineTextureAtlasName] = new Promise(resolve => {
         const onError = err => {
           console.error(
-            `Error during ${atlasTextName} atlas loading: ${err}.\nCheck if you selected correct pair of atlas and image files.`
+            `Error during ${spineTextureAtlasName} atlas loading: ${err}.\nCheck if you selected correct pair of atlas and image files.`
           );
           resolve(undefined);
         };
@@ -501,25 +515,25 @@ export default class PixiResourcesLoader {
         try {
           const atlasUrl = ResourcesLoader.getResourceFullUrl(
             project,
-            atlasTextName,
+            spineTextureAtlasName,
             {
               isResourceForPixi: true,
             }
           );
-          const atlasImage = this.getPIXITexture(project, atlasImageName);
           PIXI.Assets.setPreferences({
             preferWorkers: false,
             crossOrigin: checkIfCredentialsRequired(atlasUrl)
               ? 'use-credentials'
               : 'anonymous',
           });
-          PIXI.Assets.add(atlasTextName, atlasUrl, { image: atlasImage });
-          PIXI.Assets.load(atlasTextName)
+          PIXI.Assets.add(spineTextureAtlasName, atlasUrl, { images });
+          PIXI.Assets.load(spineTextureAtlasName)
             .then(atlas => {
               if (typeof atlas === 'string') {
                 new PIXI_SPINE.TextureAtlas(
                   atlas,
-                  (_, textureCb) => textureCb(atlasImage.baseTexture),
+                  (textureName, textureCb) =>
+                    textureCb(images[textureName].baseTexture),
                   resolve
                 );
               } else {
@@ -533,48 +547,90 @@ export default class PixiResourcesLoader {
       });
     }
 
+    return atlasPromises[spineTextureAtlasName];
+  }
+
+  /**
+   * Return the Pixi spine data of the specified resource names.
+   * @param project The project
+   * @param spineName The name of the spine json resource
+   * @returns The requested spine skeleton.
+   */
+  static async getSpineData(
+    project: gdProject,
+    spineName: string
+  ): Promise<ISkeleton> {
+    const resourceManager = project.getResourcesManager();
+    if (!resourceManager.hasResource(spineName)) {
+      return Promise.reject(`Unknown spine file ${spineName}.`);
+    }
+
+    const resource = resourceManager.getResource(spineName);
+    if (resource.getKind() !== 'spine') {
+      return Promise.reject(
+        `The resource called ${spineName} is not of appropriate file type spine.`
+      );
+    }
+
     if (!spineDataPromises[spineName]) {
+      const metadataString = resource.getMetadata();
+      const textureAtlasMapping = metadataString
+        ? JSON.parse(metadataString).embeddedResourcesMapping
+        : {};
+      const spineTextureAtlasName = Object.values(textureAtlasMapping)[0];
+
+      // flow check
+      if (typeof spineTextureAtlasName !== 'string') {
+        return Promise.reject(
+          `Unable to find embedded resources mapping for ${spineName} spine.`
+        );
+      }
+
       spineDataPromises[spineName] = new Promise(resolve => {
-        atlasPromises[atlasTextName].then(spineAtlas => {
-          if (!spineAtlas) {
-            console.error(
-              `Cannot load ${spineName} spine. Atlas ${atlasTextName} is undefined. Check if you selected correct files.`
-            );
-            return resolve(undefined);
-          }
+        this.getSpineTextureAtlas(project, spineTextureAtlasName)
+          .then(spineAtlas => {
+            if (!spineAtlas) {
+              console.error(
+                `Cannot load ${spineName} spine. Atlas ${spineTextureAtlasName} is undefined. Check if you selected correct files.`
+              );
+              return resolve(undefined);
+            }
 
-          const onError = err => {
-            console.error(
-              `Error during ${spineName} spine loading: ${err}.\nCheck if you selected correct files.`
-            );
+            const onError = err => {
+              console.error(
+                `Error during ${spineName} spine loading: ${err}.\nCheck if you selected correct files.`
+              );
+              resolve(undefined);
+            };
+
+            try {
+              const jsonUrl = ResourcesLoader.getResourceFullUrl(
+                project,
+                spineName,
+                {
+                  isResourceForPixi: true,
+                }
+              );
+              PIXI.Assets.setPreferences({
+                preferWorkers: false,
+                crossOrigin: checkIfCredentialsRequired(jsonUrl)
+                  ? 'use-credentials'
+                  : 'anonymous',
+              });
+              PIXI.Assets.add(spineName, jsonUrl, { spineAtlas });
+              PIXI.Assets.load(spineName)
+                .then(jsonData => {
+                  resolve(jsonData.spineData);
+                })
+                .catch(onError);
+            } catch (err) {
+              onError(err);
+            }
+          })
+          .catch(err => {
+            console.error('Errot during spine atlas loading.\n', err);
             resolve(undefined);
-          };
-
-          try {
-            const jsonUrl = ResourcesLoader.getResourceFullUrl(
-              project,
-              spineName,
-              {
-                isResourceForPixi: true,
-              }
-            );
-            PIXI.Assets.setPreferences({
-              preferWorkers: false,
-              crossOrigin: checkIfCredentialsRequired(jsonUrl)
-                ? 'use-credentials'
-                : 'anonymous',
-            });
-            PIXI.Assets.add(spineName, jsonUrl, { spineAtlas });
-
-            PIXI.Assets.load(spineName)
-              .then(jsonData => {
-                resolve(jsonData.spineData);
-              })
-              .catch(onError);
-          } catch (err) {
-            onError(err);
-          }
-        });
+          });
       });
     }
 

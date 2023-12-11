@@ -1171,5 +1171,16 @@ namespace gdjs {
         ? mapping[embeddedResourceName]
         : embeddedResourceName;
     }
+
+    /**
+     * Returns the array of resources that are embedded to passed one.
+     * @param resourceName The name of resource to find embedded resources of.
+     * @returns The array of related resources names.
+     */
+    getEmbeddedResourcesNames(resourceName: string): string[] {
+      return this._embeddedResourcesMappings.has(resourceName)
+        ? Object.keys(this._embeddedResourcesMappings.get(resourceName)!)
+        : [];
+    }
   }
 }

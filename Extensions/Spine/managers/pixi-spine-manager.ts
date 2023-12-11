@@ -46,16 +46,24 @@ namespace gdjs {
       }
 
       try {
-        const metadata = resource.metadata ? JSON.parse(resource.metadata) : {};
+        const game = this._resourceLoader.getRuntimeGame();
+        const embeddedResourcesMapping = game.getEmbeddedResourcesNames(
+          resource.name
+        );
 
-        if (!metadata.atlas) {
+        // there should be exactly one file which is pointing to atlas
+        if (embeddedResourcesMapping.length !== 1) {
           return logger.error(
             `Unable to find atlas metadata for resource spine json ${resourceName}.`
           );
         }
 
+        const atlasResourceName = game.resolveEmbeddedResource(
+          resource.name,
+          embeddedResourcesMapping[0]
+        );
         const spineAtlas = await this._spineAtlasManager.getOrLoad(
-          metadata.atlas
+          atlasResourceName
         );
         PIXI.Assets.setPreferences({
           preferWorkers: false,

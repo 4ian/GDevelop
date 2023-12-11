@@ -7,8 +7,6 @@ namespace gdjs {
       scale: float;
       timeScale: float;
       spineResourceName: string;
-      atlasResourceName: string;
-      imageResourceName: string;
       animations: SpineAnimation[];
     };
   };
@@ -19,12 +17,10 @@ namespace gdjs {
     private _scale: number;
     private _timeScale: number;
     private _animations: SpineAnimation[];
-    private _currentAnimationIndex = -1;
+    private _currentAnimationIndex = 0;
     private _renderer: gdjs.SpineRuntimeObjectPixiRenderer;
 
     readonly spineResourceName: string;
-    readonly atlasResourceName: string;
-    readonly imageResourceName: string;
 
     /**
      * @param instanceContainer The container the object belongs to.
@@ -41,8 +37,6 @@ namespace gdjs {
       this._opacity = objectData.content.opacity;
       this._scale = objectData.content.scale;
       this.spineResourceName = objectData.content.spineResourceName;
-      this.atlasResourceName = objectData.content.atlasResourceName;
-      this.imageResourceName = objectData.content.imageResourceName;
       this._renderer = new gdjs.SpineRuntimeObjectRenderer(
         this,
         instanceContainer

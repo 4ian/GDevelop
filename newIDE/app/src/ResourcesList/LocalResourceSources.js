@@ -98,6 +98,28 @@ const localResourceSources: Array<ResourceSource> = [
         // as written inside the tilemap to the name of the resource that is representing this file.
         const filesWithEmbeddedResources = new Map<string, EmbeddedResources>();
         const parseEmbeddedResources = embeddedResourcesParsers[kind];
+        const recursivelyParseEmbeddedResources = async (
+          initialEmbeddedResources: EmbeddedResources
+        ) => {
+          for (const initialEmbeddedResource of initialEmbeddedResources.embeddedResources.values()) {
+            const embeddedResourseParser =
+              embeddedResourcesParsers[initialEmbeddedResource.resourceKind];
+
+            if (!embeddedResourseParser) continue;
+
+            const { fullPath } = initialEmbeddedResource;
+            const newDependentResources = await embeddedResourseParser(
+              project,
+              fullPath
+            );
+
+            if (newDependentResources) {
+              filesWithEmbeddedResources.set(fullPath, newDependentResources);
+
+              await recursivelyParseEmbeddedResources(newDependentResources);
+            }
+          }
+        };
         if (parseEmbeddedResources) {
           for (const filePath of filePaths) {
             const embeddedResources = await parseEmbeddedResources(
@@ -106,6 +128,8 @@ const localResourceSources: Array<ResourceSource> = [
             );
 
             if (embeddedResources) {
+              await recursivelyParseEmbeddedResources(embeddedResources);
+
               filesWithEmbeddedResources.set(filePath, embeddedResources);
 
               if (embeddedResources.hasAnyEmbeddedResourceOutsideProjectFolder)

@@ -28,7 +28,7 @@ export type MainMenuCallbacks = {|
   onChooseProject: () => void,
   onOpenRecentFile: (
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
-  ) => void,
+  ) => Promise<void>,
   onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
   onCloseProject: () => Promise<boolean>,

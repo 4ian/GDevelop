@@ -96,7 +96,7 @@ type Props = {|
   // Project opening
   canOpen: boolean,
   onChooseProject: () => void,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenExampleStore: () => void,
   onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
   onOpenExampleStoreWithPrivateGameTemplateListingData: (

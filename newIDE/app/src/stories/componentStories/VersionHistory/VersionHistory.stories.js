@@ -159,7 +159,7 @@ export const Default = () => {
   });
 
   const onCheckoutVersion = React.useCallback(
-    (version: FilledCloudProjectVersion) => {
+    async (version: FilledCloudProjectVersion) => {
       setOpenedVersionStatus({
         id: version.id,
         status: 'opened',

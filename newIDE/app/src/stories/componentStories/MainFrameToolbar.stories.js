@@ -58,6 +58,8 @@ const defaultProps: MainFrameToolbarProps = {
   hasPreviewsRunning: false,
   canSave: true,
   onSave: async () => {},
+  showVersionHistoryButton: true,
+  onOpenVersionHistory: () => {},
   previewState: {
     isPreviewOverriden: false,
     previewLayoutName: null,

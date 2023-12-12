@@ -313,6 +313,7 @@ module.exports = {
         const animation = configuration.getAnimation(index);
         const source = animation.getSource();
         const shouldLoop = animation.shouldLoop();
+        const scale = this.getScale();
 
         // reset scale to track new animation range
         // if custom size is set it will be reinitialized in update method
@@ -321,8 +322,8 @@ module.exports = {
         spine.state.tracks[0].trackTime = 0;
         spine.update(0);
         spine.autoUpdate = false;
-        this._initialWidth = spine.width;
-        this._initialHeight = spine.height;
+        this._initialWidth = spine.width * this.getScale();
+        this._initialHeight = spine.height * this.getScale();
       }
 
       /**
@@ -330,7 +331,7 @@ module.exports = {
        */
       getDefaultWidth() {
         return (this._initialWidth !== null
-          ? this._initialWidth * this.getScale()
+          ? this._initialWidth
           : 256);
       }
 
@@ -339,7 +340,7 @@ module.exports = {
        */
       getDefaultHeight() {
         return (this._initialHeight !== null
-          ? this._initialHeight * this.getScale()
+          ? this._initialHeight
           : 256);
       }
 
@@ -348,6 +349,11 @@ module.exports = {
        */
       getScale() {
         return Number(this._getProperties().get('scale').getValue()) || 1;
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy(true);
       }
 
       /**

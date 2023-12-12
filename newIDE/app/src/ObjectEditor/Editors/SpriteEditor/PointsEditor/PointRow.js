@@ -73,6 +73,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
               }
               value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
               type="number"
+              step={0.5}
               id="point-x"
               onChange={value => {
                 const valueAsNumber = parseFloat(value);
@@ -103,6 +104,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
               }
               value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
               type="number"
+              step={0.5}
               id="point-y"
               onChange={value => {
                 const valueAsNumber = parseFloat(value);

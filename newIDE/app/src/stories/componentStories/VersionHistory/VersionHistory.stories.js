@@ -238,6 +238,7 @@ export const Default = () => {
     <ResponsiveLineStackLayout>
       <Column expand>
         <VersionHistory
+          isVisible
           projectId={projectId}
           versions={versions}
           onRenameVersion={onRenameVersion}

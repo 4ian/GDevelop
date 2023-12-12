@@ -130,6 +130,7 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
 
           gd::String potentiallyUpdatedTargetResourceName = targetResourceName;
           ExposeResourceWithType(targetResource.GetKind(), potentiallyUpdatedTargetResourceName);
+          ExposeEmbeddeds(potentiallyUpdatedTargetResourceName);
 
           if (potentiallyUpdatedTargetResourceName != targetResourceName) {
             // The resource name was renamed. Also update the mapping.

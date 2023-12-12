@@ -206,6 +206,10 @@ const ProjectVersionRow = ({
                     validateNewLabel();
                   }
                 }}
+                onKeyDown={event => {
+                  // Prevent parent drawer to be closed when Esc is hit.
+                  event.stopPropagation();
+                }}
                 onKeyUp={event => {
                   if (shouldCloseOrCancel(event)) {
                     setNewLabel(version.label || '');

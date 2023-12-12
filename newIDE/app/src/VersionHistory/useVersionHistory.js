@@ -171,9 +171,12 @@ const useVersionHistory = ({
     async (version: FilledCloudProjectVersion) => {
       if (!fileMetadata) return;
       preventEffectsRunningRef.current = true;
-      await onOpenCloudProjectOnSpecificVersion(fileMetadata, version.id);
-      preventEffectsRunningRef.current = false;
-      setCheckedOutVersionStatus({ id: version.id, status: 'opened' });
+      try {
+        await onOpenCloudProjectOnSpecificVersion(fileMetadata, version.id);
+        setCheckedOutVersionStatus({ id: version.id, status: 'opened' });
+      } finally {
+        preventEffectsRunningRef.current = false;
+      }
     },
     [fileMetadata, onOpenCloudProjectOnSpecificVersion]
   );

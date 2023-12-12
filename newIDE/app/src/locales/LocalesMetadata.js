@@ -41,7 +41,7 @@ module.exports = [
     "languageCode": "ca_ES",
     "languageName": "Catalan",
     "languageNativeName": "Català",
-    "translationRatio": 0.2612312811980033
+    "translationRatio": 0.2628951747088186
   },
   {
     "languageCode": "cs_CZ",
@@ -107,7 +107,7 @@ module.exports = [
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.9466274158453859
+    "translationRatio": 0.943171637015231
   },
   {
     "languageCode": "ha_HG",
@@ -137,7 +137,7 @@ module.exports = [
     "languageCode": "id_ID",
     "languageName": "Indonesian",
     "languageNativeName": "Bahasa Indonesia",
-    "translationRatio": 0.4621784205810828
+    "translationRatio": 0.46371432228337384
   },
   {
     "languageCode": "ig_NG",
@@ -149,13 +149,13 @@ module.exports = [
     "languageCode": "it_IT",
     "languageName": "Italian",
     "languageNativeName": "Italiano",
-    "translationRatio": 0.814411877639831
+    "translationRatio": 0.8155638039165494
   },
   {
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.984384999360041
+    "translationRatio": 0.9865608601049533
   },
   {
     "languageCode": "ka_GE",
@@ -221,7 +221,7 @@ module.exports = [
     "languageCode": "pl_PL",
     "languageName": "Polish",
     "languageNativeName": "język polski",
-    "translationRatio": 0.7051068731601178
+    "translationRatio": 0.704722897734545
   },
   {
     "languageCode": "pseudo_LOCALE",
@@ -251,7 +251,7 @@ module.exports = [
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9933444259567388
+    "translationRatio": 0.9916805324459235
   },
   {
     "languageCode": "si_LK",
@@ -347,12 +347,12 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.9923204914885447
+    "translationRatio": 0.992448483297069
   },
   {
     "languageCode": "zh_TW",
     "languageName": "Chinese Traditional",
     "languageNativeName": "正體字",
-    "translationRatio": 0.23755279662101625
+    "translationRatio": 0.2435684116216562
   }
 ];

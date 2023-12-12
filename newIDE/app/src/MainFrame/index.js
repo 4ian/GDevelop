@@ -2183,7 +2183,7 @@ const MainFrame = (props: Props) => {
   } = useVersionHistory({
     getStorageProvider,
     fileMetadata: currentFileMetadata,
-    onOpenCloudProjectOnSpecificVersion
+    onOpenCloudProjectOnSpecificVersion,
   });
 
   const openSaveToStorageProviderDialog = React.useCallback(

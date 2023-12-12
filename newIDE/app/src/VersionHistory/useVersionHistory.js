@@ -230,6 +230,7 @@ const useVersionHistory = ({
         <Line useFullHeight expand>
           <Column expand>
             <VersionHistory
+              isVisible={versionHistoryPanelOpen}
               projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
               canLoadMore={!!state.nextPageUri}
               onCheckoutVersion={onCheckoutVersion}

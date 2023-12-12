@@ -53,6 +53,7 @@ const VerticeRow = ({
           }
           value={roundTo(verticeX, VERTEX_COORDINATE_PRECISION).toString()}
           type="number"
+          step={0.5}
           id="vertice-x"
           onChange={value => {
             const valueAsNumber = parseFloat(value);
@@ -73,6 +74,7 @@ const VerticeRow = ({
           }
           value={roundTo(verticeY, VERTEX_COORDINATE_PRECISION).toString()}
           type="number"
+          step={0.5}
           id="vertice-y"
           onChange={value => {
             const valueAsNumber = parseFloat(value);

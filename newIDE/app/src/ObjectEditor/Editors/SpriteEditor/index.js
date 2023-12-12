@@ -299,22 +299,9 @@ export default function SpriteEditor({
     (resourcesByAnimation: Map<string, Array<gdResource>>) => {
       setNameErrors({});
 
-      const allAnimationNames = mapFor(
-        0,
-        spriteConfiguration.getAnimationsCount(),
-        index => spriteConfiguration.getAnimation(index).getName()
-      );
-
       for (const [name, resources] of resourcesByAnimation) {
         const animation = new gd.Animation();
-        let newName = name;
-        for (let index = 0; index < 10; index++) {
-          if (!allAnimationNames.includes(newName)) {
-            animation.setName(name);
-            break;
-          }
-          newName = name + ' ' + index;
-        }
+        animation.setName(name);
         animation.setDirectionsCount(1);
         const direction = animation.getDirection(0);
         for (const resource of resources) {
@@ -540,14 +527,17 @@ export default function SpriteEditor({
     ]
   );
 
-  const adaptCollisionMaskIfNeeded = React.useCallback(() => {
-    // If the first sprite of the first animation is updated,
-    // we update the automatic collision mask of the object,
-    // if the option is enabled.
-    if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
-      onCreateMatchingSpriteCollisionMask();
-    }
-  }, []);
+  const adaptCollisionMaskIfNeeded = React.useCallback(
+    () => {
+      // If the first sprite of the first animation is updated,
+      // we update the automatic collision mask of the object,
+      // if the option is enabled.
+      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
+        onCreateMatchingSpriteCollisionMask();
+      }
+    },
+    [onCreateMatchingSpriteCollisionMask, spriteConfiguration]
+  );
 
   const editWith = React.useCallback(
     async (
@@ -711,239 +701,243 @@ export default function SpriteEditor({
                           i18n,
                           imageResourceExternalEditors[0]
                         );
-                    }
+                      }
                     : undefined
                 }
               />
             </Column>
           ) : (
-            <ScrollView ref={scrollView}>
-              <React.Fragment>
-                <SpacedDismissableTutorialMessage />
-                {mapFor(
-                  0,
-                  spriteConfiguration.getAnimationsCount(),
-                  animationIndex => {
-                    const animation = spriteConfiguration.getAnimation(
-                      animationIndex
-                    );
-                    const animationName = animation.getName();
+            <>
+              <ScrollView ref={scrollView}>
+                <React.Fragment>
+                  <SpacedDismissableTutorialMessage />
+                  {mapFor(
+                    0,
+                    spriteConfiguration.getAnimationsCount(),
+                    animationIndex => {
+                      const animation = spriteConfiguration.getAnimation(
+                        animationIndex
+                      );
+                      const animationName = animation.getName();
 
-                    const animationRef =
-                      justAddedAnimationName === animationName
-                        ? justAddedAnimationElement
-                        : null;
+                      const animationRef =
+                        justAddedAnimationName === animationName
+                          ? justAddedAnimationElement
+                          : null;
 
-                    return (
-                      <DragSourceAndDropTarget
-                        key={animationIndex}
-                        beginDrag={() => {
-                          draggedAnimationIndex.current = animationIndex;
-                          return {};
-                        }}
-                        canDrag={() => true}
-                        canDrop={() => true}
-                        drop={() => {
-                          moveAnimation(animationIndex);
-                        }}
-                      >
-                        {({
-                          connectDragSource,
-                          connectDropTarget,
-                          isOver,
-                          canDrop,
-                        }) =>
-                          connectDropTarget(
-                            <div
-                              key={animationIndex}
-                              style={styles.rowContainer}
-                            >
-                              {isAnimationListLocked && (
-                                <Column expand noMargin>
-                                  <Text size="block-title">
-                                    {animationName}
-                                  </Text>
-                                </Column>
-                              )}
-                              {!isAnimationListLocked && isOver && (
-                                <DropIndicator canDrop={canDrop} />
-                              )}
-                              {!isAnimationListLocked && (
-                                <div
-                                  ref={animationRef}
-                                  style={{
-                                    ...styles.rowContent,
-                                    backgroundColor:
-                                      gdevelopTheme.list.itemsBackgroundColor,
-                                  }}
-                                >
-                                  <Line noMargin expand alignItems="center">
-                                    {connectDragSource(
-                                      <span>
-                                        <Column>
-                                          <DragHandleIcon />
-                                        </Column>
-                                      </span>
-                                    )}
-                                    <Text noMargin noShrink>
-                                      <Trans>Animation #{animationIndex}</Trans>
+                      return (
+                        <DragSourceAndDropTarget
+                          key={animationIndex}
+                          beginDrag={() => {
+                            draggedAnimationIndex.current = animationIndex;
+                            return {};
+                          }}
+                          canDrag={() => true}
+                          canDrop={() => true}
+                          drop={() => {
+                            moveAnimation(animationIndex);
+                          }}
+                        >
+                          {({
+                            connectDragSource,
+                            connectDropTarget,
+                            isOver,
+                            canDrop,
+                          }) =>
+                            connectDropTarget(
+                              <div
+                                key={animationIndex}
+                                style={styles.rowContainer}
+                              >
+                                {isAnimationListLocked && (
+                                  <Column expand noMargin>
+                                    <Text size="block-title">
+                                      {animationName}
                                     </Text>
+                                  </Column>
+                                )}
+                                {!isAnimationListLocked && isOver && (
+                                  <DropIndicator canDrop={canDrop} />
+                                )}
+                                {!isAnimationListLocked && (
+                                  <div
+                                    ref={animationRef}
+                                    style={{
+                                      ...styles.rowContent,
+                                      backgroundColor:
+                                        gdevelopTheme.list.itemsBackgroundColor,
+                                    }}
+                                  >
+                                    <Line noMargin expand alignItems="center">
+                                      {connectDragSource(
+                                        <span>
+                                          <Column>
+                                            <DragHandleIcon />
+                                          </Column>
+                                        </span>
+                                      )}
+                                      <Text noMargin noShrink>
+                                        <Trans>
+                                          Animation #{animationIndex}
+                                        </Trans>
+                                      </Text>
+                                      <Spacer />
+                                      <SemiControlledTextField
+                                        margin="none"
+                                        commitOnBlur
+                                        errorText={nameErrors[animationIndex]}
+                                        translatableHintText={t`Optional animation name`}
+                                        value={animation.getName()}
+                                        onChange={newName =>
+                                          changeAnimationName(
+                                            animationIndex,
+                                            newName
+                                          )
+                                        }
+                                        fullWidth
+                                      />
+                                      <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                          removeAnimation(animationIndex, i18n)
+                                        }
+                                      >
+                                        <Trash />
+                                      </IconButton>
+                                    </Line>
                                     <Spacer />
-                                    <SemiControlledTextField
-                                      margin="none"
-                                      commitOnBlur
-                                      errorText={nameErrors[animationIndex]}
-                                      translatableHintText={t`Optional animation name`}
-                                      value={animation.getName()}
-                                      onChange={newName =>
-                                        changeAnimationName(
-                                          animationIndex,
-                                          newName
-                                        )
-                                      }
-                                      fullWidth
-                                    />
-                                    <IconButton
-                                      size="small"
-                                      onClick={() =>
-                                        removeAnimation(animationIndex, i18n)
-                                      }
-                                    >
-                                      <Trash />
-                                    </IconButton>
-                                  </Line>
-                                  <Spacer />
-                                </div>
-                              )}
-                              <div style={styles.animationLine}>
-                                <Column expand noMargin>
-                                  {mapFor(
-                                    0,
-                                    animation.getDirectionsCount(),
-                                    directionIndex => {
-                                      const direction = animation.getDirection(
-                                        directionIndex
-                                      );
-                                      return (
-                                        <SpritesList
-                                          spriteConfiguration={
-                                            spriteConfiguration
-                                          }
-                                          direction={direction}
-                                          key={directionIndex}
-                                          project={project}
-                                          resourcesLoader={ResourcesLoader}
-                                          resourceManagementProps={
-                                            resourceManagementProps
-                                          }
-                                          editWith={(
-                                            i18n,
-                                            ResourceExternalEditor,
-                                            direction
-                                          ) =>
-                                            editWith(
+                                  </div>
+                                )}
+                                <div style={styles.animationLine}>
+                                  <Column expand noMargin>
+                                    {mapFor(
+                                      0,
+                                      animation.getDirectionsCount(),
+                                      directionIndex => {
+                                        const direction = animation.getDirection(
+                                          directionIndex
+                                        );
+                                        return (
+                                          <SpritesList
+                                            spriteConfiguration={
+                                              spriteConfiguration
+                                            }
+                                            direction={direction}
+                                            key={directionIndex}
+                                            project={project}
+                                            resourcesLoader={ResourcesLoader}
+                                            resourceManagementProps={
+                                              resourceManagementProps
+                                            }
+                                            editWith={(
                                               i18n,
                                               ResourceExternalEditor,
-                                              direction,
-                                              animationIndex,
-                                              directionIndex
-                                            )
-                                          }
-                                          onReplaceByDirection={newDirection =>
-                                            replaceDirection(
-                                              animationIndex,
-                                              directionIndex,
-                                              newDirection
-                                            )
-                                          }
-                                          objectName={objectName}
-                                          animationName={animationName}
-                                          onChangeName={newName =>
-                                            changeAnimationName(
-                                              animationIndex,
-                                              newName
-                                            )
-                                          }
-                                          onSpriteUpdated={onObjectUpdated}
-                                          onFirstSpriteUpdated={
-                                            animationIndex === 0
-                                              ? adaptCollisionMaskIfNeeded
-                                              : undefined
-                                          }
-                                          onSpriteAdded={onSpriteAdded}
-                                          addAnimations={addAnimations}
-                                        />
-                                      );
-                                    }
-                                  )}
-                                </Column>
+                                              direction
+                                            ) =>
+                                              editWith(
+                                                i18n,
+                                                ResourceExternalEditor,
+                                                direction,
+                                                animationIndex,
+                                                directionIndex
+                                              )
+                                            }
+                                            onReplaceByDirection={newDirection =>
+                                              replaceDirection(
+                                                animationIndex,
+                                                directionIndex,
+                                                newDirection
+                                              )
+                                            }
+                                            objectName={objectName}
+                                            animationName={animationName}
+                                            onChangeName={newName =>
+                                              changeAnimationName(
+                                                animationIndex,
+                                                newName
+                                              )
+                                            }
+                                            onSpriteUpdated={onObjectUpdated}
+                                            onFirstSpriteUpdated={
+                                              animationIndex === 0
+                                                ? adaptCollisionMaskIfNeeded
+                                                : undefined
+                                            }
+                                            onSpriteAdded={onSpriteAdded}
+                                            addAnimations={addAnimations}
+                                          />
+                                        );
+                                      }
+                                    )}
+                                  </Column>
+                                </div>
                               </div>
-                            </div>
-                          )
-                        }
-                      </DragSourceAndDropTarget>
-                    );
-                  }
-                )}
-              </React.Fragment>
-            </ScrollView>
-          )}
-          <Column noMargin>
-            <ResponsiveLineStackLayout
-              justifyContent="space-between"
-              noColumnMargin
-            >
-              {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
-                <ResponsiveLineStackLayout noMargin noColumnMargin>
-                  <FlatButton
-                    label={<Trans>Edit collision masks</Trans>}
-                    onClick={() => setCollisionMasksEditorOpen(true)}
-                    disabled={hasNoSprites()}
-                  />
-                  {!isAnimationListLocked && (
-                    <FlatButton
-                      label={<Trans>Edit points</Trans>}
-                      onClick={() => setPointsEditorOpen(true)}
+                            )
+                          }
+                        </DragSourceAndDropTarget>
+                      );
+                    }
+                  )}
+                </React.Fragment>
+              </ScrollView>
+              <Column noMargin>
+                <ResponsiveLineStackLayout
+                  justifyContent="space-between"
+                  noColumnMargin
+                >
+                  {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
+                    <ResponsiveLineStackLayout noMargin noColumnMargin>
+                      <FlatButton
+                        label={<Trans>Edit collision masks</Trans>}
+                        onClick={() => setCollisionMasksEditorOpen(true)}
+                        disabled={hasNoSprites()}
+                      />
+                      {!isAnimationListLocked && (
+                        <FlatButton
+                          label={<Trans>Edit points</Trans>}
+                          onClick={() => setPointsEditorOpen(true)}
+                          disabled={hasNoSprites()}
+                        />
+                      )}
+                      {!isAnimationListLocked && (
+                        <FlatButton
+                          label={<Trans>Advanced options</Trans>}
+                          onClick={() => setAdvancedOptionsOpen(true)}
+                          disabled={hasNoSprites()}
+                        />
+                      )}
+                    </ResponsiveLineStackLayout>
+                  ) : (
+                    <FlatButtonWithSplitMenu
+                      label={<Trans>Edit collision masks</Trans>}
+                      onClick={() => setCollisionMasksEditorOpen(true)}
                       disabled={hasNoSprites()}
+                      buildMenuTemplate={i18n => [
+                        {
+                          label: i18n._(t`Edit points`),
+                          disabled: hasNoSprites(),
+                          click: () => setPointsEditorOpen(true),
+                        },
+                        {
+                          label: i18n._(t`Advanced options`),
+                          disabled: hasNoSprites(),
+                          click: () => setAdvancedOptionsOpen(true),
+                        },
+                      ]}
                     />
                   )}
                   {!isAnimationListLocked && (
-                    <FlatButton
-                      label={<Trans>Advanced options</Trans>}
-                      onClick={() => setAdvancedOptionsOpen(true)}
-                      disabled={hasNoSprites()}
+                    <RaisedButton
+                      label={<Trans>Add an animation</Trans>}
+                      primary
+                      onClick={addAnimation}
+                      icon={<Add />}
                     />
                   )}
                 </ResponsiveLineStackLayout>
-              ) : (
-                <FlatButtonWithSplitMenu
-                  label={<Trans>Edit collision masks</Trans>}
-                  onClick={() => setCollisionMasksEditorOpen(true)}
-                  disabled={hasNoSprites()}
-                  buildMenuTemplate={i18n => [
-                    {
-                      label: i18n._(t`Edit points`),
-                      disabled: hasNoSprites(),
-                      click: () => setPointsEditorOpen(true),
-                    },
-                    {
-                      label: i18n._(t`Advanced options`),
-                      disabled: hasNoSprites(),
-                      click: () => setAdvancedOptionsOpen(true),
-                    },
-                  ]}
-                />
-              )}
-              {!isAnimationListLocked && (
-                <RaisedButton
-                  label={<Trans>Add an animation</Trans>}
-                  primary
-                  onClick={addAnimation}
-                  icon={<Add />}
-                />
-              )}
-            </ResponsiveLineStackLayout>
-          </Column>
+              </Column>
+            </>
+          )}
           {advancedOptionsOpen && (
             <Dialog
               title={<Trans>Advanced options</Trans>}

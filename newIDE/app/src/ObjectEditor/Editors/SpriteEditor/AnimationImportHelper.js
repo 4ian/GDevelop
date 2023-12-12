@@ -80,19 +80,9 @@ export const groupResourcesByAnimations = (
   const commonPrefix = findCommonPrefix(
     namedResources.map(resources => resources.name)
   );
-  const hasSeveralAnimations =
-    commonPrefix.length !== namedResources[0].name.length;
-  if (hasSeveralAnimations) {
-    // Remove the common prefix as it's probably the object name.
-    for (const namedResource of namedResources) {
-      namedResource.name = namedResource.name.substring(commonPrefix.length);
-    }
-  }
+  // Remove the common prefix as it's probably the object name.
   for (const namedResource of namedResources) {
-    console.log(
-      namedResource.name + ' = ' + trimFromSeparators(namedResource.name)
-    );
-    namedResource.name = trimFromSeparators(namedResource.name);
+    namedResource.name = namedResource.name.substring(commonPrefix.length);
   }
 
   // Index the resources by animation names and frame indexes.

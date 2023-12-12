@@ -46,9 +46,7 @@ describe('AnimationImportHelper', () => {
 
     const resourcesByAnimations = groupResourcesByAnimations(resources);
     expect(resourcesByAnimations.size).toBe(1);
-    expect(getAnimationFramesCount(resourcesByAnimations, 'Player Jump')).toBe(
-      1
-    );
+    expect(getAnimationFramesCount(resourcesByAnimations, '')).toBe(1);
 
     deleteResources(resources);
   });
@@ -61,9 +59,7 @@ describe('AnimationImportHelper', () => {
 
     const resourcesByAnimations = groupResourcesByAnimations(resources);
     expect(resourcesByAnimations.size).toBe(1);
-    expect(getAnimationFramesCount(resourcesByAnimations, 'Player Run')).toBe(
-      2
-    );
+    expect(getAnimationFramesCount(resourcesByAnimations, '')).toBe(2);
 
     deleteResources(resources);
   });

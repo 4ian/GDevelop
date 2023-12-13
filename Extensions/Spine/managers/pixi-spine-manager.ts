@@ -47,12 +47,12 @@ namespace gdjs {
 
       try {
         const game = this._resourceLoader.getRuntimeGame();
-        const embeddedResourcesMapping = game.getEmbeddedResourcesNames(
+        const embeddedResourcesNames = game.getEmbeddedResourcesNames(
           resource.name
         );
 
         // there should be exactly one file which is pointing to atlas
-        if (embeddedResourcesMapping.length !== 1) {
+        if (embeddedResourcesNames.length !== 1) {
           return logger.error(
             `Unable to find atlas metadata for resource spine json ${resourceName}.`
           );
@@ -60,7 +60,7 @@ namespace gdjs {
 
         const atlasResourceName = game.resolveEmbeddedResource(
           resource.name,
-          embeddedResourcesMapping[0]
+          embeddedResourcesNames[0]
         );
         const spineAtlas = await this._spineAtlasManager.getOrLoad(
           atlasResourceName

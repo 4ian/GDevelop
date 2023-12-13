@@ -108,7 +108,7 @@ const SpineEditor = ({
     },
     [getResource]
   );
-  const getSkeleton = React.useCallback(
+  const loadSkeleton = React.useCallback(
     (spineResourceName: string) => {
       const jsonResourcesMapping = getEmbeddedResourcesMapping(
         spineResourceName
@@ -132,25 +132,43 @@ const SpineEditor = ({
       )
         return Promise.resolve(undefined);
 
-      return PixiResourcesLoader.getSpineData(project, spineResourceName).then(
-        newSkeleton => {
-          setSkeleton(newSkeleton);
-
-          return newSkeleton;
-        }
-      );
+      return PixiResourcesLoader.getSpineData(project, spineResourceName);
     },
     [project, getEmbeddedResourcesMapping]
   );
-  getSkeleton(properties.get('spineResourceName').getValue());
+  const [sourceSelectOptions, setSourceSelectOptions] = React.useState<Array<Object>>([]);
+  const spineResourceName = properties.get('spineResourceName').getValue();
+
+  React.useEffect(
+    () => {
+      (async () => {
+        const skeleton = await loadSkeleton(spineResourceName);
+
+        setSkeleton(skeleton);
+
+        if (skeleton) {
+          setSourceSelectOptions(
+            skeleton.animations.map(animation => (
+              <SelectOption
+                key={animation.name}
+                value={animation.name}
+                label={animation.name}
+                shouldNotTranslate
+              />
+            ))
+          );
+        }
+      })();
+    },
+    [loadSkeleton, setSourceSelectOptions, spineResourceName]
+  );
 
   const onChangeSpineResourceName = React.useCallback(
-    (spineResourceName: string) => {
-      getSkeleton(spineResourceName).then(newSkeleton => {
-        spineConfiguration.removeAllAnimations();
-      });
+    () => {
+      spineConfiguration.removeAllAnimations();
+      forceUpdate();
     },
-    [getSkeleton, spineConfiguration]
+    [forceUpdate, spineConfiguration]
   );
 
   const scanNewAnimations = React.useCallback(
@@ -313,19 +331,6 @@ const SpineEditor = ({
       project,
     ]
   );
-
-  const sourceSelectOptions = skeleton
-    ? skeleton.animations.map(animation => {
-        return (
-          <SelectOption
-            key={animation.name}
-            value={animation.name}
-            label={animation.name}
-            shouldNotTranslate
-          />
-        );
-      })
-    : [];
 
   return (
     <>

@@ -106,6 +106,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 previewState={props.previewState}
                 hasPreviewsRunning={props.hasPreviewsRunning}
                 openShareDialog={props.openShareDialog}
+                isSharingEnabled={props.isSharingEnabled}
               />
               <Spacer />
             </ToolbarGroup>

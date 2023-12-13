@@ -325,6 +325,7 @@ const useClassesForDayCollapse = makeStyles(theme =>
 type DayGroupRowProps = {|
   day: number,
   versions: FilledCloudProjectVersion[],
+  isOpenedInitially: boolean,
   editedVersionId: ?string,
   onRenameVersion: (FilledCloudProjectVersion, string) => Promise<void>,
   loadingVersionId: ?string,
@@ -341,6 +342,7 @@ type DayGroupRowProps = {|
 export const DayGroupRow = ({
   day,
   versions,
+  isOpenedInitially,
   editedVersionId,
   loadingVersionId,
   onRenameVersion,
@@ -350,7 +352,7 @@ export const DayGroupRow = ({
   usersPublicProfileByIds,
   getAnonymousAvatar,
 }: DayGroupRowProps) => {
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = [];
   const unnamedVersions = [];

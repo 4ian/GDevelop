@@ -201,7 +201,7 @@ const VersionHistory = React.memo<Props>(
         <I18n>
           {({ i18n }) => (
             <Column noMargin>
-              {days.map(day => {
+              {days.map((day, index) => {
                 const dayVersions = versionsGroupedByDay[day];
                 if (!dayVersions || dayVersions.length === 0) return null;
                 return (
@@ -209,6 +209,7 @@ const VersionHistory = React.memo<Props>(
                     key={day}
                     versions={dayVersions}
                     day={day}
+                    isOpenedInitially={index === 0}
                     usersPublicProfileByIds={usersPublicProfileByIds}
                     onRenameVersion={renameVersion}
                     onCancelRenaming={onCancelRenaming}

@@ -2456,7 +2456,17 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        if (canFileMetadataBeSafelySaved) {
+        if (checkedOutVersionStatus) {
+          const shouldRestoreCheckedOutVersion = await showConfirmation({
+            title: t`Restore this version`,
+            message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`
+          })
+          if (!shouldRestoreCheckedOutVersion) return;
+          // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
+          // for too long.
+          _replaceSnackMessage(i18n._(t`Saving...`), null);
+        }
+        else if (canFileMetadataBeSafelySaved) {
           const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
             currentFileMetadata,
             {

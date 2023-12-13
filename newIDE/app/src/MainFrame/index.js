@@ -2980,6 +2980,7 @@ const MainFrame = (props: Props) => {
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
+    onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
     onExportProject: () => openShareDialog('publish'),

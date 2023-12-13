@@ -26,6 +26,7 @@ export type PreviewAndShareButtonsProps = {|
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
   openShareDialog: () => void,
+  isSharingEnabled: boolean,
 |};
 
 const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
@@ -40,6 +41,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
     previewState,
     setPreviewOverride,
     openShareDialog,
+    isSharingEnabled,
   }: PreviewAndShareButtonsProps) {
     const windowWidth = useResponsiveWindowWidth();
     const isMobileScreen = windowWidth === 'small';
@@ -152,6 +154,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
         <ResponsiveRaisedButton
           primary
           onClick={onShareClick}
+          disabled={!isSharingEnabled}
           icon={<PublishIcon />}
           label={<Trans>Share</Trans>}
           // This ID is used for guided lessons, let's keep it stable.

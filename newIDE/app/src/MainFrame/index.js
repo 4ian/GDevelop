@@ -3136,6 +3136,9 @@ const MainFrame = (props: Props) => {
         openShareDialog={() =>
           openShareDialog(/* leave the dialog decide which tab to open */)
         }
+        isSharingEnabled={
+          !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId
+        }
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}

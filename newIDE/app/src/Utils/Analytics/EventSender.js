@@ -347,6 +347,7 @@ export type SubscriptionDialogDisplayReason =
   | 'Leaderboard customization'
   | 'Extend redeemed subscription'
   | 'Generate project from prompt'
+  | 'Version history'
   | 'Add collaborators on project';
 
 export const sendSubscriptionDialogShown = (metadata: {|

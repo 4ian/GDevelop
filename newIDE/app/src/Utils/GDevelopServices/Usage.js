@@ -468,9 +468,11 @@ export const canSeeCloudProjectHistory = (
   subscription: ?Subscription
 ): boolean => {
   if (!subscription) return false;
-  return ['gdevelop_pro', 'gdevelop_startup', 'gdevelop_startup'].includes(
-    subscription.planId
-  );
+  return [
+    'gdevelop_business',
+    'gdevelop_startup',
+    'gdevelop_education',
+  ].includes(subscription.planId);
 };
 
 export const redeemCode = async (

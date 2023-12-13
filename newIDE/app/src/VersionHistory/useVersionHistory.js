@@ -15,6 +15,10 @@ import { canSeeCloudProjectHistory } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import VersionHistory, { type OpenedVersionStatus } from '.';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
+import AlertMessage from '../UI/AlertMessage';
+import { ColumnStackLayout } from '../UI/Layout';
+import RaisedButton from '../UI/RaisedButton';
+import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 const SAVED_STATUS_TIMEOUT = 3000;
 
@@ -66,6 +70,9 @@ const useVersionHistory = ({
 }: Props) => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const savedStateTimeoutRef = React.useRef<?TimeoutID>(null);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const preventEffectsRunningRef = React.useRef<boolean>(false);
   const {
@@ -85,18 +92,17 @@ const useVersionHistory = ({
     versionHistoryPanelOpen,
     setVersionHistoryPanelOpen,
   ] = React.useState<boolean>(false);
+  const isProjectOpen = !!fileMetadata;
+  const isCloudProject = storageProvider.internalName === 'Cloud';
+  const isUserAllowedToSeeVersionHistory = canSeeCloudProjectHistory(
+    subscription
+  );
   const showVersionHistoryButton =
-    storageProvider.internalName === 'Cloud' &&
-    canSeeCloudProjectHistory(subscription);
+    isCloudProject && isUserAllowedToSeeVersionHistory;
   const cloudProjectId =
-    storageProvider.internalName && fileMetadata
-      ? fileMetadata.fileIdentifier
-      : null;
+    isCloudProject && fileMetadata ? fileMetadata.fileIdentifier : null;
   const cloudProjectLastModifiedDate =
-    storageProvider.internalName && fileMetadata
-      ? fileMetadata.lastModifiedDate
-      : null;
-  console.log(hasUnsavedChanges);
+    isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null;
 
   // This effect is run in 2 cases:
   // - at start up to list the versions (when both cloudProjectId and
@@ -296,16 +302,43 @@ const useVersionHistory = ({
         />
         <Line useFullHeight expand>
           <Column expand>
-            <VersionHistory
-              isVisible={versionHistoryPanelOpen}
-              projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-              canLoadMore={!!state.nextPageUri}
-              onCheckoutVersion={onCheckoutVersion}
-              onLoadMore={onLoadMoreVersions}
-              onRenameVersion={onRenameVersion}
-              openedVersionStatus={checkedOutVersionStatus}
-              versions={state.versions || []}
-            />
+            {!isProjectOpen ? (
+              <AlertMessage kind="info">
+                <Trans>Open a cloud project to see the version history.</Trans>
+              </AlertMessage>
+            ) : !isCloudProject ? (
+              <AlertMessage kind="info">
+                <Trans>
+                  The version history is available for cloud projects only.
+                </Trans>
+              </AlertMessage>
+            ) : !isUserAllowedToSeeVersionHistory ? (
+              <ColumnStackLayout>
+                <AlertMessage kind="info">
+                  <Trans>
+                    The version history is not included in your subscription.
+                  </Trans>
+                </AlertMessage>
+                <RaisedButton
+                  primary
+                  label={<Trans>Upgrade my subscription</Trans>}
+                  onClick={() =>
+                    openSubscriptionDialog({ reason: 'Version history' })
+                  }
+                />
+              </ColumnStackLayout>
+            ) : (
+              <VersionHistory
+                isVisible={versionHistoryPanelOpen}
+                projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
+                canLoadMore={!!state.nextPageUri}
+                onCheckoutVersion={onCheckoutVersion}
+                onLoadMore={onLoadMoreVersions}
+                onRenameVersion={onRenameVersion}
+                openedVersionStatus={checkedOutVersionStatus}
+                versions={state.versions || []}
+              />
+            )}
           </Column>
         </Line>
       </Drawer>

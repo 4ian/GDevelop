@@ -131,7 +131,7 @@ namespace gdjs {
     }
 
     setOpacity(opacity: float): void {
-      this._opacity = gdjs.PixiFiltersTools.clampValue(opacity, 0, 255);
+      this._opacity = Math.max(0, Math.min(255, opacity));
       this._renderer.updateOpacity();
     }
 

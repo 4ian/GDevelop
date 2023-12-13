@@ -2180,8 +2180,10 @@ const MainFrame = (props: Props) => {
     renderVersionHistoryPanel,
     showVersionHistoryButton,
     openVersionHistoryPanel,
+    checkedOutVersionStatus,
   } = useVersionHistory({
     getStorageProvider,
+    isSavingProject,
     fileMetadata: currentFileMetadata,
     onOpenCloudProjectOnSpecificVersion,
   });
@@ -2377,7 +2379,11 @@ const MainFrame = (props: Props) => {
 
   const saveProjectAs = React.useCallback(
     () => {
-      if (!currentProject) return;
+      if (!currentProject || !!checkedOutVersionStatus) {
+        // Prevent "save project as" when no current project or when the opened project
+        // is a previous version (cloud project only) of the current project.
+        return;
+      }
 
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
@@ -2404,6 +2410,7 @@ const MainFrame = (props: Props) => {
       saveProjectAsWithStorageProvider,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
+      checkedOutVersionStatus,
     ]
   );
 
@@ -2464,12 +2471,17 @@ const MainFrame = (props: Props) => {
           _replaceSnackMessage(i18n._(t`Saving...`), null);
         }
 
+        const saveOptions = {};
+        if (cloudProjectRecoveryOpenedVersionId) {
+          saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
+        }
+        if (checkedOutVersionStatus) {
+          saveOptions.restoredFromVersionId = checkedOutVersionStatus.id;
+        }
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
-          cloudProjectRecoveryOpenedVersionId
-            ? { previousVersion: cloudProjectRecoveryOpenedVersionId }
-            : undefined
+          saveOptions
         );
 
         if (wasSaved) {
@@ -2552,6 +2564,7 @@ const MainFrame = (props: Props) => {
       cloudProjectSaveChoiceOpen,
       showAlert,
       showConfirmation,
+      checkedOutVersionStatus,
     ]
   );
 

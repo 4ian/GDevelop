@@ -14,6 +14,9 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { canSeeCloudProjectHistory } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import VersionHistory, { type OpenedVersionStatus } from '.';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
+
+const SAVED_STATUS_TIMEOUT = 3000;
 
 const styles = {
   drawerContent: {
@@ -48,6 +51,7 @@ const emptyPaginationState: PaginationState = {
 type Props = {|
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
+  isSavingProject: boolean,
   onOpenCloudProjectOnSpecificVersion: (
     fileMetadata: FileMetadata,
     versionId: string
@@ -56,9 +60,12 @@ type Props = {|
 
 const useVersionHistory = ({
   fileMetadata,
+  isSavingProject,
   getStorageProvider,
   onOpenCloudProjectOnSpecificVersion,
 }: Props) => {
+  const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
+  const savedStateTimeoutRef = React.useRef<?TimeoutID>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const preventEffectsRunningRef = React.useRef<boolean>(false);
   const {
@@ -89,6 +96,7 @@ const useVersionHistory = ({
     storageProvider.internalName && fileMetadata
       ? fileMetadata.lastModifiedDate
       : null;
+  console.log(hasUnsavedChanges);
 
   // This effect is run in 2 cases:
   // - at start up to list the versions (when both cloudProjectId and
@@ -143,6 +151,65 @@ const useVersionHistory = ({
       showVersionHistoryButton,
       cloudProjectLastModifiedDate,
     ]
+  );
+
+  React.useEffect(
+    () => {
+      if (preventEffectsRunningRef.current) return;
+      setCheckedOutVersionStatus(currentCheckedOutVersionStatus => {
+        if (
+          !currentCheckedOutVersionStatus ||
+          (hasUnsavedChanges &&
+            currentCheckedOutVersionStatus.status === 'unsavedChanges')
+        ) {
+          return currentCheckedOutVersionStatus;
+        }
+
+        return {
+          id: currentCheckedOutVersionStatus.id,
+          status: 'unsavedChanges',
+        };
+      });
+    },
+    [hasUnsavedChanges]
+  );
+
+  React.useEffect(
+    () => {
+      if (preventEffectsRunningRef.current) return;
+      setCheckedOutVersionStatus(currentCheckedOutVersionStatus => {
+        if (
+          !currentCheckedOutVersionStatus ||
+          (isSavingProject &&
+            currentCheckedOutVersionStatus.status === 'saving') ||
+          (!isSavingProject &&
+            currentCheckedOutVersionStatus.status === 'saved')
+        ) {
+          return currentCheckedOutVersionStatus;
+        }
+
+        if (isSavingProject) {
+          return {
+            id: currentCheckedOutVersionStatus.id,
+            status: 'saving',
+          };
+        }
+        savedStateTimeoutRef.current = setTimeout(() => {
+          setCheckedOutVersionStatus(null);
+        }, SAVED_STATUS_TIMEOUT);
+        return {
+          id: currentCheckedOutVersionStatus.id,
+          status: 'saved',
+        };
+      });
+      return () => {
+        if (savedStateTimeoutRef.current) {
+          clearTimeout(savedStateTimeoutRef.current);
+          savedStateTimeoutRef.current = null;
+        }
+      };
+    },
+    [isSavingProject]
   );
 
   const onLoadMoreVersions = React.useCallback(
@@ -246,6 +313,7 @@ const useVersionHistory = ({
   };
 
   return {
+    checkedOutVersionStatus,
     showVersionHistoryButton,
     openVersionHistoryPanel,
     renderVersionHistoryPanel,

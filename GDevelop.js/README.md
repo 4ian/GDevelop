@@ -10,7 +10,7 @@ These are the bindings of GDevelop core classes to WebAssembly+JavaScript. This 
 
   - [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS). On macOS, you can install it via Homebrew (recommended for Apple M1 Architectures).
   - [Node.js](https://nodejs.org/). (We recommend using [nvm](https://github.com/nvm-sh/nvm) to be able to switch between Node versions easily).
-  - Python3 (via [pyenv](https://github.com/pyenv/pyenv) for versions management).
+  - Python (via [pyenv](https://github.com/pyenv/pyenv) for versions management).
 
 - Install [Emscripten](https://github.com/kripken/emscripten) version `3.1.21`, as explained below or on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 

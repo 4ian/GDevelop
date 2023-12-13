@@ -130,7 +130,7 @@ export default function ValueTypeEditor({
                 />
                 <SelectOption
                   value="leaderboardId"
-                  label={t`Leaderboad (text)`}
+                  label={t`Leaderboard (text)`}
                 />
                 <SelectOption value="identifier" label={t`Identifier (text)`} />
                 <SelectOption value="scenevar" label={t`Scene variable`} />

@@ -2084,9 +2084,12 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadataWithStorageProvider = React.useCallback(
     async (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-      options: ?{ openAllScenes: boolean }
+      options: ?{| openAllScenes?: boolean, ignoreUnsavedChanges?: boolean |}
     ): Promise<void> => {
-      if (unsavedChanges.hasUnsavedChanges) {
+      if (
+        unsavedChanges.hasUnsavedChanges &&
+        !(options && options.ignoreUnsavedChanges)
+      ) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Open a new project? Any changes that have not been saved will be lost.`
@@ -2165,13 +2168,16 @@ const MainFrame = (props: Props) => {
 
   const onOpenCloudProjectOnSpecificVersion = React.useCallback(
     (fileMetadata: FileMetadata, versionId: string): Promise<void> => {
-      return openFromFileMetadataWithStorageProvider({
-        storageProviderName: 'Cloud',
-        fileMetadata: {
-          ...fileMetadata,
-          version: versionId,
+      return openFromFileMetadataWithStorageProvider(
+        {
+          storageProviderName: 'Cloud',
+          fileMetadata: {
+            ...fileMetadata,
+            version: versionId,
+          },
         },
-      });
+        { ignoreUnsavedChanges: true }
+      );
     },
     [openFromFileMetadataWithStorageProvider]
   );
@@ -2459,14 +2465,13 @@ const MainFrame = (props: Props) => {
         if (checkedOutVersionStatus) {
           const shouldRestoreCheckedOutVersion = await showConfirmation({
             title: t`Restore this version`,
-            message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`
-          })
+            message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
+          });
           if (!shouldRestoreCheckedOutVersion) return;
           // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
           // for too long.
           _replaceSnackMessage(i18n._(t`Saving...`), null);
-        }
-        else if (canFileMetadataBeSafelySaved) {
+        } else if (canFileMetadataBeSafelySaved) {
           const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
             currentFileMetadata,
             {

@@ -121,8 +121,8 @@ export const generateOnChangeProjectProperty = (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: {| name?: string, gameId?: string |}
-): Promise<boolean> => {
-  if (!authenticatedUser.authenticated) return false;
+): Promise<null | {| version: string |}> => {
+  if (!authenticatedUser.authenticated) return null;
   try {
     await updateCloudProject(
       authenticatedUser,
@@ -138,14 +138,14 @@ export const generateOnChangeProjectProperty = (
       throw new Error("Couldn't save project following property update.");
     }
 
-    return true;
+    return { version: newVersion };
   } catch (error) {
     // TODO: Determine if a feedback should be given to user so that they can try again if necessary.
     console.warn(
       'An error occurred while changing cloud project name. Ignoring.',
       error
     );
-    return false;
+    return null;
   }
 };
 

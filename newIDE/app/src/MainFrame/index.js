@@ -2167,7 +2167,15 @@ const MainFrame = (props: Props) => {
   );
 
   const onOpenCloudProjectOnSpecificVersion = React.useCallback(
-    (fileMetadata: FileMetadata, versionId: string): Promise<void> => {
+    ({
+      fileMetadata,
+      versionId,
+      ignoreUnsavedChanges,
+    }: {|
+      fileMetadata: FileMetadata,
+      versionId: string,
+      ignoreUnsavedChanges: boolean,
+    |}): Promise<void> => {
       return openFromFileMetadataWithStorageProvider(
         {
           storageProviderName: 'Cloud',
@@ -2176,7 +2184,7 @@ const MainFrame = (props: Props) => {
             version: versionId,
           },
         },
-        { ignoreUnsavedChanges: true }
+        { ignoreUnsavedChanges }
       );
     },
     [openFromFileMetadataWithStorageProvider]
@@ -2725,10 +2733,11 @@ const MainFrame = (props: Props) => {
   const onOpenCloudProjectOnSpecificVersionForRecovery = React.useCallback(
     (versionId: string) => {
       if (!cloudProjectFileMetadataToRecover) return;
-      onOpenCloudProjectOnSpecificVersion(
-        cloudProjectFileMetadataToRecover,
-        versionId
-      );
+      onOpenCloudProjectOnSpecificVersion({
+        fileMetadata: cloudProjectFileMetadataToRecover,
+        versionId,
+        ignoreUnsavedChanges: false,
+      });
       setCloudProjectFileMetadataToRecover(null);
       setCloudProjectRecoveryOpenedVersionId(versionId);
     },

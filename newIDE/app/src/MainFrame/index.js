@@ -2638,17 +2638,21 @@ const MainFrame = (props: Props) => {
   const onChangeProjectName = async (newName: string): Promise<void> => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
+    let newFileMetadata = { ...currentFileMetadata, name: newName };
     if (storageProviderOperations.onChangeProjectProperty) {
-      const wasSaved = await storageProviderOperations.onChangeProjectProperty(
+      const fileMetadataNewAttributes = await storageProviderOperations.onChangeProjectProperty(
         currentProject,
         currentFileMetadata,
         { name: newName }
       );
-      if (wasSaved) unsavedChanges.sealUnsavedChanges();
+      if (fileMetadataNewAttributes) {
+        unsavedChanges.sealUnsavedChanges();
+        newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
+      }
     }
     await setState(state => ({
       ...state,
-      currentFileMetadata: { ...currentFileMetadata, name: newName },
+      currentFileMetadata: newFileMetadata,
     }));
   };
 

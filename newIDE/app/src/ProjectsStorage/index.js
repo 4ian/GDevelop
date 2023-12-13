@@ -146,7 +146,7 @@ export type StorageProviderOperations = {|
     project: gdProject,
     fileMetadata: FileMetadata,
     properties: {| name?: string, gameId?: string |} // In order to synchronize project and cloud project names.
-  ) => Promise<boolean>,
+  ) => Promise<null | Object>,
 
   // Project auto saving:
   onAutoSaveProject?: (

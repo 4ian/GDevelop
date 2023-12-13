@@ -28,6 +28,7 @@ import HistoryIcon from '../UI/CustomSvgIcons/History';
 import type { OpenedVersionStatus } from '.';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Chip from '../UI/Chip';
+import CircularProgress from '../UI/CircularProgress';
 
 const thisYear = new Date().getFullYear();
 
@@ -131,7 +132,8 @@ type Props = {|
   version: FilledCloudProjectVersion,
   usersPublicProfileByIds: UserPublicProfileByIds,
   isEditing: boolean,
-  onRename: (FilledCloudProjectVersion, string) => void,
+  onRename: (FilledCloudProjectVersion, string) => Promise<void>,
+  isLoading: boolean,
   onCancelRenaming: () => void,
   onContextMenu: (
     event: PointerEvent,
@@ -146,6 +148,7 @@ const ProjectVersionRow = ({
   version,
   usersPublicProfileByIds,
   isEditing,
+  isLoading,
   onRename,
   onCancelRenaming,
   onContextMenu,
@@ -221,6 +224,11 @@ const ProjectVersionRow = ({
             ) : version.label ? (
               <LineStackLayout noMargin>
                 <Text noMargin>{version.label}</Text>
+                {isLoading && (
+                  <Column noMargin>
+                    <CircularProgress size={20} />
+                  </Column>
+                )}
                 <div style={styles.dateContainer}>
                   <Text noMargin style={styles.username}>
                     {i18n.date(
@@ -318,7 +326,8 @@ type DayGroupRowProps = {|
   day: number,
   versions: FilledCloudProjectVersion[],
   editedVersionId: ?string,
-  onRenameVersion: (FilledCloudProjectVersion, string) => void,
+  onRenameVersion: (FilledCloudProjectVersion, string) => Promise<void>,
+  loadingVersionId: ?string,
   onCancelRenaming: () => void,
   onContextMenu: (
     event: PointerEvent,
@@ -333,6 +342,7 @@ export const DayGroupRow = ({
   day,
   versions,
   editedVersionId,
+  loadingVersionId,
   onRenameVersion,
   onCancelRenaming,
   onContextMenu,
@@ -364,6 +374,7 @@ export const DayGroupRow = ({
               key={version.id}
               version={version}
               onRename={onRenameVersion}
+              isLoading={loadingVersionId === version.id}
               onCancelRenaming={onCancelRenaming}
               usersPublicProfileByIds={usersPublicProfileByIds}
               isEditing={version.id === editedVersionId}
@@ -397,6 +408,7 @@ export const DayGroupRow = ({
                       key={version.id}
                       version={version}
                       onRename={onRenameVersion}
+                      isLoading={loadingVersionId === version.id}
                       onCancelRenaming={onCancelRenaming}
                       usersPublicProfileByIds={usersPublicProfileByIds}
                       isEditing={version.id === editedVersionId}

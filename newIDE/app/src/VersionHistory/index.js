@@ -78,6 +78,10 @@ const VersionHistory = React.memo<Props>(
     ] = React.useState<?UserPublicProfileByIds>();
     const [editedVersionId, setEditedVersionId] = React.useState<?string>(null);
     const [
+      versionIdBeingRenamed,
+      setVersionIdBeingRenamed,
+    ] = React.useState<?string>(null);
+    const [
       isLoadingMoreVersions,
       setIsLoadingMoreVersions,
     ] = React.useState<boolean>(false);
@@ -137,9 +141,19 @@ const VersionHistory = React.memo<Props>(
     );
 
     const renameVersion = React.useCallback(
-      (version: FilledCloudProjectVersion, newName: string) => {
-        onRenameVersion(version, { label: newName });
+      async (version: FilledCloudProjectVersion, newName: string) => {
         setEditedVersionId(null);
+        setVersionIdBeingRenamed(version.id);
+        try {
+          await onRenameVersion(version, { label: newName });
+        } catch (error) {
+          console.error(
+            'An error occurred while rename project version:',
+            error
+          );
+        } finally {
+          setVersionIdBeingRenamed(null);
+        }
       },
       [onRenameVersion]
     );
@@ -200,6 +214,7 @@ const VersionHistory = React.memo<Props>(
                     onCancelRenaming={onCancelRenaming}
                     onContextMenu={openContextMenu}
                     editedVersionId={editedVersionId}
+                    loadingVersionId={versionIdBeingRenamed}
                     getAnonymousAvatar={getAnonymousAvatar}
                     openedVersionStatus={openedVersionStatus}
                   />

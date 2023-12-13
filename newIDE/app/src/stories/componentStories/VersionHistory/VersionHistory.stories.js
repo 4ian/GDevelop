@@ -197,7 +197,7 @@ export const Default = () => {
     version: FilledCloudProjectVersion,
     { label }: {| label: string |}
   ) => {
-    await delay(500);
+    await delay(1500);
     const newVersions = [...versions];
     const index = newVersions.findIndex(version_ => version_.id === version.id);
     newVersions.splice(index, 1, { ...version, label: label || undefined });

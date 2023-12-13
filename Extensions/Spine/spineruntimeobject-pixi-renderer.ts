@@ -6,7 +6,6 @@ namespace gdjs {
     private _object: gdjs.SpineRuntimeObject;
     private _rendererObject: pixi_spine.Spine | PIXI.Container;
     private _isAnimationComplete = true;
-    private _autoUpdateReplacer: boolean = true;
 
     /**
      * @param runtimeObject The object to render
@@ -104,8 +103,6 @@ namespace gdjs {
         this._rendererObject.state.addListener(onCompleteListener);
         this._rendererObject.state.setAnimation(0, animation, loop);
         this._rendererObject.update(0);
-      } else {
-        this._isAnimationComplete = true;
       }
     }
 
@@ -118,14 +115,12 @@ namespace gdjs {
         return this._rendererObject.autoUpdate;
       }
 
-      return !!this._autoUpdateReplacer;
+      return true;
     }
 
     setIsUpdatable(isUpdatable: boolean): void {
       if (isSpine(this._rendererObject)) {
         this._rendererObject.autoUpdate = isUpdatable;
-      } else {
-        this._autoUpdateReplacer = isUpdatable;
       }
     }
 

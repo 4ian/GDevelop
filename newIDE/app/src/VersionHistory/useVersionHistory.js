@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import Drawer from '@material-ui/core/Drawer';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import {
@@ -19,6 +19,7 @@ import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const SAVED_STATUS_TIMEOUT = 3000;
 
@@ -56,10 +57,11 @@ type Props = {|
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
   isSavingProject: boolean,
-  onOpenCloudProjectOnSpecificVersion: (
+  onOpenCloudProjectOnSpecificVersion: ({|
     fileMetadata: FileMetadata,
-    versionId: string
-  ) => Promise<void>,
+    versionId: string,
+    ignoreUnsavedChanges: boolean,
+  |}) => Promise<void>,
 |};
 
 const useVersionHistory = ({
@@ -69,6 +71,7 @@ const useVersionHistory = ({
   onOpenCloudProjectOnSpecificVersion,
 }: Props) => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
+  const { showAlert } = useAlertDialog();
   const savedStateTimeoutRef = React.useRef<?TimeoutID>(null);
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
@@ -264,17 +267,34 @@ const useVersionHistory = ({
   const onCheckoutVersion = React.useCallback(
     async (version: FilledCloudProjectVersion) => {
       if (!fileMetadata) return;
+      if (!checkedOutVersionStatus && hasUnsavedChanges) {
+        await showAlert({
+          title: t`There are unsaved changes`,
+          message: t`Save your project before using the version history.`,
+        });
+        return;
+      }
       preventEffectsRunningRef.current = true;
       ignoreFileMetadataChangesRef.current = true;
       try {
-        await onOpenCloudProjectOnSpecificVersion(fileMetadata, version.id);
+        await onOpenCloudProjectOnSpecificVersion({
+          fileMetadata,
+          versionId: version.id,
+          ignoreUnsavedChanges: true,
+        });
         setCheckedOutVersionStatus({ id: version.id, status: 'opened' });
       } finally {
         preventEffectsRunningRef.current = false;
         ignoreFileMetadataChangesRef.current = false;
       }
     },
-    [fileMetadata, onOpenCloudProjectOnSpecificVersion]
+    [
+      fileMetadata,
+      onOpenCloudProjectOnSpecificVersion,
+      checkedOutVersionStatus,
+      showAlert,
+      hasUnsavedChanges,
+    ]
   );
 
   const onRenameVersion = React.useCallback(

@@ -107,7 +107,7 @@ module.exports = [
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.943171637015231
+    "translationRatio": 0.9507231537181621
   },
   {
     "languageCode": "ha_HG",

@@ -604,18 +604,18 @@ namespace gdjs {
     }
 
     /**
-     * Get the spine manager of the game, used to load and construct spine skeletons from game
+     * Get the Spine manager of the game, used to load and construct spine skeletons from game
      * resources.
-     * @return The json manager for the game
+     * @return The Spine manager for the game
      */
     getSpineManager(): gdjs.SpineManager | null {
       return this._spineManager;
     }
 
     /**
-     * Get the atlas manager of the game, used to load atlases from game
+     * Get the Spine Atlas manager of the game, used to load atlases from game
      * resources.
-     * @return The atlas manager for the game
+     * @return The Spine Atlas manager for the game
      */
     getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
       return this._spineAtlasManager;

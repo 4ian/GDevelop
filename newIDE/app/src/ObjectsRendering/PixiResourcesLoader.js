@@ -634,7 +634,7 @@ export default class PixiResourcesLoader {
             }
           })
           .catch(err => {
-            console.error('Errot during spine atlas loading.\n', err);
+            console.error('Error during Spine atlas loading:', err);
             resolve(undefined);
           });
       });

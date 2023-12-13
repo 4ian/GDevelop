@@ -74,6 +74,7 @@ const useVersionHistory = ({
     SubscriptionSuggestionContext
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const ignoreFileMetadataChangesRef = React.useRef<boolean>(false);
   const preventEffectsRunningRef = React.useRef<boolean>(false);
   const {
     subscription,
@@ -92,17 +93,37 @@ const useVersionHistory = ({
     versionHistoryPanelOpen,
     setVersionHistoryPanelOpen,
   ] = React.useState<boolean>(false);
-  const isProjectOpen = !!fileMetadata;
   const isCloudProject = storageProvider.internalName === 'Cloud';
   const isUserAllowedToSeeVersionHistory = canSeeCloudProjectHistory(
     subscription
   );
+  const [cloudProjectId, setCloudProjectId] = React.useState<?string>(
+    isCloudProject && fileMetadata ? fileMetadata.fileIdentifier : null
+  );
+  const [
+    cloudProjectLastModifiedDate,
+    setCloudProjectLastModifiedDate,
+  ] = React.useState<?number>(
+    isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
+  );
   const showVersionHistoryButton =
     isCloudProject && isUserAllowedToSeeVersionHistory;
-  const cloudProjectId =
-    isCloudProject && fileMetadata ? fileMetadata.fileIdentifier : null;
-  const cloudProjectLastModifiedDate =
-    isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null;
+
+  // This effect is used to avoid having cloudProjectId and cloudProjectLastModifiedDate
+  // set to null when checking out a version, unmounting the VersionHistory component,
+  // making it lose its state (fetched versions and collapse states).
+  React.useEffect(
+    () => {
+      if (ignoreFileMetadataChangesRef.current) return;
+      setCloudProjectId(
+        isCloudProject && fileMetadata ? fileMetadata.fileIdentifier : null
+      );
+      setCloudProjectLastModifiedDate(
+        isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
+      );
+    },
+    [isCloudProject, fileMetadata]
+  );
 
   // This effect is run in 2 cases:
   // - at start up to list the versions (when both cloudProjectId and
@@ -244,11 +265,13 @@ const useVersionHistory = ({
     async (version: FilledCloudProjectVersion) => {
       if (!fileMetadata) return;
       preventEffectsRunningRef.current = true;
+      ignoreFileMetadataChangesRef.current = true;
       try {
         await onOpenCloudProjectOnSpecificVersion(fileMetadata, version.id);
         setCheckedOutVersionStatus({ id: version.id, status: 'opened' });
       } finally {
         preventEffectsRunningRef.current = false;
+        ignoreFileMetadataChangesRef.current = false;
       }
     },
     [fileMetadata, onOpenCloudProjectOnSpecificVersion]
@@ -302,7 +325,7 @@ const useVersionHistory = ({
         />
         <Line useFullHeight expand>
           <Column expand>
-            {!isProjectOpen ? (
+            {!cloudProjectId ? (
               <AlertMessage kind="info">
                 <Trans>Open a cloud project to see the version history.</Trans>
               </AlertMessage>

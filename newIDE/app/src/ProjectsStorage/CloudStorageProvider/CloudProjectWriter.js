@@ -121,7 +121,7 @@ export const generateOnChangeProjectProperty = (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: {| name?: string, gameId?: string |}
-): Promise<null | Object> => {
+): Promise<null | {| version: string |}> => {
   if (!authenticatedUser.authenticated) return null;
   try {
     await updateCloudProject(

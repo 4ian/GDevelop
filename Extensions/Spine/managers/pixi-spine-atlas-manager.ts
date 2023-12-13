@@ -68,34 +68,35 @@ namespace gdjs {
         );
       }
 
-      if (!this._loadingSpineAtlases.get(resource)) {
-        this._loadingSpineAtlases.set(
-          resource,
-          new Promise<pixi_spine.TextureAtlas>((resolve, reject) => {
-            const onLoad: SpineAtlasManagerRequestCallback = (
-              error,
-              content
-            ) => {
-              if (error) {
-                return reject(
-                  `Error while preloading a spine atlas resource: ${error}`
-                );
-              }
-              if (!content) {
-                return reject(
-                  `Cannot reach texture atlas for resource '${resourceName}'.`
-                );
-              }
+      let loadingPromise = this._loadingSpineAtlases.get(resource);
 
-              resolve(content);
-            };
+      if (!loadingPromise) {
+        loadingPromise = new Promise<pixi_spine.TextureAtlas>((resolve, reject) => {
+          const onLoad: SpineAtlasManagerRequestCallback = (
+            error,
+            content
+          ) => {
+            if (error) {
+              return reject(
+                `Error while preloading a spine atlas resource: ${error}`
+              );
+            }
+            if (!content) {
+              return reject(
+                `Cannot reach texture atlas for resource '${resourceName}'.`
+              );
+            }
 
-            this.load(resource, onLoad);
-          })
-        );
+            resolve(content);
+          };
+
+          this.load(resource, onLoad);
+        });
+
+        this._loadingSpineAtlases.set(resource, loadingPromise);
       }
 
-      return this._loadingSpineAtlases.get(resource)!;
+      return loadingPromise;
     }
 
     /**
@@ -109,16 +110,16 @@ namespace gdjs {
       callback: SpineAtlasManagerRequestCallback
     ): void {
       const game = this._resourceLoader.getRuntimeGame();
-      const embeddedResourcesMapping = game.getEmbeddedResourcesNames(
+      const embeddedResourcesNames = game.getEmbeddedResourcesNames(
         resource.name
       );
 
-      if (!embeddedResourcesMapping.length)
+      if (!embeddedResourcesNames.length)
         return callback(
           new Error(`${resource.name} do not have image metadata!`)
         );
 
-      const images = embeddedResourcesMapping.reduce<{
+      const images = embeddedResourcesNames.reduce<{
         [key: string]: PIXI.Texture;
       }>((imagesMap, embeddedResourceName) => {
         const mappedResourceName = game.resolveEmbeddedResource(

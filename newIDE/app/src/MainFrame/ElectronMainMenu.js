@@ -139,6 +139,11 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-show-version-history',
+    callback: callbacks.onShowVersionHistory,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-close',
     callback:
       useShortcutToClosePreviewWindow && closePreviewWindow

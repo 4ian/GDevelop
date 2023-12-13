@@ -31,6 +31,7 @@ export type MainMenuCallbacks = {|
   ) => Promise<void>,
   onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
+  onShowVersionHistory: () => void,
   onCloseProject: () => Promise<boolean>,
   onCloseApp: () => void,
   onExportProject: () => void,
@@ -57,6 +58,7 @@ export type MainMenuEvent =
   | 'main-menu-open-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
+  | 'main-menu-show-version-history'
   | 'main-menu-close'
   | 'main-menu-close-app'
   | 'main-menu-export'
@@ -82,6 +84,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-recent': callbacks.onOpenRecentFile,
     'main-menu-save': callbacks.onSaveProject,
     'main-menu-save-as': callbacks.onSaveProjectAs,
+    'main-menu-show-version-history': callbacks.onShowVersionHistory,
     'main-menu-close': callbacks.onCloseProject,
     'main-menu-close-app': callbacks.onCloseApp,
     'main-menu-export': callbacks.onExportProject,
@@ -166,6 +169,11 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Save as...`),
         accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS']),
         onClickSendEvent: 'main-menu-save-as',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Show version history`),
+        onClickSendEvent: 'main-menu-show-version-history',
         enabled: !!project,
       },
       { type: 'separator' },

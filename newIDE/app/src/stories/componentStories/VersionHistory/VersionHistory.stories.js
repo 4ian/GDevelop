@@ -18,6 +18,7 @@ import {
 } from '../../../UI/Layout';
 import FlatButton from '../../../UI/FlatButton';
 import { Column } from '../../../UI/Grid';
+import OpenedVersionStatusChip from '../../../VersionHistory/OpenedVersionStatusChip';
 
 export default {
   title: 'VersionHistory',
@@ -223,7 +224,15 @@ export const Default = () => {
     setVersions([...versions, ...nextVersions]);
   };
 
+  const onQuitVersionExploration = () => {
+    setOpenedVersionStatus(null);
+  };
+
   const canLoadMore = versions.every(version => version.previousVersion);
+
+  const openedVersion = openedVersionStatus
+    ? versions.find(version => openedVersionStatus.id)
+    : null;
 
   projectServiceMock
     .onGet(`${GDevelopUserApi.baseUrl}/user-public-profile`)
@@ -250,6 +259,11 @@ export const Default = () => {
       </Column>
       {openedVersionStatus && (
         <ColumnStackLayout>
+          <OpenedVersionStatusChip
+            openedVersion={openedVersion}
+            status={openedVersionStatus ? openedVersionStatus.status : null}
+            onClickClose={onQuitVersionExploration}
+          />
           <FlatButton label="Save" onClick={onSaveCurrentlyOpenedVersion} />
           <FlatButton label="Add changes to version" onClick={onAddChanges} />
         </ColumnStackLayout>

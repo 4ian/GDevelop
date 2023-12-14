@@ -86,7 +86,6 @@ const getStatusColor = (
   gdevelopTheme: GDevelopTheme,
   status: 'unsavedChanges' | 'saving' | 'saved' | 'latest'
 ) => {
-  console.log(gdevelopTheme);
   return status === 'unsavedChanges'
     ? gdevelopTheme.statusIndicator.error
     : status === 'saving'
@@ -284,7 +283,7 @@ const ProjectVersionRow = ({
                       version.createdAt,
                       displayFullDate
                         ? {
-                            dateStyle: 'long',
+                            dateStyle: 'medium',
                             timeStyle: 'short',
                           }
                         : {
@@ -312,7 +311,7 @@ const ProjectVersionRow = ({
                   <Text noMargin>
                     {version.restoredFromVersion.label ||
                       i18n.date(version.restoredFromVersion.createdAt, {
-                        dateStyle: 'long',
+                        dateStyle: 'medium',
                         timeStyle: 'short',
                       })}
                   </Text>

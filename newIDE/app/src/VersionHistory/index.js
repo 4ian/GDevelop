@@ -126,6 +126,11 @@ const VersionHistory = React.memo<Props>(
 
     const buildVersionMenuTemplate = React.useCallback(
       (i18n: I18nType, options: { version: FilledCloudProjectVersion }) => {
+        const isNotLatestVersionAndUserIsNotNavigatingHistory =
+          !openedVersionStatus && latestVersionId !== options.version.id;
+        const isNotTheCurrentlyOpenedVersion =
+          !!openedVersionStatus &&
+          openedVersionStatus.id !== options.version.id;
         return [
           {
             label: i18n._(
@@ -136,14 +141,17 @@ const VersionHistory = React.memo<Props>(
             },
           },
           {
-            label: i18n._(t`Checkout version`),
+            label: i18n._(t`Open version`),
             click: () => {
               onCheckoutVersion(options.version);
             },
+            enabled:
+              isNotLatestVersionAndUserIsNotNavigatingHistory ||
+              isNotTheCurrentlyOpenedVersion,
           },
         ];
       },
-      [onCheckoutVersion]
+      [onCheckoutVersion, latestVersionId, openedVersionStatus]
     );
 
     const renameVersion = React.useCallback(

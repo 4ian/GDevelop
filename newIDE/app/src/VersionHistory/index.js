@@ -43,7 +43,11 @@ const groupVersionsByDay = (
   return versionsGroupedByDay;
 };
 
-export type VersionRestoringStatus = 'opened' | 'unsavedChanges' | 'saving' | 'saved'
+export type VersionRestoringStatus =
+  | 'opened'
+  | 'unsavedChanges'
+  | 'saving'
+  | 'saved';
 export type OpenedVersionStatus = {|
   id: string,
   status: VersionRestoringStatus,
@@ -92,6 +96,7 @@ const VersionHistory = React.memo<Props>(
       () => new Set(versions.map(version => version.userId).filter(Boolean)),
       [versions]
     );
+    const latestVersionId = versions[0].id;
 
     const versionsGroupedByDay = React.useMemo(
       () => groupVersionsByDay(versions),
@@ -209,6 +214,7 @@ const VersionHistory = React.memo<Props>(
                   <DayGroupRow
                     key={day}
                     versions={dayVersions}
+                    latestVersionId={latestVersionId}
                     day={day}
                     isOpenedInitially={index === 0}
                     usersPublicProfileByIds={usersPublicProfileByIds}

@@ -125,7 +125,7 @@ const useOutline = (
 const StatusChip = ({
   status,
 }: {|
-  status: 'unsavedChanges' | 'saving' | 'saved',
+  status: 'unsavedChanges' | 'saving' | 'saved' | 'latest',
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const label =
@@ -133,6 +133,8 @@ const StatusChip = ({
       <Trans>Unsaved changes</Trans>
     ) : status === 'saving' ? (
       <Trans>Saving...</Trans>
+    ) : status === 'latest' ? (
+      <Trans>Latest save</Trans>
     ) : (
       <Trans>Changes saved</Trans>
     );
@@ -171,6 +173,7 @@ type Props = {|
   version: FilledCloudProjectVersion,
   usersPublicProfileByIds: UserPublicProfileByIds,
   isEditing: boolean,
+  isLatest: boolean,
   onRename: (FilledCloudProjectVersion, string) => Promise<void>,
   isLoading: boolean,
   onCancelRenaming: () => void,
@@ -187,6 +190,7 @@ const ProjectVersionRow = ({
   version,
   usersPublicProfileByIds,
   isEditing,
+  isLatest,
   isLoading,
   onRename,
   onCancelRenaming,
@@ -208,6 +212,14 @@ const ProjectVersionRow = ({
   const classes = useClassesForRowContainer();
   const outlineStyle = useOutline(version, openedVersionStatus);
   const anonymousAvatar = getAnonymousAvatar();
+  const versionStatus =
+    openedVersionStatus &&
+    openedVersionStatus.status !== 'opened' &&
+    openedVersionStatus.id === version.id
+      ? openedVersionStatus.status
+      : isLatest
+      ? 'latest'
+      : null;
 
   return (
     <I18n>
@@ -221,16 +233,14 @@ const ProjectVersionRow = ({
           style={outlineStyle}
         >
           <Column noMargin expand>
-            {openedVersionStatus &&
-              openedVersionStatus.status !== 'opened' &&
-              openedVersionStatus.id === version.id && (
-                <>
-                  <Line noMargin>
-                    <StatusChip status={openedVersionStatus.status} />
-                  </Line>
-                  <Spacer />
-                </>
-              )}
+            {versionStatus && (
+              <>
+                <Line noMargin>
+                  <StatusChip status={versionStatus} />
+                </Line>
+                <Spacer />
+              </>
+            )}
             {isEditing ? (
               <TextField
                 ref={textFieldRef}
@@ -378,6 +388,7 @@ type DayGroupRowProps = {|
   versions: FilledCloudProjectVersion[],
   isOpenedInitially: boolean,
   editedVersionId: ?string,
+  latestVersionId: string,
   onRenameVersion: (FilledCloudProjectVersion, string) => Promise<void>,
   loadingVersionId: ?string,
   onCancelRenaming: () => void,
@@ -395,6 +406,7 @@ export const DayGroupRow = ({
   versions,
   isOpenedInitially,
   editedVersionId,
+  latestVersionId,
   loadingVersionId,
   onRenameVersion,
   onCancelRenaming,
@@ -407,6 +419,7 @@ export const DayGroupRow = ({
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = [];
   let openedVersion = null;
+  let latestVersion = null;
 
   for (let i = 0; i < versions.length; i++) {
     const version = versions[i];
@@ -415,10 +428,14 @@ export const DayGroupRow = ({
     }
     if (openedVersionStatus && version.id === openedVersionStatus.id) {
       openedVersion = version;
+    } else if (version.id === latestVersionId) {
+      latestVersion = version;
     }
   }
 
   const shouldHighlightDay = !!openedVersion && !openedVersion.label && !isOpen;
+  const shouldDisplayLatestIndicatorOnDay =
+    !!latestVersion && !latestVersion.label && !isOpen;
 
   const classes = useClassesForDayCollapse();
 
@@ -437,7 +454,12 @@ export const DayGroupRow = ({
                 }`}
               >
                 {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
-                <Line noMargin justifyContent="space-between" expand alignItems="center">
+                <Line
+                  noMargin
+                  justifyContent="space-between"
+                  expand
+                  alignItems="center"
+                >
                   <Text noMargin>
                     {i18n.date(day, {
                       month: 'short',
@@ -445,9 +467,11 @@ export const DayGroupRow = ({
                       year: displayYear ? 'numeric' : undefined,
                     })}
                   </Text>
-                  {shouldHighlightDay && openedVersionStatus && (
+                  {shouldHighlightDay && openedVersionStatus ? (
                     <StatusIndicator status={openedVersionStatus.status} />
-                  )}
+                  ) : shouldDisplayLatestIndicatorOnDay ? (
+                    <StatusIndicator status="latest" />
+                  ) : null}
                 </Line>
               </div>
               {namedVersions && (
@@ -456,6 +480,8 @@ export const DayGroupRow = ({
                     {namedVersions.map(version => {
                       const shouldHighlightVersion =
                         openedVersion && openedVersion.id === version.id;
+                      const isLatestVersion =
+                        latestVersion && latestVersion.id === version.id;
                       return (
                         <div
                           key={version.id}
@@ -468,11 +494,13 @@ export const DayGroupRow = ({
                               {version.label}
                             </Text>
                           </div>
-                          {shouldHighlightVersion && openedVersionStatus && (
+                          {shouldHighlightVersion && openedVersionStatus ? (
                             <StatusIndicator
                               status={openedVersionStatus.status}
                             />
-                          )}
+                          ) : isLatestVersion ? (
+                            <StatusIndicator status="latest" />
+                          ) : null}
                         </div>
                       );
                     })}
@@ -486,6 +514,7 @@ export const DayGroupRow = ({
               {versions.map(version => (
                 <ProjectVersionRow
                   key={version.id}
+                  isLatest={latestVersionId === version.id}
                   version={version}
                   onRename={onRenameVersion}
                   isLoading={loadingVersionId === version.id}

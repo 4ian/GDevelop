@@ -27,6 +27,7 @@ import TextField, { type TextFieldInterface } from '../UI/TextField';
 import HistoryIcon from '../UI/CustomSvgIcons/History';
 import type { OpenedVersionStatus } from '.';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import type { GDevelopTheme } from '../UI/Theme';
 import Chip from '../UI/Chip';
 import CircularProgress from '../UI/CircularProgress';
 
@@ -61,18 +62,49 @@ const styles = {
     borderRadius: 4,
   },
   labelTextfield: { width: '100%' },
-  dayLabel: {
+  datSubRow: {
     display: 'flex',
     alignItems: 'center',
-    padding: 2,
+    padding: '2px 12px 2px 2px',
     borderRadius: 4,
   },
-  versionLabel: {
+  versionSubRow: {
     display: 'flex',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '2px 2px 2px 32px',
+    padding: '2px 12px 2px 32px',
     borderRadius: 4,
   },
+  statusIndicator: {
+    height: 6,
+    width: 6,
+    borderRadius: 3,
+  },
+};
+
+const getStatusColor = (
+  gdevelopTheme: GDevelopTheme,
+  status: 'unsavedChanges' | 'saving' | 'saved' | 'latest'
+) => {
+  console.log(gdevelopTheme);
+  return status === 'unsavedChanges'
+    ? gdevelopTheme.statusIndicator.error
+    : status === 'saving'
+    ? gdevelopTheme.statusIndicator.warning
+    : status === 'latest'
+    ? gdevelopTheme.palette.secondary
+    : gdevelopTheme.statusIndicator.success;
+};
+
+const StatusIndicator = ({
+  status,
+}: {|
+  status: 'unsavedChanges' | 'saving' | 'saved' | 'latest' | 'opened',
+|}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  if (status === 'opened') return null;
+  const backgroundColor = getStatusColor(gdevelopTheme, status);
+  return <span style={{ ...styles.statusIndicator, backgroundColor }} />;
 };
 
 const useOutline = (
@@ -104,12 +136,7 @@ const StatusChip = ({
     ) : (
       <Trans>Changes saved</Trans>
     );
-  const backgroundColor =
-    status === 'unsavedChanges'
-      ? gdevelopTheme.statusIndicator.error
-      : status === 'saving'
-      ? gdevelopTheme.statusIndicator.warning
-      : gdevelopTheme.statusIndicator.success;
+  const backgroundColor = getStatusColor(gdevelopTheme, status);
 
   return (
     <Chip
@@ -331,15 +358,14 @@ const useClassesForDayCollapse = makeStyles(theme =>
         backgroundColor: theme.palette.action.hover,
       },
     },
-    dayLabel: {
-      ...styles.dayLabel,
+    datSubRow: {
+      ...styles.datSubRow,
       '&.selected': {
         backgroundColor: theme.palette.action.focus,
       },
     },
-    versionLabel: {
-      ...styles.versionLabel,
-      ...styles.greyed,
+    versionSubRow: {
+      ...styles.versionSubRow,
       '&.selected': {
         backgroundColor: theme.palette.action.focus,
       },
@@ -406,34 +432,47 @@ export const DayGroupRow = ({
           >
             <Column noMargin expand>
               <div
-                className={`${classes.dayLabel}${
+                className={`${classes.datSubRow}${
                   shouldHighlightDay ? ' selected' : ''
                 }`}
               >
                 {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
-                <Text noMargin>
-                  {i18n.date(day, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: displayYear ? 'numeric' : undefined,
-                  })}
-                </Text>
+                <Line noMargin justifyContent="space-between" expand alignItems="center">
+                  <Text noMargin>
+                    {i18n.date(day, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: displayYear ? 'numeric' : undefined,
+                    })}
+                  </Text>
+                  {shouldHighlightDay && openedVersionStatus && (
+                    <StatusIndicator status={openedVersionStatus.status} />
+                  )}
+                </Line>
               </div>
               {namedVersions && (
                 <Collapse in={!isOpen}>
                   <ColumnStackLayout noMargin>
                     {namedVersions.map(version => {
+                      const shouldHighlightVersion =
+                        openedVersion && openedVersion.id === version.id;
                       return (
                         <div
-                          className={`${classes.versionLabel}${
-                            openedVersion && openedVersion.id === version.id
-                              ? ' selected'
-                              : ''
+                          key={version.id}
+                          className={`${classes.versionSubRow}${
+                            shouldHighlightVersion ? ' selected' : ''
                           }`}
                         >
-                          <Text size="body-small" noMargin>
-                            {version.label}
-                          </Text>
+                          <div style={styles.greyed}>
+                            <Text size="body-small" noMargin>
+                              {version.label}
+                            </Text>
+                          </div>
+                          {shouldHighlightVersion && openedVersionStatus && (
+                            <StatusIndicator
+                              status={openedVersionStatus.status}
+                            />
+                          )}
                         </div>
                       );
                     })}

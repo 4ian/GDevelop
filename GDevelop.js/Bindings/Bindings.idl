@@ -3035,6 +3035,7 @@ interface ObjectsUsingResourceCollector {
 interface ResourcesInUseHelper {
     void ResourcesInUseHelper([Ref] ResourcesManager resourcesManager);
 
+    [Ref] SetString GetAllAssets();
     [Ref] SetString GetAllImages();
     [Ref] SetString GetAllAudios();
     [Ref] SetString GetAllFonts();

@@ -113,13 +113,11 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
     gd::Project &project, gd::Object &object,
     const gd::String &destinationDirectory, const gd::String &objectFullName,
     std::map<gd::String, gd::String> &resourcesFileNameMap) {
-  // Get the resources to be copied
+  // TODO Rename AssetResourcesMergingHelper 
   gd::AssetResourcesMergingHelper resourcesMergingHelper(
       project.GetResourcesManager(), resourcesFileNameMap);
-
   object.GetConfiguration().ExposeResources(resourcesMergingHelper);
 
-  // TODO update the assets names accordingly.
   NormalizeResourceNames(object, resourcesFileNameMap, objectFullName);
 }
 

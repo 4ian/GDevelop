@@ -13,10 +13,4 @@ export type EventsFunctionsExtensionWriter = {
     extension: gdEventsFunctionsExtension,
     filepath: string
   ) => Promise<void>,
-  chooseObjectAssetFile: (objectName?: string) => Promise<?string>,
-  writeObjectsAssets: (
-    project: gdProject,
-    exportedObjects: gdObject[],
-    filepath: string
-  ) => Promise<void>,
 };

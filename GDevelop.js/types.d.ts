@@ -2327,6 +2327,7 @@ export class ObjectsUsingResourceCollector extends EmscriptenObject {
 
 export class ResourcesInUseHelper extends EmscriptenObject {
   constructor(resourcesManager: ResourcesManager): void;
+  getAllAssets(): SetString;
   getAllImages(): SetString;
   getAllAudios(): SetString;
   getAllFonts(): SetString;

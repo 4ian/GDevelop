@@ -38,6 +38,7 @@ public:
       : gd::ArbitraryResourceWorker(resourcesManager){};
   virtual ~ResourcesInUseHelper(){};
 
+  std::set<gd::String>& GetAllAssets() { return allAssets; };
   std::set<gd::String>& GetAllImages() { return GetAll("image"); };
   std::set<gd::String>& GetAllAudios() { return GetAll("audio"); };
   std::set<gd::String>& GetAllFonts() { return GetAll("font"); };
@@ -64,35 +65,45 @@ public:
   virtual void ExposeFile(gd::String& resource) override{
       /*Don't care, we just list resource names*/
   };
-  virtual void ExposeImage(gd::String& imageResourceName) override {
-    allImages.insert(imageResourceName);
+  virtual void ExposeImage(gd::String& resourceName) override {
+    allImages.insert(resourceName);
+    allAssets.insert(resourceName);
   };
-  virtual void ExposeAudio(gd::String& audioResourceName) override {
-    allAudios.insert(audioResourceName);
+  virtual void ExposeAudio(gd::String& resourceName) override {
+    allAudios.insert(resourceName);
+    allAssets.insert(resourceName);
   };
-  virtual void ExposeFont(gd::String& fontResourceName) override {
-    allFonts.insert(fontResourceName);
+  virtual void ExposeFont(gd::String& resourceName) override {
+    allFonts.insert(resourceName);
+    allAssets.insert(resourceName);
   };
-  virtual void ExposeJson(gd::String& jsonResourceName) override {
-    allJsons.insert(jsonResourceName);
+  virtual void ExposeJson(gd::String& resourceName) override {
+    allJsons.insert(resourceName);
+    allAssets.insert(resourceName);
   };
-  virtual void ExposeTilemap(gd::String& tilemapResourceName) override {
-    allTilemaps.insert(tilemapResourceName);
+  virtual void ExposeTilemap(gd::String& resourceName) override {
+    allTilemaps.insert(resourceName);
+    allAssets.insert(resourceName);
   };
-  virtual void ExposeTileset(gd::String& tilesetResourceName) override {
-    allTilesets.insert(tilesetResourceName);
+  virtual void ExposeTileset(gd::String& resourceName) override {
+    allTilesets.insert(resourceName);
+    allAssets.insert(resourceName);
   };
-  virtual void ExposeVideo(gd::String& videoResourceName) override {
-    allVideos.insert(videoResourceName);
+  virtual void ExposeVideo(gd::String& resourceName) override {
+    allVideos.insert(resourceName);
+    allAssets.insert(resourceName);
   };
-  virtual void ExposeBitmapFont(gd::String& bitmapFontResourceName) override {
-    allBitmapFonts.insert(bitmapFontResourceName);
+  virtual void ExposeBitmapFont(gd::String& resourceName) override {
+    allBitmapFonts.insert(resourceName);
+    allAssets.insert(resourceName);
   };
   virtual void ExposeModel3D(gd::String& resourceName) override {
     allModel3Ds.insert(resourceName);
+    allAssets.insert(resourceName);
   };
 
  protected:
+  std::set<gd::String> allAssets;
   std::set<gd::String> allImages;
   std::set<gd::String> allAudios;
   std::set<gd::String> allFonts;

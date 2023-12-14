@@ -43,33 +43,4 @@ export default class BrowserEventsFunctionsExtensionWriter {
       throw error;
     }
   };
-
-  static chooseObjectAssetFile = async (
-    objectName?: string
-  ): Promise<?string> => {
-    return objectName;
-  };
-
-  static writeObjectsAssets = (
-    project: gdProject,
-    exportedObjects: gdObject[],
-    filename: string
-  ): Promise<void> => {
-    //TODO Make an equivalent of LocalEventsFunctionsExtensionWriter.
-    const exportedObject = exportedObjects[0].clone().get();
-    exportedObject.getVariables().clear();
-    exportedObject.getEffects().clear();
-    exportedObject
-      .getAllBehaviorNames()
-      .toJSArray()
-      .forEach(name => exportedObject.removeBehavior(name));
-    const serializedObject = serializeToJSObject(exportedObject);
-    return downloadStringContentAsFile(
-      filename,
-      JSON.stringify(serializedObject)
-    ).catch(err => {
-      console.error('Unable to write the objects:', err);
-      throw err;
-    });
-  };
 }

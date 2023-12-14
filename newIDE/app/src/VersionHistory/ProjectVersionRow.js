@@ -61,10 +61,17 @@ const styles = {
     borderRadius: 4,
   },
   labelTextfield: { width: '100%' },
-  namedVersionPreviewRow: {
+  dayLabel: {
     display: 'flex',
+    alignItems: 'center',
+    padding: 2,
     borderRadius: 4,
-    paddingLeft: 32,
+  },
+  versionLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '2px 2px 2px 32px',
+    borderRadius: 4,
   },
 };
 
@@ -324,6 +331,19 @@ const useClassesForDayCollapse = makeStyles(theme =>
         backgroundColor: theme.palette.action.hover,
       },
     },
+    dayLabel: {
+      ...styles.dayLabel,
+      '&.selected': {
+        backgroundColor: theme.palette.action.focus,
+      },
+    },
+    versionLabel: {
+      ...styles.versionLabel,
+      ...styles.greyed,
+      '&.selected': {
+        backgroundColor: theme.palette.action.focus,
+      },
+    },
   })
 );
 
@@ -360,13 +380,19 @@ export const DayGroupRow = ({
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = [];
+  let openedVersion = null;
 
   for (let i = 0; i < versions.length; i++) {
     const version = versions[i];
     if (version.label) {
       namedVersions.push(version);
     }
+    if (openedVersionStatus && version.id === openedVersionStatus.id) {
+      openedVersion = version;
+    }
   }
+
+  const shouldHighlightDay = !!openedVersion && !openedVersion.label && !isOpen;
 
   const classes = useClassesForDayCollapse();
 
@@ -378,8 +404,12 @@ export const DayGroupRow = ({
             onClick={() => setIsOpen(!isOpen)}
             className={classes.root}
           >
-            <Column noMargin>
-              <Line alignItems="center" noMargin>
+            <Column noMargin expand>
+              <div
+                className={`${classes.dayLabel}${
+                  shouldHighlightDay ? ' selected' : ''
+                }`}
+              >
                 {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
                 <Text noMargin>
                   {i18n.date(day, {
@@ -388,22 +418,25 @@ export const DayGroupRow = ({
                     year: displayYear ? 'numeric' : undefined,
                   })}
                 </Text>
-              </Line>
+              </div>
               {namedVersions && (
                 <Collapse in={!isOpen}>
                   <ColumnStackLayout noMargin>
-                    {namedVersions.map(version => (
-                      <div
-                        style={{
-                          ...styles.namedVersionPreviewRow,
-                          ...styles.greyed,
-                        }}
-                      >
-                        <Text size="body-small" noMargin>
-                          {version.label}
-                        </Text>
-                      </div>
-                    ))}
+                    {namedVersions.map(version => {
+                      return (
+                        <div
+                          className={`${classes.versionLabel}${
+                            openedVersion && openedVersion.id === version.id
+                              ? ' selected'
+                              : ''
+                          }`}
+                        >
+                          <Text size="body-small" noMargin>
+                            {version.label}
+                          </Text>
+                        </div>
+                      );
+                    })}
                   </ColumnStackLayout>
                 </Collapse>
               )}

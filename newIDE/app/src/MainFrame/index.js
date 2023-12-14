@@ -2452,7 +2452,6 @@ const MainFrame = (props: Props) => {
       }
 
       saveUiSettings(state.editorTabs);
-      _showSnackMessage(i18n._(t`Saving...`), null);
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -2460,6 +2459,25 @@ const MainFrame = (props: Props) => {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
+
+      if (checkedOutVersionStatus) {
+        const shouldRestoreCheckedOutVersion = await showConfirmation({
+          title: t`Restore this version`,
+          message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
+        });
+        if (!shouldRestoreCheckedOutVersion) return;
+      } else if (canFileMetadataBeSafelySaved) {
+        const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
+          currentFileMetadata,
+          {
+            showAlert,
+            showConfirmation,
+          }
+        );
+        if (!canProjectBeSafelySaved) return;
+      }
+
+      _showSnackMessage(i18n._(t`Saving...`), null);
       setIsSavingProject(true);
 
       try {
@@ -2469,30 +2487,6 @@ const MainFrame = (props: Props) => {
         // may have changed (if the user opened another project). So we read and
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
-
-        if (checkedOutVersionStatus) {
-          const shouldRestoreCheckedOutVersion = await showConfirmation({
-            title: t`Restore this version`,
-            message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
-          });
-          if (!shouldRestoreCheckedOutVersion) return;
-          // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
-          // for too long.
-          _replaceSnackMessage(i18n._(t`Saving...`), null);
-        } else if (canFileMetadataBeSafelySaved) {
-          const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
-            currentFileMetadata,
-            {
-              showAlert,
-              showConfirmation,
-            }
-          );
-          if (!canProjectBeSafelySaved) return;
-
-          // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
-          // for too long.
-          _replaceSnackMessage(i18n._(t`Saving...`), null);
-        }
 
         const saveOptions = {};
         if (cloudProjectRecoveryOpenedVersionId) {

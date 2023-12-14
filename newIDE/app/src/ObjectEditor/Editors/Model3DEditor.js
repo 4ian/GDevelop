@@ -415,7 +415,7 @@ const Model3DEditor = ({
 
   const scanNewAnimations = React.useCallback(
     () => {
-      if (!model3D) {
+      if (!gltf) {
         return;
       }
       setNameErrors({});
@@ -428,7 +428,7 @@ const Model3DEditor = ({
       );
 
       let hasAddedAnimation = false;
-      for (const resourceAnimation of model3D.animations) {
+      for (const resourceAnimation of gltf.animations) {
         if (animationSources.includes(resourceAnimation.name)) {
           continue;
         }
@@ -468,7 +468,7 @@ const Model3DEditor = ({
     },
     [
       forceUpdate,
-      model3D,
+      gltf,
       model3DConfiguration,
       onObjectUpdated,
       onSizeUpdated,
@@ -575,8 +575,8 @@ const Model3DEditor = ({
     ]
   );
 
-  const sourceSelectOptions = model3D
-    ? model3D.animations.map(animation => {
+  const sourceSelectOptions = gltf
+    ? gltf.animations.map(animation => {
         return (
           <SelectOption
             key={animation.name}

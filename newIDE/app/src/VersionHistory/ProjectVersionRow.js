@@ -14,7 +14,7 @@ import {
 import { type UserPublicProfileByIds } from '../Utils/GDevelopServices/User';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
-import { LineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
@@ -37,7 +37,7 @@ const styles = {
     width: 20,
     height: 20,
   },
-  username: { opacity: 0.7 },
+  greyed: { opacity: 0.7 },
   versionsContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -61,6 +61,11 @@ const styles = {
     borderRadius: 4,
   },
   labelTextfield: { width: '100%' },
+  namedVersionPreviewRow: {
+    display: 'flex',
+    borderRadius: 4,
+    paddingLeft: 32,
+  },
 };
 
 const useOutline = (
@@ -230,7 +235,7 @@ const ProjectVersionRow = ({
                   </Column>
                 )}
                 <div style={styles.dateContainer}>
-                  <Text noMargin style={styles.username}>
+                  <Text noMargin style={styles.greyed}>
                     {i18n.date(
                       version.createdAt,
                       displayFullDate
@@ -276,7 +281,7 @@ const ProjectVersionRow = ({
                   src={authorPublicProfile.iconUrl}
                   style={styles.avatar}
                 />
-                <Text noMargin style={styles.username}>
+                <Text noMargin style={styles.greyed}>
                   {authorPublicProfile.username}
                 </Text>
               </LineStackLayout>
@@ -287,8 +292,8 @@ const ProjectVersionRow = ({
                   alt={anonymousAvatar.alt}
                   style={styles.avatar}
                 />
-                <Text noMargin style={styles.username}>
-                  <Trans>Anonymous </Trans>
+                <Text noMargin style={styles.greyed}>
+                  <Trans>Anonymous</Trans>
                 </Text>
               </LineStackLayout>
             )}
@@ -355,13 +360,11 @@ export const DayGroupRow = ({
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = [];
-  const unnamedVersions = [];
+
   for (let i = 0; i < versions.length; i++) {
     const version = versions[i];
     if (version.label) {
       namedVersions.push(version);
-    } else {
-      unnamedVersions.push(version);
     }
   }
 
@@ -371,58 +374,59 @@ export const DayGroupRow = ({
     <I18n>
       {({ i18n }) => (
         <React.Fragment>
-          {namedVersions.map(version => (
-            <ProjectVersionRow
-              key={version.id}
-              version={version}
-              onRename={onRenameVersion}
-              isLoading={loadingVersionId === version.id}
-              onCancelRenaming={onCancelRenaming}
-              usersPublicProfileByIds={usersPublicProfileByIds}
-              isEditing={version.id === editedVersionId}
-              onContextMenu={onContextMenu}
-              getAnonymousAvatar={getAnonymousAvatar}
-              openedVersionStatus={openedVersionStatus}
-              displayFullDate
-            />
-          ))}
-          {unnamedVersions.length > 0 && (
-            <>
-              <ButtonBase
-                onClick={() => setIsOpen(!isOpen)}
-                className={classes.root}
-              >
-                <Line alignItems="center" noMargin>
-                  {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
-                  <Text noMargin>
-                    {i18n.date(day, {
-                      month: 'short',
-                      day: 'numeric',
-                      year: displayYear ? 'numeric' : undefined,
-                    })}
-                  </Text>
-                </Line>
-              </ButtonBase>
-              <Collapse in={isOpen}>
-                <div style={styles.versionsContainer}>
-                  {unnamedVersions.map(version => (
-                    <ProjectVersionRow
-                      key={version.id}
-                      version={version}
-                      onRename={onRenameVersion}
-                      isLoading={loadingVersionId === version.id}
-                      onCancelRenaming={onCancelRenaming}
-                      usersPublicProfileByIds={usersPublicProfileByIds}
-                      isEditing={version.id === editedVersionId}
-                      onContextMenu={onContextMenu}
-                      getAnonymousAvatar={getAnonymousAvatar}
-                      openedVersionStatus={openedVersionStatus}
-                    />
-                  ))}
-                </div>
-              </Collapse>
-            </>
-          )}
+          <ButtonBase
+            onClick={() => setIsOpen(!isOpen)}
+            className={classes.root}
+          >
+            <Column noMargin>
+              <Line alignItems="center" noMargin>
+                {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
+                <Text noMargin>
+                  {i18n.date(day, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: displayYear ? 'numeric' : undefined,
+                  })}
+                </Text>
+              </Line>
+              {namedVersions && (
+                <Collapse in={!isOpen}>
+                  <ColumnStackLayout noMargin>
+                    {namedVersions.map(version => (
+                      <div
+                        style={{
+                          ...styles.namedVersionPreviewRow,
+                          ...styles.greyed,
+                        }}
+                      >
+                        <Text size="body-small" noMargin>
+                          {version.label}
+                        </Text>
+                      </div>
+                    ))}
+                  </ColumnStackLayout>
+                </Collapse>
+              )}
+            </Column>
+          </ButtonBase>
+          <Collapse in={isOpen}>
+            <div style={styles.versionsContainer}>
+              {versions.map(version => (
+                <ProjectVersionRow
+                  key={version.id}
+                  version={version}
+                  onRename={onRenameVersion}
+                  isLoading={loadingVersionId === version.id}
+                  onCancelRenaming={onCancelRenaming}
+                  usersPublicProfileByIds={usersPublicProfileByIds}
+                  isEditing={version.id === editedVersionId}
+                  onContextMenu={onContextMenu}
+                  getAnonymousAvatar={getAnonymousAvatar}
+                  openedVersionStatus={openedVersionStatus}
+                />
+              ))}
+            </div>
+          </Collapse>
         </React.Fragment>
       )}
     </I18n>

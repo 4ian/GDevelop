@@ -43,9 +43,10 @@ const groupVersionsByDay = (
   return versionsGroupedByDay;
 };
 
+export type VersionRestoringStatus = 'opened' | 'unsavedChanges' | 'saving' | 'saved'
 export type OpenedVersionStatus = {|
   id: string,
-  status: 'opened' | 'unsavedChanges' | 'saving' | 'saved',
+  status: VersionRestoringStatus,
 |};
 
 type Props = {|

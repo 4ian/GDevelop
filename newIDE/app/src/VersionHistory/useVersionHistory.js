@@ -21,8 +21,6 @@ import RaisedButton from '../UI/RaisedButton';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 
-const SAVED_STATUS_TIMEOUT = 3000;
-
 const styles = {
   drawerContent: {
     width: 320,
@@ -72,7 +70,6 @@ const useVersionHistory = ({
 }: Props) => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const { showAlert } = useAlertDialog();
-  const savedStateTimeoutRef = React.useRef<?TimeoutID>(null);
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
@@ -211,33 +208,18 @@ const useVersionHistory = ({
         if (
           !currentCheckedOutVersionStatus ||
           (isSavingProject &&
-            currentCheckedOutVersionStatus.status === 'saving') ||
-          (!isSavingProject &&
-            currentCheckedOutVersionStatus.status === 'saved')
+            currentCheckedOutVersionStatus.status === 'saving')
         ) {
           return currentCheckedOutVersionStatus;
         }
 
-        if (isSavingProject) {
-          return {
-            id: currentCheckedOutVersionStatus.id,
-            status: 'saving',
-          };
-        }
-        savedStateTimeoutRef.current = setTimeout(() => {
-          setCheckedOutVersionStatus(null);
-        }, SAVED_STATUS_TIMEOUT);
-        return {
-          id: currentCheckedOutVersionStatus.id,
-          status: 'saved',
-        };
+        return isSavingProject
+          ? {
+              id: currentCheckedOutVersionStatus.id,
+              status: 'saving',
+            }
+          : null;
       });
-      return () => {
-        if (savedStateTimeoutRef.current) {
-          clearTimeout(savedStateTimeoutRef.current);
-          savedStateTimeoutRef.current = null;
-        }
-      };
     },
     [isSavingProject]
   );

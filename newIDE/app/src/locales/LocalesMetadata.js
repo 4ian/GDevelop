@@ -11,7 +11,7 @@ module.exports = [
     "languageCode": "ar_SA",
     "languageName": "Arabic",
     "languageNativeName": "اللغة العربية",
-    "translationRatio": 0.965826187124024
+    "translationRatio": 0.9656981953154998
   },
   {
     "languageCode": "az_AZ",
@@ -59,7 +59,7 @@ module.exports = [
     "languageCode": "de_DE",
     "languageName": "German",
     "languageNativeName": "Deutsch",
-    "translationRatio": 0.6917957250735953
+    "translationRatio": 0.691667733265071
   },
   {
     "languageCode": "el_GR",
@@ -83,7 +83,7 @@ module.exports = [
     "languageCode": "es_ES",
     "languageName": "Spanish",
     "languageNativeName": "Español",
-    "translationRatio": 0.9863048764879048
+    "translationRatio": 0.9861768846793805
   },
   {
     "languageCode": "fa_IR",
@@ -107,7 +107,7 @@ module.exports = [
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.9507231537181621
+    "translationRatio": 0.9505951619096378
   },
   {
     "languageCode": "ha_HG",
@@ -137,7 +137,7 @@ module.exports = [
     "languageCode": "id_ID",
     "languageName": "Indonesian",
     "languageNativeName": "Bahasa Indonesia",
-    "translationRatio": 0.46371432228337384
+    "translationRatio": 0.47395366696531427
   },
   {
     "languageCode": "ig_NG",
@@ -155,7 +155,7 @@ module.exports = [
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.9865608601049533
+    "translationRatio": 0.9866888519134775
   },
   {
     "languageCode": "ka_GE",
@@ -179,7 +179,7 @@ module.exports = [
     "languageCode": "lt_LT",
     "languageName": "Lithuanian",
     "languageNativeName": "lietuvių kalba",
-    "translationRatio": 0.1635735312939972
+    "translationRatio": 0.1634455394854729
   },
   {
     "languageCode": "lv_LV",
@@ -233,7 +233,7 @@ module.exports = [
     "languageCode": "pt_BR",
     "languageName": "Brazilian Portuguese",
     "languageNativeName": "Português brasileiro",
-    "translationRatio": 0.8588250351977473
+    "translationRatio": 0.8586970433892231
   },
   {
     "languageCode": "pt_PT",
@@ -251,7 +251,7 @@ module.exports = [
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9916805324459235
+    "translationRatio": 0.9915525406373992
   },
   {
     "languageCode": "si_LK",

@@ -5,11 +5,14 @@
  */
 #include "ObjectAssetSerializer.h"
 
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Project/AssetResourcesMergingHelper.h"
 #include "GDCore/IDE/Project/ResourcesInUseHelper.h"
+#include "GDCore/IDE/Project/ResourcesRenamer.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -19,7 +22,6 @@
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
-
 
 namespace gd {
 
@@ -107,4 +109,95 @@ void ObjectAssetSerializer::SerializeTo(gd::Project &project,
   customizationElement.ConsiderAsArrayOf("empty");
 }
 
+void ObjectAssetSerializer::RenameObjectResourceFiles(
+    gd::Project &project, gd::Object &object,
+    const gd::String &destinationDirectory, const gd::String &objectFullName,
+    std::map<gd::String, gd::String> &resourcesFileNameMap) {
+  // Get the resources to be copied
+  gd::AssetResourcesMergingHelper resourcesMergingHelper(
+      project.GetResourcesManager(), resourcesFileNameMap);
+
+  object.GetConfiguration().ExposeResources(resourcesMergingHelper);
+
+  // TODO update the assets names accordingly.
+  NormalizeResourceNames(object, resourcesFileNameMap, objectFullName);
+}
+
+void ObjectAssetSerializer::NormalizeResourceNames(
+    gd::Object &object, std::map<gd::String, gd::String> &resourcesFileNameMap,
+    const gd::String &objectFullName) {
+
+  if (object.GetConfiguration().GetType() == "Sprite") {
+    gd::SpriteObject &spriteConfiguration =
+        dynamic_cast<gd::SpriteObject &>(object.GetConfiguration());
+    std::map<gd::String, gd::String> normalizedFileNames;
+
+    for (std::size_t animationIndex = 0;
+         animationIndex < spriteConfiguration.GetAnimationsCount();
+         animationIndex++) {
+      auto &animation = spriteConfiguration.GetAnimation(animationIndex);
+      auto &direction = animation.GetDirection(0);
+
+      const gd::String &animationName =
+          animation.GetName().empty()
+              ? gd::String::From(animationIndex)
+              : animation.GetName().FindAndReplace("_", " ", true);
+
+      // Search frames that share the same resource.
+      std::map<gd::String, std::vector<int>> frameIndexes;
+      for (std::size_t frameIndex = 0; frameIndex < direction.GetSpritesCount();
+           frameIndex++) {
+        auto &frame = direction.GetSprite(frameIndex);
+
+        if (frameIndexes.find(frame.GetImageName()) == frameIndexes.end()) {
+          std::vector<int> emptyVector;
+          frameIndexes[frame.GetImageName()] = emptyVector;
+        }
+        auto &indexes = frameIndexes[frame.GetImageName()];
+        indexes.push_back(frameIndex);
+      }
+
+      for (std::size_t frameIndex = 0; frameIndex < direction.GetSpritesCount();
+           frameIndex++) {
+        auto &frame = direction.GetSprite(frameIndex);
+        auto oldName = frame.GetImageName();
+
+        if (normalizedFileNames.find(oldName) != normalizedFileNames.end()) {
+          gd::LogWarning("The resource \"" + oldName +
+                         "\" is shared by several animations.");
+          continue;
+        }
+
+        gd::String newName = objectFullName;
+        if (spriteConfiguration.GetAnimationsCount() > 1) {
+          newName += "_" + animationName;
+        }
+        if (direction.GetSpritesCount() > 1) {
+          newName += "_";
+          auto &indexes = frameIndexes[frame.GetImageName()];
+          for (size_t i = 0; i < indexes.size(); i++) {
+            newName += gd::String::From(indexes.at(i) + 1);
+            if (i < indexes.size() - 1) {
+              newName += ";";
+            }
+          }
+        }
+        gd::String extension = oldName.substr(oldName.find_last_of("."));
+        newName += extension;
+
+        frame.SetImageName(newName);
+        normalizedFileNames[oldName] = newName;
+      }
+    }
+    for (std::map<gd::String, gd::String>::const_iterator it =
+             resourcesFileNameMap.begin();
+         it != resourcesFileNameMap.end(); ++it) {
+      if (!it->first.empty()) {
+        gd::String originFile = it->first;
+        gd::String destinationFile = it->second;
+        resourcesFileNameMap[originFile] = normalizedFileNames[destinationFile];
+      }
+    }
+  }
+}
 } // namespace gd

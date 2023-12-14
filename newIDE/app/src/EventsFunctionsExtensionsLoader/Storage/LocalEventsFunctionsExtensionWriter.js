@@ -124,13 +124,13 @@ export default class LocalEventsFunctionsExtensionWriter {
       exportedObjects.map(exportedObject => {
         const clonedObject = exportedObject.clone().get();
 
-        gd.ProjectResourcesCopier.copyObjectResourcesTo(
-          project,
-          clonedObject,
-          fileSystem,
-          temporaryOutputDir,
-          addSpacesToPascalCase(clonedObject.getName())
-        );
+        // gd.ProjectResourcesCopier.copyObjectResourcesTo(
+        //   project,
+        //   clonedObject,
+        //   fileSystem,
+        //   temporaryOutputDir,
+        //   addSpacesToPascalCase(clonedObject.getName())
+        // );
 
         const serializedObject = serializeToObjectAsset(project, clonedObject);
         // Resource names are changed by copyObjectResourcesTo so they don't

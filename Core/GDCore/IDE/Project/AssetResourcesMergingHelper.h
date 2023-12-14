@@ -29,10 +29,13 @@ namespace gd {
  *
  * \ingroup IDE
  */
-class GD_CORE_API AssetResourcesMergingHelper : public ResourcesMergingHelper {
+class GD_CORE_API AssetResourcesMergingHelper : public ArbitraryResourceWorker {
 public:
-  AssetResourcesMergingHelper(gd::Project &project_,
-                              gd::AbstractFileSystem &fileSystem);
+  AssetResourcesMergingHelper(
+      gd::ResourcesManager &resourcesManager,
+      std::map<gd::String, gd::String> &resourcesFileNameMap_)
+      : ArbitraryResourceWorker(resourcesManager),
+        resourcesFileNameMap(&resourcesFileNameMap_){};
   virtual ~AssetResourcesMergingHelper(){};
 
   void ExposeImage(gd::String &imageName) override;
@@ -43,11 +46,24 @@ public:
   void ExposeTileset(gd::String &tilesetName) override;
   void ExposeVideo(gd::String &videoName) override;
   void ExposeBitmapFont(gd::String &bitmapFontName) override;
+  void ExposeFile(gd::String &resource) override;
+
+  /**
+   * \brief Return a map containing the resources old absolute filename as key,
+   * and the resources new filenames as value. The new filenames are relative to
+   * the Base Directory.
+   */
+  std::map<gd::String, gd::String> &GetAllResourcesOldAndNewFilename() {
+    return *resourcesFileNameMap;
+  };
 
 protected:
   void ExposeResourceAsFile(gd::String &resourceName);
 
-  gd::Project &project;
+  /**
+   * New file names that can be accessed by their original name.
+   */
+  std::map<gd::String, gd::String> *resourcesFileNameMap;
 };
 
 } // namespace gd

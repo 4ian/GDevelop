@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #pragma once
+#include <map>
 #include <vector>
 
 #include "GDCore/String.h"
@@ -18,6 +19,7 @@ class ArbitraryResourceWorker;
 class InitialInstance;
 class SerializerElement;
 class EffectsContainer;
+class AbstractFileSystem;
 } // namespace gd
 
 namespace gd {
@@ -35,10 +37,31 @@ public:
   static void SerializeTo(gd::Project &project, const gd::Object &object,
                           SerializerElement &element);
 
+  /**
+   * \brief Copy all resources files of an object to the specified
+   * `destinationDirectory` to prepare asset archive export.
+   *
+   * \param project The object project
+   * \param object The object to be used
+   * \param destinationDirectory The directory where resources must be copied to
+   * \param objectFullName The name to use in file names of sprite resources
+   *
+   * \return true if no error happened
+   */
+  static void RenameObjectResourceFiles(
+      gd::Project &project, gd::Object &object,
+      const gd::String &destinationDirectory, const gd::String &objectFullName,
+      std::map<gd::String, gd::String> &resourcesFileNameMap);
+
   ~ObjectAssetSerializer(){};
 
 private:
   ObjectAssetSerializer(){};
+
+  static void
+  NormalizeResourceNames(gd::Object &object,
+                         std::map<gd::String, gd::String> &resourcesFileNameMap,
+                         const gd::String &objectFullName);
 
   static const std::vector<gd::String> resourceTypes;
 };

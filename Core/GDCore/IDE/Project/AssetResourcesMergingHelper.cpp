@@ -11,11 +11,6 @@
 
 
 namespace gd {
-AssetResourcesMergingHelper::AssetResourcesMergingHelper(
-    gd::Project &project_, gd::AbstractFileSystem &fileSystem)
-    : ResourcesMergingHelper(project_.GetResourcesManager(), fileSystem),
-      project(project_){};
-
 void AssetResourcesMergingHelper::ExposeImage(gd::String &imageName) {
   ExposeResourceAsFile(imageName);
 }
@@ -51,10 +46,33 @@ void AssetResourcesMergingHelper::ExposeBitmapFont(gd::String &bitmapFontName) {
 void AssetResourcesMergingHelper::ExposeResourceAsFile(
     gd::String &resourceName) {
 
-  auto &resource = project.GetResourcesManager().GetResource(resourceName);
+  auto &resource = resourcesManager->GetResource(resourceName);
   gd::String file = resource.GetFile();
   ExposeFile(file);
+
   resourceName = file;
 }
+
+void AssetResourcesMergingHelper::ExposeFile(gd::String &resourceFilePath) {
+
+  size_t slashPos = resourceFilePath.find_last_of("/");
+  size_t antiSlashPos = resourceFilePath.find_last_of("\\");
+  size_t baseNamePos = slashPos == String::npos
+                       ? antiSlashPos == String::npos
+                         ? 0
+                         : (antiSlashPos + 1)
+                       : antiSlashPos == String::npos
+                         ? (slashPos + 1)
+                         : slashPos > antiSlashPos
+                         ? (slashPos + 1)
+                         : (antiSlashPos + 1);
+  gd::String baseName =
+      baseNamePos != 0
+          ? resourceFilePath.substr(baseNamePos, resourceFilePath.length())
+          : resourceFilePath;
+
+  (*resourcesFileNameMap)[resourceFilePath] = baseName;
+  resourceFilePath = baseName;
+  }
 
 } // namespace gd

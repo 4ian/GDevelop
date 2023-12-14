@@ -1114,6 +1114,11 @@ export class Serializer extends EmscriptenObject {
   static fromJSON(json: string): SerializerElement;
 }
 
+export class ObjectAssetSerializer extends EmscriptenObject {
+  static serializeTo(project: Project, obj: gdObject, element: SerializerElement): void;
+  static renameObjectResourceFiles(project: Project, obj: gdObject, destinationDirectory: string, objectFullName: string, resourcesNewFileNames: MapStringString): void;
+}
+
 export class InstructionsList extends EmscriptenObject {
   constructor(): void;
   insert(instr: Instruction, pos: number): Instruction;

@@ -47,7 +47,8 @@ export type VersionRestoringStatus =
   | 'opened'
   | 'unsavedChanges'
   | 'saving'
-  | 'saved';
+  | 'saved'
+  | 'latest';
 export type OpenedVersionStatus = {|
   version: FilledCloudProjectVersion,
   status: VersionRestoringStatus,

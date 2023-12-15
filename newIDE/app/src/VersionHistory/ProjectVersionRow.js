@@ -25,11 +25,11 @@ import {
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
 import HistoryIcon from '../UI/CustomSvgIcons/History';
-import type { OpenedVersionStatus } from '.';
+import type { OpenedVersionStatus, VersionRestoringStatus } from '.';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import type { GDevelopTheme } from '../UI/Theme';
 import Chip from '../UI/Chip';
 import CircularProgress from '../UI/CircularProgress';
+import { getStatusColor } from './Utils';
 
 const thisYear = new Date().getFullYear();
 
@@ -82,24 +82,7 @@ const styles = {
   },
 };
 
-const getStatusColor = (
-  gdevelopTheme: GDevelopTheme,
-  status: 'unsavedChanges' | 'saving' | 'saved' | 'latest'
-) => {
-  return status === 'unsavedChanges'
-    ? gdevelopTheme.statusIndicator.error
-    : status === 'saving'
-    ? gdevelopTheme.statusIndicator.warning
-    : status === 'latest'
-    ? gdevelopTheme.palette.secondary
-    : gdevelopTheme.statusIndicator.success;
-};
-
-const StatusIndicator = ({
-  status,
-}: {|
-  status: 'unsavedChanges' | 'saving' | 'saved' | 'latest' | 'opened',
-|}) => {
+const StatusIndicator = ({ status }: {| status: VersionRestoringStatus |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   if (status === 'opened') return null;
   const backgroundColor = getStatusColor(gdevelopTheme, status);
@@ -121,11 +104,7 @@ const useOutline = (
   return { outline: `1px solid ${gdevelopTheme.statusIndicator.error}` };
 };
 
-const StatusChip = ({
-  status,
-}: {|
-  status: 'unsavedChanges' | 'saving' | 'saved' | 'latest',
-|}) => {
+const StatusChip = ({ status }: {| status: VersionRestoringStatus |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const label =
     status === 'unsavedChanges' ? (

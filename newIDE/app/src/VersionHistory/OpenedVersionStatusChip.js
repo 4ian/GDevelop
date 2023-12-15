@@ -3,8 +3,6 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 
-import type { VersionRestoringStatus } from '.';
-import type { GDevelopTheme } from '../UI/Theme';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ButtonBase from '@material-ui/core/ButtonBase';
@@ -14,19 +12,7 @@ import History from '../UI/CustomSvgIcons/History';
 import { Spacer } from '../UI/Grid';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { type OpenedVersionStatus } from '.';
-
-const getStatusColor = (
-  gdevelopTheme: GDevelopTheme,
-  status: VersionRestoringStatus
-) => {
-  return status === 'unsavedChanges'
-    ? gdevelopTheme.statusIndicator.error
-    : status === 'saving'
-    ? gdevelopTheme.statusIndicator.warning
-    : status === 'opened'
-    ? gdevelopTheme.statusIndicator.warning
-    : gdevelopTheme.statusIndicator.success;
-};
+import { getStatusColor } from './Utils';
 
 const styles = {
   chip: {

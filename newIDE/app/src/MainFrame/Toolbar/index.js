@@ -79,10 +79,19 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
           <FloppyIcon />
         </IconButton>
         {props.checkedOutVersionStatus && props.onQuitVersionHistory && (
-          <OpenedVersionStatusChip
-            onClickClose={props.onQuitVersionHistory}
-            openedVersionStatus={props.checkedOutVersionStatus}
-          />
+          <div
+            style={{
+              // Leave margin between the chip that has a Cross icon to click and the
+              // Play icon to preview the project. It's to avoid a mis-click that would
+              // quit the version history instead of previewing the game.
+              marginRight: 20,
+            }}
+          >
+            <OpenedVersionStatusChip
+              onClickClose={props.onQuitVersionHistory}
+              openedVersionStatus={props.checkedOutVersionStatus}
+            />
+          </div>
         )}
       </ToolbarGroup>
     );

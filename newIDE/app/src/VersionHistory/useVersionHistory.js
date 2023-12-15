@@ -21,6 +21,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 const styles = {
   drawerContent: {
@@ -60,6 +61,7 @@ type Props = {|
     fileMetadata: FileMetadata,
     versionId: string,
     ignoreUnsavedChanges: boolean,
+    openingMessage: MessageDescriptor,
   |}) => Promise<void>,
 |};
 
@@ -259,6 +261,7 @@ const useVersionHistory = ({
           fileMetadata,
           versionId: latestVersionId,
           ignoreUnsavedChanges: true,
+          openingMessage: t`Opening latest save...`,
         });
         setCheckedOutVersionStatus(null);
       } finally {
@@ -296,6 +299,7 @@ const useVersionHistory = ({
           fileMetadata,
           versionId: version.id,
           ignoreUnsavedChanges: true,
+          openingMessage: t`Opening older version...`,
         });
         setCheckedOutVersionStatus({ version, status: 'opened' });
       } finally {

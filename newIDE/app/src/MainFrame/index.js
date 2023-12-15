@@ -410,6 +410,10 @@ const MainFrame = (props: Props) => {
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
+  const [
+    loaderModalOpeningMessage,
+    setLoaderModalOpeningMessage,
+  ] = React.useState<?MessageDescriptor>(null);
 
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
@@ -991,7 +995,10 @@ const MainFrame = (props: Props) => {
   };
 
   const openFromFileMetadata = React.useCallback(
-    async (fileMetadata: FileMetadata): Promise<?State> => {
+    async (
+      fileMetadata: FileMetadata,
+      options?: {| openingMessage?: ?MessageDescriptor |}
+    ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
@@ -1056,6 +1063,9 @@ const MainFrame = (props: Props) => {
         return onGetAutoSave(fileMetadata);
       };
 
+      if (options && options.openingMessage) {
+        setLoaderModalOpeningMessage(options.openingMessage);
+      }
       setIsLoadingProject(true);
 
       // Try to find an autosave (and ask user if found)
@@ -1078,6 +1088,10 @@ const MainFrame = (props: Props) => {
             const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
           }
+        } finally {
+          setIsLoadingProject(false);
+          setLoaderModalOpeningMessage(null);
+          setLoaderModalProgress(null, null);
         }
         if (!content) {
           throw openingError ||
@@ -1087,8 +1101,6 @@ const MainFrame = (props: Props) => {
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           return;
         }
 
@@ -1108,8 +1120,6 @@ const MainFrame = (props: Props) => {
         }
       } catch (error) {
         if (error.name === 'CloudProjectReadingError') {
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           setCloudProjectFileMetadataToRecover(fileMetadata);
         } else {
           const errorMessage = getOpenErrorMessage
@@ -1120,8 +1130,6 @@ const MainFrame = (props: Props) => {
             title: t`Unable to open the project`,
             message: errorMessage,
           });
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           throw error;
         }
       }
@@ -2084,7 +2092,11 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadataWithStorageProvider = React.useCallback(
     async (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-      options: ?{| openAllScenes?: boolean, ignoreUnsavedChanges?: boolean |}
+      options: ?{|
+        openAllScenes?: boolean,
+        ignoreUnsavedChanges?: boolean,
+        openingMessage?: ?MessageDescriptor,
+      |}
     ): Promise<void> => {
       if (
         unsavedChanges.hasUnsavedChanges &&
@@ -2109,7 +2121,9 @@ const MainFrame = (props: Props) => {
       if (!storageProvider) return;
 
       getStorageProviderOperations(storageProvider);
-      await openFromFileMetadata(fileMetadata)
+      await openFromFileMetadata(fileMetadata, {
+        openingMessage: (options && options.openingMessage) || null,
+      })
         .then(state => {
           if (state) {
             const { currentProject } = state;
@@ -2171,10 +2185,12 @@ const MainFrame = (props: Props) => {
       fileMetadata,
       versionId,
       ignoreUnsavedChanges,
+      openingMessage,
     }: {|
       fileMetadata: FileMetadata,
       versionId: string,
       ignoreUnsavedChanges: boolean,
+      openingMessage: MessageDescriptor,
     |}): Promise<void> => {
       return openFromFileMetadataWithStorageProvider(
         {
@@ -2184,7 +2200,7 @@ const MainFrame = (props: Props) => {
             version: versionId,
           },
         },
-        { ignoreUnsavedChanges }
+        { ignoreUnsavedChanges, openingMessage }
       );
     },
     [openFromFileMetadataWithStorageProvider]
@@ -2733,6 +2749,7 @@ const MainFrame = (props: Props) => {
         fileMetadata: cloudProjectFileMetadataToRecover,
         versionId,
         ignoreUnsavedChanges: false,
+        openingMessage: t`Recovering older version...`,
       });
       setCloudProjectFileMetadataToRecover(null);
       setCloudProjectRecoveryOpenedVersionId(versionId);
@@ -3300,7 +3317,7 @@ const MainFrame = (props: Props) => {
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}
-        message={fileMetadataOpeningMessage}
+        message={loaderModalOpeningMessage || fileMetadataOpeningMessage}
       />
       <Snackbar
         open={state.snackMessageOpen}

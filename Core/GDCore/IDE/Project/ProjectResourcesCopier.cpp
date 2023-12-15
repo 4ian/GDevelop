@@ -5,17 +5,13 @@
  */
 #include "ProjectResourcesCopier.h"
 #include <map>
-#include <vector>
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/Project/ResourcesMergingHelper.h"
-#include "GDCore/IDE/Project/AssetResourcesMergingHelper.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/IDE/ResourceExposer.h"
 
 using namespace std;
@@ -69,20 +65,12 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
                                                     resourcesMergingHelper);
 
   // Copy resources
-  CopyResourcesTo(resourcesMergingHelper.GetAllResourcesOldAndNewFilename(), fs, destinationDirectory);
-
-  return true;
-}
-
-void ProjectResourcesCopier::CopyResourcesTo(
-    map<gd::String, gd::String>& resourcesNewFileNames,
-    AbstractFileSystem& fs,
-    const gd::String &destinationDirectory) {
+  map<gd::String, gd::String>& resourcesNewFilename =
+      resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
   for (map<gd::String, gd::String>::const_iterator it =
-           resourcesNewFileNames.begin();
-       it != resourcesNewFileNames.end();
+           resourcesNewFilename.begin();
+       it != resourcesNewFilename.end();
        ++it) {
-      std::cout << it->first << " --> " << it->second << std::endl;
     if (!it->first.empty()) {
       // Create the destination filename
       gd::String destinationFile = it->second;
@@ -99,6 +87,8 @@ void ProjectResourcesCopier::CopyResourcesTo(
       }
     }
   }
+
+  return true;
 }
 
 }  // namespace gd

@@ -4,9 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
-#ifndef IMAGESUSEDINVENTORIZER_H
-#define IMAGESUSEDINVENTORIZER_H
+#pragma once
 
 #include <set>
 #include <vector>
@@ -117,6 +115,3 @@ public:
 };
 
 }  // namespace gd
-
-#endif  // IMAGESUSEDINVENTORIZER_H
-#endif

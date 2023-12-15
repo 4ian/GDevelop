@@ -4,11 +4,10 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
-import { Column, Line } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
-import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
 import { mapFor } from '../Utils/MapFor';
 import Upload from '../UI/CustomSvgIcons/Upload';
@@ -21,7 +20,6 @@ import { serializeToObjectAsset } from '../Utils/Serializer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { downloadUrlsToBlobs, type ItemResult } from '../Utils/BlobDownloader';
 import { useGenericRetryableProcessWithProgress } from '../Utils/UseGenericRetryableProcessWithProgress';
-import { checkIfIsGDevelopCloudBucketUrl } from '../Utils/CrossOrigin';
 import { extractFilenameFromProjectResourceUrl } from '../Utils/GDevelopServices/Project';
 import {
   archiveFiles,
@@ -40,16 +38,6 @@ const excludedObjectType = [
   'TextObject::Text',
   'Video::VideoObject',
 ];
-
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
 
 type DownloadResourcesAsBlobsOptionsWithoutProgress = {
   project: gdProject,
@@ -104,7 +92,7 @@ export const downloadResourcesAsBlobs = async ({
   });
 
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
-    const { resource, filename } = item;
+    const { resource } = item;
     if (error || !blob) {
       result.erroredResources.push({
         resourceName: resource.getName(),
@@ -375,6 +363,7 @@ const ObjectExporterDialog = ({ project, layout, object, onClose }: Props) => {
           />
         </Line>
       </ColumnStackLayout>
+      {renderProcessDialog()}
     </Dialog>
   );
 };

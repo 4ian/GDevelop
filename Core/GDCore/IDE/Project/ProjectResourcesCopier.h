@@ -6,11 +6,9 @@
 #pragma once
 
 #include "GDCore/String.h"
-#include <map>
 
 namespace gd {
 class Project;
-class Object;
 class AbstractFileSystem;
 }  // namespace gd
 
@@ -58,12 +56,6 @@ private:
                                  gd::String destinationDirectory,
                                  bool preserveAbsoluteFilenames = true,
                                  bool preserveDirectoryStructure = true);
-
-  static void
-  CopyResourcesTo(std::map<gd::String, gd::String> &resourcesNewFileNames,
-                  AbstractFileSystem &fs,
-                  const gd::String &destinationDirectory);
-
 };
 
 }  // namespace gd

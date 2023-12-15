@@ -1,18 +1,10 @@
 // @flow
-import assignIn from 'lodash/assignIn';
-import {
-  serializeToJSObject,
-  serializeToObjectAsset,
-} from '../../Utils/Serializer';
+import { serializeToJSObject } from '../../Utils/Serializer';
 import optionalRequire from '../../Utils/OptionalRequire';
-import LocalFileSystem from '../../ExportAndShare/LocalExporters/LocalFileSystem';
-import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
-
-const gd: libGDevelop = global.gd;
 
 const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
@@ -34,17 +26,6 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   } catch (stringifyException) {
     return Promise.reject(stringifyException);
   }
-};
-
-const addSpacesToPascalCase = (pascalCaseName: string): string => {
-  let name = pascalCaseName
-    .replace(/([A-Z]+|\d+)/g, ' $1')
-    .replace(/_(\w)/g, (match, $1) => ' ' + $1.toUpperCase())
-    .replace(/_/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  name = name.charAt(0) === ' ' ? name.substring(1) : name;
-  return name;
 };
 
 export default class LocalEventsFunctionsExtensionWriter {

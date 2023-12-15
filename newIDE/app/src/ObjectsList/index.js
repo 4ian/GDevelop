@@ -278,10 +278,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [forceUpdate]
     );
-    const eventsFunctionsExtensionsState = React.useContext(
-      EventsFunctionsExtensionsContext
-    );
-    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
       from: ObjectFolderOrObjectWithContext | null,
@@ -1446,12 +1442,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               'EffectCapability::EffectBehavior'
             ),
           },
-          eventsFunctionsExtensionWriter
-            ? {
-                label: i18n._(t`Export object`),
-                click: () => onExportObject && onExportObject(object),
-              }
-            : null,
           { type: 'separator' },
           {
             label: i18n._(t`Set as global object`),
@@ -1493,6 +1483,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 enabled: instanceCountOnScene > 0,
               }
             : undefined,
+          { type: 'separator' },
+          {
+            label: i18n._(t`Export as assets`),
+            click: () => onExportObject(object),
+          },
         ].filter(Boolean);
       },
       [
@@ -1500,7 +1495,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         initialInstances,
         preferences.values.userShortcutMap,
-        eventsFunctionsExtensionWriter,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
         paste,

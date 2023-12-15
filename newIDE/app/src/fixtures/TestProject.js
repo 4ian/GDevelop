@@ -9,8 +9,10 @@ export type TestProject = {|
   tiledSpriteObjectConfiguration: gdObjectConfiguration,
   panelSpriteObject: gdObject,
   spriteObjectConfiguration: gdSpriteObject,
+  emptySpriteObjectConfiguration: gdSpriteObject,
   customObject: gdObject,
   spriteObject: gdObject,
+  emptySpriteObject: gdObject,
   spriteObjectWithBehaviors: gdObject,
   spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
@@ -223,6 +225,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'MySpriteObject',
     0
   );
+  const emptySpriteObject = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MyEmptySpriteObject',
+    0
+  );
   const spriteObjectWithBehaviors = testLayout.insertNewObject(
     project,
     'Sprite',
@@ -261,6 +269,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   );
   const spriteObjectConfiguration = gd.asSpriteConfiguration(
     spriteObject.getConfiguration()
+  );
+  const emptySpriteObjectConfiguration = gd.asSpriteConfiguration(
+    emptySpriteObject.getConfiguration()
   );
   {
     const variablesContainer = spriteObject.getVariables();
@@ -870,6 +881,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     customObject,
     spriteObject,
     spriteObjectConfiguration,
+    emptySpriteObject,
+    emptySpriteObjectConfiguration,
     testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,

@@ -131,7 +131,7 @@ export type StorageProviderOperations = {|
     actions: {|
       showAlert: ShowAlertFunction,
       showConfirmation: ShowConfirmFunction,
-    |},
+    |}
   ) => Promise<boolean>,
   canFileMetadataBeSafelySavedAs?: (
     fileMetadata: FileMetadata,

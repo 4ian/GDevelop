@@ -72,15 +72,12 @@ type InternalCustomDragLayerProps = {|
   isDragging?: boolean,
 |};
 
-const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
-  x,
-  y,
-}: XYCoord) => {
+export const isMouseOnSceneEditorCanvas = ({ x, y }: XYCoord) => {
   const swipeableDrawerContainer = document.querySelector(
     `#${swipeableDrawerContainerId}`
   );
-  // If the swipeable drawer exists, we are on mobile, and we want to show the preview
-  // only when the user is dragging in the drawer, otherwise they are on the canvas.
+  // If the swipeable drawer exists, we are on mobile, and we consider that if we are not on
+  // the drawer, we are on the canvas.
   // (the drawer is on top of the canvas)
   if (swipeableDrawerContainer) {
     const drawerRect = swipeableDrawerContainer.getBoundingClientRect();
@@ -90,13 +87,14 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
       y >= drawerRect.top &&
       y <= drawerRect.bottom
     ) {
+      // Inside the drawer, not on the canvas.
       return false;
     }
+    // Outside the drawer, on the canvas.
     return true;
   }
 
-  // Otherwise, we are on desktop, and we want to hide the preview when the user
-  // is dragging on the canvas.
+  // Otherwise, we are on desktop, so we can check if we are on the canvas.
   const activeCanvas = document.querySelector(
     `#scene-editor[data-active=true] #${instancesEditorId}`
   );
@@ -108,9 +106,12 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
       y >= canvasRect.top &&
       y <= canvasRect.bottom
     ) {
+      // Inside the canvas.
       return true;
     }
   }
+
+  // Otherwise, we are not on the canvas.
   return false;
 };
 
@@ -127,7 +128,9 @@ const CustomDragLayer = ({
     () => {
       if (!item || !clientOffset) return null;
 
-      if (shouldHidePreviewBecauseDraggingOnSceneEditorCanvas(clientOffset)) {
+      // We don't want to show the preview if the mouse is on the scene editor canvas,
+      // as we already have the instance dragged.
+      if (isMouseOnSceneEditorCanvas(clientOffset)) {
         return null;
       }
 

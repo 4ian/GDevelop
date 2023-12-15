@@ -767,6 +767,7 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onOverInstance = (instance: gdInitialInstance) => {
+    console.log('_onOverInstance');
     if (!this.instancesMover.isMoving())
       this.highlightedInstance.setInstance(instance);
   };

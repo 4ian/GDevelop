@@ -12,6 +12,8 @@ import { makeDoubleClickable } from './PixiDoubleClickEvent';
 import Rectangle from '../../Utils/Rectangle'; // TODO (3D): add support for zMin/zMax/depth.
 import { rotatePolygon, type Polygon } from '../../Utils/PolygonHelper';
 import Rendered3DInstance from '../../ObjectsRendering/Renderers/Rendered3DInstance';
+import { shouldPreventRenderingInstanceEditors } from '../../UI/MaterialUISpecificUtil';
+import { isMouseOnSceneEditorCanvas } from '../../UI/DragAndDrop/CustomDragLayer';
 const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
@@ -379,19 +381,41 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.eventMode = 'static';
       panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
+      renderedInstance._pixiObject.addEventListener('mousemove', event => {
+        console.log('mousemove');
+        if (
+          shouldPreventRenderingInstanceEditors() ||
+          !isMouseOnSceneEditorCanvas({ x: event.clientX, y: event.clientY })
+        ) {
+          this.onOutInstance(instance);
+          return;
+        }
+      });
       renderedInstance._pixiObject.addEventListener('click', event => {
+        console.log('click');
         if (event.data.originalEvent.button === 0)
           this.onInstanceClicked(instance);
       });
       renderedInstance._pixiObject.addEventListener('doubleclick', () => {
+        console.log('double click');
         this.onInstanceDoubleClicked(instance);
       });
-      renderedInstance._pixiObject.addEventListener('mouseover', () => {
+      renderedInstance._pixiObject.addEventListener('mouseover', event => {
+        console.log('mouseover', event);
+        if (
+          shouldPreventRenderingInstanceEditors() ||
+          !isMouseOnSceneEditorCanvas({ x: event.clientX, y: event.clientY })
+        ) {
+          return;
+        }
+
+        console.log('onoverinstance');
         this.onOverInstance(instance);
       });
       renderedInstance._pixiObject.addEventListener(
         'mousedown',
         (event: PIXI.InteractionEvent) => {
+          console.log('mousedown');
           if (event.data.originalEvent.button === 0) {
             const viewPoint = event.data.global;
             const scenePoint = this.viewPosition.toSceneCoordinates(
@@ -405,6 +429,7 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.addEventListener(
         'rightclick',
         interactionEvent => {
+          console.log('rightclick');
           const {
             data: { global: viewPoint, originalEvent: event },
           } = interactionEvent;
@@ -430,6 +455,7 @@ export default class LayerRenderer {
         }
       );
       renderedInstance._pixiObject.addEventListener('touchstart', event => {
+        console.log('touchstart');
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
@@ -441,12 +467,15 @@ export default class LayerRenderer {
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
-      renderedInstance._pixiObject.addEventListener('mouseout', () => {
+      renderedInstance._pixiObject.addEventListener('mouseout', event => {
+        console.log('mouseout');
+        console.log('onoutinstance');
         this.onOutInstance(instance);
       });
       renderedInstance._pixiObject.addEventListener(
         'panmove',
         (event: PanMoveEvent) => {
+          console.log('panmove');
           if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
             return null;
           }
@@ -455,6 +484,7 @@ export default class LayerRenderer {
         }
       );
       renderedInstance._pixiObject.addEventListener('panend', event => {
+        console.log('panend');
         this.onMoveInstanceEnd();
       });
     }

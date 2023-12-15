@@ -31,7 +31,7 @@ const styles = {
   chip: {
     display: 'flex',
     alignItems: 'center',
-    padding: 6,
+    padding: 4,
     borderRadius: 6,
     color: '#111111',
   },

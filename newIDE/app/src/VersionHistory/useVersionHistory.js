@@ -280,6 +280,33 @@ const useVersionHistory = ({
     ]
   );
 
+  const onQuitVersionHistory = React.useCallback(
+    async () => {
+      if (!fileMetadata || !checkedOutVersionStatus || !state.versions) return;
+      const latestVersion = state.versions[0];
+      if (!latestVersion) return;
+      preventEffectsRunningRef.current = true;
+      ignoreFileMetadataChangesRef.current = true;
+      try {
+        await onOpenCloudProjectOnSpecificVersion({
+          fileMetadata,
+          versionId: latestVersion.id,
+          ignoreUnsavedChanges: true,
+        });
+        setCheckedOutVersionStatus(null);
+      } finally {
+        preventEffectsRunningRef.current = false;
+        ignoreFileMetadataChangesRef.current = false;
+      }
+    },
+    [
+      fileMetadata,
+      onOpenCloudProjectOnSpecificVersion,
+      checkedOutVersionStatus,
+      state.versions,
+    ]
+  );
+
   const onRenameVersion = React.useCallback(
     async (
       version: FilledCloudProjectVersion,
@@ -378,6 +405,7 @@ const useVersionHistory = ({
     showVersionHistoryButton,
     openVersionHistoryPanel,
     renderVersionHistoryPanel,
+    onQuitVersionHistory,
   };
 };
 

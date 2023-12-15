@@ -9,7 +9,7 @@ import {
   getUserPublicProfilesByIds,
   type UserPublicProfileByIds,
 } from '../Utils/GDevelopServices/User';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import FlatButton from '../UI/FlatButton';
 import { DayGroupRow } from './ProjectVersionRow';
@@ -223,45 +223,50 @@ const VersionHistory = React.memo<Props>(
       <>
         <I18n>
           {({ i18n }) => (
-            <Column noMargin>
-              {days.map((day, index) => {
-                const dayVersions = versionsGroupedByDay[day];
-                if (!dayVersions || dayVersions.length === 0) return null;
-                return (
-                  <DayGroupRow
-                    key={day}
-                    versions={dayVersions}
-                    latestVersion={latestVersion}
-                    day={day}
-                    isOpenedInitially={index === 0}
-                    usersPublicProfileByIds={usersPublicProfileByIds}
-                    onRenameVersion={renameVersion}
-                    onCancelRenaming={onCancelRenaming}
-                    onContextMenu={openContextMenu}
-                    editedVersionId={editedVersionId}
-                    loadingVersionId={versionIdBeingRenamed}
-                    getAnonymousAvatar={getAnonymousAvatar}
-                    openedVersionStatus={openedVersionStatus}
+            <Column noMargin expand justifyContent="space-between">
+              <Column noMargin expand>
+                {days.map((day, index) => {
+                  const dayVersions = versionsGroupedByDay[day];
+                  if (!dayVersions || dayVersions.length === 0) return null;
+                  return (
+                    <DayGroupRow
+                      key={day}
+                      versions={dayVersions}
+                      latestVersion={latestVersion}
+                      day={day}
+                      isOpenedInitially={index === 0}
+                      usersPublicProfileByIds={usersPublicProfileByIds}
+                      onRenameVersion={renameVersion}
+                      onCancelRenaming={onCancelRenaming}
+                      onContextMenu={openContextMenu}
+                      editedVersionId={editedVersionId}
+                      loadingVersionId={versionIdBeingRenamed}
+                      getAnonymousAvatar={getAnonymousAvatar}
+                      openedVersionStatus={openedVersionStatus}
+                    />
+                  );
+                })}
+                {canLoadMore && (
+                  <FlatButton
+                    primary
+                    disabled={isLoadingMoreVersions || !canLoadMore}
+                    label={
+                      isLoadingMoreVersions ? (
+                        <Trans>Loading...</Trans>
+                      ) : (
+                        <Trans>Show older</Trans>
+                      )
+                    }
+                    onClick={loadMore}
                   />
-                );
-              })}
-              {canLoadMore ? (
-                <FlatButton
-                  primary
-                  disabled={isLoadingMoreVersions || !canLoadMore}
-                  label={
-                    isLoadingMoreVersions ? (
-                      <Trans>Loading...</Trans>
-                    ) : (
-                      <Trans>Show older</Trans>
-                    )
-                  }
-                  onClick={loadMore}
-                />
-              ) : (
-                <EmptyMessage>
-                  <Trans>This is the end of the version history.</Trans>
-                </EmptyMessage>
+                )}
+              </Column>
+              {!canLoadMore && (
+                <Line noMargin>
+                  <EmptyMessage>
+                    <Trans>This is the end of the version history.</Trans>
+                  </EmptyMessage>
+                </Line>
               )}
             </Column>
           )}

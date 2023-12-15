@@ -284,11 +284,9 @@ const useVersionHistory = ({
         });
         return;
       }
-      if (
-        checkedOutVersionStatus &&
-        checkedOutVersionStatus.version.id === latestVersionId
-      ) {
+      if (checkedOutVersionStatus && version.id === latestVersionId) {
         await onQuitVersionHistory();
+        setVersionHistoryPanelOpen(false);
         return;
       }
       preventEffectsRunningRef.current = true;

@@ -134,6 +134,11 @@ const VersionHistory = React.memo<Props>(
         const isNotTheCurrentlyOpenedVersion =
           !!openedVersionStatus &&
           openedVersionStatus.version.id !== options.version.id;
+        const isComingBackToLatestVersionAfterNavigating =
+          !!openedVersionStatus &&
+          latestVersion &&
+          latestVersion.id === options.version.id;
+
         return [
           {
             label: i18n._(
@@ -144,7 +149,9 @@ const VersionHistory = React.memo<Props>(
             },
           },
           {
-            label: i18n._(t`Open version`),
+            label: isComingBackToLatestVersionAfterNavigating
+              ? i18n._(t`Come back to latest version`)
+              : i18n._(t`Open version`),
             click: () => {
               onCheckoutVersion(options.version);
             },

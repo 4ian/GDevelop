@@ -323,17 +323,23 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (
           newObjectDialogOpen &&
           newObjectDialogOpen.from &&
-          !newObjectDialogOpen.from.global &&
-          newObjectDialogOpen.from.objectFolderOrObject.isFolder()
+          !newObjectDialogOpen.from.global
         ) {
+          const selectedItem = newObjectDialogOpen.from.objectFolderOrObject;
+          const parentFolder = selectedItem.isFolder()
+            ? selectedItem
+            : selectedItem.getParent();
+          const insertionIndex = selectedItem.isFolder()
+            ? parentFolder.getChildrenCount()
+            : parentFolder.getChildPosition(selectedItem) + 1;
+
           // If a scene folder is selected, insert object in the folder.
-          const parentFolder = newObjectDialogOpen.from.objectFolderOrObject;
           object = objectsContainer.insertNewObjectInFolder(
             project,
             objectType,
             name,
             parentFolder,
-            0
+            insertionIndex
           );
           objectFolderOrObjectWithContext = {
             objectFolderOrObject: parentFolder.getObjectChild(name),

@@ -345,6 +345,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObject: parentFolder.getObjectChild(name),
             global: false,
           };
+
+          if (treeViewRef.current) {
+            treeViewRef.current.openItems([
+              getTreeViewItemId({
+                objectFolderOrObject: parentFolder,
+                global: false,
+              }),
+            ]);
+          }
         } else {
           object = objectsContainer.insertNewObject(
             project,

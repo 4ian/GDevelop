@@ -283,7 +283,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
     const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
-    const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState(false);
+    const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
+      from: ObjectFolderOrObjectWithContext | null,
+    } | null>(null);
 
     React.useImperativeHandle(ref, () => ({
       forceUpdateList: () => {
@@ -291,10 +293,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
       openNewObjectDialog: () => {
-        setNewObjectDialogOpen(true);
+        setNewObjectDialogOpen({ from: null });
       },
       closeNewObjectDialog: () => {
-        setNewObjectDialogOpen(false);
+        setNewObjectDialogOpen(null);
       },
       renameObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext => {
         if (treeViewRef.current)
@@ -319,24 +321,39 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         let object;
         let objectFolderOrObjectWithContext;
         if (
-          selectedObjectFolderOrObjectsWithContext.length === 1 &&
-          !selectedObjectFolderOrObjectsWithContext[0].global &&
-          selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject.isFolder()
+          newObjectDialogOpen &&
+          newObjectDialogOpen.from &&
+          !newObjectDialogOpen.from.global
         ) {
+          const selectedItem = newObjectDialogOpen.from.objectFolderOrObject;
+          const parentFolder = selectedItem.isFolder()
+            ? selectedItem
+            : selectedItem.getParent();
+          const insertionIndex = selectedItem.isFolder()
+            ? parentFolder.getChildrenCount()
+            : parentFolder.getChildPosition(selectedItem) + 1;
+
           // If a scene folder is selected, insert object in the folder.
-          const parentFolder =
-            selectedObjectFolderOrObjectsWithContext[0].objectFolderOrObject;
           object = objectsContainer.insertNewObjectInFolder(
             project,
             objectType,
             name,
             parentFolder,
-            0
+            insertionIndex
           );
           objectFolderOrObjectWithContext = {
             objectFolderOrObject: parentFolder.getObjectChild(name),
             global: false,
           };
+
+          if (treeViewRef.current) {
+            treeViewRef.current.openItems([
+              getTreeViewItemId({
+                objectFolderOrObject: parentFolder,
+                global: false,
+              }),
+            ]);
+          }
         } else {
           object = objectsContainer.insertNewObject(
             project,
@@ -363,7 +380,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           scrollToItem(objectFolderOrObjectWithContext);
         }, 100); // A few ms is enough for a new render to be done.
 
-        setNewObjectDialogOpen(false);
+        setNewObjectDialogOpen(null);
         // TODO Should it be called later?
         if (onEditObject) {
           onEditObject(object);
@@ -375,11 +392,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [
         project,
-        objectsContainer,
+        newObjectDialogOpen,
         onEditObject,
+        objectsContainer,
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
-        selectedObjectFolderOrObjectsWithContext,
       ]
     );
 
@@ -411,9 +428,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectCreated, objectsContainer]
     );
 
-    const onAddNewObject = React.useCallback(() => {
-      setNewObjectDialogOpen(true);
-    }, []);
+    const onAddNewObject = React.useCallback(
+      (item: ObjectFolderOrObjectWithContext) => {
+        setNewObjectDialogOpen({ from: item });
+      },
+      []
+    );
 
     const onObjectModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
@@ -1329,6 +1349,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 })
               ),
             },
+            {
+              label: i18n._(t`Add a new object`),
+              click: () => onAddNewObject(item),
+            },
             { type: 'separator' },
             {
               label: i18n._(t`Expand all sub folders`),
@@ -1463,11 +1487,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 enabled: instanceCountOnScene > 0,
               }
             : undefined,
-          { type: 'separator' },
-          {
-            label: i18n._(t`Add a new object...`),
-            click: onAddNewObject,
-          },
         ].filter(Boolean);
       },
       [
@@ -1607,7 +1626,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             <ResponsiveRaisedButton
               label={<Trans>Add a new object</Trans>}
               primary
-              onClick={onAddNewObject}
+              onClick={() =>
+                onAddNewObject(selectedObjectFolderOrObjectsWithContext[0])
+              }
               id="add-new-object-button"
               icon={<Add />}
             />
@@ -1615,7 +1636,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         </Line>
         {newObjectDialogOpen && (
           <NewObjectDialog
-            onClose={() => setNewObjectDialogOpen(false)}
+            onClose={() => setNewObjectDialogOpen(null)}
             onCreateNewObject={addObject}
             onObjectsAddedFromAssets={onObjectsAddedFromAssets}
             project={project}

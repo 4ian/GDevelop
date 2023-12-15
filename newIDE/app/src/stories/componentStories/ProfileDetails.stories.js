@@ -52,6 +52,8 @@ const getAssetPacksListingData = (
       },
     ],
     appStoreProductId: null,
+    sellerStripeAccountId: 'sellerStripeProductId',
+    stripeProductId: 'stripeProductId',
   },
 ];
 

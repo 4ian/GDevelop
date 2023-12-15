@@ -216,7 +216,7 @@ const NewProjectSetupDialog = ({
   );
 
   const generationCurrentUsage = authenticatedUser.limits
-    ? authenticatedUser.limits.limits['ai-project-generation']
+    ? authenticatedUser.limits.quotas['ai-project-generation']
     : null;
   const canGenerateProjectFromPrompt =
     generationCurrentUsage && !generationCurrentUsage.limitReached;
@@ -628,7 +628,9 @@ const NewProjectSetupDialog = ({
                 limits={limits}
                 onUpgrade={() =>
                   openSubscriptionDialog({
-                    reason: 'Cloud Project limit reached',
+                    analyticsMetadata: {
+                      reason: 'Cloud Project limit reached',
+                    },
                   })
                 }
               />

@@ -11,13 +11,20 @@ import {
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
+export type SubscriptionAnalyticsMetadata = {|
+  reason: SubscriptionDialogDisplayReason,
+  preStep?: 'subscriptionChecker',
+|};
+
+export type SubscriptionType = 'individual' | 'team' | 'education';
+
 type SubscriptionSuggestionState = {|
   /**
    * Call this when a subscription or subscription upgrade is required.
    */
   openSubscriptionDialog: ({|
-    reason: SubscriptionDialogDisplayReason,
-    preStep?: 'subscriptionChecker',
+    analyticsMetadata: SubscriptionAnalyticsMetadata,
+    filter?: SubscriptionType,
   |}) => void,
 |};
 
@@ -40,13 +47,16 @@ export const SubscriptionSuggestionProvider = ({
     reason: SubscriptionDialogDisplayReason,
     preStep?: 'subscriptionChecker',
   |}>(null);
+  const [filter, setFilter] = React.useState<
+    'individual' | 'team' | 'education' | null
+  >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
 
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
 
   const openSubscriptionDialog = React.useCallback(
-    metadata => {
+    ({ analyticsMetadata: metadata, filter: subscriptionsFilter }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
           if (
@@ -70,6 +80,7 @@ export const SubscriptionSuggestionProvider = ({
           return;
         }
 
+        setFilter(subscriptionsFilter || null);
         setAnalyticsMetadata(metadata);
       }
     },
@@ -88,6 +99,7 @@ export const SubscriptionSuggestionProvider = ({
           open
           onClose={closeSubscriptionDialog}
           analyticsMetadata={analyticsMetadata}
+          filter={filter}
         />
       )}
     </SubscriptionSuggestionContext.Provider>

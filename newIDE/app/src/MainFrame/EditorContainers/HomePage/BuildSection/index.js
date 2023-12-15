@@ -224,7 +224,9 @@ const BuildSection = ({
                       limits={limits}
                       onUpgrade={() =>
                         openSubscriptionDialog({
-                          reason: 'Cloud Project limit reached',
+                          analyticsMetadata: {
+                            reason: 'Cloud Project limit reached',
+                          },
                         })
                       }
                     />

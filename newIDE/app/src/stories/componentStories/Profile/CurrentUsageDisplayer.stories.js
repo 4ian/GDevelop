@@ -22,7 +22,7 @@ export default {
 export const Default = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
-    currentUsage={{
+    quota={{
       current: 2,
       max: 10,
       limitReached: false,
@@ -34,7 +34,7 @@ export const Default = () => (
 export const With1BuildRemaining = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
-    currentUsage={{
+    quota={{
       current: 4,
       max: 5,
       limitReached: false,
@@ -46,7 +46,7 @@ export const With1BuildRemaining = () => (
 export const WithRedemptionCode = () => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithRedemptionCode}
-    currentUsage={{
+    quota={{
       current: 2,
       max: 10,
       limitReached: false,
@@ -58,7 +58,7 @@ export const WithRedemptionCode = () => (
 export const WithExpiredRedemptionCode = () => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithExpiredRedemptionCode}
-    currentUsage={{
+    quota={{
       current: 2,
       max: 10,
       limitReached: false,
@@ -70,7 +70,7 @@ export const WithExpiredRedemptionCode = () => (
 export const LimitReached = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
-    currentUsage={limitsReached.limits['cordova-build']}
+    quota={limitsReached.quotas['cordova-build']}
     onChangeSubscription={action('on change subscription callback')}
   />
 );
@@ -78,7 +78,7 @@ export const LimitReached = () => (
 export const LimitsReachedWithoutSubscription = () => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
-    currentUsage={limitsReached.limits['cordova-build']}
+    quota={limitsReached.quotas['cordova-build']}
     onChangeSubscription={action('on change subscription callback')}
   />
 );

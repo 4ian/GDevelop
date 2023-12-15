@@ -1070,7 +1070,9 @@ export const LeaderboardAdmin = ({
               <MaxLeaderboardCountAlertMessage
                 onUpgrade={() =>
                   openSubscriptionDialog({
-                    reason: 'Leaderboard count per game limit reached',
+                    analyticsMetadata: {
+                      reason: 'Leaderboard count per game limit reached',
+                    },
                   })
                 }
                 onClose={() =>

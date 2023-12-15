@@ -51,7 +51,9 @@ const GetSubscriptionCard = (props: Props) => {
             href="#"
             onClick={() => {
               openSubscriptionDialog({
-                reason: props.subscriptionDialogOpeningReason,
+                analyticsMetadata: {
+                  reason: props.subscriptionDialogOpeningReason,
+                },
               });
             }}
           >

@@ -16,7 +16,7 @@ import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
 } from '../../Utils/ProjectErrorsChecker';
-import { type CurrentUsage } from '../../Utils/GDevelopServices/Usage';
+import { type Quota } from '../../Utils/GDevelopServices/Usage';
 import BuildsWatcher from '../Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
@@ -410,18 +410,14 @@ export default class ExportLauncher extends Component<Props, State> {
       isSavingProject,
     } = this.props;
     if (!project) return null;
-    const getBuildCurrentUsage = (
-      authenticatedUser: AuthenticatedUser
-    ): ?CurrentUsage =>
+    const getBuildQuota = (authenticatedUser: AuthenticatedUser): ?Quota =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
-        ? authenticatedUser.limits.limits[exportPipeline.onlineBuildType]
+        ? authenticatedUser.limits.quotas[exportPipeline.onlineBuildType]
         : null;
 
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      const currentUsage: ?CurrentUsage = getBuildCurrentUsage(
-        authenticatedUser
-      );
-      if (currentUsage && currentUsage.limitReached) return false;
+      const quota: ?Quota = getBuildQuota(authenticatedUser);
+      if (quota && quota.limitReached) return false;
 
       return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
@@ -511,7 +507,7 @@ export default class ExportLauncher extends Component<Props, State> {
               authenticatedUser.authenticated && (
                 <CurrentUsageDisplayer
                   subscription={authenticatedUser.subscription}
-                  currentUsage={getBuildCurrentUsage(authenticatedUser)}
+                  quota={getBuildQuota(authenticatedUser)}
                   onChangeSubscription={this.props.onChangeSubscription}
                 />
               )}

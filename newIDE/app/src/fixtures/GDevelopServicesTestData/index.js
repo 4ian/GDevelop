@@ -257,7 +257,7 @@ export const silverSubscriptionWithRedemptionCode: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
   redemptionCode: 'test-123-code',
-  redemptionCodeValidUntil: 1695194209000,
+  redemptionCodeValidUntil: 1923400438000,
 };
 
 export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {

@@ -22,6 +22,7 @@ import {
   fakeStartupAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
+import { type SubscriptionType } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
 
 export default {
@@ -32,8 +33,10 @@ export default {
 
 const SubscriptionDialogWrapper = ({
   authenticatedUser,
+  filter,
 }: {
   authenticatedUser: AuthenticatedUser,
+  filter?: ?SubscriptionType,
 }) => (
   <AlertProvider>
     <AuthenticatedUserContext.Provider value={authenticatedUser}>
@@ -41,6 +44,7 @@ const SubscriptionDialogWrapper = ({
         open
         onClose={() => action('on close')()}
         analyticsMetadata={{ reason: 'Debugger' }}
+        filter={filter}
       />
     </AuthenticatedUserContext.Provider>
   </AlertProvider>
@@ -59,6 +63,27 @@ export const AuthenticatedButLoading = () => (
 export const WithNoSubscription = () => (
   <SubscriptionDialogWrapper
     authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+  />
+);
+
+export const FilteredOnIndividual = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+    filter="individual"
+  />
+);
+
+export const FilteredOnTeam = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+    filter="team"
+  />
+);
+
+export const FilteredOnEducation = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+    filter="education"
   />
 );
 

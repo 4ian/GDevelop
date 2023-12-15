@@ -30,7 +30,9 @@ const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {
   React.useEffect(
     () => {
       openSubscriptionDialog({
-        reason: 'Cloud Project limit reached',
+        analyticsMetadata: {
+          reason: 'Cloud Project limit reached',
+        },
       });
     },
     [openSubscriptionDialog]

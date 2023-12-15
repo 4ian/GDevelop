@@ -119,6 +119,18 @@ export const listListedPrivateGameTemplates = async ({
   return gameTemplates;
 };
 
+export const listListedCreditsPackages = async (): Promise<
+  Array<CreditsPackageListingData>
+> => {
+  const response = await client.get('/credits-package');
+  const creditsPackages = response.data;
+  if (!Array.isArray(creditsPackages)) {
+    throw new Error('Invalid response from the credits packages API');
+  }
+
+  return creditsPackages;
+};
+
 export const listSellerAssetPacks = async ({
   sellerId,
 }: {|
@@ -153,7 +165,7 @@ export const listUserPurchases = async (
     role,
   }: {|
     userId: string,
-    productType: 'asset-pack' | 'game-template',
+    productType: 'asset-pack' | 'game-template' | 'credits-package',
     role: 'receiver' | 'buyer',
   |}
 ): Promise<Array<Purchase>> => {
@@ -276,6 +288,24 @@ export const getStripeCheckoutUrl = async (
   if (!response.data.sessionUrl)
     throw new Error('Could not find the session url.');
   return response.data.sessionUrl;
+};
+
+export const getCreditsRedirectToCheckoutUrl = ({
+  creditsPackageId,
+  userId,
+  userEmail,
+}: {|
+  creditsPackageId: string,
+  userId: string,
+  userEmail: string,
+|}): string => {
+  const url = new URL(
+    `${GDevelopShopApi.baseUrl}/credits-package/action/redirect-to-checkout`
+  );
+  url.searchParams.set('creditsPackageId', creditsPackageId);
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('customerEmail', userEmail);
+  return url.toString();
 };
 
 // Helper to fetch a token for private game templates if needed, when moving or fetching resources.

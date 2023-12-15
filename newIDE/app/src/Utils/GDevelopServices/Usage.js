@@ -201,6 +201,13 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     ],
   },
   {
+    planId: 'gdevelop_enterprise',
+    name: 'GDevelop for businesses, game studios and professionals',
+    monthlyPriceInEuros: null,
+    smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
+    descriptionBullets: [],
+  },
+  {
     planId: 'gdevelop_education',
     name: 'GDevelop Education',
     monthlyPriceInEuros: 2.99,
@@ -260,14 +267,6 @@ export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
     ],
   },
 ];
-
-export const businessPlan: PlanDetails = {
-  planId: null,
-  monthlyPriceInEuros: null,
-  name: 'GDevelop for businesses, game studios and professionals',
-  smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
-  descriptionBullets: [],
-};
 
 export const getUserUsages = (
   getAuthorizationHeader: () => Promise<string>,

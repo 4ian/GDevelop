@@ -162,7 +162,7 @@ export const Default = () => {
   const onCheckoutVersion = React.useCallback(
     async (version: FilledCloudProjectVersion) => {
       setOpenedVersionStatus({
-        id: version.id,
+        version,
         status: 'opened',
       });
     },
@@ -224,15 +224,11 @@ export const Default = () => {
     setVersions([...versions, ...nextVersions]);
   };
 
-  const onQuitVersionExploration = () => {
+  const onQuitVersionExploration = async () => {
     setOpenedVersionStatus(null);
   };
 
   const canLoadMore = versions.every(version => version.previousVersion);
-
-  const openedVersion = openedVersionStatus
-    ? versions.find(version => openedVersionStatus.id)
-    : null;
 
   projectServiceMock
     .onGet(`${GDevelopUserApi.baseUrl}/user-public-profile`)
@@ -260,8 +256,7 @@ export const Default = () => {
       {openedVersionStatus && (
         <ColumnStackLayout>
           <OpenedVersionStatusChip
-            openedVersion={openedVersion}
-            status={openedVersionStatus ? openedVersionStatus.status : null}
+            openedVersionStatus={openedVersionStatus}
             onClickClose={onQuitVersionExploration}
           />
           <FlatButton label="Save" onClick={onSaveCurrentlyOpenedVersion} />

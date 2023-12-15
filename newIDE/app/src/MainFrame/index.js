@@ -2493,7 +2493,8 @@ const MainFrame = (props: Props) => {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
         }
         if (checkedOutVersionStatus) {
-          saveOptions.restoredFromVersionId = checkedOutVersionStatus.id;
+          saveOptions.restoredFromVersionId =
+            checkedOutVersionStatus.version.id;
         }
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,

@@ -194,7 +194,7 @@ const useVersionHistory = ({
         }
 
         return {
-          id: currentCheckedOutVersionStatus.id,
+          version: currentCheckedOutVersionStatus.version,
           status: 'unsavedChanges',
         };
       });
@@ -216,7 +216,7 @@ const useVersionHistory = ({
 
         return isSavingProject
           ? {
-              id: currentCheckedOutVersionStatus.id,
+              version: currentCheckedOutVersionStatus.version,
               status: 'saving',
             }
           : null;
@@ -265,7 +265,7 @@ const useVersionHistory = ({
           versionId: version.id,
           ignoreUnsavedChanges: true,
         });
-        setCheckedOutVersionStatus({ id: version.id, status: 'opened' });
+        setCheckedOutVersionStatus({ version, status: 'opened' });
       } finally {
         preventEffectsRunningRef.current = false;
         ignoreFileMetadataChangesRef.current = false;

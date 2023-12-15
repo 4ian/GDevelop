@@ -113,7 +113,7 @@ const useOutline = (
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   if (
     !openedVersionStatus ||
-    openedVersionStatus.id !== version.id ||
+    openedVersionStatus.version.id !== version.id ||
     openedVersionStatus.status !== 'unsavedChanges'
   )
     return undefined;
@@ -214,7 +214,7 @@ const ProjectVersionRow = ({
   const versionStatus =
     openedVersionStatus &&
     openedVersionStatus.status !== 'opened' &&
-    openedVersionStatus.id === version.id
+    openedVersionStatus.version.id === version.id
       ? openedVersionStatus.status
       : isLatest
       ? 'latest'
@@ -225,7 +225,7 @@ const ProjectVersionRow = ({
       {({ i18n }) => (
         <div
           className={`${classes.root}${
-            openedVersionStatus && openedVersionStatus.id === version.id
+            openedVersionStatus && openedVersionStatus.version.id === version.id
               ? ' selected'
               : ''
           }`}
@@ -425,7 +425,7 @@ export const DayGroupRow = ({
     if (version.label) {
       namedVersions.push(version);
     }
-    if (openedVersionStatus && version.id === openedVersionStatus.id) {
+    if (openedVersionStatus && version.id === openedVersionStatus.version.id) {
       openedVersion = version;
     } else if (version.id === latestVersionId) {
       latestVersion = version;

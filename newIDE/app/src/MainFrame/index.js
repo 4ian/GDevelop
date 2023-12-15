@@ -2192,6 +2192,7 @@ const MainFrame = (props: Props) => {
 
   const {
     renderVersionHistoryPanel,
+    renderMobileTopBarStatus,
     showVersionHistoryButton,
     openVersionHistoryPanel,
     checkedOutVersionStatus,
@@ -3142,6 +3143,7 @@ const MainFrame = (props: Props) => {
           onDropTab={onDropEditorTab}
         />
       </TabsTitlebar>
+      {renderMobileTopBarStatus()}
       <Toolbar
         ref={toolbar}
         showProjectButtons={

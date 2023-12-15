@@ -14,6 +14,7 @@ import OpenedVersionStatusChip from '../../VersionHistory/OpenedVersionStatusChi
 import type { OpenedVersionStatus } from '../../VersionHistory';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { getStatusColor } from '../../VersionHistory/Utils';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -45,6 +46,8 @@ type LeftButtonsToolbarGroupProps = {|
 
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   function LeftButtonsToolbarGroup(props) {
+    const windowWidth = useResponsiveWindowWidth();
+    const isMobile = windowWidth === 'small';
     return (
       <ToolbarGroup firstChild>
         <IconButton
@@ -78,21 +81,23 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
         >
           <FloppyIcon />
         </IconButton>
-        {props.checkedOutVersionStatus && props.onQuitVersionHistory && (
-          <div
-            style={{
-              // Leave margin between the chip that has a Cross icon to click and the
-              // Play icon to preview the project. It's to avoid a mis-click that would
-              // quit the version history instead of previewing the game.
-              marginRight: 20,
-            }}
-          >
-            <OpenedVersionStatusChip
-              onClickClose={props.onQuitVersionHistory}
-              openedVersionStatus={props.checkedOutVersionStatus}
-            />
-          </div>
-        )}
+        {!isMobile &&
+          props.checkedOutVersionStatus &&
+          props.onQuitVersionHistory && (
+            <div
+              style={{
+                // Leave margin between the chip that has a Cross icon to click and the
+                // Play icon to preview the project. It's to avoid a mis-click that would
+                // quit the version history instead of previewing the game.
+                marginRight: 20,
+              }}
+            >
+              <OpenedVersionStatusChip
+                onClickClose={props.onQuitVersionHistory}
+                openedVersionStatus={props.checkedOutVersionStatus}
+              />
+            </div>
+          )}
       </ToolbarGroup>
     );
   }

@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import Drawer from '@material-ui/core/Drawer';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import {
@@ -21,6 +22,15 @@ import RaisedButton from '../UI/RaisedButton';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+
+// TODO: If top bar is kept, persist these imports
+import History from '../UI/CustomSvgIcons/History';
+import Text from '../UI/Text';
+import { ButtonBase } from '@material-ui/core';
+import Cross from '../UI/CustomSvgIcons/Cross';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { getStatusColor } from './Utils';
 
 const styles = {
   drawerContent: {
@@ -69,6 +79,9 @@ const useVersionHistory = ({
   getStorageProvider,
   onOpenCloudProjectOnSpecificVersion,
 }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const { showAlert } = useAlertDialog();
   const { openSubscriptionDialog } = React.useContext(
@@ -407,11 +420,49 @@ const useVersionHistory = ({
     );
   };
 
+  const renderMobileTopBarStatus = () => {
+    if (!checkedOutVersionStatus || !isMobile) return null;
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '2px 10px 2px 10px',
+              color: '#111111',
+              backgroundColor: getStatusColor(
+                gdevelopTheme,
+                checkedOutVersionStatus.status
+              ),
+            }}
+          >
+            <History fontSize="small" />
+            <Text noMargin color="inherit" size="body-small">
+              {i18n.date(
+                Date.parse(checkedOutVersionStatus.version.createdAt),
+                {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }
+              )}
+            </Text>
+            <ButtonBase onClick={onQuitVersionHistory}>
+              <Cross fontSize="small" />
+            </ButtonBase>
+          </div>
+        )}
+      </I18n>
+    );
+  };
+
   return {
     checkedOutVersionStatus,
     showVersionHistoryButton,
     openVersionHistoryPanel,
     renderVersionHistoryPanel,
+    renderMobileTopBarStatus,
     onQuitVersionHistory,
   };
 };

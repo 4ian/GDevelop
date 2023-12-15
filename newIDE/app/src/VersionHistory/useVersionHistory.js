@@ -20,6 +20,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
 
 const styles = {
   drawerContent: {
@@ -352,7 +353,7 @@ const useVersionHistory = ({
                   }
                 />
               </ColumnStackLayout>
-            ) : (
+            ) : state.versions ? (
               <VersionHistory
                 isVisible={versionHistoryPanelOpen}
                 projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
@@ -361,8 +362,10 @@ const useVersionHistory = ({
                 onLoadMore={onLoadMoreVersions}
                 onRenameVersion={onRenameVersion}
                 openedVersionStatus={checkedOutVersionStatus}
-                versions={state.versions || []}
+                versions={state.versions}
               />
+            ) : (
+              <PlaceholderLoader />
             )}
           </Column>
         </Line>

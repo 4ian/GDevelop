@@ -274,12 +274,19 @@ const ProjectVersionRow = ({
                 </div>
               </LineStackLayout>
             ) : (
-              <Text noMargin>
-                {i18n.date(version.createdAt, {
-                  hour: 'numeric',
-                  minute: 'numeric',
-                })}
-              </Text>
+              <LineStackLayout noMargin>
+                <Text noMargin>
+                  {i18n.date(version.createdAt, {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                  })}
+                </Text>
+                {isLoading && (
+                  <Column noMargin>
+                    <CircularProgress size={20} />
+                  </Column>
+                )}
+              </LineStackLayout>
             )}
             {version.restoredFromVersion && (
               <div style={styles.restoredVersionContainer}>

@@ -429,7 +429,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const onAddNewObject = React.useCallback(
-      (item: ObjectFolderOrObjectWithContext) => {
+      (item: ObjectFolderOrObjectWithContext | null) => {
         setNewObjectDialogOpen({ from: item });
       },
       []
@@ -1165,13 +1165,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const addFolder = React.useCallback(
-      () => {
+      (items: Array<ObjectFolderOrObjectWithContext>) => {
         let newObjectFolderOrObjectWithContext;
-        if (selectedObjectFolderOrObjectsWithContext.length === 1) {
+        if (items.length === 1) {
           const {
             objectFolderOrObject: selectedObjectFolderOrObject,
             global,
-          } = selectedObjectFolderOrObjectsWithContext[0];
+          } = items[0];
           if (selectedObjectFolderOrObject.isFolder()) {
             const newFolder = selectedObjectFolderOrObject.insertNewFolder(
               'NewFolder',
@@ -1182,9 +1182,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               global,
             };
             if (treeViewRef.current) {
-              treeViewRef.current.openItems([
-                getTreeViewItemId(selectedObjectFolderOrObjectsWithContext[0]),
-              ]);
+              treeViewRef.current.openItems([getTreeViewItemId(items[0])]);
             }
           } else {
             const parentFolder = selectedObjectFolderOrObject.getParent();
@@ -1349,9 +1347,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 })
               ),
             },
+            { type: 'separator' },
             {
               label: i18n._(t`Add a new object`),
               click: () => onAddNewObject(item),
+            },
+            {
+              label: i18n._(t`Add a new folder`),
+              click: () =>
+                addFolder(
+                  selectedObjectFolderOrObjectsWithContext.includes(item)
+                    ? selectedObjectFolderOrObjectsWithContext
+                    : [item]
+                ),
             },
             { type: 'separator' },
             {
@@ -1563,7 +1571,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               />
             </Column>
             <Column noMargin>
-              <IconButton size="small" onClick={addFolder}>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  addFolder(selectedObjectFolderOrObjectsWithContext)
+                }
+              >
                 <AddFolder />
               </IconButton>
             </Column>

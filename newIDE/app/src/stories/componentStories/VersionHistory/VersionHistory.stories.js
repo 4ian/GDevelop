@@ -179,8 +179,6 @@ export const Default = () => {
       if (!openedVersionStatus) return;
       setOpenedVersionStatus({ ...openedVersionStatus, status: 'saving' });
       await delay(2000);
-      setOpenedVersionStatus({ ...openedVersionStatus, status: 'saved' });
-      await delay(3000);
 
       setOpenedVersionStatus(null);
     },

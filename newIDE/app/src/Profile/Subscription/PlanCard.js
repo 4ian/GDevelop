@@ -13,6 +13,7 @@ import Paper from '../../UI/Paper';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Silver from './Icons/Silver';
 import Gold from './Icons/Gold';
+import GDevelopGLogo from '../../UI/CustomSvgIcons/GDevelopGLogo';
 
 const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
@@ -72,8 +73,9 @@ const getPlanIcon = (plan: PlanDetails): React.Node => {
     // TODO: Add icons for other plans.
     case 'gdevelop_education':
     case 'gdevelop_startup':
+    case 'gdevelop_enterprise':
     default:
-      return null;
+      return <GDevelopGLogo style={{ width: 25, height: 25, padding: 20 }} />;
   }
 };
 

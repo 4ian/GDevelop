@@ -4,7 +4,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 
 import type { VersionRestoringStatus } from '.';
-import { type FilledCloudProjectVersion } from '../Utils/GDevelopServices/Project';
 import type { GDevelopTheme } from '../UI/Theme';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -13,6 +12,8 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import History from '../UI/CustomSvgIcons/History';
 import { Spacer } from '../UI/Grid';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { type OpenedVersionStatus } from '.';
 
 const getStatusColor = (
   gdevelopTheme: GDevelopTheme,
@@ -34,6 +35,7 @@ const styles = {
     padding: 4,
     borderRadius: 6,
     color: '#111111',
+    ...textEllipsisStyle,
   },
 };
 
@@ -49,32 +51,33 @@ const useStylesCloseIconButton = makeStyles(theme =>
 );
 
 type Props = {|
-  openedVersion: ?FilledCloudProjectVersion,
-  status: ?VersionRestoringStatus,
-  onClickClose: () => void,
+  openedVersionStatus: ?OpenedVersionStatus,
+  onClickClose: () => Promise<void>,
 |};
 
 const OpenedVersionStatusChip = ({
-  openedVersion,
-  status,
+  openedVersionStatus,
   onClickClose,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStylesCloseIconButton();
-  if (!openedVersion || !status) return null;
+  if (!openedVersionStatus) return null;
   return (
     <I18n>
       {({ i18n }) => (
         <div
           style={{
             ...styles.chip,
-            backgroundColor: getStatusColor(gdevelopTheme, status),
+            backgroundColor: getStatusColor(
+              gdevelopTheme,
+              openedVersionStatus.status
+            ),
           }}
         >
           <History />
           <Spacer />
           <Text noMargin color="inherit">
-            {i18n.date(Date.parse(openedVersion.createdAt), {
+            {i18n.date(Date.parse(openedVersionStatus.version.createdAt), {
               dateStyle: 'medium',
               timeStyle: 'short',
             })}

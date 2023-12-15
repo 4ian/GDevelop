@@ -49,7 +49,7 @@ export type VersionRestoringStatus =
   | 'saving'
   | 'saved';
 export type OpenedVersionStatus = {|
-  id: string,
+  version: FilledCloudProjectVersion,
   status: VersionRestoringStatus,
 |};
 
@@ -130,7 +130,7 @@ const VersionHistory = React.memo<Props>(
           !openedVersionStatus && latestVersionId !== options.version.id;
         const isNotTheCurrentlyOpenedVersion =
           !!openedVersionStatus &&
-          openedVersionStatus.id !== options.version.id;
+          openedVersionStatus.version.id !== options.version.id;
         return [
           {
             label: i18n._(

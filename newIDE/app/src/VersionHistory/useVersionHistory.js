@@ -109,6 +109,8 @@ const useVersionHistory = ({
   );
   const showVersionHistoryButton =
     isCloudProject && isUserAllowedToSeeVersionHistory;
+  const latestVersionId =
+    state.versions && state.versions[0] ? state.versions[0].id : null;
 
   // This effect is used to avoid having cloudProjectId and cloudProjectLastModifiedDate
   // set to null when checking out a version, unmounting the VersionHistory component,
@@ -247,6 +249,31 @@ const useVersionHistory = ({
     setVersionHistoryPanelOpen(true);
   }, []);
 
+  const onQuitVersionHistory = React.useCallback(
+    async () => {
+      if (!fileMetadata || !checkedOutVersionStatus || !latestVersionId) return;
+      preventEffectsRunningRef.current = true;
+      ignoreFileMetadataChangesRef.current = true;
+      try {
+        await onOpenCloudProjectOnSpecificVersion({
+          fileMetadata,
+          versionId: latestVersionId,
+          ignoreUnsavedChanges: true,
+        });
+        setCheckedOutVersionStatus(null);
+      } finally {
+        preventEffectsRunningRef.current = false;
+        ignoreFileMetadataChangesRef.current = false;
+      }
+    },
+    [
+      fileMetadata,
+      onOpenCloudProjectOnSpecificVersion,
+      checkedOutVersionStatus,
+      latestVersionId,
+    ]
+  );
+
   const onCheckoutVersion = React.useCallback(
     async (version: FilledCloudProjectVersion) => {
       if (!fileMetadata) return;
@@ -255,6 +282,13 @@ const useVersionHistory = ({
           title: t`There are unsaved changes`,
           message: t`Save your project before using the version history.`,
         });
+        return;
+      }
+      if (
+        checkedOutVersionStatus &&
+        checkedOutVersionStatus.version.id === latestVersionId
+      ) {
+        await onQuitVersionHistory();
         return;
       }
       preventEffectsRunningRef.current = true;
@@ -277,33 +311,8 @@ const useVersionHistory = ({
       checkedOutVersionStatus,
       showAlert,
       hasUnsavedChanges,
-    ]
-  );
-
-  const onQuitVersionHistory = React.useCallback(
-    async () => {
-      if (!fileMetadata || !checkedOutVersionStatus || !state.versions) return;
-      const latestVersion = state.versions[0];
-      if (!latestVersion) return;
-      preventEffectsRunningRef.current = true;
-      ignoreFileMetadataChangesRef.current = true;
-      try {
-        await onOpenCloudProjectOnSpecificVersion({
-          fileMetadata,
-          versionId: latestVersion.id,
-          ignoreUnsavedChanges: true,
-        });
-        setCheckedOutVersionStatus(null);
-      } finally {
-        preventEffectsRunningRef.current = false;
-        ignoreFileMetadataChangesRef.current = false;
-      }
-    },
-    [
-      fileMetadata,
-      onOpenCloudProjectOnSpecificVersion,
-      checkedOutVersionStatus,
-      state.versions,
+      latestVersionId,
+      onQuitVersionHistory,
     ]
   );
 

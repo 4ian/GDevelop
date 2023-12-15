@@ -97,7 +97,7 @@ const VersionHistory = React.memo<Props>(
       () => new Set(versions.map(version => version.userId).filter(Boolean)),
       [versions]
     );
-    const latestVersionId = versions[0].id;
+    const latestVersion = versions[0] || null;
 
     const versionsGroupedByDay = React.useMemo(
       () => groupVersionsByDay(versions),
@@ -128,7 +128,9 @@ const VersionHistory = React.memo<Props>(
     const buildVersionMenuTemplate = React.useCallback(
       (i18n: I18nType, options: { version: FilledCloudProjectVersion }) => {
         const isNotLatestVersionAndUserIsNotNavigatingHistory =
-          !openedVersionStatus && latestVersionId !== options.version.id;
+          !openedVersionStatus &&
+          latestVersion &&
+          latestVersion.id !== options.version.id;
         const isNotTheCurrentlyOpenedVersion =
           !!openedVersionStatus &&
           openedVersionStatus.version.id !== options.version.id;
@@ -152,7 +154,7 @@ const VersionHistory = React.memo<Props>(
           },
         ];
       },
-      [onCheckoutVersion, latestVersionId, openedVersionStatus]
+      [onCheckoutVersion, latestVersion, openedVersionStatus]
     );
 
     const renameVersion = React.useCallback(
@@ -223,7 +225,7 @@ const VersionHistory = React.memo<Props>(
                   <DayGroupRow
                     key={day}
                     versions={dayVersions}
-                    latestVersionId={latestVersionId}
+                    latestVersion={latestVersion}
                     day={day}
                     isOpenedInitially={index === 0}
                     usersPublicProfileByIds={usersPublicProfileByIds}

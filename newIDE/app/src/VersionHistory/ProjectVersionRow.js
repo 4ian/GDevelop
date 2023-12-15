@@ -366,7 +366,7 @@ type DayGroupRowProps = {|
   versions: FilledCloudProjectVersion[],
   isOpenedInitially: boolean,
   editedVersionId: ?string,
-  latestVersionId: string,
+  latestVersion: ?FilledCloudProjectVersion,
   onRenameVersion: (FilledCloudProjectVersion, string) => Promise<void>,
   loadingVersionId: ?string,
   onCancelRenaming: () => void,
@@ -384,7 +384,7 @@ export const DayGroupRow = ({
   versions,
   isOpenedInitially,
   editedVersionId,
-  latestVersionId,
+  latestVersion,
   loadingVersionId,
   onRenameVersion,
   onCancelRenaming,
@@ -395,25 +395,27 @@ export const DayGroupRow = ({
 }: DayGroupRowProps) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
-  const namedVersions = [];
-  let openedVersion = null;
-  let latestVersion = null;
+  const namedVersions = React.useMemo(
+    () => versions.filter(version => version.label),
+    [versions]
+  );
+  const isLatestVersionInThisDayGroup = latestVersion
+    ? versions.find(version => version.id === latestVersion.id)
+    : false;
+  const isOpenedVersionInThisDayGroup = openedVersionStatus
+    ? versions.find(version => version.id === openedVersionStatus.version.id)
+    : false;
 
-  for (let i = 0; i < versions.length; i++) {
-    const version = versions[i];
-    if (version.label) {
-      namedVersions.push(version);
-    }
-    if (openedVersionStatus && version.id === openedVersionStatus.version.id) {
-      openedVersion = version;
-    } else if (version.id === latestVersionId) {
-      latestVersion = version;
-    }
-  }
-
-  const shouldHighlightDay = !!openedVersion && !openedVersion.label && !isOpen;
+  const shouldHighlightDay =
+    isOpenedVersionInThisDayGroup &&
+    !!openedVersionStatus &&
+    !openedVersionStatus.version.label &&
+    !isOpen;
   const shouldDisplayLatestIndicatorOnDay =
-    !!latestVersion && !latestVersion.label && !isOpen;
+    isLatestVersionInThisDayGroup &&
+    latestVersion &&
+    !latestVersion.label &&
+    !isOpen;
 
   const classes = useClassesForDayCollapse();
 
@@ -457,7 +459,8 @@ export const DayGroupRow = ({
                   <ColumnStackLayout noMargin>
                     {namedVersions.map(version => {
                       const shouldHighlightVersion =
-                        openedVersion && openedVersion.id === version.id;
+                        openedVersionStatus &&
+                        openedVersionStatus.version.id === version.id;
                       const isLatestVersion =
                         latestVersion && latestVersion.id === version.id;
                       return (
@@ -492,7 +495,9 @@ export const DayGroupRow = ({
               {versions.map(version => (
                 <ProjectVersionRow
                   key={version.id}
-                  isLatest={latestVersionId === version.id}
+                  isLatest={
+                    latestVersion ? latestVersion.id === version.id : false
+                  }
                   version={version}
                   onRename={onRenameVersion}
                   isLoading={loadingVersionId === version.id}

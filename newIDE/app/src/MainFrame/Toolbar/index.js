@@ -10,6 +10,8 @@ import FloppyIcon from '../../UI/CustomSvgIcons/Floppy';
 import IconButton from '../../UI/IconButton';
 import { Spacer } from '../../UI/Grid';
 import HistoryIcon from '../../UI/CustomSvgIcons/History';
+import OpenedVersionStatusChip from '../../VersionHistory/OpenedVersionStatusChip';
+import type { OpenedVersionStatus } from '../../VersionHistory';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -19,6 +21,8 @@ export type MainFrameToolbarProps = {|
   canSave: boolean,
   showVersionHistoryButton: boolean,
   onOpenVersionHistory: () => void,
+  checkedOutVersionStatus?: ?OpenedVersionStatus,
+  onQuitVersionHistory?: () => Promise<void>,
 
   ...PreviewAndShareButtonsProps,
 |};
@@ -32,6 +36,8 @@ type LeftButtonsToolbarGroupProps = {|
   onSave: () => Promise<void>,
   showVersionHistoryButton: boolean,
   onOpenVersionHistory: () => void,
+  checkedOutVersionStatus?: ?OpenedVersionStatus,
+  onQuitVersionHistory?: () => Promise<void>,
   canSave: boolean,
 |};
 
@@ -70,6 +76,12 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
         >
           <FloppyIcon />
         </IconButton>
+        {props.checkedOutVersionStatus && props.onQuitVersionHistory && (
+          <OpenedVersionStatusChip
+            onClickClose={props.onQuitVersionHistory}
+            openedVersionStatus={props.checkedOutVersionStatus}
+          />
+        )}
       </ToolbarGroup>
     );
   }
@@ -92,6 +104,8 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               canSave={props.canSave}
               showVersionHistoryButton={props.showVersionHistoryButton}
               onOpenVersionHistory={props.onOpenVersionHistory}
+              checkedOutVersionStatus={props.checkedOutVersionStatus}
+              onQuitVersionHistory={props.onQuitVersionHistory}
             />
             <ToolbarGroup>
               <Spacer />

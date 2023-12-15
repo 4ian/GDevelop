@@ -2195,6 +2195,7 @@ const MainFrame = (props: Props) => {
     showVersionHistoryButton,
     openVersionHistoryPanel,
     checkedOutVersionStatus,
+    onQuitVersionHistory,
   } = useVersionHistory({
     getStorageProvider,
     isSavingProject,
@@ -3175,6 +3176,8 @@ const MainFrame = (props: Props) => {
         previewState={previewState}
         showVersionHistoryButton={showVersionHistoryButton}
         onOpenVersionHistory={openVersionHistoryPanel}
+        checkedOutVersionStatus={checkedOutVersionStatus}
+        onQuitVersionHistory={onQuitVersionHistory}
       />
       <LeaderboardProvider
         gameId={

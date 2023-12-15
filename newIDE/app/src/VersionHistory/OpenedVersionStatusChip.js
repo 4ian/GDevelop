@@ -11,6 +11,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import History from '../UI/CustomSvgIcons/History';
 import { Spacer } from '../UI/Grid';
 
 const getStatusColor = (
@@ -70,6 +71,8 @@ const OpenedVersionStatusChip = ({
             backgroundColor: getStatusColor(gdevelopTheme, status),
           }}
         >
+          <History />
+          <Spacer />
           <Text noMargin color="inherit">
             {i18n.date(Date.parse(openedVersion.createdAt), {
               dateStyle: 'medium',

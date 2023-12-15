@@ -1329,6 +1329,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 })
               ),
             },
+            {
+              label: i18n._(t`Add a new object`),
+              click: onAddNewObject,
+            },
             { type: 'separator' },
             {
               label: i18n._(t`Expand all sub folders`),
@@ -1463,11 +1467,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 enabled: instanceCountOnScene > 0,
               }
             : undefined,
-          { type: 'separator' },
-          {
-            label: i18n._(t`Add a new object...`),
-            click: onAddNewObject,
-          },
         ].filter(Boolean);
       },
       [

@@ -222,6 +222,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Organize students per classroom.`,
       },
       {
+        message: t`Access your students' projects`,
+      },
+      {
         message: t`You and your students receive a Gold subscription.`,
       },
     ],

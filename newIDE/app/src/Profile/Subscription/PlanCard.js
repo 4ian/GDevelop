@@ -62,20 +62,47 @@ const getPlanPrice = ({
   return prices;
 };
 
+const PLAN_LOGO_SIZE = 25;
+const PLAN_LOGO_PADDING = 20;
+
 const getPlanIcon = (plan: PlanDetails): React.Node => {
   switch (plan.planId) {
     case 'gdevelop_silver':
     case 'gdevelop_indie': // legacy
-      return <Silver fontSize="large" style={{ width: 65, height: 65 }} />;
+      return (
+        <Silver
+          style={{
+            // Those icons have a glow effect, so the padding is in the size of the image.
+            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+          }}
+        />
+      );
     case 'gdevelop_gold':
     case 'gdevelop_pro': // legacy
-      return <Gold style={{ width: 65, height: 65 }} />;
+      return (
+        <Gold
+          style={{
+            // Those icons have a glow effect, so the padding is in the size of the image.
+            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+          }}
+        />
+      );
     // TODO: Add icons for other plans.
     case 'gdevelop_education':
     case 'gdevelop_startup':
     case 'gdevelop_enterprise':
     default:
-      return <GDevelopGLogo style={{ width: 25, height: 25, padding: 20 }} />;
+      return (
+        <GDevelopGLogo
+          style={{
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
+            padding: PLAN_LOGO_PADDING,
+          }}
+        />
+      );
   }
 };
 

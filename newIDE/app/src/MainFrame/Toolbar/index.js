@@ -12,6 +12,8 @@ import { Spacer } from '../../UI/Grid';
 import HistoryIcon from '../../UI/CustomSvgIcons/History';
 import OpenedVersionStatusChip from '../../VersionHistory/OpenedVersionStatusChip';
 import type { OpenedVersionStatus } from '../../VersionHistory';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import { getStatusColor } from '../../VersionHistory/Utils';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -89,13 +91,25 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
 
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
     React.useImperativeHandle(ref, () => ({
       setEditorToolbar,
     }));
 
+    const borderBottomColor = React.useMemo(
+      () => {
+        if (!props.checkedOutVersionStatus) return null;
+        return getStatusColor(
+          gdevelopTheme,
+          props.checkedOutVersionStatus.status
+        );
+      },
+      [props.checkedOutVersionStatus, gdevelopTheme]
+    );
+
     return (
-      <Toolbar>
+      <Toolbar borderBottomColor={borderBottomColor}>
         {props.showProjectButtons ? (
           <>
             <LeftButtonsToolbarGroup

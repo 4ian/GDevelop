@@ -158,15 +158,20 @@ export const Default = () => {
   const projectServiceMock = new MockAdapter(projectApiAxiosClient, {
     delayResponse: 1000,
   });
+  const latestVersion = versions[0];
 
   const onCheckoutVersion = React.useCallback(
     async (version: FilledCloudProjectVersion) => {
+      if (version.id === latestVersion.id) {
+        setOpenedVersionStatus(null);
+        return;
+      }
       setOpenedVersionStatus({
         version,
         status: 'opened',
       });
     },
-    []
+    [latestVersion.id]
   );
 
   const onSaveCurrentlyOpenedVersion = React.useCallback(

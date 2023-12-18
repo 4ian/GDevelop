@@ -2,10 +2,19 @@
 
 import * as React from 'react';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { getProgramOpeningCount } from './Analytics/LocalStats';
 
 const featuresDisplaySettings = {
-  gamesDashboardInProjectManager: { count: 2, intervalInDays: 7 },
-  gamesDashboardInHomePage: { count: 2, intervalInDays: 7 },
+  gamesDashboardInProjectManager: {
+    count: 2,
+    intervalInDays: 7,
+    minimumProgramOpeningCount: 10,
+  },
+  gamesDashboardInHomePage: {
+    count: 2,
+    intervalInDays: 7,
+    minimumProgramOpeningCount: 10,
+  },
 };
 
 const ONE_DAY = 24 * 3600 * 1000;
@@ -20,19 +29,23 @@ const useDisplayNewFeature = () => {
 
   const shouldDisplayNewFeatureHighlighting = React.useCallback(
     ({ featureId }: { featureId: Feature }): boolean => {
+      const programOpeningCount = getProgramOpeningCount();
       const settings = featuresDisplaySettings[featureId];
       if (!settings) return false;
 
       const acknowledgments = newFeaturesAcknowledgements[featureId];
       if (!acknowledgments) return true;
 
-      const { count, intervalInDays } = settings;
+      const { count, intervalInDays, minimumProgramOpeningCount } = settings;
       const { dates } = acknowledgments;
       if (dates.length >= count) return false;
 
       const lastDate = dates[dates.length - 1];
 
-      return Date.now() > lastDate + intervalInDays * ONE_DAY;
+      return (
+        programOpeningCount > minimumProgramOpeningCount &&
+        Date.now() > lastDate + intervalInDays * ONE_DAY
+      );
     },
     [newFeaturesAcknowledgements]
   );

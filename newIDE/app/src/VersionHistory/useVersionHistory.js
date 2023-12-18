@@ -389,23 +389,25 @@ const useVersionHistory = ({
           </Line>
         ) : !isUserAllowedToSeeVersionHistory ? (
           <Line expand>
-            <Column expand>
-              <ColumnStackLayout>
-                <AlertMessage kind="info">
-                  <Trans>
-                    Access project history, name saves, restore older versions.
-                    Upgrade to X to get started
-                  </Trans>
-                </AlertMessage>
-                <RaisedButton
-                  primary
-                  label={<Trans>Upgrade my subscription</Trans>}
-                  onClick={() =>
-                    openSubscriptionDialog({ reason: 'Version history' })
-                  }
-                />
-              </ColumnStackLayout>
-            </Column>
+            <ColumnStackLayout>
+              <AlertMessage kind="info">
+                <Trans>
+                  Access project history, name saves, restore older versions.
+                  <br />
+                  Upgrade to a Pro plan to get started!
+                </Trans>
+              </AlertMessage>
+              <RaisedButton
+                primary
+                label={<Trans>Upgrade my subscription</Trans>}
+                onClick={() =>
+                  openSubscriptionDialog({
+                    analyticsMetadata: { reason: 'Version history' },
+                    filter: 'team',
+                  })
+                }
+              />
+            </ColumnStackLayout>
           </Line>
         ) : state.versions ? (
           <VersionHistory

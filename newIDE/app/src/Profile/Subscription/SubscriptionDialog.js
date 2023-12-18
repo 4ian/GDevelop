@@ -463,6 +463,7 @@ export default function SubscriptionDialog({
                 } else if (plan.planId === 'gdevelop_enterprise') {
                   return (
                     <PlanCard
+                      key={plan.planId}
                       plan={plan}
                       actions={
                         <RaisedButton

@@ -303,18 +303,15 @@ const ProjectVersionRow = ({
                 )}
                 <div style={styles.dateContainer}>
                   <Text noMargin style={styles.greyed}>
-                    {i18n.date(
-                      version.createdAt,
-                      displayFullDate
-                        ? {
-                            dateStyle: 'medium',
-                            timeStyle: 'short',
-                          }
-                        : {
-                            hour: 'numeric',
-                            minute: 'numeric',
-                          }
-                    )}
+                    {displayFullDate
+                      ? i18n.date(version.createdAt, {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        })
+                      : i18n.date(version.createdAt, {
+                          hour: 'numeric',
+                          minute: 'numeric',
+                        })}
                   </Text>
                 </div>
               </LineStackLayout>

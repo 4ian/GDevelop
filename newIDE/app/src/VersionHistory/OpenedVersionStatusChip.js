@@ -33,18 +33,23 @@ const useStylesCloseIconButton = makeStyles(theme =>
       '&:hover': {
         backdropFilter: 'brightness(0.8)',
       },
+      '&:disabled': {
+        backdropFilter: 'brightness(0.9)',
+      },
     },
   })
 );
 
 type Props = {|
   openedVersionStatus: ?OpenedVersionStatus,
-  onClickClose: () => Promise<void>,
+  onQuit: () => Promise<void>,
+  disableQuitting: boolean,
 |};
 
 const OpenedVersionStatusChip = ({
   openedVersionStatus,
-  onClickClose,
+  onQuit,
+  disableQuitting,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStylesCloseIconButton();
@@ -76,7 +81,11 @@ const OpenedVersionStatusChip = ({
                 (openedVersionStatus.status === 'unsavedChanges' ? '*' : '')}
           </Text>
           <Spacer />
-          <ButtonBase classes={classes} onClick={onClickClose}>
+          <ButtonBase
+            classes={classes}
+            onClick={onQuit}
+            disabled={disableQuitting}
+          >
             <Cross />
           </ButtonBase>
         </div>

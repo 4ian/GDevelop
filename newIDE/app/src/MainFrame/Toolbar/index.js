@@ -24,7 +24,8 @@ export type MainFrameToolbarProps = {|
   showVersionHistoryButton: boolean,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
-  onQuitVersionHistory?: () => Promise<void>,
+  onQuitVersionHistory: () => Promise<void>,
+  canQuitVersionHistory: boolean,
 
   ...PreviewAndShareButtonsProps,
 |};
@@ -39,7 +40,8 @@ type LeftButtonsToolbarGroupProps = {|
   showVersionHistoryButton: boolean,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
-  onQuitVersionHistory?: () => Promise<void>,
+  onQuitVersionHistory: () => Promise<void>,
+  canQuitVersionHistory: boolean,
   canSave: boolean,
 |};
 
@@ -78,7 +80,7 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
         >
           <FloppyIcon />
         </IconButton>
-        {props.checkedOutVersionStatus && props.onQuitVersionHistory && (
+        {props.checkedOutVersionStatus && (
           <div
             style={{
               // Leave margin between the chip that has a Cross icon to click and the
@@ -88,7 +90,8 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
             }}
           >
             <OpenedVersionStatusChip
-              onClickClose={props.onQuitVersionHistory}
+              onQuit={props.onQuitVersionHistory}
+              disableQuitting={!props.canQuitVersionHistory}
               openedVersionStatus={props.checkedOutVersionStatus}
             />
           </div>
@@ -129,6 +132,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               onOpenVersionHistory={props.onOpenVersionHistory}
               checkedOutVersionStatus={props.checkedOutVersionStatus}
               onQuitVersionHistory={props.onQuitVersionHistory}
+              canQuitVersionHistory={props.canQuitVersionHistory}
             />
             <ToolbarGroup>
               <Spacer />

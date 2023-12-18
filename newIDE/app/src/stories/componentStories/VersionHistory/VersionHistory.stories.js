@@ -260,7 +260,8 @@ export const Default = () => {
         <ColumnStackLayout>
           <OpenedVersionStatusChip
             openedVersionStatus={openedVersionStatus}
-            onClickClose={onQuitVersionExploration}
+            onQuit={onQuitVersionExploration}
+            disableQuitting={false}
           />
           <FlatButton label="Save" onClick={onSaveCurrentlyOpenedVersion} />
           <FlatButton label="Add changes to version" onClick={onAddChanges} />

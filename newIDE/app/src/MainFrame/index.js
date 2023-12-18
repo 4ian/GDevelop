@@ -3195,6 +3195,7 @@ const MainFrame = (props: Props) => {
         onOpenVersionHistory={openVersionHistoryPanel}
         checkedOutVersionStatus={checkedOutVersionStatus}
         onQuitVersionHistory={onQuitVersionHistory}
+        canQuitVersionHistory={!isSavingProject}
       />
       <LeaderboardProvider
         gameId={

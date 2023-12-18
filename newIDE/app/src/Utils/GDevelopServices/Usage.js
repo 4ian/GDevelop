@@ -196,6 +196,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
       },
       {
+        message: t`Access your cloud projects history and easily get back to a previous version.`,
+      },
+      {
         message: t`Add 1 guest user or unlimited startup team members to collaborate on every project.`,
       },
     ],
@@ -464,7 +467,7 @@ export const getRedirectToCheckoutUrl = ({
   return url.toString();
 };
 
-export const canSeeCloudProjectHistory = (
+export const canUseCloudProjectHistory = (
   subscription: ?Subscription
 ): boolean => {
   if (!subscription) return false;

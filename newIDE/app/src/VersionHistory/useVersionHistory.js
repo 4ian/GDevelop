@@ -11,7 +11,7 @@ import {
 } from '../Utils/GDevelopServices/Project';
 import type { FileMetadata, StorageProvider } from '../ProjectsStorage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { canSeeCloudProjectHistory } from '../Utils/GDevelopServices/Usage';
+import { canUseCloudProjectHistory } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import VersionHistory, { type OpenedVersionStatus } from '.';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
@@ -97,7 +97,7 @@ const useVersionHistory = ({
     setVersionHistoryPanelOpen,
   ] = React.useState<boolean>(false);
   const isCloudProject = storageProvider.internalName === 'Cloud';
-  const isUserAllowedToSeeVersionHistory = canSeeCloudProjectHistory(
+  const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(
     subscription
   );
   const [cloudProjectId, setCloudProjectId] = React.useState<?string>(

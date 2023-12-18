@@ -10,7 +10,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Project/AssetResourcesMergingHelper.h"
+#include "GDCore/IDE/Project/AssetResourcePathCleaner.h"
 #include "GDCore/IDE/Project/ResourcesInUseHelper.h"
 #include "GDCore/IDE/Project/ResourcesRenamer.h"
 #include "GDCore/Project/Behavior.h"
@@ -113,10 +113,9 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
     gd::Project &project, gd::Object &object,
     const gd::String &destinationDirectory, const gd::String &objectFullName,
     std::map<gd::String, gd::String> &resourcesFileNameMap) {
-  // TODO Rename AssetResourcesMergingHelper 
-  gd::AssetResourcesMergingHelper resourcesMergingHelper(
+  gd::AssetResourcePathCleaner assetResourcePathCleaner(
       project.GetResourcesManager(), resourcesFileNameMap);
-  object.GetConfiguration().ExposeResources(resourcesMergingHelper);
+  object.GetConfiguration().ExposeResources(assetResourcePathCleaner);
 
   NormalizeResourceNames(object, resourcesFileNameMap, objectFullName);
 }

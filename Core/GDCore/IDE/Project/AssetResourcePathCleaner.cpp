@@ -4,46 +4,46 @@
  * reserved. This project is released under the MIT License.
  */
 
-#include "AssetResourcesMergingHelper.h"
+#include "AssetResourcePathCleaner.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/String.h"
 
 
 namespace gd {
-void AssetResourcesMergingHelper::ExposeImage(gd::String &imageName) {
+void AssetResourcePathCleaner::ExposeImage(gd::String &imageName) {
   ExposeResourceAsFile(imageName);
 }
 
-void AssetResourcesMergingHelper::ExposeAudio(gd::String &audioName) {
+void AssetResourcePathCleaner::ExposeAudio(gd::String &audioName) {
   ExposeResourceAsFile(audioName);
 }
 
-void AssetResourcesMergingHelper::ExposeFont(gd::String &fontName) {
+void AssetResourcePathCleaner::ExposeFont(gd::String &fontName) {
   ExposeResourceAsFile(fontName);
 }
 
-void AssetResourcesMergingHelper::ExposeJson(gd::String &jsonName) {
+void AssetResourcePathCleaner::ExposeJson(gd::String &jsonName) {
   ExposeResourceAsFile(jsonName);
 }
 
-void AssetResourcesMergingHelper::ExposeTilemap(gd::String &tilemapName) {
+void AssetResourcePathCleaner::ExposeTilemap(gd::String &tilemapName) {
   ExposeResourceAsFile(tilemapName);
 }
 
-void AssetResourcesMergingHelper::ExposeTileset(gd::String &tilesetName) {
+void AssetResourcePathCleaner::ExposeTileset(gd::String &tilesetName) {
   ExposeResourceAsFile(tilesetName);
 }
 
-void AssetResourcesMergingHelper::ExposeVideo(gd::String &videoName) {
+void AssetResourcePathCleaner::ExposeVideo(gd::String &videoName) {
   ExposeResourceAsFile(videoName);
 }
 
-void AssetResourcesMergingHelper::ExposeBitmapFont(gd::String &bitmapFontName) {
+void AssetResourcePathCleaner::ExposeBitmapFont(gd::String &bitmapFontName) {
   ExposeResourceAsFile(bitmapFontName);
 }
 
-void AssetResourcesMergingHelper::ExposeResourceAsFile(
+void AssetResourcePathCleaner::ExposeResourceAsFile(
     gd::String &resourceName) {
 
   auto &resource = resourcesManager->GetResource(resourceName);
@@ -53,7 +53,7 @@ void AssetResourcesMergingHelper::ExposeResourceAsFile(
   resourceName = file;
 }
 
-void AssetResourcesMergingHelper::ExposeFile(gd::String &resourceFilePath) {
+void AssetResourcePathCleaner::ExposeFile(gd::String &resourceFilePath) {
 
   size_t slashPos = resourceFilePath.find_last_of("/");
   size_t antiSlashPos = resourceFilePath.find_last_of("\\");

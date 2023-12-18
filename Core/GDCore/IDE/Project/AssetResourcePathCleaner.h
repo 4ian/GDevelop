@@ -20,23 +20,21 @@ class Project;
 namespace gd {
 
 /**
- * \brief ResourcesMergingHelper is used (mainly during export)
- * to list resources and generate new filenames, to allow them to be all copied
- * in a single directory (potentially changing the filename to avoid conflicts,
- * but preserving extensions).
+ * \brief ResourcesMergingHelper is used when exporting an object as an asset.
+ * It removes the folder from the path.
  *
  * \see ArbitraryResourceWorker
  *
  * \ingroup IDE
  */
-class GD_CORE_API AssetResourcesMergingHelper : public ArbitraryResourceWorker {
+class GD_CORE_API AssetResourcePathCleaner : public ArbitraryResourceWorker {
 public:
-  AssetResourcesMergingHelper(
+  AssetResourcePathCleaner(
       gd::ResourcesManager &resourcesManager,
       std::map<gd::String, gd::String> &resourcesFileNameMap_)
       : ArbitraryResourceWorker(resourcesManager),
         resourcesFileNameMap(&resourcesFileNameMap_){};
-  virtual ~AssetResourcesMergingHelper(){};
+  virtual ~AssetResourcePathCleaner(){};
 
   void ExposeImage(gd::String &imageName) override;
   void ExposeAudio(gd::String &audioName) override;

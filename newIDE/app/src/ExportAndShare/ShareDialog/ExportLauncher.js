@@ -36,6 +36,7 @@ import {
   TRIVIAL_FIRST_WEB_EXPORT,
 } from '../../Utils/GDevelopServices/Badge';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 
 type State = {|
   exportStep: BuildStep,
@@ -54,6 +55,7 @@ type Props = {|
   isSavingProject: boolean,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
   onGameUpdated: (game: Game) => void,
@@ -202,7 +204,12 @@ export default class ExportLauncher extends Component<Props, State> {
   };
 
   _launchWholeExport = async (i18n: I18nType) => {
-    const { project, exportPipeline, authenticatedUser } = this.props;
+    const {
+      project,
+      exportPipeline,
+      eventsFunctionsExtensionsState,
+      authenticatedUser,
+    } = this.props;
     sendExportLaunched(exportPipeline.name);
 
     if (
@@ -327,6 +334,8 @@ export default class ExportLauncher extends Component<Props, State> {
             id: profile.id,
           }
         : undefined;
+
+      await eventsFunctionsExtensionsState.ensureLoadFinished();
 
       const exportOutput = await exportPipeline.launchExport(
         exportPipelineContext,

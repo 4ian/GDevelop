@@ -28,6 +28,7 @@ import ItchIo from '../../UI/CustomSvgIcons/ItchIo';
 import CloudDownload from '../../UI/CustomSvgIcons/CloudDownload';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 import Wrench from '../../UI/CustomSvgIcons/Wrench';
+import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 
 const styles = {
   buttonBase: {
@@ -241,6 +242,9 @@ const PublishHome = ({
 }: PublishHomeProps) => {
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
   const [
     hasSkippedSubSectionSelection,
     setHasSkippedSubSectionSelection,
@@ -443,6 +447,7 @@ const PublishHome = ({
       {chosenSection && chosenSubSection && selectedExporter && (
         <ExportLauncher
           authenticatedUser={authenticatedUser}
+          eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
           exportPipeline={selectedExporter.exportPipeline}
           project={project}
           onSaveProject={onSaveProject}

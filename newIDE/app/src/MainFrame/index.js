@@ -39,7 +39,7 @@ import {
   type EditorTab,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
-  notifyPreviewWillStart,
+  notifyPreviewOrExportWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
@@ -724,10 +724,12 @@ const MainFrame = (props: Props) => {
 
   const openShareDialog = React.useCallback(
     (initialTab?: ShareTab) => {
+      notifyPreviewOrExportWillStart(state.editorTabs);
+
       setShareDialogInitialTab(initialTab || null);
       setShareDialogOpen(true);
     },
-    [setShareDialogOpen, setShareDialogInitialTab]
+    [state.editorTabs]
   );
 
   const closeShareDialog = React.useCallback(
@@ -1543,7 +1545,7 @@ const MainFrame = (props: Props) => {
       if (!previewLauncher) return;
 
       setPreviewLoading(true);
-      notifyPreviewWillStart(state.editorTabs);
+      notifyPreviewOrExportWillStart(state.editorTabs);
 
       const layoutName = previewState.isPreviewOverriden
         ? previewState.overridenPreviewLayoutName
@@ -3051,7 +3053,7 @@ const MainFrame = (props: Props) => {
                 currentProject
               );
             }}
-            onShareProject={() => setShareDialogOpen(true)}
+            onShareProject={() => openShareDialog()}
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

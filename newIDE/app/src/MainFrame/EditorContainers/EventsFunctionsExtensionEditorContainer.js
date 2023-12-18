@@ -79,11 +79,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   };
 
-  previewWillStart = () => {
+  previewOrExportWillStart = () => {
     // Immediately trigger the reload/regeneration of extensions
     // if a preview is about to start, as changes chan have been made
-    // inside. The preview is responsible for waiting for extensions
-    // to be loaded before starting.
+    // inside. The preview or export is responsible for waiting
+    // for extensions to be loaded before starting.
     if (this.props.isActive) {
       this.props.onLoadEventsFunctionsExtensions();
     }

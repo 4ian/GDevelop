@@ -13,6 +13,7 @@ import { Spacer } from '../UI/Grid';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { type OpenedVersionStatus } from '.';
 import { getStatusColor } from './Utils';
+import { shortenString } from '../Utils/StringHelpers';
 
 const styles = {
   chip: {
@@ -63,10 +64,15 @@ const OpenedVersionStatusChip = ({
           <Text noMargin color="inherit">
             {openedVersionStatus.status === 'saving'
               ? i18n._(t`Saving...`)
-              : i18n.date(Date.parse(openedVersionStatus.version.createdAt), {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                }) +
+              : (openedVersionStatus.version.label
+                  ? shortenString(openedVersionStatus.version.label, 20)
+                  : i18n.date(
+                      Date.parse(openedVersionStatus.version.createdAt),
+                      {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      }
+                    )) +
                 (openedVersionStatus.status === 'unsavedChanges' ? '*' : '')}
           </Text>
           <Spacer />

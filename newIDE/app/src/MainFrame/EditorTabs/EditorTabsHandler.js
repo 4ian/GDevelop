@@ -261,12 +261,12 @@ export const saveUiSettings = (state: EditorTabsState) => {
  * Notify the editors that the preview will start. This gives a chance
  * to editors with changes to commit them (like modified extensions).
  */
-export const notifyPreviewWillStart = (state: EditorTabsState) => {
+export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
   state.editors.forEach(editorTab => {
     const editor = editorTab.editorRef;
 
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
-      editor.previewWillStart();
+      editor.previewOrExportWillStart();
     }
   });
 };

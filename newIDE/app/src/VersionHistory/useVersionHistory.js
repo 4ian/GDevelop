@@ -185,6 +185,7 @@ const useVersionHistory = ({
     ]
   );
 
+  // This effect watches the unsavedChanges instance to change the opened version status.
   React.useEffect(
     () => {
       if (preventEffectsRunningRef.current) return;
@@ -206,6 +207,7 @@ const useVersionHistory = ({
     [hasUnsavedChanges]
   );
 
+  // This effect watches the isSavingProject flag to change the opened version status.
   React.useEffect(
     () => {
       if (preventEffectsRunningRef.current) return;
@@ -227,6 +229,17 @@ const useVersionHistory = ({
       });
     },
     [isSavingProject]
+  );
+
+  // This effect watches the project file metadata to reset the opened version
+  // if the project is closed.
+  React.useEffect(
+    () => {
+      if (!fileMetadata) {
+        setCheckedOutVersionStatus(null);
+      }
+    },
+    [fileMetadata]
   );
 
   const onLoadMoreVersions = React.useCallback(

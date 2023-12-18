@@ -112,7 +112,7 @@ type Props = {|
     // Allow to customize color (replace by color prop?) // TO VERIFY
     color?: string,
     WebkitTextFillColor?: string,
-    fontSize?: '1em',
+    fontSize?: '1em' | 14,
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',

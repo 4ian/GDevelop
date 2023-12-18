@@ -29,6 +29,8 @@ import type { OpenedVersionStatus, VersionRestoringStatus } from '.';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Chip from '../UI/Chip';
 import CircularProgress from '../UI/CircularProgress';
+import CrossIcon from '../UI/CustomSvgIcons/Cross';
+import CheckIcon from '../UI/CustomSvgIcons/Check';
 import { getStatusColor } from './Utils';
 
 const thisYear = new Date().getFullYear();
@@ -187,6 +189,11 @@ const ProjectVersionRow = ({
     onRename(version, newLabel);
   };
 
+  const cancelRenaming = React.useCallback(() => {
+    setNewLabel(version.label || '');
+    onCancelRenaming();
+  }, [version, onCancelRenaming])
+
   const classes = useClassesForRowContainer();
   const outlineStyle = useOutline(version, openedVersionStatus);
   const anonymousAvatar = getAnonymousAvatar();
@@ -242,10 +249,30 @@ const ProjectVersionRow = ({
                 }}
                 onKeyUp={event => {
                   if (shouldCloseOrCancel(event)) {
-                    setNewLabel(version.label || '');
-                    onCancelRenaming();
+                    cancelRenaming()
                   }
                 }}
+                inputStyle={{fontSize: 14}}
+                endAdornment={
+                  <>
+                    <IconButton
+                      edge="end"
+                      onClick={cancelRenaming}
+                      disabled={isLoading}
+                      size="small"
+                    >
+                      <CrossIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      onClick={validateNewLabel}
+                      disabled={isLoading}
+                      size="small"
+                    >
+                      <CheckIcon />
+                    </IconButton>
+                  </>
+                }
                 style={styles.labelTextfield}
               />
             ) : version.label ? (

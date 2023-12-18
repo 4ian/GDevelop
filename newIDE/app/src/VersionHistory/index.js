@@ -9,7 +9,7 @@ import {
   getUserPublicProfilesByIds,
   type UserPublicProfileByIds,
 } from '../Utils/GDevelopServices/User';
-import { Column, Line } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import FlatButton from '../UI/FlatButton';
 import { DayGroupRow } from './ProjectVersionRow';
@@ -29,6 +29,12 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
+  },
+  container: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
   },
 };
 
@@ -234,7 +240,7 @@ const VersionHistory = React.memo<Props>(
         <I18n>
           {({ i18n }) => (
             <ScrollView style={styles.scrollView}>
-              <Column noMargin expand>
+              <div style={styles.container}>
                 {days.map((day, index) => {
                   const dayVersions = versionsGroupedByDay[day];
                   if (!dayVersions || dayVersions.length === 0) return null;
@@ -270,7 +276,7 @@ const VersionHistory = React.memo<Props>(
                     onClick={loadMore}
                   />
                 )}
-              </Column>
+              </div>
               {!canLoadMore && (
                 <Line noMargin>
                   <EmptyMessage>

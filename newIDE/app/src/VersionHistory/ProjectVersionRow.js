@@ -45,6 +45,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     paddingLeft: 30, // Width of the collapse icon button.
+    gap: 2,
   },
   dateContainer: {
     flexShrink: 0,

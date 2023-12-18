@@ -14,6 +14,7 @@ import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import FlatButton from '../UI/FlatButton';
 import { DayGroupRow } from './ProjectVersionRow';
 import EmptyMessage from '../UI/EmptyMessage';
+import ScrollView from '../UI/ScrollView';
 
 const anonymousAvatars = [
   { src: 'res/avatar/green-hero.svg', alt: 'Green hero avatar' },
@@ -21,6 +22,15 @@ const anonymousAvatars = [
   { src: 'res/avatar/ghost.svg', alt: 'Ghost avatar' },
   { src: 'res/avatar/pink-cloud.svg', alt: 'Pink cloud avatar' },
 ];
+
+const styles = {
+  scrollView: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+};
 
 type VersionsGroupedByDay = {|
   [day: number]: Array<FilledCloudProjectVersion>,
@@ -223,7 +233,7 @@ const VersionHistory = React.memo<Props>(
       <>
         <I18n>
           {({ i18n }) => (
-            <Column noMargin expand justifyContent="space-between">
+            <ScrollView style={styles.scrollView}>
               <Column noMargin expand>
                 {days.map((day, index) => {
                   const dayVersions = versionsGroupedByDay[day];
@@ -268,7 +278,7 @@ const VersionHistory = React.memo<Props>(
                   </EmptyMessage>
                 </Line>
               )}
-            </Column>
+            </ScrollView>
           )}
         </I18n>
         <ContextMenu

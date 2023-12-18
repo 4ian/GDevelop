@@ -377,8 +377,8 @@ const useVersionHistory = ({
           onClose={() => setVersionHistoryPanelOpen(false)}
           id="version-history-drawer"
         />
-        <Line useFullHeight expand>
-          <Column expand>
+        <Line useFullHeight expand noMargin>
+          <Column expand noMargin>
             {!cloudProjectId ? (
               <AlertMessage kind="info">
                 <Trans>Open a cloud project to see the version history.</Trans>

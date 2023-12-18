@@ -19,6 +19,7 @@ const isDesktop = !!electron;
 export type BuildMainMenuProps = {|
   i18n: I18nType,
   project: ?gdProject,
+  canSaveProjectAs: boolean,
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   shortcutMap: ShortcutMap,
   isApplicationTopLevelMenu: boolean,
@@ -105,16 +106,12 @@ const getMainMenuEventCallback = (
   return mapping[mainMenuEvent] || (() => {});
 };
 
-export type MainMenuProps = {|
-  ...BuildMainMenuProps,
-  ...MainMenuCallbacks,
-|};
-
 export const buildMainMenuDeclarativeTemplate = ({
   shortcutMap,
   i18n,
   recentProjectFiles,
   project,
+  canSaveProjectAs,
   isApplicationTopLevelMenu,
 }: BuildMainMenuProps): Array<MenuDeclarativeItemTemplate> => {
   const fileTemplate: MenuDeclarativeItemTemplate = {
@@ -169,7 +166,7 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Save as...`),
         accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS']),
         onClickSendEvent: 'main-menu-save-as',
-        enabled: !!project,
+        enabled: canSaveProjectAs,
       },
       {
         label: i18n._(t`Show version history`),

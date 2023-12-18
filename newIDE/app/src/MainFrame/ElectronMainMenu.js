@@ -81,6 +81,7 @@ const ElectronMainMenu = ({
   const {
     i18n,
     project,
+    canSaveProjectAs,
     recentProjectFiles,
     shortcutMap,
     isApplicationTopLevelMenu,
@@ -232,6 +233,7 @@ const ElectronMainMenu = ({
           'set-main-menu',
           buildMainMenuDeclarativeTemplate({
             project,
+            canSaveProjectAs,
             i18n,
             recentProjectFiles,
             shortcutMap,
@@ -244,6 +246,7 @@ const ElectronMainMenu = ({
       i18n,
       language,
       project,
+      canSaveProjectAs,
       recentProjectFiles,
       shortcutMap,
       isApplicationTopLevelMenu,

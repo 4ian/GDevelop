@@ -3003,11 +3003,12 @@ const MainFrame = (props: Props) => {
   );
 
   const showLoader = isLoadingProject || previewLoading;
-
+  const canSaveProjectAs = !!currentProject && !checkedOutVersionStatus;
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,
     project: state.currentProject,
+    canSaveProjectAs,
     recentProjectFiles: preferences.getRecentProjectFiles(),
     shortcutMap,
     isApplicationTopLevelMenu: false,

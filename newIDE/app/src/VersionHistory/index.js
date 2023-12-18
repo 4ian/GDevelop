@@ -15,6 +15,7 @@ import FlatButton from '../UI/FlatButton';
 import { DayGroupRow } from './ProjectVersionRow';
 import EmptyMessage from '../UI/EmptyMessage';
 import ScrollView from '../UI/ScrollView';
+import type { ClientCoordinates } from '../Utils/UseLongTouch';
 
 const anonymousAvatars = [
   { src: 'res/avatar/green-hero.svg', alt: 'Green hero avatar' },
@@ -204,7 +205,7 @@ const VersionHistory = React.memo<Props>(
     }, []);
 
     const openContextMenu = React.useCallback(
-      (event: PointerEvent, version: FilledCloudProjectVersion) => {
+      (event: ClientCoordinates, version: FilledCloudProjectVersion) => {
         const { current: contextMenu } = contextMenuRef;
         if (!contextMenu) return;
         contextMenu.open(event.clientX, event.clientY, { version });

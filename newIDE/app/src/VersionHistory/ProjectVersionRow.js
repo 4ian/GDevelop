@@ -32,6 +32,7 @@ import CircularProgress from '../UI/CircularProgress';
 import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import CheckIcon from '../UI/CustomSvgIcons/Check';
 import { getStatusColor } from './Utils';
+import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
 
 const thisYear = new Date().getFullYear();
 
@@ -82,6 +83,11 @@ const styles = {
     height: 6,
     width: 6,
     borderRadius: 3,
+  },
+  rowContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
   },
 };
 
@@ -160,7 +166,7 @@ type Props = {|
   isLoading: boolean,
   onCancelRenaming: () => void,
   onContextMenu: (
-    event: PointerEvent,
+    event: ClientCoordinates,
     version: FilledCloudProjectVersion
   ) => void,
   displayFullDate?: boolean,
@@ -199,6 +205,7 @@ const ProjectVersionRow = ({
     },
     [version, onCancelRenaming]
   );
+  const longTouchProps = useLongTouch(e => onContextMenu(e, version));
 
   const classes = useClassesForRowContainer();
   const outlineStyle = useOutline(version, openedVersionStatus);
@@ -223,7 +230,11 @@ const ProjectVersionRow = ({
           }`}
           style={outlineStyle}
         >
-          <Column noMargin expand>
+          <div
+            onContextMenu={e => onContextMenu(e, version)}
+            style={styles.rowContainer}
+            {...longTouchProps}
+          >
             {versionStatus && (
               <>
                 <Line noMargin>
@@ -237,6 +248,7 @@ const ProjectVersionRow = ({
                 ref={textFieldRef}
                 margin="none"
                 value={newLabel}
+                stopContextMenuPropagation
                 translatableHintText={t`End of jam`}
                 onChange={(event, text) =>
                   setNewLabel(
@@ -364,7 +376,7 @@ const ProjectVersionRow = ({
                 </Text>
               </LineStackLayout>
             )}
-          </Column>
+          </div>
           <IconButton
             size="small"
             onClick={event => {
@@ -417,7 +429,7 @@ type DayGroupRowProps = {|
   loadingVersionId: ?string,
   onCancelRenaming: () => void,
   onContextMenu: (
-    event: PointerEvent,
+    event: ClientCoordinates,
     version: FilledCloudProjectVersion
   ) => void,
   openedVersionStatus: ?OpenedVersionStatus,

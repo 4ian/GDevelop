@@ -57,6 +57,7 @@ type Props = {|
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
+  stopContextMenuPropagation?: boolean,
 
   // Error handling/Validation:
   errorText?: React.Node,
@@ -283,6 +284,11 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           }
           onChange={
             onChange ? event => onChange(event, event.target.value) : undefined
+          }
+          onContextMenu={
+            props.stopContextMenuPropagation
+              ? e => e.stopPropagation()
+              : undefined
           }
           // Error handling:
           error={!!props.errorText}

@@ -247,6 +247,7 @@ export const Default = () => {
       <Column expand>
         <VersionHistory
           isVisible
+          authenticatedUserId=""
           projectId={projectId}
           versions={versions}
           onRenameVersion={onRenameVersion}

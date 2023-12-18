@@ -151,6 +151,7 @@ const useClassesForRowContainer = makeStyles(theme =>
 );
 
 type Props = {|
+  authenticatedUserId: string,
   version: FilledCloudProjectVersion,
   usersPublicProfileByIds: UserPublicProfileByIds,
   isEditing: boolean,
@@ -168,6 +169,7 @@ type Props = {|
 |};
 
 const ProjectVersionRow = ({
+  authenticatedUserId,
   version,
   usersPublicProfileByIds,
   isEditing,
@@ -190,10 +192,13 @@ const ProjectVersionRow = ({
     onRename(version, newLabel);
   };
 
-  const cancelRenaming = React.useCallback(() => {
-    setNewLabel(version.label || '');
-    onCancelRenaming();
-  }, [version, onCancelRenaming])
+  const cancelRenaming = React.useCallback(
+    () => {
+      setNewLabel(version.label || '');
+      onCancelRenaming();
+    },
+    [version, onCancelRenaming]
+  );
 
   const classes = useClassesForRowContainer();
   const outlineStyle = useOutline(version, openedVersionStatus);
@@ -250,10 +255,10 @@ const ProjectVersionRow = ({
                 }}
                 onKeyUp={event => {
                   if (shouldCloseOrCancel(event)) {
-                    cancelRenaming()
+                    cancelRenaming();
                   }
                 }}
-                inputStyle={{fontSize: 14}}
+                inputStyle={{ fontSize: 14 }}
                 endAdornment={
                   <>
                     <IconButton
@@ -339,7 +344,12 @@ const ProjectVersionRow = ({
                   style={styles.avatar}
                 />
                 <Text noMargin style={styles.greyed}>
-                  {authorPublicProfile.username}
+                  {authorPublicProfile.username ||
+                    (version.userId === authenticatedUserId ? (
+                      <Trans>Me</Trans>
+                    ) : (
+                      ''
+                    ))}
                 </Text>
               </LineStackLayout>
             ) : (
@@ -398,6 +408,7 @@ const useClassesForDayCollapse = makeStyles(theme =>
 
 type DayGroupRowProps = {|
   day: number,
+  authenticatedUserId: string,
   versions: FilledCloudProjectVersion[],
   isOpenedInitially: boolean,
   editedVersionId: ?string,
@@ -416,6 +427,7 @@ type DayGroupRowProps = {|
 
 export const DayGroupRow = ({
   day,
+  authenticatedUserId,
   versions,
   isOpenedInitially,
   editedVersionId,
@@ -530,6 +542,7 @@ export const DayGroupRow = ({
               {versions.map(version => (
                 <ProjectVersionRow
                   key={version.id}
+                  authenticatedUserId={authenticatedUserId}
                   isLatest={
                     latestVersion ? latestVersion.id === version.id : false
                   }

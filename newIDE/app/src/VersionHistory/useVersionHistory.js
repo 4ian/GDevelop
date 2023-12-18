@@ -411,6 +411,9 @@ const useVersionHistory = ({
           </Line>
         ) : state.versions ? (
           <VersionHistory
+            authenticatedUserId={
+              authenticatedUser.profile ? authenticatedUser.profile.id : ''
+            }
             isVisible={versionHistoryPanelOpen}
             projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
             canLoadMore={!!state.nextPageUri}

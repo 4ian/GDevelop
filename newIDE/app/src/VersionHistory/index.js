@@ -71,6 +71,7 @@ export type OpenedVersionStatus = {|
 
 type Props = {|
   projectId: string,
+  authenticatedUserId: string,
   versions: Array<FilledCloudProjectVersion>,
   onRenameVersion: (
     FilledCloudProjectVersion,
@@ -86,6 +87,7 @@ type Props = {|
 const VersionHistory = React.memo<Props>(
   ({
     projectId,
+    authenticatedUserId,
     versions,
     onRenameVersion,
     openedVersionStatus,
@@ -249,6 +251,7 @@ const VersionHistory = React.memo<Props>(
                       key={day}
                       versions={dayVersions}
                       latestVersion={latestVersion}
+                      authenticatedUserId={authenticatedUserId}
                       day={day}
                       isOpenedInitially={index === 0}
                       usersPublicProfileByIds={usersPublicProfileByIds}

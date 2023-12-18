@@ -21,7 +21,6 @@ export type MainFrameToolbarProps = {|
   openShareDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
-  showVersionHistoryButton: boolean,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
   onQuitVersionHistory: () => Promise<void>,
@@ -37,7 +36,6 @@ export type ToolbarInterface = {|
 type LeftButtonsToolbarGroupProps = {|
   toggleProjectManager: () => void,
   onSave: () => Promise<void>,
-  showVersionHistoryButton: boolean,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
   onQuitVersionHistory: () => Promise<void>,
@@ -58,18 +56,16 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
         >
           <ProjectManagerIcon />
         </IconButton>
-        {props.showVersionHistoryButton && (
-          <IconButton
-            size="small"
-            id="toolbar-history-button"
-            onClick={props.onOpenVersionHistory}
-            tooltip={t`Open version history`}
-            color="default"
-            disabled={false}
-          >
-            <HistoryIcon />
-          </IconButton>
-        )}
+        <IconButton
+          size="small"
+          id="toolbar-history-button"
+          onClick={props.onOpenVersionHistory}
+          tooltip={t`Open version history`}
+          color="default"
+          disabled={false}
+        >
+          <HistoryIcon />
+        </IconButton>
         <IconButton
           size="small"
           id="toolbar-save-button"
@@ -128,7 +124,6 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               toggleProjectManager={props.toggleProjectManager}
               onSave={props.onSave}
               canSave={props.canSave}
-              showVersionHistoryButton={props.showVersionHistoryButton}
               onOpenVersionHistory={props.onOpenVersionHistory}
               checkedOutVersionStatus={props.checkedOutVersionStatus}
               onQuitVersionHistory={props.onQuitVersionHistory}

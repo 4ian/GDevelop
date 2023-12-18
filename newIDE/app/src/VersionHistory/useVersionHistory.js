@@ -109,7 +109,7 @@ const useVersionHistory = ({
   ] = React.useState<?number>(
     isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
   );
-  const showVersionHistoryButton =
+  const shouldFetchVersions =
     isCloudProject && isUserAllowedToSeeVersionHistory;
   const latestVersionId =
     state.versions && state.versions[0] ? state.versions[0].id : null;
@@ -138,7 +138,7 @@ const useVersionHistory = ({
     () => {
       (async () => {
         if (preventEffectsRunningRef.current) return;
-        if (!cloudProjectId || !showVersionHistoryButton) {
+        if (!cloudProjectId || !shouldFetchVersions) {
           setState(emptyPaginationState);
           return;
         }
@@ -180,7 +180,7 @@ const useVersionHistory = ({
       getAuthorizationHeader,
       firebaseUser,
       cloudProjectId,
-      showVersionHistoryButton,
+      shouldFetchVersions,
       cloudProjectLastModifiedDate,
     ]
   );
@@ -377,23 +377,24 @@ const useVersionHistory = ({
           onClose={() => setVersionHistoryPanelOpen(false)}
           id="version-history-drawer"
         />
-        <Line useFullHeight expand noMargin>
-          <Column expand noMargin>
-            {!cloudProjectId ? (
-              <AlertMessage kind="info">
-                <Trans>Open a cloud project to see the version history.</Trans>
-              </AlertMessage>
-            ) : !isCloudProject ? (
+        {!cloudProjectId ? (
+          <Line expand>
+            <Column expand>
               <AlertMessage kind="info">
                 <Trans>
                   The version history is available for cloud projects only.
                 </Trans>
               </AlertMessage>
-            ) : !isUserAllowedToSeeVersionHistory ? (
+            </Column>
+          </Line>
+        ) : !isUserAllowedToSeeVersionHistory ? (
+          <Line expand>
+            <Column expand>
               <ColumnStackLayout>
                 <AlertMessage kind="info">
                   <Trans>
-                    The version history is not included in your subscription.
+                    Access project history, name saves, restore older versions.
+                    Upgrade to X to get started
                   </Trans>
                 </AlertMessage>
                 <RaisedButton
@@ -404,29 +405,28 @@ const useVersionHistory = ({
                   }
                 />
               </ColumnStackLayout>
-            ) : state.versions ? (
-              <VersionHistory
-                isVisible={versionHistoryPanelOpen}
-                projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-                canLoadMore={!!state.nextPageUri}
-                onCheckoutVersion={onCheckoutVersion}
-                onLoadMore={onLoadMoreVersions}
-                onRenameVersion={onRenameVersion}
-                openedVersionStatus={checkedOutVersionStatus}
-                versions={state.versions}
-              />
-            ) : (
-              <PlaceholderLoader />
-            )}
-          </Column>
-        </Line>
+            </Column>
+          </Line>
+        ) : state.versions ? (
+          <VersionHistory
+            isVisible={versionHistoryPanelOpen}
+            projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
+            canLoadMore={!!state.nextPageUri}
+            onCheckoutVersion={onCheckoutVersion}
+            onLoadMore={onLoadMoreVersions}
+            onRenameVersion={onRenameVersion}
+            openedVersionStatus={checkedOutVersionStatus}
+            versions={state.versions}
+          />
+        ) : (
+          <PlaceholderLoader />
+        )}
       </Drawer>
     );
   };
 
   return {
     checkedOutVersionStatus,
-    showVersionHistoryButton,
     openVersionHistoryPanel,
     renderVersionHistoryPanel,
     onQuitVersionHistory,

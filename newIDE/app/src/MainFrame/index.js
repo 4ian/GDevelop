@@ -2208,7 +2208,6 @@ const MainFrame = (props: Props) => {
 
   const {
     renderVersionHistoryPanel,
-    showVersionHistoryButton,
     openVersionHistoryPanel,
     checkedOutVersionStatus,
     onQuitVersionHistory,
@@ -3192,7 +3191,6 @@ const MainFrame = (props: Props) => {
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
-        showVersionHistoryButton={showVersionHistoryButton}
         onOpenVersionHistory={openVersionHistoryPanel}
         checkedOutVersionStatus={checkedOutVersionStatus}
         onQuitVersionHistory={onQuitVersionHistory}

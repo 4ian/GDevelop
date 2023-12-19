@@ -36,7 +36,7 @@ public:
       : gd::ArbitraryResourceWorker(resourcesManager){};
   virtual ~ResourcesInUseHelper(){};
 
-  std::set<gd::String>& GetAllAssets() { return allAssets; };
+  const std::vector<gd::String>& GetAllResources();
   std::set<gd::String>& GetAllImages() { return GetAll("image"); };
   std::set<gd::String>& GetAllAudios() { return GetAll("audio"); };
   std::set<gd::String>& GetAllFonts() { return GetAll("font"); };
@@ -65,43 +65,34 @@ public:
   };
   virtual void ExposeImage(gd::String& resourceName) override {
     allImages.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeAudio(gd::String& resourceName) override {
     allAudios.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeFont(gd::String& resourceName) override {
     allFonts.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeJson(gd::String& resourceName) override {
     allJsons.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeTilemap(gd::String& resourceName) override {
     allTilemaps.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeTileset(gd::String& resourceName) override {
     allTilesets.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeVideo(gd::String& resourceName) override {
     allVideos.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeBitmapFont(gd::String& resourceName) override {
     allBitmapFonts.insert(resourceName);
-    allAssets.insert(resourceName);
   };
   virtual void ExposeModel3D(gd::String& resourceName) override {
     allModel3Ds.insert(resourceName);
-    allAssets.insert(resourceName);
   };
 
  protected:
-  std::set<gd::String> allAssets;
+  std::vector<gd::String> allResources;
   std::set<gd::String> allImages;
   std::set<gd::String> allAudios;
   std::set<gd::String> allFonts;
@@ -112,6 +103,8 @@ public:
   std::set<gd::String> allBitmapFonts;
   std::set<gd::String> allModel3Ds;
   std::set<gd::String> emptyResources;
+
+  static const std::vector<gd::String> resourceTypes;
 };
 
 }  // namespace gd

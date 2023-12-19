@@ -25,13 +25,10 @@
 
 namespace gd {
 
-const std::vector<gd::String> ObjectAssetSerializer::resourceTypes = {
-    "image",   "audio",   "font",  "json",
-    "tilemap", "tileset", "video", "bitmapFont"};
-
-void ObjectAssetSerializer::SerializeTo(gd::Project &project,
-                                        const gd::Object &object,
-                                        SerializerElement &element) {
+void ObjectAssetSerializer::SerializeTo(
+    gd::Project &project, const gd::Object &object,
+    const gd::String &objectFullName, SerializerElement &element,
+    std::map<gd::String, gd::String> &resourcesFileNameMap) {
   auto cleanObject = object.Clone();
   cleanObject->GetVariables().Clear();
   cleanObject->GetEffects().Clear();
@@ -44,6 +41,11 @@ void ObjectAssetSerializer::SerializeTo(gd::Project &project,
       type.find(PlatformExtension::GetNamespaceSeparator());
   gd::String extensionName =
       separatorIndex != std::string::npos ? type.substr(0, separatorIndex) : "";
+
+  std::map<gd::String, gd::String> resourcesNameReverseMap;
+  gd::ObjectAssetSerializer::RenameObjectResourceFiles(
+      project, *cleanObject, "", objectFullName, resourcesFileNameMap,
+      resourcesNameReverseMap);
 
   element.SetAttribute("id", "");
   element.SetAttribute("name", "");
@@ -77,20 +79,27 @@ void ObjectAssetSerializer::SerializeTo(gd::Project &project,
   auto &resourcesManager = project.GetResourcesManager();
   gd::ResourcesInUseHelper resourcesInUse(resourcesManager);
   cleanObject->GetConfiguration().ExposeResources(resourcesInUse);
-  for (auto &&resourceType : resourceTypes) {
-    for (auto &&resourceName : resourcesInUse.GetAll(resourceType)) {
-      if (resourceName.length() == 0) {
-        continue;
-      }
-      auto &resource = resourcesManager.GetResource(resourceName);
-      SerializerElement &resourceElement =
-          resourcesElement.AddChild("resource");
-      resourceElement.SetAttribute("name", resourceName);
-      resourceElement.SetAttribute("file", resource.GetFile());
-      resourceElement.SetAttribute("kind", resource.GetKind());
-      resourceElement.SetBoolAttribute("alwaysLoaded", false);
-      resourceElement.SetAttribute("metadata", resource.GetMetadata());
+  for (auto &&newResourceName : resourcesInUse.GetAllResources()) {
+    if (newResourceName.length() == 0) {
+      continue;
     }
+    auto &resource = resourcesManager.GetResource(
+        resourcesNameReverseMap.find(newResourceName) !=
+                resourcesNameReverseMap.end()
+            ? resourcesNameReverseMap[newResourceName]
+            : newResourceName);
+    SerializerElement &resourceElement = resourcesElement.AddChild("resource");
+    resource.SerializeTo(resourceElement);
+    // Override name and file because the project and the asset don't use the
+    // same one.
+    resourceElement.SetAttribute("kind", resource.GetKind());
+    resourceElement.SetAttribute("name", newResourceName);
+    auto &oldFilePath = resource.GetFile();
+    resourceElement.SetAttribute("file",
+                                 resourcesFileNameMap.find(oldFilePath) !=
+                                         resourcesFileNameMap.end()
+                                     ? resourcesFileNameMap[oldFilePath]
+                                     : oldFilePath);
   }
 
   SerializerElement &requiredExtensionsElement =
@@ -112,17 +121,12 @@ void ObjectAssetSerializer::SerializeTo(gd::Project &project,
 void ObjectAssetSerializer::RenameObjectResourceFiles(
     gd::Project &project, gd::Object &object,
     const gd::String &destinationDirectory, const gd::String &objectFullName,
-    std::map<gd::String, gd::String> &resourcesFileNameMap) {
+    std::map<gd::String, gd::String> &resourcesFileNameMap,
+    std::map<gd::String, gd::String> &resourcesNameReverseMap) {
   gd::AssetResourcePathCleaner assetResourcePathCleaner(
-      project.GetResourcesManager(), resourcesFileNameMap);
+      project.GetResourcesManager(), resourcesFileNameMap,
+      resourcesNameReverseMap);
   object.GetConfiguration().ExposeResources(assetResourcePathCleaner);
-
-  NormalizeResourceNames(object, resourcesFileNameMap, objectFullName);
-}
-
-void ObjectAssetSerializer::NormalizeResourceNames(
-    gd::Object &object, std::map<gd::String, gd::String> &resourcesFileNameMap,
-    const gd::String &objectFullName) {
 
   if (object.GetConfiguration().GetType() == "Sprite") {
     gd::SpriteObject &spriteConfiguration =
@@ -193,6 +197,18 @@ void ObjectAssetSerializer::NormalizeResourceNames(
         gd::String originFile = it->first;
         gd::String destinationFile = it->second;
         resourcesFileNameMap[originFile] = normalizedFileNames[destinationFile];
+      }
+    }
+    auto clonedResourcesNameReverseMap = resourcesNameReverseMap;
+    resourcesNameReverseMap.clear();
+    for (std::map<gd::String, gd::String>::const_iterator it =
+             clonedResourcesNameReverseMap.begin();
+         it != clonedResourcesNameReverseMap.end(); ++it) {
+      if (!it->first.empty()) {
+        gd::String newResourceName = it->first;
+        gd::String oldResourceName = it->second;
+        resourcesNameReverseMap[normalizedFileNames[newResourceName]] =
+            oldResourceName;
       }
     }
   }

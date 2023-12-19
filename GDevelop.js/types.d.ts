@@ -1115,8 +1115,7 @@ export class Serializer extends EmscriptenObject {
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
-  static serializeTo(project: Project, obj: gdObject, element: SerializerElement): void;
-  static renameObjectResourceFiles(project: Project, obj: gdObject, destinationDirectory: string, objectFullName: string, resourcesNewFileNames: MapStringString): void;
+  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, resourcesNewFileNames: MapStringString): void;
 }
 
 export class InstructionsList extends EmscriptenObject {
@@ -2327,7 +2326,7 @@ export class ObjectsUsingResourceCollector extends EmscriptenObject {
 
 export class ResourcesInUseHelper extends EmscriptenObject {
   constructor(resourcesManager: ResourcesManager): void;
-  getAllAssets(): SetString;
+  getAllResources(): VectorString;
   getAllImages(): SetString;
   getAllAudios(): SetString;
   getAllFonts(): SetString;

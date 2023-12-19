@@ -31,9 +31,11 @@ class GD_CORE_API AssetResourcePathCleaner : public ArbitraryResourceWorker {
 public:
   AssetResourcePathCleaner(
       gd::ResourcesManager &resourcesManager,
-      std::map<gd::String, gd::String> &resourcesFileNameMap_)
+      std::map<gd::String, gd::String> &resourcesFileNameMap_,
+      std::map<gd::String, gd::String> &resourcesNameReverseMap_)
       : ArbitraryResourceWorker(resourcesManager),
-        resourcesFileNameMap(&resourcesFileNameMap_){};
+        resourcesFileNameMap(&resourcesFileNameMap_),
+        resourcesNameReverseMap(&resourcesNameReverseMap_){};
   virtual ~AssetResourcePathCleaner(){};
 
   void ExposeImage(gd::String &imageName) override;
@@ -62,6 +64,11 @@ protected:
    * New file names that can be accessed by their original name.
    */
   std::map<gd::String, gd::String> *resourcesFileNameMap;
+
+  /**
+   * Original resource names that can be accessed by their new name.
+   */
+  std::map<gd::String, gd::String> *resourcesNameReverseMap;
 };
 
 } // namespace gd

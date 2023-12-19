@@ -130,14 +130,12 @@ const zipAssets = async (
   try {
     await Promise.all(
       objects.map(async object => {
-        // Make a copy of the project, as it will be updated.
         const resourcesInUse = new gd.ResourcesInUseHelper(
           project.getResourcesManager()
         );
         object.getConfiguration().exposeResources(resourcesInUse);
         const objectResourceNames = resourcesInUse
-          .getAllAssets()
-          .toNewVectorString()
+          .getAllResources()
           .toJSArray()
           .filter(name => name.length > 0);
         resourcesInUse.delete();
@@ -154,10 +152,9 @@ const zipAssets = async (
 
         const clonedObject = object.clone().get();
         const resourceFileRenamingMap = new gd.MapStringString();
-        gd.ObjectAssetSerializer.renameObjectResourceFiles(
+        const serializedObject = serializeToObjectAsset(
           project,
           clonedObject,
-          '',
           addSpacesToPascalCase(clonedObject.getName()),
           resourceFileRenamingMap
         );
@@ -173,15 +170,6 @@ const zipAssets = async (
         }
         resourceFileRenamingMap.delete();
 
-        // Serialize the project.
-        const serializedObject = serializeToObjectAsset(project, clonedObject);
-        // Resource names are changed by copyObjectResourcesTo so they don't
-        // match any project resource.
-        serializedObject.objectAssets.forEach(asset =>
-          asset.resources.forEach(resource => {
-            resource.file = resource.name;
-          })
-        );
         textFiles.push({
           text: JSON.stringify(serializedObject, null, 2),
           filePath: addSpacesToPascalCase(object.getName()) + '.asset.json',

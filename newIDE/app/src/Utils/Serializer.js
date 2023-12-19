@@ -24,9 +24,20 @@ export function serializeToJSObject(
   return object;
 }
 
-export function serializeToObjectAsset(project: gdProject, object: gdObject) {
+export function serializeToObjectAsset(
+  project: gdProject,
+  object: gdObject,
+  objectFullName: string,
+  resourcesFileNameMap: gdMapStringString
+) {
   const serializedElement = new gd.SerializerElement();
-  gd.ObjectAssetSerializer.serializeTo(project, object, serializedElement);
+  gd.ObjectAssetSerializer.serializeTo(
+    project,
+    object,
+    objectFullName,
+    serializedElement,
+    resourcesFileNameMap
+  );
 
   // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
   const objectAsset = JSON.parse(gd.Serializer.toJSON(serializedElement));

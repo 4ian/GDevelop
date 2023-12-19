@@ -541,7 +541,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(x)
 #define STATIC_SerializeTo SerializeTo
-#define STATIC_RenameObjectResourceFiles RenameObjectResourceFiles
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
 #define STATIC_IsExpression IsExpression
@@ -593,6 +592,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
+#define STATIC_GetResourceTypes GetResourceTypes
 
 #define STATIC_GetBehaviorMetadata GetBehaviorMetadata
 #define STATIC_GetObjectMetadata GetObjectMetadata

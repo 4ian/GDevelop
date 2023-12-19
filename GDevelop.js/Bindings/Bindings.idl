@@ -1298,10 +1298,9 @@ interface Serializer {
 };
 
 interface ObjectAssetSerializer {
-    void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj, [Ref] SerializerElement element);
-    void STATIC_RenameObjectResourceFiles(
-        [Ref] Project project, [Ref] gdObject obj, [Const] DOMString destinationDirectory,
-        [Const] DOMString objectFullName, [Ref] MapStringString resourcesNewFileNames);
+    void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
+        [Const] DOMString objectFullName, [Ref] SerializerElement element,
+        [Ref] MapStringString resourcesNewFileNames);
 };
 
 interface InstructionsList {
@@ -3035,7 +3034,7 @@ interface ObjectsUsingResourceCollector {
 interface ResourcesInUseHelper {
     void ResourcesInUseHelper([Ref] ResourcesManager resourcesManager);
 
-    [Ref] SetString GetAllAssets();
+    [Const, Ref] VectorString GetAllResources();
     [Ref] SetString GetAllImages();
     [Ref] SetString GetAllAudios();
     [Ref] SetString GetAllFonts();

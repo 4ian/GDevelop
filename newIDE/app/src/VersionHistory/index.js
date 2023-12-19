@@ -4,7 +4,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { Trans, t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import { type FilledCloudProjectVersion } from '../Utils/GDevelopServices/Project';
+import { type ExpandedCloudProjectVersion } from '../Utils/GDevelopServices/Project';
 import {
   getUserPublicProfilesByIds,
   type UserPublicProfileByIds,
@@ -40,11 +40,11 @@ const styles = {
 };
 
 type VersionsGroupedByDay = {|
-  [day: number]: Array<FilledCloudProjectVersion>,
+  [day: number]: Array<ExpandedCloudProjectVersion>,
 |};
 
 const groupVersionsByDay = (
-  versions: Array<FilledCloudProjectVersion>
+  versions: Array<ExpandedCloudProjectVersion>
 ): VersionsGroupedByDay => {
   if (versions.length === 0) return {};
 
@@ -66,22 +66,22 @@ export type VersionRestoringStatus =
   | 'saving'
   | 'latest';
 export type OpenedVersionStatus = {|
-  version: FilledCloudProjectVersion,
+  version: ExpandedCloudProjectVersion,
   status: VersionRestoringStatus,
 |};
 
 type Props = {|
   projectId: string,
   authenticatedUserId: string,
-  versions: Array<FilledCloudProjectVersion>,
+  versions: Array<ExpandedCloudProjectVersion>,
   onRenameVersion: (
-    FilledCloudProjectVersion,
+    ExpandedCloudProjectVersion,
     {| label: string |}
   ) => Promise<void>,
   openedVersionStatus: ?OpenedVersionStatus,
   onLoadMore: () => Promise<void>,
   canLoadMore: boolean,
-  onCheckoutVersion: FilledCloudProjectVersion => Promise<void>,
+  onCheckoutVersion: ExpandedCloudProjectVersion => Promise<void>,
   isVisible: boolean,
 |};
 
@@ -144,7 +144,7 @@ const VersionHistory = React.memo<Props>(
     );
 
     const buildVersionMenuTemplate = React.useCallback(
-      (i18n: I18nType, options: { version: FilledCloudProjectVersion }) => {
+      (i18n: I18nType, options: { version: ExpandedCloudProjectVersion }) => {
         const isNotLatestVersionAndUserIsNotNavigatingHistory =
           !openedVersionStatus &&
           latestVersion &&
@@ -183,7 +183,7 @@ const VersionHistory = React.memo<Props>(
     );
 
     const renameVersion = React.useCallback(
-      async (version: FilledCloudProjectVersion, newName: string) => {
+      async (version: ExpandedCloudProjectVersion, newName: string) => {
         setEditedVersionId(null);
         setVersionIdBeingRenamed(version.id);
         try {
@@ -205,7 +205,7 @@ const VersionHistory = React.memo<Props>(
     }, []);
 
     const openContextMenu = React.useCallback(
-      (event: ClientCoordinates, version: FilledCloudProjectVersion) => {
+      (event: ClientCoordinates, version: ExpandedCloudProjectVersion) => {
         const { current: contextMenu } = contextMenuRef;
         if (!contextMenu) return;
         contextMenu.open(event.clientX, event.clientY, { version });

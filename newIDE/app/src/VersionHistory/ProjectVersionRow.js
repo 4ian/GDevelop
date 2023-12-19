@@ -9,7 +9,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import {
   CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH,
-  type FilledCloudProjectVersion,
+  type ExpandedCloudProjectVersion,
 } from '../Utils/GDevelopServices/Project';
 import { type UserPublicProfileByIds } from '../Utils/GDevelopServices/User';
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -33,6 +33,7 @@ import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import CheckIcon from '../UI/CustomSvgIcons/Check';
 import { getStatusColor } from './Utils';
 import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
+import classNames from 'classnames';
 
 const thisYear = new Date().getFullYear();
 
@@ -66,7 +67,7 @@ const styles = {
     borderRadius: 4,
   },
   labelTextfield: { width: '100%' },
-  datSubRow: {
+  labelSubRow: {
     display: 'flex',
     alignItems: 'center',
     padding: '2px 12px 2px 2px',
@@ -99,7 +100,7 @@ const StatusIndicator = ({ status }: {| status: VersionRestoringStatus |}) => {
 };
 
 const useOutline = (
-  version: FilledCloudProjectVersion,
+  version: ExpandedCloudProjectVersion,
   openedVersionStatus: ?OpenedVersionStatus
 ) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -158,16 +159,16 @@ const useClassesForRowContainer = makeStyles(theme =>
 
 type Props = {|
   authenticatedUserId: string,
-  version: FilledCloudProjectVersion,
+  version: ExpandedCloudProjectVersion,
   usersPublicProfileByIds: UserPublicProfileByIds,
   isEditing: boolean,
   isLatest: boolean,
-  onRename: (FilledCloudProjectVersion, string) => Promise<void>,
+  onRename: (ExpandedCloudProjectVersion, string) => Promise<void>,
   isLoading: boolean,
   onCancelRenaming: () => void,
   onContextMenu: (
     event: ClientCoordinates,
-    version: FilledCloudProjectVersion
+    version: ExpandedCloudProjectVersion
   ) => void,
   displayFullDate?: boolean,
   openedVersionStatus: ?OpenedVersionStatus,
@@ -223,11 +224,12 @@ const ProjectVersionRow = ({
     <I18n>
       {({ i18n }) => (
         <div
-          className={`${classes.root}${
-            openedVersionStatus && openedVersionStatus.version.id === version.id
-              ? ' selected'
-              : ''
-          }`}
+          className={classNames({
+            [classes.root]: true,
+            selected:
+              !!openedVersionStatus &&
+              openedVersionStatus.version.id === version.id,
+          })}
           style={outlineStyle}
         >
           <div
@@ -400,8 +402,8 @@ const useClassesForDayCollapse = makeStyles(theme =>
         backgroundColor: theme.palette.action.hover,
       },
     },
-    datSubRow: {
-      ...styles.datSubRow,
+    labelSubRow: {
+      ...styles.labelSubRow,
       '&.selected': {
         backgroundColor: theme.palette.action.focus,
       },
@@ -418,16 +420,16 @@ const useClassesForDayCollapse = makeStyles(theme =>
 type DayGroupRowProps = {|
   day: number,
   authenticatedUserId: string,
-  versions: FilledCloudProjectVersion[],
+  versions: ExpandedCloudProjectVersion[],
   isOpenedInitially: boolean,
   editedVersionId: ?string,
-  latestVersion: ?FilledCloudProjectVersion,
-  onRenameVersion: (FilledCloudProjectVersion, string) => Promise<void>,
+  latestVersion: ?ExpandedCloudProjectVersion,
+  onRenameVersion: (ExpandedCloudProjectVersion, string) => Promise<void>,
   loadingVersionId: ?string,
   onCancelRenaming: () => void,
   onContextMenu: (
     event: ClientCoordinates,
-    version: FilledCloudProjectVersion
+    version: ExpandedCloudProjectVersion
   ) => void,
   openedVersionStatus: ?OpenedVersionStatus,
   usersPublicProfileByIds: UserPublicProfileByIds,
@@ -485,9 +487,10 @@ export const DayGroupRow = ({
           >
             <Column noMargin expand>
               <div
-                className={`${classes.datSubRow}${
-                  shouldHighlightDay ? ' selected' : ''
-                }`}
+                className={classNames({
+                  [classes.labelSubRow]: true,
+                  selected: shouldHighlightDay,
+                })}
               >
                 {isOpen ? <ChevronArrowBottom /> : <ChevronArrowRight />}
                 <Line
@@ -522,9 +525,10 @@ export const DayGroupRow = ({
                       return (
                         <div
                           key={version.id}
-                          className={`${classes.versionSubRow}${
-                            shouldHighlightVersion ? ' selected' : ''
-                          }`}
+                          className={classNames({
+                            [classes.versionSubRow]: true,
+                            selected: shouldHighlightVersion,
+                          })}
                         >
                           <div style={styles.greyed}>
                             <Text size="body-small" noMargin>

@@ -185,7 +185,7 @@ import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/S
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
-import useVersionHistory from '../VersionHistory/useVersionHistory';
+import useVersionHistory from '../VersionHistory/UseVersionHistory';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -2407,9 +2407,10 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const canSaveProjectAs = !!currentProject && !checkedOutVersionStatus;
   const saveProjectAs = React.useCallback(
     () => {
-      if (!currentProject || !!checkedOutVersionStatus) {
+      if (!canSaveProjectAs) {
         // Prevent "save project as" when no current project or when the opened project
         // is a previous version (cloud project only) of the current project.
         return;
@@ -2433,14 +2434,13 @@ const MainFrame = (props: Props) => {
       }
     },
     [
-      currentProject,
       getStorageProviderOperations,
       openSaveToStorageProviderDialog,
       props.storageProviders,
       saveProjectAsWithStorageProvider,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
-      checkedOutVersionStatus,
+      canSaveProjectAs,
     ]
   );
 
@@ -3002,7 +3002,6 @@ const MainFrame = (props: Props) => {
   );
 
   const showLoader = isLoadingProject || previewLoading;
-  const canSaveProjectAs = !!currentProject && !checkedOutVersionStatus;
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,

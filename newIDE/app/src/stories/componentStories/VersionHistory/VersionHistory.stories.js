@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { type FilledCloudProjectVersion } from '../../../Utils/GDevelopServices/Project';
+import { type ExpandedCloudProjectVersion } from '../../../Utils/GDevelopServices/Project';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
@@ -27,7 +27,7 @@ export default {
 };
 
 const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
-const initialVersions: Array<FilledCloudProjectVersion> = [
+const initialVersions: Array<ExpandedCloudProjectVersion> = [
   {
     id: 'dddbe02b-be5e-4008-aff4-90ab32e3315a',
     projectId,
@@ -86,7 +86,7 @@ const initialVersions: Array<FilledCloudProjectVersion> = [
   },
 ];
 
-const nextVersions: Array<FilledCloudProjectVersion> = [
+const nextVersions: Array<ExpandedCloudProjectVersion> = [
   {
     id: 'e51c123a-2abb-47fc-aff6-50b0572c5dc2',
     projectId,
@@ -148,7 +148,7 @@ const userPublicProfilesByIds = {
 };
 
 export const Default = () => {
-  const [versions, setVersions] = React.useState<FilledCloudProjectVersion[]>(
+  const [versions, setVersions] = React.useState<ExpandedCloudProjectVersion[]>(
     initialVersions
   );
   const [
@@ -161,7 +161,7 @@ export const Default = () => {
   const latestVersion = versions[0];
 
   const onCheckoutVersion = React.useCallback(
-    async (version: FilledCloudProjectVersion) => {
+    async (version: ExpandedCloudProjectVersion) => {
       if (version.id === latestVersion.id) {
         setOpenedVersionStatus(null);
         return;
@@ -198,7 +198,7 @@ export const Default = () => {
   );
 
   const onRenameVersion = async (
-    version: FilledCloudProjectVersion,
+    version: ExpandedCloudProjectVersion,
     { label }: {| label: string |}
   ) => {
     await delay(1500);

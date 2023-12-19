@@ -6,7 +6,7 @@ import Drawer from '@material-ui/core/Drawer';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import {
   listVersionsOfProject,
-  type FilledCloudProjectVersion,
+  type ExpandedCloudProjectVersion,
   updateCloudProjectVersion,
 } from '../Utils/GDevelopServices/Project';
 import type { FileMetadata, StorageProvider } from '../ProjectsStorage';
@@ -33,8 +33,8 @@ const styles = {
 };
 
 const mergeVersionsLists = (
-  list1: FilledCloudProjectVersion[],
-  list2: FilledCloudProjectVersion[]
+  list1: ExpandedCloudProjectVersion[],
+  list2: ExpandedCloudProjectVersion[]
 ) => {
   const mostRecentVersionDateInList2 = Date.parse(list2[0].createdAt);
   const moreRecentVersionsInList1 = list1.filter(
@@ -44,7 +44,7 @@ const mergeVersionsLists = (
 };
 
 type PaginationState = {|
-  versions: ?(FilledCloudProjectVersion[]),
+  versions: ?(ExpandedCloudProjectVersion[]),
   nextPageUri: ?Object,
 |};
 
@@ -291,7 +291,7 @@ const useVersionHistory = ({
   );
 
   const onCheckoutVersion = React.useCallback(
-    async (version: FilledCloudProjectVersion) => {
+    async (version: ExpandedCloudProjectVersion) => {
       if (!fileMetadata) return;
       if (!checkedOutVersionStatus && hasUnsavedChanges) {
         await showAlert({
@@ -333,7 +333,7 @@ const useVersionHistory = ({
 
   const onRenameVersion = React.useCallback(
     async (
-      version: FilledCloudProjectVersion,
+      version: ExpandedCloudProjectVersion,
       attributes: {| label: string |}
     ) => {
       if (!cloudProjectId) return;

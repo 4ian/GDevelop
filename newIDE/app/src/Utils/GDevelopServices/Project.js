@@ -96,7 +96,7 @@ export type CloudProjectVersion = {|
   restoredFromVersionId?: string,
 |};
 
-export type FilledCloudProjectVersion = {|
+export type ExpandedCloudProjectVersion = {|
   projectId: string,
   id: string,
   label?: string,
@@ -201,7 +201,7 @@ const getVersionIdFromPath = (path: string): string => {
 export const getLastVersionsOfProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
-): Promise<?Array<FilledCloudProjectVersion>> => {
+): Promise<?Array<ExpandedCloudProjectVersion>> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
@@ -767,7 +767,7 @@ export const listVersionsOfProject = async (
   cloudProjectId: string,
   options: {| forceUri: ?string |}
 ): Promise<?{|
-  versions: Array<FilledCloudProjectVersion>,
+  versions: Array<ExpandedCloudProjectVersion>,
   nextPageUri: ?string,
 |}> => {
   if (!firebaseUser) return;

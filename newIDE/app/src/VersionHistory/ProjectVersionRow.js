@@ -99,7 +99,7 @@ const StatusIndicator = ({ status }: {| status: VersionRestoringStatus |}) => {
   return <span style={{ ...styles.statusIndicator, backgroundColor }} />;
 };
 
-const useOutline = (
+const useBorder = (
   version: ExpandedCloudProjectVersion,
   openedVersionStatus: ?OpenedVersionStatus
 ) => {
@@ -111,7 +111,7 @@ const useOutline = (
   )
     return undefined;
 
-  return { outline: `1px solid ${gdevelopTheme.statusIndicator.error}` };
+  return { border: `1px solid ${gdevelopTheme.statusIndicator.error}` };
 };
 
 const StatusChip = ({ status }: {| status: VersionRestoringStatus |}) => {
@@ -209,7 +209,7 @@ const ProjectVersionRow = ({
   const longTouchProps = useLongTouch(e => onContextMenu(e, version));
 
   const classes = useClassesForRowContainer();
-  const outlineStyle = useOutline(version, openedVersionStatus);
+  const borderStyle = useBorder(version, openedVersionStatus);
   const anonymousAvatar = getAnonymousAvatar();
   const versionStatus =
     openedVersionStatus &&
@@ -230,7 +230,7 @@ const ProjectVersionRow = ({
               !!openedVersionStatus &&
               openedVersionStatus.version.id === version.id,
           })}
-          style={outlineStyle}
+          style={borderStyle}
         >
           <div
             onContextMenu={e => onContextMenu(e, version)}

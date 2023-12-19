@@ -11,7 +11,6 @@ import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { extractNextPageUriFromLinkHeader } from './Play';
-import { User as FirebaseUser } from 'firebase/auth';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -763,16 +762,13 @@ export const updateCloudProjectVersion = async (
  */
 export const listVersionsOfProject = async (
   getAuthorizationHeader: () => Promise<string>,
-  firebaseUser: ?FirebaseUser,
+  userId: ?string,
   cloudProjectId: string,
   options: {| forceUri: ?string |}
 ): Promise<?{|
   versions: Array<ExpandedCloudProjectVersion>,
   nextPageUri: ?string,
 |}> => {
-  if (!firebaseUser) return;
-
-  const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
   const uri = options.forceUri || `/project/${cloudProjectId}/version`;
 

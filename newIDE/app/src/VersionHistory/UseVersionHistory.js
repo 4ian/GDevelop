@@ -79,11 +79,7 @@ const useVersionHistory = ({
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const ignoreFileMetadataChangesRef = React.useRef<boolean>(false);
   const preventEffectsRunningRef = React.useRef<boolean>(false);
-  const {
-    subscription,
-    getAuthorizationHeader,
-    firebaseUser,
-  } = authenticatedUser;
+  const { subscription, getAuthorizationHeader, profile } = authenticatedUser;
   const storageProvider = getStorageProvider();
   const [state, setState] = React.useState<PaginationState>(
     emptyPaginationState
@@ -113,6 +109,7 @@ const useVersionHistory = ({
     isCloudProject && isUserAllowedToSeeVersionHistory;
   const latestVersionId =
     state.versions && state.versions[0] ? state.versions[0].id : null;
+  const authenticatedUserId = profile ? profile.id : null;
 
   // This effect is used to avoid having cloudProjectId and cloudProjectLastModifiedDate
   // set to null when checking out a version, unmounting the VersionHistory component,
@@ -144,7 +141,7 @@ const useVersionHistory = ({
         }
         const listing = await listVersionsOfProject(
           getAuthorizationHeader,
-          firebaseUser,
+          authenticatedUserId,
           cloudProjectId,
           // This effect should only run when the project changes, or the user subscription.
           // So we fetch the first page of versions.
@@ -178,7 +175,7 @@ const useVersionHistory = ({
     [
       storageProvider,
       getAuthorizationHeader,
-      firebaseUser,
+      authenticatedUserId,
       cloudProjectId,
       shouldFetchVersions,
       cloudProjectLastModifiedDate,
@@ -247,7 +244,7 @@ const useVersionHistory = ({
       if (!cloudProjectId) return;
       const listing = await listVersionsOfProject(
         getAuthorizationHeader,
-        firebaseUser,
+        authenticatedUserId,
         cloudProjectId,
         { forceUri: state.nextPageUri }
       );
@@ -257,7 +254,7 @@ const useVersionHistory = ({
         nextPageUri: listing.nextPageUri,
       });
     },
-    [getAuthorizationHeader, firebaseUser, cloudProjectId, state]
+    [getAuthorizationHeader, authenticatedUserId, cloudProjectId, state]
   );
 
   const openVersionHistoryPanel = React.useCallback(() => {

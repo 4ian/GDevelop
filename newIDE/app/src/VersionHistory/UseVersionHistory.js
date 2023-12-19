@@ -22,6 +22,7 @@ import { SubscriptionSuggestionContext } from '../Profile/Subscription/Subscript
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import PlaceholderError from '../UI/PlaceholderError';
 
 const styles = {
   drawerContent: {
@@ -76,6 +77,10 @@ const useVersionHistory = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+  const [
+    versionsFetchingError,
+    setVersionsFetchingError,
+  ] = React.useState<?React.Node>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const ignoreFileMetadataChangesRef = React.useRef<boolean>(false);
   const freezeWhileLoadingSpecificVersionRef = React.useRef<boolean>(false);
@@ -139,37 +144,51 @@ const useVersionHistory = ({
           setState(emptyPaginationState);
           return;
         }
-        const listing = await listVersionsOfProject(
-          getAuthorizationHeader,
-          authenticatedUserId,
-          cloudProjectId,
-          // This effect should only run when the project changes, or the user subscription.
-          // So we fetch the first page of versions.
-          { forceUri: null }
-        );
-        if (!listing) return;
+        setVersionsFetchingError(null);
+        try {
+          const listing = await listVersionsOfProject(
+            getAuthorizationHeader,
+            authenticatedUserId,
+            cloudProjectId,
+            // This effect should only run when the project changes, or the user subscription.
+            // So we fetch the first page of versions.
+            { forceUri: null }
+          );
+          if (!listing) return;
 
-        setState(currentState => {
-          if (!currentState.versions) {
-            // Initial loading of versions.
+          setState(currentState => {
+            if (!currentState.versions) {
+              // Initial loading of versions.
+              return {
+                versions: listing.versions,
+                nextPageUri: listing.nextPageUri,
+              };
+            }
+            // From here, we're in the case where some versions were already loaded
+            // so the effect is triggered by a modification of cloudProjectLastModifiedDate.
+            // So the versions that are fetched should not replace the whole history that
+            // the user maybe spent time to load.
             return {
-              versions: listing.versions,
-              nextPageUri: listing.nextPageUri,
+              versions: mergeVersionsLists(
+                listing.versions,
+                currentState.versions
+              ),
+              // Do not change next page URI.
+              nextPageUri: currentState.nextPageUri,
             };
-          }
-          // From here, we're in the case where some versions were already loaded
-          // so the effect is triggered by a modification of cloudProjectLastModifiedDate.
-          // So the versions that are fetched should not replace the whole history that
-          // the user maybe spent time to load.
-          return {
-            versions: mergeVersionsLists(
-              listing.versions,
-              currentState.versions
-            ),
-            // Do not change next page URI.
-            nextPageUri: currentState.nextPageUri,
-          };
-        });
+          });
+        } catch (error) {
+          console.error(
+            'An error occurred while fetching project versions:',
+            error
+          );
+          setVersionsFetchingError(
+            <Trans>
+              Could not load the project versions. Verify your internet
+              connection or try again later.
+            </Trans>
+          );
+        }
       })();
     },
     [
@@ -242,17 +261,32 @@ const useVersionHistory = ({
   const onLoadMoreVersions = React.useCallback(
     async () => {
       if (!cloudProjectId) return;
-      const listing = await listVersionsOfProject(
-        getAuthorizationHeader,
-        authenticatedUserId,
-        cloudProjectId,
-        { forceUri: state.nextPageUri }
-      );
-      if (!listing) return;
-      setState({
-        versions: [...(state.versions || []), ...listing.versions],
-        nextPageUri: listing.nextPageUri,
-      });
+
+      setVersionsFetchingError(null);
+      try {
+        const listing = await listVersionsOfProject(
+          getAuthorizationHeader,
+          authenticatedUserId,
+          cloudProjectId,
+          { forceUri: state.nextPageUri }
+        );
+        if (!listing) return;
+        setState({
+          versions: [...(state.versions || []), ...listing.versions],
+          nextPageUri: listing.nextPageUri,
+        });
+      } catch (error) {
+        console.error(
+          'An error occurred while fetching more project versions:',
+          error
+        );
+        setVersionsFetchingError(
+          <Trans>
+            Could not load the project versions. Verify your internet connection
+            or try again later.
+          </Trans>
+        );
+      }
     },
     [getAuthorizationHeader, authenticatedUserId, cloudProjectId, state]
   );
@@ -405,6 +439,14 @@ const useVersionHistory = ({
                 }
               />
             </ColumnStackLayout>
+          </Line>
+        ) : !state.versions && versionsFetchingError ? (
+          <Line expand>
+            <Column expand>
+              <PlaceholderError onRetry={onLoadMoreVersions}>
+                {versionsFetchingError}
+              </PlaceholderError>
+            </Column>
           </Line>
         ) : state.versions ? (
           <VersionHistory

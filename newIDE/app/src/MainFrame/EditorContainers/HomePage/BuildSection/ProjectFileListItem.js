@@ -203,7 +203,7 @@ type ProjectFileListItemProps = {|
   currentFileMetadata: ?FileMetadata,
   lastModifiedInfo?: LastModifiedInfo | null,
   storageProviders: Array<StorageProvider>,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   isWindowWidthMediumOrLarger: boolean,
   hideDeleteContextMenuAction?: boolean,
   onManageGame?: ({ gameId: string }) => void,

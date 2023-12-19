@@ -81,6 +81,7 @@ const ElectronMainMenu = ({
   const {
     i18n,
     project,
+    canSaveProjectAs,
     recentProjectFiles,
     shortcutMap,
     isApplicationTopLevelMenu,
@@ -136,6 +137,11 @@ const ElectronMainMenu = ({
   useIPCEventListener({
     ipcEvent: 'main-menu-save-as',
     callback: callbacks.onSaveProjectAs,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-show-version-history',
+    callback: callbacks.onShowVersionHistory,
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
@@ -227,6 +233,7 @@ const ElectronMainMenu = ({
           'set-main-menu',
           buildMainMenuDeclarativeTemplate({
             project,
+            canSaveProjectAs,
             i18n,
             recentProjectFiles,
             shortcutMap,
@@ -239,6 +246,7 @@ const ElectronMainMenu = ({
       i18n,
       language,
       project,
+      canSaveProjectAs,
       recentProjectFiles,
       shortcutMap,
       isApplicationTopLevelMenu,

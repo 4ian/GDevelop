@@ -196,6 +196,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
       },
       {
+        message: t`Access your cloud projects history and easily get back to a previous version.`,
+      },
+      {
         message: t`Add 1 guest user or unlimited startup team members to collaborate on every project.`,
       },
     ],
@@ -462,6 +465,19 @@ export const getRedirectToCheckoutUrl = ({
   if (quantity !== undefined && quantity > 1)
     url.searchParams.set('quantity', quantity.toString());
   return url.toString();
+};
+
+export const canUseCloudProjectHistory = (
+  subscription: ?Subscription
+): boolean => {
+  if (!subscription) return false;
+  return (
+    ['gdevelop_business', 'gdevelop_startup', 'gdevelop_education'].includes(
+      subscription.planId
+    ) ||
+    (subscription.planId === 'gdevelop_gold' &&
+      !!subscription.benefitsFromEducationPlan)
+  );
 };
 
 export const redeemCode = async (

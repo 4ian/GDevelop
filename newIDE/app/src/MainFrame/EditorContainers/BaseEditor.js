@@ -71,7 +71,7 @@ export type RenderEditorContainerProps = {|
   // Project opening
   canOpen: boolean,
   onChooseProject: () => void,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<boolean>,
 

@@ -101,7 +101,7 @@ export type StorageProviderOperations = {|
   onSaveProject?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    options?: {| previousVersion: string |}
+    options?: {| previousVersion?: string, restoredFromVersionId?: string |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
@@ -146,7 +146,7 @@ export type StorageProviderOperations = {|
     project: gdProject,
     fileMetadata: FileMetadata,
     properties: {| name?: string, gameId?: string |} // In order to synchronize project and cloud project names.
-  ) => Promise<null | {| version: string |}>,
+  ) => Promise<null | {| version: string, lastModifiedDate: number |}>,
 
   // Project auto saving:
   onAutoSaveProject?: (

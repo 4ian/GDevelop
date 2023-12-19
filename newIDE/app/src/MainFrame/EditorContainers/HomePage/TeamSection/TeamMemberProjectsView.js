@@ -41,7 +41,7 @@ type Props = {|
   user: User,
   currentFileMetadata: ?FileMetadata,
   onClickBack: () => void,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
   projects: ?Array<CloudProjectWithUserAccessInfo>,
   onRefreshProjects: (user: User) => Promise<void>,

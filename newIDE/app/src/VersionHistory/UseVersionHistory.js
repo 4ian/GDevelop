@@ -78,7 +78,7 @@ const useVersionHistory = ({
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const ignoreFileMetadataChangesRef = React.useRef<boolean>(false);
-  const preventEffectsRunningRef = React.useRef<boolean>(false);
+  const freezeWhileLoadingSpecificVersionRef = React.useRef<boolean>(false);
   const { subscription, getAuthorizationHeader, profile } = authenticatedUser;
   const storageProvider = getStorageProvider();
   const [state, setState] = React.useState<PaginationState>(
@@ -134,7 +134,7 @@ const useVersionHistory = ({
   React.useEffect(
     () => {
       (async () => {
-        if (preventEffectsRunningRef.current) return;
+        if (freezeWhileLoadingSpecificVersionRef.current) return;
         if (!cloudProjectId || !shouldFetchVersions) {
           setState(emptyPaginationState);
           return;
@@ -157,9 +157,9 @@ const useVersionHistory = ({
               nextPageUri: listing.nextPageUri,
             };
           }
-          // From here, we're in the case where some versions where already loaded
+          // From here, we're in the case where some versions were already loaded
           // so the effect is triggered by a modification of cloudProjectLastModifiedDate.
-          // To the versions that are fetched should not replace the whole history that
+          // So the versions that are fetched should not replace the whole history that
           // the user maybe spent time to load.
           return {
             versions: mergeVersionsLists(
@@ -185,7 +185,7 @@ const useVersionHistory = ({
   // This effect watches the unsavedChanges instance to change the opened version status.
   React.useEffect(
     () => {
-      if (preventEffectsRunningRef.current) return;
+      if (freezeWhileLoadingSpecificVersionRef.current) return;
       setCheckedOutVersionStatus(currentCheckedOutVersionStatus => {
         if (
           !currentCheckedOutVersionStatus ||
@@ -207,7 +207,7 @@ const useVersionHistory = ({
   // This effect watches the isSavingProject flag to change the opened version status.
   React.useEffect(
     () => {
-      if (preventEffectsRunningRef.current) return;
+      if (freezeWhileLoadingSpecificVersionRef.current) return;
       setCheckedOutVersionStatus(currentCheckedOutVersionStatus => {
         if (
           !currentCheckedOutVersionStatus ||
@@ -264,7 +264,7 @@ const useVersionHistory = ({
   const onQuitVersionHistory = React.useCallback(
     async () => {
       if (!fileMetadata || !checkedOutVersionStatus || !latestVersionId) return;
-      preventEffectsRunningRef.current = true;
+      freezeWhileLoadingSpecificVersionRef.current = true;
       ignoreFileMetadataChangesRef.current = true;
       try {
         await onOpenCloudProjectOnSpecificVersion({
@@ -275,7 +275,7 @@ const useVersionHistory = ({
         });
         setCheckedOutVersionStatus(null);
       } finally {
-        preventEffectsRunningRef.current = false;
+        freezeWhileLoadingSpecificVersionRef.current = false;
         ignoreFileMetadataChangesRef.current = false;
       }
     },
@@ -302,7 +302,7 @@ const useVersionHistory = ({
         setVersionHistoryPanelOpen(false);
         return;
       }
-      preventEffectsRunningRef.current = true;
+      freezeWhileLoadingSpecificVersionRef.current = true;
       ignoreFileMetadataChangesRef.current = true;
       try {
         await onOpenCloudProjectOnSpecificVersion({
@@ -313,7 +313,7 @@ const useVersionHistory = ({
         });
         setCheckedOutVersionStatus({ version, status: 'opened' });
       } finally {
-        preventEffectsRunningRef.current = false;
+        freezeWhileLoadingSpecificVersionRef.current = false;
         ignoreFileMetadataChangesRef.current = false;
       }
     },

@@ -2407,12 +2407,12 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  // Prevent "save project as" when no current project or when the opened project
+  // is a previous version (cloud project only) of the current project.
   const canSaveProjectAs = !!currentProject && !checkedOutVersionStatus;
   const saveProjectAs = React.useCallback(
     () => {
       if (!canSaveProjectAs) {
-        // Prevent "save project as" when no current project or when the opened project
-        // is a previous version (cloud project only) of the current project.
         return;
       }
 

@@ -8,9 +8,6 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import ObjectExporterDialog from '../../../ObjectEditor/ObjectExporterDialog';
-import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import LocalEventsFunctionsExtensionWriter from '../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
-import LocalEventsFunctionsExtensionOpener from '../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 
 export default {
   title: 'LayoutEditor/ObjectExporterDialog',
@@ -18,28 +15,11 @@ export default {
   decorators: [muiDecorator],
 };
 
-const fakeEventsFunctionsExtensionsContext = {
-  loadProjectEventsFunctionsExtensions: async project => {},
-  unloadProjectEventsFunctionsExtensions: project => {},
-  unloadProjectEventsFunctionsExtension: (project, extensionName) => {},
-  reloadProjectEventsFunctionsExtensions: async project => {},
-  reloadProjectEventsFunctionsExtensionMetadata: (project, extension) => {},
-  getEventsFunctionsExtensionWriter: () => LocalEventsFunctionsExtensionWriter,
-  getEventsFunctionsExtensionOpener: () => LocalEventsFunctionsExtensionOpener,
-  ensureLoadFinished: async () => {},
-  getIncludeFileHashs: () => ({}),
-  eventsFunctionsExtensionsError: null,
-};
-
 export const Default = () => (
-  <EventsFunctionsExtensionsContext.Provider
-    value={fakeEventsFunctionsExtensionsContext}
-  >
-    <ObjectExporterDialog
-      project={testProject.project}
-      layout={testProject.testLayout}
-      object={testProject.customObject}
-      onClose={() => action('Close the dialog')}
-    />
-  </EventsFunctionsExtensionsContext.Provider>
+  <ObjectExporterDialog
+    project={testProject.project}
+    layout={testProject.testLayout}
+    object={testProject.customObject}
+    onClose={() => action('Close the dialog')}
+  />
 );

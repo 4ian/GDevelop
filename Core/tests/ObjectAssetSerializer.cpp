@@ -99,8 +99,11 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
     REQUIRE(objectAssetElement.HasChild("requiredExtensions"));
     auto &requiredExtensionsElement =
         objectAssetElement.GetChild("requiredExtensions");
-    requiredExtensionsElement.ConsiderAsArrayOf("requiredExtensions");
-    REQUIRE(requiredExtensionsElement.GetChildrenCount() == 0);
+    requiredExtensionsElement.ConsiderAsArrayOf("requiredExtension");
+    REQUIRE(requiredExtensionsElement.GetChildrenCount() == 1);
+    auto &requiredExtensionElement = requiredExtensionsElement.GetChild(0);
+    REQUIRE(requiredExtensionElement.GetStringAttribute("extensionName") ==
+            "MyEventsExtension");
 
     // Resources are renamed according to asset script naming conventions.
     REQUIRE(objectAssetElement.HasChild("resources"));

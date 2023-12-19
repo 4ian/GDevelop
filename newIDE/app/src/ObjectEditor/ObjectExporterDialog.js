@@ -81,7 +81,6 @@ export const downloadResourcesAsBlobs = async ({
     )
     .filter(Boolean);
 
-  // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResources: Array<
     ItemResult<ResourceToFetch>
   > = await downloadUrlsToBlobs({
@@ -140,7 +139,7 @@ const zipAssets = async (
           .filter(name => name.length > 0);
         resourcesInUse.delete();
 
-        // Download resources to blobs, and update the project resources.
+        // Download resources to blobs and update the resources.
         const blobByResourceName: Map<string, Blob> = new Map();
         await ensureDownloadResourcesAsBlobsIsDone({
           project,
@@ -150,12 +149,14 @@ const zipAssets = async (
           },
         });
 
-        const clonedObject = object.clone().get();
+        /**
+         * The map from project resource file paths to asset resource file paths.
+         */
         const resourceFileRenamingMap = new gd.MapStringString();
         const serializedObject = serializeToObjectAsset(
           project,
-          clonedObject,
-          addSpacesToPascalCase(clonedObject.getName()),
+          object,
+          addSpacesToPascalCase(object.getName()),
           resourceFileRenamingMap
         );
 
@@ -177,24 +178,20 @@ const zipAssets = async (
       })
     );
 
-    // Archive the whole project.
-    const zippedProjectBlob = await archiveFiles({
+    const zippedAssetsBlob = await archiveFiles({
       textFiles,
       blobFiles,
       basePath: '',
       onProgress: (count: number, total: number) => {},
     });
-    return zippedProjectBlob;
+    return zippedAssetsBlob;
   } catch (rawError) {
     showErrorBox({
-      message: 'Unable to save your project because of an internal error.',
+      message: 'Unable to export your assets because of an internal error.',
       rawError,
       errorId: 'download-file-save-as-dialog-error',
     });
     return null;
-  } finally {
-    // TODO Should it be done?
-    //clonedObject.delete();
   }
 };
 

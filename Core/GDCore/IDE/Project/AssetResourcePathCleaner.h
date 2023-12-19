@@ -1,6 +1,6 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * Copyright 2008-2023 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
 #pragma once
@@ -47,15 +47,6 @@ public:
   void ExposeVideo(gd::String &videoName) override;
   void ExposeBitmapFont(gd::String &bitmapFontName) override;
   void ExposeFile(gd::String &resource) override;
-
-  /**
-   * \brief Return a map containing the resources old absolute filename as key,
-   * and the resources new filenames as value. The new filenames are relative to
-   * the Base Directory.
-   */
-  std::map<gd::String, gd::String> &GetAllResourcesOldAndNewFilename() {
-    return *resourcesFileNameMap;
-  };
 
 protected:
   void ExposeResourceAsFile(gd::String &resourceName);

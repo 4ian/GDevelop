@@ -1,6 +1,6 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * Copyright 2008-2023 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
 #pragma once
@@ -32,12 +32,20 @@ namespace gd {
 class GD_CORE_API ObjectAssetSerializer {
 public:
   /**
-   * \brief Serialize the object into an asset.
+   * \brief Serialize an object into an asset.
+   *
+   * \param project The project that contains the object and its resources.
+   * It's not actually modified.
+   * \param object The object to serialize as an asset.
+   * \param objectFullName The object name with spaces instead of PascalCase.
+   * \param element The element where the asset is serialize.
+   * \param resourcesFileNameMap The map from project resource file paths to
+   * asset resource file paths.
    */
-  static void SerializeTo(gd::Project &project, const gd::Object &object, const gd::String& objectFullName,
-                          SerializerElement &element,
-      std::map<gd::String, gd::String> &resourcesFileNameMap);
-
+  static void
+  SerializeTo(gd::Project &project, const gd::Object &object,
+              const gd::String &objectFullName, SerializerElement &element,
+              std::map<gd::String, gd::String> &resourcesFileNameMap);
 
   ~ObjectAssetSerializer(){};
 

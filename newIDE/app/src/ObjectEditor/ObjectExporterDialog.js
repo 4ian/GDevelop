@@ -26,6 +26,7 @@ import {
   type BlobFileDescriptor,
   type TextFileDescriptor,
 } from '../Utils/BrowserArchiver';
+import ResourcesLoader from '../ResourcesLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,7 +72,12 @@ export const downloadResourcesAsBlobs = async ({
     .map(
       (resourceName: string): ?ResourceToFetch => {
         const resource = resourcesManager.getResource(resourceName);
-        const resourceFile = resource.getFile();
+        const resourceFile = ResourcesLoader.getResourceFullUrl(
+          project,
+          resourceName,
+          {}
+        );
+        console.log(resourceFile);
         return {
           resource,
           url: resourceFile,

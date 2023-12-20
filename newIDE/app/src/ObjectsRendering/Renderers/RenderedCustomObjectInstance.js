@@ -199,10 +199,11 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         childType === 'TiledSpriteObject::TiledSprite' ||
         childType === 'PanelSpriteObject::PanelSprite'
       ) {
-        return ObjectsRenderingService.getThumbnail(
+        const thumbnail = ObjectsRenderingService.getThumbnail(
           project,
           childObjectConfiguration
         );
+        if (thumbnail) return thumbnail;
       }
     }
     return 'res/unknown32.png';

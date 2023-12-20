@@ -23,12 +23,17 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import PlaceholderError from '../UI/PlaceholderError';
+import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 
 const getCloudProjectFileMetadataIdentifier = (
   storageProviderInternalName: string,
   fileMetadata: ?FileMetadata
 ) => {
-  if (!fileMetadata || !storageProviderInternalName === 'Cloud') return null;
+  if (
+    !fileMetadata ||
+    !storageProviderInternalName === CloudStorageProvider.internalName
+  )
+    return null;
   if (fileMetadata.fileIdentifier.startsWith('http')) {
     // When creating a cloud project from an example, there might be a moment where
     // the used Storage Provider is the cloud one but the file identifier is the url
@@ -115,7 +120,8 @@ const useVersionHistory = ({
     setVersionHistoryPanelOpen,
   ] = React.useState<boolean>(false);
   const storageProviderInternalName = storageProvider.internalName;
-  const isCloudProject = storageProviderInternalName === 'Cloud';
+  const isCloudProject =
+    storageProviderInternalName === CloudStorageProvider.internalName;
   const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(
     subscription
   );

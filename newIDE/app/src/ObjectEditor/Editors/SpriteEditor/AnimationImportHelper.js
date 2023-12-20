@@ -54,9 +54,11 @@ export const groupResourcesByAnimations = (
 
   // Extract the frame indexes from the file names.
   const namedResources = resources.map(resource => {
+    // The resource name is used instead of the resource file path because
+    // cloud projects are prefixing files names with a UID.
     const basename = path.basename(
-      resource.getFile(),
-      path.extname(resource.getFile())
+      resource.getName(),
+      path.extname(resource.getName())
     );
     const indexMatches = basename.match(/\(\d+\)$|\d+$/g);
     const indexNumberMatches =

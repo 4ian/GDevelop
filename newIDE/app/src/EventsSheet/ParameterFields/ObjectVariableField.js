@@ -45,46 +45,31 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     });
 
     const { layout } = scope;
-    let object = null;
-    if (objectName) {
-      if (layout && layout.hasObjectNamed(objectName)) {
-        object = layout.getObject(objectName);
-      } else if (project && project.hasObjectNamed(objectName)) {
-        object = project.getObject(objectName);
-      }
-    }
-    const variablesContainers = React.useMemo(
+    const object = objectName
+      ? layout && layout.hasObjectNamed(objectName)
+        ? layout.getObject(objectName)
+        : project && project.hasObjectNamed(objectName)
+        ? project.getObject(objectName)
+        : null
+      : null;
+    const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
       () => {
+        if (!objectName) {
+          return [];
+        }
         const variablesContainers: Array<gdVariablesContainer> = [];
-        if (objectName) {
-          if (layout && layout.hasObjectNamed(objectName)) {
-            variablesContainers.push(
-              layout.getObject(objectName).getVariables()
-            );
-          } else if (project && project.hasObjectNamed(objectName)) {
-            variablesContainers.push(
-              project.getObject(objectName).getVariables()
-            );
-          } else if (layout && layout.getObjectGroups().has(objectName)) {
-            for (const subObjectName of layout
-              .getObjectGroups()
-              .get(objectName)
-              .getAllObjectsNames()
-              .toJSArray()) {
-              if (layout && layout.hasObjectNamed(subObjectName)) {
-                variablesContainers.push(
-                  layout.getObject(subObjectName).getVariables()
-                );
-              } else if (project && project.hasObjectNamed(subObjectName)) {
-                variablesContainers.push(
-                  project.getObject(subObjectName).getVariables()
-                );
-              }
-            }
-          } else if (project && project.getObjectGroups().has(objectName)) {
-            for (const subObjectName of project
-              .getObjectGroups()
-              .get(objectName)
+        if (object) {
+          variablesContainers.push(object.getVariables());
+        } else {
+          const group =
+            layout && layout.getObjectGroups().has(objectName)
+              ? layout.getObjectGroups().get(objectName)
+              : project && project.getObjectGroups().has(objectName)
+              ? project.getObjectGroups().get(objectName)
+              : null;
+
+          if (group) {
+            for (const subObjectName of group
               .getAllObjectsNames()
               .toJSArray()) {
               if (layout && layout.hasObjectNamed(subObjectName)) {
@@ -101,7 +86,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         }
         return variablesContainers;
       },
-      [layout, objectName, project]
+      [layout, object, objectName, project]
     );
 
     const onComputeAllVariableNames = () =>

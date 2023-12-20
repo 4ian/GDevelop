@@ -33,10 +33,12 @@ const useDisplayNewFeature = () => {
       const settings = featuresDisplaySettings[featureId];
       if (!settings) return false;
 
-      const acknowledgments = newFeaturesAcknowledgements[featureId];
-      if (!acknowledgments) return true;
-
       const { count, intervalInDays, minimumProgramOpeningCount } = settings;
+
+      const acknowledgments = newFeaturesAcknowledgements[featureId];
+      if (!acknowledgments)
+        return programOpeningCount > minimumProgramOpeningCount;
+
       const { dates } = acknowledgments;
       if (dates.length >= count) return false;
 

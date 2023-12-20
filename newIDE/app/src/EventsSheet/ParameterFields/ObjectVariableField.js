@@ -135,30 +135,33 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
         />
-        {editorOpen && variablesContainers.length === 1 && project && (
-          <VariablesEditorDialog
-            project={project}
-            title={<Trans>Object Variables</Trans>}
-            open={editorOpen}
-            variablesContainer={variablesContainers[0]}
-            emptyPlaceholderTitle={
-              <Trans>Add your first object variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information on an object.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/object-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
-            onCancel={() => setEditorOpen(false)}
-            onApply={() => {
-              setEditorOpen(false);
-              if (field.current) field.current.updateAutocompletions();
-            }}
-            preventRefactoringToDeleteInstructions
-          />
-        )}
+        {editorOpen &&
+          // There is no variable editor for groups.
+          variablesContainers.length === 1 &&
+          project && (
+            <VariablesEditorDialog
+              project={project}
+              title={<Trans>Object Variables</Trans>}
+              open={editorOpen}
+              variablesContainer={variablesContainers[0]}
+              emptyPlaceholderTitle={
+                <Trans>Add your first object variable</Trans>
+              }
+              emptyPlaceholderDescription={
+                <Trans>
+                  These variables hold additional information on an object.
+                </Trans>
+              }
+              helpPagePath={'/all-features/variables/object-variables'}
+              onComputeAllVariableNames={onComputeAllVariableNames}
+              onCancel={() => setEditorOpen(false)}
+              onApply={() => {
+                setEditorOpen(false);
+                if (field.current) field.current.updateAutocompletions();
+              }}
+              preventRefactoringToDeleteInstructions
+            />
+          )}
       </React.Fragment>
     );
   }

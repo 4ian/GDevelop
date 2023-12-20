@@ -23,6 +23,7 @@ import SemiControlledAutoComplete, {
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import intersection from 'lodash/intersection';
 
 type Props = {
   ...ParameterFieldProps,
@@ -125,20 +126,21 @@ export default React.forwardRef<Props, VariableFieldInterface>(
      */
     const updateAutocompletions = React.useCallback(
       () => {
-        const definedVariableNames = new Set<string>();
-        for (const variablesContainer of variablesContainers) {
-          for (const enumeratedVariable of enumerateVariables(
-            variablesContainer
-          )) {
-            // Hide invalid variable names - they would not
-            // be parsed correctly anyway.
-            if (enumeratedVariable.isValidName) {
-              definedVariableNames.add(enumeratedVariable.name);
-            }
-          }
-        }
+        const definedVariableNames = variablesContainers
+          .map(variablesContainer =>
+            enumerateVariables(variablesContainer)
+              .map(({ name, isValidName }) =>
+                isValidName
+                  ? name
+                  : // Hide invalid variable names - they would not
+                    // be parsed correctly anyway.
+                    null
+              )
+              .filter(Boolean)
+          )
+          .reduce((a, b) => intersection(a, b));
         setAutocompletionVariableNames(
-          [...definedVariableNames].map(name => ({
+          definedVariableNames.map(name => ({
             text: name,
             value: name,
           }))

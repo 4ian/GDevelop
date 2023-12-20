@@ -24,6 +24,23 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import PlaceholderError from '../UI/PlaceholderError';
 
+const getCloudProjectFileMetadataIdentifier = (
+  storageProviderInternalName: string,
+  fileMetadata: ?FileMetadata
+) => {
+  if (!fileMetadata || !storageProviderInternalName === 'Cloud') return null;
+  if (fileMetadata.fileIdentifier.startsWith('http')) {
+    // When creating a cloud project from an example, there might be a moment where
+    // the used Storage Provider is the cloud one but the file identifier is the url
+    // to the example such as `https://ressources.gdevelop-app.com/...`.
+    // A cloud project identifier is a uuid at the moment, so it does not contain the
+    // 3 letters h t and p so there should be no risk af having a cloud project
+    // uuid starting with http.
+    return null;
+  }
+  return fileMetadata.fileIdentifier;
+};
+
 const styles = {
   drawerContent: {
     width: 320,
@@ -97,12 +114,16 @@ const useVersionHistory = ({
     versionHistoryPanelOpen,
     setVersionHistoryPanelOpen,
   ] = React.useState<boolean>(false);
-  const isCloudProject = storageProvider.internalName === 'Cloud';
+  const storageProviderInternalName = storageProvider.internalName;
+  const isCloudProject = storageProviderInternalName === 'Cloud';
   const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(
     subscription
   );
   const [cloudProjectId, setCloudProjectId] = React.useState<?string>(
-    isCloudProject && fileMetadata ? fileMetadata.fileIdentifier : null
+    getCloudProjectFileMetadataIdentifier(
+      storageProviderInternalName,
+      fileMetadata
+    )
   );
   const [
     cloudProjectLastModifiedDate,
@@ -123,13 +144,16 @@ const useVersionHistory = ({
     () => {
       if (ignoreFileMetadataChangesRef.current) return;
       setCloudProjectId(
-        isCloudProject && fileMetadata ? fileMetadata.fileIdentifier : null
+        getCloudProjectFileMetadataIdentifier(
+          storageProviderInternalName,
+          fileMetadata
+        )
       );
       setCloudProjectLastModifiedDate(
         isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
       );
     },
-    [isCloudProject, fileMetadata]
+    [storageProviderInternalName, isCloudProject, fileMetadata]
   );
 
   // This effect is run in 2 cases:

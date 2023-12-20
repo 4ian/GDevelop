@@ -25,7 +25,6 @@ import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';

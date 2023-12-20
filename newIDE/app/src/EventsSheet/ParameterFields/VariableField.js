@@ -26,7 +26,7 @@ import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 type Props = {
   ...ParameterFieldProps,
-  variablesContainer: ?gdVariablesContainer,
+  variablesContainer: Array<gdVariablesContainer> | gdVariablesContainer | null,
   onOpenDialog: ?() => void,
 };
 
@@ -51,7 +51,10 @@ export const VariableNameQuickAnalyzeResults = {
 // selector that offers the variables in the scope).
 export const quicklyAnalyzeVariableName = (
   name: string,
-  variablesContainer?: ?gdVariablesContainer
+  variablesContainers?:
+    | Array<gdVariablesContainer>
+    | gdVariablesContainer
+    | null
 ): VariableNameQuickAnalyzeResult => {
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
@@ -90,8 +93,17 @@ export const quicklyAnalyzeVariableName = (
         )
       : name;
 
-  if (variablesContainer && !variablesContainer.has(nameToCheck))
+  if (Array.isArray(variablesContainers)) {
+    if (
+      !variablesContainers.some(variablesContainer =>
+        variablesContainer.has(nameToCheck)
+      )
+    ) {
+      return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
+    }
+  } else if (variablesContainers && variablesContainers.has(nameToCheck)) {
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
+  }
 
   return VariableNameQuickAnalyzeResults.OK;
 };
@@ -120,17 +132,23 @@ export default React.forwardRef<Props, VariableFieldInterface>(
      */
     const updateAutocompletions = React.useCallback(
       () => {
-        const definedVariableNames = enumerateVariables(variablesContainer)
-          .map(({ name, isValidName }) =>
-            isValidName
-              ? name
-              : // Hide invalid variable names - they would not
-                // be parsed correctly anyway.
-                null
-          )
-          .filter(Boolean);
+        const definedVariableNames = new Set<string>();
+        const variablesContainers = Array.isArray(variablesContainer)
+          ? variablesContainer
+          : [variablesContainer];
+        for (const variablesContainer of variablesContainers) {
+          for (const enumeratedVariable of enumerateVariables(
+            variablesContainer
+          )) {
+            // Hide invalid variable names - they would not
+            // be parsed correctly anyway.
+            if (enumeratedVariable.isValidName) {
+              definedVariableNames.add(enumeratedVariable.name);
+            }
+          }
+        }
         setAutocompletionVariableNames(
-          definedVariableNames.map(name => ({
+          [...definedVariableNames].map(name => ({
             text: name,
             value: name,
           }))
@@ -214,7 +232,9 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 onApply={onApply}
                 dataSource={[
                   ...autocompletionVariableNames,
-                  onOpenDialog && variablesContainer
+                  onOpenDialog &&
+                  variablesContainer &&
+                  !Array.isArray(variablesContainer)
                     ? {
                         translatableValue: t`Add or edit variables...`,
                         text: '',
@@ -232,7 +252,9 @@ export default React.forwardRef<Props, VariableFieldInterface>(
               onOpenDialog && !isInline ? (
                 <RaisedButton
                   icon={<ShareExternal />}
-                  disabled={!variablesContainer}
+                  disabled={
+                    !variablesContainer || Array.isArray(variablesContainer)
+                  }
                   primary
                   style={style}
                   onClick={onOpenDialog}

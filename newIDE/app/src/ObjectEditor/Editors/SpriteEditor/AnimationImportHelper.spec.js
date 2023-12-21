@@ -6,6 +6,7 @@ describe('AnimationImportHelper', () => {
   const createResources = (filePaths: Array<string>): Array<gdResource> =>
     filePaths.map(filePath => {
       const resource = new gd.ImageResource();
+      resource.setName(filePath);
       resource.setFile(filePath);
       return resource;
     });

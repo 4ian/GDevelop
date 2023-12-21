@@ -247,12 +247,10 @@ const AssetPackInstallDialog = ({
           onApply: () => {},
           content: (
             <AlertMessage kind="warning">
-              <Text>
-                <Trans>
-                  You need to save this project as a cloud project to install
-                  premium assets. Please save your project and try again.
-                </Trans>
-              </Text>
+              <Trans>
+                You need to save this project as a cloud project to install
+                premium assets. Please save your project and try again.
+              </Trans>
             </AlertMessage>
           ),
         }
@@ -270,13 +268,11 @@ const AssetPackInstallDialog = ({
           onApply: () => {},
           content: (
             <AlertMessage kind="warning">
-              <Text>
-                <Trans>
-                  You can only install up to {MAX_ASSETS_TO_INSTALL} assets at
-                  once. Try filtering the assets you would like to install, or
-                  install them one by one.
-                </Trans>
-              </Text>
+              <Trans>
+                You can only install up to {MAX_ASSETS_TO_INSTALL} assets at
+                once. Try filtering the assets you would like to install, or
+                install them one by one.
+              </Trans>
             </AlertMessage>
           ),
         }

@@ -207,12 +207,10 @@ export const ErrorFallbackComponent = ({
         <Divider />
         <ColumnStackLayout>
           <AlertMessage kind={isCriticalError ? 'error' : 'warning'}>
-            <Text>
-              <Trans>
-                Please <b>backup your game file</b> and save your game to ensure
-                that you don't lose anything.
-              </Trans>
-            </Text>
+            <Trans>
+              Please <b>backup your game file</b> and save your game to ensure
+              that you don't lose anything.
+            </Trans>
           </AlertMessage>
           <Text>
             <Trans>

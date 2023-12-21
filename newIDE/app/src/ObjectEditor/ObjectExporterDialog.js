@@ -4,11 +4,10 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
-import { Line } from '../UI/Grid';
-import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
+import { Column } from '../UI/Grid';
+import { ColumnStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
-import Window from '../Utils/Window';
 import { mapFor } from '../Utils/MapFor';
 import Upload from '../UI/CustomSvgIcons/Upload';
 import {
@@ -27,8 +26,6 @@ import {
   type TextFileDescriptor,
 } from '../Utils/BrowserArchiver';
 import ResourcesLoader from '../ResourcesLoader';
-import { getHelpLink } from '../Utils/HelpLink';
-import Help from '../UI/CustomSvgIcons/Help';
 
 const gd: libGDevelop = global.gd;
 
@@ -202,16 +199,6 @@ const zipAssets = async (
   }
 };
 
-const openFreePackHelpPage = () => {
-  Window.openExternalURL(
-    getHelpLink('/community/contribute-to-the-assets-store/')
-  );
-};
-
-const openPaidPackHelpPage = () => {
-  Window.openExternalURL(getHelpLink('/community/sell-asset-pack-store/'));
-};
-
 type Props = {|
   project: gdProject,
   layout: gdLayout,
@@ -264,7 +251,13 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
       secondaryActions={[
         <HelpButton
           key="help"
+          label={<Trans>Submit a free pack</Trans>}
           helpPagePath="/community/contribute-to-the-assets-store"
+        />,
+        <HelpButton
+          key="help"
+          label={<Trans>Submit a paid pack</Trans>}
+          helpPagePath="/community/sell-asset-pack-store/"
         />,
       ]}
       actions={[
@@ -281,19 +274,12 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
     >
       <ColumnStackLayout expand>
         <Text>
-          <Trans>Export the scene objects to a file and learn more about the submission process in the documentation.</Trans>
+          <Trans>
+            Export the scene objects to a file and learn more about the
+            submission process in the documentation.
+          </Trans>
         </Text>
-        <ResponsiveLineStackLayout>
-          <FlatButton
-            leftIcon={<Help />}
-            label={<Trans>Submit a free pack</Trans>}
-            onClick={openFreePackHelpPage}
-          />
-          <FlatButton
-            leftIcon={<Help />}
-            label={<Trans>Submit a paid pack</Trans>}
-            onClick={openPaidPackHelpPage}
-          />
+        <Column alignItems="center">
           {zippedSceneAssetsBlob ? (
             <BlobDownloadUrlHolder blob={zippedSceneAssetsBlob}>
               {blobDownloadUrl => (
@@ -313,7 +299,7 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
           ) : (
             <PlaceholderLoader />
           )}
-        </ResponsiveLineStackLayout>
+        </Column>
       </ColumnStackLayout>
       {renderProcessDialog()}
     </Dialog>

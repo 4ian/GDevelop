@@ -220,8 +220,8 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
             <Column expand justifyContent="center" alignItems="center">
               <AlertMessage kind="info">
                 <Trans>
-                  You can now access your games dashboard in the homepage, in
-                  the Manage section.
+                  You can now find the Games Dashboard on the home page under
+                  the Manage tab.
                 </Trans>
               </AlertMessage>
             </Column>

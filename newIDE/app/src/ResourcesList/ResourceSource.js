@@ -24,7 +24,9 @@ export type ResourceKind =
   | 'tilemap'
   | 'tileset'
   | 'bitmapFont'
-  | 'model3D';
+  | 'model3D'
+  | 'atlas'
+  | 'spine';
 
 export const allResourceKindsAndMetadata = [
   {
@@ -55,7 +57,9 @@ export const allResourceKindsAndMetadata = [
     kind: 'json',
     displayName: t`Json`,
     fileExtensions: ['json'],
-    createNewResource: () => new gd.JsonResource(),
+    createNewResource: () => {
+      return new gd.JsonResource();
+    },
   },
   {
     kind: 'tilemap',
@@ -80,6 +84,20 @@ export const allResourceKindsAndMetadata = [
     displayName: t`3D model`,
     fileExtensions: ['glb'],
     createNewResource: () => new gd.Model3DResource(),
+  },
+  {
+    kind: 'atlas',
+    displayName: t`Atlas`,
+    fileExtensions: ['atlas'],
+    createNewResource: () => new gd.AtlasResource(),
+  },
+  {
+    kind: 'spine',
+    displayName: t`Spine Json`,
+    fileExtensions: ['json'],
+    createNewResource: () => {
+      return new gd.SpineResource();
+    },
   },
 ];
 

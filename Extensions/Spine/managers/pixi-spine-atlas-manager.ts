@@ -71,27 +71,29 @@ namespace gdjs {
       let loadingPromise = this._loadingSpineAtlases.get(resource);
 
       if (!loadingPromise) {
-        loadingPromise = new Promise<pixi_spine.TextureAtlas>((resolve, reject) => {
-          const onLoad: SpineAtlasManagerRequestCallback = (
-            error,
-            content
-          ) => {
-            if (error) {
-              return reject(
-                `Error while preloading a spine atlas resource: ${error}`
-              );
-            }
-            if (!content) {
-              return reject(
-                `Cannot reach texture atlas for resource '${resourceName}'.`
-              );
-            }
+        loadingPromise = new Promise<pixi_spine.TextureAtlas>(
+          (resolve, reject) => {
+            const onLoad: SpineAtlasManagerRequestCallback = (
+              error,
+              content
+            ) => {
+              if (error) {
+                return reject(
+                  `Error while preloading a spine atlas resource: ${error}`
+                );
+              }
+              if (!content) {
+                return reject(
+                  `Cannot reach texture atlas for resource '${resourceName}'.`
+                );
+              }
 
-            resolve(content);
-          };
+              resolve(content);
+            };
 
-          this.load(resource, onLoad);
-        });
+            this.load(resource, onLoad);
+          }
+        );
 
         this._loadingSpineAtlases.set(resource, loadingPromise);
       }

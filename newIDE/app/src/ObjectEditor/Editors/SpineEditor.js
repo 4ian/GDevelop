@@ -136,7 +136,9 @@ const SpineEditor = ({
     },
     [project, getEmbeddedResourcesMapping]
   );
-  const [sourceSelectOptions, setSourceSelectOptions] = React.useState<Array<Object>>([]);
+  const [sourceSelectOptions, setSourceSelectOptions] = React.useState<
+    Array<Object>
+  >([]);
   const spineResourceName = properties.get('spineResourceName').getValue();
 
   React.useEffect(

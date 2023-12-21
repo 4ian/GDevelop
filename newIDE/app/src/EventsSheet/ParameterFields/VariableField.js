@@ -23,10 +23,11 @@ import SemiControlledAutoComplete, {
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import intersection from 'lodash/intersection';
 
 type Props = {
   ...ParameterFieldProps,
-  variablesContainer: ?gdVariablesContainer,
+  variablesContainers: Array<gdVariablesContainer>,
   onOpenDialog: ?() => void,
 };
 
@@ -51,7 +52,7 @@ export const VariableNameQuickAnalyzeResults = {
 // selector that offers the variables in the scope).
 export const quicklyAnalyzeVariableName = (
   name: string,
-  variablesContainer?: ?gdVariablesContainer
+  variablesContainers?: Array<gdVariablesContainer>
 ): VariableNameQuickAnalyzeResult => {
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
@@ -90,16 +91,21 @@ export const quicklyAnalyzeVariableName = (
         )
       : name;
 
-  if (variablesContainer && !variablesContainer.has(nameToCheck))
+  if (
+    variablesContainers &&
+    !variablesContainers.some(variablesContainer =>
+      variablesContainer.has(nameToCheck)
+    )
+  ) {
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
-
+  }
   return VariableNameQuickAnalyzeResults.OK;
 };
 
 export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
-      variablesContainer,
+      variablesContainers,
       value,
       onChange,
       isInline,
@@ -120,15 +126,22 @@ export default React.forwardRef<Props, VariableFieldInterface>(
      */
     const updateAutocompletions = React.useCallback(
       () => {
-        const definedVariableNames = enumerateVariables(variablesContainer)
-          .map(({ name, isValidName }) =>
-            isValidName
-              ? name
-              : // Hide invalid variable names - they would not
-                // be parsed correctly anyway.
-                null
-          )
-          .filter(Boolean);
+        const definedVariableNames =
+          variablesContainers.length === 0
+            ? []
+            : variablesContainers
+                .map(variablesContainer =>
+                  enumerateVariables(variablesContainer)
+                    .map(({ name, isValidName }) =>
+                      isValidName
+                        ? name
+                        : // Hide invalid variable names - they would not
+                          // be parsed correctly anyway.
+                          null
+                    )
+                    .filter(Boolean)
+                )
+                .reduce((a, b) => intersection(a, b));
         setAutocompletionVariableNames(
           definedVariableNames.map(name => ({
             text: name,
@@ -136,7 +149,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           }))
         );
       },
-      [variablesContainer]
+      [variablesContainers]
     );
 
     const focus: FieldFocusFunction = options => {
@@ -149,11 +162,9 @@ export default React.forwardRef<Props, VariableFieldInterface>(
 
     React.useEffect(
       () => {
-        if (variablesContainer) {
-          updateAutocompletions();
-        }
+        updateAutocompletions();
       },
-      [variablesContainer, updateAutocompletions]
+      [updateAutocompletions]
     );
 
     const description = parameterMetadata
@@ -162,7 +173,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
 
     const quicklyAnalysisResult = quicklyAnalyzeVariableName(
       value,
-      variablesContainer
+      variablesContainers
     );
 
     const errorText =
@@ -214,7 +225,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 onApply={onApply}
                 dataSource={[
                   ...autocompletionVariableNames,
-                  onOpenDialog && variablesContainer
+                  onOpenDialog && variablesContainers.length === 1
                     ? {
                         translatableValue: t`Add or edit variables...`,
                         text: '',
@@ -232,7 +243,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
               onOpenDialog && !isInline ? (
                 <RaisedButton
                   icon={<ShareExternal />}
-                  disabled={!variablesContainer}
+                  disabled={variablesContainers.length !== 1}
                   primary
                   style={style}
                   onClick={onOpenDialog}

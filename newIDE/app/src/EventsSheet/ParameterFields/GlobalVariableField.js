@@ -35,10 +35,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         : [];
 
+    const variablesContainers = React.useMemo(
+      () => {
+        return project ? [project.getVariables()] : [];
+      },
+      [project]
+    );
+
     return (
       <React.Fragment>
         <VariableField
-          variablesContainer={project ? project.getVariables() : null}
+          variablesContainers={variablesContainers}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

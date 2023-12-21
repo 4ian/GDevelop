@@ -25,12 +25,11 @@ import AlertMessage from '../UI/AlertMessage';
 export type ProfileTab = 'profile' | 'games-dashboard';
 
 type Props = {|
-  currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
 |};
 
-const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
+const ProfileDialog = ({ open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
 

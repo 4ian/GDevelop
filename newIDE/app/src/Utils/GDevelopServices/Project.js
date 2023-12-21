@@ -10,8 +10,10 @@ import { getFileSha512TruncatedTo256 } from '../FileHasher';
 import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import { extractNextPageUriFromLinkHeader } from './Play';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
+export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
 export const projectResourcesClient = axios.create({
@@ -83,11 +85,27 @@ type CloudProject = {|
 export type CloudProjectVersion = {|
   projectId: string,
   id: string,
+  label?: string,
   createdAt: string,
   /** Was not always recorded so can be undefined. Represents the user who created this version. */
   userId?: string,
   /** previousVersion is null when the entity represents the initial version of a project. */
   previousVersion: null | string,
+  /** If the version is a restoration from a previous one, this attribute is set. */
+  restoredFromVersionId?: string,
+|};
+
+export type ExpandedCloudProjectVersion = {|
+  projectId: string,
+  id: string,
+  label?: string,
+  createdAt: string,
+  /** Was not always recorded so can be undefined. Represents the user who created this version. */
+  userId?: string,
+  /** previousVersion is null when the entity represents the initial version of a project. */
+  previousVersion: null | string,
+  /** If the version is a restoration from a previous one, this attribute is set. */
+  restoredFromVersion?: CloudProjectVersion,
 |};
 
 export type CloudProjectWithUserAccessInfo = {|
@@ -182,7 +200,7 @@ const getVersionIdFromPath = (path: string): string => {
 export const getLastVersionsOfProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
-): Promise<?Array<CloudProjectVersion>> => {
+): Promise<?Array<ExpandedCloudProjectVersion>> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
@@ -273,11 +291,13 @@ export const commitVersion = async ({
   cloudProjectId,
   zippedProject,
   previousVersion,
+  restoredFromVersionId,
 }: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   zippedProject: Blob,
   previousVersion?: ?string,
+  restoredFromVersionId?: ?string,
 }): Promise<?string> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
@@ -304,19 +324,26 @@ export const commitVersion = async ({
         }
       )
   );
+  const body: {|
+    newVersion: string,
+    previousVersion?: string,
+    restoredFromVersionId?: string,
+  |} = { newVersion };
+  if (previousVersion) {
+    body.previousVersion = previousVersion;
+  }
+  if (restoredFromVersionId) {
+    body.restoredFromVersionId = restoredFromVersionId;
+  }
   // Inform backend a new version has been uploaded.
   try {
     // Backend only returns "OK".
-    await apiClient.post(
-      `/project/${cloudProjectId}/action/commit`,
-      { newVersion, ...(previousVersion ? { previousVersion } : undefined) },
-      {
-        headers: {
-          Authorization: authorizationHeader,
-        },
-        params: { userId },
-      }
-    );
+    await apiClient.post(`/project/${cloudProjectId}/action/commit`, body, {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    });
     return newVersion;
   } catch (error) {
     console.error('Error while committing version', error);
@@ -692,4 +719,78 @@ export const listProjectUserAcls = async (
   }
 
   return projectUserAcls;
+};
+
+export const updateCloudProjectVersion = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  versionId: string,
+  attributes: {| label: string |}
+): Promise<?CloudProjectVersion> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const trimmedLabel = attributes.label.trim();
+
+  const cleanedAttributes = {
+    label: trimmedLabel
+      ? trimmedLabel.slice(0, CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH)
+      : '',
+  };
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.patch(
+    `/project/${cloudProjectId}/version/${versionId}`,
+    cleanedAttributes,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * List versions of a cloud project.
+ * This method does not directly use the authenticatedUser object to enable
+ * listing versions in React effects. Using authenticatedUser as a dependency
+ * of an effect triggers the effect on each change of the profile (any update
+ * of badges, extensions, purchases, etc.).
+ */
+export const listVersionsOfProject = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: ?string,
+  cloudProjectId: string,
+  options: {| forceUri: ?string |}
+): Promise<?{|
+  versions: Array<ExpandedCloudProjectVersion>,
+  nextPageUri: ?string,
+|}> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const uri = options.forceUri || `/project/${cloudProjectId}/version`;
+
+  // $FlowFixMe
+  const response = await apiClient.get(uri, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: options.forceUri
+      ? { userId }
+      : { userId, goal: 'history', perPage: 15 },
+  });
+  const nextPageUri = response.headers.link
+    ? extractNextPageUriFromLinkHeader(response.headers.link)
+    : null;
+  const projectVersions = response.data;
+
+  if (!Array.isArray(projectVersions)) {
+    throw new Error('Invalid response from the project versions API');
+  }
+  return {
+    versions: projectVersions,
+    nextPageUri,
+  };
 };

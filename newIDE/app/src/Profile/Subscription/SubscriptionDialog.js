@@ -13,7 +13,6 @@ import {
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
   canCancelAtEndOfPeriod,
-  businessPlan,
   hasValidSubscriptionPlan,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
@@ -23,8 +22,11 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
-  type SubscriptionDialogDisplayReason,
 } from '../../Utils/Analytics/EventSender';
+import {
+  type SubscriptionAnalyticsMetadata,
+  type SubscriptionType,
+} from './SubscriptionSuggestionContext';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
@@ -93,16 +95,15 @@ const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
 type Props = {|
   open: boolean,
   onClose: Function,
-  analyticsMetadata: {|
-    reason: SubscriptionDialogDisplayReason,
-    preStep?: 'subscriptionChecker',
-  |},
+  analyticsMetadata: SubscriptionAnalyticsMetadata,
+  filter: ?SubscriptionType,
 |};
 
 export default function SubscriptionDialog({
   open,
   onClose,
   analyticsMetadata,
+  filter,
 }: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
@@ -339,6 +340,25 @@ export default function SubscriptionDialog({
             )}
             {getSubscriptionPlans()
               .filter(plan => !plan.hideInSubscriptionDialog)
+              .filter(plan => {
+                if (filter === 'individual') {
+                  return [null, 'gdevelop_silver', 'gdevelop_gold'].includes(
+                    plan.planId
+                  );
+                }
+                if (filter === 'team') {
+                  return [
+                    null,
+                    'gdevelop_startup',
+                    'gdevelop_enterprise',
+                  ].includes(plan.planId);
+                }
+                if (filter === 'education') {
+                  return [null, 'gdevelop_education'].includes(plan.planId);
+                }
+                // No filter, show all plans.
+                return true;
+              })
               .map(plan => {
                 const userPlanId = authenticatedUser.subscription
                   ? authenticatedUser.subscription.planId
@@ -440,6 +460,27 @@ export default function SubscriptionDialog({
                       }
                     />,
                   ];
+                } else if (plan.planId === 'gdevelop_enterprise') {
+                  return (
+                    <PlanCard
+                      key={plan.planId}
+                      plan={plan}
+                      actions={
+                        <RaisedButton
+                          primary
+                          label={<Trans>Learn more</Trans>}
+                          onClick={() => {
+                            Window.openExternalURL(
+                              'https://gdevelop.io/pricing'
+                            );
+                          }}
+                        />
+                      }
+                      isPending={false}
+                      isHighlighted={false}
+                      background="medium"
+                    />
+                  );
                 } else {
                   actions = [
                     <RaisedButton
@@ -467,21 +508,7 @@ export default function SubscriptionDialog({
                   />
                 );
               })}
-            <PlanCard
-              plan={businessPlan}
-              actions={
-                <RaisedButton
-                  primary
-                  label={<Trans>Learn more</Trans>}
-                  onClick={() => {
-                    Window.openExternalURL('https://gdevelop.io/pricing');
-                  }}
-                />
-              }
-              isPending={false}
-              isHighlighted={false}
-              background="dark"
-            />
+
             <Column>
               <Line>
                 <EmptyMessage>

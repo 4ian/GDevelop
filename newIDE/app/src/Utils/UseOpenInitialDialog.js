@@ -32,7 +32,9 @@ const useOpenInitialDialog = ({
     () => {
       switch (routeArguments['initial-dialog']) {
         case 'subscription':
-          openSubscriptionDialog({ reason: 'Landing dialog at opening' });
+          openSubscriptionDialog({
+            analyticsMetadata: { reason: 'Landing dialog at opening' },
+          });
           removeRouteArguments(['initial-dialog']);
           break;
         case 'signup':

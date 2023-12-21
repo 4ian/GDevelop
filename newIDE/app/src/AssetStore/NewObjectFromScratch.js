@@ -36,16 +36,13 @@ const ObjectListItem = ({
     return null;
   }
 
+  // For some reason, iconFileName can sometimes be undefined. see https://github.com/4ian/GDevelop/issues/6094.
+  const iconFilename = enumeratedObjectMetadata.iconFilename || '';
+
   return (
     <ListItem
       id={id}
-      leftIcon={
-        <ListIcon
-          src={enumeratedObjectMetadata.iconFilename}
-          iconSize={40}
-          isGDevelopIcon
-        />
-      }
+      leftIcon={<ListIcon src={iconFilename} iconSize={40} isGDevelopIcon />}
       key={enumeratedObjectMetadata.name}
       primaryText={enumeratedObjectMetadata.fullName}
       secondaryText={enumeratedObjectMetadata.description}

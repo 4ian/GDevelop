@@ -72,7 +72,8 @@ const eventWhichToCode = {
 };
 
 const getCodeFromEvent = (e: KeyboardEvent): string => {
-  if (e.which.toString() in eventWhichToCode)
+  // Somehow `which` was sometimes reported to be undefined.
+  if (typeof e.which === 'number' && e.which.toString() in eventWhichToCode)
     return eventWhichToCode[e.which.toString()];
   return e.code || ''; // Somehow `code` was sometimes reported to be undefined.
 };

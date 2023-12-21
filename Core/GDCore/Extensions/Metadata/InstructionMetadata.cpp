@@ -68,11 +68,11 @@ InstructionMetadata& InstructionMetadata::AddParameter(
         gd::ParameterMetadata::IsBehavior(type))
                // Prefix with the namespace if it's not already there.
                && (supplementaryInformation.find(
-                       PlatformExtension::GetNamespaceSeparator()) != gd::String::npos)
-           ? supplementaryInformation
-           : (supplementaryInformation.empty()
+                       PlatformExtension::GetNamespaceSeparator()) == gd::String::npos)
+           ? (supplementaryInformation.empty()
                   ? ""
-                  : extensionNamespace + supplementaryInformation)));
+                  : extensionNamespace + supplementaryInformation)
+           : supplementaryInformation));
 
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.

@@ -33,19 +33,9 @@ export type Subscription = {|
 |};
 
 /**
- * The current usage values made by a user of something.
- * Typically: the number of remaining builds for a user.
- */
-export type CurrentUsage = {|
-  limitReached: boolean,
-  current: number,
-  max: number,
-|};
-
-/**
  * This describes what a user can do on our online services.
  */
-export type Capabilities = {
+export type Capabilities = {|
   analytics: {
     sessions: boolean,
     players: boolean,
@@ -58,32 +48,59 @@ export type Capabilities = {
     canMaximumCountBeIncreased: boolean,
     maximumGuestCollaboratorsPerProject: number,
   },
-  /**
-   * leaderboards is marked as optional to prevent bugs at the moment
-   * the limit is enforced (endpoint deployed after the new version is released)
-   */
-  leaderboards?: {
+  leaderboards: {
     maximumCountPerGame: number,
     canMaximumCountPerGameBeIncreased: boolean,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
     canUseCustomCss: boolean,
   },
-};
+|};
 
-export type CurrentUsages = {
-  [string]: CurrentUsage,
+export type UsagePrices = {|
+  [key: string]: {|
+    priceInCredits: number,
+  |},
+|};
+
+export type UsagePurchasableQuantities = {|
+  [key: string]: {|
+    purchasableQuantity: number,
+  |},
+|};
+
+export type UserBalance = {|
+  amount: number,
+|};
+
+/**
+ * The current Quota values made by a user of something.
+ * Typically: the number of remaining builds for a user.
+ */
+export type Quota = {|
+  limitReached: boolean,
+  current: number,
+  max: number,
+|};
+
+export type Quotas = {
+  [string]: Quota,
 };
 
 /**
  * The limits communicated by the API for a user.
  */
-export type Limits = {
-  limits: CurrentUsages,
+export type Limits = {|
+  quotas: Quotas,
   capabilities: Capabilities,
+  credits: {
+    userBalance: UserBalance,
+    prices: UsagePrices,
+    purchasableQuantities: UsagePurchasableQuantities,
+  },
   message: string | typeof undefined,
-};
+|};
 
-export type PlanDetails = {
+export type PlanDetails = {|
   planId: string | null,
   legacyPlanId?: string,
   name: string,
@@ -95,7 +112,7 @@ export type PlanDetails = {
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
-};
+|};
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
@@ -179,9 +196,19 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
       },
       {
+        message: t`Access your cloud projects history and easily get back to a previous version.`,
+      },
+      {
         message: t`Add 1 guest user or unlimited startup team members to collaborate on every project.`,
       },
     ],
+  },
+  {
+    planId: 'gdevelop_enterprise',
+    name: 'GDevelop for businesses, game studios and professionals',
+    monthlyPriceInEuros: null,
+    smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
+    descriptionBullets: [],
   },
   {
     planId: 'gdevelop_education',
@@ -196,6 +223,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`Organize students per classroom.`,
+      },
+      {
+        message: t`Access your students' projects`,
       },
       {
         message: t`You and your students receive a Gold subscription.`,
@@ -243,14 +273,6 @@ export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
     ],
   },
 ];
-
-export const businessPlan: PlanDetails = {
-  planId: null,
-  monthlyPriceInEuros: null,
-  name: 'GDevelop for businesses, game studios and professionals',
-  smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
-  descriptionBullets: [],
-};
 
 export const getUserUsages = (
   getAuthorizationHeader: () => Promise<string>,
@@ -445,6 +467,19 @@ export const getRedirectToCheckoutUrl = ({
   return url.toString();
 };
 
+export const canUseCloudProjectHistory = (
+  subscription: ?Subscription
+): boolean => {
+  if (!subscription) return false;
+  return (
+    ['gdevelop_business', 'gdevelop_startup', 'gdevelop_education'].includes(
+      subscription.planId
+    ) ||
+    (subscription.planId === 'gdevelop_gold' &&
+      !!subscription.benefitsFromEducationPlan)
+  );
+};
+
 export const redeemCode = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -465,5 +500,15 @@ export const redeemCode = async (
         Authorization: authorizationHeader,
       },
     }
+  );
+};
+
+export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
+  return (
+    !!subscription &&
+    ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      subscription.planId
+    ) &&
+    !subscription.benefitsFromEducationPlan
   );
 };

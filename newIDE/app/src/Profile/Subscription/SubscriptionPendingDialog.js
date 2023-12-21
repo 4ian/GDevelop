@@ -16,6 +16,7 @@ import TextField from '../../UI/TextField';
 import { discordUsernameConfig } from '../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import LeftLoader from '../../UI/LeftLoader';
+import { canBenefitFromDiscordRole } from '../../Utils/GDevelopServices/Usage';
 
 type Props = {|
   onClose: Function,
@@ -30,11 +31,10 @@ export default function SubscriptionPendingDialog({
     !!authenticatedUser &&
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.planId;
-  const hasGoldOrStartupPlan =
+  const canUserBenefitFromDiscordRole =
     !!authenticatedUser &&
-    !!authenticatedUser.subscription &&
-    (authenticatedUser.subscription.planId === 'gdevelop_gold' ||
-      authenticatedUser.subscription.planId === 'gdevelop_startup');
+    canBenefitFromDiscordRole(authenticatedUser.subscription);
+
   useInterval(
     () => {
       authenticatedUser.onRefreshSubscription().catch(() => {
@@ -181,7 +181,7 @@ export default function SubscriptionPendingDialog({
                   </Trans>
                 </BackgroundText>
               </Line>
-              {!currentDiscordUsername && !!hasGoldOrStartupPlan && (
+              {!currentDiscordUsername && canUserBenefitFromDiscordRole && (
                 <Line>
                   <TextField
                     value={discordUsername}

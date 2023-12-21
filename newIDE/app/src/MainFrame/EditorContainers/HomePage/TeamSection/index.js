@@ -55,7 +55,7 @@ const DropTarget = makeDropTarget('team-groups');
 type Props = {|
   project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
 |};
 

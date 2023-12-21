@@ -39,7 +39,7 @@ import {
   type EditorTab,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
-  notifyPreviewWillStart,
+  notifyPreviewOrExportWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
@@ -185,6 +185,7 @@ import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/S
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import useVersionHistory from '../VersionHistory/UseVersionHistory';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -409,6 +410,10 @@ const MainFrame = (props: Props) => {
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
+  const [
+    loaderModalOpeningMessage,
+    setLoaderModalOpeningMessage,
+  ] = React.useState<?MessageDescriptor>(null);
 
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
@@ -724,10 +729,12 @@ const MainFrame = (props: Props) => {
 
   const openShareDialog = React.useCallback(
     (initialTab?: ShareTab) => {
+      notifyPreviewOrExportWillStart(state.editorTabs);
+
       setShareDialogInitialTab(initialTab || null);
       setShareDialogOpen(true);
     },
-    [setShareDialogOpen, setShareDialogInitialTab]
+    [state.editorTabs]
   );
 
   const closeShareDialog = React.useCallback(
@@ -990,7 +997,10 @@ const MainFrame = (props: Props) => {
   };
 
   const openFromFileMetadata = React.useCallback(
-    async (fileMetadata: FileMetadata): Promise<?State> => {
+    async (
+      fileMetadata: FileMetadata,
+      options?: {| openingMessage?: ?MessageDescriptor |}
+    ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
@@ -1055,6 +1065,9 @@ const MainFrame = (props: Props) => {
         return onGetAutoSave(fileMetadata);
       };
 
+      if (options && options.openingMessage) {
+        setLoaderModalOpeningMessage(options.openingMessage);
+      }
       setIsLoadingProject(true);
 
       // Try to find an autosave (and ask user if found)
@@ -1077,6 +1090,10 @@ const MainFrame = (props: Props) => {
             const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
           }
+        } finally {
+          setIsLoadingProject(false);
+          setLoaderModalOpeningMessage(null);
+          setLoaderModalProgress(null, null);
         }
         if (!content) {
           throw openingError ||
@@ -1086,8 +1103,6 @@ const MainFrame = (props: Props) => {
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           return;
         }
 
@@ -1107,8 +1122,6 @@ const MainFrame = (props: Props) => {
         }
       } catch (error) {
         if (error.name === 'CloudProjectReadingError') {
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           setCloudProjectFileMetadataToRecover(fileMetadata);
         } else {
           const errorMessage = getOpenErrorMessage
@@ -1119,8 +1132,6 @@ const MainFrame = (props: Props) => {
             title: t`Unable to open the project`,
             message: errorMessage,
           });
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           throw error;
         }
       }
@@ -1543,7 +1554,7 @@ const MainFrame = (props: Props) => {
       if (!previewLauncher) return;
 
       setPreviewLoading(true);
-      notifyPreviewWillStart(state.editorTabs);
+      notifyPreviewOrExportWillStart(state.editorTabs);
 
       const layoutName = previewState.isPreviewOverriden
         ? previewState.overridenPreviewLayoutName
@@ -2081,11 +2092,18 @@ const MainFrame = (props: Props) => {
   );
 
   const openFromFileMetadataWithStorageProvider = React.useCallback(
-    (
+    async (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-      options: ?{ openAllScenes: boolean }
-    ) => {
-      if (unsavedChanges.hasUnsavedChanges) {
+      options: ?{|
+        openAllScenes?: boolean,
+        ignoreUnsavedChanges?: boolean,
+        openingMessage?: ?MessageDescriptor,
+      |}
+    ): Promise<void> => {
+      if (
+        unsavedChanges.hasUnsavedChanges &&
+        !(options && options.ignoreUnsavedChanges)
+      ) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Open a new project? Any changes that have not been saved will be lost.`
@@ -2105,7 +2123,9 @@ const MainFrame = (props: Props) => {
       if (!storageProvider) return;
 
       getStorageProviderOperations(storageProvider);
-      openFromFileMetadata(fileMetadata)
+      await openFromFileMetadata(fileMetadata, {
+        openingMessage: (options && options.openingMessage) || null,
+      })
         .then(state => {
           if (state) {
             const { currentProject } = state;
@@ -2161,6 +2181,44 @@ const MainFrame = (props: Props) => {
       openEditorTabsFromPersistedState,
     ]
   );
+
+  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+    ({
+      fileMetadata,
+      versionId,
+      ignoreUnsavedChanges,
+      openingMessage,
+    }: {|
+      fileMetadata: FileMetadata,
+      versionId: string,
+      ignoreUnsavedChanges: boolean,
+      openingMessage: MessageDescriptor,
+    |}): Promise<void> => {
+      return openFromFileMetadataWithStorageProvider(
+        {
+          storageProviderName: 'Cloud',
+          fileMetadata: {
+            ...fileMetadata,
+            version: versionId,
+          },
+        },
+        { ignoreUnsavedChanges, openingMessage }
+      );
+    },
+    [openFromFileMetadataWithStorageProvider]
+  );
+
+  const {
+    renderVersionHistoryPanel,
+    openVersionHistoryPanel,
+    checkedOutVersionStatus,
+    onQuitVersionHistory,
+  } = useVersionHistory({
+    getStorageProvider,
+    isSavingProject,
+    fileMetadata: currentFileMetadata,
+    onOpenCloudProjectOnSpecificVersion,
+  });
 
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -2351,9 +2409,14 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  // Prevent "save project as" when no current project or when the opened project
+  // is a previous version (cloud project only) of the current project.
+  const canSaveProjectAs = !!currentProject && !checkedOutVersionStatus;
   const saveProjectAs = React.useCallback(
     () => {
-      if (!currentProject) return;
+      if (!canSaveProjectAs) {
+        return;
+      }
 
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
@@ -2373,13 +2436,13 @@ const MainFrame = (props: Props) => {
       }
     },
     [
-      currentProject,
       getStorageProviderOperations,
       openSaveToStorageProviderDialog,
       props.storageProviders,
       saveProjectAsWithStorageProvider,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
+      canSaveProjectAs,
     ]
   );
 
@@ -2407,7 +2470,6 @@ const MainFrame = (props: Props) => {
       }
 
       saveUiSettings(state.editorTabs);
-      _showSnackMessage(i18n._(t`Saving...`), null);
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -2415,6 +2477,25 @@ const MainFrame = (props: Props) => {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
+
+      if (checkedOutVersionStatus) {
+        const shouldRestoreCheckedOutVersion = await showConfirmation({
+          title: t`Restore this version`,
+          message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
+        });
+        if (!shouldRestoreCheckedOutVersion) return;
+      } else if (canFileMetadataBeSafelySaved) {
+        const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
+          currentFileMetadata,
+          {
+            showAlert,
+            showConfirmation,
+          }
+        );
+        if (!canProjectBeSafelySaved) return;
+      }
+
+      _showSnackMessage(i18n._(t`Saving...`), null);
       setIsSavingProject(true);
 
       try {
@@ -2425,27 +2506,18 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        if (canFileMetadataBeSafelySaved) {
-          const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
-            currentFileMetadata,
-            {
-              showAlert,
-              showConfirmation,
-            }
-          );
-          if (!canProjectBeSafelySaved) return;
-
-          // Ensure snackbar is shown again, in case the user stayed on the previous alert dialog
-          // for too long.
-          _replaceSnackMessage(i18n._(t`Saving...`), null);
+        const saveOptions = {};
+        if (cloudProjectRecoveryOpenedVersionId) {
+          saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
         }
-
+        if (checkedOutVersionStatus) {
+          saveOptions.restoredFromVersionId =
+            checkedOutVersionStatus.version.id;
+        }
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
-          cloudProjectRecoveryOpenedVersionId
-            ? { previousVersion: cloudProjectRecoveryOpenedVersionId }
-            : undefined
+          saveOptions
         );
 
         if (wasSaved) {
@@ -2528,6 +2600,7 @@ const MainFrame = (props: Props) => {
       cloudProjectSaveChoiceOpen,
       showAlert,
       showConfirmation,
+      checkedOutVersionStatus,
     ]
   );
 
@@ -2638,17 +2711,21 @@ const MainFrame = (props: Props) => {
   const onChangeProjectName = async (newName: string): Promise<void> => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
+    let newFileMetadata = { ...currentFileMetadata, name: newName };
     if (storageProviderOperations.onChangeProjectProperty) {
-      const wasSaved = await storageProviderOperations.onChangeProjectProperty(
+      const fileMetadataNewAttributes = await storageProviderOperations.onChangeProjectProperty(
         currentProject,
         currentFileMetadata,
         { name: newName }
       );
-      if (wasSaved) unsavedChanges.sealUnsavedChanges();
+      if (fileMetadataNewAttributes) {
+        unsavedChanges.sealUnsavedChanges();
+        newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
+      }
     }
     await setState(state => ({
       ...state,
-      currentFileMetadata: { ...currentFileMetadata, name: newName },
+      currentFileMetadata: newFileMetadata,
     }));
   };
 
@@ -2666,20 +2743,19 @@ const MainFrame = (props: Props) => {
     return true;
   };
 
-  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+  const onOpenCloudProjectOnSpecificVersionForRecovery = React.useCallback(
     (versionId: string) => {
       if (!cloudProjectFileMetadataToRecover) return;
-      openFromFileMetadataWithStorageProvider({
-        storageProviderName: 'Cloud',
-        fileMetadata: {
-          ...cloudProjectFileMetadataToRecover,
-          version: versionId,
-        },
+      onOpenCloudProjectOnSpecificVersion({
+        fileMetadata: cloudProjectFileMetadataToRecover,
+        versionId,
+        ignoreUnsavedChanges: false,
+        openingMessage: t`Recovering older version...`,
       });
       setCloudProjectFileMetadataToRecover(null);
       setCloudProjectRecoveryOpenedVersionId(versionId);
     },
-    [openFromFileMetadataWithStorageProvider, cloudProjectFileMetadataToRecover]
+    [cloudProjectFileMetadataToRecover, onOpenCloudProjectOnSpecificVersion]
   );
 
   const canInstallPrivateAsset = React.useCallback(
@@ -2928,11 +3004,11 @@ const MainFrame = (props: Props) => {
   );
 
   const showLoader = isLoadingProject || previewLoading;
-
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,
     project: state.currentProject,
+    canSaveProjectAs,
     recentProjectFiles: preferences.getRecentProjectFiles(),
     shortcutMap,
     isApplicationTopLevelMenu: false,
@@ -2942,6 +3018,7 @@ const MainFrame = (props: Props) => {
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
+    onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
     onExportProject: () => openShareDialog('publish'),
@@ -3047,7 +3124,7 @@ const MainFrame = (props: Props) => {
                 currentProject
               );
             }}
-            onShareProject={() => setShareDialogOpen(true)}
+            onShareProject={() => openShareDialog()}
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
@@ -3098,6 +3175,9 @@ const MainFrame = (props: Props) => {
         openShareDialog={() =>
           openShareDialog(/* leave the dialog decide which tab to open */)
         }
+        isSharingEnabled={
+          !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId
+        }
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -3112,6 +3192,10 @@ const MainFrame = (props: Props) => {
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
+        onOpenVersionHistory={openVersionHistoryPanel}
+        checkedOutVersionStatus={checkedOutVersionStatus}
+        onQuitVersionHistory={onQuitVersionHistory}
+        canQuitVersionHistory={!isSavingProject}
       />
       <LeaderboardProvider
         gameId={
@@ -3234,7 +3318,7 @@ const MainFrame = (props: Props) => {
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}
-        message={fileMetadataOpeningMessage}
+        message={loaderModalOpeningMessage || fileMetadataOpeningMessage}
       />
       <Snackbar
         open={state.snackMessageOpen}
@@ -3350,7 +3434,7 @@ const MainFrame = (props: Props) => {
         <CloudProjectRecoveryDialog
           cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
           onClose={() => setCloudProjectFileMetadataToRecover(null)}
-          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersion}
+          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersionForRecovery}
         />
       )}
       {cloudProjectSaveChoiceOpen && (
@@ -3411,6 +3495,7 @@ const MainFrame = (props: Props) => {
       {renderLeaderboardReplacerDialog()}
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
+      {renderVersionHistoryPanel()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

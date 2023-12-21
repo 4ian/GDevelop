@@ -103,8 +103,10 @@ const SubscriptionChecker = React.forwardRef<
             if (onChangeSubscription) onChangeSubscription();
             setDialogOpen(false);
             openSubscriptionDialog({
-              reason: id,
-              preStep: 'subscriptionChecker',
+              analyticsMetadata: {
+                reason: id,
+                preStep: 'subscriptionChecker',
+              },
             });
           }}
         />,

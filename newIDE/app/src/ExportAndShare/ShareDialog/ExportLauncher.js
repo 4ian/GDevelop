@@ -16,7 +16,7 @@ import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
 } from '../../Utils/ProjectErrorsChecker';
-import { type CurrentUsage } from '../../Utils/GDevelopServices/Usage';
+import { type Quota } from '../../Utils/GDevelopServices/Usage';
 import BuildsWatcher from '../Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
@@ -36,6 +36,7 @@ import {
   TRIVIAL_FIRST_WEB_EXPORT,
 } from '../../Utils/GDevelopServices/Badge';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 
 type State = {|
   exportStep: BuildStep,
@@ -54,6 +55,7 @@ type Props = {|
   isSavingProject: boolean,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
   onGameUpdated: (game: Game) => void,
@@ -202,7 +204,12 @@ export default class ExportLauncher extends Component<Props, State> {
   };
 
   _launchWholeExport = async (i18n: I18nType) => {
-    const { project, exportPipeline, authenticatedUser } = this.props;
+    const {
+      project,
+      exportPipeline,
+      eventsFunctionsExtensionsState,
+      authenticatedUser,
+    } = this.props;
     sendExportLaunched(exportPipeline.name);
 
     if (
@@ -328,6 +335,8 @@ export default class ExportLauncher extends Component<Props, State> {
           }
         : undefined;
 
+      await eventsFunctionsExtensionsState.ensureLoadFinished();
+
       const exportOutput = await exportPipeline.launchExport(
         exportPipelineContext,
         preparedExporter,
@@ -410,18 +419,14 @@ export default class ExportLauncher extends Component<Props, State> {
       isSavingProject,
     } = this.props;
     if (!project) return null;
-    const getBuildCurrentUsage = (
-      authenticatedUser: AuthenticatedUser
-    ): ?CurrentUsage =>
+    const getBuildQuota = (authenticatedUser: AuthenticatedUser): ?Quota =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
-        ? authenticatedUser.limits.limits[exportPipeline.onlineBuildType]
+        ? authenticatedUser.limits.quotas[exportPipeline.onlineBuildType]
         : null;
 
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      const currentUsage: ?CurrentUsage = getBuildCurrentUsage(
-        authenticatedUser
-      );
-      if (currentUsage && currentUsage.limitReached) return false;
+      const quota: ?Quota = getBuildQuota(authenticatedUser);
+      if (quota && quota.limitReached) return false;
 
       return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
@@ -511,7 +516,7 @@ export default class ExportLauncher extends Component<Props, State> {
               authenticatedUser.authenticated && (
                 <CurrentUsageDisplayer
                   subscription={authenticatedUser.subscription}
-                  currentUsage={getBuildCurrentUsage(authenticatedUser)}
+                  quota={getBuildQuota(authenticatedUser)}
                   onChangeSubscription={this.props.onChangeSubscription}
                 />
               )}

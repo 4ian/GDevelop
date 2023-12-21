@@ -69,7 +69,7 @@ type Props = {|
   currentFileMetadata: ?FileMetadata,
   canOpen: boolean,
   onChooseProject: () => void,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenNewProjectSetupDialog: () => void,
   onShowAllExamples: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
@@ -224,7 +224,9 @@ const BuildSection = ({
                       limits={limits}
                       onUpgrade={() =>
                         openSubscriptionDialog({
-                          reason: 'Cloud Project limit reached',
+                          analyticsMetadata: {
+                            reason: 'Cloud Project limit reached',
+                          },
                         })
                       }
                     />

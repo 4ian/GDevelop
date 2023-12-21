@@ -57,8 +57,6 @@ namespace gdjs {
         // without a canvas.
         return;
       }
-      this._pixiRenderer.background.color = this._loadingScreenData.backgroundColor;
-      this._pixiRenderer.background.alpha = 0;
 
       const backgroundTexture = imageManager.getOrLoadPIXITexture(
         loadingScreenData.backgroundImageResourceName
@@ -143,9 +141,8 @@ namespace gdjs {
       // Continue the rendering loop as long as the loading screen is not finished.
       if (this._state !== LoadingScreenState.FINISHED) {
         requestAnimationFrame(() => this._render(performance.now()));
+        this._renderIfNeeded(timeInMs);
       }
-
-      this._renderIfNeeded(timeInMs);
     }
 
     renderIfNeeded(): boolean {
@@ -168,101 +165,99 @@ namespace gdjs {
 
       this._updatePositions();
 
+      if (this._state === LoadingScreenState.FINISHED) {
+        return true;
+      }
       if (this._state == LoadingScreenState.NOT_STARTED) {
+        this._pixiRenderer.background.color = this._loadingScreenData.backgroundColor;
         if (!this._backgroundSprite || this._backgroundSprite.texture.valid) {
           this._startLoadingScreen();
         }
-      } else if (this._state == LoadingScreenState.STARTED) {
-        const backgroundFadeInDuration = this._loadingScreenData
-          .backgroundFadeInDuration;
+        return true;
+      }
 
-        this._pixiRenderer.clear();
-        if (!this._backgroundSprite) {
+      const backgroundFadeInDuration = this._loadingScreenData
+        .backgroundFadeInDuration;
+
+      if (!this._backgroundSprite) {
+        fadeIn(
+          this._pixiRenderer.background,
+          backgroundFadeInDuration,
+          deltaTimeInMs
+        );
+      }
+      this._pixiRenderer.clear();
+      fadeIn(this._backgroundSprite, backgroundFadeInDuration, deltaTimeInMs);
+
+      if (hasFadedIn(this._backgroundSprite)) {
+        if (!this._backgroundReadyTimeInMs)
+          this._backgroundReadyTimeInMs = timeInMs;
+
+        const logoAndProgressFadeInDuration = this._loadingScreenData
+          .logoAndProgressFadeInDuration;
+        const logoAndProgressLogoFadeInDelay = this._loadingScreenData
+          .logoAndProgressLogoFadeInDelay;
+
+        if (
+          timeInMs - this._backgroundReadyTimeInMs >
+          logoAndProgressLogoFadeInDelay * 1000
+        ) {
           fadeIn(
-            this._pixiRenderer.background,
-            backgroundFadeInDuration,
+            this._gdevelopLogoSprite,
+            logoAndProgressFadeInDuration,
+            deltaTimeInMs
+          );
+          fadeIn(
+            this._progressBarGraphics,
+            logoAndProgressFadeInDuration,
             deltaTimeInMs
           );
         }
-        fadeIn(this._backgroundSprite, backgroundFadeInDuration, deltaTimeInMs);
+      }
 
-        if (hasFadedIn(this._backgroundSprite)) {
-          if (!this._backgroundReadyTimeInMs)
-            this._backgroundReadyTimeInMs = timeInMs;
-
-          const logoAndProgressFadeInDuration = this._loadingScreenData
-            .logoAndProgressFadeInDuration;
-          const logoAndProgressLogoFadeInDelay = this._loadingScreenData
-            .logoAndProgressLogoFadeInDelay;
-
-          if (
-            timeInMs - this._backgroundReadyTimeInMs >
-            logoAndProgressLogoFadeInDelay * 1000
-          ) {
-            fadeIn(
-              this._gdevelopLogoSprite,
-              logoAndProgressFadeInDuration,
-              deltaTimeInMs
-            );
-            fadeIn(
-              this._progressBarGraphics,
-              logoAndProgressFadeInDuration,
-              deltaTimeInMs
-            );
-          }
+      if (this._progressBarGraphics) {
+        const color = this._loadingScreenData.progressBarColor;
+        let progressBarWidth =
+          (this._loadingScreenData.progressBarWidthPercent / 100) *
+          this._pixiRenderer.width;
+        if (this._loadingScreenData.progressBarMaxWidth > 0) {
+          if (progressBarWidth > this._loadingScreenData.progressBarMaxWidth)
+            progressBarWidth = this._loadingScreenData.progressBarMaxWidth;
+        }
+        if (this._loadingScreenData.progressBarMinWidth > 0) {
+          if (progressBarWidth < this._loadingScreenData.progressBarMinWidth)
+            progressBarWidth = this._loadingScreenData.progressBarMinWidth;
         }
 
-        if (this._progressBarGraphics) {
-          const color = this._loadingScreenData.progressBarColor;
-          let progressBarWidth =
-            (this._loadingScreenData.progressBarWidthPercent / 100) *
-            this._pixiRenderer.width;
-          if (this._loadingScreenData.progressBarMaxWidth > 0) {
-            if (progressBarWidth > this._loadingScreenData.progressBarMaxWidth)
-              progressBarWidth = this._loadingScreenData.progressBarMaxWidth;
-          }
-          if (this._loadingScreenData.progressBarMinWidth > 0) {
-            if (progressBarWidth < this._loadingScreenData.progressBarMinWidth)
-              progressBarWidth = this._loadingScreenData.progressBarMinWidth;
-          }
+        const progressBarHeight = this._loadingScreenData.progressBarHeight;
+        const progressBarX = Math.floor(
+          this._pixiRenderer.width / 2 - progressBarWidth / 2
+        );
+        const progressBarY =
+          this._pixiRenderer.height < 350
+            ? Math.floor(this._pixiRenderer.height - 10 - progressBarHeight)
+            : Math.floor(this._pixiRenderer.height - 90 - progressBarHeight);
+        const lineWidth = 1;
+        // Display bar with an additional 1% to ensure it's filled at the end.
+        const progress = Math.min(1, (this._progressPercent + 1) / 100);
+        this._progressBarGraphics.clear();
+        this._progressBarGraphics.lineStyle(lineWidth, color, 1, 0);
+        this._progressBarGraphics.drawRect(
+          progressBarX,
+          progressBarY,
+          progressBarWidth,
+          progressBarHeight
+        );
 
-          const progressBarHeight = this._loadingScreenData.progressBarHeight;
-          const progressBarX = Math.floor(
-            this._pixiRenderer.width / 2 - progressBarWidth / 2
-          );
-          const progressBarY =
-            this._pixiRenderer.height < 350
-              ? Math.floor(this._pixiRenderer.height - 10 - progressBarHeight)
-              : Math.floor(this._pixiRenderer.height - 90 - progressBarHeight);
-          const lineWidth = 1;
-          // Display bar with an additional 1% to ensure it's filled at the end.
-          const progress = Math.min(1, (this._progressPercent + 1) / 100);
-          this._progressBarGraphics.clear();
-          this._progressBarGraphics.lineStyle(lineWidth, color, 1, 0);
-          this._progressBarGraphics.drawRect(
-            progressBarX,
-            progressBarY,
-            progressBarWidth,
-            progressBarHeight
-          );
-
-          this._progressBarGraphics.beginFill(color, 1);
-          this._progressBarGraphics.lineStyle(0, color, 1);
-          this._progressBarGraphics.drawRect(
-            progressBarX + lineWidth,
-            progressBarY + lineWidth,
-            progressBarWidth * progress - lineWidth * 2,
-            progressBarHeight - lineWidth * 2
-          );
-          this._progressBarGraphics.endFill();
-        }
-      } else if (this._state === LoadingScreenState.FINISHED) {
-        // Display a black screen to avoid a stretched image of the loading
-        // screen to appear.
-        this._pixiRenderer.background.color = 'black';
-        this._pixiRenderer.background.alpha = 1;
-        this._pixiRenderer.clear();
-        this._loadingScreenContainer.removeChildren();
+        this._progressBarGraphics.beginFill(color, 1);
+        this._progressBarGraphics.lineStyle(0, color, 1);
+        this._progressBarGraphics.drawRect(
+          progressBarX + lineWidth,
+          progressBarY + lineWidth,
+          progressBarWidth * progress - lineWidth * 2,
+          progressBarHeight - lineWidth * 2
+        );
+        this._progressBarGraphics.endFill();
       }
 
       this._pixiRenderer.render(this._loadingScreenContainer);

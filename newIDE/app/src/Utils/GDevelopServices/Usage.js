@@ -3,6 +3,7 @@ import { t } from '@lingui/macro';
 import axios from 'axios';
 import { GDevelopUsageApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 
 export type Usage = {
   id: string,
@@ -112,6 +113,25 @@ export type PlanDetails = {|
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
+|};
+
+export type SubscriptionPlanPrice = {|
+  id: string,
+  planId: string,
+  period: 'week' | 'month' | 'year',
+  isPerUser?: true,
+  currency: 'EUR' | 'USD',
+  region: 'north' | 'south' | 'everywhere',
+  amountInCents: number,
+  periodCount: number,
+|};
+
+export type SubscriptionPlanWithPrice = {|
+  id: string,
+  isLegacy: boolean,
+  nameByLocale: MessageByLocale,
+  descriptionByLocale: MessageByLocale,
+  bulletPointsByLocale: Array<MessageByLocale>,
 |};
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
@@ -276,6 +296,13 @@ export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
     ],
   },
 ];
+
+export const listSubscriptionPlans = async (): Promise<
+  SubscriptionPlanWithPrice[]
+> => {
+  const response = await apiClient.get('/subscription-plan');
+  return response.data;
+};
 
 export const getUserUsages = async (
   getAuthorizationHeader: () => Promise<string>,

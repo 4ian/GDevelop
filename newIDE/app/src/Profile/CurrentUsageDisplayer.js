@@ -45,11 +45,9 @@ const CurrentUsageDisplayer = ({
   return (
     <ColumnStackLayout noMargin>
       <AlertMessage kind="info">
-        <Text>
-          {remainingBuilds === 1
-            ? remainingSingleMessage
-            : remainingMultipleMessage}
-        </Text>
+        {remainingBuilds === 1
+          ? remainingSingleMessage
+          : remainingMultipleMessage}
       </AlertMessage>
       {hasSubscription && quota.limitReached && (
         <GetSubscriptionCard subscriptionDialogOpeningReason="Build limit reached">

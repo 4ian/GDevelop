@@ -116,6 +116,9 @@ export type PlanDetails = {|
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
+export const apiClient = axios.create({
+  baseURL: GDevelopUsageApi.baseUrl,
+});
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
   {
@@ -274,81 +277,78 @@ export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
   },
 ];
 
-export const getUserUsages = (
+export const getUserUsages = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Usages> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/usage`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/usage', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const getUserLimits = (
+export const getUserLimits = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Limits> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/limits`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/limits', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const getUserSubscription = (
+export const getUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Subscription> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/subscription-v2`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/subscription-v2', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const changeUserSubscription = (
+export const changeUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   newSubscriptionDetails: { planId: string | null, stripeToken?: any }
 ): Promise<Subscription> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription-v2`,
-        newSubscriptionDetails,
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.post(
+    '/subscription-v2',
+    newSubscriptionDetails,
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
 export const canSeamlesslyChangeSubscription = (
@@ -405,44 +405,41 @@ export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
 
 type UploadType = 'build' | 'preview';
 
-export const getSignedUrl = (params: {|
+export const getSignedUrl = async (params: {|
   uploadType: UploadType,
   key: string,
   contentType: string,
 |}): Promise<{
   signedUrl: string,
 }> => {
-  return axios
-    .post(`${GDevelopUsageApi.baseUrl}/upload-options/signed-url`, params)
-    .then(response => response.data);
+  const response = await apiClient.post('/upload-options/signed-url', params);
+  return response.data;
 };
 
-export const getRedirectToSubscriptionPortalUrl = (
+export const getRedirectToSubscriptionPortalUrl = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<string> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-portal`,
-        {},
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data)
-    .then(({ sessionPortalUrl }) => {
-      if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
-        throw new Error('Could not find the session portal url.');
+  const authorizationHeader = await getAuthorizationHeader();
 
-      return sessionPortalUrl;
-    });
+  const response = await apiClient.post(
+    '/subscription-v2/action/redirect-to-portal',
+    {},
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  const { sessionPortalUrl } = response.data;
+  if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
+    throw new Error('Could not find the session portal url.');
+
+  return sessionPortalUrl;
 };
 
 export const getRedirectToCheckoutUrl = ({
@@ -487,8 +484,8 @@ export const redeemCode = async (
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  await axios.post(
-    `${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`,
+  await apiClient.post(
+    '/redemption-code/action/redeem-code',
     {
       code,
     },

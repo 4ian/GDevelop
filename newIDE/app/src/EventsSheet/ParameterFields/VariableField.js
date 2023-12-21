@@ -126,19 +126,22 @@ export default React.forwardRef<Props, VariableFieldInterface>(
      */
     const updateAutocompletions = React.useCallback(
       () => {
-        const definedVariableNames = variablesContainers
-          .map(variablesContainer =>
-            enumerateVariables(variablesContainer)
-              .map(({ name, isValidName }) =>
-                isValidName
-                  ? name
-                  : // Hide invalid variable names - they would not
-                    // be parsed correctly anyway.
-                    null
-              )
-              .filter(Boolean)
-          )
-          .reduce((a, b) => intersection(a, b));
+        const definedVariableNames =
+          variablesContainers.length === 0
+            ? []
+            : variablesContainers
+                .map(variablesContainer =>
+                  enumerateVariables(variablesContainer)
+                    .map(({ name, isValidName }) =>
+                      isValidName
+                        ? name
+                        : // Hide invalid variable names - they would not
+                          // be parsed correctly anyway.
+                          null
+                    )
+                    .filter(Boolean)
+                )
+                .reduce((a, b) => intersection(a, b));
         setAutocompletionVariableNames(
           definedVariableNames.map(name => ({
             text: name,

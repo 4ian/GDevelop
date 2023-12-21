@@ -14,6 +14,44 @@ import {
 } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import getObjectByName from '../../Utils/GetObjectByName';
+import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+
+// TODO Move this function to the ObjectsContainersList class.
+const getObjectOrGroupVariablesContainers = (
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  objectName: string
+): Array<gdVariablesContainer> => {
+  const object = getObjectByName(
+    globalObjectsContainer,
+    objectsContainer,
+    objectName
+  );
+  const variablesContainers: Array<gdVariablesContainer> = [];
+  if (object) {
+    variablesContainers.push(object.getVariables());
+  } else {
+    const group = getObjectGroupByName(
+      globalObjectsContainer,
+      objectsContainer,
+      objectName
+    );
+    if (group) {
+      for (const subObjectName of group.getAllObjectsNames().toJSArray()) {
+        const subObject = getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          subObjectName
+        );
+        if (subObject) {
+          variablesContainers.push(subObject.getVariables());
+        }
+      }
+    }
+  }
+  return variablesContainers;
+};
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
@@ -28,6 +66,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const {
       project,
+      globalObjectsContainer,
+      objectsContainer,
       scope,
       instructionMetadata,
       instruction,
@@ -46,47 +86,18 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const { layout } = scope;
     const object = objectName
-      ? layout && layout.hasObjectNamed(objectName)
-        ? layout.getObject(objectName)
-        : project && project.hasObjectNamed(objectName)
-        ? project.getObject(objectName)
-        : null
+      ? getObjectByName(globalObjectsContainer, objectsContainer, objectName)
       : null;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
-      () => {
-        if (!objectName) {
-          return [];
-        }
-        const variablesContainers: Array<gdVariablesContainer> = [];
-        if (object) {
-          variablesContainers.push(object.getVariables());
-        } else {
-          const group =
-            layout && layout.getObjectGroups().has(objectName)
-              ? layout.getObjectGroups().get(objectName)
-              : project && project.getObjectGroups().has(objectName)
-              ? project.getObjectGroups().get(objectName)
-              : null;
-
-          if (group) {
-            for (const subObjectName of group
-              .getAllObjectsNames()
-              .toJSArray()) {
-              if (layout && layout.hasObjectNamed(subObjectName)) {
-                variablesContainers.push(
-                  layout.getObject(subObjectName).getVariables()
-                );
-              } else if (project && project.hasObjectNamed(subObjectName)) {
-                variablesContainers.push(
-                  project.getObject(subObjectName).getVariables()
-                );
-              }
-            }
-          }
-        }
-        return variablesContainers;
-      },
-      [layout, object, objectName, project]
+      () =>
+        objectName
+          ? getObjectOrGroupVariablesContainers(
+              globalObjectsContainer,
+              objectsContainer,
+              objectName
+            )
+          : [],
+      [objectName, globalObjectsContainer, objectsContainer]
     );
 
     const onComputeAllVariableNames = () =>

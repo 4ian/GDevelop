@@ -147,6 +147,12 @@ namespace gdjs {
       PIXI.Assets.add(resource.name, resource.file, { images });
       PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
         (atlas) => {
+          /**
+           * Ideally atlas of TextureAtlas should be passed here
+           * but there is known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537)
+           *
+           * Here covered all possible ways to make it work fine if issue is fixed in pixi-spine or after migration to spine-pixi
+           */
           if (typeof atlas === 'string') {
             new pixi_spine.TextureAtlas(
               atlas,

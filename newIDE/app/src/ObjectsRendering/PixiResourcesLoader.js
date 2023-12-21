@@ -529,6 +529,12 @@ export default class PixiResourcesLoader {
           PIXI.Assets.add(spineTextureAtlasName, atlasUrl, { images });
           PIXI.Assets.load(spineTextureAtlasName)
             .then(atlas => {
+              /**
+               * Ideally atlas of TextureAtlas should be passed here
+               * but there is known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537)
+               *
+               * Here covered all possible ways to make it work fine if issue is fixed in pixi-spine or after migration to spine-pixi
+               */
               if (typeof atlas === 'string') {
                 new PIXI_SPINE.TextureAtlas(
                   atlas,

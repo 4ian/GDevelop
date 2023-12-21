@@ -280,13 +280,20 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
       maxWidth="sm"
     >
       <ColumnStackLayout expand>
-        <Text size="block-title">
-          <Trans>1. Export the assets</Trans>
-        </Text>
         <Text>
-          <Trans>Export the scene objects to a file.</Trans>
+          <Trans>Export the scene objects to a file and learn more about the submission process in the documentation.</Trans>
         </Text>
-        <Line>
+        <ResponsiveLineStackLayout>
+          <FlatButton
+            leftIcon={<Help />}
+            label={<Trans>Submit a free pack</Trans>}
+            onClick={openFreePackHelpPage}
+          />
+          <FlatButton
+            leftIcon={<Help />}
+            label={<Trans>Submit a paid pack</Trans>}
+            onClick={openPaidPackHelpPage}
+          />
           {zippedSceneAssetsBlob ? (
             <BlobDownloadUrlHolder blob={zippedSceneAssetsBlob}>
               {blobDownloadUrl => (
@@ -306,26 +313,6 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
           ) : (
             <PlaceholderLoader />
           )}
-        </Line>
-        <Text size="block-title">
-          <Trans>2. Submit the assets</Trans>
-        </Text>
-        <Text>
-          <Trans>
-            Learn more about the submission process in the documentation.
-          </Trans>
-        </Text>
-        <ResponsiveLineStackLayout>
-          <FlatButton
-            leftIcon={<Help />}
-            label={<Trans>Submit a free pack</Trans>}
-            onClick={openFreePackHelpPage}
-          />
-          <FlatButton
-            leftIcon={<Help />}
-            label={<Trans>Submit a paid pack</Trans>}
-            onClick={openPaidPackHelpPage}
-          />
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
       {renderProcessDialog()}

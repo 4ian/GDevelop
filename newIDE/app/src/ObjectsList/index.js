@@ -212,7 +212,7 @@ type Props = {|
   canSetAsGlobalObject?: boolean,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
-  onExportObject: (object: gdObject) => void,
+  onExportAssets: () => void,
   onObjectCreated: gdObject => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
@@ -247,7 +247,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       canSetAsGlobalObject,
 
       onEditObject,
-      onExportObject,
+      onExportAssets,
       onObjectCreated,
       onObjectFolderOrObjectWithContextSelected,
       onObjectPasted,
@@ -1288,7 +1288,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
-        if (item.isRoot || item.isPlaceholder) return [];
+        if (item.isPlaceholder) {
+          return [];
+        }
+        if (item.isRoot) {
+          if (item.id === 'scene-objects') {
+            return [
+              {
+                label: i18n._(t`Export as assets`),
+                click: () => onExportAssets(),
+              },
+            ];
+          }
+          return [];
+        }
+
         const { objectFolderOrObject, global } = item;
 
         const container = global ? project : objectsContainer;
@@ -1482,11 +1496,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 enabled: instanceCountOnScene > 0,
               }
             : undefined,
-          { type: 'separator' },
-          {
-            label: i18n._(t`Export as assets`),
-            click: () => onExportObject(object),
-          },
         ].filter(Boolean);
       },
       [
@@ -1507,7 +1516,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObject,
         onEditObject,
-        onExportObject,
+        onExportAssets,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,

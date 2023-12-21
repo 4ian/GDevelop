@@ -266,7 +266,7 @@ export const WithObjectsList = () => (
                   layout={testProject.testLayout}
                   resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
-                  onExportObject={action('On export object')}
+                  onExportAssets={action('On export assets')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}
                   getValidatedObjectOrGroupName={newName => newName}

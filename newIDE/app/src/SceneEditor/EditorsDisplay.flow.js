@@ -46,7 +46,7 @@ export type SceneEditorsDisplayProps = {|
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
-  onExportObject: (object: ?gdObject) => void,
+  onExportAssets: () => void,
   onDeleteObjects: (
     i18n: I18nType,
     objectsWithContext: ObjectWithContext[],

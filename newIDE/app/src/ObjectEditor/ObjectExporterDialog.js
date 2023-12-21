@@ -27,6 +27,8 @@ import {
   type TextFileDescriptor,
 } from '../Utils/BrowserArchiver';
 import ResourcesLoader from '../ResourcesLoader';
+import { getHelpLink } from '../Utils/HelpLink';
+import Help from '../UI/CustomSvgIcons/Help';
 
 const gd: libGDevelop = global.gd;
 
@@ -77,7 +79,6 @@ export const downloadResourcesAsBlobs = async ({
           resourceName,
           {}
         );
-        console.log(resourceFile);
         return {
           resource,
           url: resourceFile,
@@ -201,24 +202,23 @@ const zipAssets = async (
   }
 };
 
-const openGitHubIssue = () => {
+const openFreePackHelpPage = () => {
   Window.openExternalURL(
-    'https://github.com/4ian/GDevelop/issues/new?assignees=&labels=%F0%9F%93%A6+Asset+Store+submission&template=--asset-store-submission.md&title='
+    getHelpLink('/community/contribute-to-the-assets-store/')
   );
+};
+
+const openPaidPackHelpPage = () => {
+  Window.openExternalURL(getHelpLink('/community/sell-asset-pack-store/'));
 };
 
 type Props = {|
   project: gdProject,
   layout: gdLayout,
-  object: gdObject,
   onClose: () => void,
 |};
 
-const ObjectExporterDialog = ({ project, layout, object, onClose }: Props) => {
-  const [
-    zippedObjectAssetsBlob,
-    setZippedObjectAssetsBlob,
-  ] = React.useState<?Blob>(null);
+const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,
@@ -238,15 +238,7 @@ const ObjectExporterDialog = ({ project, layout, object, onClose }: Props) => {
   React.useEffect(
     () => {
       (async () => {
-        setZippedObjectAssetsBlob(null);
         setZippedSceneAssetsBlob(null);
-
-        const zippedObjectAssetsBlob = await zipAssets(
-          project,
-          [object],
-          ensureDownloadResourcesAsBlobsIsDone
-        );
-        setZippedObjectAssetsBlob(zippedObjectAssetsBlob);
 
         const objects = mapFor(0, layout.getObjectsCount(), index =>
           layout.getObjectAt(index)
@@ -260,16 +252,15 @@ const ObjectExporterDialog = ({ project, layout, object, onClose }: Props) => {
       })();
 
       return () => {
-        setZippedObjectAssetsBlob(null);
         setZippedSceneAssetsBlob(null);
       };
     },
-    [project, ensureDownloadResourcesAsBlobsIsDone, object, layout]
+    [project, ensureDownloadResourcesAsBlobsIsDone, layout]
   );
 
   return (
     <Dialog
-      title={<Trans>Export {object.getName()}</Trans>}
+      title={<Trans>Export {layout.getName()} assets</Trans>}
       secondaryActions={[
         <HelpButton
           key="help"
@@ -289,39 +280,13 @@ const ObjectExporterDialog = ({ project, layout, object, onClose }: Props) => {
       maxWidth="sm"
     >
       <ColumnStackLayout expand>
+        <Text size="block-title">
+          <Trans>1. Export the assets</Trans>
+        </Text>
+        <Text>
+          <Trans>Export the scene objects to a file.</Trans>
+        </Text>
         <Line>
-          <Text>
-            <Trans>
-              You can export the object to a file to submit it to the asset
-              store.
-            </Trans>
-          </Text>
-        </Line>
-        <Line>
-          <Text size="block-title">
-            <Trans>1. Export the assets</Trans>
-          </Text>
-        </Line>
-        <ResponsiveLineStackLayout>
-          {zippedObjectAssetsBlob ? (
-            <BlobDownloadUrlHolder blob={zippedObjectAssetsBlob}>
-              {blobDownloadUrl => (
-                <RaisedButton
-                  icon={<Upload />}
-                  primary
-                  onClick={() =>
-                    openBlobDownloadUrl(
-                      blobDownloadUrl,
-                      object.getName() + '.gdo'
-                    )
-                  }
-                  label={<Trans>Export the object</Trans>}
-                />
-              )}
-            </BlobDownloadUrlHolder>
-          ) : (
-            <PlaceholderLoader />
-          )}
           {zippedSceneAssetsBlob ? (
             <BlobDownloadUrlHolder blob={zippedSceneAssetsBlob}>
               {blobDownloadUrl => (
@@ -334,25 +299,34 @@ const ObjectExporterDialog = ({ project, layout, object, onClose }: Props) => {
                       layout.getName() + '.gdo'
                     )
                   }
-                  label={<Trans>Export all scene objects</Trans>}
+                  label={<Trans>Export as a pack</Trans>}
                 />
               )}
             </BlobDownloadUrlHolder>
           ) : (
             <PlaceholderLoader />
           )}
-        </ResponsiveLineStackLayout>
-        <Line>
-          <Text size="block-title">
-            <Trans>2. Submit the assets</Trans>
-          </Text>
         </Line>
-        <Line>
+        <Text size="block-title">
+          <Trans>2. Submit the assets</Trans>
+        </Text>
+        <Text>
+          <Trans>
+            Learn more about the submission process in the documentation.
+          </Trans>
+        </Text>
+        <ResponsiveLineStackLayout>
           <FlatButton
-            label={<Trans>Submit objects to the community</Trans>}
-            onClick={openGitHubIssue}
+            leftIcon={<Help />}
+            label={<Trans>Submit a free pack</Trans>}
+            onClick={openFreePackHelpPage}
           />
-        </Line>
+          <FlatButton
+            leftIcon={<Help />}
+            label={<Trans>Submit a paid pack</Trans>}
+            onClick={openPaidPackHelpPage}
+          />
+        </ResponsiveLineStackLayout>
       </ColumnStackLayout>
       {renderProcessDialog()}
     </Dialog>

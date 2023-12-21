@@ -19,7 +19,6 @@ export const Default = () => (
   <ObjectExporterDialog
     project={testProject.project}
     layout={testProject.testLayout}
-    object={testProject.customObject}
     onClose={() => action('Close the dialog')}
   />
 );

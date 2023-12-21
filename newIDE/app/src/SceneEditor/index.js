@@ -122,7 +122,7 @@ type State = {|
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
-  exportedObject: ?gdObject,
+  isAssetExporterDialogOpen: boolean,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
@@ -171,7 +171,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedLayer: null,
       editedLayerInitialTab: 'properties',
-      exportedObject: null,
+      isAssetExporterDialogOpen: false,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
@@ -471,9 +471,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  openObjectExporterDialog = (object: ?gdObject) => {
+  openObjectExporterDialog = (open: boolean = true) => {
     this.setState({
-      exportedObject: object,
+      isAssetExporterDialogOpen: open,
     });
   };
 
@@ -1701,7 +1701,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onSelectLayer={(layer: string) =>
                   this.setState({ selectedLayer: layer })
                 }
-                onExportObject={this.openObjectExporterDialog}
+                onExportAssets={this.openObjectExporterDialog}
                 onDeleteObjects={this._onDeleteObjects}
                 getValidatedObjectOrGroupName={
                   this._getValidatedObjectOrGroupName
@@ -1837,14 +1837,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                   </React.Fragment>
                 )}
               </I18n>
-              {this.state.exportedObject && (
+              {this.state.isAssetExporterDialogOpen && (
                 <ObjectExporterDialog
                   project={project}
                   layout={layout}
-                  object={this.state.exportedObject}
-                  onClose={() => {
-                    this.openObjectExporterDialog(null);
-                  }}
+                  onClose={() => this.openObjectExporterDialog(false)}
                 />
               )}
               {!!this.state.editedGroup && (

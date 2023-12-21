@@ -12,7 +12,6 @@ import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import UserAchievements from './Achievement/UserAchievements';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
-import GamesList from '../GameDashboard/GamesList';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -21,11 +20,6 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import PlaceholderError from '../UI/PlaceholderError';
-import useGamesList from '../GameDashboard/UseGamesList';
-import { type Game } from '../Utils/GDevelopServices/Game';
-import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
-import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
@@ -40,20 +34,10 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
 
-  const [openedGame, setOpenedGame] = React.useState<?Game>(null);
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
-  const {
-    games,
-    gamesFetchingError,
-    onGameUpdated,
-    fetchGames,
-  } = useGamesList();
-
-  const projectUuid = currentProject ? currentProject.getProjectUuid() : null;
-
   const markBadgesAsSeen = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
       if (!(authenticatedUser.authenticated && authenticatedUser.profile)) {
@@ -132,16 +116,6 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
     // We don't want to fetch again when authenticatedUser changes,
     // just the first time this page opens.
     [authenticatedUser.onRefreshUserProfile, open] // eslint-disable-line react-hooks/exhaustive-deps
-  );
-
-  // Only fetch games if the user decides to open the games dashboard tab.
-  React.useEffect(
-    () => {
-      if (currentTab === 'games-dashboard' && !games) {
-        fetchGames();
-      }
-    },
-    [fetchGames, currentTab, games]
   );
 
   const onLogout = React.useCallback(
@@ -242,33 +216,16 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
               </Column>
             </Line>
           )}
-          {currentTab === 'games-dashboard' &&
-            (games ? (
-              <ColumnStackLayout>
-                <AlertMessage kind="info">
-                  <Trans>
-                    You can find the Games Dashboard on the home page under the
-                    Manage tab.
-                  </Trans>
-                </AlertMessage>
-                <GamesList
-                  project={currentProject}
-                  onRefreshGames={fetchGames}
-                  games={games}
-                  onGameUpdated={onGameUpdated}
-                  onOpenGame={setOpenedGame}
-                />
-              </ColumnStackLayout>
-            ) : gamesFetchingError ? (
-              <PlaceholderError onRetry={fetchGames}>
+          {currentTab === 'games-dashboard' && (
+            <Column expand justifyContent="center" alignItems="center">
+              <AlertMessage kind="info">
                 <Trans>
-                  Can't load the games. Verify your internet connection or retry
-                  later.
+                  You can now access your games dashboard in the homepage, in
+                  the Manage section.
                 </Trans>
-              </PlaceholderError>
-            ) : (
-              <PlaceholderLoader />
-            ))}
+              </AlertMessage>
+            </Column>
+          )}
         </>
       ) : (
         <Column noMargin expand justifyContent="center">
@@ -286,28 +243,6 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
             }
           />
         </Column>
-      )}
-      {openedGame && (
-        <GameDetailsDialog
-          game={openedGame}
-          project={
-            !!projectUuid && openedGame.id === projectUuid
-              ? currentProject
-              : null
-          }
-          onClose={() => {
-            setOpenedGame(null);
-          }}
-          onGameUpdated={updatedGame => {
-            onGameUpdated(updatedGame);
-            setOpenedGame(updatedGame);
-          }}
-          onGameDeleted={() => {
-            setOpenedGame(null);
-            fetchGames();
-          }}
-          analyticsSource="profile"
-        />
       )}
     </Dialog>
   );

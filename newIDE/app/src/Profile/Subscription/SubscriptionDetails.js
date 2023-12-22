@@ -4,10 +4,10 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import {
-  getFormerSubscriptionPlans,
-  getSubscriptionPlans,
+  type SubscriptionPlanWithPrices,
+  type SubscriptionPlanPrice,
+  type SubscriptionPlan,
   type Subscription,
-  type PlanDetails,
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
 } from '../../Utils/GDevelopServices/Usage';
@@ -81,12 +81,14 @@ const subscriptionOptions: {
 
 type Props = {
   subscription: ?Subscription,
+  subscriptionPlansWithPrices: SubscriptionPlanWithPrices[],
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
   simulateNativeMobileApp?: boolean,
 };
 
 /**
+ * TODO: Update doc
  * Here are the possible cases:
  * - Subscription null: loading. (The backend always return a subscription)
  * - Subscription with no plan: show a message to invite the user to subscribe.
@@ -101,6 +103,7 @@ type Props = {
  */
 const SubscriptionDetails = ({
   subscription,
+  subscriptionPlansWithPrices,
   isManageSubscriptionLoading,
   onManageSubscription,
   simulateNativeMobileApp,
@@ -111,15 +114,35 @@ const SubscriptionDetails = ({
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  const userPlan = React.useMemo(
+  const {
+    userSubscriptionPlan,
+    userPricingSystem,
+  }: {|
+    userSubscriptionPlan: ?SubscriptionPlan,
+    userPricingSystem: ?SubscriptionPlanPrice,
+  |} = React.useMemo(
     () => {
-      if (!subscription) return null;
-      const possiblePlans: Array<PlanDetails> = getSubscriptionPlans().concat(
-        getFormerSubscriptionPlans()
+      if (!subscription)
+        return { userSubscriptionPlan: null, userPricingSystem: null };
+      const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPrices.find(
+        plan => subscription.planId === plan.id
       );
-      return possiblePlans.find(plan => subscription.planId === plan.planId);
+      if (!matchingSubscriptionPlanWithPrices) {
+        return { userSubscriptionPlan: null, userPricingSystem: null };
+      }
+      const {
+        prices,
+        ...subscriptionPlan
+      } = matchingSubscriptionPlanWithPrices;
+      return {
+        userSubscriptionPlan: subscriptionPlan,
+        // TODO: Once pricing system is stored in subscription, make sure the right
+        // pricing system is returned. If not present in subscriptionPlansWithPrices,
+        // it should be fetched.
+        userPricingSystem: prices[0],
+      };
     },
-    [subscription]
+    [subscription, subscriptionPlansWithPrices]
   );
 
   const redemptionCodeExpirationDate =
@@ -147,7 +170,9 @@ const SubscriptionDetails = ({
           </Text>
         </Column>
       </Line>
-      {userPlan && userPlan.planId && !isSubscriptionExpired ? (
+      {userSubscriptionPlan &&
+      userSubscriptionPlan.id &&
+      !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
           <Paper background="medium" variant="outlined" style={styles.paper}>
             <ResponsiveLineStackLayout alignItems="center" expand noMargin>
@@ -188,7 +213,8 @@ const SubscriptionDetails = ({
           // On web/desktop, displays the subscription as usual:
           <ColumnStackLayout noMargin>
             <PlanCard
-              plan={userPlan}
+              subscriptionPlanWithPrices={userSubscriptionPlan}
+              subscriptionPlanPrice={userPricingSystem}
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||

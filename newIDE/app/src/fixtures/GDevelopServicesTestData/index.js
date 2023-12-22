@@ -284,6 +284,573 @@ export const noSubscription: Subscription = {
   userId: 'no-subscription-user',
 };
 
+export const subscriptionPlansWithPrices = [
+  {
+    id: 'gdevelop_silver',
+    isLegacy: false,
+    nameByLocale: { en: 'GDevelop Silver' },
+    descriptionByLocale: {
+      en: 'Build more and faster.',
+      ar_SA: 'ابنِ المزيد بسرعة أكبر.',
+      de_DE: 'Baue mehr und schneller.',
+      es_ES: 'Construye más y más rápido.',
+      fr_FR: "Construire d'avantage et plus rapidement.",
+      it_IT: 'Costruisci di più e più velocemente.',
+      ja_JP: 'もっと多く、もっと速く建設する。',
+      ko_KR: '더 많이 빨리 더 많이 건설하십시오.',
+      pl_PL: 'Buduj więcej i szybciej.',
+      pt_BR: 'Construa mais e mais rápido.',
+      ru_RU: 'Стройте больше и быстрее.',
+      sl_SI: 'Gradite več in hitreje.',
+      uk_UA: 'Будуйте більше та швидше.',
+      zh_CN: '更多、更快地构建。',
+    },
+    bulletPointsByLocale: [
+      {
+        en: '50 cloud projects with 250MB of resources per project.',
+        ar_SA: '50 مشروع سحابي بسعة 250 ميجابايت لكل مشروع.',
+        de_DE: '50 Cloud-Projekte mit 250 MB Ressourcen pro Projekt.',
+        es_ES: '50 proyectos en la nube con 250 MB de recursos por proyecto.',
+        fr_FR: '50 projets cloud de 250 Mo de ressources par projet.',
+        it_IT: '50 progetti cloud con 250 MB di risorse per progetto.',
+        ja_JP:
+          '1つのプロジェクトあたり250MBのリソースを備えた50のクラウドプロジェクト。',
+        ko_KR: '프로젝트당 250MB의 자원이 포함된 50개의 클라우드 프로젝트.',
+        pl_PL: '50 projektów w chmurze z 250 MB zasobów na projekt.',
+        pt_BR: '50 projetos na nuvem com 250 MB de recursos por projeto.',
+        ru_RU: '50 проектов в облаке с ресурсами объемом 250 МБ на проект.',
+        sl_SI: '50 oblak projektov z 250MB virov na projekt.',
+        uk_UA: '50 хмарних проектів з ресурсами обсягом 250 МБ на проект.',
+        zh_CN: '每个项目有250MB资源的50个云项目。',
+      },
+      {
+        en: '10 packagings per day for Android and for desktop.',
+        ar_SA: '10 حزم يوميًا لنظام Android ولسطح المكتب.',
+        de_DE: '10 Verpackungen pro Tag für Android und Desktop.',
+        es_ES: '10 empaquetados por día para Android y para escritorio.',
+        fr_FR: '10 packagings par jour pour Android et ordinateur.',
+        it_IT: '10 confezioni al giorno per Android e desktop.',
+        ja_JP: 'Androidおよびデスクトップ用に1日10回のパッケージ。',
+        ko_KR: '하루에 안드로이드 및 데스크톱용 10개의 패키지.',
+        pl_PL: '10 opakowań dziennie dla Androida i komputera.',
+        pt_BR: '10 embalagens por dia para Android e desktop.',
+        ru_RU: '10 упаковок в день для Android и настольных компьютеров.',
+        sl_SI: '10 pakiranj na dan za Android in namizje.',
+        uk_UA: "10 упаковок на день для Android та настільних комп'ютерів.",
+        zh_CN: '每天为Android和桌面提供10个包装。',
+      },
+      {
+        en: 'Unlimited leaderboards and unlimited player feedback responses.',
+        ar_SA: 'لا حدود للجداول الصدارة ولا حدود لاستجابات تعليقات اللاعبين.',
+        de_DE:
+          'Unbegrenzte Bestenlisten und unbegrenzte Spieler-Feedback-Antworten.',
+        es_ES:
+          'Tablas de clasificación ilimitadas y respuestas ilimitadas de retroalimentación de jugadores.',
+        fr_FR:
+          'Aucune limite sur les tableaux de classements et les retours de joueurs',
+        it_IT:
+          'Classifiche illimitate e risposte illimitate ai feedback dei giocatori.',
+        ja_JP:
+          '無制限のリーダーボードと無制限のプレイヤーフィードバックレスポンス。',
+        ko_KR: '무제한 리더보드 및 무제한 플레이어 피드백 응답.',
+        pl_PL:
+          'Nieograniczone tabele wyników i nieograniczone odpowiedzi na opinie graczy.',
+        pt_BR:
+          'Quadros de líderes ilimitados e respostas ilimitadas de feedback de jogadores.',
+        ru_RU:
+          'Неограниченные таблицы лидеров и неограниченные ответы на обратную связь от игроков.',
+        sl_SI:
+          'Neomejene lestvice in neomejeni odgovori na povratne informacije igralcev.',
+        uk_UA:
+          'Необмежені таблиці лідерів і необмежені відповіді на відгуки гравців.',
+        zh_CN: '无限排行榜和无限玩家反馈响应。',
+      },
+    ],
+    prices: [
+      {
+        id: 'silver_1month',
+        planId: 'gdevelop_silver',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 499,
+        region: 'everywhere',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_gold',
+    isLegacy: false,
+    nameByLocale: { en: 'GDevelop Gold' },
+    descriptionByLocale: {
+      en: 'Experimented creators, ambitious games.',
+      ar_SA: 'مبدعين مجربين، ألعاب طموحة.',
+      de_DE: 'Erfahrene Entwickler, ambitionierte Spiele.',
+      es_ES: 'Creadores experimentados, juegos ambiciosos.',
+      fr_FR: 'Créateurs expérimentés, jeux ambitieux.',
+      it_IT: 'Creatori esperti, giochi ambiziosi.',
+      ja_JP: '経験豊富なクリエイター、野心的なゲーム。',
+      ko_KR: '경험 많은 개발자, 야심 찬 게임.',
+      pl_PL: 'Doświadczeni twórcy, ambitne gry.',
+      pt_BR: 'Criadores experientes, jogos ambiciosos.',
+      ru_RU: 'Опытные создатели, амбициозные игры.',
+      sl_SI: 'Izkušeni ustvarjalci, ambiciozne igre.',
+      uk_UA: 'Досвідчені розробники, амбіційні ігри.',
+      zh_CN: '有经验的创作者，有抱负的游戏。',
+    },
+    bulletPointsByLocale: [
+      {
+        en: '100 cloud projects with 500MB of resources per project.',
+        ar_SA: '100 مشروع سحابي بسعة 500 ميجابايت لكل مشروع.',
+        de_DE: '100 Cloud-Projekte mit 500 MB Ressourcen pro Projekt.',
+        es_ES: '100 proyectos en la nube con 500 MB de recursos por proyecto.',
+        fr_FR: '100 projets cloud de 500 Mo de ressources par projet.',
+        it_IT: '100 progetti cloud con 500 MB di risorse per progetto.',
+        ja_JP:
+          '1つのプロジェクトあたり500MBのリソースを備えた100のクラウドプロジェクト。',
+        ko_KR: '프로젝트당 500MB의 자원이 포함된 100개의 클라우드 프로젝트.',
+        pl_PL: '100 projektów w chmurze z 500 MB zasobów na projekt.',
+        pt_BR: '100 projetos na nuvem com 500 MB de recursos por projeto.',
+        ru_RU: '100 проектов в облаке с ресурсами объемом 500 МБ на проект.',
+        sl_SI: '100 oblak projektov z 500MB virov na projekt.',
+        uk_UA: '100 хмарних проектів з ресурсами обсягом 500 МБ на проект.',
+        zh_CN: '每个项目有500MB资源的100个云项目。',
+      },
+      {
+        en: '20 packagings per day for Android and for desktop.',
+        ar_SA: '20 حزم يوميًا لنظام Android ولسطح المكتب.',
+        de_DE: '20 Verpackungen pro Tag für Android und Desktop.',
+        es_ES: '20 empaquetados por día para Android y para escritorio.',
+        fr_FR: '20 packagings par jour pour Android et ordinateur.',
+        it_IT: '20 confezioni al giorno per Android e desktop.',
+        ja_JP: 'Androidおよびデスクトップ用に1日20回のパッケージ。',
+        ko_KR: '하루에 안드로이드 및 데스크톱용 20개의 패키지.',
+        pl_PL: '20 opakowań dziennie dla Androida i komputera.',
+        pt_BR: '20 embalagens por dia para Android e desktop.',
+        ru_RU: '20 упаковок в день для Android и настольных компьютеров.',
+        sl_SI: '20 pakiranj na dan za Android in namizje.',
+        uk_UA: "20 упаковок на день для Android та настільних комп'ютерів.",
+        zh_CN: '每天为Android和桌面提供20个包装。',
+      },
+      {
+        en: 'Unlimited leaderboards and unlimited player feedback responses.',
+        ar_SA: 'لا حدود للجداول الصدارة ولا حدود لاستجابات تعليقات اللاعبين.',
+        de_DE:
+          'Unbegrenzte Bestenlisten und unbegrenzte Spieler-Feedback-Antworten.',
+        es_ES:
+          'Tablas de clasificación ilimitadas y respuestas ilimitadas de retroalimentación de jugadores.',
+        fr_FR:
+          'Aucune limite sur les tableaux de classements et les retours de joueurs',
+        it_IT:
+          'Classifiche illimitate e risposte illimitate ai feedback dei giocatori.',
+        ja_JP:
+          '無制限のリーダーボードと無制限のプレイヤーフィードバックレスポンス。',
+        ko_KR: '무제한 리더보드 및 무제한 플레이어 피드백 응답.',
+        pl_PL:
+          'Nieograniczone tabele wyników i nieograniczone odpowiedzi na opinie graczy.',
+        pt_BR:
+          'Quadros de líderes ilimitados e respostas ilimitadas de feedback de jogadores.',
+        ru_RU:
+          'Неограниченные таблицы лидеров и неограниченные ответы на обратную связь от игроков.',
+        sl_SI:
+          'Neomejene lestvice in neomejeni odgovori na povratne informacije igralcev.',
+        uk_UA:
+          'Необмежені таблиці лідерів і необмежені відповіді на відгуки гравців.',
+        zh_CN: '无限排行榜和无限玩家反馈响应。',
+      },
+    ],
+    prices: [
+      {
+        id: 'gold_1month',
+        planId: 'gdevelop_gold',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 999,
+        region: 'everywhere',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_startup',
+    isLegacy: false,
+    nameByLocale: { en: 'GDevelop Startup' },
+    descriptionByLocale: {
+      en: 'Small game studios and startups',
+      ar_SA: 'الاستديوهات الصغيرة للألعاب والشركات الناشئة.',
+      de_DE: 'Kleine Spielestudios und Startups.',
+      es_ES: 'Pequeños estudios de juegos y startups.',
+      fr_FR: 'Petits studios de jeux et startups.',
+      it_IT: 'Piccoli studi di giochi e start-up.',
+      ja_JP: '小規模ゲームスタジオとスタートアップ。',
+      ko_KR: '소규모 게임 스튜디오 및 스타트업.',
+      pl_PL: 'Małe studia gier i start-upy.',
+      pt_BR: 'Pequenos estúdios de jogos e startups.',
+      ru_RU: 'Маленькие студии игр и стартапы.',
+      sl_SI: 'Mala studia iger in začetniki.',
+      uk_UA: 'Малі студії ігор та стартапи.',
+      zh_CN: '小型游戏工作室和初创企业。',
+    },
+    bulletPointsByLocale: [
+      {
+        en: '500 cloud projects with 5GB of resources per project.',
+        ar_SA: '500 مشروع سحابي بسعة 5 غيغابايت لكل مشروع.',
+        de_DE: '500 Cloud-Projekte mit 5 GB Ressourcen pro Projekt.',
+        es_ES: '500 proyectos en la nube con 5 GB de recursos por proyecto.',
+        fr_FR: '500 projets cloud de 5 Go de ressources par projet.',
+        it_IT: '500 progetti cloud con 5 GB di risorse per progetto.',
+        ja_JP:
+          '1つのプロジェクトあたり5GBのリソースを備えた500のクラウドプロジェクト。',
+        ko_KR: '프로젝트당 5GB의 자원이 포함된 500개의 클라우드 프로젝트.',
+        pl_PL: '500 projektów w chmurze z 5 GB zasobów na projekt.',
+        pt_BR: '500 projetos na nuvem com 5 GB de recursos por projeto.',
+        ru_RU: '500 проектов в облаке с ресурсами объемом 5 ГБ на проект.',
+        sl_SI: '500 oblak projektov z 5GB virov na projekt.',
+        uk_UA: '500 хмарних проектів з ресурсами обсягом 5 ГБ на проект.',
+        zh_CN: '每个项目有5GB资源的500个云项目。',
+      },
+      {
+        en: 'Unlimited packagings per day for Android, web, and desktop.',
+        ar_SA:
+          'عدد غير محدود من التعبئة يوميًا لنظام Android والويب وسطح المكتب.',
+        de_DE: 'Unbegrenzte Verpackungen pro Tag für Android, Web und Desktop.',
+        es_ES:
+          'Empaquetados ilimitados por día para Android, web y escritorio.',
+        fr_FR:
+          'Emballages illimités par jour pour Android, le web et le bureau.',
+        it_IT: 'Confezioni illimitate al giorno per Android, web e desktop.',
+        ja_JP: 'Android、Web、デスクトップ向けの1日無制限のパッケージ。',
+        ko_KR: '안드로이드, 웹 및 데스크톱용으로 하루에 무제한 패키징.',
+        pl_PL:
+          'Nieograniczone opakowania dziennie dla Androida, sieci i komputera.',
+        pt_BR: 'Embalagens ilimitadas por dia para Android, web e desktop.',
+        ru_RU:
+          'Неограниченное количество упаковок в день для Android, веба и рабочего стола.',
+        sl_SI: 'Neomejeno pakiranje na dan za Android, splet in namizje.',
+        uk_UA:
+          'Необмежена кількість упаковок на день для Android, вебу та робочого столу.',
+        zh_CN: '每天为Android、Web和桌面提供无限次打包。',
+      },
+      {
+        en: 'Unlimited leaderboards and unlimited player feedback responses.',
+        ar_SA: 'الجداول الصدارة غير المحدودة وردود فعل اللاعبين غير المحدودة.',
+        de_DE:
+          'Unbegrenzte Bestenlisten und unbegrenzte Spieler-Feedback-Antworten.',
+        es_ES:
+          'Tablas de clasificación ilimitadas y respuestas ilimitadas de retroalimentación de jugadores.',
+        fr_FR:
+          'Classements illimités et réponses illimitées aux commentaires des joueurs.',
+        it_IT:
+          'Classifiche illimitate e risposte illimitate ai feedback dei giocatori.',
+        ja_JP:
+          '無制限のリーダーボードと無制限のプレイヤーフィードバックレスポンス。',
+        ko_KR: '무제한 리더보드 및 무제한 플레이어 피드백 응답.',
+        pl_PL:
+          'Nieograniczone tabele wyników i nieograniczone odpowiedzi na opinie graczy.',
+        pt_BR:
+          'Quadros de líderes ilimitados e respostas ilimitadas de feedback de jogadores.',
+        ru_RU:
+          'Неограниченные таблицы лидеров и неограниченные ответы на обратную связь от игроков.',
+        sl_SI:
+          'Neomejene lestvice in neomejeni odgovori na povratne informacije igralcev.',
+        uk_UA:
+          'Необмежені таблиці лідерів і необмежені відповіді на відгуки гравців.',
+        zh_CN: '无限排行榜和无限玩家反馈响应。',
+      },
+      {
+        en:
+          'Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.',
+        ar_SA:
+          'تعمل على اختفاء علامة GDevelop أو شعار GDevelop عند تحميل اللعبة لتغمر لاعبيك باللعبة.',
+        de_DE:
+          'Tauchen Sie Ihre Spieler ein, indem Sie das GDevelop-Wasserzeichen oder das GDevelop-Logo beim Laden des Spiels entfernen.',
+        es_ES:
+          'Sumérgete a tus jugadores eliminando la marca de agua de GDevelop o el logotipo de GDevelop cuando se carga el juego.',
+        fr_FR:
+          'Immergez vos joueurs en supprimant le filigrane GDevelop ou le logo GDevelop lors du chargement du jeu.',
+        it_IT:
+          'Immergi i tuoi giocatori rimuovendo il watermark di GDevelop o il logo GDevelop quando il gioco si carica.',
+        ja_JP:
+          'ゲームの読み込み時にGDevelopのウォーターマークまたはGDevelopロゴを削除して、プレイヤーを没入させます。',
+        ko_KR:
+          '게임 로딩 시 GDevelop 워터마크 또는 GDevelop 로고를 제거하여 플레이어를 몰입시킵니다.',
+        pl_PL:
+          'Zanurz swoich graczy, usuwając znak wodny GDevelop lub logo GDevelop podczas ładowania gry.',
+        pt_BR:
+          "Mergulhe seus jogadores removendo a marca d'água do GDevelop ou o logotipo do GDevelop quando o jogo é carregado.",
+        ru_RU:
+          'Погрузите своих игроков, удалив водяной знак GDevelop или логотип GDevelop при загрузке игры.',
+        sl_SI:
+          'Potopite svoje igralce, tako da odstranite GDevelop watermark ali logotip GDevelop, ko se igra naloži.',
+        uk_UA:
+          'Занурте своїх гравців, видаливши водяний знак GDevelop або логотип GDevelop під час завантаження гри.',
+        zh_CN:
+          '在游戏加载时去除GDevelop水印或GDevelop标志，让您的玩家沉浸其中。',
+      },
+      {
+        en:
+          'Access your cloud projects history and easily get back to a previous version.',
+        ar_SA:
+          'الوصول إلى تاريخ مشاريعك في السحابة والعودة بسهولة إلى إصدار سابق.',
+        de_DE:
+          'Zugriff auf die Historie Ihrer Cloud-Projekte und einfaches Zurückkehren zu einer früheren Version.',
+        es_ES:
+          'Accede al historial de tus proyectos en la nube y vuelve fácilmente a una versión anterior.',
+        fr_FR:
+          "Accédez à l'historique de vos projets cloud et revenez facilement à une version précédente.",
+        it_IT:
+          'Accedi alla cronologia dei tuoi progetti cloud e torna facilmente a una versione precedente.',
+        ja_JP:
+          'クラウドプロジェクトの履歴にアクセスし、以前のバージョンに簡単に戻ります。',
+        ko_KR:
+          '클라우드 프로젝트 기록에 액세스하고 이전 버전으로 쉽게 돌아갑니다.',
+        pl_PL:
+          'Otrzymuj dostęp do historii projektów w chmurze i łatwo wracaj do poprzednich wersji.',
+        pt_BR:
+          'Acesse o histórico de seus projetos na nuvem e volte facilmente para uma versão anterior.',
+        ru_RU:
+          'Получайте доступ к истории ваших проектов в облаке и легко возвращайтесь к предыдущей версии.',
+        sl_SI:
+          'Dostopajte do zgodovine svojih projektov v oblaku in se enostavno vrnete na prejšnjo različico.',
+        uk_UA:
+          'Отримуйте доступ до історії ваших проектів в хмарі та легко повертайтесь до попередньої версії.',
+        zh_CN: '访问您的云项目历史记录并轻松返回以前的版本。',
+      },
+      {
+        en:
+          'Add 1 guest user or unlimited startup team members to collaborate on every project.',
+        ar_SA:
+          'أضف مستخدم ضيف واحد أو أعضاء فريق بدء التشغيل غير المحددين للتعاون في كل مشروع.',
+        de_DE:
+          'Fügen Sie 1 Gastbenutzer oder unbegrenzte Teammitglieder des Startups hinzu, um an jedem Projekt zusammenzuarbeiten.',
+        es_ES:
+          'Agrega 1 usuario invitado o miembros ilimitados del equipo de inicio para colaborar en cada proyecto.',
+        fr_FR:
+          "Ajoutez 1 utilisateur invité ou un nombre illimité de membres de l'équipe de démarrage pour collaborer sur chaque projet.",
+        it_IT:
+          'Aggiungi 1 utente ospite o membri illimitati del team di startup per collaborare su ogni progetto.',
+        ja_JP:
+          'ゲストユーザー1人または無制限のスタートアップチームメンバーを追加して、すべてのプロジェクトで協力します。',
+        ko_KR:
+          '모든 프로젝트에서 협력할 수 있도록 게스트 사용자 1명 또는 무제한 스타트업 팀 멤버를 추가하세요.',
+        pl_PL:
+          'Dodaj 1 gościa lub nieograniczoną liczbę członków zespołu startupowego do współpracy przy każdym projekcie.',
+        pt_BR:
+          'Adicione 1 usuário convidado ou membros ilimitados da equipe de startups para colaborar em cada projeto.',
+        ru_RU:
+          'Добавьте 1 гостевого пользователя или неограниченное количество участников стартап-команды для совместной работы над каждым проектом.',
+        sl_SI:
+          'Dodajte 1 gostu ali neomejeno število članov ekipe začetnega zagona za sodelovanje pri vsakem projektu.',
+        uk_UA:
+          'Додайте 1 гостевого користувача або необмежену кількість учасників команди стартапу для співпраці в кожному проекті.',
+        zh_CN: '添加1个访客用户或无限的初创团队成员，共同合作每个项目。',
+      },
+    ],
+    prices: [
+      {
+        id: 'startup_1month',
+        planId: 'gdevelop_startup',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 3000,
+        region: 'everywhere',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_education',
+    isLegacy: false,
+    nameByLocale: { en: 'GDevelop Education' },
+    descriptionByLocale: {
+      en: 'Schools and Universities.',
+      ar_SA: 'المدارس والجامعات.',
+      de_DE: 'Schulen und Universitäten.',
+      es_ES: 'Escuelas y universidades.',
+      fr_FR: 'Écoles et universités.',
+      it_IT: 'Scuole e università.',
+      ja_JP: '学校と大学。',
+      ko_KR: '학교 및 대학.',
+      pl_PL: 'Szkoły i uniwersytety.',
+      pt_BR: 'Escolas e universidades.',
+      ru_RU: 'Школы и университеты.',
+      sl_SI: 'Šole in univerze.',
+      uk_UA: 'Школи і університети.',
+      zh_CN: '学校和大学。',
+    },
+    bulletPointsByLocale: [
+      {
+        en: 'Students anonymity.',
+        ar_SA: 'سرية الطلاب.',
+        de_DE: 'Anonymität der Schüler.',
+        es_ES: 'Anonimato de los estudiantes.',
+        fr_FR: 'Anonymat des étudiants.',
+        it_IT: 'Anonimato degli studenti.',
+        ja_JP: '学生の匿名性。',
+        ko_KR: '학생 익명성.',
+        pl_PL: 'Anonimowość uczniów.',
+        pt_BR: 'Anonimato dos alunos.',
+        ru_RU: 'Анонимность студентов.',
+        sl_SI: 'Anonimnost študentov.',
+        uk_UA: 'Анонімність студентів.',
+        zh_CN: '学生匿名性。',
+      },
+      {
+        en: 'Organize students per classroom.',
+        ar_SA: 'تنظيم الطلاب حسب الصف.',
+        de_DE: 'Schüler pro Klassenzimmer organisieren.',
+        es_ES: 'Organizar estudiantes por aulas.',
+        fr_FR: 'Organiser les étudiants par classe.',
+        it_IT: 'Organizza gli studenti per classe.',
+        ja_JP: 'クラスごとに学生を組織化。',
+        ko_KR: '학생을 강의실별로 정리하십시오.',
+        pl_PL: 'Organizuj uczniów według sal lekcyjnych.',
+        pt_BR: 'Organize os alunos por sala de aula.',
+        ru_RU: 'Организация студентов по классам.',
+        sl_SI: 'Organizacija študentov po učilnicah.',
+        uk_UA: 'Організація студентів за класами.',
+        zh_CN: '根据教室组织学生。',
+      },
+      {
+        en: "Access your students' projects",
+        ar_SA: 'الوصول إلى مشاريع الطلاب الخاصة بك',
+        de_DE: 'Zugriff auf die Projekte Ihrer Schüler.',
+        es_ES: 'Acceda a los proyectos de sus estudiantes.',
+        fr_FR: 'Accédez aux projets de vos étudiants.',
+        it_IT: 'Accedi ai progetti dei tuoi studenti.',
+        ja_JP: '生徒のプロジェクトにアクセス。',
+        ko_KR: '학생 프로젝트에 액세스하십시오.',
+        pl_PL: 'Dostęp do projektów uczniów.',
+        pt_BR: 'Acesse os projetos dos seus alunos.',
+        ru_RU: 'Доступ к проектам ваших студентов.',
+        sl_SI: 'Dostop do projektov vaših študentov.',
+        uk_UA: 'Доступ до проектів ваших студентів.',
+        zh_CN: '访问您的学生项目。',
+      },
+      {
+        en: 'You and your students receive a Gold subscription.',
+        ar_SA: 'أنت وطلابك تتلقون اشتراكًا ذهبيًا.',
+        de_DE: 'Sie und Ihre Schüler erhalten ein Gold-Abonnement.',
+        es_ES: 'Usted y sus estudiantes reciben una suscripción Gold.',
+        fr_FR: 'Vous et vos étudiants recevrez un abonnement Gold.',
+        it_IT: 'Tu e i tuoi studenti riceverete un abbonamento Gold.',
+        ja_JP:
+          'あなたとあなたの生徒はゴールドサブスクリプションを受け取ります。',
+        ko_KR: '당신과 당신의 학생들은 골드 구독을 받습니다.',
+        pl_PL: 'Ty i Twoi uczniowie otrzymają subskrypcję Gold.',
+        pt_BR: 'Você e seus alunos recebem uma assinatura Gold.',
+        ru_RU: 'Вы и ваши студенты получите золотую подписку.',
+        sl_SI: 'Vi in vaši študenti boste prejeli zlato naročnino.',
+        uk_UA: 'Ви і ваші студенти отримаєте золоту підписку.',
+        zh_CN: '您和您的学生将收到金牌订阅。',
+      },
+      {
+        en: 'You and your students can use the cloud project version history.',
+        ar_SA: 'يمكنك وطلابك استخدام تاريخ إصدار مشروع السحابة.',
+        de_DE:
+          'Sie und Ihre Schüler können die Versionsgeschichte des Cloud-Projekts verwenden.',
+        es_ES:
+          'Usted y sus estudiantes pueden utilizar el historial de versiones del proyecto en la nube.',
+        fr_FR:
+          "Vous et vos étudiants pouvez utiliser l'historique des versions du projet cloud.",
+        it_IT:
+          'Tu e i tuoi studenti possono utilizzare la cronologia delle versioni del progetto cloud.',
+        ja_JP:
+          'あなたとあなたの生徒はクラウドプロジェクトのバージョン履歴を使用できます。',
+        ko_KR:
+          '당신과 당신의 학생들은 클라우드 프로젝트 버전 히스토리를 사용할 수 있습니다.',
+        pl_PL:
+          'Ty i Twoi uczniowie możecie korzystać z historii wersji projektu w chmurze.',
+        pt_BR:
+          'Você e seus alunos podem usar o histórico de versões do projeto na nuvem.',
+        ru_RU:
+          'Вы и ваши студенты можете использовать историю версий проекта в облаке.',
+        sl_SI:
+          'Vi in vaši študenti lahko uporabljate zgodovino različic projekta v oblaku.',
+        uk_UA:
+          'Ви і ваші студенти можете використовувати історію версій проекту в хмарі.',
+        zh_CN: '您和您的学生可以使用云项目版本历史。',
+      },
+    ],
+    prices: [
+      {
+        id: 'education_1month',
+        planId: 'gdevelop_education',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 299,
+        isPerUser: true,
+        region: 'everywhere',
+      },
+      {
+        id: 'education_1year',
+        planId: 'gdevelop_education',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 2999,
+        isPerUser: true,
+        region: 'everywhere',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_indie',
+    isLegacy: true,
+    nameByLocale: { en: 'GDevelop Indie (Legacy)' },
+    descriptionByLocale: { en: 'Build more and faster' },
+    bulletPointsByLocale: [
+      {
+        en:
+          '50 cloud projects with 250MB of resources per project and 3-month version history.',
+      },
+      { en: '10 packagings per day for Android and for desktop.' },
+      { en: 'Unlimited leaderboards and unlimited player feedback responses.' },
+    ],
+    prices: [
+      {
+        id: 'indie_1month',
+        planId: 'gdevelop_indie',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 200,
+        region: 'everywhere',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_pro',
+    isLegacy: true,
+    nameByLocale: { en: 'GDevelop Pro (Legacy)' },
+    descriptionByLocale: { en: 'Experimented creators, ambitious games' },
+    bulletPointsByLocale: [
+      {
+        en:
+          '100 cloud projects with 500MB of resources per project and one-year version history.',
+      },
+      { en: '70 packagings per day for Android and for desktop.' },
+      { en: 'Unlimited leaderboards and unlimited player feedback responses.' },
+      {
+        en:
+          'Immerse your players by removing GDevelop logo when the game loads.',
+      },
+    ],
+    prices: [
+      {
+        id: 'pro_1month',
+        planId: 'gdevelop_pro',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 700,
+        region: 'everywhere',
+      },
+    ],
+  },
+];
+
 export const limitsForNoSubscriptionUser: Limits = {
   capabilities: {
     analytics: {

@@ -126,12 +126,17 @@ export type SubscriptionPlanPrice = {|
   periodCount: number,
 |};
 
-export type SubscriptionPlanWithPrice = {|
+export type SubscriptionPlan = {|
   id: string,
   isLegacy: boolean,
   nameByLocale: MessageByLocale,
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
+|};
+
+export type SubscriptionPlanWithPrices = {|
+  ...SubscriptionPlan,
+  prices: SubscriptionPlanPrice[],
 |};
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
@@ -298,7 +303,7 @@ export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
 ];
 
 export const listSubscriptionPlans = async (): Promise<
-  SubscriptionPlanWithPrice[]
+  SubscriptionPlanWithPrices[]
 > => {
   const response = await apiClient.get('/subscription-plan');
   return response.data;

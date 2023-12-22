@@ -179,7 +179,7 @@ const getPlanPrices = ({
     return getPlanPrice(price);
   }
 
-  if (prices) {
+  if (prices && prices.length > 0) {
     const displayedPrices = prices
       .sort((priceA, priceB) => {
         // TODO: Decide if the front end should sort the prices or if it should respect

@@ -10,6 +10,9 @@ import {
 } from '../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import useSubscriptionPlans, {
+  getAvailableSubscriptionPlansWithPrices,
+} from '../../Utils/UseSubscriptionPlans';
 
 export type SubscriptionAnalyticsMetadata = {|
   reason: SubscriptionDialogDisplayReason,
@@ -52,6 +55,7 @@ export const SubscriptionSuggestionProvider = ({
   >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
+  const { subscriptionPlansWithPrices } = useSubscriptionPlans();
 
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
 
@@ -91,12 +95,21 @@ export const SubscriptionSuggestionProvider = ({
     openSubscriptionDialog,
   ]);
 
+  const availableSubscriptionPlansWithPrices = React.useMemo(
+    () =>
+      subscriptionPlansWithPrices
+        ? getAvailableSubscriptionPlansWithPrices(subscriptionPlansWithPrices)
+        : null,
+    [subscriptionPlansWithPrices]
+  );
+
   return (
     <SubscriptionSuggestionContext.Provider value={value}>
       {children}
       {analyticsMetadata && (
         <SubscriptionDialog
           open
+          subscriptionPlansWithPrices={availableSubscriptionPlansWithPrices}
           onClose={closeSubscriptionDialog}
           analyticsMetadata={analyticsMetadata}
           filter={filter}

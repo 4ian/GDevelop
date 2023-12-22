@@ -496,6 +496,28 @@ export const getRedirectToCheckoutUrl = ({
   return url.toString();
 };
 
+export const getRedirectToCheckoutUrlV2 = ({
+  pricingSystemId,
+  userId,
+  userEmail,
+  quantity,
+}: {
+  pricingSystemId: string,
+  userId: string,
+  userEmail: string,
+  quantity?: number,
+}): string => {
+  const url = new URL(
+    `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
+  );
+  url.searchParams.set('pricingSystemId', pricingSystemId);
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('customerEmail', userEmail);
+  if (quantity !== undefined && quantity > 1)
+    url.searchParams.set('quantity', quantity.toString());
+  return url.toString();
+};
+
 export const canUseCloudProjectHistory = (
   subscription: ?Subscription
 ): boolean => {

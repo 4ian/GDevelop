@@ -6,6 +6,14 @@ import {
   type SubscriptionPlanWithPrices,
 } from './GDevelopServices/Usage';
 
+export const getAvailableSubscriptionPlansWithPrices = (
+  subscriptionPlansWithPrices: SubscriptionPlanWithPrices[]
+): SubscriptionPlanWithPrices[] => {
+  return subscriptionPlansWithPrices.filter(
+    subscriptionPlanWithPrices => !subscriptionPlanWithPrices.isLegacy
+  );
+};
+
 /**
  * Hook to access subscription plans across the app.
  */

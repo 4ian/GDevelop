@@ -29,6 +29,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
+    // The list is not kept with a memo because scenes could be added by
+    // another component without this one to know.
     const layoutNames = props.project
       ? enumerateLayouts(props.project).map(layout => layout.getName())
       : [];

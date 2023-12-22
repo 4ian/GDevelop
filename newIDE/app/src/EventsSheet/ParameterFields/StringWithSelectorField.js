@@ -39,6 +39,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
+    // The list is not kept with a memo because choices could be changed by
+    // another component without this one to know.
     const choices = getParameterChoiceValues(parameterMetadata);
 
     const isCurrentValueInList = choices.some(

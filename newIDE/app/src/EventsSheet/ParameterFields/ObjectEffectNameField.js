@@ -43,6 +43,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       parameterIndex,
     } = props;
 
+    // We don't memo/callback this, as we want to recompute it every time something changes.
+    // Because of the function getLastObjectParameterValue.
     const getEffectNames = (): Array<string> => {
       const objectOrGroupName = getLastObjectParameterValue({
         instructionMetadata,

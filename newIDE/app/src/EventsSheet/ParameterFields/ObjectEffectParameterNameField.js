@@ -38,6 +38,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
+    // We don't memo/callback this, as we want to recompute it every time something changes.
+    // Because of the function getLastObjectParameterValue.
     const getEffectParameterNames = (): Array<string> => {
       const {
         project,

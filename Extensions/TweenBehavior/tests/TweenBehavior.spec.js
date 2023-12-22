@@ -100,6 +100,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
           name: behaviorName,
         },
       ],
+      // @ts-ignore
       content: {
         width: 64,
         height: 64,
@@ -711,45 +712,79 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getY()).to.be(660);
   });
 
-  it('can tween the scales', () => {
+  it('can tween the scale', () => {
     sprite.setPosition(100, 400);
-    sprite.setScaleX(200);
-    sprite.setScaleY(300);
-    spriteBehavior.addObjectScaleTween2(
+    sprite.setScale(200);
+    spriteBehavior.addObjectScaleTween3(
       'MyTween',
       600,
-      900,
       'linear',
       0.25,
       false,
       false
     );
-    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    checkProgress(6, () => sprite.getScale());
     // The interpolation is exponential.
-    expect(sprite.getScaleX()).to.be(386.6364089863524);
-    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getScale()).to.be(386.6364089863524);
     expect(sprite.getX()).to.be(100);
     expect(sprite.getY()).to.be(400);
   });
 
   it('can tween the scales from center', () => {
     sprite.setPosition(100, 400);
-    sprite.setScaleX(200);
-    sprite.setScaleY(300);
-    spriteBehavior.addObjectScaleTween2(
+    sprite.setScale(200);
+    spriteBehavior.addObjectScaleTween3(
       'MyTween',
       600,
-      900,
       'linear',
       0.25,
       false,
       true
     );
-    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    checkProgress(6, () => sprite.getScale());
     // The interpolation is exponential.
-    expect(sprite.getScaleX()).to.be(386.6364089863524);
-    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getScale()).to.be(386.6364089863524);
     expect(sprite.getX()).to.be(-5872.3650875632775);
-    expect(sprite.getY()).to.be(-8558.547631344918);
+    expect(sprite.getY()).to.be(-5572.3650875632775);
+  });
+
+  it('can tween the scale of a cube', () => {
+    cube.setPosition(100, 400);
+    cube.setZ(800);
+    cube.setScale(200);
+    cubeBehavior.addObjectScaleTween3(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    checkProgress(6, () => cube.getScale());
+    // The interpolation is exponential.
+    expect(cube.getScale()).to.be(386.6364089863524);
+    expect(cube.getX()).to.be(100);
+    expect(cube.getY()).to.be(400);
+    expect(cube.getZ()).to.be(800);
+  });
+
+  it('can tween the scales of a cube from center', () => {
+    cube.setPosition(100, 400);
+    cube.setZ(800);
+    cube.setScale(200);
+    cubeBehavior.addObjectScaleTween3(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      true
+    );
+    checkProgress(6, () => cube.getScale());
+    // The interpolation is exponential.
+    expect(cube.getScale()).to.be(386.6364089863524);
+    expect(cube.getX()).to.be(-5872.3650875632775);
+    expect(cube.getY()).to.be(-5572.3650875632775);
+    expect(cube.getZ()).to.be(-5172.3650875632775);
   });
 });

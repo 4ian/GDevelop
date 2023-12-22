@@ -808,17 +808,18 @@ namespace gdjs {
       const owner = this.owner;
       if (!isScalable(owner)) return;
 
+      const owner3d = owner instanceof gdjs.RuntimeObject3D ? owner : null;
+
       const setValue = scaleFromCenterOfObject
         ? (scale: float) => {
-            const isObject3D = owner instanceof gdjs.RuntimeObject3D;
             const oldX = owner.getCenterXInScene();
             const oldY = owner.getCenterYInScene();
-            const oldZ = isObject3D ? owner.getCenterZInScene() : 0;
+            const oldZ = owner3d ? owner3d.getCenterZInScene() : 0;
             owner.setScale(scale);
             owner.setCenterXInScene(oldX);
             owner.setCenterYInScene(oldY);
-            if (isObject3D) {
-              owner.setCenterZInScene(oldZ);
+            if (owner3d) {
+              owner3d.setCenterZInScene(oldZ);
             }
           }
         : (scaleX: float) => owner.setScale(scaleX);

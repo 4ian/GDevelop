@@ -37,7 +37,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       layoutName => `"${layoutName}"` === props.value
     );
 
-    // If the current value is not in the list of layouts, display an expression field.
+    // If the current value is not in the list of scenes, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
       (!!props.value && !isCurrentValueInLayoutsList) ||
         props.scope.eventsFunctionsExtension
@@ -114,7 +114,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select a Scene</Trans>}
+              label={<Trans>Select a scene</Trans>}
               onClick={switchFieldType}
             />
           ) : (
@@ -123,7 +123,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               icon={<Functions />}
               style={style}
               primary
-              label={<Trans>Use an Expression</Trans>}
+              label={<Trans>Use an expression</Trans>}
               onClick={switchFieldType}
             />
           )

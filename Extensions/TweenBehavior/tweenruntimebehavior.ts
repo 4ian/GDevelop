@@ -456,7 +456,7 @@ namespace gdjs {
 
     /**
      * Tween an object Z position.
-     * @deprecated Use the 3D Tween extension instead.
+     * @deprecated Use addObjectPositionZTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toZ The target Z position
      * @param easing Easing function identifier
@@ -470,13 +470,58 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectPositionZTween(
+        identifier,
+        toZ,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
+      );
+    }
+
+    /**
+     * Tween an object Z position.
+     * @param object3DBehavior Only used by events can be set to null
+     * @param identifier Unique id to identify the tween
+     * @param toZ The target Z position
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectPositionZTween2(
+      object3DBehavior: any,
+      identifier: string,
+      toZ: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._addObjectPositionZTween(
+        identifier,
+        toZ,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectPositionZTween(
+      identifier: string,
+      toZ: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.evtTools.tween.TimeSource
+    ) {
       const { owner } = this;
       if (!(owner instanceof gdjs.RuntimeObject3D)) return;
 
       this._tweens.addSimpleTween(
         identifier,
-        this.owner.getRuntimeScene(),
-        duration / 1000,
+        timeSource,
+        duration,
         easing,
         linearInterpolation,
         owner.getZ(),
@@ -559,6 +604,72 @@ namespace gdjs {
     }
 
     /**
+     * Tween a 3D object rotation X.
+     * @param object3DBehavior Only used by events can be set to null
+     * @param identifier Unique id to identify the tween
+     * @param toAngle The target angle
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectRotationXTween(
+      object3DBehavior: any,
+      identifier: string,
+      toAngle: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      const { owner } = this;
+      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+
+      this._tweens.addSimpleTween(
+        identifier,
+        this.owner,
+        duration,
+        easing,
+        linearInterpolation,
+        owner.getRotationX(),
+        toAngle,
+        (value: float) => owner.setRotationX(value),
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
+     * Tween a 3D object rotation Y.
+     * @param object3DBehavior Only used by events can be set to null
+     * @param identifier Unique id to identify the tween
+     * @param toAngle The target angle
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectRotationYTween(
+      object3DBehavior: any,
+      identifier: string,
+      toAngle: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      const { owner } = this;
+      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+
+      this._tweens.addSimpleTween(
+        identifier,
+        this.owner,
+        duration,
+        easing,
+        linearInterpolation,
+        owner.getRotationY(),
+        toAngle,
+        (value: float) => owner.setRotationY(value),
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
      * Tween an object scale.
      * @deprecated Use addObjectScaleTween2 instead.
      * @param identifier Unique id to identify the tween
@@ -593,6 +704,7 @@ namespace gdjs {
 
     /**
      * Tween an object scale.
+     * @deprecated Use addObjectScaleXTween2 and addObjectScaleYTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param toScaleY The target Y-scale
@@ -661,6 +773,64 @@ namespace gdjs {
         interpolation,
         [owner.getScaleX(), owner.getScaleY()],
         [toScaleX, toScaleY],
+        setValue,
+        destroyObjectWhenFinished ? () => this._deleteFromScene() : null
+      );
+    }
+
+    /**
+     * Tween an object scale.
+     * @param identifier Unique id to identify the tween
+     * @param toScale The target scale
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
+     */
+    addObjectScaleTween3(
+      identifier: string,
+      toScale: number,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
+    ) {
+      this._addObjectScaleXTween(
+        identifier,
+        toScale,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        scaleFromCenterOfObject,
+        this.owner,
+        exponentialInterpolation
+      );
+      const owner = this.owner;
+      if (!isScalable(owner)) return;
+
+      const setValue = scaleFromCenterOfObject
+        ? (scale: float) => {
+            const isObject3D = owner instanceof gdjs.RuntimeObject3D;
+            const oldX = owner.getCenterXInScene();
+            const oldY = owner.getCenterYInScene();
+            const oldZ = isObject3D ? owner.getCenterZInScene() : 0;
+            owner.setScale(scale);
+            owner.setCenterXInScene(oldX);
+            owner.setCenterYInScene(oldY);
+            if (isObject3D) {
+              owner.setCenterZInScene(oldZ);
+            }
+          }
+        : (scaleX: float) => owner.setScale(scaleX);
+
+      this._tweens.addSimpleTween(
+        identifier,
+        this.owner,
+        duration,
+        easing,
+        exponentialInterpolation,
+        owner.getScale(),
+        toScale,
         setValue,
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
@@ -1519,7 +1689,7 @@ namespace gdjs {
 
     /**
      * Tween an object depth.
-     * @deprecated Use the 3D Tween extension instead.
+     * @deprecated Use addObjectDepthTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toDepth The target depth
      * @param easing Easing function identifier
@@ -1533,13 +1703,58 @@ namespace gdjs {
       duration: float,
       destroyObjectWhenFinished: boolean
     ) {
+      this._addObjectDepthTween(
+        identifier,
+        toDepth,
+        easing,
+        duration / 1000,
+        destroyObjectWhenFinished,
+        this.owner.getRuntimeScene()
+      );
+    }
+
+    /**
+     * Tween an object depth.
+     * @param object3DBehavior Only used by events can be set to null
+     * @param identifier Unique id to identify the tween
+     * @param toDepth The target depth
+     * @param easing Easing function identifier
+     * @param duration Duration in seconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectDepthTween2(
+      object3DBehavior: any,
+      identifier: string,
+      toDepth: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._addObjectDepthTween(
+        identifier,
+        toDepth,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    private _addObjectDepthTween(
+      identifier: string,
+      toDepth: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean,
+      timeSource: gdjs.evtTools.tween.TimeSource
+    ) {
       const { owner } = this;
       if (!(owner instanceof gdjs.RuntimeObject3D)) return;
 
       this._tweens.addSimpleTween(
         identifier,
-        this.owner.getRuntimeScene(),
-        duration / 1000,
+        timeSource,
+        duration,
         easing,
         linearInterpolation,
         owner.getDepth(),

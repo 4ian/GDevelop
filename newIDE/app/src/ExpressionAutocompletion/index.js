@@ -14,7 +14,7 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
-import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
+import { getParameterChoiceAutocompletions } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
@@ -269,7 +269,7 @@ const getAutocompletionsForText = function(
       }
     }
   } else if (type === 'stringWithSelector') {
-    autocompletionTexts = getParameterChoices(
+    autocompletionTexts = getParameterChoiceAutocompletions(
       completionDescription.getParameterMetadata()
     ).map(autocompletion => autocompletion.completion);
   } else if (type === 'objectPointName') {

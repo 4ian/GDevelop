@@ -60,7 +60,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       effectName => `"${effectName}"` === props.value
     );
 
-    // If the current value is not in the list of animation names, display an expression field.
+    // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
       (!!props.value && !isCurrentValueInEffectNamesList) ||
         props.scope.eventsFunctionsExtension
@@ -139,7 +139,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select an Effect</Trans>}
+              label={<Trans>Select an effect</Trans>}
               onClick={switchFieldType}
             />
           ) : (
@@ -148,7 +148,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               icon={<Functions />}
               style={style}
               primary
-              label={<Trans>Use an Expression</Trans>}
+              label={<Trans>Use an expression</Trans>}
               onClick={switchFieldType}
             />
           )

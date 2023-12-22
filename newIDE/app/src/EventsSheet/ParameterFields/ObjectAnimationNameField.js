@@ -177,7 +177,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select an Animation</Trans>}
+              label={<Trans>Select an animation</Trans>}
               onClick={switchFieldType}
             />
           ) : (
@@ -186,7 +186,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               icon={<Functions />}
               style={style}
               primary
-              label={<Trans>Use an Expression</Trans>}
+              label={<Trans>Use an expression</Trans>}
               onClick={switchFieldType}
             />
           )

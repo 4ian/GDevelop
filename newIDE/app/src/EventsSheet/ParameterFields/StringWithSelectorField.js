@@ -67,10 +67,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       onChange(event.target.value);
     };
 
-    const onChangeTextValue = (value: string) => {
-      onChange(value);
-    };
-
     const fieldLabel = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -120,7 +116,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   : undefined
               }
               {...props}
-              onChange={onChangeTextValue}
+              onChange={onChange}
             />
           )
         }

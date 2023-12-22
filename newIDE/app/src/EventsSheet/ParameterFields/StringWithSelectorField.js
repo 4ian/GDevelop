@@ -19,6 +19,14 @@ import { getParameterChoiceValues } from './ParameterMetadataTools';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function StringWithSelectorField(props: ParameterFieldProps, ref) {
+    const {
+      value,
+      onChange,
+      parameterIndex,
+      parameterMetadata,
+      isInline,
+    } = props;
+
     const field = React.useRef<?(
       | GenericExpressionField
       | SelectFieldInterface
@@ -31,24 +39,24 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const choices = getParameterChoiceValues(props.parameterMetadata);
+    const choices = getParameterChoiceValues(parameterMetadata);
 
     const isCurrentValueInList = choices.some(
-      choice => `"${choice}"` === props.value
+      choice => `"${choice}"` === value
     );
 
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInList
+      !!value && !isCurrentValueInList
     );
 
     React.useEffect(
       () => {
-        if (!isExpressionField && !props.value && choices.length > 0) {
-          props.onChange(`"${choices[0]}"`);
+        if (!isExpressionField && !value && choices.length > 0) {
+          onChange(`"${choices[0]}"`);
         }
       },
-      [choices, isExpressionField, props]
+      [choices, isExpressionField, onChange, value]
     );
 
     const switchFieldType = () => {
@@ -56,15 +64,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     };
 
     const onChangeSelectValue = (event, value) => {
-      props.onChange(event.target.value);
+      onChange(event.target.value);
     };
 
     const onChangeTextValue = (value: string) => {
-      props.onChange(value);
+      onChange(value);
     };
 
-    const fieldLabel = props.parameterMetadata
-      ? props.parameterMetadata.getDescription()
+    const fieldLabel = parameterMetadata
+      ? parameterMetadata.getDescription()
       : undefined;
 
     const selectOptions = choices.map(choice => {
@@ -85,19 +93,18 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             <SelectField
               ref={field}
               id={
-                props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-layer-field`
+                parameterIndex !== undefined
+                  ? `parameter-${parameterIndex}-string-with-selector`
                   : undefined
               }
-              value={props.value}
+              value={value}
               onChange={onChangeSelectValue}
-              margin={props.isInline ? 'none' : 'dense'}
+              margin={isInline ? 'none' : 'dense'}
               fullWidth
               floatingLabelText={fieldLabel}
               translatableHintText={t`Choose a value`}
               helperMarkdownText={
-                (props.parameterMetadata &&
-                  props.parameterMetadata.getLongDescription()) ||
+                (parameterMetadata && parameterMetadata.getLongDescription()) ||
                 null
               }
             >
@@ -108,8 +115,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               expressionType="string"
               ref={field}
               id={
-                props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-string-with-selector`
+                parameterIndex !== undefined
+                  ? `parameter-${parameterIndex}-string-with-selector`
                   : undefined
               }
               {...props}
@@ -118,7 +125,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
+          isExpressionField ? (
             <FlatButton
               id="switch-expression-select"
               leftIcon={<TypeCursorSelect />}

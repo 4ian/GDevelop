@@ -262,7 +262,7 @@ module.exports = {
           spine.height = height;
           spine.alpha = this._getProperties().get('opacity').getValue() / 255;
           const localBounds = spine.getLocalBounds(undefined, true);
-          
+
           this._spineOriginOffsetX = localBounds.x * spine.scale.x;
           this._spineOriginOffsetY = localBounds.y * spine.scale.y;
           this._rect.position.set(this._spineOriginOffsetX, this._spineOriginOffsetY);
@@ -387,6 +387,9 @@ module.exports = {
             this._spine = new PIXI.Spine(spineData);
             this._pixiObject.addChild(this._spine);
             this.update();
+          }, (err) => {
+            console.error("Unable to load Spine:", err);
+            this._spine = null;
           });
       }
     }

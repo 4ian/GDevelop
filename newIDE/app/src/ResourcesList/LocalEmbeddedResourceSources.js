@@ -234,15 +234,19 @@ export async function listSpineEmbeddedResources(
   if (!fs || !path) return null;
 
   const atlasPath = filePath.replace('.json', '.atlas');
-  const isSameNamedAtlasExists = await new Promise<boolean>(resolve => {
+  const hasAtlasWithSameBasename = await new Promise<boolean>(resolve => {
     fs.promises
       .access(atlasPath, fs.constants.F_OK)
       .then(() => resolve(true))
       .catch(() => resolve(false));
   });
 
-  // Spine resources usualy have the same names. E.g. skeleton.json, skeleton.atlas, skeleton.png
-  if (!isSameNamedAtlasExists) return null;
+  // Spine resources usually have the same base names:
+  // e.g. skeleton.json, skeleton.atlas and skeleton.png.
+  if (!hasAtlasWithSameBasename) {
+    console.error(`Could not find an atlas file for Spine file ${filePath}.`);
+    return null;
+  }
 
   const atlasFileName = path.basename(atlasPath);
   const embeddedResources = new Map<string, EmbeddedResource>();
@@ -268,7 +272,18 @@ export async function listSpineTextureAtlasEmbeddedResources(
 ): Promise<?EmbeddedResources> {
   if (!fs || !path) return null;
 
-  const atlasContent = await fs.promises.readFile(filePath, 'utf8');
+  let atlasContent: ?string = null;
+  try {
+    atlasContent = await fs.promises.readFile(filePath, 'utf8');
+  } catch (error) {
+    console.error(
+      `Unable to read Spine Atlas file at path ${filePath}:`,
+      error
+    );
+  }
+
+  if (!atlasContent) return null;
+
   const atlasImageRegex = /.*\.(png|jpeg|jpg)$/gm;
   const imageDependencies = atlasContent.match(atlasImageRegex);
   const dir = path.dirname(filePath);

@@ -26,11 +26,7 @@ import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import {
-  PropertyResourceSelector,
-  PropertyField,
-  styles,
-} from './Model3DEditor';
+import { PropertyResourceSelector, PropertyField } from './PropertyFields';
 import { ISkeletonData } from 'pixi-spine';
 
 const gd: libGDevelop = global.gd;
@@ -38,6 +34,19 @@ const gd: libGDevelop = global.gd;
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'spine-animations-list'
 );
+
+const styles = {
+  rowContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginTop: 5,
+  },
+  rowContent: {
+    display: 'flex',
+    flex: 1,
+    alignItems: 'center',
+  },
+};
 
 const SpineEditor = ({
   objectConfiguration,

@@ -1,5 +1,4 @@
 const shell = require('shelljs');
-const fs = require('fs');
 const path = require('path');
 
 const sourcePath = path.join(__dirname, '../../Binaries/embuild/GDevelop.js');

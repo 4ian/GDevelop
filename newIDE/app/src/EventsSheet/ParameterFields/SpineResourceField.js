@@ -34,7 +34,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         project={props.project}
         resourceManagementProps={props.resourceManagementProps}
         resourcesLoader={ResourcesLoader}
-        resourceKind="json"
+        resourceKind="spine"
         fullWidth
         initialResourceName={props.value}
         onChange={props.onChange}

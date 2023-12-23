@@ -35,7 +35,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/objects/spine')
-      .setCategory('General');
+      .setCategory('Advanced');
 
     extension
       .addInstructionOrExpressionGroupMetadata(_('Spine'))

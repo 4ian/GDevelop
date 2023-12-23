@@ -373,8 +373,8 @@ const SpineEditor = ({
                       title={<Trans>Add your first animation</Trans>}
                       description={
                         <Trans>
-                          Import one or more animations that available in spine
-                          file.
+                          Import one or more animations that are available in
+                          this Spine file.
                         </Trans>
                       }
                       actionLabel={<Trans>Add an animation</Trans>}

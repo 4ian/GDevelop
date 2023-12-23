@@ -132,25 +132,32 @@ export const PropertyResourceSelector = ({
   const properties = objectConfiguration.getProperties();
 
   const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
-      onChange(value);
+    (propertyName: string, newValue: string) => {
+      objectConfiguration.updateProperty(propertyName, newValue);
+      onChange(newValue);
       forceUpdate();
     },
     [objectConfiguration, onChange, forceUpdate]
   );
 
+  // Note that property is a temporary - don't access it in callbacks.
   const property = properties.get(propertyName);
   const extraInfos = property.getExtraInfo();
+  const value = property.getValue();
+  const label = property.getLabel();
+
   return (
     <ResourceSelector
       project={project}
       // $FlowExpectedError
       resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
-      floatingLabelText={property.getLabel()}
+      floatingLabelText={label}
       resourceManagementProps={resourceManagementProps}
-      initialResourceName={property.getValue()}
-      onChange={value => onChangeProperty(propertyName, value)}
+      initialResourceName={value}
+      onChange={newValue => {
+        if (newValue !== value)
+          onChangeProperty(propertyName, newValue);
+      }}
       resourcesLoader={resourcesLoader}
       fullWidth
     />

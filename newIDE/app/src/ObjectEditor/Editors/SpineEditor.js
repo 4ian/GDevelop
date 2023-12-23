@@ -24,7 +24,9 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { DragHandleIcon } from '../../UI/DragHandle';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import PixiResourcesLoader, {
+  readEmbeddedResourcesMapping,
+} from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { PropertyResourceSelector, PropertyField } from './PropertyFields';
 import { ISkeletonData } from 'pixi-spine';
@@ -48,6 +50,18 @@ const styles = {
   },
 };
 
+const getAndReadEmbeddedResourcesMapping = (
+  project: gdProject,
+  resourceName: string
+) => {
+  const resourcesManager = project.getResourcesManager();
+  if (!resourcesManager.hasResource(resourceName)) return null;
+
+  return readEmbeddedResourcesMapping(
+    resourcesManager.getResource(resourceName)
+  );
+};
+
 const SpineEditor = ({
   objectConfiguration,
   project,
@@ -58,22 +72,6 @@ const SpineEditor = ({
   resourceManagementProps,
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
-
-  const getResource = React.useCallback(
-    (name: string) => {
-      const resourcesManager = project.getResourcesManager();
-
-      return resourcesManager.hasResource(name)
-        ? resourcesManager.getResource(name)
-        : null;
-    },
-    [project]
-  );
-  const getMetadata = resource => {
-    const metadataString = resource ? resource.getMetadata() : '';
-
-    return !!metadataString ? JSON.parse(metadataString) : {};
-  };
   const [
     justAddedAnimationName,
     setJustAddedAnimationName,
@@ -109,29 +107,23 @@ const SpineEditor = ({
   );
 
   const [skeleton, setSkeleton] = React.useState<?ISkeletonData>(null);
-  const getEmbeddedResourcesMapping = React.useCallback(
-    (resourceName: string): { [string]: string } => {
-      const resource = getResource(resourceName);
 
-      return getMetadata(resource).embeddedResourcesMapping;
-    },
-    [getResource]
-  );
   const loadSkeleton = React.useCallback(
-    (spineResourceName: string) => {
-      const jsonResourcesMapping = getEmbeddedResourcesMapping(
+    async (spineResourceName: string) => {
+      const embeddedResourcesMapping = getAndReadEmbeddedResourcesMapping(
+        project,
         spineResourceName
       );
-      if (!jsonResourcesMapping) return Promise.resolve(undefined);
+      if (!embeddedResourcesMapping) return null;
 
-      const jsonResourcesMappingValues = Object.values(jsonResourcesMapping);
-      const textureAtlasName = jsonResourcesMappingValues[0];
+      const embeddedResourcesMappingValues = Object.values(
+        embeddedResourcesMapping
+      );
+      const textureAtlasName = embeddedResourcesMappingValues[0];
+      if (typeof textureAtlasName !== 'string') return null;
 
-      // flow check
-      if (typeof textureAtlasName !== 'string')
-        return Promise.resolve(undefined);
-
-      const atlasResourcesMapping = getEmbeddedResourcesMapping(
+      const atlasResourcesMapping = getAndReadEmbeddedResourcesMapping(
+        project,
         textureAtlasName
       );
 
@@ -139,11 +131,11 @@ const SpineEditor = ({
         !atlasResourcesMapping ||
         !Object.values(atlasResourcesMapping).length
       )
-        return Promise.resolve(undefined);
+        return null;
 
       return PixiResourcesLoader.getSpineData(project, spineResourceName);
     },
-    [project, getEmbeddedResourcesMapping]
+    [project]
   );
   const [sourceSelectOptions, setSourceSelectOptions] = React.useState<
     Array<Object>

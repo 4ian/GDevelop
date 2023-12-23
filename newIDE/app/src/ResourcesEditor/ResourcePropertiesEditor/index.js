@@ -16,6 +16,10 @@ import {
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
+import { Column, Spacer } from '../../UI/Grid';
+import ScrollView from '../../UI/ScrollView';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 const styles = {
   propertiesContainer: {
@@ -152,15 +156,10 @@ const ResourcePropertiesEditor = React.forwardRef<
         );
 
         return (
-          <div
-            style={styles.propertiesContainer}
-            key={resources.map(resource => '' + resource.ptr).join(';')}
-          >
-            <PropertiesEditor
-              schema={schema.concat(resourceSchema)}
-              instances={resources}
-            />
-          </div>
+          <PropertiesEditor
+            schema={schema.concat(resourceSchema)}
+            instances={resources}
+          />
         );
       },
       [resources, schema, forceUpdate]
@@ -181,9 +180,18 @@ const ResourcePropertiesEditor = React.forwardRef<
     return (
       <Background maxWidth>
         {renderPreview()}
-        {!resources || !resources.length
-          ? renderEmpty()
-          : renderResourcesProperties()}
+        <Spacer />
+        <ScrollView>
+          <ColumnStackLayout
+            expand
+            key={resources.map(resource => '' + resource.ptr).join(';')}
+          >
+            {!resources || !resources.length
+              ? renderEmpty()
+              : renderResourcesProperties()}
+            <EmbeddedResourcesMappingTable resources={resources} />
+          </ColumnStackLayout>
+        </ScrollView>
       </Background>
     );
   }

@@ -150,7 +150,9 @@ const traverseToRemoveMetalnessFromMeshes = (
   node: THREE.Object3D<THREE.Event>
 ) => node.traverse(removeMetalnessFromMesh);
 
-const readEmbeddedResourcesMapping = (resource: gdResource): {} | null => {
+export const readEmbeddedResourcesMapping = (
+  resource: gdResource
+): {} | null => {
   const metadataString = resource.getMetadata();
   try {
     const metadata = JSON.parse(metadataString);

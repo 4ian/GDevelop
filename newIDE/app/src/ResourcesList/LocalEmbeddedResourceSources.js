@@ -286,6 +286,8 @@ export async function listSpineTextureAtlasEmbeddedResources(
 
   const atlasImageRegex = /.*\.(png|jpeg|jpg)$/gm;
   const imageDependencies = atlasContent.match(atlasImageRegex);
+  if (!imageDependencies) return null;
+
   const dir = path.dirname(filePath);
   const embeddedResources = new Map<string, EmbeddedResource>();
   let hasAnyEmbeddedResourceOutsideProjectFolder = false;

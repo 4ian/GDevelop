@@ -17,19 +17,9 @@ import {
 } from '../../ResourcesList/ResourceSource';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
-import { Column, Spacer } from '../../UI/Grid';
+import { Spacer } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { ColumnStackLayout } from '../../UI/Layout';
-
-const styles = {
-  propertiesContainer: {
-    padding: 8,
-    overflowY: 'scroll',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
-    overflowX: 'hidden',
-    flex: 1,
-  },
-};
 
 type Props = {|
   project: gdProject,

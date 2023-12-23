@@ -155,8 +155,7 @@ export const PropertyResourceSelector = ({
       resourceManagementProps={resourceManagementProps}
       initialResourceName={value}
       onChange={newValue => {
-        if (newValue !== value)
-          onChangeProperty(propertyName, newValue);
+        if (newValue !== value) onChangeProperty(propertyName, newValue);
       }}
       resourcesLoader={resourcesLoader}
       fullWidth

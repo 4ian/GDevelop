@@ -13,7 +13,7 @@ module.exports = function (grunt) {
   let cmakeBinary = 'emcmake cmake';
   let cmakeGeneratorArgs = [];
   let makeBinary = 'emmake make';
-  let makeArgs = ['-j 4'];
+  let makeArgs = ['-j 8'];
 
   // Use more specific paths on Windows
   if (isWin) {

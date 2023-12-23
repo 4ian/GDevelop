@@ -117,6 +117,21 @@ export function createAndMapEmbeddedResources(
 
         mapping[relPath] = resourceName;
 
+        // embedded resources can have mappings too
+        if (filesWithMappedResources.has(fullPath)) {
+          const mappedResources = filesWithMappedResources.get(fullPath);
+
+          if (mappedResources && mappedResources.mapping) {
+            theEmbeddedResource.setMetadata(
+              JSON.stringify({
+                embeddedResourcesMapping: mappedResources.mapping,
+              })
+            );
+
+            filesWithMappedResources.delete(fullPath);
+          }
+        }
+
         project.getResourcesManager().addResource(theEmbeddedResource);
       }
     }
@@ -212,7 +227,94 @@ export async function listTileMapEmbeddedResources(
   }
 }
 
+export async function listSpineEmbeddedResources(
+  project: gdProject,
+  filePath: string
+): Promise<?EmbeddedResources> {
+  if (!fs || !path) return null;
+
+  const atlasPath = filePath.replace('.json', '.atlas');
+  const hasAtlasWithSameBasename = await new Promise<boolean>(resolve => {
+    fs.promises
+      .access(atlasPath, fs.constants.F_OK)
+      .then(() => resolve(true))
+      .catch(() => resolve(false));
+  });
+
+  // Spine resources usually have the same base names:
+  // e.g. skeleton.json, skeleton.atlas and skeleton.png.
+  if (!hasAtlasWithSameBasename) {
+    console.error(`Could not find an atlas file for Spine file ${filePath}.`);
+    return null;
+  }
+
+  const atlasFileName = path.basename(atlasPath);
+  const embeddedResources = new Map<string, EmbeddedResource>();
+  const isOutsideProjectFolder = !isPathInProjectFolder(project, atlasPath);
+  const resource: EmbeddedResource = {
+    resourceKind: 'atlas',
+    relPath: atlasFileName,
+    fullPath: atlasPath,
+    isOutsideProjectFolder,
+  };
+
+  embeddedResources.set(atlasFileName, resource);
+
+  return {
+    embeddedResources,
+    hasAnyEmbeddedResourceOutsideProjectFolder: isOutsideProjectFolder,
+  };
+}
+
+export async function listSpineTextureAtlasEmbeddedResources(
+  project: gdProject,
+  filePath: string
+): Promise<?EmbeddedResources> {
+  if (!fs || !path) return null;
+
+  let atlasContent: ?string = null;
+  try {
+    atlasContent = await fs.promises.readFile(filePath, 'utf8');
+  } catch (error) {
+    console.error(
+      `Unable to read Spine Atlas file at path ${filePath}:`,
+      error
+    );
+  }
+
+  if (!atlasContent) return null;
+
+  const atlasImageRegex = /.*\.(png|jpeg|jpg)$/gm;
+  const imageDependencies = atlasContent.match(atlasImageRegex);
+  const dir = path.dirname(filePath);
+  const embeddedResources = new Map<string, EmbeddedResource>();
+  let hasAnyEmbeddedResourceOutsideProjectFolder = false;
+
+  for (const relatedImagePath of imageDependencies) {
+    const fullPath = path.resolve(dir, relatedImagePath);
+    const isOutsideProjectFolder = !isPathInProjectFolder(project, fullPath);
+    const resource: EmbeddedResource = {
+      resourceKind: 'image',
+      relPath: relatedImagePath,
+      fullPath,
+      isOutsideProjectFolder,
+    };
+
+    embeddedResources.set(relatedImagePath, resource);
+
+    if (isOutsideProjectFolder)
+      hasAnyEmbeddedResourceOutsideProjectFolder = true;
+  }
+
+  return {
+    embeddedResources,
+    hasAnyEmbeddedResourceOutsideProjectFolder,
+  };
+}
+
 export const embeddedResourcesParsers: { [string]: ParseEmbeddedFiles } = {
   tilemap: listTileMapEmbeddedResources,
   json: listTileMapEmbeddedResources,
+  spine: listSpineEmbeddedResources,
+  atlas: listSpineTextureAtlasEmbeddedResources,
 };

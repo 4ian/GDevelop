@@ -392,7 +392,13 @@ module.exports = {
               return;
             }
 
-            this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
+            try {
+              this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
+            } catch (error) {
+              console.error('Exception while loading Spine.', error);
+              this._spine = null;
+              return;
+            }
             this._pixiObject.addChild(this._spine);
             this.update();
           });

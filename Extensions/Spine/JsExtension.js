@@ -194,7 +194,7 @@ module.exports = {
    */
   registerEditorConfigurations: function (
     objectsEditorService /*: ObjectsEditorService */
-  ) { },
+  ) {},
   /**
    * Register renderers for instance of objects on the scene editor.
    *
@@ -265,7 +265,10 @@ module.exports = {
 
           this._spineOriginOffsetX = localBounds.x * spine.scale.x;
           this._spineOriginOffsetY = localBounds.y * spine.scale.y;
-          this._rect.position.set(this._spineOriginOffsetX, this._spineOriginOffsetY);
+          this._rect.position.set(
+            this._spineOriginOffsetX,
+            this._spineOriginOffsetY
+          );
         }
 
         this._rect.clear();
@@ -330,18 +333,14 @@ module.exports = {
        * @returns {number} default width
        */
       getDefaultWidth() {
-        return (this._initialWidth !== null
-          ? this._initialWidth
-          : 256);
+        return this._initialWidth !== null ? this._initialWidth : 256;
       }
 
       /**
        * @returns {number} default height
        */
       getDefaultHeight() {
-        return (this._initialHeight !== null
-          ? this._initialHeight
-          : 256);
+        return this._initialHeight !== null ? this._initialHeight : 256;
       }
 
       /**
@@ -377,19 +376,25 @@ module.exports = {
           .getValue();
 
         this._pixiResourcesLoader
-          .getSpineData(
-            this._project,
-            spineResourceName,
-          )
-          .then((spineData) => {
-            if (!spineData) return;
+          .getSpineData(this._project, spineResourceName)
+          .then((spineDataOrLoadingError) => {
+            if (!spineDataOrLoadingError.skeleton) {
+              const loadingError =
+                spineDataOrLoadingError.loadingError ||
+                (spineDataOrLoadingError.textureAtlasOrLoadingError
+                  ? spineDataOrLoadingError.textureAtlasOrLoadingError
+                      .loadingError
+                  : null);
+              console.error(
+                'Unable to load Spine: ' + (loadingError || 'Unknown reason.')
+              );
+              this._spine = null;
+              return;
+            }
 
-            this._spine = new PIXI.Spine(spineData);
+            this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
             this._pixiObject.addChild(this._spine);
             this.update();
-          }, (err) => {
-            console.error("Unable to load Spine:", err);
-            this._spine = null;
           });
       }
     }

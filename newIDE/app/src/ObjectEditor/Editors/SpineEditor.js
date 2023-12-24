@@ -25,11 +25,11 @@ import { DragHandleIcon } from '../../UI/DragHandle';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PixiResourcesLoader, {
-  readEmbeddedResourcesMapping,
+  type SpineDataOrLoadingError,
 } from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { PropertyResourceSelector, PropertyField } from './PropertyFields';
-import { ISkeletonData } from 'pixi-spine';
+import AlertMessage from '../../UI/AlertMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -48,18 +48,6 @@ const styles = {
     flex: 1,
     alignItems: 'center',
   },
-};
-
-const getAndReadEmbeddedResourcesMapping = (
-  project: gdProject,
-  resourceName: string
-) => {
-  const resourcesManager = project.getResourcesManager();
-  if (!resourcesManager.hasResource(resourceName)) return null;
-
-  return readEmbeddedResourcesMapping(
-    resourcesManager.getResource(resourceName)
-  );
 };
 
 const SpineEditor = ({
@@ -106,37 +94,11 @@ const SpineEditor = ({
     {}
   );
 
-  const [skeleton, setSkeleton] = React.useState<?ISkeletonData>(null);
+  const [spineData, setSpineData] = React.useState<SpineDataOrLoadingError>({
+    skeleton: null,
+    loadingError: null,
+  });
 
-  const loadSkeleton = React.useCallback(
-    async (spineResourceName: string) => {
-      const embeddedResourcesMapping = getAndReadEmbeddedResourcesMapping(
-        project,
-        spineResourceName
-      );
-      if (!embeddedResourcesMapping) return null;
-
-      const embeddedResourcesMappingValues = Object.values(
-        embeddedResourcesMapping
-      );
-      const textureAtlasName = embeddedResourcesMappingValues[0];
-      if (typeof textureAtlasName !== 'string') return null;
-
-      const atlasResourcesMapping = getAndReadEmbeddedResourcesMapping(
-        project,
-        textureAtlasName
-      );
-
-      if (
-        !atlasResourcesMapping ||
-        !Object.values(atlasResourcesMapping).length
-      )
-        return null;
-
-      return PixiResourcesLoader.getSpineData(project, spineResourceName);
-    },
-    [project]
-  );
   const [sourceSelectOptions, setSourceSelectOptions] = React.useState<
     Array<Object>
   >([]);
@@ -145,13 +107,16 @@ const SpineEditor = ({
   React.useEffect(
     () => {
       (async () => {
-        const skeleton = await loadSkeleton(spineResourceName);
+        const spineData = await PixiResourcesLoader.getSpineData(
+          project,
+          spineResourceName
+        );
 
-        setSkeleton(skeleton);
+        setSpineData(spineData);
 
-        if (skeleton) {
+        if (spineData.skeleton) {
           setSourceSelectOptions(
-            skeleton.animations.map(animation => (
+            spineData.skeleton.animations.map(animation => (
               <SelectOption
                 key={animation.name}
                 value={animation.name}
@@ -163,7 +128,7 @@ const SpineEditor = ({
         }
       })();
     },
-    [loadSkeleton, setSourceSelectOptions, spineResourceName]
+    [project, spineResourceName, setSourceSelectOptions]
   );
 
   const onChangeSpineResourceName = React.useCallback(
@@ -176,9 +141,9 @@ const SpineEditor = ({
 
   const scanNewAnimations = React.useCallback(
     () => {
-      if (!skeleton) {
-        return;
-      }
+      const { skeleton } = spineData;
+      if (!skeleton) return;
+
       setNameErrors({});
 
       const animationSources = mapFor(
@@ -229,7 +194,7 @@ const SpineEditor = ({
     },
     [
       forceUpdate,
-      skeleton,
+      spineData,
       spineConfiguration,
       onObjectUpdated,
       onSizeUpdated,
@@ -346,6 +311,35 @@ const SpineEditor = ({
             resourceManagementProps={resourceManagementProps}
             onChange={onChangeSpineResourceName}
           />
+          {!spineData.skeleton &&
+          (spineData.loadingError || spineData.textureAtlasOrLoadingError) ? (
+            <AlertMessage kind="error">
+              {spineData.loadingError === 'invalid-spine-resource' ? (
+                <Trans>
+                  The selected resource is not a proper Spine resource.
+                </Trans>
+              ) : spineData.loadingError === 'missing-texture-atlas-name' ? (
+                <Trans>Missing texture atlas name in the Spine file.</Trans>
+              ) : spineData.loadingError === 'spine-resource-loading-error' ? (
+                <Trans>Error while loading the Spine resource.</Trans>
+              ) : spineData.textureAtlasOrLoadingError ? (
+                spineData.textureAtlasOrLoadingError.loadingError ===
+                'invalid-atlas-resource' ? (
+                  <Trans>
+                    The Atlas embed in the Spine fine ca'n't be located.
+                  </Trans>
+                ) : spineData.textureAtlasOrLoadingError.loadingError ===
+                  'missing-texture-resources' ? (
+                  <Trans>Missing texture for an atlas in the Spine file.</Trans>
+                ) : spineData.textureAtlasOrLoadingError.loadingError ===
+                  'atlas-resource-loading-error' ? (
+                  <Trans>
+                    Error while loading the Spine Texture Atlas resource.
+                  </Trans>
+                ) : null
+              ) : null}
+            </AlertMessage>
+          ) : null}
           <Text size="block-title" noMargin>
             <Trans>Appearance</Trans>
           </Text>

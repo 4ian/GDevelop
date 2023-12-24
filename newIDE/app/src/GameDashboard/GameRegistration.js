@@ -13,6 +13,7 @@ import {
   getGame,
   registerGame,
 } from '../Utils/GDevelopServices/Game';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 export type GameRegistrationProps = {|
   project: ?gdProject,
@@ -31,8 +32,8 @@ export const GameRegistration = ({
 }: GameRegistrationProps) => {
   const {
     authenticated,
-    onLogin,
-    onCreateAccount,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
     getAuthorizationHeader,
     profile,
     onAcceptGameStatsEmail,
@@ -65,19 +66,25 @@ export const GameRegistration = ({
         );
         setUnavailableReason(null);
         setGame(game);
-      } catch (err) {
-        console.error(err);
-        if (err.response) {
-          if (err.response.status === 403) {
+      } catch (error) {
+        console.error(
+          `Unable to get the game ${project.getProjectUuid()}`,
+          error
+        );
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode) {
+          if (extractedStatusAndCode.status === 403) {
             setUnavailableReason('unauthorized');
             return;
-          } else if (err.response.status === 404) {
+          } else if (extractedStatusAndCode.status === 404) {
             setUnavailableReason('not-existing');
             return;
           }
         }
 
-        setError(err);
+        setError(error);
       }
     },
     [project, getAuthorizationHeader, profile]
@@ -153,7 +160,10 @@ export const GameRegistration = ({
 
   if (!authenticated || !profile) {
     return (
-      <CreateProfile onLogin={onLogin} onCreateAccount={onCreateAccount} />
+      <CreateProfile
+        onOpenLoginDialog={onOpenLoginDialog}
+        onOpenCreateAccountDialog={onOpenCreateAccountDialog}
+      />
     );
   }
 

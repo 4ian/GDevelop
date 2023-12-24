@@ -18,7 +18,7 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 
 import { GameThumbnail } from './GameThumbnail';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import ShareDialog from './ShareDialog';
+import ShareGameDialog from './ShareGameDialog';
 
 import {
   deleteGame,
@@ -27,7 +27,7 @@ import {
   type Game,
 } from '../Utils/GDevelopServices/Game';
 import Window from '../Utils/Window';
-import { type GameDetailsTab } from './GameDetailsDialog';
+import { type GameDetailsTab } from './GameDetails';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import BackgroundText from '../UI/BackgroundText';
 import Card from '../UI/Card';
@@ -92,7 +92,7 @@ export const GameCard = ({
     if (!url) return;
     Window.openExternalURL(url);
   };
-  const [showShareDialog, setShowShareDialog] = React.useState(false);
+  const [showShareGameDialog, setShowShareGameDialog] = React.useState(false);
   const [
     editedProperty,
     setEditedProperty,
@@ -289,7 +289,7 @@ export const GameCard = ({
                         <IconButton
                           size="small"
                           disabled={!game.publicWebBuildId || isDeletingGame}
-                          onClick={() => setShowShareDialog(true)}
+                          onClick={() => setShowShareGameDialog(true)}
                           tooltip={t`Share`}
                         >
                           <Share />
@@ -347,10 +347,10 @@ export const GameCard = ({
               </Column>
             </ResponsiveLineStackLayout>
           </Card>
-          {showShareDialog && (
-            <ShareDialog
+          {showShareGameDialog && (
+            <ShareGameDialog
               game={game}
-              onClose={() => setShowShareDialog(false)}
+              onClose={() => setShowShareGameDialog(false)}
             />
           )}
         </>

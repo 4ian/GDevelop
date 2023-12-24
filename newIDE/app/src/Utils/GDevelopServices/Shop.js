@@ -18,6 +18,7 @@ type StripePrice = {|
 type ProductListingData = {|
   id: string,
   sellerId: string,
+  isSellerGDevelop: boolean,
   productType: 'ASSET_PACK' | 'GAME_TEMPLATE',
   listing: 'ASSET_PACK' | 'GAME_TEMPLATE',
   name: string,
@@ -26,26 +27,48 @@ type ProductListingData = {|
   updatedAt: string,
   createdAt: string,
   thumbnailUrls: string[],
-  prices: StripePrice[],
-
-  /** The id of the product on the app stores - if any. */
-  appStoreProductId: string | null,
-
   includedListableProductIds?: string[],
+|};
+
+type StripeProductAttributes = {|
+  prices: StripePrice[],
+  sellerStripeAccountId: string,
+  stripeProductId: string,
+|};
+
+type AppStoreProductAttributes = {|
+  appStoreProductId: string | null,
   /** The thumbnails to use when on the app store - otherwise, use thumbnailUrls as usual. */
   appStoreThumbnailUrls?: string[] | null,
 |};
 
+type PaypalProductAttributes = {|
+  paypalProductId: string,
+  paypalPriceInUsd: number,
+|};
+
 export type PrivateAssetPackListingData = {|
   ...ProductListingData,
+  ...StripeProductAttributes,
+  ...AppStoreProductAttributes,
   productType: 'ASSET_PACK',
   listing: 'ASSET_PACK',
 |};
 
 export type PrivateGameTemplateListingData = {|
   ...ProductListingData,
+  ...StripeProductAttributes,
+  ...AppStoreProductAttributes,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
+|};
+
+export type CreditsPackageListingData = {|
+  ...ProductListingData,
+  ...StripeProductAttributes,
+  ...PaypalProductAttributes,
+  productType: 'CREDITS_PACKAGE',
+  listing: 'CREDITS_PACKAGE',
 |};
 
 type Purchase = {|
@@ -57,6 +80,7 @@ type Purchase = {|
   cancelledAt?: string,
   stripeCheckoutSessionId?: string,
   appStoreTransactionId?: string,
+  paypalOrderId?: string,
 |};
 
 export const listListedPrivateAssetPacks = async ({
@@ -69,7 +93,12 @@ export const listListedPrivateAssetPacks = async ({
       withAppStoreProductId: !!onlyAppStorePrivateAssetPacks,
     },
   });
-  return response.data;
+  const assetPacks = response.data;
+  if (!Array.isArray(assetPacks)) {
+    throw new Error('Invalid response from the asset packs API');
+  }
+
+  return assetPacks;
 };
 
 export const listListedPrivateGameTemplates = async ({
@@ -82,7 +111,24 @@ export const listListedPrivateGameTemplates = async ({
       withAppStoreProductId: !!onlyAppStorePrivateGameTemplates,
     },
   });
-  return response.data;
+  const gameTemplates = response.data;
+  if (!Array.isArray(gameTemplates)) {
+    throw new Error('Invalid response from the game templates API');
+  }
+
+  return gameTemplates;
+};
+
+export const listListedCreditsPackages = async (): Promise<
+  Array<CreditsPackageListingData>
+> => {
+  const response = await client.get('/credits-package');
+  const creditsPackages = response.data;
+  if (!Array.isArray(creditsPackages)) {
+    throw new Error('Invalid response from the credits packages API');
+  }
+
+  return creditsPackages;
 };
 
 export const listSellerAssetPacks = async ({
@@ -119,7 +165,7 @@ export const listUserPurchases = async (
     role,
   }: {|
     userId: string,
-    productType: 'asset-pack' | 'game-template',
+    productType: 'asset-pack' | 'game-template' | 'credits-package',
     role: 'receiver' | 'buyer',
   |}
 ): Promise<Array<Purchase>> => {
@@ -242,6 +288,24 @@ export const getStripeCheckoutUrl = async (
   if (!response.data.sessionUrl)
     throw new Error('Could not find the session url.');
   return response.data.sessionUrl;
+};
+
+export const getCreditsRedirectToCheckoutUrl = ({
+  creditsPackageId,
+  userId,
+  userEmail,
+}: {|
+  creditsPackageId: string,
+  userId: string,
+  userEmail: string,
+|}): string => {
+  const url = new URL(
+    `${GDevelopShopApi.baseUrl}/credits-package/action/redirect-to-checkout`
+  );
+  url.searchParams.set('creditsPackageId', creditsPackageId);
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('customerEmail', userEmail);
+  return url.toString();
 };
 
 // Helper to fetch a token for private game templates if needed, when moving or fetching resources.

@@ -47,6 +47,7 @@ namespace gdjs {
       this.world = new Box2D.b2World(
         new Box2D.b2Vec2(this.gravityX, this.gravityY)
       );
+      this.world.SetAutoClearForces(false);
       this.staticBody = this.world.CreateBody(new Box2D.b2BodyDef());
       this.contactListener = new Box2D.JSContactListener();
       this.contactListener.BeginContact = function (contactPtr) {
@@ -167,17 +168,21 @@ namespace gdjs {
 
     step(deltaTime: float): void {
       this.frameTime += deltaTime;
-      if (this.frameTime >= this.timeStep) {
-        let numberOfSteps = Math.floor(this.frameTime / this.timeStep);
-        this.frameTime -= numberOfSteps * this.timeStep;
-        if (numberOfSteps > 5) {
-          numberOfSteps = 5;
-        }
-        for (let i = 0; i < numberOfSteps; i++) {
-          this.world.Step(this.timeStep * this.timeScale, 8, 10);
-        }
-        this.world.ClearForces();
+      // `frameTime` can take negative values.
+      // It's better to be a bit early rather than skipping a frame and being
+      // a lot more late.
+      let numberOfSteps = Math.max(
+        0,
+        Math.round(this.frameTime / this.timeStep)
+      );
+      this.frameTime -= numberOfSteps * this.timeStep;
+      if (numberOfSteps > 5) {
+        numberOfSteps = 5;
       }
+      for (let i = 0; i < numberOfSteps; i++) {
+        this.world.Step(this.timeStep * this.timeScale, 8, 10);
+      }
+      this.world.ClearForces();
       this.stepped = true;
     }
 
@@ -1850,7 +1855,7 @@ namespace gdjs {
     addDistanceJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       length: float,
@@ -2096,7 +2101,7 @@ namespace gdjs {
     addRevoluteJointBetweenTwoBodies(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       enableLimit: boolean,
@@ -2396,7 +2401,7 @@ namespace gdjs {
     addPrismaticJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       axisAngle: float,
@@ -2767,7 +2772,7 @@ namespace gdjs {
     addPulleyJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       groundX1: float,
@@ -3250,7 +3255,7 @@ namespace gdjs {
     addWheelJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       axisAngle: float,
@@ -3535,7 +3540,7 @@ namespace gdjs {
     addWeldJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       referenceAngle: float,
@@ -3686,7 +3691,7 @@ namespace gdjs {
     addRopeJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       maxLength: float,
@@ -3795,7 +3800,7 @@ namespace gdjs {
     addFrictionJoint(
       x1: float,
       y1: float,
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       x2: float,
       y2: float,
       maxForce: float,
@@ -3927,7 +3932,7 @@ namespace gdjs {
 
     // Motor joint
     addMotorJoint(
-      other: gdjs.RuntimeObject,
+      other: gdjs.RuntimeObject | null,
       offsetX: float,
       offsetY: float,
       offsetAngle: float,

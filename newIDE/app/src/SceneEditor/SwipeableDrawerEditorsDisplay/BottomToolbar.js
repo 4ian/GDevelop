@@ -41,7 +41,7 @@ const editors = {
   },
 };
 
-const BottomToolbar = (props: Props) => {
+const BottomToolbar = React.memo<Props>((props: Props) => {
   return (
     <Paper background="medium" square style={styles.container}>
       <Toolbar>
@@ -69,6 +69,6 @@ const BottomToolbar = (props: Props) => {
       </Toolbar>
     </Paper>
   );
-};
+});
 
 export default BottomToolbar;

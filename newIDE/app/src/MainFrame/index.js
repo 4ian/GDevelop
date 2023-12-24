@@ -39,7 +39,7 @@ import {
   type EditorTab,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
-  notifyPreviewWillStart,
+  notifyPreviewOrExportWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
@@ -51,13 +51,15 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
-import ErrorBoundary from '../UI/ErrorBoundary';
+import ErrorBoundary, {
+  getEditorErrorBoundaryProps,
+} from '../UI/ErrorBoundary';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
   type PreviewLauncherComponent,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -83,7 +85,10 @@ import PreferencesContext, {
   type InAppTutorialUserProgress,
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
+import {
+  type ShareDialogWithoutExportsProps,
+  type ShareTab,
+} from '../ExportAndShare/ShareDialog';
 import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -173,12 +178,14 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
-import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
-
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import useResourcesWatcher from './ResourcesWatcher';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import useVersionHistory from '../VersionHistory/UseVersionHistory';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
@@ -297,7 +304,7 @@ export type Props = {|
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
-  renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
+  renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -389,7 +396,11 @@ const MainFrame = (props: Props) => {
     isProjectClosedSoAvoidReloadingExtensions,
     setIsProjectClosedSoAvoidReloadingExtensions,
   ] = React.useState<boolean>(false);
-  const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState<boolean>(false);
+  const [
+    shareDialogInitialTab,
+    setShareDialogInitialTab,
+  ] = React.useState<?ShareTab>(null);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
@@ -399,6 +410,10 @@ const MainFrame = (props: Props) => {
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
+  const [
+    loaderModalOpeningMessage,
+    setLoaderModalOpeningMessage,
+  ] = React.useState<?MessageDescriptor>(null);
 
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
@@ -469,7 +484,7 @@ const MainFrame = (props: Props) => {
     eventsFunctionsExtensionsError,
   } = state;
   const {
-    renderExportDialog,
+    renderShareDialog,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -492,6 +507,13 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
+  useResourcesWatcher({
+    getStorageProvider,
+    fileMetadata: currentFileMetadata,
+    isProjectSplitInMultipleFiles: currentProject
+      ? currentProject.isFolderProject()
+      : false,
+  });
 
   /**
    * This reference is useful to get the current opened project,
@@ -705,6 +727,24 @@ const MainFrame = (props: Props) => {
     [_closeSnackMessage, _showSnackMessage]
   );
 
+  const openShareDialog = React.useCallback(
+    (initialTab?: ShareTab) => {
+      notifyPreviewOrExportWillStart(state.editorTabs);
+
+      setShareDialogInitialTab(initialTab || null);
+      setShareDialogOpen(true);
+    },
+    [state.editorTabs]
+  );
+
+  const closeShareDialog = React.useCallback(
+    () => {
+      setShareDialogOpen(false);
+      setShareDialogInitialTab(null);
+    },
+    [setShareDialogOpen, setShareDialogInitialTab]
+  );
+
   const openInitialFileMetadata = async () => {
     if (!initialFileMetadataToOpen) return;
 
@@ -876,7 +916,7 @@ const MainFrame = (props: Props) => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
+      PixiResourcesLoader.burstCache();
 
       const state = await setState(state => ({
         ...state,
@@ -957,7 +997,10 @@ const MainFrame = (props: Props) => {
   };
 
   const openFromFileMetadata = React.useCallback(
-    async (fileMetadata: FileMetadata): Promise<?State> => {
+    async (
+      fileMetadata: FileMetadata,
+      options?: {| openingMessage?: ?MessageDescriptor |}
+    ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
@@ -1022,6 +1065,9 @@ const MainFrame = (props: Props) => {
         return onGetAutoSave(fileMetadata);
       };
 
+      if (options && options.openingMessage) {
+        setLoaderModalOpeningMessage(options.openingMessage);
+      }
       setIsLoadingProject(true);
 
       // Try to find an autosave (and ask user if found)
@@ -1044,6 +1090,10 @@ const MainFrame = (props: Props) => {
             const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
           }
+        } finally {
+          setIsLoadingProject(false);
+          setLoaderModalOpeningMessage(null);
+          setLoaderModalProgress(null, null);
         }
         if (!content) {
           throw openingError ||
@@ -1053,8 +1103,6 @@ const MainFrame = (props: Props) => {
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           return;
         }
 
@@ -1074,8 +1122,6 @@ const MainFrame = (props: Props) => {
         }
       } catch (error) {
         if (error.name === 'CloudProjectReadingError') {
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           setCloudProjectFileMetadataToRecover(fileMetadata);
         } else {
           const errorMessage = getOpenErrorMessage
@@ -1086,8 +1132,6 @@ const MainFrame = (props: Props) => {
             title: t`Unable to open the project`,
             message: errorMessage,
           });
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           throw error;
         }
       }
@@ -1510,7 +1554,7 @@ const MainFrame = (props: Props) => {
       if (!previewLauncher) return;
 
       setPreviewLoading(true);
-      notifyPreviewWillStart(state.editorTabs);
+      notifyPreviewOrExportWillStart(state.editorTabs);
 
       const layoutName = previewState.isPreviewOverriden
         ? previewState.overridenPreviewLayoutName
@@ -2048,11 +2092,18 @@ const MainFrame = (props: Props) => {
   );
 
   const openFromFileMetadataWithStorageProvider = React.useCallback(
-    (
+    async (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-      options: ?{ openAllScenes: boolean }
-    ) => {
-      if (unsavedChanges.hasUnsavedChanges) {
+      options: ?{|
+        openAllScenes?: boolean,
+        ignoreUnsavedChanges?: boolean,
+        openingMessage?: ?MessageDescriptor,
+      |}
+    ): Promise<void> => {
+      if (
+        unsavedChanges.hasUnsavedChanges &&
+        !(options && options.ignoreUnsavedChanges)
+      ) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Open a new project? Any changes that have not been saved will be lost.`
@@ -2072,7 +2123,9 @@ const MainFrame = (props: Props) => {
       if (!storageProvider) return;
 
       getStorageProviderOperations(storageProvider);
-      openFromFileMetadata(fileMetadata)
+      await openFromFileMetadata(fileMetadata, {
+        openingMessage: (options && options.openingMessage) || null,
+      })
         .then(state => {
           if (state) {
             const { currentProject } = state;
@@ -2129,6 +2182,44 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+    ({
+      fileMetadata,
+      versionId,
+      ignoreUnsavedChanges,
+      openingMessage,
+    }: {|
+      fileMetadata: FileMetadata,
+      versionId: string,
+      ignoreUnsavedChanges: boolean,
+      openingMessage: MessageDescriptor,
+    |}): Promise<void> => {
+      return openFromFileMetadataWithStorageProvider(
+        {
+          storageProviderName: 'Cloud',
+          fileMetadata: {
+            ...fileMetadata,
+            version: versionId,
+          },
+        },
+        { ignoreUnsavedChanges, openingMessage }
+      );
+    },
+    [openFromFileMetadataWithStorageProvider]
+  );
+
+  const {
+    renderVersionHistoryPanel,
+    openVersionHistoryPanel,
+    checkedOutVersionStatus,
+    onQuitVersionHistory,
+  } = useVersionHistory({
+    getStorageProvider,
+    isSavingProject,
+    fileMetadata: currentFileMetadata,
+    onOpenCloudProjectOnSpecificVersion,
+  });
+
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
       if (open) {
@@ -2169,6 +2260,7 @@ const MainFrame = (props: Props) => {
         onSaveProjectAs,
         onChooseSaveProjectAsLocation,
         getWriteErrorMessage,
+        canFileMetadataBeSafelySavedAs,
       } = newStorageProviderOperations;
       if (!onSaveProjectAs) {
         // The new storage provider can't even save as. It's strange that it was even
@@ -2194,16 +2286,16 @@ const MainFrame = (props: Props) => {
             return; // Save as was cancelled.
           }
 
-          if (
-            newStorageProvider.internalName === 'LocalFile' &&
-            saveAsLocation.fileIdentifier &&
-            isTryingToSaveInForbiddenPath(saveAsLocation.fileIdentifier)
-          ) {
-            await showAlert({
-              title: t`Choose another location`,
-              message: t`You are trying to save the project in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location.`,
-            });
-            return;
+          if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
+            const canProjectBeSafelySavedAs = await canFileMetadataBeSafelySavedAs(
+              currentFileMetadata,
+              {
+                showAlert,
+                showConfirmation,
+              }
+            );
+
+            if (!canProjectBeSafelySavedAs) return;
           }
           newSaveAsLocation = saveAsLocation;
         }
@@ -2313,12 +2405,18 @@ const MainFrame = (props: Props) => {
       authenticatedUser,
       currentlyRunningInAppTutorial,
       showAlert,
+      showConfirmation,
     ]
   );
 
+  // Prevent "save project as" when no current project or when the opened project
+  // is a previous version (cloud project only) of the current project.
+  const canSaveProjectAs = !!currentProject && !checkedOutVersionStatus;
   const saveProjectAs = React.useCallback(
     () => {
-      if (!currentProject) return;
+      if (!canSaveProjectAs) {
+        return;
+      }
 
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
@@ -2338,13 +2436,13 @@ const MainFrame = (props: Props) => {
       }
     },
     [
-      currentProject,
       getStorageProviderOperations,
       openSaveToStorageProviderDialog,
       props.storageProviders,
       saveProjectAsWithStorageProvider,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
+      canSaveProjectAs,
     ]
   );
 
@@ -2363,13 +2461,15 @@ const MainFrame = (props: Props) => {
       }
 
       const storageProviderOperations = getStorageProviderOperations();
-      const { onSaveProject } = storageProviderOperations;
+      const {
+        onSaveProject,
+        canFileMetadataBeSafelySaved,
+      } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
 
       saveUiSettings(state.editorTabs);
-      _showSnackMessage(i18n._(t`Saving...`), null);
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -2377,6 +2477,25 @@ const MainFrame = (props: Props) => {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
+
+      if (checkedOutVersionStatus) {
+        const shouldRestoreCheckedOutVersion = await showConfirmation({
+          title: t`Restore this version`,
+          message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
+        });
+        if (!shouldRestoreCheckedOutVersion) return;
+      } else if (canFileMetadataBeSafelySaved) {
+        const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
+          currentFileMetadata,
+          {
+            showAlert,
+            showConfirmation,
+          }
+        );
+        if (!canProjectBeSafelySaved) return;
+      }
+
+      _showSnackMessage(i18n._(t`Saving...`), null);
       setIsSavingProject(true);
 
       try {
@@ -2387,23 +2506,18 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        if (
-          storageProviderInternalName === 'LocalFile' &&
-          isTryingToSaveInForbiddenPath(currentFileMetadata.fileIdentifier)
-        ) {
-          await showAlert({
-            title: t`Choose another location`,
-            message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
-          });
-          // We don't block the save, as the user may want to save it anyway.
+        const saveOptions = {};
+        if (cloudProjectRecoveryOpenedVersionId) {
+          saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
         }
-
+        if (checkedOutVersionStatus) {
+          saveOptions.restoredFromVersionId =
+            checkedOutVersionStatus.version.id;
+        }
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
-          cloudProjectRecoveryOpenedVersionId
-            ? { previousVersion: cloudProjectRecoveryOpenedVersionId }
-            : undefined
+          saveOptions
         );
 
         if (wasSaved) {
@@ -2447,13 +2561,17 @@ const MainFrame = (props: Props) => {
           unsavedChanges.sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
-      } catch (rawError) {
-        showErrorBox({
-          message: i18n._(
-            t`Unable to save the project! Please try again later or save the project in another location.`
-          ),
-          rawError,
-          errorId: 'project-save-error',
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        const message =
+          extractedStatusAndCode && extractedStatusAndCode.status === 403
+            ? t`You don't have permissions to save this project. Please choose another location.`
+            : t`An error occurred when saving the project. Please try again later.`;
+        showAlert({
+          title: t`Unable to save the project`,
+          message,
         });
         _closeSnackMessage();
       } finally {
@@ -2481,6 +2599,8 @@ const MainFrame = (props: Props) => {
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
       showAlert,
+      showConfirmation,
+      checkedOutVersionStatus,
     ]
   );
 
@@ -2591,17 +2711,21 @@ const MainFrame = (props: Props) => {
   const onChangeProjectName = async (newName: string): Promise<void> => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
+    let newFileMetadata = { ...currentFileMetadata, name: newName };
     if (storageProviderOperations.onChangeProjectProperty) {
-      const wasSaved = await storageProviderOperations.onChangeProjectProperty(
+      const fileMetadataNewAttributes = await storageProviderOperations.onChangeProjectProperty(
         currentProject,
         currentFileMetadata,
         { name: newName }
       );
-      if (wasSaved) unsavedChanges.sealUnsavedChanges();
+      if (fileMetadataNewAttributes) {
+        unsavedChanges.sealUnsavedChanges();
+        newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
+      }
     }
     await setState(state => ({
       ...state,
-      currentFileMetadata: { ...currentFileMetadata, name: newName },
+      currentFileMetadata: newFileMetadata,
     }));
   };
 
@@ -2619,20 +2743,19 @@ const MainFrame = (props: Props) => {
     return true;
   };
 
-  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+  const onOpenCloudProjectOnSpecificVersionForRecovery = React.useCallback(
     (versionId: string) => {
       if (!cloudProjectFileMetadataToRecover) return;
-      openFromFileMetadataWithStorageProvider({
-        storageProviderName: 'Cloud',
-        fileMetadata: {
-          ...cloudProjectFileMetadataToRecover,
-          version: versionId,
-        },
+      onOpenCloudProjectOnSpecificVersion({
+        fileMetadata: cloudProjectFileMetadataToRecover,
+        versionId,
+        ignoreUnsavedChanges: false,
+        openingMessage: t`Recovering older version...`,
       });
       setCloudProjectFileMetadataToRecover(null);
       setCloudProjectRecoveryOpenedVersionId(versionId);
     },
-    [openFromFileMetadataWithStorageProvider, cloudProjectFileMetadataToRecover]
+    [cloudProjectFileMetadataToRecover, onOpenCloudProjectOnSpecificVersion]
   );
 
   const canInstallPrivateAsset = React.useCallback(
@@ -2848,7 +2971,8 @@ const MainFrame = (props: Props) => {
     onCloseProject: async () => {
       askToCloseProject();
     },
-    onExportGame: React.useCallback(() => openExportDialog(true), []),
+    onExportGame: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
     onOpenLayout: name => {
       openLayout(name);
     },
@@ -2880,11 +3004,11 @@ const MainFrame = (props: Props) => {
   );
 
   const showLoader = isLoadingProject || previewLoading;
-
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,
     project: state.currentProject,
+    canSaveProjectAs,
     recentProjectFiles: preferences.getRecentProjectFiles(),
     shortcutMap,
     isApplicationTopLevelMenu: false,
@@ -2894,9 +3018,11 @@ const MainFrame = (props: Props) => {
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
+    onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
-    onExportProject: () => openExportDialog(true),
+    onExportProject: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
     onCreateProject: () => setExampleStoreDialogOpen(true),
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
@@ -2998,11 +3124,11 @@ const MainFrame = (props: Props) => {
                 currentProject
               );
             }}
+            onShareProject={() => openShareDialog()}
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
-            shortcutMap={shortcutMap}
           />
         )}
         {!state.currentProject && (
@@ -3046,7 +3172,12 @@ const MainFrame = (props: Props) => {
         canSave={canSave}
         onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
-        exportProject={() => openExportDialog(true)}
+        openShareDialog={() =>
+          openShareDialog(/* leave the dialog decide which tab to open */)
+        }
+        isSharingEnabled={
+          !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId
+        }
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -3061,6 +3192,10 @@ const MainFrame = (props: Props) => {
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
+        onOpenVersionHistory={openVersionHistoryPanel}
+        checkedOutVersionStatus={checkedOutVersionStatus}
+        onQuitVersionHistory={onQuitVersionHistory}
+        canQuitVersionHistory={!isSavingProject}
       />
       <LeaderboardProvider
         gameId={
@@ -3069,19 +3204,21 @@ const MainFrame = (props: Props) => {
       >
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+          const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
-                  title="This editor encountered a problem"
-                  scope="mainframe"
+                  componentTitle={errorBoundaryProps.componentTitle}
+                  scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
                     fileMetadata: currentFileMetadata,
+                    storageProvider: getStorageProvider(),
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
@@ -3129,7 +3266,6 @@ const MainFrame = (props: Props) => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProfile: () => openProfileDialog(true),
-                    onOpenHelpFinder: openCommandPalette,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3182,7 +3318,7 @@ const MainFrame = (props: Props) => {
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}
-        message={fileMetadataOpeningMessage}
+        message={loaderModalOpeningMessage || fileMetadataOpeningMessage}
       />
       <Snackbar
         open={state.snackMessageOpen}
@@ -3193,15 +3329,16 @@ const MainFrame = (props: Props) => {
         }}
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
-      {!!renderExportDialog &&
-        exportDialogOpen &&
-        renderExportDialog({
-          onClose: () => openExportDialog(false),
-          onChangeSubscription: () => {
-            openExportDialog(false);
-          },
+      {shareDialogOpen &&
+        renderShareDialog({
+          onClose: closeShareDialog,
+          onChangeSubscription: closeShareDialog,
           project: state.currentProject,
           onSaveProject: saveProject,
+          isSavingProject: isSavingProject,
+          fileMetadata: currentFileMetadata,
+          storageProvider: getStorageProvider(),
+          initialTab: shareDialogInitialTab,
         })}
       {exampleStoreDialogOpen && (
         <ExampleStoreDialog
@@ -3235,7 +3372,7 @@ const MainFrame = (props: Props) => {
           {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openExportDialog(true),
+            onExport: () => openShareDialog('publish'),
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;
@@ -3297,7 +3434,7 @@ const MainFrame = (props: Props) => {
         <CloudProjectRecoveryDialog
           cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
           onClose={() => setCloudProjectFileMetadataToRecover(null)}
-          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersion}
+          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersionForRecovery}
         />
       )}
       {cloudProjectSaveChoiceOpen && (
@@ -3311,18 +3448,18 @@ const MainFrame = (props: Props) => {
       {preferencesDialogOpen && (
         <PreferencesDialog
           i18n={props.i18n}
-          onClose={languageChanged => {
+          onClose={options => {
             openPreferencesDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}
       {languageDialogOpen && (
         <LanguageDialog
           open
-          onClose={languageChanged => {
+          onClose={options => {
             openLanguageDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}
@@ -3358,6 +3495,7 @@ const MainFrame = (props: Props) => {
       {renderLeaderboardReplacerDialog()}
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
+      {renderVersionHistoryPanel()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

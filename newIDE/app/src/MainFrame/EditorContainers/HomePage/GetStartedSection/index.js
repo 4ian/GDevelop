@@ -1,259 +1,593 @@
 // @flow
 import * as React from 'react';
-import { Trans, t } from '@lingui/macro';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Checkbox from '../../../../UI/Checkbox';
-import { Line, LargeSpacer, Spacer } from '../../../../UI/Grid';
+import { Trans } from '@lingui/macro';
 import Text from '../../../../UI/Text';
 import {
   ColumnStackLayout,
+  LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
-import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import Window from '../../../../Utils/Window';
-
-import { type HomeTab } from '../HomePageMenu';
-import SectionContainer, { SectionRow } from '../SectionContainer';
-import { CardWidget, LARGE_WIDGET_SIZE } from '../CardWidget';
-import InAppTutorialPhaseCard from '../InAppTutorials/InAppTutorialPhaseCard';
-import GuidedLessons from '../InAppTutorials/GuidedLessons';
-import Unboxing from '../InAppTutorials/Icons/Unboxing';
-import Building from '../InAppTutorials/Icons/Building';
-import Podium from '../InAppTutorials/Icons/Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
+import TreeLeaves from '../../../../UI/CustomSvgIcons/TreeLeaves';
+import SectionContainer from '../SectionContainer';
+import JewelPlatform from '../../../../UI/CustomSvgIcons/JewelPlatform';
+import RaisedButton from '../../../../UI/RaisedButton';
+import FlatButton from '../../../../UI/FlatButton';
+import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
+import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import CircularProgress from '../../../../UI/CircularProgress';
+import BackgroundText from '../../../../UI/BackgroundText';
+import {
+  type UsernameAvailability,
+  type UserSurvey as UserSurveyType,
+} from '../../../../Utils/GDevelopServices/User';
+import UserSurvey from './UserSurvey';
+import {
+  clearUserSurveyPersistedState,
+  hasStartedUserSurvey,
+} from './UserSurveyStorage';
+import LinearProgress from '../../../../UI/LinearProgress';
+import CreateAccountForm from '../../../../Profile/CreateAccountForm';
+import LoginForm from '../../../../Profile/LoginForm';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
-import PlaceholderError from '../../../../UI/PlaceholderError';
-import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
+import RecommendationList from './RecommendationList';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import { delay } from '../../../../Utils/Delay';
+import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
+import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
+import Checkbox from '../../../../UI/Checkbox';
+import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
+import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 1;
-    case 'medium':
-      return 2;
-    case 'large':
-    case 'xlarge':
-    default:
-      return 3;
-  }
+const ONE_WEEK = 7 * 24 * 3600 * 1000;
+const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
+
+const shouldDisplayOptionToHideGetStartedSection = ({
+  isAuthenticated,
+}: {
+  isAuthenticated: boolean,
+}): boolean => {
+  if (!isAuthenticated) return false;
+
+  const getStartedSectionViewCount = getGetStartedSectionViewCount();
+  return (
+    getStartedSectionViewCount >
+    THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION
+  );
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('xlarge');
-const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
-const ITEMS_SPACING = 5;
 const styles = {
-  grid: {
-    textAlign: 'center',
-    // Avoid tiles taking too much space on large screens.
-    maxWidth: MAX_SECTION_WIDTH,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  cardTextContainer: {
-    flex: 1,
-    display: 'flex',
-  },
-  cardImage: {
-    width: '100%',
-    // Prevent cumulative layout shift by enforcing the 2 ratio.
-    aspectRatio: '2',
-    maxWidth: LARGE_WIDGET_SIZE,
-  },
-  bannerContainer: {
-    width: '100%',
-    maxWidth: MAX_SECTION_WIDTH - 2 * ITEMS_SPACING,
-  },
-  bannerImage: {
-    width: '100%',
-    // Prevent cumulative layout shift by enforcing ratio.
-    aspectRatio: '16 / 9',
-    maxWidth: LARGE_WIDGET_SIZE,
-  },
   icon: {
-    marginRight: 8, // Without this, the icon is too close to the text and space is not enough.
+    width: 80,
+    height: 80,
+    margin: 20,
   },
+  middlePageButtonContainer: {
+    width: '100%',
+    maxWidth: 300, // Make buttons larger but not too much.
+    marginBottom: '15%', // Used to display the content of the section higher than at the center.
+  },
+  bottomPageButtonContainer: {
+    width: '100%',
+    maxWidth: 300, // Make buttons larger but not too much.
+    marginBottom: 30, // Used to giver some space between the buttons and the screen bottom border.
+  },
+  linearProgress: { width: 200 },
+  getFormContainerStyle: (isMobile: boolean) => ({
+    marginTop: 20,
+    // Take full width on mobile.
+    width: isMobile ? '95%' : 300,
+  }),
+  questionnaireFinishedImage: { aspectRatio: '263 / 154' },
 };
+
+const questionnaireFinishedImageSource = 'res/questionnaire/welcome-back.svg';
 
 type Props = {|
-  onTabChange: (tab: HomeTab) => void,
+  showUserChip: boolean => void,
+  onUserSurveyStarted: () => void,
+  onUserSurveyHidden: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
-  showGetStartedSection: boolean,
-  setShowGetStartedSection: (enabled: boolean) => void,
 |};
 
 const GetStartedSection = ({
-  onTabChange,
+  showUserChip,
   selectInAppTutorial,
-  showGetStartedSection,
-  setShowGetStartedSection,
+  onUserSurveyStarted,
+  onUserSurveyHidden,
 }: Props) => {
-  const {
-    inAppTutorialShortHeaders,
-    inAppTutorialsFetchingError,
-    fetchInAppTutorials,
-  } = React.useContext(InAppTutorialContext);
-  const { getTutorialProgress } = React.useContext(PreferencesContext);
+  const isFillingOutSurvey = hasStartedUserSurvey();
+  const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const {
+    profile,
+    onResetPassword,
+    creatingOrLoggingInAccount,
+    onLogin,
+    onEditProfile,
+    onCreateAccount,
+    authenticationError,
+    loginState,
+  } = authenticatedUser;
+  const {
+    values: preferences,
+    setShowGetStartedSectionByDefault,
+  } = React.useContext(PreferencesContext);
+  const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
+  const [error, setError] = React.useState<?AuthError>(null);
+  const forceUpdate = useForceUpdate();
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
+  const [step, setStep] = React.useState<
+    | 'welcome'
+    | 'login'
+    | 'register'
+    | 'survey'
+    | 'surveyFinished'
+    | 'recommendations'
+  >(
+    profile && profile.survey
+      ? 'recommendations'
+      : isFillingOutSurvey
+      ? 'survey'
+      : 'welcome'
   );
-  const items: {
-    key: string,
-    title: React.Node,
-    description: React.Node,
-    action: () => void,
-    disabled?: boolean,
-  }[] = [
-    {
-      key: 'tutorial',
-      title: <Trans>Learn Section</Trans>,
-      description: (
-        <Trans>Find all the learning content related to GDevelop.</Trans>
-      ),
-      action: () => onTabChange('learn'),
-    },
-    {
-      key: 'build',
-      title: <Trans>“How do I” forum</Trans>,
-      description: <Trans>Ask your questions.</Trans>,
-      action: () => Window.openExternalURL('https://forum.gdevelop.io/'),
-    },
-    {
-      key: 'games',
-      title: <Trans>Wiki documentation</Trans>,
-      description: <Trans>Get inspired and have fun.</Trans>,
-      action: () =>
-        Window.openExternalURL('https://wiki.gdevelop.io/gdevelop5'),
-    },
-  ];
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [errorSendingSurvey, setErrorSendingSurvey] = React.useState<boolean>(
+    false
+  );
+  const [
+    usernameAvailability,
+    setUsernameAvailability,
+  ] = React.useState<?UsernameAvailability>(null);
+  const [
+    isValidatingUsername,
+    setIsValidatingUsername,
+  ] = React.useState<boolean>(false);
+  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
+    false
+  );
+  const [
+    lastVisitedAuthenticationStep,
+    setLastVisitedAuthenticationStep,
+  ] = React.useState<'login' | 'register'>('login');
 
-  const getTutorialPartProgress = ({
-    tutorialId,
-    part,
-  }: {
-    tutorialId: string,
-    part: number,
-  }) => {
-    const tutorialProgress = getTutorialProgress({
-      tutorialId,
-      userId: authenticatedUser.profile
-        ? authenticatedUser.profile.id
-        : undefined,
+  const doLogin = () => {
+    if (creatingOrLoggingInAccount) return;
+    onLogin({
+      email: email.trim(),
+      password,
     });
-    if (!tutorialProgress || !tutorialProgress.progress) return 0;
-    return tutorialProgress.progress[part];
   };
 
-  const isTutorialPartComplete = ({
-    tutorialId,
-    part,
-  }: {
-    tutorialId: string,
-    part: number,
-  }) => {
-    return (
-      getTutorialPartProgress({
-        tutorialId,
-        part,
-      }) === 100
+  const doCreateAccount = async () => {
+    if (creatingOrLoggingInAccount) return;
+    onCreateAccount(
+      {
+        email: email.trim(),
+        password,
+        getNewsletterEmail,
+        username,
+      },
+      preferences
     );
   };
 
-  const flingInAppTutorialCards = [
-    {
-      key: 'create',
-      title: t`Start your game`,
-      description: t`Add your first characters to the scene and throw your first objects.`,
-      keyPoints: [
-        t`Game scene size`,
-        t`Objects and characters`,
-        t`Game Scenes`,
-        t`Throwing physics`,
-      ],
-      durationInMinutes: 5,
-      locked: false, // First phase is never locked
-      // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        isTutorialPartComplete({
-          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-          part: 0,
-        }),
-      progress: getTutorialPartProgress({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 0,
-      }),
-      renderImage: props => <Unboxing {...props} />,
-    },
-    {
-      key: 'publish',
-      title: t`Improve and publish your Game`,
-      description: t`Add personality to your game and publish it online.`,
-      keyPoints: [
-        t`Game background`,
-        t`In-game obstacles`,
-        t`“You win” message`,
-        t`Sharing online`,
-      ],
-      durationInMinutes: 10,
-      // Second phase is locked if first phase is not complete
-      locked: !isTutorialPartComplete({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 0,
-      }),
-      // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        isTutorialPartComplete({
-          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-          part: 1,
-        }),
-      progress: getTutorialPartProgress({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 1,
-      }),
-      renderImage: props => <Building {...props} />,
-    },
-    {
-      key: 'leaderboards',
-      title: t`Add leaderboards to your online Game`,
-      description: t`Add player logins to your game and add a leaderboard.`,
-      keyPoints: [
-        t`Game personalisation`,
-        t`“Start” screen`,
-        t`Timers`,
-        t`Leaderboards`,
-      ],
-      durationInMinutes: 15,
-      // Third phase is locked if second phase is not complete
-      locked: !isTutorialPartComplete({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 1,
-      }),
-      // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        isTutorialPartComplete({
-          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-          part: 2,
-        }),
-      progress: getTutorialPartProgress({
-        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-        part: 2,
-      }),
-      renderImage: props => <Podium {...props} />,
-    },
-  ];
+  const onSurveyFinished = async (survey: UserSurveyType) => {
+    try {
+      setStep('surveyFinished');
+      // Artificial delay to build up expectations.
+      recommendationsGettingDelayPromise.current = delay(5000);
+      await Promise.all([
+        onEditProfile({ survey }, preferences, { throwError: true }),
+        recommendationsGettingDelayPromise.current,
+      ]);
+      sendUserSurveyCompleted();
+      clearUserSurveyPersistedState();
+      setStep('recommendations');
+    } catch (error) {
+      console.error('An error occurred when sending survey:', error);
+      setErrorSendingSurvey(true);
+      setStep('welcome');
+    } finally {
+      recommendationsGettingDelayPromise.current = null;
+    }
+  };
 
-  const Subtitle = () => (
+  React.useEffect(
+    () => {
+      if (step === 'welcome' && profile && profile.survey) {
+        setStep('recommendations');
+      } else if ((step === 'login' || step === 'register') && profile) {
+        setStep(profile.survey ? 'recommendations' : 'survey');
+      } else if (!(step === 'login' || step === 'register') && !profile) {
+        setStep('welcome');
+      }
+      // Only show user chip when the user is logged in and can see the recommendations.
+      // In any other case, we don't want to distract them from completing the survey.
+      showUserChip(step === 'recommendations' && !!profile && !!profile.survey);
+    },
+    [profile, step, showUserChip]
+  );
+
+  // Logic to store the last visited authentication step.
+  React.useEffect(
+    () => {
+      if (step === 'login') {
+        setLastVisitedAuthenticationStep('login');
+      } else if (step === 'register') {
+        setLastVisitedAuthenticationStep('register');
+      }
+    },
+    [step]
+  );
+
+  React.useEffect(
+    () => {
+      if (!authenticatedUser.authenticated) clearUserSurveyPersistedState();
+    },
+    [authenticatedUser.authenticated]
+  );
+
+  // Set the error when the authentication error changes.
+  React.useEffect(
+    () => {
+      setError(authenticationError);
+    },
+    [authenticationError]
+  );
+
+  // Reset form when user changes authentication step.
+  React.useEffect(
+    () => {
+      setError(null);
+      setEmail('');
+      setPassword('');
+    },
+    [lastVisitedAuthenticationStep]
+  );
+
+  if (
+    (creatingOrLoggingInAccount || loginState === 'loggingIn') &&
+    // Do not display loader if the user is already seeing the recommendations.
+    // It can happen when the user profile is refreshed while the recommendations
+    // are displayed. This way, the loader is not displayed unnecessarily.
+    step !== 'recommendations' &&
+    !recommendationsGettingDelayPromise.current
+  ) {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <CircularProgress size={40} />
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (!isOnline || errorSendingSurvey) {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          {errorSendingSurvey ? (
+            <>
+              <Text size="title" align="center">
+                <Trans>Error when sending survey.</Trans>
+              </Text>
+              <TreeLeaves style={styles.icon} />
+              <Text size="body2" noMargin align="center">
+                <Trans>
+                  Verify your internet connection and try again later.
+                </Trans>
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text size="title" align="center">
+                <Trans>You seem to be offline</Trans>
+              </Text>
+              <TreeLeaves style={styles.icon} />
+              <Text size="body2" noMargin align="center">
+                <Trans>
+                  Verify your internet connection to access your personalized
+                  content.
+                </Trans>
+              </Text>
+              <div style={styles.middlePageButtonContainer}>
+                <Line expand>
+                  <RaisedButton
+                    primary
+                    label={<Trans>Refresh</Trans>}
+                    onClick={forceUpdate}
+                    fullWidth
+                  />
+                </Line>
+              </div>
+            </>
+          )}
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (step === 'login') {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <ColumnStackLayout
+            expand
+            noMargin
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text size="title" align="center">
+              <Trans>Log in to Gdevelop</Trans>
+            </Text>
+            <BackgroundText>
+              <Trans>
+                This will synchronise your selected content wherever you go.
+              </Trans>
+            </BackgroundText>
+            <div style={styles.getFormContainerStyle(isMobile)}>
+              <LoginForm
+                email={email}
+                onChangeEmail={setEmail}
+                password={password}
+                onChangePassword={setPassword}
+                onLogin={doLogin}
+                loginInProgress={creatingOrLoggingInAccount}
+                onForgotPassword={onResetPassword}
+                error={error}
+              />
+            </div>
+          </ColumnStackLayout>
+          <div style={styles.bottomPageButtonContainer}>
+            <Column>
+              <LineStackLayout expand>
+                <FlatButton
+                  primary
+                  label={<Trans>Back</Trans>}
+                  onClick={() => setStep('welcome')}
+                  fullWidth
+                />
+                <RaisedButton
+                  label={<Trans>Next</Trans>}
+                  primary
+                  onClick={doLogin}
+                  fullWidth
+                />
+              </LineStackLayout>
+            </Column>
+          </div>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (step === 'register') {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <ColumnStackLayout
+            expand
+            noMargin
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text size="title" align="center">
+              <Trans>Let's start by creating your GDevelop account</Trans>
+            </Text>
+            <BackgroundText>
+              <Trans>
+                This will synchronise your selected content wherever you go.
+              </Trans>
+            </BackgroundText>
+            <div style={styles.getFormContainerStyle(isMobile)}>
+              <CreateAccountForm
+                email={email}
+                onChangeEmail={setEmail}
+                password={password}
+                onChangePassword={setPassword}
+                username={username}
+                onChangeUsername={setUsername}
+                optInNewsletterEmail={getNewsletterEmail}
+                onChangeOptInNewsletterEmail={setGetNewsletterEmail}
+                isValidatingUsername={isValidatingUsername}
+                onChangeIsValidatingUsername={setIsValidatingUsername}
+                usernameAvailability={usernameAvailability}
+                onChangeUsernameAvailability={setUsernameAvailability}
+                onCreateAccount={doCreateAccount}
+                createAccountInProgress={creatingOrLoggingInAccount}
+                error={error}
+              />
+            </div>
+          </ColumnStackLayout>
+          <div style={styles.bottomPageButtonContainer}>
+            <Column>
+              <LineStackLayout expand>
+                <FlatButton
+                  primary
+                  label={<Trans>Back</Trans>}
+                  onClick={() => setStep('welcome')}
+                  fullWidth
+                />
+                <RaisedButton
+                  label={<Trans>Next</Trans>}
+                  primary
+                  onClick={doCreateAccount}
+                  fullWidth
+                />
+              </LineStackLayout>
+            </Column>
+          </div>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (step === 'welcome') {
+    const isNewUser = profile && Date.now() - profile.createdAt < ONE_WEEK;
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <ColumnStackLayout
+            noMargin
+            expand
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Text size="title" align="center">
+              {!profile || isNewUser ? (
+                <Trans>Welcome to GDevelop!</Trans>
+              ) : profile && profile.username ? (
+                <Trans>Good to see you {profile.username}!</Trans>
+              ) : (
+                <Trans>We have something new for you!</Trans>
+              )}
+            </Text>
+            <JewelPlatform style={styles.icon} />
+            <Text size="body2" noMargin align="center">
+              <Trans>
+                We've made a selection of GDevelop content to help you on your
+                game development journey.
+              </Trans>
+            </Text>
+            <LargeSpacer />
+            <Text size="sub-title" align="center">
+              {profile ? (
+                <Trans>
+                  Answer our questionnaire and get recommendations according to
+                  your current objectives.
+                </Trans>
+              ) : (
+                <Trans>Let's start by creating your account.</Trans>
+              )}
+            </Text>
+            <div style={styles.middlePageButtonContainer}>
+              {profile ? (
+                <Column noMargin>
+                  <RaisedButton
+                    label={<Trans>Let's go!</Trans>}
+                    primary
+                    onClick={() => setStep('survey')}
+                    fullWidth
+                  />
+                </Column>
+              ) : (
+                <ColumnStackLayout noMargin>
+                  <RaisedButton
+                    label={<Trans>Let's go!</Trans>}
+                    primary
+                    onClick={() => setStep('register')}
+                    fullWidth
+                  />
+                  <FlatButton
+                    primary
+                    label={<Trans>I already have an account</Trans>}
+                    onClick={() => setStep('login')}
+                    fullWidth
+                  />
+                </ColumnStackLayout>
+              )}
+            </div>
+          </ColumnStackLayout>
+          {shouldDisplayOptionToHideGetStartedSection({
+            isAuthenticated: authenticatedUser.authenticated,
+          }) && (
+            <div style={styles.bottomPageButtonContainer}>
+              <Checkbox
+                label={<Trans>Don't show this screen on next startup</Trans>}
+                checked={!preferences.showGetStartedSectionByDefault}
+                onCheck={(e, checked) => {
+                  if (checked) onUserSurveyHidden();
+                  setShowGetStartedSectionByDefault(!checked);
+                }}
+              />
+            </div>
+          )}
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  if (step === 'surveyFinished') {
+    return (
+      <SectionContainer
+        title={null} // Let the content handle the title.
+        flexBody
+      >
+        <ColumnStackLayout
+          noMargin
+          expand
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text size="title" align="center">
+            <Trans>Alright let's see what we have for you...</Trans>
+          </Text>
+          <img
+            src={questionnaireFinishedImageSource}
+            alt="You as the red hero coming back to life"
+            style={styles.questionnaireFinishedImage}
+          />
+          <Text size="body2" noMargin align="center">
+            <Trans>Just one second please...</Trans>
+          </Text>
+          <Line>
+            <LinearProgress
+              variant="indeterminate"
+              style={styles.linearProgress}
+            />
+          </Line>
+        </ColumnStackLayout>
+      </SectionContainer>
+    );
+  }
+
+  const renderSubtitle = () => (
     <ResponsiveLineStackLayout
       justifyContent="space-between"
       alignItems="center"
@@ -261,156 +595,57 @@ const GetStartedSection = ({
       noMargin
     >
       <Text noMargin>
-        <Trans>Learn the basics of GDevelop and publish a first game.</Trans>
+        <Trans>
+          Here’s some content to get you started on your GDevelop journey!
+        </Trans>
       </Text>
       <Checkbox
         label={<Trans>Don't show this screen on next startup</Trans>}
-        checked={!showGetStartedSection}
-        onCheck={(e, checked) => setShowGetStartedSection(!checked)}
+        checked={!preferences.showGetStartedSectionByDefault}
+        onCheck={(e, checked) => setShowGetStartedSectionByDefault(!checked)}
       />
     </ResponsiveLineStackLayout>
   );
 
-  const isFlingTutorialComplete =
-    isTutorialPartComplete({
-      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-      part: 0,
-    }) &&
-    isTutorialPartComplete({
-      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-      part: 1,
-    }) &&
-    isTutorialPartComplete({
-      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-      part: 2,
-    });
+  if (step === 'recommendations' && profile) {
+    return (
+      <>
+        <AnnouncementsFeed canClose level="urgent" addMargins />
+        <SectionContainer
+          title={
+            profile.username ? (
+              <Trans>Hello {profile.username}!</Trans>
+            ) : (
+              <Trans>Hello!</Trans>
+            )
+          }
+          renderSubtitle={renderSubtitle}
+          flexBody
+        >
+          <RecommendationList
+            authenticatedUser={authenticatedUser}
+            selectInAppTutorial={selectInAppTutorial}
+          />
+        </SectionContainer>
+      </>
+    );
+  }
 
   return (
-    <SectionContainer
-      title={<Trans>Guided lessons</Trans>}
-      renderSubtitle={() => <Subtitle />}
-    >
-      <SectionRow>
-        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
-      </SectionRow>
-      <SectionRow>
-        <Text size="title" noMargin>
-          <Trans>Create and Publish a Fling game</Trans>
-        </Text>
-        <Text size="body" color="secondary" noMargin>
-          <Trans>
-            3-part tutorial to creating and publishing a game from scratch.
-          </Trans>
-        </Text>
-        <Spacer />
-        <Line>
-          <div style={styles.bannerContainer}>
-            {inAppTutorialsFetchingError ? (
-              <PlaceholderError onRetry={fetchInAppTutorials}>
-                <Trans>An error occurred when downloading the tutorials.</Trans>{' '}
-                <Trans>
-                  Please check your internet connection or try again later.
-                </Trans>
-              </PlaceholderError>
-            ) : inAppTutorialShortHeaders === null ? (
-              <PlaceholderLoader />
-            ) : (
-              <GridList
-                cols={
-                  isFlingTutorialComplete ? 1 : getColumnsFromWidth(windowWidth)
-                }
-                style={styles.grid}
-                cellHeight="auto"
-                spacing={ITEMS_SPACING * 2}
-              >
-                {isFlingTutorialComplete ? (
-                  <GridListTile>
-                    <InAppTutorialPhaseCard
-                      title={t`Congratulations! You've finished this tutorial!`}
-                      description={t`Find your finished game on the “Build” section. Or restart the tutorial by clicking on the card.`}
-                      size="banner"
-                      locked={false}
-                      disabled={false}
-                      renderImage={props => (
-                        <Line justifyContent="space-around" expand>
-                          <Unboxing {...props} />
-                          <Building {...props} />
-                          <Podium {...props} />
-                        </Line>
-                      )}
-                      onClick={() =>
-                        selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
-                      }
-                    />
-                  </GridListTile>
-                ) : (
-                  flingInAppTutorialCards.map(item => (
-                    <GridListTile key={item.key}>
-                      <InAppTutorialPhaseCard
-                        {...item}
-                        onClick={() =>
-                          selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
-                        }
-                      />
-                    </GridListTile>
-                  ))
-                )}
-              </GridList>
-            )}
-          </div>
-        </Line>
-      </SectionRow>
-      <SectionRow>
-        <Text size="title" noMargin>
-          <Trans>Want to explore further?</Trans>
-        </Text>
-        <Text size="body" color="secondary" noMargin>
-          <Trans>Articles, wiki and much more.</Trans>
-        </Text>
-        <LargeSpacer />
-        <Line noMargin expand>
-          <GridList
-            cols={getColumnsFromWidth(windowWidth)}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={ITEMS_SPACING * 2}
-          >
-            {items.map((item, index) => (
-              <GridListTile key={index}>
-                <CardWidget
-                  onClick={item.action}
-                  key={index}
-                  size="large"
-                  disabled={item.disabled}
-                  useDefaultDisabledStyle
-                >
-                  <div
-                    style={{
-                      ...styles.cardTextContainer,
-                      padding: isMobile ? 10 : 20,
-                    }}
-                  >
-                    <ColumnStackLayout
-                      expand
-                      justifyContent="center"
-                      useFullHeight
-                    >
-                      <Text size="sub-title" noMargin>
-                        {item.title}
-                      </Text>
-                      <Text size="body" color="secondary" noMargin>
-                        {item.description}
-                      </Text>
-                    </ColumnStackLayout>
-                  </div>
-                </CardWidget>
-              </GridListTile>
-            ))}
-          </GridList>
-        </Line>
-      </SectionRow>
-    </SectionContainer>
+    <UserSurvey
+      onCompleted={onSurveyFinished}
+      onStarted={onUserSurveyStarted}
+    />
   );
 };
 
-export default GetStartedSection;
+const GetStartedSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Get started section</Trans>}
+    scope="start-page-get-started"
+  >
+    <GetStartedSection {...props} />
+  </ErrorBoundary>
+);
+
+export default GetStartedSectionWithErrorBoundary;

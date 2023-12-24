@@ -14,6 +14,7 @@ import {
 import {
   communityLinksConfig,
   donateLinkConfig,
+  discordUsernameConfig,
   type UsernameAvailability,
   type CommunityLinkType,
 } from '../Utils/GDevelopServices/User';
@@ -34,6 +35,7 @@ import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
 import TextButton from '../UI/TextButton';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import Form from '../UI/Form';
 
 type Props = {|
   profile: Profile,
@@ -110,6 +112,9 @@ const EditProfileDialog = ({
     profile.description || ''
   );
   const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
+  const [discordUsername, setDiscordUsername] = React.useState(
+    profile.discordUsername || ''
+  );
   const [personalWebsiteLink, setPersonalWebsiteLink] = React.useState(
     communityLinks.personalWebsiteLink || ''
   );
@@ -191,6 +196,7 @@ const EditProfileDialog = ({
       getGameStatsEmail,
       getNewsletterEmail,
       donateLink,
+      discordUsername,
       communityLinks: {
         personalWebsiteLink,
         personalWebsite2Link,
@@ -281,15 +287,7 @@ const EditProfileDialog = ({
           onApply={edit}
           open
         >
-          <form
-            onSubmit={event => {
-              // Prevent browser to navigate on form submission.
-              event.preventDefault();
-              edit();
-            }}
-            autoComplete="on"
-            name="editProfile"
-          >
+          <Form onSubmit={edit} autoComplete="on" name="editProfile">
             <ColumnStackLayout noMargin>
               <UsernameField
                 initialUsername={profile.username}
@@ -302,6 +300,20 @@ const EditProfileDialog = ({
                 onAvailabilityCheckLoading={setIsValidatingUsername}
                 isValidatingUsername={isValidatingUsername}
                 disabled={actionInProgress}
+              />
+              <TextField
+                value={discordUsername}
+                floatingLabelText={<Trans>Discord username</Trans>}
+                fullWidth
+                translatableHintText={t`Your Discord username`}
+                onChange={(e, value) => {
+                  setDiscordUsername(value);
+                }}
+                disabled={actionInProgress}
+                maxLength={discordUsernameConfig.maxLength}
+                helperMarkdownText={i18n._(
+                  t`Add your Discord username to get access to a dedicated channel if you have a Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
+                )}
               />
               <TextField
                 value={description}
@@ -442,13 +454,8 @@ const EditProfileDialog = ({
                 }}
                 disabled={actionInProgress}
               />
-              {/*
-                This input is needed so that the browser submits the form when
-                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
-              */}
-              <input type="submit" value="Submit" style={{ display: 'none' }} />
             </ColumnStackLayout>
-          </form>
+          </Form>
         </Dialog>
       )}
     </I18n>

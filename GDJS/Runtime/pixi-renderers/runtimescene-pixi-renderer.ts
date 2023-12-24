@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
@@ -70,6 +68,19 @@ namespace gdjs {
 
       const threeRenderer = this._threeRenderer;
 
+      // If we are in VR, we cannot render like this: we must use the special VR
+      // rendering method to not display a black screen.
+      //
+      // We cannot call it here either - the headset will request a frame to be rendered
+      // whenever it wants and we must oblige, however this will  be called whenever
+      // we do a step - and we may step multiple times or none at all depending on the
+      // min/max FPS and possibly other factors, and the headset will not allow that.
+      //
+      // It is therefore left to the VR extension to call the VR rendering method whenever
+      // the headset require a new image, we'll just disable rendering when stepping to
+      // not interfere with the headset's rendering.
+      if (threeRenderer && threeRenderer.xr.isPresenting) return;
+
       this._layerRenderingMetrics.rendered2DLayersCount = 0;
       this._layerRenderingMetrics.rendered3DLayersCount = 0;
 
@@ -117,8 +128,8 @@ namespace gdjs {
 
             if (isFirstRender) {
               // Render the background color.
-              pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
-              pixiRenderer.backgroundAlpha = 1;
+              pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
+              pixiRenderer.background.alpha = 1;
               if (this._runtimeScene.getClearCanvas()) pixiRenderer.clear();
 
               isFirstRender = false;
@@ -250,7 +261,7 @@ namespace gdjs {
 
         // Render all the layers then.
         // TODO: replace by a loop like in 3D?
-        pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
+        pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
         pixiRenderer.render(this._pixiContainer, {
           clear: this._runtimeScene.getClearCanvas(),
         });
@@ -267,6 +278,77 @@ namespace gdjs {
 
       // Uncomment to check the number of 2D&3D rendering done
       // console.log(this._layerRenderingMetrics);
+    }
+
+    /**
+     * Unless you know what you are doing, use the VR extension instead of this function directly.
+     *
+     * In VR, only 3D elements can be rendered, 2D cannot.
+     * This rendering method skips over all 2D layers and elements, and simply renders the 3D content.
+     * This method is to be called by the XRSession's `requestAnimationFrame` for rendering to
+     * the headset whenever the headset requests the screen to be drawn. Note that while an XRSession
+     * is in progress, the regular `requestAnimationFrame` will be disabled. Make sure that whenever you
+     * enter an XRSession, you:
+     * - Call this function first and foremost when the XRSession's requestAnimationFrame fires,
+     *   as it is necessary to draw asap as the headset will eventually stop waiting and just draw the
+     *   framebuffer as it is to maintain a constant screen refresh rate, which can be in the middle of
+     *   or even before rendering if we aren't fast enough, leading to screen flashes and bugs.
+     * - Call GDevelop's step function to give the scene a chance to step after having drawn to the screen
+     *   to allow the game to actually progress, since GDevelop will no longer step by itself with
+     *   `requestAnimationFrame` disabled.
+     *
+     * Note to engine developers: `threeRenderer.resetState()` may NOT be called in this function,
+     * as WebXR modifies the WebGL state in a way that resetting it will cause an improper render
+     * that will lead to a black screen being displayed in VR mode.
+     */
+    renderForVR() {
+      const runtimeGameRenderer = this._runtimeGameRenderer;
+      if (!runtimeGameRenderer) return;
+
+      const threeRenderer = this._threeRenderer;
+      // VR rendering relies on ThreeJS
+      if (!threeRenderer)
+        throw new Error('Cannot render a scene with no 3D elements in VR!');
+
+      // Render each layer one by one.
+      let isFirstRender = true;
+      for (let i = 0; i < this._runtimeScene._orderedLayers.length; ++i) {
+        const runtimeLayer = this._runtimeScene._orderedLayers[i];
+        if (!runtimeLayer.isVisible()) continue;
+
+        const runtimeLayerRenderer = runtimeLayer.getRenderer();
+        const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
+        if (
+          runtimeLayerRenderingType === gdjs.RuntimeLayerRenderingType.TWO_D ||
+          !runtimeLayerRenderer.has3DObjects()
+        )
+          continue;
+
+        // Render a layer with 3D rendering, and no 2D rendering at all for VR.
+        const threeScene = runtimeLayerRenderer.getThreeScene();
+        const threeCamera = runtimeLayerRenderer.getThreeCamera();
+        if (!threeScene || !threeCamera) continue;
+
+        if (isFirstRender) {
+          // Render the background color.
+          threeRenderer.setClearColor(this._runtimeScene.getBackgroundColor());
+          if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
+          threeScene.background = new THREE.Color(
+            this._runtimeScene.getBackgroundColor()
+          );
+
+          isFirstRender = false;
+        } else {
+          // It's important to set the background to null, as maybe the first rendered
+          // layer has changed and so the Three.js scene background must be reset.
+          threeScene.background = null;
+        }
+
+        // Clear the depth as each layer is independent and display on top of the previous one,
+        // even 3D objects.
+        threeRenderer.clearDepth();
+        threeRenderer.render(threeScene, threeCamera);
+      }
     }
 
     _renderProfileText() {

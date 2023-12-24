@@ -79,7 +79,7 @@ export const getFuseSearchQueryForMultipleKeys = (
   });
 
   return {
-    $and: searchQuery,
+    $or: searchQuery,
   };
 };
 

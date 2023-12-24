@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
@@ -133,6 +131,77 @@ namespace gdjs {
         this._object._fillOpacity / 255
       );
       this._graphics.drawRoundedRect(x1, y1, x2 - x1, y2 - y1, radius);
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawChamferRectangle(
+      x1: float,
+      y1: float,
+      x2: float,
+      y2: float,
+      chamfer: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawChamferRect(x1, y1, x2 - x1, y2 - y1, chamfer);
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawTorus(
+      x1: float,
+      y1: float,
+      innerRadius: float,
+      outerRadius: float,
+      startArc: float,
+      endArc: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawTorus(
+        x1,
+        y1,
+        innerRadius,
+        outerRadius,
+        startArc ? gdjs.toRad(startArc) : 0,
+        endArc ? gdjs.toRad(endArc) : 0
+      );
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawRegularPolygon(
+      x1: float,
+      y1: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawRegularPolygon(
+        x1,
+        y1,
+        radius,
+        sides,
+        rotation ? gdjs.toRad(rotation) : 0
+      );
       this._graphics.closePath();
       this._graphics.endFill();
       this.invalidateBounds();
@@ -493,7 +562,7 @@ namespace gdjs {
     updateAntialiasing(): void {
       if (this._object.getAntialiasing() !== 'none') {
         if (!this._antialiasingFilter) {
-          this._antialiasingFilter = new PIXI.filters.FXAAFilter();
+          this._antialiasingFilter = new PIXI.FXAAFilter();
         }
 
         const antialiasingFilter = this._antialiasingFilter;
@@ -521,6 +590,10 @@ namespace gdjs {
           this._graphics.filters.splice(antialiasingFilterIndex, 1);
         }
       }
+    }
+
+    destroy(): void {
+      this._graphics.destroy();
     }
   }
 

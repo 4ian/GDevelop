@@ -168,7 +168,10 @@ export const renameResourcesInProject = (
   resourceNewNames: { [string]: string }
 ) => {
   const renamedResourcesMap = toNewGdMapStringString(resourceNewNames);
-  const resourcesRenamer = new gd.ResourcesRenamer(renamedResourcesMap);
+  const resourcesRenamer = new gd.ResourcesRenamer(
+    project.getResourcesManager(),
+    renamedResourcesMap
+  );
   renamedResourcesMap.delete();
   gd.ResourceExposer.exposeWholeProjectResources(project, resourcesRenamer);
   resourcesRenamer.delete();

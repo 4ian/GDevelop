@@ -23,13 +23,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <GenericExpressionField
         expressionType="string"
         ref={field}
-        renderExtraButton={({ style }) => (
+        renderExtraButton={({ style, onChange }) => (
           <ColorPicker
             style={style}
             disableAlpha
             color={rgbStringAndAlphaToRGBColor(props.value)}
             onChangeComplete={color => {
-              props.onChange(
+              onChange(
                 '"' + color.rgb.r + ';' + color.rgb.g + ';' + color.rgb.b + '"'
               );
             }}

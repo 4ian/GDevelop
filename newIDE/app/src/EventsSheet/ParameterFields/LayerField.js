@@ -32,6 +32,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     }));
 
     const { layout } = props.scope;
+    // The list is not kept with a memo because layers could be changed by
+    // another component without this one to know.
     const layerNames = layout
       ? mapFor(0, layout.getLayersCount(), i => {
           const layer = layout.getLayerAt(i);
@@ -126,7 +128,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select a Layer</Trans>}
+              label={<Trans>Select a layer</Trans>}
               onClick={switchFieldType}
             />
           ) : (
@@ -135,7 +137,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               icon={<Functions />}
               style={style}
               primary
-              label={<Trans>Use an Expression</Trans>}
+              label={<Trans>Use an expression</Trans>}
               onClick={switchFieldType}
             />
           )

@@ -108,6 +108,10 @@
   border-left: var(--event-sheet-sub-instructions-border);
 }
 
+.gd-events-sheet .warning-instruction {
+  background-color: var(--event-sheet-warning-instruction-background-color);
+}
+
 /**
  * Instructions parameters color scheme
  */

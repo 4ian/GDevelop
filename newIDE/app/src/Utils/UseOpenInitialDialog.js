@@ -24,7 +24,7 @@ const useOpenInitialDialog = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const { onCreateAccount, authenticated } = React.useContext(
+  const { onOpenCreateAccountDialog, authenticated } = React.useContext(
     AuthenticatedUserContext
   );
 
@@ -32,7 +32,9 @@ const useOpenInitialDialog = ({
     () => {
       switch (routeArguments['initial-dialog']) {
         case 'subscription':
-          openSubscriptionDialog({ reason: 'Landing dialog at opening' });
+          openSubscriptionDialog({
+            analyticsMetadata: { reason: 'Landing dialog at opening' },
+          });
           removeRouteArguments(['initial-dialog']);
           break;
         case 'signup':
@@ -42,7 +44,7 @@ const useOpenInitialDialog = ({
             if (authenticated) {
               openProfileDialog(true);
             } else {
-              onCreateAccount();
+              onOpenCreateAccountDialog();
             }
             removeRouteArguments(['initial-dialog']);
           }, 2000);
@@ -59,9 +61,8 @@ const useOpenInitialDialog = ({
           removeRouteArguments(['initial-dialog', 'tutorial-id']);
           break;
         case 'games-dashboard':
-          openProfileDialog(true);
-          // As the games dashboard is not a dialog in itself, we don't remove the argument
-          // and let the ProfileDialog do it once the tab is opened.
+          // Do nothing as it should open the games dashboard on the homepage
+          // in the manage tab. So the homepage handles the route arguments itself.
           break;
         default:
           break;
@@ -74,7 +75,7 @@ const useOpenInitialDialog = ({
       removeRouteArguments,
       openSubscriptionDialog,
       authenticated,
-      onCreateAccount,
+      onOpenCreateAccountDialog,
     ]
   );
 };

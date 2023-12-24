@@ -347,6 +347,12 @@
       }
     },
     "list-item": {
+      "hover": {
+        "background-color": {
+          "value": "#F6F2FF",
+          "comment": "Palette/Purple/00"
+        }
+      },
       "group": {
         "text": {
           "color": {
@@ -575,6 +581,12 @@
       },
       "border": {
         "value": "1px solid {event-sheet.sub-instructions.border-color.value}"
+      }
+    },
+    "warning-instruction": {
+      "background-color": {
+        "value": "rgba(255, 188, 87, 0.125)",
+        "comment": "Palette/Yellow/40 and alpha"
       }
     },
     "instruction-parameter": {

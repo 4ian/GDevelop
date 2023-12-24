@@ -34,6 +34,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
         behaviorsSharedData: [],
         objects: [],
         instances: [],
+        usedResources: [],
       });
       setFramePerSecond(runtimeScene, framePerSecond);
       return runtimeScene;

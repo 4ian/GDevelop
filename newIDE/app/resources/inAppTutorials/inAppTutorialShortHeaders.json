@@ -14,7 +14,7 @@
   {
     "id": "flingGame",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/flingGame.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th"]
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"]
   },
   {
     "id": "healthBar",
@@ -26,7 +26,7 @@
   {
     "id": "joystick",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/joystick.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar", "sq"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/joystick/game.json",
     "initialProjectData": {
       "gameScene": "GameScene",

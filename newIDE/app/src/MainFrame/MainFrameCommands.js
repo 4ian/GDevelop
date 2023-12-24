@@ -53,6 +53,7 @@ type CommandHandlers = {|
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
   onExportGame: () => void,
+  onInviteCollaborators: () => void,
   onOpenLayout: string => void,
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
@@ -129,6 +130,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('EXPORT_GAME', !!handlers.project, {
     handler: handlers.onExportGame,
+  });
+
+  useCommand('INVITE_COLLABORATORS', !!handlers.project, {
+    handler: handlers.onInviteCollaborators,
   });
 
   useCommand('OPEN_COMMAND_PALETTE', true, {

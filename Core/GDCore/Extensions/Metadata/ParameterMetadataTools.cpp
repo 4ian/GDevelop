@@ -8,6 +8,7 @@
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include "InstructionMetadata.h"
@@ -15,6 +16,8 @@
 #include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 
 namespace gd {
+const ParameterMetadata ParameterMetadataTools::badParameterMetadata;
+
 void ParameterMetadataTools::ParametersToObjectsContainer(
     const gd::Project& project,
     const std::vector<gd::ParameterMetadata>& parameters,
@@ -55,6 +58,55 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
       }
     }
   }
+}
+
+void ParameterMetadataTools::ForEachParameterMatchingSearch(
+    const std::vector<const std::vector<gd::ParameterMetadata>*>&
+        parametersVectorsList,
+    const gd::String& search,
+    std::function<void(const gd::ParameterMetadata&)> cb) {
+  for (auto it = parametersVectorsList.rbegin();
+       it != parametersVectorsList.rend();
+       ++it) {
+    const std::vector<gd::ParameterMetadata>* parametersVector = *it;
+
+    for (const auto& parameterMetadata: *parametersVector) {
+      if (parameterMetadata.GetName().FindCaseInsensitive(search) != gd::String::npos) cb(parameterMetadata);
+    }
+  }
+}
+
+bool ParameterMetadataTools::Has(
+      const std::vector<const std::vector<gd::ParameterMetadata>*>& parametersVectorsList,
+      const gd::String& parameterName) {
+  for (auto it = parametersVectorsList.rbegin();
+       it != parametersVectorsList.rend();
+       ++it) {
+    const std::vector<gd::ParameterMetadata>* parametersVector = *it;
+
+    for (const auto& parameterMetadata: *parametersVector) {
+      if (parameterMetadata.GetName() == parameterName) return true;
+    }
+  }
+
+  return false;
+}
+
+const gd::ParameterMetadata& ParameterMetadataTools::Get(
+    const std::vector<const std::vector<gd::ParameterMetadata>*>&
+        parametersVectorsList,
+    const gd::String& parameterName) {
+  for (auto it = parametersVectorsList.rbegin();
+       it != parametersVectorsList.rend();
+       ++it) {
+    const std::vector<gd::ParameterMetadata>* parametersVector = *it;
+
+    for (const auto& parameterMetadata: *parametersVector) {
+      if (parameterMetadata.GetName() == parameterName) return parameterMetadata;
+    }
+  }
+
+  return badParameterMetadata;
 }
 
 void ParameterMetadataTools::IterateOverParameters(
@@ -105,8 +157,7 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
 
 void ParameterMetadataTools::IterateOverParametersWithIndex(
     const gd::Platform &platform,
-    const gd::ObjectsContainer &globalObjectsContainer,
-    const gd::ObjectsContainer &objectsContainer, FunctionCallNode &node,
+    const gd::ObjectsContainersList &objectsContainersList, FunctionCallNode &node,
     std::function<void(const gd::ParameterMetadata &parameterMetadata,
                        std::unique_ptr<gd::ExpressionNode> &parameterNode,
                        size_t parameterIndex, const gd::String &lastObjectName)>
@@ -117,8 +168,7 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
   const gd::ExpressionMetadata &metadata =
       isObjectFunction ? MetadataProvider::GetObjectAnyExpressionMetadata(
                              platform,
-                             GetTypeOfObject(globalObjectsContainer,
-                                             objectsContainer, node.objectName),
+                             objectsContainersList.GetTypeOfObject(node.objectName),
                              node.functionName)
                        : MetadataProvider::GetAnyExpressionMetadata(
                              platform, node.functionName);

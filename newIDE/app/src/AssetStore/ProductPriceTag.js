@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import PriceTag from '../UI/PriceTag';
@@ -40,6 +40,24 @@ export const formatProductPrice = ({
     .replace(/\D00$/, '')}`;
 };
 
+type ProductPriceOrOwnedProps = {|
+  productListingData:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData,
+  i18n: I18nType,
+  owned?: boolean,
+|};
+
+export const getProductPriceOrOwnedLabel = ({
+  i18n,
+  productListingData,
+  owned,
+}: ProductPriceOrOwnedProps): string => {
+  return owned
+    ? i18n._(t`✅ Owned`)
+    : formatProductPrice({ i18n, productListingData });
+};
+
 type ProductPriceTagProps = {|
   productListingData:
     | PrivateAssetPackListingData
@@ -60,11 +78,11 @@ const ProductPriceTag = ({
   return (
     <I18n>
       {({ i18n }) => {
-        const label = owned ? (
-          <Trans>✅ Owned</Trans>
-        ) : (
-          formatProductPrice({ i18n, productListingData })
-        );
+        const label = getProductPriceOrOwnedLabel({
+          i18n,
+          productListingData,
+          owned,
+        });
 
         return <PriceTag withOverlay={withOverlay} label={label} />;
       }}

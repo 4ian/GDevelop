@@ -31,6 +31,8 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 type Props = {|
   project: gdProject,
@@ -210,6 +212,9 @@ const ProjectPropertiesDialog = (props: Props) => {
     setUseDeprecatedZeroAsDefaultZOrder,
   ] = React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
 
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
+
   const defaultPackageName = 'com.example.mygame';
   const defaultVersion = '1.0.0';
 
@@ -302,7 +307,13 @@ const ProjectPropertiesDialog = (props: Props) => {
                 <FlatButton
                   key="hot-reload-preview-button"
                   leftIcon={<PreviewIcon />}
-                  label={<Trans>Run a preview (with loading & branding)</Trans>}
+                  label={
+                    isMobile ? (
+                      <Trans>Preview</Trans>
+                    ) : (
+                      <Trans>Run a preview (with loading & branding)</Trans>
+                    )
+                  }
                   onClick={
                     hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview
                   }
@@ -749,4 +760,15 @@ const ProjectPropertiesDialog = (props: Props) => {
   );
 };
 
-export default ProjectPropertiesDialog;
+const ProjectPropertiesDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Project properties</Trans>}
+    scope="project-properties"
+    onClose={props.onClose}
+    showOnTop
+  >
+    <ProjectPropertiesDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ProjectPropertiesDialogWithErrorBoundary;

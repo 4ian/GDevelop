@@ -4,29 +4,34 @@ import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 type ToolbarProps = {|
   children: React.Node,
+  height?: number,
+  borderBottomColor?: ?string,
 |};
 
-type ToolbarGroupProps = {|
-  children?: React.Node,
-  firstChild?: boolean,
-  lastChild?: boolean,
-|};
+const styles = {
+  toolbar: {
+    flexShrink: 0,
+    display: 'flex',
+    overflowX: 'overlay',
+    overflowY: 'hidden',
+    paddingLeft: 8,
+    paddingRight: 8,
+  },
+};
 
 export const Toolbar = React.memo<ToolbarProps>(
-  ({ children }: ToolbarProps) => {
+  ({ children, borderBottomColor, height = 40 }: ToolbarProps) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     return (
       <div
         className="almost-invisible-scrollbar"
         style={{
+          ...styles.toolbar,
           backgroundColor: gdevelopTheme.toolbar.backgroundColor,
-          flexShrink: 0,
-          display: 'flex',
-          overflowX: 'overlay',
-          overflowY: 'hidden',
-          height: 40,
-          paddingLeft: 8,
-          paddingRight: 8,
+          height,
+          borderBottom: borderBottomColor
+            ? `2px solid ${borderBottomColor}`
+            : undefined,
         }}
       >
         {children}
@@ -45,6 +50,12 @@ const toolbarGroupStyle = props => ({
     ? 'flex-end'
     : 'center',
 });
+
+type ToolbarGroupProps = {|
+  children?: React.Node,
+  firstChild?: boolean,
+  lastChild?: boolean,
+|};
 
 export const ToolbarGroup = React.memo<ToolbarGroupProps>(
   (props: ToolbarGroupProps) => (

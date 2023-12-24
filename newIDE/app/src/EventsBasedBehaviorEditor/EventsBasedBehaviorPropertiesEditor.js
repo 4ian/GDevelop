@@ -80,7 +80,7 @@ type Props = {|
   project: gdProject,
   extension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
-  properties: gdNamedPropertyDescriptorsList,
+  properties: gdPropertiesContainer,
   isSceneProperties?: boolean,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -89,7 +89,7 @@ type Props = {|
 
 const getValidatedPropertyName = (
   i18n: I18nType,
-  properties: gdNamedPropertyDescriptorsList,
+  properties: gdPropertiesContainer,
   newName: string
 ): string => {
   const safeAndUniqueNewName = newNameGenerator(

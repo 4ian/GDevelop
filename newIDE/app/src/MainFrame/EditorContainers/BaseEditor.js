@@ -3,7 +3,7 @@ import * as React from 'react';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import type { StorageProvider } from '../../ProjectsStorage';
-import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
+import { type PreviewDebuggerServer } from '../../ExportAndShare/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import {
   type FileMetadataAndStorageProviderName,
@@ -19,7 +19,6 @@ export type EditorContainerExtraProps = {|
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
-  initialTab?: ?string,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -27,6 +26,7 @@ export type RenderEditorContainerProps = {|
   projectItemName: ?string,
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
   setToolbar: (?React.Node) => void,
 
   // Some optional extra props to pass to the rendered editor
@@ -71,7 +71,7 @@ export type RenderEditorContainerProps = {|
   // Project opening
   canOpen: boolean,
   onChooseProject: () => void,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<boolean>,
 
@@ -82,7 +82,6 @@ export type RenderEditorContainerProps = {|
   onOpenPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
-  onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenProfile: () => void,

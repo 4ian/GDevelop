@@ -47,7 +47,7 @@ const PROTECTED_PROPERTY_NAMES = ['name', 'type'];
 
 const getValidatedPropertyName = (
   i18n: I18nType,
-  properties: gdNamedPropertyDescriptorsList,
+  properties: gdPropertiesContainer,
   newName: string
 ): string => {
   const safeAndUniqueNewName = newNameGenerator(

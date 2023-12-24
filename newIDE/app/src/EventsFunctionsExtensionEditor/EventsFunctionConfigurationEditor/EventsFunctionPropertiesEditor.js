@@ -427,7 +427,10 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     getterFunction
                       ? 'Change ' +
                         getterFunction.getSentence() +
-                        ' of _PARAM0_'
+                        (eventsBasedBehavior || eventsBasedObject
+                          ? ' of _PARAM0_'
+                          : '') +
+                        ': [...]'
                       : ''
                   }
                   onChange={text => {}}

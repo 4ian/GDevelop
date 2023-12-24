@@ -83,6 +83,8 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["Vitesse"].SetFunctionName("getAverageForce().getLength");
   objectConditions["AngleOfDisplacement"].SetFunctionName(
       "averageForceAngleIs");
+  objectConditions["IsTotalForceAngleAround"].SetFunctionName(
+      "isTotalForceAngleAround");
   objectActions["SeparateFromObjects"].SetFunctionName(
       "separateFromObjectsList");
   // Deprecated
@@ -276,8 +278,8 @@ BaseObjectExtension::BaseObjectExtension() {
           gd::EventsCodeGenerationContext &context) -> gd::String {
         gd::String outputCode;
 
-        auto realObjects = codeGenerator.ExpandObjectsName(
-            instruction.GetParameter(0).GetPlainString(), context);
+        auto realObjects = codeGenerator.GetObjectsContainersList().ExpandObjectName(
+            instruction.GetParameter(0).GetPlainString(), context.GetCurrentObject());
         for (auto &realObjectName : realObjects) {
           context.SetCurrentObject(realObjectName);
           context.ObjectsListNeeded(realObjectName);
@@ -333,8 +335,8 @@ BaseObjectExtension::BaseObjectExtension() {
           gd::EventsCodeGenerationContext &context) -> gd::String {
         gd::String outputCode;
 
-        auto realObjects = codeGenerator.ExpandObjectsName(
-            instruction.GetParameter(0).GetPlainString(), context);
+        auto realObjects = codeGenerator.GetObjectsContainersList().ExpandObjectName(
+            instruction.GetParameter(0).GetPlainString(), context.GetCurrentObject());
         for (auto &realObjectName : realObjects) {
           context.SetCurrentObject(realObjectName);
           context.ObjectsListNeeded(realObjectName);

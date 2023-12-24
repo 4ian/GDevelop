@@ -18,6 +18,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Add from '../UI/CustomSvgIcons/Add';
 import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
 import { getEffects2DCount, getEffects3DCount } from '../EffectsList';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
 
@@ -215,9 +216,9 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-export type LayersListInterface = {
+export type LayersListInterface = {|
   forceUpdate: () => void,
-};
+|};
 
 const hasLightingLayer = (layout: gdLayout) => {
   const layersCount = layout.getLayersCount();
@@ -320,4 +321,16 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-export default LayersList;
+const LayersListWithErrorBoundary = React.forwardRef<
+  Props,
+  LayersListInterface
+>((props, ref) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Layers list</Trans>}
+    scope="scene-editor-layers-list"
+  >
+    <LayersList ref={ref} {...props} />
+  </ErrorBoundary>
+));
+
+export default LayersListWithErrorBoundary;

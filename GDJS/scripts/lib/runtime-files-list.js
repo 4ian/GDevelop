@@ -9,10 +9,10 @@ const extensionsRuntimePath = path.join(gdevelopRootPath, 'Extensions');
 const gdjsRuntimePath = path.join(gdjsRootPath, 'Runtime');
 
 // The extensions to be included in the bundled Runtime (will be built with esbuild or copied).
-const allowedExtensions = ['.js', '.ts', '.html', '.json', '.xml', '.map', '.wasm'];
+const allowedExtensions = ['.js', '.ts', '.tsx', '.html', '.json', '.xml', '.map', '.wasm'];
 
 // These extensions will be built with esbuild (the other will be copied).
-const transformIncludedExtensions = ['.js', '.ts'];
+const transformIncludedExtensions = ['.js', '.ts', '.tsx'];
 
 // Among the files matching the previous extensions, these extensions won't be built with esbuild
 // (they will be copied).
@@ -46,6 +46,9 @@ const untransformedPaths = [
   'Extensions/Shopify/shopify-buy.umd.polyfilled.min.js',
   'Extensions/TweenBehavior/shifty.js',
   'Extensions/JsExtensionTypes.flow.js',
+  'Extensions/TileMap/pako/dist/pako.min.js',
+  'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js',
+  'Extensions/TileMap/helper/TileMapHelper.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
 
 /**

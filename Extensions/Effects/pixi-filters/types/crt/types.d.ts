@@ -1,11 +1,10 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class CRTFilter extends PIXI.Filter {
     constructor(options?: CRTFilterOptions);
     curvature: number;
     lineWidth: number;
     lineContrast: number;
-    verticalLine: number;
+    verticalLine: boolean;
     noise: number;
     noiseSize: number;
     seed: number;
@@ -18,7 +17,7 @@ declare namespace PIXI.filters {
     curvature?: number;
     lineWidth?: number;
     lineContrast?: number;
-    verticalLine?: number;
+    verticalLine?: boolean;
     noise?: number;
     noiseSize?: number;
     seed?: number;

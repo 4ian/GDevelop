@@ -55,6 +55,11 @@ export default class RenderedTextInstance extends RenderedInstance {
     this.update();
   }
 
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    this._pixiObject.destroy(true);
+  }
+
   /**
    * Return a URL for thumbnail of the specified object.
    */

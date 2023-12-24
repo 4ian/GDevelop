@@ -52,9 +52,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .MarkAsSimple();
 
   aut.AddScopedAction("SetEffectDoubleParameter",
-                _("Effect parameter (number)"),
-                _("Change the value of a parameter of an effect.") + "\n" +
-                    _("You can find the parameter names (and change the effect "
+                _("Effect property (number)"),
+                _("Change the value of a property of an effect.") + "\n" +
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of _PARAM0_"),
                 _("Effects"),
@@ -63,15 +63,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
       .AddParameter("expression", _("New value"))
       .MarkAsSimple();
 
   aut.AddScopedAction("SetEffectStringParameter",
-                _("Effect parameter (string)"),
-                _("Change the value (string) of a parameter of an effect.") +
+                _("Effect property (string)"),
+                _("Change the value (string) of a property of an effect.") +
                     "\n" +
-                    _("You can find the parameter names (and change the effect "
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of _PARAM0_"),
                 _("Effects"),
@@ -80,14 +80,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
       .AddParameter("string", _("New value"))
       .MarkAsSimple();
 
   aut.AddScopedAction("SetEffectBooleanParameter",
-                _("Effect parameter (enable or disable)"),
-                _("Enable or disable a parameter of an effect.") + "\n" +
-                    _("You can find the parameter names (and change the effect "
+                _("Effect property (enable or disable)"),
+                _("Enable or disable a property of an effect.") + "\n" +
+                    _("You can find the property names (and change the effect "
                       "names) in the effects window."),
                 _("Enable _PARAM3_ for effect _PARAM2_ of _PARAM0_: _PARAM4_"),
                 _("Effects"),
@@ -96,8 +96,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))
-      .AddParameter("objectEffectParameterName", _("Parameter name"))
-      .AddParameter("yesorno", _("Enable?"))
+      .AddParameter("objectEffectParameterName", _("Property name"))
+      .AddParameter("yesorno", _("Enable this property"))
       .MarkAsSimple();
 
   aut.AddScopedCondition("IsEffectEnabled",

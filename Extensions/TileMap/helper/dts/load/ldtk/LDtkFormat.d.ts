@@ -2,7 +2,7 @@ import { integer } from '../../model/CommonTypes';
 /**
  * version 1.1.3 - https://github.com/deepnight/ldtk/blob/66fff7199932357f3ab9b044c2fc2a856f527831/docs/JSON_SCHEMA.json
  */
-export declare type LDtkTileMap = {
+export type LDtkTileMap = {
   /** LDtk application build identifier.<br/>  This is only used to identify the LDtk version that generated this particular project file, which can be useful for specific bug fixing. Note that the build identifier is just the date of the release, so it's not unique to each user (one single global ID per LDtk public release), and as a result, completely anonymous. */
   appBuildId: number;
   /** Number of backup files to keep, if the `backupOnSave` is TRUE */
@@ -72,7 +72,7 @@ export declare type LDtkTileMap = {
     | null;
 };
 /** Auto-layer rule group */
-declare type LDtkAutoLayerRuleGroup = {
+type LDtkAutoLayerRuleGroup = {
   /**  */
   active: boolean;
   /** *This field was removed in 1.0.0 and should no longer be used.* */
@@ -87,9 +87,9 @@ declare type LDtkAutoLayerRuleGroup = {
   uid: integer;
 };
 /** This complex section isn't meant to be used by game devs at all, as these rules are completely resolved internally by the editor before any saving. You should just ignore this part. */
-declare type LDtkAutoRuleDef = {};
+type LDtkAutoRuleDef = {};
 /** If you're writing your own LDtk importer, you should probably just ignore *most* stuff in the `defs` section, as it contains data that are mostly important to the editor. To keep you away from the `defs` section and avoid some unnecessary JSON parsing, important data from definitions is often duplicated in fields prefixed with a double underscore (eg. `__identifier` or `__type`).  The 2 only definition types you might need here are **Tilesets** and **Enums**. */
-declare type LDtkDefinition = {
+type LDtkDefinition = {
   /** All entities definitions, including their custom fields */
   entities: LDtkEntityDef[];
   /** All internal enums */
@@ -104,7 +104,7 @@ declare type LDtkDefinition = {
   tilesets: LDtkTilesetDef[];
 };
 /** Entity definition */
-declare type LDtkEntityDef = {
+type LDtkEntityDef = {
   /** Base entity color */
   color: string;
   /** Array of field definitions */
@@ -166,7 +166,7 @@ declare type LDtkEntityDef = {
   width: integer;
 };
 /** Entity instance */
-declare type LDtkEntityInstance = {
+type LDtkEntityInstance = {
   /** Grid-based coordinates (`[x,y]` format) */
   __grid: integer[];
   /** Entity definition identifier */
@@ -193,7 +193,7 @@ declare type LDtkEntityInstance = {
   width: integer;
 };
 /** Enum definition */
-declare type LDtkEnumDef = {
+type LDtkEnumDef = {
   /**  */
   externalFileChecksum: string | null;
   /** Relative path to the external file providing this Enum */
@@ -210,7 +210,7 @@ declare type LDtkEnumDef = {
   values: LDtkEnumDefValues[];
 };
 /** Enum value definition */
-declare type LDtkEnumDefValues = {
+type LDtkEnumDefValues = {
   /** An array of 4 Int values that refers to the tile in the tileset image: `[ x, y, width, height ]` */
   __tileSrcRect: integer[] | null;
   /** Optional color */
@@ -221,14 +221,14 @@ declare type LDtkEnumDefValues = {
   tileId: integer | null;
 };
 /** In a tileset definition, enum based tag infos */
-declare type LDtkEnumTagValue = {
+type LDtkEnumTagValue = {
   /**  */
   enumValueId: string;
   /**  */
   tileIds: integer[];
 };
 /** This section is mostly only intended for the LDtk editor app itself. You can safely ignore it. */
-declare type LDtkFieldDef = {
+type LDtkFieldDef = {
   /** Human readable value type. Possible values: `Int, Float, String, Bool, Color, ExternEnum.XXX, LocalEnum.XXX, Point, FilePath`.<br/>  If the field is an array, this field will look like `Array<...>` (eg. `Array<Int>`, `Array<Point>` etc.)<br/>  NOTE: if you enable the advanced option **Use Multilines type**, you will have \"*Multilines*\" instead of \"*String*\" when relevant. */
   __type: string;
   /** Optional list of accepted file extensions for FilePath value type. Includes the dot: `.ext` */
@@ -310,7 +310,7 @@ declare type LDtkFieldDef = {
   useForSmartColor: boolean;
 };
 /** Field instance */
-declare type LDtkFieldInstance = {
+type LDtkFieldInstance = {
   /** Field definition identifier */
   __identifier: string;
   /** Optional TilesetRect used to display this field (this can be the field own Tile, or some other Tile guessed from the value, like an Enum). */
@@ -324,7 +324,7 @@ declare type LDtkFieldInstance = {
   /** Editor internal raw values */
   realEditorValues: any[];
 };
-declare type LDtkFlag =
+type LDtkFlag =
   | 'DiscardPreCsvIntGrid'
   | 'ExportPreCsvIntGridFormat'
   | 'IgnoreBackupSuggest'
@@ -332,7 +332,7 @@ declare type LDtkFlag =
   | 'MultiWorlds'
   | 'UseMultilinesType';
 /** IntGrid value definition */
-declare type LDtkIntGridValueDef = {
+type LDtkIntGridValueDef = {
   /**  */
   color: string;
   /** User defined unique identifier */
@@ -341,14 +341,14 @@ declare type LDtkIntGridValueDef = {
   value: integer;
 };
 /** IntGrid value instance */
-declare type LDtkIntGridValueInstance = {
+type LDtkIntGridValueInstance = {
   /** Coordinate ID in the layer grid */
   coordId: integer;
   /** IntGrid value */
   v: integer;
 };
 /** Layer definition */
-declare type LDtkLayerDef = {
+type LDtkLayerDef = {
   /** Type of the layer (*IntGrid, Entities, Tiles or AutoLayer*) */
   __type: string;
   /** Contains all the auto-layer rule definitions. */
@@ -401,7 +401,7 @@ declare type LDtkLayerDef = {
   uid: integer;
 };
 /** Layer instance */
-declare type LDtkLayerInstance = {
+type LDtkLayerInstance = {
   /** Grid-based height */
   __cHei: integer;
   /** Grid-based width */
@@ -452,7 +452,7 @@ declare type LDtkLayerInstance = {
   visible: boolean;
 };
 /** This section contains all the level data. It can be found in 2 distinct forms, depending on Project current settings:  - If \"*Separate level files*\" is **disabled** (default): full level data is *embedded* inside the main Project JSON file, - If \"*Separate level files*\" is **enabled**: level data is stored in *separate* standalone `.ldtkl` files (one per level). In this case, the main Project JSON file will still contain most level data, except heavy sections, like the `layerInstances` array (which will be null). The `externalRelPath` string points to the `ldtkl` file.  A `ldtkl` file is just a JSON file containing exactly what is described below. */
-declare type LDtkLevel = {
+type LDtkLevel = {
   /** Background color of the level (same as `bgColor`, except the default value is automatically used here if its value is `null`) */
   __bgColor: string;
   /** Position informations of the background image, if there is one. */
@@ -497,7 +497,7 @@ declare type LDtkLevel = {
   worldY: integer;
 };
 /** Level background image position info */
-declare type LDtkLevelBgPosInfos = {
+type LDtkLevelBgPosInfos = {
   /** An array of 4 float values describing the cropped sub-rectangle of the displayed background image. This cropping happens when original is larger than the level bounds. Array format: `[ cropX, cropY, cropWidth, cropHeight ]` */
   cropRect: number[];
   /** An array containing the `[scaleX,scaleY]` values of the **cropped** background image, depending on `bgPos` option. */
@@ -506,7 +506,7 @@ declare type LDtkLevelBgPosInfos = {
   topLeftPx: integer[];
 };
 /** Nearby level info */
-declare type LDtkNeighbourLevel = {
+type LDtkNeighbourLevel = {
   /** A single lowercase character tipping on the level location (`n`orth, `s`outh, `w`est, `e`ast). */
   dir: string;
   /** Neighbour Instance Identifier */
@@ -515,7 +515,7 @@ declare type LDtkNeighbourLevel = {
   levelUid: integer;
 };
 /** This structure represents a single tile from a given Tileset. */
-declare type LDtkTile = {
+type LDtkTile = {
   /** Internal data used by the editor.<br/>  For auto-layer tiles: `[ruleId, coordId]`.<br/>  For tile-layer tiles: `[coordId]`. */
   d: integer[];
   /** \"Flip bits\", a 2-bits integer to represent the mirror transformations of the tile.<br/>   - Bit 0 = X flip<br/>   - Bit 1 = Y flip<br/>   Examples: f=0 (no flip), f=1 (X flip only), f=2 (Y flip only), f=3 (both flips) */
@@ -528,7 +528,7 @@ declare type LDtkTile = {
   t: integer;
 };
 /** The `Tileset` definition is the most important part among project definitions. It contains some extra informations about each integrated tileset. If you only had to parse one definition section, that would be the one. */
-export declare type LDtkTilesetDef = {
+export type LDtkTilesetDef = {
   /** Grid-based height */
   __cHei: integer;
   /** Grid-based width */
@@ -561,18 +561,18 @@ export declare type LDtkTilesetDef = {
   tagsSourceEnumUid: integer | null;
   /**  */
   tileGridSize: integer;
-  /** Unique Intidentifier */
+  /** Unique Identifier */
   uid: integer;
 };
 /** In a tileset definition, user defined meta-data of a tile. */
-declare type LDtkTileCustomMetadata = {
+type LDtkTileCustomMetadata = {
   /**  */
   data: string;
   /**  */
   tileId: integer;
 };
 /** This object represents a custom sub rectangle in a Tileset image. */
-declare type LDtkTilesetRect = {
+type LDtkTilesetRect = {
   /** Height in pixels */
   h: integer;
   /** UID of the tileset */
@@ -584,6 +584,6 @@ declare type LDtkTilesetRect = {
   /** Y pixels coordinate of the top-left corner in the Tileset image */
   y: integer;
 };
-declare type LDtkWorld = {};
+type LDtkWorld = {};
 export {};
 //# sourceMappingURL=LDtkFormat.d.ts.map

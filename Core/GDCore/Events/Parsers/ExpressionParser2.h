@@ -47,14 +47,9 @@ class GD_CORE_API ExpressionParser2 {
   virtual ~ExpressionParser2(){};
 
   /**
-   * Parse the given expression with the specified type.
+   * Parse the given expression into a tree of nodes.
    *
-   * \param type Type of the expression: "string", "number",
-   * type supported by gd::ParameterMetadata::IsObject, types supported by
-   * gd::ParameterMetadata::IsExpression or "unknown".
-   * \param expression The expression to parse
-   * \param objectName Specify the object name, only for the
-   * case of "objectvar" type.
+   * \param expression The expression to parse.
    *
    * \return The node representing the expression as a parsed tree.
    */
@@ -267,12 +262,11 @@ class GD_CORE_API ExpressionParser2 {
     } else if (CheckIfChar(IsDot)) {
       ExpressionParserLocation dotLocation = SkipChar();
       SkipAllWhitespaces();
-      return ObjectFunctionOrBehaviorFunction(
+      return ObjectFunctionOrBehaviorFunctionOrVariable(
           name, nameLocation, dotLocation);
     } else if (CheckIfChar(IsOpeningSquareBracket)) {
       return Variable(name, nameLocation);
-    }
-    else {
+    } else {
       auto identifier = gd::make_unique<IdentifierNode>(name);
       identifier->location = ExpressionParserLocation(
           nameLocation.GetStartPosition(), GetCurrentPosition());
@@ -283,8 +277,11 @@ class GD_CORE_API ExpressionParser2 {
 
   std::unique_ptr<VariableNode> Variable(const gd::String &name, gd::ExpressionParserLocation nameLocation) {
     auto variable = gd::make_unique<VariableNode>(name);
-    variable->child = VariableAccessorOrVariableBracketAccessor();
-    variable->child->parent = variable.get();
+
+    if (CheckIfChar(IsOpeningSquareBracket) || CheckIfChar(IsDot)) {
+      variable->child = VariableAccessorOrVariableBracketAccessor();
+      variable->child->parent = variable.get();
+    }
 
     variable->location = ExpressionParserLocation(
         nameLocation.GetStartPosition(), GetCurrentPosition());
@@ -308,8 +305,12 @@ class GD_CORE_API ExpressionParser2 {
                                "bracket for each opening bracket."));
       }
       SkipIfChar(IsClosingSquareBracket);
-      child->child = VariableAccessorOrVariableBracketAccessor();
-      child->child->parent = child.get();
+
+      SkipAllWhitespaces();
+      if (CheckIfChar(IsOpeningSquareBracket) || CheckIfChar(IsDot)) {
+        child->child = VariableAccessorOrVariableBracketAccessor();
+        child->child->parent = child.get();
+      }
       child->location =
           ExpressionParserLocation(childStartPosition, GetCurrentPosition());
 
@@ -318,11 +319,18 @@ class GD_CORE_API ExpressionParser2 {
       auto dotLocation = SkipChar();
       SkipAllWhitespaces();
 
-      auto identifierAndLocation = ReadIdentifierName();
+      auto identifierAndLocation = ReadIdentifierName(/*allowDeprecatedSpacesInName=*/ false);
       auto child =
           gd::make_unique<VariableAccessorNode>(identifierAndLocation.name);
-      child->child = VariableAccessorOrVariableBracketAccessor();
-      child->child->parent = child.get();
+      if (identifierAndLocation.name.empty()) {
+        child->diagnostic = RaiseSyntaxError(_("A name should be entered after the dot."));
+      }
+
+      SkipAllWhitespaces();
+      if (CheckIfChar(IsOpeningSquareBracket) || CheckIfChar(IsDot)) {
+        child->child = VariableAccessorOrVariableBracketAccessor();
+        child->child->parent = child.get();
+      }
       child->nameLocation = identifierAndLocation.location;
       child->dotLocation = dotLocation;
       child->location =
@@ -331,7 +339,11 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(child);
     }
 
-    return std::move(gd::make_unique<VariableAccessorOrVariableBracketAccessorNode>());
+    // Should never happen, unless a node called this function without checking if the current character
+    // was a dot or an opening bracket - this means there is an error in the grammar.
+    auto unrecognisedNode = gd::make_unique<VariableAccessorOrVariableBracketAccessorNode>();
+    unrecognisedNode->diagnostic = RaiseSyntaxError(_("A dot or bracket was expected here."));
+    return std::move(unrecognisedNode);
   }
 
   std::unique_ptr<FunctionCallNode> FreeFunction(
@@ -358,14 +370,17 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
-  ObjectFunctionOrBehaviorFunction(
+  ObjectFunctionOrBehaviorFunctionOrVariable(
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,
       const ExpressionParserLocation &parentIdentifierDotLocation) {
-    auto childIdentifierAndLocation = ReadIdentifierName();
+    auto childIdentifierAndLocation = ReadIdentifierName(/*allowDeprecatedSpacesInName=*/ false);
     const gd::String &childIdentifierName = childIdentifierAndLocation.name;
     const auto &childIdentifierNameLocation =
         childIdentifierAndLocation.location;
+
+    std::unique_ptr<gd::ExpressionParserError> emptyNameError = childIdentifierName.empty() ?
+      RaiseSyntaxError(_("A name should be entered after the dot.")) : nullptr;
 
     SkipAllWhitespaces();
 
@@ -373,12 +388,15 @@ class GD_CORE_API ExpressionParser2 {
       ExpressionParserLocation namespaceSeparatorLocation =
           SkipNamespaceSeparator();
       SkipAllWhitespaces();
-      return BehaviorFunction(parentIdentifier,
+      auto behaviorFunction = BehaviorFunction(parentIdentifier,
                               childIdentifierName,
                               parentIdentifierLocation,
                               parentIdentifierDotLocation,
                               childIdentifierNameLocation,
                               namespaceSeparatorLocation);
+
+      if (emptyNameError) behaviorFunction->diagnostic = std::move(emptyNameError);
+      return std::move(behaviorFunction);
     } else if (CheckIfChar(IsOpeningParenthesis)) {
       ExpressionParserLocation openingParenthesisLocation = SkipChar();
 
@@ -387,7 +405,7 @@ class GD_CORE_API ExpressionParser2 {
           childIdentifierName);
       auto parametersNode = Parameters(function.get(), parentIdentifier);
       function->parameters = std::move(parametersNode.parameters),
-      function->diagnostic = std::move(parametersNode.diagnostic);
+      function->diagnostic = emptyNameError ? std::move(emptyNameError) : std::move(parametersNode.diagnostic);
 
       function->location = ExpressionParserLocation(
           parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());
@@ -400,6 +418,8 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(function);
     } else if (CheckIfChar(IsDot) || CheckIfChar(IsOpeningSquareBracket)) {
       auto variable = gd::make_unique<VariableNode>(parentIdentifier);
+      variable->diagnostic = std::move(emptyNameError);
+
       auto child =
           gd::make_unique<VariableAccessorNode>(childIdentifierName);
       child->child = VariableAccessorOrVariableBracketAccessor();
@@ -420,17 +440,12 @@ class GD_CORE_API ExpressionParser2 {
 
     auto node = gd::make_unique<IdentifierNode>(
         parentIdentifier, childIdentifierName);
-    if (!CheckIfChar(IsParameterSeparator) && !CheckIfChar(IsClosingParenthesis) && !IsEndReached()) {
-      node->diagnostic = RaiseSyntaxError(
-          _("An opening parenthesis (for an object expression), a double colon "
-            "(:: for a behavior expression), a dot or an opening bracket (for "
-            "a child variable) where expected."));
-    }
     node->location = ExpressionParserLocation(
         parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());
     node->identifierNameLocation = parentIdentifierLocation;
     node->identifierNameDotLocation = parentIdentifierDotLocation;
     node->childIdentifierNameLocation = childIdentifierNameLocation;
+    node->diagnostic = std::move(emptyNameError);
     return std::move(node);
   }
 
@@ -503,11 +518,6 @@ class GD_CORE_API ExpressionParser2 {
     std::vector<std::unique_ptr<ExpressionNode>> parameters;
     gd::String lastObjectName = "";
 
-    // By convention, object is always the first parameter, and behavior the
-    // second one.
-    size_t parameterIndex =
-        WrittenParametersFirstIndex(objectName, behaviorName);
-
     bool previousCharacterIsParameterSeparator = false;
     while (!IsEndReached()) {
       SkipAllWhitespaces();
@@ -526,7 +536,6 @@ class GD_CORE_API ExpressionParser2 {
       SkipAllWhitespaces();
       previousCharacterIsParameterSeparator = CheckIfChar(IsParameterSeparator);
       SkipIfChar(IsParameterSeparator);
-      parameterIndex++;
     }
 
     ExpressionParserLocation invalidClosingParenthesisLocation;
@@ -625,13 +634,13 @@ class GD_CORE_API ExpressionParser2 {
     ExpressionParserLocation location;
   };
 
-  IdentifierAndLocation ReadIdentifierName() {
+  IdentifierAndLocation ReadIdentifierName(bool allowDeprecatedSpacesInName = true) {
     gd::String name;
     size_t startPosition = currentPosition;
     while (currentPosition < expression.size() &&
            (CheckIfChar(IsAllowedInIdentifier)
             // Allow whitespace in identifier name for compatibility
-            || expression[currentPosition] == ' ')) {
+            || (allowDeprecatedSpacesInName && expression[currentPosition] == ' '))) {
       name += expression[currentPosition];
       currentPosition++;
     }

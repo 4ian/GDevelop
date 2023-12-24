@@ -7,6 +7,7 @@ import { Line, Column } from '../../../../UI/Grid';
 
 import {
   type FileMetadataAndStorageProviderName,
+  type FileMetadata,
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import SectionContainer, { SectionRow } from '../SectionContainer';
@@ -34,6 +35,7 @@ import Paper from '../../../../UI/Paper';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../../../UI/RaisedButton';
 import { groupMembersByGroupId } from './utils';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 const PADDING = 16;
 
@@ -52,7 +54,8 @@ const DropTarget = makeDropTarget('team-groups');
 
 type Props = {|
   project: ?gdProject,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  currentFileMetadata: ?FileMetadata,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -61,7 +64,10 @@ export type TeamSectionInterface = {|
 |};
 
 const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
-  ({ project, onOpenRecentFile, storageProviders }, ref) => {
+  (
+    { project, onOpenRecentFile, storageProviders, currentFileMetadata },
+    ref
+  ) => {
     const {
       groups,
       members,
@@ -183,6 +189,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       return (
         <TeamMemberProjectsView
           user={selectedUser}
+          currentFileMetadata={currentFileMetadata}
           projects={selectedUserProjects}
           storageProviders={storageProviders}
           onOpenRecentFile={onOpenRecentFile}
@@ -371,4 +378,13 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   }
 );
 
-export default TeamSection;
+const TeamSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Team section</Trans>}
+    scope="start-page-team"
+  >
+    <TeamSection {...props} />
+  </ErrorBoundary>
+);
+
+export default TeamSectionWithErrorBoundary;

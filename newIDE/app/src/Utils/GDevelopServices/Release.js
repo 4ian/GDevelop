@@ -8,14 +8,18 @@ export type Release = {
   description: ?string,
 };
 
-export const getReleases = (): Promise<Array<Release>> => {
-  return axios
-    .get(`${GDevelopReleaseApi.baseUrl}/release`, {
-      params: {
-        last: 4,
-      },
-    })
-    .then(response => response.data);
+export const getReleases = async (): Promise<Array<Release>> => {
+  const response = await axios.get(`${GDevelopReleaseApi.baseUrl}/release`, {
+    params: {
+      last: 4,
+    },
+  });
+  const releases = response.data;
+  if (!Array.isArray(releases)) {
+    throw new Error('Invalid releases');
+  }
+
+  return releases;
 };
 
 export const hasBreakingChange = (release: Release): boolean => {

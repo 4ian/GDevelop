@@ -5,14 +5,23 @@ const {
 } = require('../TestUtils/FakeAbstractFileSystem');
 const extend = require('extend');
 
+const mapFor = /*:: <T> */ (
+  start /*: number */,
+  end /*: number */,
+  func /*: (number) => T */
+) /*: Array<T> */ => {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(func(i));
+  }
+  return result;
+};
+
 describe('libGD.js', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   describe('gd.VersionWrapper', function () {
     it('can return the version number of the library', function () {
@@ -57,9 +66,13 @@ describe('libGD.js', function () {
 
     it('can store loading screen setup', function () {
       project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(true);
-      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(true);
+      expect(
+        project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()
+      ).toBe(true);
       project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(false);
-      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(false);
+      expect(
+        project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()
+      ).toBe(false);
     });
 
     it('handles layouts', function () {
@@ -99,35 +112,31 @@ describe('libGD.js', function () {
       expect(project.hasExternalLayoutNamed('My layout')).toBe(false);
     });
 
-    it('should validate object names (legacy)', function () {
-      gd.Project.allowUsageOfUnicodeIdentifierNames(false);
-      expect(gd.Project.isNameSafe('ThisNameIs_Ok_123')).toBe(true);
-      expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);
-      expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
-      expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
-      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe('ThisNameIs_Ok_123');
-      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe('ThisName_IsNot_Ok_123');
-      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe('ThisNameIsNot_Ok_');
-      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe('_1ThisNameIsNot_Ok_123');
-      expect(gd.Project.getSafeName('官话 name')).toBe('___name');
-      expect(gd.Project.getSafeName('')).toBe('Unnamed');
-      expect(gd.Project.getSafeName('9')).toBe('_9');
-    });
-
-    it('should validate object names (unicode)', function () {
-      gd.Project.allowUsageOfUnicodeIdentifierNames(true);
+    it('should validate object names', function () {
       expect(gd.Project.isNameSafe('ThisNameIs_Ok_123')).toBe(true);
       expect(gd.Project.isNameSafe('ThisNameIs_👍_123')).toBe(true);
       expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);
       expect(gd.Project.isNameSafe('ThisName()IsNot_Ok_123')).toBe(false);
       expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
       expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
-      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe('ThisNameIs_Ok_123');
-      expect(gd.Project.getSafeName('ThisNameIs_👍_123')).toBe('ThisNameIs_👍_123');
-      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe('ThisName_IsNot_Ok_123');
-      expect(gd.Project.getSafeName('ThisName()IsNot_Ok_123')).toBe('ThisName__IsNot_Ok_123');
-      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe('ThisNameIsNot_Ok_');
-      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe('_1ThisNameIsNot_Ok_123');
+      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe(
+        'ThisNameIs_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisNameIs_👍_123')).toBe(
+        'ThisNameIs_👍_123'
+      );
+      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe(
+        'ThisName_IsNot_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisName()IsNot_Ok_123')).toBe(
+        'ThisName__IsNot_Ok_123'
+      );
+      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe(
+        'ThisNameIsNot_Ok_'
+      );
+      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe(
+        '_1ThisNameIsNot_Ok_123'
+      );
       expect(gd.Project.getSafeName('官话 name')).toBe('官话_name');
       expect(gd.Project.getSafeName('')).toBe('Unnamed');
       expect(gd.Project.getSafeName('9')).toBe('_9');
@@ -416,14 +425,34 @@ describe('libGD.js', function () {
 
       // Prepare two containers, one with 3 objects and one empty
       const objectsContainer1 = new gd.ObjectsContainer();
+      const rootFolder1 = objectsContainer1.getRootFolder();
       const objectsContainer2 = new gd.ObjectsContainer();
-      const mySpriteObject = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite', 0);
-      const mySprite2Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite2', 1);
-      const mySprite3Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite3', 2);
+      const rootFolder2 = objectsContainer2.getRootFolder();
+      const subFolder2 = rootFolder2.insertNewFolder('Folder', 1);
+      const mySpriteObject = objectsContainer1.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        0
+      );
+      const mySprite2Object = objectsContainer1.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite2',
+        1
+      );
+      const mySprite3Object = objectsContainer1.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite3',
+        2
+      );
 
-      // Find the pointer to the objects in memory
       expect(objectsContainer1.getObjectsCount()).toBe(3);
       expect(objectsContainer2.getObjectsCount()).toBe(0);
+      expect(rootFolder1.getChildrenCount()).toBe(3);
+      expect(rootFolder2.getChildrenCount()).toBe(1);
+      // Find the pointer to the objects in memory
       const mySpriteObjectPtr = gd.getPointer(objectsContainer1.getObjectAt(0));
       const mySprite2ObjectPtr = gd.getPointer(
         objectsContainer1.getObjectAt(1)
@@ -431,11 +460,24 @@ describe('libGD.js', function () {
       const mySprite3ObjectPtr = gd.getPointer(
         objectsContainer1.getObjectAt(2)
       );
+      const mySpriteObjectFolderOrObject = rootFolder1.getChildAt(0);
+      const mySprite2ObjectFolderOrObject = rootFolder1.getChildAt(1);
+      const mySprite3ObjectFolderOrObject = rootFolder1.getChildAt(2);
+      const mySpriteObjectFolderOrObjectPtr = gd.getPointer(
+        mySpriteObjectFolderOrObject
+      );
+      const mySprite2ObjectFolderOrObjectPtr = gd.getPointer(
+        mySprite2ObjectFolderOrObject
+      );
+      const mySprite3ObjectFolderOrObjectPtr = gd.getPointer(
+        mySprite3ObjectFolderOrObject
+      );
 
       // Move objects between containers
-      objectsContainer1.moveObjectToAnotherContainer(
-        'MySprite2',
+      objectsContainer1.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite2ObjectFolderOrObject,
         objectsContainer2,
+        rootFolder2,
         0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
@@ -443,17 +485,34 @@ describe('libGD.js', function () {
       expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite3');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
+      expect(rootFolder2.hasObjectNamed('MySprite2')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toBe(2);
+      expect(gd.getPointer(rootFolder2.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(rootFolder2.getObjectChild('MySprite2')).toBe(
+        mySprite2ObjectFolderOrObject
+      );
+      expect(mySprite2ObjectFolderOrObject.getParent()).toBe(rootFolder2);
 
-      objectsContainer1.moveObjectToAnotherContainer(
-        'MySprite3',
+      // Move object in sub folder.
+      objectsContainer1.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite3ObjectFolderOrObject,
         objectsContainer2,
-        1
+        subFolder2,
+        0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(1);
       expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
       expect(objectsContainer2.getObjectsCount()).toBe(2);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite2');
       expect(objectsContainer2.getObjectAt(1).getName()).toBe('MySprite3');
+      expect(subFolder2.hasObjectNamed('MySprite3')).toBe(true);
+      expect(subFolder2.getChildrenCount()).toBe(1);
+      expect(gd.getPointer(subFolder2.getObjectChild('MySprite3'))).toBe(
+        mySprite3ObjectFolderOrObjectPtr
+      );
+      expect(mySprite3ObjectFolderOrObject.getParent()).toBe(subFolder2);
 
       // Check that the object in memory are the same, even if moved to another container
       expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
@@ -466,27 +525,113 @@ describe('libGD.js', function () {
         mySprite3ObjectPtr
       );
 
-      objectsContainer2.moveObjectToAnotherContainer(
-        'MySprite2',
+      expect(gd.getPointer(rootFolder2.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(rootFolder2.getObjectChild('MySprite2')).toBe(
+        mySprite2ObjectFolderOrObject
+      );
+
+      // Move back first object to first container
+      objectsContainer2.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        mySprite2ObjectFolderOrObject,
         objectsContainer1,
+        rootFolder1,
         0
       );
       expect(objectsContainer1.getObjectsCount()).toBe(2);
-      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite2');
-      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite');
+      expect(objectsContainer1.getObjectAt(0).getName()).toBe('MySprite');
+      expect(objectsContainer1.getObjectAt(1).getName()).toBe('MySprite2');
       expect(objectsContainer2.getObjectsCount()).toBe(1);
       expect(objectsContainer2.getObjectAt(0).getName()).toBe('MySprite3');
+      expect(rootFolder2.hasObjectNamed('MySprite2')).toBe(false);
+      expect(rootFolder2.getChildrenCount()).toBe(1);
+      expect(rootFolder1.getChildrenCount()).toBe(2);
+      expect(rootFolder1.getChildAt(0).getObject().getName()).toBe('MySprite2');
+      expect(rootFolder1.getChildAt(1).getObject().getName()).toBe('MySprite');
+      expect(rootFolder1.hasObjectNamed('MySprite2')).toBe(true);
+      expect(mySprite2ObjectFolderOrObject.getParent()).toBe(rootFolder1);
 
       // Check again that the object in memory are the same, even if moved to another container
       expect(gd.getPointer(objectsContainer1.getObjectAt(0))).toBe(
-        mySprite2ObjectPtr
+        mySpriteObjectPtr
       );
       expect(gd.getPointer(objectsContainer1.getObjectAt(1))).toBe(
-        mySpriteObjectPtr
+        mySprite2ObjectPtr
       );
       expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(
         mySprite3ObjectPtr
       );
+      expect(gd.getPointer(rootFolder1.getObjectChild('MySprite2'))).toBe(
+        mySprite2ObjectFolderOrObjectPtr
+      );
+      expect(gd.getPointer(rootFolder1.getObjectChild('MySprite'))).toBe(
+        mySpriteObjectFolderOrObjectPtr
+      );
+      expect(gd.getPointer(subFolder2.getObjectChild('MySprite3'))).toBe(
+        mySprite3ObjectFolderOrObjectPtr
+      );
+
+      project.delete();
+    });
+    it('enumerates folders and objects', function () {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+
+      // Prepare two containers, one with 3 objects and one empty
+      const objectsContainer = new gd.ObjectsContainer();
+      const rootFolder = objectsContainer.getRootFolder();
+      const folder = rootFolder.insertNewFolder('Folder 1', 0);
+      const mySpriteObject = objectsContainer.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'MySprite',
+        folder,
+        0
+      );
+      const subFolder = folder.insertNewFolder('Sub Folder 1', 1);
+      const mySprite2Object = objectsContainer.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'MySprite2',
+        subFolder,
+        0
+      );
+      const mySprite3Object = objectsContainer.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'MySprite3',
+        subFolder,
+        1
+      );
+      const subSubFolder = subFolder.insertNewFolder('Sub Sub Folder 1', 2);
+
+      expect(objectsContainer.getObjectsCount()).toBe(3);
+      expect(rootFolder.getChildrenCount()).toBe(1);
+      expect(folder.getChildrenCount()).toBe(2);
+      expect(subFolder.getChildrenCount()).toBe(3);
+
+      const vectorObjectFolderOrObjects = objectsContainer.getAllObjectFolderOrObjects();
+      expect(vectorObjectFolderOrObjects.size()).toBe(6);
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(0))).toBe(
+        gd.getPointer(folder)
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(1))).toBe(
+        gd.getPointer(folder.getChildAt(0))
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(2))).toBe(
+        gd.getPointer(subFolder)
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(3))).toBe(
+        gd.getPointer(subFolder.getChildAt(0))
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(4))).toBe(
+        gd.getPointer(subFolder.getChildAt(1))
+      );
+      expect(gd.getPointer(vectorObjectFolderOrObjects.at(5))).toBe(
+        gd.getPointer(subSubFolder)
+      );
+
+      objectsContainer.delete();
       project.delete();
     });
   });
@@ -675,36 +820,36 @@ describe('libGD.js', function () {
     });
     it('can have 3D properties migrated from number properties', function () {
       const element = gd.Serializer.fromJSObject({
-        "angle": 2,
-        "customSize": true,
-        "height": 100,
-        "layer": "",
-        "name": "Walls",
-        "persistentUuid": "1075df65-af84-472d-a431-47d6f7a5cb63",
-        "width": 950,
-        "x": -100,
-        "y": -75,
-        "zOrder": 1,
-        "numberProperties": [
+        angle: 2,
+        customSize: true,
+        height: 100,
+        layer: '',
+        name: 'Walls',
+        persistentUuid: '1075df65-af84-472d-a431-47d6f7a5cb63',
+        width: 950,
+        x: -100,
+        y: -75,
+        zOrder: 1,
+        numberProperties: [
           {
-            "name": "depth", // This indicates there is a custom depth.
-            "value": 300
+            name: 'depth', // This indicates there is a custom depth.
+            value: 300,
           },
           {
-            "name": "z",
-            "value": 12
+            name: 'z',
+            value: 12,
           },
           {
-            "name": "rotationX",
-            "value": 1
+            name: 'rotationX',
+            value: 1,
           },
           {
-            "name": "rotationY",
-            "value": 3
-          }
+            name: 'rotationY',
+            value: 3,
+          },
         ],
-        "stringProperties": [],
-        "initialVariables": []
+        stringProperties: [],
+        initialVariables: [],
       });
 
       const migratedInstance = layout
@@ -727,24 +872,23 @@ describe('libGD.js', function () {
     });
     it('can have depth without a custom size', function () {
       const element = gd.Serializer.fromJSObject({
-        "angle": 2,
-        "customSize": false,
-        "height": 100,
-        "layer": "",
-        "name": "Walls",
-        "persistentUuid": "1075df65-af84-472d-a431-47d6f7a5cb63",
-        "width": 950,
-        "x": -100,
-        "y": -75,
-        "zOrder": 1,
-        "z": 12,
-        "depth": 300, // This indicates there is a custom depth.
-        "rotationX": 1,
-        "rotationY": 3,
-        "numberProperties": [
-        ],
-        "stringProperties": [],
-        "initialVariables": []
+        angle: 2,
+        customSize: false,
+        height: 100,
+        layer: '',
+        name: 'Walls',
+        persistentUuid: '1075df65-af84-472d-a431-47d6f7a5cb63',
+        width: 950,
+        x: -100,
+        y: -75,
+        zOrder: 1,
+        z: 12,
+        depth: 300, // This indicates there is a custom depth.
+        rotationX: 1,
+        rotationY: 3,
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
       });
 
       const instanceWithJustDepth = layout
@@ -766,7 +910,9 @@ describe('libGD.js', function () {
       expect(instanceWithJustDepth.getCustomHeight()).toBe(100);
     });
     it('can have 3D properties', function () {
-      const initialInstanceIn3D = layout.getInitialInstances().insertNewInitialInstance();
+      const initialInstanceIn3D = layout
+        .getInitialInstances()
+        .insertNewInitialInstance();
       initialInstanceIn3D.setX(40);
       initialInstanceIn3D.setY(41);
       initialInstanceIn3D.setZ(42);
@@ -1376,7 +1522,9 @@ describe('libGD.js', function () {
       anim1.setDirectionsCount(1);
       anim1.getDirection(0).addSprite(sprite1);
 
-      gd.castObject(obj.getConfiguration(), gd.SpriteObject).addAnimation(anim1);
+      gd.castObject(obj.getConfiguration(), gd.SpriteObject).addAnimation(
+        anim1
+      );
 
       {
         let allResources = project.getResourcesManager().getAllResourceNames();
@@ -1433,7 +1581,9 @@ describe('libGD.js', function () {
     it('should be called with resources of the project', function (done) {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      const spriteConfiguration = gd.asSpriteConfiguration(obj.getConfiguration());
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        obj.getConfiguration()
+      );
       let sprite1 = new gd.Sprite();
       sprite1.setImageName('Used');
       const animation = new gd.Animation();
@@ -1441,7 +1591,7 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       spriteConfiguration.addAnimation(animation);
 
-      let worker = extend(new gd.ArbitraryResourceWorkerJS(), {
+      let worker = extend(new gd.ArbitraryResourceWorkerJS(project.getResourcesManager()), {
         exposeImage: function (image) {
           expect(image).toBe('Used');
           done();
@@ -1509,6 +1659,73 @@ describe('libGD.js', function () {
 
       spriteObject.delete();
       spriteObject2.delete();
+    });
+  });
+
+  describe('gd.ObjectsUsingResourceCollector', function () {
+    it('lists objects that use the given resources', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const sprite1 = new gd.Sprite();
+      sprite1.setImageName('Image1');
+      const sprite2 = new gd.Sprite();
+      sprite2.setImageName('Image2');
+      const sprite3 = new gd.Sprite();
+      sprite3.setImageName('Image3');
+
+      const spriteObject = gd.asSpriteConfiguration(object.getConfiguration());
+      const animation = new gd.Animation();
+      animation.setDirectionsCount(1);
+      animation.getDirection(0).addSprite(sprite1);
+      animation.getDirection(0).addSprite(sprite2);
+      animation.getDirection(0).addSprite(sprite1);
+      spriteObject.addAnimation(animation);
+
+      const object2 = project.insertNewObject(
+        project,
+        'Sprite',
+        'MyObject2',
+        0
+      );
+      const spriteObject2 = gd.asSpriteConfiguration(
+        object2.getConfiguration()
+      );
+      const animation2 = new gd.Animation();
+      animation2.setDirectionsCount(1);
+      animation2.getDirection(0).addSprite(sprite1);
+      animation2.getDirection(0).addSprite(sprite3);
+      animation2.getDirection(0).addSprite(sprite1);
+      spriteObject2.addAnimation(animation2);
+
+      {
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image1');
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        expect(objectNames.length).toEqual(2);
+        expect(objectNames).toContain('MyObject');
+        expect(objectNames).toContain('MyObject2');
+      }
+      {
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image2');
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        expect(objectNames.length).toEqual(1);
+        expect(objectNames).toContain('MyObject');
+      }
+      {
+        const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image3');
+        gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
+        const objectNames = objectsCollector.getObjectNames().toJSArray();
+        objectsCollector.delete();
+        expect(objectNames.length).toEqual(1);
+        expect(objectNames).toContain('MyObject2');
+      }
+
+      project.delete();
     });
   });
 
@@ -1664,9 +1881,9 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.NamedPropertyDescriptorsList', function () {
+  describe('gd.PropertiesContainer', function () {
     it('can be used to store named properties', function () {
-      const list = new gd.NamedPropertyDescriptorsList();
+      const list = new gd.PropertiesContainer(0);
 
       const property1 = list.insertNew('Property1', 0);
       expect(list.has('Property1')).toBe(true);
@@ -1856,7 +2073,7 @@ describe('libGD.js', function () {
 
     it('can be un/serialized (with behavior content)', function () {
       const behaviorContent = object.getBehavior('Draggable');
-      behaviorContent.updateProperty('checkCollisionMask', "true");
+      behaviorContent.updateProperty('checkCollisionMask', 'true');
 
       let serializerElement = new gd.SerializerElement();
       object.serializeTo(serializerElement);
@@ -1871,9 +2088,9 @@ describe('libGD.js', function () {
       expect(behaviors.at(1)).toBe('Draggable');
 
       const behaviorContent2 = object2.getBehavior('Draggable');
-      expect(behaviorContent2.getProperties()
-                             .get('checkCollisionMask')
-                             .getValue()).toBe("true");
+      expect(
+        behaviorContent2.getProperties().get('checkCollisionMask').getValue()
+      ).toBe('true');
     });
 
     afterAll(function () {
@@ -2254,11 +2471,10 @@ describe('libGD.js', function () {
       action.setParametersCount(2);
       action.setParameter(0, 'MyCharacter');
 
-      let formattedTexts =
-        gd.InstructionSentenceFormatter.get().getAsFormattedText(
-          action,
-          gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
-        );
+      let formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+        action,
+        gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
+      );
 
       expect(formattedTexts.size()).toBe(2);
       expect(formattedTexts.getString(0)).toBe('Delete ');
@@ -2280,59 +2496,60 @@ describe('libGD.js', function () {
         eventList = new gd.EventsList();
 
         /* Event 1 */
-        event1 = new gd.StandardEvent();
+        {
+          const event = new gd.StandardEvent();
 
-        let eventActions1 = event1.getActions();
-        let action1 = new gd.Instruction();
-        action1.setType('RotateTowardPosition'); // should generate the sentence `Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second`
-        action1.setParametersCount(4);
-        action1.setParameter(0, 'Platform');
-        action1.setParameter(1, '450');
-        action1.setParameter(2, '200');
-        action1.setParameter(3, '90');
-        eventActions1.push_back(action1);
+          let eventActions1 = event.getActions();
+          let action1 = new gd.Instruction();
+          action1.setType('RotateTowardPosition'); // should generate the sentence `Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second`
+          action1.setParametersCount(4);
+          action1.setParameter(0, 'Platform');
+          action1.setParameter(1, '450');
+          action1.setParameter(2, '200');
+          action1.setParameter(3, '90');
+          eventActions1.push_back(action1);
 
-        let eventConditions1 = event1.getConditions();
-        let condition1 = new gd.Instruction();
-        condition1.setType('PosX'); // should generate the sentence `the X position of _PARAM0_ _PARAM1_ _PARAM2_`
-        condition1.setParametersCount(3);
-        condition1.setParameter(0, 'MyCharacter');
-        condition1.setParameter(1, '<');
-        condition1.setParameter(2, '300');
-        eventConditions1.push_back(condition1);
+          let eventConditions1 = event.getConditions();
+          let condition1 = new gd.Instruction();
+          condition1.setType('PosX'); // should generate the sentence `the X position of _PARAM0_ _PARAM1_ _PARAM2_`
+          condition1.setParametersCount(3);
+          condition1.setParameter(0, 'MyCharacter');
+          condition1.setParameter(1, '<');
+          condition1.setParameter(2, '300');
+          eventConditions1.push_back(condition1);
 
-        event1 = eventList.insertEvent(event1, 0);
+          event1 = eventList.insertEvent(event, 0);
+          action1.delete();
+          condition1.delete();
+        }
 
         /* Event 2 */
+        {
+          const event = new gd.StandardEvent();
 
-        event2 = new gd.StandardEvent();
+          let eventActions2 = event.getActions();
+          let action2 = new gd.Instruction();
+          action2.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
+          action2.setParametersCount(1);
+          action2.setParameter(0, 'OtherCharacter');
+          eventActions2.push_back(action2);
 
-        let eventActions2 = event2.getActions();
-        let action2 = new gd.Instruction();
-        action2.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
-        action2.setParametersCount(1);
-        action2.setParameter(0, 'OtherCharacter');
-        eventActions2.push_back(action2);
+          let eventConditions2 = event.getConditions();
+          let condition2 = new gd.Instruction();
+          condition2.setType('Angle'); // should generate the sentence `the angle (in degrees) of _PARAM0_ _PARAM1_ _PARAM2_`
+          condition2.setParametersCount(3);
+          condition2.setParameter(0, 'OtherPlatform');
+          condition2.setParameter(1, '>');
+          condition2.setParameter(2, '55');
+          eventConditions2.push_back(condition2);
 
-        let eventConditions2 = event2.getConditions();
-        let condition2 = new gd.Instruction();
-        condition2.setType('Angle'); // should generate the sentence `the angle (in degrees) of _PARAM0_ _PARAM1_ _PARAM2_`
-        condition2.setParametersCount(3);
-        condition2.setParameter(0, 'OtherPlatform');
-        condition2.setParameter(1, '>');
-        condition2.setParameter(2, '55');
-        eventConditions2.push_back(condition2);
-
-        event2 = eventList.insertEvent(event2, 0);
+          event2 = eventList.insertEvent(event, 0);
+          action2.delete();
+          condition2.delete();
+        }
       });
 
       afterAll(() => {
-        action1.delete();
-        action2.delete();
-        condition1.delete();
-        condition2.delete();
-        event1.delete();
-        event2.delete();
         eventList.delete();
       });
 
@@ -2718,7 +2935,12 @@ describe('libGD.js', function () {
 
         expect(positionFinder.getPositions().size()).toBe(6);
         expect(positionFinder.getPositions().toJSArray()).toEqual([
-          1, 10, 9, 4, 6, -1,
+          1,
+          10,
+          9,
+          4,
+          6,
+          -1,
         ]);
 
         events.delete();
@@ -2764,6 +2986,7 @@ describe('libGD.js', function () {
       const evt = new gd.StandardEvent();
       expect(evt.canHaveSubEvents()).toBe(true);
       expect(evt.isExecutable()).toBe(true);
+      evt.delete();
     });
     it('conditions and actions', function () {
       const evt = new gd.StandardEvent();
@@ -2778,9 +3001,6 @@ describe('libGD.js', function () {
       let act = new gd.Instruction();
       actions.push_back(act);
       expect(evt.getActions().size()).toBe(1);
-    });
-
-    afterAll(function () {
       evt.delete();
     });
   });
@@ -2817,13 +3037,11 @@ describe('libGD.js', function () {
   });
 
   describe('gd.SpriteObject', function () {
-    it('is a gd.Object and can have tags', function () {
+    it('is a gd.Object', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
       let object = project.insertNewObject(project, 'Sprite', 'MySpriteObject');
 
       expect(object instanceof gd.Object).toBe(true);
-      object.setTags('tag1, tag2, tag3');
-      expect(object.getTags()).toBe('tag1, tag2, tag3');
       expect(object.getVariables()).toBeTruthy();
       project.delete();
     });
@@ -3159,12 +3377,14 @@ describe('libGD.js', function () {
       const fs = makeFakeAbstractFileSystem(gd, {});
 
       // Check that ResourcesMergingHelper can update the filenames
-      const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
+      const resourcesMergingHelper = new gd.ResourcesMergingHelper(project.getResourcesManager(), fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
-      gd.ResourceExposer.exposeWholeProjectResources(project, resourcesMergingHelper);
+      gd.ResourceExposer.exposeWholeProjectResources(
+        project,
+        resourcesMergingHelper
+      );
 
-      const oldAndNewFilenames =
-        resourcesMergingHelper.getAllResourcesOldAndNewFilename();
+      const oldAndNewFilenames = resourcesMergingHelper.getAllResourcesOldAndNewFilename();
       expect(oldAndNewFilenames.get('/my/project/MyResource.png')).toBe(
         'MyResource.png'
       );
@@ -3477,9 +3697,12 @@ describe('libGD.js', function () {
 
       const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
-        project,
-        layout,
-        type);
+        gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+          project,
+          layout
+        ),
+        type
+      );
       expressionNode.visit(expressionValidator);
       if (expectedError2) {
         expect(expressionValidator.getAllErrors().size()).toBe(2);
@@ -3487,25 +3710,25 @@ describe('libGD.js', function () {
           expectedError
         );
         if (expectedErrorPosition)
-          expect(expressionValidator.getAllErrors().at(0).getStartPosition()).toBe(
-            expectedErrorPosition
-          );
+          expect(
+            expressionValidator.getAllErrors().at(0).getStartPosition()
+          ).toBe(expectedErrorPosition);
         expect(expressionValidator.getAllErrors().at(1).getMessage()).toBe(
           expectedError2
         );
         if (expectedErrorPosition2)
-          expect(expressionValidator.getAllErrors().at(1).getStartPosition()).toBe(
-            expectedErrorPosition2
-          );
+          expect(
+            expressionValidator.getAllErrors().at(1).getStartPosition()
+          ).toBe(expectedErrorPosition2);
       } else if (expectedError) {
         expect(expressionValidator.getAllErrors().size()).toBe(1);
         expect(expressionValidator.getAllErrors().at(0).getMessage()).toBe(
           expectedError
         );
         if (expectedErrorPosition)
-          expect(expressionValidator.getAllErrors().at(0).getStartPosition()).toBe(
-            expectedErrorPosition
-          );
+          expect(
+            expressionValidator.getAllErrors().at(0).getStartPosition()
+          ).toBe(expectedErrorPosition);
       } else {
         expect(expressionValidator.getAllErrors().size()).toBe(0);
       }
@@ -3640,161 +3863,6 @@ describe('libGD.js', function () {
     it('can parse arguments being expressions', function () {
       testExpression('number', 'MouseX(VariableString(myVariable), 0) + 1');
     });
-  });
-
-  describe('gd.ExpressionCompletionFinder', function () {
-    let project = null;
-    let layout = null;
-    beforeAll(() => {
-      project = new gd.ProjectHelper.createNewGDJSProject();
-      layout = project.insertNewLayout('Scene', 0);
-      layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
-    });
-
-    function testCompletions(
-      type,
-      expressionWithCaret,
-      onCompletionDescription
-    ) {
-      const caretPosition = expressionWithCaret.indexOf('|');
-      if (caretPosition === -1) {
-        throw new Error(
-          'Caret location not found in expression: ' + expressionWithCaret
-        );
-      }
-      const expression = expressionWithCaret.replace('|', '');
-
-      const parser = new gd.ExpressionParser2();
-      const expressionNode = parser.parseExpression(expression).get();
-      const completionDescriptions =
-        gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-          gd.JsPlatform.get(),
-          project,
-          layout,
-          type,
-          expressionNode,
-          // We're looking for completion for the character just before the caret.
-          Math.max(0, caretPosition - 1)
-        );
-
-      for (let i = 0; i < completionDescriptions.size(); i++) {
-        const completionDescription = completionDescriptions.at(i);
-
-        onCompletionDescription(completionDescription, i);
-      }
-
-      parser.delete();
-    }
-
-    it('completes an empty expression', function () {
-      expect.assertions(6);
-      testCompletions('number', '|', (completionDescription, index) => {
-        if (index === 0) {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Object
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        } else {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        }
-      });
-    });
-
-    it('does not complete an expression with an operator', function () {
-      expect.assertions(0);
-      testCompletions('number', '1 +| ', (completionDescription, index) => {
-        // No elements returned, so this will not be called.
-        expect(completionDescription).toBe(undefined);
-      });
-    });
-
-    it('completes an expression with an operator and a prefix', function () {
-      expect.assertions(6);
-      testCompletions('number', '1 + My| ', (completionDescription, index) => {
-        if (index === 0) {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Object
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('My');
-        } else {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('My');
-        }
-      });
-    });
-    it('completes an expression with a partial object function', function () {
-      expect.assertions(8);
-      testCompletions(
-        'number',
-        '1 + MyObject.Func| ',
-        (completionDescription, index) => {
-          if (index == 0) {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Behavior
-            );
-            expect(completionDescription.getType()).toBe('');
-            expect(completionDescription.getPrefix()).toBe('Func');
-            expect(completionDescription.getObjectName()).toBe('MyObject');
-          } else {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Expression
-            );
-            expect(completionDescription.getType()).toBe('number');
-            expect(completionDescription.getPrefix()).toBe('Func');
-            expect(completionDescription.getObjectName()).toBe('MyObject');
-          }
-        }
-      );
-    });
-    it('completes an expression with a partial behavior function', function () {
-      expect.assertions(5);
-      testCompletions(
-        'number',
-        '1 + MyObject.MyBehavior::Func| ',
-        (completionDescription, index) => {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('Func');
-          expect(completionDescription.getObjectName()).toBe('MyObject');
-          expect(completionDescription.getBehaviorName()).toBe('MyBehavior');
-        }
-      );
-    });
-    it('completes an expression parameters', function () {
-      expect.assertions(6);
-      testCompletions(
-        'number',
-        '1 + MySpriteObject.PointX(a| ',
-        (completionDescription, index) => {
-          if (index === 0) {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Object
-            );
-            expect(completionDescription.getType()).toBe('string');
-            expect(completionDescription.getPrefix()).toBe('a');
-          } else {
-            expect(completionDescription.getCompletionKind()).toBe(
-              gd.ExpressionCompletionDescription.Expression
-            );
-            expect(completionDescription.getType()).toBe('string');
-            expect(completionDescription.getPrefix()).toBe('a');
-          }
-        }
-      );
-    });
-
-    // More tests are done in C++ for ExpressionCompletionFinder.
   });
 
   describe('gd.Vector2f', function () {
@@ -4420,6 +4488,282 @@ describe('libGD.js', function () {
       expect(
         element2.getChild('anything').getChild('canBeStored').getBoolValue()
       ).toBe(true);
+    });
+  });
+
+  describe('gd.ObjectFolderOrObject (using gd.ObjectsContainer)', () => {
+    let project = null;
+    let layout = null;
+    beforeAll(() => {
+      project = gd.ProjectHelper.createNewGDJSProject();
+    });
+
+    afterEach(() => {
+      project.removeLayout('Scene');
+    });
+
+    beforeEach(() => {
+      layout = project.insertNewLayout('Scene', 0);
+    });
+
+    test('objects container has a root ObjectFolderOrObject', () => {
+      const rootFolder = layout.getRootFolder();
+      expect(rootFolder.isFolder()).toBe(true);
+      expect(rootFolder.isRootFolder()).toBe(true);
+      expect(rootFolder.getParent().isFolder()).toBe(true);
+      expect(rootFolder.getParent().getFolderName()).toEqual('__NULL');
+      expect(rootFolder.getChildrenCount()).toEqual(0);
+    });
+
+    test('an object added to the object container is added to the root ObjectFolderOrObject', () => {
+      let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const rootFolder = layout.getRootFolder();
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.isRootFolder()).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(1);
+      layout.removeObject('MyObject');
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(false);
+      expect(rootFolder.getChildrenCount()).toEqual(0);
+    });
+
+    test('a folder can be added to the root folder', () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      expect(subFolder.getFolderName()).toEqual('Enemies');
+      expect(subFolder.isRootFolder()).toBe(false);
+      subFolder.setFolderName('Players');
+      expect(subFolder.getFolderName()).toEqual('Players');
+      expect(subFolder.getParent()).toBe(rootFolder);
+      expect(rootFolder.getChildrenCount()).toEqual(1);
+    });
+
+    test('an object can be added to a specific folder', () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Enemies', 0);
+      const subSubFolder = subFolder.insertNewFolder('Turtles', 0);
+      layout.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        'RedTurtle',
+        subSubFolder,
+        0
+      );
+      expect(layout.hasObjectNamed('RedTurtle')).toBe(true);
+      expect(subSubFolder.hasObjectNamed('RedTurtle')).toBe(true);
+    });
+
+    test('an ObjectFolderOrObject can be serialized and unserialized', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        1
+      );
+      const object3 = layout.insertNewObject(project, 'Sprite', 'SubObject', 2);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('SubObject'),
+        subFolder,
+        0
+      );
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(3);
+      expect(
+        rootFolder.getChildPosition(rootFolder.getObjectChild('MyObject'))
+      ).toEqual(0);
+      expect(rootFolder.getChildPosition(subFolder)).toEqual(1);
+      expect(
+        rootFolder.getChildPosition(rootFolder.getObjectChild('OtherObject'))
+      ).toEqual(2);
+      expect(rootFolder.hasObjectNamed('SubObject')).toBe(true);
+      expect(subFolder.hasObjectNamed('SubObject')).toBe(true);
+
+      const element = new gd.SerializerElement();
+      layout.serializeTo(element);
+
+      project.removeLayout('Scene');
+
+      const layout2 = project.insertNewLayout('Scene2', 0);
+      layout2.unserializeFrom(project, element);
+
+      expect(layout2.hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getRootFolder();
+      expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toEqual(3);
+      const parentEqualities = mapFor(
+        0,
+        rootFolder2.getChildrenCount(),
+        (i) => {
+          const childObjectFolderOrObject = rootFolder2.getChildAt(i);
+          return childObjectFolderOrObject.getParent() === rootFolder2;
+        }
+      );
+      expect(parentEqualities.every((equality) => equality)).toBe(true);
+      const subFolder2 = rootFolder2.getChildAt(1);
+      expect(subFolder2.isFolder()).toBe(true);
+      const subObject = subFolder2.getObjectChild('SubObject');
+      expect(subObject.getParent()).toBe(subFolder2);
+    });
+
+    test('an ObjectFolderOrObject can be serialized and unserialized and missing object folders or objects are added', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        1
+      );
+      const object3 = layout.insertNewObject(project, 'Sprite', 'SubObject', 2);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('SubObject'),
+        subFolder,
+        0
+      );
+      expect(rootFolder.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder.getChildrenCount()).toEqual(3);
+      expect(rootFolder.hasObjectNamed('SubObject')).toBe(true);
+      expect(subFolder.hasObjectNamed('SubObject')).toBe(true);
+
+      const element = new gd.SerializerElement();
+      layout.serializeTo(element);
+
+      const layoutObject = JSON.parse(gd.Serializer.toJSON(element));
+      delete layoutObject.objectsFolderStructure;
+
+      project.removeLayout('Scene');
+
+      const layout2 = project.insertNewLayout('Scene2', 0);
+      layout2.unserializeFrom(
+        project,
+        gd.Serializer.fromJSObject(layoutObject)
+      );
+
+      expect(layout2.hasObjectNamed('MyObject')).toBe(true);
+      expect(layout2.hasObjectNamed('OtherObject')).toBe(true);
+      const rootFolder2 = layout.getRootFolder();
+      expect(rootFolder2.hasObjectNamed('MyObject')).toBe(true);
+      expect(rootFolder2.hasObjectNamed('OtherObject')).toBe(true);
+      expect(rootFolder2.getChildrenCount()).toEqual(3);
+      const parentEqualities = mapFor(
+        0,
+        rootFolder2.getChildrenCount(),
+        (i) => {
+          const childObjectFolderOrObject = rootFolder2.getChildAt(i);
+          return childObjectFolderOrObject.getParent() === rootFolder2;
+        }
+      );
+      expect(parentEqualities.every((equality) => equality)).toBe(true);
+    });
+
+    test('a folder can be removed from its parent if empty', () => {
+      const rootFolder = layout.getRootFolder();
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let subFolder = rootFolder.insertNewFolder('Enemies', 1);
+      const object2 = layout.insertNewObject(
+        project,
+        'Sprite',
+        'OtherObject',
+        2
+      );
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('OtherObject'),
+        subFolder,
+        0
+      );
+      rootFolder.removeFolderChild(subFolder);
+
+      // Check subfolder is still here since it was not empty.
+      expect(rootFolder.getChildrenCount()).toEqual(2);
+      subFolder = rootFolder.getChildAt(1);
+      expect(subFolder.isFolder()).toBe(true);
+      expect(subFolder.getChildrenCount()).toEqual(1);
+      expect(subFolder.hasObjectNamed('OtherObject')).toBe(true);
+
+      // Empty subfolder and remove it.
+      subFolder.moveObjectFolderOrObjectToAnotherFolder(
+        subFolder.getObjectChild('OtherObject'),
+        rootFolder,
+        0
+      );
+      rootFolder.removeFolderChild(subFolder);
+
+      expect(rootFolder.getChildrenCount()).toEqual(2);
+      const objectFolderOrObject = rootFolder.getChildAt(1);
+      const otherObjectFolderOrObject = rootFolder.getChildAt(0);
+      expect(otherObjectFolderOrObject.isFolder()).toBe(false);
+      expect(otherObjectFolderOrObject.isRootFolder()).toBe(false);
+      expect(otherObjectFolderOrObject.getObject().getName()).toBe(
+        'OtherObject'
+      );
+      expect(objectFolderOrObject.isFolder()).toBe(false);
+      expect(objectFolderOrObject.isRootFolder()).toBe(false);
+      expect(objectFolderOrObject.getObject().getName()).toBe('MyObject');
+    });
+
+    test("an ObjectFolderOrObject can test if it's a descendant of another one", () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Depth1', 0);
+      const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('MyObject'),
+        subSubFolder,
+        0
+      );
+      const objectFolderOrObject = subSubFolder.getChildAt(0);
+      expect(objectFolderOrObject.isFolder()).toBe(false);
+      expect(objectFolderOrObject.getObject().getName()).toEqual('MyObject');
+
+      expect(objectFolderOrObject.isADescendantOf(subSubFolder)).toBe(true);
+      expect(objectFolderOrObject.isADescendantOf(subFolder)).toBe(true);
+      expect(objectFolderOrObject.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(subSubFolder.isADescendantOf(subFolder)).toBe(true);
+      expect(subSubFolder.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(subFolder.isADescendantOf(rootFolder)).toBe(true);
+
+      expect(rootFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(rootFolder.isADescendantOf(subSubFolder)).toBe(false);
+      expect(rootFolder.isADescendantOf(subFolder)).toBe(false);
+      expect(rootFolder.isADescendantOf(rootFolder)).toBe(false);
+
+      expect(subFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(subFolder.isADescendantOf(subSubFolder)).toBe(false);
+      expect(subFolder.isADescendantOf(subFolder)).toBe(false);
+
+      expect(subSubFolder.isADescendantOf(objectFolderOrObject)).toBe(false);
+      expect(subSubFolder.isADescendantOf(subSubFolder)).toBe(false);
+
+      expect(objectFolderOrObject.isADescendantOf(objectFolderOrObject)).toBe(
+        false
+      );
+    });
+    test('an ObjectFolderOrObject representing an object can be retrieved using the object name only', () => {
+      const rootFolder = layout.getRootFolder();
+      const subFolder = rootFolder.insertNewFolder('Depth1', 0);
+      const subSubFolder = subFolder.insertNewFolder('Depth2', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+        rootFolder.getObjectChild('MyObject'),
+        subSubFolder,
+        0
+      );
+      const objectFolderOrObject = subSubFolder.getChildAt(0);
+      expect(objectFolderOrObject.isRootFolder()).toBe(false);
+      const objectFolderOrObjectFoundByName = rootFolder.getObjectNamed(
+        'MyObject'
+      );
+      expect(objectFolderOrObjectFoundByName.isRootFolder()).toBe(false);
+      expect(objectFolderOrObjectFoundByName).toBe(objectFolderOrObject);
     });
   });
 });

@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
    */
@@ -154,7 +152,7 @@ namespace gdjs {
     }
 
     getColor() {
-      const rgb = PIXI.utils.hex2rgb(this._sprite.tint);
+      const rgb = new PIXI.Color(this._sprite.tint).toRgbArray();
       return (
         Math.floor(rgb[0] * 255) +
         ';' +
@@ -186,15 +184,18 @@ namespace gdjs {
       return this._sprite.texture.frame.height;
     }
 
-    static getAnimationFrame(imageManager, imageName) {
+    static getAnimationFrame(
+      imageManager: gdjs.PixiImageManager,
+      imageName: string
+    ) {
       return imageManager.getPIXITexture(imageName);
     }
 
-    static getAnimationFrameWidth(pixiTexture) {
+    static getAnimationFrameWidth(pixiTexture: PIXI.Texture) {
       return pixiTexture.width;
     }
 
-    static getAnimationFrameHeight(pixiTexture) {
+    static getAnimationFrameHeight(pixiTexture: PIXI.Texture) {
       return pixiTexture.height;
     }
   }

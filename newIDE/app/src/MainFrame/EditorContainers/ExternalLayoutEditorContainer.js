@@ -21,6 +21,10 @@ import Text from '../../UI/Text';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import TutorialButton from '../../UI/TutorialButton';
 import HelpButton from '../../UI/HelpButton';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../ResourcesWatcher';
 
 const styles = {
   container: {
@@ -38,6 +42,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
   State
 > {
   editor: ?SceneEditor;
+  resourceExternallyChangedCallbackId: ?string;
   state = {
     externalPropertiesDialogOpen: false,
   };
@@ -63,6 +68,14 @@ export class ExternalLayoutEditorContainer extends React.Component<
         projectItemName
       );
     }
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
   }
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
@@ -73,6 +86,13 @@ export class ExternalLayoutEditorContainer extends React.Component<
         layout ? layout.getName() : null,
         projectItemName
       );
+    }
+  }
+
+  onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {
+    const { editor } = this;
+    if (editor) {
+      editor.onResourceExternallyChanged(resourceInfo);
     }
   }
 

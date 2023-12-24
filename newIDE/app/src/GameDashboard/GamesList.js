@@ -1,58 +1,83 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
-import PlaceholderError from '../UI/PlaceholderError';
-import {
-  type Game,
-  getGames,
-  registerGame,
-} from '../Utils/GDevelopServices/Game';
+import { type Game, registerGame } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
-import { GameDetailsDialog, type GameDetailsTab } from './GameDetailsDialog';
+import { type GameDetailsTab } from './GameDetails';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RouterContext from '../MainFrame/RouterContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import SearchBar from '../UI/SearchBar';
+import { useDebounce } from '../Utils/UseDebounce';
+import Fuse from 'fuse.js';
+import {
+  getFuseSearchQueryForSimpleArray,
+  sharedFuseConfiguration,
+} from '../UI/Search/UseSearchStructuredItem';
+
+const getGamesToDisplay = ({
+  project,
+  games,
+  searchText,
+  searchClient,
+}: {|
+  project: ?gdProject,
+  games: Array<Game>,
+  searchText: string,
+  searchClient: Fuse,
+|}): Array<Game> => {
+  const projectUuid = project ? project.getProjectUuid() : null;
+  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
+  const orderedGames = thisGame
+    ? [thisGame, ...games.filter(game => game.id !== thisGame.id)]
+    : games;
+  if (!searchText) return orderedGames;
+  const searchResults = searchClient.search(
+    getFuseSearchQueryForSimpleArray(searchText)
+  );
+  return searchResults.map(result => result.item);
+};
 
 type Props = {|
   project: ?gdProject,
+  games: Array<Game>,
+  onRefreshGames: () => Promise<void>,
+  onGameUpdated: Game => void,
+  onOpenGame: (?Game) => void,
 |};
 
-export const GamesList = ({ project }: Props) => {
+const GamesList = ({
+  project,
+  games,
+  onRefreshGames,
+  onGameUpdated,
+  onOpenGame,
+}: Props) => {
   const {
     routeArguments,
     addRouteArguments,
     removeRouteArguments,
   } = React.useContext(RouterContext);
-  const [error, setError] = React.useState<?Error>(null);
-  const [games, setGames] = React.useState<?Array<Game>>(null);
-  const {
-    authenticated,
-    firebaseUser,
-    getAuthorizationHeader,
-    profile,
-  } = React.useContext(AuthenticatedUserContext);
-  const [openedGame, setOpenedGame] = React.useState<?Game>(null);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
   const { showAlert, showConfirmation } = useAlertDialog();
   const [isGameRegistering, setIsGameRegistering] = React.useState(false);
+  const [searchText, setSearchText] = React.useState<string>('');
+  const [displayedGames, setDisplayedGames] = React.useState<Array<Game>>(
+    games
+  );
 
-  const loadGames = React.useCallback(
-    async () => {
-      if (!authenticated || !firebaseUser) return;
-
-      try {
-        setError(null);
-        const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
-        setGames(games);
-      } catch (error) {
-        console.error('Error while loading user games.', error);
-        setError(error);
-      }
-    },
-    [authenticated, firebaseUser, getAuthorizationHeader]
+  const searchClient = React.useMemo(
+    () =>
+      new Fuse(games, {
+        ...sharedFuseConfiguration,
+        keys: [{ name: 'gameName', weight: 1 }],
+      }),
+    [games]
   );
 
   const onRegisterGame = React.useCallback(
@@ -68,7 +93,7 @@ export const GamesList = ({ project }: Props) => {
           gameName: project.getName() || 'Untitled game',
           templateSlug: project.getTemplateSlug(),
         });
-        await loadGames();
+        await onRefreshGames();
       } catch (error) {
         console.error('Unable to register the game.', error);
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -92,7 +117,7 @@ export const GamesList = ({ project }: Props) => {
         setIsGameRegistering(false);
       }
     },
-    [getAuthorizationHeader, profile, project, showAlert, loadGames]
+    [getAuthorizationHeader, profile, project, showAlert, onRefreshGames]
   );
 
   React.useEffect(
@@ -104,7 +129,7 @@ export const GamesList = ({ project }: Props) => {
           const game = games.find(game => game.id === initialGameId);
           removeRouteArguments(['game-id']);
           if (game) {
-            setOpenedGame(game);
+            onOpenGame(game);
           } else {
             // If the game is not in the list, then either
             // - allow to register it, if it's the current project.
@@ -139,44 +164,31 @@ export const GamesList = ({ project }: Props) => {
       showConfirmation,
       showAlert,
       project,
+      onOpenGame,
     ]
   );
 
-  React.useEffect(
-    () => {
-      loadGames();
-    },
-    [loadGames]
-  );
-
-  if (!authenticated) {
-    return null;
-  }
-
-  if (!games && error) {
-    return (
-      <PlaceholderError
-        onRetry={() => {
-          loadGames();
-        }}
-      >
-        <Trans>
-          Can't load the games. Verify your internet connection or retry later.
-        </Trans>
-      </PlaceholderError>
+  const getGamesToDisplayDebounced = useDebounce(() => {
+    setDisplayedGames(
+      getGamesToDisplay({
+        project,
+        games,
+        searchText,
+        searchClient,
+      })
     );
-  }
+  }, 250);
 
-  if (!games) {
-    return <PlaceholderLoader />;
-  }
+  // Refresh games to display when:
+  // - search text changes (user input)
+  // - games change (refresh following an update for instance)
+  React.useEffect(getGamesToDisplayDebounced, [
+    getGamesToDisplayDebounced,
+    searchText,
+    games,
+  ]);
 
   const projectUuid = project ? project.getProjectUuid() : null;
-  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
-  const displayedGames = [
-    thisGame,
-    ...games.filter(game => game !== thisGame),
-  ].filter(Boolean);
 
   return (
     <ColumnStackLayout noMargin>
@@ -184,42 +196,31 @@ export const GamesList = ({ project }: Props) => {
         <GameRegistration
           project={project}
           hideLoader
-          onGameRegistered={loadGames}
+          onGameRegistered={onRefreshGames}
         />
       )}
-      {displayedGames.map(game => (
-        <GameCard
-          key={game.id}
-          isCurrentGame={!!projectUuid && game.id === projectUuid}
-          game={game}
-          onOpenGameManager={(tab: GameDetailsTab) => {
-            addRouteArguments({ 'games-dashboard-tab': tab });
-            setOpenedGame(game);
-          }}
-          onUpdateGame={loadGames}
-        />
-      ))}
-      {openedGame && (
-        <GameDetailsDialog
-          game={openedGame}
-          project={
-            !!projectUuid && openedGame.id === projectUuid ? project : null
-          }
-          onClose={() => {
-            setOpenedGame(null);
-          }}
-          onGameUpdated={updatedGame => {
-            setGames(
-              games.map(game => (game === openedGame ? updatedGame : game))
-            );
-            setOpenedGame(updatedGame);
-          }}
-          onGameDeleted={() => {
-            setOpenedGame(null);
-            loadGames();
-          }}
-        />
-      )}
+      <SearchBar
+        value={searchText}
+        onChange={setSearchText}
+        // Search is triggered on each search text change
+        onRequestSearch={() => {}}
+        placeholder={t`Search by name`}
+      />
+      {displayedGames &&
+        displayedGames.map(game => (
+          <GameCard
+            key={game.id}
+            isCurrentGame={!!projectUuid && game.id === projectUuid}
+            game={game}
+            onOpenGameManager={(tab: GameDetailsTab) => {
+              addRouteArguments({ 'games-dashboard-tab': tab });
+              onOpenGame(game);
+            }}
+            onUpdateGame={onRefreshGames}
+          />
+        ))}
     </ColumnStackLayout>
   );
 };
+
+export default GamesList;

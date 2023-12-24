@@ -4,10 +4,9 @@ import * as React from 'react';
 import MuiLinearProgress from '@material-ui/core/LinearProgress';
 
 type Props = {|
-  expand?: boolean,
   variant?: 'indeterminate' | 'determinate',
   value?: ?number,
-  style?: {| height?: number, borderRadius?: number |},
+  style?: {| height?: number, borderRadius?: number, width?: number |},
 |};
 
 function LinearProgress(props: Props) {

@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import Popover from '@material-ui/core/Popover';
 import * as React from 'react';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
@@ -50,6 +51,7 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  i18n: I18nType,
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
 |};
@@ -72,6 +74,7 @@ const InstructionEditorMenu = ({
   onSubmit,
   canPasteInstructions,
   onPasteInstructions,
+  i18n,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -85,6 +88,7 @@ const InstructionEditorMenu = ({
     scope,
     globalObjectsContainer,
     objectsContainer,
+    i18n,
   });
   const {
     chosenObjectName,

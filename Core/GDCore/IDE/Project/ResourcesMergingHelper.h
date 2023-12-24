@@ -28,11 +28,11 @@ namespace gd {
  * \ingroup IDE
  */
 class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
- public:
-  ResourcesMergingHelper(gd::AbstractFileSystem& fileSystem)
-      : ArbitraryResourceWorker(),
-        preserveDirectoriesStructure(false),
-        preserveAbsoluteFilenames(false),
+public:
+  ResourcesMergingHelper(gd::ResourcesManager &resourcesManager,
+                         gd::AbstractFileSystem &fileSystem)
+      : ArbitraryResourceWorker(resourcesManager),
+        preserveDirectoriesStructure(false), preserveAbsoluteFilenames(false),
         fs(fileSystem){};
   virtual ~ResourcesMergingHelper(){};
 

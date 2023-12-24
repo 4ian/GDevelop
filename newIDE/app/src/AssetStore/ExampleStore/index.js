@@ -55,7 +55,7 @@ export const prepareExampleShortHeaders = (
 
 const getItemUniqueId = (
   item: ExampleShortHeader | PrivateGameTemplateListingData
-) => item.name;
+) => item.id;
 
 type Props = {|
   isOpening: boolean,
@@ -194,8 +194,8 @@ export const ExampleStore = ({
 
       for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
         searchItems.push(exampleShortHeaderItems[i]);
-        if (i % 3 === 2 && privateGameTemplateItems.length > 0) {
-          const nextPrivateGameTemplateIndex = Math.floor(i / 3);
+        if (i % 2 === 1 && privateGameTemplateItems.length > 0) {
+          const nextPrivateGameTemplateIndex = Math.floor(i / 2);
           if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
             searchItems.push(
               privateGameTemplateItems[nextPrivateGameTemplateIndex]
@@ -263,7 +263,10 @@ export const ExampleStore = ({
                           sendExampleDetailsOpened(item.slug);
                           onSelectExampleShortHeader(item);
                         }}
-                        onOpen={onOpenNewProjectSetupDialog}
+                        onOpen={() => {
+                          onSelectExampleShortHeader(item);
+                          onOpenNewProjectSetupDialog();
+                        }}
                       />
                     );
                   }

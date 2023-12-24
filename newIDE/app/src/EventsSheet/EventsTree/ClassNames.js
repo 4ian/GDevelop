@@ -10,6 +10,7 @@ export const executableEventContainer = 'executable-event-container';
 export const actionsContainer = 'actions-container';
 export const conditionsContainer = 'conditions-container';
 export const subInstructionsContainer = 'sub-instructions-container';
+export const warningInstruction = 'warning-instruction';
 export const smallWidthContainer = 'small-width-container';
 export const instructionParameter = 'instruction-parameter';
 export const instructionInvalidParameter = 'instruction-invalid-parameter';
@@ -29,3 +30,5 @@ export const handle = 'move-handle';
 export const linkContainer = 'link-container';
 
 export const nameAndIconContainer = 'name-and-icon-container';
+
+export const treeView = 'tree-view';

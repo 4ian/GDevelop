@@ -10,6 +10,7 @@
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/UUID/UUID.h"
 
 using namespace std;
 
@@ -228,6 +229,9 @@ void Variable::SerializeTo(SerializerElement& element) const {
   element.SetStringAttribute("type", TypeAsString(GetType()));
   if (IsFolded()) element.SetBoolAttribute("folded", true);
 
+  if (!persistentUuid.empty())
+    element.SetStringAttribute("persistentUuid", persistentUuid);
+
   if (type == Type::String) {
     element.SetStringAttribute("value", GetString());
   } else if (type == Type::Number) {
@@ -253,6 +257,8 @@ void Variable::SerializeTo(SerializerElement& element) const {
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
   type = StringAsType(element.GetStringAttribute("type", "string"));
+
+  persistentUuid = element.GetStringAttribute("persistentUuid");
 
   // Compatibility with GD <= 5.0.0-beta102
   // Before, everything was stored as strings.
@@ -290,7 +296,12 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
         PushNew().UnserializeFrom(childElement);
     }
   }
-}  // namespace gd
+}
+
+Variable& Variable::ResetPersistentUuid() {
+  persistentUuid = UUID::MakeUuid4();
+  return *this;
+}
 
 std::vector<gd::String> Variable::GetAllChildrenNames() const {
   std::vector<gd::String> names;
@@ -338,7 +349,8 @@ Variable::Variable(const Variable& other)
       str(other.str),
       folded(other.folded),
       boolVal(other.boolVal),
-      type(other.type) {
+      type(other.type),
+      persistentUuid(other.persistentUuid) {
   CopyChildren(other);
 }
 
@@ -349,6 +361,7 @@ Variable& Variable::operator=(const Variable& other) {
     folded = other.folded;
     boolVal = other.boolVal;
     type = other.type;
+    persistentUuid = other.persistentUuid;
     CopyChildren(other);
   }
 

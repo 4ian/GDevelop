@@ -13,7 +13,6 @@ import {
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
   canCancelAtEndOfPeriod,
-  businessPlan,
   hasValidSubscriptionPlan,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
@@ -23,8 +22,11 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
-  type SubscriptionDialogDisplayReason,
 } from '../../Utils/Analytics/EventSender';
+import {
+  type SubscriptionAnalyticsMetadata,
+  type SubscriptionType,
+} from './SubscriptionSuggestionContext';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
@@ -73,7 +75,7 @@ const cancelImmediatelyConfirmationTexts = {
 };
 const seamlesslyChangeConfirmationTexts = {
   title: t`Update your subscription`,
-  message: t`Are you sure you want to subscribe to this new plan? Your next payment will be pro-rated.`,
+  message: t`Are you sure you want to change your plan? Your next payment will be pro-rated.`,
   confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
 };
@@ -93,16 +95,15 @@ const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
 type Props = {|
   open: boolean,
   onClose: Function,
-  analyticsMetadata: {|
-    reason: SubscriptionDialogDisplayReason,
-    preStep?: 'subscriptionChecker',
-  |},
+  analyticsMetadata: SubscriptionAnalyticsMetadata,
+  filter: ?SubscriptionType,
 |};
 
 export default function SubscriptionDialog({
   open,
   onClose,
   analyticsMetadata,
+  filter,
 }: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
@@ -174,13 +175,13 @@ export default function SubscriptionDialog({
         await changeUserSubscription(getAuthorizationHeader, profile.id, {
           planId: null,
         });
-        await authenticatedUser.onSubscriptionUpdated();
+        await authenticatedUser.onRefreshSubscription();
         showAlert({
           title: t`Subscription cancelled`,
           message: t`Your subscription is now cancelled.`,
         });
       } catch (rawError) {
-        await authenticatedUser.onSubscriptionUpdated();
+        await authenticatedUser.onRefreshSubscription();
         showErrorBox({
           message: i18n._(
             t`Your subscription could not be cancelled. Please try again later!`
@@ -202,9 +203,7 @@ export default function SubscriptionDialog({
       const hasExpiredRedeemedSubscription =
         !!subscription.redemptionCodeValidUntil &&
         subscription.redemptionCodeValidUntil < Date.now();
-      const shouldShowAlert =
-        (needToCancelSubscription && !hasExpiredRedeemedSubscription) || // we don't show an alert if the redeemed code is expired
-        hasValidRedeemedSubscription;
+      const shouldSkipAlert = hasExpiredRedeemedSubscription; // we don't show an alert if the redeemed code is expired
 
       // Changing the existing subscription.
       const confirmDialogTexts =
@@ -214,7 +213,7 @@ export default function SubscriptionDialog({
           ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
           : cancelAndChangeConfirmationTexts;
 
-      if (shouldShowAlert) {
+      if (!shouldSkipAlert) {
         const answer = await showConfirmation(confirmDialogTexts);
         if (!answer) return;
       }
@@ -226,7 +225,7 @@ export default function SubscriptionDialog({
           await changeUserSubscription(getAuthorizationHeader, profile.id, {
             planId: plan.planId,
           });
-          await authenticatedUser.onSubscriptionUpdated();
+          await authenticatedUser.onRefreshSubscription();
           showAlert({
             title: t`Subscription updated`,
             message: t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`,
@@ -249,7 +248,7 @@ export default function SubscriptionDialog({
           await changeUserSubscription(getAuthorizationHeader, profile.id, {
             planId: '',
           });
-          await authenticatedUser.onSubscriptionUpdated();
+          await authenticatedUser.onRefreshSubscription();
         } catch (rawError) {
           showErrorBox({
             message: i18n._(
@@ -341,6 +340,25 @@ export default function SubscriptionDialog({
             )}
             {getSubscriptionPlans()
               .filter(plan => !plan.hideInSubscriptionDialog)
+              .filter(plan => {
+                if (filter === 'individual') {
+                  return [null, 'gdevelop_silver', 'gdevelop_gold'].includes(
+                    plan.planId
+                  );
+                }
+                if (filter === 'team') {
+                  return [
+                    null,
+                    'gdevelop_startup',
+                    'gdevelop_enterprise',
+                  ].includes(plan.planId);
+                }
+                if (filter === 'education') {
+                  return [null, 'gdevelop_education'].includes(plan.planId);
+                }
+                // No filter, show all plans.
+                return true;
+              })
               .map(plan => {
                 const userPlanId = authenticatedUser.subscription
                   ? authenticatedUser.subscription.planId
@@ -442,6 +460,27 @@ export default function SubscriptionDialog({
                       }
                     />,
                   ];
+                } else if (plan.planId === 'gdevelop_enterprise') {
+                  return (
+                    <PlanCard
+                      key={plan.planId}
+                      plan={plan}
+                      actions={
+                        <RaisedButton
+                          primary
+                          label={<Trans>Learn more</Trans>}
+                          onClick={() => {
+                            Window.openExternalURL(
+                              'https://gdevelop.io/pricing'
+                            );
+                          }}
+                        />
+                      }
+                      isPending={false}
+                      isHighlighted={false}
+                      background="medium"
+                    />
+                  );
                 } else {
                   actions = [
                     <RaisedButton
@@ -469,21 +508,7 @@ export default function SubscriptionDialog({
                   />
                 );
               })}
-            <PlanCard
-              plan={businessPlan}
-              actions={
-                <RaisedButton
-                  primary
-                  label={<Trans>Learn more</Trans>}
-                  onClick={() => {
-                    Window.openExternalURL('https://gdevelop.io/pricing');
-                  }}
-                />
-              }
-              isPending={false}
-              isHighlighted={false}
-              background="dark"
-            />
+
             <Column>
               <Line>
                 <EmptyMessage>
@@ -514,13 +539,13 @@ export default function SubscriptionDialog({
                     <FlatButton
                       key="login"
                       label={<Trans>Login</Trans>}
-                      onClick={authenticatedUser.onLogin}
+                      onClick={authenticatedUser.onOpenLoginDialog}
                     />,
                     <DialogPrimaryButton
                       key="create-account"
                       label={<Trans>Create my account</Trans>}
                       primary
-                      onClick={authenticatedUser.onCreateAccount}
+                      onClick={authenticatedUser.onOpenCreateAccountDialog}
                     />,
                   ]}
                 >
@@ -538,7 +563,7 @@ export default function SubscriptionDialog({
                 authenticatedUser={authenticatedUser}
                 onClose={() => {
                   setSubscriptionPendingDialogOpen(false);
-                  authenticatedUser.onSubscriptionUpdated();
+                  authenticatedUser.onRefreshSubscription();
                 }}
               />
             )}
@@ -551,7 +576,7 @@ export default function SubscriptionDialog({
                   if (hasJustRedeemedCode) {
                     try {
                       setIsChangingSubscription(true);
-                      await authenticatedUser.onSubscriptionUpdated();
+                      await authenticatedUser.onRefreshSubscription();
                     } finally {
                       setIsChangingSubscription(false);
                       setSubscriptionPendingDialogOpen(true);

@@ -46,7 +46,8 @@ const fakeEditorToolbar = (
 const defaultProps: MainFrameToolbarProps = {
   showProjectButtons: true,
   toggleProjectManager: () => {},
-  exportProject: () => {},
+  openShareDialog: () => {},
+  isSharingEnabled: true,
 
   onPreviewWithoutHotReload: () => {},
   onOpenDebugger: () => {},
@@ -58,6 +59,9 @@ const defaultProps: MainFrameToolbarProps = {
   hasPreviewsRunning: false,
   canSave: true,
   onSave: async () => {},
+  onOpenVersionHistory: () => {},
+  canQuitVersionHistory: true,
+  onQuitVersionHistory: async () => {},
   previewState: {
     isPreviewOverriden: false,
     previewLayoutName: null,

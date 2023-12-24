@@ -115,6 +115,7 @@ const WrappedHomePage = ({
             <TutorialStateProvider>
               <HomePage
                 project={project}
+                fileMetadata={null}
                 isActive={true}
                 projectItemName={null}
                 setToolbar={() => {}}
@@ -135,7 +136,6 @@ const WrappedHomePage = ({
                   action('onOpenPrivateGameTemplateListingData')()
                 }
                 onOpenProjectManager={() => action('onOpenProjectManager')()}
-                onOpenHelpFinder={() => action('onOpenHelpFinder')()}
                 onOpenLanguageDialog={() => action('open language dialog')()}
                 onOpenNewProjectSetupDialog={() =>
                   action('onOpenNewProjectSetupDialog')()

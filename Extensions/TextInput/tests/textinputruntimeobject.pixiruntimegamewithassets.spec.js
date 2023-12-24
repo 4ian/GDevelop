@@ -55,6 +55,7 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
       objects: [],
       instances: [],
       variables: [],
+      usedResources: [],
     });
   };
 
@@ -147,6 +148,7 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
     expect(gameDomElementContainer.querySelector('textarea')).to.be(null);
 
     object.deleteFromScene(runtimeScene);
+    runtimeScene.renderAndStep(1000 / 60);
     expect(gameDomElementContainer.querySelector('input')).to.be(null);
     expect(gameDomElementContainer.querySelector('textarea')).to.be(null);
 

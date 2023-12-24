@@ -40,11 +40,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project, layout]
     );
 
+    const variablesContainers = React.useMemo(
+      () => {
+        return layout ? [layout.getVariables()] : [];
+      },
+      [layout]
+    );
+
     return (
       <React.Fragment>
         <VariableField
-          variablesContainer={layout ? layout.getVariables() : null}
-          onComputeAllVariableNames={onComputeAllVariableNames}
+          variablesContainers={variablesContainers}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -62,8 +68,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
         />
-        {editorOpen && layout && (
+        {editorOpen && layout && project && (
           <VariablesEditorDialog
+            project={project}
             title={<Trans>{layout.getName()} variables</Trans>}
             open
             variablesContainer={layout.getVariables()}
@@ -80,6 +87,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             }
             helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
+            preventRefactoringToDeleteInstructions
           />
         )}
       </React.Fragment>

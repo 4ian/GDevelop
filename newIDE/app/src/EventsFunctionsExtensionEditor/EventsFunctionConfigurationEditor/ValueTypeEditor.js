@@ -112,6 +112,26 @@ export default function ValueTypeEditor({
                   value="objectAnimationName"
                   label={t`Object animation (text)`}
                 />
+                <SelectOption
+                  value="layerEffectName"
+                  label={t`Layer effect (text)`}
+                />
+                <SelectOption
+                  value="layerEffectParameterName"
+                  label={t`Layer effect property (text)`}
+                />
+                <SelectOption
+                  value="objectEffectName"
+                  label={t`Object effect (text)`}
+                />
+                <SelectOption
+                  value="objectEffectParameterName"
+                  label={t`Object effect property (text)`}
+                />
+                <SelectOption
+                  value="leaderboardId"
+                  label={t`Leaderboard (text)`}
+                />
                 <SelectOption value="identifier" label={t`Identifier (text)`} />
                 <SelectOption value="scenevar" label={t`Scene variable`} />
                 {!isExpressionType && (

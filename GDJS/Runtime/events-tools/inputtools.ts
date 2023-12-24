@@ -380,7 +380,7 @@ namespace gdjs {
           .isMouseInsideCanvas();
       };
 
-      export const _cursorIsOnObject = function (
+      const _cursorIsOnObject = function (
         obj: gdjs.RuntimeObject,
         instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
@@ -394,7 +394,7 @@ namespace gdjs {
         inverted: boolean
       ) {
         return gdjs.evtTools.object.pickObjectsIf(
-          gdjs.evtTools.input._cursorIsOnObject,
+          _cursorIsOnObject,
           objectsLists,
           inverted,
           instanceContainer

@@ -2,7 +2,7 @@
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import {
   getFormerSubscriptionPlans,
   getSubscriptionPlans,
@@ -16,14 +16,25 @@ import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
 import LeftLoader from '../../UI/LeftLoader';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
-import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
+import {
+  SubscriptionSuggestionContext,
+  type SubscriptionType,
+} from './SubscriptionSuggestionContext';
 import Paper from '../../UI/Paper';
 import PlanCard from './PlanCard';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import AlertMessage from '../../UI/AlertMessage';
+import Individuals from './Icons/Individual';
+import Team from './Icons/Team';
+import Education from './Icons/Education';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   diamondIcon: {
@@ -34,6 +45,37 @@ const styles = {
   },
   paper: {
     paddingRight: 6,
+    display: 'flex',
+  },
+  subscription: {
+    display: 'flex',
+    flex: 1,
+    borderRadius: 8,
+    padding: 16,
+  },
+};
+
+const subscriptionOptions: {
+  [key: SubscriptionType]: {|
+    title: React.Node,
+    description: React.Node,
+    icon: React.Node,
+  |},
+} = {
+  individual: {
+    title: <Trans>For Individuals</Trans>,
+    description: <Trans>Hobbyists and indie devs</Trans>,
+    icon: <Individuals style={{ width: 115, height: 100 }} />,
+  },
+  team: {
+    title: <Trans>For Teams</Trans>,
+    description: <Trans>Companies, studios and agencies</Trans>,
+    icon: <Team style={{ width: 175, height: 100 }} />,
+  },
+  education: {
+    title: <Trans>For Education</Trans>,
+    description: <Trans>Teachers, courses and universities</Trans>,
+    icon: <Education style={{ width: 110, height: 100 }} />,
   },
 };
 
@@ -67,6 +109,7 @@ const SubscriptionDetails = ({
     SubscriptionSuggestionContext
   );
   const { showAlert } = useAlertDialog();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const userPlan = React.useMemo(
     () => {
@@ -92,26 +135,55 @@ const SubscriptionDetails = ({
   return (
     <Column noMargin>
       <Line alignItems="center">
-        <Text size="block-title">
-          <Trans>My online services subscription</Trans>
-        </Text>
+        <Column noMargin>
+          <Text size="block-title">
+            <Trans>Subscriptions</Trans>
+          </Text>
+          <Text size="body" noMargin>
+            <Trans>
+              Unlock more exports, cloud projects, leaderboards, collaboration
+              features and remove the GDevelop splashscreen.
+            </Trans>
+          </Text>
+        </Column>
       </Line>
       {userPlan && userPlan.planId && !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
-          <RaisedButton
-            label={<Trans>Manage subscription</Trans>}
-            primary
-            onClick={() => {
-              if (hasMobileAppStoreSubscriptionPlan(subscription)) {
-                // Would open App Store subscriptions settings.
-              } else {
-                showAlert({
-                  title: t`Subscription outside the app store`,
-                  message: t`The subscription of this account comes from outside the app store. Connect with your account on gdevelop.io from your web-browser to manage it.`,
-                });
-              }
-            }}
-          />
+          <Paper background="medium" variant="outlined" style={styles.paper}>
+            <ResponsiveLineStackLayout alignItems="center" expand noMargin>
+              <Column expand noMargin>
+                <LineStackLayout alignItems="center">
+                  <img
+                    src="res/diamond.svg"
+                    style={styles.diamondIcon}
+                    alt="diamond"
+                  />
+                  <Text noMargin>
+                    <Trans>
+                      You have unlocked full access to GDevelop to create
+                      without limits!
+                    </Trans>
+                  </Text>
+                </LineStackLayout>
+              </Column>
+              <Column noMargin>
+                <RaisedButton
+                  label={<Trans>Manage subscription</Trans>}
+                  primary
+                  onClick={() => {
+                    if (hasMobileAppStoreSubscriptionPlan(subscription)) {
+                      // Would open App Store subscriptions settings.
+                    } else {
+                      showAlert({
+                        title: t`Subscription outside the app store`,
+                        message: t`The subscription of this account comes from outside the app store. Connect with your account on gdevelop.io from your web-browser to manage it.`,
+                      });
+                    }
+                  }}
+                />
+              </Column>
+            </ResponsiveLineStackLayout>
+          </Paper>
         ) : (
           // On web/desktop, displays the subscription as usual:
           <ColumnStackLayout noMargin>
@@ -147,13 +219,15 @@ const SubscriptionDetails = ({
                         label={<Trans>Manage subscription</Trans>}
                         primary
                         onClick={() =>
-                          openSubscriptionDialog({ reason: 'Consult profile' })
+                          openSubscriptionDialog({
+                            analyticsMetadata: { reason: 'Consult profile' },
+                          })
                         }
                         disabled={isManageSubscriptionLoading}
                       />,
                     ].filter(Boolean)
               }
-              isHighlighted={false}
+              isHighlighted
               background="medium"
             />
             {subscription.cancelAtPeriodEnd && (
@@ -168,11 +242,11 @@ const SubscriptionDetails = ({
               <I18n>
                 {({ i18n }) => (
                   <Paper background="dark" variant="outlined">
-                    <LineStackLayout alignItems="center">
+                    <LineStackLayout alignItems="center" noMargin>
                       <img
                         src="res/diamond.svg"
                         style={styles.diamondIcon}
-                        alt=""
+                        alt="diamond"
                       />
                       <Column>
                         <Text>
@@ -190,59 +264,119 @@ const SubscriptionDetails = ({
             )}
           </ColumnStackLayout>
         )
-      ) : (
-        <Paper background="medium" variant="outlined" style={styles.paper}>
-          <LineStackLayout alignItems="center">
-            <img src="res/diamond.svg" style={styles.diamondIcon} alt="" />
-            <Column expand>
-              <Line>
-                {!isSubscriptionExpired ? (
-                  isOnOrSimulateMobileApp ? (
-                    <Column noMargin>
-                      <Text noMargin>
-                        <Trans>
-                          Unlock full access to GDevelop to create without
-                          limits!
-                        </Trans>
-                      </Text>
-                    </Column>
-                  ) : (
-                    <Column noMargin>
-                      <Text noMargin>
-                        <Trans>
-                          Unlock more one-click exports, cloud projects,
-                          leaderboards and remove the GDevelop splashscreen.
-                        </Trans>
-                      </Text>
-                      <Text noMargin>
-                        <Trans>
-                          With a subscription, you’re also supporting the
-                          improvement of GDevelop.
-                        </Trans>
-                      </Text>
-                    </Column>
-                  )
-                ) : (
+      ) : !isSubscriptionExpired ? (
+        isOnOrSimulateMobileApp ? (
+          <Paper background="medium" variant="outlined" style={styles.paper}>
+            <ResponsiveLineStackLayout alignItems="center" expand noMargin>
+              <Column expand noMargin>
+                <LineStackLayout alignItems="center">
+                  <img
+                    src="res/diamond.svg"
+                    style={styles.diamondIcon}
+                    alt="diamond"
+                  />
                   <Text noMargin>
                     <Trans>
-                      Oh no! Your subscription from the redemption code has
-                      expired. You can renew it by redeeming a new code or
-                      getting a new subscription.
+                      Unlock full access to GDevelop to create without limits!
                     </Trans>
                   </Text>
-                )}
-              </Line>
-              <Line justifyContent="flex-end">
+                </LineStackLayout>
+              </Column>
+              <Column noMargin>
                 <RaisedButton
                   label={<Trans>Choose a subscription</Trans>}
                   primary
                   onClick={() =>
-                    openSubscriptionDialog({ reason: 'Consult profile' })
+                    openSubscriptionDialog({
+                      analyticsMetadata: { reason: 'Consult profile' },
+                    })
                   }
                 />
-              </Line>
+              </Column>
+            </ResponsiveLineStackLayout>
+          </Paper>
+        ) : (
+          <ResponsiveLineStackLayout>
+            {Object.keys(subscriptionOptions).map(key => {
+              const { title, description, icon } = subscriptionOptions[key];
+              return (
+                <div
+                  style={{
+                    ...styles.subscription,
+                    border: `1px solid ${gdevelopTheme.palette.secondary}`,
+                  }}
+                  key={key}
+                >
+                  <Column
+                    expand
+                    alignItems="center"
+                    justifyContent="space-between"
+                    noMargin
+                    key={key}
+                  >
+                    {icon}
+                    <Column noMargin alignItems="center" expand>
+                      <Text size="sub-title" noMargin align="center">
+                        {title}
+                      </Text>
+                      <Text
+                        size="body-small"
+                        noMargin
+                        color="secondary"
+                        align="center"
+                      >
+                        {description}
+                      </Text>
+                    </Column>
+                    <Spacer />
+                    <RaisedButton
+                      primary
+                      onClick={() =>
+                        openSubscriptionDialog({
+                          analyticsMetadata: { reason: 'Consult profile' },
+                          filter: key,
+                        })
+                      }
+                      label={<Trans>See plans</Trans>}
+                      fullWidth
+                    />
+                  </Column>
+                </div>
+              );
+            })}
+          </ResponsiveLineStackLayout>
+        )
+      ) : (
+        <Paper background="medium" variant="outlined" style={styles.paper}>
+          <ResponsiveLineStackLayout alignItems="center" expand noMargin>
+            <Column expand noMargin>
+              <LineStackLayout alignItems="center">
+                <img
+                  src="res/diamond.svg"
+                  style={styles.diamondIcon}
+                  alt="diamond"
+                />
+                <Text noMargin>
+                  <Trans>
+                    Oh no! Your subscription from the redemption code has
+                    expired. You can renew it by redeeming a new code or getting
+                    a new subscription.
+                  </Trans>
+                </Text>
+              </LineStackLayout>
             </Column>
-          </LineStackLayout>
+            <Column noMargin>
+              <RaisedButton
+                label={<Trans>Choose a subscription</Trans>}
+                primary
+                onClick={() =>
+                  openSubscriptionDialog({
+                    analyticsMetadata: { reason: 'Consult profile' },
+                  })
+                }
+              />
+            </Column>
+          </ResponsiveLineStackLayout>
         </Paper>
       )}
     </Column>

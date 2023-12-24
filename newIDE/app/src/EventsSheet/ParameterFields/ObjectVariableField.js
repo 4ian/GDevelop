@@ -14,6 +14,44 @@ import {
 } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import getObjectByName from '../../Utils/GetObjectByName';
+import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+
+// TODO Move this function to the ObjectsContainersList class.
+const getObjectOrGroupVariablesContainers = (
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  objectName: string
+): Array<gdVariablesContainer> => {
+  const object = getObjectByName(
+    globalObjectsContainer,
+    objectsContainer,
+    objectName
+  );
+  const variablesContainers: Array<gdVariablesContainer> = [];
+  if (object) {
+    variablesContainers.push(object.getVariables());
+  } else {
+    const group = getObjectGroupByName(
+      globalObjectsContainer,
+      objectsContainer,
+      objectName
+    );
+    if (group) {
+      for (const subObjectName of group.getAllObjectsNames().toJSArray()) {
+        const subObject = getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          subObjectName
+        );
+        if (subObject) {
+          variablesContainers.push(subObject.getVariables());
+        }
+      }
+    }
+  }
+  return variablesContainers;
+};
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
@@ -28,6 +66,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const {
       project,
+      globalObjectsContainer,
+      objectsContainer,
       scope,
       instructionMetadata,
       instruction,
@@ -45,17 +85,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     });
 
     const { layout } = scope;
-    let object = null;
-    let variablesContainer = null;
-    if (objectName) {
-      if (layout && layout.hasObjectNamed(objectName)) {
-        object = layout.getObject(objectName);
-        variablesContainer = object.getVariables();
-      } else if (project && project.hasObjectNamed(objectName)) {
-        object = project.getObject(objectName);
-        variablesContainer = object.getVariables();
-      }
-    }
+    const object = objectName
+      ? getObjectByName(globalObjectsContainer, objectsContainer, objectName)
+      : null;
+    const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
+      () =>
+        objectName
+          ? getObjectOrGroupVariablesContainers(
+              globalObjectsContainer,
+              objectsContainer,
+              objectName
+            )
+          : [],
+      [objectName, globalObjectsContainer, objectsContainer]
+    );
 
     const onComputeAllVariableNames = () =>
       project && layout && object
@@ -70,8 +113,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <React.Fragment>
         <VariableField
-          variablesContainer={variablesContainer}
-          onComputeAllVariableNames={onComputeAllVariableNames}
+          variablesContainers={variablesContainers}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -89,28 +131,33 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
         />
-        {editorOpen && variablesContainer && (
-          <VariablesEditorDialog
-            title={<Trans>Object Variables</Trans>}
-            open={editorOpen}
-            variablesContainer={variablesContainer}
-            emptyPlaceholderTitle={
-              <Trans>Add your first object variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information on an object.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/object-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
-            onCancel={() => setEditorOpen(false)}
-            onApply={() => {
-              setEditorOpen(false);
-              if (field.current) field.current.updateAutocompletions();
-            }}
-          />
-        )}
+        {editorOpen &&
+          // There is no variable editor for groups.
+          variablesContainers.length === 1 &&
+          project && (
+            <VariablesEditorDialog
+              project={project}
+              title={<Trans>Object Variables</Trans>}
+              open={editorOpen}
+              variablesContainer={variablesContainers[0]}
+              emptyPlaceholderTitle={
+                <Trans>Add your first object variable</Trans>
+              }
+              emptyPlaceholderDescription={
+                <Trans>
+                  These variables hold additional information on an object.
+                </Trans>
+              }
+              helpPagePath={'/all-features/variables/object-variables'}
+              onComputeAllVariableNames={onComputeAllVariableNames}
+              onCancel={() => setEditorOpen(false)}
+              onApply={() => {
+                setEditorOpen(false);
+                if (field.current) field.current.updateAutocompletions();
+              }}
+              preventRefactoringToDeleteInstructions
+            />
+          )}
       </React.Fragment>
     );
   }

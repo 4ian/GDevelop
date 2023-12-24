@@ -36,6 +36,7 @@ import { RouterContextProvider } from './RouterContext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { useShopNavigation } from '../AssetStore/AssetStoreNavigator';
+import { Trans } from '@lingui/macro';
 
 type Props = {|
   authentication: Authentication,
@@ -73,7 +74,7 @@ const Providers = ({
                 <GDI18nProvider language={values.language.replace('_', '-')}>
                   <FullThemeProvider>
                     <ErrorBoundary
-                      title="GDevelop encountered an issue"
+                      componentTitle={<Trans>GDevelop app</Trans>}
                       scope="app"
                     >
                       <InAppTutorialProvider>

@@ -62,12 +62,6 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
       values.themeName = 'Blue Dark';
     }
 
-    // Synchronize the global state(s).
-    const gd: libGDevelop = global.gd;
-    gd.Project.allowUsageOfUnicodeIdentifierNames(
-      values.allowUsageOfUnicodeIdentifierNames
-    );
-
     return values;
   } catch (e) {
     return null;
@@ -113,9 +107,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
-      this
-    ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
@@ -139,6 +130,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
     getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
     setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    getShareDialogDefaultTab: this._getShareDialogDefaultTab.bind(this),
+    setShareDialogDefaultTab: this._setShareDialogDefaultTab.bind(this),
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
@@ -148,11 +141,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
-    setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
+    setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(
+      this
+    ),
     setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
       this
     ),
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
+      this
+    ),
+    setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
+      this
+    ),
+    getShowDeprecatedInstructionWarning: this._getShowDeprecatedInstructionWarning.bind(
       this
     ),
     setUse3DEditor: this._setUse3DEditor.bind(this),
@@ -166,7 +167,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
       this
     ),
-    setAllowUsageOfUnicodeIdentifierNames: this._setAllowUsageOfUnicodeIdentifierNames.bind(
+    setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(
+      this
+    ),
+    setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(
       this
     ),
     getEditorStateForProject: this._getEditorStateForProject.bind(this),
@@ -263,20 +267,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return tutorialProgresses[userIdKey];
   }
 
-  _setUseUndefinedVariablesInAutocompletion(
-    useUndefinedVariablesInAutocompletion: boolean
-  ) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          useUndefinedVariablesInAutocompletion,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
   _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {
     this.setState(
       state => ({
@@ -327,12 +317,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setShowGetStartedSection(showGetStartedSection: boolean) {
+  _setShowGetStartedSection(showGetStartedSectionByDefault: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          showGetStartedSection,
+          showGetStartedSectionByDefault,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -441,6 +431,24 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getShowEventBasedObjectsEditor() {
     return this.state.values.showEventBasedObjectsEditor;
+  }
+
+  _setShowDeprecatedInstructionWarning(
+    showDeprecatedInstructionWarning: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showDeprecatedInstructionWarning,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShowDeprecatedInstructionWarning() {
+    return this.state.values.showDeprecatedInstructionWarning;
   }
 
   _setUse3DEditor(use3DEditor: boolean) {
@@ -764,6 +772,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _getShareDialogDefaultTab() {
+    return this.state.values.shareDialogDefaultTab;
+  }
+
+  _setShareDialogDefaultTab(shareDialogDefaultTab: 'invite' | 'publish') {
+    this.setState(
+      state => ({
+        values: { ...state.values, shareDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getIsMenuBarHiddenInPreview() {
     return this.state.values.isMenuBarHiddenInPreview;
   }
@@ -831,14 +852,26 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setAllowUsageOfUnicodeIdentifierNames(enable: boolean) {
-    const gd: libGDevelop = global.gd;
-    gd.Project.allowUsageOfUnicodeIdentifierNames(enable);
+  _setWatchProjectFolderFilesForLocalProjects(enable: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          allowUsageOfUnicodeIdentifierNames: enable,
+          watchProjectFolderFilesForLocalProjects: enable,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewFeaturesAcknowledgements(newFeaturesAcknowledgements: {
+    [featureId: string]: {| dates: [number] |},
+  }) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newFeaturesAcknowledgements,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

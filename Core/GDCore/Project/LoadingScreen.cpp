@@ -5,7 +5,6 @@
  */
 
 #include "LoadingScreen.h"
-
 #include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {
@@ -18,7 +17,7 @@ LoadingScreen::LoadingScreen()
       backgroundFadeInDuration(0.2),
       minDuration(1.5),
       logoAndProgressFadeInDuration(0.2),
-      logoAndProgressLogoFadeInDelay(0.2),
+      logoAndProgressLogoFadeInDelay(0),
       showProgressBar(true),
       progressBarMinWidth(40),
       progressBarMaxWidth(200),

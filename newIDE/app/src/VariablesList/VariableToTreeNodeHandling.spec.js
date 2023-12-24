@@ -2,7 +2,6 @@
 import {
   generateListOfNodesMatchingSearchInVariable,
   generateListOfNodesMatchingSearchInVariablesContainer,
-  getExpandedNodeIdsFromVariablesContainer,
   getVariableContextFromNodeId,
   separator,
   updateListOfNodesFollowingChangeName,
@@ -126,14 +125,6 @@ describe('VariableToTreeNodeHandling', () => {
         }),
       ]);
       expect(variable.getString()).toBe(firstStructureChild.getString());
-    });
-  });
-
-  describe('getExpandedNodeIdsFromVariablesContainer', () => {
-    test('List of unfolded nodes are returned', () => {
-      expect(
-        getExpandedNodeIdsFromVariablesContainer(variablesContainer)
-      ).toEqual(['parent', `parent2${separator}structureChild`]);
     });
   });
 

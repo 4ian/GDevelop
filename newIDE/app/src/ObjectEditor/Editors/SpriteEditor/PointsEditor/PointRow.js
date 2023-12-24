@@ -32,13 +32,13 @@ type Props = {|
 |};
 
 const PointRow = ({ pointX, pointY, ...props }: Props) => {
-  const muiTheme = React.useContext(GDevelopThemeContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <TableRow
       style={{
         backgroundColor: props.selected
-          ? muiTheme.listItem.selectedBackgroundColor
-          : muiTheme.list.itemsBackgroundColor,
+          ? gdevelopTheme.listItem.selectedBackgroundColor
+          : gdevelopTheme.list.itemsBackgroundColor,
       }}
       onClick={() => props.onClick(props.pointName)}
       onPointerEnter={() => props.onPointerEnter(props.pointName)}
@@ -49,7 +49,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
           margin="none"
           inputStyle={
             props.selected
-              ? { color: muiTheme.listItem.selectedTextColor }
+              ? { color: gdevelopTheme.listItem.selectedTextColor }
               : undefined
           }
           value={props.pointName}
@@ -68,11 +68,12 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
               margin="none"
               inputStyle={
                 props.selected
-                  ? { color: muiTheme.listItem.selectedTextColor }
+                  ? { color: gdevelopTheme.listItem.selectedTextColor }
                   : undefined
               }
               value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
               type="number"
+              step={0.5}
               id="point-x"
               onChange={value => {
                 const valueAsNumber = parseFloat(value);
@@ -98,11 +99,12 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
               margin="none"
               inputStyle={
                 props.selected
-                  ? { color: muiTheme.listItem.selectedTextColor }
+                  ? { color: gdevelopTheme.listItem.selectedTextColor }
                   : undefined
               }
               value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
               type="number"
+              step={0.5}
               id="point-y"
               onChange={value => {
                 const valueAsNumber = parseFloat(value);

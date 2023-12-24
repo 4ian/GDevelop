@@ -228,7 +228,9 @@ describe('InstallAsset', () => {
       expect(layout.hasObjectNamed('PlayerSpaceship')).toBe(true);
       const object = layout.getObject('PlayerSpaceship');
 
-      const resourcesInUse = new gd.ResourcesInUseHelper();
+      const resourcesInUse = new gd.ResourcesInUseHelper(
+        project.getResourcesManager()
+      );
       object.getConfiguration().exposeResources(resourcesInUse);
       const objectResourceNames = resourcesInUse
         .getAllImages()

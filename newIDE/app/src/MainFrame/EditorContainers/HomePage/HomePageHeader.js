@@ -7,7 +7,7 @@ import FlatButton from '../../../UI/FlatButton';
 import { Column, Line } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
-import ProjectManager from '../../../UI/CustomSvgIcons/ProjectManager';
+import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
@@ -24,6 +24,7 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
+  showUserChip: boolean,
 |};
 
 export const HomePageHeader = ({
@@ -33,10 +34,10 @@ export const HomePageHeader = ({
   onOpenLanguageDialog,
   onSave,
   canSave,
+  showUserChip,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
-
   return (
     <I18n>
       {({ i18n }) => (
@@ -56,7 +57,7 @@ export const HomePageHeader = ({
                 color="default"
                 disabled={!hasProject}
               >
-                <ProjectManager />
+                <ProjectManagerIcon />
               </IconButton>
               {!!hasProject && (
                 <IconButton
@@ -82,7 +83,7 @@ export const HomePageHeader = ({
                   }
                 />
               )}
-              <UserChip onOpenProfile={onOpenProfile} />
+              {showUserChip && <UserChip onOpenProfile={onOpenProfile} />}
               <TextButton
                 label={i18n.language.toUpperCase()}
                 onClick={onOpenLanguageDialog}

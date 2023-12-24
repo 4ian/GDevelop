@@ -36,7 +36,7 @@ namespace gdjs {
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.OpacityHandler {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -145,6 +145,11 @@ namespace gdjs {
       this._renderer.ensureUpToDate();
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Initialize the extra parameters that could be set for an instance.
      */
@@ -213,20 +218,37 @@ namespace gdjs {
 
     /**
      * Get the string displayed by the object.
+     * @deprecated use `getText` instead
      */
     getString(): string {
+      return this.getText();
+    }
+
+    /**
+     * Set the string displayed by the object.
+     * @param text The new text
+     * @deprecated use `setText` instead
+     */
+    setString(text: string): void {
+      this.setText(text);
+    }
+
+    /**
+     * Get the string displayed by the object.
+     */
+    getText(): string {
       return this._str;
     }
 
     /**
      * Set the string displayed by the object.
-     * @param str The new text
+     * @param text The new text
      */
-    setString(str: string): void {
-      if (str === this._str) {
+    setText(text: string): void {
+      if (text === this._str) {
         return;
       }
-      this._str = str;
+      this._str = text;
       this._renderer.updateString();
       this._updateTextPosition();
     }

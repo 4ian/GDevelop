@@ -19,6 +19,7 @@ import { isNativeMobileApp } from '../../Utils/Platform';
 
 export type SubscriptionCheckerInterface = {|
   checkUserHasSubscription: () => boolean,
+  hasUserSubscription: () => boolean,
 |};
 
 type Props = {|
@@ -68,7 +69,14 @@ const SubscriptionChecker = React.forwardRef<
     return false;
   };
 
-  React.useImperativeHandle(ref, () => ({ checkUserHasSubscription }));
+  const hasUserSubscription = () => {
+    return hasValidSubscriptionPlan(authenticatedUser.subscription);
+  };
+
+  React.useImperativeHandle(ref, () => ({
+    checkUserHasSubscription,
+    hasUserSubscription,
+  }));
 
   return (
     <Dialog
@@ -95,8 +103,10 @@ const SubscriptionChecker = React.forwardRef<
             if (onChangeSubscription) onChangeSubscription();
             setDialogOpen(false);
             openSubscriptionDialog({
-              reason: id,
-              preStep: 'subscriptionChecker',
+              analyticsMetadata: {
+                reason: id,
+                preStep: 'subscriptionChecker',
+              },
             });
           }}
         />,

@@ -12,15 +12,15 @@ import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import UserAchievements from './Achievement/UserAchievements';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
-import { GamesList } from '../GameDashboard/GamesList';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import RouterContext from '../MainFrame/RouterContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
+import ErrorBoundary from '../UI/ErrorBoundary';
+import AlertMessage from '../UI/AlertMessage';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -31,9 +31,6 @@ type Props = {|
 |};
 
 const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
-  const { routeArguments, removeRouteArguments } = React.useContext(
-    RouterContext
-  );
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
 
@@ -41,17 +38,6 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
-
-  React.useEffect(
-    () => {
-      if (routeArguments['initial-dialog'] === 'games-dashboard') {
-        setCurrentTab('games-dashboard');
-        removeRouteArguments(['initial-dialog']);
-      }
-    },
-    [routeArguments, removeRouteArguments]
-  );
-
   const markBadgesAsSeen = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
       if (!(authenticatedUser.authenticated && authenticatedUser.profile)) {
@@ -205,8 +191,12 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
               <Column expand noMargin>
                 <AuthenticatedUserProfileDetails
                   authenticatedUser={authenticatedUser}
-                  onEditProfile={authenticatedUser.onEdit}
-                  onChangeEmail={authenticatedUser.onChangeEmail}
+                  onOpenEditProfileDialog={
+                    authenticatedUser.onOpenEditProfileDialog
+                  }
+                  onOpenChangeEmailDialog={
+                    authenticatedUser.onOpenChangeEmailDialog
+                  }
                 />
                 <SubscriptionDetails
                   subscription={authenticatedUser.subscription}
@@ -227,14 +217,23 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
             </Line>
           )}
           {currentTab === 'games-dashboard' && (
-            <GamesList project={currentProject} />
+            <Column expand justifyContent="center" alignItems="center">
+              <AlertMessage kind="info">
+                <Trans>
+                  You can now find the Games Dashboard on the home page under
+                  the Manage tab.
+                </Trans>
+              </AlertMessage>
+            </Column>
           )}
         </>
       ) : (
         <Column noMargin expand justifyContent="center">
           <CreateProfile
-            onLogin={authenticatedUser.onLogin}
-            onCreateAccount={authenticatedUser.onCreateAccount}
+            onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+            onOpenCreateAccountDialog={
+              authenticatedUser.onOpenCreateAccountDialog
+            }
             message={
               <Trans>
                 Create an account to register your games and to get access to
@@ -249,4 +248,14 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   );
 };
 
-export default ProfileDialog;
+const ProfileDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Profile</Trans>}
+    scope="profile"
+    onClose={props.onClose}
+  >
+    <ProfileDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ProfileDialogWithErrorBoundary;

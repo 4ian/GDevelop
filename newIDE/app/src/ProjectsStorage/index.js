@@ -5,6 +5,10 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import {
+  type ShowAlertFunction,
+  type ShowConfirmFunction,
+} from '../UI/Alert/AlertContext';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -97,7 +101,7 @@ export type StorageProviderOperations = {|
   onSaveProject?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    options?: {| previousVersion: string |}
+    options?: {| previousVersion?: string, restoredFromVersionId?: string |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
@@ -122,13 +126,27 @@ export type StorageProviderOperations = {|
     /** This is the location where the project was saved, or null if not persisted. */
     fileMetadata: ?FileMetadata,
   |}>,
+  canFileMetadataBeSafelySaved?: (
+    fileMetadata: FileMetadata,
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
+  ) => Promise<boolean>,
+  canFileMetadataBeSafelySavedAs?: (
+    fileMetadata: FileMetadata,
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
+  ) => Promise<boolean>,
 
   // Project properties saving:
   onChangeProjectProperty?: (
     project: gdProject,
     fileMetadata: FileMetadata,
     properties: {| name?: string, gameId?: string |} // In order to synchronize project and cloud project names.
-  ) => Promise<boolean>,
+  ) => Promise<null | {| version: string, lastModifiedDate: number |}>,
 
   // Project auto saving:
   onAutoSaveProject?: (
@@ -175,4 +193,10 @@ export type StorageProvider = {|
   createResourceOperations?: ({|
     authenticatedUser: AuthenticatedUser,
   |}) => ResourcesActionsMenuBuilder,
+  /** Resources external changes */
+  setupResourcesWatcher?: ({|
+    fileIdentifier: string,
+    callback: ({| identifier: string |}) => void,
+    options?: any,
+  |}) => () => void,
 |};

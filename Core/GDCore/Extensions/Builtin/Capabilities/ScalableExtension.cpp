@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Scalable capability"))
+      .SetIcon("res/actions/scale24_black.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
       .SetIcon("res/actions/scale24_black.png");
 
@@ -44,7 +46,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
          _("Scale"),
          _("the scale of the object (default scale is 1)"),
          _("the scale"),
-         _("Scale"),
+         _("Size"),
          "res/actions/scale24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")
@@ -53,6 +55,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["Value"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "number",
@@ -60,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
          _("Scale on X axis"),
          _("the scale on X axis of the object (default scale is 1)"),
          _("the scale on X axis"),
-         _("Scale"),
+         _("Size"),
          "res/actions/scaleWidth24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")
@@ -69,6 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["X"].SetGroup("");
 
   aut.AddExpressionAndConditionAndAction(
          "number",
@@ -76,7 +80,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
          _("Scale on Y axis"),
          _("the scale on Y axis of the object (default scale is 1)"),
          _("the scale on Y axis"),
-         _("Scale"),
+         _("Size"),
          "res/actions/scaleHeight24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")
@@ -85,6 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
+  aut.GetAllExpressions()["Y"].SetGroup("");
 }
 
 }  // namespace gd

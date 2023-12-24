@@ -134,18 +134,23 @@ export const tryExtractStringLiteralContent = (
   return null;
 };
 
-export const getParameterChoices = (
+export const getParameterChoiceAutocompletions = (
   parameterMetadata: ?gdParameterMetadata
-): Array<ExpressionAutocompletion> => {
+): Array<ExpressionAutocompletion> =>
+  getParameterChoiceValues(parameterMetadata).map(choice => ({
+    kind: 'Text',
+    completion: `"${choice}"`,
+  }));
+
+export const getParameterChoiceValues = (
+  parameterMetadata: ?gdParameterMetadata
+): Array<string> => {
   if (!parameterMetadata) {
     return [];
   }
 
   try {
-    return JSON.parse(parameterMetadata.getExtraInfo()).map(choice => ({
-      kind: 'Text',
-      completion: `"${choice}"`,
-    }));
+    return JSON.parse(parameterMetadata.getExtraInfo());
   } catch (exception) {
     console.error(
       'The parameter seems misconfigured, as an array of choices could not be extracted - verify that your properly wrote a list of choices in JSON format. Full exception is:',

@@ -3,12 +3,13 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef EXPORTER_HELPER_H
-#define EXPORTER_HELPER_H
+#pragma once
+
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "GDCore/String.h"
 namespace gd {
@@ -264,11 +265,12 @@ class ExporterHelper {
    * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs,
-      const gd::Project &project,
-      gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions);
+  static gd::String
+  ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
+                    gd::String filename,
+                    const gd::SerializerElement &runtimeGameOptions,
+                    std::set<gd::String> &projectUsedResources,
+                    std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -474,7 +476,12 @@ class ExporterHelper {
       gdjsRoot;  ///< The root directory of GDJS, used to copy runtime files.
   gd::String codeOutputDir;  ///< The directory where JS code is outputted. Will
                              ///< be then copied to the final output directory.
+
+private:
+  static void SerializeUsedResources(
+      gd::SerializerElement &rootElement,
+      std::set<gd::String> &projectUsedResources,
+      std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
 };
 
 }  // namespace gdjs
-#endif  // EXPORTER_HELPER_H

@@ -24,7 +24,7 @@
   "dependencies": {
     "@types/offscreencanvas": "^2019.6.4",
     "pako": "^2.0.4",
-    "pixi.js": "6.1.2"
+    "pixi.js": "7.3.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.1.3",

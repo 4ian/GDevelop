@@ -8,6 +8,7 @@ namespace gdjs {
     _runtimeGame: gdjs.RuntimeGame;
     _stack: gdjs.RuntimeScene[] = [];
     _wasFirstSceneLoaded: boolean = false;
+    _isNextLayoutLoading: boolean = false;
 
     /**
      * @param runtimeGame The runtime game that is using the scene stack
@@ -31,7 +32,7 @@ namespace gdjs {
     }
 
     step(elapsedTime: float): boolean {
-      if (this._stack.length === 0) {
+      if (this._isNextLayoutLoading || this._stack.length === 0) {
         return false;
       }
       const currentScene = this._stack[this._stack.length - 1];
@@ -91,13 +92,34 @@ namespace gdjs {
      * Pause the scene currently being played and start the new scene that is specified.
      * If `externalLayoutName` is set, also instantiate the objects from this external layout.
      */
-    push(newSceneName: string, externalLayoutName?: string): gdjs.RuntimeScene {
+    push(
+      newSceneName: string,
+      externalLayoutName?: string
+    ): gdjs.RuntimeScene | null {
       // Tell the scene it's being paused
       const currentScene = this._stack[this._stack.length - 1];
       if (currentScene) {
         currentScene.onPause();
       }
 
+      // Avoid a risk of displaying an intermediate loading screen
+      // during 1 frame.
+      if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
+        return this._loadNewScene(newSceneName, externalLayoutName);
+      }
+
+      this._isNextLayoutLoading = true;
+      this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
+        this._loadNewScene(newSceneName);
+        this._isNextLayoutLoading = false;
+      });
+      return null;
+    }
+
+    private _loadNewScene(
+      newSceneName: string,
+      externalLayoutName?: string
+    ): gdjs.RuntimeScene {
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
@@ -113,6 +135,7 @@ namespace gdjs {
             externalLayoutData.instances,
             0,
             0,
+            0,
             /*trackByPersistentUuid=*/
             true
           );
@@ -126,7 +149,7 @@ namespace gdjs {
      * Start the specified scene, replacing the one currently being played.
      * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
      */
-    replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene {
+    replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene | null {
       if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {

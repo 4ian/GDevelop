@@ -7,12 +7,9 @@ const {
 
 describe('libGD.js - GDJS Code Generation integration tests', () => {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   describe('can generate a function that create an instance', () => {
     const generateFunctionWithCreateAction = (gd) => {

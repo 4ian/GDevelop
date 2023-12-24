@@ -35,11 +35,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         : [];
 
+    const variablesContainers = React.useMemo(
+      () => {
+        return project ? [project.getVariables()] : [];
+      },
+      [project]
+    );
+
     return (
       <React.Fragment>
         <VariableField
-          variablesContainer={project ? project.getVariables() : null}
-          onComputeAllVariableNames={onComputeAllVariableNames}
+          variablesContainers={variablesContainers}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -54,6 +60,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         />
         {editorOpen && project && (
           <VariablesEditorDialog
+            project={project}
             title={<Trans>Global Variables</Trans>}
             open={editorOpen}
             variablesContainer={project.getVariables()}
@@ -72,6 +79,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             }
             helpPagePath={'/all-features/variables/global-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
+            preventRefactoringToDeleteInstructions
           />
         )}
       </React.Fragment>

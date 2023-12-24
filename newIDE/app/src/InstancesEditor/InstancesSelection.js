@@ -105,4 +105,25 @@ export default class InstancesSelection {
       }
     }
   }
+
+  cleanNonExistingInstances(instancesContainer: gdInitialInstancesContainer) {
+    const allExistingInstancePointers = new Set<number>();
+    const functor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - typing is not correct.
+    functor.invoke = (instancePtr: number) => {
+      allExistingInstancePointers.add(instancePtr);
+    };
+    // $FlowFixMe
+    instancesContainer.iterateOverInstances(functor);
+    functor.delete();
+
+    for (let i = 0; i < this.selection.length; ) {
+      const instance = this.selection[i];
+      if (!allExistingInstancePointers.has(instance.ptr)) {
+        this.selection.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+  }
 }

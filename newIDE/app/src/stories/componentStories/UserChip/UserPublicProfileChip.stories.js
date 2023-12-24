@@ -19,7 +19,9 @@ export const UserPublicProfileChip = () => (
       username: 'username',
       description: 'something',
       donateLink: 'https://myurl.com',
+      discordUsername: 'username#1234',
       communityLinks: {},
+      iconUrl: 'https://resources.gdevelop-app.com/avatars/4ian.png',
     }}
   />
 );

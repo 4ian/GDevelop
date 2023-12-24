@@ -9,8 +9,11 @@ import PromisePool from '@supercharge/promise-pool';
 import { getFileSha512TruncatedTo256 } from '../FileHasher';
 import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import { extractNextPageUriFromLinkHeader } from './Play';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
+export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
 export const projectResourcesClient = axios.create({
@@ -71,23 +74,68 @@ export type UploadedProjectResourceFiles = Array<{|
 type CloudProject = {|
   id: string,
   name: string,
-  gameId?: string,
   createdAt: string,
-  currentVersion?: string,
   deletedAt?: string,
+  updatedAt: string,
+  currentVersion?: string,
+  committedAt?: string,
+  gameId?: string,
 |};
 
 export type CloudProjectVersion = {|
   projectId: string,
   id: string,
+  label?: string,
   createdAt: string,
+  /** Was not always recorded so can be undefined. Represents the user who created this version. */
+  userId?: string,
   /** previousVersion is null when the entity represents the initial version of a project. */
   previousVersion: null | string,
+  /** If the version is a restoration from a previous one, this attribute is set. */
+  restoredFromVersionId?: string,
+|};
+
+export type ExpandedCloudProjectVersion = {|
+  projectId: string,
+  id: string,
+  label?: string,
+  createdAt: string,
+  /** Was not always recorded so can be undefined. Represents the user who created this version. */
+  userId?: string,
+  /** previousVersion is null when the entity represents the initial version of a project. */
+  previousVersion: null | string,
+  /** If the version is a restoration from a previous one, this attribute is set. */
+  restoredFromVersion?: CloudProjectVersion,
 |};
 
 export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
+  /** Represents when the current user last modified the project. */
   lastModifiedAt: string,
+  /** Was not always recorded so can be undefined. Represents the last user who committed. */
+  lastCommittedBy?: string,
+|};
+
+export type Feature = 'ownership' | 'collaboration';
+export type Level = 'owner' | 'writer' | 'reader';
+
+export type ProjectUserAcl = {|
+  projectId: string,
+  userId: string,
+  feature: Feature,
+  level: Level,
+|};
+
+export type ProjectUserAclWithEmail = {|
+  ...ProjectUserAcl,
+  email: string,
+|};
+
+export type ProjectUserAclRequest = {|
+  projectId: string,
+  email: string, // The email of the user to add to the project.
+  feature: Feature,
+  level: Level,
 |};
 
 export const isCloudProjectVersionSane = async (
@@ -124,7 +172,8 @@ const refetchCredentialsForProjectAndRetryIfUnauthorized = async <T>(
     const response = await apiCall();
     return response;
   } catch (error) {
-    if (error.response && error.response.status === 403) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
       await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
       const response = await apiCall();
       return response;
@@ -151,7 +200,7 @@ const getVersionIdFromPath = (path: string): string => {
 export const getLastVersionsOfProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
-): Promise<?Array<CloudProjectVersion>> => {
+): Promise<?Array<ExpandedCloudProjectVersion>> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
@@ -163,7 +212,13 @@ export const getLastVersionsOfProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  const projectVersions = response.data;
+
+  if (!Array.isArray(projectVersions)) {
+    throw new Error('Invalid response from the project versions API');
+  }
+
+  return projectVersions;
 };
 
 export const getCredentialsForCloudProject = async (
@@ -236,11 +291,13 @@ export const commitVersion = async ({
   cloudProjectId,
   zippedProject,
   previousVersion,
+  restoredFromVersionId,
 }: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   zippedProject: Blob,
   previousVersion?: ?string,
+  restoredFromVersionId?: ?string,
 }): Promise<?string> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
@@ -267,18 +324,31 @@ export const commitVersion = async ({
         }
       )
   );
+  const body: {|
+    newVersion: string,
+    previousVersion?: string,
+    restoredFromVersionId?: string,
+  |} = { newVersion };
+  if (previousVersion) {
+    body.previousVersion = previousVersion;
+  }
+  if (restoredFromVersionId) {
+    body.restoredFromVersionId = restoredFromVersionId;
+  }
   // Inform backend a new version has been uploaded.
-  const response = await apiClient.post(
-    `/project/${cloudProjectId}/action/commit`,
-    { newVersion, ...(previousVersion ? { previousVersion } : undefined) },
-    {
+  try {
+    // Backend only returns "OK".
+    await apiClient.post(`/project/${cloudProjectId}/action/commit`, body, {
       headers: {
         Authorization: authorizationHeader,
       },
       params: { userId },
-    }
-  );
-  return response.data;
+    });
+    return newVersion;
+  } catch (error) {
+    console.error('Error while committing version', error);
+    return null;
+  }
 };
 
 export const uploadProjectResourceFiles = async (
@@ -287,6 +357,8 @@ export const uploadProjectResourceFiles = async (
   resourceFiles: File[],
   onProgress: (number, number) => void
 ): Promise<UploadedProjectResourceFiles> => {
+  if (resourceFiles.length === 0) return [];
+
   // Get the pre-signed urls where to upload the files.
   const resourceFileWithPresignedUrls = await getPresignedUrlForResourcesUpload(
     authenticatedUser,
@@ -345,7 +417,13 @@ export const listUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const cloudProjects = response.data;
+
+  if (!Array.isArray(cloudProjects)) {
+    throw new Error('Invalid response from the projects API');
+  }
+
+  return cloudProjects;
 };
 
 export const listOtherUserCloudProjects = async (
@@ -358,13 +436,19 @@ export const listOtherUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const cloudProjects = response.data;
+
+  if (!Array.isArray(cloudProjects)) {
+    throw new Error('Invalid response from the projects API');
+  }
+
+  return cloudProjects;
 };
 
 export const getCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
-): Promise<?CloudProject> => {
+): Promise<?CloudProjectWithUserAccessInfo> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
@@ -480,6 +564,8 @@ const getPresignedUrlForResourcesUpload = async (
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) throw new Error('User is not authenticated.');
 
+  if (resourceFiles.length === 0) return [];
+
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
 
@@ -518,7 +604,7 @@ const getPresignedUrlForResourcesUpload = async (
 };
 
 export const getProjectFileAsZipBlob = async (
-  cloudProject: CloudProject,
+  cloudProject: CloudProject | CloudProjectWithUserAccessInfo,
   versionId?: ?string
 ): Promise<Blob> => {
   if (!cloudProject.currentVersion) {
@@ -535,9 +621,9 @@ export const getProjectFileAsZipBlob = async (
   return response.data;
 };
 
-function escapeStringForRegExp(string) {
+const escapeStringForRegExp = string => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
+};
 const resourceFilenameRegex = new RegExp(
   `${escapeStringForRegExp(
     GDevelopProjectResourcesStorage.baseUrl
@@ -569,4 +655,142 @@ export const extractProjectUuidFromProjectResourceUrl = (
   }
 
   return null;
+};
+
+export const createProjectUserAcl = async (
+  authenticatedUser: AuthenticatedUser,
+  { projectId, email, feature, level }: ProjectUserAclRequest
+): Promise<?ProjectUserAclWithEmail> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: currentUserId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/project-user-acl`,
+    { userId: currentUserId, projectId, feature, level, email },
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId: currentUserId },
+    }
+  );
+  return response.data;
+};
+
+export const deleteProjectUserAcl = async (
+  authenticatedUser: AuthenticatedUser,
+  { projectId, userId, feature }: ProjectUserAcl
+): Promise<void> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: currentUserId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.delete(`/project-user-acl`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId: currentUserId, projectId, feature, targetUserId: userId },
+  });
+  return response.data;
+};
+
+export const listProjectUserAcls = async (
+  authenticatedUser: AuthenticatedUser,
+  { projectId }: { projectId: string }
+): Promise<Array<ProjectUserAclWithEmail>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return [];
+
+  const { uid: currentUserId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`/project-user-acl`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId: currentUserId, projectId },
+  });
+  const projectUserAcls = response.data;
+
+  if (!Array.isArray(projectUserAcls)) {
+    throw new Error('Invalid response from the project user acls API');
+  }
+
+  return projectUserAcls;
+};
+
+export const updateCloudProjectVersion = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  versionId: string,
+  attributes: {| label: string |}
+): Promise<?CloudProjectVersion> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const trimmedLabel = attributes.label.trim();
+
+  const cleanedAttributes = {
+    label: trimmedLabel
+      ? trimmedLabel.slice(0, CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH)
+      : '',
+  };
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.patch(
+    `/project/${cloudProjectId}/version/${versionId}`,
+    cleanedAttributes,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * List versions of a cloud project.
+ * This method does not directly use the authenticatedUser object to enable
+ * listing versions in React effects. Using authenticatedUser as a dependency
+ * of an effect triggers the effect on each change of the profile (any update
+ * of badges, extensions, purchases, etc.).
+ */
+export const listVersionsOfProject = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: ?string,
+  cloudProjectId: string,
+  options: {| forceUri: ?string |}
+): Promise<?{|
+  versions: Array<ExpandedCloudProjectVersion>,
+  nextPageUri: ?string,
+|}> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const uri = options.forceUri || `/project/${cloudProjectId}/version`;
+
+  // $FlowFixMe
+  const response = await apiClient.get(uri, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: options.forceUri
+      ? { userId }
+      : { userId, goal: 'history', perPage: 15 },
+  });
+  const nextPageUri = response.headers.link
+    ? extractNextPageUriFromLinkHeader(response.headers.link)
+    : null;
+  const projectVersions = response.data;
+
+  if (!Array.isArray(projectVersions)) {
+    throw new Error('Invalid response from the project versions API');
+  }
+  return {
+    versions: projectVersions,
+    nextPageUri,
+  };
 };

@@ -216,7 +216,7 @@ const NewProjectSetupDialog = ({
   );
 
   const generationCurrentUsage = authenticatedUser.limits
-    ? authenticatedUser.limits.limits['ai-project-generation']
+    ? authenticatedUser.limits.quotas['ai-project-generation']
     : null;
   const canGenerateProjectFromPrompt =
     generationCurrentUsage && !generationCurrentUsage.limitReached;
@@ -283,8 +283,8 @@ const NewProjectSetupDialog = ({
           error.response.data.code === 'project-generation/quota-exceeded'
         ) {
           setGenerationPrompt('');
-          // Fetch the user again to update the limits and show the subscription info.
-          await authenticatedUser.onSubscriptionUpdated();
+          // Fetch the limits again to show the warning about quota.
+          await authenticatedUser.onRefreshLimits();
         } else {
           showAlert({
             title: t`Unable to generate project`,
@@ -509,8 +509,10 @@ const NewProjectSetupDialog = ({
               <Paper background="dark" variant="outlined">
                 <Line justifyContent="center">
                   <CreateProfile
-                    onLogin={authenticatedUser.onLogin}
-                    onCreateAccount={authenticatedUser.onCreateAccount}
+                    onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+                    onOpenCreateAccountDialog={
+                      authenticatedUser.onOpenCreateAccountDialog
+                    }
                     message={
                       <Trans>
                         Create an account to store your project online.
@@ -626,7 +628,9 @@ const NewProjectSetupDialog = ({
                 limits={limits}
                 onUpgrade={() =>
                   openSubscriptionDialog({
-                    reason: 'Cloud Project limit reached',
+                    analyticsMetadata: {
+                      reason: 'Cloud Project limit reached',
+                    },
                   })
                 }
               />

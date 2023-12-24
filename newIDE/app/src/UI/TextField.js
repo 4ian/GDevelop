@@ -12,9 +12,10 @@ import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 type ValueProps =
-  // Support "text" and "password" type:
+  // Support "text", "password" and "email" type:
+  // "email" type is used to display appropriate keyboard on mobile.
   | {|
-      type?: 'text' | 'password' | 'search',
+      type?: 'text' | 'password' | 'email',
       value: string,
       onChange?: (
         event: {| target: {| value: string |} |},
@@ -56,6 +57,7 @@ type Props = {|
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
+  stopContextMenuPropagation?: boolean,
 
   // Error handling/Validation:
   errorText?: React.Node,
@@ -111,7 +113,7 @@ type Props = {|
     // Allow to customize color (replace by color prop?) // TO VERIFY
     color?: string,
     WebkitTextFillColor?: string,
-    fontSize?: '1em',
+    fontSize?: '1em' | 14,
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',
@@ -282,6 +284,11 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           }
           onChange={
             onChange ? event => onChange(event, event.target.value) : undefined
+          }
+          onContextMenu={
+            props.stopContextMenuPropagation
+              ? e => e.stopPropagation()
+              : undefined
           }
           // Error handling:
           error={!!props.errorText}

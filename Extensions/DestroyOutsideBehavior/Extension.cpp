@@ -41,7 +41,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Compare the additional border that the object must cross "
                      "before being deleted."),
                    _("the additional border"),
-                   "",
+                   _("Destroy outside configuration"),
                    "CppPlatform/Extensions/destroyoutsideicon24.png",
                    "CppPlatform/Extensions/destroyoutsideicon16.png")
       .AddParameter("object", _("Object"))
@@ -56,7 +56,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Change the additional border that the object must cross "
                   "before being deleted."),
                 _("the additional border"),
-                "",
+                _("Destroy outside configuration"),
                 "CppPlatform/Extensions/destroyoutsideicon24.png",
                 "CppPlatform/Extensions/destroyoutsideicon16.png")
       .AddParameter("object", _("Object"))

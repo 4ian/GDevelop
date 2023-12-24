@@ -1,9 +1,8 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Displacement',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      makePIXIFilter(target, effectData) {
+      makePIXIFilter(target: EffectsTarget, effectData) {
         const displacementMapTexture = target
           .getRuntimeScene()
           .getGame()
@@ -11,15 +10,18 @@ namespace gdjs {
           .getPIXITexture(effectData.stringParameters.displacementMapTexture);
         displacementMapTexture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
         const displacementSprite = new PIXI.Sprite(displacementMapTexture);
-        const displacementFilter = new PIXI.filters.DisplacementFilter(
+        const displacementFilter = new PIXI.DisplacementFilter(
           displacementSprite
         );
         return displacementFilter;
       }
-      updatePreRender(filter, target) {}
-      updateDoubleParameter(filter, parameterName, value) {
-        // @ts-ignore - unsure why PIXI.filters is not recognised.
-        const displacementFilter = (filter as unknown) as PIXI.filters.DisplacementFilter;
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
+        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
         if (parameterName === 'scaleX') {
           displacementFilter.scale.x = value;
         }
@@ -27,8 +29,34 @@ namespace gdjs {
           displacementFilter.scale.y = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {}
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        if (parameterName === 'scaleX') {
+          return displacementFilter.scale.x;
+        }
+        if (parameterName === 'scaleY') {
+          return displacementFilter.scale.y;
+        }
+        return 0;
+      }
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
     })()
   );
 }

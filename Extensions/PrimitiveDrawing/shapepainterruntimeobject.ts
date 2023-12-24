@@ -174,6 +174,11 @@ namespace gdjs {
       super.stepBehaviorsPreEvents(instanceContainer);
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Clear the graphics.
      */
@@ -218,6 +223,56 @@ namespace gdjs {
         endX2,
         endY2,
         radius
+      );
+    }
+
+    drawChamferRectangle(
+      startX1: float,
+      startY1: float,
+      endX2: float,
+      endY2: float,
+      chamfer: float
+    ) {
+      this._renderer.drawChamferRectangle(
+        startX1,
+        startY1,
+        endX2,
+        endY2,
+        chamfer
+      );
+    }
+
+    drawTorus(
+      centerX: float,
+      centerY: float,
+      innerRadius: float,
+      outerRadius: float,
+      startArc: float,
+      endArc: float
+    ) {
+      this._renderer.drawTorus(
+        centerX,
+        centerY,
+        innerRadius,
+        outerRadius,
+        startArc,
+        endArc
+      );
+    }
+
+    drawRegularPolygon(
+      centerX: float,
+      centerY: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this._renderer.drawRegularPolygon(
+        centerX,
+        centerY,
+        sides,
+        radius,
+        rotation
       );
     }
 

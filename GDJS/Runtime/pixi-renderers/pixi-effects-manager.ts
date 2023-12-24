@@ -4,8 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   type RendererEffects = Record<string, gdjs.PixiFiltersTools.Filter>;
 
   export interface EffectsTarget {
@@ -133,11 +131,11 @@ namespace gdjs {
     }
 
     /**
-     * Update the parameter of an effect (with a number).
+     * Update the property of an effect (with a number).
      * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
-     * @param parameterName The parameter name
-     * @param value The new value for the parameter
+     * @param parameterName The property name
+     * @param value The new value for the property
      */
     setEffectDoubleParameter(
       rendererEffects: RendererEffects,
@@ -152,11 +150,11 @@ namespace gdjs {
     }
 
     /**
-     * Update the parameter of an effect (with a string).
+     * Update the property of an effect (with a string).
      * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
-     * @param parameterName The parameter name
-     * @param value The new value for the parameter
+     * @param parameterName The property name
+     * @param value The new value for the property
      */
     setEffectStringParameter(
       rendererEffects: RendererEffects,
@@ -171,11 +169,11 @@ namespace gdjs {
     }
 
     /**
-     * Enable or disable the parameter of an effect (boolean).
+     * Enable or disable the property of an effect (boolean).
      * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
-     * @param parameterName The parameter name
-     * @param value The new value for the parameter
+     * @param parameterName The property name
+     * @param value The new value for the property
      */
     setEffectBooleanParameter(
       rendererEffects: RendererEffects,
@@ -190,7 +188,7 @@ namespace gdjs {
     }
 
     /**
-     * Updates all the effect parameters.
+     * Updates all the effect properties.
      * @param rendererEffects
      * @param effectData
      */

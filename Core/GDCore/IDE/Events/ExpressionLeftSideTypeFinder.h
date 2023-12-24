@@ -14,7 +14,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadata.h"
-#include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Tools/Localization.h"
 
 namespace gd {
@@ -40,11 +40,10 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
    * operations.
    */
   static const gd::String GetType(const gd::Platform &platform,
-                      const gd::ObjectsContainer &globalObjectsContainer,
-                      const gd::ObjectsContainer &objectsContainer,
+                      const gd::ProjectScopedContainers &projectScopedContainers,
                       gd::ExpressionNode& node) {
     gd::ExpressionLeftSideTypeFinder typeFinder(
-        platform, globalObjectsContainer, objectsContainer);
+        platform, projectScopedContainers);
     node.Visit(typeFinder);
     return typeFinder.GetType();
   }
@@ -53,11 +52,9 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
 
  protected:
   ExpressionLeftSideTypeFinder(const gd::Platform &platform_,
-                       const gd::ObjectsContainer &globalObjectsContainer_,
-                       const gd::ObjectsContainer &objectsContainer_)
+                       const gd::ProjectScopedContainers &projectScopedContainers_)
       : platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        projectScopedContainers(projectScopedContainers_),
         type("unknown") {};
 
   const gd::String &GetType() {
@@ -69,6 +66,14 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
     node.leftHandSide->Visit(*this);
+
+    // The type is decided by the first operand, unless it can (`number|string`)
+    // or should (`unknown`) be refined, in which case we go for the right
+    // operand (which got visited knowing the type of the first operand, so it's
+    // equal or strictly more precise than the left operand).
+    if (type == "unknown" || type == "number|string") {
+      node.rightHandSide->Visit(*this);
+    }
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     node.factor->Visit(*this);
@@ -85,7 +90,7 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
-        platform, globalObjectsContainer, objectsContainer, node);
+        platform, projectScopedContainers.GetObjectsContainersList(), node);
     if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
       type = "unknown";
     }
@@ -95,12 +100,99 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   }
   void OnVisitVariableNode(VariableNode& node) override {
     type = "unknown";
+
+    projectScopedContainers.MatchIdentifierWithName<void>(node.name,
+      [&]() {
+        // This represents an object.
+        // We could store it to explore the type of the variable, but in practice this
+        // is only called for structures/arrays with 2 levels, and we don't support structure
+        // type identification for now.
+      },
+      [&]() {
+        // This is a variable.
+        // We could store it to explore the type of the variable, but in practice this
+        // is only called for structures/arrays with 2 levels, and we don't support structure
+        // type identification for now.
+      }, [&]() {
+        // This is a property with more than one child - this is unsupported.
+      }, [&]() {
+        // This is a parameter with more than one child - this is unsupported.
+      }, [&]() {
+        // This is something else.
+        type = "unknown";
+      });
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     type = "unknown";
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     type = "unknown";
+    projectScopedContainers.MatchIdentifierWithName<void>(node.identifierName,
+      [&]() {
+        // It's an object variable.
+        if (projectScopedContainers.GetObjectsContainersList()
+                .HasObjectOrGroupWithVariableNamed(
+                    node.identifierName, node.childIdentifierName)
+              == ObjectsContainersList::VariableExistence::DoesNotExist) {
+          type = "unknown";
+          return;
+        }
+
+        auto variableType =
+            projectScopedContainers.GetObjectsContainersList()
+                .GetTypeOfObjectOrGroupVariable(node.identifierName,
+                                                node.childIdentifierName);
+        ReadTypeFromVariable(variableType);
+      },
+      [&]() {
+        // It's a variable.
+        const auto& variable =
+            projectScopedContainers.GetVariablesContainersList().Get(
+                node.identifierName);
+
+        if (node.childIdentifierName.empty()) {
+          ReadTypeFromVariable(variable.GetType());
+        } else {
+          if (!variable.HasChild(node.childIdentifierName)) {
+            type = "unknown";
+            return;
+          }
+
+          ReadTypeFromVariable(
+              variable.GetChild(node.childIdentifierName).GetType());
+        }
+      }, [&]() {
+        // This is a property.
+        const gd::NamedPropertyDescriptor& property = projectScopedContainers
+            .GetPropertiesContainersList().Get(node.identifierName).second;
+
+        if (property.GetType() == "Number") {
+          type = "number";
+        } else if (property.GetType() == "Boolean") {
+          // Nothing - we don't know the precise type (this could be used a string or as a number)
+        } else {
+          // Assume type is String or equivalent.
+          type = "string";
+        }
+      }, [&]() {
+        // It's a parameter.
+
+        const auto& parametersVectorsList = projectScopedContainers.GetParametersVectorsList();
+        const auto& parameter = gd::ParameterMetadataTools::Get(parametersVectorsList, node.identifierName);
+        const auto& valueTypeMetadata = parameter.GetValueTypeMetadata();
+        if (valueTypeMetadata.IsNumber()) {
+          type = "number";
+        } else if (valueTypeMetadata.IsString()) {
+          type = "string";
+        } else if (valueTypeMetadata.IsBoolean()) {
+          // Nothing - we don't know the precise type (this could be used as a string or as a number).
+        } else {
+          type = "unknown";
+        }
+      }, [&]() {
+        // This is something else.
+        type = "unknown";
+      });
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
     type = "unknown";
@@ -110,11 +202,18 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   }
 
  private:
+  void ReadTypeFromVariable(gd::Variable::Type variableType) {
+    if (variableType == gd::Variable::Number) {
+      type = "number";
+    } else if (variableType == gd::Variable::String) {
+      type = "string";
+    }
+  }
+
   gd::String type;
 
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ProjectScopedContainers &projectScopedContainers;
   const gd::String rootType;
 };
 

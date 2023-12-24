@@ -46,10 +46,10 @@ export const ListSearchResults = <SearchItem>({
   const cachedHeights = React.useRef({});
   const onItemHeightComputed = React.useCallback(
     (searchItem, height) => {
-      if (cachedHeights.current[getSearchItemUniqueId(searchItem)] === height)
-        return false;
+      const uniqueId = getSearchItemUniqueId(searchItem);
+      if (cachedHeights.current[uniqueId] === height) return false;
 
-      cachedHeights.current[getSearchItemUniqueId(searchItem)] = height;
+      cachedHeights.current[uniqueId] = height;
       return true;
     },
     [getSearchItemUniqueId]
@@ -114,7 +114,7 @@ export const ListSearchResults = <SearchItem>({
 
   return (
     <ErrorBoundary
-      title="An error occurred when displaying search results"
+      componentTitle={<Trans>Search results</Trans>}
       scope="list-search-result"
     >
       <div

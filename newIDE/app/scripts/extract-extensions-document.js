@@ -380,6 +380,59 @@ const generateAllExtensionsSections = extensions => {
   return extensionSectionsContent;
 };
 
+/**
+ * @param {Array<any>} extensions The extension (gdEventsFunctionsExtension)
+ */
+const generateExtensionsPageList = (extensions, indentationLevel) => {
+  const extensionsByCategory = sortKeys(
+    groupBy(extensions, pair => pair.getCategory() || 'General')
+  );
+
+  const baseIndentation = ' '.repeat(4 * indentationLevel);
+
+  let pagesList = '';
+  for (const category in extensionsByCategory) {
+    pagesList += `${baseIndentation}- ${category}:\n`;
+
+    const extensions = extensionsByCategory[category];
+    for (const extension of extensions) {
+      const folderName = getExtensionFolderName(extension.getName());
+      pagesList += `${baseIndentation}    - ${extension.getFullName()}: ${folderName}\n`;
+    }
+  }
+
+  return pagesList.length === 0
+    ? pagesList
+    : pagesList.substring(0, pagesList.length - 1);
+};
+
+/**
+ * @param {Array<any>} reviewedExtensions The extension (gdEventsFunctionsExtension)
+ * @param {Array<any>} communityExtensions The extension (gdEventsFunctionsExtension)
+ */
+const generateExtensionsMkDocsDotPagesFile = async (
+  reviewedExtensions,
+  communityExtensions
+) => {
+  const dotPagesContent = `nav:
+    - index.md
+    - search.md
+    - tiers.md
+    - Create your own extensions:
+        - Create a new extension : create.md
+        - best-practices.md
+        - share-extension.md
+${generateExtensionsPageList(reviewedExtensions, 1)}
+    - Community extensions:
+${generateExtensionsPageList(communityExtensions, 2)}
+    - ...
+`;
+
+  const extensionsDotPagesFilePath = path.join(extensionsRootPath, '.pages');
+  await fs.writeFile(extensionsDotPagesFilePath, dotPagesContent);
+  console.info(`ℹ️ File generated: ${extensionsDotPagesFilePath}`);
+};
+
 const generateExtensionsList = async gd => {
   let content = `## Extensions list
 
@@ -400,11 +453,11 @@ Here are listed all the extensions available in GDevelop. The list is divided in
     header => header.tier === 'community'
   );
 
-  const reviewedExtensions = reviewedExtensionShortHeaders.map(
-    header => project.getEventsFunctionsExtension(header.name)
+  const reviewedExtensions = reviewedExtensionShortHeaders.map(header =>
+    project.getEventsFunctionsExtension(header.name)
   );
-  const communityExtensions = communityExtensionShortHeaders.map(
-    header => project.getEventsFunctionsExtension(header.name)
+  const communityExtensions = communityExtensionShortHeaders.map(header =>
+    project.getEventsFunctionsExtension(header.name)
   );
 
   content += '## Reviewed extensions\n\n';
@@ -454,6 +507,12 @@ does or inspect its content before using it.
     );
   }
   content += generateAllExtensionsSections(communityExtensions);
+
+  await generateExtensionsMkDocsDotPagesFile(
+    reviewedExtensions,
+    communityExtensions
+  );
+
   project.delete();
   return content;
 };
@@ -466,14 +525,14 @@ initializeGDevelopJs().then(async gd => {
 
 GDevelop is built in a flexible way. In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
 
-[Directly from GDevelop](/gdevelop5/extensions/search), you have access to a collection of community created extensions, [listed here](/gdevelop5/extensions/extensions-list).
-You can also [create](/gdevelop5/extensions/create) directly in your project new behaviors, actions, conditions or expressions for your game.
+Community created extensions are accessible [directly from GDevelop](/gdevelop5/extensions/search).
+New extensions can also be [created](/gdevelop5/extensions/create) from scratch using events or JavaScript.
 
 Read more about this:
 
 * [Create your own extensions](/gdevelop5/extensions/create)
 * [Share extensions with the community](/gdevelop5/extensions/share-extension)
-* [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)
+* [Use JavaScript in events](/gdevelop5/events/js-code)
 
 `;
 

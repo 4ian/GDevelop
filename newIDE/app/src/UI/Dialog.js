@@ -119,24 +119,28 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
   },
-  fullHeightModal: {
-    minHeight: 'calc(100% - 64px)',
-  },
+  minHeightForFullHeightModal: 'calc(100% - 64px)',
+  minHeightForSmallHeightModal: 'min(100% - 64px, 350px)',
+  minHeightForLargeHeightModal: 'min(100% - 64px, 800px)',
 };
 
-const useDangerousStylesForDialog = makeStyles(theme => ({
-  paper: {
-    '&:before': {
-      content: '""',
-      height: 60,
-      background: `repeating-linear-gradient(110deg, ${
-        theme.palette.error.dark
-      }, ${theme.palette.error.dark} 25px, ${theme.palette.error.main} 25px, ${
-        theme.palette.error.main
-      } 40px)`,
-    },
-  },
-}));
+const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
+  makeStyles(theme => {
+    if (!dangerLevel) return {};
+    const color =
+      dangerLevel === 'warning' ? theme.palette.warning : theme.palette.error;
+    return {
+      paper: {
+        '&:before': {
+          content: '""',
+          height: 60,
+          background: `repeating-linear-gradient(110deg, ${color.dark}, ${
+            color.dark
+          } 25px, ${color.main} 25px, ${color.main} 40px)`,
+        },
+      },
+    };
+  })();
 
 // Customize scrollbar inside Dialog so that it gives a bit of space
 // to the content.
@@ -165,7 +169,7 @@ type DialogProps = {|
   fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
-  isDangerous?: boolean,
+  dangerLevel?: 'warning' | 'danger',
 
   /**
    * Callback called when the dialog is asking to be closed
@@ -207,6 +211,7 @@ type DialogProps = {|
 
   // Size
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
+  minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
   noMobileFullScreen?: boolean,
 
@@ -222,11 +227,12 @@ export const DialogPrimaryButton = RaisedButton;
 const Dialog = ({
   onApply,
   secondaryActions,
-  isDangerous,
+  dangerLevel,
   actions,
   open,
   onRequestClose,
   maxWidth,
+  minHeight,
   title,
   fixedContent,
   children,
@@ -248,7 +254,7 @@ const Dialog = ({
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
   const isFullScreen = isMobileScreen && !noMobileFullScreen;
 
-  const classesForDangerousDialog = useDangerousStylesForDialog();
+  const classesForDangerousDialog = useDangerousStylesForDialog(dangerLevel);
   const classesForDialogContent = useStylesForDialogContent();
 
   const dialogActions = React.useMemo(
@@ -334,7 +340,7 @@ const Dialog = ({
 
   return (
     <MuiDialog
-      classes={isDangerous ? classesForDangerousDialog : undefined}
+      classes={classesForDangerousDialog}
       open={open}
       onClose={onCloseDialog}
       fullWidth
@@ -347,7 +353,13 @@ const Dialog = ({
         id,
         style: {
           backgroundColor: gdevelopTheme.dialog.backgroundColor,
-          ...(fullHeight ? styles.fullHeightModal : {}),
+          minHeight: fullHeight
+            ? styles.minHeightForFullHeightModal
+            : minHeight === 'lg'
+            ? styles.minHeightForLargeHeightModal
+            : minHeight === 'sm'
+            ? styles.minHeightForSmallHeightModal
+            : undefined,
         },
       }}
       maxWidth={

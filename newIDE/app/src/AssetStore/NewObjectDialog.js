@@ -35,6 +35,8 @@ import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import PromisePool from '@supercharge/promise-pool';
 import NewObjectFromScratch from './NewObjectFromScratch';
+import { getAssetShortHeadersToDisplay } from './AssetsList';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const isDev = Window.isDev();
 
@@ -103,7 +105,7 @@ type Props = {|
   canInstallPrivateAsset: () => boolean,
 |};
 
-export default function NewObjectDialog({
+function NewObjectDialog({
   project,
   layout,
   objectsContainer,
@@ -137,14 +139,17 @@ export default function NewObjectDialog({
   const {
     openedAssetPack,
     openedAssetShortHeader,
+    selectedFolders,
   } = shopNavigationState.getCurrentPage();
   const [
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const existingAssetStoreIds = React.useMemo(
-    () => enumerateAssetStoreIds(project, objectsContainer),
-    [project, objectsContainer]
+  // Avoid memoizing the result of enumerateAssetStoreIds, as it does not get updated
+  // when adding assets.
+  const existingAssetStoreIds = enumerateAssetStoreIds(
+    project,
+    objectsContainer
   );
   const [
     isAssetBeingInstalled,
@@ -312,6 +317,18 @@ export default function NewObjectDialog({
     ]
   );
 
+  const displayedAssetShortHeaders = React.useMemo(
+    () => {
+      return assetShortHeadersSearchResults
+        ? getAssetShortHeadersToDisplay(
+            assetShortHeadersSearchResults,
+            selectedFolders
+          )
+        : [];
+    },
+    [assetShortHeadersSearchResults, selectedFolders]
+  );
+
   const mainAction =
     currentTab === 'asset-store' ? (
       openedAssetPack ? (
@@ -463,11 +480,11 @@ export default function NewObjectDialog({
             )}
           </Dialog>
           {isAssetPackDialogInstallOpen &&
-            assetShortHeadersSearchResults &&
+            displayedAssetShortHeaders &&
             openedAssetPack && (
               <AssetPackInstallDialog
                 assetPack={openedAssetPack}
-                assetShortHeaders={assetShortHeadersSearchResults}
+                assetShortHeaders={displayedAssetShortHeaders}
                 addedAssetIds={existingAssetStoreIds}
                 onClose={() => setIsAssetPackDialogInstallOpen(false)}
                 onAssetsAdded={() => {
@@ -485,3 +502,15 @@ export default function NewObjectDialog({
     </I18n>
   );
 }
+
+const NewObjectDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>New Object dialog</Trans>}
+    scope="new-object-dialog"
+    onClose={props.onClose}
+  >
+    <NewObjectDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default NewObjectDialogWithErrorBoundary;

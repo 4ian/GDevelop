@@ -338,6 +338,24 @@ class GD_CORE_API Variable {
    * \brief Unserialize the variable.
    */
   void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Reset the persistent UUID used to recognize
+   * the same variable between serialization.
+   */
+  Variable& ResetPersistentUuid();
+
+  /**
+   * \brief Remove the persistent UUID - when the variable no
+   * longer needs to be recognized between serializations.
+   */
+  Variable& ClearPersistentUuid() { persistentUuid = ""; return *this; };
+
+  /**
+   * \brief Get the persistent UUID used to recognize
+   * the same variable between serialization.
+   */
+  const gd::String& GetPersistentUuid() const { return persistentUuid; };
   ///@}
 
  private:
@@ -361,6 +379,8 @@ class GD_CORE_API Variable {
   mutable std::vector<std::shared_ptr<Variable>>
       childrenArray;  ///< Children, when the variable is considered as an
                       ///< array.
+  mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
+                                      ///< useful for computing changesets.
 
   /**
    * Initialize children by copying them from another variable.  Used by

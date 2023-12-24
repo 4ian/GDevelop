@@ -1,7 +1,5 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * Displays a Tilemap object (mapeditor.org supported).
    */
@@ -158,6 +156,11 @@ namespace gdjs {
           );
         }
       );
+    }
+
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
     }
 
     /**

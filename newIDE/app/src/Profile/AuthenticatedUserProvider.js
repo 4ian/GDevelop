@@ -6,15 +6,17 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
-import { getUserBadges } from '../Utils/GDevelopServices/User';
+import {
+  getUserBadges,
+  listRecommendations,
+} from '../Utils/GDevelopServices/User';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
-  type EditForm,
+  type PatchUserPayload,
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
-  type AdditionalUserInfoForm,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
@@ -46,13 +48,11 @@ import {
   listReceivedAssetPacks,
   listReceivedGameTemplates,
 } from '../Utils/GDevelopServices/Asset';
-import AdditionalUserInfoDialog, {
-  shouldAskForAdditionalUserInfo,
-} from './AdditionalUserInfoDialog';
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
 import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 type Props = {|
   authentication: Authentication,
@@ -68,8 +68,7 @@ type State = {|
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
   deleteInProgress: boolean,
-  additionalUserInfoDialogOpen: boolean,
-  authError: ?AuthError,
+  apiCallError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   emailVerificationDialogOpen: boolean,
   emailVerificationDialogProps: {|
@@ -89,6 +88,8 @@ const cleanUserTracesOnDevice = async () => {
   ]);
 };
 
+const TEN_SECONDS = 10 * 1000;
+
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
   State
@@ -102,8 +103,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     editProfileDialogOpen: false,
     editInProgress: false,
     deleteInProgress: false,
-    additionalUserInfoDialogOpen: false,
-    authError: null,
+    apiCallError: null,
     resetPasswordDialogOpen: false,
     emailVerificationDialogOpen: false,
     emailVerificationDialogProps: {
@@ -116,7 +116,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     userSnackbarMessage: null,
   };
   _automaticallyUpdateUserProfile = true;
-  _hasNotifiedUserAboutAdditionalInfo = false;
   _hasNotifiedUserAboutEmailVerification = false;
 
   // Cloud projects are requested in 2 different places at app opening.
@@ -186,18 +185,23 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...initialAuthenticatedUser,
+        onLogin: this._doLogin,
         onLogout: this._doLogout,
+        onCreateAccount: this._doCreateAccount,
+        onEditProfile: this._doEdit,
+        onResetPassword: this._doForgotPassword,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
-        onLogin: () => this.openLoginDialog(true),
-        onEdit: () => this.openEditProfileDialog(true),
-        onChangeEmail: () => this.openChangeEmailDialog(true),
-        onCreateAccount: () => this.openCreateAccountDialog(true),
+        onOpenLoginDialog: () => this.openLoginDialog(true),
+        onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
+        onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
+        onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
         },
-        onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
+        onRefreshSubscription: this._fetchUserSubscriptionLimitsAndUsages,
+        onRefreshLimits: this._fetchUserLimits,
         onPurchaseSuccessful: this._fetchUserPurchases,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
@@ -217,7 +221,6 @@ export default class AuthenticatedUserProvider extends React.Component<
           this.props.authentication.getAuthorizationHeader(),
       },
     }));
-    this._hasNotifiedUserAboutAdditionalInfo = false;
     this._hasNotifiedUserAboutEmailVerification = false;
   }
 
@@ -232,7 +235,6 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...authenticatedUserLoggedOutAttributes,
       },
     }));
-    this._hasNotifiedUserAboutAdditionalInfo = false;
     this._hasNotifiedUserAboutEmailVerification = false;
   }
 
@@ -408,6 +410,29 @@ export default class AuthenticatedUserProvider extends React.Component<
         );
       }
     );
+    listRecommendations(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      recommendations =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            recommendations,
+          },
+        })),
+      error => {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+          console.warn(
+            'List recommendations endpoint returned 404, user might not have completed survey.'
+          );
+        } else {
+          console.error('Error while loading recommendations:', error);
+        }
+      }
+    );
     listReceivedGameTemplates(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
     }).then(
@@ -455,12 +480,33 @@ export default class AuthenticatedUserProvider extends React.Component<
         // We call this function every time the user is fetched, as it will
         // automatically prevent the event to be sent if the user attributes haven't changed.
         identifyUserForAnalytics(this.state.authenticatedUser);
-        this._notifyUserAboutEmailVerificationAndAdditionalInfo();
+        this._notifyUserAboutEmailVerification();
       }
     );
   };
 
-  _fetchUserSubscriptionLimitsAndUsages = async () => {
+  _fetchUserSubscription = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const subscription = await getUserSubscription(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          subscription,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user subscriptions:', error);
+    }
+  };
+
+  _fetchUserUsages = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
     if (!firebaseUser) return;
@@ -479,21 +525,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading user usages:', error);
     }
+  };
 
-    try {
-      const subscription = await getUserSubscription(
-        authentication.getAuthorizationHeader,
-        firebaseUser.uid
-      );
-      this.setState(({ authenticatedUser }) => ({
-        authenticatedUser: {
-          ...authenticatedUser,
-          subscription,
-        },
-      }));
-    } catch (error) {
-      console.error('Error while loading user subscriptions:', error);
-    }
+  _fetchUserLimits = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
 
     try {
       const limits = await getUserLimits(
@@ -509,6 +546,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     } catch (error) {
       console.error('Error while loading user limits:', error);
     }
+  };
+
+  _fetchUserSubscriptionLimitsAndUsages = async () => {
+    await Promise.all([
+      this._fetchUserSubscription(),
+      this._fetchUserUsages(),
+      this._fetchUserLimits(),
+    ]);
   };
 
   _fetchUserAssetPacks = async () => {
@@ -649,48 +694,27 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _notifyUserAboutEmailVerificationAndAdditionalInfo = () => {
-    const { profile } = this.state.authenticatedUser;
+  _notifyUserAboutEmailVerification = () => {
+    const { profile, firebaseUser } = this.state.authenticatedUser;
     if (!profile) return;
+    if (firebaseUser && firebaseUser.emailVerified) return;
+
+    const now = Date.now();
     // If the user has not verified their email when logging in we show a dialog to do so.
     // - If they just registered, we don't send the email again as it will be sent automatically,
     // nor do we show a button to send again.
     // - If they are just logging in, we don't send the email but we show a button to send again.
     // Use a boolean to show the dialog only once.
-    const accountAgeInMs = Date.now() - profile.createdAt;
-    const hasJustCreatedAccount = accountAgeInMs < 1000 * 10; // 10 seconds.
-    if (
-      this.state.authenticatedUser.firebaseUser &&
-      !this.state.authenticatedUser.firebaseUser.emailVerified &&
-      !this._hasNotifiedUserAboutEmailVerification
-    ) {
-      setTimeout(
-        () =>
-          this.openEmailVerificationDialog({
-            open: true,
-            sendEmailAutomatically: false,
-            showSendEmailButton: !hasJustCreatedAccount,
-          }),
-        1000
-      );
-    } else {
-      // If the user has not filled additional info, we show a dialog to do so.
-      this._notifyUserAboutAdditionalInfo();
-    }
-  };
-
-  _notifyUserAboutAdditionalInfo = () => {
-    const profile = this.state.authenticatedUser.profile;
-    if (!profile) return;
-    // If the user has not filled their additional information, show
-    // the dialog to fill it, but ensure they have closed the email verification dialog first.
-    // Use a boolean to show the dialog only once.
-    if (
-      profile &&
-      !this._hasNotifiedUserAboutAdditionalInfo &&
-      shouldAskForAdditionalUserInfo(profile)
-    ) {
-      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
+    const accountAgeInMs = now - profile.createdAt;
+    const hasJustCreatedAccount = accountAgeInMs < TEN_SECONDS;
+    if (!this._hasNotifiedUserAboutEmailVerification) {
+      setTimeout(() => {
+        this.openEmailVerificationDialog({
+          open: true,
+          sendEmailAutomatically: false,
+          showSendEmailButton: !hasJustCreatedAccount,
+        });
+      }, 1000);
     }
   };
 
@@ -711,7 +735,12 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       loginInProgress: true,
-      authError: null,
+      apiCallError: null,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: true,
+        authenticationError: null,
+      },
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -727,46 +756,66 @@ export default class AuthenticatedUserProvider extends React.Component<
           <Trans>👋 Good to see you!</Trans>
         ),
       });
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({
+        apiCallError,
+        authenticatedUser: {
+          ...this.state.authenticatedUser,
+          authenticationError: apiCallError,
+        },
+      });
     }
     this.setState({
       loginInProgress: false,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: false,
+      },
     });
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doEdit = async (form: EditForm, preferences: PreferencesValues) => {
+  _doEdit = async (
+    payload: PatchUserPayload,
+    preferences: PreferencesValues,
+    { throwError }: {| throwError: boolean |}
+  ) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
     this.setState({
       editInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
         {
-          username: form.username,
-          description: form.description,
-          getGameStatsEmail: form.getGameStatsEmail,
-          getNewsletterEmail: form.getNewsletterEmail,
+          username: payload.username,
+          description: payload.description,
+          getGameStatsEmail: payload.getGameStatsEmail,
+          getNewsletterEmail: payload.getNewsletterEmail,
           appLanguage: preferences.language,
-          donateLink: form.donateLink,
-          communityLinks: form.communityLinks,
+          donateLink: payload.donateLink,
+          discordUsername: payload.discordUsername,
+          communityLinks: payload.communityLinks,
+          survey: payload.survey,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
+      if (throwError) {
+        throw apiCallError;
+      }
+    } finally {
+      this.setState({
+        editInProgress: false,
+      });
+      this._automaticallyUpdateUserProfile = true;
     }
-    this.setState({
-      editInProgress: false,
-    });
-    this._automaticallyUpdateUserProfile = true;
   };
 
   _doCreateAccount = async (
@@ -778,7 +827,12 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       createAccountInProgress: true,
-      authError: null,
+      apiCallError: null,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: true,
+        authenticationError: null,
+      },
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -810,11 +864,21 @@ export default class AuthenticatedUserProvider extends React.Component<
           <Trans>👋 Welcome to GDevelop!</Trans>
         ),
       });
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({
+        apiCallError,
+        authenticatedUser: {
+          ...this.state.authenticatedUser,
+          authenticationError: apiCallError,
+        },
+      });
     }
     this.setState({
       createAccountInProgress: false,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: false,
+      },
     });
     this._automaticallyUpdateUserProfile = true;
   };
@@ -825,7 +889,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       deleteInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -836,48 +900,11 @@ export default class AuthenticatedUserProvider extends React.Component<
       this.showUserSnackbar({
         message: <Trans>Your account has been deleted!</Trans>,
       });
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
     }
     this.setState({
       deleteInProgress: false,
-    });
-    this._automaticallyUpdateUserProfile = true;
-  };
-
-  _doSaveAdditionalUserInfo = async (form: AdditionalUserInfoForm) => {
-    const { authentication } = this.props;
-    if (!authentication) return;
-
-    this.setState({
-      editInProgress: true,
-    });
-    this._automaticallyUpdateUserProfile = false;
-    try {
-      await authentication.editUserProfile(
-        authentication.getAuthorizationHeader,
-        {
-          gdevelopUsage: form.gdevelopUsage,
-          teamOrCompanySize: form.teamOrCompanySize,
-          companyName: form.companyName,
-          creationExperience: form.creationExperience,
-          creationGoal: form.creationGoal,
-          hearFrom: form.hearFrom,
-        }
-      );
-      await this._fetchUserProfileWithoutThrowingErrors();
-    } catch (authError) {
-      // Do not throw error, as this is a best effort call.
-      console.error('Error while saving additional user info:', authError);
-    } finally {
-      // Close anyway.
-      this.openAdditionalUserInfoDialog(false);
-      this.showUserSnackbar({
-        message: <Trans>Thank you!</Trans>,
-      });
-    }
-    this.setState({
-      editInProgress: false,
     });
     this._automaticallyUpdateUserProfile = true;
   };
@@ -888,7 +915,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     try {
       await authentication.forgotPassword(form);
-    } catch (authError) {
+    } catch (apiCallError) {
       // Do not throw error if the email is not found, as we don't want to
       // give information to the user about which email is registered.
     }
@@ -907,7 +934,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -915,8 +942,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         authentication.getAuthorizationHeader
       );
       await this._fetchUserProfileWithoutThrowingErrors();
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
     }
     this.setState({
       editInProgress: false,
@@ -930,7 +957,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       changeEmailInProgress: true,
-      authError: null,
+      apiCallError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -940,8 +967,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openChangeEmailDialog(false);
-    } catch (authError) {
-      this.setState({ authError });
+    } catch (apiCallError) {
+      this.setState({ apiCallError });
     }
     this.setState({
       changeEmailInProgress: false,
@@ -969,14 +996,13 @@ export default class AuthenticatedUserProvider extends React.Component<
     // And we show them the additional info dialog if they haven't seen it yet.
     if (!open) {
       this._hasNotifiedUserAboutEmailVerification = true;
-      this._notifyUserAboutAdditionalInfo();
     }
   };
 
   openResetPassword = (open: boolean = true) => {
     this.setState({
       resetPasswordDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
@@ -984,16 +1010,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       loginDialogOpen: open,
       createAccountDialogOpen: false,
-      authError: null,
-    });
-  };
-
-  openAdditionalUserInfoDialog = (open: boolean = true) => {
-    this._hasNotifiedUserAboutAdditionalInfo = true;
-    this.setState({
-      additionalUserInfoDialogOpen: open,
-      createAccountDialogOpen: false,
-      loginDialogOpen: false,
+      apiCallError: null,
     });
   };
 
@@ -1008,7 +1025,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   openEditProfileDialog = (open: boolean = true) => {
     this.setState({
       editProfileDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
@@ -1016,14 +1033,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       loginDialogOpen: false,
       createAccountDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
   openChangeEmailDialog = (open: boolean = true) => {
     this.setState({
       changeEmailDialogOpen: open,
-      authError: null,
+      apiCallError: null,
     });
   };
 
@@ -1043,7 +1060,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
                 loginInProgress={this.state.loginInProgress}
-                error={this.state.authError}
+                error={this.state.apiCallError}
                 onForgotPassword={this._doForgotPassword}
               />
             )}
@@ -1053,12 +1070,14 @@ export default class AuthenticatedUserProvider extends React.Component<
                   profile={this.state.authenticatedUser.profile}
                   subscription={this.state.authenticatedUser.subscription}
                   onClose={() => this.openEditProfileDialog(false)}
-                  onEdit={form => this._doEdit(form, preferences)}
+                  onEdit={form =>
+                    this._doEdit(form, preferences, { throwError: false })
+                  }
                   onDelete={this._doDeleteAccount}
                   actionInProgress={
                     this.state.editInProgress || this.state.deleteInProgress
                   }
-                  error={this.state.authError}
+                  error={this.state.apiCallError}
                 />
               )}
             {this.state.authenticatedUser.firebaseUser &&
@@ -1068,7 +1087,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   onClose={() => this.openChangeEmailDialog(false)}
                   onChangeEmail={this._doChangeEmail}
                   changeEmailInProgress={this.state.changeEmailInProgress}
-                  error={this.state.authError}
+                  error={this.state.apiCallError}
                 />
               )}
             {this.state.createAccountDialogOpen && (
@@ -1079,20 +1098,9 @@ export default class AuthenticatedUserProvider extends React.Component<
                   this._doCreateAccount(form, preferences)
                 }
                 createAccountInProgress={this.state.createAccountInProgress}
-                error={this.state.authError}
+                error={this.state.apiCallError}
               />
             )}
-            {this.state.additionalUserInfoDialogOpen &&
-              this.state.authenticatedUser.profile && (
-                <AdditionalUserInfoDialog
-                  profile={this.state.authenticatedUser.profile}
-                  onClose={() => this.openAdditionalUserInfoDialog(false)}
-                  onSaveAdditionalUserInfo={form =>
-                    this._doSaveAdditionalUserInfo(form)
-                  }
-                  updateInProgress={this.state.editInProgress}
-                />
-              )}
             {this.state.emailVerificationDialogOpen && (
               <EmailVerificationDialog
                 authenticatedUser={this.state.authenticatedUser}

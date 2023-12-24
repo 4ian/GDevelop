@@ -73,9 +73,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             .getAnimation(index)
             .getName();
           return animationName.length > 0 ? animationName : null;
-        })
-          .filter(Boolean)
-          .sort();
+        }).filter(Boolean);
       } else if (object.getType() === 'Scene3D::Model3DObject') {
         const model3DConfiguration = gd.asModel3DConfiguration(
           object.getConfiguration()
@@ -179,7 +177,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select an Animation</Trans>}
+              label={<Trans>Select an animation</Trans>}
               onClick={switchFieldType}
             />
           ) : (
@@ -188,7 +186,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               icon={<Functions />}
               style={style}
               primary
-              label={<Trans>Use an Expression</Trans>}
+              label={<Trans>Use an expression</Trans>}
               onClick={switchFieldType}
             />
           )

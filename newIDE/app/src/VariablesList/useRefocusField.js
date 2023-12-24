@@ -1,6 +1,11 @@
 // @flow
 import React from 'react';
 
+type FocusOptions = {|
+  identifier: number,
+  caretPosition?: ?number,
+|};
+
 const useRefocusField = (fieldRefs: {|
   current: {|
     [identifier: number]: {|
@@ -8,23 +13,23 @@ const useRefocusField = (fieldRefs: {|
     |},
   |},
 |}) => {
-  const [fieldToFocus, setFieldToFocus] = React.useState<?{
-    identifier: number,
-    caretPosition?: ?number,
-  }>(null);
+  const fieldToFocus = React.useRef<FocusOptions | null>(null);
 
-  React.useEffect(
-    () => {
-      if (fieldToFocus) {
-        const fieldRef = fieldRefs.current[fieldToFocus.identifier];
-        if (fieldRef) {
-          fieldRef.focus({ caretPosition: fieldToFocus.caretPosition });
-          setFieldToFocus(null);
-        }
+  const setFieldToFocus = React.useCallback((options: FocusOptions) => {
+    fieldToFocus.current = options;
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (fieldToFocus.current) {
+      const fieldRef = fieldRefs.current[fieldToFocus.current.identifier];
+      if (fieldRef) {
+        fieldRef.focus({ caretPosition: fieldToFocus.current.caretPosition });
       }
-    },
-    [fieldToFocus, fieldRefs]
-  );
+    }
+
+    fieldToFocus.current = null;
+  });
+
   return setFieldToFocus;
 };
 

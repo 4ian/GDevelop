@@ -23,7 +23,7 @@ export const RelationalOperatorFieldString = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -40,7 +40,7 @@ export const RelationalOperatorFieldNumber = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -57,7 +57,7 @@ export const RelationalOperatorFieldColor = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -72,7 +72,7 @@ export const RelationalOperatorFieldUnknownType = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}

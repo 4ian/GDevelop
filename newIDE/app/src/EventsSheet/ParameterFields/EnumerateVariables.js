@@ -23,9 +23,10 @@ const convertToStringLiteral = (variableName: string) => {
   return '"' + variableName.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
 };
 
-type EnumeratedVariable = {|
+export type EnumeratedVariable = {|
   name: string,
   isValidName: boolean,
+  type: Variable_Type,
 |};
 
 export const enumerateVariables = (
@@ -46,9 +47,10 @@ export const enumerateVariables = (
     const isValidName = isTopLevel
       ? isValidIdentifier(fullName)
       : isFullNameValid;
-    const enumeratedVariable = { name: fullName, isValidName };
+    const type = variable.getType();
+    const enumeratedVariable = { name: fullName, isValidName, type };
 
-    if (variable.getType() === gd.Variable.Structure) {
+    if (type === gd.Variable.Structure) {
       return [
         enumeratedVariable,
         ...flatMap(variable.getAllChildrenNames().toJSArray(), childName =>
@@ -62,7 +64,7 @@ export const enumerateVariables = (
           )
         ),
       ];
-    } else if (variable.getType() === gd.Variable.Array) {
+    } else if (type === gd.Variable.Array) {
       return [
         enumeratedVariable,
         ...flatMap(

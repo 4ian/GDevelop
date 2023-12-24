@@ -29,6 +29,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
+    // The list is not kept with a memo because scenes could be added by
+    // another component without this one to know.
     const layoutNames = props.project
       ? enumerateLayouts(props.project).map(layout => layout.getName())
       : [];
@@ -37,7 +39,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       layoutName => `"${layoutName}"` === props.value
     );
 
-    // If the current value is not in the list of layouts, display an expression field.
+    // If the current value is not in the list of scenes, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
       (!!props.value && !isCurrentValueInLayoutsList) ||
         props.scope.eventsFunctionsExtension
@@ -114,7 +116,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select a Scene</Trans>}
+              label={<Trans>Select a scene</Trans>}
               onClick={switchFieldType}
             />
           ) : (
@@ -123,7 +125,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               icon={<Functions />}
               style={style}
               primary
-              label={<Trans>Use an Expression</Trans>}
+              label={<Trans>Use an expression</Trans>}
               onClick={switchFieldType}
             />
           )

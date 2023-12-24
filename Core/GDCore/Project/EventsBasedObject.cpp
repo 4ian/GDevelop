@@ -17,7 +17,7 @@ EventsBasedObject::EventsBasedObject()
 }
 
 EventsBasedObject::~EventsBasedObject() {}
-    
+
 EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObject)
         : AbstractEventsBasedEntity(_eventBasedObject) {
   // TODO Add a copy constructor in ObjectsContainer.
@@ -27,17 +27,26 @@ EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObj
 
 void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
+  if (isRenderedIn3D) {
+    element.SetBoolAttribute("is3D", true);
+  }
 
   AbstractEventsBasedEntity::SerializeTo(element);
   SerializeObjectsTo(element.AddChild("objects"));
+  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
 }
 
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
-                                          const SerializerElement& element) {
+                                        const SerializerElement& element) {
   defaultName = element.GetStringAttribute("defaultName");
+  isRenderedIn3D = element.GetBoolAttribute("is3D", false);
 
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   UnserializeObjectsFrom(project, element.GetChild("objects"));
+  if (element.HasChild("objectsFolderStructure")) {
+    UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
+  }
+  AddMissingObjectsInRootFolder();
 }
 
 }  // namespace gd

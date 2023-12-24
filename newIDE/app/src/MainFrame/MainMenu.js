@@ -14,9 +14,12 @@ import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
+const isDesktop = !!electron;
+
 export type BuildMainMenuProps = {|
   i18n: I18nType,
   project: ?gdProject,
+  canSaveProjectAs: boolean,
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   shortcutMap: ShortcutMap,
   isApplicationTopLevelMenu: boolean,
@@ -26,12 +29,14 @@ export type MainMenuCallbacks = {|
   onChooseProject: () => void,
   onOpenRecentFile: (
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
-  ) => void,
+  ) => Promise<void>,
   onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
+  onShowVersionHistory: () => void,
   onCloseProject: () => Promise<boolean>,
   onCloseApp: () => void,
-  onExportProject: (open?: boolean) => void,
+  onExportProject: () => void,
+  onInviteCollaborators: () => void,
   onCreateProject: (open?: boolean) => void,
   onCreateBlank: () => void,
   onOpenProjectManager: (open?: boolean) => void,
@@ -54,9 +59,11 @@ export type MainMenuEvent =
   | 'main-menu-open-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
+  | 'main-menu-show-version-history'
   | 'main-menu-close'
   | 'main-menu-close-app'
   | 'main-menu-export'
+  | 'main-menu-invite-collaborators'
   | 'main-menu-create-template'
   | 'main-menu-create-blank'
   | 'main-menu-open-project-manager'
@@ -78,9 +85,11 @@ const getMainMenuEventCallback = (
     'main-menu-open-recent': callbacks.onOpenRecentFile,
     'main-menu-save': callbacks.onSaveProject,
     'main-menu-save-as': callbacks.onSaveProjectAs,
+    'main-menu-show-version-history': callbacks.onShowVersionHistory,
     'main-menu-close': callbacks.onCloseProject,
     'main-menu-close-app': callbacks.onCloseApp,
     'main-menu-export': callbacks.onExportProject,
+    'main-menu-invite-collaborators': callbacks.onInviteCollaborators,
     'main-menu-create-template': callbacks.onCreateProject,
     'main-menu-create-blank': callbacks.onCreateBlank,
     'main-menu-open-project-manager': callbacks.onOpenProjectManager,
@@ -97,16 +106,12 @@ const getMainMenuEventCallback = (
   return mapping[mainMenuEvent] || (() => {});
 };
 
-export type MainMenuProps = {|
-  ...BuildMainMenuProps,
-  ...MainMenuCallbacks,
-|};
-
 export const buildMainMenuDeclarativeTemplate = ({
   shortcutMap,
   i18n,
   recentProjectFiles,
   project,
+  canSaveProjectAs,
   isApplicationTopLevelMenu,
 }: BuildMainMenuProps): Array<MenuDeclarativeItemTemplate> => {
   const fileTemplate: MenuDeclarativeItemTemplate = {
@@ -136,11 +141,19 @@ export const buildMainMenuDeclarativeTemplate = ({
       },
       {
         label: i18n._(t`Open Recent`),
-        submenu: recentProjectFiles.map(item => ({
-          label: item.fileMetadata.fileIdentifier,
-          onClickSendEvent: 'main-menu-open-recent',
-          eventArgs: item,
-        })),
+        submenu:
+          recentProjectFiles.length > 0
+            ? recentProjectFiles.map(item => ({
+                label: item.fileMetadata.fileIdentifier,
+                onClickSendEvent: 'main-menu-open-recent',
+                eventArgs: item,
+              }))
+            : [
+                {
+                  label: i18n._(t`No recent project`),
+                  enabled: false,
+                },
+              ],
       },
       { type: 'separator' },
       {
@@ -153,9 +166,22 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Save as...`),
         accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS']),
         onClickSendEvent: 'main-menu-save-as',
+        enabled: canSaveProjectAs,
+      },
+      {
+        label: i18n._(t`Show version history`),
+        onClickSendEvent: 'main-menu-show-version-history',
         enabled: !!project,
       },
       { type: 'separator' },
+      {
+        label: i18n._(t`Invite collaborators`),
+        accelerator: getElectronAccelerator(
+          shortcutMap['INVITE_COLLABORATORS']
+        ),
+        onClickSendEvent: 'main-menu-invite-collaborators',
+        enabled: !!project,
+      },
       {
         label: i18n._(t`Export (web, iOS, Android)...`),
         accelerator: getElectronAccelerator(shortcutMap['EXPORT_GAME']),
@@ -330,15 +356,15 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Report a wrong translation`),
         onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
       },
-      ...(!isMacLike() && isApplicationTopLevelMenu
-        ? [
+      ...(isMacLike() && isDesktop
+        ? []
+        : [
             { type: 'separator' },
             {
               label: i18n._(t`About GDevelop`),
               onClickSendEvent: 'main-menu-open-about',
             },
-          ]
-        : []),
+          ]),
     ],
   };
 

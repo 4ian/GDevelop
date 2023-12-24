@@ -26,6 +26,7 @@
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
+#include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/EventsBasedObject.h"
@@ -146,13 +147,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   auto usedExtensionsResult =
       gd::UsedExtensionsFinder::ScanProject(exportedProject);
 
-  bool isUsingScene3DExtension =
-      usedExtensionsResult.GetUsedExtensions().find("Scene3D") !=
-      usedExtensionsResult.GetUsedExtensions().end();
-
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
-                 /*pixiInThreeRenderers=*/isUsingScene3DExtension,
+                 usedExtensionsResult.Has3DObjects(),
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
@@ -189,6 +186,17 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     }
 
     previousTime = LogTimeSpent("Events code export", previousTime);
+  }
+
+  auto projectUsedResources =
+      gd::SceneResourcesFinder::FindProjectResources(exportedProject);
+  std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
+  for (std::size_t layoutIndex = 0;
+       layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
+    auto &layout = exportedProject.GetLayout(layoutIndex);
+    scenesUsedResources[layout.GetName()] = 
+        gd::SceneResourcesFinder::FindSceneResources(exportedProject,
+                                                          layout);
   }
 
   // Strip the project (*after* generating events as the events may use stripped
@@ -238,8 +246,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   // Export the project
-  ExportProjectData(
-      fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
+  ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                    runtimeGameOptions, projectUsedResources,
+                    scenesUsedResources);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   previousTime = LogTimeSpent("Project data export", previousTime);
@@ -263,14 +272,17 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs,
-    const gd::Project &project,
+    gd::Project &project,
     gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions) {
+    const gd::SerializerElement &runtimeGameOptions,
+    std::set<gd::String> &projectUsedResources,
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
+  SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources);
   gd::String output =
       "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
       "gdjs.runtimeGameOptions = " +
@@ -279,6 +291,35 @@ gd::String ExporterHelper::ExportProjectData(
   if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
 
   return "";
+}
+
+void ExporterHelper::SerializeUsedResources(
+    gd::SerializerElement &rootElement,
+    std::set<gd::String> &projectUsedResources,
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
+
+  auto serializeUsedResources =
+      [](gd::SerializerElement &element,
+         std::set<gd::String> &usedResources) -> void {
+    auto &resourcesElement = element.AddChild("usedResources");
+    resourcesElement.ConsiderAsArrayOf("resourceReference");
+    for (auto &resourceName : usedResources) {
+      auto &resourceElement = resourcesElement.AddChild("resourceReference");
+      resourceElement.SetAttribute("name", resourceName);
+    }
+  };
+
+  serializeUsedResources(rootElement, projectUsedResources);
+
+  auto &layoutsElement = rootElement.GetChild("layouts");
+  for (std::size_t layoutIndex = 0;
+       layoutIndex < layoutsElement.GetChildrenCount(); layoutIndex++) {
+    auto &layoutElement = layoutsElement.GetChild(layoutIndex);
+    const auto layoutName = layoutElement.GetStringAttribute("name");
+
+    auto &layoutUsedResources = scenesUsedResources[layoutName];
+    serializeUsedResources(layoutElement, layoutUsedResources);
+  }
 }
 
 bool ExporterHelper::ExportPixiIndexFile(
@@ -625,6 +666,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "Model3DManager.js");
+  InsertUnique(includesFiles, "ResourceLoader.js");
+  InsertUnique(includesFiles, "ResourceCache.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
@@ -674,6 +717,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
     InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
+    InsertUnique(includesFiles, "debugger-client/InGameDebugger.js");
   }
   if (includeWebsocketDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");

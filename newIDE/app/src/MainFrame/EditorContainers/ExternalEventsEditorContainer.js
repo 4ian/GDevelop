@@ -17,6 +17,10 @@ import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender
 import HelpButton from '../../UI/HelpButton';
 import TutorialButton from '../../UI/TutorialButton';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../ResourcesWatcher';
 
 const styles = {
   container: {
@@ -24,6 +28,8 @@ const styles = {
     flex: 1,
   },
 };
+
+const editSceneIconReactNode = <EditSceneIcon />;
 
 type State = {|
   externalPropertiesDialogOpen: boolean,
@@ -34,6 +40,7 @@ export class ExternalEventsEditorContainer extends React.Component<
   State
 > {
   editor: ?EventsSheetInterface;
+  resourceExternallyChangedCallbackId: ?string;
 
   state = {
     externalPropertiesDialogOpen: false,
@@ -45,6 +52,21 @@ export class ExternalEventsEditorContainer extends React.Component<
     // Especially important to note that when becoming inactive, a "last" update is allowed.
     return this.props.isActive || nextProps.isActive;
   }
+
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
+  }
+
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
+    if (this.editor) this.editor.onResourceExternallyChanged(resourceInfo);
+  };
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -151,6 +173,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             unsavedChanges={this.props.unsavedChanges}
             project={project}
             scope={{
+              project,
               layout,
               externalEvents,
             }}
@@ -158,7 +181,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             objectsContainer={layout}
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
-            settingsIcon={<EditSceneIcon />}
+            settingsIcon={editSceneIconReactNode}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             isActive={this.props.isActive}
           />

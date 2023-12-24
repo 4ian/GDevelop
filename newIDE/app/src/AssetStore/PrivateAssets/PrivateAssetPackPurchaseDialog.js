@@ -24,6 +24,8 @@ import {
   shouldUseAppStoreProduct,
   purchaseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
+import Form from '../../UI/Form';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 const PasswordPromptDialog = (props: {
   passwordValue: string,
@@ -51,15 +53,7 @@ const PasswordPromptDialog = (props: {
       />,
     ]}
   >
-    <form
-      onSubmit={event => {
-        // Prevent browser to navigate on form submission.
-        event.preventDefault();
-        props.onApply();
-      }}
-      autoComplete="off"
-      name="asset-store-password"
-    >
+    <Form onSubmit={props.onApply} name="asset-store-password">
       <TextField
         fullWidth
         autoFocus="desktopAndMobileDevices"
@@ -70,7 +64,7 @@ const PasswordPromptDialog = (props: {
           props.setPasswordValue(value);
         }}
       />
-    </form>
+    </Form>
   </Dialog>
 );
 
@@ -88,8 +82,8 @@ const PrivateAssetPackPurchaseDialog = ({
   const {
     profile,
     getAuthorizationHeader,
-    onLogin,
-    onCreateAccount,
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
     receivedAssetPacks,
     onPurchaseSuccessful,
   } = React.useContext(AuthenticatedUserContext);
@@ -138,10 +132,13 @@ const PrivateAssetPackPurchaseDialog = ({
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       if (
-        error.response &&
-        error.response.status === 403 &&
-        error.response.data.code === 'auth/wrong-password'
+        extractedStatusAndCode &&
+        extractedStatusAndCode.status === 403 &&
+        extractedStatusAndCode.code === 'auth/wrong-password'
       ) {
         await showAlert({
           title: t`Operation not allowed`,
@@ -263,8 +260,8 @@ const PrivateAssetPackPurchaseDialog = ({
         subtitle: <Trans>Log-in to purchase this item</Trans>,
         content: (
           <CreateProfile
-            onLogin={onLogin}
-            onCreateAccount={onCreateAccount}
+            onOpenLoginDialog={onOpenLoginDialog}
+            onOpenCreateAccountDialog={onOpenCreateAccountDialog}
             message={
               <Trans>
                 Asset packs will be linked to your user account and available

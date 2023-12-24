@@ -178,17 +178,21 @@ const translateTypeToHumanReadableDescription = type => {
 
   if (type === 'layer') return '🔤 Layer name (String)';
   if (type === 'stringWithSelector') return '🔤 String';
-  if (type === 'identifier') return "🔤 Name (String)";
-  if (type === 'sceneName') return "🔤 Name of a scene (String)";
-  if (type === 'layerEffectName') return "🔤 Layer Effect Name (String)";
-  if (type === 'layerEffectParameterName') return "🔤 Layer Effect Parameter Name (String)";
-  if (type === 'objectEffectName') return "🔤 Object Effect Name (String)";
-  if (type === 'objectEffectParameterName') return "🔤 Object Effect Parameter Name (String)";
-  if (type === 'objectPointName') return "🔤 Object Point Name (String)";
-  if (type === 'objectAnimationName') return "🔤 Object Animation Name (String)";
-  if (type === 'functionParameterName') return "🔤 Function Parameter Name (String)";
-  if (type === 'externalLayoutName') return "🔤 External Layout Name (String)";
-  if (type === 'leaderboardId') return "🔤 Leaderboard Identifier (String)";
+  if (type === 'identifier') return '🔤 Name (String)';
+  if (type === 'sceneName') return '🔤 Name of a scene (String)';
+  if (type === 'layerEffectName') return '🔤 Layer Effect Name (String)';
+  if (type === 'layerEffectParameterName')
+    return '🔤 Layer Effect Property Name (String)';
+  if (type === 'objectEffectName') return '🔤 Object Effect Name (String)';
+  if (type === 'objectEffectParameterName')
+    return '🔤 Object Effect Property Name (String)';
+  if (type === 'objectPointName') return '🔤 Object Point Name (String)';
+  if (type === 'objectAnimationName')
+    return '🔤 Object Animation Name (String)';
+  if (type === 'functionParameterName')
+    return '🔤 Function Parameter Name (String)';
+  if (type === 'externalLayoutName') return '🔤 External Layout Name (String)';
+  if (type === 'leaderboardId') return '🔤 Leaderboard Identifier (String)';
 
   return type;
 };
@@ -212,17 +216,18 @@ const translateTypeToHumanReadableType = type => {
 
   if (type === 'layer') return 'layer name';
   if (type === 'stringWithSelector') return 'string';
-  if (type === 'identifier') return "string";
-  if (type === 'sceneName') return "scene name";
-  if (type === 'layerEffectName') return "layer effect name";
-  if (type === 'layerEffectParameterName') return "layer effect parameter name";
-  if (type === 'objectEffectName') return "object effect name";
-  if (type === 'objectEffectParameterName') return "object effect parameter name";
-  if (type === 'objectPointName') return "object point name";
-  if (type === 'objectAnimationName') return "object animation name";
-  if (type === 'functionParameterName') return "function parameter name";
-  if (type === 'externalLayoutName') return "external layout name";
-  if (type === 'leaderboardId') return "leaderboard identifier";
+  if (type === 'identifier') return 'string';
+  if (type === 'sceneName') return 'scene name';
+  if (type === 'layerEffectName') return 'layer effect name';
+  if (type === 'layerEffectParameterName') return 'layer effect property name';
+  if (type === 'objectEffectName') return 'object effect name';
+  if (type === 'objectEffectParameterName')
+    return 'object effect property name';
+  if (type === 'objectPointName') return 'object point name';
+  if (type === 'objectAnimationName') return 'object animation name';
+  if (type === 'functionParameterName') return 'function parameter name';
+  if (type === 'externalLayoutName') return 'external layout name';
+  if (type === 'leaderboardId') return 'leaderboard identifier';
 
   return type;
 };
@@ -273,7 +278,7 @@ const generateExpressionReferenceRowsText = ({
     );
 
     const type = parameterMetadata.getType();
-    const humanReadableTypeDesc = translateTypeToHumanReadableDescription(type)
+    const humanReadableTypeDesc = translateTypeToHumanReadableDescription(type);
 
     parameterRows.push(
       `| | _${humanReadableTypeDesc}_ | ${sanitizedDescription} |`
@@ -324,7 +329,8 @@ const generateInstructionsReferenceRowsTexts = ({
     .map(instructionType => {
       const instructionMetadata = instructionsMetadata.get(instructionType);
 
-      if (instructionMetadata.isHidden() || instructionMetadata.isPrivate()) return null;
+      if (instructionMetadata.isHidden() || instructionMetadata.isPrivate())
+        return null;
 
       return generateInstructionReferenceRowsText({
         instructionType,
@@ -353,7 +359,8 @@ const generateExpressionsReferenceRowsTexts = ({
     .map(expressionType => {
       const expressionMetadata = expressionsMetadata.get(expressionType);
 
-      if (!expressionMetadata.isShown() || expressionMetadata.isPrivate()) return null;
+      if (!expressionMetadata.isShown() || expressionMetadata.isPrivate())
+        return null;
 
       return generateExpressionReferenceRowsText({
         expressionType,
@@ -429,46 +436,50 @@ const generateExtensionReference = extension => {
 
   // Behavior expressions
   /** @type {Array<BehaviorReference>} */
-  let behaviorReferences = behaviorTypes.map(behaviorType => {
-    const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
+  let behaviorReferences = behaviorTypes
+    .map(behaviorType => {
+      const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
 
-    if (behaviorMetadata.isPrivate()) {
-      return null;
-    }
+      if (behaviorMetadata.isPrivate()) {
+        return null;
+      }
 
-    const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
-      areConditions: false,
-      instructionsMetadata: extension.getAllActionsForBehavior(behaviorType),
-      behaviorMetadata,
-    });
-    const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts({
-      areConditions: true,
-      instructionsMetadata: extension.getAllConditionsForBehavior(behaviorType),
-      behaviorMetadata,
-    });
-    const expressionsReferenceTexts = [
-      ...generateExpressionsReferenceRowsTexts({
-        expressionsMetadata: extension.getAllExpressionsForBehavior(
+      const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
+        areConditions: false,
+        instructionsMetadata: extension.getAllActionsForBehavior(behaviorType),
+        behaviorMetadata,
+      });
+      const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts({
+        areConditions: true,
+        instructionsMetadata: extension.getAllConditionsForBehavior(
           behaviorType
         ),
         behaviorMetadata,
-      }),
-      ...generateExpressionsReferenceRowsTexts({
-        expressionsMetadata: extension.getAllStrExpressionsForBehavior(
-          behaviorType
-        ),
-        behaviorMetadata,
-      }),
-    ];
-    expressionsReferenceTexts.sort(sortReferenceTexts);
+      });
+      const expressionsReferenceTexts = [
+        ...generateExpressionsReferenceRowsTexts({
+          expressionsMetadata: extension.getAllExpressionsForBehavior(
+            behaviorType
+          ),
+          behaviorMetadata,
+        }),
+        ...generateExpressionsReferenceRowsTexts({
+          expressionsMetadata: extension.getAllStrExpressionsForBehavior(
+            behaviorType
+          ),
+          behaviorMetadata,
+        }),
+      ];
+      expressionsReferenceTexts.sort(sortReferenceTexts);
 
-    return {
-      behaviorMetadata,
-      actionsReferenceTexts,
-      conditionsReferenceTexts,
-      expressionsReferenceTexts,
-    };
-  }).filter(Boolean);
+      return {
+        behaviorMetadata,
+        actionsReferenceTexts,
+        conditionsReferenceTexts,
+        expressionsReferenceTexts,
+      };
+    })
+    .filter(Boolean);
 
   // Free (non objects/non behaviors) actions/conditions/expressions
   const freeActionsReferenceTexts = generateInstructionsReferenceRowsTexts({
@@ -501,9 +512,9 @@ const generateExtensionReference = extension => {
 
 /**
  * @param {ExtensionReference} extensionReference
- * @param {({extension: gdPlatformExtension, depth: number}) => RawText} generateExtensionHeaderText
- * @param {({extension: gdPlatformExtension}) => RawText} generateExtensionFooterText
- * @returns {Array<RawText>}}}
+ * @param {({extension, depth}) => RawText} generateExtensionHeaderText
+ * @param {({extension}) => RawText} generateExtensionFooterText
+ * @returns {Array<RawText>}
  */
 const generateExtensionRawText = (
   extensionReference,

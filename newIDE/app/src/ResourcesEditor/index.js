@@ -18,11 +18,18 @@ import {
 } from '../ResourcesList/ResourceSource';
 import { type FileMetadata } from '../ProjectsStorage';
 import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
+import type { StorageProvider } from '../ProjectsStorage';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
 
 const gd: libGDevelop = global.gd;
 
-const electron = optionalRequire('electron');
-const shell = electron ? electron.shell : null;
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
+const remote = optionalRequire('@electron/remote');
 const path = optionalRequire('path');
 const styles = {
   container: {
@@ -48,6 +55,7 @@ type Props = {|
   ) => void,
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
 |};
 
 const initialMosaicEditorNodes = {
@@ -61,7 +69,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   static defaultProps = {
     setToolbar: () => {},
   };
-
+  resourceExternallyChangedCallbackId: ?string;
   editorMosaic: ?EditorMosaic = null;
   _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
   _resourcesList: ?ResourcesList = null;
@@ -69,6 +77,17 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   state = {
     selectedResource: null,
   };
+
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
+  }
 
   refreshResourcesList() {
     if (this._resourcesList) this._resourcesList.forceUpdate();
@@ -82,6 +101,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.props.setToolbar(
       <Toolbar
         onOpenProjectFolder={this.openProjectFolder}
+        canOpenProjectFolder={
+          !!remote &&
+          !!this.props.fileMetadata &&
+          this.props.storageProvider.internalName === 'LocalFile'
+        }
         onToggleProperties={this.toggleProperties}
         isPropertiesShown={openedEditorNames.includes('properties')}
         canDelete={!!this.state.selectedResource}
@@ -184,8 +208,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   openProjectFolder = () => {
-    const project = this.props.project;
-    if (shell) shell.openPath(path.dirname(project.getProjectFile()));
+    if (remote)
+      remote.shell.openPath(path.dirname(this.props.project.getProjectFile()));
   };
 
   toggleProperties = () => {
@@ -203,6 +227,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         this.updateToolbar();
       }
     );
+  };
+
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
+    if (this._propertiesEditor) {
+      this._propertiesEditor.forceUpdate();
+    }
+    this.refreshResourcesList();
   };
 
   render() {

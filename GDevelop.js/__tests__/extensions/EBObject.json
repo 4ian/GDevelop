@@ -1,0 +1,157 @@
+{
+  "author": "",
+  "category": "",
+  "extensionNamespace": "",
+  "fullName": "",
+  "helpPath": "",
+  "iconUrl": "",
+  "name": "EBObject",
+  "previewIconUrl": "",
+  "shortDescription": "",
+  "version": "",
+  "description": "",
+  "tags": [],
+  "authorIds": [],
+  "dependencies": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "defaultName": "",
+      "description": "",
+      "fullName": "",
+      "name": "Object",
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "testProperties",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": ["SuccessVariable", "+", "MyFirstProperty + MySecondProperty + MyThirdProperty"]
+                },
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": ["SuccessStringVariable", "=", "MyFirstProperty + MyThirdProperty + MyFourthProperty"]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "EBObject::Object",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "testParameters",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": ["SuccessVariable", "+", "MyFirstParameter + MySecondParameter + MyThirdParameter"]
+                },
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": ["SuccessStringVariable", "=", "MyFirstParameter + MyThirdParameter + MyFourthParameter"]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "EBObject::Object",
+              "type": "object"
+            },
+            {
+              "description": "First parameter",
+              "name": "MyFirstParameter",
+              "type": "number"
+            },
+            {
+              "description": "Second parameter",
+              "name": "MySecondParameter",
+              "type": "string"
+            },
+            {
+              "description": "Third parameter",
+              "name": "MyThirdParameter",
+              "type": "yesorno"
+            },
+            {
+              "description": "Fourth parameter",
+              "name": "MyFourthParameter",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "propertyDescriptors": [
+        {
+          "name": "MyFirstProperty",
+          "value": "2",
+          "type": "Number",
+          "label": "My first property",
+          "description": "",
+          "group": "",
+          "extraInformation": []
+        },
+        {
+          "name": "MySecondProperty",
+          "value": "4",
+          "type": "String",
+          "label": "My second property",
+          "description": "",
+          "group": "",
+          "extraInformation": []
+        },
+        {
+          "name": "MyThirdProperty",
+          "value": "true",
+          "type": "Boolean",
+          "label": "My third property",
+          "description": "",
+          "group": "",
+          "extraInformation": []
+        },
+        {
+          "name": "MyFourthProperty",
+          "value": "Test",
+          "type": "String",
+          "label": "My fourth property",
+          "description": "",
+          "group": "",
+          "extraInformation": []
+        }
+      ],
+      "objects": []
+    }
+  ]
+}

@@ -147,6 +147,9 @@ namespace gdjs {
       originalDepth: float,
       keepAspectRatio: boolean
     ) {
+      // These formulas are also used in:
+      // - Model3DEditor.modelSize
+      // - Model3DRendered2DInstance
       threeObject.rotation.set(
         gdjs.toRad(rotationX),
         gdjs.toRad(rotationY),
@@ -347,6 +350,24 @@ namespace gdjs {
       this._action.play();
       // Make sure the first frame is displayed.
       this._animationMixer.update(0);
+    }
+
+    getAnimationElapsedTime(): float {
+      return this._action ? this._action.time : 0;
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      if (this._action) {
+        this._action.time = time;
+      }
+    }
+
+    getAnimationDuration(animationName: string): float {
+      const clip = THREE.AnimationClip.findByName(
+        this._originalModel.animations,
+        animationName
+      );
+      return clip ? clip.duration : 0;
     }
   }
 

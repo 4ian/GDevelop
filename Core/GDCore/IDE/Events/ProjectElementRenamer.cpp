@@ -34,13 +34,12 @@ class GD_CORE_API ExpressionIdentifierStringFinder
 public:
   ExpressionIdentifierStringFinder(
       const gd::Platform &platform_,
-      const gd::ObjectsContainer &globalObjectsContainer_,
-      const gd::ObjectsContainer &objectsContainer_,
+      const gd::ProjectScopedContainers& projectScopedContainers_,
       const gd::String &expressionPlainString_,
       const gd::String &parameterType_, const gd::String &objectName_,
       const gd::String &layerName_, const gd::String &oldName_)
-      : platform(platform_), globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+      : platform(platform_),
+        projectScopedContainers(projectScopedContainers_),
         expressionPlainString(expressionPlainString_),
         parameterType(parameterType_), objectName(objectName_),
         layerName(layerName_), oldName(oldName_){};
@@ -82,7 +81,7 @@ protected:
   void OnVisitFunctionCallNode(FunctionCallNode &node) override {
     gd::String lastLayerName;
     gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-        platform, globalObjectsContainer, objectsContainer, node,
+        platform, projectScopedContainers.GetObjectsContainersList(), node,
         [&](const gd::ParameterMetadata &parameterMetadata,
             std::unique_ptr<gd::ExpressionNode> &parameterNode,
             size_t parameterIndex, const gd::String &lastObjectName) {
@@ -123,8 +122,7 @@ protected:
 
 private:
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ProjectScopedContainers &projectScopedContainers;
   /// It's used to extract parameter content.
   const gd::String &expressionPlainString;
   const gd::String &oldName;
@@ -176,7 +174,7 @@ bool ProjectElementRenamer::DoVisitInstruction(gd::Instruction &instruction,
         auto node = parameterValue.GetRootNode();
         if (node) {
           ExpressionIdentifierStringFinder finder(
-              platform, GetGlobalObjectsContainer(), GetObjectsContainer(),
+              platform, GetProjectScopedContainers(),
               parameterValue.GetPlainString(), parameterType, objectName,
               layerName, oldName);
           node->Visit(finder);

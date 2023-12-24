@@ -41,12 +41,84 @@ export type CommunityLinks = {|
   discordServerLink?: string,
 |};
 
+export type UserSurvey = {|
+  creationGoal?: Array<'learningOrTeaching' | 'building'>,
+  creationGoalInput?: string,
+  learningOrTeaching?: Array<'learning' | 'teaching'>,
+  learningHow?: Array<'alone' | 'withTeacher'>,
+  projectDescription?: string,
+  kindOfProjects?: Array<
+    | 'gameToPublish'
+    | 'interactiveService'
+    | 'other'
+    | 'videoGame'
+    | 'interactiveContent'
+    | 'appOrTool'
+    | 'seriousGame'
+  >,
+  workingTeam?: Array<'alone' | 'onePlus' | 'team'>,
+  painPoints?: Array<
+    | 'lackGraphics'
+    | 'lackSound'
+    | 'lackMarketing'
+    | 'inAppMonetization'
+    | 'externalIntegration'
+  >,
+  painPointsInput?: string,
+  targetDate?: Array<
+    | '1MonthOrLess'
+    | '1To2Months'
+    | '3To5Months'
+    | '6MonthsPlus'
+    | '1Year'
+    | 'noDeadline'
+  >,
+  gameDevelopmentExperience?: Array<'none' | 'someNoCode' | 'someCode'>,
+  targetPlatform?: Array<
+    | 'steamEpic'
+    | 'itchNewgrounds'
+    | 'pokiCrazyGames'
+    | 'androidApp'
+    | 'iosApp'
+    | 'client'
+    | 'personal'
+    | 'console'
+    | 'other'
+  >,
+|};
+
+/**
+ * Official tutorial registered in the tutorial database.
+ * Can be a youtube video, wiki page or blog article.
+ */
+export type GDevelopTutorialRecommendation = {|
+  type: 'gdevelop-tutorial',
+  /**
+   * Id of the tutorial in the database.
+   */
+  id: string,
+|};
+export type PlanRecommendation = {|
+  type: 'plan',
+  id: 'silver' | 'gold' | 'startup' | 'business' | 'education',
+|};
+export type GuidedLessonsRecommendation = {|
+  type: 'guided-lessons',
+  lessonsIds?: string[],
+|};
+export type Recommendation =
+  | GDevelopTutorialRecommendation
+  | GuidedLessonsRecommendation
+  | PlanRecommendation;
+
 export type UserPublicProfile = {|
   id: string,
   username: ?string,
   description: ?string,
   donateLink: ?string,
+  discordUsername: ?string,
   communityLinks: CommunityLinks,
+  iconUrl: string,
 |};
 
 export type UserPublicProfileByIds = {|
@@ -69,11 +141,15 @@ export type TeamMembership = {|
   groups?: ?Array<string>,
 |};
 
+export const apiClient = axios.create({
+  baseURL: GDevelopUserApi.baseUrl,
+});
+
 export const searchCreatorPublicProfilesByUsername = (
   searchString: string
 ): Promise<Array<UserPublicProfile>> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/user-public-profile/search`, {
+  return apiClient
+    .get(`/user-public-profile/search`, {
       params: {
         username: searchString,
         type: 'creator',
@@ -82,10 +158,15 @@ export const searchCreatorPublicProfilesByUsername = (
     .then(response => response.data);
 };
 
-export const getUserBadges = (id: string): Promise<Array<Badge>> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/user/${id}/badge`)
-    .then(response => response.data);
+export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
+  const response = await apiClient.get(`/user/${id}/badge`);
+  const badges = response.data;
+
+  if (!Array.isArray(badges)) {
+    throw new Error('Invalid response from the badges API');
+  }
+
+  return badges;
 };
 
 export const listUserTeams = async (
@@ -93,7 +174,7 @@ export const listUserTeams = async (
   userId: string
 ): Promise<Array<Team>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(`${GDevelopUserApi.baseUrl}/team`, {
+  const response = await apiClient.get(`/team`, {
     headers: { Authorization: authorizationHeader },
     params: { userId, role: 'admin' },
   });
@@ -106,7 +187,7 @@ export const listTeamMembers = async (
   teamId: string
 ): Promise<Array<User>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(`${GDevelopUserApi.baseUrl}/user`, {
+  const response = await apiClient.get(`/user`, {
     headers: { Authorization: authorizationHeader },
     params: { userId, teamId },
   });
@@ -119,13 +200,10 @@ export const listTeamMemberships = async (
   teamId: string
 ): Promise<Array<TeamMembership>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopUserApi.baseUrl}/team-membership`,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId, teamId },
-    }
-  );
+  const response = await apiClient.get(`/team-membership`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId, teamId },
+  });
   return response.data;
 };
 
@@ -135,13 +213,10 @@ export const listTeamGroups = async (
   teamId: string
 ): Promise<Array<TeamGroup>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopUserApi.baseUrl}/team/${teamId}/group`,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+  const response = await apiClient.get(`/team/${teamId}/group`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
   return response.data;
 };
 
@@ -153,8 +228,8 @@ export const updateGroup = async (
   attributes: {| name: string |}
 ): Promise<TeamGroup> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.patch(
-    `${GDevelopUserApi.baseUrl}/team/${teamId}/group/${groupId}`,
+  const response = await apiClient.patch(
+    `/team/${teamId}/group/${groupId}`,
     attributes,
     {
       headers: { Authorization: authorizationHeader },
@@ -171,14 +246,10 @@ export const createGroup = async (
   attributes: {| name: string |}
 ): Promise<TeamGroup> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopUserApi.baseUrl}/team/${teamId}/group`,
-    attributes,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+  const response = await apiClient.post(`/team/${teamId}/group`, attributes, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
   return response.data;
 };
 
@@ -189,13 +260,22 @@ export const deleteGroup = async (
   groupId: string
 ): Promise<Array<TeamGroup>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.delete(
-    `${GDevelopUserApi.baseUrl}/team/${teamId}/group/${groupId}`,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+  const response = await apiClient.delete(`/team/${teamId}/group/${groupId}`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
+export const listRecommendations = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId }: {| userId: string |}
+): Promise<Array<Recommendation>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`/recommendation`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
   return response.data;
 };
 
@@ -207,8 +287,8 @@ export const updateUserGroup = async (
   userId: string
 ): Promise<Array<TeamGroup>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopUserApi.baseUrl}/team/${teamId}/action/update-members`,
+  const response = await apiClient.post(
+    `/team/${teamId}/action/update-members`,
     [{ groupId, userId }],
     {
       headers: { Authorization: authorizationHeader },
@@ -218,32 +298,47 @@ export const updateUserGroup = async (
   return response.data;
 };
 
-export const getUserPublicProfilesByIds = (
+export const getUserPublicProfilesByIds = async (
   ids: Array<string>
 ): Promise<UserPublicProfileByIds> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/user-public-profile`, {
-      params: {
-        id: ids.join(','),
-      },
-    })
-    .then(response => response.data);
+  // Ensure we don't send an empty list of ids, as the request would fail.
+  if (ids.length === 0) return {};
+  const response = await apiClient.get(`/user-public-profile`, {
+    params: {
+      id: ids.join(','),
+    },
+  });
+  return response.data;
 };
 
 export const getUserPublicProfile = (
   id: string
 ): Promise<UserPublicProfile> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/user-public-profile/${id}`)
+  return apiClient
+    .get(`/user-public-profile/${id}`)
     .then(response => response.data);
 };
 
-export const getUsernameAvailability = (
+export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/username-availability/${username}`)
-    .then(response => response.data);
+  const response = await apiClient.get(`/username-availability/${username}`);
+  return response.data;
+};
+
+export const syncDiscordUsername = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await apiClient.post(
+    `/user/${userId}/action/update-discord-role`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
 };
 
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;
@@ -265,6 +360,10 @@ export const donateLinkConfig = {
       ? profileLinkFormattingErrorMessage
       : undefined,
   maxLength: 150,
+};
+
+export const discordUsernameConfig = {
+  maxLength: 32,
 };
 
 export const communityLinksConfig = {

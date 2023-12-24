@@ -22,13 +22,16 @@ namespace gd {
  */
 class ResourcesRenamer : public gd::ArbitraryResourceWorker {
  public:
-  /**
-   * @brief Constructor taking the map from old name to new name.
-   * @param oldToNewNames_ A map associating to a resource name the new name to
-   * use.
-   */
-  ResourcesRenamer(const std::map<gd::String, gd::String>& oldToNewNames_)
-      : gd::ArbitraryResourceWorker(), oldToNewNames(oldToNewNames_){};
+   /**
+    * @brief Constructor taking the map from old name to new name.
+    * @param oldToNewNames_ A map associating to a resource name the new name to
+    * use.
+    */
+   ResourcesRenamer(gd::ResourcesManager &resourcesManager,
+                    const std::map<gd::String, gd::String> &oldToNewNames_)
+       : gd::ArbitraryResourceWorker(resourcesManager),
+         oldToNewNames(oldToNewNames_){};
+
   virtual ~ResourcesRenamer(){};
 
   virtual void ExposeFile(gd::String& resourceFileName) override{

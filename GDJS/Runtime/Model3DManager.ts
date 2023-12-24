@@ -5,20 +5,21 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Model3DManager');
-  type OnProgressCallback = (loadedCount: integer, totalCount: integer) => void;
+
+  const resourceKinds: Array<ResourceKind> = ['model3D'];
 
   /**
    * Load GLB files (using `Three.js`), using the "model3D" resources
    * registered in the game resources.
    */
-  export class Model3DManager {
+  export class Model3DManager implements gdjs.ResourceManager {
     /**
      * Map associating a resource name to the loaded Three.js model.
      */
-    private _loadedThreeModels = new Map<String, THREE_ADDONS.GLTF>();
+    private _loadedThreeModels = new gdjs.ResourceCache<THREE_ADDONS.GLTF>();
+    private _downloadedArrayBuffers = new gdjs.ResourceCache<ArrayBuffer>();
 
-    _resourcesLoader: RuntimeGameResourcesLoader;
-    _resources: Map<string, ResourceData>;
+    _resourceLoader: gdjs.ResourceLoader;
 
     _loader: THREE_ADDONS.GLTFLoader | null = null;
     _dracoLoader: THREE_ADDONS.DRACOLoader | null = null;
@@ -28,15 +29,10 @@ namespace gdjs {
 
     /**
      * @param resourceDataArray The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
      */
-    constructor(
-      resourceDataArray: ResourceData[],
-      resourcesLoader: RuntimeGameResourcesLoader
-    ) {
-      this._resources = new Map<string, ResourceData>();
-      this.setResources(resourceDataArray);
-      this._resourcesLoader = resourcesLoader;
+    constructor(resourceLoader: gdjs.ResourceLoader) {
+      this._resourceLoader = resourceLoader;
 
       if (typeof THREE !== 'undefined') {
         this._loader = new THREE_ADDONS.GLTFLoader();
@@ -69,61 +65,69 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     *
-     * @param resourceDataArray The resources data of the game.
-     */
-    setResources(resourceDataArray: ResourceData[]): void {
-      this._resources.clear();
-      for (const resourceData of resourceDataArray) {
-        if (resourceData.kind === 'model3D') {
-          this._resources.set(resourceData.name, resourceData);
-        }
+    getResourceKinds(): ResourceKind[] {
+      return resourceKinds;
+    }
+
+    async processResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return;
+      }
+      const loader = this._loader;
+      if (!loader) {
+        return;
+      }
+      const data = this._downloadedArrayBuffers.get(resource);
+      if (!data) {
+        return;
+      }
+      this._downloadedArrayBuffers.delete(resource);
+      try {
+        const gltf: THREE_ADDONS.GLTF = await loader.parseAsync(data, '');
+        this._loadedThreeModels.set(resource, gltf);
+      } catch (error) {
+        logger.error(
+          "Can't fetch the 3D model file " + resource.file + ', error: ' + error
+        );
       }
     }
 
-    /**
-     * Load all the 3D models.
-     *
-     * Note that even if a file is already loaded, it will be reloaded (useful for hot-reloading,
-     * as files can have been modified without the editor knowing).
-     *
-     * @param onProgress The function called after each file is loaded.
-     * @param onComplete The function called when all file are loaded.
-     */
-    async loadModels(onProgress: OnProgressCallback): Promise<integer> {
-      const loader = this._loader;
-      if (this._resources.size === 0 || !loader) {
-        return 0;
+    async loadResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return;
       }
-
-      let loadedCount = 0;
-      await Promise.all(
-        [...this._resources.values()].map(async (resource) => {
-          const url = this._resourcesLoader.getFullUrl(resource.file);
-          loader.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
-            url
-          );
-          try {
-            const gltf: THREE_ADDONS.GLTF = await loader.loadAsync(
-              url,
-              (event) => {}
-            );
-            this._loadedThreeModels.set(resource.name, gltf);
-          } catch (error) {
-            logger.error(
-              "Can't fetch the 3D model file " +
-                resource.file +
-                ', error: ' +
-                error
-            );
-          }
-          loadedCount++;
-          onProgress(loadedCount, this._resources.size);
-        })
-      );
-      return loadedCount;
+      const loader = this._loader;
+      if (!loader) {
+        return;
+      }
+      if (this._loadedThreeModels.get(resource)) {
+        return;
+      }
+      const url = this._resourceLoader.getFullUrl(resource.file);
+      try {
+        const response = await fetch(url, {
+          credentials: this._resourceLoader.checkIfCredentialsRequired(url)
+            ? 'include'
+            : 'omit',
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.arrayBuffer();
+        this._downloadedArrayBuffers.set(resource, data);
+      } catch (error) {
+        logger.error(
+          "Can't fetch the 3D model file " + resource.file + ', error: ' + error
+        );
+      }
     }
 
     /**
@@ -135,7 +139,9 @@ namespace gdjs {
      * @returns a 3D model if it exists.
      */
     getModel(resourceName: string): THREE_ADDONS.GLTF {
-      return this._loadedThreeModels.get(resourceName) || this._invalidModel;
+      return (
+        this._loadedThreeModels.getFromName(resourceName) || this._invalidModel
+      );
     }
   }
 }

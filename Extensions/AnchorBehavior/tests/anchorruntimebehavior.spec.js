@@ -30,6 +30,7 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
     behaviorsSharedData: [],
     objects: [],
     instances: [],
+    usedResources: [],
   });
 
   function createObject(behaviorProperties) {

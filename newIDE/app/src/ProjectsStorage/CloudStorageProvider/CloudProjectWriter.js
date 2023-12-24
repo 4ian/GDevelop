@@ -53,7 +53,7 @@ const zipProjectAndCommitVersion = async ({
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
-  options?: {| previousVersion: string |},
+  options?: {| previousVersion?: string, restoredFromVersionId?: string |},
 |}): Promise<?string> => {
   const [zippedProject, projectJson] = await zipProject(project);
   const archiveIsSane = await checkZipContent(zippedProject, projectJson);
@@ -65,6 +65,7 @@ const zipProjectAndCommitVersion = async ({
     cloudProjectId,
     zippedProject,
     previousVersion: options ? options.previousVersion : null,
+    restoredFromVersionId: options ? options.restoredFromVersionId : null,
   });
   return newVersion;
 };
@@ -74,33 +75,46 @@ export const generateOnSaveProject = (
 ) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
-  options?: {| previousVersion: string |}
+  options?: {| previousVersion?: string, restoredFromVersionId?: string |}
 ) => {
+  const cloudProjectId = fileMetadata.fileIdentifier;
+  const gameId = project.getProjectUuid();
+  const now = Date.now();
+
   if (!fileMetadata.gameId) {
     console.info('Game id was never set, updating the cloud project.');
     try {
-      await updateCloudProject(authenticatedUser, fileMetadata.fileIdentifier, {
-        gameId: project.getProjectUuid(),
+      await updateCloudProject(authenticatedUser, cloudProjectId, {
+        gameId,
       });
     } catch (error) {
       console.error('Could not update cloud project with gameId', error);
       // Do not throw, as this is not a blocking error.
     }
   }
-  const newFileMetadata: FileMetadata = {
-    ...fileMetadata,
-    gameId: project.getProjectUuid(),
-    // lastModifiedDate is not set since it will be set by backend services
-    // and then frontend will use it to transform the list of cloud project
-    // items into a list of FileMetadata.
-  };
   const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,
     project,
-    cloudProjectId: newFileMetadata.fileIdentifier,
+    cloudProjectId,
     options,
   });
+
+  const newFileMetadata: FileMetadata = {
+    ...fileMetadata,
+    gameId,
+    // lastModifiedDate is set here even though it will be set by backend services.
+    // Regarding the list of cloud projects in the build section, it should not have
+    // an impact since the 2 dates are not used for the same purpose.
+    // But it's better to have an up-to-date current file metadata (used by the version
+    // history to know when to refresh the most recent version).
+    lastModifiedDate: now,
+  };
   if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
+
+  // Save the version being modified in the file metadata, so that it can be
+  // used when saving to compare with the last version of the project, and
+  // raise a conflict warning if different.
+  newFileMetadata.version = newVersion;
   return {
     wasSaved: true,
     fileMetadata: newFileMetadata,
@@ -113,8 +127,8 @@ export const generateOnChangeProjectProperty = (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: {| name?: string, gameId?: string |}
-): Promise<boolean> => {
-  if (!authenticatedUser.authenticated) return false;
+): Promise<null | {| version: string, lastModifiedDate: number |}> => {
+  if (!authenticatedUser.authenticated) return null;
   try {
     await updateCloudProject(
       authenticatedUser,
@@ -130,14 +144,14 @@ export const generateOnChangeProjectProperty = (
       throw new Error("Couldn't save project following property update.");
     }
 
-    return true;
+    return { version: newVersion, lastModifiedDate: Date.now() };
   } catch (error) {
     // TODO: Determine if a feedback should be given to user so that they can try again if necessary.
     console.warn(
       'An error occurred while changing cloud project name. Ignoring.',
       error
     );
-    return false;
+    return null;
   }
 };
 
@@ -231,9 +245,10 @@ export const generateOnSaveProjectAs = (
     });
     if (!cloudProject)
       throw new Error('No cloud project was returned from creation api call.');
+    const cloudProjectId = cloudProject.id;
 
-    const fileMetadata = {
-      fileIdentifier: cloudProject.id,
+    const fileMetadata: FileMetadata = {
+      fileIdentifier: cloudProjectId,
       gameId,
     };
 
@@ -241,7 +256,6 @@ export const generateOnSaveProjectAs = (
     await options.onMoveResources({ newFileMetadata: fileMetadata });
 
     // Commit the changes to the newly created cloud project.
-    const cloudProjectId = fileMetadata.fileIdentifier;
     await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
     const newVersion = await zipProjectAndCommitVersion({
       authenticatedUser,
@@ -250,6 +264,11 @@ export const generateOnSaveProjectAs = (
     });
     if (!newVersion)
       throw new Error('No version id was returned from committing api call.');
+
+    // Save the version being modified in the file metadata, so that it can be
+    // used when saving to compare with the last version of the project, and
+    // raise a conflict warning if different.
+    fileMetadata.version = newVersion;
 
     return {
       wasSaved: true,

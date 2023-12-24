@@ -10,8 +10,6 @@ import { TileMapFileContent } from "../load/TileMapFileContent";
 import { TileTextureCache } from "./TileTextureCache";
 import { FlippingHelper, getPixiRotate } from "../model/GID";
 
-import PIXI = GlobalPIXIModule.PIXI;
-
 export namespace PixiTileMapHelper {
   /**
    * Split an atlas image into Pixi textures.

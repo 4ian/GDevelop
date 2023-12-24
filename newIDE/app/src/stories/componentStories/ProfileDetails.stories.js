@@ -6,7 +6,11 @@ import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import ProfileDetails from '../../Profile/ProfileDetails';
-import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
+import {
+  indieUserProfile,
+  subscriptionForStartupUser,
+  subscriptionForSilverUser,
+} from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
 
@@ -29,6 +33,7 @@ const getAssetPacksListingData = (
   {
     id: 'assetPackId',
     sellerId: userId,
+    isSellerGDevelop: false,
     productType: 'ASSET_PACK',
     listing: 'ASSET_PACK',
     name: 'French food',
@@ -47,20 +52,56 @@ const getAssetPacksListingData = (
       },
     ],
     appStoreProductId: null,
+    sellerStripeAccountId: 'sellerStripeProductId',
+    stripeProductId: 'stripeProductId',
   },
 ];
 
-export const MyProfile = () => (
+export const MyCompleteProfileWithoutSubscription = () => (
   <ProfileDetails profile={indieUserProfile} isAuthenticatedUserProfile />
+);
+
+export const MyCompleteProfileWithSilverSubscription = () => (
+  <ProfileDetails
+    profile={indieUserProfile}
+    isAuthenticatedUserProfile
+    subscription={subscriptionForSilverUser}
+  />
+);
+
+export const MyCompleteProfileWithBusinessSubscription = () => (
+  <ProfileDetails
+    profile={indieUserProfile}
+    isAuthenticatedUserProfile
+    subscription={subscriptionForStartupUser}
+  />
+);
+
+export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
+  <ProfileDetails
+    profile={{ ...indieUserProfile, discordUsername: '' }}
+    isAuthenticatedUserProfile
+  />
+);
+
+export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
+  <ProfileDetails
+    profile={{ ...indieUserProfile, discordUsername: '' }}
+    isAuthenticatedUserProfile
+    subscription={subscriptionForStartupUser}
+  />
 );
 
 export const OtherUserProfile = () => (
   <ProfileDetails profile={indieUserProfile} assetPacksListingDatas={[]} />
 );
 
-export const IncompleteUserProfile = () => (
+export const OtherUserIncompleteProfile = () => (
   <ProfileDetails
-    profile={indieUserWithoutUsernameNorDescriptionProfile}
+    profile={{
+      ...indieUserWithoutUsernameNorDescriptionProfile,
+      discordUsername: '',
+    }}
     assetPacksListingDatas={[]}
   />
 );

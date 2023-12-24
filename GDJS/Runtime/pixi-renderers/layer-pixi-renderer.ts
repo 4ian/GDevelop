@@ -5,8 +5,6 @@
  */
 
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   const logger = new gdjs.Logger('LayerPixiRenderer');
 
   /**
@@ -343,12 +341,32 @@ namespace gdjs {
         // onScreenPosition = floor(980.75 - 200)
         // onScreenPosition = floor(780.75)
         // onScreenPosition = 780
-        this._pixiContainer.position.x = Math.ceil(
-          this._pixiContainer.position.x
-        );
-        this._pixiContainer.position.y = Math.ceil(
-          this._pixiContainer.position.y
-        );
+
+        if (
+          this._layer
+            .getRuntimeScene()
+            .getGame()
+            .getRenderer()
+            .getPIXIRenderer() instanceof PIXI.Renderer
+        ) {
+          // TODO Revert from `round` to `ceil` when the issue is fixed in Pixi.
+          // Since the upgrade to Pixi 7, sprites are rounded with `round`
+          // instead of `floor`.
+          // https://github.com/pixijs/pixijs/issues/9868
+          this._pixiContainer.position.x = Math.round(
+            this._pixiContainer.position.x
+          );
+          this._pixiContainer.position.y = Math.round(
+            this._pixiContainer.position.y
+          );
+        } else {
+          this._pixiContainer.position.x = Math.ceil(
+            this._pixiContainer.position.x
+          );
+          this._pixiContainer.position.y = Math.ceil(
+            this._pixiContainer.position.y
+          );
+        }
       }
 
       if (this._threeCamera) {
@@ -519,8 +537,9 @@ namespace gdjs {
       const height = this._oldHeight;
       const resolution = pixiRenderer.resolution;
       this._renderTexture = PIXI.RenderTexture.create({
-        width,
-        height,
+        // A size of 0 is forbidden by Pixi.
+        width: width || 100,
+        height: height || 100,
         resolution,
       });
       this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
@@ -539,14 +558,15 @@ namespace gdjs {
         this._oldWidth !== pixiRenderer.screen.width ||
         this._oldHeight !== pixiRenderer.screen.height
       ) {
+        // A size of 0 is forbidden by Pixi.
         this._renderTexture.resize(
-          pixiRenderer.screen.width,
-          pixiRenderer.screen.height
+          pixiRenderer.screen.width || 100,
+          pixiRenderer.screen.height || 100
         );
         this._oldWidth = pixiRenderer.screen.width;
         this._oldHeight = pixiRenderer.screen.height;
       }
-      const oldRenderTexture = pixiRenderer.renderTexture.current;
+      const oldRenderTexture = pixiRenderer.renderTexture.current || undefined;
       const oldSourceFrame = pixiRenderer.renderTexture.sourceFrame;
       pixiRenderer.renderTexture.bind(this._renderTexture);
 

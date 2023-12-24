@@ -33,7 +33,11 @@ export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
  * This function will retry to send the event if the analytics service is not ready.
  */
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
-  if (isDev) return;
+  if (isDev) {
+    // Uncomment to inspect analytics in development.
+    // console.log(`Should have sent analytics event "${name}"`, metadata);
+    return;
+  }
 
   if (!posthogLoaded || !userIdentified) {
     console.info(`App analytics not ready for an event - retrying in 2s.`);
@@ -192,6 +196,12 @@ export const sendExportLaunched = (exportKind: string) => {
   });
 };
 
+export const sendGameDetailsOpened = (options: {
+  from: 'profile' | 'homepage' | 'projectManager',
+}) => {
+  recordEvent('game_details_opened', options);
+};
+
 export const sendExampleDetailsOpened = (slug: string) => {
   recordEvent('example-details-opened', { slug });
 };
@@ -266,6 +276,16 @@ export const sendGameTemplateInformationOpened = (options: {|
   recordEvent('game_template_information_opened', options);
 };
 
+export const sendUserSurveyStarted = () => {
+  recordEvent('user_survey_started');
+};
+export const sendUserSurveyCompleted = () => {
+  recordEvent('user_survey_completed');
+};
+export const sendUserSurveyHidden = () => {
+  recordEvent('user_survey_hidden');
+};
+
 export const sendHelpSearch = (searchText: string) => {
   recordEvent('help_search', {
     searchText,
@@ -326,7 +346,9 @@ export type SubscriptionDialogDisplayReason =
   | 'Build limit reached'
   | 'Leaderboard customization'
   | 'Extend redeemed subscription'
-  | 'Generate project from prompt';
+  | 'Generate project from prompt'
+  | 'Version history'
+  | 'Add collaborators on project';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,
@@ -416,16 +438,68 @@ export const sendEventsExtractedAsFunction = (metadata: {|
   recordEvent('events-extracted-as-function', metadata);
 };
 
-export const sendInAppTutorialProgress = (metadata: {|
+const inAppTutorialProgressLastFiredEvents: {
+  [string]: {
+    lastStep: number,
+    nextCheckTimeoutId: TimeoutID | null,
+  },
+} = {};
+
+/**
+ * Register the progress of a tutorial.
+ *
+ * To avoid sending too many events, we only send tutorial progress analytics events
+ * when some steps are reached (step index == multiple of 5), when the tutorial is completed,
+ * or after some inactivity (more than 30 seconds).
+ */
+export const sendInAppTutorialProgress = ({
+  step,
+  tutorialId,
+  isCompleted,
+}: {|
   tutorialId: string,
   step: number,
   isCompleted: boolean,
 |}) => {
-  const builtInTutorialIds = ['onboarding'];
-  recordEvent(
-    builtInTutorialIds.includes(metadata.tutorialId)
-      ? 'in-app-tutorial-built-in'
-      : 'in-app-tutorial-external',
-    metadata
-  );
+  const immediatelyRecordEvent = (
+    spentMoreThan30SecondsSinceLastStep: ?boolean
+  ) => {
+    // Remember the last step we sent an event for.
+    inAppTutorialProgressLastFiredEvents[tutorialId] = {
+      lastStep: step,
+      nextCheckTimeoutId: null,
+    };
+    recordEvent('in-app-tutorial-external', {
+      tutorialId,
+      step,
+      isCompleted,
+      spentMoreThan30SecondsSinceLastStep: !!spentMoreThan30SecondsSinceLastStep,
+    });
+  };
+
+  // We receive a new progress event, so we can clear the timeout used
+  // to send the last event in case there is no progress.
+  const lastFiredEvent = inAppTutorialProgressLastFiredEvents[tutorialId];
+  if (lastFiredEvent && lastFiredEvent.nextCheckTimeoutId !== null)
+    clearTimeout(lastFiredEvent.nextCheckTimeoutId);
+
+  // Immediately send the event if the tutorial is ended or it's the first progress.
+  if (isCompleted || !lastFiredEvent) {
+    immediatelyRecordEvent();
+    return;
+  }
+
+  // Then, send an event every 5 steps, or if we had more than 5 steps since the last event.
+  // This last point is important because some steps might be hidden/skipped.
+  if (step % 5 === 0 || step >= lastFiredEvent.lastStep + 5) {
+    immediatelyRecordEvent();
+    return;
+  }
+
+  // Otherwise, continue to remember the last step that was sent, and force to send it 30 seconds
+  // later if there was no more progress.
+  inAppTutorialProgressLastFiredEvents[tutorialId] = {
+    lastStep: lastFiredEvent.lastStep,
+    nextCheckTimeoutId: setTimeout(() => immediatelyRecordEvent(true), 30000),
+  };
 };

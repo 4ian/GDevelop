@@ -1,6 +1,10 @@
-// @ts-nocheck - TODO: fix typings in this file
-
 namespace gdjs {
+  interface GodrayFilterExtra {
+    animationSpeed: number;
+    light: number;
+    x: number;
+    y: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Godray',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
@@ -8,35 +12,90 @@ namespace gdjs {
         const godrayFilter = new PIXI.filters.GodrayFilter();
         return godrayFilter;
       }
-      updatePreRender(filter, target) {
-        if (filter.animationSpeed !== 0) {
-          filter.time +=
-            (target.getElapsedTime() / 1000) * filter.animationSpeed;
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
+        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+          GodrayFilterExtra;
+        if (godrayFilter.animationSpeed !== 0) {
+          godrayFilter.time +=
+            (target.getElapsedTime() / 1000) * godrayFilter.animationSpeed;
         }
       }
-      updateDoubleParameter(filter, parameterName, value) {
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ) {
+        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+          GodrayFilterExtra;
         if (parameterName === 'lacunarity') {
-          filter.lacunarity = value;
+          godrayFilter.lacunarity = value;
         } else if (parameterName === 'angle') {
-          filter.angle = value;
+          godrayFilter.angle = value;
         } else if (parameterName === 'gain') {
-          filter.gain = value;
+          godrayFilter.gain = value;
         } else if (parameterName === 'light') {
-          filter.light = value;
+          godrayFilter.light = value;
         } else if (parameterName === 'x') {
-          filter.x = value;
+          godrayFilter.x = value;
         } else if (parameterName === 'y') {
-          filter.y = value;
+          godrayFilter.y = value;
         } else if (parameterName === 'animationSpeed') {
-          filter.animationSpeed = value;
+          godrayFilter.animationSpeed = value;
         } else if (parameterName === 'padding') {
-          filter.padding = value;
+          godrayFilter.padding = value;
         }
       }
-      updateStringParameter(filter, parameterName, value) {}
-      updateBooleanParameter(filter, parameterName, value) {
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+          GodrayFilterExtra;
+        if (parameterName === 'lacunarity') {
+          return godrayFilter.lacunarity;
+        }
+        if (parameterName === 'angle') {
+          return godrayFilter.angle;
+        }
+        if (parameterName === 'gain') {
+          return godrayFilter.gain;
+        }
+        if (parameterName === 'light') {
+          return godrayFilter.light;
+        }
+        if (parameterName === 'x') {
+          return godrayFilter.x;
+        }
+        if (parameterName === 'y') {
+          return godrayFilter.y;
+        }
+        if (parameterName === 'animationSpeed') {
+          return godrayFilter.animationSpeed;
+        }
+        if (parameterName === 'padding') {
+          return godrayFilter.padding;
+        }
+        return 0;
+      }
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {
+        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+          GodrayFilterExtra;
         if (parameterName === 'parallel') {
-          filter.parallel = value;
+          godrayFilter.parallel = value;
         }
       }
     })()

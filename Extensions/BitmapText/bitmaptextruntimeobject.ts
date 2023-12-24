@@ -37,7 +37,7 @@ namespace gdjs {
    */
   export class BitmapTextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.OpacityHandler, gdjs.Scalable {
+    implements gdjs.TextContainer, gdjs.OpacityHandler, gdjs.Scalable {
     _opacity: float;
     _text: string;
     /** color in format [r, g, b], where each component is in the range [0, 255] */
@@ -141,8 +141,8 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(instanceContainer);
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.onDestroy();
     }
 

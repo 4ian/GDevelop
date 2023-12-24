@@ -49,6 +49,22 @@ namespace gdjs {
     getAnimationSpeedScale(): float;
 
     setAnimationSpeedScale(ratio: float): void;
+
+    /**
+     * @return The elapsed time from the start of the animation in seconds.
+     */
+    getAnimationElapsedTime(): float;
+
+    /**
+     * Set the elapsed time from the start of the animation in seconds.
+     * @param time The time in seconds
+     */
+    setAnimationElapsedTime(time: float): void;
+
+    /**
+     * @return The duration of the current animation in seconds.
+     */
+    getAnimationDuration(): float;
   }
 
   /**
@@ -127,6 +143,18 @@ namespace gdjs {
 
     setAnimationSpeedScale(ratio: float): void {
       this.object.setAnimationSpeedScale(ratio);
+    }
+
+    getAnimationElapsedTime(): float {
+      return this.object.getAnimationElapsedTime();
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      this.object.setAnimationElapsedTime(time);
+    }
+
+    getAnimationDuration(): float {
+      return this.object.getAnimationDuration();
     }
   }
 

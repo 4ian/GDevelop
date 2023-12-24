@@ -142,6 +142,64 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Radius (in pixels)"))
       .SetFunctionName("DrawRoundedRectangle");
 
+  obj.AddAction("ChamferRectangle",
+                _("Chamfer Rectangle"),
+                _("Draw a chamfer rectangle on screen"),
+                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a chamfer "
+                  "rectangle (chamfer: _PARAM5_) "
+                  "with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/chamferRectangle24.png",
+                "res/actions/chamferRectangle.png")
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
+        .AddParameter("expression", _("Left X position"))
+        .AddParameter("expression", _("Top Y position"))
+        .AddParameter("expression", _("Right X position"))
+        .AddParameter("expression", _("Bottom Y position"))
+        .AddParameter("expression", _("Chamfer (in pixels)"))
+        .SetFunctionName("DrawChamferRectangle");
+
+
+  obj.AddAction("Torus",
+               _("Torus"),
+               _("Draw a torus on screen"),
+               _("Draw at _PARAM1_;_PARAM2_ a torus with inner radius"
+               "_PARAM3_ and outer radius _PARAM4_ and "
+               "with start arc _PARAM5_° and end arc _PARAM6_°"
+               "with _PARAM0_"),
+               _("Drawing"),
+               "res/actions/torus24.png",
+               "res/actions/torus.png")
+        
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
+        .AddParameter("expression", _("X position of center"))
+        .AddParameter("expression", _("Y position of center"))
+        .AddParameter("expression", _("Inner Radius (in pixels)"))
+        .AddParameter("expression", _("Outer Radius (in pixels)"))
+        .AddParameter("expression", _("Start Arc (in degrees)"))
+        .AddParameter("expression", _("End Arc (in degrees)"))
+        .SetFunctionName("DrawTorus");
+  
+  
+  obj.AddAction("RegularPolygon",
+                _("Regular Polygon"),
+                _("Draw a regular polygon on screen"),
+                _("Draw at _PARAM1_;_PARAM2_ a regular polygon with _PARAM3_ sides and radius: "
+                  "_PARAM4_ (rotation: _PARAM5_) "
+                  "with _PARAM0_"),
+                  _("Drawing"),
+                  "res/actions/regularPolygon24.png",
+                  "res/actions/regularPolygon.png")
+
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
+        .AddParameter("expression", _("X position of center"))
+        .AddParameter("expression", _("Y position of center"))
+        .AddParameter("expression",
+              _("Number of sides of the polygon (minimum: 3)"))
+        .AddParameter("expression", _("Radius (in pixels)"))
+        .AddParameter("expression", _("Rotation (in degrees)"))
+        .SetFunctionName("DrawRegularPolygon");
+
   obj.AddAction(
          "Star",
          _("Star"),

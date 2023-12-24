@@ -2,9 +2,7 @@
 import * as React from 'react';
 
 // Keep first as it creates the `global.gd` object:
-import GDevelopJsInitializerDecorator, {
-  testProject,
-} from './GDevelopJsInitializerDecorator';
+import { testProject } from './GDevelopJsInitializerDecorator';
 
 import { storiesOf } from '@storybook/react';
 import { action, configureActions } from '@storybook/addon-actions';
@@ -39,19 +37,7 @@ import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
-import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
-import CreateProfile from '../Profile/CreateProfile';
-import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfileDetails';
-import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import {
-  subscriptionForIndieUser,
-  silverSubscriptionWithRedemptionCode,
-  silverSubscriptionWithExpiredRedemptionCode,
-  limitsForSilverUser,
-  limitsReached,
-  noSubscription,
-  fakeSilverAuthenticatedUser,
-  fakeAuthenticatedUserLoggingIn,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -63,11 +49,10 @@ import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
 import DebuggerContent from '../Debugger/DebuggerContent';
-import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
+import BuildStepsProgress from '../ExportAndShare/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
-import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -98,7 +83,7 @@ import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import PropertiesEditor from '../PropertiesEditor';
 import { OpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
-import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
+import BrowserPreviewErrorDialog from '../ExportAndShare/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
@@ -132,7 +117,6 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
-import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import fakeResourceManagementProps from './FakeResourceManagement';
 
@@ -982,18 +966,6 @@ storiesOf('UI Building Blocks/Accordion', module)
     </React.Fragment>
   ));
 
-storiesOf('UI Building Blocks/PlaceholderMessage', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <PlaceholderMessage>
-      <p>
-        Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,
-        consectetur, adipisci velit
-      </p>
-    </PlaceholderMessage>
-  ));
-
 storiesOf('UI Building Blocks/PlaceholderLoader', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -1433,7 +1405,10 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExpressionField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -1451,7 +1426,10 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExpressionField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -1467,7 +1445,10 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <StringField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -1503,7 +1484,10 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <LayerField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -1517,7 +1501,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"GUI"'}
       render={(value, onChange) => (
         <LayerField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1532,7 +1516,10 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <SceneNameField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -1546,7 +1533,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"TestLayout"'}
       render={(value, onChange) => (
         <SceneNameField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1561,7 +1548,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <KeyField
           project={testProject.project}
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1576,7 +1563,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <MouseField
           project={testProject.project}
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1591,7 +1578,10 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <SceneVariableField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -1605,7 +1595,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <SceneVariableField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1619,7 +1609,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <ObjectVariableField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1633,7 +1623,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1647,7 +1637,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1662,7 +1652,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <TrueFalseField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1677,7 +1667,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <YesNoField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1692,7 +1682,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <ForceMultiplierField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -1706,7 +1696,7 @@ storiesOf('ParameterFields', module)
       initialValue={'0.8'}
       render={(value, onChange) => (
         <ForceMultiplierField
-          scope={{}}
+          scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -2136,6 +2126,7 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
   .add('default', () => (
     <EventsFunctionExtractorDialog
       project={testProject.project}
+      scope={{ project: testProject.project, layout: testProject.testLayout }}
       globalObjectsContainer={testProject.project}
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEvents}
@@ -2146,6 +2137,7 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
   .add('with a lot of parameters', () => (
     <EventsFunctionExtractorDialog
       project={testProject.project}
+      scope={{ project: testProject.project, layout: testProject.testLayout }}
       globalObjectsContainer={testProject.project}
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEventsWithLotsOfObjects}
@@ -2210,22 +2202,32 @@ storiesOf('InstructionSelector', module)
   .addDecorator(muiDecorator)
   .add('conditions (no scope)', () => (
     <FixedHeightFlexContainer height={400}>
-      <InstructionSelector
-        selectedType=""
-        onChoose={action('Instruction chosen')}
-        isCondition
-        scope={{}}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <InstructionSelector
+            i18n={i18n}
+            selectedType=""
+            onChoose={action('Instruction chosen')}
+            isCondition
+            scope={{ project: testProject.project }}
+          />
+        )}
+      </I18n>
     </FixedHeightFlexContainer>
   ))
   .add('actions (no scope)', () => (
     <FixedHeightFlexContainer height={400}>
-      <InstructionSelector
-        selectedType=""
-        onChoose={action('Instruction chosen')}
-        isCondition={false}
-        scope={{}}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <InstructionSelector
+            i18n={i18n}
+            selectedType=""
+            onChoose={action('Instruction chosen')}
+            isCondition={false}
+            scope={{ project: testProject.project }}
+          />
+        )}
+      </I18n>
     </FixedHeightFlexContainer>
   ));
 
@@ -2242,7 +2244,10 @@ storiesOf('InstructionOrObjectSelector', module)
               <InstructionOrObjectSelector
                 style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
                 project={testProject.project}
-                scope={{ layout: testProject.testLayout }}
+                scope={{
+                  project: testProject.project,
+                  layout: testProject.testLayout,
+                }}
                 currentTab={value}
                 onChangeTab={onChange}
                 globalObjectsContainer={testProject.project}
@@ -2272,7 +2277,10 @@ storiesOf('InstructionOrObjectSelector', module)
               <InstructionOrObjectSelector
                 style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
                 project={testProject.project}
-                scope={{ layout: testProject.testLayout }}
+                scope={{
+                  project: testProject.project,
+                  layout: testProject.testLayout,
+                }}
                 currentTab={value}
                 onChangeTab={onChange}
                 globalObjectsContainer={testProject.project}
@@ -2297,40 +2305,53 @@ storiesOf('InstructionEditorDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('Existing condition (scope: in a layout)', () => (
-    <InstructionEditorDialog
-      open
-      project={testProject.project}
-      scope={{ layout: testProject.testLayout }}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
-      isCondition
-      isNewInstruction={false}
-      instruction={testProject.testInstruction}
-      resourceManagementProps={fakeResourceManagementProps}
-      openInstructionOrExpression={action('open instruction or expression')}
-      onCancel={action('cancel')}
-      onSubmit={action('submit')}
-      canPasteInstructions={true}
-      onPasteInstructions={action('paste instructions')}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <InstructionEditorDialog
+          i18n={i18n}
+          open
+          project={testProject.project}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          isCondition
+          isNewInstruction={false}
+          instruction={testProject.testInstruction}
+          resourceManagementProps={fakeResourceManagementProps}
+          openInstructionOrExpression={action('open instruction or expression')}
+          onCancel={action('cancel')}
+          onSubmit={action('submit')}
+          canPasteInstructions={true}
+          onPasteInstructions={action('paste instructions')}
+        />
+      )}
+    </I18n>
   ))
   .add('Existing condition (scope: without layout)', () => (
-    <InstructionEditorDialog
-      open
-      project={testProject.project}
-      scope={{ layout: null }}
-      globalObjectsContainer={testProject.project}
-      objectsContainer={testProject.testLayout}
-      isCondition
-      isNewInstruction={false}
-      instruction={testProject.testInstruction}
-      resourceManagementProps={fakeResourceManagementProps}
-      openInstructionOrExpression={action('open instruction or expression')}
-      onCancel={action('cancel')}
-      onSubmit={action('submit')}
-      canPasteInstructions={true}
-      onPasteInstructions={action('paste instructions')}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <InstructionEditorDialog
+          i18n={i18n}
+          open
+          project={testProject.project}
+          scope={{ project: testProject.project, layout: null }}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          isCondition
+          isNewInstruction={false}
+          instruction={testProject.testInstruction}
+          resourceManagementProps={fakeResourceManagementProps}
+          openInstructionOrExpression={action('open instruction or expression')}
+          onCancel={action('cancel')}
+          onSubmit={action('submit')}
+          canPasteInstructions={true}
+          onPasteInstructions={action('paste instructions')}
+        />
+      )}
+    </I18n>
   ))
   .add('New condition (scope: without layout)', () => (
     <Column>
@@ -2340,22 +2361,29 @@ storiesOf('InstructionEditorDialog', module)
         instructions can be created either by selecting an object first or by
         searching for it).
       </Text>
-      <InstructionEditorDialog
-        open
-        project={testProject.project}
-        scope={{ layout: null }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
-        isCondition
-        isNewInstruction={true}
-        instruction={testProject.testInstruction}
-        resourceManagementProps={fakeResourceManagementProps}
-        openInstructionOrExpression={action('open instruction or expression')}
-        onCancel={action('cancel')}
-        onSubmit={action('submit')}
-        canPasteInstructions={true}
-        onPasteInstructions={action('paste instructions')}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <InstructionEditorDialog
+            i18n={i18n}
+            open
+            project={testProject.project}
+            scope={{ project: testProject.project, layout: null }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            isCondition
+            isNewInstruction={true}
+            instruction={testProject.testInstruction}
+            resourceManagementProps={fakeResourceManagementProps}
+            openInstructionOrExpression={action(
+              'open instruction or expression'
+            )}
+            onCancel={action('cancel')}
+            onSubmit={action('submit')}
+            canPasteInstructions={true}
+            onPasteInstructions={action('paste instructions')}
+          />
+        )}
+      </I18n>
     </Column>
   ));
 
@@ -2372,25 +2400,33 @@ storiesOf('InstructionEditorMenu', module)
       </Text>
       <PopoverButton>
         {({ buttonElement, onClose }) => (
-          <InstructionEditorMenu
-            open
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            isCondition
-            isNewInstruction={false}
-            instruction={testProject.testInstruction}
-            resourceManagementProps={fakeResourceManagementProps}
-            openInstructionOrExpression={action(
-              'open instruction or expression'
+          <I18n>
+            {({ i18n }) => (
+              <InstructionEditorMenu
+                i18n={i18n}
+                open
+                project={testProject.project}
+                scope={{
+                  project: testProject.project,
+                  layout: testProject.testLayout,
+                }}
+                globalObjectsContainer={testProject.project}
+                objectsContainer={testProject.testLayout}
+                isCondition
+                isNewInstruction={false}
+                instruction={testProject.testInstruction}
+                resourceManagementProps={fakeResourceManagementProps}
+                openInstructionOrExpression={action(
+                  'open instruction or expression'
+                )}
+                onCancel={onClose}
+                onSubmit={onClose}
+                anchorEl={buttonElement}
+                canPasteInstructions={true}
+                onPasteInstructions={action('paste instructions')}
+              />
             )}
-            onCancel={onClose}
-            onSubmit={onClose}
-            anchorEl={buttonElement}
-            canPasteInstructions={true}
-            onPasteInstructions={action('paste instructions')}
-          />
+          </I18n>
         )}
       </PopoverButton>
     </Column>
@@ -2436,18 +2472,6 @@ storiesOf('ObjectSelector', module)
     />
   ));
 
-const fakeError = new Error('Fake error for storybook');
-storiesOf('ErrorBoundary', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ErrorFallbackComponent
-      componentStack="Fake stack"
-      error={fakeError}
-      title="Error customizable title"
-    />
-  ));
-
 storiesOf('Changelog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -2488,74 +2512,6 @@ storiesOf('Changelog', module)
   ))
   .add('complete changelog dialog', () => (
     <ChangelogDialog open onClose={action('close dialog')} />
-  ));
-
-storiesOf('Profile/CreateProfile', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <CreateProfile
-      onLogin={action('onLogin')}
-      onCreateAccount={action('onCreateAccount')}
-    />
-  ));
-
-storiesOf('CurrentUsageDisplayer', module)
-  .addDecorator(subscriptionSuggestionDecorator)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <CurrentUsageDisplayer
-      subscription={subscriptionForIndieUser}
-      currentUsage={limitsForSilverUser.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('with redemption code', () => (
-    <CurrentUsageDisplayer
-      subscription={silverSubscriptionWithRedemptionCode}
-      currentUsage={limitsForSilverUser.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('with expired redemption code', () => (
-    <CurrentUsageDisplayer
-      subscription={silverSubscriptionWithExpiredRedemptionCode}
-      currentUsage={limitsForSilverUser.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('limit reached', () => (
-    <CurrentUsageDisplayer
-      subscription={subscriptionForIndieUser}
-      currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ))
-  .add('limit reached without subscription', () => (
-    <CurrentUsageDisplayer
-      subscription={noSubscription}
-      currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('on change subscription callback')}
-    />
-  ));
-
-storiesOf('AuthenticatedUserProfileDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('profile', () => (
-    <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onEditProfile={action('edit profile')}
-      onChangeEmail={action('change email')}
-    />
-  ))
-  .add('loading', () => (
-    <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeAuthenticatedUserLoggingIn}
-      onEditProfile={action('edit profile')}
-      onChangeEmail={action('change email')}
-    />
   ));
 
 storiesOf('Profile/ContributionsDetails', module)

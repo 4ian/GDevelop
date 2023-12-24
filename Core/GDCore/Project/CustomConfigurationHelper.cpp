@@ -5,26 +5,28 @@
  */
 #include "CustomConfigurationHelper.h"
 
+#include <map>
+
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
-#include <map>
-
 using namespace gd;
 
 void CustomConfigurationHelper::InitializeContent(
-    const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+    const gd::PropertiesContainer &properties,
     gd::SerializerElement &configurationContent) {
   for (auto &&property : properties.GetInternalVector()) {
     auto &element = configurationContent.AddChild(property->GetName());
     auto propertyType = property->GetType();
 
     if (propertyType == "String" || propertyType == "Choice" ||
-        propertyType == "Color" || propertyType == "Behavior") {
+        propertyType == "Color" || propertyType == "Behavior" ||
+        propertyType == "resource") {
       element.SetStringValue(property->GetValue());
     } else if (propertyType == "Number") {
       element.SetDoubleValue(property->GetValue().To<double>());
@@ -35,7 +37,7 @@ void CustomConfigurationHelper::InitializeContent(
 }
 
 std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetProperties(
-    const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+    const gd::PropertiesContainer &properties,
     const gd::SerializerElement &configurationContent) {
   auto behaviorProperties = std::map<gd::String, gd::PropertyDescriptor>();
 
@@ -50,7 +52,8 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
 
     if (configurationContent.HasChild(propertyName)) {
       if (propertyType == "String" || propertyType == "Choice" ||
-          propertyType == "Color" || propertyType == "Behavior") {
+          propertyType == "Color" || propertyType == "Behavior" ||
+          propertyType == "resource") {
         newProperty.SetValue(
             configurationContent.GetChild(propertyName).GetStringValue());
       } else if (propertyType == "Number") {
@@ -58,8 +61,9 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
             configurationContent.GetChild(propertyName).GetDoubleValue()));
       } else if (propertyType == "Boolean") {
         newProperty.SetValue(
-            configurationContent.GetChild(propertyName).GetBoolValue() ? "true"
-                                                                  : "false");
+            configurationContent.GetChild(propertyName).GetBoolValue()
+                ? "true"
+                : "false");
       }
     } else {
       // No value was serialized for this property. `newProperty`
@@ -71,7 +75,7 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
 }
 
 bool CustomConfigurationHelper::UpdateProperty(
-    const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+    const gd::PropertiesContainer &properties,
     gd::SerializerElement &configurationContent,
     const gd::String &propertyName,
     const gd::String &newValue) {
@@ -84,7 +88,8 @@ bool CustomConfigurationHelper::UpdateProperty(
   const gd::String &propertyType = property.GetType();
 
   if (propertyType == "String" || propertyType == "Choice" ||
-      propertyType == "Color" || propertyType == "Behavior") {
+      propertyType == "Color" || propertyType == "Behavior" ||
+      propertyType == "resource") {
     element.SetStringValue(newValue);
   } else if (propertyType == "Number") {
     element.SetDoubleValue(newValue.To<double>());

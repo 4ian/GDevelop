@@ -131,6 +131,9 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
+  if (eventsBasedObject.IsRenderedIn3D()) {
+    objectMetadata.MarkAsRenderedIn3D();
+  }
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.
@@ -950,12 +953,6 @@ MetadataDeclarationHelper::UncapitalizeFirstLetter(const gd::String &string) {
                            : string.substr(0, 1).LowerCase() + string.substr(1);
 }
 
-gd::String
-MetadataDeclarationHelper::CapitalizeFirstLetter(const gd::String &string) {
-  return string.size() < 1 ? string
-                           : string.substr(0, 1).UpperCase() + string.substr(1);
-}
-
 void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
     gd::PlatformExtension &extension,
     gd::InstructionOrExpressionContainerMetadata &entityMetadata,
@@ -972,7 +969,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
   auto &propertyType = property.GetType();
 
   auto uncapitalizedLabel =
-      UncapitalizeFirstLetter(property.GetLabel() || property.GetName());
+      UncapitalizeFirstLetter(property.GetLabel()) || property.GetName();
   if (propertyType == "Boolean") {
     auto &conditionMetadata = entityMetadata.AddScopedCondition(
         conditionName, propertyLabel,

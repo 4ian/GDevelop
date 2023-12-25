@@ -123,7 +123,7 @@ class ObjectTreeViewItem implements TreeViewItem {
     return this.object.getName();
   }
   getId(): string {
-    return this.object.getName();
+    return 'objects.' + this.object.getName();
   }
   getHtmlId(index: number): ?string {
     return `object-item-${index}`;
@@ -140,7 +140,6 @@ class ObjectTreeViewItem implements TreeViewItem {
       i =>
         new FunctionTreeViewItem(
           functions.getEventsFunctionAt(i),
-          this.getId(),
           eventFunctionContext
         )
     );
@@ -170,7 +169,7 @@ class BehaviorTreeViewItem implements TreeViewItem {
     return this.behavior.getName();
   }
   getId(): string {
-    return this.behavior.getName();
+    return 'behaviors.' + this.behavior.getName();
   }
   getHtmlId(index: number): ?string {
     return `behavior-item-${index}`;
@@ -187,7 +186,6 @@ class BehaviorTreeViewItem implements TreeViewItem {
       i =>
         new FunctionTreeViewItem(
           functions.getEventsFunctionAt(i),
-          this.getId(),
           eventFunctionContext
         )
     );
@@ -203,16 +201,13 @@ class BehaviorTreeViewItem implements TreeViewItem {
 
 class FunctionTreeViewItem implements TreeViewItem {
   eventFunction: gdEventsFunction;
-  parentId: string;
   eventFunctionContext: EventFunctionContext;
 
   constructor(
     eventFunction: gdEventsFunction,
-    parentId: string,
     eventFunctionContext: EventFunctionContext
   ) {
     this.eventFunction = eventFunction;
-    this.parentId = parentId;
     this.eventFunctionContext = eventFunctionContext;
   }
 
@@ -220,7 +215,15 @@ class FunctionTreeViewItem implements TreeViewItem {
     return this.eventFunction.getName();
   }
   getId(): string {
-    return this.parentId + '.' + this.eventFunction.getName();
+    const behavior = this.eventFunctionContext.eventsBasedBehavior;
+    const object = this.eventFunctionContext.eventsBasedObject;
+    return (
+      (behavior
+        ? `behaviors.${behavior.getName()}.`
+        : object
+        ? `objects.${object.getName()}.`
+        : '') + this.eventFunction.getName()
+    );
   }
   getHtmlId(index: number): ?string {
     return `function-item-${index}`;
@@ -435,6 +438,10 @@ const EventsFunctionsList = React.forwardRef<
       onRenameEventsFunction,
       onAddEventsFunction,
       onEventsFunctionAdded,
+
+      selectedEventsFunction,
+      selectedEventsBasedBehavior,
+      selectedEventsBasedObject,
     }: Props,
     ref
   ) => {
@@ -447,8 +454,18 @@ const EventsFunctionsList = React.forwardRef<
         onAddEventsFunction,
         onEventsFunctionAdded,
       }),
-      []
+      [
+        canRename,
+        onAddEventsFunction,
+        onDeleteEventsFunction,
+        onEventsFunctionAdded,
+        onRenameEventsFunction,
+        onSelectEventsFunction,
+      ]
     );
+    const [selectedItems, setSelectedItems] = React.useState<
+      Array<TreeViewItem>
+    >([]);
 
     const preferences = React.useContext(PreferencesContext);
     const { currentlyRunningInAppTutorial } = React.useContext(
@@ -796,7 +813,6 @@ const EventsFunctionsList = React.forwardRef<
                 i =>
                   new FunctionTreeViewItem(
                     eventsFunctionsExtension.getEventsFunctionAt(i),
-                    '',
                     eventFunctionContext
                   )
               );
@@ -812,7 +828,12 @@ const EventsFunctionsList = React.forwardRef<
         // $FlowFixMe
         return treeViewItems;
       },
-      [eventBasedBehaviors, eventBasedObjects, eventsFunctionsExtension]
+      [
+        eventBasedBehaviors,
+        eventBasedObjects,
+        eventFunctionCallbacks,
+        eventsFunctionsExtension,
+      ]
     );
 
     const canMoveSelectionTo = React.useCallback(
@@ -964,16 +985,14 @@ const EventsFunctionsList = React.forwardRef<
                       getItemDataset={getTreeViewItemData}
                       onEditItem={editItem}
                       onCollapseItem={onCollapseItem}
-                      selectedItems={
-                        // TODO
-                        []
-                      }
+                      selectedItems={selectedItems}
                       onSelectItems={items => {
                         if (!items) selectObjectFolderOrObjectWithContext(null);
                         const itemToSelect = items[0];
                         if (itemToSelect.isRoot) return;
                         if (!itemToSelect) return;
                         itemToSelect.onSelect();
+                        setSelectedItems(items);
                       }}
                       onRenameItem={rename}
                       buildMenuTemplate={renderObjectMenuTemplate(i18n)}

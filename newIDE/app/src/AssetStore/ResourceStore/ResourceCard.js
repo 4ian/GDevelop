@@ -178,6 +178,7 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
     case 'json':
     case 'tilemap':
     case 'tileset':
+    case 'spine':
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">
@@ -211,6 +212,17 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
         </GenericCard>
       );
     case 'model3D':
+      return (
+        <GenericCard onChoose={onChoose} resource={resource} size={size}>
+          <Line justifyContent="center">
+            <FontDownload style={styles.icon} />
+          </Line>
+          <Line justifyContent="center">
+            <RaisedButton onClick={onChoose} label={<Trans>Choose</Trans>} />
+          </Line>
+        </GenericCard>
+      );
+    case 'atlas':
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">

@@ -11,6 +11,10 @@ import {
   signOut,
   sendEmailVerification,
   updateEmail,
+  signInWithPopup,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  OAuthProvider,
 } from 'firebase/auth';
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
@@ -103,8 +107,11 @@ export type AuthError = {
     | 'auth/requires-recent-login'
     | 'auth/too-many-requests'
     | 'auth/internal-error'
-    | 'auth/network-request-failed',
+    | 'auth/network-request-failed'
+    | 'auth/account-exists-with-different-credential',
 };
+
+export type IdentityProvider = 'google' | 'apple' | 'github';
 
 export default class Authentication {
   auth: Auth;
@@ -201,6 +208,34 @@ export default class Authentication {
 
   login = (form: LoginForm): Promise<void> => {
     return signInWithEmailAndPassword(this.auth, form.email, form.password)
+      .then(userCredentials => {
+        // The user is now stored in `this.auth`.
+      })
+      .catch(error => {
+        console.error('Error while login:', error);
+        throw error;
+      });
+  };
+
+  loginWithProvider = (provider: IdentityProvider): Promise<void> => {
+    let firebaseProvider = null;
+    if (provider === 'google') {
+      firebaseProvider = new GoogleAuthProvider();
+      firebaseProvider.addScope('profile');
+      firebaseProvider.addScope('email');
+    } else if (provider === 'github') {
+      firebaseProvider = new GithubAuthProvider();
+      // No scope needed for GitHub.
+    } else if (provider === 'apple') {
+      firebaseProvider = new OAuthProvider('apple.com');
+      firebaseProvider.addScope('email');
+      firebaseProvider.addScope('name');
+    }
+
+    if (!firebaseProvider)
+      throw new Error(`Unknown provider ${provider} for login.`);
+
+    return signInWithPopup(this.auth, firebaseProvider)
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })

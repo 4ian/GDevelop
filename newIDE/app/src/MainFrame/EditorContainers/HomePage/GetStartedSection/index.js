@@ -109,6 +109,7 @@ const GetStartedSection = ({
     onResetPassword,
     creatingOrLoggingInAccount,
     onLogin,
+    onLoginWithProvider,
     onEditProfile,
     onCreateAccount,
     authenticationError,
@@ -365,6 +366,7 @@ const GetStartedSection = ({
                 password={password}
                 onChangePassword={setPassword}
                 onLogin={doLogin}
+                onLoginWithProvider={onLoginWithProvider}
                 loginInProgress={creatingOrLoggingInAccount}
                 onForgotPassword={onResetPassword}
                 error={error}

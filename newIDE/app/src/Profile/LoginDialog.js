@@ -9,6 +9,7 @@ import {
   type LoginForm as LoginFormType,
   type ForgotPasswordForm,
   type AuthError,
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
@@ -29,6 +30,7 @@ type Props = {|
   onClose: () => void,
   onGoToCreateAccount: () => void,
   onLogin: (form: LoginFormType) => Promise<void>,
+  onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
@@ -38,6 +40,7 @@ const LoginDialog = ({
   onClose,
   onGoToCreateAccount,
   onLogin,
+  onLoginWithProvider,
   onForgotPassword,
   loginInProgress,
   error,
@@ -123,6 +126,7 @@ const LoginDialog = ({
         >
           <LoginForm
             onLogin={doLogin}
+            onLoginWithProvider={onLoginWithProvider}
             email={email}
             onChangeEmail={setEmail}
             password={password}

@@ -6,6 +6,7 @@ import TextField from '../UI/TextField';
 import {
   type ForgotPasswordForm,
   type AuthError,
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import Text from '../UI/Text';
 import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
@@ -14,9 +15,12 @@ import Link from '../UI/Link';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
 import Form from '../UI/Form';
 import { Line } from '../UI/Grid';
+import FlatButton from '../UI/FlatButton';
+import AlertMessage from '../UI/AlertMessage';
 
 type Props = {|
   onLogin: () => void,
+  onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   email: string,
   onChangeEmail: string => void,
   password: string,
@@ -28,6 +32,7 @@ type Props = {|
 
 const LoginForm = ({
   onLogin,
+  onLoginWithProvider,
   email,
   onChangeEmail,
   password,
@@ -41,6 +46,10 @@ const LoginForm = ({
     setIsForgotPasswordDialogOpen,
   ] = React.useState(false);
 
+  const accountsExistsWithOtherCredentials = error
+    ? error.code === 'auth/account-exists-with-different-credential'
+    : false;
+
   return (
     <>
       <ColumnStackLayout
@@ -51,6 +60,14 @@ const LoginForm = ({
       >
         <Form onSubmit={onLogin} autoComplete="on" name="login">
           <ColumnStackLayout noMargin>
+            {accountsExistsWithOtherCredentials && (
+              <AlertMessage kind="error">
+                <Trans>
+                  You already have an account with another provider or with an
+                  email/password. Try these instead.
+                </Trans>
+              </AlertMessage>
+            )}
             <TextField
               autoFocus="desktop"
               value={email}
@@ -90,6 +107,24 @@ const LoginForm = ({
             </Text>
           </Link>
         </Line>
+        <FlatButton
+          label={'Login with Google'}
+          onClick={() => {
+            onLoginWithProvider('google');
+          }}
+        />
+        <FlatButton
+          label={'Login with GitHub'}
+          onClick={() => {
+            onLoginWithProvider('github');
+          }}
+        />
+        <FlatButton
+          label={'Login with Apple'}
+          onClick={() => {
+            onLoginWithProvider('apple');
+          }}
+        />
       </ColumnStackLayout>
       {isForgotPasswordDialogOpen && (
         <ForgotPasswordDialog

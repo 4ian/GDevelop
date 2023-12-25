@@ -15,6 +15,7 @@ const defaultProps = {
   onClose: action('onClose'),
   onForgotPassword: action('onForgotPassword'),
   onLogin: action('onLogin'),
+  onLoginWithProvider: action('onLoginWithProvider'),
   onGoToCreateAccount: action('onGoToCreateAccount'),
   loginInProgress: false,
   error: null,
@@ -36,6 +37,15 @@ export const InvalidEmailErrorFromBackend = () => (
     {...defaultProps}
     error={{
       code: 'auth/invalid-email',
+    }}
+  />
+);
+
+export const AccountExistsWithDifferentCredentialErrorFromBackend = () => (
+  <LoginDialog
+    {...defaultProps}
+    error={{
+      code: 'auth/account-exists-with-different-credential',
     }}
   />
 );

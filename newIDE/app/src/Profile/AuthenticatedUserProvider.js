@@ -17,6 +17,7 @@ import Authentication, {
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
@@ -186,6 +187,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...initialAuthenticatedUser,
         onLogin: this._doLogin,
+        onLoginWithProvider: this._doLoginWithProvider,
         onLogout: this._doLogout,
         onCreateAccount: this._doCreateAccount,
         onEditProfile: this._doEdit,
@@ -729,6 +731,52 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  _doLoginWithProvider = async (provider: IdentityProvider) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      loginInProgress: true,
+      apiCallError: null,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: true,
+        authenticationError: null,
+      },
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.loginWithProvider(provider);
+      await this._fetchUserProfileWithoutThrowingErrors();
+      this.openLoginDialog(false);
+      const profile = this.state.authenticatedUser.profile;
+      const username = profile ? profile.username : null;
+      this.showUserSnackbar({
+        message: username ? (
+          <Trans>👋 Good to see you {username}!</Trans>
+        ) : (
+          <Trans>👋 Good to see you!</Trans>
+        ),
+      });
+    } catch (apiCallError) {
+      this.setState({
+        apiCallError,
+        authenticatedUser: {
+          ...this.state.authenticatedUser,
+          authenticationError: apiCallError,
+        },
+      });
+    }
+    this.setState({
+      loginInProgress: false,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: false,
+      },
+    });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
   _doLogin = async (form: LoginForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -1059,6 +1107,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 onClose={() => this.openLoginDialog(false)}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
+                onLoginWithProvider={this._doLoginWithProvider}
                 loginInProgress={this.state.loginInProgress}
                 error={this.state.apiCallError}
                 onForgotPassword={this._doForgotPassword}

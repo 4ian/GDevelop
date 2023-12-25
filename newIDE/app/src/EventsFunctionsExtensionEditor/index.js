@@ -1188,8 +1188,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 unsavedChanges={this.props.unsavedChanges}
                 // Free functions
                 selectedEventsFunction={selectedEventsFunction}
-                onSelectEventsFunction={selectedEventsFunction =>
-                  this._selectEventsFunction(selectedEventsFunction, null)
+                onSelectEventsFunction={(
+                  selectedEventsFunction,
+                  selectedEventsBasedBehavior,
+                  selectedEventsBasedObject
+                ) =>
+                  this._selectEventsFunction(
+                    selectedEventsFunction,
+                    selectedEventsBasedBehavior,
+                    selectedEventsBasedObject
+                  )
                 }
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
                 canRename={(eventsFunction: gdEventsFunction) => {

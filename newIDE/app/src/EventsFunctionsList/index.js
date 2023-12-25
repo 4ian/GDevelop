@@ -71,6 +71,30 @@ const styles = {
 
 export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
+type EventFunctionCallbacks = {|
+  onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
+  onDeleteEventsFunction: (
+    eventsFunction: gdEventsFunction,
+    cb: (boolean) => void
+  ) => void,
+  canRename: (eventsFunction: gdEventsFunction) => boolean,
+  onRenameEventsFunction: (
+    eventsFunction: gdEventsFunction,
+    newName: string,
+    cb: (boolean) => void
+  ) => void,
+  onAddEventsFunction: (
+    (parameters: ?EventsFunctionCreationParameters) => void
+  ) => void,
+  onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
+|};
+
+type EventFunctionContext = {|
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
+  functionCallbacks: EventFunctionCallbacks,
+|};
+
 interface TreeViewItem {
   isRoot?: boolean;
   isPlaceholder?: boolean;
@@ -80,13 +104,19 @@ interface TreeViewItem {
   getChildren(): ?Array<TreeViewItem>;
   getThumbnail(): ?string;
   getDataset(): ?HTMLDataset;
+  onSelect(): void;
 }
 
 class ObjectTreeViewItem implements TreeViewItem {
   object: gdEventsBasedObject;
+  eventFunctionCallbacks: EventFunctionCallbacks;
 
-  constructor(object: gdEventsBasedObject) {
+  constructor(
+    object: gdEventsBasedObject,
+    eventFunctionCallbacks: EventFunctionCallbacks
+  ) {
     this.object = object;
+    this.eventFunctionCallbacks = eventFunctionCallbacks;
   }
 
   getName(): string | React.Node {
@@ -100,10 +130,19 @@ class ObjectTreeViewItem implements TreeViewItem {
   }
   getChildren(): ?Array<TreeViewItem> {
     const functions = this.object.getEventsFunctions();
+    const eventFunctionContext: EventFunctionContext = {
+      eventsBasedObject: this.object,
+      eventFunctionCallbacks: this.eventFunctionCallbacks,
+    };
     return mapFor(
       0,
       functions.getEventsFunctionsCount(),
-      i => new FunctionTreeViewItem(functions.getEventsFunctionAt(i), this.getId())
+      i =>
+        new FunctionTreeViewItem(
+          functions.getEventsFunctionAt(i),
+          this.getId(),
+          eventFunctionContext
+        )
     );
   }
   getThumbnail(): ?string {
@@ -112,13 +151,19 @@ class ObjectTreeViewItem implements TreeViewItem {
   getDataset(): ?HTMLDataset {
     return null;
   }
+  onSelect(): void {}
 }
 
 class BehaviorTreeViewItem implements TreeViewItem {
   behavior: gdEventsBasedBehavior;
+  eventFunctionCallbacks: EventFunctionCallbacks;
 
-  constructor(behavior: gdEventsBasedBehavior) {
+  constructor(
+    behavior: gdEventsBasedBehavior,
+    eventFunctionCallbacks: EventFunctionCallbacks
+  ) {
     this.behavior = behavior;
+    this.eventFunctionCallbacks = eventFunctionCallbacks;
   }
 
   getName(): string | React.Node {
@@ -132,10 +177,19 @@ class BehaviorTreeViewItem implements TreeViewItem {
   }
   getChildren(): ?Array<TreeViewItem> {
     const functions = this.behavior.getEventsFunctions();
+    const eventFunctionContext: EventFunctionContext = {
+      eventsBasedBehavior: this.behavior,
+      eventFunctionCallbacks: this.eventFunctionCallbacks,
+    };
     return mapFor(
       0,
       functions.getEventsFunctionsCount(),
-      i => new FunctionTreeViewItem(functions.getEventsFunctionAt(i), this.getId())
+      i =>
+        new FunctionTreeViewItem(
+          functions.getEventsFunctionAt(i),
+          this.getId(),
+          eventFunctionContext
+        )
     );
   }
   getThumbnail(): ?string {
@@ -144,22 +198,29 @@ class BehaviorTreeViewItem implements TreeViewItem {
   getDataset(): ?HTMLDataset {
     return null;
   }
+  onSelect(): void {}
 }
 
 class FunctionTreeViewItem implements TreeViewItem {
   eventFunction: gdEventsFunction;
   parentId: string;
+  eventFunctionContext: EventFunctionContext;
 
-  constructor(eventFunction: gdEventsFunction, parentId: string) {
+  constructor(
+    eventFunction: gdEventsFunction,
+    parentId: string,
+    eventFunctionContext: EventFunctionContext
+  ) {
     this.eventFunction = eventFunction;
     this.parentId = parentId;
+    this.eventFunctionContext = eventFunctionContext;
   }
 
   getName(): string | React.Node {
     return this.eventFunction.getName();
   }
   getId(): string {
-    return this.parentId + "." + this.eventFunction.getName();
+    return this.parentId + '.' + this.eventFunction.getName();
   }
   getHtmlId(index: number): ?string {
     return `function-item-${index}`;
@@ -212,6 +273,13 @@ class FunctionTreeViewItem implements TreeViewItem {
   }
   getDataset(): ?HTMLDataset {
     return null;
+  }
+  onSelect(): void {
+    this.eventFunctionContext.eventFunctionCallbacks.onSelectEventsFunction(
+      this.eventFunction,
+      this.eventFunctionContext.eventsBasedBehavior,
+      this.eventFunctionContext.eventsBasedObject
+    );
   }
 }
 
@@ -286,6 +354,11 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   unsavedChanges?: ?UnsavedChanges,
+  onSelectEventsFunction: (
+    selectedEventsFunction: ?gdEventsFunction,
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
+    selectedEventsBasedObject: ?gdEventsBasedObject
+  ) => void,
 
   // Objects
   selectedEventsBasedObject: ?gdEventsBasedObject,
@@ -331,7 +404,6 @@ type Props = {|
 
   // Free functions
   selectedEventsFunction: ?gdEventsFunction,
-  onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
   onDeleteEventsFunction: (
     eventsFunction: gdEventsFunction,
     cb: (boolean) => void
@@ -351,544 +423,594 @@ type Props = {|
 const EventsFunctionsList = React.forwardRef<
   Props,
   EventsFunctionsListInterface
->(({ project, eventsFunctionsExtension, unsavedChanges }: Props, ref) => {
-  const preferences = React.useContext(PreferencesContext);
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
-  const { showDeleteConfirmation } = useAlertDialog();
-  const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
-  const forceUpdate = useForceUpdate();
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-
-  const forceUpdateList = React.useCallback(
-    () => {
-      forceUpdate();
-      if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-    },
-    [forceUpdate]
-  );
-
-  const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
-    from: ObjectFolderOrObjectWithContext | null,
-  } | null>(null);
-
-  React.useImperativeHandle(ref, () => ({
-    forceUpdateList: () => {
-      forceUpdate();
-      if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-    },
-    openNewObjectDialog: () => {
-      setNewObjectDialogOpen({ from: null });
-    },
-    closeNewObjectDialog: () => {
-      setNewObjectDialogOpen(null);
-    },
-    renameObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext => {
-      if (treeViewRef.current)
-        treeViewRef.current.renameItem(objectFolderOrObjectWithContext);
-    },
-  }));
-
-  const [searchText, setSearchText] = React.useState('');
-
-  const addObject = React.useCallback((objectType: string) => {
-    // TODO
-  }, []);
-
-  const onAddNewObject = React.useCallback(
-    (item: ObjectFolderOrObjectWithContext | null) => {
-      setNewObjectDialogOpen({ from: item });
-    },
-    []
-  );
-
-  const onObjectModified = React.useCallback(
-    (shouldForceUpdateList: boolean) => {
-      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-
-      if (shouldForceUpdateList) forceUpdateList();
-      else forceUpdate();
-    },
-    [forceUpdate, forceUpdateList, unsavedChanges]
-  );
-
-  const selectObjectFolderOrObjectWithContext = React.useCallback(
-    (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
-      // TODO
-    },
-    []
-  );
-
-  const deleteObjectFolderOrObjectWithContext = React.useCallback(
-    async (
-      objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
-    ) => {
-      // TODO
-    },
-    []
-  );
-
-  // Initialize keyboard shortcuts as empty.
-  // onDelete callback is set outside because it deletes the selected
-  // item (that is a props). As it is stored in a ref, the keyboard shortcut
-  // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
-  const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
-    new KeyboardShortcuts({
-      shortcutCallbacks: {},
-    })
-  );
-  React.useEffect(
-    () => {
-      if (keyboardShortcutsRef.current) {
-        keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-          deleteObjectFolderOrObjectWithContext(
-            // TODO
-            null
-          );
-        });
-      }
-    },
-    [deleteObjectFolderOrObjectWithContext]
-  );
-
-  const copyObjectFolderOrObjectWithContext = React.useCallback(
-    (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
-      const { objectFolderOrObject } = objectFolderOrObjectWithContext;
-      if (objectFolderOrObject.isFolder()) return;
-      const object = objectFolderOrObject.getObject();
-      Clipboard.set(CLIPBOARD_KIND, {
-        type: object.getType(),
-        name: object.getName(),
-        object: serializeToJSObject(object),
-      });
-    },
-    []
-  );
-
-  const cutObjectFolderOrObjectWithContext = React.useCallback(
-    (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
-      copyObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
-      deleteObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
-    },
-    [copyObjectFolderOrObjectWithContext, deleteObjectFolderOrObjectWithContext]
-  );
-
-  const addSerializedObjectToObjectsContainer = React.useCallback(
-    ({
-      objectName,
-      positionObjectFolderOrObjectWithContext,
-      objectType,
-      serializedObject,
-      addInsideFolder,
-    }: {|
-      objectName: string,
-      positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-      objectType: string,
-      serializedObject: Object,
-      addInsideFolder?: boolean,
-    |}): ObjectWithContext => {
-      // TODO
-    },
-    []
-  );
-
-  const paste = React.useCallback(
-    (
-      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-      addInsideFolder?: boolean
-    ) => {
-      // TODO
-    },
-    []
-  );
-
-  const editName = React.useCallback(
-    (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
-      if (!objectFolderOrObjectWithContext) return;
-      const treeView = treeViewRef.current;
-      if (treeView) {
-        if (isMobileScreen) {
-          // Position item at top of the screen to make sure it will be visible
-          // once the keyboard is open.
-          treeView.scrollToItem(objectFolderOrObjectWithContext, 'start');
-        }
-        treeView.renameItem(objectFolderOrObjectWithContext);
-      }
-    },
-    [isMobileScreen]
-  );
-
-  const duplicateObject = React.useCallback(
-    (
-      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-      duplicateInScene?: boolean
-    ) => {
-      const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
-      if (objectFolderOrObject.isFolder()) return;
-
-      const object = objectFolderOrObject.getObject();
-      const type = object.getType();
-      const name = object.getName();
-      const serializedObject = serializeToJSObject(object);
-
-      const newObjectWithContext = addSerializedObjectToObjectsContainer({
-        objectName: name,
-        positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
-        objectType: type,
-        serializedObject,
-      });
-
-      const newObjectFolderOrObjectWithContext = {
-        objectFolderOrObject: objectFolderOrObject
-          .getParent()
-          .getObjectChild(newObjectWithContext.object.getName()),
-        global,
-      };
-
-      forceUpdateList();
-      editName(newObjectFolderOrObjectWithContext);
-      selectObjectFolderOrObjectWithContext(newObjectFolderOrObjectWithContext);
-    },
-    [
-      addSerializedObjectToObjectsContainer,
-      editName,
-      forceUpdateList,
-      selectObjectFolderOrObjectWithContext,
-    ]
-  );
-
-  const rename = React.useCallback((item: TreeViewItem, newName: string) => {
-    // TODO
-  }, []);
-
-  const editItem = React.useCallback((item: TreeViewItem) => {
-    // TODO
-  }, []);
-
-  const scrollToItem = (
-    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
+>(
+  (
+    {
+      project,
+      eventsFunctionsExtension,
+      unsavedChanges,
+      onSelectEventsFunction,
+      onDeleteEventsFunction,
+      canRename,
+      onRenameEventsFunction,
+      onAddEventsFunction,
+      onEventsFunctionAdded,
+    }: Props,
+    ref
   ) => {
-    if (treeViewRef.current) {
-      treeViewRef.current.scrollToItem(objectFolderOrObjectWithContext);
-    }
-  };
+    const eventFunctionCallbacks = React.useMemo<EventFunctionCallbacks>(
+      () => ({
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        canRename,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+      }),
+      []
+    );
 
-  const getClosestVisibleParent = (
-    objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-  ): ?ObjectFolderOrObjectWithContext => {
-    // TODO
-    return null;
-  };
+    const preferences = React.useContext(PreferencesContext);
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
+    );
+    const { showDeleteConfirmation } = useAlertDialog();
+    const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
+    const forceUpdate = useForceUpdate();
+    const windowWidth = useResponsiveWindowWidth();
+    const isMobileScreen = windowWidth === 'small';
 
-  const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-  const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
-  const getTreeViewData = React.useCallback(
-    (i18n: I18nType): Array<TreeViewItem> => {
-      const treeViewItems = [
-        {
-          isRoot: true,
-          getName(): string | React.Node {
-            return i18n._(t`Objects`);
-          },
-          getId(): string {
-            return extensionObjectsRootFolderId;
-          },
-          getHtmlId(index: number): ?string {
-            return null;
-          },
-          getChildren(): ?Array<TreeViewItem> {
-            if (eventBasedObjects.size() === 0) {
-              return [
-                new PlaceHolderTreeViewItem(
-                  extensionObjectsEmptyPlaceholderId,
-                  i18n._(t`Start by adding a new object.`)
-                ),
-              ];
-            }
-            return mapFor(
-              0,
-              eventBasedObjects.size(),
-              i => new ObjectTreeViewItem(eventBasedObjects.at(i))
-            );
-          },
-          getThumbnail(): ?string {
-            return null;
-          },
-          getDataset(): ?HTMLDataset {
-            return null;
-          },
-        },
-        {
-          isRoot: true,
-          getName(): string | React.Node {
-            return i18n._(t`Behaviors`);
-          },
-          getId(): string {
-            return extensionBehaviorsRootFolderId;
-          },
-          getHtmlId(index: number): ?string {
-            return null;
-          },
-          getChildren(): ?Array<TreeViewItem> {
-            if (eventBasedBehaviors.size() === 0) {
-              return [
-                new PlaceHolderTreeViewItem(
-                  extensionBehaviorsEmptyPlaceholderId,
-                  i18n._(t`Start by adding a new behavior.`)
-                ),
-              ];
-            }
-            return mapFor(
-              0,
-              eventBasedBehaviors.size(),
-              i => new BehaviorTreeViewItem(eventBasedBehaviors.at(i))
-            );
-          },
-          getThumbnail(): ?string {
-            return null;
-          },
-          getDataset(): ?HTMLDataset {
-            return null;
-          },
-        },
-        {
-          isRoot: true,
-          getName(): string | React.Node {
-            return i18n._(t`Functions`);
-          },
-          getId(): string {
-            return extensionFunctionsRootFolderId;
-          },
-          getHtmlId(index: number): ?string {
-            return null;
-          },
-          getChildren(): ?Array<TreeViewItem> {
-            if (eventsFunctionsExtension.getEventsFunctionsCount() === 0) {
-              return [
-                new PlaceHolderTreeViewItem(
-                  extensionFunctionsEmptyPlaceholderId,
-                  i18n._(t`Start by adding a new function.`)
-                ),
-              ];
-            }
-            return mapFor(
-              0,
-              eventsFunctionsExtension.getEventsFunctionsCount(),
-              i =>
-                new FunctionTreeViewItem(
-                  eventsFunctionsExtension.getEventsFunctionAt(i)
-                )
-            );
-          },
-          getThumbnail(): ?string {
-            return null;
-          },
-          getDataset(): ?HTMLDataset {
-            return null;
-          },
-        },
-      ];
-      // $FlowFixMe
-      return treeViewItems;
-    },
-    [eventBasedBehaviors, eventBasedObjects, eventsFunctionsExtension]
-  );
+    const forceUpdateList = React.useCallback(
+      () => {
+        forceUpdate();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+      },
+      [forceUpdate]
+    );
 
-  const canMoveSelectionTo = React.useCallback(
-    (destinationItem: TreeViewItem) => {
+    const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
+      from: ObjectFolderOrObjectWithContext | null,
+    } | null>(null);
+
+    React.useImperativeHandle(ref, () => ({
+      forceUpdateList: () => {
+        forceUpdate();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+      },
+      openNewObjectDialog: () => {
+        setNewObjectDialogOpen({ from: null });
+      },
+      closeNewObjectDialog: () => {
+        setNewObjectDialogOpen(null);
+      },
+      renameObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext => {
+        if (treeViewRef.current)
+          treeViewRef.current.renameItem(objectFolderOrObjectWithContext);
+      },
+    }));
+
+    const [searchText, setSearchText] = React.useState('');
+
+    const addObject = React.useCallback((objectType: string) => {
       // TODO
-      return false;
-    },
-    []
-  );
+    }, []);
 
-  const moveSelectionTo = React.useCallback(
-    (
-      i18n: I18nType,
-      destinationItem: TreeViewItem,
-      where: 'before' | 'inside' | 'after'
-    ) => {
-      // TODO
-    },
-    []
-  );
+    const onAddNewObject = React.useCallback(
+      (item: ObjectFolderOrObjectWithContext | null) => {
+        setNewObjectDialogOpen({ from: item });
+      },
+      []
+    );
 
-  const addFolder = React.useCallback(
-    (items: Array<ObjectFolderOrObjectWithContext>) => {},
-    []
-  );
+    const onObjectModified = React.useCallback(
+      (shouldForceUpdateList: boolean) => {
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
 
-  /**
-   * Unselect item if one of the parent is collapsed (folded) so that the item
-   * does not stay selected and not visible to the user.
-   */
-  const onCollapseItem = React.useCallback((item: TreeViewItem) => {
-    // TODO
-  }, []);
+        if (shouldForceUpdateList) forceUpdateList();
+        else forceUpdate();
+      },
+      [forceUpdate, forceUpdateList, unsavedChanges]
+    );
 
-  const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
-    (
-      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-      folder: gdObjectFolderOrObject
-    ) => {
-      const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
-      if (folder === objectFolderOrObject.getParent()) return;
-      objectFolderOrObject
-        .getParent()
-        .moveObjectFolderOrObjectToAnotherFolder(
-          objectFolderOrObject,
-          folder,
-          0
-        );
-      const treeView = treeViewRef.current;
-      if (treeView) {
-        const closestVisibleParent = getClosestVisibleParent({
-          objectFolderOrObject: folder,
-          global,
-        });
-        if (closestVisibleParent) {
-          treeView.animateItem(closestVisibleParent);
+    const selectObjectFolderOrObjectWithContext = React.useCallback(
+      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
+        // TODO
+      },
+      []
+    );
+
+    const deleteObjectFolderOrObjectWithContext = React.useCallback(
+      async (
+        objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
+      ) => {
+        // TODO
+      },
+      []
+    );
+
+    // Initialize keyboard shortcuts as empty.
+    // onDelete callback is set outside because it deletes the selected
+    // item (that is a props). As it is stored in a ref, the keyboard shortcut
+    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
+    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+      new KeyboardShortcuts({
+        shortcutCallbacks: {},
+      })
+    );
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            deleteObjectFolderOrObjectWithContext(
+              // TODO
+              null
+            );
+          });
         }
+      },
+      [deleteObjectFolderOrObjectWithContext]
+    );
+
+    const copyObjectFolderOrObjectWithContext = React.useCallback(
+      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
+        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
+        if (objectFolderOrObject.isFolder()) return;
+        const object = objectFolderOrObject.getObject();
+        Clipboard.set(CLIPBOARD_KIND, {
+          type: object.getType(),
+          name: object.getName(),
+          object: serializeToJSObject(object),
+        });
+      },
+      []
+    );
+
+    const cutObjectFolderOrObjectWithContext = React.useCallback(
+      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
+        copyObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
+        deleteObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
+      },
+      [
+        copyObjectFolderOrObjectWithContext,
+        deleteObjectFolderOrObjectWithContext,
+      ]
+    );
+
+    const addSerializedObjectToObjectsContainer = React.useCallback(
+      ({
+        objectName,
+        positionObjectFolderOrObjectWithContext,
+        objectType,
+        serializedObject,
+        addInsideFolder,
+      }: {|
+        objectName: string,
+        positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        objectType: string,
+        serializedObject: Object,
+        addInsideFolder?: boolean,
+      |}): ObjectWithContext => {
+        // TODO
+      },
+      []
+    );
+
+    const paste = React.useCallback(
+      (
+        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        addInsideFolder?: boolean
+      ) => {
+        // TODO
+      },
+      []
+    );
+
+    const editName = React.useCallback(
+      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
+        if (!objectFolderOrObjectWithContext) return;
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          if (isMobileScreen) {
+            // Position item at top of the screen to make sure it will be visible
+            // once the keyboard is open.
+            treeView.scrollToItem(objectFolderOrObjectWithContext, 'start');
+          }
+          treeView.renameItem(objectFolderOrObjectWithContext);
+        }
+      },
+      [isMobileScreen]
+    );
+
+    const duplicateObject = React.useCallback(
+      (
+        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        duplicateInScene?: boolean
+      ) => {
+        const {
+          objectFolderOrObject,
+          global,
+        } = objectFolderOrObjectWithContext;
+        if (objectFolderOrObject.isFolder()) return;
+
+        const object = objectFolderOrObject.getObject();
+        const type = object.getType();
+        const name = object.getName();
+        const serializedObject = serializeToJSObject(object);
+
+        const newObjectWithContext = addSerializedObjectToObjectsContainer({
+          objectName: name,
+          positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
+          objectType: type,
+          serializedObject,
+        });
+
+        const newObjectFolderOrObjectWithContext = {
+          objectFolderOrObject: objectFolderOrObject
+            .getParent()
+            .getObjectChild(newObjectWithContext.object.getName()),
+          global,
+        };
+
+        forceUpdateList();
+        editName(newObjectFolderOrObjectWithContext);
+        selectObjectFolderOrObjectWithContext(
+          newObjectFolderOrObjectWithContext
+        );
+      },
+      [
+        addSerializedObjectToObjectsContainer,
+        editName,
+        forceUpdateList,
+        selectObjectFolderOrObjectWithContext,
+      ]
+    );
+
+    const rename = React.useCallback((item: TreeViewItem, newName: string) => {
+      // TODO
+    }, []);
+
+    const editItem = React.useCallback((item: TreeViewItem) => {
+      // TODO
+    }, []);
+
+    const scrollToItem = (
+      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
+    ) => {
+      if (treeViewRef.current) {
+        treeViewRef.current.scrollToItem(objectFolderOrObjectWithContext);
       }
-      onObjectModified(true);
-    },
-    [onObjectModified]
-  );
+    };
 
-  const renderObjectMenuTemplate = React.useCallback(
-    (i18n: I18nType) => (item: TreeViewItem, index: number) => {
-      // TODO Define drop down menu
-      return [];
-    },
-    []
-  );
+    const getClosestVisibleParent = (
+      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
+    ): ?ObjectFolderOrObjectWithContext => {
+      // TODO
+      return null;
+    };
 
-  // Force List component to be mounted again if project or objectsContainer
-  // has been changed. Avoid accessing to invalid objects that could
-  // crash the app.
-  const listKey = project.ptr + ';' + eventsFunctionsExtension.ptr;
-  const initiallyOpenedNodeIds = [
-    extensionObjectsRootFolderId,
-    extensionBehaviorsRootFolderId,
-    extensionFunctionsRootFolderId,
-  ];
+    const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+    const getTreeViewData = React.useCallback(
+      (i18n: I18nType): Array<TreeViewItem> => {
+        const treeViewItems = [
+          {
+            isRoot: true,
+            getName(): string | React.Node {
+              return i18n._(t`Objects`);
+            },
+            getId(): string {
+              return extensionObjectsRootFolderId;
+            },
+            getHtmlId(index: number): ?string {
+              return null;
+            },
+            getChildren(): ?Array<TreeViewItem> {
+              if (eventBasedObjects.size() === 0) {
+                return [
+                  new PlaceHolderTreeViewItem(
+                    extensionObjectsEmptyPlaceholderId,
+                    i18n._(t`Start by adding a new object.`)
+                  ),
+                ];
+              }
+              return mapFor(
+                0,
+                eventBasedObjects.size(),
+                i =>
+                  new ObjectTreeViewItem(
+                    eventBasedObjects.at(i),
+                    eventFunctionCallbacks
+                  )
+              );
+            },
+            getThumbnail(): ?string {
+              return null;
+            },
+            getDataset(): ?HTMLDataset {
+              return null;
+            },
+          },
+          {
+            isRoot: true,
+            getName(): string | React.Node {
+              return i18n._(t`Behaviors`);
+            },
+            getId(): string {
+              return extensionBehaviorsRootFolderId;
+            },
+            getHtmlId(index: number): ?string {
+              return null;
+            },
+            getChildren(): ?Array<TreeViewItem> {
+              if (eventBasedBehaviors.size() === 0) {
+                return [
+                  new PlaceHolderTreeViewItem(
+                    extensionBehaviorsEmptyPlaceholderId,
+                    i18n._(t`Start by adding a new behavior.`)
+                  ),
+                ];
+              }
+              return mapFor(
+                0,
+                eventBasedBehaviors.size(),
+                i =>
+                  new BehaviorTreeViewItem(
+                    eventBasedBehaviors.at(i),
+                    eventFunctionCallbacks
+                  )
+              );
+            },
+            getThumbnail(): ?string {
+              return null;
+            },
+            getDataset(): ?HTMLDataset {
+              return null;
+            },
+          },
+          {
+            isRoot: true,
+            getName(): string | React.Node {
+              return i18n._(t`Functions`);
+            },
+            getId(): string {
+              return extensionFunctionsRootFolderId;
+            },
+            getHtmlId(index: number): ?string {
+              return null;
+            },
+            getChildren(): ?Array<TreeViewItem> {
+              if (eventsFunctionsExtension.getEventsFunctionsCount() === 0) {
+                return [
+                  new PlaceHolderTreeViewItem(
+                    extensionFunctionsEmptyPlaceholderId,
+                    i18n._(t`Start by adding a new function.`)
+                  ),
+                ];
+              }
+              const eventFunctionContext: EventFunctionContext = {
+                eventFunctionCallbacks,
+              };
+              return mapFor(
+                0,
+                eventsFunctionsExtension.getEventsFunctionsCount(),
+                i =>
+                  new FunctionTreeViewItem(
+                    eventsFunctionsExtension.getEventsFunctionAt(i),
+                    '',
+                    eventFunctionContext
+                  )
+              );
+            },
+            getThumbnail(): ?string {
+              return null;
+            },
+            getDataset(): ?HTMLDataset {
+              return null;
+            },
+          },
+        ];
+        // $FlowFixMe
+        return treeViewItems;
+      },
+      [eventBasedBehaviors, eventBasedObjects, eventsFunctionsExtension]
+    );
 
-  const arrowKeyNavigationProps = React.useMemo(
-    () => ({
-      onGetItemInside: item => {
-        if (item.isPlaceholder || item.isRoot) return null;
-        if (!item.objectFolderOrObject.isFolder()) return null;
-        else {
-          if (item.objectFolderOrObject.getChildrenCount() === 0) return null;
+    const canMoveSelectionTo = React.useCallback(
+      (destinationItem: TreeViewItem) => {
+        // TODO
+        return false;
+      },
+      []
+    );
+
+    const moveSelectionTo = React.useCallback(
+      (
+        i18n: I18nType,
+        destinationItem: TreeViewItem,
+        where: 'before' | 'inside' | 'after'
+      ) => {
+        // TODO
+      },
+      []
+    );
+
+    const addFolder = React.useCallback(
+      (items: Array<ObjectFolderOrObjectWithContext>) => {},
+      []
+    );
+
+    /**
+     * Unselect item if one of the parent is collapsed (folded) so that the item
+     * does not stay selected and not visible to the user.
+     */
+    const onCollapseItem = React.useCallback((item: TreeViewItem) => {
+      // TODO
+    }, []);
+
+    const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
+      (
+        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        folder: gdObjectFolderOrObject
+      ) => {
+        const {
+          objectFolderOrObject,
+          global,
+        } = objectFolderOrObjectWithContext;
+        if (folder === objectFolderOrObject.getParent()) return;
+        objectFolderOrObject
+          .getParent()
+          .moveObjectFolderOrObjectToAnotherFolder(
+            objectFolderOrObject,
+            folder,
+            0
+          );
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          const closestVisibleParent = getClosestVisibleParent({
+            objectFolderOrObject: folder,
+            global,
+          });
+          if (closestVisibleParent) {
+            treeView.animateItem(closestVisibleParent);
+          }
+        }
+        onObjectModified(true);
+      },
+      [onObjectModified]
+    );
+
+    const renderObjectMenuTemplate = React.useCallback(
+      (i18n: I18nType) => (item: TreeViewItem, index: number) => {
+        // TODO Define drop down menu
+        return [];
+      },
+      []
+    );
+
+    // Force List component to be mounted again if project or objectsContainer
+    // has been changed. Avoid accessing to invalid objects that could
+    // crash the app.
+    const listKey = project.ptr + ';' + eventsFunctionsExtension.ptr;
+    const initiallyOpenedNodeIds = [
+      extensionObjectsRootFolderId,
+      extensionBehaviorsRootFolderId,
+      extensionFunctionsRootFolderId,
+    ];
+
+    const arrowKeyNavigationProps = React.useMemo(
+      () => ({
+        onGetItemInside: item => {
+          if (item.isPlaceholder || item.isRoot) return null;
+          if (!item.objectFolderOrObject.isFolder()) return null;
+          else {
+            if (item.objectFolderOrObject.getChildrenCount() === 0) return null;
+            return {
+              objectFolderOrObject: item.objectFolderOrObject.getChildAt(0),
+              global: item.global,
+            };
+          }
+        },
+        onGetItemOutside: item => {
+          if (item.isPlaceholder || item.isRoot) return null;
+          const parent = item.objectFolderOrObject.getParent();
+          if (parent.isRootFolder()) return null;
           return {
-            objectFolderOrObject: item.objectFolderOrObject.getChildAt(0),
+            objectFolderOrObject: parent,
             global: item.global,
           };
-        }
-      },
-      onGetItemOutside: item => {
-        if (item.isPlaceholder || item.isRoot) return null;
-        const parent = item.objectFolderOrObject.getParent();
-        if (parent.isRootFolder()) return null;
-        return {
-          objectFolderOrObject: parent,
-          global: item.global,
-        };
-      },
-    }),
-    []
-  );
+        },
+      }),
+      []
+    );
 
-  return (
-    <Background maxWidth>
-      <Column>
-        <LineStackLayout>
-          <Column expand noMargin>
-            <SearchBar
-              value={searchText}
-              onRequestSearch={() => {}}
-              onChange={text => setSearchText(text)}
-              placeholder={t`Search objects`}
+    return (
+      <Background maxWidth>
+        <Column>
+          <LineStackLayout>
+            <Column expand noMargin>
+              <SearchBar
+                value={searchText}
+                onRequestSearch={() => {}}
+                onChange={text => setSearchText(text)}
+                placeholder={t`Search objects`}
+              />
+            </Column>
+          </LineStackLayout>
+        </Column>
+        <div
+          style={styles.listContainer}
+          onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+          onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+          id="events-function-list"
+        >
+          <I18n>
+            {({ i18n }) => (
+              <div style={styles.autoSizerContainer}>
+                <AutoSizer style={styles.autoSizer} disableWidth>
+                  {({ height }) => (
+                    <TreeView
+                      key={listKey}
+                      ref={treeViewRef}
+                      items={getTreeViewData(i18n)}
+                      height={height}
+                      forceAllOpened={!!currentlyRunningInAppTutorial}
+                      searchText={searchText}
+                      getItemName={getTreeViewItemName}
+                      getItemThumbnail={getTreeViewItemThumbnail}
+                      getItemChildren={getTreeViewItemChildren}
+                      multiSelect={false}
+                      getItemId={getTreeViewItemId}
+                      getItemHtmlId={getTreeViewItemHtmlId}
+                      getItemDataset={getTreeViewItemData}
+                      onEditItem={editItem}
+                      onCollapseItem={onCollapseItem}
+                      selectedItems={
+                        // TODO
+                        []
+                      }
+                      onSelectItems={items => {
+                        if (!items) selectObjectFolderOrObjectWithContext(null);
+                        const itemToSelect = items[0];
+                        if (itemToSelect.isRoot) return;
+                        if (!itemToSelect) return;
+                        itemToSelect.onSelect();
+                      }}
+                      onRenameItem={rename}
+                      buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                      onMoveSelectionToItem={(destinationItem, where) =>
+                        moveSelectionTo(i18n, destinationItem, where)
+                      }
+                      canMoveSelectionToItem={canMoveSelectionTo}
+                      reactDndType={objectWithContextReactDndType}
+                      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                      arrowKeyNavigationProps={arrowKeyNavigationProps}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
+            )}
+          </I18n>
+        </div>
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new function</Trans>}
+              primary
+              onClick={() => {
+                // TODO
+              }}
+              id="add-new-function-button"
+              icon={<Add />}
             />
           </Column>
-        </LineStackLayout>
-      </Column>
-      <div
-        style={styles.listContainer}
-        onKeyDown={keyboardShortcutsRef.current.onKeyDown}
-        onKeyUp={keyboardShortcutsRef.current.onKeyUp}
-        id="events-function-list"
-      >
-        <I18n>
-          {({ i18n }) => (
-            <div style={styles.autoSizerContainer}>
-              <AutoSizer style={styles.autoSizer} disableWidth>
-                {({ height }) => (
-                  <TreeView
-                    key={listKey}
-                    ref={treeViewRef}
-                    items={getTreeViewData(i18n)}
-                    height={height}
-                    forceAllOpened={!!currentlyRunningInAppTutorial}
-                    searchText={searchText}
-                    getItemName={getTreeViewItemName}
-                    getItemThumbnail={getTreeViewItemThumbnail}
-                    getItemChildren={getTreeViewItemChildren}
-                    multiSelect={false}
-                    getItemId={getTreeViewItemId}
-                    getItemHtmlId={getTreeViewItemHtmlId}
-                    getItemDataset={getTreeViewItemData}
-                    onEditItem={editItem}
-                    onCollapseItem={onCollapseItem}
-                    selectedItems={
-                      // TODO
-                      []
-                    }
-                    onSelectItems={items => {
-                      if (!items) selectObjectFolderOrObjectWithContext(null);
-                      const itemToSelect = items[0];
-                      if (itemToSelect.isRoot) return;
-                      selectObjectFolderOrObjectWithContext(
-                        itemToSelect || null
-                      );
-                    }}
-                    onRenameItem={rename}
-                    buildMenuTemplate={renderObjectMenuTemplate(i18n)}
-                    onMoveSelectionToItem={(destinationItem, where) =>
-                      moveSelectionTo(i18n, destinationItem, where)
-                    }
-                    canMoveSelectionToItem={canMoveSelectionTo}
-                    reactDndType={objectWithContextReactDndType}
-                    initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                    arrowKeyNavigationProps={arrowKeyNavigationProps}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          )}
-        </I18n>
-      </div>
-      <Line>
-        <Column expand>
-          <ResponsiveRaisedButton
-            label={<Trans>Add a new function</Trans>}
-            primary
-            onClick={() => {
-              // TODO
-            }}
-            id="add-new-function-button"
-            icon={<Add />}
-          />
-        </Column>
-      </Line>
-      {newObjectDialogOpen &&
-        // TODO
-        false}
-    </Background>
-  );
-});
+        </Line>
+        {newObjectDialogOpen &&
+          // TODO
+          false}
+      </Background>
+    );
+  }
+);
 
 const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // The component is costly to render, so avoid any re-rendering as much

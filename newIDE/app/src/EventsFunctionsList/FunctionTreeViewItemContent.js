@@ -17,6 +17,20 @@ const gd: libGDevelop = global.gd;
 
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
+export const getFunctionTreeViewItemId = (
+  eventFunction: gdEventsFunction,
+  eventsBasedBehavior: gdEventsBasedBehavior | null,
+  eventsBasedObject: gdEventsBasedObject | null
+): string => {
+  return (
+    (eventsBasedBehavior
+      ? `behaviors.${eventsBasedBehavior.getName()}.`
+      : eventsBasedObject
+      ? `objects.${eventsBasedObject.getName()}.`
+      : '') + eventFunction.getName()
+  );
+};
+
 export class FunctionTreeViewItemContent implements TreeViewItemContent {
   eventFunction: gdEventsFunction;
   props: EventFunctionProps;
@@ -29,20 +43,19 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   getName(): string | React.Node {
     return this.eventFunction.getName();
   }
+
   getId(): string {
-    const behavior = this.props.eventsBasedBehavior;
-    const object = this.props.eventsBasedObject;
-    return (
-      (behavior
-        ? `behaviors.${behavior.getName()}.`
-        : object
-        ? `objects.${object.getName()}.`
-        : '') + this.eventFunction.getName()
+    return getFunctionTreeViewItemId(
+      this.eventFunction,
+      this.props.eventsBasedBehavior,
+      this.props.eventsBasedObject
     );
   }
+
   getHtmlId(index: number): ?string {
     return `function-item-${index}`;
   }
+
   getThumbnail(): ?string {
     switch (this.eventFunction.getFunctionType()) {
       default:
@@ -86,9 +99,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
         return 'res/functions/expression.svg';
     }
   }
+
   getDataset(): ?HTMLDataset {
     return null;
   }
+
   onSelect(): void {
     this.props.onSelectEventsFunction(
       this.eventFunction,
@@ -96,12 +111,13 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedObject
     );
   }
+
   buildMenuTemplate(i18n: I18nType, index: number) {
     const eventsFunction = this.eventFunction;
     return [
       {
         label: i18n._(t`Rename`),
-        click: () => this._editName(eventsFunction),
+        click: () => this.props.editName(this.getId()),
         enabled: this.props.canRename(eventsFunction),
       },
       {
@@ -177,22 +193,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     });
   };
 
-  _editName = (eventsFunction: ?gdEventsFunction) => {
-    this.setState(
-      {
-        renamedEventsFunction: eventsFunction,
-      },
-      () => {
-        this.props.forceUpdateList();
-      }
-    );
-  };
-
   _rename = (eventsFunction: gdEventsFunction, newName: string) => {
-    this.setState({
-      renamedEventsFunction: null,
-    });
-
     if (eventsFunction.getName() === newName) return;
 
     this.props.onRenameEventsFunction(eventsFunction, newName, doRename => {
@@ -246,7 +247,13 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
     this._onEventsFunctionModified();
     this.props.onSelectEventsFunction(newEventsFunction);
-    this._editName(newEventsFunction);
+    this.props.editName(
+      getFunctionTreeViewItemId(
+        newEventsFunction,
+        this.props.eventsBasedBehavior,
+        this.props.eventsBasedObject
+      )
+    );
   };
 
   _duplicateEventsFunction = (
@@ -266,7 +273,13 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
     this._onEventsFunctionModified();
     this.props.onSelectEventsFunction(newEventsFunction);
-    this._editName(newEventsFunction);
+    this.props.editName(
+      getFunctionTreeViewItemId(
+        newEventsFunction,
+        this.props.eventsBasedBehavior,
+        this.props.eventsBasedObject
+      )
+    );
   };
 
   _onEventsFunctionModified() {

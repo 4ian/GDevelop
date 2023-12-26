@@ -44,7 +44,18 @@ import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import { FunctionTreeViewItemContent } from './FunctionTreeViewItemContent';
+import {
+  FunctionTreeViewItemContent,
+  getFunctionTreeViewItemId,
+} from './FunctionTreeViewItemContent';
+import {
+  BehaviorTreeViewItemContent,
+  getBehaviorTreeViewItemId,
+} from './BehaviorTreeViewItemContent';
+import {
+  ObjectTreeViewItemContent,
+  getObjectTreeViewItemId,
+} from './ObjectTreeViewItemContent';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const gd: libGDevelop = global.gd;
@@ -72,6 +83,23 @@ const styles = {
 };
 
 const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
+
+export interface TreeViewItemContent {
+  getName(): string | React.Node;
+  getId(): string;
+  getHtmlId(index: number): ?string;
+  getThumbnail(): ?string;
+  getDataset(): ?HTMLDataset;
+  onSelect(): void;
+  buildMenuTemplate(i18n: I18nType, index: number): any;
+}
+
+interface TreeViewItem {
+  isRoot?: boolean;
+  isPlaceholder?: boolean;
+  +content: TreeViewItemContent;
+  getChildren(): ?Array<TreeViewItem>;
+}
 
 export type EventsFunctionCreationParameters = {|
   functionType: 0 | 1 | 2,
@@ -105,6 +133,7 @@ type TreeItemProps = {|
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   project: gdProject,
+  editName: (itemId: string) => void,
 |};
 
 export type EventFunctionProps = {|
@@ -120,79 +149,6 @@ type EventObjectCallbacks = {||};
 
 type EventBehaviorProps = TreeItemProps & EventBehaviorCallbacks;
 type EventObjectProps = TreeItemProps & EventObjectCallbacks;
-
-export interface TreeViewItemContent {
-  getName(): string | React.Node;
-  getId(): string;
-  getHtmlId(index: number): ?string;
-  getThumbnail(): ?string;
-  getDataset(): ?HTMLDataset;
-  onSelect(): void;
-  buildMenuTemplate(i18n: I18nType, index: number): any;
-}
-
-interface TreeViewItem {
-  isRoot?: boolean;
-  isPlaceholder?: boolean;
-  +content: TreeViewItemContent;
-  getChildren(): ?Array<TreeViewItem>;
-}
-
-class ObjectTreeViewItemContent implements TreeViewItemContent {
-  object: gdEventsBasedObject;
-
-  constructor(object: gdEventsBasedObject) {
-    this.object = object;
-  }
-
-  getName(): string | React.Node {
-    return this.object.getName();
-  }
-  getId(): string {
-    return 'objects.' + this.object.getName();
-  }
-  getHtmlId(index: number): ?string {
-    return `object-item-${index}`;
-  }
-  getThumbnail(): ?string {
-    return null;
-  }
-  getDataset(): ?HTMLDataset {
-    return null;
-  }
-  onSelect(): void {}
-  buildMenuTemplate(i18n: I18nType, index: number) {
-    return [];
-  }
-}
-
-class BehaviorTreeViewItemContent implements TreeViewItemContent {
-  behavior: gdEventsBasedBehavior;
-
-  constructor(behavior: gdEventsBasedBehavior) {
-    this.behavior = behavior;
-  }
-
-  getName(): string | React.Node {
-    return this.behavior.getName();
-  }
-  getId(): string {
-    return 'behaviors.' + this.behavior.getName();
-  }
-  getHtmlId(index: number): ?string {
-    return `behavior-item-${index}`;
-  }
-  getThumbnail(): ?string {
-    return null;
-  }
-  getDataset(): ?HTMLDataset {
-    return null;
-  }
-  onSelect(): void {}
-  buildMenuTemplate(i18n: I18nType, index: number) {
-    return [];
-  }
-}
 
 class ObjectTreeViewItem implements TreeViewItem {
   content: ObjectTreeViewItemContent;
@@ -461,33 +417,6 @@ const EventsFunctionsList = React.forwardRef<
       [forceUpdate]
     );
 
-    const eventFunctionProps = React.useMemo<EventFunctionProps>(
-      () => ({
-        project,
-        unsavedChanges,
-        forceUpdate,
-        forceUpdateList,
-        onSelectEventsFunction,
-        onDeleteEventsFunction,
-        canRename,
-        onRenameEventsFunction,
-        onAddEventsFunction,
-        onEventsFunctionAdded,
-      }),
-      [
-        canRename,
-        forceUpdate,
-        forceUpdateList,
-        onAddEventsFunction,
-        onDeleteEventsFunction,
-        onEventsFunctionAdded,
-        onRenameEventsFunction,
-        onSelectEventsFunction,
-        project,
-        unsavedChanges,
-      ]
-    );
-
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
       from: ObjectFolderOrObjectWithContext | null,
     } | null>(null);
@@ -626,16 +555,15 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     const editName = React.useCallback(
-      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
-        if (!objectFolderOrObjectWithContext) return;
+      (itemId: string) => {
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobileScreen) {
             // Position item at top of the screen to make sure it will be visible
             // once the keyboard is open.
-            treeView.scrollToItem(objectFolderOrObjectWithContext, 'start');
+            treeView.scrollToItemById(itemId, 'start');
           }
-          treeView.renameItem(objectFolderOrObjectWithContext);
+          treeView.renameItemFromId(itemId);
         }
       },
       [isMobileScreen]
@@ -707,6 +635,35 @@ const EventsFunctionsList = React.forwardRef<
       // TODO
       return null;
     };
+
+    const eventFunctionProps = React.useMemo<EventFunctionProps>(
+      () => ({
+        project,
+        unsavedChanges,
+        forceUpdate,
+        forceUpdateList,
+        editName,
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        canRename,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+      }),
+      [
+        canRename,
+        editName,
+        forceUpdate,
+        forceUpdateList,
+        onAddEventsFunction,
+        onDeleteEventsFunction,
+        onEventsFunctionAdded,
+        onRenameEventsFunction,
+        onSelectEventsFunction,
+        project,
+        unsavedChanges,
+      ]
+    );
 
     const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
     const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();

@@ -102,6 +102,7 @@ export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
   scrollToItem: (Item, placement?: 'smart' | 'start') => void,
   renameItem: Item => void,
+  renameItemFromId: (itemId: string) => void,
   openItems: (string[]) => void,
   closeItems: (string[]) => void,
   animateItem: Item => void,
@@ -396,6 +397,10 @@ const TreeView = <Item: ItemBaseAttributes>(
     [getItemId]
   );
 
+  const renameItemFromId = React.useCallback((itemId: string) => {
+    setRenamedItemId(itemId);
+  }, []);
+
   const openItems = React.useCallback(
     (itemIds: string[]) => {
       const notAlreadyOpenedNodeIds = itemIds.filter(
@@ -457,6 +462,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       forceUpdateList: forceUpdate,
       scrollToItem,
       renameItem,
+      renameItemFromId,
       openItems,
       closeItems,
       animateItem,

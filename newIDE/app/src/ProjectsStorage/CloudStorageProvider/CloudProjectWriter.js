@@ -19,6 +19,7 @@ import {
 } from '../../Utils/Zip.js/Utils';
 import ProjectCache from '../../Utils/ProjectCache';
 import { getProjectCache } from './CloudProjectOpener';
+import { retryIfFailed } from '../../Utils/RetryIfFailed';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -60,13 +61,16 @@ const zipProjectAndCommitVersion = async ({
   if (!archiveIsSane) {
     throw new Error('Project compression failed before saving the project.');
   }
-  const newVersion = await commitVersion({
-    authenticatedUser,
-    cloudProjectId,
-    zippedProject,
-    previousVersion: options ? options.previousVersion : null,
-    restoredFromVersionId: options ? options.restoredFromVersionId : null,
-  });
+
+  const newVersion = await retryIfFailed({ times: 2 }, () =>
+    commitVersion({
+      authenticatedUser,
+      cloudProjectId,
+      zippedProject,
+      previousVersion: options ? options.previousVersion : null,
+      restoredFromVersionId: options ? options.restoredFromVersionId : null,
+    })
+  );
   return newVersion;
 };
 

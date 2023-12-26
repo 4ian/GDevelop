@@ -45,6 +45,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { FunctionTreeViewItemContent } from './FunctionTreeViewItemContent';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,8 +73,17 @@ const styles = {
 
 const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
+export type EventsFunctionCreationParameters = {|
+  functionType: 0 | 1 | 2,
+  name: ?string,
+|};
+
 type EventFunctionCallbacks = {|
-  onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
+  onSelectEventsFunction: (
+    selectedEventsFunction: ?gdEventsFunction,
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
+    selectedEventsBasedObject: ?gdEventsBasedObject
+  ) => void,
   onDeleteEventsFunction: (
     eventsFunction: gdEventsFunction,
     cb: (boolean) => void
@@ -93,14 +103,17 @@ type EventFunctionCallbacks = {|
 type TreeItemProps = {|
   forceUpdate: () => void,
   forceUpdateList: () => void,
+  unsavedChanges?: ?UnsavedChanges,
+  project: gdProject,
 |};
 
-type EventFunctionProps = {|
+export type EventFunctionProps = {|
+  ...TreeItemProps,
+  ...EventFunctionCallbacks,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
   eventsFunctionsContainer: gdEventsFunctionsContainer,
-|} & TreeItemProps &
-  EventFunctionCallbacks;
+|};
 
 type EventBehaviorCallbacks = {||};
 type EventObjectCallbacks = {||};
@@ -108,19 +121,20 @@ type EventObjectCallbacks = {||};
 type EventBehaviorProps = TreeItemProps & EventBehaviorCallbacks;
 type EventObjectProps = TreeItemProps & EventObjectCallbacks;
 
-interface TreeViewItemContent {
+export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
   getHtmlId(index: number): ?string;
   getThumbnail(): ?string;
   getDataset(): ?HTMLDataset;
   onSelect(): void;
+  buildMenuTemplate(i18n: I18nType, index: number): any;
 }
 
 interface TreeViewItem {
   isRoot?: boolean;
   isPlaceholder?: boolean;
-  content: TreeViewItemContent;
+  +content: TreeViewItemContent;
   getChildren(): ?Array<TreeViewItem>;
 }
 
@@ -220,7 +234,7 @@ class BehaviorTreeViewItem implements TreeViewItem {
 
   constructor(
     content: BehaviorTreeViewItemContent,
-    eventFunctionProps: EventFunctionCallbacks
+    eventFunctionProps: EventFunctionProps
   ) {
     this.content = content;
     this.eventFunctionProps = eventFunctionProps;
@@ -251,7 +265,7 @@ class BehaviorTreeViewItem implements TreeViewItem {
 class LeafTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
 
-  constructor(content: ObjectTreeViewItem) {
+  constructor(content: TreeViewItemContent) {
     this.content = content;
   }
 
@@ -285,12 +299,16 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   getDataset(): ?HTMLDataset {
     return null;
   }
+  onSelect(): void {}
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return [];
+  }
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
 const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
 const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
-  item.content.getHtmlId();
+  item.content.getHtmlId(index);
 const getTreeViewItemChildren = (item: TreeViewItem) => item.getChildren();
 const getTreeViewItemThumbnail = (item: TreeViewItem) =>
   item.content.getThumbnail();
@@ -445,6 +463,8 @@ const EventsFunctionsList = React.forwardRef<
 
     const eventFunctionProps = React.useMemo<EventFunctionProps>(
       () => ({
+        project,
+        unsavedChanges,
         forceUpdate,
         forceUpdateList,
         onSelectEventsFunction,
@@ -463,6 +483,8 @@ const EventsFunctionsList = React.forwardRef<
         onEventsFunctionAdded,
         onRenameEventsFunction,
         onSelectEventsFunction,
+        project,
+        unsavedChanges,
       ]
     );
 
@@ -1026,10 +1048,9 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // from the component.
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.
-  prevProps.selectedObjectFolderOrObjectsWithContext ===
-    nextProps.selectedObjectFolderOrObjectsWithContext &&
+  prevProps.selectedEventsFunction === nextProps.selectedEventsFunction &&
   prevProps.project === nextProps.project &&
-  prevProps.objectsContainer === nextProps.objectsContainer;
+  prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension;
 
 const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
   EventsFunctionsList,

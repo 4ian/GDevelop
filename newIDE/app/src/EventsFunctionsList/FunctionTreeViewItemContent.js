@@ -10,6 +10,8 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type EventFunctionProps, TreeViewItemContent } from '.';
 
 const gd: libGDevelop = global.gd;
 
@@ -181,7 +183,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
         renamedEventsFunction: eventsFunction,
       },
       () => {
-        if (this.sortableList) this.sortableList.forceUpdateGrid();
+        this.props.forceUpdateList();
       }
     );
   };
@@ -266,4 +268,10 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     this.props.onSelectEventsFunction(newEventsFunction);
     this._editName(newEventsFunction);
   };
+
+  _onEventsFunctionModified() {
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.props.forceUpdate();
+  }
 }

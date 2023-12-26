@@ -101,6 +101,7 @@ const getItemProps = memoizeOne(
 export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
   scrollToItem: (Item, placement?: 'smart' | 'start') => void,
+  scrollToItemFromId: (itemId: string, placement?: 'smart' | 'start') => void,
   renameItem: Item => void,
   renameItemFromId: (itemId: string) => void,
   openItems: (string[]) => void,
@@ -373,11 +374,10 @@ const TreeView = <Item: ItemBaseAttributes>(
     [flattenOpened, items, searchText]
   );
 
-  const scrollToItem = React.useCallback(
-    (item: Item, placement?: 'smart' | 'start' = 'smart') => {
+  const scrollToItemFromId = React.useCallback(
+    (itemId: string, placement?: 'smart' | 'start' = 'smart') => {
       const list = listRef.current;
       if (list) {
-        const itemId = getItemId(item);
         // Browse flattenedData in reverse order since scrollToItem is mainly used
         // to scroll to newly added object that is appended at the end of the list.
         // $FlowFixMe - Method introduced in 2022.
@@ -387,7 +387,13 @@ const TreeView = <Item: ItemBaseAttributes>(
         }
       }
     },
-    [getItemId, flattenedData]
+    [flattenedData]
+  );
+
+  const scrollToItem = React.useCallback(
+    (item: Item, placement?: 'smart' | 'start' = 'smart') =>
+      scrollToItemFromId(getItemId(item), placement),
+    [getItemId, scrollToItemFromId]
   );
 
   const renameItem = React.useCallback(
@@ -461,6 +467,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     () => ({
       forceUpdateList: forceUpdate,
       scrollToItem,
+      scrollToItemFromId,
       renameItem,
       renameItemFromId,
       openItems,

@@ -11,16 +11,55 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { type EventFunctionProps, TreeViewItemContent } from '.';
+import { TreeViewItemContent, type TreeItemProps } from '.';
 
 const gd: libGDevelop = global.gd;
 
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
+export type EventsFunctionCreationParameters = {|
+  functionType: 0 | 1 | 2,
+  name: ?string,
+|};
+
+export type EventFunctionCallbacks = {|
+  onSelectEventsFunction: (
+    selectedEventsFunction: ?gdEventsFunction,
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
+    selectedEventsBasedObject: ?gdEventsBasedObject
+  ) => void,
+  onDeleteEventsFunction: (
+    eventsFunction: gdEventsFunction,
+    cb: (boolean) => void
+  ) => void,
+  canRename: (eventsFunction: gdEventsFunction) => boolean,
+  onRenameEventsFunction: (
+    eventsFunction: gdEventsFunction,
+    newName: string,
+    cb: (boolean) => void
+  ) => void,
+  onAddEventsFunction: (
+    (parameters: ?EventsFunctionCreationParameters) => void
+  ) => void,
+  onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
+|};
+
+export type EventFunctionCommonProps = {|
+  ...TreeItemProps,
+  ...EventFunctionCallbacks,
+|};
+
+export type EventFunctionProps = {|
+  ...EventFunctionCommonProps,
+  eventsBasedBehavior?: ?gdEventsBasedBehavior,
+  eventsBasedObject?: ?gdEventsBasedObject,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
+|};
+
 export const getFunctionTreeViewItemId = (
   eventFunction: gdEventsFunction,
-  eventsBasedBehavior: gdEventsBasedBehavior | null,
-  eventsBasedObject: gdEventsBasedObject | null
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject
 ): string => {
   return (
     (eventsBasedBehavior

@@ -8,21 +8,42 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
-import EventsFunctionsList from '../../../EventsFunctionsList';
+import EventsFunctionsListWithErrorBoundary from '../../../EventsFunctionsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/EventsFunctionsList',
-  component: EventsFunctionsList,
+  component: EventsFunctionsListWithErrorBoundary,
   decorators: [muiDecorator],
 };
 
 export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
-      <EventsFunctionsList
+      <EventsFunctionsListWithErrorBoundary
         project={testProject.project}
-        eventsFunctionsContainer={testProject.testEventsFunctionsExtension}
+        eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
+        // Objects
+        onSelectEventsBasedObject={eventsBasedObject => {}}
+        onDeleteEventsBasedObject={(eventsBasedObject, cb) => cb(true)}
+        onRenameEventsBasedObject={(eventsBasedObject, newName, cb) => cb(true)}
+        onEventsBasedObjectRenamed={eventsBasedObject => {}}
+        onEditEventsBasedObjectProperties={eventsBasedObject => {}}
+        // Behaviors
+        onSelectEventsBasedBehavior={eventsBasedBehavior => {}}
+        onDeleteEventsBasedBehavior={(eventsBasedBehavior, cb) => cb(true)}
+        onRenameEventsBasedBehavior={(eventsBasedBehavior, newName, cb) =>
+          cb(true)
+        }
+        onEventsBasedBehaviorRenamed={eventsBasedBehavior => {}}
+        onEventsBasedBehaviorPasted={(
+          eventsBasedBehavior,
+          sourceExtensionName
+        ) => {}}
+        onEditEventsBasedBehaviorProperties={(
+          eventsBasedBehavior: gdEventsBasedBehavior
+        ) => {}}
+        // Free functions
         selectedEventsFunction={testProject.testEventsFunctionsExtension.getEventsFunctionAt(
           1
         )}
@@ -35,6 +56,9 @@ export const Default = () => (
           cb(true);
         }}
         canRename={() => true}
+        selectedEventsBasedObject={null}
+        selectedEventsBasedBehavior={null}
+        selectedEventsFunction={null}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

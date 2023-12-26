@@ -47,14 +47,21 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import {
   FunctionTreeViewItemContent,
   getFunctionTreeViewItemId,
+  type EventFunctionProps,
+  type EventFunctionCommonProps,
+  type EventFunctionCallbacks,
 } from './FunctionTreeViewItemContent';
 import {
   BehaviorTreeViewItemContent,
   getBehaviorTreeViewItemId,
+  type EventBehaviorProps,
+  type EventBehaviorCallbacks,
 } from './BehaviorTreeViewItemContent';
 import {
   ObjectTreeViewItemContent,
   getObjectTreeViewItemId,
+  type EventObjectProps,
+  type EventObjectCallbacks,
 } from './ObjectTreeViewItemContent';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
@@ -101,62 +108,22 @@ interface TreeViewItem {
   getChildren(): ?Array<TreeViewItem>;
 }
 
-export type EventsFunctionCreationParameters = {|
-  functionType: 0 | 1 | 2,
-  name: ?string,
-|};
-
-type EventFunctionCallbacks = {|
-  onSelectEventsFunction: (
-    selectedEventsFunction: ?gdEventsFunction,
-    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    selectedEventsBasedObject: ?gdEventsBasedObject
-  ) => void,
-  onDeleteEventsFunction: (
-    eventsFunction: gdEventsFunction,
-    cb: (boolean) => void
-  ) => void,
-  canRename: (eventsFunction: gdEventsFunction) => boolean,
-  onRenameEventsFunction: (
-    eventsFunction: gdEventsFunction,
-    newName: string,
-    cb: (boolean) => void
-  ) => void,
-  onAddEventsFunction: (
-    (parameters: ?EventsFunctionCreationParameters) => void
-  ) => void,
-  onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
-|};
-
-type TreeItemProps = {|
+export type TreeItemProps = {|
   forceUpdate: () => void,
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   project: gdProject,
   editName: (itemId: string) => void,
+  scrollToItem: (itemId: string) => void,
 |};
-
-export type EventFunctionProps = {|
-  ...TreeItemProps,
-  ...EventFunctionCallbacks,
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject,
-  eventsFunctionsContainer: gdEventsFunctionsContainer,
-|};
-
-type EventBehaviorCallbacks = {||};
-type EventObjectCallbacks = {||};
-
-type EventBehaviorProps = TreeItemProps & EventBehaviorCallbacks;
-type EventObjectProps = TreeItemProps & EventObjectCallbacks;
 
 class ObjectTreeViewItem implements TreeViewItem {
   content: ObjectTreeViewItemContent;
-  eventFunctionProps: EventFunctionProps;
+  eventFunctionProps: EventFunctionCommonProps;
 
   constructor(
     content: ObjectTreeViewItemContent,
-    eventFunctionProps: EventFunctionProps
+    eventFunctionProps: EventFunctionCommonProps
   ) {
     this.content = content;
     this.eventFunctionProps = eventFunctionProps;
@@ -164,9 +131,10 @@ class ObjectTreeViewItem implements TreeViewItem {
 
   getChildren(): ?Array<TreeViewItem> {
     const eventsBasedObject = this.content.object;
+    const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
     const eventFunctionProps = {
       eventsBasedObject,
-      eventsFunctionsContainer: eventsBasedObject,
+      eventsFunctionsContainer,
       ...this.eventFunctionProps,
     };
     const functions = eventsBasedObject.getEventsFunctions();
@@ -186,11 +154,11 @@ class ObjectTreeViewItem implements TreeViewItem {
 
 class BehaviorTreeViewItem implements TreeViewItem {
   content: BehaviorTreeViewItemContent;
-  eventFunctionProps: EventFunctionProps;
+  eventFunctionProps: EventFunctionCommonProps;
 
   constructor(
     content: BehaviorTreeViewItemContent,
-    eventFunctionProps: EventFunctionProps
+    eventFunctionProps: EventFunctionCommonProps
   ) {
     this.content = content;
     this.eventFunctionProps = eventFunctionProps;
@@ -198,19 +166,19 @@ class BehaviorTreeViewItem implements TreeViewItem {
 
   getChildren(): ?Array<TreeViewItem> {
     const eventsBasedBehavior = this.content.behavior;
+    const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
     const eventFunctionProps = {
       eventsBasedBehavior,
-      eventsFunctionsContainer: eventsBasedBehavior,
+      eventsFunctionsContainer,
       ...this.eventFunctionProps,
     };
-    const functions = eventsBasedBehavior.getEventsFunctions();
     return mapFor(
       0,
-      functions.getEventsFunctionsCount(),
+      eventsFunctionsContainer.getEventsFunctionsCount(),
       i =>
         new LeafTreeViewItem(
           new FunctionTreeViewItemContent(
-            functions.getEventsFunctionAt(i),
+            eventsFunctionsContainer.getEventsFunctionAt(i),
             eventFunctionProps
           )
         )
@@ -243,19 +211,25 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   getName(): string | React.Node {
     return this.label;
   }
+
   getId(): string {
     return this.id;
   }
+
   getHtmlId(index: number): ?string {
     return null;
   }
+
   getThumbnail(): ?string {
     return null;
   }
+
   getDataset(): ?HTMLDataset {
     return null;
   }
+
   onSelect(): void {}
+
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [];
   }
@@ -298,79 +272,22 @@ const getPasteLabel = (
 
 export type EventsFunctionsListInterface = {|
   forceUpdateList: () => void,
-  openNewObjectDialog: () => void,
-  closeNewObjectDialog: () => void,
-  renameObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext => void,
+  renameObjectFolderOrObjectWithContext: TreeViewItem => void,
 |};
 
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   unsavedChanges?: ?UnsavedChanges,
-  onSelectEventsFunction: (
-    selectedEventsFunction: ?gdEventsFunction,
-    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    selectedEventsBasedObject: ?gdEventsBasedObject
-  ) => void,
-
   // Objects
   selectedEventsBasedObject: ?gdEventsBasedObject,
-  onSelectEventsBasedObject: (eventsBasedObject: ?gdEventsBasedObject) => void,
-  onDeleteEventsBasedObject: (
-    eventsBasedObject: gdEventsBasedObject,
-    cb: (boolean) => void
-  ) => void,
-  onRenameEventsBasedObject: (
-    eventsBasedObject: gdEventsBasedObject,
-    newName: string,
-    cb: (boolean) => void
-  ) => void,
-  onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
-  onEditEventsBasedObjectProperties: (
-    eventsBasedObject: gdEventsBasedObject
-  ) => void,
-
+  ...EventObjectCallbacks,
   // Behaviors
   selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-  onSelectEventsBasedBehavior: (
-    eventsBasedBehavior: ?gdEventsBasedBehavior
-  ) => void,
-  onDeleteEventsBasedBehavior: (
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    cb: (boolean) => void
-  ) => void,
-  onRenameEventsBasedBehavior: (
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    newName: string,
-    cb: (boolean) => void
-  ) => void,
-  onEventsBasedBehaviorRenamed: (
-    eventsBasedBehavior: gdEventsBasedBehavior
-  ) => void,
-  onEventsBasedBehaviorPasted: (
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    sourceExtensionName: string
-  ) => void,
-  onEditEventsBasedBehaviorProperties: (
-    eventsBasedBehavior: gdEventsBasedBehavior
-  ) => void,
-
+  ...EventBehaviorCallbacks,
   // Free functions
   selectedEventsFunction: ?gdEventsFunction,
-  onDeleteEventsFunction: (
-    eventsFunction: gdEventsFunction,
-    cb: (boolean) => void
-  ) => void,
-  canRename: (eventsFunction: gdEventsFunction) => boolean,
-  onRenameEventsFunction: (
-    eventsFunction: gdEventsFunction,
-    newName: string,
-    cb: (boolean) => void
-  ) => void,
-  onAddEventsFunction: (
-    (parameters: ?EventsFunctionCreationParameters) => void
-  ) => void,
-  onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
+  ...EventFunctionCallbacks,
 |};
 
 const EventsFunctionsList = React.forwardRef<
@@ -388,7 +305,17 @@ const EventsFunctionsList = React.forwardRef<
       onRenameEventsFunction,
       onAddEventsFunction,
       onEventsFunctionAdded,
-
+      onSelectEventsBasedBehavior,
+      onDeleteEventsBasedBehavior,
+      onRenameEventsBasedBehavior,
+      onEventsBasedBehaviorRenamed,
+      onEventsBasedBehaviorPasted,
+      onEditEventsBasedBehaviorProperties,
+      onSelectEventsBasedObject,
+      onDeleteEventsBasedObject,
+      onRenameEventsBasedObject,
+      onEventsBasedObjectRenamed,
+      onEditEventsBasedObjectProperties,
       selectedEventsFunction,
       selectedEventsBasedBehavior,
       selectedEventsBasedObject,
@@ -403,7 +330,6 @@ const EventsFunctionsList = React.forwardRef<
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
-    const { showDeleteConfirmation } = useAlertDialog();
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
     const windowWidth = useResponsiveWindowWidth();
@@ -417,20 +343,10 @@ const EventsFunctionsList = React.forwardRef<
       [forceUpdate]
     );
 
-    const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
-      from: ObjectFolderOrObjectWithContext | null,
-    } | null>(null);
-
     React.useImperativeHandle(ref, () => ({
       forceUpdateList: () => {
         forceUpdate();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-      },
-      openNewObjectDialog: () => {
-        setNewObjectDialogOpen({ from: null });
-      },
-      closeNewObjectDialog: () => {
-        setNewObjectDialogOpen(null);
       },
       renameObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext => {
         if (treeViewRef.current)
@@ -444,12 +360,8 @@ const EventsFunctionsList = React.forwardRef<
       // TODO
     }, []);
 
-    const onAddNewObject = React.useCallback(
-      (item: ObjectFolderOrObjectWithContext | null) => {
-        setNewObjectDialogOpen({ from: item });
-      },
-      []
-    );
+    const onAddNewObject = React.useCallback((item: TreeViewItem | null) => {},
+    []);
 
     const onObjectModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
@@ -462,16 +374,14 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     const selectObjectFolderOrObjectWithContext = React.useCallback(
-      (objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext) => {
+      (objectFolderOrObjectWithContext: ?TreeViewItem) => {
         // TODO
       },
       []
     );
 
     const deleteObjectFolderOrObjectWithContext = React.useCallback(
-      async (
-        objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
-      ) => {
+      async (objectFolderOrObjectWithContext: ?TreeViewItem) => {
         // TODO
       },
       []
@@ -500,60 +410,6 @@ const EventsFunctionsList = React.forwardRef<
       [deleteObjectFolderOrObjectWithContext]
     );
 
-    const copyObjectFolderOrObjectWithContext = React.useCallback(
-      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
-        const { objectFolderOrObject } = objectFolderOrObjectWithContext;
-        if (objectFolderOrObject.isFolder()) return;
-        const object = objectFolderOrObject.getObject();
-        Clipboard.set(CLIPBOARD_KIND, {
-          type: object.getType(),
-          name: object.getName(),
-          object: serializeToJSObject(object),
-        });
-      },
-      []
-    );
-
-    const cutObjectFolderOrObjectWithContext = React.useCallback(
-      (objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext) => {
-        copyObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
-        deleteObjectFolderOrObjectWithContext(objectFolderOrObjectWithContext);
-      },
-      [
-        copyObjectFolderOrObjectWithContext,
-        deleteObjectFolderOrObjectWithContext,
-      ]
-    );
-
-    const addSerializedObjectToObjectsContainer = React.useCallback(
-      ({
-        objectName,
-        positionObjectFolderOrObjectWithContext,
-        objectType,
-        serializedObject,
-        addInsideFolder,
-      }: {|
-        objectName: string,
-        positionObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        objectType: string,
-        serializedObject: Object,
-        addInsideFolder?: boolean,
-      |}): ObjectWithContext => {
-        // TODO
-      },
-      []
-    );
-
-    const paste = React.useCallback(
-      (
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        addInsideFolder?: boolean
-      ) => {
-        // TODO
-      },
-      []
-    );
-
     const editName = React.useCallback(
       (itemId: string) => {
         const treeView = treeViewRef.current;
@@ -561,56 +417,12 @@ const EventsFunctionsList = React.forwardRef<
           if (isMobileScreen) {
             // Position item at top of the screen to make sure it will be visible
             // once the keyboard is open.
-            treeView.scrollToItemById(itemId, 'start');
+            treeView.scrollToItemFromId(itemId, 'start');
           }
           treeView.renameItemFromId(itemId);
         }
       },
       [isMobileScreen]
-    );
-
-    const duplicateObject = React.useCallback(
-      (
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
-        duplicateInScene?: boolean
-      ) => {
-        const {
-          objectFolderOrObject,
-          global,
-        } = objectFolderOrObjectWithContext;
-        if (objectFolderOrObject.isFolder()) return;
-
-        const object = objectFolderOrObject.getObject();
-        const type = object.getType();
-        const name = object.getName();
-        const serializedObject = serializeToJSObject(object);
-
-        const newObjectWithContext = addSerializedObjectToObjectsContainer({
-          objectName: name,
-          positionObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext,
-          objectType: type,
-          serializedObject,
-        });
-
-        const newObjectFolderOrObjectWithContext = {
-          objectFolderOrObject: objectFolderOrObject
-            .getParent()
-            .getObjectChild(newObjectWithContext.object.getName()),
-          global,
-        };
-
-        forceUpdateList();
-        editName(newObjectFolderOrObjectWithContext);
-        selectObjectFolderOrObjectWithContext(
-          newObjectFolderOrObjectWithContext
-        );
-      },
-      [
-        addSerializedObjectToObjectsContainer,
-        editName,
-        forceUpdateList,
-        selectObjectFolderOrObjectWithContext,
-      ]
     );
 
     const rename = React.useCallback((item: TreeViewItem, newName: string) => {
@@ -621,28 +433,27 @@ const EventsFunctionsList = React.forwardRef<
       // TODO
     }, []);
 
-    const scrollToItem = (
-      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-    ) => {
+    const scrollToItem = React.useCallback((itemId: string) => {
       if (treeViewRef.current) {
-        treeViewRef.current.scrollToItem(objectFolderOrObjectWithContext);
+        treeViewRef.current.scrollToItemFromId(itemId);
       }
-    };
+    }, []);
 
     const getClosestVisibleParent = (
-      objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
-    ): ?ObjectFolderOrObjectWithContext => {
+      objectFolderOrObjectWithContext: TreeViewItem
+    ): ?TreeViewItem => {
       // TODO
       return null;
     };
 
-    const eventFunctionProps = React.useMemo<EventFunctionProps>(
+    const eventFunctionProps = React.useMemo<EventFunctionCommonProps>(
       () => ({
         project,
         unsavedChanges,
         forceUpdate,
         forceUpdateList,
         editName,
+        scrollToItem,
         onSelectEventsFunction,
         onDeleteEventsFunction,
         canRename,
@@ -661,12 +472,80 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsFunction,
         onSelectEventsFunction,
         project,
+        scrollToItem,
         unsavedChanges,
       ]
     );
 
     const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
     const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+
+    const eventBehaviorProps = React.useMemo<EventBehaviorProps>(
+      () => ({
+        project,
+        eventsFunctionsExtension,
+        eventsBasedBehaviorsList: eventBasedBehaviors,
+        unsavedChanges,
+        forceUpdate,
+        forceUpdateList,
+        editName,
+        scrollToItem,
+        onSelectEventsBasedBehavior,
+        onDeleteEventsBasedBehavior,
+        onRenameEventsBasedBehavior,
+        onEventsBasedBehaviorRenamed,
+        onEventsBasedBehaviorPasted,
+        onEditEventsBasedBehaviorProperties,
+      }),
+      [
+        editName,
+        eventBasedBehaviors,
+        eventsFunctionsExtension,
+        forceUpdate,
+        forceUpdateList,
+        onDeleteEventsBasedBehavior,
+        onEditEventsBasedBehaviorProperties,
+        onEventsBasedBehaviorPasted,
+        onEventsBasedBehaviorRenamed,
+        onRenameEventsBasedBehavior,
+        onSelectEventsBasedBehavior,
+        project,
+        scrollToItem,
+        unsavedChanges,
+      ]
+    );
+
+    const eventObjectProps = React.useMemo<EventObjectProps>(
+      () => ({
+        project,
+        eventsBasedObjectsList: eventBasedObjects,
+        unsavedChanges,
+        forceUpdate,
+        forceUpdateList,
+        editName,
+        scrollToItem,
+        onSelectEventsBasedObject,
+        onDeleteEventsBasedObject,
+        onRenameEventsBasedObject,
+        onEventsBasedObjectRenamed,
+        onEditEventsBasedObjectProperties,
+      }),
+      [
+        editName,
+        eventBasedObjects,
+        forceUpdate,
+        forceUpdateList,
+        onDeleteEventsBasedObject,
+        onEditEventsBasedObjectProperties,
+        onEventsBasedObjectRenamed,
+        onRenameEventsBasedObject,
+        onSelectEventsBasedObject,
+        project,
+        scrollToItem,
+        unsavedChanges,
+      ]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
@@ -705,7 +584,10 @@ const EventsFunctionsList = React.forwardRef<
                 eventBasedObjects.size(),
                 i =>
                   new ObjectTreeViewItem(
-                    new ObjectTreeViewItemContent(eventBasedObjects.at(i)),
+                    new ObjectTreeViewItemContent(
+                      eventBasedObjects.at(i),
+                      eventObjectProps
+                    ),
                     eventFunctionProps
                   )
               );
@@ -746,7 +628,10 @@ const EventsFunctionsList = React.forwardRef<
                 eventBasedBehaviors.size(),
                 i =>
                   new BehaviorTreeViewItem(
-                    new BehaviorTreeViewItemContent(eventBasedBehaviors.at(i)),
+                    new BehaviorTreeViewItemContent(
+                      eventBasedBehaviors.at(i),
+                      eventBehaviorProps
+                    ),
                     eventFunctionProps
                   )
               );
@@ -806,7 +691,9 @@ const EventsFunctionsList = React.forwardRef<
       [
         eventBasedBehaviors,
         eventBasedObjects,
+        eventBehaviorProps,
         eventFunctionProps,
+        eventObjectProps,
         eventsFunctionsExtension,
       ]
     );
@@ -830,11 +717,6 @@ const EventsFunctionsList = React.forwardRef<
       []
     );
 
-    const addFolder = React.useCallback(
-      (items: Array<ObjectFolderOrObjectWithContext>) => {},
-      []
-    );
-
     /**
      * Unselect item if one of the parent is collapsed (folded) so that the item
      * does not stay selected and not visible to the user.
@@ -845,34 +727,12 @@ const EventsFunctionsList = React.forwardRef<
 
     const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
       (
-        objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
+        objectFolderOrObjectWithContext: TreeViewItem,
         folder: gdObjectFolderOrObject
       ) => {
-        const {
-          objectFolderOrObject,
-          global,
-        } = objectFolderOrObjectWithContext;
-        if (folder === objectFolderOrObject.getParent()) return;
-        objectFolderOrObject
-          .getParent()
-          .moveObjectFolderOrObjectToAnotherFolder(
-            objectFolderOrObject,
-            folder,
-            0
-          );
-        const treeView = treeViewRef.current;
-        if (treeView) {
-          const closestVisibleParent = getClosestVisibleParent({
-            objectFolderOrObject: folder,
-            global,
-          });
-          if (closestVisibleParent) {
-            treeView.animateItem(closestVisibleParent);
-          }
-        }
-        onObjectModified(true);
+        // TODO
       },
-      [onObjectModified]
+      []
     );
 
     // Force List component to be mounted again if project or objectsContainer
@@ -990,9 +850,6 @@ const EventsFunctionsList = React.forwardRef<
             />
           </Column>
         </Line>
-        {newObjectDialogOpen &&
-          // TODO
-          false}
       </Background>
     );
   }

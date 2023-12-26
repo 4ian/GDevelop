@@ -9,9 +9,8 @@ import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
 import EditorMosaic, { mosaicContainsNode } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
-import EventsFunctionsListWithErrorBoundary, {
-  type EventsFunctionCreationParameters,
-} from '../EventsFunctionsList';
+import EventsFunctionsListWithErrorBoundary from '../EventsFunctionsList';
+import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/FunctionTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';

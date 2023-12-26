@@ -29,6 +29,7 @@ import {
 } from '../../../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlanRecommendationRow from './PlanRecommendationRow';
+import useSubscriptionPlans from '../../../../Utils/UseSubscriptionPlans';
 
 const styles = {
   textTutorialContent: {
@@ -170,6 +171,7 @@ const RecommendationList = ({
   const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
+  const { subscriptionPlansWithPrices } = useSubscriptionPlans();
 
   if (!recommendations) return null;
 
@@ -279,11 +281,12 @@ const RecommendationList = ({
             !profile.isStudent &&
             (!subscription ||
               isPlanRecommendationRelevant(subscription, planRecommendation));
-          if (shouldDisplayPlanRecommendation) {
+          if (shouldDisplayPlanRecommendation && subscriptionPlansWithPrices) {
             items.push(
               <SectionRow key="plan">
                 <PlanRecommendationRow
                   recommendationPlanId={planRecommendation.id}
+                  subscriptionPlansWithPrices={subscriptionPlansWithPrices}
                   i18n={i18n}
                 />
               </SectionRow>

@@ -44,6 +44,7 @@ import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import { FunctionTreeViewItemContent } from './FunctionTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -69,7 +70,7 @@ const styles = {
   autoSizer: { width: '100%' },
 };
 
-export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
+const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
 type EventFunctionCallbacks = {|
   onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
@@ -89,34 +90,45 @@ type EventFunctionCallbacks = {|
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
 |};
 
-type EventFunctionContext = {|
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject,
-  functionCallbacks: EventFunctionCallbacks,
+type TreeItemProps = {|
+  forceUpdate: () => void,
+  forceUpdateList: () => void,
 |};
 
-interface TreeViewItem {
-  isRoot?: boolean;
-  isPlaceholder?: boolean;
+type EventFunctionProps = {|
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
+|} & TreeItemProps &
+  EventFunctionCallbacks;
+
+type EventBehaviorCallbacks = {||};
+type EventObjectCallbacks = {||};
+
+type EventBehaviorProps = TreeItemProps & EventBehaviorCallbacks;
+type EventObjectProps = TreeItemProps & EventObjectCallbacks;
+
+interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
   getHtmlId(index: number): ?string;
-  getChildren(): ?Array<TreeViewItem>;
   getThumbnail(): ?string;
   getDataset(): ?HTMLDataset;
   onSelect(): void;
 }
 
-class ObjectTreeViewItem implements TreeViewItem {
-  object: gdEventsBasedObject;
-  eventFunctionCallbacks: EventFunctionCallbacks;
+interface TreeViewItem {
+  isRoot?: boolean;
+  isPlaceholder?: boolean;
+  content: TreeViewItemContent;
+  getChildren(): ?Array<TreeViewItem>;
+}
 
-  constructor(
-    object: gdEventsBasedObject,
-    eventFunctionCallbacks: EventFunctionCallbacks
-  ) {
+class ObjectTreeViewItemContent implements TreeViewItemContent {
+  object: gdEventsBasedObject;
+
+  constructor(object: gdEventsBasedObject) {
     this.object = object;
-    this.eventFunctionCallbacks = eventFunctionCallbacks;
   }
 
   getName(): string | React.Node {
@@ -128,22 +140,6 @@ class ObjectTreeViewItem implements TreeViewItem {
   getHtmlId(index: number): ?string {
     return `object-item-${index}`;
   }
-  getChildren(): ?Array<TreeViewItem> {
-    const functions = this.object.getEventsFunctions();
-    const eventFunctionContext: EventFunctionContext = {
-      eventsBasedObject: this.object,
-      eventFunctionCallbacks: this.eventFunctionCallbacks,
-    };
-    return mapFor(
-      0,
-      functions.getEventsFunctionsCount(),
-      i =>
-        new FunctionTreeViewItem(
-          functions.getEventsFunctionAt(i),
-          eventFunctionContext
-        )
-    );
-  }
   getThumbnail(): ?string {
     return null;
   }
@@ -151,18 +147,16 @@ class ObjectTreeViewItem implements TreeViewItem {
     return null;
   }
   onSelect(): void {}
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return [];
+  }
 }
 
-class BehaviorTreeViewItem implements TreeViewItem {
+class BehaviorTreeViewItemContent implements TreeViewItemContent {
   behavior: gdEventsBasedBehavior;
-  eventFunctionCallbacks: EventFunctionCallbacks;
 
-  constructor(
-    behavior: gdEventsBasedBehavior,
-    eventFunctionCallbacks: EventFunctionCallbacks
-  ) {
+  constructor(behavior: gdEventsBasedBehavior) {
     this.behavior = behavior;
-    this.eventFunctionCallbacks = eventFunctionCallbacks;
   }
 
   getName(): string | React.Node {
@@ -174,22 +168,6 @@ class BehaviorTreeViewItem implements TreeViewItem {
   getHtmlId(index: number): ?string {
     return `behavior-item-${index}`;
   }
-  getChildren(): ?Array<TreeViewItem> {
-    const functions = this.behavior.getEventsFunctions();
-    const eventFunctionContext: EventFunctionContext = {
-      eventsBasedBehavior: this.behavior,
-      eventFunctionCallbacks: this.eventFunctionCallbacks,
-    };
-    return mapFor(
-      0,
-      functions.getEventsFunctionsCount(),
-      i =>
-        new FunctionTreeViewItem(
-          functions.getEventsFunctionAt(i),
-          eventFunctionContext
-        )
-    );
-  }
   getThumbnail(): ?string {
     return null;
   }
@@ -197,96 +175,92 @@ class BehaviorTreeViewItem implements TreeViewItem {
     return null;
   }
   onSelect(): void {}
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return [];
+  }
 }
 
-class FunctionTreeViewItem implements TreeViewItem {
-  eventFunction: gdEventsFunction;
-  eventFunctionContext: EventFunctionContext;
+class ObjectTreeViewItem implements TreeViewItem {
+  content: ObjectTreeViewItemContent;
+  eventFunctionProps: EventFunctionProps;
 
   constructor(
-    eventFunction: gdEventsFunction,
-    eventFunctionContext: EventFunctionContext
+    content: ObjectTreeViewItemContent,
+    eventFunctionProps: EventFunctionProps
   ) {
-    this.eventFunction = eventFunction;
-    this.eventFunctionContext = eventFunctionContext;
+    this.content = content;
+    this.eventFunctionProps = eventFunctionProps;
   }
 
-  getName(): string | React.Node {
-    return this.eventFunction.getName();
-  }
-  getId(): string {
-    const behavior = this.eventFunctionContext.eventsBasedBehavior;
-    const object = this.eventFunctionContext.eventsBasedObject;
-    return (
-      (behavior
-        ? `behaviors.${behavior.getName()}.`
-        : object
-        ? `objects.${object.getName()}.`
-        : '') + this.eventFunction.getName()
+  getChildren(): ?Array<TreeViewItem> {
+    const eventsBasedObject = this.content.object;
+    const eventFunctionProps = {
+      eventsBasedObject,
+      eventsFunctionsContainer: eventsBasedObject,
+      ...this.eventFunctionProps,
+    };
+    const functions = eventsBasedObject.getEventsFunctions();
+    return mapFor(
+      0,
+      functions.getEventsFunctionsCount(),
+      i =>
+        new LeafTreeViewItem(
+          new FunctionTreeViewItemContent(
+            functions.getEventsFunctionAt(i),
+            eventFunctionProps
+          )
+        )
     );
   }
-  getHtmlId(index: number): ?string {
-    return `function-item-${index}`;
+}
+
+class BehaviorTreeViewItem implements TreeViewItem {
+  content: BehaviorTreeViewItemContent;
+  eventFunctionProps: EventFunctionProps;
+
+  constructor(
+    content: BehaviorTreeViewItemContent,
+    eventFunctionProps: EventFunctionCallbacks
+  ) {
+    this.content = content;
+    this.eventFunctionProps = eventFunctionProps;
   }
+
+  getChildren(): ?Array<TreeViewItem> {
+    const eventsBasedBehavior = this.content.behavior;
+    const eventFunctionProps = {
+      eventsBasedBehavior,
+      eventsFunctionsContainer: eventsBasedBehavior,
+      ...this.eventFunctionProps,
+    };
+    const functions = eventsBasedBehavior.getEventsFunctions();
+    return mapFor(
+      0,
+      functions.getEventsFunctionsCount(),
+      i =>
+        new LeafTreeViewItem(
+          new FunctionTreeViewItemContent(
+            functions.getEventsFunctionAt(i),
+            eventFunctionProps
+          )
+        )
+    );
+  }
+}
+
+class LeafTreeViewItem implements TreeViewItem {
+  content: TreeViewItemContent;
+
+  constructor(content: ObjectTreeViewItem) {
+    this.content = content;
+  }
+
   getChildren(): ?Array<TreeViewItem> {
     return null;
   }
-  getThumbnail(): ?string {
-    switch (this.eventFunction.getFunctionType()) {
-      default:
-        return 'res/functions/function.svg';
-      case gd.EventsFunction.Action:
-      case gd.EventsFunction.ActionWithOperator:
-        switch (this.eventFunction.getName()) {
-          default:
-            return 'res/functions/action.svg';
-
-          case 'onSceneUnloading':
-          case 'onDestroy':
-            return 'res/functions/destroy.svg';
-
-          case 'onSceneResumed':
-          case 'onActivate':
-            return 'res/functions/activate.svg';
-
-          case 'onScenePaused':
-          case 'onDeActivate':
-            return 'res/functions/deactivate.svg';
-
-          case 'onScenePreEvents':
-          case 'onScenePostEvents':
-          case 'doStepPreEvents':
-          case 'doStepPostEvents':
-            return 'res/functions/step.svg';
-
-          case 'onSceneLoaded':
-          case 'onFirstSceneLoaded':
-          case 'onCreated':
-            return 'res/functions/create.svg';
-
-          case 'onHotReloading':
-            return 'res/functions/reload.svg';
-        }
-      case gd.EventsFunction.Condition:
-        return 'res/functions/condition.svg';
-      case gd.EventsFunction.Expression:
-      case gd.EventsFunction.ExpressionAndCondition:
-        return 'res/functions/expression.svg';
-    }
-  }
-  getDataset(): ?HTMLDataset {
-    return null;
-  }
-  onSelect(): void {
-    this.eventFunctionContext.eventFunctionCallbacks.onSelectEventsFunction(
-      this.eventFunction,
-      this.eventFunctionContext.eventsBasedBehavior,
-      this.eventFunctionContext.eventsBasedObject
-    );
-  }
 }
 
-class PlaceHolderTreeViewItem implements TreeViewItem {
+class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   isPlaceholder = true;
   id: string;
   label: string | React.Node;
@@ -305,9 +279,6 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
   getHtmlId(index: number): ?string {
     return null;
   }
-  getChildren(): ?Array<TreeViewItem> {
-    return null;
-  }
   getThumbnail(): ?string {
     return null;
   }
@@ -316,13 +287,18 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
   }
 }
 
-const getTreeViewItemName = (item: TreeViewItem) => item.getName();
-const getTreeViewItemId = (item: TreeViewItem) => item.getId();
+const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
+const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
 const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
-  item.getHtmlId();
+  item.content.getHtmlId();
 const getTreeViewItemChildren = (item: TreeViewItem) => item.getChildren();
-const getTreeViewItemThumbnail = (item: TreeViewItem) => item.getThumbnail();
-const getTreeViewItemData = (item: TreeViewItem) => item.getDataset();
+const getTreeViewItemThumbnail = (item: TreeViewItem) =>
+  item.content.getThumbnail();
+const getTreeViewItemData = (item: TreeViewItem) => item.content.getDataset();
+const buildMenuTemplate = (i18n: I18nType) => (
+  item: TreeViewItem,
+  index: number
+) => item.content.buildMenuTemplate(i18n, index);
 
 const CLIPBOARD_KIND = 'Object';
 
@@ -445,24 +421,6 @@ const EventsFunctionsList = React.forwardRef<
     }: Props,
     ref
   ) => {
-    const eventFunctionCallbacks = React.useMemo<EventFunctionCallbacks>(
-      () => ({
-        onSelectEventsFunction,
-        onDeleteEventsFunction,
-        canRename,
-        onRenameEventsFunction,
-        onAddEventsFunction,
-        onEventsFunctionAdded,
-      }),
-      [
-        canRename,
-        onAddEventsFunction,
-        onDeleteEventsFunction,
-        onEventsFunctionAdded,
-        onRenameEventsFunction,
-        onSelectEventsFunction,
-      ]
-    );
     const [selectedItems, setSelectedItems] = React.useState<
       Array<TreeViewItem>
     >([]);
@@ -483,6 +441,29 @@ const EventsFunctionsList = React.forwardRef<
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
       [forceUpdate]
+    );
+
+    const eventFunctionProps = React.useMemo<EventFunctionProps>(
+      () => ({
+        forceUpdate,
+        forceUpdateList,
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        canRename,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+      }),
+      [
+        canRename,
+        forceUpdate,
+        forceUpdateList,
+        onAddEventsFunction,
+        onDeleteEventsFunction,
+        onEventsFunctionAdded,
+        onRenameEventsFunction,
+        onSelectEventsFunction,
+      ]
     );
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
@@ -712,21 +693,31 @@ const EventsFunctionsList = React.forwardRef<
         const treeViewItems = [
           {
             isRoot: true,
-            getName(): string | React.Node {
-              return i18n._(t`Objects`);
-            },
-            getId(): string {
-              return extensionObjectsRootFolderId;
-            },
-            getHtmlId(index: number): ?string {
-              return null;
+            content: {
+              getName(): string | React.Node {
+                return i18n._(t`Objects`);
+              },
+              getId(): string {
+                return extensionObjectsRootFolderId;
+              },
+              getHtmlId(index: number): ?string {
+                return null;
+              },
+              getThumbnail(): ?string {
+                return null;
+              },
+              getDataset(): ?HTMLDataset {
+                return null;
+              },
             },
             getChildren(): ?Array<TreeViewItem> {
               if (eventBasedObjects.size() === 0) {
                 return [
-                  new PlaceHolderTreeViewItem(
-                    extensionObjectsEmptyPlaceholderId,
-                    i18n._(t`Start by adding a new object.`)
+                  new LeafTreeViewItem(
+                    new PlaceHolderTreeViewItemContent(
+                      extensionObjectsEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new object.`)
+                    )
                   ),
                 ];
               }
@@ -735,35 +726,39 @@ const EventsFunctionsList = React.forwardRef<
                 eventBasedObjects.size(),
                 i =>
                   new ObjectTreeViewItem(
-                    eventBasedObjects.at(i),
-                    eventFunctionCallbacks
+                    new ObjectTreeViewItemContent(eventBasedObjects.at(i)),
+                    eventFunctionProps
                   )
               );
-            },
-            getThumbnail(): ?string {
-              return null;
-            },
-            getDataset(): ?HTMLDataset {
-              return null;
             },
           },
           {
             isRoot: true,
-            getName(): string | React.Node {
-              return i18n._(t`Behaviors`);
-            },
-            getId(): string {
-              return extensionBehaviorsRootFolderId;
-            },
-            getHtmlId(index: number): ?string {
-              return null;
+            content: {
+              getName(): string | React.Node {
+                return i18n._(t`Behaviors`);
+              },
+              getId(): string {
+                return extensionBehaviorsRootFolderId;
+              },
+              getHtmlId(index: number): ?string {
+                return null;
+              },
+              getThumbnail(): ?string {
+                return null;
+              },
+              getDataset(): ?HTMLDataset {
+                return null;
+              },
             },
             getChildren(): ?Array<TreeViewItem> {
               if (eventBasedBehaviors.size() === 0) {
                 return [
-                  new PlaceHolderTreeViewItem(
-                    extensionBehaviorsEmptyPlaceholderId,
-                    i18n._(t`Start by adding a new behavior.`)
+                  new LeafTreeViewItem(
+                    new PlaceHolderTreeViewItemContent(
+                      extensionBehaviorsEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new behavior.`)
+                    )
                   ),
                 ];
               }
@@ -772,56 +767,57 @@ const EventsFunctionsList = React.forwardRef<
                 eventBasedBehaviors.size(),
                 i =>
                   new BehaviorTreeViewItem(
-                    eventBasedBehaviors.at(i),
-                    eventFunctionCallbacks
+                    new BehaviorTreeViewItemContent(eventBasedBehaviors.at(i)),
+                    eventFunctionProps
                   )
               );
-            },
-            getThumbnail(): ?string {
-              return null;
-            },
-            getDataset(): ?HTMLDataset {
-              return null;
             },
           },
           {
             isRoot: true,
-            getName(): string | React.Node {
-              return i18n._(t`Functions`);
-            },
-            getId(): string {
-              return extensionFunctionsRootFolderId;
-            },
-            getHtmlId(index: number): ?string {
-              return null;
+            content: {
+              getName(): string | React.Node {
+                return i18n._(t`Functions`);
+              },
+              getId(): string {
+                return extensionFunctionsRootFolderId;
+              },
+              getHtmlId(index: number): ?string {
+                return null;
+              },
+              getThumbnail(): ?string {
+                return null;
+              },
+              getDataset(): ?HTMLDataset {
+                return null;
+              },
             },
             getChildren(): ?Array<TreeViewItem> {
               if (eventsFunctionsExtension.getEventsFunctionsCount() === 0) {
                 return [
-                  new PlaceHolderTreeViewItem(
-                    extensionFunctionsEmptyPlaceholderId,
-                    i18n._(t`Start by adding a new function.`)
+                  new LeafTreeViewItem(
+                    new PlaceHolderTreeViewItemContent(
+                      extensionFunctionsEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new function.`)
+                    )
                   ),
                 ];
               }
-              const eventFunctionContext: EventFunctionContext = {
-                eventFunctionCallbacks,
+              const freeFunctionProps = {
+                eventsFunctionsContainer: eventsFunctionsExtension,
+                ...eventFunctionProps,
               };
               return mapFor(
                 0,
                 eventsFunctionsExtension.getEventsFunctionsCount(),
                 i =>
-                  new FunctionTreeViewItem(
-                    eventsFunctionsExtension.getEventsFunctionAt(i),
-                    eventFunctionContext
+                  new LeafTreeViewItem(
+                    new FunctionTreeViewItemContent(
+                      eventsFunctionsExtension.getEventsFunctionAt(i),
+                      freeFunctionProps
+                    )
                   )
               );
-            },
-            getThumbnail(): ?string {
-              return null;
-            },
-            getDataset(): ?HTMLDataset {
-              return null;
             },
           },
         ];
@@ -831,7 +827,7 @@ const EventsFunctionsList = React.forwardRef<
       [
         eventBasedBehaviors,
         eventBasedObjects,
-        eventFunctionCallbacks,
+        eventFunctionProps,
         eventsFunctionsExtension,
       ]
     );
@@ -898,14 +894,6 @@ const EventsFunctionsList = React.forwardRef<
         onObjectModified(true);
       },
       [onObjectModified]
-    );
-
-    const renderObjectMenuTemplate = React.useCallback(
-      (i18n: I18nType) => (item: TreeViewItem, index: number) => {
-        // TODO Define drop down menu
-        return [];
-      },
-      []
     );
 
     // Force List component to be mounted again if project or objectsContainer
@@ -991,11 +979,11 @@ const EventsFunctionsList = React.forwardRef<
                         const itemToSelect = items[0];
                         if (itemToSelect.isRoot) return;
                         if (!itemToSelect) return;
-                        itemToSelect.onSelect();
+                        itemToSelect.content.onSelect();
                         setSelectedItems(items);
                       }}
                       onRenameItem={rename}
-                      buildMenuTemplate={renderObjectMenuTemplate(i18n)}
+                      buildMenuTemplate={buildMenuTemplate(i18n)}
                       onMoveSelectionToItem={(destinationItem, where) =>
                         moveSelectionTo(i18n, destinationItem, where)
                       }

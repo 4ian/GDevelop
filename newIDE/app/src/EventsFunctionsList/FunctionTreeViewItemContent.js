@@ -165,6 +165,17 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
+  rename(newName: string): void {
+    if (this.eventFunction.getName() === newName) return;
+
+    this.props.onRenameEventsFunction(this.eventFunction, newName, doRename => {
+      if (!doRename) return;
+      this._onEventsFunctionModified();
+    });
+  }
+
+  edit(): void {}
+
   buildMenuTemplate(i18n: I18nType, index: number) {
     const eventsFunction = this.eventFunction;
     return [
@@ -242,15 +253,6 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       if (!doRemove) return;
 
       eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
-      this._onEventsFunctionModified();
-    });
-  };
-
-  _rename = (eventsFunction: gdEventsFunction, newName: string) => {
-    if (eventsFunction.getName() === newName) return;
-
-    this.props.onRenameEventsFunction(eventsFunction, newName, doRename => {
-      if (!doRename) return;
       this._onEventsFunctionModified();
     });
   };

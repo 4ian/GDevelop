@@ -90,6 +90,21 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
   onSelect(): void {}
 
+  rename(newName: string): void {
+    if (this.object.getName() === newName) return;
+
+    this.props.onRenameEventsBasedObject(this.object, newName, doRename => {
+      if (!doRename) return;
+
+      this._onEventsBasedObjectModified();
+      this.props.onEventsBasedObjectRenamed(this.object);
+    });
+  }
+
+  edit(): void {
+    this.props.onEditEventsBasedObjectProperties(this.object);
+  }
+
   buildMenuTemplate(i18n: I18nType, index: number) {
     const eventsBasedObject = this.object;
     return [
@@ -150,21 +165,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       eventsBasedObjectsList.remove(eventsBasedObject.getName());
       this._onEventsBasedObjectModified();
     });
-  };
-
-  _rename = (eventsBasedObject: gdEventsBasedObject, newName: string) => {
-    if (eventsBasedObject.getName() === newName) return;
-
-    this.props.onRenameEventsBasedObject(
-      eventsBasedObject,
-      newName,
-      doRename => {
-        if (!doRename) return;
-
-        this._onEventsBasedObjectModified();
-        this.props.onEventsBasedObjectRenamed(eventsBasedObject);
-      }
-    );
   };
 
   _copyEventsBasedObject = (eventsBasedObject: gdEventsBasedObject) => {

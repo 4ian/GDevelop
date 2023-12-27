@@ -98,6 +98,21 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
 
   onSelect(): void {}
 
+  rename(newName: string): void {
+    if (this.behavior.getName() === newName) return;
+
+    this.props.onRenameEventsBasedBehavior(this.behavior, newName, doRename => {
+      if (!doRename) return;
+
+      this._onEventsBasedBehaviorModified();
+      this.props.onEventsBasedBehaviorRenamed(this.behavior);
+    });
+  }
+
+  edit(): void {
+    this.props.onEditEventsBasedBehaviorProperties(this.behavior);
+  }
+
   buildMenuTemplate(i18n: I18nType, index: number) {
     const eventsBasedBehavior = this.behavior;
     return [
@@ -164,21 +179,6 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       eventsBasedBehaviorsList.remove(eventsBasedBehavior.getName());
       this._onEventsBasedBehaviorModified();
     });
-  };
-
-  _rename = (eventsBasedBehavior: gdEventsBasedBehavior, newName: string) => {
-    if (eventsBasedBehavior.getName() === newName) return;
-
-    this.props.onRenameEventsBasedBehavior(
-      eventsBasedBehavior,
-      newName,
-      doRename => {
-        if (!doRename) return;
-
-        this._onEventsBasedBehaviorModified();
-        this.props.onEventsBasedBehaviorRenamed(eventsBasedBehavior);
-      }
-    );
   };
 
   _togglePrivate = (eventsBasedBehavior: gdEventsBasedBehavior) => {

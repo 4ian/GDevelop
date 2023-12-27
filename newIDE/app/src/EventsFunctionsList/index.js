@@ -100,6 +100,8 @@ export interface TreeViewItemContent {
   getDataset(): ?HTMLDataset;
   onSelect(): void;
   buildMenuTemplate(i18n: I18nType, index: number): any;
+  rename(newName: string): void;
+  edit(): void;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
   getEventsBasedObject(): ?gdEventsBasedObject;
@@ -250,6 +252,10 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [];
   }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -264,6 +270,12 @@ const buildMenuTemplate = (i18n: I18nType) => (
   item: TreeViewItem,
   index: number
 ) => item.content.buildMenuTemplate(i18n, index);
+const renameItem = (item: TreeViewItem, newName: string) => {
+  item.content.rename(newName);
+};
+const editItem = (item: TreeViewItem) => {
+  item.content.edit();
+};
 
 const CLIPBOARD_KIND = 'Object';
 
@@ -393,10 +405,6 @@ const EventsFunctionsList = React.forwardRef<
       },
       [isMobileScreen]
     );
-
-    const addObject = React.useCallback((objectType: string) => {
-      // TODO
-    }, []);
 
     const addNewEventsFunction = React.useCallback(
       () => {
@@ -540,14 +548,6 @@ const EventsFunctionsList = React.forwardRef<
       },
       [deleteObjectFolderOrObjectWithContext]
     );
-
-    const rename = React.useCallback((item: TreeViewItem, newName: string) => {
-      // TODO
-    }, []);
-
-    const editItem = React.useCallback((item: TreeViewItem) => {
-      // TODO
-    }, []);
 
     const getClosestVisibleParent = (
       objectFolderOrObjectWithContext: TreeViewItem
@@ -935,7 +935,7 @@ const EventsFunctionsList = React.forwardRef<
                         itemToSelect.content.onSelect();
                         setSelectedItems(items);
                       }}
-                      onRenameItem={rename}
+                      onRenameItem={renameItem}
                       buildMenuTemplate={buildMenuTemplate(i18n)}
                       onMoveSelectionToItem={(destinationItem, where) =>
                         moveSelectionTo(i18n, destinationItem, where)

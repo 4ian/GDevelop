@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopUsageApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export type Usage = {
   id: string,
@@ -159,6 +160,23 @@ export const listSubscriptionPlans = async (): Promise<
 > => {
   const response = await apiClient.get('/subscription-plan');
   return response.data;
+};
+
+export const getSubscriptionPlanPrice = async (
+  pricingSystemId: string
+): Promise<?SubscriptionPlanPrice> => {
+  try {
+    const response = await apiClient.get(
+      `/subscription-plan-pricing-system/${pricingSystemId}`
+    );
+    return response.data;
+  } catch (error) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+      return null;
+    }
+    throw error;
+  }
 };
 
 export const getUserUsages = async (

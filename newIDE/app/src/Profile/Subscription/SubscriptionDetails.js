@@ -10,6 +10,7 @@ import {
   type Subscription,
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
+  getSubscriptionPlanPrice,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
@@ -113,34 +114,54 @@ const SubscriptionDetails = ({
   );
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
-  const {
+  const [
     userSubscriptionPlan,
-    userPricingSystem,
-  }: {|
-    userSubscriptionPlan: ?SubscriptionPlan,
-    userPricingSystem: ?SubscriptionPlanPrice,
-  |} = React.useMemo(
+    setUserSubscriptionPlan,
+  ] = React.useState<?SubscriptionPlan>(null);
+  const [
+    userSubscriptionPlanPrice,
+    setUserSubscriptionPlanPrice,
+  ] = React.useState<?SubscriptionPlanPrice>(null);
+
+  React.useEffect(
     () => {
-      if (!subscription)
-        return { userSubscriptionPlan: null, userPricingSystem: null };
-      const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPrices.find(
-        plan => subscription.planId === plan.id
-      );
-      if (!matchingSubscriptionPlanWithPrices) {
-        return { userSubscriptionPlan: null, userPricingSystem: null };
-      }
-      const {
-        prices,
-        ...subscriptionPlan
-      } = matchingSubscriptionPlanWithPrices;
-      return {
-        userSubscriptionPlan: subscriptionPlan,
-        // TODO: Once pricing system is stored in subscription, make sure the right
-        // pricing system is returned. If not present in subscriptionPlansWithPrices,
-        // it should be fetched.
-        userPricingSystem: prices[0],
-      };
+      (async () => {
+        if (!subscription) {
+          setUserSubscriptionPlan(null);
+          setUserSubscriptionPlanPrice(null);
+          return;
+        }
+
+        const { planId, pricingSystemId } = subscription;
+        if (!planId || !pricingSystemId) {
+          setUserSubscriptionPlan(null);
+          setUserSubscriptionPlanPrice(null);
+          return;
+        }
+
+        const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPrices.find(
+          plan => subscription.planId === plan.id
+        );
+        if (!matchingSubscriptionPlanWithPrices) {
+          setUserSubscriptionPlan(null);
+          setUserSubscriptionPlanPrice(null);
+          return;
+        }
+        const {
+          prices,
+          ...subscriptionPlan
+        } = matchingSubscriptionPlanWithPrices;
+
+        let pricingSystem = prices.find(
+          price => price.id === subscription.pricingSystemId
+        );
+        if (!pricingSystem) {
+          pricingSystem = await getSubscriptionPlanPrice(pricingSystemId);
+        }
+
+        setUserSubscriptionPlan(subscriptionPlan);
+        setUserSubscriptionPlanPrice(pricingSystem);
+      })();
     },
     [subscription, subscriptionPlansWithPrices]
   );
@@ -150,7 +171,8 @@ const SubscriptionDetails = ({
   const isSubscriptionExpired =
     !!redemptionCodeExpirationDate && redemptionCodeExpirationDate < Date.now();
 
-  if (!subscription) return <PlaceholderLoader />;
+  if (!subscription || (!userSubscriptionPlan && !userSubscriptionPlanPrice))
+    return <PlaceholderLoader />;
 
   const isOnOrSimulateMobileApp =
     isNativeMobileApp() || simulateNativeMobileApp;
@@ -214,7 +236,7 @@ const SubscriptionDetails = ({
           <ColumnStackLayout noMargin>
             <PlanCard
               subscriptionPlanWithPrices={userSubscriptionPlan}
-              subscriptionPlanPrice={userPricingSystem}
+              subscriptionPlanPrice={userSubscriptionPlanPrice}
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||

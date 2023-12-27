@@ -171,6 +171,20 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     });
   };
 
+  getIndex(): number {
+    return this.props.eventsBasedObjectsList.getPosition(this.object);
+  }
+
+  moveAt(destinationIndex: number): void {
+    const originIndex = this.getIndex();
+    this.props.eventsBasedObjectsList.move(
+      originIndex,
+      // When moving the item down, it must not be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+    );
+    this.props.forceUpdateList();
+  }
+
   _copyEventsBasedObject = (eventsBasedObject: gdEventsBasedObject) => {
     Clipboard.set(EVENTS_BASED_OBJECT_CLIPBOARD_KIND, {
       eventsBasedObject: serializeToJSObject(eventsBasedObject),

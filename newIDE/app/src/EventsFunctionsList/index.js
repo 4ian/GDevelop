@@ -75,11 +75,6 @@ const extensionObjectsEmptyPlaceholderId = 'extension-objects-placeholder';
 const extensionBehaviorsEmptyPlaceholderId = 'extension-behaviors-placeholder';
 const extensionFunctionsEmptyPlaceholderId = 'extension-functions-placeholder';
 
-const globalObjectsWikiLink = getHelpLink(
-  '/interface/scene-editor/global-objects/',
-  ':~:text=Global%20objects%20are%20objects%20which,are%20usable%20by%20all%20Scenes'
-);
-
 const styles = {
   listContainer: {
     flex: 1,
@@ -102,6 +97,8 @@ export interface TreeViewItemContent {
   buildMenuTemplate(i18n: I18nType, index: number): any;
   rename(newName: string): void;
   edit(): void;
+  getIndex(): number;
+  moveAt(destinationIndex: number): void;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
   getEventsFunction(): ?gdEventsFunction;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
@@ -273,6 +270,12 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   rename(newName: string): void {}
 
   edit(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  moveAt(destinationIndex: number): void {}
 }
 
 class RootTreeViewItemContent implements TreeViewItemContent {
@@ -335,6 +338,12 @@ class RootTreeViewItemContent implements TreeViewItemContent {
   rename(newName: string): void {}
 
   edit(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  moveAt(destinationIndex: number): void {}
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -973,9 +982,15 @@ const EventsFunctionsList = React.forwardRef<
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        // TODO
+        if (selectedItems.length === 0) {
+          return;
+        }
+        const selectedItem = selectedItems[0];
+        selectedItem.content.moveAt(
+          destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
+        );
       },
-      []
+      [selectedItems]
     );
 
     /**
@@ -985,16 +1000,6 @@ const EventsFunctionsList = React.forwardRef<
     const onCollapseItem = React.useCallback((item: TreeViewItem) => {
       // TODO
     }, []);
-
-    const moveObjectFolderOrObjectToAnotherFolderInSameContainer = React.useCallback(
-      (
-        objectFolderOrObjectWithContext: TreeViewItem,
-        folder: gdObjectFolderOrObject
-      ) => {
-        // TODO
-      },
-      []
-    );
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could

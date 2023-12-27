@@ -261,6 +261,22 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     });
   };
 
+  getIndex(): number {
+    return this.props.eventsFunctionsContainer.getEventsFunctionPosition(
+      this.eventFunction
+    );
+  }
+
+  moveAt(destinationIndex: number): void {
+    const originIndex = this.getIndex();
+    this.props.eventsFunctionsContainer.moveEventsFunction(
+      originIndex,
+      // When moving the item down, it must not be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+    );
+    this.props.forceUpdateList();
+  }
+
   _copyEventsFunction = (eventsFunction: gdEventsFunction) => {
     Clipboard.set(EVENTS_FUNCTION_CLIPBOARD_KIND, {
       eventsFunction: serializeToJSObject(eventsFunction),

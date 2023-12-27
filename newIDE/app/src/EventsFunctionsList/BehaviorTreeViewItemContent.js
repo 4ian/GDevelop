@@ -190,6 +190,20 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   };
 
+  getIndex(): number {
+    return this.props.eventsBasedBehaviorsList.getPosition(this.behavior);
+  }
+
+  moveAt(destinationIndex: number): void {
+    const originIndex = this.getIndex();
+    this.props.eventsBasedBehaviorsList.move(
+      originIndex,
+      // When moving the item down, it must not be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+    );
+    this.props.forceUpdateList();
+  }
+
   _copyEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
       eventsBasedBehavior: serializeToJSObject(eventsBasedBehavior),

@@ -64,16 +64,20 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  getEventsFunctionsContainer(): gdEventsFunctionsContainer {
+    return this.behavior.getEventsFunctions();
+  }
+
+  getEventsFunction(): ?gdEventsFunction {
+    return null;
+  }
+
   getEventsBasedBehavior(): ?gdEventsBasedBehavior {
     return this.behavior;
   }
 
   getEventsBasedObject(): ?gdEventsBasedObject {
     return null;
-  }
-
-  getEventsFunctionsContainer(): gdEventsFunctionsContainer {
-    return this.behavior.getEventsFunctions();
   }
 
   getName(): string | React.Node {

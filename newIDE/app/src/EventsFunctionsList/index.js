@@ -103,6 +103,7 @@ export interface TreeViewItemContent {
   rename(newName: string): void;
   edit(): void;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
+  getEventsFunction(): ?gdEventsFunction;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
   getEventsBasedObject(): ?gdEventsBasedObject;
 }
@@ -231,6 +232,10 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
+  getEventsFunction(): ?gdEventsFunction {
+    return null;
+  }
+
   getEventsBasedBehavior(): ?gdEventsBasedBehavior {
     return null;
   }
@@ -286,6 +291,10 @@ class RootTreeViewItemContent implements TreeViewItemContent {
   }
 
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
+    return null;
+  }
+
+  getEventsFunction(): ?gdEventsFunction {
     return null;
   }
 
@@ -923,6 +932,8 @@ const EventsFunctionsList = React.forwardRef<
         ];
       },
       [
+        addNewEventsBehavior,
+        addNewEventsObject,
         eventBasedBehaviors,
         eventBasedObjects,
         eventBehaviorProps,
@@ -933,11 +944,27 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     const canMoveSelectionTo = React.useCallback(
-      (destinationItem: TreeViewItem) => {
-        // TODO
-        return false;
-      },
-      []
+      (destinationItem: TreeViewItem) =>
+        selectedItems.every(item => {
+          if (
+            item.content.getEventsFunction() &&
+            destinationItem.content.getEventsFunction()
+          ) {
+            // Functions from the same container
+            return (
+              item.content.getEventsFunctionsContainer() ===
+              destinationItem.content.getEventsFunctionsContainer()
+            );
+          }
+          // Behaviors or Objects
+          return (
+            (item.content.getEventsBasedBehavior() &&
+              destinationItem.content.getEventsBasedBehavior()) ||
+            (item.content.getEventsBasedObject() &&
+              destinationItem.content.getEventsBasedObject())
+          );
+        }),
+      [selectedItems]
     );
 
     const moveSelectionTo = React.useCallback(

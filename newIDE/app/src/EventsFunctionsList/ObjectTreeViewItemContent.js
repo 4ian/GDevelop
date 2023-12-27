@@ -60,6 +60,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this.object.getEventsFunctions();
   }
 
+  getEventsFunction(): ?gdEventsFunction {
+    return null;
+  }
+
   getEventsBasedBehavior(): ?gdEventsBasedBehavior {
     return null;
   }

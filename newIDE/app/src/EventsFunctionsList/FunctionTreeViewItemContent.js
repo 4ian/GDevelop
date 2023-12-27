@@ -85,6 +85,10 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     return this.props.eventsFunctionsContainer;
   }
 
+  getEventsFunction(): ?gdEventsFunction {
+    return this.eventFunction;
+  }
+
   getEventsBasedBehavior(): ?gdEventsBasedBehavior {
     return this.props.eventsBasedBehavior;
   }

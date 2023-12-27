@@ -12,6 +12,7 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { TreeViewItemContent, type TreeItemProps } from '.';
+import { getFunctionTreeViewItemId } from './FunctionTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -53,6 +54,18 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   constructor(object: gdEventsBasedObject, props: EventObjectProps) {
     this.object = object;
     this.props = props;
+  }
+
+  getEventsFunctionsContainer(): gdEventsFunctionsContainer {
+    return this.object.getEventsFunctions();
+  }
+
+  getEventsBasedBehavior(): ?gdEventsBasedBehavior {
+    return null;
+  }
+
+  getEventsBasedObject(): ?gdEventsBasedObject {
+    return this.object;
   }
 
   getName(): string | React.Node {

@@ -691,17 +691,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     cb(true);
   };
 
-  _onAddFreeEventsFunction = (
-    onAddEventsFunctionCb: (
-      parameters: ?EventsFunctionCreationParameters
-    ) => void
-  ) => {
-    this.setState({
-      extensionFunctionSelectorDialogOpen: true,
-      onAddEventsFunctionCb,
-    });
-  };
-
   _onCloseExtensionFunctionSelectorDialog = (
     parameters: ?EventsFunctionCreationParameters
   ) => {
@@ -715,6 +704,33 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         if (onAddEventsFunctionCb) onAddEventsFunctionCb(parameters);
       }
     );
+  };
+
+  _onAddEventsFunction = (
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject,
+    onAddEventsFunctionCb: (
+      parameters: ?EventsFunctionCreationParameters
+    ) => void
+  ) => {
+    if (eventsBasedBehavior) {
+      this._onAddBehaviorEventsFunction(onAddEventsFunctionCb);
+    } else if (eventsBasedObject) {
+      this._onAddObjectEventsFunction(onAddEventsFunctionCb);
+    } else {
+      this._onAddFreeEventsFunction(onAddEventsFunctionCb);
+    }
+  };
+
+  _onAddFreeEventsFunction = (
+    onAddEventsFunctionCb: (
+      parameters: ?EventsFunctionCreationParameters
+    ) => void
+  ) => {
+    this.setState({
+      extensionFunctionSelectorDialogOpen: true,
+      onAddEventsFunctionCb,
+    });
   };
 
   _onAddBehaviorEventsFunction = (
@@ -1207,7 +1223,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onRenameEventsFunction={this._makeRenameFreeEventsFunction(
                   i18n
                 )}
-                onAddEventsFunction={this._onAddFreeEventsFunction}
+                onAddEventsFunction={this._onAddEventsFunction}
                 onEventsFunctionAdded={() => {}}
                 // Behaviors
                 selectedEventsBasedBehavior={selectedEventsBasedBehavior}

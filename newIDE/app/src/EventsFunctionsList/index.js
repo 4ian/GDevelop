@@ -50,6 +50,7 @@ import {
   type EventFunctionProps,
   type EventFunctionCommonProps,
   type EventFunctionCallbacks,
+  type EventsFunctionCreationParameters,
 } from './FunctionTreeViewItemContent';
 import {
   BehaviorTreeViewItemContent,
@@ -99,6 +100,9 @@ export interface TreeViewItemContent {
   getDataset(): ?HTMLDataset;
   onSelect(): void;
   buildMenuTemplate(i18n: I18nType, index: number): any;
+  getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
+  getEventsBasedBehavior(): ?gdEventsBasedBehavior;
+  getEventsBasedObject(): ?gdEventsBasedObject;
 }
 
 interface TreeViewItem {
@@ -113,6 +117,7 @@ export type TreeItemProps = {|
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   editName: (itemId: string) => void,
   scrollToItem: (itemId: string) => void,
 |};
@@ -206,6 +211,18 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   constructor(id: string, label: string | React.Node) {
     this.id = id;
     this.label = label;
+  }
+
+  getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
+    return null;
+  }
+
+  getEventsBasedBehavior(): ?gdEventsBasedBehavior {
+    return null;
+  }
+
+  getEventsBasedObject(): ?gdEventsBasedObject {
+    return null;
   }
 
   getName(): string | React.Node {
@@ -356,9 +373,123 @@ const EventsFunctionsList = React.forwardRef<
 
     const [searchText, setSearchText] = React.useState('');
 
+    const scrollToItem = React.useCallback((itemId: string) => {
+      if (treeViewRef.current) {
+        treeViewRef.current.scrollToItemFromId(itemId);
+      }
+    }, []);
+
+    const editName = React.useCallback(
+      (itemId: string) => {
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          if (isMobileScreen) {
+            // Position item at top of the screen to make sure it will be visible
+            // once the keyboard is open.
+            treeView.scrollToItemFromId(itemId, 'start');
+          }
+          treeView.renameItemFromId(itemId);
+        }
+      },
+      [isMobileScreen]
+    );
+
     const addObject = React.useCallback((objectType: string) => {
       // TODO
     }, []);
+
+    const addNewEventsFunction = React.useCallback(
+      () => {
+        const selectedItem = selectedItems[0];
+        const eventsFunctionsContainer = selectedItem
+          ? selectedItem.content.getEventsFunctionsContainer() ||
+            eventsFunctionsExtension
+          : eventsFunctionsExtension;
+
+        const eventsBasedBehavior = selectedItem
+          ? selectedItem.content.getEventsBasedBehavior()
+          : null;
+        const eventsBasedObject = selectedItem
+          ? selectedItem.content.getEventsBasedObject()
+          : null;
+
+        onAddEventsFunction(
+          eventsBasedBehavior,
+          eventsBasedObject,
+          (parameters: ?EventsFunctionCreationParameters) => {
+            if (!parameters) {
+              return;
+            }
+
+            const eventsFunctionName =
+              parameters.name ||
+              newNameGenerator('Function', name =>
+                eventsFunctionsContainer.hasEventsFunctionNamed(name)
+              );
+
+            const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+              eventsFunctionName,
+              eventsFunctionsContainer.getEventsFunctionsCount()
+            );
+            eventsFunction.setFunctionType(parameters.functionType);
+
+            if (
+              eventsFunction.isCondition() &&
+              !eventsFunction.isExpression()
+            ) {
+              gd.PropertyFunctionGenerator.generateConditionSkeleton(
+                project,
+                eventsFunction
+              );
+            }
+
+            const functionItemId = getFunctionTreeViewItemId(
+              eventsFunction,
+              eventsBasedBehavior,
+              eventsBasedObject
+            );
+
+            // Scroll to the new function.
+            // Ideally, we'd wait for the list to be updated to scroll, but
+            // to simplify the code, we just wait a few ms for a new render
+            // to be done.
+            setTimeout(() => {
+              scrollToItem(functionItemId);
+            }, 100); // A few ms is enough for a new render to be done.
+
+            onEventsFunctionAdded(eventsFunction);
+            if (unsavedChanges) {
+              unsavedChanges.triggerUnsavedChanges();
+            }
+            forceUpdate();
+
+            // We focus it so the user can edit the name directly.
+            // TODO Set behavior or object
+            onSelectEventsFunction(
+              eventsFunction,
+              eventsBasedBehavior,
+              eventsBasedObject
+            );
+            if (canRename(eventsFunction)) {
+              editName(functionItemId);
+            }
+          }
+        );
+      },
+      [
+        canRename,
+        editName,
+        eventsFunctionsExtension,
+        forceUpdate,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+        onSelectEventsFunction,
+        project,
+        scrollToItem,
+        selectedItems,
+        unsavedChanges,
+      ]
+    );
 
     const onAddNewObject = React.useCallback((item: TreeViewItem | null) => {},
     []);
@@ -410,33 +541,12 @@ const EventsFunctionsList = React.forwardRef<
       [deleteObjectFolderOrObjectWithContext]
     );
 
-    const editName = React.useCallback(
-      (itemId: string) => {
-        const treeView = treeViewRef.current;
-        if (treeView) {
-          if (isMobileScreen) {
-            // Position item at top of the screen to make sure it will be visible
-            // once the keyboard is open.
-            treeView.scrollToItemFromId(itemId, 'start');
-          }
-          treeView.renameItemFromId(itemId);
-        }
-      },
-      [isMobileScreen]
-    );
-
     const rename = React.useCallback((item: TreeViewItem, newName: string) => {
       // TODO
     }, []);
 
     const editItem = React.useCallback((item: TreeViewItem) => {
       // TODO
-    }, []);
-
-    const scrollToItem = React.useCallback((itemId: string) => {
-      if (treeViewRef.current) {
-        treeViewRef.current.scrollToItemFromId(itemId);
-      }
     }, []);
 
     const getClosestVisibleParent = (
@@ -449,6 +559,7 @@ const EventsFunctionsList = React.forwardRef<
     const eventFunctionProps = React.useMemo<EventFunctionCommonProps>(
       () => ({
         project,
+        eventsFunctionsExtension,
         unsavedChanges,
         forceUpdate,
         forceUpdateList,
@@ -464,6 +575,7 @@ const EventsFunctionsList = React.forwardRef<
       [
         canRename,
         editName,
+        eventsFunctionsExtension,
         forceUpdate,
         forceUpdateList,
         onAddEventsFunction,
@@ -518,6 +630,7 @@ const EventsFunctionsList = React.forwardRef<
     const eventObjectProps = React.useMemo<EventObjectProps>(
       () => ({
         project,
+        eventsFunctionsExtension,
         eventsBasedObjectsList: eventBasedObjects,
         unsavedChanges,
         forceUpdate,
@@ -532,6 +645,7 @@ const EventsFunctionsList = React.forwardRef<
       }),
       [
         editName,
+        eventsFunctionsExtension,
         eventBasedObjects,
         forceUpdate,
         forceUpdateList,
@@ -842,9 +956,7 @@ const EventsFunctionsList = React.forwardRef<
             <ResponsiveRaisedButton
               label={<Trans>Add a new function</Trans>}
               primary
-              onClick={() => {
-                // TODO
-              }}
+              onClick={addNewEventsFunction}
               id="add-new-function-button"
               icon={<Add />}
             />

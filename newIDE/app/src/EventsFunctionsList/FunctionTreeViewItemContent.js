@@ -39,6 +39,8 @@ export type EventFunctionCallbacks = {|
     cb: (boolean) => void
   ) => void,
   onAddEventsFunction: (
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject,
     (parameters: ?EventsFunctionCreationParameters) => void
   ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
@@ -51,9 +53,9 @@ export type EventFunctionCommonProps = {|
 
 export type EventFunctionProps = {|
   ...EventFunctionCommonProps,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsBasedObject?: ?gdEventsBasedObject,
-  eventsFunctionsContainer: gdEventsFunctionsContainer,
 |};
 
 export const getFunctionTreeViewItemId = (
@@ -77,6 +79,18 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   constructor(eventFunction: gdEventsFunction, props: EventFunctionProps) {
     this.eventFunction = eventFunction;
     this.props = props;
+  }
+
+  getEventsFunctionsContainer(): gdEventsFunctionsContainer {
+    return this.props.eventsFunctionsContainer;
+  }
+
+  getEventsBasedBehavior(): ?gdEventsBasedBehavior {
+    return this.props.eventsBasedBehavior;
+  }
+
+  getEventsBasedObject(): ?gdEventsBasedObject {
+    return this.props.eventsBasedObject;
   }
 
   getName(): string | React.Node {

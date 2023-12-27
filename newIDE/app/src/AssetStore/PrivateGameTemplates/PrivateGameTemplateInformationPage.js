@@ -38,12 +38,21 @@ import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { capitalize } from 'lodash';
 import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import Chip from '../../UI/Chip';
+import Lightning from '../../UI/CustomSvgIcons/Lightning';
 
 const styles = {
   disabledText: { opacity: 0.6 },
   scrollview: { overflowX: 'hidden' },
   grid: {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
+  },
+  chip: {
+    marginRight: 2,
+    marginBottom: 2,
+  },
+  chipsContainer: {
+    flexWrap: 'wrap',
   },
 };
 
@@ -296,13 +305,35 @@ const PrivateGameTemplateInformationPage = ({
                           )}
                           {getBuyButton(i18n)}
                         </Line>
-                        <Text size="body2" displayInlineAsSpan>
-                          <Trans>Ready-made</Trans>,{' '}
-                          <Trans>Game template</Trans>,{' '}
-                          {privateGameTemplateListingData.categories
-                            .map(category => capitalize(category))
-                            .join(', ')}
-                        </Text>
+                        <Line>
+                          <div style={styles.chipsContainer}>
+                            <Chip
+                              icon={<Lightning />}
+                              variant="outlined"
+                              color="secondary"
+                              size="small"
+                              style={styles.chip}
+                              label={<Trans>Ready-made</Trans>}
+                              key="premium"
+                            />
+                            <Chip
+                              size="small"
+                              style={styles.chip}
+                              label={<Trans>Game template</Trans>}
+                              key="game-template"
+                            />
+                            {privateGameTemplateListingData.categories.map(
+                              category => (
+                                <Chip
+                                  size="small"
+                                  style={styles.chip}
+                                  label={capitalize(category)}
+                                  key={category}
+                                />
+                              )
+                            )}
+                          </div>
+                        </Line>
                         <Text size="body2" displayInlineAsSpan>
                           <MarkdownText
                             source={gameTemplate.longDescription}

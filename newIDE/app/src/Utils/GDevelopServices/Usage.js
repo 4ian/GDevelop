@@ -17,6 +17,16 @@ export type Subscription = {|
   planId: string | null,
   createdAt: number,
   updatedAt: number,
+  /**
+   * Id of the pricing system.
+   * null when subscription is empty.
+   */
+  pricingSystemId:
+    | 'REDEMPTION_CODE'
+    | 'MANUALLY_ADDED'
+    | 'TEAM_MEMBER'
+    | string
+    | null,
   stripeSubscriptionId?: string,
   stripeCustomerId?: string,
   paypalSubscriptionId?: string,

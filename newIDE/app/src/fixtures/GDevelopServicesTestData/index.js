@@ -191,6 +191,7 @@ export const subscriptionForIndieUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'indie-user',
+  pricingSystemId: 'indie_1month',
 };
 
 export const subscriptionForProUser: Subscription = {
@@ -198,6 +199,7 @@ export const subscriptionForProUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'pro-user',
+  pricingSystemId: 'pro_1month',
 };
 
 export const subscriptionForSilverUser: Subscription = {
@@ -205,6 +207,7 @@ export const subscriptionForSilverUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'silver-user',
+  pricingSystemId: 'silver_1month',
 };
 
 export const subscriptionForGoldUser: Subscription = {
@@ -212,6 +215,7 @@ export const subscriptionForGoldUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'gold-user',
+  pricingSystemId: 'gold_1month',
 };
 
 export const subscriptionForStartupUser: Subscription = {
@@ -219,6 +223,7 @@ export const subscriptionForStartupUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'startup-user',
+  pricingSystemId: 'startup_1month',
 };
 
 export const subscriptionForBusinessUser: Subscription = {
@@ -226,6 +231,7 @@ export const subscriptionForBusinessUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'business-user',
+  pricingSystemId: 'business_1month',
 };
 
 export const subscriptionForEducationPlan: Subscription = {
@@ -233,6 +239,7 @@ export const subscriptionForEducationPlan: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'teacher-user',
+  pricingSystemId: 'education_1month',
 };
 
 export const subscriptionForGoldUserFromEducationPlan: Subscription = {
@@ -241,6 +248,7 @@ export const subscriptionForGoldUserFromEducationPlan: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
   benefitsFromEducationPlan: true,
+  pricingSystemId: 'TEAM_MEMBER',
 };
 
 export const purchaselyGoldSubscription: Subscription = {
@@ -249,6 +257,7 @@ export const purchaselyGoldSubscription: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
   purchaselyPlan: 'gdevelop_gold_whatever',
+  pricingSystemId: 'PURCHASELY_gdevelop_gold_whatever',
 };
 
 export const silverSubscriptionWithRedemptionCode: Subscription = {
@@ -258,6 +267,7 @@ export const silverSubscriptionWithRedemptionCode: Subscription = {
   userId: 'silver-user',
   redemptionCode: 'test-123-code',
   redemptionCodeValidUntil: 1923400438000,
+  pricingSystemId: 'REDEMPTION_CODE',
 };
 
 export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {
@@ -267,6 +277,7 @@ export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {
   userId: 'silver-user',
   redemptionCode: 'test-123-code',
   redemptionCodeValidUntil: Date.now() - 1000,
+  pricingSystemId: 'REDEMPTION_CODE',
 };
 
 export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
@@ -275,6 +286,7 @@ export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
   cancelAtPeriodEnd: true,
+  pricingSystemId: 'MANUALLY_ADDED',
 };
 
 export const noSubscription: Subscription = {
@@ -282,6 +294,7 @@ export const noSubscription: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'no-subscription-user',
+  pricingSystemId: null,
 };
 
 export const subscriptionPlansWithPrices = [

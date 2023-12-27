@@ -45,6 +45,7 @@ import { GameMonetization } from './Monetization/GameMonetization';
 import RouterContext from '../MainFrame/RouterContext';
 import { sendGameDetailsOpened } from '../Utils/Analytics/EventSender';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 export type GameDetailsTab =
   | 'details'
@@ -301,10 +302,12 @@ const GameDetails = ({
         onGameDeleted();
       } catch (error) {
         console.error('Unable to delete the game:', error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
         if (
-          error.response &&
-          error.response.data &&
-          error.response.data.code === 'game-deletion/leaderboards-exist'
+          extractedStatusAndCode &&
+          extractedStatusAndCode.code === 'game-deletion/leaderboards-exist'
         ) {
           setGameUnregisterErrorText(
             i18n._(

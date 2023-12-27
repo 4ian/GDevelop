@@ -205,8 +205,20 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
-class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
+class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
+  content: TreeViewItemContent;
+
+  constructor(content: TreeViewItemContent) {
+    this.content = content;
+  }
+
+  getChildren(): ?Array<TreeViewItem> {
+    return null;
+  }
+}
+
+class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   id: string;
   label: string | React.Node;
 
@@ -251,6 +263,64 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [];
+  }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
+}
+
+class RootTreeViewItemContent implements TreeViewItemContent {
+  id: string;
+  label: string | React.Node;
+  buildMenuTemplateFunction: (i18n: I18nType, index: number) => any;
+
+  constructor(
+    id: string,
+    label: string | React.Node,
+    buildMenuTemplate: (i18n: I18nType, index: number) => any
+  ) {
+    this.id = id;
+    this.label = label;
+    this.buildMenuTemplateFunction = buildMenuTemplate;
+  }
+
+  getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
+    return null;
+  }
+
+  getEventsBasedBehavior(): ?gdEventsBasedBehavior {
+    return null;
+  }
+
+  getEventsBasedObject(): ?gdEventsBasedObject {
+    return null;
+  }
+
+  getName(): string | React.Node {
+    return this.label;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getHtmlId(index: number): ?string {
+    return null;
+  }
+
+  getThumbnail(): ?string {
+    return null;
+  }
+
+  getDataset(): ?HTMLDataset {
+    return null;
+  }
+
+  onSelect(): void {}
+
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return this.buildMenuTemplateFunction(i18n, index);
   }
 
   rename(newName: string): void {}
@@ -472,7 +542,6 @@ const EventsFunctionsList = React.forwardRef<
             forceUpdate();
 
             // We focus it so the user can edit the name directly.
-            // TODO Set behavior or object
             onSelectEventsFunction(
               eventsFunction,
               eventsBasedBehavior,
@@ -499,8 +568,87 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    const onAddNewObject = React.useCallback((item: TreeViewItem | null) => {},
-    []);
+    const addNewEventsBehavior = React.useCallback(
+      () => {
+        const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+
+        const name = newNameGenerator('MyBehavior', name =>
+          eventBasedBehaviors.has(name)
+        );
+        const newEventsBasedBehavior = eventBasedBehaviors.insertNew(
+          name,
+          eventBasedBehaviors.getCount()
+        );
+        if (unsavedChanges) {
+          unsavedChanges.triggerUnsavedChanges();
+        }
+        forceUpdate();
+
+        const behaviorItemId = getBehaviorTreeViewItemId(
+          newEventsBasedBehavior
+        );
+
+        // Scroll to the new behavior.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(behaviorItemId);
+        }, 100); // A few ms is enough for a new render to be done.
+
+        // We focus it so the user can edit the name directly.
+        onSelectEventsBasedBehavior(newEventsBasedBehavior);
+        editName(behaviorItemId);
+      },
+      [
+        editName,
+        eventsFunctionsExtension,
+        forceUpdate,
+        onSelectEventsBasedBehavior,
+        scrollToItem,
+        unsavedChanges,
+      ]
+    );
+
+    const addNewEventsObject = React.useCallback(
+      () => {
+        const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+
+        const name = newNameGenerator('MyObject', name =>
+          eventBasedObjects.has(name)
+        );
+        const newEventsBasedObject = eventBasedObjects.insertNew(
+          name,
+          eventBasedObjects.getCount()
+        );
+        if (unsavedChanges) {
+          unsavedChanges.triggerUnsavedChanges();
+        }
+        forceUpdate();
+
+        const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
+
+        // Scroll to the new function.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(objectItemId);
+        }, 100); // A few ms is enough for a new render to be done.
+
+        // We focus it so the user can edit the name directly.
+        onSelectEventsBasedObject(newEventsBasedObject);
+        editName(objectItemId);
+      },
+      [
+        editName,
+        eventsFunctionsExtension,
+        forceUpdate,
+        onSelectEventsBasedObject,
+        scrollToItem,
+        unsavedChanges,
+      ]
+    );
 
     const onObjectModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
@@ -662,30 +810,23 @@ const EventsFunctionsList = React.forwardRef<
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
-        const treeViewItems = [
+        return [
           {
             isRoot: true,
-            content: {
-              getName(): string | React.Node {
-                return i18n._(t`Objects`);
-              },
-              getId(): string {
-                return extensionObjectsRootFolderId;
-              },
-              getHtmlId(index: number): ?string {
-                return null;
-              },
-              getThumbnail(): ?string {
-                return null;
-              },
-              getDataset(): ?HTMLDataset {
-                return null;
-              },
-            },
+            content: new RootTreeViewItemContent(
+              extensionObjectsRootFolderId,
+              i18n._(t`Objects`),
+              (i18n, index) => [
+                {
+                  label: i18n._(t`Add an object`),
+                  click: addNewEventsObject,
+                },
+              ]
+            ),
             getChildren(): ?Array<TreeViewItem> {
               if (eventBasedObjects.size() === 0) {
                 return [
-                  new LeafTreeViewItem(
+                  new PlaceHolderTreeViewItem(
                     new PlaceHolderTreeViewItemContent(
                       extensionObjectsEmptyPlaceholderId,
                       i18n._(t`Start by adding a new object.`)
@@ -709,27 +850,20 @@ const EventsFunctionsList = React.forwardRef<
           },
           {
             isRoot: true,
-            content: {
-              getName(): string | React.Node {
-                return i18n._(t`Behaviors`);
-              },
-              getId(): string {
-                return extensionBehaviorsRootFolderId;
-              },
-              getHtmlId(index: number): ?string {
-                return null;
-              },
-              getThumbnail(): ?string {
-                return null;
-              },
-              getDataset(): ?HTMLDataset {
-                return null;
-              },
-            },
+            content: new RootTreeViewItemContent(
+              extensionBehaviorsRootFolderId,
+              i18n._(t`Behaviors`),
+              (i18n, index) => [
+                {
+                  label: i18n._(t`Add a behavior`),
+                  click: addNewEventsBehavior,
+                },
+              ]
+            ),
             getChildren(): ?Array<TreeViewItem> {
               if (eventBasedBehaviors.size() === 0) {
                 return [
-                  new LeafTreeViewItem(
+                  new PlaceHolderTreeViewItem(
                     new PlaceHolderTreeViewItemContent(
                       extensionBehaviorsEmptyPlaceholderId,
                       i18n._(t`Start by adding a new behavior.`)
@@ -753,27 +887,15 @@ const EventsFunctionsList = React.forwardRef<
           },
           {
             isRoot: true,
-            content: {
-              getName(): string | React.Node {
-                return i18n._(t`Functions`);
-              },
-              getId(): string {
-                return extensionFunctionsRootFolderId;
-              },
-              getHtmlId(index: number): ?string {
-                return null;
-              },
-              getThumbnail(): ?string {
-                return null;
-              },
-              getDataset(): ?HTMLDataset {
-                return null;
-              },
-            },
+            content: new RootTreeViewItemContent(
+              extensionFunctionsRootFolderId,
+              i18n._(t`Functions`),
+              (i18n, index) => []
+            ),
             getChildren(): ?Array<TreeViewItem> {
               if (eventsFunctionsExtension.getEventsFunctionsCount() === 0) {
                 return [
-                  new LeafTreeViewItem(
+                  new PlaceHolderTreeViewItem(
                     new PlaceHolderTreeViewItemContent(
                       extensionFunctionsEmptyPlaceholderId,
                       i18n._(t`Start by adding a new function.`)
@@ -799,8 +921,6 @@ const EventsFunctionsList = React.forwardRef<
             },
           },
         ];
-        // $FlowFixMe
-        return treeViewItems;
       },
       [
         eventBasedBehaviors,

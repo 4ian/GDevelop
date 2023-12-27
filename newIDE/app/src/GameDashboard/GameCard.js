@@ -33,6 +33,7 @@ import BackgroundText from '../UI/BackgroundText';
 import Card from '../UI/Card';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Share from '../UI/CustomSvgIcons/Share';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 type Props = {|
   game: Game,
@@ -153,10 +154,12 @@ export const GameCard = ({
       await onUpdateGame();
     } catch (error) {
       console.error('Unable to delete the game:', error);
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       if (
-        error.response &&
-        error.response.data &&
-        error.response.data.code === 'game-deletion/leaderboards-exist'
+        extractedStatusAndCode &&
+        extractedStatusAndCode.code === 'game-deletion/leaderboards-exist'
       ) {
         showErrorBox({
           message: i18n._(

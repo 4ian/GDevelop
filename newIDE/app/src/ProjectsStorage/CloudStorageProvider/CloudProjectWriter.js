@@ -20,6 +20,7 @@ import {
 import ProjectCache from '../../Utils/ProjectCache';
 import { getProjectCache } from './CloudProjectOpener';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -162,10 +163,10 @@ export const generateOnChangeProjectProperty = (
 export const getWriteErrorMessage = (
   error: Error | $AxiosError<any>
 ): MessageDescriptor => {
+  const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
   if (
-    error.response &&
-    error.response.data &&
-    error.response.data.code === 'project-creation/too-many-projects'
+    extractedStatusAndCode &&
+    extractedStatusAndCode.code === 'project-creation/too-many-projects'
   ) {
     return t`You've reached the limit of cloud projects you can have. Delete some existing cloud projects of yours before trying again.`;
   }

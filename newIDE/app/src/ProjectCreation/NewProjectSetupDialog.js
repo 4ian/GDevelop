@@ -52,6 +52,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -277,10 +278,12 @@ const NewProjectSetupDialog = ({
         );
         setGeneratingProjectId(generatedProject.id);
       } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
         if (
-          error.response &&
-          error.response.data &&
-          error.response.data.code === 'project-generation/quota-exceeded'
+          extractedStatusAndCode &&
+          extractedStatusAndCode.code === 'project-generation/quota-exceeded'
         ) {
           setGenerationPrompt('');
           // Fetch the limits again to show the warning about quota.

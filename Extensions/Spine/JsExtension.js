@@ -352,7 +352,7 @@ module.exports = {
 
       onRemovedFromScene() {
         super.onRemovedFromScene();
-        this._pixiObject.destroy(true);
+        this._pixiObject.destroy({ children: true });
       }
 
       /**

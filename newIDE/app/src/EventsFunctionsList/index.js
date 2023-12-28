@@ -1046,7 +1046,7 @@ const EventsFunctionsList = React.forwardRef<
                 value={searchText}
                 onRequestSearch={() => {}}
                 onChange={text => setSearchText(text)}
-                placeholder={t`Search objects`}
+                placeholder={t`Search functions`}
               />
             </Column>
           </LineStackLayout>

@@ -1263,13 +1263,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   (this._editorNavigator = editorNavigator)
                 }
                 editors={editors}
-                initialEditorName={'functions-lists'}
+                initialEditorName={'functions-list'}
                 transitions={{
                   'events-sheet': {
                     nextIcon: <Tune />,
                     nextLabel: <Trans>Parameters</Trans>,
                     nextEditor: 'parameters',
-                    previousEditor: () => 'functions-lists',
+                    previousEditor: () => 'functions-list',
                   },
                   parameters: {
                     nextIcon: <Mark />,

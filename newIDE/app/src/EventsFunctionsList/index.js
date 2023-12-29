@@ -826,6 +826,30 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
+    const objectTreeViewItems = mapFor(
+      0,
+      eventBasedObjects.size(),
+      i =>
+        new ObjectTreeViewItem(
+          new ObjectTreeViewItemContent(
+            eventBasedObjects.at(i),
+            eventObjectProps
+          ),
+          eventFunctionProps
+        )
+    );
+    const behaviorTreeViewItems = mapFor(
+      0,
+      eventBasedBehaviors.size(),
+      i =>
+        new BehaviorTreeViewItem(
+          new BehaviorTreeViewItemContent(
+            eventBasedBehaviors.at(i),
+            eventBehaviorProps
+          ),
+          eventFunctionProps
+        )
+    );
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         return [
@@ -842,28 +866,16 @@ const EventsFunctionsList = React.forwardRef<
               ]
             ),
             getChildren(): ?Array<TreeViewItem> {
-              if (eventBasedObjects.size() === 0) {
-                return [
-                  new PlaceHolderTreeViewItem(
-                    new PlaceHolderTreeViewItemContent(
-                      extensionObjectsEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new object.`)
-                    )
-                  ),
-                ];
-              }
-              return mapFor(
-                0,
-                eventBasedObjects.size(),
-                i =>
-                  new ObjectTreeViewItem(
-                    new ObjectTreeViewItemContent(
-                      eventBasedObjects.at(i),
-                      eventObjectProps
+              return objectTreeViewItems.length === 0
+                ? [
+                    new PlaceHolderTreeViewItem(
+                      new PlaceHolderTreeViewItemContent(
+                        extensionObjectsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new object.`)
+                      )
                     ),
-                    eventFunctionProps
-                  )
-              );
+                  ]
+                : objectTreeViewItems;
             },
           },
           {
@@ -879,28 +891,16 @@ const EventsFunctionsList = React.forwardRef<
               ]
             ),
             getChildren(): ?Array<TreeViewItem> {
-              if (eventBasedBehaviors.size() === 0) {
-                return [
-                  new PlaceHolderTreeViewItem(
-                    new PlaceHolderTreeViewItemContent(
-                      extensionBehaviorsEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new behavior.`)
-                    )
-                  ),
-                ];
-              }
-              return mapFor(
-                0,
-                eventBasedBehaviors.size(),
-                i =>
-                  new BehaviorTreeViewItem(
-                    new BehaviorTreeViewItemContent(
-                      eventBasedBehaviors.at(i),
-                      eventBehaviorProps
+              return behaviorTreeViewItems.length === 0
+                ? [
+                    new PlaceHolderTreeViewItem(
+                      new PlaceHolderTreeViewItemContent(
+                        extensionBehaviorsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new behavior.`)
+                      )
                     ),
-                    eventFunctionProps
-                  )
-              );
+                  ]
+                : behaviorTreeViewItems;
             },
           },
           {
@@ -1009,6 +1009,8 @@ const EventsFunctionsList = React.forwardRef<
       extensionObjectsRootFolderId,
       extensionBehaviorsRootFolderId,
       extensionFunctionsRootFolderId,
+      ...objectTreeViewItems.map(item => item.content.getId()),
+      ...behaviorTreeViewItems.map(item => item.content.getId()),
     ];
 
     const arrowKeyNavigationProps = React.useMemo(

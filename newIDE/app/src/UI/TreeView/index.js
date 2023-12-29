@@ -28,6 +28,7 @@ export type ItemBaseAttributes = {
 type FlattenedNode<Item> = {|
   id: string,
   name: string | React.Node,
+  leftComponent: ?React.Node,
   hasChildren: boolean,
   canHaveChildren: boolean,
   extraClass: string,
@@ -122,6 +123,7 @@ type Props<Item> = {|
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
+  renderLeftComponent: Item => ?React.Node,
   /**
    * Callback called when a folder is collapsed (folded).
    */
@@ -159,6 +161,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     getItemDataset,
     onEditItem,
     buildMenuTemplate,
+    renderLeftComponent,
     selectedItems,
     onSelectItems,
     multiSelect,
@@ -226,6 +229,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
+      const leftComponent = renderLeftComponent(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
         animatedItemId && id === animatedItemId ? 'animate' : '';
@@ -251,6 +255,7 @@ const TreeView = <Item: ItemBaseAttributes>(
           {
             id,
             name,
+            leftComponent,
             hasChildren: !!children && children.length > 0,
             canHaveChildren,
             depth,

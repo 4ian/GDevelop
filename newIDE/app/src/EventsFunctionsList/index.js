@@ -95,6 +95,7 @@ export interface TreeViewItemContent {
   getDataset(): ?HTMLDataset;
   onSelect(): void;
   buildMenuTemplate(i18n: I18nType, index: number): any;
+  renderLeftComponent(i18n: I18nType): ?React.Node;
   rename(newName: string): void;
   edit(): void;
   getIndex(): number;
@@ -267,6 +268,10 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
     return [];
   }
 
+  renderLeftComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
   rename(newName: string): void {}
 
   edit(): void {}
@@ -335,6 +340,10 @@ class RootTreeViewItemContent implements TreeViewItemContent {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
+  renderLeftComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
   rename(newName: string): void {}
 
   edit(): void {}
@@ -358,6 +367,9 @@ const buildMenuTemplate = (i18n: I18nType) => (
   item: TreeViewItem,
   index: number
 ) => item.content.buildMenuTemplate(i18n, index);
+const renderTreeViewItemLeftComponent = (i18n: I18nType) => (
+  item: TreeViewItem
+) => item.content.renderLeftComponent(i18n);
 const renameItem = (item: TreeViewItem, newName: string) => {
   item.content.rename(newName);
 };
@@ -1091,6 +1103,9 @@ const EventsFunctionsList = React.forwardRef<
                       }}
                       onRenameItem={renameItem}
                       buildMenuTemplate={buildMenuTemplate(i18n)}
+                      renderLeftComponent={renderTreeViewItemLeftComponent(
+                        i18n
+                      )}
                       onMoveSelectionToItem={(destinationItem, where) =>
                         moveSelectionTo(i18n, destinationItem, where)
                       }

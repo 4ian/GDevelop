@@ -18,6 +18,10 @@ const gd: libGDevelop = global.gd;
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
+const styles = {
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
+};
+
 export type EventObjectCallbacks = {|
   onSelectEventsBasedObject: (eventsBasedObject: ?gdEventsBasedObject) => void,
   onDeleteEventsBasedObject: (
@@ -148,6 +152,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         click: () => this._pasteEventsBasedObject(index + 1),
       },
     ];
+  }
+
+  renderLeftComponent(i18n: I18nType): ?React.Node {
+    return null;
   }
 
   _deleteEventsBasedObject = (

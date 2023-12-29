@@ -1,6 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -13,10 +14,16 @@ import {
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { TreeViewItemContent, type TreeItemProps } from '.';
 import { getFunctionTreeViewItemId } from './FunctionTreeViewItemContent';
+import Tooltip from '@material-ui/core/Tooltip';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 
 const gd: libGDevelop = global.gd;
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
+
+const styles = {
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
+};
 
 export const getBehaviorTreeViewItemId = (
   eventsBasedBehavior: gdEventsBasedBehavior
@@ -162,6 +169,18 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
         click: () => this._pasteEventsBasedBehavior(index + 1),
       },
     ];
+  }
+
+  renderLeftComponent(i18n: I18nType): ?React.Node {
+    return this.behavior.isPrivate() ? (
+      <Tooltip
+        title={
+          <Trans>This behavior won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOff fontSize="small" style={styles.tooltip} />
+      </Tooltip>
+    ) : null;
   }
 
   _deleteEventsBasedBehavior = (

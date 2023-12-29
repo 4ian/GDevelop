@@ -342,6 +342,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   <ListIcon iconSize={20} src={node.thumbnailSrc} />
                 </div>
               ) : null}
+              {node.leftComponent}
               {renamedItemId === node.id && typeof node.name === 'string' ? (
                 <SemiControlledRowInput
                   initialValue={node.name}

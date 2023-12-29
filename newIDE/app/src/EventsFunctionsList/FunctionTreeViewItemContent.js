@@ -1,6 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -12,10 +13,17 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { TreeViewItemContent, type TreeItemProps } from '.';
+import Tooltip from '@material-ui/core/Tooltip';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import AsyncIcon from '@material-ui/icons/SyncAlt';
 
 const gd: libGDevelop = global.gd;
 
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
+
+const styles = {
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
+};
 
 export type EventsFunctionCreationParameters = {|
   functionType: 0 | 1 | 2,
@@ -228,6 +236,39 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
         click: () => this._duplicateEventsFunction(eventsFunction, index + 1),
       },
     ];
+  }
+
+  renderLeftComponent(i18n: I18nType): ?React.Node {
+    const privateIcon = this.eventFunction.isPrivate() ? (
+      <Tooltip
+        title={
+          <Trans>This function won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOff fontSize="small" style={styles.tooltip} />
+      </Tooltip>
+    ) : null;
+    const asyncIcon = this.eventFunction.isAsync() ? (
+      <Tooltip
+        title={
+          <Trans>
+            This function is asynchronous - it will only allow subsequent events
+            to run after calling the action "End asynchronous task" within the
+            function.
+          </Trans>
+        }
+      >
+        <AsyncIcon fontSize="small" style={styles.tooltip} />
+      </Tooltip>
+    ) : null;
+    return privateIcon && asyncIcon ? (
+      <>
+        {privateIcon}
+        {asyncIcon}
+      </>
+    ) : (
+      privateIcon || asyncIcon
+    );
   }
 
   _togglePrivate = (eventsFunction: gdEventsFunction) => {

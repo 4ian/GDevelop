@@ -123,7 +123,7 @@ type Props<Item> = {|
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
-  renderLeftComponent: Item => ?React.Node,
+  renderLeftComponent?: Item => ?React.Node,
   /**
    * Callback called when a folder is collapsed (folded).
    */
@@ -229,7 +229,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
-      const leftComponent = renderLeftComponent(item);
+      const leftComponent = renderLeftComponent ? renderLeftComponent(item) : null;
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
         animatedItemId && id === animatedItemId ? 'animate' : '';

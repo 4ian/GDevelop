@@ -542,7 +542,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             this._editorMosaic.collapseEditor('parameters');
           }
           if (this._editorNavigator)
-          this._editorNavigator.openEditor('events-sheet');
+            this._editorNavigator.openEditor('events-sheet');
         }
       }
     );
@@ -1147,7 +1147,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'events-sheet': {
         type: 'primary',
-        noTitleBar: selectedEventsFunction,
+        noTitleBar: !!selectedEventsFunction,
         title: selectedEventsBasedBehavior
           ? t`Behavior Configuration`
           : selectedEventsBasedObject

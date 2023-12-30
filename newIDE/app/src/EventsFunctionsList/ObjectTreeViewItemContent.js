@@ -39,6 +39,7 @@ export type EventObjectCallbacks = {|
 export type EventObjectProps = {|
   ...TreeItemProps,
   ...EventObjectCallbacks,
+  addNewEventsFunction: (itemContent: TreeViewItemContent) => void,
   eventsBasedObjectsList: gdEventsBasedObjectsList,
 |};
 
@@ -113,6 +114,13 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   buildMenuTemplate(i18n: I18nType, index: number) {
     const eventsBasedObject = this.object;
     return [
+      {
+        label: i18n._(t`Add a function`),
+        click: () => this.props.addNewEventsFunction(this),
+      },
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),

@@ -526,19 +526,24 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     const addNewEventsFunction = React.useCallback(
-      () => {
-        const selectedItem = selectedItems[0];
-        const eventsFunctionsContainer = selectedItem
-          ? selectedItem.content.getEventsFunctionsContainer() ||
+      (itemContent: ?TreeViewItemContent) => {
+        const eventsFunctionsContainer = itemContent
+          ? itemContent.getEventsFunctionsContainer() ||
             eventsFunctionsExtension
           : eventsFunctionsExtension;
 
-        const eventsBasedBehavior = selectedItem
-          ? selectedItem.content.getEventsBasedBehavior()
+        const eventsBasedBehavior = itemContent
+          ? itemContent.getEventsBasedBehavior()
           : null;
-        const eventsBasedObject = selectedItem
-          ? selectedItem.content.getEventsBasedObject()
+        if (eventsBasedBehavior) {
+          onSelectEventsBasedBehavior(eventsBasedBehavior);
+        }
+        const eventsBasedObject = itemContent
+          ? itemContent.getEventsBasedObject()
           : null;
+        if (eventsBasedObject) {
+          onSelectEventsBasedObject(eventsBasedObject);
+        }
 
         onAddEventsFunction(
           eventsBasedBehavior,
@@ -609,10 +614,11 @@ const EventsFunctionsList = React.forwardRef<
         forceUpdate,
         onAddEventsFunction,
         onEventsFunctionAdded,
+        onSelectEventsBasedBehavior,
+        onSelectEventsBasedObject,
         onSelectEventsFunction,
         project,
         scrollToItem,
-        selectedItems,
         unsavedChanges,
       ]
     );
@@ -804,8 +810,10 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsBasedBehavior,
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
+        addNewEventsFunction,
       }),
       [
+        addNewEventsFunction,
         editName,
         eventBasedBehaviors,
         eventsFunctionsExtension,
@@ -836,20 +844,22 @@ const EventsFunctionsList = React.forwardRef<
         onDeleteEventsBasedObject,
         onRenameEventsBasedObject,
         onEventsBasedObjectRenamed,
+        addNewEventsFunction,
       }),
       [
-        editName,
+        project,
         eventsFunctionsExtension,
         eventBasedObjects,
+        unsavedChanges,
         forceUpdate,
         forceUpdateList,
-        onDeleteEventsBasedObject,
-        onEventsBasedObjectRenamed,
-        onRenameEventsBasedObject,
-        onSelectEventsBasedObject,
-        project,
+        editName,
         scrollToItem,
-        unsavedChanges,
+        onSelectEventsBasedObject,
+        onDeleteEventsBasedObject,
+        onRenameEventsBasedObject,
+        onEventsBasedObjectRenamed,
+        addNewEventsFunction,
       ]
     );
 
@@ -936,7 +946,7 @@ const EventsFunctionsList = React.forwardRef<
               {
                 icon: <Add />,
                 label: i18n._(t`Add a function`),
-                click: addNewEventsFunction,
+                click: () => addNewEventsFunction(null),
               }
             ),
             getChildren(): ?Array<TreeViewItem> {
@@ -1142,7 +1152,11 @@ const EventsFunctionsList = React.forwardRef<
             <ResponsiveRaisedButton
               label={<Trans>Add a new function</Trans>}
               primary
-              onClick={addNewEventsFunction}
+              onClick={() =>
+                addNewEventsFunction(
+                  selectedItems.length === 0 ? null : selectedItems[0].content
+                )
+              }
               id="add-new-function-button"
               icon={<Add />}
             />

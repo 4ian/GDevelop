@@ -475,8 +475,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     ) {
       this._selectEventsFunction(
         null,
-        this.state.selectedEventsBasedBehavior,
-        this.state.selectedEventsBasedObject
+        null,
+        null
       );
     }
 

@@ -33,7 +33,6 @@ export const Default = () => (
         onDeleteEventsBasedObject={(eventsBasedObject, cb) => cb(true)}
         onRenameEventsBasedObject={(eventsBasedObject, newName, cb) => cb(true)}
         onEventsBasedObjectRenamed={eventsBasedObject => {}}
-        onEditEventsBasedObjectProperties={eventsBasedObject => {}}
         // Behaviors
         onSelectEventsBasedBehavior={eventsBasedBehavior => {}}
         onDeleteEventsBasedBehavior={(eventsBasedBehavior, cb) => cb(true)}
@@ -44,9 +43,6 @@ export const Default = () => (
         onEventsBasedBehaviorPasted={(
           eventsBasedBehavior,
           sourceExtensionName
-        ) => {}}
-        onEditEventsBasedBehaviorProperties={(
-          eventsBasedBehavior: gdEventsBasedBehavior
         ) => {}}
         // Free functions
         onSelectEventsFunction={action('select')}

@@ -34,9 +34,6 @@ export type EventObjectCallbacks = {|
     cb: (boolean) => void
   ) => void,
   onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
-  onEditEventsBasedObjectProperties: (
-    eventsBasedObject: gdEventsBasedObject
-  ) => void,
 |};
 
 export type EventObjectProps = {|
@@ -96,7 +93,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  onSelect(): void {}
+  onSelect(): void {
+    this.props.onSelectEventsBasedObject(this.object);
+  }
 
   rename(newName: string): void {
     if (this.object.getName() === newName) return;
@@ -109,21 +108,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  edit(): void {
-    this.props.onEditEventsBasedObjectProperties(this.object);
-  }
+  edit(): void {}
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     const eventsBasedObject = this.object;
     return [
-      {
-        label: i18n._(t`Properties`),
-        click: () =>
-          this.props.onEditEventsBasedObjectProperties(eventsBasedObject),
-      },
-      {
-        type: 'separator',
-      },
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),

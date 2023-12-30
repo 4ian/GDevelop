@@ -23,7 +23,6 @@ export const Default = () => (
       globalObjectsContainer={testProject.emptyObjectsContainer}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedObject={testProject.testEventsBasedObject}
-      onApply={action('apply')}
       onRenameProperty={action('property rename')}
     />
   </DragAndDropContextProvider>

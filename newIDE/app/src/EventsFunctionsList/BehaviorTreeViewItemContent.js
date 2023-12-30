@@ -51,9 +51,6 @@ export type EventBehaviorCallbacks = {|
     eventsBasedBehavior: gdEventsBasedBehavior,
     sourceExtensionName: string
   ) => void,
-  onEditEventsBasedBehaviorProperties: (
-    eventsBasedBehavior: gdEventsBasedBehavior
-  ) => void,
 |};
 
 export type EventBehaviorProps = {|
@@ -107,7 +104,9 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  onSelect(): void {}
+  onSelect(): void {
+    this.props.onSelectEventsBasedBehavior(this.behavior);
+  }
 
   rename(newName: string): void {
     if (this.behavior.getName() === newName) return;
@@ -120,21 +119,11 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  edit(): void {
-    this.props.onEditEventsBasedBehaviorProperties(this.behavior);
-  }
+  edit(): void {}
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     const eventsBasedBehavior = this.behavior;
     return [
-      {
-        label: i18n._(t`Properties`),
-        click: () =>
-          this.props.onEditEventsBasedBehaviorProperties(eventsBasedBehavior),
-      },
-      {
-        type: 'separator',
-      },
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),

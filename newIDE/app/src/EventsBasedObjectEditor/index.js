@@ -10,6 +10,8 @@ import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Checkbox from '../UI/Checkbox';
+import HelpButton from '../UI/HelpButton';
+import { Column, Line, Spacer } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -101,6 +103,9 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
           </Trans>
         </DismissableAlertMessage>
       )}
+      <Line noMargin>
+        <HelpButton key="help" helpPagePath="/objects/events-based-objects" />
+      </Line>
     </ColumnStackLayout>
   );
 }

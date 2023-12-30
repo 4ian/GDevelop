@@ -12,6 +12,8 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import HelpButton from '../UI/HelpButton';
+import { Column, Line, Spacer } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -133,6 +135,12 @@ export default function EventsBasedBehaviorEditor({
               </Trans>
             </DismissableAlertMessage>
           )}
+          <Line noMargin>
+            <HelpButton
+              key="help"
+              helpPagePath="/behaviors/events-based-behaviors"
+            />
+          </Line>
         </ColumnStackLayout>
       )}
     </I18n>

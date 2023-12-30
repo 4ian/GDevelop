@@ -1147,7 +1147,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'events-sheet': {
         type: 'primary',
-        noTitleBar: !!selectedEventsFunction,
+        noTitleBar:
+          !!selectedEventsFunction ||
+          (!selectedEventsBasedBehavior && !selectedEventsBasedObject),
         title: selectedEventsBasedBehavior
           ? t`Behavior Configuration`
           : selectedEventsBasedObject

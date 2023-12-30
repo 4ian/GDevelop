@@ -517,8 +517,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           if (this._editorMosaic) {
             this._editorMosaic.collapseEditor('parameters');
           }
-          if (this._editorNavigator)
-            this._editorNavigator.openEditor('behavior-functions-list');
+          if (this._editorNavigator) {
+            this._editorNavigator.openEditor('events-sheet');
+          }
         }
       }
     );
@@ -541,7 +542,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             this._editorMosaic.collapseEditor('parameters');
           }
           if (this._editorNavigator)
-            this._editorNavigator.openEditor('behavior-functions-list');
+          this._editorNavigator.openEditor('events-sheet');
         }
       }
     );

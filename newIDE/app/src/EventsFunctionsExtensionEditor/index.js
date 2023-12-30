@@ -1365,14 +1365,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       mosaicContainsNode(
                         getDefaultEditorMosaicNode(
                           'events-functions-extension-editor'
-                        ) ||
-                          getInitialMosaicEditorNodes(),
+                        ) || getInitialMosaicEditorNodes(),
                         'functions-list'
                       )
                         ? getDefaultEditorMosaicNode(
                             'events-functions-extension-editor'
-                          ) ||
-                          getInitialMosaicEditorNodes()
+                          ) || getInitialMosaicEditorNodes()
                         : // Force the mosaic to reset to default.
                           getInitialMosaicEditorNodes()
                     }

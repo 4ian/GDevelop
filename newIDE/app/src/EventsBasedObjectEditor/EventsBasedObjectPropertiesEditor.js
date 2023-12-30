@@ -25,6 +25,8 @@ import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapT
 import Visibility from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,75 +74,93 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
   return extraInfoVector.toJSArray();
 };
 
-export default class EventsBasedObjectPropertiesEditor extends React.Component<
-  Props,
-  {||}
-> {
-  _addProperty = () => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
+export default function EventsBasedObjectPropertiesEditor({
+  project,
+  extension,
+  eventsBasedObject,
+  onPropertiesUpdated,
+  onRenameProperty,
+}: Props) {
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
 
-    const newName = newNameGenerator('Property', name => properties.has(name));
-    const property = properties.insertNew(newName, properties.getCount());
-    property.setType('Number');
-    this.forceUpdate();
-    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
-  };
+  const forceUpdate = useForceUpdate();
 
-  _removeProperty = (name: string) => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
+  const addProperty = React.useCallback(
+    () => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    properties.remove(name);
-    this.forceUpdate();
-    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
-  };
-
-  _moveProperty = (oldIndex: number, newIndex: number) => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
-
-    properties.move(oldIndex, newIndex);
-    this.forceUpdate();
-    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
-  };
-
-  _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
-    return (newExtraInfo: Array<string>) => {
-      const defaultValueIndex = getExtraInfoArray(property).indexOf(
-        property.getValue()
+      const newName = newNameGenerator('Property', name =>
+        properties.has(name)
       );
-      const vectorString = new gd.VectorString();
-      newExtraInfo.forEach(item => vectorString.push_back(item));
-      property.setExtraInfo(vectorString);
-      vectorString.delete();
-      property.setValue(newExtraInfo[defaultValueIndex] || '');
-      this.forceUpdate();
-    };
-  };
+      const property = properties.insertNew(newName, properties.getCount());
+      property.setType('Number');
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
 
-  _getPropertyGroupNames = (): Array<string> => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
+  const removeProperty = React.useCallback(
+    (name: string) => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    const groupNames = new Set<string>();
-    for (let i = 0; i < properties.size(); i++) {
-      const property = properties.at(i);
-      const group = property.getGroup() || '';
-      groupNames.add(group);
-    }
-    return [...groupNames].sort((a, b) => a.localeCompare(b));
-  };
+      properties.remove(name);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
 
-  render() {
-    const { eventsBasedObject } = this.props;
+  const moveProperty = React.useCallback(
+    (oldIndex: number, newIndex: number) => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    const properties = eventsBasedObject.getPropertyDescriptors();
+      properties.move(oldIndex, newIndex);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <Column noMargin expand>
+  const setChoiceExtraInfo = React.useCallback(
+    (property: gdNamedPropertyDescriptor) => {
+      return (newExtraInfo: Array<string>) => {
+        const defaultValueIndex = getExtraInfoArray(property).indexOf(
+          property.getValue()
+        );
+        const vectorString = new gd.VectorString();
+        newExtraInfo.forEach(item => vectorString.push_back(item));
+        property.setExtraInfo(vectorString);
+        vectorString.delete();
+        property.setValue(newExtraInfo[defaultValueIndex] || '');
+        forceUpdate();
+      };
+    },
+    [forceUpdate]
+  );
+
+  const getPropertyGroupNames = React.useCallback(
+    (): Array<string> => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
+
+      const groupNames = new Set<string>();
+      for (let i = 0; i < properties.size(); i++) {
+        const property = properties.at(i);
+        const group = property.getGroup() || '';
+        groupNames.add(group);
+      }
+      return [...groupNames].sort((a, b) => a.localeCompare(b));
+    },
+    [eventsBasedObject]
+  );
+
+  const properties = eventsBasedObject.getPropertyDescriptors();
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Column noMargin expand useFullHeight>
+          <ScrollView ref={scrollView}>
             <Line noMargin>
               <div style={styles.propertiesContainer}>
                 {mapVector(
@@ -162,15 +182,14 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 properties,
                                 newName
                               );
-                              this.props.onRenameProperty(
+                              onRenameProperty(
                                 property.getName(),
                                 validatedNewName
                               );
                               property.setName(validatedNewName);
 
-                              this.forceUpdate();
-                              this.props.onPropertiesUpdated &&
-                                this.props.onPropertiesUpdated();
+                              forceUpdate();
+                              onPropertiesUpdated && onPropertiesUpdated();
                             }}
                             fullWidth
                           />
@@ -186,9 +205,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           checked={!property.isHidden()}
                           onCheck={(e, checked) => {
                             property.setHidden(!checked);
-                            this.forceUpdate();
-                            this.props.onPropertiesUpdated &&
-                              this.props.onPropertiesUpdated();
+                            forceUpdate();
+                            onPropertiesUpdated && onPropertiesUpdated();
                           }}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
@@ -202,31 +220,30 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           buildMenuTemplate={(i18n: I18nType) => [
                             {
                               label: i18n._(t`Delete`),
-                              click: () =>
-                                this._removeProperty(property.getName()),
+                              click: () => removeProperty(property.getName()),
                             },
                             { type: 'separator' },
                             {
                               label: i18n._(t`Move up`),
-                              click: () => this._moveProperty(i, i - 1),
+                              click: () => moveProperty(i, i - 1),
                               enabled: i - 1 >= 0,
                             },
                             {
                               label: i18n._(t`Move down`),
-                              click: () => this._moveProperty(i, i + 1),
+                              click: () => moveProperty(i, i + 1),
                               enabled: i + 1 < properties.getCount(),
                             },
                             {
                               label: i18n._(t`Generate expression and action`),
                               click: () =>
                                 gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
-                                  this.props.project,
-                                  this.props.extension,
-                                  this.props.eventsBasedObject,
+                                  project,
+                                  extension,
+                                  eventsBasedObject,
                                   property
                                 ),
                               enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
-                                this.props.eventsBasedObject,
+                                eventsBasedObject,
                                 property
                               ),
                             },
@@ -241,9 +258,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               value={property.getType()}
                               onChange={(e, i, value: string) => {
                                 property.setType(value);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
+                                forceUpdate();
+                                onPropertiesUpdated && onPropertiesUpdated();
                               }}
                               fullWidth
                             >
@@ -274,9 +290,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                       value
                                     )
                                   );
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated &&
-                                    this.props.onPropertiesUpdated();
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -318,9 +333,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 value={property.getValue()}
                                 onChange={newValue => {
                                   property.setValue(newValue);
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated &&
-                                    this.props.onPropertiesUpdated();
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
                                 }}
                                 fullWidth
                               />
@@ -335,9 +349,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 }
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated &&
-                                    this.props.onPropertiesUpdated();
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -357,9 +370,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 value={property.getValue()}
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated &&
-                                    this.props.onPropertiesUpdated();
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -378,7 +390,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           {property.getType() === 'Choice' && (
                             <StringArrayEditor
                               extraInfo={getExtraInfoArray(property)}
-                              setExtraInfo={this._setChoiceExtraInfo(property)}
+                              setExtraInfo={setChoiceExtraInfo(property)}
                             />
                           )}
                           {property.getType() === 'Color' && (
@@ -389,9 +401,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               color={property.getValue()}
                               onChange={color => {
                                 property.setValue(color);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
+                                forceUpdate();
+                                onPropertiesUpdated && onPropertiesUpdated();
                               }}
                             />
                           )}
@@ -404,7 +415,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               value={property.getLabel()}
                               onChange={text => {
                                 property.setLabel(text);
-                                this.forceUpdate();
+                                forceUpdate();
                               }}
                               fullWidth
                             />
@@ -415,16 +426,13 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               value={property.getGroup()}
                               onChange={text => {
                                 property.setGroup(text);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
+                                forceUpdate();
+                                onPropertiesUpdated && onPropertiesUpdated();
                               }}
-                              dataSource={this._getPropertyGroupNames().map(
-                                name => ({
-                                  text: name,
-                                  value: name,
-                                })
-                              )}
+                              dataSource={getPropertyGroupNames().map(name => ({
+                                text: name,
+                                value: name,
+                              }))}
                               openOnFocus={true}
                             />
                           </ResponsiveLineStackLayout>
@@ -436,7 +444,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                             value={property.getDescription()}
                             onChange={text => {
                               property.setDescription(text);
-                              this.forceUpdate();
+                              forceUpdate();
                             }}
                             fullWidth
                           />
@@ -459,16 +467,16 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                     <RaisedButton
                       primary
                       label={<Trans>Add a property</Trans>}
-                      onClick={this._addProperty}
+                      onClick={addProperty}
                       icon={<Add />}
                     />
                   </Line>
                 </Column>
               </div>
             </Line>
-          </Column>
-        )}
-      </I18n>
-    );
-  }
+          </ScrollView>
+        </Column>
+      )}
+    </I18n>
+  );
 }

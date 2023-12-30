@@ -429,6 +429,7 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   unsavedChanges?: ?UnsavedChanges,
+  shouldShowEventBasedObjectsEditor: boolean,
   // Objects
   selectedEventsBasedObject: ?gdEventsBasedObject,
   ...EventObjectCallbacks,
@@ -449,6 +450,7 @@ const EventsFunctionsList = React.forwardRef<
       project,
       eventsFunctionsExtension,
       unsavedChanges,
+      shouldShowEventBasedObjectsEditor,
       onSelectEventsFunction,
       onDeleteEventsFunction,
       canRename,
@@ -890,30 +892,32 @@ const EventsFunctionsList = React.forwardRef<
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         return [
-          {
-            isRoot: true,
-            content: new RootTreeViewItemContent(
-              extensionObjectsRootFolderId,
-              i18n._(t`Objects`),
-              {
-                icon: <Add />,
-                label: i18n._(t`Add an object`),
-                click: addNewEventsObject,
+          shouldShowEventBasedObjectsEditor
+            ? {
+                isRoot: true,
+                content: new RootTreeViewItemContent(
+                  extensionObjectsRootFolderId,
+                  i18n._(t`Objects`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Add an object`),
+                    click: addNewEventsObject,
+                  }
+                ),
+                getChildren(): ?Array<TreeViewItem> {
+                  return objectTreeViewItems.length === 0
+                    ? [
+                        new PlaceHolderTreeViewItem(
+                          new PlaceHolderTreeViewItemContent(
+                            extensionObjectsEmptyPlaceholderId,
+                            i18n._(t`Start by adding a new object.`)
+                          )
+                        ),
+                      ]
+                    : objectTreeViewItems;
+                },
               }
-            ),
-            getChildren(): ?Array<TreeViewItem> {
-              return objectTreeViewItems.length === 0
-                ? [
-                    new PlaceHolderTreeViewItem(
-                      new PlaceHolderTreeViewItemContent(
-                        extensionObjectsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new object.`)
-                      )
-                    ),
-                  ]
-                : objectTreeViewItems;
-            },
-          },
+            : null,
           {
             isRoot: true,
             content: new RootTreeViewItemContent(
@@ -977,7 +981,7 @@ const EventsFunctionsList = React.forwardRef<
               );
             },
           },
-        ];
+        ].filter(Boolean);
       },
       [
         addNewEventsBehavior,
@@ -987,6 +991,7 @@ const EventsFunctionsList = React.forwardRef<
         eventFunctionProps,
         eventsFunctionsExtension,
         objectTreeViewItems,
+        shouldShowEventBasedObjectsEditor,
       ]
     );
 

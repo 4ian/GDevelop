@@ -28,6 +28,7 @@ export const Default = () => (
         selectedEventsFunction={testProject.testEventsFunctionsExtension.getEventsFunctionAt(
           1
         )}
+        shouldShowEventBasedObjectsEditor={true}
         // Objects
         onSelectEventsBasedObject={eventsBasedObject => {}}
         onDeleteEventsBasedObject={(eventsBasedObject, cb) => cb(true)}

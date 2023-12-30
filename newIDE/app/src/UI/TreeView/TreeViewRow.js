@@ -374,6 +374,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             itemRow = connectDragPreview(itemRow);
           }
 
+          const rightButton = node.rightButton;
+
           const dragSource = connectDragSource(
             <div className="full-space-container">
               {isOver && whereToDrop === 'before' && (
@@ -388,7 +390,23 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 {...longTouchForContextMenuProps}
               >
                 {itemRow}
-                {!isMobileScreen &&
+                {rightButton && (
+                  <div className="row-content-side row-content-side-right">
+                    <IconButton
+                      size="small"
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (rightButton.click) {
+                          rightButton.click();
+                        }
+                      }}
+                    >
+                      {rightButton.icon}
+                    </IconButton>
+                  </div>
+                )}
+                {!rightButton &&
+                  !isMobileScreen &&
                   !node.item.isRoot &&
                   !node.item.isPlaceholder && (
                     <div className="row-content-side row-content-side-right">

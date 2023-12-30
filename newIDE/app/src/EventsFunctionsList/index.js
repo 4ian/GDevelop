@@ -20,7 +20,10 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import TreeView, { type TreeViewInterface } from '../UI/TreeView';
+import TreeView, {
+  type TreeViewInterface,
+  type MenuButton,
+} from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
@@ -65,6 +68,7 @@ import {
   type EventObjectCallbacks,
 } from './ObjectTreeViewItemContent';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -94,7 +98,8 @@ export interface TreeViewItemContent {
   getThumbnail(): ?string;
   getDataset(): ?HTMLDataset;
   onSelect(): void;
-  buildMenuTemplate(i18n: I18nType, index: number): any;
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
+  getRightButton(): ?MenuButton;
   renderLeftComponent(i18n: I18nType): ?React.Node;
   rename(newName: string): void;
   edit(): void;
@@ -268,6 +273,10 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
     return [];
   }
 
+  getRightButton(): ?MenuButton {
+    return null;
+  }
+
   renderLeftComponent(i18n: I18nType): ?React.Node {
     return null;
   }
@@ -286,16 +295,34 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
 class RootTreeViewItemContent implements TreeViewItemContent {
   id: string;
   label: string | React.Node;
-  buildMenuTemplateFunction: (i18n: I18nType, index: number) => any;
+  buildMenuTemplateFunction: (
+    i18n: I18nType,
+    index: number
+  ) => Array<MenuItemTemplate>;
+  rightButton: MenuButton;
 
-  constructor(
-    id: string,
-    label: string | React.Node,
-    buildMenuTemplate: (i18n: I18nType, index: number) => any
-  ) {
+  constructor(id: string, label: string | React.Node, rightButton: MenuButton) {
     this.id = id;
     this.label = label;
-    this.buildMenuTemplateFunction = buildMenuTemplate;
+    this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => [
+      {
+        label: rightButton.label,
+        click: rightButton.click,
+      },
+    ];
+    this.rightButton = rightButton;
+  }
+
+  getName(): string | React.Node {
+    return this.label;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getRightButton(): ?MenuButton {
+    return this.rightButton;
   }
 
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
@@ -312,14 +339,6 @@ class RootTreeViewItemContent implements TreeViewItemContent {
 
   getEventsBasedObject(): ?gdEventsBasedObject {
     return null;
-  }
-
-  getName(): string | React.Node {
-    return this.label;
-  }
-
-  getId(): string {
-    return this.id;
   }
 
   getHtmlId(index: number): ?string {
@@ -376,6 +395,8 @@ const renameItem = (item: TreeViewItem, newName: string) => {
 const editItem = (item: TreeViewItem) => {
   item.content.edit();
 };
+const getTreeViewItemRightButton = (item: TreeViewItem) =>
+  item.content.getRightButton();
 
 const CLIPBOARD_KIND = 'Object';
 
@@ -870,12 +891,11 @@ const EventsFunctionsList = React.forwardRef<
             content: new RootTreeViewItemContent(
               extensionObjectsRootFolderId,
               i18n._(t`Objects`),
-              (i18n, index) => [
-                {
-                  label: i18n._(t`Add an object`),
-                  click: addNewEventsObject,
-                },
-              ]
+              {
+                icon: <Add />,
+                label: i18n._(t`Add an object`),
+                click: addNewEventsObject,
+              }
             ),
             getChildren(): ?Array<TreeViewItem> {
               return objectTreeViewItems.length === 0
@@ -895,12 +915,11 @@ const EventsFunctionsList = React.forwardRef<
             content: new RootTreeViewItemContent(
               extensionBehaviorsRootFolderId,
               i18n._(t`Behaviors`),
-              (i18n, index) => [
-                {
-                  label: i18n._(t`Add a behavior`),
-                  click: addNewEventsBehavior,
-                },
-              ]
+              {
+                icon: <Add />,
+                label: i18n._(t`Add a behavior`),
+                click: addNewEventsBehavior,
+              }
             ),
             getChildren(): ?Array<TreeViewItem> {
               return behaviorTreeViewItems.length === 0
@@ -920,7 +939,11 @@ const EventsFunctionsList = React.forwardRef<
             content: new RootTreeViewItemContent(
               extensionFunctionsRootFolderId,
               i18n._(t`Functions`),
-              (i18n, index) => []
+              {
+                icon: <Add />,
+                label: i18n._(t`Add a function`),
+                click: addNewEventsFunction,
+              }
             ),
             getChildren(): ?Array<TreeViewItem> {
               if (eventsFunctionsExtension.getEventsFunctionsCount() === 0) {
@@ -954,13 +977,12 @@ const EventsFunctionsList = React.forwardRef<
       },
       [
         addNewEventsBehavior,
+        addNewEventsFunction,
         addNewEventsObject,
-        eventBasedBehaviors,
-        eventBasedObjects,
-        eventBehaviorProps,
+        behaviorTreeViewItems,
         eventFunctionProps,
-        eventObjectProps,
         eventsFunctionsExtension,
+        objectTreeViewItems,
       ]
     );
 
@@ -1103,6 +1125,7 @@ const EventsFunctionsList = React.forwardRef<
                       }}
                       onRenameItem={renameItem}
                       buildMenuTemplate={buildMenuTemplate(i18n)}
+                      getItemRightButton={getTreeViewItemRightButton}
                       renderLeftComponent={renderTreeViewItemLeftComponent(
                         i18n
                       )}

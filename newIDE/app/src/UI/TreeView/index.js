@@ -25,10 +25,17 @@ export type ItemBaseAttributes = {
   +isPlaceholder?: boolean,
 };
 
+export type MenuButton = {|
+  icon: React.Node,
+  label: string,
+  click: ?() => void | Promise<void>,
+|};
+
 type FlattenedNode<Item> = {|
   id: string,
   name: string | React.Node,
   leftComponent: ?React.Node,
+  rightButton: ?MenuButton,
   hasChildren: boolean,
   canHaveChildren: boolean,
   extraClass: string,
@@ -123,6 +130,7 @@ type Props<Item> = {|
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
+  getItemRightButton?: Item => ?MenuButton,
   renderLeftComponent?: Item => ?React.Node,
   /**
    * Callback called when a folder is collapsed (folded).
@@ -161,6 +169,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     getItemDataset,
     onEditItem,
     buildMenuTemplate,
+    getItemRightButton,
     renderLeftComponent,
     selectedItems,
     onSelectItems,
@@ -229,7 +238,8 @@ const TreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
-      const leftComponent = renderLeftComponent ? renderLeftComponent(item) : null;
+      const leftComponent = renderLeftComponent && renderLeftComponent(item);
+      const rightButton = getItemRightButton && getItemRightButton(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
         animatedItemId && id === animatedItemId ? 'animate' : '';
@@ -256,6 +266,7 @@ const TreeView = <Item: ItemBaseAttributes>(
             id,
             name,
             leftComponent,
+            rightButton,
             hasChildren: !!children && children.length > 0,
             canHaveChildren,
             depth,
@@ -288,16 +299,18 @@ const TreeView = <Item: ItemBaseAttributes>(
       return [];
     },
     [
-      getItemChildren,
       getItemId,
-      getItemName,
-      getItemThumbnail,
-      getItemDataset,
-      openedDuringSearchNodeIds,
-      openedNodeIds,
-      selectedNodeIds,
+      getItemChildren,
       forceAllOpened,
+      openedNodeIds,
+      openedDuringSearchNodeIds,
+      getItemName,
+      renderLeftComponent,
+      getItemRightButton,
+      getItemDataset,
       animatedItemId,
+      getItemThumbnail,
+      selectedNodeIds,
     ]
   );
 

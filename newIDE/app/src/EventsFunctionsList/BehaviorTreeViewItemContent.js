@@ -319,4 +319,8 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.props.forceUpdate();
   }
+
+  getRightButton() {
+    return null;
+  }
 }

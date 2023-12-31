@@ -473,11 +473,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.state.selectedEventsFunction &&
       gd.compare(eventsFunction, this.state.selectedEventsFunction)
     ) {
-      this._selectEventsFunction(
-        null,
-        null,
-        null
-      );
+      this._selectEventsFunction(null, null, null);
     }
 
     cb(true);

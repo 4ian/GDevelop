@@ -163,7 +163,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
-        click: () => this._pasteEventsBasedBehavior(index + 1),
+        click: () => this._pasteEventsBasedBehavior(),
       },
     ];
   }
@@ -235,7 +235,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     });
   };
 
-  _pasteEventsBasedBehavior = (index: number) => {
+  _pasteEventsBasedBehavior = () => {
     if (!Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(
@@ -256,7 +256,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
 
     const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
       newName,
-      index
+      this.getIndex() + 1
     );
 
     unserializeFromJSObject(

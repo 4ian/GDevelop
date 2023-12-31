@@ -229,11 +229,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
-        click: () => this._pasteEventsFunction(index + 1),
+        click: () => this._pasteEventsFunction(),
       },
       {
         label: i18n._(t`Duplicate`),
-        click: () => this._duplicateEventsFunction(eventsFunction, index + 1),
+        click: () => this._duplicateEventsFunction(eventsFunction),
       },
     ];
   }
@@ -330,7 +330,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     this._deleteEventsFunction(eventsFunction, { askForConfirmation: false });
   };
 
-  _pasteEventsFunction = (index: number) => {
+  _pasteEventsFunction = () => {
     if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EVENTS_FUNCTION_CLIPBOARD_KIND);
@@ -349,7 +349,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
     const newEventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
       newName,
-      index
+      this.getIndex() + 1
     );
 
     unserializeFromJSObject(
@@ -372,17 +372,14 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     );
   };
 
-  _duplicateEventsFunction = (
-    eventsFunction: gdEventsFunction,
-    newFunctionIndex: number
-  ) => {
+  _duplicateEventsFunction = (eventsFunction: gdEventsFunction) => {
     const { eventsFunctionsContainer } = this.props;
     const newName = newNameGenerator(eventsFunction.getName(), name =>
       eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
     const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
       eventsFunction,
-      newFunctionIndex
+      this.getIndex() + 1
     );
     newEventsFunction.setName(newName);
     this.props.onEventsFunctionAdded(newEventsFunction);

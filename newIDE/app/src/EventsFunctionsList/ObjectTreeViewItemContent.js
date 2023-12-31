@@ -146,7 +146,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_BASED_OBJECT_CLIPBOARD_KIND),
-        click: () => this._pasteEventsBasedObject(index + 1),
+        click: () => this._pasteEventsBasedObject(),
       },
     ];
   }
@@ -204,7 +204,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     });
   };
 
-  _pasteEventsBasedObject = (index: number) => {
+  _pasteEventsBasedObject = () => {
     if (!Clipboard.has(EVENTS_BASED_OBJECT_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EVENTS_BASED_OBJECT_CLIPBOARD_KIND);
@@ -223,7 +223,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     const newEventsBasedObject = eventsBasedObjectsList.insertNew(
       newName,
-      index
+      this.getIndex() + 1
     );
 
     unserializeFromJSObject(

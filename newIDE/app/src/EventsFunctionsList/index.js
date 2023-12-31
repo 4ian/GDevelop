@@ -78,6 +78,8 @@ const extensionFunctionsRootFolderId = 'extension-functions';
 const extensionObjectsEmptyPlaceholderId = 'extension-objects-placeholder';
 const extensionBehaviorsEmptyPlaceholderId = 'extension-behaviors-placeholder';
 const extensionFunctionsEmptyPlaceholderId = 'extension-functions-placeholder';
+const eventBehaviorFunctionsEmptyPlaceholderId =
+  'events-behavior-functions-placeholder';
 
 const styles = {
   listContainer: {
@@ -115,7 +117,7 @@ interface TreeViewItem {
   isRoot?: boolean;
   isPlaceholder?: boolean;
   +content: TreeViewItemContent;
-  getChildren(): ?Array<TreeViewItem>;
+  getChildren(i18n: I18nType): ?Array<TreeViewItem>;
 }
 
 export type TreeItemProps = {|
@@ -140,7 +142,7 @@ class ObjectTreeViewItem implements TreeViewItem {
     this.eventFunctionProps = eventFunctionProps;
   }
 
-  getChildren(): ?Array<TreeViewItem> {
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     const eventsBasedObject = this.content.object;
     const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
     const eventFunctionProps = {
@@ -149,17 +151,27 @@ class ObjectTreeViewItem implements TreeViewItem {
       ...this.eventFunctionProps,
     };
     const functions = eventsBasedObject.getEventsFunctions();
-    return mapFor(
-      0,
-      functions.getEventsFunctionsCount(),
-      i =>
-        new LeafTreeViewItem(
-          new FunctionTreeViewItemContent(
-            functions.getEventsFunctionAt(i),
-            eventFunctionProps
-          )
-        )
-    );
+    const functionsCount = functions.getEventsFunctionsCount();
+    return functionsCount === 0
+      ? [
+          new PlaceHolderTreeViewItem(
+            new PlaceHolderTreeViewItemContent(
+              eventBehaviorFunctionsEmptyPlaceholderId,
+              i18n._(t`Start by adding a new function.`)
+            )
+          ),
+        ]
+      : mapFor(
+          0,
+          functions.getEventsFunctionsCount(),
+          i =>
+            new LeafTreeViewItem(
+              new FunctionTreeViewItemContent(
+                functions.getEventsFunctionAt(i),
+                eventFunctionProps
+              )
+            )
+        );
   }
 }
 
@@ -175,7 +187,7 @@ class BehaviorTreeViewItem implements TreeViewItem {
     this.eventFunctionProps = eventFunctionProps;
   }
 
-  getChildren(): ?Array<TreeViewItem> {
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     const eventsBasedBehavior = this.content.behavior;
     const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
     const eventFunctionProps = {
@@ -183,17 +195,27 @@ class BehaviorTreeViewItem implements TreeViewItem {
       eventsFunctionsContainer,
       ...this.eventFunctionProps,
     };
-    return mapFor(
-      0,
-      eventsFunctionsContainer.getEventsFunctionsCount(),
-      i =>
-        new LeafTreeViewItem(
-          new FunctionTreeViewItemContent(
-            eventsFunctionsContainer.getEventsFunctionAt(i),
-            eventFunctionProps
-          )
-        )
-    );
+    const functionsCount = eventsFunctionsContainer.getEventsFunctionsCount();
+    return functionsCount === 0
+      ? [
+          new PlaceHolderTreeViewItem(
+            new PlaceHolderTreeViewItemContent(
+              eventBehaviorFunctionsEmptyPlaceholderId,
+              i18n._(t`Start by adding a new function.`)
+            )
+          ),
+        ]
+      : mapFor(
+          0,
+          eventsFunctionsContainer.getEventsFunctionsCount(),
+          i =>
+            new LeafTreeViewItem(
+              new FunctionTreeViewItemContent(
+                eventsFunctionsContainer.getEventsFunctionAt(i),
+                eventFunctionProps
+              )
+            )
+        );
   }
 }
 
@@ -204,7 +226,7 @@ class LeafTreeViewItem implements TreeViewItem {
     this.content = content;
   }
 
-  getChildren(): ?Array<TreeViewItem> {
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     return null;
   }
 }
@@ -217,7 +239,7 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
     this.content = content;
   }
 
-  getChildren(): ?Array<TreeViewItem> {
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     return null;
   }
 }
@@ -378,7 +400,8 @@ const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
 const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
 const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
   item.content.getHtmlId(index);
-const getTreeViewItemChildren = (item: TreeViewItem) => item.getChildren();
+const getTreeViewItemChildren = (i18n: I18nType) => (item: TreeViewItem) =>
+  item.getChildren(i18n);
 const getTreeViewItemThumbnail = (item: TreeViewItem) =>
   item.content.getThumbnail();
 const getTreeViewItemData = (item: TreeViewItem) => item.content.getDataset();
@@ -904,7 +927,7 @@ const EventsFunctionsList = React.forwardRef<
                     click: addNewEventsObject,
                   }
                 ),
-                getChildren(): ?Array<TreeViewItem> {
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   return objectTreeViewItems.length === 0
                     ? [
                         new PlaceHolderTreeViewItem(
@@ -929,7 +952,7 @@ const EventsFunctionsList = React.forwardRef<
                 click: addNewEventsBehavior,
               }
             ),
-            getChildren(): ?Array<TreeViewItem> {
+            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
               return behaviorTreeViewItems.length === 0
                 ? [
                     new PlaceHolderTreeViewItem(
@@ -953,7 +976,7 @@ const EventsFunctionsList = React.forwardRef<
                 click: () => addNewEventsFunction(null),
               }
             ),
-            getChildren(): ?Array<TreeViewItem> {
+            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
               if (eventsFunctionsExtension.getEventsFunctionsCount() === 0) {
                 return [
                   new PlaceHolderTreeViewItem(
@@ -1116,7 +1139,7 @@ const EventsFunctionsList = React.forwardRef<
                       searchText={searchText}
                       getItemName={getTreeViewItemName}
                       getItemThumbnail={getTreeViewItemThumbnail}
-                      getItemChildren={getTreeViewItemChildren}
+                      getItemChildren={getTreeViewItemChildren(i18n)}
                       multiSelect={false}
                       getItemId={getTreeViewItemId}
                       getItemHtmlId={getTreeViewItemHtmlId}

@@ -67,6 +67,7 @@ export type ItemData<Item> = {|
   isMobileScreen: boolean,
   DragSourceAndDropTarget: any => React.Node,
   getItemHtmlId?: (Item, index: number) => ?string,
+  forceDefaultDraggingPreview?: boolean,
 |};
 
 const getItemProps = memoizeOne(
@@ -88,7 +89,8 @@ const getItemProps = memoizeOne(
     onEditItem?: Item => void,
     isMobileScreen: boolean,
     DragSourceAndDropTarget: any => React.Node,
-    getItemHtmlId?: (Item, index: number) => ?string
+    getItemHtmlId?: (Item, index: number) => ?string,
+    forceDefaultDraggingPreview?: boolean
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -103,6 +105,7 @@ const getItemProps = memoizeOne(
     isMobileScreen,
     DragSourceAndDropTarget,
     getItemHtmlId,
+    forceDefaultDraggingPreview,
   })
 );
 
@@ -153,6 +156,7 @@ type Props<Item> = {|
     onGetItemInside: (item: Item) => ?Item,
     onGetItemOutside: (item: Item) => ?Item,
   |},
+  forceDefaultDraggingPreview?: boolean,
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -182,6 +186,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     forceAllOpened,
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
+    forceDefaultDraggingPreview,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
@@ -541,7 +546,8 @@ const TreeView = <Item: ItemBaseAttributes>(
     onEditItem,
     isMobileScreen,
     DragSourceAndDropTarget,
-    getItemHtmlId
+    getItemHtmlId,
+    forceDefaultDraggingPreview
   );
 
   // Reset opened nodes during search when user stops searching

@@ -91,7 +91,7 @@ const styles = {
   autoSizer: { width: '100%' },
 };
 
-const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
+const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
 export interface TreeViewItemContent {
   getName(): string | React.Node;
@@ -420,28 +420,6 @@ const editItem = (item: TreeViewItem) => {
 };
 const getTreeViewItemRightButton = (item: TreeViewItem) =>
   item.content.getRightButton();
-
-const CLIPBOARD_KIND = 'Object';
-
-const getPasteLabel = (
-  i18n: I18nType,
-  { isGlobalObject, isFolder }: {| isGlobalObject: boolean, isFolder: boolean |}
-) => {
-  let translation = t`Paste`;
-  if (Clipboard.has(CLIPBOARD_KIND)) {
-    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-    const clipboardObjectName =
-      SafeExtractor.extractStringProperty(clipboardContent, 'name') || '';
-    translation = isGlobalObject
-      ? isFolder
-        ? t`Paste ${clipboardObjectName} as a Global Object inside folder`
-        : t`Paste ${clipboardObjectName} as a Global Object`
-      : isFolder
-      ? t`Paste ${clipboardObjectName} inside folder`
-      : t`Paste ${clipboardObjectName}`;
-  }
-  return i18n._(translation);
-};
 
 export type EventsFunctionsListInterface = {|
   forceUpdateList: () => void,
@@ -1165,9 +1143,10 @@ const EventsFunctionsList = React.forwardRef<
                         moveSelectionTo(i18n, destinationItem, where)
                       }
                       canMoveSelectionToItem={canMoveSelectionTo}
-                      reactDndType={objectWithContextReactDndType}
+                      reactDndType={extensionItemReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
+                      forceDefaultDraggingPreview
                     />
                   )}
                 </AutoSizer>

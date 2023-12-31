@@ -131,6 +131,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     isMobileScreen,
     DragSourceAndDropTarget,
     getItemHtmlId,
+    forceDefaultDraggingPreview,
   } = data;
   const node = flattenedData[index];
   const left = node.depth * 16;
@@ -241,6 +242,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       <DragSourceAndDropTarget
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
+
+          if (forceDefaultDraggingPreview) {
+            return {};
+          }
 
           // We return the item name and thumbnail to be used by the
           // drag preview if this is not a folder.

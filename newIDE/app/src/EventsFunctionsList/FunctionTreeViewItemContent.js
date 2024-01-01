@@ -99,6 +99,10 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     return this.props.eventsFunctionsContainer;
   }
 
+  getFunctionInsertionIndex(): number {
+    return this.getIndex() + 1;
+  }
+
   getEventsFunction(): ?gdEventsFunction {
     return this.eventFunction;
   }

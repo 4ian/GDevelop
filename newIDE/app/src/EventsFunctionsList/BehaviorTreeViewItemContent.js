@@ -74,6 +74,10 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     return this.behavior.getEventsFunctions();
   }
 
+  getFunctionInsertionIndex(): number {
+    return this.behavior.getEventsFunctions().getEventsFunctionsCount();
+  }
+
   getEventsFunction(): ?gdEventsFunction {
     return null;
   }

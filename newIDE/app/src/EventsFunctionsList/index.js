@@ -89,6 +89,7 @@ export interface TreeViewItemContent {
   moveAt(destinationIndex: number): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
+  getFunctionInsertionIndex(): number;
   getEventsFunction(): ?gdEventsFunction;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
   getEventsBasedObject(): ?gdEventsBasedObject;
@@ -238,6 +239,11 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
+  getFunctionInsertionIndex(): number {
+    // It's never used;
+    return 0;
+  }
+
   getEventsFunction(): ?gdEventsFunction {
     return null;
   }
@@ -337,6 +343,11 @@ class RootTreeViewItemContent implements TreeViewItemContent {
 
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
     return null;
+  }
+
+  getFunctionInsertionIndex(): number {
+    // It's never used;
+    return 0;
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -532,6 +543,8 @@ const EventsFunctionsList = React.forwardRef<
             eventsFunctionsExtension
           : eventsFunctionsExtension;
 
+        const index = itemContent && itemContent.getFunctionInsertionIndex();
+
         const eventsBasedBehavior = itemContent
           ? itemContent.getEventsBasedBehavior()
           : null;
@@ -561,7 +574,7 @@ const EventsFunctionsList = React.forwardRef<
 
             const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
               eventsFunctionName,
-              eventsFunctionsContainer.getEventsFunctionsCount()
+              index || eventsFunctionsContainer.getEventsFunctionsCount()
             );
             eventsFunction.setFunctionType(parameters.functionType);
 

@@ -59,6 +59,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this.object.getEventsFunctions();
   }
 
+  getFunctionInsertionIndex(): number {
+    return this.object.getEventsFunctions().getEventsFunctionsCount();
+  }
+
   getEventsFunction(): ?gdEventsFunction {
     return null;
   }

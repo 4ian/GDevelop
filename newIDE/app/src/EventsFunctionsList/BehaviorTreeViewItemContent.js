@@ -12,7 +12,11 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { TreeViewItemContent, type TreeItemProps } from '.';
+import {
+  TreeViewItemContent,
+  type TreeItemProps,
+  extensionBehaviorsRootFolderId,
+} from '.';
 import { getFunctionTreeViewItemId } from './FunctionTreeViewItemContent';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
@@ -83,6 +87,10 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
 
   getEventsBasedObject(): ?gdEventsBasedObject {
     return null;
+  }
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return itemContent.getId() === extensionBehaviorsRootFolderId;
   }
 
   getName(): string | React.Node {

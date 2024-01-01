@@ -12,7 +12,13 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { TreeViewItemContent, type TreeItemProps } from '.';
+import {
+  TreeViewItemContent,
+  type TreeItemProps,
+  extensionFunctionsRootFolderId,
+  extensionBehaviorsRootFolderId,
+  extensionObjectsRootFolderId,
+} from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import AsyncIcon from '@material-ui/icons/SyncAlt';
@@ -103,6 +109,19 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
   getEventsBasedObject(): ?gdEventsBasedObject {
     return this.props.eventsBasedObject;
+  }
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return (
+      itemContent.getEventsFunction() === null &&
+      (this.getEventsBasedBehavior() === itemContent.getEventsBasedBehavior() ||
+        this.getEventsBasedObject() === itemContent.getEventsBasedObject() ||
+        (this.getEventsBasedBehavior() &&
+          itemContent.getId() === extensionBehaviorsRootFolderId) ||
+        (this.getEventsBasedObject() &&
+          itemContent.getId() === extensionObjectsRootFolderId) ||
+        itemContent.getId() === extensionFunctionsRootFolderId)
+    );
   }
 
   getName(): string | React.Node {
@@ -362,7 +381,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     this.props.onEventsFunctionAdded(newEventsFunction);
 
     this._onEventsFunctionModified();
-    this.props.onSelectEventsFunction(newEventsFunction);
+    this.props.onSelectEventsFunction(
+      newEventsFunction,
+      this.props.eventsBasedBehavior,
+      this.props.eventsBasedObject
+    );
     this.props.editName(
       getFunctionTreeViewItemId(
         newEventsFunction,
@@ -385,7 +408,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     this.props.onEventsFunctionAdded(newEventsFunction);
 
     this._onEventsFunctionModified();
-    this.props.onSelectEventsFunction(newEventsFunction);
+    this.props.onSelectEventsFunction(
+      newEventsFunction,
+      this.props.eventsBasedBehavior,
+      this.props.eventsBasedObject
+    );
     this.props.editName(
       getFunctionTreeViewItemId(
         newEventsFunction,

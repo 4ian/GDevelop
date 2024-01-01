@@ -72,9 +72,9 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 const gd: libGDevelop = global.gd;
 
-const extensionObjectsRootFolderId = 'extension-objects';
-const extensionBehaviorsRootFolderId = 'extension-behaviors';
-const extensionFunctionsRootFolderId = 'extension-functions';
+export const extensionObjectsRootFolderId = 'extension-objects';
+export const extensionBehaviorsRootFolderId = 'extension-behaviors';
+export const extensionFunctionsRootFolderId = 'extension-functions';
 const extensionObjectsEmptyPlaceholderId = 'extension-objects-placeholder';
 const extensionBehaviorsEmptyPlaceholderId = 'extension-behaviors-placeholder';
 const extensionFunctionsEmptyPlaceholderId = 'extension-functions-placeholder';
@@ -107,6 +107,7 @@ export interface TreeViewItemContent {
   edit(): void;
   getIndex(): number;
   moveAt(destinationIndex: number): void;
+  isDescendantOf(itemContent: TreeViewItemContent): boolean;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
   getEventsFunction(): ?gdEventsFunction;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
@@ -312,6 +313,11 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   moveAt(destinationIndex: number): void {}
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    // It's not actually used.
+    return false;
+  }
 }
 
 class RootTreeViewItemContent implements TreeViewItemContent {
@@ -394,6 +400,10 @@ class RootTreeViewItemContent implements TreeViewItemContent {
   }
 
   moveAt(destinationIndex: number): void {}
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return false;
+  }
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -584,6 +594,13 @@ const EventsFunctionsList = React.forwardRef<
               eventsBasedObject
             );
 
+            if (treeViewRef.current) {
+              treeViewRef.current.openItems([
+                itemContent
+                  ? itemContent.getId()
+                  : extensionFunctionsRootFolderId,
+              ]);
+            }
             // Scroll to the new function.
             // Ideally, we'd wait for the list to be updated to scroll, but
             // to simplify the code, we just wait a few ms for a new render
@@ -646,6 +663,9 @@ const EventsFunctionsList = React.forwardRef<
           newEventsBasedBehavior
         );
 
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([behaviorItemId]);
+        }
         // Scroll to the new behavior.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
@@ -686,6 +706,9 @@ const EventsFunctionsList = React.forwardRef<
 
         const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
 
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([objectItemId]);
+        }
         // Scroll to the new function.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
@@ -716,13 +739,6 @@ const EventsFunctionsList = React.forwardRef<
         else forceUpdate();
       },
       [forceUpdate, forceUpdateList, unsavedChanges]
-    );
-
-    const selectObjectFolderOrObjectWithContext = React.useCallback(
-      (objectFolderOrObjectWithContext: ?TreeViewItem) => {
-        // TODO
-      },
-      []
     );
 
     const deleteObjectFolderOrObjectWithContext = React.useCallback(
@@ -1041,9 +1057,19 @@ const EventsFunctionsList = React.forwardRef<
      * Unselect item if one of the parent is collapsed (folded) so that the item
      * does not stay selected and not visible to the user.
      */
-    const onCollapseItem = React.useCallback((item: TreeViewItem) => {
-      // TODO
-    }, []);
+    const onCollapseItem = React.useCallback(
+      (item: TreeViewItem) => {
+        // TODO
+        if (selectedItems.length !== 1 || item.isPlaceholder) {
+          return;
+        }
+        if (selectedItems[0].content.isDescendantOf(item.content)) {
+          setSelectedItems([]);
+          onSelectEventsFunction(null, null, null);
+        }
+      },
+      [selectedItems, onSelectEventsFunction]
+    );
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -1126,10 +1152,9 @@ const EventsFunctionsList = React.forwardRef<
                       onCollapseItem={onCollapseItem}
                       selectedItems={selectedItems}
                       onSelectItems={items => {
-                        if (!items) selectObjectFolderOrObjectWithContext(null);
                         const itemToSelect = items[0];
-                        if (itemToSelect.isRoot) return;
                         if (!itemToSelect) return;
+                        if (itemToSelect.isRoot) return;
                         itemToSelect.content.onSelect();
                         setSelectedItems(items);
                       }}

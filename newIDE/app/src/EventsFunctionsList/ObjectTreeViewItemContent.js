@@ -11,7 +11,11 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { TreeViewItemContent, type TreeItemProps } from '.';
+import {
+  TreeViewItemContent,
+  type TreeItemProps,
+  extensionObjectsRootFolderId,
+} from '.';
 import { getFunctionTreeViewItemId } from './FunctionTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
@@ -72,6 +76,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
   getEventsBasedObject(): ?gdEventsBasedObject {
     return this.object;
+  }
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return itemContent.getId() === extensionObjectsRootFolderId;
   }
 
   getName(): string | React.Node {

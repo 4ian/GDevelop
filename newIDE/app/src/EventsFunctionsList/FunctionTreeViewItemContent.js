@@ -229,10 +229,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Delete`),
-        click: () =>
-          this._deleteEventsFunction(eventsFunction, {
-            askForConfirmation: true,
-          }),
+        click: () => this.delete(),
       },
       {
         type: 'separator',
@@ -299,6 +296,12 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     eventsFunction.setAsync(!eventsFunction.isAsync());
     this.props.forceUpdateList();
   };
+
+  delete(): void {
+    this._deleteEventsFunction(this.eventFunction, {
+      askForConfirmation: true,
+    });
+  }
 
   _deleteEventsFunction = (
     eventsFunction: gdEventsFunction,

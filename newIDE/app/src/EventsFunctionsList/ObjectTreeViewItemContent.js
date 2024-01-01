@@ -16,15 +16,8 @@ import {
   type TreeItemProps,
   extensionObjectsRootFolderId,
 } from '.';
-import { getFunctionTreeViewItemId } from './FunctionTreeViewItemContent';
-
-const gd: libGDevelop = global.gd;
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
-
-const styles = {
-  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
-};
 
 export type EventObjectCallbacks = {|
   onSelectEventsBasedObject: (eventsBasedObject: ?gdEventsBasedObject) => void,
@@ -135,10 +128,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Delete`),
-        click: () =>
-          this._deleteEventsBasedObject(eventsBasedObject, {
-            askForConfirmation: true,
-          }),
+        click: () => this.delete(),
       },
       {
         type: 'separator',
@@ -161,6 +151,12 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
   renderLeftComponent(i18n: I18nType): ?React.Node {
     return null;
+  }
+
+  delete(): void {
+    this._deleteEventsBasedObject(this.object, {
+      askForConfirmation: true,
+    });
   }
 
   _deleteEventsBasedObject = (

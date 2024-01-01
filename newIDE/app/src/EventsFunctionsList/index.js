@@ -8,28 +8,13 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
-import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
-import Window from '../Utils/Window';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
-import { showWarningBox } from '../UI/Messages/MessageBox';
-import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
-import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import TreeView, {
   type TreeViewInterface,
   type MenuButton,
 } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
@@ -38,19 +23,13 @@ import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
-import IconButton from '../UI/IconButton';
-import AddFolder from '../UI/CustomSvgIcons/AddFolder';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import Link from '../UI/Link';
-import { getHelpLink } from '../Utils/HelpLink';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import {
   FunctionTreeViewItemContent,
   getFunctionTreeViewItemId,
-  type EventFunctionProps,
   type EventFunctionCommonProps,
   type EventFunctionCallbacks,
   type EventsFunctionCreationParameters,
@@ -105,6 +84,7 @@ export interface TreeViewItemContent {
   renderLeftComponent(i18n: I18nType): ?React.Node;
   rename(newName: string): void;
   edit(): void;
+  delete(): void;
   getIndex(): number;
   moveAt(destinationIndex: number): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
@@ -308,6 +288,8 @@ class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
 
   edit(): void {}
 
+  delete(): void {}
+
   getIndex(): number {
     return 0;
   }
@@ -395,6 +377,8 @@ class RootTreeViewItemContent implements TreeViewItemContent {
 
   edit(): void {}
 
+  delete(): void {}
+
   getIndex(): number {
     return 0;
   }
@@ -427,6 +411,9 @@ const renameItem = (item: TreeViewItem, newName: string) => {
 };
 const editItem = (item: TreeViewItem) => {
   item.content.edit();
+};
+const deleteItem = (item: TreeViewItem) => {
+  item.content.delete();
 };
 const getTreeViewItemRightButton = (item: TreeViewItem) =>
   item.content.getRightButton();
@@ -741,13 +728,6 @@ const EventsFunctionsList = React.forwardRef<
       [forceUpdate, forceUpdateList, unsavedChanges]
     );
 
-    const deleteObjectFolderOrObjectWithContext = React.useCallback(
-      async (objectFolderOrObjectWithContext: ?TreeViewItem) => {
-        // TODO
-      },
-      []
-    );
-
     // Initialize keyboard shortcuts as empty.
     // onDelete callback is set outside because it deletes the selected
     // item (that is a props). As it is stored in a ref, the keyboard shortcut
@@ -757,19 +737,15 @@ const EventsFunctionsList = React.forwardRef<
         shortcutCallbacks: {},
       })
     );
-    React.useEffect(
-      () => {
-        if (keyboardShortcutsRef.current) {
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            deleteObjectFolderOrObjectWithContext(
-              // TODO
-              null
-            );
-          });
-        }
-      },
-      [deleteObjectFolderOrObjectWithContext]
-    );
+    React.useEffect(() => {
+      if (keyboardShortcutsRef.current) {
+        keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+          if (selectedItems.length > 0) {
+            deleteItem(selectedItems[0]);
+          }
+        });
+      }
+    }, [selectedItems]);
 
     const getClosestVisibleParent = (
       objectFolderOrObjectWithContext: TreeViewItem

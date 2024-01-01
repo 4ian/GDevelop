@@ -17,11 +17,8 @@ import {
   type TreeItemProps,
   extensionBehaviorsRootFolderId,
 } from '.';
-import { getFunctionTreeViewItemId } from './FunctionTreeViewItemContent';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
-
-const gd: libGDevelop = global.gd;
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -146,10 +143,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Delete`),
-        click: () =>
-          this._deleteEventsBasedBehavior(eventsBasedBehavior, {
-            askForConfirmation: true,
-          }),
+        click: () => this.delete(),
       },
       {
         label: eventsBasedBehavior.isPrivate()
@@ -186,6 +180,12 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
         <VisibilityOff fontSize="small" style={styles.tooltip} />
       </Tooltip>
     ) : null;
+  }
+
+  delete(): void {
+    this._deleteEventsBasedBehavior(this.behavior, {
+      askForConfirmation: true,
+    });
   }
 
   _deleteEventsBasedBehavior = (

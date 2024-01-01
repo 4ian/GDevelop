@@ -427,7 +427,6 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   unsavedChanges?: ?UnsavedChanges,
-  shouldShowEventBasedObjectsEditor: boolean,
   // Objects
   selectedEventsBasedObject: ?gdEventsBasedObject,
   ...EventObjectCallbacks,
@@ -448,7 +447,6 @@ const EventsFunctionsList = React.forwardRef<
       project,
       eventsFunctionsExtension,
       unsavedChanges,
-      shouldShowEventBasedObjectsEditor,
       onSelectEventsFunction,
       onDeleteEventsFunction,
       canRename,
@@ -474,7 +472,9 @@ const EventsFunctionsList = React.forwardRef<
       Array<TreeViewItem>
     >([]);
 
-    const preferences = React.useContext(PreferencesContext);
+    const { getShowEventBasedObjectsEditor } = React.useContext(
+      PreferencesContext
+    );
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
@@ -737,15 +737,18 @@ const EventsFunctionsList = React.forwardRef<
         shortcutCallbacks: {},
       })
     );
-    React.useEffect(() => {
-      if (keyboardShortcutsRef.current) {
-        keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-          if (selectedItems.length > 0) {
-            deleteItem(selectedItems[0]);
-          }
-        });
-      }
-    }, [selectedItems]);
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            if (selectedItems.length > 0) {
+              deleteItem(selectedItems[0]);
+            }
+          });
+        }
+      },
+      [selectedItems]
+    );
 
     const getClosestVisibleParent = (
       objectFolderOrObjectWithContext: TreeViewItem
@@ -885,7 +888,7 @@ const EventsFunctionsList = React.forwardRef<
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         return [
-          shouldShowEventBasedObjectsEditor
+          getShowEventBasedObjectsEditor()
             ? {
                 isRoot: true,
                 content: new RootTreeViewItemContent(
@@ -984,7 +987,7 @@ const EventsFunctionsList = React.forwardRef<
         eventFunctionProps,
         eventsFunctionsExtension,
         objectTreeViewItems,
-        shouldShowEventBasedObjectsEditor,
+        getShowEventBasedObjectsEditor,
       ]
     );
 

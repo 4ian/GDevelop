@@ -1241,67 +1241,54 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
-              <PreferencesContext.Consumer>
-                {({ getShowEventBasedObjectsEditor }) => (
-                  <EventsFunctionsListWithErrorBoundary
-                    project={project}
-                    eventsFunctionsExtension={eventsFunctionsExtension}
-                    unsavedChanges={this.props.unsavedChanges}
-                    // Free functions
-                    selectedEventsFunction={selectedEventsFunction}
-                    onSelectEventsFunction={(
-                      selectedEventsFunction,
-                      selectedEventsBasedBehavior,
-                      selectedEventsBasedObject
-                    ) =>
-                      this._selectEventsFunction(
-                        selectedEventsFunction,
-                        selectedEventsBasedBehavior,
-                        selectedEventsBasedObject
-                      )
-                    }
-                    onDeleteEventsFunction={this._onDeleteEventsFunction}
-                    canRename={(eventsFunction: gdEventsFunction) => {
-                      return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
-                        eventsFunction.getName()
-                      );
-                    }}
-                    onRenameEventsFunction={this._makeRenameFreeEventsFunction(
-                      i18n
-                    )}
-                    onAddEventsFunction={this._onAddEventsFunction}
-                    onEventsFunctionAdded={() => {}}
-                    // Behaviors
-                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
-                    onSelectEventsBasedBehavior={
-                      this._selectEventsBasedBehavior
-                    }
-                    onDeleteEventsBasedBehavior={
-                      this._onDeleteEventsBasedBehavior
-                    }
-                    onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
-                      i18n
-                    )}
-                    onEventsBasedBehaviorRenamed={
-                      this._onEventsBasedBehaviorRenamed
-                    }
-                    onEventsBasedBehaviorPasted={
-                      this._onEventsBasedBehaviorPasted
-                    }
-                    // Objects
-                    shouldShowEventBasedObjectsEditor={getShowEventBasedObjectsEditor()}
-                    selectedEventsBasedObject={selectedEventsBasedObject}
-                    onSelectEventsBasedObject={this._selectEventsBasedObject}
-                    onDeleteEventsBasedObject={this._onDeleteEventsBasedObject}
-                    onRenameEventsBasedObject={this._makeRenameEventsBasedObject(
-                      i18n
-                    )}
-                    onEventsBasedObjectRenamed={
-                      this._onEventsBasedObjectRenamed
-                    }
-                  />
+              <EventsFunctionsListWithErrorBoundary
+                project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
+                unsavedChanges={this.props.unsavedChanges}
+                // Free functions
+                selectedEventsFunction={selectedEventsFunction}
+                onSelectEventsFunction={(
+                  selectedEventsFunction,
+                  selectedEventsBasedBehavior,
+                  selectedEventsBasedObject
+                ) =>
+                  this._selectEventsFunction(
+                    selectedEventsFunction,
+                    selectedEventsBasedBehavior,
+                    selectedEventsBasedObject
+                  )
+                }
+                onDeleteEventsFunction={this._onDeleteEventsFunction}
+                canRename={(eventsFunction: gdEventsFunction) => {
+                  return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+                    eventsFunction.getName()
+                  );
+                }}
+                onRenameEventsFunction={this._makeRenameFreeEventsFunction(
+                  i18n
                 )}
-              </PreferencesContext.Consumer>
+                onAddEventsFunction={this._onAddEventsFunction}
+                onEventsFunctionAdded={() => {}}
+                // Behaviors
+                selectedEventsBasedBehavior={selectedEventsBasedBehavior}
+                onSelectEventsBasedBehavior={this._selectEventsBasedBehavior}
+                onDeleteEventsBasedBehavior={this._onDeleteEventsBasedBehavior}
+                onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
+                  i18n
+                )}
+                onEventsBasedBehaviorRenamed={
+                  this._onEventsBasedBehaviorRenamed
+                }
+                onEventsBasedBehaviorPasted={this._onEventsBasedBehaviorPasted}
+                // Objects
+                selectedEventsBasedObject={selectedEventsBasedObject}
+                onSelectEventsBasedObject={this._selectEventsBasedObject}
+                onDeleteEventsBasedObject={this._onDeleteEventsBasedObject}
+                onRenameEventsBasedObject={this._makeRenameEventsBasedObject(
+                  i18n
+                )}
+                onEventsBasedObjectRenamed={this._onEventsBasedObjectRenamed}
+              />
             )}
           </I18n>
         ),

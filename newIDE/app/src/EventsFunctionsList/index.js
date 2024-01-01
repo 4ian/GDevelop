@@ -616,11 +616,6 @@ const EventsFunctionsList = React.forwardRef<
             forceUpdate();
 
             // We focus it so the user can edit the name directly.
-            onSelectEventsFunction(
-              eventsFunction,
-              eventsBasedBehavior,
-              eventsBasedObject
-            );
             if (canRename(eventsFunction)) {
               editName(functionItemId);
             }
@@ -636,7 +631,6 @@ const EventsFunctionsList = React.forwardRef<
         onEventsFunctionAdded,
         onSelectEventsBasedBehavior,
         onSelectEventsBasedObject,
-        onSelectEventsFunction,
         project,
         scrollToItem,
         unsavedChanges,
@@ -675,14 +669,12 @@ const EventsFunctionsList = React.forwardRef<
         }, 100); // A few ms is enough for a new render to be done.
 
         // We focus it so the user can edit the name directly.
-        onSelectEventsBasedBehavior(newEventsBasedBehavior);
         editName(behaviorItemId);
       },
       [
         editName,
         eventsFunctionsExtension,
         forceUpdate,
-        onSelectEventsBasedBehavior,
         scrollToItem,
         unsavedChanges,
       ]
@@ -718,19 +710,18 @@ const EventsFunctionsList = React.forwardRef<
         }, 100); // A few ms is enough for a new render to be done.
 
         // We focus it so the user can edit the name directly.
-        onSelectEventsBasedObject(newEventsBasedObject);
         editName(objectItemId);
       },
       [
         editName,
         eventsFunctionsExtension,
         forceUpdate,
-        onSelectEventsBasedObject,
         scrollToItem,
         unsavedChanges,
       ]
     );
 
+    // TODO
     const onObjectModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
         if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
@@ -763,9 +754,7 @@ const EventsFunctionsList = React.forwardRef<
       [selectedItems]
     );
 
-    const getClosestVisibleParent = (
-      objectFolderOrObjectWithContext: TreeViewItem
-    ): ?TreeViewItem => {
+    const getClosestVisibleParent = (item: TreeViewItem): ?TreeViewItem => {
       // TODO
       return null;
     };

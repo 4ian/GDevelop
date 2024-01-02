@@ -19,7 +19,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
 |};
 
-export default function EventsBasedBehaviorEditorDialog({
+export default function EventsBasedBehaviorEditorPanel({
   eventsBasedBehavior,
   eventsFunctionsExtension,
   project,

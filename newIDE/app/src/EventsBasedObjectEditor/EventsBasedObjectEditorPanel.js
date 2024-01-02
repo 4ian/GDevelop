@@ -21,7 +21,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
 |};
 
-export default function EventsBasedObjectEditorDialog({
+export default function EventsBasedObjectEditorPanel({
   project,
   globalObjectsContainer,
   eventsFunctionsExtension,

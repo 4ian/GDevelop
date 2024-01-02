@@ -13,8 +13,8 @@ import EventsFunctionsListWithErrorBoundary from '../EventsFunctionsList';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/FunctionTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
-import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
-import EventsBasedObjectEditorDialog from '../EventsBasedObjectEditor/EventsBasedObjectEditorDialog';
+import EventsBasedBehaviorEditorPanel from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
+import EventsBasedObjectEditorPanel from '../EventsBasedObjectEditor/EventsBasedObjectEditorPanel';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
@@ -1189,7 +1189,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               />
             </Background>
           ) : selectedEventsBasedBehavior ? (
-            <EventsBasedBehaviorEditorDialog
+            <EventsBasedBehaviorEditorPanel
               project={project}
               eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedBehavior={selectedEventsBasedBehavior}
@@ -1210,7 +1210,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               }
             />
           ) : selectedEventsBasedObject && this._globalObjectsContainer ? (
-            <EventsBasedObjectEditorDialog
+            <EventsBasedObjectEditorPanel
               project={project}
               globalObjectsContainer={this._globalObjectsContainer}
               eventsFunctionsExtension={eventsFunctionsExtension}

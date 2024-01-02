@@ -57,8 +57,6 @@ export const extensionFunctionsRootFolderId = 'extension-functions';
 const extensionObjectsEmptyPlaceholderId = 'extension-objects-placeholder';
 const extensionBehaviorsEmptyPlaceholderId = 'extension-behaviors-placeholder';
 const extensionFunctionsEmptyPlaceholderId = 'extension-functions-placeholder';
-const eventBehaviorFunctionsEmptyPlaceholderId =
-  'events-behavior-functions-placeholder';
 
 const styles = {
   listContainer: {
@@ -138,7 +136,8 @@ class ObjectTreeViewItem implements TreeViewItem {
       ? [
           new PlaceHolderTreeViewItem(
             new PlaceHolderTreeViewItemContent(
-              eventBehaviorFunctionsEmptyPlaceholderId,
+              'events-object-functions-placeholder.' +
+                eventsBasedObject.getName(),
               i18n._(t`Start by adding a new function.`)
             )
           ),
@@ -182,7 +181,8 @@ class BehaviorTreeViewItem implements TreeViewItem {
       ? [
           new PlaceHolderTreeViewItem(
             new PlaceHolderTreeViewItemContent(
-              eventBehaviorFunctionsEmptyPlaceholderId,
+              'events-behavior-functions-placeholder.' +
+                eventsBasedBehavior.getName(),
               i18n._(t`Start by adding a new function.`)
             )
           ),

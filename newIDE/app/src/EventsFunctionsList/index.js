@@ -824,7 +824,10 @@ const EventsFunctionsList = React.forwardRef<
         );
 
         if (treeViewRef.current) {
-          treeViewRef.current.openItems([behaviorItemId]);
+          treeViewRef.current.openItems([
+            behaviorItemId,
+            extensionBehaviorsRootFolderId,
+          ]);
         }
         // Scroll to the new behavior.
         // Ideally, we'd wait for the list to be updated to scroll, but
@@ -880,7 +883,10 @@ const EventsFunctionsList = React.forwardRef<
         const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
 
         if (treeViewRef.current) {
-          treeViewRef.current.openItems([objectItemId]);
+          treeViewRef.current.openItems([
+            objectItemId,
+            extensionObjectsRootFolderId,
+          ]);
         }
         // Scroll to the new function.
         // Ideally, we'd wait for the list to be updated to scroll, but

@@ -27,10 +27,18 @@ export default function EventsBasedObjectEditorDialog({
   eventsFunctionsExtension,
   eventsBasedObject,
   onRenameProperty,
-  // TODO Notify changes.
   unsavedChanges,
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
+
+  const onPropertiesUpdated = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+    },
+    [unsavedChanges]
+  );
 
   return (
     <Background>
@@ -58,7 +66,10 @@ export default function EventsBasedObjectEditorDialog({
           </Column>
         </Line>
         {currentTab === 'configuration' && (
-          <EventsBasedObjectEditor eventsBasedObject={eventsBasedObject} />
+          <EventsBasedObjectEditor
+            eventsBasedObject={eventsBasedObject}
+            unsavedChanges={unsavedChanges}
+          />
         )}
         {currentTab === 'properties' && (
           <EventsBasedObjectPropertiesEditor
@@ -66,6 +77,7 @@ export default function EventsBasedObjectEditorDialog({
             extension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             onRenameProperty={onRenameProperty}
+            onPropertiesUpdated={onPropertiesUpdated}
           />
         )}
         {currentTab === 'children' && (

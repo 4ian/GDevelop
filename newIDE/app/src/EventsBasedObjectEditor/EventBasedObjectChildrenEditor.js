@@ -17,6 +17,7 @@ import {
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,6 +26,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -236,6 +238,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   ObjectsRenderingService
                 )}
                 project={project}
+                unsavedChanges={this.props.unsavedChanges}
                 // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
                 objectsContainer={eventsBasedObject}
                 layout={null}

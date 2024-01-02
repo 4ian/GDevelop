@@ -25,10 +25,18 @@ export default function EventsBasedBehaviorEditorDialog({
   project,
   onRenameProperty,
   onRenameSharedProperty,
-  // TODO Notify changes.
   unsavedChanges,
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
+
+  const onPropertiesUpdated = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+    },
+    [unsavedChanges]
+  );
 
   return (
     <Background>
@@ -60,6 +68,7 @@ export default function EventsBasedBehaviorEditorDialog({
             project={project}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={eventsBasedBehavior}
+            unsavedChanges={unsavedChanges}
           />
         )}
         {currentTab === 'behavior-properties' && (
@@ -70,6 +79,7 @@ export default function EventsBasedBehaviorEditorDialog({
             properties={eventsBasedBehavior.getPropertyDescriptors()}
             onRenameProperty={onRenameProperty}
             behaviorObjectType={eventsBasedBehavior.getObjectType()}
+            onPropertiesUpdated={onPropertiesUpdated}
           />
         )}
         {currentTab === 'scene-properties' && (
@@ -80,6 +90,7 @@ export default function EventsBasedBehaviorEditorDialog({
             eventsBasedBehavior={eventsBasedBehavior}
             properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
             onRenameProperty={onRenameSharedProperty}
+            onPropertiesUpdated={onPropertiesUpdated}
           />
         )}
       </Column>

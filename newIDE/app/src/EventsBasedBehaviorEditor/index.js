@@ -14,6 +14,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import HelpButton from '../UI/HelpButton';
 import { Column, Line, Spacer } from '../UI/Grid';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -21,14 +22,26 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 export default function EventsBasedBehaviorEditor({
   project,
   eventsFunctionsExtension,
   eventsBasedBehavior,
+  unsavedChanges,
 }: Props) {
   const forceUpdate = useForceUpdate();
+
+  const onChange = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
   // An array containing all the object types that are using the behavior
   const allObjectTypes: Array<string> = React.useMemo(
@@ -69,7 +82,7 @@ export default function EventsBasedBehaviorEditor({
             value={eventsBasedBehavior.getFullName()}
             onChange={text => {
               eventsBasedBehavior.setFullName(text);
-              forceUpdate();
+              onChange();
             }}
             fullWidth
           />
@@ -82,7 +95,7 @@ export default function EventsBasedBehaviorEditor({
             value={eventsBasedBehavior.getDescription()}
             onChange={text => {
               eventsBasedBehavior.setDescription(text);
-              forceUpdate();
+              onChange();
             }}
             multiline
             fullWidth
@@ -96,7 +109,7 @@ export default function EventsBasedBehaviorEditor({
             value={eventsBasedBehavior.getObjectType()}
             onChange={(objectType: string) => {
               eventsBasedBehavior.setObjectType(objectType);
-              forceUpdate();
+              onChange();
             }}
             allowedObjectTypes={
               allObjectTypes.length === 0

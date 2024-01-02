@@ -19,6 +19,8 @@ import {
 } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -146,10 +148,16 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
+        accelerator: getShortcutDisplayName(
+          this.props.preferences.values.userShortcutMap[
+            'RENAME_SCENE_OBJECT'
+          ] || defaultShortcuts.RENAME_SCENE_OBJECT
+        ),
       },
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
+        accelerator: 'Backspace',
       },
       {
         label: eventsBasedBehavior.isPrivate()

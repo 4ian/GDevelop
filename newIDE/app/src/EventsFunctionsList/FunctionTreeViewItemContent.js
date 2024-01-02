@@ -22,6 +22,8 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import AsyncIcon from '@material-ui/icons/SyncAlt';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 
 const gd: libGDevelop = global.gd;
 
@@ -208,6 +210,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
         enabled: this.props.canRename(eventsFunction),
+        accelerator: getShortcutDisplayName(
+          this.props.preferences.values.userShortcutMap[
+            'RENAME_SCENE_OBJECT'
+          ] || defaultShortcuts.RENAME_SCENE_OBJECT
+        ),
       },
       {
         label: eventsFunction.isPrivate()
@@ -224,6 +231,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
+        accelerator: 'Backspace',
       },
       {
         type: 'separator',

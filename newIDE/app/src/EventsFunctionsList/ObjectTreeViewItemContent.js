@@ -16,6 +16,8 @@ import {
   type TreeItemProps,
   extensionObjectsRootFolderId,
 } from '.';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -131,10 +133,16 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
+        accelerator: getShortcutDisplayName(
+          this.props.preferences.values.userShortcutMap[
+            'RENAME_SCENE_OBJECT'
+          ] || defaultShortcuts.RENAME_SCENE_OBJECT
+        ),
       },
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
+        accelerator: 'Backspace',
       },
       {
         type: 'separator',

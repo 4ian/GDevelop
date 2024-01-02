@@ -104,6 +104,7 @@ export type TreeItemProps = {|
   forceUpdate: () => void,
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  preferences: PreferencesContext,
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   editName: (itemId: string) => void,
@@ -483,9 +484,8 @@ const EventsFunctionsList = React.forwardRef<
       Array<TreeViewItem>
     >([]);
 
-    const { getShowEventBasedObjectsEditor } = React.useContext(
-      PreferencesContext
-    );
+    const preferences = React.useContext(PreferencesContext);
+    const { getShowEventBasedObjectsEditor } = preferences;
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
@@ -541,6 +541,7 @@ const EventsFunctionsList = React.forwardRef<
         project,
         eventsFunctionsExtension,
         unsavedChanges,
+        preferences,
         forceUpdate,
         forceUpdateList,
         editName,
@@ -563,6 +564,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsFunctionAdded,
         onRenameEventsFunction,
         onSelectEventsFunction,
+        preferences,
         project,
         scrollToItem,
         unsavedChanges,
@@ -717,6 +719,7 @@ const EventsFunctionsList = React.forwardRef<
         eventsFunctionsExtension,
         eventsBasedBehaviorsList: eventBasedBehaviors,
         unsavedChanges,
+        preferences,
         forceUpdate,
         forceUpdateList,
         editName,
@@ -740,6 +743,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedBehaviorRenamed,
         onRenameEventsBasedBehavior,
         onSelectEventsBasedBehavior,
+        preferences,
         project,
         scrollToItem,
         unsavedChanges,
@@ -752,6 +756,7 @@ const EventsFunctionsList = React.forwardRef<
         eventsFunctionsExtension,
         eventsBasedObjectsList: eventBasedObjects,
         unsavedChanges,
+        preferences,
         forceUpdate,
         forceUpdateList,
         editName,
@@ -767,6 +772,7 @@ const EventsFunctionsList = React.forwardRef<
         eventsFunctionsExtension,
         eventBasedObjects,
         unsavedChanges,
+        preferences,
         forceUpdate,
         forceUpdateList,
         editName,

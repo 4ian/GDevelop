@@ -1151,6 +1151,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           : selectedEventsBasedObject
           ? t`Object Configuration`
           : null,
+        toolbarControls: [],
         renderEditor: () =>
           selectedEventsFunction &&
           this._globalObjectsContainer &&

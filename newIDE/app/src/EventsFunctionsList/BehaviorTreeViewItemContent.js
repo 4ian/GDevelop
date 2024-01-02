@@ -29,7 +29,9 @@ const styles = {
 export const getBehaviorTreeViewItemId = (
   eventsBasedBehavior: gdEventsBasedBehavior
 ): string => {
-  return 'behaviors.' + eventsBasedBehavior.getName();
+  // Pointers are used because they stay the same even when the names are
+  // changed.
+  return 'behavior-' + eventsBasedBehavior.ptr;
 };
 
 export type EventBehaviorCallbacks = {|

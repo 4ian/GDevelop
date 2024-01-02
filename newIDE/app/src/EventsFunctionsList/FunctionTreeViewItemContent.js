@@ -73,17 +73,11 @@ export type EventFunctionProps = {|
 |};
 
 export const getFunctionTreeViewItemId = (
-  eventFunction: gdEventsFunction,
-  eventsBasedBehavior: ?gdEventsBasedBehavior,
-  eventsBasedObject: ?gdEventsBasedObject
+  eventFunction: gdEventsFunction
 ): string => {
-  return (
-    (eventsBasedBehavior
-      ? `behaviors.${eventsBasedBehavior.getName()}.`
-      : eventsBasedObject
-      ? `objects.${eventsBasedObject.getName()}.`
-      : '') + eventFunction.getName()
-  );
+  // Pointers are used because they stay the same even when the names are
+  // changed.
+  return `function-${eventFunction.ptr}`;
 };
 
 export class FunctionTreeViewItemContent implements TreeViewItemContent {
@@ -133,11 +127,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getId(): string {
-    return getFunctionTreeViewItemId(
-      this.eventFunction,
-      this.props.eventsBasedBehavior,
-      this.props.eventsBasedObject
-    );
+    return getFunctionTreeViewItemId(this.eventFunction);
   }
 
   getHtmlId(index: number): ?string {
@@ -393,13 +383,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedBehavior,
       this.props.eventsBasedObject
     );
-    this.props.editName(
-      getFunctionTreeViewItemId(
-        newEventsFunction,
-        this.props.eventsBasedBehavior,
-        this.props.eventsBasedObject
-      )
-    );
+    this.props.editName(getFunctionTreeViewItemId(newEventsFunction));
   };
 
   _duplicateEventsFunction = (eventsFunction: gdEventsFunction) => {
@@ -420,13 +404,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedBehavior,
       this.props.eventsBasedObject
     );
-    this.props.editName(
-      getFunctionTreeViewItemId(
-        newEventsFunction,
-        this.props.eventsBasedBehavior,
-        this.props.eventsBasedObject
-      )
-    );
+    this.props.editName(getFunctionTreeViewItemId(newEventsFunction));
   };
 
   _onEventsFunctionModified() {

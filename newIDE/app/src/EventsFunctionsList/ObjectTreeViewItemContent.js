@@ -43,7 +43,9 @@ export type EventObjectProps = {|
 export const getObjectTreeViewItemId = (
   eventsBasedObject: gdEventsBasedObject
 ): string => {
-  return 'objects.' + eventsBasedObject.getName();
+  // Pointers are used because they stay the same even when the names are
+  // changed.
+  return 'object-' + eventsBasedObject.ptr;
 };
 
 export class ObjectTreeViewItemContent implements TreeViewItemContent {

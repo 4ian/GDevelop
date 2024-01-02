@@ -7,18 +7,18 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
-import EventsBasedBehaviorEditorDialog from '../../../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
+import EventsBasedBehaviorEditorPanel from '../../../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export default {
   title: 'EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog',
-  component: EventsBasedBehaviorEditorDialog,
+  component: EventsBasedBehaviorEditorPanel,
   decorators: [muiDecorator],
 };
 
 export const Default = () => (
   <DragAndDropContextProvider>
-    <EventsBasedBehaviorEditorDialog
+    <EventsBasedBehaviorEditorPanel
       project={testProject.project}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
@@ -30,7 +30,7 @@ export const Default = () => (
 
 export const WithoutFunction = () => (
   <DragAndDropContextProvider>
-    <EventsBasedBehaviorEditorDialog
+    <EventsBasedBehaviorEditorPanel
       project={testProject.project}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}

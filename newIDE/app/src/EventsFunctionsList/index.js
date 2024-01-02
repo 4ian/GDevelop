@@ -657,11 +657,7 @@ const EventsFunctionsList = React.forwardRef<
               );
             }
 
-            const functionItemId = getFunctionTreeViewItemId(
-              eventsFunction,
-              eventsBasedBehavior,
-              eventsBasedObject
-            );
+            const functionItemId = getFunctionTreeViewItemId(eventsFunction);
 
             if (treeViewRef.current) {
               treeViewRef.current.openItems([

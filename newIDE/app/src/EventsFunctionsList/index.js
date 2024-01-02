@@ -17,7 +17,9 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import PreferencesContext, {
+  type Preferences,
+} from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
@@ -104,7 +106,7 @@ export type TreeItemProps = {|
   forceUpdate: () => void,
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
-  preferences: PreferencesContext,
+  preferences: Preferences,
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   editName: (itemId: string) => void,

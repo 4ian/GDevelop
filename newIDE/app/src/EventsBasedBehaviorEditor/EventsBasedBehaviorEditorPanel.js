@@ -5,7 +5,7 @@ import EventsBasedBehaviorEditor from './index';
 import { Tabs } from '../UI/Tabs';
 import EventsBasedBehaviorPropertiesEditor from './EventsBasedBehaviorPropertiesEditor';
 import Background from '../UI/Background';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 type TabName = 'configuration' | 'behavior-properties' | 'scene-properties';

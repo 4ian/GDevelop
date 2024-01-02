@@ -2,12 +2,11 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import EventsBasedObjectEditor from './index';
-import HelpButton from '../UI/HelpButton';
 import { Tabs } from '../UI/Tabs';
 import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
 import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import Background from '../UI/Background';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 type TabName = 'configuration' | 'properties' | 'children';

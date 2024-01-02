@@ -893,7 +893,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addObjectPositionXTween2');
 
-    // deprecated use the 3D Tween extension
+    // deprecated
     behavior
       .addAction(
         'AddObjectPositionZTween',
@@ -925,6 +925,38 @@ module.exports = {
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectPositionZTween');
+
+      behavior
+        .addAction(
+          'AddObjectPositionZTween2',
+          _('Tween object Z position'),
+          _(
+            'Tweens an object Z position (3D objects only) from its current Z position to a new one.'
+          ),
+          _(
+            'Tween the Z position of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+          ),
+          _('Position'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+        .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+        .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+        .addParameter('expression', _('To Z'), '', false)
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .addParameter(
+          'yesorno',
+          _('Destroy this object when tween finishes'),
+          '',
+          false
+        )
+        .setDefaultValue('no')
+        .getCodeExtraInformation()
+        .setFunctionName('addObjectPositionZTween2');
 
     // deprecated
     behavior
@@ -1079,6 +1111,38 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addObjectDepthTween');
 
+      behavior
+        .addAction(
+          'AddObjectDepthTween2',
+          _('Tween object depth'),
+          _(
+            'Tweens an object depth (suitable 3D objects only) from its current depth to a new one.'
+          ),
+          _(
+            'Tween the depth of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+          ),
+          _('Size'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+        .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+        .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+        .addParameter('expression', _('To depth'), '', false)
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .addParameter(
+          'yesorno',
+          _('Destroy this object when tween finishes'),
+          '',
+          false
+        )
+        .setDefaultValue('no')
+        .getCodeExtraInformation()
+        .setFunctionName('addObjectDepthTween2');
+
     // deprecated
     behavior
       .addAction(
@@ -1203,6 +1267,66 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addObjectAngleTween2');
 
+      behavior
+        .addScopedAction(
+          'AddObjectRotationXTween',
+          _('Tween object rotation on X axis'),
+          _('Tweens an object rotation on X axis from its current angle to a new one.'),
+          _(
+            'Tween the rotation on X axis of _PARAM0_ to _PARAM4_° with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+          ),
+          _('Angle'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+        .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+        .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+        .addParameter('expression', _('To angle (in degrees)'), '', false)
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .addParameter(
+          'yesorno',
+          _('Destroy this object when tween finishes'),
+          '',
+          false
+        )
+        .setDefaultValue('no')
+        .getCodeExtraInformation()
+        .setFunctionName('addObjectRotationXTween');
+
+        behavior
+          .addScopedAction(
+            'AddObjectRotationYTween',
+            _('Tween object rotation on Y axis'),
+            _('Tweens an object rotation on Y axis from its current angle to a new one.'),
+            _(
+              'Tween the rotation on Y axis of _PARAM0_ to _PARAM4_° with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+            ),
+            _('Angle'),
+            'JsPlatform/Extensions/tween_behavior24.png',
+            'JsPlatform/Extensions/tween_behavior32.png'
+          )
+          .addParameter('object', _('Object'), '', false)
+          .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+          .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+          .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+          .addParameter('expression', _('To angle (in degrees)'), '', false)
+          .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+          .setDefaultValue('linear')
+          .addParameter('expression', _('Duration (in seconds)'), '', false)
+          .addParameter(
+            'yesorno',
+            _('Destroy this object when tween finishes'),
+            '',
+            false
+          )
+          .setDefaultValue('no')
+          .getCodeExtraInformation()
+          .setFunctionName('addObjectRotationYTween');
+
     // deprecated
     behavior
       .addAction(
@@ -1239,6 +1363,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleTween');
 
+    // deprecated
     behavior
       .addScopedAction(
         'AddObjectScaleTween2',
@@ -1253,6 +1378,7 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
+      .setHidden()
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
@@ -1272,6 +1398,39 @@ module.exports = {
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleTween2');
+
+    behavior
+      .addScopedAction(
+        'AddObjectScaleTween3',
+        _('Tween object scale'),
+        _(
+          'Tweens an object scale from its current value to a new one (note: the scale can never be 0 or less).'
+        ),
+        _(
+          'Tween the scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ seconds as _PARAM2_'
+        ),
+        _('Size'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('expression', _('To scale'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .addParameter('yesorno', _('Scale from center of object'), '', false)
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectScaleTween3');
 
     // deprecated
     behavior

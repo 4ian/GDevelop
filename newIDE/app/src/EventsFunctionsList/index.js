@@ -15,8 +15,6 @@ import TreeView, {
 } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { getShortcutDisplayName } from '../KeyboardShortcuts';
-import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext, {
   type Preferences,
 } from '../MainFrame/Preferences/PreferencesContext';
@@ -914,8 +912,7 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    // TODO
-    const onObjectModified = React.useCallback(
+    const onTreeModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
         if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
 
@@ -946,11 +943,6 @@ const EventsFunctionsList = React.forwardRef<
       },
       [selectedItems]
     );
-
-    const getClosestVisibleParent = (item: TreeViewItem): ?TreeViewItem => {
-      // TODO
-      return null;
-    };
 
     const objectTreeViewItems = mapFor(
       0,
@@ -1119,8 +1111,9 @@ const EventsFunctionsList = React.forwardRef<
         selectedItem.content.moveAt(
           destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
         );
+        onTreeModified();
       },
-      [selectedItems]
+      [onTreeModified, selectedItems]
     );
 
     /**
@@ -1129,7 +1122,6 @@ const EventsFunctionsList = React.forwardRef<
      */
     const onCollapseItem = React.useCallback(
       (item: TreeViewItem) => {
-        // TODO
         if (selectedItems.length !== 1 || item.isPlaceholder) {
           return;
         }

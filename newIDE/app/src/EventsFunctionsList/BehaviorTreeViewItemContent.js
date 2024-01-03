@@ -202,16 +202,17 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  _deleteEventsBasedBehavior = (
+  async _deleteEventsBasedBehavior(
     eventsBasedBehavior: gdEventsBasedBehavior,
     { askForConfirmation }: {| askForConfirmation: boolean |}
-  ) => {
+  ): Promise<void> {
     const { eventsBasedBehaviorsList } = this.props;
 
     if (askForConfirmation) {
-      const answer = Window.showConfirmDialog(
-        "Are you sure you want to remove this behavior? This can't be undone."
-      );
+      const answer = await this.props.showDeleteConfirmation({
+        title: t`Remove behavior`,
+        message: t`Are you sure you want to remove this behavior? This can't be undone.`,
+      });
       if (!answer) return;
     }
 
@@ -221,7 +222,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       eventsBasedBehaviorsList.remove(eventsBasedBehavior.getName());
       this._onEventsBasedBehaviorModified();
     });
-  };
+  }
 
   _togglePrivate = (eventsBasedBehavior: gdEventsBasedBehavior) => {
     eventsBasedBehavior.setPrivate(!eventsBasedBehavior.isPrivate());

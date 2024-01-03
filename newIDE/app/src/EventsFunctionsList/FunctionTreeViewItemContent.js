@@ -305,16 +305,17 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  _deleteEventsFunction = (
+  async _deleteEventsFunction(
     eventsFunction: gdEventsFunction,
     { askForConfirmation }: {| askForConfirmation: boolean |}
-  ) => {
+  ): Promise<void> {
     const { eventsFunctionsContainer } = this.props;
 
     if (askForConfirmation) {
-      const answer = Window.showConfirmDialog(
-        "Are you sure you want to remove this function? This can't be undone."
-      );
+      const answer = await this.props.showDeleteConfirmation({
+        title: t`Remove function`,
+        message: t`Are you sure you want to remove this function? This can't be undone.`,
+      });
       if (!answer) return;
     }
 
@@ -324,7 +325,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
       this._onEventsFunctionModified();
     });
-  };
+  }
 
   getIndex(): number {
     return this.props.eventsFunctionsContainer.getEventsFunctionPosition(

@@ -48,6 +48,8 @@ import {
 } from './ObjectTreeViewItemContent';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -109,6 +111,9 @@ export type TreeItemProps = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   editName: (itemId: string) => void,
   scrollToItem: (itemId: string) => void,
+  showDeleteConfirmation: (
+    options: ShowConfirmDeleteDialogOptions
+  ) => Promise<boolean>,
 |};
 
 class ObjectTreeViewItem implements TreeViewItem {
@@ -493,6 +498,7 @@ const EventsFunctionsList = React.forwardRef<
     const forceUpdate = useForceUpdate();
     const windowWidth = useResponsiveWindowWidth();
     const isMobileScreen = windowWidth === 'small';
+    const { showDeleteConfirmation } = useAlertDialog();
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -544,6 +550,7 @@ const EventsFunctionsList = React.forwardRef<
         preferences,
         forceUpdate,
         forceUpdateList,
+        showDeleteConfirmation,
         editName,
         scrollToItem,
         onSelectEventsFunction,
@@ -567,6 +574,7 @@ const EventsFunctionsList = React.forwardRef<
         preferences,
         project,
         scrollToItem,
+        showDeleteConfirmation,
         unsavedChanges,
       ]
     );
@@ -722,6 +730,7 @@ const EventsFunctionsList = React.forwardRef<
         preferences,
         forceUpdate,
         forceUpdateList,
+        showDeleteConfirmation,
         editName,
         scrollToItem,
         onSelectEventsBasedBehavior,
@@ -746,6 +755,7 @@ const EventsFunctionsList = React.forwardRef<
         preferences,
         project,
         scrollToItem,
+        showDeleteConfirmation,
         unsavedChanges,
       ]
     );
@@ -759,6 +769,7 @@ const EventsFunctionsList = React.forwardRef<
         preferences,
         forceUpdate,
         forceUpdateList,
+        showDeleteConfirmation,
         editName,
         scrollToItem,
         onSelectEventsBasedObject,
@@ -775,6 +786,7 @@ const EventsFunctionsList = React.forwardRef<
         preferences,
         forceUpdate,
         forceUpdateList,
+        showDeleteConfirmation,
         editName,
         scrollToItem,
         onSelectEventsBasedObject,

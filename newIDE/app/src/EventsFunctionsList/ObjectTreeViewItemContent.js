@@ -173,16 +173,17 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  _deleteEventsBasedObject = (
+  async _deleteEventsBasedObject(
     eventsBasedObject: gdEventsBasedObject,
     { askForConfirmation }: {| askForConfirmation: boolean |}
-  ) => {
+  ): Promise<void> {
     const { eventsBasedObjectsList } = this.props;
 
     if (askForConfirmation) {
-      const answer = Window.showConfirmDialog(
-        "Are you sure you want to remove this object? This can't be undone."
-      );
+      const answer = await this.props.showDeleteConfirmation({
+        title: t`Remove object`,
+        message: t`Are you sure you want to remove this object? This can't be undone.`,
+      });
       if (!answer) return;
     }
 
@@ -192,7 +193,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       eventsBasedObjectsList.remove(eventsBasedObject.getName());
       this._onEventsBasedObjectModified();
     });
-  };
+  }
 
   getIndex(): number {
     return this.props.eventsBasedObjectsList.getPosition(this.object);

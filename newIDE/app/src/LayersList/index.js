@@ -130,8 +130,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
             }));
           } else {
             onRenameLayer(layerName, newName, doRename => {
-              if (doRename)
-                layersContainer.getLayer(layerName).setName(newName);
+              if (!doRename) return;
+              layersContainer.getLayer(layerName).setName(newName);
               gd.WholeProjectRefactorer.renameLayer(
                 project,
                 layersContainer,

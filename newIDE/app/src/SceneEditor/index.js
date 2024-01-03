@@ -878,7 +878,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string,
     done: boolean => void
   ) => {
-    this.props.initialInstances.moveInstancesToLayer(oldName, newName);
+    // Nothing to do, the callback is in charge of renaming the layer and moving the instances.
     done(true);
     this.forceUpdatePropertiesEditor();
   };

@@ -69,6 +69,8 @@ function YesNoCancelDialog(props: Props) {
           ]}
           maxWidth="xs"
           noMobileFullScreen
+          onRequestClose={props.onClickCancel}
+          onApply={props.onClickYes}
         >
           <MarkdownText translatableSource={props.message} isStandaloneText />
         </Dialog>

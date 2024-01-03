@@ -1111,7 +1111,7 @@ const EventsFunctionsList = React.forwardRef<
         selectedItem.content.moveAt(
           destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
         );
-        onTreeModified();
+        onTreeModified(true);
       },
       [onTreeModified, selectedItems]
     );

@@ -339,7 +339,6 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       // When moving the item down, it must not be counted.
       destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
     );
-    this.props.forceUpdateList();
   }
 
   _copyEventsFunction = (eventsFunction: gdEventsFunction) => {

@@ -79,6 +79,8 @@ function ConfirmDialog(props: Props) {
             actions={dialogActions}
             maxWidth="xs"
             noMobileFullScreen
+            onRequestClose={props.onDismiss}
+            onApply={props.onConfirm}
           >
             <MarkdownText translatableSource={props.message} isStandaloneText />
           </Dialog>

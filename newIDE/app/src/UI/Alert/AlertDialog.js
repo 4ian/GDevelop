@@ -39,6 +39,8 @@ function AlertDialog(props: Props) {
             />,
           ]}
           maxWidth="xs"
+          onRequestClose={props.onDismiss}
+          onApply={props.onDismiss}
         >
           <Text>{i18n._(props.message)}</Text>
         </Dialog>

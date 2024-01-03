@@ -1087,24 +1087,24 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     const canMoveSelectionTo = React.useCallback(
-      (destinationItem: TreeViewItem) =>
+      (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {
-          if (
-            item.content.getEventsFunction() &&
-            destinationItem.content.getEventsFunction()
-          ) {
+          if (item.content.getEventsFunction()) {
             // Functions from the same container
             return (
+              destinationItem.content.getEventsFunction() &&
               item.content.getEventsFunctionsContainer() ===
-              destinationItem.content.getEventsFunctionsContainer()
+                destinationItem.content.getEventsFunctionsContainer()
             );
           }
           // Behaviors or Objects
           return (
-            (item.content.getEventsBasedBehavior() &&
+            !destinationItem.content.getEventsFunction() &&
+            where !== 'inside' &&
+            ((item.content.getEventsBasedBehavior() &&
               destinationItem.content.getEventsBasedBehavior()) ||
-            (item.content.getEventsBasedObject() &&
-              destinationItem.content.getEventsBasedObject())
+              (item.content.getEventsBasedObject() &&
+                destinationItem.content.getEventsBasedObject()))
           );
         }),
       [selectedItems]

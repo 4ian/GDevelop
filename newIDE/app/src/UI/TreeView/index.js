@@ -61,7 +61,7 @@ export type ItemData<Item> = {|
     y: number,
   |}) => void,
   renamedItemId: ?string,
-  canDrop?: ?(Item) => boolean,
+  canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
   onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
   onEditItem?: Item => void,
   isMobileScreen: boolean,
@@ -84,7 +84,7 @@ const getItemProps = memoizeOne(
       x: number,
       y: number,
     |}) => void,
-    canDrop?: ?(Item) => boolean,
+    canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
     onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
     onEditItem?: Item => void,
     isMobileScreen: boolean,
@@ -148,7 +148,10 @@ type Props<Item> = {|
     destinationItem: Item,
     where: 'before' | 'inside' | 'after'
   ) => void,
-  canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
+  canMoveSelectionToItem?: ?(
+    destinationItem: Item,
+    where: 'before' | 'inside' | 'after'
+  ) => boolean,
   reactDndType: string,
   forceAllOpened?: boolean,
   initiallyOpenedNodeIds?: string[],

@@ -6,7 +6,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
-import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,

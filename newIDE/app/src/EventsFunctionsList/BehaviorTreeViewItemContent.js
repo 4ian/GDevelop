@@ -136,7 +136,6 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
   edit(): void {}
 
   buildMenuTemplate(i18n: I18nType, index: number) {
-    const eventsBasedBehavior = this.behavior;
     return [
       {
         label: i18n._(t`Add a function`),
@@ -160,21 +159,21 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
         accelerator: 'Backspace',
       },
       {
-        label: eventsBasedBehavior.isPrivate()
+        label: this.behavior.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
-        click: () => this._togglePrivate(eventsBasedBehavior),
+        click: () => this._togglePrivate(),
       },
       {
         type: 'separator',
       },
       {
         label: i18n._(t`Copy`),
-        click: () => this._copyEventsBasedBehavior(eventsBasedBehavior),
+        click: () => this._copyEventsBasedBehavior(),
       },
       {
         label: i18n._(t`Cut`),
-        click: () => this._cutEventsBasedBehavior(eventsBasedBehavior),
+        click: () => this._cutEventsBasedBehavior(),
       },
       {
         label: i18n._(t`Paste`),
@@ -197,15 +196,16 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this._deleteEventsBasedBehavior(this.behavior, {
+    this._deleteEventsBasedBehavior({
       askForConfirmation: true,
     });
   }
 
-  async _deleteEventsBasedBehavior(
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    { askForConfirmation }: {| askForConfirmation: boolean |}
-  ): Promise<void> {
+  async _deleteEventsBasedBehavior({
+    askForConfirmation,
+  }: {|
+    askForConfirmation: boolean,
+  |}): Promise<void> {
     const { eventsBasedBehaviorsList } = this.props;
 
     if (askForConfirmation) {
@@ -216,18 +216,18 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsBasedBehavior(eventsBasedBehavior, doRemove => {
+    this.props.onDeleteEventsBasedBehavior(this.behavior, doRemove => {
       if (!doRemove) return;
 
-      eventsBasedBehaviorsList.remove(eventsBasedBehavior.getName());
+      eventsBasedBehaviorsList.remove(this.behavior.getName());
       this._onEventsBasedBehaviorModified();
     });
   }
 
-  _togglePrivate = (eventsBasedBehavior: gdEventsBasedBehavior) => {
-    eventsBasedBehavior.setPrivate(!eventsBasedBehavior.isPrivate());
+  _togglePrivate(): void {
+    this.behavior.setPrivate(!this.behavior.isPrivate());
     this.props.forceUpdate();
-  };
+  }
 
   getIndex(): number {
     return this.props.eventsBasedBehaviorsList.getPosition(this.behavior);
@@ -242,22 +242,22 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  _copyEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+  _copyEventsBasedBehavior(): void {
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
-      eventsBasedBehavior: serializeToJSObject(eventsBasedBehavior),
-      name: eventsBasedBehavior.getName(),
+      eventsBasedBehavior: serializeToJSObject(this.behavior),
+      name: this.behavior.getName(),
       extensionName: this.props.eventsFunctionsExtension.getName(),
     });
-  };
+  }
 
-  _cutEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
-    this._copyEventsBasedBehavior(eventsBasedBehavior);
-    this._deleteEventsBasedBehavior(eventsBasedBehavior, {
+  _cutEventsBasedBehavior(): void {
+    this._copyEventsBasedBehavior();
+    this._deleteEventsBasedBehavior({
       askForConfirmation: false,
     });
-  };
+  }
 
-  _pasteEventsBasedBehavior = () => {
+  _pasteEventsBasedBehavior(): void {
     if (!Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(
@@ -303,9 +303,9 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     this._onEventsBasedBehaviorModified();
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
     this.props.editName(getBehaviorTreeViewItemId(newEventsBasedBehavior));
-  };
+  }
 
-  _addNewEventsBasedBehavior = () => {
+  _addNewEventsBasedBehavior(): void {
     const { eventsBasedBehaviorsList } = this.props;
 
     const name = newNameGenerator('MyBehavior', name =>
@@ -331,9 +331,9 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     // We focus it so the user can edit the name directly.
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
     this.props.editName(newEventsBasedBehaviorId);
-  };
+  }
 
-  _onEventsBasedBehaviorModified() {
+  _onEventsBasedBehaviorModified(): void {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.props.forceUpdate();

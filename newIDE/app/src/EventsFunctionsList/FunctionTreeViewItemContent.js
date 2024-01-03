@@ -204,12 +204,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   edit(): void {}
 
   buildMenuTemplate(i18n: I18nType, index: number) {
-    const eventsFunction = this.eventFunction;
     return [
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
-        enabled: this.props.canRename(eventsFunction),
+        enabled: this.props.canRename(this.eventFunction),
         accelerator: getShortcutDisplayName(
           this.props.preferences.values.userShortcutMap[
             'RENAME_SCENE_OBJECT'
@@ -217,16 +216,16 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
         ),
       },
       {
-        label: eventsFunction.isPrivate()
+        label: this.eventFunction.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
-        click: () => this._togglePrivate(eventsFunction),
+        click: () => this._togglePrivate(),
       },
       {
-        label: eventsFunction.isAsync()
+        label: this.eventFunction.isAsync()
           ? i18n._(t`Make synchronous`)
           : i18n._(t`Make asynchronous`),
-        click: () => this._toggleAsync(eventsFunction),
+        click: () => this._toggleAsync(),
       },
       {
         label: i18n._(t`Delete`),
@@ -238,11 +237,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Copy`),
-        click: () => this._copyEventsFunction(eventsFunction),
+        click: () => this._copyEventsFunction(),
       },
       {
         label: i18n._(t`Cut`),
-        click: () => this._cutEventsFunction(eventsFunction),
+        click: () => this._cutEventsFunction(),
       },
       {
         label: i18n._(t`Paste`),
@@ -251,7 +250,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Duplicate`),
-        click: () => this._duplicateEventsFunction(eventsFunction),
+        click: () => this._duplicateEventsFunction(),
       },
     ];
   }
@@ -289,26 +288,27 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     return icons.length > 0 ? icons : null;
   }
 
-  _togglePrivate = (eventsFunction: gdEventsFunction) => {
-    eventsFunction.setPrivate(!eventsFunction.isPrivate());
+  _togglePrivate(): void {
+    this.eventFunction.setPrivate(!this.eventFunction.isPrivate());
     this.props.forceUpdate();
-  };
+  }
 
-  _toggleAsync = (eventsFunction: gdEventsFunction) => {
-    eventsFunction.setAsync(!eventsFunction.isAsync());
+  _toggleAsync(): void {
+    this.eventFunction.setAsync(!this.eventFunction.isAsync());
     this.props.forceUpdateList();
-  };
+  }
 
   delete(): void {
-    this._deleteEventsFunction(this.eventFunction, {
+    this._deleteEventsFunction({
       askForConfirmation: true,
     });
   }
 
-  async _deleteEventsFunction(
-    eventsFunction: gdEventsFunction,
-    { askForConfirmation }: {| askForConfirmation: boolean |}
-  ): Promise<void> {
+  async _deleteEventsFunction({
+    askForConfirmation,
+  }: {|
+    askForConfirmation: boolean,
+  |}): Promise<void> {
     const { eventsFunctionsContainer } = this.props;
 
     if (askForConfirmation) {
@@ -319,10 +319,12 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsFunction(eventsFunction, doRemove => {
+    this.props.onDeleteEventsFunction(this.eventFunction, doRemove => {
       if (!doRemove) return;
 
-      eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
+      eventsFunctionsContainer.removeEventsFunction(
+        this.eventFunction.getName()
+      );
       this._onEventsFunctionModified();
     });
   }
@@ -342,19 +344,19 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  _copyEventsFunction = (eventsFunction: gdEventsFunction) => {
+  _copyEventsFunction(): void {
     Clipboard.set(EVENTS_FUNCTION_CLIPBOARD_KIND, {
-      eventsFunction: serializeToJSObject(eventsFunction),
-      name: eventsFunction.getName(),
+      eventsFunction: serializeToJSObject(this.eventFunction),
+      name: this.eventFunction.getName(),
     });
-  };
+  }
 
-  _cutEventsFunction = (eventsFunction: gdEventsFunction) => {
-    this._copyEventsFunction(eventsFunction);
-    this._deleteEventsFunction(eventsFunction, { askForConfirmation: false });
-  };
+  _cutEventsFunction(): void {
+    this._copyEventsFunction();
+    this._deleteEventsFunction({ askForConfirmation: false });
+  }
 
-  _pasteEventsFunction = () => {
+  _pasteEventsFunction(): void {
     if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EVENTS_FUNCTION_CLIPBOARD_KIND);
@@ -392,15 +394,15 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedObject
     );
     this.props.editName(getFunctionTreeViewItemId(newEventsFunction));
-  };
+  }
 
-  _duplicateEventsFunction = (eventsFunction: gdEventsFunction) => {
+  _duplicateEventsFunction(): void {
     const { eventsFunctionsContainer } = this.props;
-    const newName = newNameGenerator(eventsFunction.getName(), name =>
+    const newName = newNameGenerator(this.eventFunction.getName(), name =>
       eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
     const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
-      eventsFunction,
+      this.eventFunction,
       this.getIndex() + 1
     );
     newEventsFunction.setName(newName);
@@ -413,7 +415,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedObject
     );
     this.props.editName(getFunctionTreeViewItemId(newEventsFunction));
-  };
+  }
 
   _onEventsFunctionModified() {
     if (this.props.unsavedChanges)

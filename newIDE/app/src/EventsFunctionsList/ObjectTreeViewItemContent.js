@@ -121,7 +121,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   edit(): void {}
 
   buildMenuTemplate(i18n: I18nType, index: number) {
-    const eventsBasedObject = this.object;
     return [
       {
         label: i18n._(t`Add a function`),
@@ -149,11 +148,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Copy`),
-        click: () => this._copyEventsBasedObject(eventsBasedObject),
+        click: () => this._copyEventsBasedObject(),
       },
       {
         label: i18n._(t`Cut`),
-        click: () => this._cutEventsBasedObject(eventsBasedObject),
+        click: () => this._cutEventsBasedObject(),
       },
       {
         label: i18n._(t`Paste`),
@@ -168,15 +167,16 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this._deleteEventsBasedObject(this.object, {
+    this._deleteEventsBasedObject({
       askForConfirmation: true,
     });
   }
 
-  async _deleteEventsBasedObject(
-    eventsBasedObject: gdEventsBasedObject,
-    { askForConfirmation }: {| askForConfirmation: boolean |}
-  ): Promise<void> {
+  async _deleteEventsBasedObject({
+    askForConfirmation,
+  }: {|
+    askForConfirmation: boolean,
+  |}): Promise<void> {
     const { eventsBasedObjectsList } = this.props;
 
     if (askForConfirmation) {
@@ -187,10 +187,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsBasedObject(eventsBasedObject, doRemove => {
+    this.props.onDeleteEventsBasedObject(this.object, doRemove => {
       if (!doRemove) return;
 
-      eventsBasedObjectsList.remove(eventsBasedObject.getName());
+      eventsBasedObjectsList.remove(this.object.getName());
       this._onEventsBasedObjectModified();
     });
   }
@@ -208,21 +208,21 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  _copyEventsBasedObject = (eventsBasedObject: gdEventsBasedObject) => {
+  _copyEventsBasedObject(): void {
     Clipboard.set(EVENTS_BASED_OBJECT_CLIPBOARD_KIND, {
-      eventsBasedObject: serializeToJSObject(eventsBasedObject),
-      name: eventsBasedObject.getName(),
+      eventsBasedObject: serializeToJSObject(this.object),
+      name: this.object.getName(),
     });
-  };
+  }
 
-  _cutEventsBasedObject = (eventsBasedObject: gdEventsBasedObject) => {
-    this._copyEventsBasedObject(eventsBasedObject);
-    this._deleteEventsBasedObject(eventsBasedObject, {
+  _cutEventsBasedObject(): void {
+    this._copyEventsBasedObject();
+    this._deleteEventsBasedObject({
       askForConfirmation: false,
     });
-  };
+  }
 
-  _pasteEventsBasedObject = () => {
+  _pasteEventsBasedObject(): void {
     if (!Clipboard.has(EVENTS_BASED_OBJECT_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EVENTS_BASED_OBJECT_CLIPBOARD_KIND);
@@ -255,9 +255,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     this._onEventsBasedObjectModified();
     this.props.onSelectEventsBasedObject(newEventsBasedObject);
     this.props.editName(getObjectTreeViewItemId(newEventsBasedObject));
-  };
+  }
 
-  _addNewEventsBasedObject = () => {
+  _addNewEventsBasedObject(): void {
     const { eventsBasedObjectsList } = this.props;
 
     const name = newNameGenerator('MyObject', name =>
@@ -283,9 +283,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     // We focus it so the user can edit the name directly.
     this.props.onSelectEventsBasedObject(newEventsBasedObject);
     this.props.editName(newEventsBasedObjectId);
-  };
+  }
 
-  _onEventsBasedObjectModified() {
+  _onEventsBasedObjectModified(): void {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.props.forceUpdate();

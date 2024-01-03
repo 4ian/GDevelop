@@ -257,36 +257,36 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   renderLeftComponent(i18n: I18nType): ?React.Node {
-    const privateIcon = this.eventFunction.isPrivate() ? (
-      <Tooltip
-        title={
-          <Trans>This function won't be visible in the events editor.</Trans>
-        }
-      >
-        <VisibilityOff fontSize="small" style={styles.tooltip} />
-      </Tooltip>
-    ) : null;
-    const asyncIcon = this.eventFunction.isAsync() ? (
-      <Tooltip
-        title={
-          <Trans>
-            This function is asynchronous - it will only allow subsequent events
-            to run after calling the action "End asynchronous task" within the
-            function.
-          </Trans>
-        }
-      >
-        <AsyncIcon fontSize="small" style={styles.tooltip} />
-      </Tooltip>
-    ) : null;
-    return privateIcon && asyncIcon ? (
-      <>
-        {privateIcon}
-        {asyncIcon}
-      </>
-    ) : (
-      privateIcon || asyncIcon
-    );
+    const icons = [];
+    if (this.eventFunction.isPrivate()) {
+      icons.push(
+        <Tooltip
+          key="visibility"
+          title={
+            <Trans>This function won't be visible in the events editor.</Trans>
+          }
+        >
+          <VisibilityOff fontSize="small" style={styles.tooltip} />
+        </Tooltip>
+      );
+    }
+    if (this.eventFunction.isAsync()) {
+      icons.push(
+        <Tooltip
+          key="async"
+          title={
+            <Trans>
+              This function is asynchronous - it will only allow subsequent
+              events to run after calling the action "End asynchronous task"
+              within the function.
+            </Trans>
+          }
+        >
+          <AsyncIcon fontSize="small" style={styles.tooltip} />
+        </Tooltip>
+      );
+    }
+    return icons.length > 0 ? icons : null;
   }
 
   _togglePrivate = (eventsFunction: gdEventsFunction) => {

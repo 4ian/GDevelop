@@ -621,7 +621,7 @@ const EventsFunctionsList = React.forwardRef<
 
         const index = itemContent && itemContent.getFunctionInsertionIndex();
 
-        // Let EventsFunctionsExtensionEditor knows if the function is:
+        // Let EventsFunctionsExtensionEditor know if the function is:
         // a free function, a behavior one or an object one.
         // It shows a different dialog according to this.
         const eventsBasedBehavior = itemContent

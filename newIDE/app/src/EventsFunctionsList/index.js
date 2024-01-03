@@ -121,10 +121,11 @@ class ObjectTreeViewItem implements TreeViewItem {
   eventFunctionProps: EventFunctionCommonProps;
 
   constructor(
-    content: ObjectTreeViewItemContent,
+    object: gdEventsBasedObject,
+    props: EventObjectProps,
     eventFunctionProps: EventFunctionCommonProps
   ) {
-    this.content = content;
+    this.content = new ObjectTreeViewItemContent(object, props);
     this.eventFunctionProps = eventFunctionProps;
   }
 
@@ -141,11 +142,9 @@ class ObjectTreeViewItem implements TreeViewItem {
     return functionsCount === 0
       ? [
           new PlaceHolderTreeViewItem(
-            new PlaceHolderTreeViewItemContent(
-              'events-object-functions-placeholder.' +
-                eventsBasedObject.getName(),
-              i18n._(t`Start by adding a new function.`)
-            )
+            'events-object-functions-placeholder.' +
+              eventsBasedObject.getName(),
+            i18n._(t`Start by adding a new function.`)
           ),
         ]
       : mapFor(
@@ -167,10 +166,11 @@ class BehaviorTreeViewItem implements TreeViewItem {
   eventFunctionProps: EventFunctionCommonProps;
 
   constructor(
-    content: BehaviorTreeViewItemContent,
+    behavior: gdEventsBasedBehavior,
+    props: EventBehaviorProps,
     eventFunctionProps: EventFunctionCommonProps
   ) {
-    this.content = content;
+    this.content = new BehaviorTreeViewItemContent(behavior, props);
     this.eventFunctionProps = eventFunctionProps;
   }
 
@@ -186,11 +186,9 @@ class BehaviorTreeViewItem implements TreeViewItem {
     return functionsCount === 0
       ? [
           new PlaceHolderTreeViewItem(
-            new PlaceHolderTreeViewItemContent(
-              'events-behavior-functions-placeholder.' +
-                eventsBasedBehavior.getName(),
-              i18n._(t`Start by adding a new function.`)
-            )
+            'events-behavior-functions-placeholder.' +
+              eventsBasedBehavior.getName(),
+            i18n._(t`Start by adding a new function.`)
           ),
         ]
       : mapFor(
@@ -223,8 +221,8 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
 
-  constructor(content: TreeViewItemContent) {
-    this.content = content;
+  constructor(id: string, label: string | React.Node) {
+    this.content = new LabelTreeViewItemContent(id, label);
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -232,106 +230,31 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
   }
 }
 
-class PlaceHolderTreeViewItemContent implements TreeViewItemContent {
-  id: string;
-  label: string | React.Node;
-
-  constructor(id: string, label: string | React.Node) {
-    this.id = id;
-    this.label = label;
-  }
-
-  getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
-    return null;
-  }
-
-  getFunctionInsertionIndex(): number {
-    // It's never used;
-    return 0;
-  }
-
-  getEventsFunction(): ?gdEventsFunction {
-    return null;
-  }
-
-  getEventsBasedBehavior(): ?gdEventsBasedBehavior {
-    return null;
-  }
-
-  getEventsBasedObject(): ?gdEventsBasedObject {
-    return null;
-  }
-
-  getName(): string | React.Node {
-    return this.label;
-  }
-
-  getId(): string {
-    return this.id;
-  }
-
-  getHtmlId(index: number): ?string {
-    return null;
-  }
-
-  getThumbnail(): ?string {
-    return null;
-  }
-
-  getDataset(): ?HTMLDataset {
-    return null;
-  }
-
-  onSelect(): void {}
-
-  buildMenuTemplate(i18n: I18nType, index: number) {
-    return [];
-  }
-
-  getRightButton(): ?MenuButton {
-    return null;
-  }
-
-  renderLeftComponent(i18n: I18nType): ?React.Node {
-    return null;
-  }
-
-  rename(newName: string): void {}
-
-  edit(): void {}
-
-  delete(): void {}
-
-  getIndex(): number {
-    return 0;
-  }
-
-  moveAt(destinationIndex: number): void {}
-
-  isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    // It's not actually used.
-    return false;
-  }
-}
-
-class RootTreeViewItemContent implements TreeViewItemContent {
+class LabelTreeViewItemContent implements TreeViewItemContent {
   id: string;
   label: string | React.Node;
   buildMenuTemplateFunction: (
     i18n: I18nType,
     index: number
   ) => Array<MenuItemTemplate>;
-  rightButton: MenuButton;
+  rightButton: ?MenuButton;
 
-  constructor(id: string, label: string | React.Node, rightButton: MenuButton) {
+  constructor(
+    id: string,
+    label: string | React.Node,
+    rightButton?: MenuButton
+  ) {
     this.id = id;
     this.label = label;
-    this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => [
-      {
-        label: rightButton.label,
-        click: rightButton.click,
-      },
-    ];
+    this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
+      rightButton
+        ? [
+            {
+              label: rightButton.label,
+              click: rightButton.click,
+            },
+          ]
+        : [];
     this.rightButton = rightButton;
   }
 
@@ -801,10 +724,8 @@ const EventsFunctionsList = React.forwardRef<
       (eventsBasedBehavior: gdEventsBasedBehavior) => {
         setSelectedItems([
           new BehaviorTreeViewItem(
-            new BehaviorTreeViewItemContent(
-              eventsBasedBehavior,
-              eventBehaviorProps
-            ),
+            eventsBasedBehavior,
+            eventBehaviorProps,
             eventFunctionCommonProps
           ),
         ]);
@@ -869,7 +790,8 @@ const EventsFunctionsList = React.forwardRef<
       (eventsBasedObject: gdEventsBasedObject) => {
         setSelectedItems([
           new ObjectTreeViewItem(
-            new ObjectTreeViewItemContent(eventsBasedObject, eventObjectProps),
+            eventsBasedObject,
+            eventObjectProps,
             eventFunctionCommonProps
           ),
         ]);
@@ -961,10 +883,8 @@ const EventsFunctionsList = React.forwardRef<
       eventBasedObjects.size(),
       i =>
         new ObjectTreeViewItem(
-          new ObjectTreeViewItemContent(
-            eventBasedObjects.at(i),
-            eventObjectProps
-          ),
+          eventBasedObjects.at(i),
+          eventObjectProps,
           eventFunctionCommonProps
         )
     );
@@ -973,10 +893,8 @@ const EventsFunctionsList = React.forwardRef<
       eventBasedBehaviors.size(),
       i =>
         new BehaviorTreeViewItem(
-          new BehaviorTreeViewItemContent(
-            eventBasedBehaviors.at(i),
-            eventBehaviorProps
-          ),
+          eventBasedBehaviors.at(i),
+          eventBehaviorProps,
           eventFunctionCommonProps
         )
     );
@@ -986,7 +904,7 @@ const EventsFunctionsList = React.forwardRef<
           getShowEventBasedObjectsEditor()
             ? {
                 isRoot: true,
-                content: new RootTreeViewItemContent(
+                content: new LabelTreeViewItemContent(
                   extensionObjectsRootFolderId,
                   i18n._(t`Objects`),
                   {
@@ -999,10 +917,8 @@ const EventsFunctionsList = React.forwardRef<
                   return objectTreeViewItems.length === 0
                     ? [
                         new PlaceHolderTreeViewItem(
-                          new PlaceHolderTreeViewItemContent(
-                            extensionObjectsEmptyPlaceholderId,
-                            i18n._(t`Start by adding a new object.`)
-                          )
+                          extensionObjectsEmptyPlaceholderId,
+                          i18n._(t`Start by adding a new object.`)
                         ),
                       ]
                     : objectTreeViewItems;
@@ -1011,7 +927,7 @@ const EventsFunctionsList = React.forwardRef<
             : null,
           {
             isRoot: true,
-            content: new RootTreeViewItemContent(
+            content: new LabelTreeViewItemContent(
               extensionBehaviorsRootFolderId,
               i18n._(t`Behaviors`),
               {
@@ -1024,10 +940,8 @@ const EventsFunctionsList = React.forwardRef<
               return behaviorTreeViewItems.length === 0
                 ? [
                     new PlaceHolderTreeViewItem(
-                      new PlaceHolderTreeViewItemContent(
-                        extensionBehaviorsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new behavior.`)
-                      )
+                      extensionBehaviorsEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new behavior.`)
                     ),
                   ]
                 : behaviorTreeViewItems;
@@ -1035,7 +949,7 @@ const EventsFunctionsList = React.forwardRef<
           },
           {
             isRoot: true,
-            content: new RootTreeViewItemContent(
+            content: new LabelTreeViewItemContent(
               extensionFunctionsRootFolderId,
               i18n._(t`Functions`),
               {
@@ -1048,10 +962,8 @@ const EventsFunctionsList = React.forwardRef<
               if (eventsFunctionsExtension.getEventsFunctionsCount() === 0) {
                 return [
                   new PlaceHolderTreeViewItem(
-                    new PlaceHolderTreeViewItemContent(
-                      extensionFunctionsEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new function.`)
-                    )
+                    extensionFunctionsEmptyPlaceholderId,
+                    i18n._(t`Start by adding a new function.`)
                   ),
                 ];
               }

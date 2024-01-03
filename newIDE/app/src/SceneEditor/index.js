@@ -873,13 +873,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
-  _onRenameLayer = (
-    oldName: string,
-    newName: string,
-    done: boolean => void
-  ) => {
-    // Nothing to do, the callback is in charge of renaming the layer and moving the instances.
-    done(true);
+  _onLayerRenamed = () => {
     this.forceUpdatePropertiesEditor();
   };
 
@@ -1696,7 +1690,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectFolderOrObjectsWithContext={
                   selectedObjectFolderOrObjectsWithContext
                 }
-                onRenameLayer={this._onRenameLayer}
+                onLayerRenamed={this._onLayerRenamed}
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={(layer: string) =>
                   this.setState({ selectedLayer: layer })

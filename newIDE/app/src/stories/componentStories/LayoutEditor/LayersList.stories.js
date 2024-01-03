@@ -31,9 +31,7 @@ export const Default = () => {
         onRemoveLayer={(layerName, cb) => {
           cb(true);
         }}
-        onRenameLayer={(oldName, newName, cb) => {
-          cb(true);
-        }}
+        onLayerRenamed={action('onLayerRenamed')}
         onCreateLayer={action('onCreateLayer')}
         layersContainer={testProject.testLayout}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
@@ -57,9 +55,7 @@ export const SmallWidthAndHeight = () => {
           onRemoveLayer={(layerName, cb) => {
             cb(true);
           }}
-          onRenameLayer={(oldName, newName, cb) => {
-            cb(true);
-          }}
+          onLayerRenamed={action('onLayerRenamed')}
           onCreateLayer={action('onCreateLayer')}
           layersContainer={testProject.testLayout}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}

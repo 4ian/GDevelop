@@ -31,11 +31,7 @@ type LayersListBodyProps = {|
   onSelectLayer: string => void,
   unsavedChanges?: ?UnsavedChanges,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
-  onRenameLayer: (
-    oldName: string,
-    newName: string,
-    cb: (done: boolean) => void
-  ) => void,
+  onLayerRenamed: () => void,
   onEditEffects: (layer: ?gdLayer) => void,
   onEdit: (layer: ?gdLayer) => void,
   width: number,
@@ -64,7 +60,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
     onEditEffects,
     onEdit,
     width,
-    onRenameLayer,
+    onLayerRenamed,
     onRemoveLayer,
     unsavedChanges,
   } = props;
@@ -129,16 +125,15 @@ const LayersListBody = (props: LayersListBodyProps) => {
               [layerName]: <Trans>The name {newName} is already taken</Trans>,
             }));
           } else {
-            onRenameLayer(layerName, newName, doRename => {
-              if (!doRename) return;
-              layersContainer.getLayer(layerName).setName(newName);
-              gd.WholeProjectRefactorer.renameLayer(
-                project,
-                layersContainer,
-                layerName,
-                newName
-              );
-            });
+            layersContainer.getLayer(layerName).setName(newName);
+            gd.WholeProjectRefactorer.renameLayer(
+              project,
+              layersContainer,
+              layerName,
+              newName
+            );
+            onLayerRenamed();
+            onLayerModified();
           }
         }}
         onRemove={() => {
@@ -204,11 +199,7 @@ type Props = {|
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
-  onRenameLayer: (
-    oldName: string,
-    newName: string,
-    cb: (done: boolean) => void
-  ) => void,
+  onLayerRenamed: () => void,
   onCreateLayer: () => void,
   unsavedChanges?: ?UnsavedChanges,
 
@@ -291,7 +282,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}
                 onRemoveLayer={props.onRemoveLayer}
-                onRenameLayer={props.onRenameLayer}
+                onLayerRenamed={props.onLayerRenamed}
                 unsavedChanges={props.unsavedChanges}
                 width={width}
               />

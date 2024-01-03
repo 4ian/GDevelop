@@ -7,6 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
+import alertDecorator from '../../AlertDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import EventsFunctionsListWithErrorBoundary from '../../../EventsFunctionsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
@@ -14,7 +15,7 @@ import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropConte
 export default {
   title: 'EventsFunctionsExtensionEditor/EventsFunctionsList',
   component: EventsFunctionsListWithErrorBoundary,
-  decorators: [muiDecorator],
+  decorators: [muiDecorator, alertDecorator],
 };
 
 export const Default = () => (

@@ -18,8 +18,6 @@ import {
 } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
-import { getShortcutDisplayName } from '../KeyboardShortcuts';
-import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 

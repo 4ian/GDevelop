@@ -15,8 +15,6 @@ import {
   type TreeItemProps,
   extensionObjectsRootFolderId,
 } from '.';
-import { getShortcutDisplayName } from '../KeyboardShortcuts';
-import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 

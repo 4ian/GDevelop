@@ -529,9 +529,6 @@ export default function SpriteEditor({
 
   const adaptCollisionMaskIfNeeded = React.useCallback(
     () => {
-      // If the first sprite of the first animation is updated,
-      // we update the automatic collision mask of the object,
-      // if the option is enabled.
       if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
         onCreateMatchingSpriteCollisionMask();
       }
@@ -539,7 +536,7 @@ export default function SpriteEditor({
     [onCreateMatchingSpriteCollisionMask, spriteConfiguration]
   );
 
-  const editWith = React.useCallback(
+  const editDirectionWith = React.useCallback(
     async (
       i18n: I18nType,
       externalEditor: ResourceExternalEditor,
@@ -662,9 +659,9 @@ export default function SpriteEditor({
     async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
       addAnimation();
       const direction = spriteConfiguration.getAnimation(0).getDirection(0);
-      await editWith(i18n, externalEditor, direction, 0, 0);
+      await editDirectionWith(i18n, externalEditor, direction, 0, 0);
     },
-    [addAnimation, editWith, spriteConfiguration]
+    [addAnimation, editDirectionWith, spriteConfiguration]
   );
 
   const imageResourceExternalEditors = resourceManagementProps.resourceExternalEditors.filter(
@@ -829,12 +826,12 @@ export default function SpriteEditor({
                                             resourceManagementProps={
                                               resourceManagementProps
                                             }
-                                            editWith={(
+                                            editDirectionWith={(
                                               i18n,
                                               ResourceExternalEditor,
                                               direction
                                             ) =>
-                                              editWith(
+                                              editDirectionWith(
                                                 i18n,
                                                 ResourceExternalEditor,
                                                 direction,
@@ -859,6 +856,9 @@ export default function SpriteEditor({
                                             }
                                             onSpriteUpdated={onObjectUpdated}
                                             onFirstSpriteUpdated={
+                                              // If the first sprite of the first animation is updated,
+                                              // we update the automatic collision mask of the object,
+                                              // if the option is enabled.
                                               animationIndex === 0
                                                 ? adaptCollisionMaskIfNeeded
                                                 : undefined

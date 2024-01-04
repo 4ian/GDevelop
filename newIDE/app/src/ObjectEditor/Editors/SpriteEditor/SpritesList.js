@@ -266,7 +266,7 @@ type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resourceManagementProps: ResourceManagementProps,
-  editWith: (
+  editDirectionWith: (
     i18n: I18nType,
     ResourceExternalEditor,
     direction: gdDirection
@@ -287,7 +287,7 @@ const SpritesList = ({
   project,
   resourcesLoader,
   resourceManagementProps,
-  editWith,
+  editDirectionWith,
   onReplaceByDirection,
   onSpriteAdded,
   onSpriteUpdated,
@@ -591,7 +591,7 @@ const SpritesList = ({
           resourceManagementProps.resourceExternalEditors
         }
         onEditWith={(i18n, ResourceExternalEditor) =>
-          editWith(i18n, ResourceExternalEditor, direction)
+          editDirectionWith(i18n, ResourceExternalEditor, direction)
         }
         onDirectionUpdated={onSpriteUpdated}
       />

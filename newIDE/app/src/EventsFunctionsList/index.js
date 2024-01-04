@@ -465,79 +465,6 @@ const EventsFunctionsList = React.forwardRef<
       [isMobileScreen]
     );
 
-    const eventFunctionCommonProps = React.useMemo<EventFunctionCommonProps>(
-      () => ({
-        project,
-        eventsFunctionsExtension,
-        unsavedChanges,
-        preferences,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
-        onSelectEventsFunction,
-        onDeleteEventsFunction,
-        canRename,
-        onRenameEventsFunction,
-        onAddEventsFunction,
-        onEventsFunctionAdded,
-      }),
-      [
-        canRename,
-        editName,
-        eventsFunctionsExtension,
-        forceUpdate,
-        forceUpdateList,
-        onAddEventsFunction,
-        onDeleteEventsFunction,
-        onEventsFunctionAdded,
-        onRenameEventsFunction,
-        onSelectEventsFunction,
-        preferences,
-        project,
-        scrollToItem,
-        showDeleteConfirmation,
-        unsavedChanges,
-      ]
-    );
-
-    const setSelectionToFunction = React.useCallback(
-      (
-        eventsFunction: gdEventsFunction,
-        eventsBasedBehavior: ?gdEventsBasedBehavior,
-        eventsBasedObject: ?gdEventsBasedObject
-      ) => {
-        const eventsBasedEntity = eventsBasedBehavior || eventsBasedObject;
-        const eventsFunctionsContainer = eventsBasedEntity
-          ? eventsBasedEntity.getEventsFunctions()
-          : eventsFunctionsExtension;
-        const eventFunctionProps = {
-          eventsBasedObject,
-          eventsFunctionsContainer,
-          ...eventFunctionCommonProps,
-        };
-        setSelectedItems([
-          new LeafTreeViewItem(
-            new EventsFunctionTreeViewItemContent(
-              eventsFunction,
-              eventFunctionProps
-            )
-          ),
-        ]);
-        onSelectEventsFunction(
-          eventsFunction,
-          eventsBasedBehavior,
-          eventsBasedObject
-        );
-      },
-      [
-        eventFunctionCommonProps,
-        eventsFunctionsExtension,
-        onSelectEventsFunction,
-      ]
-    );
-
     const addNewEventsFunction = React.useCallback(
       (itemContent: ?TreeViewItemContent) => {
         const eventsFunctionsContainer = itemContent
@@ -619,7 +546,7 @@ const EventsFunctionsList = React.forwardRef<
             forceUpdate();
 
             // We focus it so the user can edit the name directly.
-            setSelectionToFunction(
+            onSelectEventsFunction(
               eventsFunction,
               eventsBasedBehavior,
               eventsBasedObject
@@ -640,13 +567,175 @@ const EventsFunctionsList = React.forwardRef<
         onSelectEventsBasedBehavior,
         onSelectEventsBasedObject,
         project,
-        setSelectionToFunction,
+        onSelectEventsFunction,
         scrollToItem,
         unsavedChanges,
       ]
     );
 
-    const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    const addNewEventsBehavior = React.useCallback(
+      () => {
+        const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+
+        const name = newNameGenerator('MyBehavior', name =>
+          eventBasedBehaviors.has(name)
+        );
+        const newEventsBasedBehavior = eventBasedBehaviors.insertNew(
+          name,
+          eventBasedBehaviors.getCount()
+        );
+        if (unsavedChanges) {
+          unsavedChanges.triggerUnsavedChanges();
+        }
+        forceUpdate();
+
+        const behaviorItemId = getEventsBasedBehaviorTreeViewItemId(
+          newEventsBasedBehavior
+        );
+
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([
+            behaviorItemId,
+            extensionBehaviorsRootFolderId,
+          ]);
+        }
+        // Scroll to the new behavior.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(behaviorItemId);
+        }, 100); // A few ms is enough for a new render to be done.
+
+        // We focus it so the user can edit the name directly.
+        onSelectEventsBasedBehavior(newEventsBasedBehavior);
+        editName(behaviorItemId);
+      },
+      [
+        editName,
+        eventsFunctionsExtension,
+        forceUpdate,
+        scrollToItem,
+        onSelectEventsBasedBehavior,
+        unsavedChanges,
+      ]
+    );
+
+    const addNewEventsBasedObject = React.useCallback(
+      () => {
+        const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+
+        const name = newNameGenerator('MyObject', name =>
+          eventBasedObjects.has(name)
+        );
+        const newEventsBasedObject = eventBasedObjects.insertNew(
+          name,
+          eventBasedObjects.getCount()
+        );
+        if (unsavedChanges) {
+          unsavedChanges.triggerUnsavedChanges();
+        }
+        forceUpdate();
+
+        const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
+
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([
+            objectItemId,
+            extensionObjectsRootFolderId,
+          ]);
+        }
+        // Scroll to the new function.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(objectItemId);
+        }, 100); // A few ms is enough for a new render to be done.
+
+        // We focus it so the user can edit the name directly.
+        onSelectEventsBasedObject(newEventsBasedObject);
+        editName(objectItemId);
+      },
+      [
+        editName,
+        eventsFunctionsExtension,
+        forceUpdate,
+        scrollToItem,
+        onSelectEventsBasedObject,
+        unsavedChanges,
+      ]
+    );
+
+    const onTreeModified = React.useCallback(
+      (shouldForceUpdateList: boolean) => {
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+
+        if (shouldForceUpdateList) forceUpdateList();
+        else forceUpdate();
+      },
+      [forceUpdate, forceUpdateList, unsavedChanges]
+    );
+
+    // Initialize keyboard shortcuts as empty.
+    // onDelete callback is set outside because it deletes the selected
+    // item (that is a props). As it is stored in a ref, the keyboard shortcut
+    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
+    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+      new KeyboardShortcuts({
+        shortcutCallbacks: {},
+      })
+    );
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            if (selectedItems.length > 0) {
+              deleteItem(selectedItems[0]);
+            }
+          });
+        }
+      },
+      [selectedItems]
+    );
+
+    const eventFunctionCommonProps = React.useMemo<EventFunctionCommonProps>(
+      () => ({
+        project,
+        eventsFunctionsExtension,
+        unsavedChanges,
+        preferences,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        canRename,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+      }),
+      [
+        canRename,
+        editName,
+        eventsFunctionsExtension,
+        forceUpdate,
+        forceUpdateList,
+        onAddEventsFunction,
+        onDeleteEventsFunction,
+        onEventsFunctionAdded,
+        onRenameEventsFunction,
+        onSelectEventsFunction,
+        preferences,
+        project,
+        scrollToItem,
+        showDeleteConfirmation,
+        unsavedChanges,
+      ]
+    );
+
     const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
 
     const eventBasedBehaviorProps = React.useMemo<EventsBasedBehaviorProps>(
@@ -688,6 +777,8 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
+    const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+
     const eventsBasedObjectProps = React.useMemo<EventsBasedObjectProps>(
       () => ({
         project,
@@ -723,168 +814,6 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedObjectRenamed,
         addNewEventsFunction,
       ]
-    );
-
-    const setSelectionToBehavior = React.useCallback(
-      (eventsBasedBehavior: gdEventsBasedBehavior) => {
-        setSelectedItems([
-          new BehaviorTreeViewItem(
-            eventsBasedBehavior,
-            eventBasedBehaviorProps,
-            eventFunctionCommonProps
-          ),
-        ]);
-        onSelectEventsBasedBehavior(eventsBasedBehavior);
-      },
-      [
-        eventBasedBehaviorProps,
-        eventFunctionCommonProps,
-        onSelectEventsBasedBehavior,
-      ]
-    );
-
-    const addNewEventsBehavior = React.useCallback(
-      () => {
-        const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
-
-        const name = newNameGenerator('MyBehavior', name =>
-          eventBasedBehaviors.has(name)
-        );
-        const newEventsBasedBehavior = eventBasedBehaviors.insertNew(
-          name,
-          eventBasedBehaviors.getCount()
-        );
-        if (unsavedChanges) {
-          unsavedChanges.triggerUnsavedChanges();
-        }
-        forceUpdate();
-
-        const behaviorItemId = getEventsBasedBehaviorTreeViewItemId(
-          newEventsBasedBehavior
-        );
-
-        if (treeViewRef.current) {
-          treeViewRef.current.openItems([
-            behaviorItemId,
-            extensionBehaviorsRootFolderId,
-          ]);
-        }
-        // Scroll to the new behavior.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
-        setTimeout(() => {
-          scrollToItem(behaviorItemId);
-        }, 100); // A few ms is enough for a new render to be done.
-
-        // We focus it so the user can edit the name directly.
-        setSelectionToBehavior(newEventsBasedBehavior);
-        editName(behaviorItemId);
-      },
-      [
-        editName,
-        eventsFunctionsExtension,
-        forceUpdate,
-        scrollToItem,
-        setSelectionToBehavior,
-        unsavedChanges,
-      ]
-    );
-
-    const setSelectionToObject = React.useCallback(
-      (eventsBasedObject: gdEventsBasedObject) => {
-        setSelectedItems([
-          new EventsBasedObjectTreeViewItem(
-            eventsBasedObject,
-            eventsBasedObjectProps,
-            eventFunctionCommonProps
-          ),
-        ]);
-        onSelectEventsBasedObject(eventsBasedObject);
-      },
-      [
-        eventFunctionCommonProps,
-        eventsBasedObjectProps,
-        onSelectEventsBasedObject,
-      ]
-    );
-
-    const addNewEventsBasedObject = React.useCallback(
-      () => {
-        const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-
-        const name = newNameGenerator('MyObject', name =>
-          eventBasedObjects.has(name)
-        );
-        const newEventsBasedObject = eventBasedObjects.insertNew(
-          name,
-          eventBasedObjects.getCount()
-        );
-        if (unsavedChanges) {
-          unsavedChanges.triggerUnsavedChanges();
-        }
-        forceUpdate();
-
-        const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
-
-        if (treeViewRef.current) {
-          treeViewRef.current.openItems([
-            objectItemId,
-            extensionObjectsRootFolderId,
-          ]);
-        }
-        // Scroll to the new function.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
-        setTimeout(() => {
-          scrollToItem(objectItemId);
-        }, 100); // A few ms is enough for a new render to be done.
-
-        // We focus it so the user can edit the name directly.
-        setSelectionToObject(newEventsBasedObject);
-        editName(objectItemId);
-      },
-      [
-        editName,
-        eventsFunctionsExtension,
-        forceUpdate,
-        scrollToItem,
-        setSelectionToObject,
-        unsavedChanges,
-      ]
-    );
-
-    const onTreeModified = React.useCallback(
-      (shouldForceUpdateList: boolean) => {
-        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-
-        if (shouldForceUpdateList) forceUpdateList();
-        else forceUpdate();
-      },
-      [forceUpdate, forceUpdateList, unsavedChanges]
-    );
-
-    // Initialize keyboard shortcuts as empty.
-    // onDelete callback is set outside because it deletes the selected
-    // item (that is a props). As it is stored in a ref, the keyboard shortcut
-    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
-    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
-      new KeyboardShortcuts({
-        shortcutCallbacks: {},
-      })
-    );
-    React.useEffect(
-      () => {
-        if (keyboardShortcutsRef.current) {
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            if (selectedItems.length > 0) {
-              deleteItem(selectedItems[0]);
-            }
-          });
-        }
-      },
-      [selectedItems]
     );
 
     const objectTreeViewItems = mapFor(
@@ -1102,6 +1031,60 @@ const EventsFunctionsList = React.forwardRef<
         },
       }),
       []
+    );
+
+    React.useEffect(
+      () => {
+        // TODO Use a map from itemId to item to avoid to rebuild the item.
+        if (selectedEventsFunction) {
+          const eventsBasedEntity =
+            selectedEventsBasedBehavior || selectedEventsBasedObject;
+          const eventsFunctionsContainer = eventsBasedEntity
+            ? eventsBasedEntity.getEventsFunctions()
+            : eventsFunctionsExtension;
+          const eventFunctionProps = {
+            eventsBasedBehavior: selectedEventsBasedBehavior,
+            eventsBasedObject: selectedEventsBasedObject,
+            eventsFunctionsContainer,
+            ...eventFunctionCommonProps,
+          };
+          setSelectedItems([
+            new LeafTreeViewItem(
+              new EventsFunctionTreeViewItemContent(
+                selectedEventsFunction,
+                eventFunctionProps
+              )
+            ),
+          ]);
+        } else if (selectedEventsBasedBehavior) {
+          setSelectedItems([
+            new BehaviorTreeViewItem(
+              selectedEventsBasedBehavior,
+              eventBasedBehaviorProps,
+              eventFunctionCommonProps
+            ),
+          ]);
+        } else if (selectedEventsBasedObject) {
+          setSelectedItems([
+            new EventsBasedObjectTreeViewItem(
+              selectedEventsBasedObject,
+              eventsBasedObjectProps,
+              eventFunctionCommonProps
+            ),
+          ]);
+        } else {
+          setSelectedItems([]);
+        }
+      },
+      [
+        eventBasedBehaviorProps,
+        eventFunctionCommonProps,
+        eventsBasedObjectProps,
+        eventsFunctionsExtension,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
+      ]
     );
 
     return (

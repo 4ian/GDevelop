@@ -249,7 +249,7 @@ export const getUserSubscription = async (
 export const changeUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  newSubscriptionDetails: { planId: string | null, stripeToken?: any }
+  newSubscriptionDetails: {| planId: string | null, stripeToken?: any |}
 ): Promise<Subscription> => {
   const authorizationHeader = await getAuthorizationHeader();
 
@@ -365,12 +365,12 @@ export const getRedirectToCheckoutUrl = ({
   userId,
   userEmail,
   quantity,
-}: {
+}: {|
   planId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
-}): string => {
+|}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout`
   );
@@ -387,12 +387,12 @@ export const getRedirectToCheckoutUrlV2 = ({
   userId,
   userEmail,
   quantity,
-}: {
+}: {|
   pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
-}): string => {
+|}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
   );

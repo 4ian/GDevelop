@@ -3,7 +3,10 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import { fakeAuthenticatedUserWithNoSubscription } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeAuthenticatedUserWithNoSubscription,
+  subscriptionPlansWithPrices,
+} from '../../../../fixtures/GDevelopServicesTestData';
 import RecommendationList from '../../../../MainFrame/EditorContainers/HomePage/GetStartedSection/RecommendationList';
 import PreferencesContext, {
   initialPreferences,
@@ -34,6 +37,7 @@ const RecommendationListStory = () => {
       key={tutorials ? tutorials.length : 0}
       authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
       selectInAppTutorial={action('selectInAppTutorial')}
+      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
     />
   );
 };

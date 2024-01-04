@@ -689,7 +689,7 @@ const EventsFunctionsList = React.forwardRef<
     // Initialize keyboard shortcuts as empty.
     // onDelete callback is set outside because it deletes the selected
     // item (that is a props). As it is stored in a ref, the keyboard shortcut
-    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
+    // instance does not update with selectedItems changes.
     const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
       new KeyboardShortcuts({
         shortcutCallbacks: {},

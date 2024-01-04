@@ -20,6 +20,7 @@ import {
 import Text from '../../../../UI/Text';
 import { Column } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
+import { type SubscriptionPlanWithPrices } from '../../../../Utils/GDevelopServices/Usage';
 import { CardWidget } from '../CardWidget';
 import Window from '../../../../Utils/Window';
 import { ColumnStackLayout } from '../../../../UI/Layout';
@@ -29,7 +30,6 @@ import {
 } from '../../../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlanRecommendationRow from './PlanRecommendationRow';
-import useSubscriptionPlans from '../../../../Utils/UseSubscriptionPlans';
 
 const styles = {
   textTutorialContent: {
@@ -162,18 +162,17 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
 type Props = {|
   authenticatedUser: AuthenticatedUser,
   selectInAppTutorial: (tutorialId: string) => void,
+  subscriptionPlansWithPrices: ?(SubscriptionPlanWithPrices[]),
 |};
 
 const RecommendationList = ({
   authenticatedUser,
   selectInAppTutorial,
+  subscriptionPlansWithPrices,
 }: Props) => {
   const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
-  const { subscriptionPlansWithPrices } = useSubscriptionPlans({
-    includeLegacy: false,
-  });
 
   if (!recommendations) return null;
 

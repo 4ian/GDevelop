@@ -203,6 +203,23 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("abcd[0]");
       REQUIRE(node != nullptr);
 
+      // Also check that if we try to find the last parent of node, it is not defined.
+      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, *node);
+      REQUIRE(lastParentOfNode.parentVariable == nullptr);
+      REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No object, variable or property with this name found.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("abcd[0].efg");
+      REQUIRE(node != nullptr);
+
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
@@ -213,6 +230,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("abcd.efg.hij");
       REQUIRE(node != nullptr);
+
+      // Also check that if we try to find the last parent of node, it is not defined.
+      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, *node);
+      REQUIRE(lastParentOfNode.parentVariable == nullptr);
+      REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
@@ -761,6 +784,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("abcd.efg.hij");
       REQUIRE(node != nullptr);
+
+      // Also check that if we try to find the last parent of node, it is not defined.
+      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, *node);
+      REQUIRE(lastParentOfNode.parentVariable == nullptr);
+      REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
@@ -1495,6 +1524,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node =
           parser.ParseExpression("MyNonExistingSceneVariable");
 
+      // Also check that if we try to find the last parent of node, it is not defined.
+      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, *node);
+      REQUIRE(lastParentOfNode.parentVariable == nullptr);
+      REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
+
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
@@ -1513,6 +1548,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "No child variable with this name found.");
+    }
+  }
+
+  SECTION("Invalid scene variables (2 levels, variable and child do not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MyNonExistingSceneVariable.MyNonExistingChild");
+
+      // Also check that if we try to find the last parent of node, it is not defined.
+      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, *node);
+      REQUIRE(lastParentOfNode.parentVariable == nullptr);
+      REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
     }
   }
 
@@ -1585,6 +1639,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node =
           parser.ParseExpression("MyNonExistingSpriteObject.MyVariable");
+
+      // Also check that if we try to find the last parent of node, it is not defined.
+      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+          platform, projectScopedContainers, *node);
+      REQUIRE(lastParentOfNode.parentVariable == nullptr);
+      REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);

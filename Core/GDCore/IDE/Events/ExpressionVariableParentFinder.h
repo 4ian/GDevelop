@@ -39,7 +39,8 @@ struct VariableAndItsParent {
 };
 
 /**
- * \brief Find the last parent (i.e: the variables container) of a node representing a variable.
+ * \brief Find the last parent (i.e: the variables container) of a node
+ * representing a variable.
  *
  * Useful for completions, to know which variables can be entered in a node.
  *
@@ -48,13 +49,12 @@ struct VariableAndItsParent {
 class GD_CORE_API ExpressionVariableParentFinder
     : public ExpressionParser2NodeWorker {
  public:
-
   static VariableAndItsParent GetLastParentOfNode(
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers,
       gd::ExpressionNode& node) {
-    gd::ExpressionVariableParentFinder typeFinder(
-        platform, projectScopedContainers);
+    gd::ExpressionVariableParentFinder typeFinder(platform,
+                                                  projectScopedContainers);
     node.Visit(typeFinder);
     return typeFinder.variableAndItsParent;
   }
@@ -70,7 +70,8 @@ class GD_CORE_API ExpressionVariableParentFinder
         variableNode(nullptr),
         thisIsALegacyPrescopedVariable(false),
         bailOutBecauseEmptyVariableName(false),
-        legacyPrescopedVariablesContainer(nullptr){};
+        legacyPrescopedVariablesContainer(nullptr),
+        variableAndItsParent{} {};
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {}
   void OnVisitOperatorNode(OperatorNode& node) override {}
@@ -135,10 +136,10 @@ class GD_CORE_API ExpressionVariableParentFinder
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     if (node.name.empty() && node.child) {
-      // A variable accessor should always have a name if it has a child (i.e: another accessor).
-      // While the parser may have generated an empty name,
-      // flag this so we avoid finding a wrong parent (and so, run the risk of giving
-      // wrong autocompletions).
+      // A variable accessor should always have a name if it has a child (i.e:
+      // another accessor). While the parser may have generated an empty name,
+      // flag this so we avoid finding a wrong parent (and so, run the risk of
+      // giving wrong autocompletions).
       bailOutBecauseEmptyVariableName = true;
     }
     childVariableNames.insert(childVariableNames.begin(), node.name);
@@ -300,7 +301,8 @@ class GD_CORE_API ExpressionVariableParentFinder
       const std::vector<gd::String>& childVariableNames,
       size_t startIndex = 0) {
     if (bailOutBecauseEmptyVariableName)
-      return {}; // Do not even attempt to find the parent if we had an issue when visiting nodes.
+      return {};  // Do not even attempt to find the parent if we had an issue
+                  // when visiting nodes.
 
     const gd::Variable* currentVariable = &variable;
 
@@ -332,8 +334,8 @@ class GD_CORE_API ExpressionVariableParentFinder
       }
     }
 
-    // Return the last parent of the chain of variables (so not the last variable
-    // but the one before it).
+    // Return the last parent of the chain of variables (so not the last
+    // variable but the one before it).
     return {.parentVariable = currentVariable};
   }
 
@@ -341,14 +343,16 @@ class GD_CORE_API ExpressionVariableParentFinder
       const gd::VariablesContainer& variablesContainer,
       const std::vector<gd::String>& childVariableNames) {
     if (bailOutBecauseEmptyVariableName)
-      return {}; // Do not even attempt to find the parent if we had an issue when visiting nodes.
+      return {};  // Do not even attempt to find the parent if we had an issue
+                  // when visiting nodes.
     if (childVariableNames.empty())
       return {};  // There is no "parent" to the variables container itself.
 
     const gd::String& firstChildName = *childVariableNames.begin();
 
-    const gd::Variable* variable = variablesContainer.Has(firstChildName) ?
-      &variablesContainer.Get(firstChildName) : nullptr;
+    const gd::Variable* variable = variablesContainer.Has(firstChildName)
+                                       ? &variablesContainer.Get(firstChildName)
+                                       : nullptr;
     if (childVariableNames.size() == 1 || !variable)
       return {// Only one child: the parent is the variables container itself.
               .parentVariablesContainer = &variablesContainer};

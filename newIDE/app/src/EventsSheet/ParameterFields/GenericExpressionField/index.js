@@ -193,6 +193,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
+  componentWillUnmount() {
+    this._enqueueValidation.cancel();
+  }
+
   focus: FieldFocusFunction = options => {
     if (this._field) {
       this._field.focus(options);

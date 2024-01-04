@@ -36,6 +36,7 @@ import Individuals from './Icons/Individual';
 import Team from './Icons/Team';
 import Education from './Icons/Education';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import PlaceholderError from '../../UI/PlaceholderError';
 
 const styles = {
   diamondIcon: {
@@ -118,6 +119,10 @@ const SubscriptionDetails = ({
     userSubscriptionPlan,
     setUserSubscriptionPlan,
   ] = React.useState<?SubscriptionPlan>(null);
+  const [error, setError] = React.useState<?React.Node>(null);
+  const [isLoadingUserPrice, setIsLoadingUserPrice] = React.useState<boolean>(
+    false
+  );
   const [
     userSubscriptionPlanPrice,
     setUserSubscriptionPlanPrice,
@@ -126,41 +131,64 @@ const SubscriptionDetails = ({
   React.useEffect(
     () => {
       (async () => {
-        if (!subscription) {
-          setUserSubscriptionPlan(null);
-          setUserSubscriptionPlanPrice(null);
-          return;
-        }
+        setError(null);
+        setIsLoadingUserPrice(true);
+        try {
+          if (!subscription) {
+            setUserSubscriptionPlan(null);
+            setUserSubscriptionPlanPrice(null);
+            return;
+          }
 
-        const { planId, pricingSystemId } = subscription;
-        if (!planId || !pricingSystemId) {
-          setUserSubscriptionPlan(null);
-          setUserSubscriptionPlanPrice(null);
-          return;
-        }
+          const { planId, pricingSystemId } = subscription;
+          if (!planId || !pricingSystemId) {
+            setUserSubscriptionPlan(null);
+            setUserSubscriptionPlanPrice(null);
+            return;
+          }
 
-        const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPrices.find(
-          plan => subscription.planId === plan.id
-        );
-        if (!matchingSubscriptionPlanWithPrices) {
-          setUserSubscriptionPlan(null);
-          setUserSubscriptionPlanPrice(null);
-          return;
-        }
-        const {
-          prices,
-          ...subscriptionPlan
-        } = matchingSubscriptionPlanWithPrices;
+          const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPrices.find(
+            plan => subscription.planId === plan.id
+          );
+          if (!matchingSubscriptionPlanWithPrices) {
+            setError(
+              <Trans>
+                Couldn't find a subscription matching your account. Please get
+                in touch with us to fix this issue.
+              </Trans>
+            );
+            setUserSubscriptionPlan(null);
+            setUserSubscriptionPlanPrice(null);
+            return;
+          }
+          const {
+            prices,
+            ...subscriptionPlan
+          } = matchingSubscriptionPlanWithPrices;
 
-        let pricingSystem = prices.find(
-          price => price.id === subscription.pricingSystemId
-        );
-        if (!pricingSystem) {
-          pricingSystem = await getSubscriptionPlanPrice(pricingSystemId);
-        }
+          let pricingSystem = prices.find(
+            price => price.id === subscription.pricingSystemId
+          );
+          if (!pricingSystem) {
+            pricingSystem = await getSubscriptionPlanPrice(pricingSystemId);
+          }
+          if (!pricingSystem) {
+            setError(
+              <Trans>
+                Couldn't find a subscription price matching your account. Please
+                get in touch with us to fix this issue.
+              </Trans>
+            );
+            setUserSubscriptionPlan(null);
+            setUserSubscriptionPlanPrice(null);
+            return;
+          }
 
-        setUserSubscriptionPlan(subscriptionPlan);
-        setUserSubscriptionPlanPrice(pricingSystem);
+          setUserSubscriptionPlan(subscriptionPlan);
+          setUserSubscriptionPlanPrice(pricingSystem);
+        } finally {
+          setIsLoadingUserPrice(false);
+        }
       })();
     },
     [subscription, subscriptionPlansWithPrices]
@@ -170,12 +198,15 @@ const SubscriptionDetails = ({
     subscription && subscription.redemptionCodeValidUntil;
   const isSubscriptionExpired =
     !!redemptionCodeExpirationDate && redemptionCodeExpirationDate < Date.now();
-
-  if (!subscription || (!userSubscriptionPlan && !userSubscriptionPlanPrice))
-    return <PlaceholderLoader />;
-
   const isOnOrSimulateMobileApp =
     isNativeMobileApp() || simulateNativeMobileApp;
+
+  if (error) {
+    return <PlaceholderError>{error}</PlaceholderError>;
+  }
+  if (!subscription || isLoadingUserPrice) {
+    return <PlaceholderLoader />;
+  }
 
   return (
     <Column noMargin>

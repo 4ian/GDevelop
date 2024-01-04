@@ -171,7 +171,9 @@ const RecommendationList = ({
   const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
-  const { subscriptionPlansWithPrices } = useSubscriptionPlans();
+  const { subscriptionPlansWithPrices } = useSubscriptionPlans({
+    includeLegacy: false,
+  });
 
   if (!recommendations) return null;
 

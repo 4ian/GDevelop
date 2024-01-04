@@ -4,9 +4,7 @@ import { t, Trans } from '@lingui/macro';
 import { I18n as I18nType } from '@lingui/core';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import {
-  type SubscriptionPlanWithPrices,
-} from '../../../../Utils/GDevelopServices/Usage';
+import { type SubscriptionPlanWithPrices } from '../../../../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../../../../UI/Grid';
 import Paper from '../../../../UI/Paper';
 import {

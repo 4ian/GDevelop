@@ -33,7 +33,9 @@ type Props = {|
 const ProfileDialog = ({ open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
-  const { subscriptionPlansWithPrices } = useSubscriptionPlans();
+  const { subscriptionPlansWithPrices } = useSubscriptionPlans({
+    includeLegacy: true,
+  });
 
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

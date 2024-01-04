@@ -155,10 +155,12 @@ export const apiClient = axios.create({
   baseURL: GDevelopUsageApi.baseUrl,
 });
 
-export const listSubscriptionPlans = async (): Promise<
-  SubscriptionPlanWithPrices[]
-> => {
-  const response = await apiClient.get('/subscription-plan');
+export const listSubscriptionPlans = async (options: {|
+  includeLegacy: boolean,
+|}): Promise<SubscriptionPlan[]> => {
+  const response = await apiClient.get('/subscription-plan', {
+    params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
+  });
   return response.data;
 };
 
@@ -177,6 +179,20 @@ export const getSubscriptionPlanPrice = async (
     }
     throw error;
   }
+};
+
+export const listSubscriptionPlanPrices = async (
+  subscriptionPlanIds?: ?(string[])
+): Promise<SubscriptionPlanPrice[]> => {
+  const params =
+    subscriptionPlanIds && subscriptionPlanIds.length > 0
+      ? { subscriptionPlanIds: subscriptionPlanIds.join(',') }
+      : undefined;
+  const response = await apiClient.get(
+    '/subscription-plan-pricing-system',
+    params
+  );
+  return response.data;
 };
 
 export const getUserUsages = async (

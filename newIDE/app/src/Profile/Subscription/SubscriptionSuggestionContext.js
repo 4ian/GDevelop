@@ -55,7 +55,9 @@ export const SubscriptionSuggestionProvider = ({
   >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
-  const { subscriptionPlansWithPrices } = useSubscriptionPlans();
+  const { subscriptionPlansWithPrices } = useSubscriptionPlans({
+    includeLegacy: false,
+  });
 
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
 

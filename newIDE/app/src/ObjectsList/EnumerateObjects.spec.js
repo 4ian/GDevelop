@@ -17,9 +17,9 @@ describe('EnumerateObjects', () => {
       allObjectsList,
     } = enumerateObjects(project, testLayout);
 
-    expect(containerObjectsList).toHaveLength(19);
+    expect(containerObjectsList).toHaveLength(20);
     expect(projectObjectsList).toHaveLength(2);
-    expect(allObjectsList).toHaveLength(21);
+    expect(allObjectsList).toHaveLength(22);
   });
 
   it('can enumerate objects with a filter on object type', () => {
@@ -27,7 +27,7 @@ describe('EnumerateObjects', () => {
     const countByType = {
       'Button::PanelSpriteButton': 1,
       'TextObject::Text': 2,
-      Sprite: 12,
+      Sprite: 13,
     };
     Object.entries(countByType).forEach(([type, count]) => {
       const { allObjectsList } = enumerateObjects(project, testLayout, {

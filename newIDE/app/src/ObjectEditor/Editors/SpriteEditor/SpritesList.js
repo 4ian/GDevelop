@@ -24,14 +24,8 @@ import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../../ResourcesList/ResourceSource';
-import {
-  type ResourceExternalEditor,
-  type EditWithExternalEditorReturn,
-} from '../../../ResourcesList/ResourceExternalEditor';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
-import { ExternalEditorOpenedDialog } from '../../../UI/ExternalEditorOpenedDialog';
-import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import {
   ColumnStackLayout,
@@ -43,6 +37,9 @@ import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../UI/Menu/ContextMenu';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import { groupResourcesByAnimations } from './AnimationImportHelper';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
+
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -196,9 +193,71 @@ const checkObjectPointsAndCollisionsMasks = (
   };
 };
 
-const removeExtensionFromFileName = (fileName: string) => {
-  const dotIndex = fileName.lastIndexOf('.');
-  return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
+export const applyPointsAndMasksToSpriteIfNecessary = (
+  spriteConfiguration: gdSpriteObject,
+  direction: gdDirection,
+  sprite: gdSprite
+) => {
+  const {
+    allDirectionSpritesHaveSameCollisionMasks,
+    allDirectionSpritesHaveSamePoints,
+  } = checkDirectionPointsAndCollisionsMasks(direction);
+  const {
+    allObjectSpritesHaveSameCollisionMasks,
+    allObjectSpritesHaveSamePoints,
+  } = checkObjectPointsAndCollisionsMasks(spriteConfiguration);
+  const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
+    spriteConfiguration
+  );
+  const firstObjectSprite = getCurrentElements(spriteConfiguration, 0, 0, 0)
+    .sprite;
+  const firstDirectionSprite =
+    direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+
+  // Copy points if toggles were set before adding the sprite.
+  if (allObjectSpritesHaveSamePoints && firstObjectSprite) {
+    // Copy points from the first sprite of the object, if existing.
+    copySpritePoints(firstObjectSprite, sprite);
+  } else if (allDirectionSpritesHaveSamePoints && firstDirectionSprite) {
+    // Copy points from the first sprite of the direction, if this is not the first one we add.
+    copySpritePoints(firstDirectionSprite, sprite);
+  }
+
+  // Copy collision masks if toggles were set before adding the sprite.
+  if (allObjectSpritesHaveSameCollisionMasks && firstObjectSprite) {
+    // Copy collision masks from the first sprite of the object, if existing.
+    copySpritePolygons(firstObjectSprite, sprite);
+  } else if (
+    allDirectionSpritesHaveSameCollisionMasks &&
+    firstDirectionSprite
+  ) {
+    // Copy collision masks from the first sprite of the direction, if this is not the first one we add.
+    copySpritePolygons(firstDirectionSprite, sprite);
+  }
+
+  if (shouldUseFullImageCollisionMask) {
+    sprite.setFullImageCollisionMask(true);
+  }
+};
+
+export const addAnimationFrame = (
+  spriteConfiguration: gdSpriteObject,
+  direction: gdDirection,
+  resource: gdResource,
+  onSpriteAdded: (sprite: gdSprite) => void
+) => {
+  const sprite = new gd.Sprite();
+  sprite.setImageName(resource.getName());
+
+  applyPointsAndMasksToSpriteIfNecessary(
+    spriteConfiguration,
+    direction,
+    sprite
+  );
+
+  onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
+  direction.addSprite(sprite);
+  sprite.delete();
 };
 
 type Props = {|
@@ -207,10 +266,16 @@ type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resourceManagementProps: ResourceManagementProps,
+  editDirectionWith: (
+    i18n: I18nType,
+    ResourceExternalEditor,
+    direction: gdDirection
+  ) => Promise<void>,
   onReplaceByDirection: (newDirection: gdDirection) => void,
   onSpriteAdded: (sprite: gdSprite) => void,
   onSpriteUpdated?: () => void,
   onFirstSpriteUpdated?: () => void,
+  addAnimations: (resourcesByAnimation: Map<string, Array<gdResource>>) => void,
   onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
   objectName: string, // This is used for the default name of images created with Piskel.
   animationName: string, // This is used for the default name of images created with Piskel.
@@ -222,15 +287,16 @@ const SpritesList = ({
   project,
   resourcesLoader,
   resourceManagementProps,
+  editDirectionWith,
   onReplaceByDirection,
   onSpriteAdded,
   onSpriteUpdated,
   onFirstSpriteUpdated,
+  addAnimations,
   onChangeName,
   objectName,
   animationName,
 }: Props) => {
-  const [externalEditorOpened, setExternalEditorOpened] = React.useState(false);
   // It's important to save the selected sprites in a ref, so that
   // we can update the selection when a context menu is opened without relying on the state.
   // Otherwise, the selection would be updated after the context menu is opened.
@@ -326,52 +392,6 @@ const SpritesList = ({
     ]
   );
 
-  const applyPointsAndMasksToSpriteIfNecessary = React.useCallback(
-    (sprite: gdSprite) => {
-      const {
-        allDirectionSpritesHaveSameCollisionMasks,
-        allDirectionSpritesHaveSamePoints,
-      } = checkDirectionPointsAndCollisionsMasks(direction);
-      const {
-        allObjectSpritesHaveSameCollisionMasks,
-        allObjectSpritesHaveSamePoints,
-      } = checkObjectPointsAndCollisionsMasks(spriteConfiguration);
-      const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
-        spriteConfiguration
-      );
-      const firstObjectSprite = getCurrentElements(spriteConfiguration, 0, 0, 0)
-        .sprite;
-      const firstDirectionSprite =
-        direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
-
-      // Copy points if toggles were set before adding the sprite.
-      if (allObjectSpritesHaveSamePoints && firstObjectSprite) {
-        // Copy points from the first sprite of the object, if existing.
-        copySpritePoints(firstObjectSprite, sprite);
-      } else if (allDirectionSpritesHaveSamePoints && firstDirectionSprite) {
-        // Copy points from the first sprite of the direction, if this is not the first one we add.
-        copySpritePoints(firstDirectionSprite, sprite);
-      }
-
-      // Copy collision masks if toggles were set before adding the sprite.
-      if (allObjectSpritesHaveSameCollisionMasks && firstObjectSprite) {
-        // Copy collision masks from the first sprite of the object, if existing.
-        copySpritePolygons(firstObjectSprite, sprite);
-      } else if (
-        allDirectionSpritesHaveSameCollisionMasks &&
-        firstDirectionSprite
-      ) {
-        // Copy collision masks from the first sprite of the direction, if this is not the first one we add.
-        copySpritePolygons(firstDirectionSprite, sprite);
-      }
-
-      if (shouldUseFullImageCollisionMask) {
-        sprite.setFullImageCollisionMask(true);
-      }
-    },
-    [direction, spriteConfiguration]
-  );
-
   const onAddSprite = React.useCallback(
     async (resourceSource: ResourceSource) => {
       const directionSpritesCountBeforeAdding = direction.getSpritesCount();
@@ -381,20 +401,38 @@ const SpritesList = ({
         multiSelection: true,
         resourceKind: 'image',
       });
-
       resources.forEach(resource => {
         applyResourceDefaults(project, resource);
         project.getResourcesManager().addResource(resource);
-
-        const sprite = new gd.Sprite();
-        sprite.setImageName(resource.getName());
-
-        applyPointsAndMasksToSpriteIfNecessary(sprite);
-
-        onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
-        direction.addSprite(sprite);
-        sprite.delete();
       });
+
+      if (directionSpritesCountBeforeAdding === 0 && resources.length > 1) {
+        const resourcesByAnimation = groupResourcesByAnimations(resources);
+        if (resourcesByAnimation.size > 1) {
+          addAnimations(resourcesByAnimation);
+        } else {
+          // Use `resourcesByAnimation` because frames are sorted.
+          for (const resources of resourcesByAnimation.values()) {
+            for (const resource of resources) {
+              addAnimationFrame(
+                spriteConfiguration,
+                direction,
+                resource,
+                onSpriteAdded
+              );
+            }
+          }
+        }
+      } else {
+        for (const resource of resources) {
+          addAnimationFrame(
+            spriteConfiguration,
+            direction,
+            resource,
+            onSpriteAdded
+          );
+        }
+      }
 
       // Important, we are responsible for deleting the resources that were given to us.
       // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
@@ -412,121 +450,14 @@ const SpritesList = ({
     },
     [
       direction,
-      project,
       resourceManagementProps,
       forceUpdate,
       onSpriteUpdated,
-      onSpriteAdded,
-      onFirstSpriteUpdated,
-      applyPointsAndMasksToSpriteIfNecessary,
-    ]
-  );
-
-  const editWith = React.useCallback(
-    async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
-      const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
-        return direction.getSprite(i).getImageName();
-      });
-
-      try {
-        setExternalEditorOpened(true);
-        const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
-          {
-            project,
-            i18n,
-            getStorageProvider: resourceManagementProps.getStorageProvider,
-            resourceManagementProps,
-            resourceNames,
-            extraOptions: {
-              singleFrame: false,
-              fps:
-                direction.getTimeBetweenFrames() > 0
-                  ? 1 / direction.getTimeBetweenFrames()
-                  : 1,
-              name:
-                animationName ||
-                (resourceNames[0] &&
-                  removeExtensionFromFileName(resourceNames[0])) ||
-                objectName,
-              isLooping: direction.isLooping(),
-              existingMetadata: direction.getMetadata(),
-            },
-          }
-        );
-
-        setExternalEditorOpened(false);
-        if (!editResult) return;
-
-        const { resources, newMetadata, newName } = editResult;
-
-        const newDirection = new gd.Direction();
-        newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
-        newDirection.setLoop(direction.isLooping());
-        resources.forEach(resource => {
-          const sprite = new gd.Sprite();
-          sprite.setImageName(resource.name);
-          // Restore collision masks and points
-          if (
-            resource.originalIndex !== undefined &&
-            resource.originalIndex !== null
-          ) {
-            // The sprite existed before, so we can copy its points and collision masks.
-            const originalSprite = direction.getSprite(resource.originalIndex);
-            copySpritePoints(originalSprite, sprite);
-            copySpritePolygons(originalSprite, sprite);
-          } else {
-            // The sprite is new, apply points & collision masks if necessary.
-            applyPointsAndMasksToSpriteIfNecessary(sprite);
-          }
-          onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
-          newDirection.addSprite(sprite);
-          sprite.delete();
-        });
-
-        // Set metadata on the direction to allow editing again in the future.
-        if (newMetadata) {
-          newDirection.setMetadata(JSON.stringify(newMetadata));
-        }
-
-        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
-        onReplaceByDirection(newDirection);
-
-        // If a name was specified in the external editor, use it for the animation.
-        if (newName) {
-          onChangeName(newName);
-        }
-        newDirection.delete();
-
-        if (onSpriteUpdated) onSpriteUpdated();
-        // If an external editor is used to edit the sprites, we assume the first sprite was edited.
-        if (onFirstSpriteUpdated) onFirstSpriteUpdated();
-      } catch (error) {
-        setExternalEditorOpened(false);
-        console.error(
-          'An exception was thrown when launching or reading resources from the external editor:',
-          error
-        );
-        showErrorBox({
-          message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
-          rawError: error,
-          errorId: 'external-editor-error',
-        });
-      }
-    },
-    [
-      animationName,
-      direction,
-      objectName,
-      onReplaceByDirection,
-      onSpriteUpdated,
-      onSpriteAdded,
       onFirstSpriteUpdated,
       project,
-      resourceManagementProps,
-      resourcesLoader,
-      onChangeName,
-      applyPointsAndMasksToSpriteIfNecessary,
+      addAnimations,
+      spriteConfiguration,
+      onSpriteAdded,
     ]
   );
 
@@ -659,7 +590,9 @@ const SpritesList = ({
         resourceExternalEditors={
           resourceManagementProps.resourceExternalEditors
         }
-        onEditWith={editWith}
+        onEditWith={(i18n, ResourceExternalEditor) =>
+          editDirectionWith(i18n, ResourceExternalEditor, direction)
+        }
         onDirectionUpdated={onSpriteUpdated}
       />
       <ResponsiveLineStackLayout noMargin expand alignItems="center">
@@ -715,7 +648,6 @@ const SpritesList = ({
           />
         </Column>
       </ResponsiveLineStackLayout>
-      {externalEditorOpened && <ExternalEditorOpenedDialog />}
     </ColumnStackLayout>
   );
 };

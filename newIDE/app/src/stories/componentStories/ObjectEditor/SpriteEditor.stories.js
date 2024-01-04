@@ -56,6 +56,22 @@ export const AnimationLocked = () => (
   </SerializedObjectDisplay>
 );
 
+export const Empty = () => (
+  <SerializedObjectDisplay object={testProject.emptySpriteObjectConfiguration}>
+    <DragAndDropContextProvider>
+      <SpriteEditor
+        objectConfiguration={testProject.emptySpriteObjectConfiguration}
+        project={testProject.project}
+        layout={testProject.testLayout}
+        resourceManagementProps={fakeResourceManagementProps}
+        onSizeUpdated={() => {}}
+        object={testProject.emptySpriteObject}
+        objectName="FakeObjectName"
+      />
+    </DragAndDropContextProvider>
+  </SerializedObjectDisplay>
+);
+
 export const Points = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>

@@ -27,7 +27,7 @@ const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },
 };
 
-export const getBehaviorTreeViewItemId = (
+export const getEventsBasedBehaviorTreeViewItemId = (
   eventsBasedBehavior: gdEventsBasedBehavior
 ): string => {
   // Pointers are used because they stay the same even when the names are
@@ -35,7 +35,7 @@ export const getBehaviorTreeViewItemId = (
   return 'behavior-' + eventsBasedBehavior.ptr;
 };
 
-export type EventBehaviorCallbacks = {|
+export type EventsBasedBehaviorCallbacks = {|
   onSelectEventsBasedBehavior: (
     eventsBasedBehavior: ?gdEventsBasedBehavior
   ) => void,
@@ -57,28 +57,34 @@ export type EventBehaviorCallbacks = {|
   ) => void,
 |};
 
-export type EventBehaviorProps = {|
+export type EventsBasedBehaviorProps = {|
   ...TreeItemProps,
-  ...EventBehaviorCallbacks,
+  ...EventsBasedBehaviorCallbacks,
   addNewEventsFunction: (itemContent: TreeViewItemContent) => void,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
 |};
 
-export class BehaviorTreeViewItemContent implements TreeViewItemContent {
-  behavior: gdEventsBasedBehavior;
-  props: EventBehaviorProps;
+export class EventsBasedBehaviorTreeViewItemContent
+  implements TreeViewItemContent {
+  eventsBasedBehavior: gdEventsBasedBehavior;
+  props: EventsBasedBehaviorProps;
 
-  constructor(behavior: gdEventsBasedBehavior, props: EventBehaviorProps) {
-    this.behavior = behavior;
+  constructor(
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    props: EventsBasedBehaviorProps
+  ) {
+    this.eventsBasedBehavior = eventsBasedBehavior;
     this.props = props;
   }
 
   getEventsFunctionsContainer(): gdEventsFunctionsContainer {
-    return this.behavior.getEventsFunctions();
+    return this.eventsBasedBehavior.getEventsFunctions();
   }
 
   getFunctionInsertionIndex(): number {
-    return this.behavior.getEventsFunctions().getEventsFunctionsCount();
+    return this.eventsBasedBehavior
+      .getEventsFunctions()
+      .getEventsFunctionsCount();
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -86,7 +92,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
   }
 
   getEventsBasedBehavior(): ?gdEventsBasedBehavior {
-    return this.behavior;
+    return this.eventsBasedBehavior;
   }
 
   getEventsBasedObject(): ?gdEventsBasedObject {
@@ -98,11 +104,11 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.behavior.getName();
+    return this.eventsBasedBehavior.getName();
   }
 
   getId(): string {
-    return getBehaviorTreeViewItemId(this.behavior);
+    return getEventsBasedBehaviorTreeViewItemId(this.eventsBasedBehavior);
   }
 
   getHtmlId(index: number): ?string {
@@ -118,18 +124,22 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
   }
 
   onSelect(): void {
-    this.props.onSelectEventsBasedBehavior(this.behavior);
+    this.props.onSelectEventsBasedBehavior(this.eventsBasedBehavior);
   }
 
   rename(newName: string): void {
-    if (this.behavior.getName() === newName) return;
+    if (this.eventsBasedBehavior.getName() === newName) return;
 
-    this.props.onRenameEventsBasedBehavior(this.behavior, newName, doRename => {
-      if (!doRename) return;
+    this.props.onRenameEventsBasedBehavior(
+      this.eventsBasedBehavior,
+      newName,
+      doRename => {
+        if (!doRename) return;
 
-      this._onEventsBasedBehaviorModified();
-      this.props.onEventsBasedBehaviorRenamed(this.behavior);
-    });
+        this._onEventsBasedBehaviorModified();
+        this.props.onEventsBasedBehaviorRenamed(this.eventsBasedBehavior);
+      }
+    );
   }
 
   edit(): void {}
@@ -158,7 +168,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
         accelerator: 'Backspace',
       },
       {
-        label: this.behavior.isPrivate()
+        label: this.eventsBasedBehavior.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
         click: () => this._togglePrivate(),
@@ -183,7 +193,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
   }
 
   renderLeftComponent(i18n: I18nType): ?React.Node {
-    return this.behavior.isPrivate() ? (
+    return this.eventsBasedBehavior.isPrivate() ? (
       <Tooltip
         title={
           <Trans>This behavior won't be visible in the events editor.</Trans>
@@ -215,21 +225,26 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsBasedBehavior(this.behavior, doRemove => {
-      if (!doRemove) return;
+    this.props.onDeleteEventsBasedBehavior(
+      this.eventsBasedBehavior,
+      doRemove => {
+        if (!doRemove) return;
 
-      eventsBasedBehaviorsList.remove(this.behavior.getName());
-      this._onEventsBasedBehaviorModified();
-    });
+        eventsBasedBehaviorsList.remove(this.eventsBasedBehavior.getName());
+        this._onEventsBasedBehaviorModified();
+      }
+    );
   }
 
   _togglePrivate(): void {
-    this.behavior.setPrivate(!this.behavior.isPrivate());
+    this.eventsBasedBehavior.setPrivate(!this.eventsBasedBehavior.isPrivate());
     this.props.forceUpdate();
   }
 
   getIndex(): number {
-    return this.props.eventsBasedBehaviorsList.getPosition(this.behavior);
+    return this.props.eventsBasedBehaviorsList.getPosition(
+      this.eventsBasedBehavior
+    );
   }
 
   moveAt(destinationIndex: number): void {
@@ -243,8 +258,8 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
 
   _copyEventsBasedBehavior(): void {
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
-      eventsBasedBehavior: serializeToJSObject(this.behavior),
-      name: this.behavior.getName(),
+      eventsBasedBehavior: serializeToJSObject(this.eventsBasedBehavior),
+      name: this.eventsBasedBehavior.getName(),
       extensionName: this.props.eventsFunctionsExtension.getName(),
     });
   }
@@ -301,7 +316,9 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
 
     this._onEventsBasedBehaviorModified();
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
-    this.props.editName(getBehaviorTreeViewItemId(newEventsBasedBehavior));
+    this.props.editName(
+      getEventsBasedBehaviorTreeViewItemId(newEventsBasedBehavior)
+    );
   }
 
   _addNewEventsBasedBehavior(): void {
@@ -316,7 +333,7 @@ export class BehaviorTreeViewItemContent implements TreeViewItemContent {
     );
     this._onEventsBasedBehaviorModified();
 
-    const newEventsBasedBehaviorId = getBehaviorTreeViewItemId(
+    const newEventsBasedBehaviorId = getEventsBasedBehaviorTreeViewItemId(
       newEventsBasedBehavior
     );
     // Scroll to the new behavior.

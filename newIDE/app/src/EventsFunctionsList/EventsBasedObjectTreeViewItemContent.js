@@ -20,7 +20,7 @@ import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
-export type EventObjectCallbacks = {|
+export type EventsBasedObjectCallbacks = {|
   onSelectEventsBasedObject: (eventsBasedObject: ?gdEventsBasedObject) => void,
   onDeleteEventsBasedObject: (
     eventsBasedObject: gdEventsBasedObject,
@@ -34,9 +34,9 @@ export type EventObjectCallbacks = {|
   onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
 |};
 
-export type EventObjectProps = {|
+export type EventsBasedObjectProps = {|
   ...TreeItemProps,
-  ...EventObjectCallbacks,
+  ...EventsBasedObjectCallbacks,
   addNewEventsFunction: (itemContent: TreeViewItemContent) => void,
   eventsBasedObjectsList: gdEventsBasedObjectsList,
 |};
@@ -49,21 +49,27 @@ export const getObjectTreeViewItemId = (
   return 'object-' + eventsBasedObject.ptr;
 };
 
-export class ObjectTreeViewItemContent implements TreeViewItemContent {
-  object: gdEventsBasedObject;
-  props: EventObjectProps;
+export class EventsBasedObjectTreeViewItemContent
+  implements TreeViewItemContent {
+  eventsBasedObject: gdEventsBasedObject;
+  props: EventsBasedObjectProps;
 
-  constructor(object: gdEventsBasedObject, props: EventObjectProps) {
-    this.object = object;
+  constructor(
+    eventsBasedObject: gdEventsBasedObject,
+    props: EventsBasedObjectProps
+  ) {
+    this.eventsBasedObject = eventsBasedObject;
     this.props = props;
   }
 
   getEventsFunctionsContainer(): gdEventsFunctionsContainer {
-    return this.object.getEventsFunctions();
+    return this.eventsBasedObject.getEventsFunctions();
   }
 
   getFunctionInsertionIndex(): number {
-    return this.object.getEventsFunctions().getEventsFunctionsCount();
+    return this.eventsBasedObject
+      .getEventsFunctions()
+      .getEventsFunctionsCount();
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -75,7 +81,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getEventsBasedObject(): ?gdEventsBasedObject {
-    return this.object;
+    return this.eventsBasedObject;
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
@@ -83,11 +89,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.object.getName();
+    return this.eventsBasedObject.getName();
   }
 
   getId(): string {
-    return getObjectTreeViewItemId(this.object);
+    return getObjectTreeViewItemId(this.eventsBasedObject);
   }
 
   getHtmlId(index: number): ?string {
@@ -103,18 +109,22 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   onSelect(): void {
-    this.props.onSelectEventsBasedObject(this.object);
+    this.props.onSelectEventsBasedObject(this.eventsBasedObject);
   }
 
   rename(newName: string): void {
-    if (this.object.getName() === newName) return;
+    if (this.eventsBasedObject.getName() === newName) return;
 
-    this.props.onRenameEventsBasedObject(this.object, newName, doRename => {
-      if (!doRename) return;
+    this.props.onRenameEventsBasedObject(
+      this.eventsBasedObject,
+      newName,
+      doRename => {
+        if (!doRename) return;
 
-      this._onEventsBasedObjectModified();
-      this.props.onEventsBasedObjectRenamed(this.object);
-    });
+        this._onEventsBasedObjectModified();
+        this.props.onEventsBasedObjectRenamed(this.eventsBasedObject);
+      }
+    );
   }
 
   edit(): void {}
@@ -186,16 +196,18 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsBasedObject(this.object, doRemove => {
+    this.props.onDeleteEventsBasedObject(this.eventsBasedObject, doRemove => {
       if (!doRemove) return;
 
-      eventsBasedObjectsList.remove(this.object.getName());
+      eventsBasedObjectsList.remove(this.eventsBasedObject.getName());
       this._onEventsBasedObjectModified();
     });
   }
 
   getIndex(): number {
-    return this.props.eventsBasedObjectsList.getPosition(this.object);
+    return this.props.eventsBasedObjectsList.getPosition(
+      this.eventsBasedObject
+    );
   }
 
   moveAt(destinationIndex: number): void {
@@ -209,8 +221,8 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
   _copyEventsBasedObject(): void {
     Clipboard.set(EVENTS_BASED_OBJECT_CLIPBOARD_KIND, {
-      eventsBasedObject: serializeToJSObject(this.object),
-      name: this.object.getName(),
+      eventsBasedObject: serializeToJSObject(this.eventsBasedObject),
+      name: this.eventsBasedObject.getName(),
     });
   }
 

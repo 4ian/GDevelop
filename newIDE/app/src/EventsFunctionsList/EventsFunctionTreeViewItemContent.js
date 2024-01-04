@@ -37,7 +37,7 @@ export type EventsFunctionCreationParameters = {|
   name: ?string,
 |};
 
-export type EventFunctionCallbacks = {|
+export type EventsFunctionCallbacks = {|
   onSelectEventsFunction: (
     selectedEventsFunction: ?gdEventsFunction,
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
@@ -63,17 +63,17 @@ export type EventFunctionCallbacks = {|
 
 export type EventFunctionCommonProps = {|
   ...TreeItemProps,
-  ...EventFunctionCallbacks,
+  ...EventsFunctionCallbacks,
 |};
 
-export type EventFunctionProps = {|
+export type EventsFunctionProps = {|
   ...EventFunctionCommonProps,
   eventsFunctionsContainer: gdEventsFunctionsContainer,
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsBasedObject?: ?gdEventsBasedObject,
 |};
 
-export const getFunctionTreeViewItemId = (
+export const getEventsFunctionTreeViewItemId = (
   eventFunction: gdEventsFunction
 ): string => {
   // Pointers are used because they stay the same even when the names are
@@ -81,12 +81,12 @@ export const getFunctionTreeViewItemId = (
   return `function-${eventFunction.ptr}`;
 };
 
-export class FunctionTreeViewItemContent implements TreeViewItemContent {
-  eventFunction: gdEventsFunction;
-  props: EventFunctionProps;
+export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
+  eventsFunction: gdEventsFunction;
+  props: EventsFunctionProps;
 
-  constructor(eventFunction: gdEventsFunction, props: EventFunctionProps) {
-    this.eventFunction = eventFunction;
+  constructor(eventsFunction: gdEventsFunction, props: EventsFunctionProps) {
+    this.eventsFunction = eventsFunction;
     this.props = props;
   }
 
@@ -99,7 +99,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getEventsFunction(): ?gdEventsFunction {
-    return this.eventFunction;
+    return this.eventsFunction;
   }
 
   getEventsBasedBehavior(): ?gdEventsBasedBehavior {
@@ -124,11 +124,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.eventFunction.getName();
+    return this.eventsFunction.getName();
   }
 
   getId(): string {
-    return getFunctionTreeViewItemId(this.eventFunction);
+    return getEventsFunctionTreeViewItemId(this.eventsFunction);
   }
 
   getHtmlId(index: number): ?string {
@@ -136,12 +136,12 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getThumbnail(): ?string {
-    switch (this.eventFunction.getFunctionType()) {
+    switch (this.eventsFunction.getFunctionType()) {
       default:
         return 'res/functions/function.svg';
       case gd.EventsFunction.Action:
       case gd.EventsFunction.ActionWithOperator:
-        switch (this.eventFunction.getName()) {
+        switch (this.eventsFunction.getName()) {
           default:
             return 'res/functions/action.svg';
 
@@ -185,19 +185,23 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
   onSelect(): void {
     this.props.onSelectEventsFunction(
-      this.eventFunction,
+      this.eventsFunction,
       this.props.eventsBasedBehavior,
       this.props.eventsBasedObject
     );
   }
 
   rename(newName: string): void {
-    if (this.eventFunction.getName() === newName) return;
+    if (this.eventsFunction.getName() === newName) return;
 
-    this.props.onRenameEventsFunction(this.eventFunction, newName, doRename => {
-      if (!doRename) return;
-      this._onEventsFunctionModified();
-    });
+    this.props.onRenameEventsFunction(
+      this.eventsFunction,
+      newName,
+      doRename => {
+        if (!doRename) return;
+        this._onEventsFunctionModified();
+      }
+    );
   }
 
   edit(): void {}
@@ -207,7 +211,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
-        enabled: this.props.canRename(this.eventFunction),
+        enabled: this.props.canRename(this.eventsFunction),
         accelerator: getShortcutDisplayName(
           this.props.preferences.values.userShortcutMap[
             'RENAME_SCENE_OBJECT'
@@ -215,13 +219,13 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
         ),
       },
       {
-        label: this.eventFunction.isPrivate()
+        label: this.eventsFunction.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
         click: () => this._togglePrivate(),
       },
       {
-        label: this.eventFunction.isAsync()
+        label: this.eventsFunction.isAsync()
           ? i18n._(t`Make synchronous`)
           : i18n._(t`Make asynchronous`),
         click: () => this._toggleAsync(),
@@ -256,7 +260,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
   renderLeftComponent(i18n: I18nType): ?React.Node {
     const icons = [];
-    if (this.eventFunction.isPrivate()) {
+    if (this.eventsFunction.isPrivate()) {
       icons.push(
         <Tooltip
           key="visibility"
@@ -268,7 +272,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
         </Tooltip>
       );
     }
-    if (this.eventFunction.isAsync()) {
+    if (this.eventsFunction.isAsync()) {
       icons.push(
         <Tooltip
           key="async"
@@ -288,12 +292,12 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   _togglePrivate(): void {
-    this.eventFunction.setPrivate(!this.eventFunction.isPrivate());
+    this.eventsFunction.setPrivate(!this.eventsFunction.isPrivate());
     this.props.forceUpdate();
   }
 
   _toggleAsync(): void {
-    this.eventFunction.setAsync(!this.eventFunction.isAsync());
+    this.eventsFunction.setAsync(!this.eventsFunction.isAsync());
     this.props.forceUpdateList();
   }
 
@@ -318,11 +322,11 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsFunction(this.eventFunction, doRemove => {
+    this.props.onDeleteEventsFunction(this.eventsFunction, doRemove => {
       if (!doRemove) return;
 
       eventsFunctionsContainer.removeEventsFunction(
-        this.eventFunction.getName()
+        this.eventsFunction.getName()
       );
       this._onEventsFunctionModified();
     });
@@ -330,7 +334,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
   getIndex(): number {
     return this.props.eventsFunctionsContainer.getEventsFunctionPosition(
-      this.eventFunction
+      this.eventsFunction
     );
   }
 
@@ -345,8 +349,8 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
 
   _copyEventsFunction(): void {
     Clipboard.set(EVENTS_FUNCTION_CLIPBOARD_KIND, {
-      eventsFunction: serializeToJSObject(this.eventFunction),
-      name: this.eventFunction.getName(),
+      eventsFunction: serializeToJSObject(this.eventsFunction),
+      name: this.eventsFunction.getName(),
     });
   }
 
@@ -392,16 +396,16 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedBehavior,
       this.props.eventsBasedObject
     );
-    this.props.editName(getFunctionTreeViewItemId(newEventsFunction));
+    this.props.editName(getEventsFunctionTreeViewItemId(newEventsFunction));
   }
 
   _duplicateEventsFunction(): void {
     const { eventsFunctionsContainer } = this.props;
-    const newName = newNameGenerator(this.eventFunction.getName(), name =>
+    const newName = newNameGenerator(this.eventsFunction.getName(), name =>
       eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
     const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
-      this.eventFunction,
+      this.eventsFunction,
       this.getIndex() + 1
     );
     newEventsFunction.setName(newName);
@@ -413,7 +417,7 @@ export class FunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedBehavior,
       this.props.eventsBasedObject
     );
-    this.props.editName(getFunctionTreeViewItemId(newEventsFunction));
+    this.props.editName(getEventsFunctionTreeViewItemId(newEventsFunction));
   }
 
   _onEventsFunctionModified() {

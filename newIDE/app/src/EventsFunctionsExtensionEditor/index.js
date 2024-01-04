@@ -10,7 +10,7 @@ import EditorMosaic, { mosaicContainsNode } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
 import EventsFunctionsListWithErrorBoundary from '../EventsFunctionsList';
-import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/FunctionTreeViewItemContent';
+import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import EventsBasedBehaviorEditorPanel from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';

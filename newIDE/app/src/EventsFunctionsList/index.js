@@ -28,24 +28,24 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import {
-  FunctionTreeViewItemContent,
-  getFunctionTreeViewItemId,
+  EventsFunctionTreeViewItemContent,
+  getEventsFunctionTreeViewItemId,
   type EventFunctionCommonProps,
-  type EventFunctionCallbacks,
+  type EventsFunctionCallbacks,
   type EventsFunctionCreationParameters,
-} from './FunctionTreeViewItemContent';
+} from './EventsFunctionTreeViewItemContent';
 import {
-  BehaviorTreeViewItemContent,
-  getBehaviorTreeViewItemId,
-  type EventBehaviorProps,
-  type EventBehaviorCallbacks,
-} from './BehaviorTreeViewItemContent';
+  EventsBasedBehaviorTreeViewItemContent,
+  getEventsBasedBehaviorTreeViewItemId,
+  type EventsBasedBehaviorProps,
+  type EventsBasedBehaviorCallbacks,
+} from './EventsBasedBehaviorTreeViewItemContent';
 import {
-  ObjectTreeViewItemContent,
+  EventsBasedObjectTreeViewItemContent,
   getObjectTreeViewItemId,
-  type EventObjectProps,
-  type EventObjectCallbacks,
-} from './ObjectTreeViewItemContent';
+  type EventsBasedObjectProps,
+  type EventsBasedObjectCallbacks,
+} from './EventsBasedObjectTreeViewItemContent';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -116,21 +116,21 @@ export type TreeItemProps = {|
   ) => Promise<boolean>,
 |};
 
-class ObjectTreeViewItem implements TreeViewItem {
-  content: ObjectTreeViewItemContent;
+class EventsBasedObjectTreeViewItem implements TreeViewItem {
+  content: EventsBasedObjectTreeViewItemContent;
   eventFunctionProps: EventFunctionCommonProps;
 
   constructor(
     object: gdEventsBasedObject,
-    props: EventObjectProps,
+    props: EventsBasedObjectProps,
     eventFunctionProps: EventFunctionCommonProps
   ) {
-    this.content = new ObjectTreeViewItemContent(object, props);
+    this.content = new EventsBasedObjectTreeViewItemContent(object, props);
     this.eventFunctionProps = eventFunctionProps;
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-    const eventsBasedObject = this.content.object;
+    const eventsBasedObject = this.content.eventsBasedObject;
     const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
     const eventFunctionProps = {
       eventsBasedObject,
@@ -152,7 +152,7 @@ class ObjectTreeViewItem implements TreeViewItem {
           functions.getEventsFunctionsCount(),
           i =>
             new LeafTreeViewItem(
-              new FunctionTreeViewItemContent(
+              new EventsFunctionTreeViewItemContent(
                 functions.getEventsFunctionAt(i),
                 eventFunctionProps
               )
@@ -162,20 +162,20 @@ class ObjectTreeViewItem implements TreeViewItem {
 }
 
 class BehaviorTreeViewItem implements TreeViewItem {
-  content: BehaviorTreeViewItemContent;
+  content: EventsBasedBehaviorTreeViewItemContent;
   eventFunctionProps: EventFunctionCommonProps;
 
   constructor(
     behavior: gdEventsBasedBehavior,
-    props: EventBehaviorProps,
+    props: EventsBasedBehaviorProps,
     eventFunctionProps: EventFunctionCommonProps
   ) {
-    this.content = new BehaviorTreeViewItemContent(behavior, props);
+    this.content = new EventsBasedBehaviorTreeViewItemContent(behavior, props);
     this.eventFunctionProps = eventFunctionProps;
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-    const eventsBasedBehavior = this.content.behavior;
+    const eventsBasedBehavior = this.content.eventsBasedBehavior;
     const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
     const eventFunctionProps = {
       eventsBasedBehavior,
@@ -196,7 +196,7 @@ class BehaviorTreeViewItem implements TreeViewItem {
           eventsFunctionsContainer.getEventsFunctionsCount(),
           i =>
             new LeafTreeViewItem(
-              new FunctionTreeViewItemContent(
+              new EventsFunctionTreeViewItemContent(
                 eventsFunctionsContainer.getEventsFunctionAt(i),
                 eventFunctionProps
               )
@@ -369,13 +369,13 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   // Objects
   selectedEventsBasedObject: ?gdEventsBasedObject,
-  ...EventObjectCallbacks,
+  ...EventsBasedObjectCallbacks,
   // Behaviors
   selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-  ...EventBehaviorCallbacks,
+  ...EventsBasedBehaviorCallbacks,
   // Free functions
   selectedEventsFunction: ?gdEventsFunction,
-  ...EventFunctionCallbacks,
+  ...EventsFunctionCallbacks,
 |};
 
 const EventsFunctionsList = React.forwardRef<
@@ -519,7 +519,10 @@ const EventsFunctionsList = React.forwardRef<
         };
         setSelectedItems([
           new LeafTreeViewItem(
-            new FunctionTreeViewItemContent(eventsFunction, eventFunctionProps)
+            new EventsFunctionTreeViewItemContent(
+              eventsFunction,
+              eventFunctionProps
+            )
           ),
         ]);
         onSelectEventsFunction(
@@ -590,7 +593,9 @@ const EventsFunctionsList = React.forwardRef<
               );
             }
 
-            const functionItemId = getFunctionTreeViewItemId(eventsFunction);
+            const functionItemId = getEventsFunctionTreeViewItemId(
+              eventsFunction
+            );
 
             if (treeViewRef.current) {
               treeViewRef.current.openItems([
@@ -644,7 +649,7 @@ const EventsFunctionsList = React.forwardRef<
     const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
     const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
 
-    const eventBehaviorProps = React.useMemo<EventBehaviorProps>(
+    const eventBasedBehaviorProps = React.useMemo<EventsBasedBehaviorProps>(
       () => ({
         project,
         eventsFunctionsExtension,
@@ -683,7 +688,7 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    const eventObjectProps = React.useMemo<EventObjectProps>(
+    const eventsBasedObjectProps = React.useMemo<EventsBasedObjectProps>(
       () => ({
         project,
         eventsFunctionsExtension,
@@ -725,14 +730,14 @@ const EventsFunctionsList = React.forwardRef<
         setSelectedItems([
           new BehaviorTreeViewItem(
             eventsBasedBehavior,
-            eventBehaviorProps,
+            eventBasedBehaviorProps,
             eventFunctionCommonProps
           ),
         ]);
         onSelectEventsBasedBehavior(eventsBasedBehavior);
       },
       [
-        eventBehaviorProps,
+        eventBasedBehaviorProps,
         eventFunctionCommonProps,
         onSelectEventsBasedBehavior,
       ]
@@ -754,7 +759,7 @@ const EventsFunctionsList = React.forwardRef<
         }
         forceUpdate();
 
-        const behaviorItemId = getBehaviorTreeViewItemId(
+        const behaviorItemId = getEventsBasedBehaviorTreeViewItemId(
           newEventsBasedBehavior
         );
 
@@ -789,18 +794,22 @@ const EventsFunctionsList = React.forwardRef<
     const setSelectionToObject = React.useCallback(
       (eventsBasedObject: gdEventsBasedObject) => {
         setSelectedItems([
-          new ObjectTreeViewItem(
+          new EventsBasedObjectTreeViewItem(
             eventsBasedObject,
-            eventObjectProps,
+            eventsBasedObjectProps,
             eventFunctionCommonProps
           ),
         ]);
         onSelectEventsBasedObject(eventsBasedObject);
       },
-      [eventFunctionCommonProps, eventObjectProps, onSelectEventsBasedObject]
+      [
+        eventFunctionCommonProps,
+        eventsBasedObjectProps,
+        onSelectEventsBasedObject,
+      ]
     );
 
-    const addNewEventsObject = React.useCallback(
+    const addNewEventsBasedObject = React.useCallback(
       () => {
         const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
 
@@ -882,9 +891,9 @@ const EventsFunctionsList = React.forwardRef<
       0,
       eventBasedObjects.size(),
       i =>
-        new ObjectTreeViewItem(
+        new EventsBasedObjectTreeViewItem(
           eventBasedObjects.at(i),
-          eventObjectProps,
+          eventsBasedObjectProps,
           eventFunctionCommonProps
         )
     );
@@ -894,7 +903,7 @@ const EventsFunctionsList = React.forwardRef<
       i =>
         new BehaviorTreeViewItem(
           eventBasedBehaviors.at(i),
-          eventBehaviorProps,
+          eventBasedBehaviorProps,
           eventFunctionCommonProps
         )
     );
@@ -910,7 +919,7 @@ const EventsFunctionsList = React.forwardRef<
                   {
                     icon: <Add />,
                     label: i18n._(t`Add an object`),
-                    click: addNewEventsObject,
+                    click: addNewEventsBasedObject,
                   }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -976,7 +985,7 @@ const EventsFunctionsList = React.forwardRef<
                 eventsFunctionsExtension.getEventsFunctionsCount(),
                 i =>
                   new LeafTreeViewItem(
-                    new FunctionTreeViewItemContent(
+                    new EventsFunctionTreeViewItemContent(
                       eventsFunctionsExtension.getEventsFunctionAt(i),
                       freeFunctionProps
                     )
@@ -989,7 +998,7 @@ const EventsFunctionsList = React.forwardRef<
       [
         addNewEventsBehavior,
         addNewEventsFunction,
-        addNewEventsObject,
+        addNewEventsBasedObject,
         behaviorTreeViewItems,
         eventFunctionCommonProps,
         eventsFunctionsExtension,
@@ -1188,7 +1197,7 @@ const EventsFunctionsList = React.forwardRef<
 const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // The component is costly to render, so avoid any re-rendering as much
   // as possible.
-  // We make the assumption that no changes to objects list is made outside
+  // We make the assumption that no changes to the tree is made outside
   // from the component.
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.

@@ -7,28 +7,50 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
+import alertDecorator from '../../AlertDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
-import EventsFunctionsList from '../../../EventsFunctionsList';
+import EventsFunctionsListWithErrorBoundary from '../../../EventsFunctionsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/EventsFunctionsList',
-  component: EventsFunctionsList,
-  decorators: [muiDecorator],
+  component: EventsFunctionsListWithErrorBoundary,
+  decorators: [muiDecorator, alertDecorator],
 };
 
 export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
-      <EventsFunctionsList
+      <EventsFunctionsListWithErrorBoundary
         project={testProject.project}
-        eventsFunctionsContainer={testProject.testEventsFunctionsExtension}
+        eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
+        selectedEventsBasedObject={null}
+        selectedEventsBasedBehavior={null}
         selectedEventsFunction={testProject.testEventsFunctionsExtension.getEventsFunctionAt(
           1
         )}
+        // Objects
+        onSelectEventsBasedObject={eventsBasedObject => {}}
+        onDeleteEventsBasedObject={(eventsBasedObject, cb) => cb(true)}
+        onRenameEventsBasedObject={(eventsBasedObject, newName, cb) => cb(true)}
+        onEventsBasedObjectRenamed={eventsBasedObject => {}}
+        // Behaviors
+        onSelectEventsBasedBehavior={eventsBasedBehavior => {}}
+        onDeleteEventsBasedBehavior={(eventsBasedBehavior, cb) => cb(true)}
+        onRenameEventsBasedBehavior={(eventsBasedBehavior, newName, cb) =>
+          cb(true)
+        }
+        onEventsBasedBehaviorRenamed={eventsBasedBehavior => {}}
+        onEventsBasedBehaviorPasted={(
+          eventsBasedBehavior,
+          sourceExtensionName
+        ) => {}}
+        // Free functions
         onSelectEventsFunction={action('select')}
         onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
-        onAddEventsFunction={cb => cb({ functionType: 0, name: null })}
+        onAddEventsFunction={(eventsBasedBehavior, eventsBasedObject, cb) =>
+          cb({ functionType: 0, name: null })
+        }
         onEventsFunctionAdded={() => {}}
         onRenameEventsFunction={(eventsFunction, newName, cb) => {
           eventsFunction.setName(newName);

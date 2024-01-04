@@ -17,6 +17,7 @@ import {
   getObjectFolderOrObjectUnifiedName,
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,6 +26,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
 type State = {|
@@ -236,6 +238,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   ObjectsRenderingService
                 )}
                 project={project}
+                unsavedChanges={this.props.unsavedChanges}
                 // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
                 objectsContainer={eventsBasedObject}
                 layout={null}
@@ -270,7 +273,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onAddObjectInstance={() => {}}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 ref={objectsList => (this._objectsList = objectsList)}
-                unsavedChanges={null}
                 // TODO EBO Hide the preview button or implement it.
                 // Note that it will be hard to do hot reload as extensions need
                 // to be generated.

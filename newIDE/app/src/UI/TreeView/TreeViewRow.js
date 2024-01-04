@@ -131,6 +131,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     isMobileScreen,
     DragSourceAndDropTarget,
     getItemHtmlId,
+    forceDefaultDraggingPreview,
   } = data;
   const node = flattenedData[index];
   const left = node.depth * 16;
@@ -242,6 +243,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
 
+          if (forceDefaultDraggingPreview) {
+            return {};
+          }
+
           // We return the item name and thumbnail to be used by the
           // drag preview if this is not a folder.
           // We can't use the item itself because it's not serializable.
@@ -263,7 +268,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
           renamedItemId !== node.id
         }
-        canDrop={canDrop ? () => canDrop(node.item) : () => true}
+        canDrop={canDrop ? () => canDrop(node.item, whereToDrop) : () => true}
         drop={() => {
           onDrop(node.item, whereToDrop);
         }}
@@ -342,6 +347,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   <ListIcon iconSize={20} src={node.thumbnailSrc} />
                 </div>
               ) : null}
+              {node.leftComponent}
               {renamedItemId === node.id && typeof node.name === 'string' ? (
                 <SemiControlledRowInput
                   initialValue={node.name}
@@ -373,6 +379,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             itemRow = connectDragPreview(itemRow);
           }
 
+          const rightButton = node.rightButton;
+
           const dragSource = connectDragSource(
             <div className="full-space-container">
               {isOver && whereToDrop === 'before' && (
@@ -387,7 +395,23 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 {...longTouchForContextMenuProps}
               >
                 {itemRow}
-                {!isMobileScreen &&
+                {rightButton && (
+                  <div className="row-content-side row-content-side-right">
+                    <IconButton
+                      size="small"
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (rightButton.click) {
+                          rightButton.click();
+                        }
+                      }}
+                    >
+                      {rightButton.icon}
+                    </IconButton>
+                  </div>
+                )}
+                {!rightButton &&
+                  !isMobileScreen &&
                   !node.item.isRoot &&
                   !node.item.isPlaceholder && (
                     <div className="row-content-side row-content-side-right">

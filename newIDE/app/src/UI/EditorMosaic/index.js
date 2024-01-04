@@ -157,6 +157,58 @@ const removeNode = (
   }
 };
 
+const resizeNode = (
+  currentNode: ?EditorMosaicNode,
+  resizedNode: ?EditorMosaicNode,
+  splitPercentage: number
+): ?EditorMosaicNode => {
+  if (!currentNode) {
+    return currentNode;
+  }
+  if (typeof currentNode === 'string') {
+    return currentNode;
+  }
+  if (currentNode.first === resizedNode) {
+    return {
+      ...currentNode,
+      splitPercentage: splitPercentage,
+    };
+  }
+  if (currentNode.second === resizedNode) {
+    return {
+      ...currentNode,
+      splitPercentage: 100 - splitPercentage,
+    };
+  }
+  return {
+    ...currentNode,
+    first: resizeNode(currentNode.first, resizedNode, splitPercentage),
+    second: resizeNode(currentNode.second, resizedNode, splitPercentage),
+  };
+};
+
+const getNodeSize = (
+  currentNode: ?EditorMosaicNode,
+  resizedNode: ?EditorMosaicNode
+): number => {
+  if (!currentNode) {
+    return 0;
+  }
+  if (typeof currentNode === 'string') {
+    return 0;
+  }
+  if (currentNode.first === resizedNode) {
+    return currentNode.splitPercentage;
+  }
+  if (currentNode.second === resizedNode) {
+    return 100 - currentNode.splitPercentage;
+  }
+  return (
+    getNodeSize(currentNode.first, resizedNode) ||
+    getNodeSize(currentNode.second, resizedNode)
+  );
+};
+
 const defaultToolbarControls = [<CloseButton key="close" />];
 
 const renderMosaicWindowPreview = props => (
@@ -224,6 +276,28 @@ export default class EditorMosaic extends React.Component<Props, State> {
     }
 
     return this.openEditor(editorName, position, splitPercentage, direction);
+  };
+
+  collapseEditor = (editorName: string) => {
+    const editor = this.props.editors[editorName];
+    if (!editor) return false;
+
+    this._onChanged(resizeNode(this.state.mosaicNode, editorName, 0));
+    return true;
+  };
+
+  uncollapseEditor = (editorName: string, splitPercentage: number) => {
+    const editor = this.props.editors[editorName];
+    if (!editor) return false;
+
+    if (getNodeSize(this.state.mosaicNode, editorName) !== 0) {
+      return false;
+    }
+
+    this._onChanged(
+      resizeNode(this.state.mosaicNode, editorName, splitPercentage)
+    );
+    return true;
   };
 
   openEditor = (

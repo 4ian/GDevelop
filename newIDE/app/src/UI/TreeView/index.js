@@ -25,9 +25,17 @@ export type ItemBaseAttributes = {
   +isPlaceholder?: boolean,
 };
 
+export type MenuButton = {|
+  icon: React.Node,
+  label: string,
+  click: ?() => void | Promise<void>,
+|};
+
 type FlattenedNode<Item> = {|
   id: string,
   name: string | React.Node,
+  leftComponent: ?React.Node,
+  rightButton: ?MenuButton,
   hasChildren: boolean,
   canHaveChildren: boolean,
   extraClass: string,
@@ -53,12 +61,13 @@ export type ItemData<Item> = {|
     y: number,
   |}) => void,
   renamedItemId: ?string,
-  canDrop?: ?(Item) => boolean,
+  canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
   onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
   onEditItem?: Item => void,
   isMobileScreen: boolean,
   DragSourceAndDropTarget: any => React.Node,
   getItemHtmlId?: (Item, index: number) => ?string,
+  forceDefaultDraggingPreview?: boolean,
 |};
 
 const getItemProps = memoizeOne(
@@ -75,12 +84,13 @@ const getItemProps = memoizeOne(
       x: number,
       y: number,
     |}) => void,
-    canDrop?: ?(Item) => boolean,
+    canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
     onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
     onEditItem?: Item => void,
     isMobileScreen: boolean,
     DragSourceAndDropTarget: any => React.Node,
-    getItemHtmlId?: (Item, index: number) => ?string
+    getItemHtmlId?: (Item, index: number) => ?string,
+    forceDefaultDraggingPreview?: boolean
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -95,13 +105,16 @@ const getItemProps = memoizeOne(
     isMobileScreen,
     DragSourceAndDropTarget,
     getItemHtmlId,
+    forceDefaultDraggingPreview,
   })
 );
 
 export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
   scrollToItem: (Item, placement?: 'smart' | 'start') => void,
+  scrollToItemFromId: (itemId: string, placement?: 'smart' | 'start') => void,
   renameItem: Item => void,
+  renameItemFromId: (itemId: string) => void,
   openItems: (string[]) => void,
   closeItems: (string[]) => void,
   animateItem: Item => void,
@@ -120,6 +133,8 @@ type Props<Item> = {|
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
+  getItemRightButton?: Item => ?MenuButton,
+  renderLeftComponent?: Item => ?React.Node,
   /**
    * Callback called when a folder is collapsed (folded).
    */
@@ -133,7 +148,10 @@ type Props<Item> = {|
     destinationItem: Item,
     where: 'before' | 'inside' | 'after'
   ) => void,
-  canMoveSelectionToItem?: ?(destinationItem: Item) => boolean,
+  canMoveSelectionToItem?: ?(
+    destinationItem: Item,
+    where: 'before' | 'inside' | 'after'
+  ) => boolean,
   reactDndType: string,
   forceAllOpened?: boolean,
   initiallyOpenedNodeIds?: string[],
@@ -141,6 +159,7 @@ type Props<Item> = {|
     onGetItemInside: (item: Item) => ?Item,
     onGetItemOutside: (item: Item) => ?Item,
   |},
+  forceDefaultDraggingPreview?: boolean,
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -157,6 +176,8 @@ const TreeView = <Item: ItemBaseAttributes>(
     getItemDataset,
     onEditItem,
     buildMenuTemplate,
+    getItemRightButton,
+    renderLeftComponent,
     selectedItems,
     onSelectItems,
     multiSelect,
@@ -168,6 +189,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     forceAllOpened,
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
+    forceDefaultDraggingPreview,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
@@ -224,6 +246,8 @@ const TreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
+      const leftComponent = renderLeftComponent && renderLeftComponent(item);
+      const rightButton = getItemRightButton && getItemRightButton(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
         animatedItemId && id === animatedItemId ? 'animate' : '';
@@ -249,6 +273,8 @@ const TreeView = <Item: ItemBaseAttributes>(
           {
             id,
             name,
+            leftComponent,
+            rightButton,
             hasChildren: !!children && children.length > 0,
             canHaveChildren,
             depth,
@@ -281,16 +307,18 @@ const TreeView = <Item: ItemBaseAttributes>(
       return [];
     },
     [
-      getItemChildren,
       getItemId,
-      getItemName,
-      getItemThumbnail,
-      getItemDataset,
-      openedDuringSearchNodeIds,
-      openedNodeIds,
-      selectedNodeIds,
+      getItemChildren,
       forceAllOpened,
+      openedNodeIds,
+      openedDuringSearchNodeIds,
+      getItemName,
+      renderLeftComponent,
+      getItemRightButton,
+      getItemDataset,
       animatedItemId,
+      getItemThumbnail,
+      selectedNodeIds,
     ]
   );
 
@@ -372,11 +400,10 @@ const TreeView = <Item: ItemBaseAttributes>(
     [flattenOpened, items, searchText]
   );
 
-  const scrollToItem = React.useCallback(
-    (item: Item, placement?: 'smart' | 'start' = 'smart') => {
+  const scrollToItemFromId = React.useCallback(
+    (itemId: string, placement?: 'smart' | 'start' = 'smart') => {
       const list = listRef.current;
       if (list) {
-        const itemId = getItemId(item);
         // Browse flattenedData in reverse order since scrollToItem is mainly used
         // to scroll to newly added object that is appended at the end of the list.
         // $FlowFixMe - Method introduced in 2022.
@@ -386,7 +413,13 @@ const TreeView = <Item: ItemBaseAttributes>(
         }
       }
     },
-    [getItemId, flattenedData]
+    [flattenedData]
+  );
+
+  const scrollToItem = React.useCallback(
+    (item: Item, placement?: 'smart' | 'start' = 'smart') =>
+      scrollToItemFromId(getItemId(item), placement),
+    [getItemId, scrollToItemFromId]
   );
 
   const renameItem = React.useCallback(
@@ -395,6 +428,10 @@ const TreeView = <Item: ItemBaseAttributes>(
     },
     [getItemId]
   );
+
+  const renameItemFromId = React.useCallback((itemId: string) => {
+    setRenamedItemId(itemId);
+  }, []);
 
   const openItems = React.useCallback(
     (itemIds: string[]) => {
@@ -456,7 +493,9 @@ const TreeView = <Item: ItemBaseAttributes>(
     () => ({
       forceUpdateList: forceUpdate,
       scrollToItem,
+      scrollToItemFromId,
       renameItem,
+      renameItemFromId,
       openItems,
       closeItems,
       animateItem,
@@ -510,7 +549,8 @@ const TreeView = <Item: ItemBaseAttributes>(
     onEditItem,
     isMobileScreen,
     DragSourceAndDropTarget,
-    getItemHtmlId
+    getItemHtmlId,
+    forceDefaultDraggingPreview
   );
 
   // Reset opened nodes during search when user stops searching

@@ -155,6 +155,20 @@ export const apiClient = axios.create({
   baseURL: GDevelopUsageApi.baseUrl,
 });
 
+export const canPriceBeFoundInGDevelopPrices = (
+  pricingSystemId: string
+): boolean => {
+  if (
+    ['REDEMPTION_CODE', 'MANUALLY_ADDED', 'TEAM_MEMBER'].includes(
+      pricingSystemId
+    )
+  ) {
+    return false;
+  }
+  if (pricingSystemId.startsWith('PURCHASELY_')) return false;
+  return true;
+};
+
 export const listSubscriptionPlans = async (options: {|
   includeLegacy: boolean,
 |}): Promise<SubscriptionPlan[]> => {

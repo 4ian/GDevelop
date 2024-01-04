@@ -286,7 +286,7 @@ export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
   cancelAtPeriodEnd: true,
-  pricingSystemId: 'MANUALLY_ADDED',
+  pricingSystemId: 'silver_1month',
 };
 
 export const noSubscription: Subscription = {

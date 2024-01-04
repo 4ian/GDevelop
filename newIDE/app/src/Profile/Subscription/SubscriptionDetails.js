@@ -11,6 +11,7 @@ import {
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
   getSubscriptionPlanPrice,
+  canPriceBeFoundInGDevelopPrices,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
@@ -161,10 +162,17 @@ const SubscriptionDetails = ({
             setUserSubscriptionPlanPrice(null);
             return;
           }
+
           const {
             prices,
             ...subscriptionPlan
           } = matchingSubscriptionPlanWithPrices;
+
+          if (!canPriceBeFoundInGDevelopPrices(pricingSystemId)) {
+            setUserSubscriptionPlan(subscriptionPlan);
+            setUserSubscriptionPlanPrice(null);
+            return;
+          }
 
           let pricingSystem = prices.find(
             price => price.id === subscription.pricingSystemId

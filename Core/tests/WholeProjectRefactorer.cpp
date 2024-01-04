@@ -3474,6 +3474,72 @@ TEST_CASE("RenameLayer", "[common]") {
             "MyExtension::CameraCenterX(\"layerA\")");
   }
 
+  SECTION("Renaming a layer also moves the instances on this layer and of the associated external layouts") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+
+    layout.InsertNewLayer("My layer", 0);
+    otherLayout.InsertNewLayer("My layer", 0);
+
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    auto &otherExternalLayout =
+        project.InsertNewExternalLayout("My other external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    otherExternalLayout.SetAssociatedLayout("My other layout");
+
+    auto &initialInstances = layout.GetInitialInstances();
+    auto &initialInstance1 = initialInstances.InsertNewInitialInstance();
+    initialInstance1.SetLayer("My layer");
+    auto &initialInstance2 = initialInstances.InsertNewInitialInstance();
+    initialInstance2.SetLayer("My layer");
+    auto &initialInstance3 = initialInstances.InsertNewInitialInstance();
+    initialInstance3.SetLayer("");
+
+    auto &externalInitialInstances = externalLayout.GetInitialInstances();
+    auto &externalInitialInstance1 = externalInitialInstances.InsertNewInitialInstance();
+    externalInitialInstance1.SetLayer("My layer");
+    auto &externalInitialInstance2 = externalInitialInstances.InsertNewInitialInstance();
+    externalInitialInstance2.SetLayer("My layer");
+    auto &externalInitialInstance3 = externalInitialInstances.InsertNewInitialInstance();
+    externalInitialInstance3.SetLayer("");
+
+    auto &otherInitialInstances = otherLayout.GetInitialInstances();
+    auto &otherInitialInstance1 = otherInitialInstances.InsertNewInitialInstance();
+    otherInitialInstance1.SetLayer("My layer");
+
+    auto &otherExternalInitialInstances = otherExternalLayout.GetInitialInstances();
+    auto &otherExternalInitialInstance1 = otherExternalInitialInstances.InsertNewInitialInstance();
+    otherExternalInitialInstance1.SetLayer("My layer");
+
+    REQUIRE(initialInstance1.GetLayer() == "My layer");
+    REQUIRE(initialInstance2.GetLayer() == "My layer");
+    REQUIRE(initialInstance3.GetLayer() == "");
+    REQUIRE(externalInitialInstance1.GetLayer() == "My layer");
+    REQUIRE(externalInitialInstance2.GetLayer() == "My layer");
+    REQUIRE(externalInitialInstance3.GetLayer() == "");
+    REQUIRE(otherInitialInstance1.GetLayer() == "My layer");
+    REQUIRE(otherExternalInitialInstance1.GetLayer() == "My layer");
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer", "My new layer");
+
+    // Instances on the renamed layer are moved to the new layer.
+    REQUIRE(initialInstance1.GetLayer() == "My new layer");
+    REQUIRE(initialInstance2.GetLayer() == "My new layer");
+    REQUIRE(initialInstance3.GetLayer() == "");
+    // Instances on the renamed layer of external layouts are moved to the new layer.
+    REQUIRE(externalInitialInstance1.GetLayer() == "My new layer");
+    REQUIRE(externalInitialInstance2.GetLayer() == "My new layer");
+    REQUIRE(externalInitialInstance3.GetLayer() == "");
+    // Instances on the renamed layer of other layouts & external layouts are not moved.
+    REQUIRE(otherInitialInstance1.GetLayer() == "My layer");
+    REQUIRE(otherExternalInitialInstance1.GetLayer() == "My layer");
+  }
+
   SECTION("Can rename a layer when a layer parameter is empty") {
     gd::Project project;
     gd::Platform platform;

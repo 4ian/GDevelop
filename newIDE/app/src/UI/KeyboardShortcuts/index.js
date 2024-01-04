@@ -28,6 +28,7 @@ const KEY_1_NUMPAD = 97;
 const KEY_2_NUMPAD = 98;
 const KEY_3_NUMPAD = 99;
 const ESC_KEY = 27;
+const F2_KEY = 113;
 
 export const MID_MOUSE_BUTTON = 1;
 
@@ -48,6 +49,7 @@ type ShortcutCallbacks = {|
   onShift2?: () => void | Promise<void>,
   onShift3?: () => void | Promise<void>,
   onToggleGrabbingTool?: (isEnabled: boolean) => void | Promise<void>,
+  onRename?: () => void | Promise<void>,
 |};
 
 type ConstructorArgs = {|
@@ -260,6 +262,7 @@ export default class KeyboardShortcuts {
       onShift1,
       onShift2,
       onShift3,
+      onRename,
     } = this._shortcutCallbacks;
 
     if (onMove) {
@@ -280,6 +283,10 @@ export default class KeyboardShortcuts {
     if (onDelete && (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY)) {
       evt.preventDefault();
       onDelete();
+    }
+    if (onRename && evt.which === F2_KEY) {
+      evt.preventDefault();
+      onRename();
     }
     if (onCopy && this._isControlOrCmdPressed() && evt.which === C_KEY) {
       evt.preventDefault();

@@ -85,6 +85,9 @@ export interface TreeViewItemContent {
   rename(newName: string): void;
   edit(): void;
   delete(): void;
+  copy(): void;
+  paste(): void;
+  cut(): void;
   getIndex(): number;
   moveAt(destinationIndex: number): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
@@ -318,6 +321,12 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   edit(): void {}
 
   delete(): void {}
+
+  copy(): void {}
+
+  paste(): void {}
+
+  cut(): void {}
 
   getIndex(): number {
     return 0;
@@ -694,9 +703,29 @@ const EventsFunctionsList = React.forwardRef<
               deleteItem(selectedItems[0]);
             }
           });
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            if (selectedItems.length > 0) {
+              editName(selectedItems[0].content.getId());
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onCopy', () => {
+            if (selectedItems.length > 0) {
+              selectedItems[0].content.copy();
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onPaste', () => {
+            if (selectedItems.length > 0) {
+              selectedItems[0].content.paste();
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onCut', () => {
+            if (selectedItems.length > 0) {
+              selectedItems[0].content.cut();
+            }
+          });
         }
       },
-      [selectedItems]
+      [editName, selectedItems]
     );
 
     const eventFunctionCommonProps = React.useMemo<EventFunctionCommonProps>(

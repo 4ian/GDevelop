@@ -212,11 +212,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
         enabled: this.props.canRename(this.eventsFunction),
-        accelerator: getShortcutDisplayName(
-          this.props.preferences.values.userShortcutMap[
-            'RENAME_SCENE_OBJECT'
-          ] || defaultShortcuts.RENAME_SCENE_OBJECT
-        ),
+        accelerator: 'F2',
       },
       {
         label: this.eventsFunction.isPrivate()
@@ -240,16 +236,19 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Copy`),
-        click: () => this._copyEventsFunction(),
+        click: () => this.copy(),
+        accelerator: 'CmdOrCtrl+C',
       },
       {
         label: i18n._(t`Cut`),
-        click: () => this._cutEventsFunction(),
+        click: () => this.cut(),
+        accelerator: 'CmdOrCtrl+X',
       },
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
-        click: () => this._pasteEventsFunction(),
+        click: () => this.paste(),
+        accelerator: 'CmdOrCtrl+V',
       },
       {
         label: i18n._(t`Duplicate`),
@@ -347,19 +346,19 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  _copyEventsFunction(): void {
+  copy(): void {
     Clipboard.set(EVENTS_FUNCTION_CLIPBOARD_KIND, {
       eventsFunction: serializeToJSObject(this.eventsFunction),
       name: this.eventsFunction.getName(),
     });
   }
 
-  _cutEventsFunction(): void {
-    this._copyEventsFunction();
+  cut(): void {
+    this.copy();
     this._deleteEventsFunction({ askForConfirmation: false });
   }
 
-  _pasteEventsFunction(): void {
+  paste(): void {
     if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EVENTS_FUNCTION_CLIPBOARD_KIND);

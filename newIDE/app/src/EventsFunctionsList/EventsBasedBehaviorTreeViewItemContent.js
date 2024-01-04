@@ -156,11 +156,7 @@ export class EventsBasedBehaviorTreeViewItemContent
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
-        accelerator: getShortcutDisplayName(
-          this.props.preferences.values.userShortcutMap[
-            'RENAME_SCENE_OBJECT'
-          ] || defaultShortcuts.RENAME_SCENE_OBJECT
-        ),
+        accelerator: 'F2',
       },
       {
         label: i18n._(t`Delete`),
@@ -178,16 +174,19 @@ export class EventsBasedBehaviorTreeViewItemContent
       },
       {
         label: i18n._(t`Copy`),
-        click: () => this._copyEventsBasedBehavior(),
+        click: () => this.copy(),
+        accelerator: 'CmdOrCtrl+C',
       },
       {
         label: i18n._(t`Cut`),
-        click: () => this._cutEventsBasedBehavior(),
+        click: () => this.cut(),
+        accelerator: 'CmdOrCtrl+X',
       },
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
-        click: () => this._pasteEventsBasedBehavior(),
+        click: () => this.paste(),
+        accelerator: 'CmdOrCtrl+V',
       },
     ];
   }
@@ -256,7 +255,7 @@ export class EventsBasedBehaviorTreeViewItemContent
     );
   }
 
-  _copyEventsBasedBehavior(): void {
+  copy(): void {
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
       eventsBasedBehavior: serializeToJSObject(this.eventsBasedBehavior),
       name: this.eventsBasedBehavior.getName(),
@@ -264,14 +263,14 @@ export class EventsBasedBehaviorTreeViewItemContent
     });
   }
 
-  _cutEventsBasedBehavior(): void {
-    this._copyEventsBasedBehavior();
+  cut(): void {
+    this.copy();
     this._deleteEventsBasedBehavior({
       askForConfirmation: false,
     });
   }
 
-  _pasteEventsBasedBehavior(): void {
+  paste(): void {
     if (!Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(

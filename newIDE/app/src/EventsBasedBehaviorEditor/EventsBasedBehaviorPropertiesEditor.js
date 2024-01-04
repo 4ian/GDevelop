@@ -84,6 +84,7 @@ type Props = {|
   isSceneProperties?: boolean,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  onEventsFunctionsAdded: () => void,
   behaviorObjectType?: string,
 |};
 
@@ -116,7 +117,7 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
 };
 
 export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
-  const { properties, onPropertiesUpdated } = props;
+  const { properties, onPropertiesUpdated, onEventsFunctionsAdded } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedPropertyName,
@@ -493,14 +494,16 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           label: i18n._(
                                             t`Generate expression and action`
                                           ),
-                                          click: () =>
+                                          click: () => {
                                             gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
                                               props.project,
                                               props.extension,
                                               props.eventsBasedBehavior,
                                               property,
                                               !!props.isSceneProperties
-                                            ),
+                                            );
+                                            onEventsFunctionsAdded();
+                                          },
                                           enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
                                             props.eventsBasedBehavior,
                                             property

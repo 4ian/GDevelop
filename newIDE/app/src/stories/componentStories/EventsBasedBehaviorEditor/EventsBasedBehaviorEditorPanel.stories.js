@@ -24,6 +24,7 @@ export const Default = () => (
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
       onRenameProperty={action('property rename')}
       onRenameSharedProperty={action('shared property rename')}
+      onEventsFunctionsAdded={action('functions added')}
     />
   </DragAndDropContextProvider>
 );
@@ -36,6 +37,7 @@ export const WithoutFunction = () => (
       eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}
       onRenameProperty={action('property rename')}
       onRenameSharedProperty={action('shared property rename')}
+      onEventsFunctionsAdded={action('functions added')}
     />
   </DragAndDropContextProvider>
 );

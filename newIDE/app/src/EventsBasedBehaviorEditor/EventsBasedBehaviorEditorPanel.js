@@ -16,6 +16,7 @@ type Props = {|
   eventsBasedBehavior: gdEventsBasedBehavior,
   onRenameProperty: (oldName: string, newName: string) => void,
   onRenameSharedProperty: (oldName: string, newName: string) => void,
+  onEventsFunctionsAdded: () => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -26,6 +27,7 @@ export default function EventsBasedBehaviorEditorPanel({
   onRenameProperty,
   onRenameSharedProperty,
   unsavedChanges,
+  onEventsFunctionsAdded,
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
 
@@ -80,6 +82,7 @@ export default function EventsBasedBehaviorEditorPanel({
             onRenameProperty={onRenameProperty}
             behaviorObjectType={eventsBasedBehavior.getObjectType()}
             onPropertiesUpdated={onPropertiesUpdated}
+            onEventsFunctionsAdded={onEventsFunctionsAdded}
           />
         )}
         {currentTab === 'scene-properties' && (
@@ -91,6 +94,7 @@ export default function EventsBasedBehaviorEditorPanel({
             properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
             onRenameProperty={onRenameSharedProperty}
             onPropertiesUpdated={onPropertiesUpdated}
+            onEventsFunctionsAdded={onEventsFunctionsAdded}
           />
         )}
       </Column>

@@ -369,7 +369,6 @@ const getTreeViewItemRightButton = (item: TreeViewItem) =>
 
 export type EventsFunctionsListInterface = {|
   forceUpdateList: () => void,
-  renameObjectFolderOrObjectWithContext: TreeViewItem => void,
 |};
 
 type Props = {|
@@ -444,10 +443,6 @@ const EventsFunctionsList = React.forwardRef<
       forceUpdateList: () => {
         forceUpdate();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-      },
-      renameObjectFolderOrObjectWithContext: objectFolderOrObjectWithContext => {
-        if (treeViewRef.current)
-          treeViewRef.current.renameItem(objectFolderOrObjectWithContext);
       },
     }));
 

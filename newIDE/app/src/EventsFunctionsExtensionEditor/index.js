@@ -9,7 +9,9 @@ import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
 import EditorMosaic, { mosaicContainsNode } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
-import EventsFunctionsListWithErrorBoundary from '../EventsFunctionsList';
+import EventsFunctionsListWithErrorBoundary, {
+  type EventsFunctionsListInterface,
+} from '../EventsFunctionsList';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
@@ -108,6 +110,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     onAddEventsFunctionCb: null,
   };
   editor: ?EventsSheetInterface;
+  eventsFunctionList: ?EventsFunctionsListInterface;
   _editorMosaic: ?EditorMosaic;
   _editorNavigator: ?EditorNavigatorInterface;
   // Create an empty "context" of objects.
@@ -1208,6 +1211,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onEventsFunctionsAdded={() => {
+                if (this.eventsFunctionList) {
+                  this.eventsFunctionList.forceUpdateList();
+                }
+              }}
             />
           ) : selectedEventsBasedObject && this._globalObjectsContainer ? (
             <EventsBasedObjectEditorPanel
@@ -1223,6 +1231,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onEventsFunctionsAdded={() => {
+                if (this.eventsFunctionList) {
+                  this.eventsFunctionList.forceUpdateList();
+                }
+              }}
             />
           ) : (
             <Background>
@@ -1243,6 +1256,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           <I18n>
             {({ i18n }) => (
               <EventsFunctionsListWithErrorBoundary
+                ref={eventsFunctionList =>
+                  (this.eventsFunctionList = eventsFunctionList)
+                }
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 unsavedChanges={this.props.unsavedChanges}

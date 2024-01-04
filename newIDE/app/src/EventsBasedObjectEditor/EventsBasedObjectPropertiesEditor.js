@@ -36,6 +36,7 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  onEventsFunctionsAdded: () => void,
 |};
 
 const styles = {
@@ -80,6 +81,7 @@ export default function EventsBasedObjectPropertiesEditor({
   eventsBasedObject,
   onPropertiesUpdated,
   onRenameProperty,
+  onEventsFunctionsAdded,
 }: Props) {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
@@ -235,13 +237,15 @@ export default function EventsBasedObjectPropertiesEditor({
                             },
                             {
                               label: i18n._(t`Generate expression and action`),
-                              click: () =>
+                              click: () => {
                                 gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
                                   project,
                                   extension,
                                   eventsBasedObject,
                                   property
-                                ),
+                                );
+                                onEventsFunctionsAdded();
+                              },
                               enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
                                 eventsBasedObject,
                                 property

@@ -11,6 +11,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
+import { type ResourceKind } from '../ResourcesList/ResourceSource';
 const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
@@ -236,10 +237,18 @@ export default class PixiResourcesLoader {
     spineDataPromises = {};
   }
 
-  static async reloadResource(
+  static async _reloadResourceOwner(
     project: gdProject,
-    resourceName: string
+    resourceName: string,
+    ownerKind: ResourceKind
   ) {
+    const supposedOwner = getEmbeddedOwnerResource(project, resourceName);
+    if (supposedOwner && supposedOwner.getKind() === ownerKind) {
+      await this.reloadResource(project, supposedOwner.getName());
+    }
+  }
+
+  static async reloadResource(project: gdProject, resourceName: string) {
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture && loadedTexture.textureCacheIds) {
       // The property textureCacheIds indicates that the PIXI.Texture object has some
@@ -251,17 +260,7 @@ export default class PixiResourcesLoader {
       // been added and detected by file watcher. When reloading the texture, the cache must
       // be cleaned too.
       delete loadedTextures[resourceName];
-
-      const supposedAtlasOwner = getEmbeddedOwnerResource(
-        project,
-        resourceName
-      );
-      if (supposedAtlasOwner && supposedAtlasOwner.getKind() === 'atlas') {
-        await this.reloadResource(
-          project,
-          supposedAtlasOwner.getName()
-        );
-      }
+      await this._reloadResourceOwner(project, resourceName, 'atlas');
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
@@ -291,20 +290,7 @@ export default class PixiResourcesLoader {
         }
       });
       delete spineAtlasPromises[resourceName];
-
-      const supposedSpineResourceOwner = getEmbeddedOwnerResource(
-        project,
-        resourceName
-      );
-      if (
-        supposedSpineResourceOwner &&
-        supposedSpineResourceOwner.getKind() === 'spine'
-      ) {
-        await this.reloadResource(
-          project,
-          supposedSpineResourceOwner.getName()
-        );
-      }
+      await this._reloadResourceOwner(project, resourceName, 'spine');
     }
     if (spineDataPromises[resourceName]) {
       await PIXI.Assets.unload(resourceName);

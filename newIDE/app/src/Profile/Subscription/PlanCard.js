@@ -162,25 +162,15 @@ const getPlanPrice = (
   }
 };
 
-/**
- * If pricing system is given, it will be displayed. Otherwise, the pricing systems
- * stored in the subscription plan will be displayed.
- */
 const getPlanPrices = ({
   pricingSystems,
-  pricingSystem,
   hidePrice,
 }: {
-  pricingSystems: ?(SubscriptionPlanPricingSystem[]),
-  pricingSystem: ?SubscriptionPlanPricingSystem,
+  pricingSystems: SubscriptionPlanPricingSystem[],
   hidePrice?: boolean,
 }): React.Node => {
   if (hidePrice) return null;
-  if (pricingSystem) {
-    return getPlanPrice(pricingSystem);
-  }
-
-  if (pricingSystems && pricingSystems.length > 0) {
+  if (pricingSystems.length > 0) {
     const displayedPricingSystems = pricingSystems.map(getPlanPrice);
 
     return displayedPricingSystems;
@@ -240,10 +230,7 @@ const getPlanIcon = (
 };
 
 type Props = {|
-  subscriptionPlanWithPricingSystems:
-    | SubscriptionPlanWithPricingSystems
-    | SubscriptionPlan,
-  subscriptionPlanPricingSystem?: ?SubscriptionPlanPricingSystem,
+  subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
   isHighlighted: boolean,
   actions?: React.Node,
   isPending?: boolean,
@@ -294,9 +281,7 @@ const PlanCard = (props: Props) => {
                 <Column noMargin alignItems="flex-end">
                   {getPlanPrices({
                     pricingSystems:
-                      props.subscriptionPlanWithPricingSystems.pricingSystems ||
-                      null,
-                    pricingSystem: props.subscriptionPlanPricingSystem,
+                      props.subscriptionPlanWithPricingSystems.pricingSystems,
                     hidePrice: props.hidePrice,
                   })}
                 </Column>

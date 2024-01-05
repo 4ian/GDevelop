@@ -1,12 +1,10 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import {
   type SubscriptionPlanWithPricingSystems,
-  type SubscriptionPlanPricingSystem,
-  type SubscriptionPlan,
   type Subscription,
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
@@ -15,7 +13,6 @@ import {
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
-import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
 import LeftLoader from '../../UI/LeftLoader';
 import {
@@ -117,17 +114,13 @@ const SubscriptionDetails = ({
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [
-    userSubscriptionPlan,
-    setUserSubscriptionPlan,
-  ] = React.useState<?SubscriptionPlan>(null);
+    userSubscriptionPlanWithPricingSystems,
+    setUserSubscriptionPlanWithPricingSystems,
+  ] = React.useState<?SubscriptionPlanWithPricingSystems>(null);
   const [error, setError] = React.useState<?React.Node>(null);
   const [isLoadingUserPrice, setIsLoadingUserPrice] = React.useState<boolean>(
     false
   );
-  const [
-    userSubscriptionPlanPrice,
-    setUserSubscriptionPlanPrice,
-  ] = React.useState<?SubscriptionPlanPricingSystem>(null);
 
   React.useEffect(
     () => {
@@ -136,15 +129,13 @@ const SubscriptionDetails = ({
         setIsLoadingUserPrice(true);
         try {
           if (!subscription) {
-            setUserSubscriptionPlan(null);
-            setUserSubscriptionPlanPrice(null);
+            setUserSubscriptionPlanWithPricingSystems(null);
             return;
           }
 
           const { planId, pricingSystemId } = subscription;
           if (!planId || !pricingSystemId) {
-            setUserSubscriptionPlan(null);
-            setUserSubscriptionPlanPrice(null);
+            setUserSubscriptionPlanWithPricingSystems(null);
             return;
           }
 
@@ -158,8 +149,7 @@ const SubscriptionDetails = ({
                 in touch with us to fix this issue.
               </Trans>
             );
-            setUserSubscriptionPlan(null);
-            setUserSubscriptionPlanPrice(null);
+            setUserSubscriptionPlanWithPricingSystems(null);
             return;
           }
 
@@ -169,8 +159,10 @@ const SubscriptionDetails = ({
           } = matchingSubscriptionPlanWithPrices;
 
           if (!canPriceBeFoundInGDevelopPrices(pricingSystemId)) {
-            setUserSubscriptionPlan(subscriptionPlan);
-            setUserSubscriptionPlanPrice(null);
+            setUserSubscriptionPlanWithPricingSystems({
+              ...subscriptionPlan,
+              pricingSystems: [],
+            });
             return;
           }
 
@@ -189,13 +181,14 @@ const SubscriptionDetails = ({
                 get in touch with us to fix this issue.
               </Trans>
             );
-            setUserSubscriptionPlan(null);
-            setUserSubscriptionPlanPrice(null);
+            setUserSubscriptionPlanWithPricingSystems(null);
             return;
           }
 
-          setUserSubscriptionPlan(subscriptionPlan);
-          setUserSubscriptionPlanPrice(pricingSystem);
+          setUserSubscriptionPlanWithPricingSystems({
+            ...subscriptionPlan,
+            pricingSystems: [pricingSystem],
+          });
         } finally {
           setIsLoadingUserPrice(false);
         }
@@ -233,8 +226,8 @@ const SubscriptionDetails = ({
           </Text>
         </Column>
       </Line>
-      {userSubscriptionPlan &&
-      userSubscriptionPlan.id &&
+      {userSubscriptionPlanWithPricingSystems &&
+      userSubscriptionPlanWithPricingSystems.id &&
       !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
           <Paper background="medium" variant="outlined" style={styles.paper}>
@@ -276,8 +269,9 @@ const SubscriptionDetails = ({
           // On web/desktop, displays the subscription as usual:
           <ColumnStackLayout noMargin>
             <PlanCard
-              subscriptionPlanWithPricingSystems={userSubscriptionPlan}
-              subscriptionPlanPricingSystem={userSubscriptionPlanPrice}
+              subscriptionPlanWithPricingSystems={
+                userSubscriptionPlanWithPricingSystems
+              }
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||

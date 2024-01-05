@@ -10,13 +10,25 @@ import {
 } from '../Utils/GDevelopServices/Authentication';
 import Text from '../UI/Text';
 import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Link from '../UI/Link';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
 import Form from '../UI/Form';
 import { Line } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import AlertMessage from '../UI/AlertMessage';
+import Google from '../UI/CustomSvgIcons/Google';
+import Apple from '../UI/CustomSvgIcons/Apple';
+import GitHub from '../UI/CustomSvgIcons/GitHub';
+
+const styles = {
+  identityProvidersBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    marginTop: 30,
+  },
+};
 
 type Props = {|
   onLogin: () => void,
@@ -107,24 +119,44 @@ const LoginForm = ({
             </Text>
           </Link>
         </Line>
-        <FlatButton
-          label={'Login with Google'}
-          onClick={() => {
-            onLoginWithProvider('google');
-          }}
-        />
-        <FlatButton
-          label={'Login with GitHub'}
-          onClick={() => {
-            onLoginWithProvider('github');
-          }}
-        />
-        <FlatButton
-          label={'Login with Apple'}
-          onClick={() => {
-            onLoginWithProvider('apple');
-          }}
-        />
+        <div style={styles.identityProvidersBlock}>
+          <Line noMargin justifyContent="center">
+            <Text size="body2" noMargin>
+              <Trans>Or continue with</Trans>
+            </Text>
+          </Line>
+          <Line>
+            <ResponsiveLineStackLayout expand noColumnMargin noMargin>
+              <FlatButton
+                primary
+                fullWidth
+                label="Google"
+                leftIcon={<Google />}
+                onClick={() => {
+                  onLoginWithProvider('google');
+                }}
+              />
+              <FlatButton
+                primary
+                fullWidth
+                label="GitHub"
+                leftIcon={<GitHub />}
+                onClick={() => {
+                  onLoginWithProvider('github');
+                }}
+              />
+              <FlatButton
+                primary
+                fullWidth
+                label="Apple"
+                leftIcon={<Apple />}
+                onClick={() => {
+                  onLoginWithProvider('apple');
+                }}
+              />
+            </ResponsiveLineStackLayout>
+          </Line>
+        </div>
       </ColumnStackLayout>
       {isForgotPasswordDialogOpen && (
         <ForgotPasswordDialog

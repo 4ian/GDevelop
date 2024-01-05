@@ -186,6 +186,38 @@ export const readEmbeddedResourcesMapping = (
   }
 };
 
+const getEmbeddedOwnerResource = (
+  project: gdProject,
+  resourceName: string
+): null | gdResource => {
+  const resourcesManager = project.getResourcesManager();
+
+  for (const supposedOwnerResourceName of resourcesManager
+    .getAllResourceNames()
+    .toJSArray()) {
+    if (resourceName === supposedOwnerResourceName) {
+      continue;
+    }
+
+    const supposedOwnerResource = resourcesManager.getResource(
+      supposedOwnerResourceName
+    );
+    const embeddedResourcesMapping = readEmbeddedResourcesMapping(
+      supposedOwnerResource
+    );
+    if (!embeddedResourcesMapping) {
+      continue;
+    }
+
+    const mappedResources = Object.values(embeddedResourcesMapping);
+    if (mappedResources.includes(resourceName)) {
+      return supposedOwnerResource;
+    }
+  }
+
+  return null;
+};
+
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
  * resources and a gd.Project.
@@ -219,6 +251,17 @@ export default class PixiResourcesLoader {
       // been added and detected by file watcher. When reloading the texture, the cache must
       // be cleaned too.
       delete loadedTextures[resourceName];
+
+      const supposedAtlasOwner = getEmbeddedOwnerResource(
+        project,
+        resourceName
+      );
+      if (supposedAtlasOwner && supposedAtlasOwner.getKind() === 'atlas') {
+        await this.reloadTextureForResource(
+          project,
+          supposedAtlasOwner.getName()
+        );
+      }
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
@@ -235,6 +278,43 @@ export default class PixiResourcesLoader {
     if (loadedThreeTextures[resourceName]) {
       loadedThreeTextures[resourceName].dispose();
       delete loadedThreeTextures[resourceName];
+    }
+    if (spineAtlasPromises[resourceName]) {
+      /**
+       * Expected error due to https://github.com/pixijs/spine/issues/537 issue (read comments).
+       * String is stored as loaded atlas resource but pixi-spine considers it as TextureAtlas and tries to call dispose on it that causes TypeError.
+       */
+      await PIXI.Assets.unload(resourceName).catch(async () => {
+        const { textureAtlas } = await spineAtlasPromises[resourceName];
+        if (textureAtlas) textureAtlas.dispose();
+      });
+      delete spineAtlasPromises[resourceName];
+
+      const supposedSpineResourceOwner = getEmbeddedOwnerResource(
+        project,
+        resourceName
+      );
+      if (
+        supposedSpineResourceOwner &&
+        supposedSpineResourceOwner.getKind() === 'spine'
+      ) {
+        await this.reloadTextureForResource(
+          project,
+          supposedSpineResourceOwner.getName()
+        );
+      }
+    }
+    if (spineDataPromises[resourceName]) {
+      await PIXI.Assets.unload(resourceName);
+      delete spineDataPromises[resourceName];
+
+      /**
+       * This line allows us to omit issue https://github.com/pixijs/pixijs/issues/10069.
+       * PIXI.Assets.resolver caches data that was passed to PIXI.Assets.add even if resource was unloaded.
+       * So every time we unload spine resources we need to call it to clean resolver cash
+       * and pick up fresh data next time we load it.
+       */
+      PIXI.Assets.resolver.prefer();
     }
     const matchingMaterials = Object.keys(loadedThreeMaterials).filter(key =>
       key.startsWith(resourceName)

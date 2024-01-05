@@ -25,6 +25,15 @@
 
 namespace gd {
 
+gd::String
+ObjectAssetSerializer::GetObjectExtensionName(const gd::Object &object) {
+  const gd::String &type = object.GetType();
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  return separatorIndex != std::string::npos ? type.substr(0, separatorIndex)
+                                             : "";
+}
+
 void ObjectAssetSerializer::SerializeTo(
     gd::Project &project, const gd::Object &object,
     const gd::String &objectFullName, SerializerElement &element,
@@ -36,11 +45,7 @@ void ObjectAssetSerializer::SerializeTo(
     cleanObject->RemoveBehavior(behaviorName);
   }
 
-  const gd::String &type = cleanObject->GetType();
-  const auto separatorIndex =
-      type.find(PlatformExtension::GetNamespaceSeparator());
-  gd::String extensionName =
-      separatorIndex != std::string::npos ? type.substr(0, separatorIndex) : "";
+  gd::String extensionName = GetObjectExtensionName(*cleanObject);
 
   std::map<gd::String, gd::String> resourcesNameReverseMap;
   gd::ObjectAssetSerializer::RenameObjectResourceFiles(
@@ -128,6 +133,7 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
       resourcesNameReverseMap);
   object.GetConfiguration().ExposeResources(assetResourcePathCleaner);
 
+  // Use asset store script naming conventions for sprite resource files.
   if (object.GetConfiguration().GetType() == "Sprite") {
     gd::SpriteObject &spriteConfiguration =
         dynamic_cast<gd::SpriteObject &>(object.GetConfiguration());

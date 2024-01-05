@@ -57,6 +57,8 @@ private:
       const gd::String &destinationDirectory, const gd::String &objectFullName,
       std::map<gd::String, gd::String> &resourcesFileNameMap,
       std::map<gd::String, gd::String> &resourcesNameReverseMap);
+
+  static gd::String GetObjectExtensionName(const gd::Object &object);
 };
 
 } // namespace gd

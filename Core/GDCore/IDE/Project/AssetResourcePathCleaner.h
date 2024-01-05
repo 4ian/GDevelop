@@ -20,7 +20,7 @@ class Project;
 namespace gd {
 
 /**
- * \brief ResourcesMergingHelper is used when exporting an object as an asset.
+ * \brief AssetResourcePathCleaner is used when exporting an object as an asset.
  * It removes the folder from the path.
  *
  * \see ArbitraryResourceWorker
@@ -34,8 +34,8 @@ public:
       std::map<gd::String, gd::String> &resourcesFileNameMap_,
       std::map<gd::String, gd::String> &resourcesNameReverseMap_)
       : ArbitraryResourceWorker(resourcesManager),
-        resourcesFileNameMap(&resourcesFileNameMap_),
-        resourcesNameReverseMap(&resourcesNameReverseMap_){};
+        resourcesFileNameMap(resourcesFileNameMap_),
+        resourcesNameReverseMap(resourcesNameReverseMap_){};
   virtual ~AssetResourcePathCleaner(){};
 
   void ExposeImage(gd::String &imageName) override;
@@ -54,12 +54,12 @@ protected:
   /**
    * New file names that can be accessed by their original name.
    */
-  std::map<gd::String, gd::String> *resourcesFileNameMap;
+  std::map<gd::String, gd::String> &resourcesFileNameMap;
 
   /**
    * Original resource names that can be accessed by their new name.
    */
-  std::map<gd::String, gd::String> *resourcesNameReverseMap;
+  std::map<gd::String, gd::String> &resourcesNameReverseMap;
 };
 
 } // namespace gd

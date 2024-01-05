@@ -250,12 +250,12 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
       title={<Trans>Export {layout.getName()} assets</Trans>}
       secondaryActions={[
         <HelpButton
-          key="help"
+          key="free-pack-help"
           label={<Trans>Submit a free pack</Trans>}
           helpPagePath="/community/contribute-to-the-assets-store"
         />,
         <HelpButton
-          key="help"
+          key="paid-pack-help"
           label={<Trans>Submit a paid pack</Trans>}
           helpPagePath="/community/sell-asset-pack-store/"
         />,

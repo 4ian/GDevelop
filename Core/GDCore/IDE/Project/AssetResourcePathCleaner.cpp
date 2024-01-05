@@ -48,7 +48,7 @@ void AssetResourcePathCleaner::ExposeResourceAsFile(gd::String &resourceName) {
   gd::String file = resource.GetFile();
   ExposeFile(file);
 
-  (*resourcesNameReverseMap)[file] = resourceName;
+  resourcesNameReverseMap[file] = resourceName;
   resourceName = file;
 }
 
@@ -67,7 +67,7 @@ void AssetResourcePathCleaner::ExposeFile(gd::String &resourceFilePath) {
           ? resourceFilePath.substr(baseNamePos, resourceFilePath.length())
           : resourceFilePath;
 
-  (*resourcesFileNameMap)[resourceFilePath] = baseName;
+  resourcesFileNameMap[resourceFilePath] = baseName;
   resourceFilePath = baseName;
 }
 

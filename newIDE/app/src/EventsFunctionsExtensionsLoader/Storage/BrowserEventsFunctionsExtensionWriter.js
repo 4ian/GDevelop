@@ -36,7 +36,7 @@ export default class BrowserEventsFunctionsExtensionWriter {
     try {
       await downloadStringContentAsFile(
         filename,
-        JSON.stringify(serializedObject)
+        JSON.stringify(serializedObject, null, 2)
       );
     } catch (error) {
       console.error('Unable to write the events function extension:', error);

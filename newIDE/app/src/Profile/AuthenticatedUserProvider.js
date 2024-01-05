@@ -1146,6 +1146,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 onCreateAccount={form =>
                   this._doCreateAccount(form, preferences)
                 }
+                onLoginWithProvider={this._doLoginWithProvider}
                 createAccountInProgress={this.state.createAccountInProgress}
                 error={this.state.apiCallError}
               />

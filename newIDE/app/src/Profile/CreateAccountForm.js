@@ -3,17 +3,35 @@ import React from 'react';
 import { Trans } from '@lingui/macro';
 
 import TextField from '../UI/TextField';
-import { type AuthError } from '../Utils/GDevelopServices/Authentication';
+import {
+  type AuthError,
+  type IdentityProvider,
+} from '../Utils/GDevelopServices/Authentication';
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { UsernameField } from './UsernameField';
 import Checkbox from '../UI/Checkbox';
 import Form from '../UI/Form';
 import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
+import Text from '../UI/Text';
+import FlatButton from '../UI/FlatButton';
+import Google from '../UI/CustomSvgIcons/Google';
+import Apple from '../UI/CustomSvgIcons/Apple';
+import GitHub from '../UI/CustomSvgIcons/GitHub';
+
+const styles = {
+  identityProvidersBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    marginTop: 30,
+  },
+};
 
 type Props = {|
   onCreateAccount: () => Promise<void>,
+  onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   email: string,
   onChangeEmail: string => void,
   password: string,
@@ -32,6 +50,7 @@ type Props = {|
 
 const CreateAccountForm = ({
   onCreateAccount,
+  onLoginWithProvider,
   email,
   onChangeEmail,
   password,
@@ -97,6 +116,44 @@ const CreateAccountForm = ({
             }}
             disabled={createAccountInProgress}
           />
+          <div style={styles.identityProvidersBlock}>
+            <Line noMargin justifyContent="center">
+              <Text size="body2" noMargin>
+                <Trans>Or continue with</Trans>
+              </Text>
+            </Line>
+            <Line>
+              <ResponsiveLineStackLayout expand noColumnMargin noMargin>
+                <FlatButton
+                  primary
+                  fullWidth
+                  label="Google"
+                  leftIcon={<Google />}
+                  onClick={() => {
+                    onLoginWithProvider('google');
+                  }}
+                />
+                <FlatButton
+                  primary
+                  fullWidth
+                  label="GitHub"
+                  leftIcon={<GitHub />}
+                  onClick={() => {
+                    onLoginWithProvider('github');
+                  }}
+                />
+                <FlatButton
+                  primary
+                  fullWidth
+                  label="Apple"
+                  leftIcon={<Apple />}
+                  onClick={() => {
+                    onLoginWithProvider('apple');
+                  }}
+                />
+              </ResponsiveLineStackLayout>
+            </Line>
+          </div>
         </ColumnStackLayout>
       </Form>
     </Column>

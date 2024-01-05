@@ -426,6 +426,7 @@ const GetStartedSection = ({
               <CreateAccountForm
                 email={email}
                 onChangeEmail={setEmail}
+                onLoginWithProvider={onLoginWithProvider}
                 password={password}
                 onChangePassword={setPassword}
                 username={username}

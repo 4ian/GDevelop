@@ -88,7 +88,6 @@ type Props = {
 };
 
 /**
- * TODO: Update doc
  * Here are the possible cases:
  * - Subscription null: loading. (The backend always return a subscription)
  * - Subscription with no plan: show a message to invite the user to subscribe.

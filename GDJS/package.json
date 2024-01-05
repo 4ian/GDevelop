@@ -16,6 +16,7 @@
     "minimist": "^1.2.5",
     "patch-package": "^6.4.7",
     "pixi.js": "7.3.0",
+    "pixi-spine": "4.0.4",
     "prettier": "2.1.2",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.8.4",
@@ -23,8 +24,19 @@
     "typedoc-plugin-reference-excluder": "^1.0.0",
     "typescript": "4.3.2"
   },
+  "overrides": {
+    "pixi-spine": {
+      "@pixi/assets": "7.3.0",
+      "@pixi/core": "7.3.0",
+      "@pixi/display": "7.3.0",
+      "@pixi/graphics": "7.3.0",
+      "@pixi/mesh": "7.3.0",
+      "@pixi/mesh-extras": "7.3.0",
+      "@pixi/sprite": "7.3.0"
+    }
+  },
   "scripts": {
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && node scripts/install-spine.js",
     "check-types": "tsc",
     "build": "node scripts/build.js",
     "test": "cd tests && npm run test-benchmark",

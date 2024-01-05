@@ -11,6 +11,7 @@ import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialo
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 
 type Props = {|
   project: ?gdProject,
@@ -38,13 +39,22 @@ const StoreSection = ({
   const {
     openedAssetPack,
     openedAssetShortHeader,
+    selectedFolders,
   } = shopNavigationState.getCurrentPage();
 
-  const assetShortHeadersToInstall = openedAssetShortHeader
-    ? [openedAssetShortHeader]
-    : openedAssetPack
-    ? assetShortHeadersSearchResults
-    : [];
+  const displayedAssetShortHeaders = React.useMemo(
+    () => {
+      return openedAssetShortHeader
+        ? [openedAssetShortHeader]
+        : assetShortHeadersSearchResults
+        ? getAssetShortHeadersToDisplay(
+            assetShortHeadersSearchResults,
+            selectedFolders
+          )
+        : [];
+    },
+    [openedAssetShortHeader, assetShortHeadersSearchResults, selectedFolders]
+  );
 
   const existingAssetStoreIds = React.useMemo(
     () => {
@@ -84,12 +94,11 @@ const StoreSection = ({
 
             setIsAssetPackDialogInstallOpen(true);
           }}
-          disabled={!project || !assetShortHeadersToInstall.length}
+          disabled={!project || !displayedAssetShortHeaders.length}
           label={
             project ? (
-              openedAssetPack ? (
-                <Trans>Add assets from this pack to the project</Trans>
-              ) : assetShortHeadersToInstall.length === 1 ? (
+              openedAssetShortHeader ||
+              displayedAssetShortHeaders.length === 1 ? (
                 <Trans>Add this asset to the project</Trans>
               ) : (
                 <Trans>Add these assets to the project</Trans>
@@ -104,10 +113,10 @@ const StoreSection = ({
       </Line>
       {project &&
         isAssetPackDialogInstallOpen &&
-        !!assetShortHeadersToInstall.length && (
+        !!displayedAssetShortHeaders.length && (
           <AssetPackInstallDialog
             assetPack={openedAssetPack}
-            assetShortHeaders={assetShortHeadersToInstall}
+            assetShortHeaders={displayedAssetShortHeaders}
             addedAssetIds={existingAssetStoreIds}
             onClose={() => setIsAssetPackDialogInstallOpen(false)}
             onAssetsAdded={() => {

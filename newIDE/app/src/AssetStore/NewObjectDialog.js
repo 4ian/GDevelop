@@ -335,11 +335,17 @@ function NewObjectDialog({
         <RaisedButton
           key="add-all-assets"
           primary
-          label={<Trans>Add all assets to my scene</Trans>}
+          label={
+            displayedAssetShortHeaders.length === 1 ? (
+              <Trans>Add this asset to my scene</Trans>
+            ) : (
+              <Trans>Add these assets to my scene</Trans>
+            )
+          }
           onClick={() => setIsAssetPackDialogInstallOpen(true)}
           disabled={
-            !assetShortHeadersSearchResults ||
-            assetShortHeadersSearchResults.length === 0
+            !displayedAssetShortHeaders ||
+            displayedAssetShortHeaders.length === 0
           }
         />
       ) : openedAssetShortHeader ? (

@@ -189,7 +189,7 @@ export const readEmbeddedResourcesMapping = (
 const getEmbeddedOwnerResource = (
   project: gdProject,
   resourceName: string
-): null | gdResource => {
+): gdResource | null => {
   const resourcesManager = project.getResourcesManager();
 
   for (const supposedOwnerResourceName of resourcesManager
@@ -236,7 +236,7 @@ export default class PixiResourcesLoader {
     spineDataPromises = {};
   }
 
-  static async reloadTextureForResource(
+  static async reloadResource(
     project: gdProject,
     resourceName: string
   ) {
@@ -257,7 +257,7 @@ export default class PixiResourcesLoader {
         resourceName
       );
       if (supposedAtlasOwner && supposedAtlasOwner.getKind() === 'atlas') {
-        await this.reloadTextureForResource(
+        await this.reloadResource(
           project,
           supposedAtlasOwner.getName()
         );
@@ -286,7 +286,9 @@ export default class PixiResourcesLoader {
        */
       await PIXI.Assets.unload(resourceName).catch(async () => {
         const { textureAtlas } = await spineAtlasPromises[resourceName];
-        if (textureAtlas) textureAtlas.dispose();
+        if (textureAtlas) {
+          textureAtlas.dispose();
+        }
       });
       delete spineAtlasPromises[resourceName];
 
@@ -298,7 +300,7 @@ export default class PixiResourcesLoader {
         supposedSpineResourceOwner &&
         supposedSpineResourceOwner.getKind() === 'spine'
       ) {
-        await this.reloadTextureForResource(
+        await this.reloadResource(
           project,
           supposedSpineResourceOwner.getName()
         );

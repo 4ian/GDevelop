@@ -236,7 +236,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         // through the RenderedInstance's, triggering crashes. So the scene rendering
         // is paused during this period.
         editorDisplay.startSceneRendering(false);
-        await PixiResourcesLoader.reloadTextureForResource(
+        await PixiResourcesLoader.reloadResource(
           project,
           resourceName
         );

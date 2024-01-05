@@ -375,28 +375,6 @@ export const getRedirectToSubscriptionPortalUrl = async (
 };
 
 export const getRedirectToCheckoutUrl = ({
-  planId,
-  userId,
-  userEmail,
-  quantity,
-}: {|
-  planId: string,
-  userId: string,
-  userEmail: string,
-  quantity?: number,
-|}): string => {
-  const url = new URL(
-    `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout`
-  );
-  url.searchParams.set('planId', planId);
-  url.searchParams.set('userId', userId);
-  url.searchParams.set('customerEmail', userEmail);
-  if (quantity !== undefined && quantity > 1)
-    url.searchParams.set('quantity', quantity.toString());
-  return url.toString();
-};
-
-export const getRedirectToCheckoutUrlV2 = ({
   pricingSystemId,
   userId,
   userEmail,

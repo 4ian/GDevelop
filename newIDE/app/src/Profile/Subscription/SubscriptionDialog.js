@@ -9,7 +9,7 @@ import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import { Column, Line } from '../../UI/Grid';
 import {
   changeUserSubscription,
-  getRedirectToCheckoutUrlV2,
+  getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
   canCancelAtEndOfPeriod,
   hasValidSubscriptionPlan,
@@ -154,7 +154,7 @@ export default function SubscriptionDialog({
         subscriptionPlanPrice.planId === 'gdevelop_education';
       const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
       Window.openExternalURL(
-        getRedirectToCheckoutUrlV2({
+        getRedirectToCheckoutUrl({
           pricingSystemId: subscriptionPlanPrice.id,
           userId: profile.id,
           userEmail: profile.email,
@@ -270,7 +270,7 @@ export default function SubscriptionDialog({
       // Then redirect as if a new subscription is being chosen.
       setSubscriptionPendingDialogOpen(true);
       Window.openExternalURL(
-        getRedirectToCheckoutUrlV2({
+        getRedirectToCheckoutUrl({
           pricingSystemId: subscriptionPlanPrice.id,
           userId: profile.id,
           userEmail: profile.email,

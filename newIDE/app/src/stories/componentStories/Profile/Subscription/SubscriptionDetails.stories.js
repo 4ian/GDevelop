@@ -17,7 +17,7 @@ import {
   subscriptionForSilverUser,
   purchaselyGoldSubscription,
   subscriptionForGoldUserFromEducationPlan,
-  subscriptionPlansWithPrices,
+  subscriptionPlansWithPricingSystems,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
@@ -32,7 +32,7 @@ export default {
 export const LoadingSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={null}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -43,7 +43,7 @@ export const LoadingSubscription = () => (
 export const ManagingSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForSilverUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={true}
@@ -54,7 +54,7 @@ export const ManagingSubscription = () => (
 export const WithNoSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={noSubscription}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -65,7 +65,7 @@ export const WithNoSubscription = () => (
 export const WithSilverSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForSilverUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -76,7 +76,7 @@ export const WithSilverSubscription = () => (
 export const WithGoldSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForGoldUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -87,7 +87,7 @@ export const WithGoldSubscription = () => (
 export const WithStartupSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForStartupUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -98,7 +98,7 @@ export const WithStartupSubscription = () => (
 export const WithGoldSubscriptionFromEducationPlan = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForGoldUserFromEducationPlan}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -109,7 +109,7 @@ export const WithGoldSubscriptionFromEducationPlan = () => (
 export const WithEducationSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForEducationPlan}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -120,7 +120,7 @@ export const WithEducationSubscription = () => (
 export const WithSilverSubscriptionButCancelAtPeriodEnd = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={silverSubscriptionButCancelAtPeriodEnd}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -131,7 +131,7 @@ export const WithSilverSubscriptionButCancelAtPeriodEnd = () => (
 export const WithValidSilverRedemptionCodeSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={silverSubscriptionWithRedemptionCode}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -142,7 +142,7 @@ export const WithValidSilverRedemptionCodeSubscription = () => (
 export const WithExpiredSilverRedemptionCodeSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={silverSubscriptionWithExpiredRedemptionCode}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -153,7 +153,7 @@ export const WithExpiredSilverRedemptionCodeSubscription = () => (
 export const WithPurchaselyGoldSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={purchaselyGoldSubscription}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -164,7 +164,7 @@ export const WithPurchaselyGoldSubscription = () => (
 export const WithLegacyIndieSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForIndieUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -175,7 +175,7 @@ export const WithLegacyIndieSubscription = () => (
 export const WithLegacyProSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForProUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -186,7 +186,7 @@ export const WithLegacyProSubscription = () => (
 export const WithNoSubscriptionOnMobile = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={noSubscription}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -198,7 +198,7 @@ export const WithNoSubscriptionOnMobile = () => (
 export const WithGoldSubscriptionOnMobile = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForGoldUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -210,7 +210,7 @@ export const WithGoldSubscriptionOnMobile = () => (
 export const WithExpiredSilverRedemptionCodeSubscriptionOnMobile = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={silverSubscriptionWithExpiredRedemptionCode}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -222,7 +222,7 @@ export const WithExpiredSilverRedemptionCodeSubscriptionOnMobile = () => (
 export const WithPurchaselyGoldSubscriptionOnMobile = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={purchaselyGoldSubscription}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
@@ -234,7 +234,7 @@ export const WithPurchaselyGoldSubscriptionOnMobile = () => (
 export const WithLegacyProSubscriptionOnMobile = () => (
   <AlertProvider>
     <SubscriptionDetails
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
       subscription={subscriptionForProUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}

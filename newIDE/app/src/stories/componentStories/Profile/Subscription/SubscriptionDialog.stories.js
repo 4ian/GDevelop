@@ -20,7 +20,7 @@ import {
   fakeAuthenticatedUserWithLegacyProSubscription,
   fakeAuthenticatedUserWithEducationPlan,
   fakeStartupAuthenticatedUser,
-  subscriptionPlansWithPrices,
+  subscriptionPlansWithPricingSystems,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import { type SubscriptionType } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
@@ -43,7 +43,9 @@ const SubscriptionDialogWrapper = ({
     <AuthenticatedUserContext.Provider value={authenticatedUser}>
       <SubscriptionDialog
         open
-        subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+        subscriptionPlansWithPricingSystems={
+          subscriptionPlansWithPricingSystems
+        }
         onClose={() => action('on close')()}
         analyticsMetadata={{ reason: 'Debugger' }}
         filter={filter}

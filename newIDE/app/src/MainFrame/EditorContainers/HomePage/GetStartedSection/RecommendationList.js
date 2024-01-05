@@ -20,7 +20,7 @@ import {
 import Text from '../../../../UI/Text';
 import { Column } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
-import { type SubscriptionPlanWithPrices } from '../../../../Utils/GDevelopServices/Usage';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { CardWidget } from '../CardWidget';
 import Window from '../../../../Utils/Window';
 import { ColumnStackLayout } from '../../../../UI/Layout';
@@ -162,13 +162,13 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
 type Props = {|
   authenticatedUser: AuthenticatedUser,
   selectInAppTutorial: (tutorialId: string) => void,
-  subscriptionPlansWithPrices: ?(SubscriptionPlanWithPrices[]),
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
 |};
 
 const RecommendationList = ({
   authenticatedUser,
   selectInAppTutorial,
-  subscriptionPlansWithPrices,
+  subscriptionPlansWithPricingSystems,
 }: Props) => {
   const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
@@ -282,12 +282,17 @@ const RecommendationList = ({
             !profile.isStudent &&
             (!subscription ||
               isPlanRecommendationRelevant(subscription, planRecommendation));
-          if (shouldDisplayPlanRecommendation && subscriptionPlansWithPrices) {
+          if (
+            shouldDisplayPlanRecommendation &&
+            subscriptionPlansWithPricingSystems
+          ) {
             items.push(
               <SectionRow key="plan">
                 <PlanRecommendationRow
                   recommendationPlanId={planRecommendation.id}
-                  subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+                  subscriptionPlansWithPricingSystems={
+                    subscriptionPlansWithPricingSystems
+                  }
                   i18n={i18n}
                 />
               </SectionRow>

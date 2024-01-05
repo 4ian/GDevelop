@@ -225,7 +225,7 @@ export const HomePage = React.memo<Props>(
       const shouldDisplayTooltip = shouldDisplayNewFeatureHighlighting({
         featureId: 'gamesDashboardInHomePage',
       });
-      const { subscriptionPlansWithPrices } = useSubscriptionPlans({
+      const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
         includeLegacy: false,
       });
 
@@ -518,7 +518,9 @@ export const HomePage = React.memo<Props>(
                       selectInAppTutorial={selectInAppTutorial}
                       onUserSurveyStarted={onUserSurveyStarted}
                       onUserSurveyHidden={onUserSurveyHidden}
-                      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+                      subscriptionPlansWithPricingSystems={
+                        subscriptionPlansWithPricingSystems
+                      }
                     />
                   )}
                   {activeTab === 'build' && (

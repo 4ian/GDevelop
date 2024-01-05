@@ -125,7 +125,7 @@ export type PlanDetails = {|
   |}>,
 |};
 
-export type SubscriptionPlanPrice = {|
+export type SubscriptionPlanPricingSystem = {|
   id: string,
   planId: string,
   period: 'week' | 'month' | 'year',
@@ -144,9 +144,9 @@ export type SubscriptionPlan = {|
   bulletPointsByLocale: Array<MessageByLocale>,
 |};
 
-export type SubscriptionPlanWithPrices = {|
+export type SubscriptionPlanWithPricingSystems = {|
   ...SubscriptionPlan,
-  prices: SubscriptionPlanPrice[],
+  pricingSystems: SubscriptionPlanPricingSystem[],
 |};
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
@@ -178,9 +178,9 @@ export const listSubscriptionPlans = async (options: {|
   return response.data;
 };
 
-export const getSubscriptionPlanPrice = async (
+export const getSubscriptionPlanPricingSystem = async (
   pricingSystemId: string
-): Promise<?SubscriptionPlanPrice> => {
+): Promise<?SubscriptionPlanPricingSystem> => {
   try {
     const response = await apiClient.get(
       `/subscription-plan-pricing-system/${pricingSystemId}`
@@ -195,9 +195,9 @@ export const getSubscriptionPlanPrice = async (
   }
 };
 
-export const listSubscriptionPlanPrices = async (
+export const listSubscriptionPlanPricingSystems = async (
   subscriptionPlanIds?: ?(string[])
-): Promise<SubscriptionPlanPrice[]> => {
+): Promise<SubscriptionPlanPricingSystem[]> => {
   const params =
     subscriptionPlanIds && subscriptionPlanIds.length > 0
       ? { subscriptionPlanIds: subscriptionPlanIds.join(',') }

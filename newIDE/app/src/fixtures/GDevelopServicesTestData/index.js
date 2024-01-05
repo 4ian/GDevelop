@@ -297,7 +297,7 @@ export const noSubscription: Subscription = {
   pricingSystemId: null,
 };
 
-export const subscriptionPlansWithPrices = [
+export const subscriptionPlansWithPricingSystems = [
   {
     id: 'free',
     isLegacy: false,
@@ -394,7 +394,7 @@ export const subscriptionPlansWithPrices = [
         'zh-CN': '每款游戏有3个排行榜，每款游戏有10个玩家反馈响应。',
       },
     ],
-    prices: [],
+    pricingSystems: [],
   },
   {
     id: 'gdevelop_silver',
@@ -507,7 +507,7 @@ export const subscriptionPlansWithPrices = [
           '在游戏加载时去除GDevelop水印或GDevelop标志，让您的玩家沉浸其中。',
       },
     ],
-    prices: [
+    pricingSystems: [
       {
         id: 'silver_1month',
         planId: 'gdevelop_silver',
@@ -631,7 +631,7 @@ export const subscriptionPlansWithPrices = [
           '在游戏加载时去除GDevelop水印或GDevelop标志，让您的玩家沉浸其中。',
       },
     ],
-    prices: [
+    pricingSystems: [
       {
         id: 'gold_1month',
         planId: 'gdevelop_gold',
@@ -820,7 +820,7 @@ export const subscriptionPlansWithPrices = [
         'zh-CN': '添加1个访客用户或无限的初创团队成员，共同合作每个项目。',
       },
     ],
-    prices: [
+    pricingSystems: [
       {
         id: 'startup_1month',
         planId: 'gdevelop_startup',
@@ -946,7 +946,7 @@ export const subscriptionPlansWithPrices = [
         'zh-CN': '您和您的学生可以使用云项目版本历史。',
       },
     ],
-    prices: [
+    pricingSystems: [
       {
         id: 'education_1month',
         planId: 'gdevelop_education',
@@ -982,7 +982,7 @@ export const subscriptionPlansWithPrices = [
       { en: '10 packagings per day for Android and for desktop.' },
       { en: 'Unlimited leaderboards and unlimited player feedback responses.' },
     ],
-    prices: [
+    pricingSystems: [
       {
         id: 'indie_1month',
         planId: 'gdevelop_indie',
@@ -1011,7 +1011,7 @@ export const subscriptionPlansWithPrices = [
           'Immerse your players by removing GDevelop logo when the game loads.',
       },
     ],
-    prices: [
+    pricingSystems: [
       {
         id: 'pro_1month',
         planId: 'gdevelop_pro',

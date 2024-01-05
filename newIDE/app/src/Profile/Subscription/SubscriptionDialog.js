@@ -15,8 +15,8 @@ import {
   hasValidSubscriptionPlan,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
-  type SubscriptionPlanWithPrices,
-  type SubscriptionPlanPrice,
+  type SubscriptionPlanWithPricingSystems,
+  type SubscriptionPlanPricingSystem,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -98,7 +98,7 @@ type Props = {|
   open: boolean,
   onClose: Function,
   analyticsMetadata: SubscriptionAnalyticsMetadata,
-  subscriptionPlansWithPrices: ?(SubscriptionPlanWithPrices[]),
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   filter: ?SubscriptionType,
 |};
 
@@ -106,7 +106,7 @@ export default function SubscriptionDialog({
   open,
   onClose,
   analyticsMetadata,
-  subscriptionPlansWithPrices,
+  subscriptionPlansWithPricingSystems,
   filter,
 }: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
@@ -139,7 +139,7 @@ export default function SubscriptionDialog({
 
   const buyUpdateOrCancelPlan = async (
     i18n: I18nType,
-    subscriptionPlanPrice: SubscriptionPlanPrice | null
+    subscriptionPlanPrice: SubscriptionPlanPricingSystem | null
   ) => {
     const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
     if (!profile || !subscription) return;
@@ -320,7 +320,7 @@ export default function SubscriptionDialog({
             onRequestClose={onClose}
             open={open}
           >
-            {subscriptionPlansWithPrices ? (
+            {subscriptionPlansWithPricingSystems ? (
               <ColumnStackLayout noMargin expand>
                 <LineStackLayout noMargin alignItems="center">
                   <img
@@ -352,7 +352,7 @@ export default function SubscriptionDialog({
                     </Trans>
                   </AlertMessage>
                 )}
-                {subscriptionPlansWithPrices
+                {subscriptionPlansWithPricingSystems
                   .filter(plan => {
                     if (filter === 'individual') {
                       return [
@@ -374,21 +374,23 @@ export default function SubscriptionDialog({
                     // No filter, show all plans.
                     return true;
                   })
-                  .map(subscriptionPlanWithPrices => {
-                    const isFreePlan = subscriptionPlanWithPrices.id === 'free';
+                  .map(subscriptionPlanWithPricingSystems => {
+                    const isFreePlan =
+                      subscriptionPlanWithPricingSystems.id === 'free';
                     const isUserCurrentOrLegacyPlan =
-                      userPlanId === subscriptionPlanWithPrices.id;
+                      userPlanId === subscriptionPlanWithPricingSystems.id;
                     let actions: React.Node = null;
                     if (isFreePlan) {
                       // If no plan (free usage), do not display button.
                     } else if (
-                      subscriptionPlanWithPrices.id === 'gdevelop_education'
+                      subscriptionPlanWithPricingSystems.id ===
+                      'gdevelop_education'
                     ) {
                       if (!isUserCurrentOrLegacyPlan) {
-                        const yearlyPlanPrice = subscriptionPlanWithPrices.prices.find(
+                        const yearlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
                           price => price.period === 'year'
                         );
-                        const monthlyPlanPrice = subscriptionPlanWithPrices.prices.find(
+                        const monthlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
                           price => price.period === 'month'
                         );
                         if (yearlyPlanPrice && monthlyPlanPrice) {
@@ -495,13 +497,14 @@ export default function SubscriptionDialog({
                         />,
                       ];
                     } else if (
-                      subscriptionPlanWithPrices.id === 'gdevelop_enterprise'
+                      subscriptionPlanWithPricingSystems.id ===
+                      'gdevelop_enterprise'
                     ) {
                       return (
                         <PlanCard
-                          key={subscriptionPlanWithPrices.id}
-                          subscriptionPlanWithPrices={
-                            subscriptionPlanWithPrices
+                          key={subscriptionPlanWithPricingSystems.id}
+                          subscriptionPlanWithPricingSystems={
+                            subscriptionPlanWithPricingSystems
                           }
                           actions={
                             <RaisedButton
@@ -520,7 +523,8 @@ export default function SubscriptionDialog({
                         />
                       );
                     } else {
-                      const price = subscriptionPlanWithPrices.prices[0];
+                      const price =
+                        subscriptionPlanWithPricingSystems.pricingSystems[0];
                       if (price) {
                         actions = [
                           <RaisedButton
@@ -540,8 +544,10 @@ export default function SubscriptionDialog({
 
                     return (
                       <PlanCard
-                        key={subscriptionPlanWithPrices.id || 'free'}
-                        subscriptionPlanWithPrices={subscriptionPlanWithPrices}
+                        key={subscriptionPlanWithPricingSystems.id || 'free'}
+                        subscriptionPlanWithPricingSystems={
+                          subscriptionPlanWithPricingSystems
+                        }
                         actions={actions}
                         isPending={isLoading}
                         isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.

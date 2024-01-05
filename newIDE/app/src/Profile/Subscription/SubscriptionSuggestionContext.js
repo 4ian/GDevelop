@@ -55,7 +55,7 @@ export const SubscriptionSuggestionProvider = ({
   >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
-  const { subscriptionPlansWithPrices } = useSubscriptionPlans({
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: false,
   });
 
@@ -99,10 +99,12 @@ export const SubscriptionSuggestionProvider = ({
 
   const availableSubscriptionPlansWithPrices = React.useMemo(
     () =>
-      subscriptionPlansWithPrices
-        ? getAvailableSubscriptionPlansWithPrices(subscriptionPlansWithPrices)
+      subscriptionPlansWithPricingSystems
+        ? getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )
         : null,
-    [subscriptionPlansWithPrices]
+    [subscriptionPlansWithPricingSystems]
   );
 
   return (
@@ -111,7 +113,9 @@ export const SubscriptionSuggestionProvider = ({
       {analyticsMetadata && (
         <SubscriptionDialog
           open
-          subscriptionPlansWithPrices={availableSubscriptionPlansWithPrices}
+          subscriptionPlansWithPricingSystems={
+            availableSubscriptionPlansWithPrices
+          }
           onClose={closeSubscriptionDialog}
           analyticsMetadata={analyticsMetadata}
           filter={filter}

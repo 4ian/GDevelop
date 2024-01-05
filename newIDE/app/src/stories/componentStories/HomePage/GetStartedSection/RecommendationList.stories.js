@@ -5,7 +5,7 @@ import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import {
   fakeAuthenticatedUserWithNoSubscription,
-  subscriptionPlansWithPrices,
+  subscriptionPlansWithPricingSystems,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import RecommendationList from '../../../../MainFrame/EditorContainers/HomePage/GetStartedSection/RecommendationList';
 import PreferencesContext, {
@@ -37,7 +37,7 @@ const RecommendationListStory = () => {
       key={tutorials ? tutorials.length : 0}
       authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
       selectInAppTutorial={action('selectInAppTutorial')}
-      subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
     />
   );
 };

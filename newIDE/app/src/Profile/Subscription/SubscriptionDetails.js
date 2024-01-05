@@ -4,13 +4,13 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import {
-  type SubscriptionPlanWithPrices,
-  type SubscriptionPlanPrice,
+  type SubscriptionPlanWithPricingSystems,
+  type SubscriptionPlanPricingSystem,
   type SubscriptionPlan,
   type Subscription,
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
-  getSubscriptionPlanPrice,
+  getSubscriptionPlanPricingSystem,
   canPriceBeFoundInGDevelopPrices,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -84,7 +84,7 @@ const subscriptionOptions: {
 
 type Props = {
   subscription: ?Subscription,
-  subscriptionPlansWithPrices: SubscriptionPlanWithPrices[],
+  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
   simulateNativeMobileApp?: boolean,
@@ -106,7 +106,7 @@ type Props = {
  */
 const SubscriptionDetails = ({
   subscription,
-  subscriptionPlansWithPrices,
+  subscriptionPlansWithPricingSystems,
   isManageSubscriptionLoading,
   onManageSubscription,
   simulateNativeMobileApp,
@@ -127,7 +127,7 @@ const SubscriptionDetails = ({
   const [
     userSubscriptionPlanPrice,
     setUserSubscriptionPlanPrice,
-  ] = React.useState<?SubscriptionPlanPrice>(null);
+  ] = React.useState<?SubscriptionPlanPricingSystem>(null);
 
   React.useEffect(
     () => {
@@ -148,7 +148,7 @@ const SubscriptionDetails = ({
             return;
           }
 
-          const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPrices.find(
+          const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPricingSystems.find(
             plan => subscription.planId === plan.id
           );
           if (!matchingSubscriptionPlanWithPrices) {
@@ -164,7 +164,7 @@ const SubscriptionDetails = ({
           }
 
           const {
-            prices,
+            pricingSystems,
             ...subscriptionPlan
           } = matchingSubscriptionPlanWithPrices;
 
@@ -174,11 +174,13 @@ const SubscriptionDetails = ({
             return;
           }
 
-          let pricingSystem = prices.find(
+          let pricingSystem = pricingSystems.find(
             price => price.id === subscription.pricingSystemId
           );
           if (!pricingSystem) {
-            pricingSystem = await getSubscriptionPlanPrice(pricingSystemId);
+            pricingSystem = await getSubscriptionPlanPricingSystem(
+              pricingSystemId
+            );
           }
           if (!pricingSystem) {
             setError(
@@ -199,7 +201,7 @@ const SubscriptionDetails = ({
         }
       })();
     },
-    [subscription, subscriptionPlansWithPrices]
+    [subscription, subscriptionPlansWithPricingSystems]
   );
 
   const redemptionCodeExpirationDate =
@@ -274,8 +276,8 @@ const SubscriptionDetails = ({
           // On web/desktop, displays the subscription as usual:
           <ColumnStackLayout noMargin>
             <PlanCard
-              subscriptionPlanWithPrices={userSubscriptionPlan}
-              subscriptionPlanPrice={userSubscriptionPlanPrice}
+              subscriptionPlanWithPricingSystems={userSubscriptionPlan}
+              subscriptionPlanPricingSystem={userSubscriptionPlanPrice}
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||

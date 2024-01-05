@@ -4,8 +4,8 @@ import { I18n } from '@lingui/react';
 
 import {
   type SubscriptionPlan,
-  type SubscriptionPlanWithPrices,
-  type SubscriptionPlanPrice,
+  type SubscriptionPlanWithPricingSystems,
+  type SubscriptionPlanPricingSystem,
 } from '../../Utils/GDevelopServices/Usage';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
@@ -25,15 +25,17 @@ const styles = {
   bulletText: { flex: 1 },
 };
 
-const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
-  if (price.period === 'week') {
-    if (price.periodCount === 1) {
-      if (price.isPerUser) {
+const getPlanPrice = (
+  pricingSystem: SubscriptionPlanPricingSystem
+): React.Node => {
+  if (pricingSystem.period === 'week') {
+    if (pricingSystem.periodCount === 1) {
+      if (pricingSystem.isPerUser) {
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/seat/week
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat/week
             </Trans>
           </Text>
         );
@@ -41,20 +43,20 @@ const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/week
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/week
             </Trans>
           </Text>
         );
       }
     } else {
-      if (price.isPerUser) {
+      if (pricingSystem.isPerUser) {
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/seat every{' '}
-              {price.periodCount} weeks
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat every{' '}
+              {pricingSystem.periodCount} weeks
             </Trans>
           </Text>
         );
@@ -62,22 +64,22 @@ const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'} every {price.periodCount}{' '}
-              weeks
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'} every{' '}
+              {pricingSystem.periodCount} weeks
             </Trans>
           </Text>
         );
       }
     }
-  } else if (price.period === 'month') {
-    if (price.periodCount === 1) {
-      if (price.isPerUser) {
+  } else if (pricingSystem.period === 'month') {
+    if (pricingSystem.periodCount === 1) {
+      if (pricingSystem.isPerUser) {
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/seat/month
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat/month
             </Trans>
           </Text>
         );
@@ -85,20 +87,20 @@ const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/month
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/month
             </Trans>
           </Text>
         );
       }
     } else {
-      if (price.isPerUser) {
+      if (pricingSystem.isPerUser) {
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/seat every{' '}
-              {price.periodCount} months
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat every{' '}
+              {pricingSystem.periodCount} months
             </Trans>
           </Text>
         );
@@ -106,22 +108,22 @@ const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'} every {price.periodCount}{' '}
-              months
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'} every{' '}
+              {pricingSystem.periodCount} months
             </Trans>
           </Text>
         );
       }
     }
   } else {
-    if (price.periodCount === 1) {
-      if (price.isPerUser) {
+    if (pricingSystem.periodCount === 1) {
+      if (pricingSystem.isPerUser) {
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/seat/year
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat/year
             </Trans>
           </Text>
         );
@@ -129,20 +131,20 @@ const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/year
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/year
             </Trans>
           </Text>
         );
       }
     } else {
-      if (price.isPerUser) {
+      if (pricingSystem.isPerUser) {
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'}/seat every{' '}
-              {price.periodCount} years
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat every{' '}
+              {pricingSystem.periodCount} years
             </Trans>
           </Text>
         );
@@ -150,9 +152,9 @@ const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {price.amountInCents / 100}
-              {price.currency === 'EUR' ? '€' : '$'} every {price.periodCount}{' '}
-              years
+              {pricingSystem.amountInCents / 100}
+              {pricingSystem.currency === 'EUR' ? '€' : '$'} every{' '}
+              {pricingSystem.periodCount} years
             </Trans>
           </Text>
         );
@@ -162,27 +164,27 @@ const getPlanPrice = (price: SubscriptionPlanPrice): React.Node => {
 };
 
 /**
- * If price is given, it will be displayed. Otherwise, the prices stored in the
- * subscription plan will be displayed.
+ * If pricing system is given, it will be displayed. Otherwise, the pricing systems
+ * stored in the subscription plan will be displayed.
  */
 const getPlanPrices = ({
-  prices,
-  price,
+  pricingSystems,
+  pricingSystem,
   hidePrice,
 }: {
-  prices: ?(SubscriptionPlanPrice[]),
-  price: ?SubscriptionPlanPrice,
+  pricingSystems: ?(SubscriptionPlanPricingSystem[]),
+  pricingSystem: ?SubscriptionPlanPricingSystem,
   hidePrice?: boolean,
 }): React.Node => {
   if (hidePrice) return null;
-  if (price) {
-    return getPlanPrice(price);
+  if (pricingSystem) {
+    return getPlanPrice(pricingSystem);
   }
 
-  if (prices && prices.length > 0) {
-    const displayedPrices = prices.map(getPlanPrice);
+  if (pricingSystems && pricingSystems.length > 0) {
+    const displayedPricingSystems = pricingSystems.map(getPlanPrice);
 
-    return displayedPrices;
+    return displayedPricingSystems;
   }
 
   return (
@@ -196,7 +198,7 @@ const PLAN_LOGO_SIZE = 25;
 const PLAN_LOGO_PADDING = 20;
 
 const getPlanIcon = (
-  subscriptionPlan: SubscriptionPlan | SubscriptionPlanWithPrices
+  subscriptionPlan: SubscriptionPlan | SubscriptionPlanWithPricingSystems
 ): React.Node => {
   switch (subscriptionPlan.id) {
     case 'gdevelop_silver':
@@ -239,8 +241,10 @@ const getPlanIcon = (
 };
 
 type Props = {|
-  subscriptionPlanWithPrices: SubscriptionPlanWithPrices | SubscriptionPlan,
-  subscriptionPlanPrice?: ?SubscriptionPlanPrice,
+  subscriptionPlanWithPricingSystems:
+    | SubscriptionPlanWithPricingSystems
+    | SubscriptionPlan,
+  subscriptionPlanPricingSystem?: ?SubscriptionPlanPricingSystem,
   isHighlighted: boolean,
   actions?: React.Node,
   isPending?: boolean,
@@ -253,7 +257,7 @@ const PlanCard = (props: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
 
-  const planIcon = getPlanIcon(props.subscriptionPlanWithPrices);
+  const planIcon = getPlanIcon(props.subscriptionPlanWithPricingSystems);
 
   return (
     <I18n>
@@ -283,15 +287,17 @@ const PlanCard = (props: Props) => {
                     <b>
                       {selectMessageByLocale(
                         i18n,
-                        props.subscriptionPlanWithPrices.nameByLocale
+                        props.subscriptionPlanWithPricingSystems.nameByLocale
                       )}
                     </b>
                   </span>
                 </Text>
                 <Column noMargin alignItems="flex-end">
                   {getPlanPrices({
-                    prices: props.subscriptionPlanWithPrices.prices || null,
-                    price: props.subscriptionPlanPrice,
+                    pricingSystems:
+                      props.subscriptionPlanWithPricingSystems.pricingSystems ||
+                      null,
+                    pricingSystem: props.subscriptionPlanPricingSystem,
                     hidePrice: props.hidePrice,
                   })}
                 </Column>
@@ -299,12 +305,12 @@ const PlanCard = (props: Props) => {
               <Text color="secondary" noMargin>
                 {selectMessageByLocale(
                   i18n,
-                  props.subscriptionPlanWithPrices.descriptionByLocale
+                  props.subscriptionPlanWithPricingSystems.descriptionByLocale
                 )}
               </Text>
               <Line>
                 <Column noMargin>
-                  {props.subscriptionPlanWithPrices.bulletPointsByLocale.map(
+                  {props.subscriptionPlanWithPricingSystems.bulletPointsByLocale.map(
                     (bulletPointByLocale, index) => (
                       <Column key={index} expand noMargin>
                         <Line noMargin alignItems="center">

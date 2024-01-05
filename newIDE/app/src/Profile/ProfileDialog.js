@@ -33,7 +33,7 @@ type Props = {|
 const ProfileDialog = ({ open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
-  const { subscriptionPlansWithPrices } = useSubscriptionPlans({
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
   });
 
@@ -201,10 +201,12 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                     authenticatedUser.onOpenChangeEmailDialog
                   }
                 />
-                {subscriptionPlansWithPrices ? (
+                {subscriptionPlansWithPricingSystems ? (
                   <SubscriptionDetails
                     subscription={authenticatedUser.subscription}
-                    subscriptionPlansWithPrices={subscriptionPlansWithPrices}
+                    subscriptionPlansWithPricingSystems={
+                      subscriptionPlansWithPricingSystems
+                    }
                     onManageSubscription={onManageSubscription}
                     isManageSubscriptionLoading={isManageSubscriptionLoading}
                   />

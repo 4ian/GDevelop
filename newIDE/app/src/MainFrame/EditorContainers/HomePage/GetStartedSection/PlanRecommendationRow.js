@@ -4,7 +4,7 @@ import { t, Trans } from '@lingui/macro';
 import { I18n as I18nType } from '@lingui/core';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import { type SubscriptionPlanWithPrices } from '../../../../Utils/GDevelopServices/Usage';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../../../../UI/Grid';
 import Paper from '../../../../UI/Paper';
 import {
@@ -90,11 +90,11 @@ const planDetailsById = {
 
 const PlanRecommendationRow = ({
   recommendationPlanId,
-  subscriptionPlansWithPrices,
+  subscriptionPlansWithPricingSystems,
   i18n,
 }: {|
   recommendationPlanId: string,
-  subscriptionPlansWithPrices: SubscriptionPlanWithPrices[],
+  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
   i18n: I18nType,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -113,7 +113,9 @@ const PlanRecommendationRow = ({
       : null;
   if (!planToUse) return null;
 
-  const plan = subscriptionPlansWithPrices.find(plan => plan.id === planToUse);
+  const plan = subscriptionPlansWithPricingSystems.find(
+    plan => plan.id === planToUse
+  );
   if (!plan) return null;
 
   const planDetails = planDetailsById[recommendationPlanId];

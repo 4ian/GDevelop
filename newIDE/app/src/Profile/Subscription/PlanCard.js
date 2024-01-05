@@ -25,6 +25,17 @@ const styles = {
   bulletText: { flex: 1 },
 };
 
+const formatPricingSystemPriceAndCurrency = (
+  pricingSystem: SubscriptionPlanPricingSystem
+) => {
+  if (pricingSystem.currency === 'USD') {
+    return `$${pricingSystem.amountInCents / 100}`;
+  }
+  return `${pricingSystem.amountInCents / 100}${
+    pricingSystem.currency === 'EUR' ? '€' : pricingSystem.currency
+  }`;
+};
+
 const getPlanPrice = (
   pricingSystem: SubscriptionPlanPricingSystem
 ): React.Node => {
@@ -34,8 +45,7 @@ const getPlanPrice = (
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat/week
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat/week
             </Trans>
           </Text>
         );
@@ -43,8 +53,7 @@ const getPlanPrice = (
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/week
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/week
             </Trans>
           </Text>
         );
@@ -54,8 +63,7 @@ const getPlanPrice = (
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat every{' '}
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat every{' '}
               {pricingSystem.periodCount} weeks
             </Trans>
           </Text>
@@ -64,8 +72,7 @@ const getPlanPrice = (
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'} every{' '}
+              {formatPricingSystemPriceAndCurrency(pricingSystem)} every{' '}
               {pricingSystem.periodCount} weeks
             </Trans>
           </Text>
@@ -78,8 +85,7 @@ const getPlanPrice = (
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat/month
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat/month
             </Trans>
           </Text>
         );
@@ -87,8 +93,7 @@ const getPlanPrice = (
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/month
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/month
             </Trans>
           </Text>
         );
@@ -98,8 +103,7 @@ const getPlanPrice = (
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat every{' '}
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat every{' '}
               {pricingSystem.periodCount} months
             </Trans>
           </Text>
@@ -108,8 +112,7 @@ const getPlanPrice = (
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'} every{' '}
+              {formatPricingSystemPriceAndCurrency(pricingSystem)} every{' '}
               {pricingSystem.periodCount} months
             </Trans>
           </Text>
@@ -122,8 +125,7 @@ const getPlanPrice = (
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat/year
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat/year
             </Trans>
           </Text>
         );
@@ -131,8 +133,7 @@ const getPlanPrice = (
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/year
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/year
             </Trans>
           </Text>
         );
@@ -142,8 +143,7 @@ const getPlanPrice = (
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'}/seat every{' '}
+              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat every{' '}
               {pricingSystem.periodCount} years
             </Trans>
           </Text>
@@ -152,8 +152,7 @@ const getPlanPrice = (
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {pricingSystem.amountInCents / 100}
-              {pricingSystem.currency === 'EUR' ? '€' : '$'} every{' '}
+              {formatPricingSystemPriceAndCurrency(pricingSystem)} every{' '}
               {pricingSystem.periodCount} years
             </Trans>
           </Text>

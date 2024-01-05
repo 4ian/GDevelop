@@ -1114,6 +1114,10 @@ export class Serializer extends EmscriptenObject {
   static fromJSON(json: string): SerializerElement;
 }
 
+export class ObjectAssetSerializer extends EmscriptenObject {
+  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, resourcesNewFileNames: MapStringString): void;
+}
+
 export class InstructionsList extends EmscriptenObject {
   constructor(): void;
   insert(instr: Instruction, pos: number): Instruction;
@@ -2322,6 +2326,7 @@ export class ObjectsUsingResourceCollector extends EmscriptenObject {
 
 export class ResourcesInUseHelper extends EmscriptenObject {
   constructor(resourcesManager: ResourcesManager): void;
+  getAllResources(): VectorString;
   getAllImages(): SetString;
   getAllAudios(): SetString;
   getAllFonts(): SetString;

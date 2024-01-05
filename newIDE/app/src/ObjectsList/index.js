@@ -25,7 +25,6 @@ import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
@@ -213,7 +212,7 @@ type Props = {|
   canSetAsGlobalObject?: boolean,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
-  onExportObject: (object: gdObject) => void,
+  onExportAssets: () => void,
   onObjectCreated: gdObject => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
@@ -248,7 +247,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       canSetAsGlobalObject,
 
       onEditObject,
-      onExportObject,
+      onExportAssets,
       onObjectCreated,
       onObjectFolderOrObjectWithContextSelected,
       onObjectPasted,
@@ -278,10 +277,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [forceUpdate]
     );
-    const eventsFunctionsExtensionsState = React.useContext(
-      EventsFunctionsExtensionsContext
-    );
-    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
       from: ObjectFolderOrObjectWithContext | null,
@@ -1293,7 +1288,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
-        if (item.isRoot || item.isPlaceholder) return [];
+        if (item.isPlaceholder) {
+          return [];
+        }
+        if (item.isRoot) {
+          if (item.id === 'scene-objects') {
+            return [
+              {
+                label: i18n._(t`Export as assets`),
+                click: () => onExportAssets(),
+              },
+            ];
+          }
+          return [];
+        }
+
         const { objectFolderOrObject, global } = item;
 
         const container = global ? project : objectsContainer;
@@ -1446,13 +1455,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               'EffectCapability::EffectBehavior'
             ),
           },
-          eventsFunctionsExtensionWriter &&
-          project.hasEventsBasedObject(object.getType())
-            ? {
-                label: i18n._(t`Export object`),
-                click: () => onExportObject && onExportObject(object),
-              }
-            : null,
           { type: 'separator' },
           {
             label: i18n._(t`Set as global object`),
@@ -1501,7 +1503,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         initialInstances,
         preferences.values.userShortcutMap,
-        eventsFunctionsExtensionWriter,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
         paste,
@@ -1515,7 +1516,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObject,
         onEditObject,
-        onExportObject,
+        onExportAssets,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,

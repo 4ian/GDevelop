@@ -123,14 +123,15 @@ public:
    */
   virtual void ExposeEmbeddeds(gd::String &resourceName);
 
+protected:
+  gd::ResourcesManager * resourcesManager;
+
  private:
   /**
    * \brief Expose a resource: resources that have a file are
    * exposed as file (see ExposeFile).
    */
   void ExposeResource(gd::Resource &resource);
-
-  gd::ResourcesManager * resourcesManager;
 };
 
 /**

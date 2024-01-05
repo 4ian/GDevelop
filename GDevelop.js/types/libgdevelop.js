@@ -122,6 +122,7 @@ declare class libGDevelop {
   SerializerElement: Class<gdSerializerElement>;
   SharedPtrSerializerElement: Class<gdSharedPtrSerializerElement>;
   Serializer: Class<gdSerializer>;
+  ObjectAssetSerializer: Class<gdObjectAssetSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
   Expression: Class<gdExpression>;

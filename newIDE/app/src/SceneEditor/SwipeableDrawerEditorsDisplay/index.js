@@ -291,7 +291,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       }
                       canInstallPrivateAsset={props.canInstallPrivateAsset}
                       onEditObject={props.onEditObject}
-                      onExportObject={props.onExportObject}
+                      onExportAssets={props.onExportAssets}
                       onDeleteObjects={(objectWithContext, cb) =>
                         props.onDeleteObjects(i18n, objectWithContext, cb)
                       }

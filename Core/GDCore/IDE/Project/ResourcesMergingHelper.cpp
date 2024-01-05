@@ -28,7 +28,7 @@ void ResourcesMergingHelper::ExposeFile(gd::String& resourceFilename) {
   auto stripToFilenameOnly = [&]() {
     fs.MakeAbsolute(resourceFullFilename, baseDirectory);
     SetNewFilename(resourceFullFilename, fs.FileNameFrom(resourceFullFilename));
-    resourceFilename = oldFilenames[resourceFullFilename];
+    resourceFilename = newFilenames[resourceFullFilename];
   };
 
   // if we do not want to preserve the folders at all,
@@ -45,7 +45,7 @@ void ResourcesMergingHelper::ExposeFile(gd::String& resourceFilename) {
     gd::String relativeFilename = resourceFullFilename;
     if (fs.MakeRelative(relativeFilename, baseDirectory)) {
       SetNewFilename(resourceFullFilename, relativeFilename);
-      resourceFilename = oldFilenames[resourceFullFilename];
+      resourceFilename = newFilenames[resourceFullFilename];
     } else {
       // The filename cannot be made relative. Consider that it is absolute.
       // Just strip the filename to its file part
@@ -63,7 +63,7 @@ void ResourcesMergingHelper::ExposeFile(gd::String& resourceFilename) {
 
 void ResourcesMergingHelper::SetNewFilename(gd::String oldFilename,
                                             gd::String newFilename) {
-  if (oldFilenames.find(oldFilename) != oldFilenames.end()) return;
+  if (newFilenames.find(oldFilename) != newFilenames.end()) return;
 
   // Extract baseName and extension from the new filename
   size_t extensionPos = newFilename.find_last_of(".");
@@ -80,13 +80,13 @@ void ResourcesMergingHelper::SetNewFilename(gd::String oldFilename,
       gd::NewNameGenerator::Generate(
           baseName,
           [this, extension](const gd::String& newBaseName) {
-            return newFilenames.find(newBaseName + extension) !=
-                   newFilenames.end();
+            return oldFilenames.find(newBaseName + extension) !=
+                   oldFilenames.end();
           }) +
       extension;
 
-  oldFilenames[oldFilename] = finalFilename;
-  newFilenames[finalFilename] = oldFilename;
+  newFilenames[oldFilename] = finalFilename;
+  oldFilenames[finalFilename] = oldFilename;
 }
 
 void ResourcesMergingHelper::SetBaseDirectory(

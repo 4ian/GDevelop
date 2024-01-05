@@ -256,7 +256,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 }
                 onEditObject={this.editObject}
                 // Don't allow export as there is no assets.
-                onExportObject={() => {}}
+                onExportAssets={() => {}}
                 onDeleteObjects={this._onDeleteObjects(i18n)}
                 getValidatedObjectOrGroupName={
                   this._getValidatedObjectOrGroupName

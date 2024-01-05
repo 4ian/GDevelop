@@ -43,31 +43,4 @@ export default class BrowserEventsFunctionsExtensionWriter {
       throw error;
     }
   };
-
-  static chooseCustomObjectFile = async (
-    objectName?: string
-  ): Promise<?string> => {
-    return objectName;
-  };
-
-  static writeCustomObject = (
-    customObject: gdObject,
-    filename: string
-  ): Promise<void> => {
-    const exportedObject = customObject.clone().get();
-    exportedObject.getVariables().clear();
-    exportedObject.getEffects().clear();
-    exportedObject
-      .getAllBehaviorNames()
-      .toJSArray()
-      .forEach(name => exportedObject.removeBehavior(name));
-    const serializedObject = serializeToJSObject(exportedObject);
-    return downloadStringContentAsFile(
-      filename,
-      JSON.stringify(serializedObject)
-    ).catch(err => {
-      console.error('Unable to write the events function extension:', err);
-      throw err;
-    });
-  };
 }

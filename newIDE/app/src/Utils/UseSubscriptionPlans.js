@@ -21,6 +21,7 @@ const mergeSubscriptionPlansWithPrices = (
           prices: [],
         };
       }
+      // Filter operation here keeps the order of the prices sent by the server.
       const matchingPricingSystems = subscriptionPlanPrices.filter(
         pricingSystem => pricingSystem.planId === subscriptionPlan.id
       );

@@ -180,17 +180,7 @@ const getPlanPrices = ({
   }
 
   if (prices && prices.length > 0) {
-    const displayedPrices = prices
-      .sort((priceA, priceB) => {
-        // TODO: Decide if the front end should sort the prices or if it should respect
-        // the order sent by the back end.
-        if (priceA.period === 'week' && priceB.period === 'month') return 1;
-        if (priceA.period === 'week' && priceB.period === 'year') return 1;
-        if (priceA.period === 'month' && priceB.period === 'year') return 1;
-        if (priceA.period === priceB.period) return 0;
-        return -1;
-      })
-      .map(getPlanPrice);
+    const displayedPrices = prices.map(getPlanPrice);
 
     return displayedPrices;
   }

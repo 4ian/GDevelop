@@ -326,7 +326,7 @@ const SpineEditor = ({
                 spineData.textureAtlasOrLoadingError.loadingError ===
                 'invalid-atlas-resource' ? (
                   <Trans>
-                    The Atlas embed in the Spine fine ca'n't be located.
+                    The Atlas embedded in the Spine fine can't be located.
                   </Trans>
                 ) : spineData.textureAtlasOrLoadingError.loadingError ===
                   'missing-texture-resources' ? (

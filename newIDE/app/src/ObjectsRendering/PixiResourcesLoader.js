@@ -187,36 +187,40 @@ export const readEmbeddedResourcesMapping = (
   }
 };
 
-const getEmbeddedOwnerResource = (
+const getEmbedderResources = (
   project: gdProject,
-  resourceName: string
-): gdResource | null => {
+  embeddedResourceName: string,
+  embedderResourceKind: ResourceKind
+): Array<gdResource> => {
   const resourcesManager = project.getResourcesManager();
+  const embedderResources: Array<gdResource> = [];
 
-  for (const supposedOwnerResourceName of resourcesManager
+  for (const resourceName of resourcesManager
     .getAllResourceNames()
     .toJSArray()) {
-    if (resourceName === supposedOwnerResourceName) {
+    if (embeddedResourceName === resourceName) {
       continue;
     }
 
-    const supposedOwnerResource = resourcesManager.getResource(
-      supposedOwnerResourceName
-    );
+    const possibleEmbedderResource = resourcesManager.getResource(resourceName);
+    if (possibleEmbedderResource.getKind() !== embedderResourceKind) {
+      continue;
+    }
+
     const embeddedResourcesMapping = readEmbeddedResourcesMapping(
-      supposedOwnerResource
+      possibleEmbedderResource
     );
     if (!embeddedResourcesMapping) {
       continue;
     }
 
     const mappedResources = Object.values(embeddedResourcesMapping);
-    if (mappedResources.includes(resourceName)) {
-      return supposedOwnerResource;
+    if (mappedResources.includes(embeddedResourceName)) {
+      embedderResources.push(possibleEmbedderResource);
     }
   }
 
-  return null;
+  return embedderResources;
 };
 
 /**
@@ -237,15 +241,21 @@ export default class PixiResourcesLoader {
     spineDataPromises = {};
   }
 
-  static async _reloadResourceOwner(
+  static async _reloadEmbedderResources(
     project: gdProject,
-    resourceName: string,
-    ownerKind: ResourceKind
+    embeddedResourceName: string,
+    embedderResourceKind: ResourceKind
   ) {
-    const supposedOwner = getEmbeddedOwnerResource(project, resourceName);
-    if (supposedOwner && supposedOwner.getKind() === ownerKind) {
-      await this.reloadResource(project, supposedOwner.getName());
-    }
+    const embeddedResources = getEmbedderResources(
+      project,
+      embeddedResourceName,
+      embedderResourceKind
+    );
+    await Promise.all(
+      embeddedResources.map(embeddedResource =>
+        this.reloadResource(project, embeddedResource.getName())
+      )
+    );
   }
 
   static async reloadResource(project: gdProject, resourceName: string) {
@@ -260,7 +270,9 @@ export default class PixiResourcesLoader {
       // been added and detected by file watcher. When reloading the texture, the cache must
       // be cleaned too.
       delete loadedTextures[resourceName];
-      await this._reloadResourceOwner(project, resourceName, 'atlas');
+
+      // Also reload any resource embedding this resource:
+      await this._reloadEmbedderResources(project, resourceName, 'atlas');
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
@@ -279,31 +291,33 @@ export default class PixiResourcesLoader {
       delete loadedThreeTextures[resourceName];
     }
     if (spineAtlasPromises[resourceName]) {
-      /**
-       * Expected error due to https://github.com/pixijs/spine/issues/537 issue (read comments).
-       * String is stored as loaded atlas resource but pixi-spine considers it as TextureAtlas and tries to call dispose on it that causes TypeError.
-       */
       await PIXI.Assets.unload(resourceName).catch(async () => {
+        // Workaround:
+        // This is an expected error due to https://github.com/pixijs/spine/issues/537 issue (read comments
+        // and search the other mentions to this issue in the codebase):
+        // A string, instead of a TextureAtlas, is stored as the loaded atlas resource (which is the root cause of this exception).
+        // pixi-spine considers it acts on a TextureAtlas and tries to call dispose on it that causes a TypeError.
         const { textureAtlas } = await spineAtlasPromises[resourceName];
         if (textureAtlas) {
-          textureAtlas.dispose();
+          textureAtlas.dispose(); // Workaround by doing `dispose` ourselves.
         }
       });
       delete spineAtlasPromises[resourceName];
-      await this._reloadResourceOwner(project, resourceName, 'spine');
+
+      // Also reload any resource embedding this resource:
+      await this._reloadEmbedderResources(project, resourceName, 'spine');
     }
     if (spineDataPromises[resourceName]) {
       await PIXI.Assets.unload(resourceName);
       delete spineDataPromises[resourceName];
 
-      /**
-       * This line allows us to omit issue https://github.com/pixijs/pixijs/issues/10069.
-       * PIXI.Assets.resolver caches data that was passed to PIXI.Assets.add even if resource was unloaded.
-       * So every time we unload spine resources we need to call it to clean resolver cash
-       * and pick up fresh data next time we load it.
-       */
+      // This line allows us to avoid issue https://github.com/pixijs/pixijs/issues/10069.
+      // PIXI.Assets.resolver caches data that was passed to `PIXI.Assets.add`, even if resource was unloaded.
+      // So every time we unload spine resources, we need to call it to clean the resolver cache
+      // and pick up fresh data next time we call `getSpineData`.
       PIXI.Assets.resolver.prefer();
     }
+
     const matchingMaterials = Object.keys(loadedThreeMaterials).filter(key =>
       key.startsWith(resourceName)
     );
@@ -640,7 +654,8 @@ export default class PixiResourcesLoader {
       PIXI.Assets.load(spineTextureAtlasName).then(
         atlas => {
           // Ideally atlas of type `TextureAtlas` should be passed here.
-          // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537).
+          // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537
+          // and search the other mentions to this issue in the codebase).
           //
           // This branching covers all possible ways to make it work fine,
           // if issue is fixed in pixi-spine or after migration to spine-pixi.

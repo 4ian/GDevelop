@@ -97,6 +97,7 @@ const SpineEditor = ({
   const [spineData, setSpineData] = React.useState<SpineDataOrLoadingError>({
     skeleton: null,
     loadingError: null,
+    loadingErrorReason: null,
   });
 
   const [sourceSelectOptions, setSourceSelectOptions] = React.useState<
@@ -311,32 +312,38 @@ const SpineEditor = ({
             resourceManagementProps={resourceManagementProps}
             onChange={onChangeSpineResourceName}
           />
-          {!spineData.skeleton &&
-          (spineData.loadingError || spineData.textureAtlasOrLoadingError) ? (
+          {!spineData.skeleton && spineData.loadingErrorReason ? (
             <AlertMessage kind="error">
-              {spineData.loadingError === 'invalid-spine-resource' ? (
+              {spineData.loadingErrorReason === 'invalid-spine-resource' ? (
                 <Trans>
                   The selected resource is not a proper Spine resource.
                 </Trans>
-              ) : spineData.loadingError === 'missing-texture-atlas-name' ? (
+              ) : spineData.loadingErrorReason ===
+                'missing-texture-atlas-name' ? (
                 <Trans>Missing texture atlas name in the Spine file.</Trans>
-              ) : spineData.loadingError === 'spine-resource-loading-error' ? (
-                <Trans>Error while loading the Spine resource.</Trans>
-              ) : spineData.textureAtlasOrLoadingError ? (
-                spineData.textureAtlasOrLoadingError.loadingError ===
-                'invalid-atlas-resource' ? (
-                  <Trans>
-                    The Atlas embedded in the Spine fine can't be located.
-                  </Trans>
-                ) : spineData.textureAtlasOrLoadingError.loadingError ===
-                  'missing-texture-resources' ? (
-                  <Trans>Missing texture for an atlas in the Spine file.</Trans>
-                ) : spineData.textureAtlasOrLoadingError.loadingError ===
-                  'atlas-resource-loading-error' ? (
-                  <Trans>
-                    Error while loading the Spine Texture Atlas resource.
-                  </Trans>
-                ) : null
+              ) : spineData.loadingErrorReason ===
+                'spine-resource-loading-error' ? (
+                <Trans>Error while loading the Spine resource (
+                  {spineData.loadingError
+                    ? spineData.loadingError.message
+                    : 'Unknown error'}
+                  ).</Trans>
+              ) : spineData.loadingErrorReason === 'invalid-atlas-resource' ? (
+                <Trans>
+                  The Atlas embedded in the Spine fine can't be located.
+                </Trans>
+              ) : spineData.loadingErrorReason ===
+                'missing-texture-resources' ? (
+                <Trans>Missing texture for an atlas in the Spine file.</Trans>
+              ) : spineData.loadingErrorReason ===
+                'atlas-resource-loading-error' ? (
+                <Trans>
+                  Error while loading the Spine Texture Atlas resource (
+                  {spineData.loadingError
+                    ? spineData.loadingError.message
+                    : 'Unknown error'}
+                  ).
+                </Trans>
               ) : null}
             </AlertMessage>
           ) : null}

@@ -16,7 +16,8 @@ const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
   textureAtlas: ?TextureAtlas,
-  loadingError:
+  loadingError: ?Error,
+  loadingErrorReason:
     | null
     | 'invalid-atlas-resource'
     | 'missing-texture-resources'
@@ -25,12 +26,16 @@ type SpineTextureAtlasOrLoadingError = {|
 
 export type SpineDataOrLoadingError = {|
   skeleton: ?ISkeleton,
-  loadingError:
+  loadingError: ?Error,
+  loadingErrorReason:
     | null
     | 'invalid-spine-resource'
     | 'missing-texture-atlas-name'
-    | 'spine-resource-loading-error',
-  textureAtlasOrLoadingError?: SpineTextureAtlasOrLoadingError,
+    | 'spine-resource-loading-error'
+    // Atlas loading error reasons:
+    | 'invalid-atlas-resource'
+    | 'missing-texture-resources'
+    | 'atlas-resource-loading-error',
 |};
 
 type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
@@ -590,7 +595,8 @@ export default class PixiResourcesLoader {
     if (!spineTextureAtlasName) {
       return {
         textureAtlas: null,
-        loadingError: 'invalid-atlas-resource',
+        loadingError: null,
+        loadingErrorReason: 'invalid-atlas-resource',
       };
     }
 
@@ -598,7 +604,8 @@ export default class PixiResourcesLoader {
     if (!resourceManager.hasResource(spineTextureAtlasName)) {
       return {
         textureAtlas: null,
-        loadingError: 'invalid-atlas-resource',
+        loadingError: null,
+        loadingErrorReason: 'invalid-atlas-resource',
       };
     }
 
@@ -606,7 +613,8 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'atlas') {
       return {
         textureAtlas: null,
-        loadingError: 'invalid-atlas-resource',
+        loadingError: null,
+        loadingErrorReason: 'invalid-atlas-resource',
       };
     }
 
@@ -617,7 +625,8 @@ export default class PixiResourcesLoader {
     if (!textureAtlasMappingEntries.length) {
       return {
         textureAtlas: null,
-        loadingError: 'missing-texture-resources',
+        loadingError: null,
+        loadingErrorReason: 'missing-texture-resources',
       };
     }
 
@@ -668,12 +677,14 @@ export default class PixiResourcesLoader {
                 resolve({
                   textureAtlas,
                   loadingError: null,
+                  loadingErrorReason: null,
                 })
             );
           } else {
             resolve({
               textureAtlas: atlas,
               loadingError: null,
+              loadingErrorReason: null,
             });
           }
         },
@@ -683,7 +694,8 @@ export default class PixiResourcesLoader {
           );
           resolve({
             textureAtlas: null,
-            loadingError: 'atlas-resource-loading-error',
+            loadingError: err,
+            loadingErrorReason: 'atlas-resource-loading-error',
           });
         }
       );
@@ -708,6 +720,7 @@ export default class PixiResourcesLoader {
       return {
         skeleton: null,
         loadingError: null,
+        loadingErrorReason: null,
       };
     }
 
@@ -715,7 +728,8 @@ export default class PixiResourcesLoader {
     if (!resourceManager.hasResource(spineName)) {
       return {
         skeleton: null,
-        loadingError: 'invalid-spine-resource',
+        loadingError: null,
+        loadingErrorReason: 'invalid-spine-resource',
       };
     }
 
@@ -723,7 +737,8 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'spine') {
       return {
         skeleton: null,
-        loadingError: 'invalid-spine-resource',
+        loadingError: null,
+        loadingErrorReason: 'invalid-spine-resource',
       };
     }
 
@@ -734,7 +749,8 @@ export default class PixiResourcesLoader {
     if (typeof spineTextureAtlasName !== 'string') {
       return {
         skeleton: null,
-        loadingError: 'missing-texture-atlas-name',
+        loadingError: null,
+        loadingErrorReason: 'missing-texture-atlas-name',
       };
     }
 
@@ -744,8 +760,8 @@ export default class PixiResourcesLoader {
           if (!textureAtlasOrLoadingError.textureAtlas) {
             return resolve({
               skeleton: null,
-              loadingError: null,
-              textureAtlasOrLoadingError,
+              loadingError: textureAtlasOrLoadingError.loadingError,
+              loadingErrorReason: textureAtlasOrLoadingError.loadingErrorReason,
             });
           }
 
@@ -770,6 +786,7 @@ export default class PixiResourcesLoader {
               resolve({
                 skeleton: jsonData.spineData,
                 loadingError: null,
+                loadingErrorReason: null,
               });
             },
             err => {
@@ -778,7 +795,8 @@ export default class PixiResourcesLoader {
               );
               resolve({
                 skeleton: null,
-                loadingError: 'spine-resource-loading-error',
+                loadingError: err,
+                loadingErrorReason: 'spine-resource-loading-error',
               });
             }
           );

@@ -29,7 +29,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'SpineObject',
-        _('Spine'),
+        _('Spine (experimental)'),
         _('Displays a Spine animation.'),
         'Vladyslav Pohorielov',
         'Open source (MIT License)'
@@ -44,7 +44,7 @@ module.exports = {
     const object = extension
       .addObject(
         'SpineObject',
-        _('Spine'),
+        _('Spine (experimental)'),
         _(
           'Display and animate Spine skeleton. Select Spine files (json, atlas, image).'
         ),
@@ -56,7 +56,7 @@ module.exports = {
       .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-atlas-manager.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-manager.js')
-      .setCategoryFullName(_('General'));
+      .setCategoryFullName(_('Advanced'));
 
     object
       .addExpressionAndConditionAndAction(
@@ -379,14 +379,12 @@ module.exports = {
           .getSpineData(this._project, spineResourceName)
           .then((spineDataOrLoadingError) => {
             if (!spineDataOrLoadingError.skeleton) {
-              const loadingError =
-                spineDataOrLoadingError.loadingError ||
-                (spineDataOrLoadingError.textureAtlasOrLoadingError
-                  ? spineDataOrLoadingError.textureAtlasOrLoadingError
-                      .loadingError
-                  : null);
               console.error(
-                'Unable to load Spine: ' + (loadingError || 'Unknown reason.')
+                'Unable to load Spine (' +
+                  (spineDataOrLoadingError.loadingErrorReason ||
+                    'Unknown reason') +
+                  ')',
+                spineDataOrLoadingError.loadingError
               );
               this._spine = null;
               return;

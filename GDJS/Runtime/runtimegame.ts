@@ -152,6 +152,7 @@ namespace gdjs {
         getGlobalResourceNames(data),
         data.layouts
       );
+
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
@@ -304,6 +305,24 @@ namespace gdjs {
      */
     getModel3DManager(): gdjs.Model3DManager {
       return this._resourcesLoader.getModel3DManager();
+    }
+
+    /**
+     * Get the Spine manager of the game, used to load and construct spine skeletons from game
+     * resources.
+     * @return The Spine manager for the game
+     */
+    getSpineManager(): gdjs.SpineManager | null {
+      return this._resourcesLoader.getSpineManager();
+    }
+
+    /**
+     * Get the Spine Atlas manager of the game, used to load atlases from game
+     * resources.
+     * @return The Spine Atlas manager for the game
+     */
+    getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
+      return this._resourcesLoader.getSpineAtlasManager();
     }
 
     /**
@@ -1151,6 +1170,17 @@ namespace gdjs {
       return mapping && mapping[embeddedResourceName]
         ? mapping[embeddedResourceName]
         : embeddedResourceName;
+    }
+
+    /**
+     * Returns the array of resources that are embedded to passed one.
+     * @param resourceName The name of resource to find embedded resources of.
+     * @returns The array of related resources names.
+     */
+    getEmbeddedResourcesNames(resourceName: string): string[] {
+      return this._embeddedResourcesMappings.has(resourceName)
+        ? Object.keys(this._embeddedResourcesMappings.get(resourceName)!)
+        : [];
     }
   }
 }

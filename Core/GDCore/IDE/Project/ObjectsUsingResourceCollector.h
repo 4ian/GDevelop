@@ -79,6 +79,12 @@ public:
   virtual void ExposeModel3D(gd::String& otherResourceName) override {
     MatchResourceName(otherResourceName);
   };
+  virtual void ExposeAtlas(gd::String& otherResourceName) override {
+    MatchResourceName(otherResourceName);
+  };
+  virtual void ExposeSpine(gd::String& otherResourceName) override {
+    MatchResourceName(otherResourceName);
+  };
 
   void MatchResourceName(gd::String& otherResourceName) {
     if (otherResourceName == resourceName) matchesResourceName = true;

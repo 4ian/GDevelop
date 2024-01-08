@@ -5,7 +5,7 @@ import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
 import { Tabs } from '../../UI/Tabs';
 import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor';
-import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
+import { EventsFunctionPropertiesEditor } from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';

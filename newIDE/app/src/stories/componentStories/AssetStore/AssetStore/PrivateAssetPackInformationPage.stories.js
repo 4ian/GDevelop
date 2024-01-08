@@ -37,6 +37,8 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   name: 'French Food',
   categories: ['props'],
   prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
+  paypalPriceInUsd: 15.0,
+  paypalProductId: 'fake-paypal-product-id',
   appStoreProductId: null,
   sellerStripeAccountId: 'sellerStripeProductId',
   stripeProductId: 'stripeProductId',
@@ -126,6 +128,8 @@ export const Default = () => {
           prices: [
             { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
           ],
+          paypalPriceInUsd: 15.0,
+          paypalProductId: 'fake-paypal-product-id',
           appStoreProductId: null,
           sellerStripeAccountId: 'sellerStripeProductId',
           stripeProductId: 'stripeProductId',
@@ -147,6 +151,8 @@ export const Default = () => {
           prices: [
             { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
           ],
+          paypalPriceInUsd: 10.0,
+          paypalProductId: 'fake-paypal-product-id',
           appStoreProductId: 'fake.product.id',
           sellerStripeAccountId: 'sellerStripeProductId',
           stripeProductId: 'stripeProductId',
@@ -226,6 +232,8 @@ export const ForAlreadyPurchasedAssetPack = () => {
             prices: [
               { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
             ],
+            paypalPriceInUsd: 15.0,
+            paypalProductId: 'fake-paypal-product-id',
             appStoreProductId: null,
             sellerStripeAccountId: 'sellerStripeProductId',
             stripeProductId: 'stripeProductId',
@@ -247,6 +255,8 @@ export const ForAlreadyPurchasedAssetPack = () => {
             prices: [
               { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
             ],
+            paypalPriceInUsd: 10.0,
+            paypalProductId: 'fake-paypal-product-id',
             appStoreProductId: 'fake.product.id',
             sellerStripeAccountId: 'sellerStripeProductId',
             stripeProductId: 'stripeProductId',

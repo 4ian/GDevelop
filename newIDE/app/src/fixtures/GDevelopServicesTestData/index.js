@@ -2413,6 +2413,8 @@ export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData 
   createdAt: '2020-01-01',
   thumbnailUrls: [],
   prices: [],
+  paypalPriceInUsd: 9.99,
+  paypalProductId: 'fake-paypal-product-id',
   appStoreProductId: 'fake-app-store-product-id',
   includedListableProductIds: [],
   sellerStripeAccountId: 'fake-seller-stripe-account-id',

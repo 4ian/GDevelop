@@ -17,6 +17,9 @@ import Paper from '../../UI/Paper';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Silver from './Icons/Silver';
 import Gold from './Icons/Gold';
+import Startup from './Icons/Startup';
+import Business from './Icons/Business';
+import Education from './Icons/Education';
 import GDevelopGLogo from '../../UI/CustomSvgIcons/GDevelopGLogo';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 
@@ -212,10 +215,36 @@ const getPlanIcon = (
           }}
         />
       );
-    // TODO: Add icons for other plans.
     case 'gdevelop_education':
+      return (
+        <Education
+          style={{
+            // Those icons have a glow effect, so the padding is in the size of the image.
+            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+          }}
+        />
+      );
     case 'gdevelop_startup':
+      return (
+        <Startup
+          style={{
+            // Those icons have a glow effect, so the padding is in the size of the image.
+            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+          }}
+        />
+      );
     case 'gdevelop_enterprise':
+      return (
+        <Business
+          style={{
+            // Those icons have a glow effect, so the padding is in the size of the image.
+            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+          }}
+        />
+      );
     default:
       return (
         <GDevelopGLogo

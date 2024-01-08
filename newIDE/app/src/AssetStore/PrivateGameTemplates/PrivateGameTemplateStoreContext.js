@@ -135,7 +135,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const fetchedPivateGameTemplateListingDatas = await listListedPrivateGameTemplates(
+          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates(
             {
               onlyAppStorePrivateGameTemplates,
             }
@@ -143,18 +143,18 @@ export const PrivateGameTemplateStoreStateProvider = ({
 
           console.info(
             `Loaded ${
-              fetchedPivateGameTemplateListingDatas
-                ? fetchedPivateGameTemplateListingDatas.length
+              fetchedPrivateGameTemplateListingDatas
+                ? fetchedPrivateGameTemplateListingDatas.length
                 : 0
             } game templates from the store.`
           );
 
           setPrivateGameTemplateListingDatas(
-            fetchedPivateGameTemplateListingDatas
+            fetchedPrivateGameTemplateListingDatas
           );
           const gameTemplateFilters: Filters = {
             allTags: [],
-            defaultTags: fetchedPivateGameTemplateListingDatas.reduce(
+            defaultTags: fetchedPrivateGameTemplateListingDatas.reduce(
               (allCategories, privateGameTemplateListingData) => {
                 return allCategories.concat(
                   privateGameTemplateListingData.categories.map(category =>

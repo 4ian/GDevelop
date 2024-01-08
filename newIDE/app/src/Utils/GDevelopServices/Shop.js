@@ -50,6 +50,7 @@ type PaypalProductAttributes = {|
 export type PrivateAssetPackListingData = {|
   ...ProductListingData,
   ...StripeProductAttributes,
+  ...PaypalProductAttributes,
   ...AppStoreProductAttributes,
   productType: 'ASSET_PACK',
   listing: 'ASSET_PACK',
@@ -58,6 +59,7 @@ export type PrivateAssetPackListingData = {|
 export type PrivateGameTemplateListingData = {|
   ...ProductListingData,
   ...StripeProductAttributes,
+  ...PaypalProductAttributes,
   ...AppStoreProductAttributes,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
@@ -67,6 +69,7 @@ export type CreditsPackageListingData = {|
   ...ProductListingData,
   ...StripeProductAttributes,
   ...PaypalProductAttributes,
+  ...AppStoreProductAttributes,
   productType: 'CREDITS_PACKAGE',
   listing: 'CREDITS_PACKAGE',
 |};
@@ -278,6 +281,7 @@ export const getPurchaseCheckoutUrl = ({
   url.searchParams.set('userId', userId);
   url.searchParams.set('customerEmail', userEmail);
   if (password) url.searchParams.set('password', password);
+
   return url.toString();
 };
 

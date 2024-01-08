@@ -22,6 +22,9 @@ import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopService
 import ErrorBoundary from '../UI/ErrorBoundary';
 import AlertMessage from '../UI/AlertMessage';
 import useSubscriptionPlans from '../Utils/UseSubscriptionPlans';
+import Text from '../UI/Text';
+import Link from '../UI/Link';
+import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -213,6 +216,28 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                 ) : (
                   <PlaceholderLoader />
                 )}
+                <Column noMargin>
+                  <Line alignItems="center">
+                    <Column noMargin>
+                      <Text size="block-title">
+                        <Trans>GDevelop credits</Trans>
+                      </Text>
+                      <Text size="body" noMargin>
+                        <Trans>
+                          Get perks and cloud benefits when getting closer to
+                          your game launch.{' '}
+                          <Link
+                            href="{TODO}"
+                            onClick={() => Window.openExternalURL('{TODO}')}
+                          >
+                            Learn more
+                          </Link>
+                        </Trans>
+                      </Text>
+                    </Column>
+                  </Line>
+                  <CreditsStatusBanner displayPurchaseAction />
+                </Column>
                 <ContributionsDetails userId={authenticatedUser.profile.id} />
                 {isConnected && (
                   <div ref={userAchievementsContainerRef}>

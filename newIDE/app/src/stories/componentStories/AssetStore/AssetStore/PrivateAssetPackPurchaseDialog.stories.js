@@ -38,6 +38,8 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   name: 'French Food',
   categories: ['props'],
   prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
+  paypalPriceInUsd: 15.0,
+  paypalProductId: 'fake-paypal-product-id',
   appStoreProductId: null,
   sellerStripeAccountId: 'sellerStripeProductId',
   stripeProductId: 'stripeProductId',

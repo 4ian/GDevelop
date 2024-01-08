@@ -51,6 +51,8 @@ const getAssetPacksListingData = (
         stripePriceId: 'stripePriceId',
       },
     ],
+    paypalPriceInUsd: 5.99,
+    paypalProductId: 'fake-paypal-product-id',
     appStoreProductId: null,
     sellerStripeAccountId: 'sellerStripeProductId',
     stripeProductId: 'stripeProductId',

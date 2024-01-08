@@ -7,6 +7,7 @@ import PriceTag from '../UI/PriceTag';
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type CreditsPackageListingData,
 } from '../Utils/GDevelopServices/Shop';
 import {
   shouldUseAppStoreProduct,
@@ -16,7 +17,8 @@ import {
 type FormatProps = {|
   productListingData:
     | PrivateAssetPackListingData
-    | PrivateGameTemplateListingData,
+    | PrivateGameTemplateListingData
+    | CreditsPackageListingData,
   i18n: I18nType,
 |};
 
@@ -43,7 +45,8 @@ export const formatProductPrice = ({
 type ProductPriceOrOwnedProps = {|
   productListingData:
     | PrivateAssetPackListingData
-    | PrivateGameTemplateListingData,
+    | PrivateGameTemplateListingData
+    | CreditsPackageListingData,
   i18n: I18nType,
   owned?: boolean,
 |};
@@ -61,7 +64,8 @@ export const getProductPriceOrOwnedLabel = ({
 type ProductPriceTagProps = {|
   productListingData:
     | PrivateAssetPackListingData
-    | PrivateGameTemplateListingData,
+    | PrivateGameTemplateListingData
+    | CreditsPackageListingData,
   /**
    * To be used when the component is over an element for which
    * we don't control the background (e.g. an image).

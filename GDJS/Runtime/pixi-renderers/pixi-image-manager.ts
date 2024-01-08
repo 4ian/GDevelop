@@ -340,12 +340,15 @@ namespace gdjs {
             });
 
             const baseTexture = texture.baseTexture;
-
-            baseTexture.on('loaded', () => {
-              this._loadedTextures.set(resource, texture);
-              applyTextureSettings(texture, resource);
-              resolve();
-            });
+            baseTexture
+              .on('loaded', () => {
+                this._loadedTextures.set(resource, texture);
+                applyTextureSettings(texture, resource);
+                resolve();
+              })
+              .on('error', (error) => {
+                reject(error);
+              });
           });
         } else {
           // If the file has no extension, PIXI.assets.load cannot find

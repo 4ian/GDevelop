@@ -12,12 +12,10 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
-import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
 import { enumerateValidVariableNames } from './EnumerateVariables';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function GlobalVariableField(props: ParameterFieldProps, ref) {
+  function SceneVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [editorOpen, setEditorOpen] = React.useState(false);
     const focus: FieldFocusFunction = options => {
@@ -28,34 +26,34 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     }));
 
     const { project, scope } = props;
+    const { layout } = scope;
 
-    const onComputeAllVariableNames = () =>
-      project
-        ? EventsRootVariablesFinder.findAllGlobalVariables(
-            project.getCurrentPlatform(),
-            project
-          )
-        : [];
+    const onComputeAllVariableNames = React.useCallback(
+      () => [],
+      []
+    );
+
+    // TODO Handle object variable?
+    const enumerateGlobalAndSceneVariableNames = React.useCallback<Array<string>>(
+      () => {
+        return project && layout ? [...enumerateValidVariableNames(layout.getVariables()),
+          ...enumerateValidVariableNames(project.getVariables())] : [];
+      },
+      [project, layout]
+    );
 
     const variablesContainers = React.useMemo(
       () => {
-        return project ? [project.getVariables()] : [];
+        return layout ? [layout.getVariables(), project.getVariables()] : [];
       },
-      [project]
-    );
-
-    const enumerateGlobalVariableNames = React.useCallback<Array<string>>(
-      () => {
-        return project ? enumerateValidVariableNames(project.getVariables()) : [];
-      },
-      [project]
+      [layout, project]
     );
 
     return (
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateGlobalVariableNames}
+          enumerateVariableNames={enumerateGlobalAndSceneVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -67,27 +65,30 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           scope={scope}
+          id={
+            props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-scene-variable-field`
+              : undefined
+          }
         />
-        {editorOpen && project && (
+        {editorOpen && layout && project && (
           <VariablesEditorDialog
             project={project}
-            title={<Trans>Global Variables</Trans>}
-            open={editorOpen}
-            variablesContainer={project.getVariables()}
+            title={<Trans>{layout.getName()} variables</Trans>}
+            open
+            variablesContainer={layout.getVariables()}
             onCancel={() => setEditorOpen(false)}
             onApply={() => {
               setEditorOpen(false);
               if (field.current) field.current.updateAutocompletions();
             }}
-            emptyPlaceholderTitle={
-              <Trans>Add your first global variable</Trans>
-            }
+            emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}
             emptyPlaceholderDescription={
               <Trans>
-                These variables hold additional information on a project.
+                These variables hold additional information on a scene.
               </Trans>
             }
-            helpPagePath={'/all-features/variables/global-variables'}
+            helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             preventRefactoringToDeleteInstructions
           />
@@ -97,6 +98,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-export const renderInlineGlobalVariable = (
+export const renderInlineAnyVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, GlobalIcon, 'global variable');
+) => renderVariableWithIcon(props, 'res/types/scenevar.png', 'variable');

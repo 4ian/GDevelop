@@ -323,11 +323,13 @@ const SpineEditor = ({
                 <Trans>Missing texture atlas name in the Spine file.</Trans>
               ) : spineData.loadingErrorReason ===
                 'spine-resource-loading-error' ? (
-                <Trans>Error while loading the Spine resource (
+                <Trans>
+                  Error while loading the Spine resource (
                   {spineData.loadingError
                     ? spineData.loadingError.message
                     : 'Unknown error'}
-                  ).</Trans>
+                  ).
+                </Trans>
               ) : spineData.loadingErrorReason === 'invalid-atlas-resource' ? (
                 <Trans>
                   The Atlas embedded in the Spine fine can't be located.

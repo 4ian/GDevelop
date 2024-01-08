@@ -4,7 +4,6 @@ import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
-import { enumerateVariables } from './EnumerateVariables';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -28,6 +27,7 @@ import intersection from 'lodash/intersection';
 type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
+  enumerateVariableNames: Array<string>,
   onOpenDialog: ?() => void,
 };
 
@@ -106,6 +106,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
       variablesContainers,
+      enumerateVariableNames,
       value,
       onChange,
       isInline,
@@ -126,30 +127,14 @@ export default React.forwardRef<Props, VariableFieldInterface>(
      */
     const updateAutocompletions = React.useCallback(
       () => {
-        const definedVariableNames =
-          variablesContainers.length === 0
-            ? []
-            : variablesContainers
-                .map(variablesContainer =>
-                  enumerateVariables(variablesContainer)
-                    .map(({ name, isValidName }) =>
-                      isValidName
-                        ? name
-                        : // Hide invalid variable names - they would not
-                          // be parsed correctly anyway.
-                          null
-                    )
-                    .filter(Boolean)
-                )
-                .reduce((a, b) => intersection(a, b));
         setAutocompletionVariableNames(
-          definedVariableNames.map(name => ({
+          enumerateVariableNames().map(name => ({
             text: name,
             value: name,
           }))
         );
       },
-      [variablesContainers]
+      [enumerateVariableNames]
     );
 
     const focus: FieldFocusFunction = options => {

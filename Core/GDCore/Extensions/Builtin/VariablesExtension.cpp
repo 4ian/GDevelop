@@ -26,6 +26,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetIcon("res/conditions/var24.png");
 
   extension
+      .AddCondition("Variable",
+                    _("Number variable"),
+                    _("Compare the number value of a variable."),
+                    _("The number of variable _PARAM0_"),
+                    _("Variables"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions());
+
+  extension
+      .AddCondition("VariableTxt",
+                    _("Text variable"),
+                    _("Compare the text (string) of a variable."),
+                    _("The text of variable _PARAM0_"),
+                    _("Variables"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .UseStandardRelationalOperatorParameters(
+          "string", ParameterOptions::MakeNewOptions());
+
+  extension
       .AddCondition("VarScene",
                     _("Number variable"),
                     _("Compare the number value of a scene variable."),

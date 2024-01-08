@@ -29,6 +29,18 @@ export type EnumeratedVariable = {|
   type: Variable_Type,
 |};
 
+export const enumerateValidVariableNames = (
+  variablesContainer: ?gdVariablesContainer
+): Array<EnumeratedVariable> => enumerateVariables(variablesContainer)
+.map(({ name, isValidName }) =>
+  isValidName
+    ? name
+    : // Hide invalid variable names - they would not
+      // be parsed correctly anyway.
+      null
+)
+.filter(Boolean);
+
 export const enumerateVariables = (
   variablesContainer: ?gdVariablesContainer
 ): Array<EnumeratedVariable> => {

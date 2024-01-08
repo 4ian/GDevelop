@@ -1298,7 +1298,20 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     const gd::String& objectName) {
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
-  if (scope == LAYOUT_VARIABLE) {
+  if (scope == ANY_VARIABLE) {
+    if (HasProjectAndLayout()) {
+      if (GetLayout().GetVariables().Has(variableName)) {
+        variables = &GetLayout().GetVariables();
+        output = "runtimeScene.getScene().getVariables()";
+      } else if (GetProject().GetVariables().Has(variableName)) {
+        variables = &GetProject().GetVariables();
+        output = "runtimeScene.getGame().getVariables()";
+      }
+    }
+    else {
+      output = "runtimeScene.getScene().getVariables()";
+    }
+  } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";
 
     if (HasProjectAndLayout()) {

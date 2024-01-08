@@ -13,6 +13,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import { enumerateValidVariableNames } from './EnumerateVariables';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
@@ -46,11 +47,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       },
       [layout]
     );
+    
+    const enumerateSceneVariableNames = React.useCallback<Array<string>>(
+      () => {
+        return layout ? enumerateValidVariableNames(layout.getVariables()) : [];
+      },
+      [layout]
+    );
 
     return (
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
+          enumerateVariables={enumerateSceneVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

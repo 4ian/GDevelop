@@ -17,6 +17,8 @@ import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
+import { enumerateValidVariableNames } from './EnumerateVariables';
+import intersection from 'lodash/intersection';
 
 // TODO Move this function to the ObjectsContainersList class.
 const getObjectOrGroupVariablesContainers = (
@@ -100,6 +102,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           : [],
       [objectName, globalObjectsContainer, objectsContainer]
     );
+    
+    const enumerateObjectVariableNames = React.useCallback<Array<string>>(
+      () =>
+      variablesContainers.map(variablesContainer =>
+              enumerateValidVariableNames(variablesContainer))
+              .reduce((a, b) => intersection(a, b)),
+      [variablesContainers]
+    );
 
     const onComputeAllVariableNames = () =>
       project && layout && object
@@ -115,6 +125,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
+          enumerateVariables={enumerateObjectVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

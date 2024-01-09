@@ -254,57 +254,28 @@ export const extractFilenameWithExtensionFromProductAuthorizedUrl = (
   return filenameWithExtension;
 };
 
-export const getStripeCheckoutUrl = async (
-  getAuthorizationHeader: () => Promise<string>,
-  {
-    priceName,
-    productId,
-    userId,
-    customerEmail,
-    password,
-  }: {|
-    priceName: string,
-    productId: string,
-    userId: string,
-    customerEmail: string,
-    password?: string,
-  |}
-): Promise<string> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.post(
-    '/purchase/action/create-stripe-checkout-session',
-    {
-      priceName,
-      productId,
-      customerEmail,
-      password,
-    },
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
-  if (!response.data) throw new Error('Could not create the checkout session.');
-  if (!response.data.sessionUrl)
-    throw new Error('Could not find the session url.');
-  return response.data.sessionUrl;
-};
-
-export const getCreditsRedirectToCheckoutUrl = ({
-  creditsPackageId,
+export const getPurchaseCheckoutUrl = ({
+  productId,
+  priceName,
   userId,
   userEmail,
+  password,
 }: {|
-  creditsPackageId: string,
+  productId: string,
+  priceName: string,
   userId: string,
   userEmail: string,
+  password?: string,
 |}): string => {
   const url = new URL(
-    `${GDevelopShopApi.baseUrl}/credits-package/action/redirect-to-checkout`
+    `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-checkout`
   );
-  url.searchParams.set('creditsPackageId', creditsPackageId);
+
+  url.searchParams.set('productId', productId);
+  url.searchParams.set('priceName', priceName);
   url.searchParams.set('userId', userId);
   url.searchParams.set('customerEmail', userEmail);
+  if (password) url.searchParams.set('password', password);
   return url.toString();
 };
 

@@ -246,12 +246,14 @@ export const isProductAuthorizedResourceUrl = (url: string): boolean =>
   isPrivateAssetResourceAuthorizedUrl(url) ||
   isPrivateGameTemplateResourceAuthorizedUrl(url);
 
-export const extractFilenameWithExtensionFromProductAuthorizedUrl = (
-  url: string
+export const extractDecodedFilenameWithExtensionFromProductAuthorizedUrl = (
+  productAuthorizedUrl: string
 ): string => {
-  const urlWithoutQueryParams = url.split('?')[0];
-  const filenameWithExtension = path.basename(urlWithoutQueryParams);
-  return filenameWithExtension;
+  const urlWithoutQueryParams = productAuthorizedUrl.split('?')[0];
+  const decodedFilenameWithExtension = decodeURIComponent(
+    path.basename(urlWithoutQueryParams)
+  );
+  return decodedFilenameWithExtension;
 };
 
 export const getPurchaseCheckoutUrl = ({

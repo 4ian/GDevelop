@@ -44,6 +44,7 @@ export const downloadUrlsToLocalFiles = async <
         };
         return result;
       } catch (error) {
+        console.error(`Error while downloading file ${url}:`, error);
         firstError = error;
         const result: ItemResult<Item> = {
           item: urlContainer,

@@ -39,7 +39,7 @@ module.exports = {
 
     extension
       .addInstructionOrExpressionGroupMetadata(_('Spine'))
-      .setIcon('CppPlatform/Extensions/spriteicon.png');
+      .setIcon('JsPlatform/Extensions/spine.svg');
 
     const object = extension
       .addObject(
@@ -48,7 +48,7 @@ module.exports = {
         _(
           'Display and animate Spine skeleton. Select Spine files (json, atlas, image).'
         ),
-        'CppPlatform/Extensions/spriteicon.png',
+        'JsPlatform/Extensions/spine.svg',
         new gd.SpineObjectConfiguration()
       )
       .setIncludeFile('Extensions/Spine/spineruntimeobject.js')
@@ -107,8 +107,8 @@ module.exports = {
         ),
         _('The animation of _PARAM0_ is complete'),
         _('Animations and images'),
-        'res/conditions/animation24.png',
-        'res/conditions/animation.png'
+        'JsPlatform/Extensions/spine.svg',
+        'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .markAsSimple()
@@ -122,7 +122,7 @@ module.exports = {
         _('an animation is updatable'),
         _('Updatable'),
         '',
-        'res/conditions/animation.png'
+        'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
@@ -139,7 +139,7 @@ module.exports = {
         ),
         _('the number of the animation'),
         _('Animations and images'),
-        'res/actions/animation24.png'
+        'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
@@ -156,7 +156,7 @@ module.exports = {
         _('the animation played by the object'),
         _('the animation'),
         _('Animations and images'),
-        'res/actions/animation24.png'
+        'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .useStandardParameters(
@@ -242,7 +242,7 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'CppPlatform/Extensions/spriteicon.png';
+        return 'JsPlatform/Extensions/spine.svg';
       }
 
       update() {

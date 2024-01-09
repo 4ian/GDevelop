@@ -15,6 +15,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import HelpButton from '../UI/HelpButton';
 import { Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import Checkbox from '../UI/Checkbox';
+import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -23,6 +25,9 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
   unsavedChanges?: ?UnsavedChanges,
+  onConfigurationUpdated?: (
+    whatChanged?: ExtensionItemConfigurationAttribute
+  ) => void,
 |};
 
 export default function EventsBasedBehaviorEditor({
@@ -30,6 +35,7 @@ export default function EventsBasedBehaviorEditor({
   eventsFunctionsExtension,
   eventsBasedBehavior,
   unsavedChanges,
+  onConfigurationUpdated,
 }: Props) {
   const forceUpdate = useForceUpdate();
 
@@ -134,6 +140,15 @@ export default function EventsBasedBehaviorEditor({
               </Trans>
             </AlertMessage>
           )}
+          <Checkbox
+            label={<Trans>Private</Trans>}
+            checked={eventsBasedBehavior.isPrivate()}
+            onCheck={(e, checked) => {
+              eventsBasedBehavior.setPrivate(checked);
+              if (onConfigurationUpdated) onConfigurationUpdated('visibility');
+              onChange();
+            }}
+          />
           {eventsBasedBehavior
             .getEventsFunctions()
             .getEventsFunctionsCount() === 0 && (
@@ -142,9 +157,8 @@ export default function EventsBasedBehaviorEditor({
               kind="info"
             >
               <Trans>
-                Once you're done, close this dialog and start adding some
-                functions to the behavior. Then, test the behavior by adding it
-                to an object in a scene.
+                Once you're done, start adding some functions to the behavior.
+                Then, test the behavior by adding it to an object in a scene.
               </Trans>
             </DismissableAlertMessage>
           )}

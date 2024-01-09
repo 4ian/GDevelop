@@ -12,6 +12,7 @@ import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';
+import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,7 +26,9 @@ type Props = {|
   eventsFunctionsContainer: gdEventsFunctionsContainer,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
-  onConfigurationUpdated?: (whatChanged?: 'type') => void,
+  onConfigurationUpdated?: (
+    whatChanged?: ExtensionItemConfigurationAttribute
+  ) => void,
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,

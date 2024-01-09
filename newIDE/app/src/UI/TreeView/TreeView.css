@@ -28,7 +28,7 @@
 
 .tree-view .row-content-side.row-content-extra-padding {
   /* Used for a better dragging preview. */
-  padding: 0 6px;
+  padding: 0 21px;
 }
 .tree-view .row-content-side.row-content-side-left {
   /* Necessary for item-name to be overflown. */

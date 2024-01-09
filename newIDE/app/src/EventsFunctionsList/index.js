@@ -18,8 +18,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import PreferencesContext, {
   type Preferences,
 } from '../MainFrame/Preferences/PreferencesContext';
-import { Column, Line } from '../UI/Grid';
-import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import { Column } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
@@ -50,6 +49,8 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { type GDevelopTheme } from '../UI/Theme';
 
 const gd: libGDevelop = global.gd;
 
@@ -80,8 +81,8 @@ export interface TreeViewItemContent {
   getDataset(): ?HTMLDataset;
   onSelect(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
-  getRightButton(): ?MenuButton;
-  renderLeftComponent(i18n: I18nType): ?React.Node;
+  getRightButton(i18n: I18nType): ?MenuButton;
+  renderRightComponent(i18n: I18nType): ?React.Node;
   rename(newName: string): void;
   edit(): void;
   delete(): void;
@@ -92,10 +93,10 @@ export interface TreeViewItemContent {
   moveAt(destinationIndex: number): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
-  getFunctionInsertionIndex(): number;
   getEventsFunction(): ?gdEventsFunction;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
   getEventsBasedObject(): ?gdEventsBasedObject;
+  addFunctionAtSelection(): void;
 }
 
 interface TreeViewItem {
@@ -109,7 +110,9 @@ export type TreeItemProps = {|
   forceUpdate: () => void,
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  forceUpdateEditor: () => void,
   preferences: Preferences,
+  gdevelopTheme: GDevelopTheme,
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   editName: (itemId: string) => void,
@@ -117,6 +120,9 @@ export type TreeItemProps = {|
   showDeleteConfirmation: (
     options: ShowConfirmDeleteDialogOptions
   ) => Promise<boolean>,
+  selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
+  selectedEventsBasedObject: ?gdEventsBasedObject,
+  selectedEventsFunction: ?gdEventsFunction,
 |};
 
 class EventsBasedObjectTreeViewItem implements TreeViewItem {
@@ -269,17 +275,12 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return this.id;
   }
 
-  getRightButton(): ?MenuButton {
+  getRightButton(i18n: I18nType): ?MenuButton {
     return this.rightButton;
   }
 
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
     return null;
-  }
-
-  getFunctionInsertionIndex(): number {
-    // It's never used;
-    return 0;
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -312,7 +313,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
-  renderLeftComponent(i18n: I18nType): ?React.Node {
+  renderRightComponent(i18n: I18nType): ?React.Node {
     return null;
   }
 
@@ -337,6 +338,12 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return false;
   }
+
+  addFunctionAtSelection(
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
+    selectedEventsBasedObject: ?gdEventsBasedObject,
+    selectedEventsFunction: ?gdEventsFunction
+  ): void {}
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -352,9 +359,9 @@ const buildMenuTemplate = (i18n: I18nType) => (
   item: TreeViewItem,
   index: number
 ) => item.content.buildMenuTemplate(i18n, index);
-const renderTreeViewItemLeftComponent = (i18n: I18nType) => (
+const renderTreeViewItemRightComponent = (i18n: I18nType) => (
   item: TreeViewItem
-) => item.content.renderLeftComponent(i18n);
+) => item.content.renderRightComponent(i18n);
 const renameItem = (item: TreeViewItem, newName: string) => {
   item.content.rename(newName);
 };
@@ -364,8 +371,8 @@ const editItem = (item: TreeViewItem) => {
 const deleteItem = (item: TreeViewItem) => {
   item.content.delete();
 };
-const getTreeViewItemRightButton = (item: TreeViewItem) =>
-  item.content.getRightButton();
+const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
+  item.content.getRightButton(i18n);
 
 export type EventsFunctionsListInterface = {|
   forceUpdateList: () => void,
@@ -375,6 +382,7 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   unsavedChanges?: ?UnsavedChanges,
+  forceUpdateEditor: () => void,
   // Objects
   selectedEventsBasedObject: ?gdEventsBasedObject,
   ...EventsBasedObjectCallbacks,
@@ -413,6 +421,7 @@ const EventsFunctionsList = React.forwardRef<
       selectedEventsFunction,
       selectedEventsBasedBehavior,
       selectedEventsBasedObject,
+      forceUpdateEditor,
     }: Props,
     ref
   ) => {
@@ -421,6 +430,7 @@ const EventsFunctionsList = React.forwardRef<
     >([]);
 
     const preferences = React.useContext(PreferencesContext);
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { getShowEventBasedObjectsEditor } = preferences;
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
@@ -470,26 +480,23 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     const addNewEventsFunction = React.useCallback(
-      (itemContent: ?TreeViewItemContent) => {
-        const eventsFunctionsContainer = itemContent
-          ? itemContent.getEventsFunctionsContainer() ||
-            eventsFunctionsExtension
+      (
+        itemContent: ?TreeViewItemContent,
+        eventsBasedBehavior: ?gdEventsBasedBehavior,
+        eventsBasedObject: ?gdEventsBasedObject,
+        index: number
+      ) => {
+        const eventBasedEntity = eventsBasedBehavior || eventsBasedObject;
+        const eventsFunctionsContainer = eventBasedEntity
+          ? eventBasedEntity.getEventsFunctions()
           : eventsFunctionsExtension;
-
-        const index = itemContent && itemContent.getFunctionInsertionIndex();
 
         // Let EventsFunctionsExtensionEditor know if the function is:
         // a free function, a behavior one or an object one.
         // It shows a different dialog according to this.
-        const eventsBasedBehavior = itemContent
-          ? itemContent.getEventsBasedBehavior()
-          : null;
         if (eventsBasedBehavior) {
           onSelectEventsBasedBehavior(eventsBasedBehavior);
         }
-        const eventsBasedObject = itemContent
-          ? itemContent.getEventsBasedObject()
-          : null;
         if (eventsBasedObject) {
           onSelectEventsBasedObject(eventsBasedObject);
         }
@@ -729,6 +736,8 @@ const EventsFunctionsList = React.forwardRef<
         eventsFunctionsExtension,
         unsavedChanges,
         preferences,
+        forceUpdateEditor,
+        gdevelopTheme,
         forceUpdate,
         forceUpdateList,
         showDeleteConfirmation,
@@ -740,23 +749,31 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsFunction,
         onAddEventsFunction,
         onEventsFunctionAdded,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
       }),
       [
-        canRename,
-        editName,
+        project,
         eventsFunctionsExtension,
+        unsavedChanges,
+        preferences,
+        forceUpdateEditor,
+        gdevelopTheme,
         forceUpdate,
         forceUpdateList,
-        onAddEventsFunction,
-        onDeleteEventsFunction,
-        onEventsFunctionAdded,
-        onRenameEventsFunction,
-        onSelectEventsFunction,
-        preferences,
-        project,
-        scrollToItem,
         showDeleteConfirmation,
-        unsavedChanges,
+        editName,
+        scrollToItem,
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        canRename,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
       ]
     );
 
@@ -768,7 +785,9 @@ const EventsFunctionsList = React.forwardRef<
         eventsFunctionsExtension,
         eventsBasedBehaviorsList: eventBasedBehaviors,
         unsavedChanges,
+        forceUpdateEditor,
         preferences,
+        gdevelopTheme,
         forceUpdate,
         forceUpdateList,
         showDeleteConfirmation,
@@ -780,24 +799,32 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
         addNewEventsFunction,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
       }),
       [
-        addNewEventsFunction,
-        editName,
-        eventBasedBehaviors,
+        project,
         eventsFunctionsExtension,
+        eventBasedBehaviors,
+        unsavedChanges,
+        forceUpdateEditor,
+        preferences,
+        gdevelopTheme,
         forceUpdate,
         forceUpdateList,
-        onDeleteEventsBasedBehavior,
-        onEventsBasedBehaviorPasted,
-        onEventsBasedBehaviorRenamed,
-        onRenameEventsBasedBehavior,
-        onSelectEventsBasedBehavior,
-        preferences,
-        project,
-        scrollToItem,
         showDeleteConfirmation,
-        unsavedChanges,
+        editName,
+        scrollToItem,
+        onSelectEventsBasedBehavior,
+        onDeleteEventsBasedBehavior,
+        onRenameEventsBasedBehavior,
+        onEventsBasedBehaviorRenamed,
+        onEventsBasedBehaviorPasted,
+        addNewEventsFunction,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
       ]
     );
 
@@ -810,6 +837,8 @@ const EventsFunctionsList = React.forwardRef<
         eventsBasedObjectsList: eventBasedObjects,
         unsavedChanges,
         preferences,
+        forceUpdateEditor,
+        gdevelopTheme,
         forceUpdate,
         forceUpdateList,
         showDeleteConfirmation,
@@ -820,6 +849,9 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsBasedObject,
         onEventsBasedObjectRenamed,
         addNewEventsFunction,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
       }),
       [
         project,
@@ -827,6 +859,8 @@ const EventsFunctionsList = React.forwardRef<
         eventBasedObjects,
         unsavedChanges,
         preferences,
+        forceUpdateEditor,
+        gdevelopTheme,
         forceUpdate,
         forceUpdateList,
         showDeleteConfirmation,
@@ -837,6 +871,9 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsBasedObject,
         onEventsBasedObjectRenamed,
         addNewEventsFunction,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
       ]
     );
 
@@ -917,7 +954,17 @@ const EventsFunctionsList = React.forwardRef<
               {
                 icon: <Add />,
                 label: i18n._(t`Add a function`),
-                click: () => addNewEventsFunction(null),
+                click: () => {
+                  const index =
+                    !selectedEventsBasedBehavior &&
+                    !selectedEventsBasedObject &&
+                    selectedEventsFunction
+                      ? eventsFunctionsExtension.getEventsFunctionPosition(
+                          selectedEventsFunction
+                        ) + 1
+                      : eventsFunctionsExtension.getEventsFunctionsCount();
+                  addNewEventsFunction(null, null, null, index);
+                },
               }
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -949,14 +996,17 @@ const EventsFunctionsList = React.forwardRef<
         ].filter(Boolean);
       },
       [
-        addNewEventsBehavior,
-        addNewEventsFunction,
-        addNewEventsBasedObject,
-        behaviorTreeViewItems,
-        eventFunctionCommonProps,
-        eventsFunctionsExtension,
-        objectTreeViewItems,
         getShowEventBasedObjectsEditor,
+        addNewEventsBasedObject,
+        addNewEventsBehavior,
+        objectTreeViewItems,
+        behaviorTreeViewItems,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        selectedEventsFunction,
+        eventsFunctionsExtension,
+        addNewEventsFunction,
+        eventFunctionCommonProps,
       ]
     );
 
@@ -1162,8 +1212,8 @@ const EventsFunctionsList = React.forwardRef<
                       }}
                       onRenameItem={renameItem}
                       buildMenuTemplate={buildMenuTemplate(i18n)}
-                      getItemRightButton={getTreeViewItemRightButton}
-                      renderLeftComponent={renderTreeViewItemLeftComponent(
+                      getItemRightButton={getTreeViewItemRightButton(i18n)}
+                      renderRightComponent={renderTreeViewItemRightComponent(
                         i18n
                       )}
                       onMoveSelectionToItem={(destinationItem, where) =>
@@ -1174,6 +1224,7 @@ const EventsFunctionsList = React.forwardRef<
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
                       forceDefaultDraggingPreview
+                      shouldHideMenuIcon
                     />
                   )}
                 </AutoSizer>
@@ -1181,21 +1232,6 @@ const EventsFunctionsList = React.forwardRef<
             )}
           </I18n>
         </div>
-        <Line>
-          <Column expand>
-            <ResponsiveRaisedButton
-              label={<Trans>Add a new function</Trans>}
-              primary
-              onClick={() =>
-                addNewEventsFunction(
-                  selectedItems.length === 0 ? null : selectedItems[0].content
-                )
-              }
-              id="add-new-function-button"
-              icon={<Add />}
-            />
-          </Column>
-        </Line>
       </Background>
     );
   }

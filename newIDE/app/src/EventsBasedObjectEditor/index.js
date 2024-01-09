@@ -113,8 +113,8 @@ export default function EventsBasedObjectEditor({
           kind="info"
         >
           <Trans>
-            Once you're done, close this dialog and start adding some functions
-            to the object. Then, test the object by adding to a scene.
+            Once you're done, start adding some functions to the object. Then,
+            test the object by adding it to a scene.
           </Trans>
         </DismissableAlertMessage>
       )}

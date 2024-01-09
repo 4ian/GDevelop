@@ -1281,8 +1281,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Enable an effect on the object"),
                 _("Enable effect _PARAM1_ on _PARAM0_: _PARAM2_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable?"))
@@ -1297,8 +1297,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Property name"))
@@ -1315,8 +1315,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Property name"))
@@ -1332,8 +1332,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "names) in the effects window."),
                 _("Enable _PARAM2_ for effect _PARAM1_ of _PARAM0_: _PARAM3_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Property name"))
@@ -1347,8 +1347,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Check if the effect on an object is enabled."),
                    _("Effect _PARAM1_ of _PARAM0_ is enabled"),
                    _("Effects"),
-                   "res/actions/effect24.png",
-                   "res/actions/effect.png")
+                   "res/actions/effect_black.svg",
+                   "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .MarkAsSimple()

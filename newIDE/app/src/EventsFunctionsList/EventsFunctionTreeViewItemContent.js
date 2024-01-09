@@ -92,10 +92,6 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     return this.props.eventsFunctionsContainer;
   }
 
-  getFunctionInsertionIndex(): number {
-    return this.getIndex() + 1;
-  }
-
   getEventsFunction(): ?gdEventsFunction {
     return this.eventsFunction;
   }
@@ -202,13 +198,15 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  edit(): void {}
+  edit(): void {
+    this.props.editName(this.getId());
+  }
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Rename`),
-        click: () => this.props.editName(this.getId()),
+        click: () => this.edit(),
         enabled: this.props.canRename(this.eventsFunction),
         accelerator: 'F2',
       },
@@ -255,7 +253,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     ];
   }
 
-  renderLeftComponent(i18n: I18nType): ?React.Node {
+  renderRightComponent(i18n: I18nType): ?React.Node {
     const icons = [];
     if (this.eventsFunction.isPrivate()) {
       icons.push(
@@ -265,7 +263,13 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
             <Trans>This function won't be visible in the events editor.</Trans>
           }
         >
-          <VisibilityOff fontSize="small" style={styles.tooltip} />
+          <VisibilityOff
+            fontSize="small"
+            style={{
+              ...styles.tooltip,
+              color: this.props.gdevelopTheme.text.color.disabled,
+            }}
+          />
         </Tooltip>
       );
     }
@@ -281,7 +285,13 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
             </Trans>
           }
         >
-          <AsyncIcon fontSize="small" style={styles.tooltip} />
+          <AsyncIcon
+            fontSize="small"
+            style={{
+              ...styles.tooltip,
+              color: this.props.gdevelopTheme.text.color.disabled,
+            }}
+          />
         </Tooltip>
       );
     }
@@ -290,12 +300,12 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
   _togglePrivate(): void {
     this.eventsFunction.setPrivate(!this.eventsFunction.isPrivate());
-    this.props.forceUpdate();
+    this.props.forceUpdateEditor();
   }
 
   _toggleAsync(): void {
     this.eventsFunction.setAsync(!this.eventsFunction.isAsync());
-    this.props.forceUpdateList();
+    this.props.forceUpdateEditor();
   }
 
   delete(): void {
@@ -423,7 +433,9 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton() {
+  getRightButton(i18n: I18nType) {
     return null;
   }
+
+  addFunctionAtSelection(): void {}
 }

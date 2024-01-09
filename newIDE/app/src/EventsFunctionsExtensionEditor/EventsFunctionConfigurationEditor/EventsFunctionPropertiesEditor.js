@@ -21,6 +21,8 @@ import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import ValueTypeEditor from './ValueTypeEditor';
 import AlertMessage from '../../UI/AlertMessage';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import Checkbox from '../../UI/Checkbox';
+import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -31,7 +33,9 @@ type Props = {|
   eventsBasedObject: ?gdEventsBasedObject,
   eventsFunctionsContainer: ?gdEventsFunctionsContainer,
   helpPagePath?: string,
-  onConfigurationUpdated?: (whatChanged?: 'type') => void,
+  onConfigurationUpdated?: (
+    whatChanged?: ExtensionItemConfigurationAttribute
+  ) => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
   getFunctionGroupNames?: () => string[],
@@ -510,6 +514,26 @@ export const EventsFunctionPropertiesEditor = ({
                       getLastObjectParameterObjectType={() => ''}
                     />
                   )}
+                  <Checkbox
+                    label={<Trans>Private</Trans>}
+                    checked={eventsFunction.isPrivate()}
+                    onCheck={(e, checked) => {
+                      eventsFunction.setPrivate(checked);
+                      if (onConfigurationUpdated)
+                        onConfigurationUpdated('visibility');
+                      forceUpdate();
+                    }}
+                  />
+                  <Checkbox
+                    label={<Trans>Asynchronous</Trans>}
+                    checked={eventsFunction.isAsync()}
+                    onCheck={(e, checked) => {
+                      eventsFunction.setAsync(checked);
+                      if (onConfigurationUpdated)
+                        onConfigurationUpdated('type');
+                      forceUpdate();
+                    }}
+                  />
                   {eventsFunction.isAsync() && (
                     <AlertMessage kind="info">
                       <Trans>

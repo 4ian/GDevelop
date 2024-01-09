@@ -15,6 +15,7 @@ import {
   type TreeItemProps,
   extensionObjectsRootFolderId,
 } from '.';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -35,7 +36,12 @@ export type EventsBasedObjectCallbacks = {|
 export type EventsBasedObjectProps = {|
   ...TreeItemProps,
   ...EventsBasedObjectCallbacks,
-  addNewEventsFunction: (itemContent: TreeViewItemContent) => void,
+  addNewEventsFunction: (
+    itemContent: TreeViewItemContent,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject,
+    index: number
+  ) => void,
   eventsBasedObjectsList: gdEventsBasedObjectsList,
 |};
 
@@ -62,12 +68,6 @@ export class EventsBasedObjectTreeViewItemContent
 
   getEventsFunctionsContainer(): gdEventsFunctionsContainer {
     return this.eventsBasedObject.getEventsFunctions();
-  }
-
-  getFunctionInsertionIndex(): number {
-    return this.eventsBasedObject
-      .getEventsFunctions()
-      .getEventsFunctionsCount();
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -99,7 +99,7 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   getThumbnail(): ?string {
-    return null;
+    return 'res/functions/object_black.svg';
   }
 
   getDataset(): ?HTMLDataset {
@@ -125,13 +125,15 @@ export class EventsBasedObjectTreeViewItemContent
     );
   }
 
-  edit(): void {}
+  edit(): void {
+    this.props.editName(this.getId());
+  }
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Add a function`),
-        click: () => this.props.addNewEventsFunction(this),
+        click: () => this.addFunctionAtSelection(),
       },
       {
         type: 'separator',
@@ -168,7 +170,7 @@ export class EventsBasedObjectTreeViewItemContent
     ];
   }
 
-  renderLeftComponent(i18n: I18nType): ?React.Node {
+  renderRightComponent(i18n: I18nType): ?React.Node {
     return null;
   }
 
@@ -299,7 +301,24 @@ export class EventsBasedObjectTreeViewItemContent
     this.props.forceUpdate();
   }
 
-  getRightButton() {
-    return null;
+  getRightButton(i18n: I18nType) {
+    return {
+      icon: <Add />,
+      label: i18n._(t`Add a function`),
+      click: () => this.addFunctionAtSelection(),
+    };
+  }
+
+  addFunctionAtSelection(): void {
+    const { selectedEventsFunction, selectedEventsBasedObject } = this.props;
+    const eventsFunctionsContainer = this.eventsBasedObject.getEventsFunctions();
+    const index =
+      selectedEventsBasedObject === this.eventsBasedObject &&
+      selectedEventsFunction
+        ? eventsFunctionsContainer.getEventsFunctionPosition(
+            selectedEventsFunction
+          ) + 1
+        : eventsFunctionsContainer.getEventsFunctionsCount();
+    this.props.addNewEventsFunction(this, null, this.eventsBasedObject, index);
   }
 }

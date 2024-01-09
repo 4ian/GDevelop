@@ -37,6 +37,8 @@ import Mark from '../UI/CustomSvgIcons/Mark';
 import newNameGenerator from '../Utils/NewNameGenerator';
 const gd: libGDevelop = global.gd;
 
+export type ExtensionItemConfigurationAttribute = 'type' | 'visibility';
+
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -1035,8 +1037,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
-  _onConfigurationUpdated = (whatChanged?: 'type') => {
-    if (whatChanged === 'type') {
+  _onConfigurationUpdated = (
+    whatChanged?: ExtensionItemConfigurationAttribute
+  ) => {
+    if (whatChanged === 'type' || whatChanged === 'visibility') {
       // Force an update to ensure the icon of the edited function is updated.
       this.forceUpdate();
     }
@@ -1216,6 +1220,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this.eventsFunctionList.forceUpdateList();
                 }
               }}
+              onConfigurationUpdated={this._onConfigurationUpdated}
             />
           ) : selectedEventsBasedObject && this._globalObjectsContainer ? (
             <EventsBasedObjectEditorPanel
@@ -1262,6 +1267,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 unsavedChanges={this.props.unsavedChanges}
+                forceUpdateEditor={() => this.forceUpdate()}
                 // Free functions
                 selectedEventsFunction={selectedEventsFunction}
                 onSelectEventsFunction={(

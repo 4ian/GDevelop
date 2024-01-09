@@ -34,7 +34,7 @@ export type MenuButton = {|
 type FlattenedNode<Item> = {|
   id: string,
   name: string | React.Node,
-  leftComponent: ?React.Node,
+  rightComponent: ?React.Node,
   rightButton: ?MenuButton,
   hasChildren: boolean,
   canHaveChildren: boolean,
@@ -65,6 +65,7 @@ export type ItemData<Item> = {|
   onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
   onEditItem?: Item => void,
   isMobileScreen: boolean,
+  shouldHideMenuIcon: ?boolean,
   DragSourceAndDropTarget: any => React.Node,
   getItemHtmlId?: (Item, index: number) => ?string,
   forceDefaultDraggingPreview?: boolean,
@@ -88,6 +89,7 @@ const getItemProps = memoizeOne(
     onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
     onEditItem?: Item => void,
     isMobileScreen: boolean,
+    shouldHideMenuIcon: ?boolean,
     DragSourceAndDropTarget: any => React.Node,
     getItemHtmlId?: (Item, index: number) => ?string,
     forceDefaultDraggingPreview?: boolean
@@ -103,6 +105,7 @@ const getItemProps = memoizeOne(
     onDrop,
     onEditItem,
     isMobileScreen,
+    shouldHideMenuIcon,
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
@@ -134,7 +137,7 @@ type Props<Item> = {|
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
   getItemRightButton?: Item => ?MenuButton,
-  renderLeftComponent?: Item => ?React.Node,
+  renderRightComponent?: Item => ?React.Node,
   /**
    * Callback called when a folder is collapsed (folded).
    */
@@ -160,6 +163,7 @@ type Props<Item> = {|
     onGetItemOutside: (item: Item) => ?Item,
   |},
   forceDefaultDraggingPreview?: boolean,
+  shouldHideMenuIcon?: boolean,
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -177,7 +181,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     onEditItem,
     buildMenuTemplate,
     getItemRightButton,
-    renderLeftComponent,
+    renderRightComponent,
     selectedItems,
     onSelectItems,
     multiSelect,
@@ -190,6 +194,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
     forceDefaultDraggingPreview,
+    shouldHideMenuIcon,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
@@ -246,7 +251,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
-      const leftComponent = renderLeftComponent && renderLeftComponent(item);
+      const rightComponent = renderRightComponent && renderRightComponent(item);
       const rightButton = getItemRightButton && getItemRightButton(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
@@ -273,7 +278,7 @@ const TreeView = <Item: ItemBaseAttributes>(
           {
             id,
             name,
-            leftComponent,
+            rightComponent,
             rightButton,
             hasChildren: !!children && children.length > 0,
             canHaveChildren,
@@ -313,7 +318,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       openedNodeIds,
       openedDuringSearchNodeIds,
       getItemName,
-      renderLeftComponent,
+      renderRightComponent,
       getItemRightButton,
       getItemDataset,
       animatedItemId,
@@ -548,6 +553,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     onMoveSelectionToItem,
     onEditItem,
     isMobileScreen,
+    shouldHideMenuIcon,
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview

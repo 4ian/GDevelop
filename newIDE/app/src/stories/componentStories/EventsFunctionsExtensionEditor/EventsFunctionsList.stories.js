@@ -57,6 +57,7 @@ export const Default = () => (
           cb(true);
         }}
         canRename={() => true}
+        forceUpdateEditor={() => {}}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

@@ -171,6 +171,12 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/3D/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'SpineObject',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Spine/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

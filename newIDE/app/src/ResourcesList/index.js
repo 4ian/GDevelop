@@ -116,10 +116,9 @@ export default class ResourcesList extends React.Component<Props, State> {
       case 'audio':
         return 'res/actions/music24.png';
       case 'json':
-        return 'res/actions/fichier24.png';
       case 'tilemap':
-        return 'res/actions/fichier24.png';
       case 'tileset':
+      case 'spine':
         return 'res/actions/fichier24.png';
       case 'video':
         return 'JsPlatform/Extensions/videoicon24.png';

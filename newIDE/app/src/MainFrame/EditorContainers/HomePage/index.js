@@ -31,6 +31,7 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
+import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
 import {
   sendUserSurveyHidden,
@@ -223,6 +224,9 @@ export const HomePage = React.memo<Props>(
       const manageTabElement = document.getElementById('home-manage-tab');
       const shouldDisplayTooltip = shouldDisplayNewFeatureHighlighting({
         featureId: 'gamesDashboardInHomePage',
+      });
+      const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+        includeLegacy: false,
       });
 
       const displayTooltip =
@@ -514,6 +518,9 @@ export const HomePage = React.memo<Props>(
                       selectInAppTutorial={selectInAppTutorial}
                       onUserSurveyStarted={onUserSurveyStarted}
                       onUserSurveyHidden={onUserSurveyHidden}
+                      subscriptionPlansWithPricingSystems={
+                        subscriptionPlansWithPricingSystems
+                      }
                     />
                   )}
                   {activeTab === 'build' && (

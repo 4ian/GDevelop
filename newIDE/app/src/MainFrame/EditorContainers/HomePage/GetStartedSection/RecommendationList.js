@@ -20,6 +20,7 @@ import {
 import Text from '../../../../UI/Text';
 import { Column } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { CardWidget } from '../CardWidget';
 import Window from '../../../../Utils/Window';
 import { ColumnStackLayout } from '../../../../UI/Layout';
@@ -161,11 +162,13 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
 type Props = {|
   authenticatedUser: AuthenticatedUser,
   selectInAppTutorial: (tutorialId: string) => void,
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
 |};
 
 const RecommendationList = ({
   authenticatedUser,
   selectInAppTutorial,
+  subscriptionPlansWithPricingSystems,
 }: Props) => {
   const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
@@ -279,11 +282,17 @@ const RecommendationList = ({
             !profile.isStudent &&
             (!subscription ||
               isPlanRecommendationRelevant(subscription, planRecommendation));
-          if (shouldDisplayPlanRecommendation) {
+          if (
+            shouldDisplayPlanRecommendation &&
+            subscriptionPlansWithPricingSystems
+          ) {
             items.push(
               <SectionRow key="plan">
                 <PlanRecommendationRow
                   recommendationPlanId={planRecommendation.id}
+                  subscriptionPlansWithPricingSystems={
+                    subscriptionPlansWithPricingSystems
+                  }
                   i18n={i18n}
                 />
               </SectionRow>

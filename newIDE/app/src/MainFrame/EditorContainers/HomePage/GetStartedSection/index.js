@@ -36,6 +36,7 @@ import RecommendationList from './RecommendationList';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
 import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
 import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
@@ -90,6 +91,7 @@ type Props = {|
   onUserSurveyStarted: () => void,
   onUserSurveyHidden: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
 |};
 
 const GetStartedSection = ({
@@ -97,6 +99,7 @@ const GetStartedSection = ({
   selectInAppTutorial,
   onUserSurveyStarted,
   onUserSurveyHidden,
+  subscriptionPlansWithPricingSystems,
 }: Props) => {
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
@@ -625,6 +628,9 @@ const GetStartedSection = ({
           <RecommendationList
             authenticatedUser={authenticatedUser}
             selectInAppTutorial={selectInAppTutorial}
+            subscriptionPlansWithPricingSystems={
+              subscriptionPlansWithPricingSystems
+            }
           />
         </SectionContainer>
       </>

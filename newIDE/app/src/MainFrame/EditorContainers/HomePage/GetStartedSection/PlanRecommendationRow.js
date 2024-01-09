@@ -4,7 +4,7 @@ import { t, Trans } from '@lingui/macro';
 import { I18n as I18nType } from '@lingui/core';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import { getSubscriptionPlans } from '../../../../Utils/GDevelopServices/Usage';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../../../../UI/Grid';
 import Paper from '../../../../UI/Paper';
 import {
@@ -15,6 +15,7 @@ import Text from '../../../../UI/Text';
 import CheckCircle from '../../../../UI/CustomSvgIcons/CheckCircle';
 import RaisedButton from '../../../../UI/RaisedButton';
 import Window from '../../../../Utils/Window';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 
 const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
@@ -89,11 +90,13 @@ const planDetailsById = {
 
 const PlanRecommendationRow = ({
   recommendationPlanId,
+  subscriptionPlansWithPricingSystems,
   i18n,
-}: {
+}: {|
   recommendationPlanId: string,
+  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
   i18n: I18nType,
-}) => {
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
@@ -110,7 +113,9 @@ const PlanRecommendationRow = ({
       : null;
   if (!planToUse) return null;
 
-  const plan = getSubscriptionPlans().find(plan => plan.planId === planToUse);
+  const plan = subscriptionPlansWithPricingSystems.find(
+    plan => plan.id === planToUse
+  );
   if (!plan) return null;
 
   const planDetails = planDetailsById[recommendationPlanId];
@@ -144,22 +149,24 @@ const PlanRecommendationRow = ({
               </Text>
               <div style={{ padding: `0 20px` }}>
                 <ColumnStackLayout noMargin>
-                  {plan.descriptionBullets.map((descriptionBullet, index) => (
-                    <Column key={index} expand noMargin>
-                      <Line noMargin alignItems="center">
-                        <CheckCircle
-                          style={{
-                            ...styles.bulletIcon,
-                            color: gdevelopTheme.message.valid,
-                          }}
-                        />
+                  {plan.bulletPointsByLocale.map(
+                    (bulletPointByLocale, index) => (
+                      <Column key={index} expand noMargin>
+                        <Line noMargin alignItems="center">
+                          <CheckCircle
+                            style={{
+                              ...styles.bulletIcon,
+                              color: gdevelopTheme.message.valid,
+                            }}
+                          />
 
-                        <Text style={styles.bulletText} size="body2" noMargin>
-                          {i18n._(descriptionBullet.message)}
-                        </Text>
-                      </Line>
-                    </Column>
-                  ))}
+                          <Text style={styles.bulletText} size="body2" noMargin>
+                            {selectMessageByLocale(i18n, bulletPointByLocale)}
+                          </Text>
+                        </Line>
+                      </Column>
+                    )
+                  )}
                 </ColumnStackLayout>
               </div>
               <Column noMargin>

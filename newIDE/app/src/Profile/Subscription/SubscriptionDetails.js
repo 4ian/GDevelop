@@ -1,19 +1,18 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import {
-  getFormerSubscriptionPlans,
-  getSubscriptionPlans,
+  type SubscriptionPlanWithPricingSystems,
   type Subscription,
-  type PlanDetails,
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
+  getSubscriptionPlanPricingSystem,
+  canPriceBeFoundInGDevelopPrices,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
-import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
 import LeftLoader from '../../UI/LeftLoader';
 import {
@@ -35,6 +34,7 @@ import Individuals from './Icons/Individual';
 import Team from './Icons/Team';
 import Education from './Icons/Education';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import PlaceholderError from '../../UI/PlaceholderError';
 
 const styles = {
   diamondIcon: {
@@ -81,6 +81,7 @@ const subscriptionOptions: {
 
 type Props = {
   subscription: ?Subscription,
+  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
   simulateNativeMobileApp?: boolean,
@@ -101,6 +102,7 @@ type Props = {
  */
 const SubscriptionDetails = ({
   subscription,
+  subscriptionPlansWithPricingSystems,
   isManageSubscriptionLoading,
   onManageSubscription,
   simulateNativeMobileApp,
@@ -110,27 +112,103 @@ const SubscriptionDetails = ({
   );
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [
+    userSubscriptionPlanWithPricingSystems,
+    setUserSubscriptionPlanWithPricingSystems,
+  ] = React.useState<?SubscriptionPlanWithPricingSystems>(null);
+  const [error, setError] = React.useState<?React.Node>(null);
+  const [isLoadingUserPrice, setIsLoadingUserPrice] = React.useState<boolean>(
+    false
+  );
 
-  const userPlan = React.useMemo(
+  React.useEffect(
     () => {
-      if (!subscription) return null;
-      const possiblePlans: Array<PlanDetails> = getSubscriptionPlans().concat(
-        getFormerSubscriptionPlans()
-      );
-      return possiblePlans.find(plan => subscription.planId === plan.planId);
+      (async () => {
+        setError(null);
+        setIsLoadingUserPrice(true);
+        try {
+          if (!subscription) {
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          const { planId, pricingSystemId } = subscription;
+          if (!planId || !pricingSystemId) {
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPricingSystems.find(
+            plan => subscription.planId === plan.id
+          );
+          if (!matchingSubscriptionPlanWithPrices) {
+            setError(
+              <Trans>
+                Couldn't find a subscription matching your account. Please get
+                in touch with us to fix this issue.
+              </Trans>
+            );
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          const {
+            pricingSystems,
+            ...subscriptionPlan
+          } = matchingSubscriptionPlanWithPrices;
+
+          if (!canPriceBeFoundInGDevelopPrices(pricingSystemId)) {
+            setUserSubscriptionPlanWithPricingSystems({
+              ...subscriptionPlan,
+              pricingSystems: [],
+            });
+            return;
+          }
+
+          let pricingSystem = pricingSystems.find(
+            price => price.id === subscription.pricingSystemId
+          );
+          if (!pricingSystem) {
+            pricingSystem = await getSubscriptionPlanPricingSystem(
+              pricingSystemId
+            );
+          }
+          if (!pricingSystem) {
+            setError(
+              <Trans>
+                Couldn't find a subscription price matching your account. Please
+                get in touch with us to fix this issue.
+              </Trans>
+            );
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          setUserSubscriptionPlanWithPricingSystems({
+            ...subscriptionPlan,
+            pricingSystems: [pricingSystem],
+          });
+        } finally {
+          setIsLoadingUserPrice(false);
+        }
+      })();
     },
-    [subscription]
+    [subscription, subscriptionPlansWithPricingSystems]
   );
 
   const redemptionCodeExpirationDate =
     subscription && subscription.redemptionCodeValidUntil;
   const isSubscriptionExpired =
     !!redemptionCodeExpirationDate && redemptionCodeExpirationDate < Date.now();
-
-  if (!subscription) return <PlaceholderLoader />;
-
   const isOnOrSimulateMobileApp =
     isNativeMobileApp() || simulateNativeMobileApp;
+
+  if (error) {
+    return <PlaceholderError>{error}</PlaceholderError>;
+  }
+  if (!subscription || isLoadingUserPrice) {
+    return <PlaceholderLoader />;
+  }
 
   return (
     <Column noMargin>
@@ -147,7 +225,9 @@ const SubscriptionDetails = ({
           </Text>
         </Column>
       </Line>
-      {userPlan && userPlan.planId && !isSubscriptionExpired ? (
+      {userSubscriptionPlanWithPricingSystems &&
+      userSubscriptionPlanWithPricingSystems.id &&
+      !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
           <Paper background="medium" variant="outlined" style={styles.paper}>
             <ResponsiveLineStackLayout alignItems="center" expand noMargin>
@@ -188,7 +268,9 @@ const SubscriptionDetails = ({
           // On web/desktop, displays the subscription as usual:
           <ColumnStackLayout noMargin>
             <PlanCard
-              plan={userPlan}
+              subscriptionPlanWithPricingSystems={
+                userSubscriptionPlanWithPricingSystems
+              }
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||

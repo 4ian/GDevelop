@@ -52,6 +52,7 @@ const defaultProps = {
     planId: 'planId',
     createdAt: 12345,
     updatedAt: 12345,
+    pricingSystemId: 'whatever',
   },
 };
 export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;

@@ -14,6 +14,7 @@ describe('Usage service', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         userId: 'user_id',
+        pricingSystemId: null,
       };
       const result = canBenefitFromDiscordRole(subscription);
       expect(result).toBe(false);
@@ -25,6 +26,7 @@ describe('Usage service', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         userId: 'user_id',
+        pricingSystemId: 'silver_1month',
       };
       const result = canBenefitFromDiscordRole(subscription);
       expect(result).toBe(false);
@@ -36,6 +38,7 @@ describe('Usage service', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         userId: 'user_id',
+        pricingSystemId: 'pro_1month',
       };
       const result = canBenefitFromDiscordRole(subscription);
       expect(result).toBe(false);
@@ -48,6 +51,7 @@ describe('Usage service', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         userId: 'user_id',
+        pricingSystemId: 'TEAM_MEMBER',
       };
       const result = canBenefitFromDiscordRole(subscription);
       expect(result).toBe(false);
@@ -59,6 +63,7 @@ describe('Usage service', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         userId: 'user_id',
+        pricingSystemId: 'education_1month',
       };
       const result = canBenefitFromDiscordRole(subscription);
       expect(result).toBe(true);
@@ -70,6 +75,7 @@ describe('Usage service', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         userId: 'user_id',
+        pricingSystemId: 'gold_1month',
       };
       const result = canBenefitFromDiscordRole(subscription);
       expect(result).toBe(true);
@@ -81,6 +87,7 @@ describe('Usage service', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         userId: 'user_id',
+        pricingSystemId: 'startup_1month',
       };
       const result = canBenefitFromDiscordRole(subscription);
       expect(result).toBe(true);

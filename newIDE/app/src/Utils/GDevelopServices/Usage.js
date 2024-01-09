@@ -1,8 +1,9 @@
 // @flow
-import { t } from '@lingui/macro';
 import axios from 'axios';
 import { GDevelopUsageApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export type Usage = {
   id: string,
@@ -17,6 +18,16 @@ export type Subscription = {|
   planId: string | null,
   createdAt: number,
   updatedAt: number,
+  /**
+   * Id of the pricing system.
+   * null when subscription is empty.
+   */
+  pricingSystemId:
+    | 'REDEMPTION_CODE'
+    | 'MANUALLY_ADDED'
+    | 'TEAM_MEMBER'
+    | string
+    | null,
   stripeSubscriptionId?: string,
   stripeCustomerId?: string,
   paypalSubscriptionId?: string,
@@ -114,241 +125,162 @@ export type PlanDetails = {|
   |}>,
 |};
 
+export type SubscriptionPlanPricingSystem = {|
+  id: string,
+  planId: string,
+  period: 'week' | 'month' | 'year',
+  isPerUser?: true,
+  currency: 'EUR' | 'USD',
+  region: 'north' | 'south' | 'everywhere',
+  amountInCents: number,
+  periodCount: number,
+|};
+
+export type SubscriptionPlan = {|
+  id: string,
+  isLegacy: boolean,
+  nameByLocale: MessageByLocale,
+  descriptionByLocale: MessageByLocale,
+  bulletPointsByLocale: Array<MessageByLocale>,
+|};
+
+export type SubscriptionPlanWithPricingSystems = {|
+  ...SubscriptionPlan,
+  pricingSystems: SubscriptionPlanPricingSystem[],
+|};
+
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
+export const apiClient = axios.create({
+  baseURL: GDevelopUsageApi.baseUrl,
+});
 
-export const getSubscriptionPlans = (): Array<PlanDetails> => [
-  {
-    planId: null,
-    name: 'GDevelop Free & Open-source',
-    monthlyPriceInEuros: 0,
-    smallDescription: t`Use GDevelop for free, forever. We also give you access to these additional online services for free.`,
-    descriptionBullets: [
-      {
-        message: t`10 cloud projects with 50MB of resources per project and 2-days version history.`,
-      },
-      {
-        message: t`2 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`3 leaderboards per game and 10 player feedback responses per game.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_silver',
-    legacyPlanId: 'gdevelop_indie',
-    name: 'GDevelop Silver',
-    monthlyPriceInEuros: 4.99,
-    smallDescription: t`Build more and faster.`,
-    descriptionBullets: [
-      {
-        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
-      },
-      {
-        message: t`10 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-      {
-        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_gold',
-    legacyPlanId: 'gdevelop_pro',
-    name: 'GDevelop Gold',
-    monthlyPriceInEuros: 9.99,
-    smallDescription: t`Experimented creators, ambitious games.`,
-    descriptionBullets: [
-      {
-        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
-      },
-      {
-        message: t`100 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-      {
-        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_startup',
-    name: 'GDevelop Startup',
-    monthlyPriceInEuros: 30,
-    smallDescription: t`Small game studios and startups.`,
-    descriptionBullets: [
-      {
-        message: t`500 cloud projects with 5GB of resources per project.`,
-      },
-      {
-        message: t`Unlimited packagings per day for Android, web and desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-      {
-        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
-      },
-      {
-        message: t`Access your cloud projects history and easily get back to a previous version.`,
-      },
-      {
-        message: t`Add 1 guest user or unlimited startup team members to collaborate on every project.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_enterprise',
-    name: 'GDevelop for businesses, game studios and professionals',
-    monthlyPriceInEuros: null,
-    smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
-    descriptionBullets: [],
-  },
-  {
-    planId: 'gdevelop_education',
-    name: 'GDevelop Education',
-    monthlyPriceInEuros: 2.99,
-    yearlyPriceInEuros: 29.99,
-    isPerUser: true,
-    smallDescription: t`Schools and universities.`,
-    descriptionBullets: [
-      {
-        message: t`Students anonymity.`,
-      },
-      {
-        message: t`Organize students per classroom.`,
-      },
-      {
-        message: t`Access your students' projects`,
-      },
-      {
-        message: t`You and your students receive a Gold subscription.`,
-      },
-    ],
-  },
-];
+export const canPriceBeFoundInGDevelopPrices = (
+  pricingSystemId: string
+): boolean => {
+  if (
+    ['REDEMPTION_CODE', 'MANUALLY_ADDED', 'TEAM_MEMBER'].includes(
+      pricingSystemId
+    )
+  ) {
+    return false;
+  }
+  if (pricingSystemId.startsWith('PURCHASELY_')) return false;
+  return true;
+};
 
-export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
-  {
-    planId: 'gdevelop_indie',
-    name: 'GDevelop Indie (Legacy)',
-    monthlyPriceInEuros: 2.0,
-    smallDescription: t`Build more and faster.`,
-    descriptionBullets: [
-      {
-        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
-      },
-      {
-        message: t`10 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_pro',
-    name: 'GDevelop Pro (Legacy)',
-    monthlyPriceInEuros: 7.0,
-    smallDescription: t`Experimented creators, ambitious games.`,
-    descriptionBullets: [
-      {
-        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
-      },
-      {
-        message: t`70 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-      {
-        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
-      },
-    ],
-  },
-];
+export const listSubscriptionPlans = async (options: {|
+  includeLegacy: boolean,
+|}): Promise<SubscriptionPlan[]> => {
+  const response = await apiClient.get('/subscription-plan', {
+    params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
+  });
+  return response.data;
+};
 
-export const getUserUsages = (
+export const getSubscriptionPlanPricingSystem = async (
+  pricingSystemId: string
+): Promise<?SubscriptionPlanPricingSystem> => {
+  try {
+    const response = await apiClient.get(
+      `/subscription-plan-pricing-system/${pricingSystemId}`
+    );
+    return response.data;
+  } catch (error) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
+
+export const listSubscriptionPlanPricingSystems = async (
+  subscriptionPlanIds?: ?(string[])
+): Promise<SubscriptionPlanPricingSystem[]> => {
+  const params =
+    subscriptionPlanIds && subscriptionPlanIds.length > 0
+      ? { subscriptionPlanIds: subscriptionPlanIds.join(',') }
+      : undefined;
+  const response = await apiClient.get(
+    '/subscription-plan-pricing-system',
+    params
+  );
+  return response.data;
+};
+
+export const getUserUsages = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Usages> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/usage`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/usage', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const getUserLimits = (
+export const getUserLimits = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Limits> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/limits`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/limits', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const getUserSubscription = (
+export const getUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Subscription> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/subscription-v2`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/subscription-v2', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const changeUserSubscription = (
+export const changeUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  newSubscriptionDetails: { planId: string | null, stripeToken?: any }
+  newSubscriptionDetails: {| planId: string | null, stripeToken?: any |}
 ): Promise<Subscription> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription-v2`,
-        newSubscriptionDetails,
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.post(
+    '/subscription-v2',
+    newSubscriptionDetails,
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
 export const canSeamlesslyChangeSubscription = (
@@ -405,61 +337,58 @@ export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
 
 type UploadType = 'build' | 'preview';
 
-export const getSignedUrl = (params: {|
+export const getSignedUrl = async (params: {|
   uploadType: UploadType,
   key: string,
   contentType: string,
 |}): Promise<{
   signedUrl: string,
 }> => {
-  return axios
-    .post(`${GDevelopUsageApi.baseUrl}/upload-options/signed-url`, params)
-    .then(response => response.data);
+  const response = await apiClient.post('/upload-options/signed-url', params);
+  return response.data;
 };
 
-export const getRedirectToSubscriptionPortalUrl = (
+export const getRedirectToSubscriptionPortalUrl = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<string> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-portal`,
-        {},
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data)
-    .then(({ sessionPortalUrl }) => {
-      if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
-        throw new Error('Could not find the session portal url.');
+  const authorizationHeader = await getAuthorizationHeader();
 
-      return sessionPortalUrl;
-    });
+  const response = await apiClient.post(
+    '/subscription-v2/action/redirect-to-portal',
+    {},
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  const { sessionPortalUrl } = response.data;
+  if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
+    throw new Error('Could not find the session portal url.');
+
+  return sessionPortalUrl;
 };
 
 export const getRedirectToCheckoutUrl = ({
-  planId,
+  pricingSystemId,
   userId,
   userEmail,
   quantity,
-}: {
-  planId: string,
+}: {|
+  pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
-}): string => {
+|}): string => {
   const url = new URL(
-    `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout`
+    `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
   );
-  url.searchParams.set('planId', planId);
+  url.searchParams.set('pricingSystemId', pricingSystemId);
   url.searchParams.set('userId', userId);
   url.searchParams.set('customerEmail', userEmail);
   if (quantity !== undefined && quantity > 1)
@@ -487,8 +416,8 @@ export const redeemCode = async (
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  await axios.post(
-    `${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`,
+  await apiClient.post(
+    '/redemption-code/action/redeem-code',
     {
       code,
     },

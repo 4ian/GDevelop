@@ -21,18 +21,21 @@ import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import AlertMessage from '../UI/AlertMessage';
+import useSubscriptionPlans from '../Utils/UseSubscriptionPlans';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
 type Props = {|
-  currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
 |};
 
-const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
+const ProfileDialog = ({ open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+  });
 
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -198,11 +201,18 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
                     authenticatedUser.onOpenChangeEmailDialog
                   }
                 />
-                <SubscriptionDetails
-                  subscription={authenticatedUser.subscription}
-                  onManageSubscription={onManageSubscription}
-                  isManageSubscriptionLoading={isManageSubscriptionLoading}
-                />
+                {subscriptionPlansWithPricingSystems ? (
+                  <SubscriptionDetails
+                    subscription={authenticatedUser.subscription}
+                    subscriptionPlansWithPricingSystems={
+                      subscriptionPlansWithPricingSystems
+                    }
+                    onManageSubscription={onManageSubscription}
+                    isManageSubscriptionLoading={isManageSubscriptionLoading}
+                  />
+                ) : (
+                  <PlaceholderLoader />
+                )}
                 <ContributionsDetails userId={authenticatedUser.profile.id} />
                 {isConnected && (
                   <div ref={userAchievementsContainerRef}>

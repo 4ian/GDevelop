@@ -3400,7 +3400,6 @@ const MainFrame = (props: Props) => {
       )}
       {profileDialogOpen && (
         <ProfileDialog
-          currentProject={currentProject}
           open
           onClose={() => {
             openProfileDialog(false);

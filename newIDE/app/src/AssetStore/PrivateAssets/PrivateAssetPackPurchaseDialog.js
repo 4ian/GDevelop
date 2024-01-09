@@ -10,7 +10,7 @@ import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CreateProfile from '../../Profile/CreateProfile';
 import Text from '../../UI/Text';
 import { useInterval } from '../../Utils/UseInterval';
-import { getStripeCheckoutUrl } from '../../Utils/GDevelopServices/Shop';
+import { getPurchaseCheckoutUrl } from '../../Utils/GDevelopServices/Shop';
 import Window from '../../Utils/Window';
 import { Line, Spacer } from '../../UI/Grid';
 import CircularProgress from '../../UI/CircularProgress';
@@ -123,11 +123,11 @@ const PrivateAssetPackPurchaseDialog = ({
     // Purchase with web.
     try {
       setIsPurchasing(true);
-      const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
+      const checkoutUrl = getPurchaseCheckoutUrl({
         productId: privateAssetPackListingData.id,
         priceName: privateAssetPackListingData.prices[0].name,
         userId: profile.id,
-        customerEmail: profile.email,
+        userEmail: profile.email,
         ...(password ? { password } : undefined),
       });
       Window.openExternalURL(checkoutUrl);
@@ -162,6 +162,15 @@ const PrivateAssetPackPurchaseDialog = ({
     if (Window.isDev()) setDisplayPasswordPrompt(true);
     else onStartPurchase();
   };
+
+  React.useEffect(
+    () => {
+      onWillPurchase();
+    },
+    // Launch the start process directly when the dialog is opened, to avoid an extra click.
+    // eslint-disable-next-line
+    []
+  );
 
   const checkUserPurchases = React.useCallback(
     async () => {

@@ -6,7 +6,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../../ThemeDecorator';
 
 import paperDecorator from '../../../PaperDecorator';
-import { GameMonetization } from '../../../../GameDashboard/Monetization/GameMonetization';
+import GameMonetization from '../../../../GameDashboard/Monetization/GameMonetization';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 import {

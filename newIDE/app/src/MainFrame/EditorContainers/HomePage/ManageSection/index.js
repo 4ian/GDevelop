@@ -87,7 +87,7 @@ const ManageSection = ({
         <LargeSpacer />
         <SectionRow expand>
           <Paper
-            background="medium"
+            background="dark"
             square={false}
             style={styles.gameDetailsContainer}
           >

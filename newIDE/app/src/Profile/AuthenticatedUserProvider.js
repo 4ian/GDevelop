@@ -18,6 +18,7 @@ import Authentication, {
   type AuthError,
   type ForgotPasswordForm,
   type IdentityProvider,
+  type LoginOptions,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
@@ -31,7 +32,6 @@ import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
   authenticatedUserLoggedOutAttributes,
-  type LoginOptions,
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
@@ -750,7 +750,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
     this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.loginWithProvider(provider);
+      await authentication.loginWithProvider(provider, this.state.loginOptions);
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false, null);
       this.openCreateAccountDialog(false);
@@ -797,7 +797,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
     this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.login(form);
+      await authentication.login(form, this.state.loginOptions);
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false, null);
       const profile = this.state.authenticatedUser.profile;

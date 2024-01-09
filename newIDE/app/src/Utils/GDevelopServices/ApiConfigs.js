@@ -41,10 +41,14 @@ export const GDevelopAuthorizationWebSocketApi = {
     : 'wss://api-ws.gdevelop.io/authorization',
 };
 
+export const GDevelopAuthorizationApis = {
+  dev: 'https://api-dev.gdevelop.io/authorization',
+  live: 'https://api.gdevelop.io/authorization',
+};
 export const GDevelopAuthorizationApi = {
   baseUrl: isDev
-    ? 'wss://api-dev.gdevelop.io/authorization'
-    : 'wss://api.gdevelop.io/authorization',
+    ? GDevelopAuthorizationApis.dev
+    : GDevelopAuthorizationApis.live,
 };
 
 export const GDevelopBuildApi = {

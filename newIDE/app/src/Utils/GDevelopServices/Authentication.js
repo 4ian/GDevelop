@@ -17,6 +17,11 @@ import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 
+export type LoginOptions = {|
+  notifyConnection: string,
+  environment: 'dev' | 'live',
+|};
+
 export type Profile = {|
   id: string,
   email: string,
@@ -207,13 +212,13 @@ export default class Authentication {
       });
   };
 
-  login = (form: LoginForm): Promise<void> => {
+  login = (form: LoginForm, loginOptions?: ?LoginOptions): Promise<void> => {
     const { loginProvider } = this;
     if (!loginProvider) {
       throw new Error('Login provider not set.');
     }
     return loginProvider
-      .loginWithEmailAndPassword(form)
+      .loginWithEmailAndPassword({ ...form, loginOptions })
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })
@@ -223,14 +228,17 @@ export default class Authentication {
       });
   };
 
-  loginWithProvider = (provider: IdentityProvider): Promise<void> => {
+  loginWithProvider = (
+    provider: IdentityProvider,
+    loginOptions?: ?LoginOptions
+  ): Promise<void> => {
     const { loginProvider } = this;
     if (!loginProvider) {
       throw new Error('Login provider not set.');
     }
 
     return loginProvider
-      .loginOrSignupWithProvider({ provider })
+      .loginOrSignupWithProvider({ provider, loginOptions })
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })

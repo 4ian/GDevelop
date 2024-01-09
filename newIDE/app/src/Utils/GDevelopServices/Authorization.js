@@ -2,13 +2,8 @@
 import axios from 'axios';
 import {
   GDevelopAuthorizationWebSocketApi,
-  GDevelopAuthorizationApi,
+  GDevelopAuthorizationApis,
 } from './ApiConfigs';
-import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-
-export const apiClient = axios.create({
-  baseURL: GDevelopAuthorizationApi.baseUrl,
-});
 
 let webSocket: ?WebSocket;
 
@@ -77,17 +72,22 @@ export const terminateWebSocket = () => {
 };
 
 export const generateCustomToken = async (
-  authenticatedUser: AuthenticatedUser,
-  payload: {| connectionId: string |}
+  userId: string,
+  getAuthorizationHeader: () => string,
+  options: {|
+    connectionId: string,
+    /** Allow to force environment so that the live online editor can be used in dev environment. */
+    environment: 'dev' | 'live',
+  |}
 ): Promise<?void> => {
-  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return null;
-
-  const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await apiClient.post(
-    '/action/generate-custom-token',
-    payload,
+  const response = await axios.post(
+    `${
+      options.environment === 'dev'
+        ? GDevelopAuthorizationApis.dev
+        : GDevelopAuthorizationApis.live
+    }/action/generate-custom-token`,
+    options,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },

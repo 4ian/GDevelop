@@ -6,8 +6,14 @@ import {
   signInWithCustomToken,
 } from 'firebase/auth';
 import type { LoginProvider, FirebaseBasedLoginProvider } from '.';
-import type { IdentityProvider } from '../Utils/GDevelopServices/Authentication';
-import { setupAuthenticationWebSocket } from '../Utils/GDevelopServices/Authorization';
+import type {
+  IdentityProvider,
+  LoginOptions,
+} from '../Utils/GDevelopServices/Authentication';
+import {
+  setupAuthenticationWebSocket,
+  terminateWebSocket,
+} from '../Utils/GDevelopServices/Authorization';
 import Window from '../Utils/Window';
 
 const isDev = Window.isDev();
@@ -27,6 +33,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   }: {|
     email: string,
     password: string,
+    loginOptions?: ?LoginOptions,
   |}) {
     try {
       await signInWithEmailAndPassword(this.auth, email, password);
@@ -40,6 +47,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
     provider,
   }: {|
     provider: IdentityProvider,
+    loginOptions?: ?LoginOptions,
   |}) {
     const promise = new Promise((resolve, reject) => {
       setupAuthenticationWebSocket({
@@ -53,10 +61,10 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
           Window.openExternalURL(url.toString());
         },
         onTokenReceived: async token => {
-          console.log(token);
           try {
             await signInWithCustomToken(this.auth, token);
             resolve();
+            terminateWebSocket();
           } catch (error) {
             console.error(
               'An error occurred while logging in with custom token:',

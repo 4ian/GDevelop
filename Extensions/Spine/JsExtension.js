@@ -46,7 +46,7 @@ module.exports = {
         'SpineObject',
         _('Spine (experimental)'),
         _(
-          'Display and animate Spine skeleton. Select Spine files (json, atlas, image).'
+          'Display and smoothly animate a 2D object with skeletal animations made with Spine. Use files exported from Spine (json, atlas and image).'
         ),
         'JsPlatform/Extensions/spine.svg',
         new gd.SpineObjectConfiguration()

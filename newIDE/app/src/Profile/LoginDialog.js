@@ -62,7 +62,7 @@ const LoginDialog = ({
   const actions = [
     <FlatButton
       label={<Trans>Cancel</Trans>}
-      disabled={loginInProgress}
+      disabled={loginInProgress} // TODO: Add possibility to cancel login with providers.
       key="cancel"
       primary={false}
       onClick={onClose}

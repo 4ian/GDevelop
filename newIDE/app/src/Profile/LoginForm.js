@@ -135,6 +135,7 @@ const LoginForm = ({
                 onClick={() => {
                   onLoginWithProvider('google');
                 }}
+                disabled={loginInProgress}
               />
               <FlatButton
                 primary
@@ -144,6 +145,7 @@ const LoginForm = ({
                 onClick={() => {
                   onLoginWithProvider('github');
                 }}
+                disabled={loginInProgress}
               />
               <FlatButton
                 primary
@@ -153,6 +155,7 @@ const LoginForm = ({
                 onClick={() => {
                   onLoginWithProvider('apple');
                 }}
+                disabled={loginInProgress}
               />
             </ResponsiveLineStackLayout>
           </Line>

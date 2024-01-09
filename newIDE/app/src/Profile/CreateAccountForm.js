@@ -132,6 +132,7 @@ const CreateAccountForm = ({
                   onClick={() => {
                     onLoginWithProvider('google');
                   }}
+                  disabled={createAccountInProgress}
                 />
                 <FlatButton
                   primary
@@ -141,6 +142,7 @@ const CreateAccountForm = ({
                   onClick={() => {
                     onLoginWithProvider('github');
                   }}
+                  disabled={createAccountInProgress}
                 />
                 <FlatButton
                   primary
@@ -150,6 +152,7 @@ const CreateAccountForm = ({
                   onClick={() => {
                     onLoginWithProvider('apple');
                   }}
+                  disabled={createAccountInProgress}
                 />
               </ResponsiveLineStackLayout>
             </Line>

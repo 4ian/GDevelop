@@ -8,7 +8,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type RegisterForm,
   type AuthError,
-  type IdentityProvider
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
@@ -161,7 +161,7 @@ const CreateAccountDialog = ({
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
-          disabled={createAccountInProgress}
+          disabled={createAccountInProgress} // TODO: Add possibility to cancel login with providers.
           key="close"
           primary={false}
           onClick={onClose}

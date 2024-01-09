@@ -25,6 +25,11 @@ import {
   type PrivateGameTemplate,
 } from '../Utils/GDevelopServices/Asset';
 
+export type LoginOptions = {|
+  notifyConnection: string,
+  environment: 'dev' | 'live',
+|};
+
 export type AuthenticatedUser = {|
   authenticated: boolean,
   firebaseUser: ?FirebaseUser,
@@ -55,7 +60,7 @@ export type AuthenticatedUser = {|
     options: {| throwError: boolean |}
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
-  onOpenLoginDialog: () => void,
+  onOpenLoginDialog: (?LoginOptions) => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
   onOpenCreateAccountDialog: () => void,

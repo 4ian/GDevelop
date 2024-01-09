@@ -6,19 +6,20 @@ import {
 } from './ApiConfigs';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
-
 export const apiClient = axios.create({
   baseURL: GDevelopAuthorizationApi.baseUrl,
 });
 
 let webSocket: ?WebSocket;
 
-export const setupAuthenticationWebsocket = ({
+export const setupAuthenticationWebSocket = ({
   onConnectionEstablished,
   onTokenReceived,
+  onError,
 }: {|
   onConnectionEstablished: (connectionId: string) => void,
   onTokenReceived: (token: string) => Promise<void>,
+  onError: Error => void,
 |}) => {
   webSocket = new WebSocket(GDevelopAuthorizationWebSocketApi.baseUrl);
   webSocket.onopen = () => {
@@ -32,6 +33,7 @@ export const setupAuthenticationWebsocket = ({
   };
   webSocket.onerror = event => {
     console.error('WebSocket - Error:', event);
+    onError(event);
   };
 
   webSocket.onmessage = event => {
@@ -76,7 +78,7 @@ export const terminateWebSocket = () => {
 
 export const generateCustomToken = async (
   authenticatedUser: AuthenticatedUser,
-  cloudProjectCreationPayload: {| name: string, gameId?: string |}
+  payload: {| connectionId: string |}
 ): Promise<?void> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return null;
@@ -84,8 +86,8 @@ export const generateCustomToken = async (
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
-    '/project',
-    cloudProjectCreationPayload,
+    '/action/generate-custom-token',
+    payload,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },

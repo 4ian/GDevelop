@@ -31,6 +31,7 @@ import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
   authenticatedUserLoggedOutAttributes,
+  type LoginOptions,
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
@@ -63,6 +64,7 @@ type Props = {|
 type State = {|
   authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
+  loginOptions: ?LoginOptions,
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
@@ -98,6 +100,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   state = {
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
+    loginOptions: null,
     createAccountDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
@@ -194,7 +197,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onResetPassword: this._doForgotPassword,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
-        onOpenLoginDialog: () => this.openLoginDialog(true),
+        onOpenLoginDialog: (options: ?LoginOptions) =>
+          this.openLoginDialog(true, options),
         onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
         onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
         onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
@@ -748,7 +752,8 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       await authentication.loginWithProvider(provider);
       await this._fetchUserProfileWithoutThrowingErrors();
-      this.openLoginDialog(false);
+      this.openLoginDialog(false, null);
+      this.openCreateAccountDialog(false);
       const profile = this.state.authenticatedUser.profile;
       const username = profile ? profile.username : null;
       this.showUserSnackbar({
@@ -794,7 +799,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       await authentication.login(form);
       await this._fetchUserProfileWithoutThrowingErrors();
-      this.openLoginDialog(false);
+      this.openLoginDialog(false, null);
       const profile = this.state.authenticatedUser.profile;
       const username = profile ? profile.username : null;
       this.showUserSnackbar({
@@ -1054,9 +1059,16 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openLoginDialog = (open: boolean = true) => {
+  /**
+   * If options is undefined, the login options in the state are kept.
+   * If options is null, the login options in the state are erased so that
+   * a new login does not trigger a notification to the server.
+   */
+  openLoginDialog = (open: boolean = true, options?: ?LoginOptions) => {
     this.setState({
       loginDialogOpen: open,
+      loginOptions:
+        typeof options === 'undefined' ? this.state.loginOptions : options,
       createAccountDialogOpen: false,
       apiCallError: null,
     });
@@ -1104,7 +1116,7 @@ export default class AuthenticatedUserProvider extends React.Component<
             </AuthenticatedUserContext.Provider>
             {this.state.loginDialogOpen && (
               <LoginDialog
-                onClose={() => this.openLoginDialog(false)}
+                onClose={() => this.openLoginDialog(false, null)}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
                 onLoginWithProvider={this._doLoginWithProvider}

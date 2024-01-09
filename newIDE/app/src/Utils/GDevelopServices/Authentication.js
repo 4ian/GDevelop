@@ -6,18 +6,14 @@ import {
   onAuthStateChanged,
   User as FirebaseUser,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
   sendEmailVerification,
   updateEmail,
-  signInWithPopup,
-  GoogleAuthProvider,
-  GithubAuthProvider,
-  OAuthProvider,
 } from 'firebase/auth';
-import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
+import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
+import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 
@@ -117,6 +113,7 @@ export default class Authentication {
   auth: Auth;
   _onUserLogoutCallbacks: Array<() => void | Promise<void>> = [];
   _onUserUpdateCallbacks: Array<() => void | Promise<void>> = [];
+  loginProvider: ?LoginProvider;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
@@ -131,6 +128,10 @@ export default class Authentication {
       }
     });
   }
+
+  setLoginProvider = (loginProvider: LoginProvider) => {
+    this.loginProvider = loginProvider;
+  };
 
   addUserLogoutListener = (cb: () => void | Promise<void>) => {
     this._onUserLogoutCallbacks.push(cb);
@@ -207,7 +208,12 @@ export default class Authentication {
   };
 
   login = (form: LoginForm): Promise<void> => {
-    return signInWithEmailAndPassword(this.auth, form.email, form.password)
+    const { loginProvider } = this;
+    if (!loginProvider) {
+      throw new Error('Login provider not set.');
+    }
+    return loginProvider
+      .loginWithEmailAndPassword(form)
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })
@@ -218,29 +224,18 @@ export default class Authentication {
   };
 
   loginWithProvider = (provider: IdentityProvider): Promise<void> => {
-    let firebaseProvider = null;
-    if (provider === 'google') {
-      firebaseProvider = new GoogleAuthProvider();
-      firebaseProvider.addScope('profile');
-      firebaseProvider.addScope('email');
-    } else if (provider === 'github') {
-      firebaseProvider = new GithubAuthProvider();
-      // No scope needed for GitHub.
-    } else if (provider === 'apple') {
-      firebaseProvider = new OAuthProvider('apple.com');
-      firebaseProvider.addScope('email');
-      firebaseProvider.addScope('name');
+    const { loginProvider } = this;
+    if (!loginProvider) {
+      throw new Error('Login provider not set.');
     }
 
-    if (!firebaseProvider)
-      throw new Error(`Unknown provider ${provider} for login.`);
-
-    return signInWithPopup(this.auth, firebaseProvider)
+    return loginProvider
+      .loginOrSignupWithProvider({ provider })
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })
       .catch(error => {
-        console.error('Error while login:', error);
+        console.error('Error while login with provider:', error);
         throw error;
       });
   };

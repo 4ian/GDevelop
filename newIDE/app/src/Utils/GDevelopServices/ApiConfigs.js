@@ -35,6 +35,18 @@ export const GDevelopFirebaseConfig = {
   messagingSenderId: '44882707384',
 };
 
+export const GDevelopAuthorizationWebSocketApi = {
+  baseUrl: isDev
+    ? 'wss://api-ws-dev.gdevelop.io/authorization'
+    : 'wss://api-ws.gdevelop.io/authorization',
+};
+
+export const GDevelopAuthorizationApi = {
+  baseUrl: isDev
+    ? 'wss://api-dev.gdevelop.io/authorization'
+    : 'wss://api.gdevelop.io/authorization',
+};
+
 export const GDevelopBuildApi = {
   baseUrl: isDev
     ? 'https://api-dev.gdevelop.io/build'

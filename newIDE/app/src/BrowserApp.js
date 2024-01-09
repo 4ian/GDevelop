@@ -29,9 +29,12 @@ import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourc
 import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 import BrowserEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionOpener';
 import BrowserEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionWriter';
+import BrowserLoginProvider from './LoginProvider/BrowserLoginProvider';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
+  const loginProvider = new BrowserLoginProvider(authentication.auth);
+  authentication.setLoginProvider(loginProvider);
 
   let app = null;
   const appArguments = Window.getArguments();

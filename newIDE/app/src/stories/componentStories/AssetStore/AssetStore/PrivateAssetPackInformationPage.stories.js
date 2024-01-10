@@ -108,7 +108,7 @@ export const Default = () => {
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
       onAssetPackOpen={() => action('open asset pack')()}
-      privateAssetPacksFromSameCreatorListingData={[
+      privateAssetPackListingDatasFromSameCreator={[
         {
           id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
           sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
@@ -208,7 +208,7 @@ export const ForAlreadyPurchasedAssetPack = () => {
         isPurchaseDialogOpen={false}
         onOpenPurchaseDialog={() => action('open purchase dialog')()}
         onAssetPackOpen={() => action('open asset pack')()}
-        privateAssetPacksFromSameCreatorListingData={[
+        privateAssetPackListingDatasFromSameCreator={[
           {
             id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
             sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',

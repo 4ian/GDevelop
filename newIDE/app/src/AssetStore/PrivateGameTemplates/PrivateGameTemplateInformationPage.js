@@ -25,7 +25,10 @@ import Link from '../../UI/Link';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import Cross from '../../UI/CustomSvgIcons/Cross';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendGameTemplateBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
@@ -40,6 +43,25 @@ import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import Chip from '../../UI/Chip';
 import Lightning from '../../UI/CustomSvgIcons/Lightning';
+import { PrivateGameTemplateTile } from '../ShopTiles';
+import { GridList } from '@material-ui/core';
+
+const cellSpacing = 8;
+
+const getTemplateColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+      return 4;
+    case 'xlarge':
+      return 5;
+    default:
+      return 3;
+  }
+};
 
 const styles = {
   disabledText: { opacity: 0.6 },
@@ -78,17 +100,21 @@ const howToUseItems = [
 
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
+  privateGameTemplateListingDatasFromSameCreator?: ?Array<PrivateGameTemplateListingData>,
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
+  onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
 |};
 
 const PrivateGameTemplateInformationPage = ({
   privateGameTemplateListingData,
+  privateGameTemplateListingDatasFromSameCreator,
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
   onGameTemplateOpen,
+  onCreateWithGameTemplate,
   simulateAppStoreProduct,
 }: Props) => {
   const { id, name, sellerId } = privateGameTemplateListingData;
@@ -119,6 +145,47 @@ const PrivateGameTemplateInformationPage = ({
     !!receivedGameTemplates.find(
       gameTemplate => gameTemplate.id === privateGameTemplateListingData.id
     );
+
+  const otherTemplatesFromTheSameAuthorTiles = React.useMemo(
+    () => {
+      if (
+        !privateGameTemplateListingDatasFromSameCreator ||
+        // Only display Templates if there are at least 2. If there is only one,
+        // it means it's the same as the one currently opened.
+        privateGameTemplateListingDatasFromSameCreator.length < 2
+      )
+        return null;
+
+      return (
+        privateGameTemplateListingDatasFromSameCreator
+          // Do not display the template currently opened.
+          .filter(
+            gameTemplateFromSameCreator => gameTemplateFromSameCreator.id !== id
+          )
+          .map(gameTemplateFromSameCreator => {
+            const isTemplateOwned =
+              !!receivedGameTemplates &&
+              !!receivedGameTemplates.find(
+                template => template.id === gameTemplateFromSameCreator.id
+              );
+            return (
+              <PrivateGameTemplateTile
+                privateGameTemplateListingData={gameTemplateFromSameCreator}
+                key={gameTemplateFromSameCreator.id}
+                onSelect={() => onGameTemplateOpen(gameTemplateFromSameCreator)}
+                owned={isTemplateOwned}
+              />
+            );
+          })
+      );
+    },
+    [
+      id,
+      privateGameTemplateListingDatasFromSameCreator,
+      onGameTemplateOpen,
+      receivedGameTemplates,
+    ]
+  );
 
   React.useEffect(
     () => {
@@ -160,7 +227,7 @@ const PrivateGameTemplateInformationPage = ({
     async () => {
       if (!gameTemplate) return;
       if (isAlreadyReceived) {
-        onGameTemplateOpen(privateGameTemplateListingData);
+        onCreateWithGameTemplate(privateGameTemplateListingData);
         return;
       }
 
@@ -181,7 +248,7 @@ const PrivateGameTemplateInformationPage = ({
       onOpenPurchaseDialog,
       privateGameTemplateListingData,
       isAlreadyReceived,
-      onGameTemplateOpen,
+      onCreateWithGameTemplate,
     ]
   );
 
@@ -307,15 +374,17 @@ const PrivateGameTemplateInformationPage = ({
                         </Line>
                         <Line>
                           <div style={styles.chipsContainer}>
-                            <Chip
-                              icon={<Lightning />}
-                              variant="outlined"
-                              color="secondary"
-                              size="small"
-                              style={styles.chip}
-                              label={<Trans>Ready-made</Trans>}
-                              key="premium"
-                            />
+                            {privateGameTemplateListingData.isSellerGDevelop && (
+                              <Chip
+                                icon={<Lightning />}
+                                variant="outlined"
+                                color="secondary"
+                                size="small"
+                                style={styles.chip}
+                                label={<Trans>Ready-made</Trans>}
+                                key="premium"
+                              />
+                            )}
                             <Chip
                               size="small"
                               style={styles.chip}
@@ -439,6 +508,26 @@ const PrivateGameTemplateInformationPage = ({
                     </Paper>
                   </ColumnStackLayout>
                 </ResponsiveLineStackLayout>
+                {otherTemplatesFromTheSameAuthorTiles &&
+                  otherTemplatesFromTheSameAuthorTiles.length > 0 && (
+                    <>
+                      <Line>
+                        <Text size="block-title">
+                          <Trans>From the same author</Trans>
+                        </Text>
+                      </Line>
+                      <Line>
+                        <GridList
+                          cols={getTemplateColumns(windowWidth)}
+                          cellHeight="auto"
+                          spacing={cellSpacing / 2}
+                          style={styles.grid}
+                        >
+                          {otherTemplatesFromTheSameAuthorTiles}
+                        </GridList>
+                      </Line>
+                    </>
+                  )}
               </ScrollView>
             </Column>
           ) : null}

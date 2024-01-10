@@ -147,9 +147,11 @@ const MarketingPlans = ({ game }: Props) => {
 
   const fetchMarketingPlans = React.useCallback(async () => {
     try {
+      console.log('fetchMarketingPlans');
       setMarketingPlansError(null);
-      const categories = await listMarketingPlans();
-      setMarketingPlans(categories);
+      const marketingPlans = await listMarketingPlans();
+      console.log('marketingPlans', marketingPlans);
+      setMarketingPlans(marketingPlans);
     } catch (error) {
       console.error('An error occurred while fetching marketing plans.', error);
       setMarketingPlansError(error);
@@ -196,6 +198,7 @@ const MarketingPlans = ({ game }: Props) => {
 
   const onPurchase = React.useCallback(
     async (i18n: I18nType, marketingPlan: MarketingPlan) => {
+      console.log(profile, limits);
       if (!profile || !limits) return;
 
       const {

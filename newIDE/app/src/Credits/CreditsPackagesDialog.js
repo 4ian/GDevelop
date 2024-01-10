@@ -4,7 +4,6 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column } from '../UI/Grid';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import Coin from '../UI/CustomSvgIcons/Coin';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -24,6 +23,9 @@ import Link from '../UI/Link';
 import Window from '../Utils/Window';
 import CreditsPackagePurchaseDialog from '../AssetStore/CreditsPackages/CreditsPackagePurchaseDialog';
 import { type CreditsPackageListingData } from '../Utils/GDevelopServices/Shop';
+import Coin from './Icons/Coin';
+import TwoCoins from './Icons/TwoCoins';
+import ThreeCoins from './Icons/ThreeCoins';
 
 const styles = {
   creditsPackage: {
@@ -37,9 +39,28 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
   },
+  iconContainer: {
+    marginRight: 8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 30,
+  },
   backgroundText: {
     textAlign: 'left',
   },
+};
+
+const getIconFromIndex = (index: number) => {
+  switch (index) {
+    case 0:
+      return <Coin style={{ width: 15, height: 15 }} />;
+    case 1:
+      return <TwoCoins style={{ width: 30, height: 30 }} />;
+    case 2:
+    default:
+      return <ThreeCoins style={{ width: 30, height: 30 }} />;
+  }
 };
 
 type Props = {
@@ -64,8 +85,6 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
     },
     [fetchCreditsPackages]
   );
-
-  console.log(creditsPackageListingDatas);
 
   return (
     <I18n>
@@ -96,67 +115,77 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
               <PlaceholderLoader />
             ) : (
               <ResponsiveLineStackLayout>
-                {creditsPackageListingDatas.map(creditsPackageListingData => {
-                  const { id, name, description } = creditsPackageListingData;
-                  return (
-                    <div
-                      style={{
-                        ...styles.creditsPackage,
-                        border: `1px solid ${gdevelopTheme.palette.secondary}`,
-                      }}
-                      key={id}
-                    >
-                      <ColumnStackLayout
-                        alignItems="center"
-                        justifyContent="space-between"
-                        noMargin
-                        expand
+                {creditsPackageListingDatas.map(
+                  (creditsPackageListingData, index) => {
+                    const { id, name, description } = creditsPackageListingData;
+                    return (
+                      <div
+                        style={{
+                          ...styles.creditsPackage,
+                          border: `1px solid ${
+                            gdevelopTheme.palette.secondary
+                          }`,
+                        }}
+                        key={id}
                       >
-                        <div style={styles.titleContainer}>
-                          <LineStackLayout
-                            justifyContent="space-between"
-                            alignItems="flex-end"
-                            expand
-                          >
-                            <LineStackLayout noMargin alignItems="flex-end">
-                              <Coin />
-                              <Text size="sub-title" noMargin>
-                                {name}
+                        <ColumnStackLayout
+                          alignItems="center"
+                          justifyContent="space-between"
+                          noMargin
+                          expand
+                        >
+                          <div style={styles.titleContainer}>
+                            <div style={styles.iconContainer}>
+                              {getIconFromIndex(index)}
+                            </div>
+                            <LineStackLayout
+                              justifyContent="space-between"
+                              alignItems="flex-end"
+                              expand
+                            >
+                              <LineStackLayout noMargin alignItems="flex-end">
+                                <Text size="sub-title" noMargin>
+                                  {name}
+                                </Text>
+                              </LineStackLayout>
+                              <Text
+                                size="body-small"
+                                color="secondary"
+                                noMargin
+                              >
+                                {formatProductPrice({
+                                  productListingData: creditsPackageListingData,
+                                  i18n,
+                                })}
                               </Text>
                             </LineStackLayout>
-                            <Text size="body-small" color="secondary" noMargin>
-                              {formatProductPrice({
-                                productListingData: creditsPackageListingData,
-                                i18n,
-                              })}
-                            </Text>
-                          </LineStackLayout>
-                        </div>
+                          </div>
 
-                        <Column noMargin alignItems="center" expand>
-                          <Text
-                            size="body-small"
-                            noMargin
-                            color="secondary"
-                            align="left"
-                          >
-                            {description}
-                          </Text>
-                        </Column>
-                        <RaisedButton
-                          primary
-                          onClick={() =>
-                            setPurchasingCreditsPackageListingData(
-                              creditsPackageListingData
-                            )
-                          }
-                          label={<Trans>Purchase</Trans>}
-                          fullWidth
-                        />
-                      </ColumnStackLayout>
-                    </div>
-                  );
-                })}
+                          <Column noMargin alignItems="center" expand>
+                            <Text
+                              size="body-small"
+                              noMargin
+                              color="secondary"
+                              align="left"
+                            >
+                              {description}
+                            </Text>
+                          </Column>
+                          <RaisedButton
+                            primary
+                            onClick={() =>
+                              setPurchasingCreditsPackageListingData(
+                                creditsPackageListingData
+                              )
+                            }
+                            label={<Trans>Purchase</Trans>}
+                            fullWidth
+                          />
+                        </ColumnStackLayout>
+                      </div>
+                    );
+                  }
+                )}
               </ResponsiveLineStackLayout>
             )}
             <BackgroundText style={styles.backgroundText}>

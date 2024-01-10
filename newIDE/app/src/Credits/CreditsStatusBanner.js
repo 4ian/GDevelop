@@ -3,12 +3,12 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { Column } from '../UI/Grid';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import Coin from '../UI/CustomSvgIcons/Coin';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import CreditsPackagesDialog from './CreditsPackagesDialog';
+import Coin from './Icons/Coin';
 
 const styles = {
   container: {

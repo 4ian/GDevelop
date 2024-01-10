@@ -27,6 +27,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   constructor(auth: Auth) {
     this.auth = auth;
   }
+
   async loginWithEmailAndPassword({
     email,
     password,
@@ -43,6 +44,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
       throw error;
     }
   }
+
   async loginOrSignupWithProvider({
     provider,
   }: {|
@@ -83,6 +85,13 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
       });
     });
     return promise;
+  }
+
+  async notifyLogin(options: {|
+    connectionId: string,
+    environment: 'dev' | 'live',
+  |}): Promise<void> {
+    console.warn('notifyLogin not implemented in LocalLoginProvider.');
   }
 }
 

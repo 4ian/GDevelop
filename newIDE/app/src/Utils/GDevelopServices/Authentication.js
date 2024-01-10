@@ -228,6 +228,18 @@ export default class Authentication {
       });
   };
 
+  notifyLogin = (loginOptions: LoginOptions) => {
+    const { loginProvider } = this;
+    if (!loginProvider) {
+      throw new Error('Login provider not set.');
+    }
+
+    return loginProvider.notifyLogin({
+      environment: loginOptions.environment,
+      connectionId: loginOptions.notifyConnection,
+    });
+  };
+
   loginWithProvider = (
     provider: IdentityProvider,
     loginOptions?: ?LoginOptions

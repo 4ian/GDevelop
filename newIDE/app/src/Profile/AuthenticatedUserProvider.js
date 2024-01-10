@@ -65,6 +65,7 @@ type State = {|
   authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
   loginOptions: ?LoginOptions,
+  loginOnDesktopAppSuccess: boolean,
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
@@ -101,6 +102,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
     loginOptions: null,
+    loginOnDesktopAppSuccess: false,
     createAccountDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
@@ -828,6 +830,17 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
+  _doLoginOnDesktopApp = async () => {
+    const { authentication } = this.props;
+    const { loginOptions } = this.state;
+    if (!authentication || !loginOptions) return;
+
+    await authentication.notifyLogin(loginOptions);
+    this.setState({
+      loginOnDesktopAppSuccess: true,
+    });
+  };
+
   _doEdit = async (
     payload: PatchUserPayload,
     preferences: PreferencesValues,
@@ -1116,9 +1129,13 @@ export default class AuthenticatedUserProvider extends React.Component<
             </AuthenticatedUserContext.Provider>
             {this.state.loginDialogOpen && (
               <LoginDialog
+                authenticatedUser={this.state.authenticatedUser}
                 onClose={() => this.openLoginDialog(false, null)}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
+                onLoginOnDesktopApp={this._doLoginOnDesktopApp}
+                loginOnDesktopAppSuccess={this.state.loginOnDesktopAppSuccess}
+                onLogout={this._doLogout}
                 onLoginWithProvider={this._doLoginWithProvider}
                 loginInProgress={this.state.loginInProgress}
                 error={this.state.apiCallError}

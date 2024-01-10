@@ -21,6 +21,7 @@ class BrowserLoginProvider
   constructor(auth: Auth) {
     this.auth = auth;
   }
+
   async loginWithEmailAndPassword({
     email,
     password,
@@ -35,18 +36,14 @@ class BrowserLoginProvider
       // The user is now stored in `this.auth`.
       if (loginOptions && loginOptions.notifyConnection) {
         const { notifyConnection: connectionId, environment } = loginOptions;
-        const { currentUser } = this.auth;
-        await generateCustomToken(
-          currentUser.uid,
-          () => currentUser.getIdToken().then(token => `Bearer ${token}`),
-          { connectionId, environment }
-        );
+        await this.notifyLogin({ connectionId, environment });
       }
     } catch (error) {
       console.error('Error while login:', error);
       throw error;
     }
   }
+
   async loginOrSignupWithProvider({
     provider,
     loginOptions,
@@ -76,17 +73,29 @@ class BrowserLoginProvider
       // The user is now stored in `this.auth`.
       if (loginOptions && loginOptions.notifyConnection) {
         const { notifyConnection: connectionId, environment } = loginOptions;
-        const { currentUser } = this.auth;
-        await generateCustomToken(
-          currentUser.uid,
-          () => currentUser.getIdToken().then(token => `Bearer ${token}`),
-          { connectionId, environment }
-        );
+        await this.notifyLogin({ connectionId, environment });
       }
     } catch (error) {
       console.error('Error while login with provider:', error);
       throw error;
     }
+  }
+
+  async notifyLogin({
+    connectionId,
+    environment,
+  }: {|
+    connectionId: string,
+    environment: 'dev' | 'live',
+  |}): Promise<void> {
+    const { currentUser } = this.auth;
+    if (!currentUser) return;
+
+    await generateCustomToken(
+      currentUser.uid,
+      () => currentUser.getIdToken().then(token => `Bearer ${token}`),
+      { connectionId, environment }
+    );
   }
 }
 

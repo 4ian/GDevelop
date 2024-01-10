@@ -15,6 +15,10 @@ export interface LoginProvider {
     provider: IdentityProvider,
     loginOptions?: ?LoginOptions,
   |}): Promise<void>;
+  notifyLogin({|
+    connectionId: string,
+    environment: 'dev' | 'live',
+  |}): Promise<void>;
 }
 
 export interface FirebaseBasedLoginProvider {

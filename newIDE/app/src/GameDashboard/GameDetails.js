@@ -47,7 +47,7 @@ import { sendGameDetailsOpened } from '../Utils/Analytics/EventSender';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
-import { MarketingCampaigns } from './Marketing/MarketingCampaigns';
+import MarketingPlans from './Marketing/MarketingPlans';
 
 export type GameDetailsTab =
   | 'details'
@@ -581,10 +581,7 @@ const GameDetails = ({
             {currentTab === 'marketing' ? (
               <ColumnStackLayout noMargin expand>
                 <CreditsStatusBanner displayPurchaseAction />
-                <MarketingCampaigns
-                  game={game}
-                  onGameUpdated={handleGameUpdated}
-                />
+                <MarketingPlans game={game} />
                 <GameMonetization
                   game={game}
                   onGameUpdated={handleGameUpdated}

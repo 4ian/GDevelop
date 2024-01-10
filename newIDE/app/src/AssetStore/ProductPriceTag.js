@@ -34,7 +34,9 @@ export const formatProductPrice = ({
   const stripePrice = productListingData.prices[0];
   if (!stripePrice) return '';
 
-  return `€ ${i18n
+  const currencyCode = stripePrice.currency === 'USD' ? '$' : '€';
+
+  return `${currencyCode} ${i18n
     .number(stripePrice.value / 100, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,

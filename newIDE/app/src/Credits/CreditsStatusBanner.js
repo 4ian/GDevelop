@@ -29,6 +29,15 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
     setCreditsPackDialogOpen,
   ] = React.useState<boolean>(false);
 
+  // Ensure credits are refreshed when this component is shown.
+  React.useEffect(
+    () => {
+      authenticatedUser.onRefreshLimits();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   if (!authenticatedUser.limits) {
     return null;
   }

@@ -3,6 +3,7 @@ import axios from 'axios';
 import capitalize from 'lodash/capitalize';
 import { type I18n as I18nType } from '@lingui/core';
 import { GDevelopGameApi, GDevelopGamesPlatform } from './ApiConfigs';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
@@ -97,10 +98,33 @@ export type GameApiError = {|
   code: 'game-deletion/leaderboards-exist',
 |};
 
+export type FeaturingType =
+  | 'games-platform-home'
+  | 'games-platform-game-page'
+  | 'games-platform-listing'
+  | 'socials-newsletter'
+  | 'gdevelop-banner';
+
+export type GameFeaturing = {|
+  gameId: string,
+  featuring: FeaturingType,
+  createdAt: number,
+  updatedAt: number,
+  expiresAt: number, // in seconds.
+|};
+
 export type GameUsageType =
-  | 'featuring-games-platform'
-  | 'featuring-socials'
-  | 'featuring-gdevelop';
+  | 'featuring-basic'
+  | 'featuring-pro'
+  | 'featuring-premium';
+
+export type MarketingPlan = {|
+  id: GameUsageType,
+  nameByLocale: MessageByLocale,
+  descriptionByLocale: MessageByLocale,
+  bulletPointsByLocale: Array<MessageByLocale>,
+  creditsAmount: number,
+|};
 
 export const getCategoryName = (category: string, i18n: I18nType) => {
   switch (category) {
@@ -433,4 +457,30 @@ export const buyGameFeaturing = async (
       },
     }
   );
+};
+
+export const listGameFeaturings = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { gameId, userId }: {| gameId: string, userId: string |}
+): Promise<GameFeaturing[]> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopGameApi.baseUrl}/game-featuring`,
+    {
+      params: {
+        userId,
+        gameId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
+  const response = await axios.get(`${GDevelopGameApi.baseUrl}/marketing-plan`);
+  return response.data;
 };

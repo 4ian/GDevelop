@@ -3,7 +3,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import {
   type CreditsPackageListingData,
-  getPurchaseRedirectToCheckoutUrl,
+  getPurchaseCheckoutUrl,
 } from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -118,8 +118,9 @@ const CreditsPackagePurchaseDialog = ({
     // Purchase with web.
     try {
       setIsPurchasing(true);
-      const checkoutUrl = await getPurchaseRedirectToCheckoutUrl({
+      const checkoutUrl = await getPurchaseCheckoutUrl({
         productId: creditsPackageListingData.id,
+        priceName: creditsPackageListingData.prices[0].name,
         userId: profile.id,
         userEmail: profile.email,
         password,

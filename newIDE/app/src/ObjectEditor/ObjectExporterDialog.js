@@ -19,7 +19,7 @@ import { serializeToObjectAsset } from '../Utils/Serializer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { downloadUrlsToBlobs, type ItemResult } from '../Utils/BlobDownloader';
 import { useGenericRetryableProcessWithProgress } from '../Utils/UseGenericRetryableProcessWithProgress';
-import { extractFilenameFromProjectResourceUrl } from '../Utils/GDevelopServices/Project';
+import { extractDecodedFilenameFromProjectResourceUrl } from '../Utils/GDevelopServices/Project';
 import {
   archiveFiles,
   type BlobFileDescriptor,
@@ -79,7 +79,7 @@ export const downloadResourcesAsBlobs = async ({
         return {
           resource,
           url: resourceFile,
-          filename: extractFilenameFromProjectResourceUrl(resourceFile),
+          filename: extractDecodedFilenameFromProjectResourceUrl(resourceFile),
         };
       }
     )

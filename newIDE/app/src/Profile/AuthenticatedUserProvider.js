@@ -830,7 +830,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doLoginOnDesktopApp = async () => {
+  _doAllowLoginOnDesktopApp = async () => {
     const { authentication } = this.props;
     const { loginOptions } = this.state;
     if (!authentication || !loginOptions) return;
@@ -1133,7 +1133,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 onClose={() => this.openLoginDialog(false, null)}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
-                onLoginOnDesktopApp={this._doLoginOnDesktopApp}
+                onLoginOnDesktopApp={this._doAllowLoginOnDesktopApp}
                 loginOnDesktopAppSuccess={this.state.loginOnDesktopAppSuccess}
                 onLogout={this._doLogout}
                 onLoginWithProvider={this._doLoginWithProvider}

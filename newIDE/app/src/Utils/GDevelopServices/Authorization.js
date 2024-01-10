@@ -2,8 +2,10 @@
 import axios from 'axios';
 import {
   GDevelopAuthorizationWebSocketApi,
-  GDevelopAuthorizationApis,
+  GDevelopAuthorizationApi,
 } from './ApiConfigs';
+
+const apiClient = axios.create({ baseURL: GDevelopAuthorizationApi.baseUrl });
 
 let webSocket: ?WebSocket;
 
@@ -76,17 +78,11 @@ export const generateCustomToken = async (
   getAuthorizationHeader: () => string,
   options: {|
     connectionId: string,
-    /** Allow to force environment so that the live online editor can be used in dev environment. */
-    environment: 'dev' | 'live',
   |}
 ): Promise<?void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${
-      options.environment === 'dev'
-        ? GDevelopAuthorizationApis.dev
-        : GDevelopAuthorizationApis.live
-    }/action/generate-custom-token`,
+  const response = await apiClient.post(
+    '/action/generate-custom-token',
     options,
     {
       headers: { Authorization: authorizationHeader },

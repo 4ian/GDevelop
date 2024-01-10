@@ -18,9 +18,9 @@ import Window from '../Utils/Window';
 
 const isDev = Window.isDev();
 
-// Uncomment to use local web app.
-// const webAppUrl =  'http://editor-local.gdevelop.io:3000'
-const webAppUrl = 'https://editor.gdevelop.io';
+const webAppUrl = isDev
+  ? 'http://editor-local.gdevelop.io:3000'
+  : 'https://editor.gdevelop.io';
 
 class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   auth: Auth;
@@ -57,9 +57,6 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
           const url = new URL(webAppUrl);
           url.searchParams.set('initial-dialog', 'login');
           url.searchParams.set('connection-id', connectionId);
-          if (isDev) {
-            url.searchParams.set('login-environment', 'dev');
-          }
           Window.openExternalURL(url.toString());
         },
         onTokenReceived: async token => {
@@ -87,10 +84,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
     return promise;
   }
 
-  async notifyLogin(options: {|
-    connectionId: string,
-    environment: 'dev' | 'live',
-  |}): Promise<void> {
+  async notifyLogin(options: {| connectionId: string |}): Promise<void> {
     console.warn('notifyLogin not implemented in LocalLoginProvider.');
   }
 }

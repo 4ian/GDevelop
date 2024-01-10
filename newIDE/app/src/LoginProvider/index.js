@@ -17,7 +17,6 @@ export interface LoginProvider {
   |}): Promise<void>;
   notifyLogin({|
     connectionId: string,
-    environment: 'dev' | 'live',
   |}): Promise<void>;
 }
 

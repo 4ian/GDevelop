@@ -35,8 +35,8 @@ class BrowserLoginProvider
       await signInWithEmailAndPassword(this.auth, email, password);
       // The user is now stored in `this.auth`.
       if (loginOptions && loginOptions.notifyConnection) {
-        const { notifyConnection: connectionId, environment } = loginOptions;
-        await this.notifyLogin({ connectionId, environment });
+        const { notifyConnection: connectionId } = loginOptions;
+        await this.notifyLogin({ connectionId });
       }
     } catch (error) {
       console.error('Error while login:', error);
@@ -72,8 +72,8 @@ class BrowserLoginProvider
       await signInWithPopup(this.auth, firebaseProvider);
       // The user is now stored in `this.auth`.
       if (loginOptions && loginOptions.notifyConnection) {
-        const { notifyConnection: connectionId, environment } = loginOptions;
-        await this.notifyLogin({ connectionId, environment });
+        const { notifyConnection: connectionId } = loginOptions;
+        await this.notifyLogin({ connectionId });
       }
     } catch (error) {
       console.error('Error while login with provider:', error);
@@ -83,10 +83,8 @@ class BrowserLoginProvider
 
   async notifyLogin({
     connectionId,
-    environment,
   }: {|
     connectionId: string,
-    environment: 'dev' | 'live',
   |}): Promise<void> {
     const { currentUser } = this.auth;
     if (!currentUser) return;
@@ -94,7 +92,7 @@ class BrowserLoginProvider
     await generateCustomToken(
       currentUser.uid,
       () => currentUser.getIdToken().then(token => `Bearer ${token}`),
-      { connectionId, environment }
+      { connectionId }
     );
   }
 }

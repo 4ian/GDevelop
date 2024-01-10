@@ -41,18 +41,14 @@ const useOpenInitialDialog = ({
           break;
         case 'login':
           const connectionId = routeArguments['connection-id'];
-          const loginEnvironment =
-            routeArguments['login-environment'] === 'dev' ? 'dev' : 'live';
           // Add timeout to give time to the app to sign in with Firebase
           // to make sure the most relevant dialog is opened.
           const loginTimeoutId = setTimeout(() => {
             onOpenLoginDialog({
               notifyConnection: connectionId,
-              environment: loginEnvironment,
             });
             removeRouteArguments([
               'initial-dialog',
-              'login-environment',
               'connection-id',
             ]);
           }, 500);

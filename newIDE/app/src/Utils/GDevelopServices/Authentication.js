@@ -19,7 +19,6 @@ import { type CommunityLinks, type UserSurvey } from './User';
 
 export type LoginOptions = {|
   notifyConnection: string,
-  environment: 'dev' | 'live',
 |};
 
 export type Profile = {|
@@ -235,7 +234,6 @@ export default class Authentication {
     }
 
     return loginProvider.notifyLogin({
-      environment: loginOptions.environment,
       connectionId: loginOptions.notifyConnection,
     });
   };

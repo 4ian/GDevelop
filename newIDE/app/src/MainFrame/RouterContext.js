@@ -16,8 +16,7 @@ type RouteKey =
   | 'asset-pack'
   | 'game-template'
   | 'tutorial-id'
-  | 'connection-id'
-  | 'login-environment';
+  | 'connection-id';
 export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|

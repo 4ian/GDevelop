@@ -47,10 +47,7 @@ const useOpenInitialDialog = ({
             onOpenLoginDialog({
               notifyConnection: connectionId,
             });
-            removeRouteArguments([
-              'initial-dialog',
-              'connection-id',
-            ]);
+            removeRouteArguments(['initial-dialog', 'connection-id']);
           }, 500);
           return () => clearTimeout(loginTimeoutId);
         case 'signup':

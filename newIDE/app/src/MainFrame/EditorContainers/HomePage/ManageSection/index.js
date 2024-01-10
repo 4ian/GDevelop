@@ -66,6 +66,15 @@ const ManageSection = ({
     onOpenLoginDialog,
   } = authenticatedUser;
 
+  React.useEffect(
+    () => {
+      onRefreshGames();
+    },
+    // Refresh the games when the section is opened, useful when a game gets registered.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const onBack = React.useCallback(
     () => {
       setCurrentTab('details');

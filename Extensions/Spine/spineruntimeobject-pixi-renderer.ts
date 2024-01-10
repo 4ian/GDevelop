@@ -34,6 +34,17 @@ namespace gdjs {
       return this._rendererObject;
     }
 
+    getOriginOffset(): PIXI.Point {
+      if (!isSpine(this._rendererObject)) return new PIXI.Point(0, 0);
+
+      const localBounds = this._rendererObject.getLocalBounds(undefined, true);
+
+      return new PIXI.Point(
+        localBounds.x * this._rendererObject.scale.x,
+        localBounds.y * this._rendererObject.scale.y
+      );
+    }
+
     onDestroy(): void {
       this._rendererObject.destroy();
     }

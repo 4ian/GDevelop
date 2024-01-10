@@ -91,6 +91,18 @@ namespace gdjs {
       }
     }
 
+    getDrawableX(): number {
+      const originOffset = this._renderer.getOriginOffset();
+
+      return this.getX() + originOffset.x;
+    }
+
+    getDrawableY(): number {
+      const originOffset = this._renderer.getOriginOffset();
+
+      return this.getY() + originOffset.y;
+    }
+
     onDestroyed(): void {
       super.onDestroyed();
       this._renderer.onDestroy();

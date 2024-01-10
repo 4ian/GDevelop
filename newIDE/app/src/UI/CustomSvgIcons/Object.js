@@ -2,7 +2,7 @@ import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 export default React.memo(props => (
-  <SvgIcon {...props} viewBox="0 0 24 24">
+  <SvgIcon {...props} width="24" height="24" viewBox="0 0 24 24">
     <g
       fill="none"
       stroke="currentColor"

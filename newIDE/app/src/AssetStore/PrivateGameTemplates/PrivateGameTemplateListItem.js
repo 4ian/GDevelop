@@ -129,15 +129,17 @@ const PrivateGameTemplateListItem = ({
               <Text noMargin>{renderGameTemplateField('name')} </Text>
               <Line>
                 <div style={{ flexWrap: 'wrap' }}>
-                  <Chip
-                    icon={<Lightning />}
-                    variant="outlined"
-                    color="secondary"
-                    size="small"
-                    style={styles.chip}
-                    label={<Trans>Ready-made</Trans>}
-                    key="premium"
-                  />
+                  {privateGameTemplateListingData.isSellerGDevelop && (
+                    <Chip
+                      icon={<Lightning />}
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      style={styles.chip}
+                      label={<Trans>Ready-made</Trans>}
+                      key="premium"
+                    />
+                  )}
                   {privateGameTemplateListingData.categories.map(category => (
                     <Chip
                       size="small"

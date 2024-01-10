@@ -374,15 +374,17 @@ const PrivateGameTemplateInformationPage = ({
                         </Line>
                         <Line>
                           <div style={styles.chipsContainer}>
-                            <Chip
-                              icon={<Lightning />}
-                              variant="outlined"
-                              color="secondary"
-                              size="small"
-                              style={styles.chip}
-                              label={<Trans>Ready-made</Trans>}
-                              key="premium"
-                            />
+                            {privateGameTemplateListingData.isSellerGDevelop && (
+                              <Chip
+                                icon={<Lightning />}
+                                variant="outlined"
+                                color="secondary"
+                                size="small"
+                                style={styles.chip}
+                                label={<Trans>Ready-made</Trans>}
+                                key="premium"
+                              />
+                            )}
                             <Chip
                               size="small"
                               style={styles.chip}

@@ -219,6 +219,38 @@ export const ExampleStore = ({
     [exampleFilters, gameTemplateFilters]
   );
 
+  const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
+    () => {
+      if (
+        !selectedPrivateGameTemplateListingData ||
+        !privateGameTemplateListingDatasSearchResults ||
+        !receivedGameTemplates
+      )
+        return null;
+
+      const receivedGameTemplateIds = receivedGameTemplates.map(
+        template => template.id
+      );
+
+      return privateGameTemplateListingDatasSearchResults
+        .map(({ item }) => item)
+        .filter(
+          template =>
+            template.sellerId ===
+              selectedPrivateGameTemplateListingData.sellerId &&
+            !receivedGameTemplateIds.includes(template.sellerId)
+        )
+        .sort((template1, template2) =>
+          template1.name.localeCompare(template2.name)
+        );
+    },
+    [
+      selectedPrivateGameTemplateListingData,
+      privateGameTemplateListingDatasSearchResults,
+      receivedGameTemplates,
+    ]
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -316,13 +348,17 @@ export const ExampleStore = ({
             selectedPrivateGameTemplateListingData
           }
           isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
-          onGameTemplateOpen={onOpenNewProjectSetupDialog}
+          onCreateWithGameTemplate={onOpenNewProjectSetupDialog}
+          onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
           onOpenPurchaseDialog={() => {
             setPurchasingGameTemplateListingData(
               selectedPrivateGameTemplateListingData
             );
           }}
           onClose={() => onSelectPrivateGameTemplateListingData(null)}
+          privateGameTemplateListingDatasFromSameCreator={
+            privateGameTemplateListingDatasFromSameCreator
+          }
         />
       )}
       {!!purchasingGameTemplateListingData && (

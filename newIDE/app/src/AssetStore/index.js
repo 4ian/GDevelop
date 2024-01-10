@@ -157,7 +157,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       purchasingPrivateGameTemplateListingData,
       setPurchasingPrivateGameTemplateListingData,
     ] = React.useState<?PrivateGameTemplateListingData>(null);
-    const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
+      AuthenticatedUserContext
+    );
 
     // The saved scroll position must not be reset by a scroll event until it
     // has been applied.
@@ -526,7 +528,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [shouldAutofocusSearchbar]
     );
 
-    const privateAssetPackFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(
+    const privateAssetPackListingDatasFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(
       () => {
         if (
           !openedPrivateAssetPackListingData ||
@@ -549,6 +551,37 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         openedPrivateAssetPackListingData,
         privateAssetPackListingDatas,
         receivedAssetPacks,
+      ]
+    );
+
+    const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
+      () => {
+        if (
+          !openedPrivateGameTemplateListingData ||
+          !privateGameTemplateListingDatas ||
+          !receivedGameTemplates
+        )
+          return null;
+
+        const receivedGameTemplateIds = receivedGameTemplates.map(
+          template => template.id
+        );
+
+        return privateGameTemplateListingDatas
+          .filter(
+            template =>
+              template.sellerId ===
+                openedPrivateGameTemplateListingData.sellerId &&
+              !receivedGameTemplateIds.includes(template.sellerId)
+          )
+          .sort((template1, template2) =>
+            template1.name.localeCompare(template2.name)
+          );
+      },
+      [
+        openedPrivateGameTemplateListingData,
+        privateGameTemplateListingDatas,
+        receivedGameTemplates,
       ]
     );
 
@@ -747,8 +780,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               }
               isPurchaseDialogOpen={!!purchasingPrivateAssetPackListingData}
               onAssetPackOpen={selectPrivateAssetPack}
-              privateAssetPacksFromSameCreatorListingData={
-                privateAssetPackFromSameCreator
+              privateAssetPackListingDatasFromSameCreator={
+                privateAssetPackListingDatasFromSameCreator
               }
             />
           ) : !!openedPrivateGameTemplateListingData ? (
@@ -761,13 +794,17 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateGameTemplateListingData
                 )
               }
-              isPurchaseDialogOpen={!!purchasingPrivateAssetPackListingData}
-              onGameTemplateOpen={() => {
+              isPurchaseDialogOpen={!!purchasingPrivateGameTemplateListingData}
+              onCreateWithGameTemplate={() => {
                 onOpenPrivateGameTemplateListingData &&
                   onOpenPrivateGameTemplateListingData(
                     openedPrivateGameTemplateListingData
                   );
               }}
+              onGameTemplateOpen={selectPrivateGameTemplate}
+              privateGameTemplateListingDatasFromSameCreator={
+                privateGameTemplateListingDatasFromSameCreator
+              }
             />
           ) : null}
           {!!purchasingPrivateAssetPackListingData && (

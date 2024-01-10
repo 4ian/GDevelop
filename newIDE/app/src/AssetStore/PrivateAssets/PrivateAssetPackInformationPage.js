@@ -92,7 +92,7 @@ const styles = {
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
-  privateAssetPacksFromSameCreatorListingData?: ?Array<PrivateAssetPackListingData>,
+  privateAssetPackListingDatasFromSameCreator?: ?Array<PrivateAssetPackListingData>,
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
   onAssetPackOpen: PrivateAssetPackListingData => void,
@@ -101,7 +101,7 @@ type Props = {|
 
 const PrivateAssetPackInformationPage = ({
   privateAssetPackListingData,
-  privateAssetPacksFromSameCreatorListingData,
+  privateAssetPackListingDatasFromSameCreator,
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
   onAssetPackOpen,
@@ -240,15 +240,15 @@ const PrivateAssetPackInformationPage = ({
   const otherPacksFromTheSameAuthorTiles = React.useMemo(
     () => {
       if (
-        !privateAssetPacksFromSameCreatorListingData ||
+        !privateAssetPackListingDatasFromSameCreator ||
         // Only display packs if there are at least 2. If there is only one,
         // it means it's the same as the one currently opened.
-        privateAssetPacksFromSameCreatorListingData.length < 2
+        privateAssetPackListingDatasFromSameCreator.length < 2
       )
         return null;
 
       return (
-        privateAssetPacksFromSameCreatorListingData
+        privateAssetPackListingDatasFromSameCreator
           // Do not display the pack currently opened.
           .filter(
             assetPackFromSameCreator => assetPackFromSameCreator.id !== id
@@ -272,7 +272,7 @@ const PrivateAssetPackInformationPage = ({
     },
     [
       id,
-      privateAssetPacksFromSameCreatorListingData,
+      privateAssetPackListingDatasFromSameCreator,
       onAssetPackOpen,
       receivedAssetPacks,
     ]

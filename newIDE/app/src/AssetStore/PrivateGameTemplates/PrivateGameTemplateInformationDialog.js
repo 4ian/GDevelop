@@ -8,17 +8,21 @@ import PrivateGameTemplateInformationPage from './PrivateGameTemplateInformation
 
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
+  privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData>,
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
+  onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
   onClose: () => void,
 |};
 
 const PrivateGameTemplateInformationDialog = ({
   privateGameTemplateListingData,
+  privateGameTemplateListingDatasFromSameCreator,
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
   onGameTemplateOpen,
+  onCreateWithGameTemplate,
   onClose,
 }: Props) => {
   return (
@@ -38,9 +42,13 @@ const PrivateGameTemplateInformationDialog = ({
     >
       <PrivateGameTemplateInformationPage
         privateGameTemplateListingData={privateGameTemplateListingData}
+        privateGameTemplateListingDatasFromSameCreator={
+          privateGameTemplateListingDatasFromSameCreator
+        }
         onOpenPurchaseDialog={onOpenPurchaseDialog}
         isPurchaseDialogOpen={isPurchaseDialogOpen}
         onGameTemplateOpen={onGameTemplateOpen}
+        onCreateWithGameTemplate={onCreateWithGameTemplate}
       />
     </Dialog>
   );

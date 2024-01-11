@@ -189,7 +189,6 @@ const PageBreakNavigation = ({
             currentPage.pageBreakIndex = (currentPage.pageBreakIndex || 0) + 1;
             setPageBreakIndex(currentPage.pageBreakIndex);
             scrollView && scrollView.scrollToPosition(0);
-            console.log(pageBreakIndex);
           }}
           disabled={
             assetShortHeaders.length <

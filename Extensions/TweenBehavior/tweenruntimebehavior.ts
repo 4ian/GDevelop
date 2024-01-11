@@ -911,11 +911,9 @@ namespace gdjs {
 
       const setValue = scaleFromCenterOfObject
         ? (scaleX: float) => {
-            if (scaleX) {
-              const oldX = owner.getCenterXInScene();
-              owner.setScaleX(scaleX);
-              owner.setCenterXInScene(oldX);
-            }
+            const oldX = owner.getCenterXInScene();
+            owner.setScaleX(scaleX);
+            owner.setCenterXInScene(oldX);
           }
         : (scaleX: float) => owner.setScaleX(scaleX);
 
@@ -1006,11 +1004,9 @@ namespace gdjs {
 
       const setValue = scaleFromCenterOfObject
         ? (scaleY: float) => {
-            if (scaleY) {
-              const oldY = owner.getCenterYInScene();
-              owner.setScaleY(scaleY);
-              owner.setCenterYInScene(oldY);
-            }
+            const oldY = owner.getCenterYInScene();
+            owner.setScaleY(scaleY);
+            owner.setCenterYInScene(oldY);
           }
         : (scaleY: float) => owner.setScaleY(scaleY);
 

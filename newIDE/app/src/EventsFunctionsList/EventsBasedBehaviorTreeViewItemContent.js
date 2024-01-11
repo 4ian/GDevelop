@@ -59,12 +59,12 @@ export type EventsBasedBehaviorCallbacks = {|
 export type EventsBasedBehaviorProps = {|
   ...TreeItemProps,
   ...EventsBasedBehaviorCallbacks,
-  addNewEventsFunction: (
-    itemContent: TreeViewItemContent,
+  addNewEventsFunction: ({|
+    itemContent: ?TreeViewItemContent,
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
-    index: number
-  ) => void,
+    index: number,
+  |}) => void,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
 |};
 
@@ -371,6 +371,8 @@ export class EventsBasedBehaviorTreeViewItemContent
   addFunctionAtSelection(): void {
     const { selectedEventsFunction, selectedEventsBasedBehavior } = this.props;
     const eventsFunctionsContainer = this.eventsBasedBehavior.getEventsFunctions();
+    // When the selected item is inside the behavior, the new function is
+    // added below it.
     const index =
       selectedEventsBasedBehavior === this.eventsBasedBehavior &&
       selectedEventsFunction
@@ -378,11 +380,11 @@ export class EventsBasedBehaviorTreeViewItemContent
             selectedEventsFunction
           ) + 1
         : eventsFunctionsContainer.getEventsFunctionsCount();
-    this.props.addNewEventsFunction(
-      this,
-      this.eventsBasedBehavior,
-      null,
-      index
-    );
+    this.props.addNewEventsFunction({
+      itemContent: this,
+      eventsBasedBehavior: this.eventsBasedBehavior,
+      eventsBasedObject: null,
+      index,
+    });
   }
 }

@@ -480,12 +480,17 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     const addNewEventsFunction = React.useCallback(
-      (
+      ({
+        itemContent,
+        eventsBasedBehavior,
+        eventsBasedObject,
+        index,
+      }: {|
         itemContent: ?TreeViewItemContent,
         eventsBasedBehavior: ?gdEventsBasedBehavior,
         eventsBasedObject: ?gdEventsBasedObject,
-        index: number
-      ) => {
+        index: number,
+      |}) => {
         const eventBasedEntity = eventsBasedBehavior || eventsBasedObject;
         const eventsFunctionsContainer = eventBasedEntity
           ? eventBasedEntity.getEventsFunctions()
@@ -963,7 +968,12 @@ const EventsFunctionsList = React.forwardRef<
                           selectedEventsFunction
                         ) + 1
                       : eventsFunctionsExtension.getEventsFunctionsCount();
-                  addNewEventsFunction(null, null, null, index);
+                  addNewEventsFunction({
+                    itemContent: null,
+                    eventsBasedBehavior: null,
+                    eventsBasedObject: null,
+                    index,
+                  });
                 },
               }
             ),

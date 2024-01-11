@@ -387,7 +387,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
           const rightButton = node.rightButton;
 
-          const isMenuShown =
+          const shouldDisplayMenu =
             !shouldHideMenuIcon &&
             !isMobileScreen &&
             !node.item.isRoot &&
@@ -407,7 +407,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 {...longTouchForContextMenuProps}
               >
                 {itemRow}
-                {(node.rightComponent || rightButton || isMenuShown) && (
+                {(node.rightComponent || rightButton || shouldDisplayMenu) && (
                   <div className="row-content-side row-content-side-right">
                     {node.rightComponent}
                     {rightButton && (
@@ -423,7 +423,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                         {rightButton.icon}
                       </IconButton>
                     )}
-                    {isMenuShown && (
+                    {shouldDisplayMenu && (
                       <IconButton
                         size="small"
                         onClick={e => {

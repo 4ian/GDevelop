@@ -19,6 +19,7 @@ export type AssetStorePageState = {|
   openedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
   selectedFolders: Array<string>,
   filtersState: FiltersState,
+  pageBreakIndex?: ?number,
   scrollPosition?: ?number,
   displayAssets: boolean,
   searchText?: string,

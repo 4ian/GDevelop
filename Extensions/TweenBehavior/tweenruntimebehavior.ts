@@ -825,6 +825,10 @@ namespace gdjs {
             }
           }
         : (scale: float) => {
+            // As the interpolation is exponential,
+            // it would need an infinite speed to reach 0.
+            // To avoid the object to disappear instantly,
+            // nothing is done.
             if (scale > 0) {
               owner.setScale(scale);
             }

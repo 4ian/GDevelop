@@ -921,11 +921,17 @@ namespace gdjs {
 
       const setValue = scaleFromCenterOfObject
         ? (scaleX: float) => {
-            const oldX = owner.getCenterXInScene();
-            owner.setScaleX(scaleX);
-            owner.setCenterXInScene(oldX);
+            if (scaleX) {
+              const oldX = owner.getCenterXInScene();
+              owner.setScaleX(scaleX);
+              owner.setCenterXInScene(oldX);
+            }
           }
-        : (scaleX: float) => owner.setScaleX(scaleX);
+        : (scaleX: float) => {
+            if (scaleX) {
+              owner.setScaleX(scaleX);
+            }
+          };
 
       this._tweens.addSimpleTween(
         identifier,
@@ -1014,11 +1020,17 @@ namespace gdjs {
 
       const setValue = scaleFromCenterOfObject
         ? (scaleY: float) => {
-            const oldY = owner.getCenterYInScene();
-            owner.setScaleY(scaleY);
-            owner.setCenterYInScene(oldY);
+            if (scaleY) {
+              const oldY = owner.getCenterYInScene();
+              owner.setScaleY(scaleY);
+              owner.setCenterYInScene(oldY);
+            }
           }
-        : (scaleY: float) => owner.setScaleY(scaleY);
+        : (scaleY: float) => {
+            if (scaleY) {
+              owner.setScaleY(scaleY);
+            }
+          };
 
       this._tweens.addSimpleTween(
         identifier,

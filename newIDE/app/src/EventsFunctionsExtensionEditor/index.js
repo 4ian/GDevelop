@@ -1038,9 +1038,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _onConfigurationUpdated = (
-    whatChanged?: ExtensionItemConfigurationAttribute
+    attribute: ?ExtensionItemConfigurationAttribute
   ) => {
-    if (whatChanged === 'type' || whatChanged === 'visibility') {
+    if (attribute === 'type' || attribute === 'visibility') {
       // Force an update to ensure the icon of the edited function is updated.
       this.forceUpdate();
     }

@@ -184,7 +184,7 @@ const PageBreakNavigation = ({
         <RaisedButton
           key="next-assets"
           primary
-          label={<Trans>Show more assets</Trans>}
+          label={<Trans>Show next assets</Trans>}
           onClick={() => {
             currentPage.pageBreakIndex = (currentPage.pageBreakIndex || 0) + 1;
             setPageBreakIndex(currentPage.pageBreakIndex);

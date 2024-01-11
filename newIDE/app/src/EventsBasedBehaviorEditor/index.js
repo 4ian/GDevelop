@@ -25,7 +25,7 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
   unsavedChanges?: ?UnsavedChanges,
-  onConfigurationUpdated?: ?ExtensionItemConfigurationAttribute => void,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
 |};
 
 export default function EventsBasedBehaviorEditor({

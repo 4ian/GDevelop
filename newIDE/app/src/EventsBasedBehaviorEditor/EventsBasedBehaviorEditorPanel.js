@@ -19,7 +19,7 @@ type Props = {|
   onRenameSharedProperty: (oldName: string, newName: string) => void,
   onEventsFunctionsAdded: () => void,
   unsavedChanges?: ?UnsavedChanges,
-  onConfigurationUpdated?: ?ExtensionItemConfigurationAttribute => void,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
 |};
 
 export default function EventsBasedBehaviorEditorPanel({

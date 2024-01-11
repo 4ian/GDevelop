@@ -26,7 +26,7 @@ type Props = {|
   eventsFunctionsContainer: gdEventsFunctionsContainer,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
-  onConfigurationUpdated?: ?ExtensionItemConfigurationAttribute => void,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,

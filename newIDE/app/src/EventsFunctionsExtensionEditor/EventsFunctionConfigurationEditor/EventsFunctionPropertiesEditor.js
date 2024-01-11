@@ -33,7 +33,7 @@ type Props = {|
   eventsBasedObject: ?gdEventsBasedObject,
   eventsFunctionsContainer: ?gdEventsFunctionsContainer,
   helpPagePath?: string,
-  onConfigurationUpdated?: ?ExtensionItemConfigurationAttribute => void,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
   getFunctionGroupNames?: () => string[],

@@ -812,27 +812,17 @@ namespace gdjs {
 
       const setValue = scaleFromCenterOfObject
         ? (scale: float) => {
-            if (scale > 0) {
-              const oldX = owner.getCenterXInScene();
-              const oldY = owner.getCenterYInScene();
-              const oldZ = owner3d ? owner3d.getCenterZInScene() : 0;
-              owner.setScale(scale);
-              owner.setCenterXInScene(oldX);
-              owner.setCenterYInScene(oldY);
-              if (owner3d) {
-                owner3d.setCenterZInScene(oldZ);
-              }
+            const oldX = owner.getCenterXInScene();
+            const oldY = owner.getCenterYInScene();
+            const oldZ = owner3d ? owner3d.getCenterZInScene() : 0;
+            owner.setScale(scale);
+            owner.setCenterXInScene(oldX);
+            owner.setCenterYInScene(oldY);
+            if (owner3d) {
+              owner3d.setCenterZInScene(oldZ);
             }
           }
-        : (scale: float) => {
-            // As the interpolation is exponential,
-            // it would need an infinite speed to reach 0.
-            // To avoid the object to disappear instantly,
-            // nothing is done.
-            if (scale > 0) {
-              owner.setScale(scale);
-            }
-          };
+        : (scale: float) => owner.setScale(scale);
 
       this._tweens.addSimpleTween(
         identifier,
@@ -927,11 +917,7 @@ namespace gdjs {
               owner.setCenterXInScene(oldX);
             }
           }
-        : (scaleX: float) => {
-            if (scaleX) {
-              owner.setScaleX(scaleX);
-            }
-          };
+        : (scaleX: float) => owner.setScaleX(scaleX);
 
       this._tweens.addSimpleTween(
         identifier,
@@ -1026,11 +1012,7 @@ namespace gdjs {
               owner.setCenterYInScene(oldY);
             }
           }
-        : (scaleY: float) => {
-            if (scaleY) {
-              owner.setScaleY(scaleY);
-            }
-          };
+        : (scaleY: float) => owner.setScaleY(scaleY);
 
       this._tweens.addSimpleTween(
         identifier,

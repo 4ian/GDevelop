@@ -641,12 +641,11 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       false
     );
     // The interpolation is exponential.
-    // It would need an infinite speed to reach 0.
-    // To avoid the object to disappear instantly,
-    // nothing is done.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 0 directly.
     for (let i = 0; i < 11; i++) {
       runtimeScene.renderAndStep(1000 / 60);
-      expect(sprite.getScaleX()).to.be(1);
+      expect(sprite.getScaleX()).to.be(0);
     }
     expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
     expect(sprite.getX()).to.be(100);
@@ -725,12 +724,11 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       false
     );
     // The interpolation is exponential.
-    // It would need an infinite speed to reach 0.
-    // To avoid the object to disappear instantly,
-    // nothing is done.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 0 directly.
     for (let i = 0; i < 11; i++) {
       runtimeScene.renderAndStep(1000 / 60);
-      expect(sprite.getScaleY()).to.be(1);
+      expect(sprite.getScaleY()).to.be(0);
     }
     expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
     expect(sprite.getX()).to.be(100);
@@ -838,12 +836,11 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       false
     );
     // The interpolation is exponential.
-    // It would need an infinite speed to reach 0.
-    // To avoid the object to disappear instantly,
-    // nothing is done.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 0 directly.
     for (let i = 0; i < 11; i++) {
       runtimeScene.renderAndStep(1000 / 60);
-      expect(sprite.getScale()).to.be(1);
+      expect(sprite.getScale()).to.be(0);
     }
     expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
     expect(sprite.getX()).to.be(100);

@@ -812,17 +812,23 @@ namespace gdjs {
 
       const setValue = scaleFromCenterOfObject
         ? (scale: float) => {
-            const oldX = owner.getCenterXInScene();
-            const oldY = owner.getCenterYInScene();
-            const oldZ = owner3d ? owner3d.getCenterZInScene() : 0;
-            owner.setScale(scale);
-            owner.setCenterXInScene(oldX);
-            owner.setCenterYInScene(oldY);
-            if (owner3d) {
-              owner3d.setCenterZInScene(oldZ);
+            if (scale > 0) {
+              const oldX = owner.getCenterXInScene();
+              const oldY = owner.getCenterYInScene();
+              const oldZ = owner3d ? owner3d.getCenterZInScene() : 0;
+              owner.setScale(scale);
+              owner.setCenterXInScene(oldX);
+              owner.setCenterYInScene(oldY);
+              if (owner3d) {
+                owner3d.setCenterZInScene(oldZ);
+              }
             }
           }
-        : (scaleX: float) => owner.setScale(scaleX);
+        : (scale: float) => {
+            if (scale > 0) {
+              owner.setScale(scale);
+            }
+          };
 
       this._tweens.addSimpleTween(
         identifier,

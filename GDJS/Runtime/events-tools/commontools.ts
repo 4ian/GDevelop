@@ -290,6 +290,16 @@ namespace gdjs {
         end: float,
         progress: float
       ) => {
+        if (progress === 0) {
+          return start;
+        }
+        if (progress === 1) {
+          return end;
+        }
+        if (start <= 0 || end <= 0) {
+          // The exponential function is flattened to something like a 90° corner.
+          return 0;
+        }
         const startLog = Math.log(start);
         const endLog = Math.log(end);
         return Math.exp(startLog + (endLog - startLog) * progress);

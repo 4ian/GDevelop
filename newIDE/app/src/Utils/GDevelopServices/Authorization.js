@@ -5,6 +5,8 @@ import {
   GDevelopAuthorizationApi,
 } from './ApiConfigs';
 
+export const FEATURE_FLAG_SSO_LOGIN = false;
+
 const apiClient = axios.create({ baseURL: GDevelopAuthorizationApi.baseUrl });
 
 let webSocket: ?WebSocket;

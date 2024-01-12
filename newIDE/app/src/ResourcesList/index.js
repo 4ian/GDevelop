@@ -128,7 +128,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       case 'bitmapFont':
         return 'JsPlatform/Extensions/bitmapfont32.png';
       case 'model3D':
-        return 'JsPlatform/Extensions/3d_box.svg';
+        return 'JsPlatform/Extensions/3d_model.svg';
       default:
         return 'res/unknown32.png';
     }

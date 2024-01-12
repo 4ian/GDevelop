@@ -247,7 +247,7 @@ module.exports = {
           'Model3DObject',
           _('3D Model'),
           _('An animated 3D model.'),
-          'JsPlatform/Extensions/3d_box.svg',
+          'JsPlatform/Extensions/3d_model.svg',
           new gd.Model3DObjectConfiguration()
         )
         .setCategoryFullName(_('General'))
@@ -2695,7 +2695,7 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'JsPlatform/Extensions/3d_box.svg';
+        return 'JsPlatform/Extensions/3d_model.svg';
       }
 
       getOriginX() {

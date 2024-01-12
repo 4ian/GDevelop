@@ -737,6 +737,19 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  _showLoginSnackbar = (authenticatedUser: AuthenticatedUser) => {
+    const username = authenticatedUser.profile
+      ? authenticatedUser.profile.username
+      : null;
+    this.showUserSnackbar({
+      message: username ? (
+        <Trans>👋 Good to see you {username}!</Trans>
+      ) : (
+        <Trans>👋 Good to see you!</Trans>
+      ),
+    });
+  };
+
   _doLoginWithProvider = async (provider: IdentityProvider) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -756,15 +769,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false, null);
       this.openCreateAccountDialog(false);
-      const profile = this.state.authenticatedUser.profile;
-      const username = profile ? profile.username : null;
-      this.showUserSnackbar({
-        message: username ? (
-          <Trans>👋 Good to see you {username}!</Trans>
-        ) : (
-          <Trans>👋 Good to see you!</Trans>
-        ),
-      });
+      this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       this.setState({
         apiCallError,
@@ -802,15 +807,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.login(form, this.state.loginOptions);
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false, null);
-      const profile = this.state.authenticatedUser.profile;
-      const username = profile ? profile.username : null;
-      this.showUserSnackbar({
-        message: username ? (
-          <Trans>👋 Good to see you {username}!</Trans>
-        ) : (
-          <Trans>👋 Good to see you!</Trans>
-        ),
-      });
+      this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       this.setState({
         apiCallError,

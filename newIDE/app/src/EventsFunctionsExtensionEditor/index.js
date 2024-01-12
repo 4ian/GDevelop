@@ -37,7 +37,10 @@ import Mark from '../UI/CustomSvgIcons/Mark';
 import newNameGenerator from '../Utils/NewNameGenerator';
 const gd: libGDevelop = global.gd;
 
-export type ExtensionItemConfigurationAttribute = 'type' | 'visibility';
+export type ExtensionItemConfigurationAttribute =
+  | 'type'
+  | 'isPrivate'
+  | 'isAsync';
 
 type Props = {|
   project: gdProject,
@@ -1040,7 +1043,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _onConfigurationUpdated = (
     attribute: ?ExtensionItemConfigurationAttribute
   ) => {
-    if (attribute === 'type' || attribute === 'visibility') {
+    if (
+      attribute === 'type' ||
+      attribute === 'isPrivate' ||
+      attribute === 'isAsync'
+    ) {
       // Force an update to ensure the icon of the edited function is updated.
       this.forceUpdate();
     }

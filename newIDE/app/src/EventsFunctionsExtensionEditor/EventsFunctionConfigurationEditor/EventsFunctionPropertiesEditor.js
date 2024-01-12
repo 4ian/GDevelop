@@ -518,7 +518,7 @@ export const EventsFunctionPropertiesEditor = ({
                     onCheck={(e, checked) => {
                       eventsFunction.setPrivate(checked);
                       if (onConfigurationUpdated)
-                        onConfigurationUpdated('visibility');
+                        onConfigurationUpdated('isPrivate');
                       forceUpdate();
                     }}
                   />
@@ -528,7 +528,7 @@ export const EventsFunctionPropertiesEditor = ({
                     onCheck={(e, checked) => {
                       eventsFunction.setAsync(checked);
                       if (onConfigurationUpdated)
-                        onConfigurationUpdated('type');
+                        onConfigurationUpdated('isAsync');
                       forceUpdate();
                     }}
                   />

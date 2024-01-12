@@ -143,7 +143,7 @@ export default function EventsBasedBehaviorEditor({
             checked={eventsBasedBehavior.isPrivate()}
             onCheck={(e, checked) => {
               eventsBasedBehavior.setPrivate(checked);
-              if (onConfigurationUpdated) onConfigurationUpdated('visibility');
+              if (onConfigurationUpdated) onConfigurationUpdated('isPrivate');
               onChange();
             }}
           />

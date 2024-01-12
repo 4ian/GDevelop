@@ -18,6 +18,7 @@ import {
 } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -58,7 +59,12 @@ export type EventsBasedBehaviorCallbacks = {|
 export type EventsBasedBehaviorProps = {|
   ...TreeItemProps,
   ...EventsBasedBehaviorCallbacks,
-  addNewEventsFunction: (itemContent: TreeViewItemContent) => void,
+  addNewEventsFunction: ({|
+    itemContent: ?TreeViewItemContent,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject,
+    index: number,
+  |}) => void,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
 |};
 
@@ -77,12 +83,6 @@ export class EventsBasedBehaviorTreeViewItemContent
 
   getEventsFunctionsContainer(): gdEventsFunctionsContainer {
     return this.eventsBasedBehavior.getEventsFunctions();
-  }
-
-  getFunctionInsertionIndex(): number {
-    return this.eventsBasedBehavior
-      .getEventsFunctions()
-      .getEventsFunctionsCount();
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -114,7 +114,7 @@ export class EventsBasedBehaviorTreeViewItemContent
   }
 
   getThumbnail(): ?string {
-    return null;
+    return 'res/functions/behavior_black.svg';
   }
 
   getDataset(): ?HTMLDataset {
@@ -140,20 +140,22 @@ export class EventsBasedBehaviorTreeViewItemContent
     );
   }
 
-  edit(): void {}
+  edit(): void {
+    this.props.editName(this.getId());
+  }
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Add a function`),
-        click: () => this.props.addNewEventsFunction(this),
+        click: () => this.addFunctionAtSelection(),
       },
       {
         type: 'separator',
       },
       {
         label: i18n._(t`Rename`),
-        click: () => this.props.editName(this.getId()),
+        click: () => this.edit(),
         accelerator: 'F2',
       },
       {
@@ -189,14 +191,20 @@ export class EventsBasedBehaviorTreeViewItemContent
     ];
   }
 
-  renderLeftComponent(i18n: I18nType): ?React.Node {
+  renderRightComponent(i18n: I18nType): ?React.Node {
     return this.eventsBasedBehavior.isPrivate() ? (
       <Tooltip
         title={
           <Trans>This behavior won't be visible in the events editor.</Trans>
         }
       >
-        <VisibilityOff fontSize="small" style={styles.tooltip} />
+        <VisibilityOff
+          fontSize="small"
+          style={{
+            ...styles.tooltip,
+            color: this.props.gdevelopTheme.text.color.disabled,
+          }}
+        />
       </Tooltip>
     ) : null;
   }
@@ -235,7 +243,7 @@ export class EventsBasedBehaviorTreeViewItemContent
 
   _togglePrivate(): void {
     this.eventsBasedBehavior.setPrivate(!this.eventsBasedBehavior.isPrivate());
-    this.props.forceUpdate();
+    this.props.forceUpdateEditor();
   }
 
   getIndex(): number {
@@ -352,7 +360,31 @@ export class EventsBasedBehaviorTreeViewItemContent
     this.props.forceUpdate();
   }
 
-  getRightButton() {
-    return null;
+  getRightButton(i18n: I18nType) {
+    return {
+      icon: <Add />,
+      label: i18n._(t`Add a function`),
+      click: () => this.addFunctionAtSelection(),
+    };
+  }
+
+  addFunctionAtSelection(): void {
+    const { selectedEventsFunction, selectedEventsBasedBehavior } = this.props;
+    const eventsFunctionsContainer = this.eventsBasedBehavior.getEventsFunctions();
+    // When the selected item is inside the behavior, the new function is
+    // added below it.
+    const index =
+      selectedEventsBasedBehavior === this.eventsBasedBehavior &&
+      selectedEventsFunction
+        ? eventsFunctionsContainer.getEventsFunctionPosition(
+            selectedEventsFunction
+          ) + 1
+        : eventsFunctionsContainer.getEventsFunctionsCount();
+    this.props.addNewEventsFunction({
+      itemContent: this,
+      eventsBasedBehavior: this.eventsBasedBehavior,
+      eventsBasedObject: null,
+      index,
+    });
   }
 }

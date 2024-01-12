@@ -1,37 +1,24 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-export default React.memo(props => (
-  <SvgIcon {...props} width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M11.6932 4.06562C11.8883 3.97813 12.1116 3.97813 12.3067 4.06562L19.5567 7.31562C19.8264 7.4365 19.9999 7.70448 19.9999 8C19.9999 8.29552 19.8264 8.5635 19.5567 8.68438L12.3067 11.9344C12.1116 12.0219 11.8883 12.0219 11.6932 11.9344L4.44315 8.68438C4.17348 8.5635 3.99994 8.29552 3.99994 8C3.99994 7.70448 4.17348 7.4365 4.44315 7.31562L11.6932 4.06562ZM6.58343 8L11.9999 10.4281L17.4165 8L11.9999 5.57191L6.58343 8Z"
-      fill="currentColor"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M4.06556 15.6932C4.235 15.3152 4.67876 15.1462 5.05673 15.3156L11.9999 18.4281L18.9432 15.3156C19.3211 15.1462 19.7649 15.3152 19.9343 15.6932C20.1038 16.0712 19.9347 16.5149 19.5567 16.6844L12.3067 19.9344C12.1116 20.0219 11.8883 20.0219 11.6932 19.9344L4.44315 16.6844C4.06518 16.5149 3.89612 16.0712 4.06556 15.6932Z"
-      fill="currentColor"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M19.2499 7.25C19.6642 7.25 19.9999 7.58579 19.9999 8V16C19.9999 16.4142 19.6642 16.75 19.2499 16.75C18.8357 16.75 18.4999 16.4142 18.4999 16V8C18.4999 7.58579 18.8357 7.25 19.2499 7.25Z"
-      fill="currentColor"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M4.74994 7.25C5.16416 7.25 5.49994 7.58579 5.49994 8V16C5.49994 16.4142 5.16416 16.75 4.74994 16.75C4.33573 16.75 3.99994 16.4142 3.99994 16V8C3.99994 7.58579 4.33573 7.25 4.74994 7.25Z"
-      fill="currentColor"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M11.9999 10.75C12.4142 10.75 12.7499 11.0858 12.7499 11.5V19C12.7499 19.4142 12.4142 19.75 11.9999 19.75C11.5857 19.75 11.2499 19.4142 11.2499 19V11.5C11.2499 11.0858 11.5857 10.75 11.9999 10.75Z"
-      fill="currentColor"
-    />
-  </SvgIcon>
-));
+export default React.memo(
+  React.forwardRef((props, ref) => (
+    <SvgIcon {...props} ref={ref} width="24" height="24" viewBox="0 0 24 24">
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      >
+        <path
+          d="M4.75 8L12 4.75L19.25 8L12 11.25L4.75 8Z"
+          strokeLinecap="round"
+        />
+        <path d="M4.75 16L12 19.25L19.25 16" strokeLinecap="round" />
+        <path d="m19.25 8v8" />
+        <path d="m4.75 8v8" />
+        <path d="M12 11.5V19" />
+      </g>
+    </SvgIcon>
+  ))
+);

@@ -284,10 +284,13 @@ export default class EditorMosaic extends React.Component<Props, State> {
     const editor = this.props.editors[editorName];
     if (!editor) return false;
 
-    this.state.collapsedEditorSize.set(
-      editorName,
-      getNodeSize(this.state.mosaicNode, editorName)
-    );
+    const nodeSize = getNodeSize(this.state.mosaicNode, editorName);
+    if (nodeSize > 0) {
+      this.state.collapsedEditorSize.set(
+        editorName,
+        getNodeSize(this.state.mosaicNode, editorName)
+      );
+    }
     this._onChanged(resizeNode(this.state.mosaicNode, editorName, 0));
     return true;
   };

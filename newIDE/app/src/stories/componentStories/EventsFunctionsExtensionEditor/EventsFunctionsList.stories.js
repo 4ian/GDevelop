@@ -30,33 +30,29 @@ export const Default = () => (
           1
         )}
         // Objects
-        onSelectEventsBasedObject={eventsBasedObject => {}}
-        onDeleteEventsBasedObject={(eventsBasedObject, cb) => cb(true)}
-        onRenameEventsBasedObject={(eventsBasedObject, newName, cb) => cb(true)}
-        onEventsBasedObjectRenamed={eventsBasedObject => {}}
+        onSelectEventsBasedObject={action('object selected')}
+        onDeleteEventsBasedObject={action('object deleted')}
+        onRenameEventsBasedObject={action('rename object')}
+        onEventsBasedObjectRenamed={action('object renamed')}
         // Behaviors
-        onSelectEventsBasedBehavior={eventsBasedBehavior => {}}
-        onDeleteEventsBasedBehavior={(eventsBasedBehavior, cb) => cb(true)}
-        onRenameEventsBasedBehavior={(eventsBasedBehavior, newName, cb) =>
-          cb(true)
-        }
-        onEventsBasedBehaviorRenamed={eventsBasedBehavior => {}}
-        onEventsBasedBehaviorPasted={(
-          eventsBasedBehavior,
-          sourceExtensionName
-        ) => {}}
+        onSelectEventsBasedBehavior={action('behavior selected')}
+        onDeleteEventsBasedBehavior={action('behavior deleted')}
+        onRenameEventsBasedBehavior={action('rename behavior')}
+        onEventsBasedBehaviorRenamed={action('behavior renamed')}
+        onEventsBasedBehaviorPasted={action('behavior pasted')}
         // Free functions
-        onSelectEventsFunction={action('select')}
-        onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
+        onSelectEventsFunction={action('function selected')}
+        onDeleteEventsFunction={action('function deleted')}
         onAddEventsFunction={(eventsBasedBehavior, eventsBasedObject, cb) =>
           cb({ functionType: 0, name: null })
         }
-        onEventsFunctionAdded={() => {}}
+        onEventsFunctionAdded={action('function added')}
         onRenameEventsFunction={(eventsFunction, newName, cb) => {
           eventsFunction.setName(newName);
           cb(true);
         }}
         canRename={() => true}
+        forceUpdateEditor={action('force editor update')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

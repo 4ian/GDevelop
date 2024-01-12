@@ -24,7 +24,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Effects"))
-      .SetIcon("res/actions/effect24.png");
+      .SetIcon("res/actions/effect_black.svg");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "FlippableBehavior",

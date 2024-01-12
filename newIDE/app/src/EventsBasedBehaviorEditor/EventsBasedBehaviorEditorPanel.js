@@ -7,6 +7,7 @@ import EventsBasedBehaviorPropertiesEditor from './EventsBasedBehaviorProperties
 import Background from '../UI/Background';
 import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
 
 type TabName = 'configuration' | 'behavior-properties' | 'scene-properties';
 
@@ -18,6 +19,7 @@ type Props = {|
   onRenameSharedProperty: (oldName: string, newName: string) => void,
   onEventsFunctionsAdded: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
 |};
 
 export default function EventsBasedBehaviorEditorPanel({
@@ -28,6 +30,7 @@ export default function EventsBasedBehaviorEditorPanel({
   onRenameSharedProperty,
   unsavedChanges,
   onEventsFunctionsAdded,
+  onConfigurationUpdated,
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
 
@@ -71,6 +74,7 @@ export default function EventsBasedBehaviorEditorPanel({
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedBehavior={eventsBasedBehavior}
             unsavedChanges={unsavedChanges}
+            onConfigurationUpdated={onConfigurationUpdated}
           />
         )}
         {currentTab === 'behavior-properties' && (

@@ -24,9 +24,11 @@ const useOpenInitialDialog = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const { onOpenCreateAccountDialog, authenticated } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    onOpenCreateAccountDialog,
+    onOpenLoginDialog,
+    authenticated,
+  } = React.useContext(AuthenticatedUserContext);
 
   React.useEffect(
     () => {
@@ -37,10 +39,21 @@ const useOpenInitialDialog = ({
           });
           removeRouteArguments(['initial-dialog']);
           break;
+        case 'login':
+          const connectionId = routeArguments['connection-id'];
+          // Add timeout to give time to the app to sign in with Firebase
+          // to make sure the most relevant dialog is opened.
+          const loginTimeoutId = setTimeout(() => {
+            onOpenLoginDialog({
+              notifyConnection: connectionId,
+            });
+            removeRouteArguments(['initial-dialog', 'connection-id']);
+          }, 500);
+          return () => clearTimeout(loginTimeoutId);
         case 'signup':
           // Add timeout to give time to the app to sign in with Firebase
           // to make sure the most relevant dialog is opened.
-          const timeoutId = setTimeout(() => {
+          const signupTimeoutId = setTimeout(() => {
             if (authenticated) {
               openProfileDialog(true);
             } else {
@@ -48,7 +61,7 @@ const useOpenInitialDialog = ({
             }
             removeRouteArguments(['initial-dialog']);
           }, 2000);
-          return () => clearTimeout(timeoutId);
+          return () => clearTimeout(signupTimeoutId);
         case 'onboarding':
         case 'guided-lesson':
           const tutorialId = routeArguments['tutorial-id'];
@@ -76,6 +89,7 @@ const useOpenInitialDialog = ({
       openSubscriptionDialog,
       authenticated,
       onOpenCreateAccountDialog,
+      onOpenLoginDialog,
     ]
   );
 };

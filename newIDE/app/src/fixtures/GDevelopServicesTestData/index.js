@@ -1343,6 +1343,7 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
   onLogin: async () => {},
+  onLoginWithProvider: async () => {},
   onLogout: async () => {},
   onCreateAccount: async () => {},
   onResetPassword: async () => {},

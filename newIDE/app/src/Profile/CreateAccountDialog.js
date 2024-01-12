@@ -8,6 +8,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type RegisterForm,
   type AuthError,
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
@@ -37,6 +38,7 @@ type Props = {|
   onClose: () => void,
   onGoToLogin: () => void,
   onCreateAccount: (form: RegisterForm) => Promise<void>,
+  onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   createAccountInProgress: boolean,
   error: ?AuthError,
 |};
@@ -111,6 +113,7 @@ const CreateAccountDialog = ({
   onClose,
   onGoToLogin,
   onCreateAccount,
+  onLoginWithProvider,
   createAccountInProgress,
   error,
 }: Props) => {
@@ -158,7 +161,6 @@ const CreateAccountDialog = ({
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
-          disabled={createAccountInProgress}
           key="close"
           primary={false}
           onClick={onClose}
@@ -217,6 +219,7 @@ const CreateAccountDialog = ({
         <div style={styles.formContainer}>
           <CreateAccountForm
             onCreateAccount={createAccount}
+            onLoginWithProvider={onLoginWithProvider}
             email={email}
             onChangeEmail={setEmail}
             password={password}

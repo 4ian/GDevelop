@@ -17,6 +17,8 @@ import Authentication, {
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
+  type IdentityProvider,
+  type LoginOptions,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
@@ -62,6 +64,8 @@ type Props = {|
 type State = {|
   authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
+  loginOptions: ?LoginOptions,
+  loginOnDesktopAppSuccess: boolean,
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
@@ -97,6 +101,8 @@ export default class AuthenticatedUserProvider extends React.Component<
   state = {
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
+    loginOptions: null,
+    loginOnDesktopAppSuccess: false,
     createAccountDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
@@ -186,13 +192,15 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...initialAuthenticatedUser,
         onLogin: this._doLogin,
+        onLoginWithProvider: this._doLoginWithProvider,
         onLogout: this._doLogout,
         onCreateAccount: this._doCreateAccount,
         onEditProfile: this._doEdit,
         onResetPassword: this._doForgotPassword,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
-        onOpenLoginDialog: () => this.openLoginDialog(true),
+        onOpenLoginDialog: (options: ?LoginOptions) =>
+          this.openLoginDialog(true, options),
         onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
         onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
         onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
@@ -729,7 +737,20 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  _doLogin = async (form: LoginForm) => {
+  _showLoginSnackbar = (authenticatedUser: AuthenticatedUser) => {
+    const username = authenticatedUser.profile
+      ? authenticatedUser.profile.username
+      : null;
+    this.showUserSnackbar({
+      message: username ? (
+        <Trans>👋 Good to see you {username}!</Trans>
+      ) : (
+        <Trans>👋 Good to see you!</Trans>
+      ),
+    });
+  };
+
+  _doLoginWithProvider = async (provider: IdentityProvider) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
@@ -744,18 +765,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
     this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.login(form);
+      await authentication.loginWithProvider(provider, this.state.loginOptions);
       await this._fetchUserProfileWithoutThrowingErrors();
-      this.openLoginDialog(false);
-      const profile = this.state.authenticatedUser.profile;
-      const username = profile ? profile.username : null;
-      this.showUserSnackbar({
-        message: username ? (
-          <Trans>👋 Good to see you {username}!</Trans>
-        ) : (
-          <Trans>👋 Good to see you!</Trans>
-        ),
-      });
+      this.openLoginDialog(false, null);
+      this.openCreateAccountDialog(false);
+      this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       this.setState({
         apiCallError,
@@ -773,6 +787,55 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     });
     this._automaticallyUpdateUserProfile = true;
+  };
+
+  _doLogin = async (form: LoginForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      loginInProgress: true,
+      apiCallError: null,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: true,
+        authenticationError: null,
+      },
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.login(form, this.state.loginOptions);
+      await this._fetchUserProfileWithoutThrowingErrors();
+      this.openLoginDialog(false, null);
+      this._showLoginSnackbar(this.state.authenticatedUser);
+    } catch (apiCallError) {
+      this.setState({
+        apiCallError,
+        authenticatedUser: {
+          ...this.state.authenticatedUser,
+          authenticationError: apiCallError,
+        },
+      });
+    }
+    this.setState({
+      loginInProgress: false,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: false,
+      },
+    });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _doAllowLoginOnDesktopApp = async () => {
+    const { authentication } = this.props;
+    const { loginOptions } = this.state;
+    if (!authentication || !loginOptions) return;
+
+    await authentication.notifyLogin(loginOptions);
+    this.setState({
+      loginOnDesktopAppSuccess: true,
+    });
   };
 
   _doEdit = async (
@@ -1006,9 +1069,16 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openLoginDialog = (open: boolean = true) => {
+  /**
+   * If options is undefined, the login options in the state are kept.
+   * If options is null, the login options in the state are erased so that
+   * a new login does not trigger a notification to the server.
+   */
+  openLoginDialog = (open: boolean = true, options?: ?LoginOptions) => {
     this.setState({
       loginDialogOpen: open,
+      loginOptions:
+        typeof options === 'undefined' ? this.state.loginOptions : options,
       createAccountDialogOpen: false,
       apiCallError: null,
     });
@@ -1056,9 +1126,14 @@ export default class AuthenticatedUserProvider extends React.Component<
             </AuthenticatedUserContext.Provider>
             {this.state.loginDialogOpen && (
               <LoginDialog
-                onClose={() => this.openLoginDialog(false)}
+                authenticatedUser={this.state.authenticatedUser}
+                onClose={() => this.openLoginDialog(false, null)}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
+                onLoginOnDesktopApp={this._doAllowLoginOnDesktopApp}
+                loginOnDesktopAppSuccess={this.state.loginOnDesktopAppSuccess}
+                onLogout={this._doLogout}
+                onLoginWithProvider={this._doLoginWithProvider}
                 loginInProgress={this.state.loginInProgress}
                 error={this.state.apiCallError}
                 onForgotPassword={this._doForgotPassword}
@@ -1097,6 +1172,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 onCreateAccount={form =>
                   this._doCreateAccount(form, preferences)
                 }
+                onLoginWithProvider={this._doLoginWithProvider}
                 createAccountInProgress={this.state.createAccountInProgress}
                 error={this.state.apiCallError}
               />

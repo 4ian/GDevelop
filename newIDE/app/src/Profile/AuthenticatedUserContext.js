@@ -7,6 +7,8 @@ import {
   type PatchUserPayload,
   type ForgotPasswordForm,
   type AuthError,
+  type IdentityProvider,
+  type LoginOptions,
 } from '../Utils/GDevelopServices/Authentication';
 import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
@@ -42,6 +44,7 @@ export type AuthenticatedUser = {|
   usages: ?Usages,
   subscription: ?Subscription,
   onLogin: (form: LoginForm) => Promise<void>,
+  onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   onLogout: () => Promise<void>,
   onCreateAccount: (
     form: RegisterForm,
@@ -53,7 +56,7 @@ export type AuthenticatedUser = {|
     options: {| throwError: boolean |}
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
-  onOpenLoginDialog: () => void,
+  onOpenLoginDialog: (?LoginOptions) => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
   onOpenCreateAccountDialog: () => void,
@@ -91,6 +94,7 @@ export const initialAuthenticatedUser = {
   limits: null,
   authenticationError: null,
   onLogin: async () => {},
+  onLoginWithProvider: async () => {},
   onLogout: async () => {},
   onCreateAccount: async () => {},
   onEditProfile: async () => {},

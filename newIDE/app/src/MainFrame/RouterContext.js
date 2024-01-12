@@ -15,7 +15,8 @@ type RouteKey =
   | 'games-dashboard-tab'
   | 'asset-pack'
   | 'game-template'
-  | 'tutorial-id';
+  | 'tutorial-id'
+  | 'connection-id';
 export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|

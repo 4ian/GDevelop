@@ -10,6 +10,8 @@ import IconButton from '../UI/IconButton';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import Warning from '../UI/CustomSvgIcons/Warning';
 import Undo from '../UI/CustomSvgIcons/Undo';
+import { Tooltip } from '@material-ui/core';
+import { LineStackLayout } from '../UI/Layout';
 
 const styles = {
   shortcutChip: {
@@ -34,25 +36,30 @@ const ShortcutsListRow = (props: Props) => {
         primary={props.i18n._(commandsList[props.commandName].displayText)}
       />
       <ListItemSecondaryAction>
-        {props.isClashing && (
-          <IconButton tooltip={t`This shortcut clashes with another action.`}>
-            <Warning />
-          </IconButton>
-        )}
-        <Chip
-          style={styles.shortcutChip}
-          label={props.shortcutString || <Trans>No shortcut</Trans>}
-          onClick={props.onEditShortcut}
-          color={props.shortcutString ? 'secondary' : 'default'}
-        />
-        {!props.isDefault && (
-          <IconButton
-            onClick={props.onResetShortcut}
-            tooltip={t`Reset to default`}
-          >
-            <Undo />
-          </IconButton>
-        )}
+        <LineStackLayout alignItems="center">
+          {props.isClashing && (
+            <Tooltip
+              title={<Trans>This shortcut clashes with another action.</Trans>}
+            >
+              <Warning />
+            </Tooltip>
+          )}
+          <Chip
+            style={styles.shortcutChip}
+            label={props.shortcutString || <Trans>No shortcut</Trans>}
+            onClick={props.onEditShortcut}
+            color={props.shortcutString ? 'secondary' : 'default'}
+          />
+          {!props.isDefault && (
+            <IconButton
+              onClick={props.onResetShortcut}
+              tooltip={t`Reset to default`}
+              size="small"
+            >
+              <Undo />
+            </IconButton>
+          )}
+        </LineStackLayout>
       </ListItemSecondaryAction>
     </ListItem>
   );

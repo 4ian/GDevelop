@@ -161,7 +161,6 @@ const CreateAccountDialog = ({
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
-          disabled={createAccountInProgress} // TODO: Add possibility to cancel login with providers.
           key="close"
           primary={false}
           onClick={onClose}

@@ -10,8 +10,8 @@ namespace gdjs {
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-        const threeCamera = layerRenderer.getThreeCamera();
-        const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
+        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
+        const fov = threeCamera ? threeCamera.fov || null : assumedFovIn2D;
         return layer.getCameraZ(fov, cameraIndex);
       };
 
@@ -23,8 +23,8 @@ namespace gdjs {
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-        const threeCamera = layerRenderer.getThreeCamera();
-        const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
+        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
+        const fov = threeCamera ? threeCamera.fov || null : assumedFovIn2D;
         layer.setCameraZ(z, fov, cameraIndex);
       };
 
@@ -212,8 +212,9 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return 45;
+        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
+        if (!threeCamera) return assumedFovIn2D;
+        if (!threeCamera.isPerspectiveCamera) return 0;
         return threeCamera.fov;
       };
 
@@ -226,8 +227,8 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return;
+        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
+        if (!threeCamera || !threeCamera.isPerspectiveCamera) return;
 
         threeCamera.fov = Math.min(Math.max(angle, 0), 180);
         layerRenderer.setThreeCameraDirty(true);

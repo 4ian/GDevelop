@@ -19,6 +19,15 @@ namespace gdjs {
       ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
       : RuntimeLayerRenderingType.TWO_D;
 
+  export enum RuntimeLayerCameraType {
+    PERSPECTIVE,
+    ORTHOGRAPHIC,
+  }
+
+  const getCameraTypeFromString = (renderingTypeAsString: string | undefined) =>
+    renderingTypeAsString === 'orthographic'
+      ? RuntimeLayerCameraType.ORTHOGRAPHIC
+      : RuntimeLayerCameraType.PERSPECTIVE;
   /**
    * Represents a layer of a "container", used to display objects.
    * The container can be a scene (see gdjs.Layer)
@@ -27,6 +36,7 @@ namespace gdjs {
   export abstract class RuntimeLayer implements EffectsTarget {
     _name: string;
     _renderingType: RuntimeLayerRenderingType;
+    _cameraType: RuntimeLayerCameraType;
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
     _hidden: boolean;
@@ -59,12 +69,13 @@ namespace gdjs {
     ) {
       this._name = layerData.name;
       this._renderingType = getRenderingTypeFromString(layerData.renderingType);
+      this._cameraType = getCameraTypeFromString(layerData.cameraType);
       this._hidden = !layerData.visibility;
       this._initialCamera3DFieldOfView = layerData.camera3DFieldOfView || 45;
-      this._initialCamera3DFarPlaneDistance =
-        layerData.camera3DFarPlaneDistance || 0.1;
       this._initialCamera3DNearPlaneDistance =
-        layerData.camera3DNearPlaneDistance || 2000;
+        layerData.camera3DNearPlaneDistance || 0.1;
+      this._initialCamera3DFarPlaneDistance =
+        layerData.camera3DFarPlaneDistance || 2000;
       this._initialEffectsData = layerData.effects || [];
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
@@ -101,6 +112,10 @@ namespace gdjs {
 
     getRenderingType(): RuntimeLayerRenderingType {
       return this._renderingType;
+    }
+
+    getCameraType(): RuntimeLayerCameraType {
+      return this._cameraType;
     }
 
     /**
@@ -246,7 +261,7 @@ namespace gdjs {
      * @param fov The field of view.
      * @param cameraId The camera number. Currently ignored.
      */
-    abstract setCameraZ(z: float, fov: float, cameraId?: integer): void;
+    abstract setCameraZ(z: float, fov: float | null, cameraId?: integer): void;
 
     /**
      * Get the camera center Z position.
@@ -255,7 +270,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The z position of the camera
      */
-    abstract getCameraZ(fov: float, cameraId?: integer): float;
+    abstract getCameraZ(fov: float | null, cameraId?: integer): float;
 
     /**
      * Get the rotation of the camera, expressed in degrees.

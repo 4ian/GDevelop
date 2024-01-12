@@ -105,17 +105,30 @@ const LayerEditorDialog = (props: Props) => {
     [forceUpdate, layer, notifyOfChange]
   );
 
-  const onChangeCamera3DNearPlaneDistance = React.useCallback(
+  const checkNearPlaneDistanceError = React.useCallback(
     value => {
       setCamera3DNearPlaneDistanceError(null);
-      const newValue = parseFloat(value) || 0;
-      if (newValue <= 0 || newValue >= layer.getCamera3DFarPlaneDistance()) {
+      const hasError =
+        (value <= 0 && layer.getCameraType() !== 'orthographic') ||
+        value >= layer.getCamera3DFarPlaneDistance();
+      if (hasError) {
         setCamera3DNearPlaneDistanceError(
           <Trans>
             The near plane distance must be strictly greater than 0 and lower
             than the far plan distance.
           </Trans>
         );
+      }
+      return hasError;
+    },
+    [layer]
+  );
+
+  const onChangeCamera3DNearPlaneDistance = React.useCallback(
+    value => {
+      const newValue = parseFloat(value) || 0;
+      const hasError = checkNearPlaneDistanceError(newValue);
+      if (hasError) {
         return;
       }
       if (newValue === layer.getCamera3DNearPlaneDistance()) return;
@@ -123,7 +136,7 @@ const LayerEditorDialog = (props: Props) => {
       forceUpdate();
       notifyOfChange();
     },
-    [forceUpdate, layer, notifyOfChange]
+    [checkNearPlaneDistanceError, forceUpdate, layer, notifyOfChange]
   );
 
   const onChangeCamera3DFarPlaneDistance = React.useCallback(
@@ -249,7 +262,7 @@ const LayerEditorDialog = (props: Props) => {
             }
           />
           {!layer.isLightingLayer() && (
-            <>
+            <ColumnStackLayout noMargin>
               <Text size="block-title">
                 <Trans>3D settings</Trans>
               </Text>
@@ -282,39 +295,65 @@ const LayerEditorDialog = (props: Props) => {
                 />
               </SelectField>
               {layer.getRenderingType() !== '2d' && (
-                <ResponsiveLineStackLayout>
-                  <SemiControlledTextField
-                    commitOnBlur
-                    fullWidth
-                    errorText={camera3DFieldOfViewError}
-                    onChange={onChangeCamera3DFieldOfView}
-                    value={layer.getCamera3DFieldOfView().toString(10)}
-                    floatingLabelText={
-                      <Trans>Field of view (in degrees)</Trans>
-                    }
-                    floatingLabelFixed
-                  />
-                  <SemiControlledTextField
-                    commitOnBlur
-                    fullWidth
-                    errorText={camera3DNearPlaneDistanceError}
-                    onChange={onChangeCamera3DNearPlaneDistance}
-                    value={layer.getCamera3DNearPlaneDistance().toString(10)}
-                    floatingLabelText={<Trans>Near plane distance</Trans>}
-                    floatingLabelFixed
-                  />
-                  <SemiControlledTextField
-                    commitOnBlur
-                    fullWidth
-                    errorText={camera3DFarPlaneDistanceError}
-                    onChange={onChangeCamera3DFarPlaneDistance}
-                    value={layer.getCamera3DFarPlaneDistance().toString(10)}
-                    floatingLabelText={<Trans>Far plane distance</Trans>}
-                    floatingLabelFixed
-                  />
-                </ResponsiveLineStackLayout>
+                <ColumnStackLayout noMargin>
+                  <ResponsiveLineStackLayout noMargin>
+                    <SelectField
+                      fullWidth
+                      floatingLabelText={<Trans>Camera type</Trans>}
+                      value={layer.getCameraType()}
+                      onChange={(e, i, newValue: string) => {
+                        layer.setCameraType(newValue);
+                        checkNearPlaneDistanceError(
+                          layer.getCamera3DNearPlaneDistance()
+                        );
+                        forceUpdate();
+                      }}
+                    >
+                      <SelectOption
+                        value={'perspective'}
+                        label={t`Perspective camera`}
+                      />
+                      <SelectOption
+                        value={'orthographic'}
+                        label={t`Orthographic camera`}
+                      />
+                    </SelectField>
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DFieldOfViewError}
+                      onChange={onChangeCamera3DFieldOfView}
+                      value={layer.getCamera3DFieldOfView().toString(10)}
+                      floatingLabelText={
+                        <Trans>Field of view (in degrees)</Trans>
+                      }
+                      floatingLabelFixed
+                      disabled={layer.getCameraType() !== 'perspective'}
+                    />
+                  </ResponsiveLineStackLayout>
+                  <ResponsiveLineStackLayout noMargin>
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DNearPlaneDistanceError}
+                      onChange={onChangeCamera3DNearPlaneDistance}
+                      value={layer.getCamera3DNearPlaneDistance().toString(10)}
+                      floatingLabelText={<Trans>Near plane distance</Trans>}
+                      floatingLabelFixed
+                    />
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DFarPlaneDistanceError}
+                      onChange={onChangeCamera3DFarPlaneDistance}
+                      value={layer.getCamera3DFarPlaneDistance().toString(10)}
+                      floatingLabelText={<Trans>Far plane distance</Trans>}
+                      floatingLabelFixed
+                    />
+                  </ResponsiveLineStackLayout>
+                </ColumnStackLayout>
               )}
-            </>
+            </ColumnStackLayout>
           )}
           {layer.isLightingLayer() ? (
             <React.Fragment>

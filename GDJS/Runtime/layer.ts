@@ -159,18 +159,20 @@ namespace gdjs {
      * @param fov The field of view.
      * @param cameraId The camera number. Currently ignored.
      */
-    setCameraZ(z: float, fov: float = 45, cameraId?: integer): void {
-      const cameraFovInRadians = gdjs.toRad(fov);
+    setCameraZ(z: float, fov: float | null, cameraId?: integer): void {
+      if (fov) {
+        const cameraFovInRadians = gdjs.toRad(fov);
 
-      // The zoom factor is capped to a not too big value to avoid infinity.
-      // MAX_SAFE_INTEGER is an arbitrary choice. It's big but not too big.
-      const zoomFactor = Math.min(
-        Number.MAX_SAFE_INTEGER,
-        (0.5 * this.getHeight()) / (z * Math.tan(0.5 * cameraFovInRadians))
-      );
+        // The zoom factor is capped to a not too big value to avoid infinity.
+        // MAX_SAFE_INTEGER is an arbitrary choice. It's big but not too big.
+        const zoomFactor = Math.min(
+          Number.MAX_SAFE_INTEGER,
+          (0.5 * this.getHeight()) / (z * Math.tan(0.5 * cameraFovInRadians))
+        );
 
-      if (zoomFactor > 0) {
-        this._zoomFactor = zoomFactor;
+        if (zoomFactor > 0) {
+          this._zoomFactor = zoomFactor;
+        }
       }
 
       this._cameraZ = z;
@@ -185,8 +187,8 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The z position of the camera
      */
-    getCameraZ(fov: float = 45, cameraId?: integer): float {
-      if (!this._isCameraZDirty) {
+    getCameraZ(fov: float | null, cameraId?: integer): float {
+      if (!this._isCameraZDirty || !fov) {
         return this._cameraZ;
       }
 

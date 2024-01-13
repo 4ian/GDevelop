@@ -461,7 +461,6 @@ namespace gdjs {
         LayerPixiRenderer.vectorForProjections = vector;
       }
 
-      camera.updateProjectionMatrix();
       camera.updateMatrixWorld();
 
       const orthographicCamera = camera as THREE.OrthographicCamera;

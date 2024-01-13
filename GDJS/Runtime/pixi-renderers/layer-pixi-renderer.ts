@@ -452,6 +452,8 @@ namespace gdjs {
       }
       const width = this._layer.getWidth();
       const height = this._layer.getHeight();
+      const normalizedX = (screenX / width) * 2 - 1;
+      const normalizedY = -(screenY / height) * 2 + 1;
 
       let vector = LayerPixiRenderer.vectorForProjections;
       if (!vector) {
@@ -465,7 +467,7 @@ namespace gdjs {
       const orthographicCamera = camera as THREE.OrthographicCamera;
       if (orthographicCamera.isOrthographicCamera) {
         // https://discourse.threejs.org/t/how-to-unproject-mouse2d-with-orthographic-camera/4777
-        vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0);
+        vector.set(normalizedX, normalizedY, 0);
         vector.unproject(camera);
         // The unprojected point is on the camera.
         // Find x and y for a given z along the camera direction line.
@@ -476,7 +478,7 @@ namespace gdjs {
         vector.y += distance * direction.y;
       } else {
         // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
-        vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0.5);
+        vector.set(normalizedX, normalizedY, 0.5);
         vector.unproject(camera);
         // The unprojected point is on the frustum plane.
         // Find x and y for a given z along the line between the camera and

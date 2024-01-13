@@ -465,11 +465,20 @@ namespace gdjs {
       const orthographicCamera = camera as THREE.OrthographicCamera;
       if (orthographicCamera.isOrthographicCamera) {
         // https://discourse.threejs.org/t/how-to-unproject-mouse2d-with-orthographic-camera/4777
-        // TODO It doesn't work with 3D rotations.
-        vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0.5);
+        vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0);
         vector.unproject(camera);
-        vector.x = vector.x;
-        vector.y = vector.y;
+        // The unprojected point is on the camera.
+        // Find x and y for a given Z on along the camera direction line.
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction);
+        if (direction.z === 0) {
+          vector.x = 0;
+          vector.y = 0;
+        } else {
+          const k = (worldZ - vector.z) / direction.z;
+          vector.x += k * direction.x;
+          vector.y += k * direction.y;
+        }
       } else {
         // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
         vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0.5);

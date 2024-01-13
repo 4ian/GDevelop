@@ -468,26 +468,23 @@ namespace gdjs {
         vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0);
         vector.unproject(camera);
         // The unprojected point is on the camera.
-        // Find x and y for a given Z on along the camera direction line.
+        // Find x and y for a given z along the camera direction line.
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
-        if (direction.z === 0) {
-          vector.x = 0;
-          vector.y = 0;
-        } else {
-          const k = (worldZ - vector.z) / direction.z;
-          vector.x += k * direction.x;
-          vector.y += k * direction.y;
-        }
+        const distance = (worldZ - vector.z) / direction.z;
+        vector.x += distance * direction.x;
+        vector.y += distance * direction.y;
       } else {
         // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
         vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0.5);
         vector.unproject(camera);
+        // The unprojected point is on the frustum plane.
+        // Find x and y for a given z along the line between the camera and
+        // the one on the frustum.
         vector.sub(camera.position).normalize();
         const distance = (worldZ - camera.position.z) / vector.z;
-        vector.multiplyScalar(distance);
-        vector.x += camera.position.x;
-        vector.y += camera.position.y;
+        vector.x = distance * vector.x + camera.position.x;
+        vector.y = distance * vector.y + camera.position.y;
       }
 
       // The plane z == worldZ may not be visible on the camera.

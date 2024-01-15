@@ -21,7 +21,7 @@ using namespace std;
 SpineAnimation SpineObjectConfiguration::badAnimation;
 
 SpineObjectConfiguration::SpineObjectConfiguration()
-    : scale(1), opacity(255), timeScale(1), spineResourceName("") {};
+    : scale(1), opacity(255), spineResourceName("") {};
 
 bool SpineObjectConfiguration::UpdateProperty(const gd::String &propertyName, const gd::String &newValue) {
   if (propertyName == "scale") {
@@ -30,10 +30,6 @@ bool SpineObjectConfiguration::UpdateProperty(const gd::String &propertyName, co
   }
   if (propertyName == "opacity") {
     opacity = newValue.To<double>();
-    return true;
-  }
-  if (propertyName == "timeScale") {
-    timeScale = newValue.To<double>();
     return true;
   }
   if (propertyName == "spineResourceName") {
@@ -59,12 +55,6 @@ SpineObjectConfiguration::GetProperties() const {
       .SetType("number")
       .SetLabel(_("Opacity"))
       .SetGroup(_("Appearance"));
-  
-  objectProperties["timeScale"]
-      .SetValue(gd::String::From(timeScale))
-      .SetType("number")
-      .SetLabel(_("Time Scale"))
-      .SetGroup(_("Play"));
 
   objectProperties["spineResourceName"]
       .SetValue(spineResourceName)
@@ -102,7 +92,6 @@ void SpineObjectConfiguration::DoUnserializeFrom(gd::Project &project, const gd:
 
   scale = content.GetDoubleAttribute("scale");
   opacity = content.GetDoubleAttribute("opacity");
-  timeScale = content.GetDoubleAttribute("timeScale");
   spineResourceName = content.GetStringAttribute("spineResourceName");
 
   RemoveAllAnimations();
@@ -122,7 +111,6 @@ void SpineObjectConfiguration::DoSerializeTo(gd::SerializerElement &element) con
   auto &content = element.AddChild("content");
   content.SetAttribute("scale", scale);
   content.SetAttribute("opacity", opacity);
-  content.SetAttribute("timeScale", timeScale);
   content.SetAttribute("spineResourceName", spineResourceName);
 
   auto &animationsElement = content.AddChild("animations");

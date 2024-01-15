@@ -56,8 +56,7 @@ module.exports = {
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')
       .addDefaultBehavior('FlippableCapability::FlippableBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')
-      // TODO implement AnimatableBehavior
-      //.addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
+      .addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
       .setIncludeFile('Extensions/Spine/spineruntimeobject.js')
       .addIncludeFile('Extensions/Spine/spineruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
@@ -109,6 +108,7 @@ module.exports = {
       .setFunctionName('setScale')
       .setGetter('getScale');
 
+    // TODO Remove before the release.
     object
       .addCondition(
         'isAnimationComplete',
@@ -121,25 +121,12 @@ module.exports = {
         'JsPlatform/Extensions/spine.svg',
         'JsPlatform/Extensions/spine.svg'
       )
+      .setHidden()
       .addParameter('object', _('Spine'), 'SpineObject')
       .markAsSimple()
-      .setFunctionName('isAnimationComplete');
+      .setFunctionName('hasAnimationEnded');
 
-    object
-      .addExpressionAndConditionAndAction(
-        'boolean',
-        'Updatable',
-        _('Updatable'),
-        _('an animation is updatable'),
-        _('Updatable'),
-        '',
-        'JsPlatform/Extensions/spine.svg'
-      )
-      .addParameter('object', _('Spine'), 'SpineObject')
-      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('setIsUpdatable')
-      .setGetter('isUpdatable');
-
+    // TODO Remove before the release.
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -152,13 +139,15 @@ module.exports = {
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )
+      .setHidden()
       .addParameter('object', _('Spine'), 'SpineObject')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .addParameter('number', _('Mixing duration'), '', false)
       .markAsSimple()
       .setFunctionName('setAnimationIndex')
-      .setGetter('getCurrentAnimationIndex');
+      .setGetter('getAnimationIndex');
 
+    // TODO Remove before the release.
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -169,6 +158,7 @@ module.exports = {
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )
+      .setHidden()
       .addParameter('object', _('Spine'), 'SpineObject')
       .useStandardParameters(
         'objectAnimationName',
@@ -178,6 +168,23 @@ module.exports = {
       .markAsAdvanced()
       .setFunctionName('setAnimationName')
       .setGetter('getAnimationName');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Animation',
+        _('Animation mixing duration'),
+        _(
+          'the duration of the smooth transition between 2 animations (in second)'
+        ),
+        _('the animation mixing duration'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setAnimationMixingDuration')
+      .setGetter('getAnimationMixingDuration');
 
     return extension;
   },

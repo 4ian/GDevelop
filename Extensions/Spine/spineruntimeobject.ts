@@ -17,8 +17,7 @@ namespace gdjs {
     implements
       gdjs.Resizable,
       gdjs.Scalable,
-      // TODO implement Animatable
-      // gdjs.Animatable,
+      gdjs.Animatable,
       gdjs.OpacityHandler {
     private _opacity: float;
     private _scaleX: number = 1;
@@ -26,9 +25,13 @@ namespace gdjs {
     _originalScale: number;
     private _flippedX: boolean = false;
     private _flippedY: boolean = false;
-    private _timeScale: number;
     private _animations: SpineAnimation[];
-    private _currentAnimationIndex = 0;
+    private _currentAnimationIndex = -1;
+    private _animationSpeedScale: float = 1;
+    private _animationPaused: boolean = false;
+    private _isPausedFrameDirty = false;
+    /** The duration in second for the smooth transition between 2 animations */
+    private _animationMixingDuration: number;
     private _renderer: gdjs.SpineRuntimeObjectPixiRenderer;
 
     readonly spineResourceName: string;
@@ -44,17 +47,31 @@ namespace gdjs {
       super(instanceContainer, objectData);
 
       this._animations = objectData.content.animations;
-      this._timeScale = objectData.content.timeScale;
       this._opacity = objectData.content.opacity;
       this._originalScale = objectData.content.scale;
       this.spineResourceName = objectData.content.spineResourceName;
+      this._animationMixingDuration = 0.1;
       this._renderer = new gdjs.SpineRuntimeObjectRenderer(
         this,
         instanceContainer
       );
+      this.setAnimationIndex(0);
+      this._renderer.updateAnimation(0);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
+    }
+
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      if (this._animationPaused) {
+        if (this._isPausedFrameDirty) {
+          this._renderer.updateAnimation(0);
+          this._isPausedFrameDirty = false;
+        }
+        return;
+      }
+      const elapsedTime = this.getElapsedTime() / 1000;
+      this._renderer.updateAnimation(elapsedTime * this._animationSpeedScale);
     }
 
     getRendererObject(): pixi_spine.Spine | PIXI.Container {
@@ -71,10 +88,7 @@ namespace gdjs {
         this.setOpacity(newObjectData.content.opacity);
       }
       if (oldObjectData.content.scale !== newObjectData.content.scale) {
-        this.setScale(newObjectData.content.scale);
-      }
-      if (oldObjectData.content.timeScale !== newObjectData.content.timeScale) {
-        this.setTimeScale(newObjectData.content.timeScale);
+        this._originalScale = newObjectData.content.scale;
       }
 
       return true;
@@ -90,14 +104,10 @@ namespace gdjs {
         ? animationData.value
         : this._currentAnimationIndex;
 
-      this.setAnimationIndex(animationIndex, 0);
+      this.setAnimationIndexWithMixing(animationIndex, 0);
 
       if (initialInstanceData.customSize) {
-        this.setScale(1);
-        this._renderer.setSize(
-          initialInstanceData.width,
-          initialInstanceData.height
-        );
+        this.setSize(initialInstanceData.width, initialInstanceData.height);
         this.invalidateHitboxes();
       }
     }
@@ -119,39 +129,55 @@ namespace gdjs {
       this._renderer.onDestroy();
     }
 
-    setTimeScale(timeScale: float): void {
-      this._timeScale = timeScale;
-      this._renderer.updateTimeScale();
+    setX(x: float): void {
+      super.setX(x);
+      this._renderer.updatePosition();
     }
 
-    getTimeScale(): float {
-      return this._timeScale;
+    setY(y: float): void {
+      super.setY(y);
+      this._renderer.updatePosition();
     }
 
-    flipX(enable: boolean) {
-      if (enable !== this._flippedX) {
-        this._scaleX *= -1;
-        this._flippedX = enable;
-        this.invalidateHitboxes();
-        this._renderer.updateScale();
+    setAngle(angle: float): void {
+      super.setAngle(angle);
+      this._renderer.updateAngle();
+    }
+
+    setOpacity(opacity: float): void {
+      this._opacity = Math.max(0, Math.min(255, opacity));
+      this._renderer.updateOpacity();
+    }
+
+    getOpacity(): float {
+      return this._opacity;
+    }
+
+    getWidth(): float {
+      return this._renderer.getWidth();
+    }
+
+    getHeight(): float {
+      return this._renderer.getHeight();
+    }
+
+    setWidth(newWidth: float): void {
+      const unscaledWidth = this._renderer.getUnscaledWidth();
+      if (unscaledWidth !== 0) {
+        this.setScaleX(newWidth / unscaledWidth);
       }
     }
 
-    flipY(enable: boolean) {
-      if (enable !== this._flippedY) {
-        this._scaleY *= -1;
-        this._flippedY = enable;
-        this.invalidateHitboxes();
-        this._renderer.updateScale();
+    setHeight(newHeight: float): void {
+      const unscaledHeight = this._renderer.getUnscaledHeight();
+      if (unscaledHeight !== 0) {
+        this.setScaleY(newHeight / unscaledHeight);
       }
     }
 
-    isFlippedX(): boolean {
-      return this._flippedX;
-    }
-
-    isFlippedY(): boolean {
-      return this._flippedY;
+    setSize(newWidth: number, newHeight: number): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     setScale(newScale: float): void {
@@ -213,89 +239,103 @@ namespace gdjs {
       return Math.abs(this._scaleX);
     }
 
-    setX(x: float): void {
-      super.setX(x);
-      this._renderer.updatePosition();
+    isFlippedX(): boolean {
+      return this._flippedX;
     }
 
-    setY(y: float): void {
-      super.setY(y);
-      this._renderer.updatePosition();
+    isFlippedY(): boolean {
+      return this._flippedY;
     }
 
-    setAngle(angle: float): void {
-      super.setAngle(angle);
-      this._renderer.updateAngle();
+    flipX(enable: boolean) {
+      if (enable !== this._flippedX) {
+        this._scaleX *= -1;
+        this._flippedX = enable;
+        this.invalidateHitboxes();
+        this._renderer.updateScale();
+      }
     }
 
-    setOpacity(opacity: float): void {
-      this._opacity = Math.max(0, Math.min(255, opacity));
-      this._renderer.updateOpacity();
+    flipY(enable: boolean) {
+      if (enable !== this._flippedY) {
+        this._scaleY *= -1;
+        this._flippedY = enable;
+        this.invalidateHitboxes();
+        this._renderer.updateScale();
+      }
     }
 
-    getOpacity(): float {
-      return this._opacity;
+    setAnimationIndex(animationIndex: number): void {
+      this.setAnimationIndexWithMixing(
+        animationIndex,
+        this._animationMixingDuration
+      );
     }
 
-    getWidth(): float {
-      return this._renderer.getWidth();
-    }
-
-    getHeight(): float {
-      return this._renderer.getHeight();
-    }
-
-    setWidth(width: float): void {
-      this._renderer.setWidth(width);
-      this.invalidateHitboxes();
-    }
-
-    setHeight(height: float): void {
-      this._renderer.setHeight(height);
-      this.invalidateHitboxes();
-    }
-
-    setSize(newWidth: number, newHeight: number): void {
-      this.setWidth(newWidth);
-      this.setHeight(newHeight);
-    }
-
-    setAnimationIndex(animationIndex: number, mixingDuration: number): void {
-      if (!this.isAnimationIndex(animationIndex)) {
+    setAnimationIndexWithMixing(
+      animationIndex: number,
+      mixingDuration: number
+    ): void {
+      if (
+        this._animations.length === 0 ||
+        this._currentAnimationIndex === animationIndex ||
+        !this.isAnimationIndex(animationIndex)
+      ) {
         return;
       }
+      const previousAnimation = this._animations[this._currentAnimationIndex];
+      const newAnimation = this._animations[animationIndex];
+      this._currentAnimationIndex = animationIndex;
 
-      const previousAnimationName = this.getAnimationSource(
-        this._currentAnimationIndex
-      );
-      const newAnimationName = this.getAnimationSource(animationIndex);
-
-      if (
-        previousAnimationName &&
-        newAnimationName &&
-        newAnimationName !== previousAnimationName
-      ) {
+      if (previousAnimation) {
         this._renderer.setMixing(
-          previousAnimationName,
-          newAnimationName,
+          previousAnimation.source,
+          newAnimation.source,
           mixingDuration
         );
       }
-
-      const animation = this._animations[animationIndex];
-      this._currentAnimationIndex = animationIndex;
-
-      this._renderer.setAnimation(animation.source, animation.loop);
+      this._renderer.setAnimation(newAnimation.source, newAnimation.loop);
+      this._isPausedFrameDirty = true;
     }
 
-    setAnimationName(animationName: string, mixingDuration: number): void {
-      this.setAnimationIndex(
-        this.getAnimationIndex(animationName),
+    setAnimationName(animationName: string): void {
+      this.setAnimationNameWithMixing(
+        animationName,
+        this._animationMixingDuration
+      );
+    }
+
+    setAnimationNameWithMixing(
+      animationName: string,
+      mixingDuration: number
+    ): void {
+      this.setAnimationIndexWithMixing(
+        this.getAnimationIndexFor(animationName),
         mixingDuration
       );
     }
 
-    getCurrentAnimationIndex(): number {
+    getAnimationIndexFor(animationName: string): number {
+      return this._animations.findIndex(
+        (animation) => animation.name === animationName
+      );
+    }
+
+    /**
+     * Return the duration in second for the smooth transition between 2 animations.
+     */
+    getAnimationMixingDuration(): number {
+      return this._animationMixingDuration;
+    }
+
+    /**
+     * Change the duration in second for the smooth transition between 2 animations.
+     */
+    setAnimationMixingDuration(animationMixingDuration: number): void {
+      this._animationMixingDuration = animationMixingDuration;
+    }
+
+    getAnimationIndex(): number {
       return this._currentAnimationIndex;
     }
 
@@ -303,16 +343,6 @@ namespace gdjs {
       return this.isAnimationIndex(this._currentAnimationIndex)
         ? this._animations[this._currentAnimationIndex].name
         : '';
-    }
-
-    getAnimationSource(index: number): string {
-      return this.isAnimationIndex(index) ? this._animations[index].source : '';
-    }
-
-    getAnimationIndex(animationName: string): number {
-      return this._animations.findIndex(
-        (animation) => animation.name === animationName
-      );
     }
 
     isAnimationIndex(animationIndex: number): boolean {
@@ -323,20 +353,52 @@ namespace gdjs {
       );
     }
 
-    isAnimationComplete(): boolean {
+    hasAnimationEnded(): boolean {
       return this._renderer.isAnimationComplete();
     }
 
-    isCurrentAnimationName(name: string): boolean {
-      return this.getAnimationName() === name;
+    isAnimationPaused() {
+      return this._animationPaused;
     }
 
-    setIsUpdatable(isUpdatable: boolean): void {
-      this._renderer.setIsUpdatable(isUpdatable);
+    pauseAnimation() {
+      this._animationPaused = true;
     }
 
-    isUpdatable(): boolean {
-      return this._renderer.isUpdatable();
+    resumeAnimation() {
+      this._animationPaused = false;
+    }
+
+    getAnimationSpeedScale() {
+      return this._animationSpeedScale;
+    }
+
+    setAnimationSpeedScale(ratio: float): void {
+      this._animationSpeedScale = ratio;
+    }
+
+    getAnimationElapsedTime(): number {
+      if (this._animations.length === 0) {
+        return 0;
+      }
+      return this._renderer.getAnimationElapsedTime();
+    }
+
+    setAnimationElapsedTime(time: number): void {
+      if (this._animations.length === 0) {
+        return;
+      }
+      this._renderer.setAnimationElapsedTime(time);
+      this._isPausedFrameDirty = true;
+    }
+
+    getAnimationDuration(): number {
+      if (this._animations.length === 0) {
+        return 0;
+      }
+      return this._renderer.getAnimationDuration(
+        this._animations[this._currentAnimationIndex].source
+      );
     }
   }
 

@@ -360,13 +360,6 @@ const SpineEditor = ({
             objectConfiguration={objectConfiguration}
             propertyName="opacity"
           />
-          <Text size="block-title" noMargin>
-            <Trans>Play</Trans>
-          </Text>
-          <PropertyField
-            objectConfiguration={objectConfiguration}
-            propertyName="timeScale"
-          />
           {sourceSelectOptions.length && (
             <>
               <Text size="block-title">Animations</Text>

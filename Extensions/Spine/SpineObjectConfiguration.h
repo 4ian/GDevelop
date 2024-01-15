@@ -154,7 +154,6 @@ protected:
 private:
   double scale;
   double opacity;
-  double timeScale;
 
   gd::String spineResourceName;
 

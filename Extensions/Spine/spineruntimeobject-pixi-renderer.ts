@@ -17,8 +17,10 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
       this._rendererObject = this.constructRendererObject();
+      if (isSpine(this._rendererObject)) {
+        this._rendererObject.autoUpdate = false;
+      }
 
-      this.updateTimeScale();
       this.updatePosition();
       this.updateAngle();
       this.updateOpacity();
@@ -28,6 +30,13 @@ namespace gdjs {
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._rendererObject, runtimeObject.getZOrder());
+    }
+
+    updateAnimation(timeDelta: float) {
+      if (!isSpine(this._rendererObject)) {
+        return;
+      }
+      this._rendererObject.update(timeDelta);
     }
 
     getRendererObject(): pixi_spine.Spine | PIXI.Container {
@@ -49,15 +58,15 @@ namespace gdjs {
       this._rendererObject.destroy();
     }
 
-    updateTimeScale(): void {
-      if (!isSpine(this._rendererObject)) return;
-
-      this._rendererObject.state.timeScale = this._object.getTimeScale();
-    }
-
     updateScale(): void {
-      const scaleX = Math.max(this._object._originalScale * this._object.getScaleX(), 0);
-      const scaleY = Math.max(this._object._originalScale * this._object.getScaleY(), 0);
+      const scaleX = Math.max(
+        this._object._originalScale * this._object.getScaleX(),
+        0
+      );
+      const scaleY = Math.max(
+        this._object._originalScale * this._object.getScaleY(),
+        0
+      );
       this._rendererObject.scale.x = this._object.isFlippedX()
         ? -scaleX
         : scaleX;
@@ -95,9 +104,18 @@ namespace gdjs {
       this._rendererObject.height = height;
     }
 
-    setSize(width: float, height: float): void {
-      this._rendererObject.width = width;
-      this._rendererObject.height = height;
+    getUnscaledWidth(): float {
+      return Math.abs(
+        (this._rendererObject.width * this._object._originalScale) /
+          this._rendererObject.scale.x
+      );
+    }
+
+    getUnscaledHeight(): float {
+      return Math.abs(
+        (this._rendererObject.height * this._object._originalScale) /
+          this._rendererObject.scale.y
+      );
     }
 
     setMixing(from: string, to: string, duration: number): void {
@@ -124,22 +142,44 @@ namespace gdjs {
       }
     }
 
+    getAnimationDuration(sourceAnimationName: string) {
+      if (!isSpine(this._rendererObject)) {
+        return 0;
+      }
+      const animation = this._rendererObject.spineData.findAnimation(
+        sourceAnimationName
+      );
+      return animation ? animation.duration : 0;
+    }
+
+    getAnimationElapsedTime(): number {
+      if (!isSpine(this._rendererObject)) {
+        return 0;
+      }
+      const tracks = this._rendererObject.state.tracks;
+      if (tracks.length === 0) {
+        return 0;
+      }
+      // This should be fine because only 1 track is used.
+      const track = tracks[0];
+      // @ts-ignore TrackEntry.getAnimationTime is not exposed.
+      return track.getAnimationTime();
+    }
+
+    setAnimationElapsedTime(time: number): void {
+      if (!isSpine(this._rendererObject)) {
+        return;
+      }
+      const tracks = this._rendererObject.state.tracks;
+      if (tracks.length === 0) {
+        return;
+      }
+      const track = tracks[0];
+      track.trackTime = time;
+    }
+
     isAnimationComplete(): boolean {
       return this._isAnimationComplete;
-    }
-
-    isUpdatable(): boolean {
-      if (isSpine(this._rendererObject)) {
-        return this._rendererObject.autoUpdate;
-      }
-
-      return true;
-    }
-
-    setIsUpdatable(isUpdatable: boolean): void {
-      if (isSpine(this._rendererObject)) {
-        this._rendererObject.autoUpdate = isUpdatable;
-      }
     }
 
     private constructRendererObject(): pixi_spine.Spine | PIXI.Container {

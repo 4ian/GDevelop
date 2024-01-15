@@ -51,6 +51,13 @@ module.exports = {
         'JsPlatform/Extensions/spine.svg',
         new gd.SpineObjectConfiguration()
       )
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
+      .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+      .addDefaultBehavior('ScalableCapability::ScalableBehavior')
+      .addDefaultBehavior('FlippableCapability::FlippableBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior')
+      // TODO implement AnimatableBehavior
+      //.addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
       .setIncludeFile('Extensions/Spine/spineruntimeobject.js')
       .addIncludeFile('Extensions/Spine/spineruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
@@ -58,6 +65,7 @@ module.exports = {
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-manager.js')
       .setCategoryFullName(_('Advanced'));
 
+    // TODO Remove before the release.
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -68,6 +76,7 @@ module.exports = {
         '',
         'res/conditions/opacity24.png'
       )
+      .setHidden()
       .addParameter('object', _('Spine'), 'SpineObject', false)
       .useStandardParameters(
         'number',
@@ -78,6 +87,7 @@ module.exports = {
       .setFunctionName('setOpacity')
       .setGetter('getOpacity');
 
+    // TODO Remove before the release.
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -88,6 +98,7 @@ module.exports = {
         '',
         'res/actions/scale24_black.png'
       )
+      .setHidden()
       .addParameter('object', _('Spine'), 'SpineObject', false)
       .useStandardParameters(
         'number',

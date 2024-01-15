@@ -12,9 +12,20 @@ namespace gdjs {
   };
   export type SpineObjectData = ObjectData & SpineObjectDataType;
 
-  export class SpineRuntimeObject extends gdjs.RuntimeObject {
+  export class SpineRuntimeObject
+    extends gdjs.RuntimeObject
+    implements
+      gdjs.Resizable,
+      gdjs.Scalable,
+      // TODO implement Animatable
+      // gdjs.Animatable,
+      gdjs.OpacityHandler {
     private _opacity: float;
-    private _scale: number;
+    private _scaleX: number = 1;
+    private _scaleY: number = 1;
+    _originalScale: number;
+    private _flippedX: boolean = false;
+    private _flippedY: boolean = false;
     private _timeScale: number;
     private _animations: SpineAnimation[];
     private _currentAnimationIndex = 0;
@@ -35,7 +46,7 @@ namespace gdjs {
       this._animations = objectData.content.animations;
       this._timeScale = objectData.content.timeScale;
       this._opacity = objectData.content.opacity;
-      this._scale = objectData.content.scale;
+      this._originalScale = objectData.content.scale;
       this.spineResourceName = objectData.content.spineResourceName;
       this._renderer = new gdjs.SpineRuntimeObjectRenderer(
         this,
@@ -117,14 +128,89 @@ namespace gdjs {
       return this._timeScale;
     }
 
-    setScale(scale: float): void {
-      this._scale = scale;
+    flipX(enable: boolean) {
+      if (enable !== this._flippedX) {
+        this._scaleX *= -1;
+        this._flippedX = enable;
+        this.invalidateHitboxes();
+        this._renderer.updateScale();
+      }
+    }
+
+    flipY(enable: boolean) {
+      if (enable !== this._flippedY) {
+        this._scaleY *= -1;
+        this._flippedY = enable;
+        this.invalidateHitboxes();
+        this._renderer.updateScale();
+      }
+    }
+
+    isFlippedX(): boolean {
+      return this._flippedX;
+    }
+
+    isFlippedY(): boolean {
+      return this._flippedY;
+    }
+
+    setScale(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (
+        newScale === Math.abs(this._scaleX) &&
+        newScale === Math.abs(this._scaleY)
+      ) {
+        return;
+      }
+      this._scaleX = newScale * (this._flippedX ? -1 : 1);
+      this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.updateScale();
       this.invalidateHitboxes();
     }
 
+    setScaleX(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (newScale === Math.abs(this._scaleX)) {
+        return;
+      }
+      this._scaleX = newScale * (this._flippedX ? -1 : 1);
+      this._renderer.updateScale();
+      this.invalidateHitboxes();
+    }
+
+    setScaleY(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (newScale === Math.abs(this._scaleY)) {
+        return;
+      }
+      this._scaleY = newScale * (this._flippedY ? -1 : 1);
+      this._renderer.updateScale();
+      this.invalidateHitboxes();
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
     getScale(): float {
-      return this._scale;
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
+    }
+
+    getScaleY(): float {
+      return Math.abs(this._scaleY);
+    }
+
+    getScaleX(): float {
+      return Math.abs(this._scaleX);
     }
 
     setX(x: float): void {
@@ -167,6 +253,11 @@ namespace gdjs {
     setHeight(height: float): void {
       this._renderer.setHeight(height);
       this.invalidateHitboxes();
+    }
+
+    setSize(newWidth: number, newHeight: number): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     setAnimationIndex(animationIndex: number, mixingDuration: number): void {

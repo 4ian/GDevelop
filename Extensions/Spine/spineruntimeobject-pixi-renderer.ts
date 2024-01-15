@@ -56,7 +56,14 @@ namespace gdjs {
     }
 
     updateScale(): void {
-      this._rendererObject.scale.set(Math.max(this._object.getScale(), 0));
+      const scaleX = Math.max(this._object._originalScale * this._object.getScaleX(), 0);
+      const scaleY = Math.max(this._object._originalScale * this._object.getScaleY(), 0);
+      this._rendererObject.scale.x = this._object.isFlippedX()
+        ? -scaleX
+        : scaleX;
+      this._rendererObject.scale.y = this._object.isFlippedY()
+        ? -scaleY
+        : scaleY;
     }
 
     updatePosition(): void {

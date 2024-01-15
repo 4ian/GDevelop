@@ -170,6 +170,23 @@ module.exports = {
       .setFunctionName('gdjs.playerAuthentication.getUsername');
 
     extension
+      .addStrExpression(
+        'UserID',
+        _('User ID'),
+        _('Get the unique user ID of the authenticated player.'),
+        '',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .setFunctionName('gdjs.playerAuthentication.getUserId');
+
+    extension
       .addCondition(
         'IsPlayerAuthenticated',
         _('Player is authenticated'),

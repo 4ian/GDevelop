@@ -104,25 +104,23 @@ namespace gdjs {
     }
 
     private _update3DCameraAspectAndPosition() {
-      if (this._threeCamera) {
-        const perspectiveCamera = this._threeCamera as THREE.PerspectiveCamera;
-        const orthographicCamera = this
-          ._threeCamera as THREE.OrthographicCamera;
-        if (perspectiveCamera.isPerspectiveCamera) {
-          perspectiveCamera.aspect =
-            this._layer.getWidth() / this._layer.getHeight();
-        } else if (orthographicCamera.isOrthographicCamera) {
-          const width = this._layer.getWidth();
-          const height = this._layer.getHeight();
-          orthographicCamera.left = -width / 2;
-          orthographicCamera.right = width / 2;
-          orthographicCamera.top = height / 2;
-          orthographicCamera.bottom = -height / 2;
-        }
-        this._threeCamera.updateProjectionMatrix();
-
-        this.updatePosition();
+      if (!this._threeCamera) {
+        return;
       }
+      if (this._threeCamera instanceof THREE.OrthographicCamera) {
+        const width = this._layer.getWidth();
+        const height = this._layer.getHeight();
+        this._threeCamera.left = -width / 2;
+        this._threeCamera.right = width / 2;
+        this._threeCamera.top = height / 2;
+        this._threeCamera.bottom = -height / 2;
+      } else {
+        this._threeCamera.aspect =
+          this._layer.getWidth() / this._layer.getHeight();
+      }
+      this._threeCamera.updateProjectionMatrix();
+
+      this.updatePosition();
     }
 
     getRendererObject(): PIXI.Container {
@@ -409,11 +407,13 @@ namespace gdjs {
         this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
         this._threeCamera.rotation.z = angle;
 
-        const fov = (this._threeCamera as THREE.PerspectiveCamera).fov || null;
-        this._threeCamera.position.z = this._layer.getCameraZ(fov);
-        if (fov === null) {
-          const camera = this._threeCamera as THREE.OrthographicCamera;
-          camera.zoom = this._layer.getCameraZoom();
+        if (this._threeCamera instanceof THREE.OrthographicCamera) {
+          this._threeCamera.zoom = this._layer.getCameraZoom();
+          this._threeCamera.position.z = this._layer.getCameraZ(null);
+        } else {
+          this._threeCamera.position.z = this._layer.getCameraZ(
+            this._threeCamera.fov
+          );
         }
 
         if (this._threePlaneMesh) {
@@ -463,8 +463,7 @@ namespace gdjs {
 
       camera.updateMatrixWorld();
 
-      const orthographicCamera = camera as THREE.OrthographicCamera;
-      if (orthographicCamera.isOrthographicCamera) {
+      if (camera instanceof THREE.OrthographicCamera) {
         // https://discourse.threejs.org/t/how-to-unproject-mouse2d-with-orthographic-camera/4777
         vector.set(normalizedX, normalizedY, 0);
         vector.unproject(camera);

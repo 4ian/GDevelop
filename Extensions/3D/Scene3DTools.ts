@@ -10,8 +10,13 @@ namespace gdjs {
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
-        const fov = threeCamera ? threeCamera.fov || null : assumedFovIn2D;
+        const threeCamera = layerRenderer.getThreeCamera();
+        const fov =
+          threeCamera instanceof THREE.OrthographicCamera
+            ? null
+            : threeCamera
+            ? threeCamera.fov
+            : assumedFovIn2D;
         return layer.getCameraZ(fov, cameraIndex);
       };
 
@@ -23,8 +28,13 @@ namespace gdjs {
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
-        const fov = threeCamera ? threeCamera.fov || null : assumedFovIn2D;
+        const threeCamera = layerRenderer.getThreeCamera();
+        const fov =
+          threeCamera instanceof THREE.OrthographicCamera
+            ? null
+            : threeCamera
+            ? threeCamera.fov
+            : assumedFovIn2D;
         layer.setCameraZ(z, fov, cameraIndex);
       };
 
@@ -212,10 +222,11 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
+        const threeCamera = layerRenderer.getThreeCamera();
         if (!threeCamera) return assumedFovIn2D;
-        if (!threeCamera.isPerspectiveCamera) return 0;
-        return threeCamera.fov;
+        return threeCamera instanceof THREE.OrthographicCamera
+          ? 0
+          : threeCamera.fov;
       };
 
       export const setFov = (
@@ -227,8 +238,9 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer.getThreeCamera() as THREE.PerspectiveCamera;
-        if (!threeCamera || !threeCamera.isPerspectiveCamera) return;
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera || threeCamera instanceof THREE.OrthographicCamera)
+          return;
 
         threeCamera.fov = Math.min(Math.max(angle, 0), 180);
         layerRenderer.setThreeCameraDirty(true);

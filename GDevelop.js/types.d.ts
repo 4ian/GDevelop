@@ -796,6 +796,8 @@ export class Layer extends EmscriptenObject {
   getName(): string;
   setRenderingType(renderingType: string): void;
   getRenderingType(): string;
+  setCameraType(cameraType: string): void;
+  getCameraType(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
   setLocked(isLocked: boolean): void;

@@ -146,6 +146,7 @@ declare interface InstanceStringProperty {
 declare interface LayerData {
   name: string;
   renderingType?: '' | '2d' | '3d' | '2d+3d';
+  cameraType?: 'perspective' | 'orthographic';
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];

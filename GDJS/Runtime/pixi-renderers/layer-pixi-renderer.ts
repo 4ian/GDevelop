@@ -34,7 +34,10 @@ namespace gdjs {
     // For a 3D (or 2D+3D) layer:
     private _threeGroup: THREE.Group | null = null;
     private _threeScene: THREE.Scene | null = null;
-    private _threeCamera: THREE.PerspectiveCamera | null = null;
+    private _threeCamera:
+      | THREE.PerspectiveCamera
+      | THREE.OrthographicCamera
+      | null = null;
     private _threeCameraDirty: boolean = false;
 
     // For a 2D+3D layer, the 2D rendering is done on the render texture
@@ -101,13 +104,23 @@ namespace gdjs {
     }
 
     private _update3DCameraAspectAndPosition() {
-      if (this._threeCamera) {
+      if (!this._threeCamera) {
+        return;
+      }
+      if (this._threeCamera instanceof THREE.OrthographicCamera) {
+        const width = this._layer.getWidth();
+        const height = this._layer.getHeight();
+        this._threeCamera.left = -width / 2;
+        this._threeCamera.right = width / 2;
+        this._threeCamera.top = height / 2;
+        this._threeCamera.bottom = -height / 2;
+      } else {
         this._threeCamera.aspect =
           this._layer.getWidth() / this._layer.getHeight();
-        this._threeCamera.updateProjectionMatrix();
-
-        this.updatePosition();
       }
+      this._threeCamera.updateProjectionMatrix();
+
+      this.updatePosition();
     }
 
     getRendererObject(): PIXI.Container {
@@ -118,7 +131,10 @@ namespace gdjs {
       return this._threeScene;
     }
 
-    getThreeCamera(): THREE.PerspectiveCamera | null {
+    getThreeCamera():
+      | THREE.PerspectiveCamera
+      | THREE.OrthographicCamera
+      | null {
       return this._threeCamera;
     }
 
@@ -164,12 +180,28 @@ namespace gdjs {
           this._threeGroup = new THREE.Group();
           this._threeScene.add(this._threeGroup);
 
-          this._threeCamera = new THREE.PerspectiveCamera(
-            this._layer.getInitialCamera3DFieldOfView(),
-            1,
-            this._layer.getInitialCamera3DNearPlaneDistance(),
-            this._layer.getInitialCamera3DFarPlaneDistance()
-          );
+          if (
+            this._layer.getCameraType() ===
+            gdjs.RuntimeLayerCameraType.ORTHOGRAPHIC
+          ) {
+            const width = this._layer.getWidth();
+            const height = this._layer.getHeight();
+            this._threeCamera = new THREE.OrthographicCamera(
+              -width / 2,
+              width / 2,
+              height / 2,
+              -height / 2,
+              this._layer.getInitialCamera3DNearPlaneDistance(),
+              this._layer.getInitialCamera3DFarPlaneDistance()
+            );
+          } else {
+            this._threeCamera = new THREE.PerspectiveCamera(
+              this._layer.getInitialCamera3DFieldOfView(),
+              1,
+              this._layer.getInitialCamera3DNearPlaneDistance(),
+              this._layer.getInitialCamera3DFarPlaneDistance()
+            );
+          }
           this._threeCamera.rotation.order = 'ZYX';
 
           if (
@@ -375,9 +407,14 @@ namespace gdjs {
         this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
         this._threeCamera.rotation.z = angle;
 
-        this._threeCamera.position.z = this._layer.getCameraZ(
-          this._threeCamera.fov
-        );
+        if (this._threeCamera instanceof THREE.OrthographicCamera) {
+          this._threeCamera.zoom = this._layer.getCameraZoom();
+          this._threeCamera.position.z = this._layer.getCameraZ(null);
+        } else {
+          this._threeCamera.position.z = this._layer.getCameraZ(
+            this._threeCamera.fov
+          );
+        }
 
         if (this._threePlaneMesh) {
           // Adapt the plane size so that it covers the whole screen.
@@ -415,6 +452,8 @@ namespace gdjs {
       }
       const width = this._layer.getWidth();
       const height = this._layer.getHeight();
+      const normalizedX = (screenX / width) * 2 - 1;
+      const normalizedY = -(screenY / height) * 2 + 1;
 
       let vector = LayerPixiRenderer.vectorForProjections;
       if (!vector) {
@@ -422,12 +461,31 @@ namespace gdjs {
         LayerPixiRenderer.vectorForProjections = vector;
       }
 
-      // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
-      vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0.5);
-      vector.unproject(camera);
-      vector.sub(camera.position).normalize();
-      const distance = (worldZ - camera.position.z) / vector.z;
-      vector.multiplyScalar(distance);
+      camera.updateMatrixWorld();
+
+      if (camera instanceof THREE.OrthographicCamera) {
+        // https://discourse.threejs.org/t/how-to-unproject-mouse2d-with-orthographic-camera/4777
+        vector.set(normalizedX, normalizedY, 0);
+        vector.unproject(camera);
+        // The unprojected point is on the camera.
+        // Find x and y for a given z along the camera direction line.
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction);
+        const distance = (worldZ - vector.z) / direction.z;
+        vector.x += distance * direction.x;
+        vector.y += distance * direction.y;
+      } else {
+        // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
+        vector.set(normalizedX, normalizedY, 0.5);
+        vector.unproject(camera);
+        // The unprojected point is on the frustum plane.
+        // Find x and y for a given z along the line between the camera and
+        // the one on the frustum.
+        vector.sub(camera.position).normalize();
+        const distance = (worldZ - camera.position.z) / vector.z;
+        vector.x = distance * vector.x + camera.position.x;
+        vector.y = distance * vector.y + camera.position.y;
+      }
 
       // The plane z == worldZ may not be visible on the camera.
       if (!Number.isFinite(vector.x) || !Number.isFinite(vector.y)) {
@@ -436,8 +494,8 @@ namespace gdjs {
         return result;
       }
 
-      result[0] = camera.position.x + vector.x;
-      result[1] = -(camera.position.y + vector.y);
+      result[0] = vector.x;
+      result[1] = -vector.y;
       return result;
     }
 

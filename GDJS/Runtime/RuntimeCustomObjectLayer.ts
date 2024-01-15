@@ -56,7 +56,7 @@ namespace gdjs {
 
     setCameraZ(z: float, fov: float, cameraId?: integer): void {}
 
-    getCameraZ(fov: float = 45, cameraId?: integer): float {
+    getCameraZ(fov: float | null, cameraId?: integer): float {
       return 0;
     }
 

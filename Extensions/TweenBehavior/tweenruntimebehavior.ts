@@ -822,7 +822,7 @@ namespace gdjs {
               owner3d.setCenterZInScene(oldZ);
             }
           }
-        : (scaleX: float) => owner.setScale(scaleX);
+        : (scale: float) => owner.setScale(scale);
 
       this._tweens.addSimpleTween(
         identifier,

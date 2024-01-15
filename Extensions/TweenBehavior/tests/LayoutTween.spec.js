@@ -10,210 +10,256 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   };
 
   /** @type {gdjs.RuntimeScene} */
-  let layout;
+  let runtimeScene;
   /** @type {gdjs.TweenRuntimeBehavior} */
   beforeEach(() => {
-    layout = createScene();
-    layout.getLayer('').setTimeScale(1.5);
+    runtimeScene = createScene();
+    runtimeScene.getLayer('').setTimeScale(1.5);
   });
 
   const tween = gdjs.evtTools.tween;
   const camera = gdjs.evtTools.camera;
 
   it("can get default values for tweens that don't exist", () => {
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(false);
-    expect(tween.getValue(layout, 'MyTween')).to.be(0);
-    expect(tween.getProgress(layout, 'MyTween')).to.be(0);
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.getValue(runtimeScene, 'MyTween')).to.be(0);
+    expect(tween.getProgress(runtimeScene, 'MyTween')).to.be(0);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
   });
 
   it('can play a tween till the end', () => {
-    camera.setCameraRotation(layout, 200, '', 0);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
+    camera.setCameraRotation(runtimeScene, 200, '', 0);
+    tween.tweenCameraRotation2(
+      runtimeScene,
+      'MyTween',
+      600,
+      '',
+      'linear',
+      0.25
+    );
 
     // Tween actions don't change the value directly.
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(200);
-    expect(tween.getValue(layout, 'MyTween')).to.be(200);
-    expect(tween.getProgress(layout, 'MyTween')).to.be(0);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(200);
+    expect(tween.getValue(runtimeScene, 'MyTween')).to.be(200);
+    expect(tween.getProgress(runtimeScene, 'MyTween')).to.be(0);
 
     let oldAngle;
     let oldValue;
     let oldProgress;
     for (let i = 0; i < 10; i++) {
-      oldAngle = camera.getCameraRotation(layout, '', 0);
-      oldValue = tween.getValue(layout, 'MyTween');
-      oldProgress = tween.getProgress(layout, 'MyTween');
+      oldAngle = camera.getCameraRotation(runtimeScene, '', 0);
+      oldValue = tween.getValue(runtimeScene, 'MyTween');
+      oldProgress = tween.getProgress(runtimeScene, 'MyTween');
 
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
-      expect(camera.getCameraRotation(layout, '', 0)).to.be.above(oldAngle);
-      expect(tween.getValue(layout, 'MyTween')).to.be.above(oldValue);
-      expect(tween.getProgress(layout, 'MyTween')).to.be.above(oldProgress);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
+      expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be.above(
+        oldAngle
+      );
+      expect(tween.getValue(runtimeScene, 'MyTween')).to.be.above(oldValue);
+      expect(tween.getProgress(runtimeScene, 'MyTween')).to.be.above(
+        oldProgress
+      );
     }
     // The tween reaches the end
-    layout.renderAndStep(1000 / 60);
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(true);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(600);
-    expect(tween.getValue(layout, 'MyTween')).to.be(600);
-    expect(tween.getProgress(layout, 'MyTween')).to.be(1);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(true);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(600);
+    expect(tween.getValue(runtimeScene, 'MyTween')).to.be(600);
+    expect(tween.getProgress(runtimeScene, 'MyTween')).to.be(1);
 
     // The value is not changed after the tween is finished
-    layout.renderAndStep(1000 / 60);
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(true);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(600);
-    expect(tween.getValue(layout, 'MyTween')).to.be(600);
-    expect(tween.getProgress(layout, 'MyTween')).to.be(1);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(true);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(600);
+    expect(tween.getValue(runtimeScene, 'MyTween')).to.be(600);
+    expect(tween.getProgress(runtimeScene, 'MyTween')).to.be(1);
 
     // The value is not set to the targeted value over and over
     // after the tween is finished.
-    camera.setCameraRotation(layout, 123, '', 0);
-    layout.renderAndStep(1000 / 60);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
+    camera.setCameraRotation(runtimeScene, 123, '', 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
   });
 
   it('can pause and resume a tween', () => {
-    camera.setCameraRotation(layout, 200, '', 0);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
+    camera.setCameraRotation(runtimeScene, 200, '', 0);
+    tween.tweenCameraRotation2(
+      runtimeScene,
+      'MyTween',
+      600,
+      '',
+      'linear',
+      0.25
+    );
 
     // The tween starts
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
     }
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
 
     // Pause the tween
-    tween.pauseSceneTween(layout, 'MyTween');
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+    tween.pauseSceneTween(runtimeScene, 'MyTween');
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
-      expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
+      expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
     }
 
     // The value is not overridden during the pause.
-    camera.setCameraRotation(layout, 123, '', 0);
-    layout.renderAndStep(1000 / 60);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
+    camera.setCameraRotation(runtimeScene, 123, '', 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
 
     // Resume the tween
-    tween.resumeSceneTween(layout, 'MyTween');
+    tween.resumeSceneTween(runtimeScene, 'MyTween');
 
     // Tween actions don't change the value directly.
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
-    layout.renderAndStep(1000 / 60);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(440);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(440);
   });
 
   it('can stop and restart a tween', () => {
-    camera.setCameraRotation(layout, 200, '', 0);
+    camera.setCameraRotation(runtimeScene, 200, '', 0);
 
     // Start the tween
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
+    tween.tweenCameraRotation2(
+      runtimeScene,
+      'MyTween',
+      600,
+      '',
+      'linear',
+      0.25
+    );
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
     }
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
 
     // Stop the tween
-    tween.stopSceneTween(layout, 'MyTween', false);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+    tween.stopSceneTween(runtimeScene, 'MyTween', false);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(true);
-      expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(true);
+      expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
     }
 
     // The value is not overridden by a stopped tween.
-    camera.setCameraRotation(layout, 123, '', 0);
-    layout.renderAndStep(1000 / 60);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
+    camera.setCameraRotation(runtimeScene, 123, '', 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
 
     // A stopped tween can't be resumed.
-    tween.resumeSceneTween(layout, 'MyTween');
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(true);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
+    tween.resumeSceneTween(runtimeScene, 'MyTween');
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(true);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
 
-    layout.renderAndStep(1000 / 60);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(true);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(true);
 
     // Restart the tween
-    tween.tweenCameraRotation2(layout, 'MyTween', 623, '', 'linear', 0.25);
+    tween.tweenCameraRotation2(
+      runtimeScene,
+      'MyTween',
+      623,
+      '',
+      'linear',
+      0.25
+    );
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
     }
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(373);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(373);
   });
 
   it('can remove and recreate a tween', () => {
-    camera.setCameraRotation(layout, 200, '', 0);
+    camera.setCameraRotation(runtimeScene, 200, '', 0);
 
     // Start the tween
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(false);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(true);
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(false);
+    tween.tweenCameraRotation2(
+      runtimeScene,
+      'MyTween',
+      600,
+      '',
+      'linear',
+      0.25
+    );
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(true);
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
     }
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
 
     // Remove the tween
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(true);
-    tween.removeSceneTween(layout, 'MyTween');
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(false);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(true);
+    tween.removeSceneTween(runtimeScene, 'MyTween');
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(false);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
-      expect(camera.getCameraRotation(layout, '', 0)).to.be(400);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
+      expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(400);
     }
 
     // The value is not overridden after the tween has been removed.
-    camera.setCameraRotation(layout, 123, '', 0);
-    layout.renderAndStep(1000 / 60);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
+    camera.setCameraRotation(runtimeScene, 123, '', 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
 
     // A removed tween can't be resumed.
-    tween.resumeSceneTween(layout, 'MyTween');
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
+    tween.resumeSceneTween(runtimeScene, 'MyTween');
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
 
-    layout.renderAndStep(1000 / 60);
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(123);
-    expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(false);
-    expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(123);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
 
     // Recreate the tween
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(false);
-    tween.tweenCameraRotation2(layout, 'MyTween', 623, '', 'linear', 0.25);
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(true);
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(false);
+    tween.tweenCameraRotation2(
+      runtimeScene,
+      'MyTween',
+      623,
+      '',
+      'linear',
+      0.25
+    );
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(true);
     for (let i = 0; i < 5; i++) {
-      layout.renderAndStep(1000 / 60);
-      expect(tween.sceneTweenIsPlaying(layout, 'MyTween')).to.be(true);
-      expect(tween.sceneTweenHasFinished(layout, 'MyTween')).to.be(false);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+      expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
     }
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(373);
-    expect(tween.sceneTweenExists(layout, 'MyTween')).to.be(true);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(373);
+    expect(tween.sceneTweenExists(runtimeScene, 'MyTween')).to.be(true);
   });
 
   const checkProgress = (steps, getValueFunctions) => {
@@ -222,7 +268,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     }
     for (let i = 0; i < steps; i++) {
       const oldValues = getValueFunctions.map((getValue) => getValue());
-      layout.renderAndStep(1000 / 60);
+      runtimeScene.renderAndStep(1000 / 60);
 
       for (let index = 0; index < oldValues.length; index++) {
         expect(getValueFunctions[index]()).not.to.be(oldValues[index]);
@@ -231,10 +277,10 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   };
 
   it('can tween a scene variable', () => {
-    const variable = layout.getVariables().get('MyVariable');
+    const variable = runtimeScene.getVariables().get('MyVariable');
     variable.setNumber(200);
     tween.tweenVariableNumber3(
-      layout,
+      runtimeScene,
       'MyTween',
       variable,
       600,
@@ -247,7 +293,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can tween a layer value', () => {
     tween.addLayerValueTween(
-      layout,
+      runtimeScene,
       'MyTween',
       200,
       600,
@@ -256,13 +302,13 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       false,
       ''
     );
-    checkProgress(6, () => tween.getValue(layout, 'MyTween'));
-    expect(tween.getValue(layout, 'MyTween')).to.be(440);
+    checkProgress(6, () => tween.getValue(runtimeScene, 'MyTween'));
+    expect(tween.getValue(runtimeScene, 'MyTween')).to.be(440);
   });
 
   it('can tween a layout value', () => {
     tween.addLayoutValueTween(
-      layout,
+      runtimeScene,
       'MyTween',
       200,
       600,
@@ -270,39 +316,69 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       0.25 / 1.5,
       false
     );
-    checkProgress(6, () => tween.getValue(layout, 'MyTween'));
-    expect(tween.getValue(layout, 'MyTween')).to.be(440);
+    checkProgress(6, () => tween.getValue(runtimeScene, 'MyTween'));
+    expect(tween.getValue(runtimeScene, 'MyTween')).to.be(440);
   });
 
   it('can tween a layer camera position', () => {
-    camera.setCameraX(layout, 200, '', 0);
-    camera.setCameraY(layout, 300, '', 0);
-    tween.tweenCamera2(layout, 'MyTween', 600, 900, '', 'linear', 0.25);
+    camera.setCameraX(runtimeScene, 200, '', 0);
+    camera.setCameraY(runtimeScene, 300, '', 0);
+    tween.tweenCamera2(runtimeScene, 'MyTween', 600, 900, '', 'linear', 0.25);
     checkProgress(6, [
-      () => camera.getCameraX(layout, '', 0),
-      () => camera.getCameraY(layout, '', 0),
+      () => camera.getCameraX(runtimeScene, '', 0),
+      () => camera.getCameraY(runtimeScene, '', 0),
     ]);
-    expect(camera.getCameraX(layout, '', 0)).to.be(440);
-    expect(camera.getCameraY(layout, '', 0)).to.be(660);
+    expect(camera.getCameraX(runtimeScene, '', 0)).to.be(440);
+    expect(camera.getCameraY(runtimeScene, '', 0)).to.be(660);
   });
 
   it('can tween a layer camera zoom', () => {
-    camera.setCameraZoom(layout, 200, '', 0);
-    tween.tweenCameraZoom2(layout, 'MyTween', 600, '', 'linear', 0.25);
-    checkProgress(6, () => camera.getCameraZoom(layout, '', 0));
+    camera.setCameraZoom(runtimeScene, 200, '', 0);
+    tween.tweenCameraZoom2(runtimeScene, 'MyTween', 600, '', 'linear', 0.25);
+    checkProgress(6, () => camera.getCameraZoom(runtimeScene, '', 0));
     // The interpolation is exponential.
-    expect(camera.getCameraZoom(layout, '', 0)).to.be(386.6364089863524);
+    expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(386.6364089863524);
+  });
+
+  it('can tween a layer camera zoom to 0', () => {
+    camera.setCameraZoom(runtimeScene, 1, '', 0);
+    tween.tweenCameraZoom2(runtimeScene, 'MyTween', 0, '', 'linear', 0.25);
+    // A camera zoom of 0 doesn't make sense.
+    // Check that there is no NaN.
+    for (let i = 0; i < 11; i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(0);
+    }
+  });
+
+  it('can tween a layer camera zoom from 0', () => {
+    camera.setCameraZoom(runtimeScene, 0, '', 0);
+    tween.tweenCameraZoom2(runtimeScene, 'MyTween', 1, '', 'linear', 0.25);
+    // A camera zoom of 0 doesn't make sense.
+    // Check that there is no NaN.
+    for (let i = 0; i < 11; i++) {
+      expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(0);
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(1);
   });
 
   it('can tween a layer camera rotation', () => {
-    camera.setCameraRotation(layout, 200, '', 0);
-    tween.tweenCameraRotation2(layout, 'MyTween', 600, '', 'linear', 0.25);
-    checkProgress(6, () => camera.getCameraRotation(layout, '', 0));
-    expect(camera.getCameraRotation(layout, '', 0)).to.be(440);
+    camera.setCameraRotation(runtimeScene, 200, '', 0);
+    tween.tweenCameraRotation2(
+      runtimeScene,
+      'MyTween',
+      600,
+      '',
+      'linear',
+      0.25
+    );
+    checkProgress(6, () => camera.getCameraRotation(runtimeScene, '', 0));
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(440);
   });
 
   it('can tween a number effect property', () => {
-    const layer = layout.getLayer('');
+    const layer = runtimeScene.getLayer('');
     layer.addEffect({
       effectType: 'Outline',
       name: 'MyEffect',
@@ -311,7 +387,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       booleanParameters: {},
     });
     tween.tweenNumberEffectPropertyTween(
-      layout,
+      runtimeScene,
       'MyTween',
       600,
       '',
@@ -329,7 +405,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   });
 
   it('can tween a color effect property', () => {
-    const layer = layout.getLayer('');
+    const layer = runtimeScene.getLayer('');
     layer.addEffect({
       effectType: 'Outline',
       name: 'MyEffect',
@@ -338,7 +414,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
       booleanParameters: {},
     });
     tween.tweenColorEffectPropertyTween(
-      layout,
+      runtimeScene,
       'MyTween',
       '255;192;128',
       '',

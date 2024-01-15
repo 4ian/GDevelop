@@ -394,7 +394,7 @@ module.exports = {
         'ReadDirectory',
         _('Read a directory'),
         _(
-          'Reads the contents of a directory (all files and sub-directories) and stores them in an array..'
+          'Reads the contents of a directory (all files and sub-directories) and stores them in an array.'
         ),
         _('Read the directory _PARAM0_ into _PARAM1_'),
         _('Windows, Linux, MacOS/Asynchronous'),

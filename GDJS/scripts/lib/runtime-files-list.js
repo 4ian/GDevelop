@@ -23,6 +23,7 @@ const transformExcludedExtensions = ['.min.js', '.d.ts'];
 const untransformedPaths = [
   // GDJS prebuilt files:
   'GDJS/Runtime/pixi-renderers/pixi.js',
+  'GDJS/Runtime/pixi-renderers/pixi-spine.js',
   'GDJS/Runtime/pixi-renderers/three.js',
   'GDJS/Runtime/pixi-renderers/ThreeAddons.js',
   'GDJS/Runtime/pixi-renderers/draco/gltf/draco_wasm_wrapper.js',

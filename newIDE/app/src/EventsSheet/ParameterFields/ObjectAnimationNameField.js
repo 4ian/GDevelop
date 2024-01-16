@@ -87,6 +87,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         })
           .filter(Boolean)
           .sort();
+      } else if (object.getType() === 'SpineObject::SpineObject') {
+        const spineConfiguration = gd.asSpineConfiguration(
+          object.getConfiguration()
+        );
+
+        return mapFor(0, spineConfiguration.getAnimationsCount(), index => {
+          const animationName = spineConfiguration
+            .getAnimation(index)
+            .getName();
+          return animationName.length > 0 ? animationName : null;
+        })
+          .filter(Boolean)
+          .sort();
       }
 
       return [];

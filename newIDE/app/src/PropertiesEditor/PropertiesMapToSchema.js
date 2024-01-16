@@ -227,6 +227,10 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Acceleration', 'Deceleration'],
   ['Duration', 'Easing'],
   ['EffectName', 'EffectProperty'],
+  ['Gravity', 'MaxFallingSpeed'],
+  ['JumpSpeed', 'JumpSustainTime'],
+  ['XGrabTolerance', 'YGrabOffset'],
+  ['MaxSpeed', 'SlopeMaxAngle'],
 ];
 
 const uncapitalize = str => {

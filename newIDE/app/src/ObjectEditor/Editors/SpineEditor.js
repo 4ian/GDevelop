@@ -356,15 +356,11 @@ const SpineEditor = ({
             </AlertMessage>
           ) : null}
           <Text size="block-title" noMargin>
-            <Trans>Appearance</Trans>
+            <Trans>Default size</Trans>
           </Text>
           <PropertyField
             objectConfiguration={objectConfiguration}
             propertyName="scale"
-          />
-          <PropertyField
-            objectConfiguration={objectConfiguration}
-            propertyName="opacity"
           />
           {sourceSelectOptions.length && (
             <>

@@ -153,7 +153,6 @@ protected:
 
 private:
   double scale;
-  double opacity;
 
   gd::String spineResourceName;
 

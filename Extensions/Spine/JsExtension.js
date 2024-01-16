@@ -278,7 +278,6 @@ module.exports = {
         if (spine) {
           spine.width = width;
           spine.height = height;
-          spine.alpha = this._getProperties().get('opacity').getValue() / 255;
           const localBounds = spine.getLocalBounds(undefined, true);
 
           this._spineOriginOffsetX = localBounds.x * spine.scale.x;

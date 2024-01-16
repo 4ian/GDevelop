@@ -19,7 +19,7 @@ namespace gdjs {
       gdjs.Scalable,
       gdjs.Animatable,
       gdjs.OpacityHandler {
-    private _opacity: float;
+    private _opacity: float = 255;
     private _scaleX: number = 1;
     private _scaleY: number = 1;
     _originalScale: number;
@@ -47,7 +47,6 @@ namespace gdjs {
       super(instanceContainer, objectData);
 
       this._animations = objectData.content.animations;
-      this._opacity = objectData.content.opacity;
       this._originalScale = objectData.content.scale;
       this.spineResourceName = objectData.content.spineResourceName;
       this._animationMixingDuration = 0.1;
@@ -84,9 +83,6 @@ namespace gdjs {
     ): boolean {
       super.updateFromObjectData(oldObjectData, newObjectData);
 
-      if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
-        this.setOpacity(newObjectData.content.opacity);
-      }
       if (oldObjectData.content.scale !== newObjectData.content.scale) {
         this._originalScale = newObjectData.content.scale;
       }

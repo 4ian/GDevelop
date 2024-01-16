@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -35,7 +27,7 @@ module.exports = {
       )
       .setExtensionHelpPath('/behaviors/physics2')
       .setCategory('Movement')
-      .setTags("physics, gravity, obstacle, collision");
+      .setTags('physics, gravity, obstacle, collision');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');
@@ -775,10 +767,10 @@ module.exports = {
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('setSleepingAllowed');
-    
+
     // Deprecated action (fixed typo):
     aut
-      .addDuplicatedAction("SetSleepingaAllowed", "SetSleepingAllowed")
+      .addDuplicatedAction('SetSleepingaAllowed', 'SetSleepingAllowed')
       .setHidden();
 
     aut
@@ -1476,10 +1468,16 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('X component (N)'))
       .addParameter('expression', _('Y component (N)'))
-      .setParameterLongDescription(_('A force is like an acceleration but depends on the mass.'))
+      .setParameterLongDescription(
+        _('A force is like an acceleration but depends on the mass.')
+      )
       .addParameter('expression', _('Application point on X axis'))
       .addParameter('expression', _('Application point on Y axis'))
-      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyForce');
 
@@ -1499,10 +1497,16 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
       .addParameter('expression', _('Length (N)'))
-      .setParameterLongDescription(_('A force is like an acceleration but depends on the mass.'))
+      .setParameterLongDescription(
+        _('A force is like an acceleration but depends on the mass.')
+      )
       .addParameter('expression', _('Application point on X axis'))
       .addParameter('expression', _('Application point on Y axis'))
-      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyPolarForce');
 
@@ -1523,12 +1527,18 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Length (N)'))
-      .setParameterLongDescription(_('A force is like an acceleration but depends on the mass.'))
+      .setParameterLongDescription(
+        _('A force is like an acceleration but depends on the mass.')
+      )
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
       .addParameter('expression', _('Application point on X axis'))
       .addParameter('expression', _('Application point on Y axis'))
-      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyForceTowardPosition');
 
@@ -1546,18 +1556,18 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter(
-        'expression',
-        _('X component (N·s or kg·m·s⁻¹)')
+      .addParameter('expression', _('X component (N·s or kg·m·s⁻¹)'))
+      .addParameter('expression', _('Y component (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
       )
-      .addParameter(
-        'expression',
-        _('Y component (N·s or kg·m·s⁻¹)')
-      )
-      .setParameterLongDescription(_('An impulse is like a speed addition but depends on the mass.'))
       .addParameter('expression', _('Application point on X axis'))
       .addParameter('expression', _('Application point on Y axis'))
-      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyImpulse');
 
@@ -1578,14 +1588,17 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
-      .addParameter(
-        'expression',
-        _('Length (N·s or kg·m·s⁻¹)')
+      .addParameter('expression', _('Length (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
       )
-      .setParameterLongDescription(_('An impulse is like a speed addition but depends on the mass.'))
       .addParameter('expression', _('Application point on X axis'))
       .addParameter('expression', _('Application point on Y axis'))
-      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyPolarImpulse');
 
@@ -1605,16 +1618,19 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter(
-        'expression',
-        _('Length (N·s or kg·m·s⁻¹)')
+      .addParameter('expression', _('Length (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
       )
-      .setParameterLongDescription(_('An impulse is like a speed addition but depends on the mass.'))
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
       .addParameter('expression', _('Application point on X axis'))
       .addParameter('expression', _('Application point on Y axis'))
-      .setParameterLongDescription(_('Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyImpulseTowardPosition');
 
@@ -1633,7 +1649,9 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Torque (N·m)'))
-      .setParameterLongDescription(_('A torque is like a rotation acceleration but depends on the mass.'))
+      .setParameterLongDescription(
+        _('A torque is like a rotation acceleration but depends on the mass.')
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyTorque');
 
@@ -1652,7 +1670,11 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angular impulse (N·m·s'))
-      .setParameterLongDescription(_('An impulse is like a rotation speed addition but depends on the mass.'))
+      .setParameterLongDescription(
+        _(
+          'An impulse is like a rotation speed addition but depends on the mass.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyAngularImpulse');
 
@@ -4061,10 +4083,7 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     const dummyBehavior = extension
       .getBehaviorMetadata('Physics2::Physics2Behavior')
       .get();

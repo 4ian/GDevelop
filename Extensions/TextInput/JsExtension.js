@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -288,7 +280,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
       )
-      .addDefaultBehavior("TextContainerCapability::TextContainerBehavior")
+      .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
@@ -585,7 +577,9 @@ module.exports = {
       .addScopedAction(
         'Focus',
         _('Focus'),
-        _('Focus the input so that text can be entered (like if it was touched/clicked).'),
+        _(
+          'Focus the input so that text can be entered (like if it was touched/clicked).'
+        ),
         _('Focus _PARAM0_'),
         _(''),
         'res/conditions/surObjet24.png',
@@ -607,10 +601,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -618,9 +609,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'TextInput::TextInputObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -633,9 +622,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 

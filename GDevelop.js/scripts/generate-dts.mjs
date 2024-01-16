@@ -245,8 +245,12 @@ for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
     );
   }
 
+  const inheritedClass = bindingsFile.match(
+    new RegExp(`(?<![a-zA-Z0-9])${interfaceName} implements ([a-zA-Z0-9]+)`)
+  );
+
   interfaces.push(
-    `export class ${interfaceName} extends EmscriptenObject {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${attributes.length ? '\n  ' + attributes.join('\n  ') : ''}
+    `export class ${interfaceName} extends ${inheritedClass ? inheritedClass[1] : 'EmscriptenObject'} {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${attributes.length ? '\n  ' + attributes.join('\n  ') : ''}
 }`
   );
 }

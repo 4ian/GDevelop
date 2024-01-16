@@ -672,7 +672,7 @@ export class ObjectJsImplementation extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class CustomObjectConfiguration extends EmscriptenObject {
+export class CustomObjectConfiguration extends ObjectConfiguration {
   clone(): UniquePtrObjectConfiguration;
   getChildObjectConfiguration(objectName: string): ObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
@@ -880,7 +880,7 @@ export class MeasurementBaseUnit extends EmscriptenObject {
   getQuantity(): string;
 }
 
-export class NamedPropertyDescriptor extends EmscriptenObject {
+export class NamedPropertyDescriptor extends PropertyDescriptor {
   constructor();
   setName(name: string): PropertyDescriptor;
   getName(): string;
@@ -950,41 +950,41 @@ export class ResourcesManager extends EmscriptenObject {
   moveResource(oldIndex: number, newIndex: number): void;
 }
 
-export class ImageResource extends EmscriptenObject {
+export class ImageResource extends Resource {
   constructor();
   isSmooth(): boolean;
   setSmooth(enable: boolean): void;
 }
 
-export class AudioResource extends EmscriptenObject {
+export class AudioResource extends Resource {
   constructor();
 }
 
-export class FontResource extends EmscriptenObject {
+export class FontResource extends Resource {
   constructor();
 }
 
-export class BitmapFontResource extends EmscriptenObject {
+export class BitmapFontResource extends Resource {
   constructor();
 }
 
-export class VideoResource extends EmscriptenObject {
+export class VideoResource extends Resource {
   constructor();
 }
 
-export class JsonResource extends EmscriptenObject {
+export class JsonResource extends Resource {
   constructor();
 }
 
-export class TilemapResource extends EmscriptenObject {
+export class TilemapResource extends Resource {
   constructor();
 }
 
-export class TilesetResource extends EmscriptenObject {
+export class TilesetResource extends Resource {
   constructor();
 }
 
-export class Model3DResource extends EmscriptenObject {
+export class Model3DResource extends Resource {
   constructor();
 }
 
@@ -1199,7 +1199,7 @@ export class AbstractFunctionMetadata extends EmscriptenObject {
   getIncludeFiles(): VectorString;
 }
 
-export class InstructionMetadata extends EmscriptenObject {
+export class InstructionMetadata extends AbstractFunctionMetadata {
   constructor();
   getFullName(): string;
   getDescription(): string;
@@ -1252,7 +1252,7 @@ export class InstructionMetadata extends EmscriptenObject {
   getIncludeFiles(): VectorString;
 }
 
-export class ExpressionMetadata extends EmscriptenObject {
+export class ExpressionMetadata extends AbstractFunctionMetadata {
   constructor(returnType: string, extensionNamespace: string, name: string, fullname: string, description: string, group: string, smallicon: string);
   getReturnType(): string;
   getFullName(): string;
@@ -1289,7 +1289,7 @@ export class ExpressionMetadata extends EmscriptenObject {
   getIncludeFiles(): VectorString;
 }
 
-export class MultipleInstructionMetadata extends EmscriptenObject {
+export class MultipleInstructionMetadata extends AbstractFunctionMetadata {
   addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): MultipleInstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): MultipleInstructionMetadata;
   setDefaultValue(defaultValue: string): MultipleInstructionMetadata;
@@ -2083,7 +2083,7 @@ export class AbstractEventsBasedEntity extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
-export class EventsBasedBehavior extends EmscriptenObject {
+export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   constructor();
   setDescription(description: string): EventsBasedBehavior;
   getDescription(): string;
@@ -2120,7 +2120,7 @@ export class EventsBasedBehaviorsList extends EmscriptenObject {
   at(index: number): EventsBasedBehavior;
 }
 
-export class EventsBasedObject extends EmscriptenObject {
+export class EventsBasedObject extends AbstractEventsBasedEntity {
   constructor();
   setDescription(description: string): EventsBasedObject;
   getDescription(): string;
@@ -2317,13 +2317,13 @@ export class ArbitraryResourceWorkerJS extends EmscriptenObject {
   exposeFile(file: string): void;
 }
 
-export class ResourcesMergingHelper extends EmscriptenObject {
+export class ResourcesMergingHelper extends ArbitraryResourceWorker {
   constructor(resourcesManager: ResourcesManager, fs: AbstractFileSystem);
   setBaseDirectory(basePath: string): void;
   getAllResourcesOldAndNewFilename(): MapStringString;
 }
 
-export class ResourcesRenamer extends EmscriptenObject {
+export class ResourcesRenamer extends ArbitraryResourceWorker {
   constructor(resourcesManager: ResourcesManager, oldToNewNames: MapStringString);
 }
 
@@ -2337,7 +2337,7 @@ export class ObjectsUsingResourceCollector extends EmscriptenObject {
   launch(container: ObjectsContainer): void;
 }
 
-export class ResourcesInUseHelper extends EmscriptenObject {
+export class ResourcesInUseHelper extends ArbitraryResourceWorker {
   constructor(resourcesManager: ResourcesManager);
   getAllResources(): VectorString;
   getAllImages(): SetString;
@@ -2444,7 +2444,7 @@ export class Animation extends EmscriptenObject {
   setUseMultipleDirections(enable: boolean): void;
 }
 
-export class SpriteObject extends EmscriptenObject {
+export class SpriteObject extends ObjectConfiguration {
   constructor();
   addAnimation(animation: Animation): void;
   getAnimation(index: number): Animation;
@@ -2470,7 +2470,7 @@ export class Model3DAnimation extends EmscriptenObject {
   shouldLoop(): boolean;
 }
 
-export class Model3DObjectConfiguration extends EmscriptenObject {
+export class Model3DObjectConfiguration extends ObjectConfiguration {
   constructor();
   addAnimation(animation: Model3DAnimation): void;
   getAnimation(index: number): Model3DAnimation;
@@ -2500,7 +2500,7 @@ export class VectorVector2f extends EmscriptenObject {
   clear(): void;
 }
 
-export class TextObject extends EmscriptenObject {
+export class TextObject extends ObjectConfiguration {
   constructor();
   setString(string: string): void;
   getString(): string;
@@ -2522,7 +2522,7 @@ export class TextObject extends EmscriptenObject {
   getTextAlignment(): string;
 }
 
-export class TiledSpriteObject extends EmscriptenObject {
+export class TiledSpriteObject extends ObjectConfiguration {
   constructor();
   setTexture(texture: string): void;
   getTexture(): string;
@@ -2532,7 +2532,7 @@ export class TiledSpriteObject extends EmscriptenObject {
   getHeight(): number;
 }
 
-export class PanelSpriteObject extends EmscriptenObject {
+export class PanelSpriteObject extends ObjectConfiguration {
   constructor();
   getLeftMargin(): number;
   setLeftMargin(newMargin: number): void;
@@ -2552,7 +2552,7 @@ export class PanelSpriteObject extends EmscriptenObject {
   getHeight(): number;
 }
 
-export class ShapePainterObject extends EmscriptenObject {
+export class ShapePainterObject extends ObjectConfiguration {
   constructor();
   setCoordinatesAbsolute(): void;
   setCoordinatesRelative(): void;
@@ -2577,11 +2577,11 @@ export class ShapePainterObject extends EmscriptenObject {
   setAntialiasing(value: string): void;
 }
 
-export class TextEntryObject extends EmscriptenObject {
+export class TextEntryObject extends ObjectConfiguration {
   constructor();
 }
 
-export class ParticleEmitterObject extends EmscriptenObject {
+export class ParticleEmitterObject extends ObjectConfiguration {
   constructor();
   setRendererType(type: ParticleEmitterObject_RendererType): void;
   getRendererType(): ParticleEmitterObject_RendererType;

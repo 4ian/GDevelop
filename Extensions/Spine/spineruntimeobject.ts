@@ -85,6 +85,8 @@ namespace gdjs {
 
       if (oldObjectData.content.scale !== newObjectData.content.scale) {
         this._originalScale = newObjectData.content.scale;
+        this._renderer.updateScale();
+        this.invalidateHitboxes();
       }
 
       return true;

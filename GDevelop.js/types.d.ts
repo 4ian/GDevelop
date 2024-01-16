@@ -839,9 +839,11 @@ export class PropertyDescriptor extends EmscriptenObject {
   setExtraInfo(info: VectorString): PropertyDescriptor;
   getExtraInfo(): VectorString;
   setHidden(enable: boolean): PropertyDescriptor;
+  isHidden(): boolean;
+  setDeprecated(enable: boolean): PropertyDescriptor;
+  isDeprecated(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
-  isHidden(): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   serializeValuesTo(element: SerializerElement): void;

@@ -253,7 +253,8 @@ const propertiesMapToSchema = (
     propertyName: string,
     newValue: string
   ) => void,
-  object: ?gdObject
+  object: ?gdObject,
+  deprecated: boolean = false
 ): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
@@ -263,6 +264,9 @@ const propertiesMapToSchema = (
     const name = propertyNames.at(i);
     const property = properties.get(name);
     if (property.isHidden()) return null;
+    if (property.isDeprecated() !== deprecated) {
+      return null;
+    }
     if (alreadyHandledProperties.has(name)) return null;
 
     const groupName = property.getGroup() || '';
